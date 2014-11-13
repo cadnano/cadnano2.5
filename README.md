@@ -26,7 +26,7 @@ to run:
 
 ## PyQt5 Installation
 
-PyQt5 and the requirement sip are available from Riverbank Computing Limited at: 
+the requirements PyQt5 and sip are available from Riverbank Computing Limited at: 
 
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
