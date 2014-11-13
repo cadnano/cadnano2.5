@@ -3,7 +3,7 @@ from cadnano.part.part import Part
 
 class Crossovers:
     SQUARE_SCAF_LOW = [[4, 26, 15], [18, 28, 7], [10, 20, 31], [2, 12, 23]]
-    SQUARE_SCAF_LOW = [[5, 27, 16], [19, 29, 8], [11, 21, 0], [3, 13, 24]]
+    SQUARE_SCAF_HIGH = [[5, 27, 16], [19, 29, 8], [11, 21, 0], [3, 13, 24]]
     SQUARE_STAP_LOW = [[31], [23], [15], [7]]
     SQUARE_STAP_HIGH = [[0], [24], [16], [8]]
 
