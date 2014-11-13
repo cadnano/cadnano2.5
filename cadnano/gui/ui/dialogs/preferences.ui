@@ -1,0 +1,456 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Preferences</class>
+ <widget class="QWidget" name="Preferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <layout class="QVBoxLayout" name="vertical_layout">
+   <item>
+    <widget class="QTabWidget" name="tab_widget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="settings">
+      <attribute name="title">
+       <string>Settings</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="vertical_layout_4">
+       <item>
+        <widget class="QTabWidget" name="tab_widget_2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab_honeycomb">
+          <attribute name="icon">
+           <iconset resource="dialogicons.qrc">
+            <normaloff>:/part/dlg_honeycomb</normaloff>:/part/dlg_honeycomb</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>Honeycomb</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="vertical_layout_3">
+           <item>
+            <layout class="QFormLayout" name="formLayout_3">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="dimensionsLabel1">
+               <property name="text">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Default&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dimensions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QGridLayout" name="honeycomb_g_layout">
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>-1</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QSpinBox" name="honeycomb_rows_spin_box">
+                 <property name="minimum">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <number>200</number>
+                 </property>
+                 <property name="value">
+                  <number>30</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="honeycomb_cols_spin_box">
+                 <property name="minimum">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <number>200</number>
+                 </property>
+                 <property name="value">
+                  <number>32</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="h_rows_label">
+                 <property name="text">
+                  <string>rows</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="h_cols_label">
+                 <property name="text">
+                  <string>columns</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QSpinBox" name="honeycomb_steps_spin_box">
+                 <property name="minimum">
+                  <number>2</number>
+                 </property>
+                 <property name="maximum">
+                  <number>2000</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1</number>
+                 </property>
+                 <property name="value">
+                  <number>2</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="h_bases_label">
+                 <property name="text">
+                  <string>bases (x21)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_square">
+          <attribute name="icon">
+           <iconset resource="dialogicons.qrc">
+            <normaloff>:/part/dlg_square</normaloff>:/part/dlg_square</iconset>
+          </attribute>
+          <attribute name="title">
+           <string>Square</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="vertical_layout_2">
+           <item>
+            <layout class="QFormLayout" name="formLayout_2">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="QLabel" name="dimensionsLabel2">
+               <property name="text">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Lucida Grande'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Default&lt;/p&gt;
+&lt;p align=&quot;center&quot; style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dimensions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <layout class="QGridLayout" name="square_g_layout">
+               <property name="topMargin">
+                <number>3</number>
+               </property>
+               <property name="horizontalSpacing">
+                <number>-1</number>
+               </property>
+               <item row="0" column="0">
+                <widget class="QSpinBox" name="square_rows_spin_box">
+                 <property name="minimum">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <number>200</number>
+                 </property>
+                 <property name="value">
+                  <number>30</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="1">
+                <widget class="QSpinBox" name="square_cols_spin_box">
+                 <property name="minimum">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <number>200</number>
+                 </property>
+                 <property name="value">
+                  <number>30</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="s_rows_label">
+                 <property name="text">
+                  <string>rows</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="s_cols_label">
+                 <property name="text">
+                  <string>columns</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="0" column="2">
+                <widget class="QSpinBox" name="square_steps_spin_box">
+                 <property name="minimum">
+                  <number>2</number>
+                 </property>
+                 <property name="maximum">
+                  <number>2000</number>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="2">
+                <widget class="QLabel" name="s_bases_label">
+                 <property name="text">
+                  <string>bases (x32)</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="form_layout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         </property>
+         <item row="1" column="0">
+          <widget class="QLabel" name="auto_scaf_label">
+           <property name="text">
+            <string>Auto-scaffold style:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="auto_scaf_combo_box">
+           <item>
+            <property name="text">
+             <string>Mid-seam</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Raster</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="zoom_speed_label">
+           <property name="text">
+            <string>Mousewheel zoom speed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSlider" name="zoom_speed_slider">
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="invertedControls">
+            <bool>false</bool>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksBelow</enum>
+           </property>
+           <property name="tickInterval">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="default_tool_combo_box">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="current_index">
+            <number>0</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Select Tool</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_select</normaloff>:/pathtools/dlg_select</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Pencil Tool</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_pencil</normaloff>:/pathtools/dlg_pencil</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Paint</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_paint</normaloff>:/pathtools/dlg_paint</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Add Seq</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_addseq</normaloff>:/pathtools/dlg_addseq</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="default_tool_label">
+           <property name="text">
+            <string>Default tool at startup:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QDialogButtonBox" name="button_box">
+         <property name="standardButtons">
+          <set>QDialogButtonBox::RestoreDefaults</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="plugins">
+      <attribute name="title">
+       <string>Plugins</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="vertical_layout_5">
+       <item>
+        <widget class="QTableWidget" name="plugin_table_widget">
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Path</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="add_plugin_button">
+         <property name="text">
+          <string>Add Plugin</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>zoom_speed_slider</tabstop>
+ </tabstops>
+ <resources>
+  <include location="dialogicons.qrc"/>
+ </resources>
+ <connections/>
+ <slots>
+  <slot>addPlugin()</slot>
+  <slot>handleButtonClick(QAbstractButton*)</slot>
+  <slot>setHoneycombRows(int)</slot>
+  <slot>setHoneycombCols(int)</slot>
+  <slot>setHoneycombSteps(int)</slot>
+  <slot>setSquareRows(int)</slot>
+  <slot>setSquareCols(int)</slot>
+  <slot>setSquareSteps(int)</slot>
+  <slot>setAutoScaf(int)</slot>
+  <slot>setStartupTool(int)</slot>
+  <slot>setZoomSpeed(int)</slot>
+ </slots>
+</ui>

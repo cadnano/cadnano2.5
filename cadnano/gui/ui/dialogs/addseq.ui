@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>AddSeqDialog</class>
+ <widget class="QDialog" name="AddSeqDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>500</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Choose a sequence</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QGridLayout" name="dialogGridLayout">
+   <item row="0" column="0">
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tabStandard">
+      <attribute name="title">
+       <string>Standard</string>
+      </attribute>
+      <layout class="QGridLayout" name="standardTabGridLayout">
+       <item row="0" column="1">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="title">
+          <string/>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout"/>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tabCustom">
+      <attribute name="title">
+       <string>Custom</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QTextEdit" name="seqTextEdit"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="customButtonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel</set>
+     </property>
+     <property name="centerButtons">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>customButtonBox</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>seqTextEdit</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>customButtonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>AddSeqDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>315</x>
+     <y>485</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>321</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>customButtonBox</sender>
+   <signal>clicked(QAbstractButton*)</signal>
+   <receiver>AddSeqDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>485</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
