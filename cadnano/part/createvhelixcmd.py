@@ -2,7 +2,7 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.virtualhelix import VirtualHelix
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(self, part, row, col, batch=False):
+    def __init__(self, part, row, col):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self._part = part
         self._is_parity_even = part.isEvenParity(row, col)
@@ -10,7 +10,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                                             requested_id_num=None)
         self._vhelix = VirtualHelix(part, row, col, id_num)
         self._id_num = id_num
-        self._batch = batch
+        # self._batch = batch
     # end def
 
     def redo(self):
@@ -37,7 +37,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         # clear out part references
         vh.setNumber(None)  # must come before setPart(None)
         vh.setPart(None)
-        vh.virtualHelixRemovedSignal.emit(vh, self._batch)
+        vh.virtualHelixRemovedSignal.emit(vh)
         part.partActiveSliceResizeSignal.emit(part)
     # end def
 # end class
