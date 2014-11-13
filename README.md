@@ -1,5 +1,5 @@
-# cadnano 2.5  (aka radnano)
-This is a development version of cadnano ported to Qt5/PyQt5
+# cadnano 2.5  (aka *radnano*)
+This is a development version of cadnano ported to `Qt5/PyQt5`
 
 ## Changes
 A number of organizational and style changes have occured from cadnano 2
@@ -26,11 +26,17 @@ to run:
 
 ## PyQt5 Installation
 
-if on Windows just download the installer for your python
+PyQt5 and the requirement sip are available from Riverbank Computing Limited at: 
+
+* [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
+* [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
+
+if on Windows just download the installer for your python version
+
 if on Linux or Mac follow this path:
 
-you can run `pyqt5_check.py` which will grab, build and install
-`Qt5`, `sip` and `PyQt5` in your python environment.  Its cleanest using 
+you can run the included `pyqt5_check.py` which will grab, build and install
+`Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using 
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
 
     mkvirtualenv -p /path/to/python/of/choice/bin/python
@@ -43,12 +49,12 @@ python if you run:
 
 or you can manually:
 
-1.  Install Qt5 (download online installer)
+1.  Install Qt5. download the [online installer](http://www.qt.io/download-open-source/)
 2.  Build sip and PyQt5 against this Qt5
 
 Of course there are many ways to accomplish this feat, but needless to say
-OS X and Linux installs of `PyQt5` can be painful.
+OS X and Linux installs of `PyQt5` can be painful for some people.
 
-# Conversion of cadnano .nno files to 3D STL model
+# *nno2stl*: Conversion of cadnano .nno files to 3D STL model
 
-The purpose of this is for 3D printing
+The purpose of this is for 3D printing cadnano designs
