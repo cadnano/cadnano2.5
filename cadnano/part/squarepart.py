@@ -18,7 +18,7 @@ class SquarePart(Part):
     
     # Used in VirtualHelix::potentialCrossoverList
     _SCAFL = Crossovers.SQUARE_SCAF_LOW
-    _SCAFH = Crossovers.SQUARE_SCAF_LOW
+    _SCAFH = Crossovers.SQUARE_SCAF_HIGH
     _STAPL = Crossovers.SQUARE_STAP_LOW
     _STAPH = Crossovers.SQUARE_STAP_HIGH
 
