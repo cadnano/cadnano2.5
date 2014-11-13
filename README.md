@@ -12,11 +12,17 @@ A number of organizational and style changes have occured from cadnano 2
 * Maya code removed.
 * Added ability to take advantage of `pyqtdeploy` tool to build standalone
 versions that can be destributed as binary
-* stablized code base
+* stablized code base so fewer crashes
 
 The only additional burden for development on this code base is installing PyQt5 
 to use the GUI which is not a one click situation.  Fortunately `pyqtdeploy`
 should make this a problem for only people who want to hack on the code base.
+
+## Running
+
+to run:
+
+    python bin/main.py
 
 ## PyQt5 Installation
 
