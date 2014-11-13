@@ -1,8 +1,24 @@
-# Conversion of cadnano .nno files to 3D STL model
+# cadnano 2.5  (aka radnano)
+This is a development version of cadnano ported to Qt5/PyQt5
 
-The purpose of this is for 3D printing
+## Changes
+A number of organizational and style changes have occured from cadnano 2
 
-# PyQt5 Installation
+* cadnano can be run in python without Qt installed at all
+* Python 3 compatible
+* no more camel-case'd variables
+* QUndoCommands are broken out to their own modules
+* added a STL generator to generate models for 3D printing
+* Maya code removed.
+* Added ability to take advantage of `pyqtdeploy` tool to build standalone
+versions that can be destributed as binary
+* stablized code base
+
+The only additional burden for development on this code base is installing PyQt5 
+to use the GUI which is not a one click situation.  Fortunately `pyqtdeploy`
+should make this a problem for only people who want to hack on the code base.
+
+## PyQt5 Installation
 
 if on Windows just download the installer for your python
 if on Linux or Mac follow this path:
@@ -27,3 +43,6 @@ or you can manually:
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful.
 
+# Conversion of cadnano .nno files to 3D STL model
+
+The purpose of this is for 3D printing
