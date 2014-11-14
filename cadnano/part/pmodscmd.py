@@ -32,7 +32,7 @@ class AddModCommand(UndoCommand):
 # end class
 
 class RemoveModCommand(UndoCommand):
-    def __init__(self, part, params, mid):
+    def __init__(self, part, mid):
         super(RemoveModCommand, self).__init__()
         self._part = part
         self._params_old = self._part._mods[mid].copy()
