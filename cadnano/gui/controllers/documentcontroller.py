@@ -716,8 +716,9 @@ class DocumentController():
         return True
 
     def writeDocumentToFile(self, filename=None):
-        if filename == None:
-            assert(not self._has_no_associated_file)
+        if filename == None or filename == '':
+            if self._has_no_associated_file:
+                return False
             filename = self.filename()
         try:
             with open(filename, 'w') as f:
