@@ -495,6 +495,8 @@ class DocumentController():
                             "%s - Save As" % QApplication.applicationName(),
                             directory,
                             "%s (*.json)" % QApplication.applicationName())
+            if isinstance(fname, (list, tuple)):
+                fname = fname[0]
             self.writeDocumentToFile(fname)
         else:  # access through non-blocking callback
             fdialog = QFileDialog(
