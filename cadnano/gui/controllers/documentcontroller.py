@@ -585,7 +585,9 @@ class DocumentController():
             fname = selected[0]
         else:
             fname = selected
-        if fname is None or os.path.isdir(fname):
+        if fname is None or fname == '' or os.path.isdir(fname):
+            return False
+        if not os.path.exists(fname):
             return False
         self._writeFileOpenPath(os.path.dirname(fname))
 
