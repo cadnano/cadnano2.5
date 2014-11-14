@@ -6,6 +6,7 @@ from cadnano.fileio.nnodecode import decode, decodeFile
 from cadnano.fileio.encoder import encode
 
 from cadnano.gui.views.documentwindow import DocumentWindow
+from cadnano.gui.ui.dialogs.ui_about import Ui_About
 
 from cadnano.gui.views import styles
 import cadnano.util as util
@@ -121,7 +122,6 @@ class DocumentController():
 
     def actionAboutSlot(self):
         """Displays the about cadnano dialog."""
-        from ui.dialogs.ui_about import Ui_About
         dialog = QDialog()
         dialog_about = Ui_About()  # reusing this dialog, should rename
         dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
