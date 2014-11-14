@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created: Sat Oct 18 16:17:29 2014
+# Created: Thu Nov 13 14:59:56 2014
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -77,12 +77,18 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.topToolBar = QtWidgets.QToolBar(MainWindow)
+        self.part_toolbutton = QtWidgets.QToolButton(MainWindow)
+        self.part_toolbutton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
+        self.part_toolbutton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.topToolBar.sizePolicy().hasHeightForWidth())
         self.topToolBar.setSizePolicy(sizePolicy)
         self.topToolBar.setBaseSize(QtCore.QSize(550, 0))
+        font = QtGui.QFont()
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.topToolBar.setFont(font)
         self.topToolBar.setIconSize(QtCore.QSize(24, 24))
         self.topToolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.topToolBar.setObjectName("topToolBar")
@@ -314,14 +320,21 @@ class Ui_MainWindow(object):
         icon27.addPixmap(QtGui.QPixmap(":/pathtools/mods"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_path_mods.setIcon(icon27)
         self.action_path_mods.setObjectName("action_path_mods")
+        self.action_new_honeypx_part = QtWidgets.QAction(MainWindow)
+        self.action_new_honeypx_part.setIcon(icon4)
+        self.action_new_honeypx_part.setObjectName("action_new_honeypx_part")
         self.topToolBar.addAction(self.action_new)
         self.topToolBar.addAction(self.action_open)
         self.topToolBar.addAction(self.action_save)
         self.topToolBar.addAction(self.action_SVG)
         self.topToolBar.addAction(self.action_export_staples)
         self.topToolBar.addSeparator()
-        self.topToolBar.addAction(self.action_new_honeycomb_part)
-        self.topToolBar.addAction(self.action_new_square_part)
+        # custom button
+        self.topToolBar.addWidget(self.part_toolbutton)
+        self.part_toolbutton.setIcon(icon4)
+        self.part_toolbutton.addAction(self.action_new_honeycomb_part)
+        self.part_toolbutton.addAction(self.action_new_honeypx_part)
+        self.part_toolbutton.addAction(self.action_new_square_part)
         self.topToolBar.addSeparator()
         self.topToolBar.addAction(self.action_autostaple)
         self.topToolBar.addAction(self.action_filters_label)
@@ -452,9 +465,14 @@ class Ui_MainWindow(object):
         self.action_about.setText(_translate("MainWindow", "About cadnano"))
         self.action_autostaple.setText(_translate("MainWindow", "AutoStaple"))
         self.action_autostaple.setToolTip(_translate("MainWindow", "Create staple strands complementary to existing scaffold."))
-        self.action_path_mods.setText(_translate("MainWindow", "Mods"))
-        self.action_path_mods.setToolTip(_translate("MainWindow", "(M)ods Tool"))
+        self.action_path_mods.setText(_translate("MainWindow", "Mod"))
+        self.action_path_mods.setToolTip(_translate("MainWindow", "(M)odifer Tool"))
         self.action_path_mods.setShortcut(_translate("MainWindow", "M"))
+        self.action_new_honeypx_part.setText(_translate("MainWindow", "Honeycomb PX"))
+        self.action_new_honeypx_part.setIconText(_translate("MainWindow", "Honey PX"))
+        self.action_new_honeypx_part.setToolTip(_translate("MainWindow", "Add new part honeycomb PX"))
+        self.part_toolbutton.setText(_translate("MainWindow", "Add Part "))
+        self.part_toolbutton.setToolTip(_translate("MainWindow", "Select a part type"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 import cadnano.gui.ui.mainwindow.icons_rc

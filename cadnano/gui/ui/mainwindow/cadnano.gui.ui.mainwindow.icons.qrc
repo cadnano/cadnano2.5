@@ -1,0 +1,45 @@
+<RCC>
+    <qresource prefix="/filetools">
+        <file alias="svg">images/data-svg.png</file>
+        <file alias="new">images/data-new_32.png</file>
+        <file alias="csv">images/export-staples.png</file>
+        <file alias="open">images/data-open_32.png</file>
+        <file alias="save">images/data-save_32.png</file>
+    </qresource>
+    <qresource prefix="/parttools">
+        <file alias="filter-scaf">images/part-filter-scaf.png</file>
+        <file alias="filter-stap">images/part-filter-stap.png</file>
+        <file alias="filter-strand">images/part-filter-strand.png</file>
+        <file alias="filter-handle">images/part-filter-handle.png</file>
+        <file alias="filter-part">images/part-filter-part.png</file>
+        <file alias="filter-xover">images/part-filter-xover.png</file>
+        <file alias="filter-endpoint">images/part-filter-endpoint.png</file>
+        <file alias="new-honeycomb">images/part-new-honeycomb.png</file>
+        <file alias="new-square">images/part-new-square.png</file>
+    </qresource>
+    <qresource prefix="/slicetools">
+        <file alias="del-last">images/slice-delete-last.png</file>
+        <file alias="move">images/slice-move.png</file>
+        <file alias="renumber">images/slice-renumber.png</file>
+        <file alias="select">images/slice-edit.png</file>
+        <file alias="go-last">images/slice-go-last.png</file>
+        <file alias="go-first">images/slice-go-first.png</file>
+    </qresource>
+    <qresource prefix="/pathtools">
+        <file alias="autobreak">images/path-autobreak.png</file>
+        <file alias="modify">images/path-modify.png</file>
+        <file alias="add-bases">images/add-bases.svg</file>
+        <file alias="addseq">images/path-addseq.png</file>
+        <file alias="remove-bases">images/remove-bases.svg</file>
+        <file alias="insert">images/path-insert_48x48.png</file>
+        <file alias="frame">images/path-frame.png</file>
+        <file alias="paint">images/path-paint_48.png</file>
+        <file alias="move">images/path-move.png</file>
+        <file alias="skip">images/path-skip_48x48.png</file>
+        <file alias="force">images/path-force-xover.png</file>
+        <file alias="break">images/path-break_48.png</file>
+        <file alias="select">images/path-edit_32.png</file>
+        <file alias="autostaple">images/path-staple.png</file>
+        <file alias="mods">images/path-decorator_48x48.png</file>
+    </qresource>
+</RCC>
