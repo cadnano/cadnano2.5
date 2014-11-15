@@ -133,7 +133,10 @@ class VirtualHelix(ProxyObject):
     # end def
 
     def hasStrandAtIdx(self, idx):
-        return self._scaf_strandset.hasStrandAt(idx, idx)
+        """Return a tuple for (Scaffold, Staple). True if
+           a strand is present at idx, False otherwise."""
+        return (self._scaf_strandset.hasStrandAt(idx, idx),\
+                self._stap_strandset.hasStrandAt(idx, idx))
     # end def
 
     def indexOfRightmostNonemptyBase(self):

@@ -53,7 +53,8 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         # handle the label specific stuff
         self._label = self.createLabel()
         self.setNumber()
-        self.createArrow()
+        self._pen1, self._pen2 = (QPen(), QPen())
+        self.createArrows()
 
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
 
@@ -86,8 +87,6 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         pass
     # end def
 
-    ###
-
     def createLabel(self):
         label = QGraphicsSimpleTextItem("%d" % self._virtual_helix.number())
         label.setFont(self._FONT)
@@ -96,30 +95,64 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         return label
     # end def
 
-    def createArrow(self):
+    def createArrows(self):
         rad = self._RADIUS
-        pen = QPen()
-        pen.setWidth(3)
-        color = QColor(Qt.blue)
-        color.setAlphaF(0.25)
-        pen.setBrush(color)
+        pen1 = self._pen1
+        pen2 = self._pen2
+        pen1.setWidth(3)
+        pen2.setWidth(3)
+        pen1.setBrush(Qt.gray)
+        pen2.setBrush(Qt.lightGray)
         if self._virtual_helix.isEvenParity():
-            arrow = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
+            arrow1 = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
+            arrow2 = QGraphicsLineItem(0, rad, rad, rad, self)
         else:
-            arrow = QGraphicsLineItem(0, rad, rad, rad, self)
-        arrow.setTransformOriginPoint(rad, rad)
-        arrow.setZValue(400)
-        arrow.setPen(pen)
-        self.arrow = arrow
-        self.arrow.hide()
+            arrow1 = QGraphicsLineItem(0, rad, rad, rad, self)
+            arrow2 = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
+        arrow1.setTransformOriginPoint(rad, rad)
+        arrow2.setTransformOriginPoint(rad, rad)
+        arrow1.setZValue(400)
+        arrow2.setZValue(400)
+        arrow1.setPen(pen1)
+        arrow2.setPen(pen2)
+        self.arrow1 = arrow1
+        self.arrow2 = arrow2
+        self.arrow1.hide()
+        self.arrow2.hide()
     # end def
 
-    def updateArrow(self, idx):
+    def updateScafArrow(self, idx):
+        scafStrand = self._virtual_helix.scaf(idx)
+        if scafStrand:
+            scafStrandColor = QColor(scafStrand.oligo().color())
+            scafAlpha = 0.9 if scafStrand.hasXoverAt(idx) else 0.3
+        else:
+            scafStrandColor = QColor(Qt.gray)
+            scafAlpha = 0.1
+        scafStrandColor.setAlphaF(scafAlpha)
+        self._pen1.setBrush(scafStrandColor)
+        self.arrow1.setPen(self._pen1)
         part = self.part()
         tpb = part._TWIST_PER_BASE
         angle = idx*tpb
         # for some reason rotation is CW and not CCW with increasing angle
-        self.arrow.setRotation(angle + part._TWIST_OFFSET)
+        self.arrow1.setRotation(angle + part._TWIST_OFFSET)
+
+    def updateStapArrow(self, idx):
+        stapStrand = self._virtual_helix.stap(idx)
+        if stapStrand:
+            stapStrandColor = QColor(stapStrand.oligo().color()) 
+            stapAlpha = 0.9 if stapStrand.hasXoverAt(idx) else 0.3
+        else:
+            stapStrandColor = QColor(Qt.lightGray)
+            stapAlpha = 0.1
+        stapStrandColor.setAlphaF(stapAlpha)
+        self._pen2.setBrush(stapStrandColor)
+        self.arrow2.setPen(self._pen2)
+        part = self.part()
+        tpb = part._TWIST_PER_BASE
+        angle = idx*tpb
+        self.arrow2.setRotation(angle + part._TWIST_OFFSET)
     # end def
 
     def setNumber(self):
@@ -157,16 +190,21 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     def number(self):
         return self.virtualHelix().number()
 
-    def setActiveSliceView(self, is_active_now, idx):
-        if is_active_now:
+    def setActiveSliceView(self, idx, has_scaf, has_stap):
+        if has_scaf:
             self.setPen(self._USE_PEN)
             self.setBrush(self._USE_BRUSH)
-            self.updateArrow(idx)
-            self.arrow.show()
+            self.updateScafArrow(idx)
+            self.arrow1.show()
         else:
             self.setPen(self._OUT_OF_SLICE_PEN)
             self.setBrush(self._OUT_OF_SLICE_BRUSH)
-            self.arrow.hide()
+            self.arrow1.hide()
+        if has_stap:
+            self.updateStapArrow(idx)
+            self.arrow2.show()
+        else:
+            self.arrow2.hide()
     # end def
 
     ############################ User Interaction ############################
