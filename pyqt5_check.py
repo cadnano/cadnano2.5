@@ -2,6 +2,7 @@ import sys
 import distutils
 import os
 import subprocess
+import platform
 
 QT_VERSION = '5.3.2'
 SIP_VERSION = '4.16.4'
@@ -182,7 +183,7 @@ def checker():
         print("import success!")
     except:
         print("need to install")
-        if sys.platform in ['Windows', 'win32']:
+        if not platform.system() in ['Linux', 'Darwin']:
             raise OSError("Download PyQt5 installer from Riverbank software")
         else:
             print("OS is Linux or Mac")
