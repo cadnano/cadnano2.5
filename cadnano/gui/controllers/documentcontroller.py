@@ -6,6 +6,7 @@ from cadnano.fileio.nnodecode import decode, decodeFile
 from cadnano.fileio.encoder import encode
 
 from cadnano.gui.views.documentwindow import DocumentWindow
+from cadnano.gui.ui.dialogs.ui_about import Ui_About
 
 from cadnano.gui.views import styles
 import cadnano.util as util
@@ -121,7 +122,6 @@ class DocumentController():
 
     def actionAboutSlot(self):
         """Displays the about cadnano dialog."""
-        from ui.dialogs.ui_about import Ui_About
         dialog = QDialog()
         dialog_about = Ui_About()  # reusing this dialog, should rename
         dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
@@ -495,6 +495,8 @@ class DocumentController():
                             "%s - Save As" % QApplication.applicationName(),
                             directory,
                             "%s (*.json)" % QApplication.applicationName())
+            if isinstance(fname, (list, tuple)):
+                fname = fname[0]
             self.writeDocumentToFile(fname)
         else:  # access through non-blocking callback
             fdialog = QFileDialog(
@@ -583,7 +585,9 @@ class DocumentController():
             fname = selected[0]
         else:
             fname = selected
-        if fname is None or os.path.isdir(fname):
+        if fname is None or fname == '' or os.path.isdir(fname):
+            return False
+        if not os.path.exists(fname):
             return False
         self._writeFileOpenPath(os.path.dirname(fname))
 
@@ -712,8 +716,9 @@ class DocumentController():
         return True
 
     def writeDocumentToFile(self, filename=None):
-        if filename == None:
-            assert(not self._has_no_associated_file)
+        if filename == None or filename == '':
+            if self._has_no_associated_file:
+                return False
             filename = self.filename()
         try:
             with open(filename, 'w') as f:
