@@ -39,7 +39,7 @@ you can run the included `pyqt5_check.py` which will grab, build and install
 `Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using 
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
 
-    mkvirtualenv -p /path/to/python/of/choice/bin/python
+    mkvirtualenv -p /path/to/python/of/choice/bin/python myvenv
     python pyqt5_check.py
 
 and then running the script, but you can definitely install in your system
