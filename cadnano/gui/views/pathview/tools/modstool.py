@@ -36,7 +36,7 @@ class ModsTool(AbstractPathTool):
 
         uiDlg.createButtonBox = QDialogButtonBox(self.dialog)
         uiDlg.createButtonBox.setCenterButtons(True)
-        uiDlg.customButtonBox.setObjectName(_fromUtf8("createButtonBox"))
+        uiDlg.custom_button_box.setObjectName(_fromUtf8("createButtonBox"))
         uiDlg.dialogGridLayout.addWidget(uiDlg.createButtonBox, 2, 0, 1, 1)
         
         saveButton = QPushButton("Save", uiDlg.createButtonBox)

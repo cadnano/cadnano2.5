@@ -16,11 +16,11 @@ class Ui_ModsDialog(object):
         ModsDialog.setModal(True)
         self.dialogGridLayout = QtWidgets.QGridLayout(ModsDialog)
         self.dialogGridLayout.setObjectName("dialogGridLayout")
-        self.customButtonBox = QtWidgets.QDialogButtonBox(ModsDialog)
-        self.customButtonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
-        self.customButtonBox.setCenterButtons(True)
-        self.customButtonBox.setObjectName("customButtonBox")
-        self.dialogGridLayout.addWidget(self.customButtonBox, 1, 0, 1, 1)
+        self.custom_button_box = QtWidgets.QDialogButtonBox(ModsDialog)
+        self.custom_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
+        self.custom_button_box.setCenterButtons(True)
+        self.custom_button_box.setObjectName("custom_button_box")
+        self.dialogGridLayout.addWidget(self.custom_button_box, 1, 0, 1, 1)
         self.formLayout_2 = QtWidgets.QFormLayout()
         self.formLayout_2.setFieldGrowthPolicy(QtWidgets.QFormLayout.AllNonFixedFieldsGrow)
         self.formLayout_2.setObjectName("formLayout_2")
@@ -64,8 +64,8 @@ class Ui_ModsDialog(object):
         self.dialogGridLayout.addLayout(self.formLayout_2, 0, 0, 1, 1)
 
         self.retranslateUi(ModsDialog)
-        self.customButtonBox.rejected.connect(ModsDialog.reject)
-        self.customButtonBox.clicked['QAbstractButton*'].connect(ModsDialog.accept)
+        self.custom_button_box.rejected.connect(ModsDialog.reject)
+        self.custom_button_box.clicked['QAbstractButton*'].connect(ModsDialog.accept)
         QtCore.QMetaObject.connectSlotsByName(ModsDialog)
 
     def retranslateUi(self, ModsDialog):

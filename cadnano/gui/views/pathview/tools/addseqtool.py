@@ -37,11 +37,11 @@ class AddSeqTool(AbstractPathTool):
         AbstractPathTool.__init__(self, controller, parent)
         self.dialog = QDialog()
         self.buttons = []
-        self.seqBox = None
-        self.chosenStandardSequence = None  # state for tab switching
-        self.customSequenceIsValid = False  # state for tab switching
-        self.useCustomSequence = False  # for applying sequence
-        self.validatedSequenceToApply = None
+        self.seq_box = None
+        self.chosen_standard_sequence = None  # state for tab switching
+        self.custom_sequence_is_valid = False  # state for tab switching
+        self.use_custom_sequence = False  # for applying sequence
+        self.validated_sequence_to_apply = None
         self.initDialog()
 
     def __repr__(self):
@@ -56,92 +56,92 @@ class AddSeqTool(AbstractPathTool):
         add them to the dialog.
         2. Map the clicked signal of those buttons to keep track of what
         sequence gets selected.
-        3. Watch the tabWidget change signal to determine whether a
+        3. Watch the tab_widget change signal to determine whether a
         standard or custom sequence should be applied.
         """
-        uiDlg = Ui_AddSeqDialog()
-        uiDlg.setupUi(self.dialog)
-        self.signalMapper = QSignalMapper(self)
+        ui_dlg = Ui_AddSeqDialog()
+        ui_dlg.setupUi(self.dialog)
+        self.signal_mapper = QSignalMapper(self)
         # set up the radio buttons
         for i, name in enumerate(sorted(sequences.keys())):
-            radioButton = QRadioButton(uiDlg.groupBox)
-            radioButton.setObjectName(name + "Button")
-            radioButton.setText(name)
-            self.buttons.append(radioButton)
-            uiDlg.verticalLayout.addWidget(radioButton)
-            self.signalMapper.setMapping(radioButton, i)
-            radioButton.clicked.connect(self.signalMapper.map)
-        self.signalMapper.mapped.connect(self.standardSequenceChangedSlot)
-        uiDlg.tabWidget.currentChanged.connect(self.tabWidgetChangedSlot)
+            radio_button = QRadioButton(ui_dlg.group_box)
+            radio_button.setObjectName(name + "Button")
+            radio_button.setText(name)
+            self.buttons.append(radio_button)
+            ui_dlg.verticalLayout.addWidget(radio_button)
+            self.signal_mapper.setMapping(radio_button, i)
+            radio_button.clicked.connect(self.signal_mapper.map)
+        self.signal_mapper.mapped.connect(self.standardSequenceChangedSlot)
+        ui_dlg.tab_widget.currentChanged.connect(self.tabWidgetChangedSlot)
         # disable apply until valid option or custom sequence is chosen
-        self.applyButton = uiDlg.customButtonBox.button(QDialogButtonBox.Apply)
-        self.applyButton.setEnabled(False)
+        self.apply_button = ui_dlg.custom_button_box.button(QDialogButtonBox.Apply)
+        self.apply_button.setEnabled(False)
         # watch sequence textedit box to validate custom sequences
-        self.seqBox = uiDlg.seqTextEdit
-        self.seqBox.textChanged.connect(self.validateCustomSequence)
-        self.highlighter = DNAHighlighter(self.seqBox)
+        self.seq_box = ui_dlg.seq_text_edit
+        self.seq_box.textChanged.connect(self.validateCustomSequence)
+        self.highlighter = DNAHighlighter(self.seq_box)
         # finally, pre-click the M13mp18 radio button
         self.buttons[0].click()
         buttons = self.buttons
 
-        self.dialog.setFocusProxy(uiDlg.groupBox)
+        self.dialog.setFocusProxy(ui_dlg.group_box)
         self.dialog.setFocusPolicy(Qt.TabFocus)
-        uiDlg.groupBox.setFocusPolicy(Qt.TabFocus)
+        ui_dlg.group_box.setFocusPolicy(Qt.TabFocus)
         for i in range(len(buttons)-1):
-            uiDlg.groupBox.setTabOrder(buttons[i], buttons[i+1])
+            ui_dlg.group_box.setTabOrder(buttons[i], buttons[i+1])
 
     def tabWidgetChangedSlot(self, index):
-        applyEnabled = False
+        apply_enabled = False
         if index == 1:  # Custom Sequence
             self.validateCustomSequence()
-            if self.customSequenceIsValid:
-                applyEnabled = True
+            if self.custom_sequence_is_valid:
+                apply_enabled = True
         else:  # Standard Sequence
-            self.useCustomSequence = False
-            if self.chosenStandardSequence != None:
+            self.use_custom_sequence = False
+            if self.chosen_standard_sequence != None:
                 # Overwrite sequence in case custom has been applied
-                activeButton = self.buttons[self.chosenStandardSequence]
-                sequenceName = str(activeButton.text())
-                self.validatedSequenceToApply = sequences.get(sequenceName, None)
-                applyEnabled = True
-        self.applyButton.setEnabled(applyEnabled)
+                active_button = self.buttons[self.chosen_standard_sequence]
+                sequence_name = active_button.text()
+                self.validated_sequence_to_apply = sequences.get(sequence_name, None)
+                apply_enabled = True
+        self.apply_button.setEnabled(apply_enabled)
 
     def standardSequenceChangedSlot(self, optionChosen):
         """
-        Connected to signalMapper to receive a signal whenever user selects
+        Connected to signal_mapper to receive a signal whenever user selects
         a different sequence in the standard tab.
         """
-        sequenceName = str(self.buttons[optionChosen].text())
-        self.validatedSequenceToApply = sequences.get(sequenceName, None)
-        self.chosenStandardSequence = optionChosen
-        self.applyButton.setEnabled(True)
+        sequence_name = self.buttons[optionChosen].text()
+        self.validated_sequence_to_apply = sequences.get(sequence_name, None)
+        self.chosen_standard_sequence = optionChosen
+        self.apply_button.setEnabled(True)
 
     def validateCustomSequence(self):
         """
         Called when:
-        1. User enters custom sequence (i.e. seqBox emits textChanged signal)
+        1. User enters custom sequence (i.e. seq_box emits textChanged signal)
         2. tabWidgetChangedSlot sees the user has switched to custom tab.
 
-        When the sequence is valid, make the applyButton active for clicking.
+        When the sequence is valid, make the apply_button active for clicking.
         Otherwise
         """
-        userSequence = self.seqBox.toPlainText()
-        if len(userSequence) == 0:
-            self.customSequenceIsValid = False
-            return  # tabWidgetChangedSlot will disable applyButton
-        if dnapattern.indexIn(userSequence) == -1:  # no invalid characters
-            self.useCustomSequence = True
-            self.customSequenceIsValid = True
-            self.applyButton.setEnabled(True)
+        user_sequence = self.seq_box.toPlainText()
+        if len(user_sequence) == 0:
+            self.custom_sequence_is_valid = False
+            return  # tabWidgetChangedSlot will disable apply_button
+        if dnapattern.indexIn(user_sequence) == -1:  # no invalid characters
+            self.use_custom_sequence = True
+            self.custom_sequence_is_valid = True
+            self.apply_button.setEnabled(True)
         else:
-            self.customSequenceIsValid = False
-            self.applyButton.setEnabled(False)
+            self.custom_sequence_is_valid = False
+            self.apply_button.setEnabled(False)
 
     def applySequence(self, oligo):
         self.dialog.setFocus()
         if self.dialog.exec_():  # apply the sequence if accept was clicked
-            if self.useCustomSequence:
-                self.validatedSequenceToApply = str(self.seqBox.toPlainText().toUpper())
-            oligo.applySequence(self.validatedSequenceToApply)
-            return oligo.length(), len(self.validatedSequenceToApply)
+            if self.use_custom_sequence:
+                self.validated_sequence_to_apply = self.seq_box.toPlainText().upper()
+            oligo.applySequence(self.validated_sequence_to_apply)
+            return oligo.length(), len(self.validated_sequence_to_apply)
         return (None, None)

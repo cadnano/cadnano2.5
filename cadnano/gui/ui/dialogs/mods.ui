@@ -18,7 +18,7 @@
   </property>
   <layout class="QGridLayout" name="dialogGridLayout">
    <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="customButtonBox">
+    <widget class="QDialogButtonBox" name="custom_button_box">
      <property name="standardButtons">
       <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel</set>
      </property>
@@ -101,12 +101,12 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>customButtonBox</tabstop>
+  <tabstop>custom_button_box</tabstop>
  </tabstops>
  <resources/>
  <connections>
   <connection>
-   <sender>customButtonBox</sender>
+   <sender>custom_button_box</sender>
    <signal>rejected()</signal>
    <receiver>ModsDialog</receiver>
    <slot>reject()</slot>
@@ -122,7 +122,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>customButtonBox</sender>
+   <sender>custom_button_box</sender>
    <signal>clicked(QAbstractButton*)</signal>
    <receiver>ModsDialog</receiver>
    <slot>accept()</slot>
