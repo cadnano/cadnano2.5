@@ -1,4 +1,4 @@
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.enum import StrandType
 
 import cadnano.util as util

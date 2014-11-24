@@ -1,4 +1,4 @@
-from cadnano.gui.views import styles
+from . import slicestyles as styles
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.enum import Parity, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController

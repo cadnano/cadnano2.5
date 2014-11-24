@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from math import floor
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 
 import cadnano.gui.views.pathview.pathselection as pathselection
 

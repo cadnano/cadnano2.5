@@ -5,7 +5,7 @@ from math import floor
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.enum import StrandType
 from .strand.stranditem import StrandItem
-from cadnano.gui.views import styles
+from . import pathstyles as styles
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 import cadnano.util as util
 

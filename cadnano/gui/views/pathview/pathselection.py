@@ -1,6 +1,6 @@
 from math import floor
 import cadnano.util as util
-from cadnano.gui.views import styles
+from . import pathstyles as styles
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
 
@@ -277,7 +277,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     """
     _HELIX_HEIGHT = styles.PATH_HELIX_HEIGHT + styles.PATH_HELIX_PADDING
     _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
-    _PEN_WIDTH = styles.SLICE_HELIX_HILIGHT_WIDTH
+    _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
     _BOX_PEN = QPen(styles.BLUE_STROKE, _PEN_WIDTH)
 
     def __init__(self, item_group):
@@ -381,7 +381,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
 
 
 class EndpointHandleSelectionBox(QGraphicsPathItem):
-    _PEN_WIDTH = styles.SLICE_HELIX_HILIGHT_WIDTH
+    _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
     _BOX_PEN = QPen(styles.SELECTED_COLOR, _PEN_WIDTH)
     _BASE_WIDTH = styles.PATH_BASE_WIDTH
 

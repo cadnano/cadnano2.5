@@ -59,7 +59,7 @@ class CadnanoQt(QObject):
         from cadnano.document import Document
         from cadnano.fileio.nnodecode import decode
         from cadnano.gui.controllers.documentcontroller import DocumentController
-        from cadnano.gui.views import styles
+        from cadnano.gui.views.pathview import pathstyles as styles
         doc = Document()
         self.d = self.newDocument(base_doc=doc)
         styles.setFontMetrics()

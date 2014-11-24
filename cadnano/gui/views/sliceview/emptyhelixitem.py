@@ -4,7 +4,7 @@ import re
 from cadnano import app
 
 from cadnano.enum import StrandType
-from cadnano.gui.views import styles
+from . import slicestyles as styles
 import cadnano.util as util
 
 GL = False

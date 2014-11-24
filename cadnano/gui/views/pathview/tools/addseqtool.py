@@ -3,7 +3,7 @@ from .abstractpathtool import AbstractPathTool
 from cadnano.enum import StrandType
 from cadnano.data.dnasequences import sequences
 from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 import cadnano.util as util
 
 from PyQt5.QtCore import Qt, QObject, QPointF, QRegExp, QSignalMapper, pyqtSignal, pyqtSlot

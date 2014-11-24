@@ -4,7 +4,7 @@ from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
 from .activesliceitem import ActiveSliceItem
 
-from cadnano.gui.views import styles
+from . import slicestyles as styles
 import cadnano.util as util
 from cadnano import getReopen
 

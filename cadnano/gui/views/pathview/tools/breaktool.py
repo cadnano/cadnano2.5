@@ -1,5 +1,5 @@
 from .abstractpathtool import AbstractPathTool
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 import cadnano.util as util
 
 from PyQt5.QtCore import Qt, QRectF, QPointF

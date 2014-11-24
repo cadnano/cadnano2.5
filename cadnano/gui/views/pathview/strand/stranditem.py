@@ -4,7 +4,7 @@
 from math import floor
 from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
 from .endpointitem import EndpointItem
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 from .xoveritem import XoverItem
 from .decorators.insertionitem import InsertionItem
 

@@ -1,5 +1,5 @@
 import cadnano.util as util
-from cadnano.gui.views import styles
+from . import pathstyles as styles
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 

@@ -7,7 +7,7 @@ from cadnano.gui.controllers.itemcontrollers.partitemcontroller import PartItemC
 from .prexoveritem import PreXoverItem
 from .strand.xoveritem import XoverNode3
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
-from cadnano.gui.views import styles
+from . import pathstyles as styles
 from .virtualhelixitem import VirtualHelixItem
 import cadnano.util as util
 

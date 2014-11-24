@@ -1,5 +1,6 @@
 from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
 from cadnano.gui.views import styles
+from cadnano.gui.views.sliceview import slicestyles
 import cadnano.util as util
 
 import os.path, zipfile, shutil, platform, subprocess, tempfile, errno
@@ -50,12 +51,12 @@ class Preferences(object):
 
     def readPreferences(self):
         self.qs.beginGroup("Preferences")
-        self.honeycomb_rows = self.qs.value("honeycomb_rows", styles.HONEYCOMB_PART_MAXROWS)
-        self.honeycomb_cols = self.qs.value("honeycomb_cols", styles.HONEYCOMB_PART_MAXCOLS)
-        self.honeycomb_steps = self.qs.value("honeycomb_steps", styles.HONEYCOMB_PART_MAXSTEPS)
-        self.square_rows = self.qs.value("square_rows", styles.SQUARE_PART_MAXROWS)
-        self.square_cols = self.qs.value("square_cols", styles.SQUARE_PART_MAXCOLS)
-        self.square_steps = self.qs.value("square_steps", styles.SQUARE_PART_MAXSTEPS)
+        self.honeycomb_rows = self.qs.value("honeycomb_rows", slicestyles.HONEYCOMB_PART_MAXROWS)
+        self.honeycomb_cols = self.qs.value("honeycomb_cols", slicestyles.HONEYCOMB_PART_MAXCOLS)
+        self.honeycomb_steps = self.qs.value("honeycomb_steps", slicestyles.HONEYCOMB_PART_MAXSTEPS)
+        self.square_rows = self.qs.value("square_rows", slicestyles.SQUARE_PART_MAXROWS)
+        self.square_cols = self.qs.value("square_cols", slicestyles.SQUARE_PART_MAXCOLS)
+        self.square_steps = self.qs.value("square_steps", slicestyles.SQUARE_PART_MAXSTEPS)
         self.auto_scaf_index = self.qs.value("autoScaf", styles.PREF_AUTOSCAF_INDEX)
         self.startup_tool_index = self.qs.value("startup_tool", styles.PREF_STARTUP_TOOL_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
@@ -81,12 +82,12 @@ class Preferences(object):
         
 
     def restoreDefaults(self):
-        self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", styles.HONEYCOMB_PART_MAXROWS)
-        self.ui_prefs.honeycomb_cols_spin_box.setProperty("value", styles.HONEYCOMB_PART_MAXCOLS)
-        self.ui_prefs.honeycomb_steps_spin_box.setProperty("value", styles.HONEYCOMB_PART_MAXSTEPS)
-        self.ui_prefs.square_rows_spin_box.setProperty("value", styles.SQUARE_PART_MAXROWS)
-        self.ui_prefs.square_cols_spin_box.setProperty("value", styles.SQUARE_PART_MAXCOLS)
-        self.ui_prefs.square_steps_spin_box.setProperty("value", styles.SQUARE_PART_MAXSTEPS)
+        self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXROWS)
+        self.ui_prefs.honeycomb_cols_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXCOLS)
+        self.ui_prefs.honeycomb_steps_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXSTEPS)
+        self.ui_prefs.square_rows_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXROWS)
+        self.ui_prefs.square_cols_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXCOLS)
+        self.ui_prefs.square_steps_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXSTEPS)
         self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(styles.PREF_AUTOSCAF_INDEX)
         self.ui_prefs.default_tool_combo_box.setCurrentIndex(styles.PREF_STARTUP_TOOL_INDEX)
         self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)

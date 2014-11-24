@@ -1,5 +1,5 @@
 from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
-from cadnano.gui.views import styles
+from . import slicestyles as styles
 import cadnano.util as util
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPointF, Qt, QObject

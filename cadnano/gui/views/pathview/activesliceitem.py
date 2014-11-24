@@ -1,7 +1,7 @@
 from math import floor
 
 from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
-from cadnano.gui.views import styles
+from . import pathstyles as styles
 import cadnano.util as util
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal, pyqtSlot, QEvent

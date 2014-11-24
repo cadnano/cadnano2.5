@@ -1,5 +1,5 @@
 import time
-from cadnano.gui.views import styles
+from cadnano.gui.views.pathview import pathstyles as styles
 
 import cadnano.util as util
 
