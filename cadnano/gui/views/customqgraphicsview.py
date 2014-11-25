@@ -41,7 +41,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     Parameters
     ----------
-    parent: type of QWidget, such as QWidget.splitter() for the type of
+    parent: type of QWidget, such as QWidget.main_splitter() for the type of
     View its has
 
     See Also
@@ -352,14 +352,14 @@ class CustomQGraphicsView(QGraphicsView):
                 posf = event.localPos()
                 xf = posf.x()
                 yf = posf.y()
-                
+
                 factor = self.transform().m11()
 
                 transform = self.scene_root_item.transform()
                 transform.translate((xf - self._x0)/factor,\
                                              (yf - self._y0)/factor)
                 self.scene_root_item.setTransform(transform)
-                
+
                 self._x0 = xf
                 self._y0 = yf
             elif self._dolly_zoom_enable == True:
@@ -487,9 +487,7 @@ class CustomQGraphicsView(QGraphicsView):
     # end def
 
     def resetScale(self):
-        """
-        reset the scale to 1
-        """
+        """reset the scale to 1"""
         # use the transform value if you want to get how much the view 
         # has been scaled
         self._scale_size = self.transform().m11()
@@ -524,7 +522,6 @@ class CustomQGraphicsView(QGraphicsView):
         # this is good for selection
         self.scale(self._scale_fit_factor, self._scale_fit_factor)
         self._scale_size *= self._scale_fit_factor
-        
         self.resetGL()
     # end def
 

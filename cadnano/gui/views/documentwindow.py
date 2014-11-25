@@ -1,6 +1,7 @@
 from cadnano import app
 
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
+from cadnano.gui.views.pathview.pathtoolbar import PathToolBar
 
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
@@ -10,14 +11,16 @@ from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
 import cadnano.gui.ui.mainwindow.ui_mainwindow as ui_mainwindow
 import cadnano.util as util
 
-from PyQt5.QtCore import pyqtSignal, Qt, QFileInfo, QPoint
-from PyQt5.QtCore import QSettings, QSize
+from PyQt5.QtCore import pyqtSignal, Qt
+from PyQt5.QtCore import QFileInfo, QSettings
+from PyQt5.QtCore import QPoint, QSize
 
 from PyQt5.QtGui import QPaintEngine, QIcon
 from PyQt5.QtWidgets import QGraphicsObject, QGraphicsScene
 from PyQt5.QtWidgets import QGraphicsView, QMainWindow
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QApplication, QWidget, QAction
+from PyQt5.QtWidgets import QSizePolicy, QFrame
 
 # for OpenGL mode
 try:
@@ -65,6 +68,25 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.scene_root_item = self.pathroot
         self.path_graphics_view.setScaleFitFactor(0.9)
         self.path_graphics_view.setName("PathView")
+
+        # path toolbar
+        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.main_splitter.sizePolicy().hasHeightForWidth())
+
+        self.path_splitter.setSizePolicy(sizePolicy)
+        self.path_splitter.setFrameShape(QFrame.NoFrame)
+        self.path_splitter.setFrameShadow(QFrame.Plain)
+        self.path_splitter.setLineWidth(0)
+        self.path_splitter.setOrientation(Qt.Horizontal)
+        self.path_splitter.setOpaqueResize(False)
+        self.path_splitter.setHandleWidth(0)
+        self.path_splitter.setObjectName("path_splitter")
+        self.path_splitter.setSizes([600,0])
+
+        self.path_toolbar = PathToolBar(self.path_splitter)
+        # self.path_splitter.addWidget(self.path_graphics_view) # move to end
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
@@ -102,7 +124,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.splitter.setSizes([400, 400])  # balance splitter size
+        self.main_splitter.setSizes([400, 400])  # balance main_splitter size
         self.statusBar().showMessage("")
 
     ### ACCESSORS ###

@@ -27,17 +27,17 @@ class PaintTool(AbstractPathTool):
     def widgetClicked(self):
         """Cycle through colors on 'p' keypress"""
         self._window.path_color_panel.nextColor()
-        
+
     def customMouseRelease(self, event):
         if self._is_macrod:
             self._is_macrod = False
             self._window.undoStack().endMacro()
     # end def
-    
+
     def isMacrod(self):
         return self._is_macrod
     # end def
-    
+
     def setMacrod(self):
         self._is_macrod = True
         self._window.undoStack().beginMacro("Group Paint")

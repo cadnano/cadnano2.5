@@ -9,6 +9,9 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from cadnano.gui.views.pathview.pathtoolbar import PathToolBar
+
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -26,20 +29,21 @@ class Ui_MainWindow(object):
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setHorizontalSpacing(6)
         self.gridLayout.setObjectName("gridLayout")
-        self.splitter = QtWidgets.QSplitter(self.centralwidget)
+        self.main_splitter = QtWidgets.QSplitter(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.splitter.sizePolicy().hasHeightForWidth())
-        self.splitter.setSizePolicy(sizePolicy)
-        self.splitter.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.splitter.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.splitter.setLineWidth(0)
-        self.splitter.setOrientation(QtCore.Qt.Horizontal)
-        self.splitter.setOpaqueResize(True)
-        self.splitter.setHandleWidth(7)
-        self.splitter.setObjectName("splitter")
-        self.slice_graphics_view = CustomQGraphicsView(self.splitter)
+        sizePolicy.setHeightForWidth(self.main_splitter.sizePolicy().hasHeightForWidth())
+        self.main_splitter.setSizePolicy(sizePolicy)
+        self.main_splitter.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.main_splitter.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.main_splitter.setLineWidth(0)
+        self.main_splitter.setOrientation(QtCore.Qt.Horizontal)
+        self.main_splitter.setOpaqueResize(True)
+        self.main_splitter.setHandleWidth(7)
+        self.main_splitter.setObjectName("main_splitter")
+
+        self.slice_graphics_view = CustomQGraphicsView(self.main_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -58,7 +62,10 @@ class Ui_MainWindow(object):
         self.slice_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setObjectName("slice_graphics_view")
-        self.path_graphics_view = CustomQGraphicsView(self.splitter)
+
+        self.path_splitter = QtWidgets.QSplitter(self.main_splitter)
+
+        self.path_graphics_view = CustomQGraphicsView(self.path_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -74,7 +81,7 @@ class Ui_MainWindow(object):
         self.path_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
         self.path_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.path_graphics_view.setObjectName("path_graphics_view")
-        self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.main_splitter, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.topToolBar = QtWidgets.QToolBar(MainWindow)
         self.part_toolbutton = QtWidgets.QToolButton(MainWindow)
