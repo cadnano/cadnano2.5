@@ -111,7 +111,6 @@ class DocumentController():
         self.win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
         self.win.action_filter_scaf.triggered.connect(self.actionFilterScafSlot)
         self.win.action_filter_stap.triggered.connect(self.actionFilterStapSlot)
-        self.win.action_renumber.triggered.connect(self.actionRenumberSlot)
 
 
     ### SLOTS ###
@@ -437,9 +436,10 @@ class DocumentController():
         self.setActivePart(part)
 
     def actionRenumberSlot(self):
-        coordList = self.win.pathroot.getSelectedPartOrderedVHList()
         part = self.activePart()
-        part.renumber(coordList)
+        if part:
+            coordList = self.win.pathroot.getSelectedPartOrderedVHList()
+            part.renumber(coordList)
     # end def
 
     ### ACCESSORS ###

@@ -40,6 +40,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.setupUi(self)
         self.settings = QSettings()
         self._readSettings()
+
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
         self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),\
@@ -54,6 +55,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.scene_root_item = self.sliceroot
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self)
+
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
         self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),\
@@ -69,7 +71,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setScaleFitFactor(0.9)
         self.path_graphics_view.setName("PathView")
 
-        # path toolbar
+        # Path toolbar
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -79,14 +81,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_splitter.setFrameShape(QFrame.NoFrame)
         self.path_splitter.setFrameShadow(QFrame.Plain)
         self.path_splitter.setLineWidth(0)
-        self.path_splitter.setOrientation(Qt.Horizontal)
+        self.path_splitter.setOrientation(Qt.Vertical)
         self.path_splitter.setOpaqueResize(False)
         self.path_splitter.setHandleWidth(0)
         self.path_splitter.setObjectName("path_splitter")
-        self.path_splitter.setSizes([600,0])
-
-        self.path_toolbar = PathToolBar(self.path_splitter)
-        # self.path_splitter.addWidget(self.path_graphics_view) # move to end
+        # self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
+        self.path_toolbar = PathToolBar(doc, self.path_splitter)
+        self.path_splitter.addWidget(self.path_graphics_view) # move to end
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
