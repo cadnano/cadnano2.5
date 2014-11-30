@@ -1,6 +1,6 @@
 from cadnano.gui.views import styles
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.enum import Parity, StrandType
+from cadnano.enum import LatticeType, Parity, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 import cadnano.util as util
@@ -45,6 +45,11 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(self._ZVALUE)
         self.lastMousePressAddedBases = False
+
+        if self.part().crossSectionType() == LatticeType.HPX:
+            self._USE_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
+                                          styles.SLICE_HELIX_STROKE_WIDTH)
 
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)

@@ -101,6 +101,8 @@ class DocumentController():
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\
             self.actionAddSquarePartSlot)
+        self.win.action_new_hpx_part.triggered.connect(\
+            self.actionAddHpxPartSlot)
         self.win.closeEvent = self.windowCloseEventHandler
         self.win.action_about.triggered.connect(self.actionAboutSlot)
         self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
@@ -427,13 +429,15 @@ class DocumentController():
         #     self.win.solidroot.setModifyState(isChecked)
 
     def actionAddHoneycombPartSlot(self):
-        """docstring for actionAddHoneycombPartSlot"""
         part = self._document.addHoneycombPart()
         self.setActivePart(part)
 
     def actionAddSquarePartSlot(self):
-        """docstring for actionAddSquarePartSlot"""
         part = self._document.addSquarePart()
+        self.setActivePart(part)
+
+    def actionAddHpxPartSlot(self):
+        part = self._document.addHpxPart()
         self.setActivePart(part)
 
     def actionRenumberSlot(self):

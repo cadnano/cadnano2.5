@@ -328,7 +328,7 @@
     </property>
     <addaction name="action_new_honeycomb_part"/>
     <addaction name="action_new_square_part"/>
-    <addaction name="action_new_honeypx_part"/>
+    <addaction name="action_new_hpx_part"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -871,7 +871,7 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_honeypx_part">
+  <action name="action_new_hpx_part">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>

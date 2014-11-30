@@ -2,6 +2,7 @@
 class LatticeType:
     HONEYCOMB = 0
     SQUARE = 1
+    HPX = 2
 
 
 class EndType:

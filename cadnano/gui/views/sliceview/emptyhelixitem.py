@@ -3,7 +3,7 @@ import re
 
 from cadnano import app
 
-from cadnano.enum import StrandType
+from cadnano.enum import LatticeType, StrandType
 from cadnano.gui.views import styles
 import cadnano.util as util
 
@@ -49,6 +49,10 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.hide()
         self._is_hovered = False
         self.setAcceptHoverEvents(True)
+
+        # part-specific styles
+        if part_item.part().crossSectionType() == LatticeType.HPX:
+            self._DEFAULT_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
 
         self.setNotHovered()
 
