@@ -27,6 +27,9 @@ class PartToolBar(QToolBar):
         self.setLayoutDirection(Qt.LeftToRight)
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
+        # Toolbar Label
+        self.action_toolbar_label = self.setupAction("Add\nPart:", None, "action_new_honeycomb_part", None, None)
+
         # Origami ToolButton
         self.add_origamipart_button = self.setupToolButton("Origami", None, 
                                                            "add_origamipart_button", 
@@ -75,15 +78,19 @@ class PartToolBar(QToolBar):
         and returns a reference to the object.
         """
         action = QAction(self)
-        icon = QIcon()
-        icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
-        action.setIcon(icon)
-        action.setObjectName(actionName)
-        action.setText(QApplication.translate("MainWindow", actionText, None))
+
+        if actionText != None:
+            action.setText(QApplication.translate("MainWindow", actionText, None))
+        if rc_path != None:
+            icon = QIcon()
+            icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
+            action.setIcon(icon)
+            action.setFont(_FONT)
+        if actionName != None:
+            action.setObjectName(actionName)
         if shortcut:
             action.setShortcut(QApplication.translate("MainWindow", shortcut))
             action.setCheckable(True)
-        action.setFont(_FONT)
         if toolbutton == None:
             self.addAction(action)
         else:
