@@ -255,7 +255,7 @@ class Part(ProxyObject):
     def getStapleLoopOligos(self):
         """
         Returns staple oligos with no 5'/3' ends. Used by
-        actionExportStaplesSlot in documentcontroller to validate before
+        actionExportSequencesSlot in documentcontroller to validate before
         exporting staple sequences.
         """
         stap_loop_olgs = []

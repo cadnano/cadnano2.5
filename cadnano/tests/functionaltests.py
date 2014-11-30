@@ -186,7 +186,7 @@ class FunctionalTests(CadnanoGuiTestCase):
     # def testActiveSliceHandleAltShiftClick(self):
     #     """Alt+Shift+Click on ActiveSliceHandle extends scaffold strands."""
     #     # Create a new Honeycomb part
-    #     newHoneycombPartButton = self.mainWindow.topToolBar.widgetForAction(\
+    #     newHoneycombPartButton = self.mainWindow.selectionToolBar.widgetForAction(\
     #                                    self.mainWindow.actionNewHoneycombPart)
     #     self.click(newHoneycombPartButton)
     #     # Click each SliceHelix
@@ -212,7 +212,7 @@ class FunctionalTests(CadnanoGuiTestCase):
     # def testEndpointAltClick(self):
     #     """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
     #     # Create a new Honeycomb part
-    #     newHoneycombPartButton = self.mainWindow.topToolBar.widgetForAction(\
+    #     newHoneycombPartButton = self.mainWindow.selectionToolBar.widgetForAction(\
     #                                    self.mainWindow.actionNewHoneycombPart)
     #     self.click(newHoneycombPartButton)
     #     # Click each SliceHelix

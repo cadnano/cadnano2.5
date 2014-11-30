@@ -27,16 +27,29 @@ class PathToolBar(QToolBar):
         self.setLayoutDirection(Qt.LeftToRight)
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
+        # Tools
         self.action_path_select = self.setupAction("Select", "V", "action_path_select", ":/pathtools/select")
         self.action_path_pencil = self.setupAction("Pencil", "N", "action_path_pencil", ":/pathtools/force")
-        self.action_path_break = self.setupAction("Break", "B", "action_path_break", ":/pathtools/break")
+        self.action_path_break = self.setupAction("Nick", "K", "action_path_break", ":/pathtools/nick")
         self.action_path_insertion = self.setupAction("Insert", "I", "action_path_insertion", ":/pathtools/insert")
         self.action_path_skip = self.setupAction("Skip", "S", "action_path_skip", ":/pathtools/skip")
         self.action_path_paint = self.setupAction("Paint", "P", "action_path_paint", ":/pathtools/paint")
-        self.action_path_add_seq = self.setupAction("AddSeq", "A", "action_path_add_seq", ":/pathtools/addseq")
-        self.action_path_mod = self.setupAction("Mod", "M", "action_path_mod", ":/pathtools/mods")
-        self.action_renumber = self.setupAction("Rnum", None, "action_renumber", ":/slicetools/renumber")
+        self.action_path_mod = self.setupAction("Mod", "M", "action_path_mod", ":/pathtools/mod")
+        self.action_path_add_seq = self.setupAction("Seq", "A", "action_path_add_seq", ":/pathtools/addseq")
+
+        # Buttons
+        self.action_renumber = self.setupAction("Rnum", None, "action_renumber", ":/parttools/renum")
         self.action_renumber.triggered.connect(self.doc.controller().actionRenumberSlot)
+        self.action_svg = self.setupAction("SVG", None, "action_svg", ":/filetools/svg")
+        self.action_svg.triggered.connect(self.doc.controller().actionSVGSlot)
+        self.action_autostaple = self.setupAction("Auto", None, "action_autostaple", ":/pathtools/autostaple")
+        self.action_autostaple.triggered.connect(self.doc.controller().actionAutostapleSlot)
+
+        self.action_export = self.setupAction("Export", None, "action_export_staples", ":/filetools/export")
+        self.action_export.triggered.connect(self.doc.controller().actionExportSequencesSlot)
+
+    # end def
+
 
     def setupAction(self, actionText, shortcut, actionName, rc_path):
         """
@@ -55,3 +68,5 @@ class PathToolBar(QToolBar):
             action.setCheckable(True)
         action.setFont(_FONT)
         return action
+    # end def
+

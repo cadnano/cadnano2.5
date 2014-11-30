@@ -92,9 +92,9 @@ class DocumentController():
         self.win.action_close.triggered.connect(self.actionCloseSlot)
         self.win.action_save.triggered.connect(self.actionSaveSlot)
         self.win.action_save_as.triggered.connect(self.actionSaveAsSlot)
-        self.win.action_SVG.triggered.connect(self.actionSVGSlot)
-        self.win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
-        self.win.action_export_staples.triggered.connect(self.actionExportStaplesSlot)
+        # self.win.action_SVG.triggered.connect(self.actionSVGSlot)
+        # self.win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
+        # self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
         self.win.action_new_honeycomb_part.triggered.connect(\
@@ -343,7 +343,7 @@ class DocumentController():
                 q.extend(graphics_item.childItems())
         painter.end()
 
-    def actionExportStaplesSlot(self):
+    def actionExportSequencesSlot(self):
         """
         Triggered by clicking Export Staples button. Opens a file dialog to
         determine where the staples should be saved. The callback is
@@ -401,6 +401,7 @@ class DocumentController():
 
     def actionPrefsSlot(self):
         app().prefsClicked()
+    # end def
 
     def actionAutostapleSlot(self):
         part = self.activePart()
@@ -408,6 +409,7 @@ class DocumentController():
             self.win.path_graphics_view.setViewportUpdateOn(False)
             part.autoStaple()
             self.win.path_graphics_view.setViewportUpdateOn(True)
+    # end def
 
     def actionModifySlot(self):
         """
@@ -426,14 +428,27 @@ class DocumentController():
         #     self.win.solidroot.setModifyState(isChecked)
 
     def actionAddHoneycombPartSlot(self):
-        """docstring for actionAddHoneycombPartSlot"""
         part = self._document.addHoneycombPart()
         self.setActivePart(part)
+    # end def
 
     def actionAddSquarePartSlot(self):
-        """docstring for actionAddSquarePartSlot"""
         part = self._document.addSquarePart()
         self.setActivePart(part)
+    # end def
+
+    def actionAddHpxPartSlot(self):
+        # part = self._document.addHpxPart()
+        # self.setActivePart(part)
+        pass
+    # end def
+
+    def actionAddSpxPartSlot(self):
+        # part = self._document.addHpxPart()
+        # self.setActivePart(part)
+        pass
+    # end def
+
 
     def actionRenumberSlot(self):
         part = self.activePart()
@@ -445,9 +460,11 @@ class DocumentController():
     ### ACCESSORS ###
     def document(self):
         return self._document
+    # end def
 
     def window(self):
         return self.win
+    # end def
 
     def setDocument(self, doc):
         """
@@ -456,17 +473,21 @@ class DocumentController():
         """
         self._document = doc
         doc.setController(self)
+    # end def
 
     def activePart(self):
         if self._active_part == None:
             self._active_part = self._document.selectedPart()
         return self._active_part
+    # end def
 
     def setActivePart(self, part):
         self._active_part = part
+    # end def
 
     def undoStack(self):
         return self._document.undoStack()
+    # end def
 
     ### PRIVATE SUPPORT METHODS ###
     def newDocument(self, doc=None, fname=None):
@@ -482,6 +503,7 @@ class DocumentController():
         self._has_no_associated_file = fname == None
         self._active_part = None
         self.win.setWindowTitle(self.documentTitle() + '[*]')
+    # end def
 
     def saveFileDialog(self):
         fname = self.filename()

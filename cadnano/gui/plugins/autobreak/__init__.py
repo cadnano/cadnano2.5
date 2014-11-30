@@ -15,8 +15,8 @@ class AutobreakHandler(object):
         self.action_autobreak.triggered.connect(self.actionAutobreakSlot)
         self.win.menu_plugins.addAction(self.action_autobreak)
         # add to main tool bar
-        self.win.topToolBar.insertAction(self.win.actionFiltersLabel, self.action_autobreak)
-        self.win.topToolBar.insertSeparator(self.win.actionFiltersLabel)
+        self.win.selectionToolBar.insertAction(self.win.actionFiltersLabel, self.action_autobreak)
+        self.win.selectionToolBar.insertSeparator(self.win.actionFiltersLabel)
         self.config_dialog = None
 
     def actionAutobreakSlot(self):
