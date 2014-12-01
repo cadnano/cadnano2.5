@@ -1,4 +1,5 @@
 from cadnano.cnproxy import UndoCommand
+from cadnano.strand import Strand
 
 class RemoveStrandCommand(UndoCommand):
     """
