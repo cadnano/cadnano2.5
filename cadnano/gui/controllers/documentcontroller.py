@@ -449,6 +449,13 @@ class DocumentController():
         pass
     # end def
 
+    def actionAddDnaPartSlot(self):
+        # part = self._document.addHpxPart()
+        # self.setActivePart(part)
+        print("add DNA part")
+        pass
+    # end def
+
 
     def actionRenumberSlot(self):
         part = self.activePart()

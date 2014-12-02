@@ -31,7 +31,7 @@ class PartToolBar(QToolBar):
         self.action_toolbar_label = self.setupAction("Add\nPart:", None, "action_new_honeycomb_part", None, None)
 
         # Origami ToolButton
-        self.add_origamipart_button = self.setupToolButton("Origami", None, 
+        self.add_origamipart_button = self.setupToolButton("Origami  ", None, 
                                                            "add_origamipart_button", 
                                                            ":/parttools/new-origami")
 
@@ -59,13 +59,21 @@ class PartToolBar(QToolBar):
                                                         ":/parttools/new-spx",
                                                         self.add_origamipart_button)
         self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSpxPartSlot)
+
+        # Origami Part (S-px)
+        self.action_new_dna_part = self.setupAction("DNA", None, 
+                                                        "action_new_dna_part", 
+                                                        ":/parttools/new-dna")
+        self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
+
     # end def
 
     def setupToolButton(self, actionText, shortcut, actionName, rc_path):
         toolbutton = QToolButton(self)
         toolbutton.setPopupMode(QToolButton.InstantPopup)
         toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        # toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
+        toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
+        toolbutton.setFont(_FONT)
         icon = QIcon()
         icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
         toolbutton.setIcon(icon)
