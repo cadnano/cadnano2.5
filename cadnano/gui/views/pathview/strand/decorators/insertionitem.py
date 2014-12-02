@@ -5,7 +5,7 @@ from cadnano.enum import StrandType
 
 import cadnano.util as util
 
-from PyQt5.QtCore import QRectF, Qt, QPointF
+from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
 
 from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QFontMetricsF, QPainterPath
 from PyQt5.QtGui import QTransform, QTextCursor
@@ -94,8 +94,8 @@ class SkipPath(object):
     This is just the shape of the Insert item
     """
 
-    _skipPath = QPainterPath()
-    _xGen(_skipPath, _DEFAULT_RECT.bottomLeft(), _DEFAULT_RECT.topRight(), \
+    _skip_path = QPainterPath()
+    _xGen(_skip_path, _DEFAULT_RECT.bottomLeft(), _DEFAULT_RECT.topRight(), \
                         _DEFAULT_RECT.topLeft(), _DEFAULT_RECT.bottomRight())
 
     def __init__(self):
@@ -107,12 +107,12 @@ class SkipPath(object):
     # end def
 
     def getSkip(self):
-        return self._skipPath
+        return self._skip_path
     # end def
 # end class
 
-_insertPath = InsertionPath()
-_skipPath = SkipPath()
+_insert_path = InsertionPath()
+_skip_path = SkipPath()
 
 class InsertionItem(QGraphicsPathItem):
     """
@@ -136,16 +136,8 @@ class InsertionItem(QGraphicsPathItem):
 
     def _initLabel(self):
         """Display the length of the insertion."""
-        self._label = label = QGraphicsTextItem("", parent=self)
-        label.setFont(_FONT)
-        label.setTextInteractionFlags(Qt.TextEditorInteraction)
-        label.inputMethodEvent = self.inputMethodEventHandler
-        label.keyPressEvent = self.textkeyPressEvent
-        label.mousePressEvent = self.labelMousePressEvent
-        label.mouseDoubleClickEvent = self.mouseDoubleClickEvent
-        label.setTextWidth(-1)
 
-        self._label = label
+        self._label = InsertionLabel(self)
         self._seq_item = QGraphicsPathItem(parent=self)
         self._seq_text = None
         self.updateItem()
@@ -182,42 +174,12 @@ class InsertionItem(QGraphicsPathItem):
 
     def updateItem(self):
         self._updatePath()
-        self._updateLabel()
+        self._label.updateLabel()
         self._updateSequenceText()
-        self._resetPosition()
+        self._label.resetPosition()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _focusOut(self):
-        lbl = self._label
-        if lbl == None:
-            return
-        cursor = lbl.textCursor()
-        cursor.clearSelection()
-        lbl.setTextCursor(cursor)
-        lbl.clearFocus()
-    # end def
-
-    def _resetPosition(self):
-        """
-        Set the label position based on orientation and text alignment.
-        """
-        lbl = self._label
-        if lbl == None:
-            return
-        txt_offset = lbl.boundingRect().width()/2
-        insertion = self._insertion
-        y = -_BW if self._is_on_top else _BW
-        lbl.setPos(_OFFSET2 - txt_offset, y)
-        if insertion.length() > 0:
-            lbl.show()
-        else:
-            lbl.hide()
-    # end def
-
-    def _updateLabel(self):
-        self._label.setPlainText("%d" % (self._insertion.length()))
-    # end def
 
     def _updatePath(self):
         strand = self._strand
@@ -230,10 +192,10 @@ class InsertionItem(QGraphicsPathItem):
         if self._insertion.length() > 0:
             self.setPen(QPen(QColor(strand.oligo().color()), styles.INSERTWIDTH))
             self.setBrush(QBrush(Qt.NoBrush))
-            self.setPath(_insertPath.getInsert(is_on_top))
+            self.setPath(_insert_path.getInsert(is_on_top))
         else:  # insertion_size < 0 (a skip)
-            self.setPen(_skipPath.getPen())
-            self.setPath(_skipPath.getSkip())
+            self.setPen(_skip_path.getPen())
+            self.setPath(_skip_path.getSkip())
     # end def
 
     def setSequence(self, sequence):
@@ -291,7 +253,7 @@ class InsertionItem(QGraphicsPathItem):
                 mat = QTransform()
                 # 3. rotate it
                 mat.rotate(-tang_ang + angle_offset)
-                
+
                 rotated_path = mat.map(temp_path)
                 # 4. translate the rotate object to it's position on the part
                 rotated_path.translate(pt)
@@ -310,19 +272,49 @@ class InsertionItem(QGraphicsPathItem):
         """This needs to be present for mouseDoubleClickEvent to work."""
         pass
 
-    def labelMousePressEvent(self, event):
+# end class
+
+class InsertionLabel(QGraphicsTextItem):
+    def __init__(self, parent):
+        super(QGraphicsTextItem, self).__init__("", parent=parent)
+        self.setFont(_FONT)
+        self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.setTextWidth(-1)
+    # end def
+
+    def inputMethodEvent(self, event):
         """
-        Pre-selects the text for editing when you click
-        the label.
+        This is run on the label being changed
+        or losing focus
         """
-        lbl = self._label
-        lbl.setTextInteractionFlags(Qt.TextEditorInteraction)
-        cursor = lbl.textCursor()
+        # test = unicode(lbl.toPlainText())
+        parent = self.parentItem()
+        test = self.toPlainText()
+        try:
+            insertion_size = int(test)
+        except:
+            insertion_size = None
+        insertion = parent._insertion
+        length = insertion.length()
+        if insertion_size != None and insertion_size != length:
+            parent._strand.changeInsertion(insertion.idx(), insertion_size)
+            if insertion.length():
+                self.resetPosition()
+        else:
+            self.updateLabel()
+        # end if
+        self.focusOut()
+    # end def
+
+    def mousePressEvent(self, event):
+        self.setTextInteractionFlags(Qt.TextEditorInteraction)
+        cursor = self.textCursor()
         cursor.setPosition(0)
         cursor.movePosition(QTextCursor.End, QTextCursor.KeepAnchor)
-        lbl.setTextCursor(cursor)
+        self.setTextCursor(cursor)
+    # end def
 
-    def textkeyPressEvent(self, event):
+    def keyPressEvent(self, event):
         """
         Must intercept invalid input events.  Make changes here
         """
@@ -331,37 +323,57 @@ class InsertionItem(QGraphicsPathItem):
         if a in [Qt.Key_Space, Qt.Key_Tab]:
             return
         elif a in [Qt.Key_Return, Qt.Key_Enter]:
-            self.inputMethodEventHandler(event)
+            self.inputMethodEvent(event)
             return
-        # elif unicode(text).isalpha():
         elif text.isalpha():
             return
         else:
-            return QGraphicsTextItem.keyPressEvent(self._label, event)
-
-    def inputMethodEventHandler(self, event):
-        """
-        This is run on the label being changed
-        or losing focus
-        """
-        lbl = self._label
-        if lbl == None:
-            return
-        # test = unicode(lbl.toPlainText())
-        test = lbl.toPlainText()
-        try:
-            insertion_size = int(test)
-        except:
-            insertion_size = None
-        insertion = self._insertion
-        length = insertion.length()
-        if insertion_size != None and insertion_size != length:
-            self._strand.changeInsertion(insertion.idx(), insertion_size)
-            if insertion.length():
-                self._resetPosition()
-        else:
-            self._updateLabel()
-        # end if
-        self._focusOut()
+            return QGraphicsTextItem.keyPressEvent(self, event)
     # end def
+
+    def mouseDoubleClickEvent(self, event):
+        self.parentItem().mouseDoubleClickEvent(event)
+    # end def
+
+    def focusOutEvent(self, event):
+        self.inputMethodEvent(event)
+        QGraphicsTextItem.focusOutEvent(self, event)
+    # end class
+
+    def event(self, event):
+       if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
+           # print("tab pressed")
+           return True
+       return QGraphicsTextItem.event(self, event)
+    # end def
+
+    def focusOut(self):
+        cursor = self.textCursor()
+        cursor.clearSelection()
+        self.setTextCursor(cursor)
+        self.clearFocus()
+    # end def
+
+    def resetPosition(self):
+        """
+        Set the label position based on orientation and text alignment.
+        """
+        parent = self.parentItem()
+        txt_offset = self.boundingRect().width()/2
+        insertion = parent._insertion
+        y = -_BW if parent._is_on_top else _BW
+        self.setPos(_OFFSET2 - txt_offset, y)
+        if insertion.length() > 0:
+            self.show()
+        else:
+            self.hide()
+    # end def
+
+    def updateLabel(self):
+        self.setPlainText("%d" % (self.parentItem()._insertion.length()))
+    # end def
+
 # end class
+
+
+
