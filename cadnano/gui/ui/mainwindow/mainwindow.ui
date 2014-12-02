@@ -46,7 +46,7 @@
      <number>0</number>
     </property>
     <item row="0" column="0">
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="main_splitter">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -163,7 +163,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="topToolBar">
+  <widget class="QToolBar" name="selectionToolBar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
      <horstretch>0</horstretch>
