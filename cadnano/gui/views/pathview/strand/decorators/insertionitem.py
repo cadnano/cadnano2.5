@@ -140,7 +140,7 @@ class InsertionItem(QGraphicsPathItem):
         self._label = InsertionLabel(self)
         self._seq_item = QGraphicsPathItem(parent=self)
         self._seq_text = None
-        self.updateItem()
+        # self.updateItem()
         self.show()
     # end def
 
@@ -322,6 +322,10 @@ class InsertionLabel(QGraphicsTextItem):
         text = event.text()
         if a in [Qt.Key_Space, Qt.Key_Tab]:
             return
+        elif a in [Qt.Key_Escape]:
+            self.updateLabel()
+            self.focusOut()
+            return
         elif a in [Qt.Key_Return, Qt.Key_Enter]:
             self.inputMethodEvent(event)
             return
@@ -359,6 +363,8 @@ class InsertionLabel(QGraphicsTextItem):
         Set the label position based on orientation and text alignment.
         """
         parent = self.parentItem()
+        if parent is None:
+            return
         txt_offset = self.boundingRect().width()/2
         insertion = parent._insertion
         y = -_BW if parent._is_on_top else _BW

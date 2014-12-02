@@ -637,8 +637,10 @@ class DocumentController():
             # if app().isInMaya():
             #     self.windock.setVisible(False)
             #     del self.windock
-            #     self.windock = None
-            app().document_controllers.remove(self)
+            #     self.windock = action_new_honeycomb_part
+            dcs = app().document_controllers
+            if self in dcs:
+                dcs.remove(self)
         else:
             event.ignore()
         self.actionCloseSlot()
