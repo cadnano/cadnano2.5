@@ -31,6 +31,7 @@ class Preferences(object):
         # self.ui_prefs.helixAddCheckBox.toggled.connect(self.setZoomToFitOnHelixAddition)
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
         self.ui_prefs.add_plugin_button.clicked.connect(self.addPlugin)
+        self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
 
     def showDialog(self):
         # self.exec_()
@@ -61,6 +62,7 @@ class Preferences(object):
         self.startup_tool_index = self.qs.value("startup_tool", styles.PREF_STARTUP_TOOL_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
         self.zoom_on_helix_add = self.qs.value("zoom_on_helix_add", styles.PREF_ZOOM_AFTER_HELIX_ADD)
+        self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
         self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", self.honeycomb_rows)
         self.ui_prefs.honeycomb_cols_spin_box.setProperty("value", self.honeycomb_cols)
@@ -71,6 +73,7 @@ class Preferences(object):
         self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(self.auto_scaf_index)
         self.ui_prefs.default_tool_combo_box.setCurrentIndex(self.startup_tool_index)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
+        self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         ptw = self.ui_prefs.plugin_table_widget
         loaded_plugin_paths = util.loadedPlugins.keys()
         ptw.setRowCount(len(loaded_plugin_paths))
@@ -79,7 +82,7 @@ class Preferences(object):
             row.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             ptw.setItem(i, 0, row)
         # self.ui_prefs.helixAddCheckBox.setChecked(self.zoom_on_helix_add)
-        
+    # end def
 
     def restoreDefaults(self):
         self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXROWS)
@@ -91,7 +94,9 @@ class Preferences(object):
         self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(styles.PREF_AUTOSCAF_INDEX)
         self.ui_prefs.default_tool_combo_box.setCurrentIndex(styles.PREF_STARTUP_TOOL_INDEX)
         self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)
+        self.ui_prefs.show_icon_labels.setChecked("value", self.PREF_SHOW_ICON_LABELS)
         # self.ui_prefs.helixAddCheckBox.setChecked(styles.PREF_ZOOM_AFTER_HELIX_ADD)
+    # end def
 
     def setHoneycombRows(self, rows):
         self.honeycomb_rows = rows
@@ -145,6 +150,12 @@ class Preferences(object):
         self.zoom_speed = speed
         self.qs.beginGroup("Preferences")
         self.qs.setValue("zoom_speed", self.zoom_speed)
+        self.qs.endGroup()
+
+    def setShowIconLabels(self, checked):
+        self.show_icon_labels = checked
+        self.qs.beginGroup("Preferences")
+        self.qs.setValue("ui_icons_labels", self.show_icon_labels)
         self.qs.endGroup()
 
     # def setZoomToFitOnHelixAddition(self, checked):

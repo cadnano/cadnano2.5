@@ -100,8 +100,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_splitter.setObjectName("path_splitter")
         # self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
         self.path_toolbar = PathToolBar(doc, self.path_splitter)
-        self.path_splitter.addWidget(self.path_graphics_view) # reorder
         self.path_splitter.addWidget(self.selectionToolBar)
+        self.path_splitter.addWidget(self.path_graphics_view) # reorder
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)

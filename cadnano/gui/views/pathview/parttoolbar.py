@@ -1,3 +1,4 @@
+from cadnano import app
 
 from . import pathstyles as styles
 
@@ -21,14 +22,15 @@ class PartToolBar(QToolBar):
         _sizePolicy.setHeightForWidth(_sizePolicy.hasHeightForWidth())
         self.setSizePolicy(_sizePolicy)
         # self.setOrientation(Qt.Vertical)  # default is horizontal
-        self.setMaximumHeight(40) # horizontal
+        _maxH = 40 if app().prefs.show_icon_labels else 30
+        self.setMaximumHeight(_maxH) # horizontal
         # self.setMaximumWidth(46) # vertical
         self.setIconSize(QSize(20, 20))
         self.setLayoutDirection(Qt.LeftToRight)
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # Toolbar Label
-        self.action_toolbar_label = self.setupAction("Add\nPart:", None, "action_new_honeycomb_part", None, None)
+        self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
 
         # Origami ToolButton
         self.add_origamipart_button = self.setupToolButton("Origami", None, 
@@ -44,19 +46,19 @@ class PartToolBar(QToolBar):
         # Origami Part (Square)
         self.action_new_square_part = self.setupAction("Square", None, 
                                                        "action_new_square_part", 
-                                                       ":/parttools/new-square",
+                                                       ":/parttools/new-square", 
                                                        self.add_origamipart_button)
         self.action_new_square_part.triggered.connect(self.doc.controller().actionAddSquarePartSlot)
         # Origami Part (H-PX)
         self.action_new_hpx_part = self.setupAction("H-PX", None, 
                                                         "action_new_honeypx_part", 
-                                                        ":/parttools/new-hpx",
+                                                        ":/parttools/new-hpx", 
                                                         self.add_origamipart_button)
         self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHpxPartSlot)
         # Origami Part (S-px)
         self.action_new_spx_part = self.setupAction("Sq-PX", None, 
                                                         "action_new_squarepx_part", 
-                                                        ":/parttools/new-spx",
+                                                        ":/parttools/new-spx", 
                                                         self.add_origamipart_button)
         self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSpxPartSlot)
     # end def
@@ -71,6 +73,17 @@ class PartToolBar(QToolBar):
         toolbutton.setIcon(icon)
         self.addWidget(toolbutton)
         return toolbutton
+    # end def
+
+    def setupLabel(self, actionText, actionName):
+        action = QAction(self)
+        if actionText != None:
+            action.setText(QApplication.translate("MainWindow", actionText, None))
+        if actionName != None:
+            action.setObjectName(actionName)
+        self.addAction(action)
+        return action
+    # end def
 
     def setupAction(self, actionText, shortcut, actionName, rc_path, toolbutton=None):
         """
@@ -79,7 +92,7 @@ class PartToolBar(QToolBar):
         """
         action = QAction(self)
 
-        if actionText != None:
+        if actionText != None and app().prefs.show_icon_labels or toolbutton:
             action.setText(QApplication.translate("MainWindow", actionText, None))
         if rc_path != None:
             icon = QIcon()
