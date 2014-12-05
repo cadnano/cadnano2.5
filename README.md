@@ -1,4 +1,4 @@
-# cadnano 2.5  (aka *radnano*)
+# cadnano 2.5  (*radnano*)
 This is a development version of cadnano ported to `Qt5/PyQt5`
 
 ## Changes
