@@ -1,5 +1,7 @@
 from operator import itemgetter
 from itertools import repeat
+import array
+
 izip = zip
 
 from cadnano.enum import StrandType
@@ -33,7 +35,9 @@ class StrandSet(ProxyObject):
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
         self._strand_list = []
-        self._undoStack = None
+
+        # self.strand_vector = array.array('L')
+        self._undo_stack = None
         self._last_strandset_idx = None
         self._strand_type = strand_type
     # end def
@@ -85,21 +89,48 @@ class StrandSet(ProxyObject):
         return self._strand_type == StrandType.SCAFFOLD
     # end def
 
+    # def getNeighbors(self, strand):
+    #     is_in_set, overlap, strandset_idx = self._findIndexOfRangeFor(strand)
+    #     s_list = self._strand_list
+    #     if is_in_set:
+    #         if strandset_idx > 0:
+    #             lowStrand = s_list[strandset_idx - 1]
+    #         else:
+    #             lowStrand = None
+    #         if strandset_idx < len(s_list) - 1:
+    #             highStrand = s_list[strandset_idx + 1]
+    #         else:
+    #             highStrand = None
+    #         return lowStrand, highStrand
+    #     else:
+    #         raise IndexError
+    # # end def
+
     def getNeighbors(self, strand):
-        is_in_set, overlap, strandset_idx = self._findIndexOfRangeFor(strand)
-        s_list = self._strand_list
-        if is_in_set:
-            if strandset_idx > 0:
-                lowStrand = s_list[strandset_idx - 1]
+        sl = self._strand_list
+        lsl = len(sl) 
+        start, end = strand.idxs()
+        if sl[start] != strand:
+            raise IndexError("strand not in list")
+        if start != 0:
+            start -= 1
+        if end != lsl - 1:
+            end += 1
+        low_strand = None
+        high_strand = None
+        while start > -1:
+            if sl[start] != None:
+                low_strand = sl[start]
+                break
             else:
-                lowStrand = None
-            if strandset_idx < len(s_list) - 1:
-                highStrand = s_list[strandset_idx + 1]
+                start -= 1
+        while end < lsl:
+            if sl[i] != None:
+                high_strand = sl[end]
+                break
             else:
-                highStrand = None
-            return lowStrand, highStrand
-        else:
-            raise IndexError
+                end += 1
+        return low_strand, high_strand
     # end def
 
     def complementStrandSet(self):
@@ -114,44 +145,88 @@ class StrandSet(ProxyObject):
             return vh.stapleStrandSet()
     # end def
 
+    # def getBoundsOfEmptyRegionContaining(self, base_idx):
+    #     """
+    #     Returns the (tight) bounds of the contiguous stretch of unpopulated
+    #     bases that includes the base_idx.
+    #     """
+    #     low_idx, high_idx = 0, self.partMaxBaseIdx()  # init the return values
+    #     len_strands = len(self._strand_list)
+
+    #     # not sure how to set this up this to help in caching
+    #     # lastIdx = self._last_strandset_idx
+
+    #     if len_strands == 0:  # empty strandset, just return the part bounds
+    #         return (low_idx, high_idx)
+
+    #     low = 0              # index of the first (left-most) strand
+    #     high = len_strands    # index of the last (right-most) strand
+    #     while low < high:    # perform binary search to find empty region
+    #         mid = (low + high) // 2
+    #         midStrand = self._strand_list[mid]
+    #         mLow, mHigh = midStrand.idxs()
+    #         if base_idx < mLow:  # base_idx is to the left of crntStrand
+    #             high = mid   # continue binary search to the left
+    #             high_idx = mLow - 1  # set high_idx to left of crntStrand
+    #         elif base_idx > mHigh:   # base_idx is to the right of crntStrand
+    #             low = mid + 1    # continue binary search to the right
+    #             low_idx = mHigh + 1  # set low_idx to the right of crntStrand
+    #         else:
+    #             return (None, None)  # base_idx was not empty
+    #     self._last_strandset_idx = (low + high) // 2  # set cache
+    #     return (low_idx, high_idx)
+    # # end def
+
     def getBoundsOfEmptyRegionContaining(self, base_idx):
         """
         Returns the (tight) bounds of the contiguous stretch of unpopulated
         bases that includes the base_idx.
         """
+        sl = self._strand_list
+
         low_idx, high_idx = 0, self.partMaxBaseIdx()  # init the return values
-        len_strands = len(self._strand_list)
+        # len_strands = len(sl)
 
-        # not sure how to set this up this to help in caching
-        # lastIdx = self._last_strandset_idx
+        # if len_strands == 0:  # empty strandset, just return the part bounds
+        #     return (low_idx, high_idx)
 
-        if len_strands == 0:  # empty strandset, just return the part bounds
-            return (low_idx, high_idx)
+        if sl[base_idx] != None:
+            return (None, None)
 
-        low = 0              # index of the first (left-most) strand
-        high = len_strands    # index of the last (right-most) strand
-        while low < high:    # perform binary search to find empty region
-            mid = (low + high) // 2
-            midStrand = self._strand_list[mid]
-            mLow, mHigh = midStrand.idxs()
-            if base_idx < mLow:  # base_idx is to the left of crntStrand
-                high = mid   # continue binary search to the left
-                high_idx = mLow - 1  # set high_idx to left of crntStrand
-            elif base_idx > mHigh:   # base_idx is to the right of crntStrand
-                low = mid + 1    # continue binary search to the right
-                low_idx = mHigh + 1  # set low_idx to the right of crntStrand
+        low_idx = None
+        high_idx= None
+        i = base_idx
+        while i > -1:
+            if sl[i] == None:
+                i -= 1
             else:
-                return (None, None)  # base_idx was not empty
-        self._last_strandset_idx = (low + high) // 2  # set cache
+                low_idx = i + 1
+                break
+        i = base_idx
+        while end < lsl:
+            if sl[i] == None:
+                i += 1
+            else:
+                high_idx = i - 1
         return (low_idx, high_idx)
     # end def
 
+
+    # def indexOfRightmostNonemptyBase(self):
+    #     """Returns the high base_idx of the last strand, or 0."""
+    #     if len(self._strand_list) > 0:
+    #         return self._strand_list[-1].highIdx()
+    #     else:
+    #         return 0
+
     def indexOfRightmostNonemptyBase(self):
         """Returns the high base_idx of the last strand, or 0."""
-        if len(self._strand_list) > 0:
-            return self._strand_list[-1].highIdx()
-        else:
-            return 0
+        sl = self._strand_list
+        lsl = len(sl)-1
+        for i in range(lsl, -1, -1):
+            if sl[i] != None:
+                return sl[i].highIdx()
+    # end def
 
     def partMaxBaseIdx(self):
         """Return the bounds of the StrandSet as defined in the part."""
@@ -171,19 +246,17 @@ class StrandSet(ProxyObject):
         """
         Assumes a strand is being created at a valid set of indices.
         """
-        boundsLow, boundsHigh = \
+        bounds_low, bounds_high = \
                             self.getBoundsOfEmptyRegionContaining(base_idx_low)
-        can_insert, strandset_idx = \
-                                self.getIndexToInsert(base_idx_low, base_idx_high)
-        if can_insert:
+    
+        if bounds_low != None and bounds_low <= base_idx_low and
+            bounds_high != None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self,
-                                        base_idx_low, base_idx_high, strandset_idx)
+                                        base_idx_low, base_idx_high)
             row, col = self._virtual_helix.coord()
-            # d = "(%d,%d).%d + [%d,%d]" % \
-            #             (row, col, self._strand_type, base_idx_low, base_idx_high)
-            d = "(%d,%d).%d^%d" % (row, col, self._strand_type, strandset_idx)
+            d = "(%d,%d).%d" % (row, col, self._strand_type)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
-            return strandset_idx
+            return 0
         else:
             return -1
     # end def
@@ -194,34 +267,36 @@ class StrandSet(ProxyObject):
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
         """
-        boundsLow, boundsHigh = self.getBoundsOfEmptyRegionContaining(base_idx_low)
-        assert(base_idx_low < base_idx_high)
-        assert(boundsLow <= base_idx_low)
-        assert(base_idx_high <= boundsHigh)
-        can_insert, strandset_idx = self.getIndexToInsert(base_idx_low, base_idx_high)
-        if can_insert:
-            c = CreateStrandCommand(self, base_idx_low, base_idx_high, strandset_idx)
-            util.execCommandList(self, [c], desc=None, use_undostack=use_undostack)
-            return strandset_idx
-        else:
-            return -1
+        c = CreateStrandCommand(self,
+                                    base_idx_low, base_idx_high)
+        row, col = self._virtual_helix.coord()
+        d = "(%d,%d).%d" % (row, col, self._strand_type)
+        util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
+        return 0
     # end def
 
-    def removeStrand(self, strand, strandset_idx=None, use_undostack=True, solo=True):
+    def isStrandInSet(self, strand):
+        sl = self._strand_list
+        if sl[strand.lowIdx()] == strand and sl[strand.highIdx()] == strand:
+            return True
+        else:
+            return False
+    # end def
+
+    def removeStrand(self, strand, use_undostack=True, solo=True):
         """
         solo is an argument to enable limiting signals emiting from
         the command in the case the command is instantiated part of a larger
         command
         """
         cmds = []
-        if strandset_idx == None:
-            is_in_set, overlap, strandset_idx = self._findIndexOfRangeFor(strand)
-            if not is_in_set:
-                raise IndexError
+
+        if not self.isStrandInSet(strand):
+                raise IndexError("Strandset.removeStrand: strand not in set")
         if self.isScaffold() and strand.sequence() is not None:
             cmds.append(strand.oligo().applySequenceCMD(None))
         cmds += strand.clearDecoratorCommands()
-        cmds.append(RemoveStrandCommand(self, strand, strandset_idx, solo))
+        cmds.append(RemoveStrandCommand(self, strand, solo))
         util.execCommandList(self, cmds, desc="Remove strand", use_undostack=use_undostack)
         return strandset_idx
     # end def
@@ -230,8 +305,8 @@ class StrandSet(ProxyObject):
         # copy the list because we are going to shrink it and that's
         # a no no with iterators
         #temp = [x for x in self._strand_list]
-        for strand in list(self._strand_list):#temp:
-            self.removeStrand(strand, 0, use_undostack, solo=False)
+        for strand in set(self._strand_list):
+            self.removeStrand(strand, use_undostack=use_undostack, solo=False)
         # end def
 
     def mergeStrands(self, priority_strand, other_strand, use_undostack=True):
@@ -243,10 +318,8 @@ class StrandSet(ProxyObject):
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
             strand_low, strand_high = low_and_high_strands
-            is_in_set, overlap, low_strandset_idx = self._findIndexOfRangeFor(strand_low)
-            if is_in_set:
-                c = MergeCommand(strand_low, strand_high, \
-                                    low_strandset_idx, priority_strand)
+            if self.isStrandInSet(low_strand):
+                c = MergeCommand(strand_low, strand_high, priority_strand)
                 util.execCommandList(self, [c], desc="Merge", use_undostack=use_undostack)
     # end def
 
@@ -279,8 +352,7 @@ class StrandSet(ProxyObject):
         during autostaple).
         """
         if self.strandCanBeSplit(strand, base_idx):
-            is_in_set, overlap, strandset_idx = self._findIndexOfRangeFor(strand)
-            if is_in_set:
+            if self.isStrandInSet(low_strand):
                 c = SplitCommand(strand, base_idx, strandset_idx, update_sequence)
                 util.execCommandList(self, [c], desc="Split", use_undostack=use_undostack)
                 return True
@@ -325,9 +397,9 @@ class StrandSet(ProxyObject):
 
     ### PUBLIC SUPPORT METHODS ###
     def undoStack(self):
-        if self._undoStack == None:
-            self._undoStack = self._virtual_helix.undoStack()
-        return self._undoStack
+        if self._undo_stack == None:
+            self._undo_stack = self._virtual_helix.undoStack()
+        return self._undo_stack
 
     def virtualHelix(self):
         return self._virtual_helix
@@ -335,80 +407,55 @@ class StrandSet(ProxyObject):
     def strandFilter(self):
         return "scaffold" if self._strand_type == StrandType.SCAFFOLD else "staple"
 
-    def hasStrandAt(self, idxLow, idxHigh):
+    def hasStrandAt(self, idx_low, idx_high):
         """
         """
-        dummy_strand = Strand(self, idxLow, idxHigh)
-        strand_list = [s for s in self._findOverlappingRanges(dummy_strand)]
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        return len(strand_list) > 0
-    # end def
-
-    def getOverlappingStrands(self, idxLow, idxHigh):
-        dummy_strand = Strand(self, idxLow, idxHigh)
-        strand_list = [s for s in self._findOverlappingRanges(dummy_strand)]
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        return strand_list
-    # end def
-
-    def hasStrandAtAndNoXover(self, idx):
-        dummy_strand = Strand(self, idx, idx)
-        strand_list = [s for s in self._findOverlappingRanges(dummy_strand)]
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        if len(strand_list) > 0:
-            return False if strand_list[0].hasXoverAt(idx) else True
-        else:
+        sl = self._strand_list
+        if sl[idx_low] == None and sl[idx_high] == None:
             return False
-    # end def
-
-    def hasNoStrandAtOrNoXover(self, idx):
-        dummy_strand = Strand(self, idx, idx)
-        strand_list = [s for s in self._findOverlappingRanges(dummy_strand)]
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        if len(strand_list) > 0:
-            return False if strand_list[0].hasXoverAt(idx) else True
         else:
             return True
     # end def
 
-    def getIndexToInsert(self, idxLow, idxHigh):
-        """
-        """
-        can_insert = True
-        dummy_strand = Strand(self, idxLow, idxHigh)
-        if self._couldStrandInsertAtLastIndex(dummy_strand):
-            return can_insert, self._last_strandset_idx
-        is_in_set, overlap, idx = self._findIndexOfRangeFor(dummy_strand)
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        if overlap:
-            can_insert = False
-        return can_insert, idx
+    def getOverlappingStrands(self, idx_low, idx_high):
+        sl = self._strand_list
+        strand_subset = set()
+        out = []
+        for i in range(idx_low, idx_high + 1]):
+            strand = sl[i]
+            if strand in strand_subset:
+                continue
+            else:
+                strand_subset.add(strand)
+                out.append(strand)
+        return out
+    # end def
+
+    def hasStrandAtAndNoXover(self, idx):
+        sl = self._strand_list
+        strand = sl[idx]
+        if strand == None:
+            return False
+        elif strand.hasXoverAt(idx):
+            return False
+        else:
+            return True
+    # end def
+
+    def hasNoStrandAtOrNoXover(self, idx):
+        sl = self._strand_list
+        strand = sl[idx]
+        if strand == None:
+            return True
+        elif strand.hasXoverAt(idx):
+            return False
+        else:
+            return True
     # end def
 
     def getStrand(self, base_idx):
         """Returns the strand that overlaps with base_idx."""
-        dummy_strand = Strand(self, base_idx, base_idx)
-        strand_list = [s for s in self._findOverlappingRanges(dummy_strand)]
-        dummy_strand._strandset = None
-        dummy_strand.setParent(None)
-        dummy_strand.deleteLater()
-        dummy_strand = None
-        return strand_list[0] if len(strand_list) > 0 else None
+        return self._strand_list[base_idx]
     # end def
 
     def getLegacyArray(self):
@@ -472,140 +519,16 @@ class StrandSet(ProxyObject):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _addToStrandList(self, strand, idx):
+    def _addToStrandList(self, strand):
         """Inserts strand into the _strand_list at idx."""
-        self._strand_list.insert(idx, strand)
+        idx_low, idx_high = strand.idxs()
+        self._strand_list[idx_low:idx_high+1] = strand
 
     def _removeFromStrandList(self, strand):
         """Remove strand from _strand_list."""
         self._doc.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
-        self._strand_list.remove(strand)
-
-    def _couldStrandInsertAtLastIndex(self, strand):
-        """Verification of insertability based on cached last index."""
-        last_idx = self._last_strandset_idx
-        strand_list = self._strand_list
-        if last_idx == None or last_idx > (len(strand_list) - 1):
-            self._last_strandset_idx = None
-            return False
-        else:
-            s_test_high = strand_list[last_idx].lowIdx() if last_idx < len(strand_list) else self.partMaxBaseIdx()
-            s_test_low = strand_list[last_idx - 1].highIdx() if last_idx > 0 else - 1
-            sLow, sHigh = strand.idxs()
-            if s_test_low < sLow and sHigh < s_test_high:
-                return True
-            else:
-                return False
-
-    def _findOverlappingRanges(self, qstrand, use_cache=False):
-        """
-        a binary search for the strands in self._strand_list overlapping with
-        a query strands, or qstrands, indices.
-
-        Useful for operations on complementary strands such as applying a
-        sequence
-
-        This is an generator for now
-
-        Strategy:
-        1.
-            search the _strand_list for a strand the first strand that has a
-            highIndex >= lowIndex of the query strand.
-            save that strandset index as s_set_idx_low.
-            if No strand satisfies this condition, return an empty list
-
-            Unless it matches the query strand's lowIndex exactly,
-            Step 1 is O(log N) where N in length of self._strand_list to the max,
-            that is it needs to exhaust the search
-
-            conversely you could search for first strand that has a
-            lowIndex LESS than or equal to the lowIndex of the query strand.
-
-        2.
-            starting at self._strand_list[s_set_idx_low] test each strand to see if
-            it's indexLow is LESS than or equal to qstrand.indexHigh.  If it is
-            yield/return that strand.  If it's GREATER than the indexHigh, or
-            you run out of strands to check, the generator terminates
-        """
-        strand_list = self._strand_list
-        len_strands = len(strand_list)
-        if len_strands == 0:
-            return
-        # end if
-
-        low = 0
-        high = len_strands
-        qLow, qHigh = qstrand.idxs()
-
-        # Step 1: get rangeIndexLow with a binary search
-        if use_cache:  # or self.doesLastSetIndexMatch(qstrand, strand_list):
-            # cache match!
-            s_set_idx_low = self._last_strandset_idx
-        else:
-            s_set_idx_low = -1
-            while low < high:
-                mid = (low + high) // 2
-                midStrand = strand_list[mid]
-
-                # pre get indices from the currently tested strand
-                mLow, mHigh = midStrand.idxs()
-
-                if mHigh == qLow:
-                    # match, break out of while loop
-                    s_set_idx_low = mid
-                    break
-                elif mHigh > qLow:
-                    # store the candidate index
-                    s_set_idx_low = mid
-                    # adjust the high index to find a better candidate if
-                    # it exists
-                    high = mid
-                # end elif
-                else:  # mHigh < qLow
-                    # If a strand exists it must be a higher rangeIndex
-                    # leave the high the same
-                    low = mid + 1
-                #end elif
-            # end while
-        # end else
-
-        # Step 2: create a generator on matches
-        # match on whether the temp_strand's lowIndex is
-        # within the range of the qStrand
-        if s_set_idx_low > -1:
-            temp_strands = iter(strand_list[s_set_idx_low:])
-            temp_strand = next(temp_strands)
-            qHigh += 1  # bump it up for a more efficient comparison
-            i = 0   # use this to
-            while temp_strand and temp_strand.lowIdx() < qHigh:
-                yield temp_strand
-                # use a next and a default to cause a break condition
-                temp_strand = next(temp_strands, None)
-                i += 1
-            # end while
-
-            # cache the last index we left of at
-            i = s_set_idx_low + i
-            """
-            if
-            1. we ran out of strands to test adjust
-                OR
-            2. the end condition temp_strands highIndex is still inside the
-            qstrand but not equal to the end point
-                adjust i down 1
-            otherwise
-            """
-            if not temp_strand or temp_strand.highIdx() < qHigh - 1:
-                i -= 1
-            # assign cache but double check it's a valid index
-            self._last_strandset_idx = i if -1 < i < len_strands else None
-            return
-        else:
-            # no strand was found
-            # go ahead and clear the cache
-            self._last_strandset_idx = None if len(self._strand_list) > 0 else 0
-            return
-    # end def
+        idx_low, idx_high = strand.idxs()
+        self._strand_list[idx_low:idx_high+1] = None
 
     def getStrandIndex(self, strand):
         try:

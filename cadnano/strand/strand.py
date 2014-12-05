@@ -236,11 +236,12 @@ class Strand(ProxyObject):
         # whole thing
         self._sequence = None
         
-        for comp_strand in comp_ss._findOverlappingRanges(self):
-            compSeq = comp_strand.sequence()
-            usedSeq = util.comp(compSeq) if compSeq else None
-            usedSeq = self.setComplementSequence(
-                                        usedSeq, comp_strand)
+        for comp_strand in comp_ss.getOverlappingStrands(self._base_idx_low, 
+                                self._base_idx_high):
+            comp_seq = comp_strand.sequence()
+            used_seq = util.comp(comp_seq) if comp_seq else None
+            used_seq = self.setComplementSequence(
+                                        used_seq, comp_strand)
         # end for
     # end def
     
@@ -249,7 +250,9 @@ class Strand(ProxyObject):
         return the list of complement strands that overlap with this strand
         """
         comp_ss = self.strandSet().complementStrandSet()
-        return [comp_strand for comp_strand in comp_ss._findOverlappingRanges(self)]
+        return [comp_strand for comp_strand in 
+                            comp_ss.getOverlappingStrands(self._base_idx_low, 
+                                                    self._base_idx_high)]
     # end def 
 
     def getPreDecoratorIdxList(self):

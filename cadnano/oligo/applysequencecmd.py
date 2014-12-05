@@ -19,8 +19,7 @@ class ApplySequenceCommand(UndoCommand):
             used_seq, n_s = strand.setSequence(n_s)
             # get the compliment ahead of time
             used_seq = util.comp(used_seq) if used_seq else None
-            comp_ss = strand.strandSet().complementStrandSet()
-            for comp_strand in comp_ss._findOverlappingRanges(strand):
+            for comp_strand in strand.getComplementStrands():
                 sub_used_seq = comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())
             # end for
@@ -43,8 +42,7 @@ class ApplySequenceCommand(UndoCommand):
 
             # get the compliment ahead of time
             used_seq = util.comp(used_seq) if used_seq else None
-            comp_ss = strand.strandSet().complementStrandSet()
-            for comp_strand in comp_ss._findOverlappingRanges(strand):
+            for comp_strand in strand.getComplementStrands():
                 sub_used_seq = comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())
             # end for

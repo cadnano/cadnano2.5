@@ -276,7 +276,7 @@ class Document(ProxyObject):
                 min_low_delta = temp_low
             if temp_high < min_high_delta or min_high_delta < 0:
                 min_high_delta = temp_high
-        # end for Mark train bus to metro
+
         return (min_low_delta, min_high_delta)
     # end def
 
