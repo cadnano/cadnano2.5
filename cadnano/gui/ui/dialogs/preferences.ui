@@ -20,20 +20,158 @@
    <string>Preferences</string>
   </property>
   <layout class="QVBoxLayout" name="vertical_layout">
-   <item>
+   <item alignment="Qt::AlignTop">
     <widget class="QTabWidget" name="tab_widget">
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <property name="tabShape">
+      <enum>QTabWidget::Rounded</enum>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="settings">
+     <widget class="QWidget" name="interface_tab">
       <attribute name="title">
-       <string>Settings</string>
+       <string>Interface</string>
       </attribute>
       <layout class="QVBoxLayout" name="vertical_layout_4">
        <item>
+        <layout class="QFormLayout" name="form_layout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+         </property>
+         <item row="2" column="0">
+          <widget class="QLabel" name="default_tool_label">
+           <property name="text">
+            <string>Default tool at startup:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="default_tool_combo_box">
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="current_index" stdset="0">
+            <number>0</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>Select Tool</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_select</normaloff>:/pathtools/dlg_select</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Pencil Tool</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_pencil</normaloff>:/pathtools/dlg_pencil</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Paint</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_paint</normaloff>:/pathtools/dlg_paint</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Add Seq</string>
+            </property>
+            <property name="icon">
+             <iconset resource="dialogicons.qrc">
+              <normaloff>:/pathtools/dlg_addseq</normaloff>:/pathtools/dlg_addseq</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="zoom_speed_label">
+           <property name="text">
+            <string>Mousewheel zoom speed:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSlider" name="zoom_speed_slider">
+           <property name="minimumSize">
+            <size>
+             <width>140</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="singleStep">
+            <number>1</number>
+           </property>
+           <property name="value">
+            <number>50</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="invertedControls">
+            <bool>false</bool>
+           </property>
+           <property name="tickPosition">
+            <enum>QSlider::TicksBelow</enum>
+           </property>
+           <property name="tickInterval">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="show_icon_label_text">
+           <property name="text">
+            <string>Show Icon Labels:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="show_icon_labels">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QDialogButtonBox" name="button_box">
+         <property name="standardButtons">
+          <set>QDialogButtonBox::RestoreDefaults</set>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="parts_tab">
+      <attribute name="title">
+       <string>Parts</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
         <widget class="QTabWidget" name="tab_widget_2">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -265,18 +403,15 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <layout class="QFormLayout" name="form_layout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-         </property>
-         <item row="1" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
           <widget class="QLabel" name="auto_scaf_label">
            <property name="text">
             <string>Auto-scaffold style:</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item>
           <widget class="QComboBox" name="auto_scaf_combo_box">
            <item>
             <property name="text">
@@ -290,112 +425,11 @@ p, li { white-space: pre-wrap; }
            </item>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="zoom_speed_label">
-           <property name="text">
-            <string>Mousewheel zoom speed:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QSlider" name="zoom_speed_slider">
-           <property name="minimumSize">
-            <size>
-             <width>140</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-           <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="value">
-            <number>50</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="invertedControls">
-            <bool>false</bool>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBelow</enum>
-           </property>
-           <property name="tickInterval">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="default_tool_combo_box">
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="current_index">
-            <number>0</number>
-           </property>
-           <item>
-            <property name="text">
-             <string>Select Tool</string>
-            </property>
-            <property name="icon">
-             <iconset resource="dialogicons.qrc">
-              <normaloff>:/pathtools/dlg_select</normaloff>:/pathtools/dlg_select</iconset>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Pencil Tool</string>
-            </property>
-            <property name="icon">
-             <iconset resource="dialogicons.qrc">
-              <normaloff>:/pathtools/dlg_pencil</normaloff>:/pathtools/dlg_pencil</iconset>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Paint</string>
-            </property>
-            <property name="icon">
-             <iconset resource="dialogicons.qrc">
-              <normaloff>:/pathtools/dlg_paint</normaloff>:/pathtools/dlg_paint</iconset>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Add Seq</string>
-            </property>
-            <property name="icon">
-             <iconset resource="dialogicons.qrc">
-              <normaloff>:/pathtools/dlg_addseq</normaloff>:/pathtools/dlg_addseq</iconset>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="default_tool_label">
-           <property name="text">
-            <string>Default tool at startup:</string>
-           </property>
-          </widget>
-         </item>
         </layout>
-       </item>
-       <item>
-        <widget class="QDialogButtonBox" name="button_box">
-         <property name="standardButtons">
-          <set>QDialogButtonBox::RestoreDefaults</set>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="plugins">
+     <widget class="QWidget" name="plugins_tab">
       <attribute name="title">
        <string>Plugins</string>
       </attribute>

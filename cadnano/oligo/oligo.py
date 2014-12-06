@@ -136,13 +136,13 @@ class Oligo(ProxyObject):
         for strand in strand5p.generator3pStrand():
             seq = seq + Strand.sequence(strand, for_export=True)
             if strand.connection3p() == None:  # last strand in the oligo
-                vhNum3p = strand.virtualHelix().number()
+                vh_num3p = strand.virtualHelix().number()
                 idx3p = strand.idx3Prime()
         modseq5p, modseq5p_name = part.getModSequence(strand5p, idx5p, 0)
         modseq3p, modseq3p_name = part.getModSequence(strand, idx3p, 1)
         seq = modseq5p + seq + modseq3p
         output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
-                (vhNum5p, idx5p, vhNum3p, idx3p, seq, len(seq),
+                (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
                     self._color, modseq5p_name, modseq3p_name)
         return output
     # end def
