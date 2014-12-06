@@ -16,9 +16,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import qApp, QApplication, QUndoGroup
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__)) 
+# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
+#                                 'images', 'cadnano2-app-icon.png')
+# print(ICON_PATH)
 ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
-                                'images', 'cadnano2-app-icon.png')
-print(ICON_PATH)
+                                'images', 'radnano-app-icon.png')
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
     shouldPerformBoilerplateStartupScript = False
