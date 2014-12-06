@@ -35,7 +35,7 @@ class PartToolBar(QToolBar):
         self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
 
         # Origami ToolButton
-        self.add_origamipart_button = self.setupToolButton("Origami  ", None, 
+        self.add_origamipart_button = self.setupToolButton("Origami\n", None, 
                                                            "add_origamipart_button", 
                                                            ":/parttools/new-honeycomb")
 
@@ -75,10 +75,10 @@ class PartToolBar(QToolBar):
     def setupToolButton(self, actionText, shortcut, actionName, rc_path):
         toolbutton = QToolButton(self)
         toolbutton.setPopupMode(QToolButton.InstantPopup)
-        # toolbutton.setFont(_FONT)
+        toolbutton.setFont(_FONT)
         if app().prefs.show_icon_labels:
             toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        # toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
+            toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
         icon = QIcon()
         icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
         toolbutton.setIcon(icon)
