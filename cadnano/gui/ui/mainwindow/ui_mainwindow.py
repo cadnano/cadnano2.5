@@ -316,9 +316,15 @@ class Ui_MainWindow(object):
         icon27.addPixmap(QtGui.QPixmap(":/pathtools/mods"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_path_mods.setIcon(icon27)
         self.action_path_mods.setObjectName("action_path_mods")
-        self.action_new_honeypx_part = QtWidgets.QAction(MainWindow)
-        self.action_new_honeypx_part.setIcon(icon4)
-        self.action_new_honeypx_part.setObjectName("action_new_honeypx_part")
+
+        self.action_new_hpx_part = QtWidgets.QAction(MainWindow)
+        self.action_new_hpx_part.setIcon(icon4)
+        self.action_new_hpx_part.setObjectName("action_new_hpx_part")
+
+        self.action_new_spx_part = QtWidgets.QAction(MainWindow)
+        self.action_new_spx_part.setIcon(icon4)
+        self.action_new_spx_part.setObjectName("action_new_spx_part")
+
         # self.selectionToolBar.addAction(self.action_new)
         # self.selectionToolBar.addAction(self.action_open)
         # self.selectionToolBar.addAction(self.action_save)
@@ -344,6 +350,7 @@ class Ui_MainWindow(object):
         # self.leftToolBar.addAction(self.action_slice_first)
         # self.leftToolBar.addAction(self.action_slice_last)
         # self.leftToolBar.addAction(self.action_renumber)
+
         self.menu_file.addAction(self.action_about)
         self.menu_file.addAction(self.action_preferences)
         self.menu_file.addAction(self.action_new)
@@ -443,14 +450,6 @@ class Ui_MainWindow(object):
         self.action_about.setText(_translate("MainWindow", "About cadnano"))
         self.action_autostaple.setText(_translate("MainWindow", "AutoStaple"))
         self.action_autostaple.setToolTip(_translate("MainWindow", "Create staple strands complementary to existing scaffold."))
-        # self.action_path_mods.setText(_translate("MainWindow", "Mod"))
-        # self.action_path_mods.setToolTip(_translate("MainWindow", "(M)odifer Tool"))
-        # self.action_path_mods.setShortcut(_translate("MainWindow", "M"))
-        # self.action_new_honeypx_part.setText(_translate("MainWindow", "Honeycomb PX"))
-        # self.action_new_honeypx_part.setIconText(_translate("MainWindow", "Honey PX"))
-        # self.action_new_honeypx_part.setToolTip(_translate("MainWindow", "Add new part honeycomb PX"))
-        # self.part_toolbutton.setText(_translate("MainWindow", "Add Part "))
-        # self.part_toolbutton.setToolTip(_translate("MainWindow", "Select a part type"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 import cadnano.gui.ui.mainwindow.icons_rc

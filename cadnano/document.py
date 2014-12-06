@@ -16,6 +16,7 @@ from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
 from cadnano.part import HoneycombPart
 from cadnano.part import SquarePart
+from cadnano.part import HpxPart
 from cadnano import app
 
 class Document(ProxyObject):
@@ -24,7 +25,6 @@ class Document(ProxyObject):
     1. Serve as the parent all Part objects within the model.
     2. Track all sub-model actions on its undoStack.
     """
-
 
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
@@ -133,7 +133,7 @@ class Document(ProxyObject):
     def selectionDict(self):
         return self._selection_dict
     # end def
-    
+
     def selectedOligos(self):
         """
         as long as one endpoint of a strand is in the selection, then the oligo
@@ -461,6 +461,16 @@ class Document(ProxyObject):
         if len(self._parts) == 0:
             dnapart = SquarePart(document=self, max_row=max_row, 
                                 max_col=max_col, max_steps=max_steps)
+            self._addPart(dnapart)
+        return dnapart
+
+    def addHpxPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS, 
+                          max_col=prefs.HONEYCOMB_PART_MAXCOLS, 
+                          max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
+        dnapart = None
+        if len(self._parts) == 0:
+            dnapart = HpxPart(document=self, max_row=max_row, 
+                              max_col=max_col, max_steps=max_steps)
             self._addPart(dnapart)
         return dnapart
 
