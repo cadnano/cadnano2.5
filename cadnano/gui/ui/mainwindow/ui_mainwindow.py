@@ -89,16 +89,15 @@ class Ui_MainWindow(object):
         # self.part_toolbutton = QtWidgets.QToolButton(MainWindow)
         # self.part_toolbutton.setPopupMode(QtWidgets.QToolButton.InstantPopup)
         # self.part_toolbutton.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHeightForWidth(self.selectionToolBar.sizePolicy().hasHeightForWidth())
         self.selectionToolBar.setSizePolicy(sizePolicy)
-        self.selectionToolBar.setMaximumHeight(30) # horizontal
-        self.selectionToolBar.setBaseSize(QtCore.QSize(550, 0))
-        # self.selectionToolBar.setLayoutDirection(QtCore.Qt.RightToLeft)
+        # self.selectionToolBar.setMaximumHeight(30) # horizontal
+        self.selectionToolBar.setMaximumWidth(30) # vertical
+        self.selectionToolBar.setOrientation(QtCore.Qt.Vertical)
+        # self.selectionToolBar.setBaseSize(QtCore.QSize(0, 400))
         self.selectionToolBar.setIconSize(QtCore.QSize(24, 24))
-        self.selectionToolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+        # self.selectionToolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         self.selectionToolBar.setObjectName("selectionToolBar")
         # MainWindow.addToolBar(QtCore.Qt.BottomToolBarArea, self.selectionToolBar)
 

@@ -21,13 +21,15 @@ class PathToolBar(QToolBar):
         _sizePolicy.setVerticalStretch(0)
         _sizePolicy.setHeightForWidth(_sizePolicy.hasHeightForWidth())
         self.setSizePolicy(_sizePolicy)
-        # self.setOrientation(Qt.Vertical)  # default is horizontal
-        _maxH = 40 if app().prefs.show_icon_labels else 30
-        self.setMaximumHeight(_maxH) # horizontal
-        # self.setMaximumWidth(46) # vertical
+        self.setOrientation(Qt.Vertical)  # default is horizontal
+        # _maxH = 40 if app().prefs.show_icon_labels else 30
+        # self.setMaximumHeight(_maxH) # horizontal
+        self.setMaximumWidth(46) # vertical
         self.setIconSize(QSize(20, 20))
         self.setLayoutDirection(Qt.LeftToRight)
-        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        if app().prefs.show_icon_labels:
+            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # Tools
         self.action_path_select = self.setupAction("Select", "V", "action_path_select", ":/pathtools/select")

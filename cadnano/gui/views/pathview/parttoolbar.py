@@ -21,13 +21,15 @@ class PartToolBar(QToolBar):
         _sizePolicy.setVerticalStretch(0)
         _sizePolicy.setHeightForWidth(_sizePolicy.hasHeightForWidth())
         self.setSizePolicy(_sizePolicy)
-        # self.setOrientation(Qt.Vertical)  # default is horizontal
-        _maxH = 40 if app().prefs.show_icon_labels else 30
-        self.setMaximumHeight(_maxH) # horizontal
-        # self.setMaximumWidth(46) # vertical
+        self.setOrientation(Qt.Vertical)  # default is horizontal
+        # _maxH = 40 if app().prefs.show_icon_labels else 30
+        # self.setMaximumHeight(_maxH) # horizontal
+        self.setMaximumWidth(36) # vertical
         self.setIconSize(QSize(20, 20))
         self.setLayoutDirection(Qt.LeftToRight)
-        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        if app().prefs.show_icon_labels:
+            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # Toolbar Label
         self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
@@ -66,7 +68,8 @@ class PartToolBar(QToolBar):
     def setupToolButton(self, actionText, shortcut, actionName, rc_path):
         toolbutton = QToolButton(self)
         toolbutton.setPopupMode(QToolButton.InstantPopup)
-        toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        if app().prefs.show_icon_labels:
+            toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         # toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
         icon = QIcon()
         icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
