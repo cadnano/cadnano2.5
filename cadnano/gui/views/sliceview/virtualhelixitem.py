@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 class VirtualHelixItem(QGraphicsEllipseItem):
     """
     The VirtualHelixItem is an individual circle that gets drawn in the SliceView
-    as a child of the PartItem. Taken as a group, many SliceHelix
+    as a child of the OrigamiPartItem. Taken as a group, many SliceHelix
     instances make up the crossection of the DNAPart. Clicking on a SliceHelix
     adds a VirtualHelix to the DNAPart. The SliceHelix then changes appearence
     and paints its corresponding VirtualHelix number.

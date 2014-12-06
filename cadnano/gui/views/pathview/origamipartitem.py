@@ -3,7 +3,7 @@ from collections import defaultdict
 from math import ceil
 
 from .activesliceitem import ActiveSliceItem
-from cadnano.gui.controllers.itemcontrollers.partitemcontroller import PartItemController
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from .prexoveritem import PreXoverItem
 from .strand.xoveritem import XoverNode3
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
@@ -27,18 +27,18 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
-class PartItem(QGraphicsRectItem):
+class OrigamiPartItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
     def __init__(self, model_part, viewroot, active_tool_getter, parent):
         """parent should always be pathrootitem"""
-        super(PartItem, self).__init__(parent)
+        super(OrigamiPartItem, self).__init__(parent)
         self._model_part = m_p = model_part
         self._viewroot = viewroot
         self._getActiveTool = active_tool_getter
         self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
-        self._controller = PartItemController(self, m_p)
+        self._controller = OrigamiPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
         self._virtual_helix_hash = {}
         self._virtual_helix_item_list = []
@@ -82,7 +82,7 @@ class PartItem(QGraphicsRectItem):
     ### SLOTS ###
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
-        # print "PartItem.partParentChangedSlot"
+        # print "OrigamiPartItem.partParentChangedSlot"
         pass
     # end def
 
@@ -109,7 +109,7 @@ class PartItem(QGraphicsRectItem):
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
         self._activeSliceItem.removed()
-        self.parentItem().removePartItem(self)
+        self.parentItem().removeOrigamiPartItem(self)
         scene = self.scene()
         scene.removeItem(self)
         self._model_part = None
@@ -140,7 +140,7 @@ class PartItem(QGraphicsRectItem):
         When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
         """
-        # print("PartItem.partVirtualHelixAddedSlot")
+        # print("OrigamiPartItem.partVirtualHelixAddedSlot")
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi
@@ -422,7 +422,7 @@ class PartItem(QGraphicsRectItem):
             return
 
         vh = vhi.virtualHelix()
-        part_item = self
+        origami_part_item = self
         part = self.part()
         idx = part.activeVirtualHelixIdx()
 
@@ -490,7 +490,7 @@ class PartItem(QGraphicsRectItem):
 
     def pencilToolHoverMove(self, pt):
         """Pencil the strand is possible."""
-        part_item = self
+        origami_part_item = self
         active_tool = self._getActiveTool()
         if not active_tool.isFloatingXoverBegin():
             temp_xover = active_tool.floatingXover()

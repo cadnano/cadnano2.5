@@ -24,10 +24,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     """docstring for VirtualHelixHandleItem"""
     _filter_name = "virtual_helix"
     
-    def __init__(self, virtual_helix, part_item, viewroot):
-        super(VirtualHelixHandleItem, self).__init__(part_item)
+    def __init__(self, virtual_helix, origami_part_item, viewroot):
+        super(VirtualHelixHandleItem, self).__init__(origami_part_item)
         self._virtual_helix = virtual_helix
-        self._part_item = part_item
+        self._origami_part_item = origami_part_item
         self._viewroot = viewroot
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
@@ -115,7 +115,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._virtual_helix.number()
         
     def partItem(self):
-        return self._part_item
+        return self._origami_part_item
     # end def
 
     def hoverEnterEvent(self, event):
@@ -169,20 +169,20 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def restoreParent(self, pos=None):
         """
-        Required to restore parenting and positioning in the part_item
+        Required to restore parenting and positioning in the origami_part_item
         """
 
         # map the position
-        part_item = self._part_item
+        origami_part_item = self._origami_part_item
         if pos == None:
             pos = self.scenePos()
-        self.setParentItem(part_item)
+        self.setParentItem(origami_part_item)
         self.setSelectedColor(False)
 
-        assert(self.parentItem() == part_item)
+        assert(self.parentItem() == origami_part_item)
         # print "restore", self.number(), self.parentItem(), self.group()
         assert(self.group() == None)
-        temp_p = part_item.mapFromScene(pos)
+        temp_p = origami_part_item.mapFromScene(pos)
         self.setPos(temp_p)
         self.setSelected(False)
     # end def

@@ -1,12 +1,12 @@
-class PartItemController(object):
-    def __init__(self, part_item, model_part):
-        self._part_item = part_item
+class OrigamiPartItemController(object):
+    def __init__(self, origami_part_item, model_part):
+        self._origami_part_item = origami_part_item
         self._model_part = model_part
         self.connectSignals()
 
     def connectSignals(self):
         m_p = self._model_part
-        p_i = self._part_item
+        p_i = self._origami_part_item
 
         if hasattr(p_i, "partHideSlot"):
             m_p.partHideSignal.connect(p_i.partHideSlot)
@@ -26,7 +26,7 @@ class PartItemController(object):
 
     def disconnectSignals(self):
         m_p = self._model_part
-        p_i = self._part_item
+        p_i = self._origami_part_item
         
         if hasattr(p_i, "partHideSlot"):
             m_p.partHideSignal.disconnect(p_i.partHideSlot)

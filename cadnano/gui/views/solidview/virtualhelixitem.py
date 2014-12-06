@@ -85,7 +85,7 @@ class VirtualHelixItem(object):
     # end def
 
     def partItem(self):
-        """PartItem Accessor - parent Item"""
+        """OrigamiPartItem Accessor - parent Item"""
         return self._partItem
 
     def virtualHelix(self):

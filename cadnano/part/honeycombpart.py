@@ -1,6 +1,6 @@
 
 
-from cadnano.part.part import Part
+from cadnano.part.origamipart import OrigamiPart
 from cadnano.enum import LatticeType
 
 
@@ -19,7 +19,7 @@ class Crossovers:
 root3 = 1.732051
 
 
-class HoneycombPart(Part):
+class HoneycombPart(OrigamiPart):
     _STEP = 21  # 32 in square
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP

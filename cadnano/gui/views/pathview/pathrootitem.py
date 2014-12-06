@@ -1,5 +1,5 @@
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .partitem import PartItem
+from .origamipartitem import OrigamiPartItem
 from .pathselection import SelectionItemGroup
 from .pathselection import VirtualHelixHandleSelectionBox
 from .pathselection import EndpointHandleSelectionBox
@@ -27,7 +27,7 @@ class PathRootItem(QGraphicsRectItem):
         self._document = document
         self._controller = ViewRootController(self, document)
         self._model_part = None
-        self._part_item_for_part = {}  # Maps Part -> PartItem
+        self._origami_part_item_for_part = {}  # Maps Part -> PartItem
         self._selection_filter_dict = {}
         self._initSelections()
     # end def
@@ -37,10 +37,10 @@ class PathRootItem(QGraphicsRectItem):
     ### SLOTS ###
     def partItems(self):
         "iterator"
-        return self._part_item_for_part.values()
+        return self._origami_part_item_for_part.values()
 
     def partItemForPart(self, part):
-        return self._part_item_for_part[part]
+        return self._origami_part_item_for_part[part]
     
     def partAddedSlot(self, sender, model_part):
         """
@@ -51,12 +51,12 @@ class PathRootItem(QGraphicsRectItem):
         # print "PathRootItem partAddedSlot", model_part
         self._model_part = model_part
         win = self._window
-        part_item = PartItem(model_part,\
+        origami_part_item = OrigamiPartItem(model_part,\
                             viewroot=self, \
                             active_tool_getter=win.path_tool_manager.activeToolGetter,\
                             parent=self)
-        self._part_item_for_part[model_part] = part_item
-        win.path_tool_manager.setActivePart(part_item)
+        self._origami_part_item_for_part[model_part] = origami_part_item
+        win.path_tool_manager.setActivePart(origami_part_item)
         self.setModifyState(win.action_modify.isChecked())
     # end def
 
@@ -121,13 +121,13 @@ class PathRootItem(QGraphicsRectItem):
     def getSelectedPartOrderedVHList(self):
         """Used for encoding."""
         selectedPart = self._document.selectedPart()
-        return self._part_item_for_part[selectedPart].getOrderedVirtualHelixList()
+        return self._origami_part_item_for_part[selectedPart].getOrderedVirtualHelixList()
     # end def
 
-    def removePartItem(self, part_item):
-        for k in self._part_item_for_part.keys():
-            if k == part_item:
-                del self._part_item_for_part[k]
+    def removeOrigamiPartItem(self, origami_part_item):
+        for k in self._origami_part_item_for_part.keys():
+            if k == origami_part_item:
+                del self._origami_part_item_for_part[k]
                 return
     # end def
 
@@ -139,8 +139,8 @@ class PathRootItem(QGraphicsRectItem):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for part_item in self._part_item_for_part.values():
-            part_item.setModifyState(bool)
+        for origami_part_item in self._origami_part_item_for_part.values():
+            origami_part_item.setModifyState(bool)
     # end def
 
     def selectionFilterDict(self):

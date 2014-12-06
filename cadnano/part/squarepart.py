@@ -1,5 +1,5 @@
 from cadnano.enum import LatticeType
-from cadnano.part.part import Part
+from cadnano.part.origamipart import OrigamiPart
 
 class Crossovers:
     SQUARE_SCAF_LOW = [[4, 26, 15], [18, 28, 7], [10, 20, 31], [2, 12, 23]]
@@ -8,7 +8,7 @@ class Crossovers:
     SQUARE_STAP_HIGH = [[0], [24], [16], [8]]
 
 
-class SquarePart(Part):
+class SquarePart(OrigamiPart):
     _STEP = 32  # 21 in honeycomb
     _SUB_STEP_SIZE = _STEP / 4
     _TURNS_PER_STEP = 3.0

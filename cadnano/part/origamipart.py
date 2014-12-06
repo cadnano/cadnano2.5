@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# encoding: utf-8
+
+from cadnano.part.part import Part
 
 from heapq import heapify, heappush, heappop
 from itertools import product, islice
@@ -39,9 +39,9 @@ from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
 
-class Part(ProxyObject):
+class OrigamiPart(Part):
     """
-    A Part is a group of VirtualHelix items that are on the same lattice.
+    An OrigamiPart is a group of VirtualHelix items that are on the same lattice.
     Parts are the model component that most directly corresponds to a
     DNA origami design.
 
@@ -304,6 +304,152 @@ class Part(ProxyObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
+    def autoStaple(part, is_slow=True):
+        """Autostaple does the following:
+        1. Clear existing staple strands by iterating over each strand
+        and calling RemoveStrandCommand on each. The next strand to remove
+        is always at index 0.
+        2. Create temporary strands that span regions where scaffold is present.
+        3. Determine where actual strands will go based on strand overlap with
+        prexovers.
+        4. Delete temporary strands and create new strands.
+
+        is_slow: True --> undoable
+                : False --> not undoable
+        """
+        ep_dict = {}  # keyed on StrandSet
+        cmds = []
+        doc = part.document()
+        # clear existing staple strands
+        # part.verifyOligos()
+
+        for o in list(part.oligos()):
+            if not o.isStaple():
+                continue
+            c = RemoveOligoCommand(o)
+            cmds.append(c)
+        # end for
+        util.execCommandList(part, cmds, desc="Clear staples",
+                                            use_undostack=False)
+        cmds = []
+
+        # create strands that span all bases where scaffold is present
+        for vh in part.getVirtualHelices():
+            segments = []
+            scaf_ss = vh.scaffoldStrandSet()
+            for strand in scaf_ss:
+                lo, hi = strand.idxs()
+                if len(segments) == 0:
+                    segments.append([lo, hi])  # insert 1st strand
+                elif segments[-1][1] == lo - 1:
+                    segments[-1][1] = hi  # extend
+                else:
+                    segments.append([lo, hi])  # insert another strand
+            stap_ss = vh.stapleStrandSet()
+            ep_dict[stap_ss] = []
+            for i in range(len(segments)):
+                lo, hi = segments[i]
+                ep_dict[stap_ss].extend(segments[i])
+                c = CreateStrandCommand(stap_ss, lo, hi, i)
+                cmds.append(c)
+        util.execCommandList(part, cmds, desc="Add tmp strands",
+                                use_undostack=False)
+        cmds = []
+
+        # determine where xovers should be installed
+        for vh in part.getVirtualHelices():
+            stap_ss = vh.stapleStrandSet()
+            scaf_ss = vh.scaffoldStrandSet()
+            is5to3 = stap_ss.isDrawn5to3()
+            potential_xovers = part.potentialCrossoverList(vh)
+            for neighbor_vh, idx, strand_type, is_low_idx in potential_xovers:
+                if strand_type != StrandType.STAPLE:
+                    continue
+                if is_low_idx and is5to3:
+                    strand = stap_ss.getStrand(idx)
+                    neighbor_ss = neighbor_vh.stapleStrandSet()
+                    n_strand = neighbor_ss.getStrand(idx)
+                    if strand == None or n_strand == None:
+                        continue
+                    # check for bases on both strands at [idx-1:idx+3]
+                    if not (strand.lowIdx() < idx and strand.highIdx() > idx + 1):
+                        continue
+                    if not (n_strand.lowIdx() < idx and n_strand.highIdx() > idx + 1):
+                        continue
+
+                    # # check for nearby scaffold xovers
+                    # scaf_strand_L = scaf_ss.getStrand(idx-4)
+                    # scaf_strand_H = scaf_ss.getStrand(idx+5)
+                    # if scaf_strand_L:
+                    #     if scaf_strand_L.hasXoverAt(idx-4):
+                    #         continue
+                    # if scaf_strand_H:
+                    #     if scaf_strand_H.hasXoverAt(idx+5):
+                    #         continue
+
+                    # Finally, add the xovers to install
+                    ep_dict[stap_ss].extend([idx, idx+1])
+                    ep_dict[neighbor_ss].extend([idx, idx+1])
+
+        # clear temporary staple strands
+        for vh in part.getVirtualHelices():
+            stap_ss = vh.stapleStrandSet()
+            for strand in stap_ss:
+                c = RemoveStrandCommand(stap_ss, strand, 0)
+                cmds.append(c)
+        util.execCommandList(part, cmds, desc="Rm tmp strands",
+                                        use_undostack=False)
+        cmds = []
+
+        if is_slow:
+            part.undoStack().beginMacro("Auto-Staple")
+
+        for stap_ss, ep_list in ep_dict.items():
+            assert (len(ep_list) % 2 == 0)
+            ep_list = sorted(ep_list)
+            ss_idx = 0
+            for i in range(0, len(ep_list),2):
+                lo, hi = ep_list[i:i+2]
+                c = CreateStrandCommand(stap_ss, lo, hi, ss_idx)
+                cmds.append(c)
+                ss_idx += 1
+        util.execCommandList(part, cmds, desc="Create strands",
+                                use_undostack=is_slow)
+        cmds = [] 
+
+        # create crossovers wherever possible (from strand5p only)
+        for vh in part.getVirtualHelices():
+            stap_ss = vh.stapleStrandSet()
+            is5to3 = stap_ss.isDrawn5to3()
+            potential_xovers = part.potentialCrossoverList(vh)
+            for neighbor_vh, idx, strand_type, is_low_idx in potential_xovers:
+                if strand_type != StrandType.STAPLE:
+                    continue
+                if (is_low_idx and is5to3) or (not is_low_idx and not is5to3):
+                    strand = stap_ss.getStrand(idx)
+                    neighbor_ss = neighbor_vh.stapleStrandSet()
+                    n_strand = neighbor_ss.getStrand(idx)
+                    if strand == None or n_strand == None:
+                        continue
+                    if idx in strand.idxs() and idx in n_strand.idxs():
+                        # only install xovers on pre-split strands
+                        part.createXover(strand, idx, n_strand, idx, 
+                                            update_oligo=is_slow,
+                                            use_undostack=is_slow)
+
+        if not is_slow:
+            c = RefreshOligosCommand(part)
+            cmds.append(c)
+            util.execCommandList(part, cmds, desc="Assign oligos",
+                                            use_undostack=False)
+
+        cmds = []
+        if is_slow:
+            part.undoStack().endMacro()
+        else:
+            part.undoStack().clear()
+    # end def
+
     def verifyOligoStrandCounts(self):
         total_stap_strands = 0
         stapOligos = set()
@@ -583,6 +729,67 @@ class Part(ProxyObject):
         return product(range(self._max_row), range(self._max_col))
     # end def
 
+    def generatorSpatialLattice(self, scale_factor=1.0):
+        """
+        Returns a generator that yields the XY spatial lattice points to draw
+        relative to the part origin.
+        """
+        # nested for loop in one line
+        latticeCoordToPositionXY = self.latticeCoordToPositionXY
+        for latticeCoord in product(range(self._max_row), range(self._max_col)):
+            row, col = latticeCoord
+            x, y = latticeCoordToPositionXY(row, col, scale_factor)
+            yield x, y, row, col
+    # end def
+
+    def getPreXoversHigh(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
+        """
+        Returns all prexover positions for neighbor_type that are below
+        max_idx. Used in emptyhelixitem.py.
+        """
+        pre_xo = self._SCAFH if strand_type == StrandType.SCAFFOLD else self._STAPH
+        if max_idx == None:
+            max_idx = self._max_base
+        steps = (self._max_base // self._STEP) + 1
+        ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
+        return filter(lambda x: x >= min_idx and x <= max_idx, ret)
+
+    def getPreXoversLow(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
+        """
+        Returns all prexover positions for neighbor_type that are above
+        min_idx. Used in emptyhelixitem.py.
+        """
+        pre_xo = self._SCAFL if strand_type == StrandType.SCAFFOLD \
+                                else self._STAPL
+        if max_idx == None:
+            max_idx = self._max_base
+        steps = (self._max_base // self._STEP) + 1
+        ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
+        return filter(lambda x: x >= min_idx and x <= max_idx, ret)
+
+    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0):
+        """
+        Returns a tuple of the (x,y) position for a given lattice row and
+        column.
+
+        Note: The x,y position is the upperLeftCorner for the given
+        coordinate, and relative to the part instance.
+        """
+        raise NotImplementedError  # To be implemented by Part subclass
+    # end def
+
+    def positionToCoord(self, x, y, scale_factor=1.0):
+        """
+        Returns a tuple (row, column) lattice coordinate for a given
+        x and y position that is within +/- 0.5 of a true valid lattice
+        position.
+
+        Note: mapping should account for int-to-float rounding errors.
+        x,y is relative to the Part Instance Position.
+        """
+        raise NotImplementedError  # To be implemented by Part subclass
+    # end def
+
     def newPart(self):
         return Part(self._document)
     # end def
@@ -598,11 +805,38 @@ class Part(ProxyObject):
             print("error removing oligo", oligo)
     # end def
 
+    def renumber(self, coord_list, use_undostack=True):
+        if use_undostack:
+            self.undoStack().beginMacro("Renumber VirtualHelices")
+        c = RenumberVirtualHelicesCommand(self, coord_list)
+        if use_undostack:
+            self.undoStack().push(c)
+            self.undoStack().endMacro()
+        else:
+            c.redo()
+    # end def
+
+    def resizeLattice(self):
+        """docstring for resizeLattice"""
+        pass
+    # end def
+
     def resizeVirtualHelices(self, min_delta, max_delta, use_undostack=True):
         """docstring for resizeVirtualHelices"""
         c = ResizePartCommand(self, min_delta, max_delta)
         util.execCommandList(self, [c], desc="Resize part", \
                                                     use_undostack=use_undostack)
+    # end def
+
+    def setActiveBaseIndex(self, idx):
+        self._active_base_index = idx
+        self.partActiveSliceIndexSignal.emit(self, idx)
+    # end def
+
+    def setActiveVirtualHelix(self, virtual_helix, idx=None):
+        self._active_virtual_helix = virtual_helix
+        self._active_virtual_helix_idx = idx
+        self.partStrandChangedSignal.emit(self, virtual_helix)
     # end def
 
     def selectPreDecorator(self, selection_list):
@@ -616,6 +850,44 @@ class Part(ProxyObject):
         sel = selection_list[0]
         (row, col, baseIdx) = (sel[0], sel[1], sel[2])
         self.partPreDecoratorSelectedSignal.emit(self, row, col, baseIdx)
+
+    def xoverSnapTo(self, strand, idx, delta):
+        """
+        Returns the nearest xover position to allow snap-to behavior in
+        resizing strands via dragging selected xovers.
+        """
+        strand_type = strand.strandType()
+        if delta > 0:
+            min_idx, max_idx = idx - delta, idx + delta
+        else:
+            min_idx, max_idx = idx + delta, idx - delta
+
+        # determine neighbor strand and bind the appropriate prexover method
+        lo, hi = strand.idxs()
+        if idx == lo:
+            connected_strand = strand.connectionLow()
+            preXovers = self.getPreXoversHigh
+        else:
+            connected_strand = strand.connectionHigh()
+            preXovers = self.getPreXoversLow
+        connected_vh = connected_strand.virtualHelix()
+
+        # determine neighbor position, if any
+        neighbors = self.getVirtualHelixNeighbors(strand.virtualHelix())
+        if connected_vh in neighbors:
+            neighbor_idx = neighbors.index(connected_vh)
+            try:
+                new_idx = util.nearest(idx + delta,
+                                    preXovers(strand_type,
+                                                neighbor_idx,
+                                                min_idx=min_idx,
+                                                max_idx=max_idx)
+                                    )
+                return new_idx
+            except ValueError:
+                return None  # nearest not found in the expanded list
+        else:  # no neighbor (forced xover?)... don't snap, just return
+            return idx + delta
 
     ### PRIVATE SUPPORT METHODS ###
     def _addVirtualHelix(self, virtual_helix):

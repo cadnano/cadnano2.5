@@ -1,5 +1,5 @@
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .partitem import PartItem
+from .origamipartitem import OrigamiPartItem
 import cadnano.util as util
 
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -30,8 +30,8 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
         """
         self._model_part = model_part
-        part_item = PartItem(model_part, parent=self)
-        self._instance_items[part_item] = part_item
+        origami_part_item = OrigamiPartItem(model_part, parent=self)
+        self._instance_items[origami_part_item] = origami_part_item
         self.setModifyState(self._window.action_modify.isChecked())
     # end def
 
@@ -63,8 +63,8 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
-    def removePartItem(self, part_item):
-        del self._instance_items[part_item]
+    def removeOrigamiPartItem(self, origami_part_item):
+        del self._instance_items[origami_part_item]
     # end def
 
     def resetDocumentAndController(self, document):
@@ -77,6 +77,6 @@ class SliceRootItem(QGraphicsRectItem):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for part_item in self._instance_items:
-            part_item.setModifyState(bool)
+        for origami_part_item in self._instance_items:
+            origami_part_item.setModifyState(bool)
     # end def

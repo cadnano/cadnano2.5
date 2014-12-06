@@ -23,7 +23,7 @@
 # http://www.opensource.org/licenses/mit-license.php
 
 """
-partitem.py
+origamipartitem.py
 Created by Simon Breslav on 2011-07-21
 """
 
@@ -43,16 +43,16 @@ import maya.cmds as cmds
 import util
 
 from controllers.mayacontrollers.mayaObjectManager import Mom
-from controllers.itemcontrollers.partitemcontroller import PartItemController
+from controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from virtualhelixitem import VirtualHelixItem
 
 # import Qt stuff into the module namespace with PySide, PyQt4 independence
 util.qtWrapImport('QtCore', globals(), ['pyqtSignal', 'pyqtSlot', 'QObject'])
 
 
-class PartItem(object):
+class OrigamiPartItem(object):
     """
-    PartItem stores VirtualHelixItems for a given DNA Part model
+    OrigamiPartItem stores VirtualHelixItems for a given DNA Part model
     """
     def __init__(self, modelPart, parent=None):
         """
@@ -60,8 +60,8 @@ class PartItem(object):
         the model (XXX [SB] -this code should probably go somewhere else).
         Initiates some private variables that are constant across all
         strands (XXX [SB] -this code should also probably go somewhere else).
-        Sets up PartItemController that is used to setup all the
-        slots and signals between strand model and this PartItem.
+        Sets up OrigamiPartItemController that is used to setup all the
+        slots and signals between strand model and this OrigamiPartItem.
         """
         self._parentItem = parent
         pluginPath = os.path.join(os.environ['CADNANO_PATH'],
@@ -80,7 +80,7 @@ class PartItem(object):
             print "HalfCylinderHelixNode failed to load"
             return
 
-        #print "maya PartItem created"
+        #print "maya OrigamiPartItem created"
         self._type = modelPart.crossSectionType()
 
         #self.mayaScale = 1.0
@@ -92,7 +92,7 @@ class PartItem(object):
         self._virtualHelixItems = {}
 
         self._part = modelPart
-        self._controller = PartItemController(self, modelPart)
+        self._controller = OrigamiPartItemController(self, modelPart)
 
         self.modifyState = False
     # end def
@@ -103,13 +103,13 @@ class PartItem(object):
     # end def
 
     def setModifyState(self, val):
-        """Change Modify state for all the strands in this PartItem"""
+        """Change Modify state for all the strands in this OrigamiPartItem"""
         self.modifyState = val
         self.updateModifyState()
     # end def
 
     def updateModifyState(self):
-        """Update Modify state for all the strands in this PartItem"""
+        """Update Modify state for all the strands in this OrigamiPartItem"""
         for sh in self._virtualHelixItems:
             sh.setModifyState(self.modifyState)
             sh.updateDecorators()
@@ -160,9 +160,9 @@ class PartItem(object):
 
     def partRemovedSlot(self, sender, part):
         """clears out private variables and disconnects signals"""
-        # print "solidview.PartItem.partRemovedSlot"
+        # print "solidview.OrigamiPartItem.partRemovedSlot"
         self._virtualHelixItems = None
-        self._parentItem.removePartItem(self)
+        self._parentItem.removeOrigamiPartItem(self)
         self._parentItem = None
         self._part = None
         self._controller.disconnectSignals()
@@ -213,7 +213,7 @@ class PartItem(object):
     def createNewVirtualHelixItem(self, virtualHelix):
         """Create a new Virtual Helix """
         coords = virtualHelix.coord()
-        #print "solidview.PartItem.createNewVirtualHelixItem: %d %d" % \
+        #print "solidview.OrigamiPartItem.createNewVirtualHelixItem: %d %d" % \
         #                                                (coords[0], coords[1])
         # figure out Maya Coordinates
         x, y = self.cadnanoToMayaCoords(coords[0], coords[1])

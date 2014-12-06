@@ -28,7 +28,7 @@ Created by Simon Breslav on 2011-10-05.
 """
 
 from controllers.viewrootcontroller import ViewRootController
-from partitem import PartItem
+from origamipartitem import OrigamiPartItem
 import maya.cmds as cmds
 
 import util
@@ -58,7 +58,7 @@ class SolidRootItem(object):
         """
         #print "SolidRootItem.partAddedSlot!"
         self._modelPart = modelPart
-        partItem = PartItem(modelPart, self)
+        partItem = OrigamiPartItem(modelPart, self)
         self._partItems[partItem] = True
         self.setModifyState(self._modifyState)
 
@@ -121,7 +121,7 @@ class SolidRootItem(object):
         return self._partItems
     # end def
 
-    def removePartItem(self, partItem):
+    def removeOrigamiPartItem(self, partItem):
         """Remove a given partItem"""
         del self._partItems[partItem]
     # end def
