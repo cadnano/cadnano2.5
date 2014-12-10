@@ -163,7 +163,7 @@ class XMLTestRunner(object):
         """Run the given test case or test suite."""
         class_ = test.__class__
         classname = class_.__module__ + "." + class_.__name__
-        if self._stream == None:
+        if self._stream is None:
             filename = "TEST-%s.xml" % classname
             stream = file(os.path.join(self._path, filename), "w")
         else:

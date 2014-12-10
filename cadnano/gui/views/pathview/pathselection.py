@@ -170,6 +170,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
 
     def mouseMoveEvent(self, event):
         if self._drag_enable == True:
+
             # map the item to the scene coordinates
             # to help keep coordinates uniform
             rf = self.getR(self.mapFromScene(QPointF(event.scenePos())))
@@ -181,6 +182,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             else:
                 delta = self.selectionbox.delta(rf, self._r0)
                 self.translateR(delta)
+                # print("mouse move path selectionbox", delta, rf, self._r0)
             # end else
             self._r = rf
         # end if
@@ -428,7 +430,10 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     def refreshPath(self):
         temp_low, temp_high = \
                     self._item_group._viewroot.document().getSelectionBounds()
+        
         self._bounds = (temp_low, temp_high)
+        
+        # print("rp:", self._bounds)
         self.prepareGeometryChange()
         self.setPath(self.painterPath())
         self._pos0 = self.pos()

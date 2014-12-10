@@ -79,19 +79,19 @@ class PartToolBar(QToolBar):
         """
         action = QAction(self)
 
-        if actionText != None:
+        if actionText is not None:
             action.setText(QApplication.translate("MainWindow", actionText, None))
-        if rc_path != None:
+        if rc_path is not None:
             icon = QIcon()
             icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
             action.setIcon(icon)
             action.setFont(_FONT)
-        if actionName != None:
+        if actionName is not None:
             action.setObjectName(actionName)
         if shortcut:
             action.setShortcut(QApplication.translate("MainWindow", shortcut))
             action.setCheckable(True)
-        if toolbutton == None:
+        if toolbutton is None:
             self.addAction(action)
         else:
             toolbutton.addAction(action)

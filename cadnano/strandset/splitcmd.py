@@ -15,14 +15,15 @@ class SplitCommand(UndoCommand):
     original strand, resizes each and modifies their connections.
     On undo, the new copies are removed and the original is restored.
     """
-    def __init__(self, strand, base_idx, strandset_idx, update_sequence=True):
+    # def __init__(self, strand, base_idx, strandset_idx, update_sequence=True):
+    def __init__(self, strand, base_idx, update_sequence=True):
         super(SplitCommand, self).__init__("split strand")
         # Store inputs
         self._old_strand = strand
         old_sequence  = strand._sequence
         is5to3 = strand.isDrawn5to3()
         
-        self._s_set_idx = strandset_idx
+        # self._s_set_idx = strandset_idx
         self._s_set = s_set = strand.strandSet()
         self._old_oligo = oligo = strand.oligo()
         # Create copies
@@ -98,10 +99,10 @@ class SplitCommand(UndoCommand):
 
     def redo(self):
         ss = self._s_set
-        sL = self._strand_low
-        sH = self._strand_high
-        oS = self._old_strand
-        idx = self._s_set_idx
+        s_low = self._strand_low
+        s_high = self._strand_high
+        o_strand = self._old_strand
+        # idx = self._s_set_idx
         olg = self._old_oligo
         doc = ss.document()
         l_olg = self._l_oligo
@@ -109,24 +110,24 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove old Strand from the s_set
-        ss._removeFromStrandList(oS)
+        ss._removeFromStrandList(o_strand)
 
         # Add new strands to the s_set (reusing idx, so order matters)
-        ss._addToStrandList(sH, idx)
-        ss._addToStrandList(sL, idx)
+        ss._addToStrandList(s_high)
+        ss._addToStrandList(s_low)
 
         # update connectivity of strands
-        sLcL = sL.connectionLow()
+        sLcL = s_low.connectionLow()
         if sLcL:
-            if (oS.isDrawn5to3() and sLcL.isDrawn5to3()) or \
-                (not oS.isDrawn5to3() and not sLcL.isDrawn5to3()):
-                sLcL.setConnectionHigh(sL)
+            if (o_strand.isDrawn5to3() and sLcL.isDrawn5to3()) or \
+                (not o_strand.isDrawn5to3() and not sLcL.isDrawn5to3()):
+                sLcL.setConnectionHigh(s_low)
             else:
-                sLcL.setConnectionLow(sL)
-        sHcH = sH.connectionHigh()
+                sLcL.setConnectionLow(s_low)
+        sHcH = s_high.connectionHigh()
         if sHcH:
-            if (oS.isDrawn5to3() and sHcH.isDrawn5to3()) or \
-                (not oS.isDrawn5to3() and not sHcH.isDrawn5to3()):
+            if (o_strand.isDrawn5to3() and sHcH.isDrawn5to3()) or \
+                (not o_strand.isDrawn5to3() and not sHcH.isDrawn5to3()):
                 sHcH.setConnectionLow(sH)
             else:
                 sHcH.setConnectionHigh(sH)
@@ -141,22 +142,22 @@ class SplitCommand(UndoCommand):
 
         # Add new oligo and remove old oligos from the part
         olg.removeFromPart()
-        l_olg.addToPart(sL.part())
+        l_olg.addToPart(s_low.part())
         if was_not_loop:
-            h_olg.addToPart(sH.part())
+            h_olg.addToPart(s_high.part())
 
         # Emit Signals related to destruction and addition
-        oS.strandRemovedSignal.emit(oS)
-        ss.strandsetStrandAddedSignal.emit(ss, sH)
-        ss.strandsetStrandAddedSignal.emit(ss, sL)
+        o_strand.strandRemovedSignal.emit(o_strand)
+        ss.strandsetStrandAddedSignal.emit(ss, s_high)
+        ss.strandsetStrandAddedSignal.emit(ss, s_low)
     # end def
 
     def undo(self):
         ss = self._s_set
-        sL = self._strand_low
-        sH = self._strand_high
-        oS = self._old_strand
-        idx = self._s_set_idx
+        s_low = self._strand_low
+        s_high = self._strand_high
+        o_strand = self._old_strand
+        # idx = self._s_set_idx
         olg = self._old_oligo
         doc = ss.document()
         l_olg = self._l_oligo
@@ -164,26 +165,26 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove new strands from the s_set (reusing idx, so order matters)
-        ss._removeFromStrandList(sL)
-        ss._removeFromStrandList(sH)
+        ss._removeFromStrandList(s_low)
+        ss._removeFromStrandList(s_high)
         # Add the old strand to the s_set
-        ss._addToStrandList(oS, idx)
+        ss._addToStrandList(o_strand)
 
         # update connectivity of strands
-        oScL = oS.connectionLow()
+        oScL = o_strand.connectionLow()
         if oScL:
-            if (oS.isDrawn5to3() and oScL.isDrawn5to3()) or \
-                (not oS.isDrawn5to3() and not oScL.isDrawn5to3()):
-                oScL.setConnectionHigh(oS)
+            if (o_strand.isDrawn5to3() and oScL.isDrawn5to3()) or \
+                (not o_strand.isDrawn5to3() and not oScL.isDrawn5to3()):
+                oScL.setConnectionHigh(o_strand)
             else:
-                oScL.setConnectionLow(oS)
-        oScH = oS.connectionHigh()
+                oScL.setConnectionLow(o_strand)
+        oScH = o_strand.connectionHigh()
         if oScH:
-            if (oS.isDrawn5to3() and oScH.isDrawn5to3()) or \
-                (not oS.isDrawn5to3() and not oScH.isDrawn5to3()):
-                oScH.setConnectionLow(oS)
+            if (o_strand.isDrawn5to3() and oScH.isDrawn5to3()) or \
+                (not o_strand.isDrawn5to3() and not oScH.isDrawn5to3()):
+                oScH.setConnectionLow(o_strand)
             else:
-                oScH.setConnectionHigh(oS)
+                oScH.setConnectionHigh(o_strand)
 
         # Traverse the strands via 3'conns to assign the old oligo
         for strand in olg.strand5p().generator3pStrand():
@@ -195,8 +196,8 @@ class SplitCommand(UndoCommand):
             h_olg.removeFromPart()
 
         # Emit Signals related to destruction and addition
-        sL.strandRemovedSignal.emit(sL)
-        sH.strandRemovedSignal.emit(sH)
-        ss.strandsetStrandAddedSignal.emit(ss, oS)
+        s_low.strandRemovedSignal.emit(s_low)
+        s_high.strandRemovedSignal.emit(s_high)
+        ss.strandsetStrandAddedSignal.emit(ss, o_strand)
     # end def
 # end class

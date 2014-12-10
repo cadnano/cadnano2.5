@@ -14,8 +14,8 @@ class RemoveAllStrandsCommand(UndoCommand):
             x = vh.getStrandSets()
             self._strand_sets.append(x[0])
             self._strand_sets.append(x[1])
-        self._strandSetListCopies = \
-                    [[y for y in x._strand_list] for x in self._strand_sets]
+        self._strandset_list_copies = \
+                    [[y for y in x] for x in self._strand_sets]
         self._oligos = set(part.oligos())
     # end def
 
@@ -23,7 +23,7 @@ class RemoveAllStrandsCommand(UndoCommand):
         part = self._part
         # Remove the strand
         for s_set in self.__strand_set:
-            s_list = s_set._strand_list
+            s_list = list(set(s_set._strand_list))
             for strand in s_list:
                 s_set.removeStrand(strand)
             # end for
@@ -39,7 +39,7 @@ class RemoveAllStrandsCommand(UndoCommand):
     def undo(self):
         part = self._part
         # Remove the strand
-        sListCopyIterator = iter(self._strandSetListCopies)
+        sListCopyIterator = iter(self._strandset_list_copies)
         for s_set in self._strand_sets:
             s_list = next(sListCopyIterator)
             for strand in s_list:

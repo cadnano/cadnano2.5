@@ -145,8 +145,8 @@ class XoverNode3(QGraphicsRectItem):
         updateConnectivity. Updates drawing and position of the label.
         """
         lbl = self._label
-        if self._idx != None:
-            if lbl == None:
+        if self._idx is not None:
+            if lbl is None:
                 bw = _BASE_WIDTH
                 num = self._partner_virtual_helix.number()
                 tbr = _FM.tightBoundingRect(str(num))
@@ -287,7 +287,7 @@ class XoverItem(QGraphicsPathItem):
         node3 = self._node3
         if strand5p:
             strand3p = strand5p.connection3p()
-            if strand3p != None and node3:
+            if strand3p is not None and node3:
                 if node3.virtualHelix():
                     self.update(self._strand5p)
                 else:
@@ -314,10 +314,10 @@ class XoverItem(QGraphicsPathItem):
         # This condition is for floating xovers
         idx_3_prime = idx if idx else strand5p.idx3Prime()
 
-        if self._node5 == None:
+        if self._node5 is None:
             self._node5 = XoverNode5(vhi5p, self, strand5p, idx_3_prime)
-        if strand3p != None:
-            if self._node3 == None:
+        if strand3p is not None:
+            if self._node3 is None:
                 vhi3p = partItem.itemForVirtualHelix(strand3p.virtualHelix())
                 self._node3 = XoverNode3(vhi3p, self, strand3p, strand3p.idx5Prime())
             else:
@@ -506,7 +506,7 @@ class XoverItem(QGraphicsPathItem):
 
     def tempReparent(self, pos=None):
         partItem = self.partItem()
-        if pos == None:
+        if pos is None:
             pos = self.scenePos()
         self.setParentItem(partItem)
         tempP = partItem.mapFromScene(pos)

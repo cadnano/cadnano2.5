@@ -167,7 +167,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def autoScafMidSeam(self, strands):
-        """docstring for autoScafMidSeam"""
+        """
+        TODO fix this for array strand set
+        docstring for autoScafMidSeam"""
         part = self.part()
         strand_type = StrandType.SCAFFOLD
         idx = part.activeBaseIndex()
@@ -325,7 +327,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         vh = self.virtualHelix()
         part = self.part()
 
-        if vh == None:
+        if vh is None:
             return EmptyHelixItem.addVHIfMissing
 
         idx = part.activeBaseIndex()
@@ -347,7 +349,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     def addScafAtActiveSliceIfMissing(self):
         vh = self.virtualHelix()
         part = self.part()
-        if vh == None:
+        if vh is None:
             return
 
         idx = part.activeBaseIndex()
@@ -362,7 +364,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         vh = self.virtualHelix()
         part = self.part()
 
-        if vh == None:
+        if vh is None:
             return
 
         idx = part.activeBaseIndex()
@@ -378,7 +380,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         coord = self._coord
         part = self.part()
 
-        if vh != None:
+        if vh is not None:
             return
         u_s = part.undoStack()
         u_s.beginMacro("Slice Click")

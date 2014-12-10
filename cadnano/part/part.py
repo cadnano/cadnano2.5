@@ -350,7 +350,7 @@ class Part(ProxyObject):
             for i in range(len(segments)):
                 lo, hi = segments[i]
                 ep_dict[stap_ss].extend(segments[i])
-                c = CreateStrandCommand(stap_ss, lo, hi, i)
+                c = CreateStrandCommand(stap_ss, lo, hi)
                 cmds.append(c)
         util.execCommandList(part, cmds, desc="Add tmp strands",
                                 use_undostack=False)
@@ -369,7 +369,7 @@ class Part(ProxyObject):
                     strand = stap_ss.getStrand(idx)
                     neighbor_ss = neighbor_vh.stapleStrandSet()
                     n_strand = neighbor_ss.getStrand(idx)
-                    if strand == None or n_strand == None:
+                    if strand is None or n_strand is None:
                         continue
                     # check for bases on both strands at [idx-1:idx+3]
                     if not (strand.lowIdx() < idx and strand.highIdx() > idx + 1):
@@ -395,7 +395,7 @@ class Part(ProxyObject):
         for vh in part.getVirtualHelices():
             stap_ss = vh.stapleStrandSet()
             for strand in stap_ss:
-                c = RemoveStrandCommand(stap_ss, strand, 0)
+                c = RemoveStrandCommand(stap_ss, strand)
                 cmds.append(c)
         util.execCommandList(part, cmds, desc="Rm tmp strands",
                                         use_undostack=False)
@@ -407,12 +407,10 @@ class Part(ProxyObject):
         for stap_ss, ep_list in ep_dict.items():
             assert (len(ep_list) % 2 == 0)
             ep_list = sorted(ep_list)
-            ss_idx = 0
             for i in range(0, len(ep_list),2):
                 lo, hi = ep_list[i:i+2]
-                c = CreateStrandCommand(stap_ss, lo, hi, ss_idx)
+                c = CreateStrandCommand(stap_ss, lo, hi)
                 cmds.append(c)
-                ss_idx += 1
         util.execCommandList(part, cmds, desc="Create strands",
                                 use_undostack=is_slow)
         cmds = [] 
@@ -429,7 +427,7 @@ class Part(ProxyObject):
                     strand = stap_ss.getStrand(idx)
                     neighbor_ss = neighbor_vh.stapleStrandSet()
                     n_strand = neighbor_ss.getStrand(idx)
-                    if strand == None or n_strand == None:
+                    if strand is None or n_strand is None:
                         continue
                     if idx in strand.idxs() and idx in n_strand.idxs():
                         # only install xovers on pre-split strands
@@ -457,7 +455,8 @@ class Part(ProxyObject):
 
         for vh in self.getVirtualHelices():
             stap_ss = vh.stapleStrandSet()
-            total_stap_strands += len(stap_ss._strand_list)
+
+            total_stap_strands += stap_ss.strandCount()
             for strand in stap_ss:
                 stapOligos.add(strand.oligo())
         # print("# stap oligos:", len(stapOligos), "# stap strands:", total_stap_strands)
@@ -587,13 +586,12 @@ class Part(ProxyObject):
             """
             c = None
             # lookup the initial strandset index
-            found, overlap, ss_idx3p = ss3p._findIndexOfRangeFor(strand3p)
             if strand3p.idx5Prime() == idx3p:  # yes, idx already matches
                 temp5 = xo_strand3 = strand3p
             else:
                 offset3p = -1 if ss3p.isDrawn5to3() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
-                    c = SplitCommand(strand3p, idx3p + offset3p, ss_idx3p)
+                    c = SplitCommand(strand3p, idx3p + offset3p)
                     # cmds.append(c)
                     xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
                     # adjust the target 5prime strand, always necessary if a split happens here
@@ -630,7 +628,7 @@ class Part(ProxyObject):
                     else:
                         ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
                 if ss5p.strandCanBeSplit(temp5, idx5p):
-                    d = SplitCommand(temp5, idx5p, ss_idx5p)
+                    d = SplitCommand(temp5, idx5p)
                     # cmds.append(d)
                     xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
                     if use_undostack:
@@ -657,9 +655,8 @@ class Part(ProxyObject):
             else:  # no, let's try to split
                 offset3p = -1 if ss3p.isDrawn5to3() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
-                    found, overlap, ss_idx = ss3p._findIndexOfRangeFor(strand3p)
-                    if found:
-                        c = SplitCommand(strand3p, idx3p + offset3p, ss_idx)
+                    if ss3p.getStrandIndex(strand3p)[0]:
+                        c = SplitCommand(strand3p, idx3p + offset3p)
                         # cmds.append(c)
                         xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
                         if use_undostack:
@@ -679,9 +676,8 @@ class Part(ProxyObject):
                 xo_strand5 = strand5p
             else:
                 if ss5p.strandCanBeSplit(strand5p, idx5p):
-                    found, overlap, ss_idx = ss5p._findIndexOfRangeFor(strand5p)
-                    if found:
-                        d = SplitCommand(strand5p, idx5p, ss_idx)
+                    if ss5p.getStrandIndex(strand5p)[0]:
+                        d = SplitCommand(strand5p, idx5p)
                         # cmds.append(d)
                         xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
                         if use_undostack:
@@ -748,7 +744,7 @@ class Part(ProxyObject):
         max_idx. Used in emptyhelixitem.py.
         """
         pre_xo = self._SCAFH if strand_type == StrandType.SCAFFOLD else self._STAPH
-        if max_idx == None:
+        if max_idx is None:
             max_idx = self._max_base
         steps = (self._max_base // self._STEP) + 1
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
@@ -761,7 +757,7 @@ class Part(ProxyObject):
         """
         pre_xo = self._SCAFL if strand_type == StrandType.SCAFFOLD \
                                 else self._STAPL
-        if max_idx == None:
+        if max_idx is None:
             max_idx = self._max_base
         steps = (self._max_base // self._STEP) + 1
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]

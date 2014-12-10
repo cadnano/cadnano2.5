@@ -48,7 +48,7 @@ class AutobreakConfig(QDialog, autobreakconfig_ui.Ui_Dialog):
 
     def accept(self):
         part = self.handler.doc.controller().activePart()
-        if part != None:
+        if part is not None:
             settings = {\
                 'stapleScorer'    : autobreak.tgtLengthStapleScorer,\
                 'minStapleLegLen' : self.minLegLengthSpinBox.value(),\

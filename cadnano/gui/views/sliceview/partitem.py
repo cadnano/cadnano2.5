@@ -233,7 +233,7 @@ class PartItem(QGraphicsItem):
     # end def
 
     def selectionWillChange(self, newSel):
-        if self.part() == None:
+        if self.part() is None:
             return
         if self.part().selectAllBehavior():
             return

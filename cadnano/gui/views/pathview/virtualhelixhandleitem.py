@@ -93,7 +93,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         label = self._label
         radius = _RADIUS
 
-        if num != None:
+        if num is not None:
             label.setText("%d" % num)
         else:
             return
@@ -150,7 +150,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         All mousePressEvents are passed to the group if it's in a group
         """
         selection_group = self.group()
-        if selection_group != None:
+        if selection_group is not None:
             selection_group.mousePressEvent(event)
         else:
             QGraphicsItem.mousePressEvent(self, event)
@@ -161,7 +161,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         All mouseMoveEvents are passed to the group if it's in a group
         """
         selection_group = self.group()
-        if selection_group != None:
+        if selection_group is not None:
             selection_group.mousePressEvent(event)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
@@ -174,14 +174,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
         # map the position
         part_item = self._part_item
-        if pos == None:
+        if pos is None:
             pos = self.scenePos()
         self.setParentItem(part_item)
         self.setSelectedColor(False)
 
         assert(self.parentItem() == part_item)
         # print "restore", self.number(), self.parentItem(), self.group()
-        assert(self.group() == None)
+        assert(self.group() is None)
         temp_p = part_item.mapFromScene(pos)
         self.setPos(temp_p)
         self.setSelected(False)

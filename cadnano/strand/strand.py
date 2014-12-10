@@ -89,7 +89,7 @@ class Strand(ProxyObject):
 
     def generator5pStrand(self):
         """
-        Iterate from self to the final _strand5p == None
+        Iterate from self to the final _strand5p is None
         3prime to 5prime
         Includes originalCount to check for circular linked list
         """
@@ -111,7 +111,7 @@ class Strand(ProxyObject):
 
     def generator3pStrand(self):
         """
-        Iterate from self to the final _strand3p == None
+        Iterate from self to the final _strand3p is None
         5prime to 3prime
         Includes originalCount to check for circular linked list
         """
@@ -213,7 +213,7 @@ class Strand(ProxyObject):
         Applies sequence string from 5' to 3'
         return the tuple (used, unused) portion of the sequence_string
         """
-        if sequence_string == None:
+        if sequence_string is None:
             self._sequence = None
             return None, None
         length = self.totalLength()
@@ -270,8 +270,8 @@ class Strand(ProxyObject):
     #     part = self._strandset.part()
     #     validIdxs = sorted([idx[0] for idx in part._stapL + part._stapH])
     #     lo, hi = self._base_idx_low, self._base_idx_high
-    #     start = lo if self.connectionLow() == None else lo+1
-    #     end = hi if self.connectionHigh() == None else hi-1
+    #     start = lo if self.connectionLow() is None else lo+1
+    #     end = hi if self.connectionHigh() is None else hi-1
     #     ret = []
     #     for i in range(start, end+1):
     #         if i % part.stepSize() in validIdxs:
@@ -311,7 +311,7 @@ class Strand(ProxyObject):
         total_length = self.totalLength()
 
         # see if we are applying
-        if sequence_string == None:
+        if sequence_string is None:
             # clear out string for in case of not total overlap
             use_seq = ''.join([' ' for x in range(total_length)])
         else:  # use the string as is
@@ -319,7 +319,7 @@ class Strand(ProxyObject):
                                             else sequence_string
 
         temp = array(array_type, sixb(use_seq))
-        if self._sequence == None:
+        if self._sequence is None:
             temp_self = array(array_type, sixb(''.join([' ' for x in range(total_length)])))
         else:
             temp_self = array(array_type, sixb(self._sequence) if self._is_drawn_5_to_3 \
@@ -438,18 +438,18 @@ class Strand(ProxyObject):
         return seqList
     # end def
 
-    def canResizeTo(self, newLow, newHigh):
+    def canResizeTo(self, new_low, new_high):
         """
         Checks to see if a resize is allowed. Similar to getResizeBounds
         but works for two bounds at once.
         """
-        lowNeighbor, highNeighbor = self._strandset.getNeighbors(self)
-        lowBound = lowNeighbor.highIdx() if lowNeighbor \
+        low_neighbor, high_neighbor = self._strandset.getNeighbors(self)
+        low_bound = low_neighbor.highIdx() if low_neighbor \
                                             else self.part().minBaseIdx()
-        highBound = highNeighbor.lowIdx() if highNeighbor \
+        high_bound = high_neighbor.lowIdx() if high_neighbor \
                                             else self.part().maxBaseIdx()
 
-        if newLow > lowBound and newHigh < highBound:
+        if new_low > low_bound and new_high < high_bound:
             return True
         return False
 
@@ -470,16 +470,18 @@ class Strand(ProxyObject):
         """
         neighbors = self._strandset.getNeighbors(self)
         if idx == self._base_idx_low:
-            if neighbors[0]:
+            if neighbors[0] is not None:
                 low = neighbors[0].highIdx() + 1
             else:
                 low = self.part().minBaseIdx()
+            # print("A", low, self._base_idx_high - 1 )
             return low, self._base_idx_high - 1
         else:  # self._base_idx_high
-            if neighbors[1]:
+            if neighbors[1] is not None:
                 high = neighbors[1].lowIdx() - 1
             else:
                 high = self.part().maxBaseIdx()
+            # print("B", self._base_idx_low+1, high)
             return self._base_idx_low + 1, high
     # end def
 
@@ -549,7 +551,7 @@ class Strand(ProxyObject):
         coord = self.virtualHelix().coord()
         insertionsDict = self.part().insertions()[coord]
         sortedIndices = sorted(insertionsDict.keys())
-        if idxL == None:
+        if idxL is None:
             idxL, idxH = self.idxs()
         for index in sortedIndices:
             insertion = insertionsDict[index]
@@ -707,16 +709,16 @@ class Strand(ProxyObject):
 
     def merge(self, idx):
         """Check for neighbor, then merge if possible."""
-        lowNeighbor, highNeighbor = self._strandset.getNeighbors(self)
+        low_neighbor, high_neighbor = self._strandset.getNeighbors(self)
         # determine where to check for neighboring endpoint
         if idx == self._base_idx_low:
-            if lowNeighbor:
-                if lowNeighbor.highIdx() == idx - 1:
-                    self._strandset.mergeStrands(self, lowNeighbor)
+            if low_neighbor:
+                if low_neighbor.highIdx() == idx - 1:
+                    self._strandset.mergeStrands(self, low_neighbor)
         elif idx == self._base_idx_high:
-            if highNeighbor:
-                if highNeighbor.lowIdx() == idx + 1:
-                    self._strandset.mergeStrands(self, highNeighbor)
+            if high_neighbor:
+                if high_neighbor.lowIdx() == idx + 1:
+                    self._strandset.mergeStrands(self, high_neighbor)
         else:
             raise IndexError
     # end def

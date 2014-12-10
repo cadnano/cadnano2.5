@@ -63,6 +63,6 @@ class BreakTool(AbstractPathTool):
         pos_item = item.mapFromScene(pos_scene)
         self.setTopStrand(self.helixIndex(pos_item)[1] == 0)
         new_position = self.helixPos(pos_item)
-        if new_position != None:
+        if new_position is not None:
             self.setPos(new_position)
 

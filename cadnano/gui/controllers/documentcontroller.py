@@ -237,7 +237,7 @@ class DocumentController():
         if self.maybeSave() == False:
             return  # user canceled in maybe save
         else:  # user did not cancel
-            if self.filesavedialog != None:
+            if self.filesavedialog is not None:
                 self.filesavedialog.finished.connect(self.newClickedCallback)
             else:  # user did not save
                 self.newClickedCallback()  # finalize new
@@ -253,7 +253,7 @@ class DocumentController():
             return  # user canceled in maybe save
         else:  # user did not cancel
             if hasattr(self, "filesavedialog"): # user did save
-                if self.filesavedialog != None:
+                if self.filesavedialog is not None:
                     self.filesavedialog.finished.connect(self.openAfterMaybeSave)
                 else:
                     self.openAfterMaybeSave()  # windows
@@ -280,7 +280,7 @@ class DocumentController():
     def actionSVGSlot(self):
         """docstring for actionSVGSlot"""
         fname = os.path.basename(str(self.filename()))
-        if fname == None:
+        if fname is None:
             directory = "."
         else:
             directory = QFileInfo(fname).path()
@@ -313,7 +313,7 @@ class DocumentController():
             return False
         if not fname.lower().endswith(".svg"):
             fname += ".svg"
-        if self.svgsavedialog != None:
+        if self.svgsavedialog is not None:
             self.svgsavedialog.filesSelected.disconnect(self.saveSVGDialogCallback)
             del self.svgsavedialog  # prevents hang
             self.svgsavedialog = None
@@ -373,7 +373,7 @@ class DocumentController():
 
         # Proceed with staple export.
         fname = self.filename()
-        if fname == None:
+        if fname is None:
             directory = "."
         else:
             directory = QFileInfo(fname).path()
@@ -476,7 +476,7 @@ class DocumentController():
     # end def
 
     def activePart(self):
-        if self._active_part == None:
+        if self._active_part is None:
             self._active_part = self._document.selectedPart()
         return self._active_part
     # end def
@@ -500,14 +500,14 @@ class DocumentController():
         setBatch(False)
         self._document.undoStack().clear()  # reset undostack
         self._filename = fname if fname else "untitled.json"
-        self._has_no_associated_file = fname == None
+        self._has_no_associated_file = fname is None
         self._active_part = None
         self.win.setWindowTitle(self.documentTitle() + '[*]')
     # end def
 
     def saveFileDialog(self):
         fname = self.filename()
-        if fname == None:
+        if fname is None:
             directory = "."
         else:
             directory = QFileInfo(fname).path()
@@ -554,7 +554,7 @@ class DocumentController():
         maybeSave. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
-        if self.filesavedialog != None:
+        if self.filesavedialog is not None:
             self.filesavedialog.finished.disconnect(self.actionNewSlotCallback)
             del self.filesavedialog  # prevents hang (?)
             self.filesavedialog = None
@@ -570,7 +570,7 @@ class DocumentController():
             return False
         if not fname.lower().endswith(".csv"):
             fname += ".csv"
-        if self.saveStaplesDialog != None:
+        if self.saveStaplesDialog is not None:
             self.saveStaplesDialog.filesSelected.disconnect(self.exportStaplesCallback)
             # manual garbage collection to prevent hang (in osx)
             del self.saveStaplesDialog
@@ -588,7 +588,7 @@ class DocumentController():
         already removed by saveFileDialogCallback.
         """
 
-        if self.filesavedialog != None:
+        if self.filesavedialog is not None:
             self.filesavedialog.finished.disconnect(self.newClickedCallback)
             del self.filesavedialog  # prevents hang (?)
             self.filesavedialog = None
@@ -626,7 +626,7 @@ class DocumentController():
         self.win.slice_graphics_view.update()
 
         if hasattr(self, "filesavedialog"): # user did save
-            if self.fileopendialog != None:
+            if self.fileopendialog is not None:
                 self.fileopendialog.filesSelected.disconnect(\
                                               self.openAfterMaybeSaveCallback)
             # manual garbage collection to prevent hang (in osx)
@@ -643,7 +643,7 @@ class DocumentController():
             return False
         if not fname.lower().endswith(".json"):
             fname += ".json"
-        if self.filesavedialog != None:
+        if self.filesavedialog is not None:
             self.filesavedialog.filesSelected.disconnect(
                                                 self.saveFileDialogCallback)
             del self.filesavedialog  # prevents hang
@@ -740,7 +740,7 @@ class DocumentController():
         return True
 
     def writeDocumentToFile(self, filename=None):
-        if filename == None or filename == '':
+        if filename is None or filename == '':
             if self._has_no_associated_file:
                 return False
             filename = self.filename()

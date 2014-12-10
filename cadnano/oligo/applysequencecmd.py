@@ -24,7 +24,7 @@ class ApplySequenceCommand(UndoCommand):
                 oligo_list.append(comp_strand.oligo())
             # end for
             # as long as the new Applied Sequence is not None
-            if n_s == None and n_s_original:
+            if n_s is None and n_s_original:
                 break
         # end for
         for oligo in oligo_list:
