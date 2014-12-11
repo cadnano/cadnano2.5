@@ -128,9 +128,9 @@ class SplitCommand(UndoCommand):
         if sHcH:
             if (o_strand.isDrawn5to3() and sHcH.isDrawn5to3()) or \
                 (not o_strand.isDrawn5to3() and not sHcH.isDrawn5to3()):
-                sHcH.setConnectionLow(sH)
+                sHcH.setConnectionLow(s_high)
             else:
-                sHcH.setConnectionHigh(sH)
+                sHcH.setConnectionHigh(s_high)
 
         # Traverse the strands via 3'conns to assign the new oligos
         for strand in l_olg.strand5p().generator3pStrand():

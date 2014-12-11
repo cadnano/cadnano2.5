@@ -149,7 +149,7 @@ class StrandSet(ProxyObject):
         #     return (low_idx, high_idx)
 
         if sl[base_idx] is not None:
-            print("base already there", base_idx)
+            # print("base already there", base_idx)
             return (None, None)
 
         i = base_idx
@@ -204,11 +204,12 @@ class StrandSet(ProxyObject):
             c = CreateStrandCommand(self,
                                         base_idx_low, base_idx_high)
             row, col = self._virtual_helix.coord()
-            d = "(%d,%d).%d" % (row, col, self._strand_type)
+            d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
+            # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return 0
         else:
-            print("could not create strand", bounds_low, bounds_high, base_idx_low, base_idx_high)
+            # print("could not create strand", bounds_low, bounds_high, base_idx_low, base_idx_high)
             return -1
     # end def
 
@@ -221,7 +222,8 @@ class StrandSet(ProxyObject):
         c = CreateStrandCommand(self,
                                     base_idx_low, base_idx_high)
         row, col = self._virtual_helix.coord()
-        d = "(%d,%d).%d" % (row, col, self._strand_type)
+        d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
+        # print("strand", d)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
         return 0
     # end def
