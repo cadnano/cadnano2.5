@@ -20,9 +20,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         vh.setPart(part)
         part._addVirtualHelix(vh)
         vh.setNumber(id_num)
-        if not vh.number():
-            part._reserveHelixIDNumber(self._is_parity_even,
-                                        requested_id_num=id_num)
+        # need to always reserve an id
+        part._reserveHelixIDNumber(self._is_parity_even,
+                                    requested_id_num=id_num)
         # end if
         part.partVirtualHelixAddedSignal.emit(part, vh)
         part.partActiveSliceResizeSignal.emit(part)

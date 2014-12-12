@@ -914,10 +914,12 @@ class Part(ProxyObject):
             # assert not num in self._number_to_virtual_helix
             if num in self.odd_recycle_bin:
                 self.odd_recycle_bin.remove(num)
+                # rebuild the heap since we removed a specific item
                 heapify(self.odd_recycle_bin)
                 return num
             if num in self.even_recycle_bin:
                 self.even_recycle_bin.remove(num)
+                # rebuild the heap since we removed a specific item
                 heapify(self.even_recycle_bin)
                 return num
             self.reserve_bin.add(num)
@@ -932,6 +934,7 @@ class Part(ProxyObject):
                     while self._highest_used_even + 2 in self.reserve_bin:
                         self._highest_used_even += 2
                     self._highest_used_even += 2
+                    self.reserve_bin.add(self._highest_used_even)
                     return self._highest_used_even
             else:
                 if len(self.odd_recycle_bin):
@@ -942,6 +945,7 @@ class Part(ProxyObject):
                     while self._highest_used_odd + 2 in self.reserve_bin:
                         self._highest_used_odd += 2
                     self._highest_used_odd += 2
+                    self.reserve_bin.add(self._highest_used_odd)
                     return self._highest_used_odd
         # end else
     # end def
