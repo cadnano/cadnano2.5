@@ -33,7 +33,7 @@ from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from .resizepartcmd import ResizePartCommand
-from .removeallstrandscmd import RemoveAllStrandsCommand
+
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
@@ -1260,7 +1260,7 @@ class Part(ProxyObject):
         vh = self.virtualHelixAtCoord(coord)
         if vh:
             strand = vh.stap(idx) if isstaple else vh.scaf(idx)
-            return strand, idx
+            return strand, idx, coord, isstaple
         else:
             raise ValueError("getModStrandIdx: no strand for key: {}", key)
     # end def
@@ -1323,6 +1323,21 @@ class Part(ProxyObject):
         if idx_old != idx:
             self.removeModInstance(coord, idx_old, isstaple, isinternal, mid)
             self.addModInstance(coord, idx, isstaple, isinternal, mid)
+    # end def
+
+    def changeModDeltaMinKey(self, key, delta_min, mid, mods_strands, locations):
+        strand, idx, coord, isstaple = part.getModStrandIdx(key)
+        mid = self.getModID(strand, idx)
+        self.removeModInstanceKey(key, mods_strands, locations)
+        kew_new =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
+        self.addModInstanceKey(key_new, mods_strands, locations, mid)
+    # def
+
+    def changeModsDeltaLowIdx(self, delta_min, isinternal=False):
+        mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
+        locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
+        for key, mid in list(mods_strands.items()):
+            self.changeModDeltaMinKey(key, delta_min, mid, mods_strands, locations)
     # end def
 
     def changeModStrandLocation(self, strand, idxs_old, idxs):

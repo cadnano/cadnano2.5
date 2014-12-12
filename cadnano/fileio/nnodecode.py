@@ -267,14 +267,14 @@ def decode(document, obj):
             if mod_id != 'int_instances' and mod_id != 'ext_instances':
                 part.createMod(item, mod_id)
         for key, mid in obj['modifications']['ext_instances'].items():
-            strand, idx = part.getModStrandIdx(key)
+            strand, idx, coord, isstaple = part.getModStrandIdx(key)
             try:
                 strand.addMods(mid, idx, use_undostack=False)
             except:
                 print(strand, idx)
                 raise
         for key in obj['modifications']['int_instances'].items():
-            strand, idx = part.getModStrandIdx(key)
+            strand, idx, coord, isstaple  = part.getModStrandIdx(key)
             try:
                 strand.addMods(mid, idx, use_undostack=False)
             except:

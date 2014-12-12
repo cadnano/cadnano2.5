@@ -34,7 +34,7 @@ class StrandSet(ProxyObject):
         self._doc = virtual_helix.document()
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
-        self._strand_list = [None]*virtual_helix.part().maxBaseIdx()
+        self.strand_array = [None]*virtual_helix.part().maxBaseIdx()
 
         # self.strand_vector = array.array('L')
         self._undo_stack = None
@@ -43,8 +43,18 @@ class StrandSet(ProxyObject):
     # end def
 
     def strands(self):
-        strands = [x for x in self._strand_list if x is not None]
+        strands = [x for x in self.strand_array if x is not None]
         return set(strands)
+
+    def resize(self, delta_low, delta_high):
+        if delta_low < 0:
+            self.strand_array = self.strand_array[delta_low:]
+        if delta_high < 0:
+            self.strand_array = self.strand_array[:delta_high]
+        self.strand_array = [None]*delta_low + \
+                self.strand_array + \
+                    [None]*delta_high
+        # end def
 
     def __iter__(self):
         """Iterate over each strand in the strands list."""
@@ -76,7 +86,7 @@ class StrandSet(ProxyObject):
     # end def
 
     def generatorStrand(self):
-        """Return a generator that yields the strands in self._strand_list."""
+        """Return a generator that yields the strands in self.strand_array."""
         return iter(self.strands())
     # end def
 
@@ -94,10 +104,10 @@ class StrandSet(ProxyObject):
     # end def
 
     def length(self):
-        return len(self._strand_list)
+        return len(self.strand_array)
 
     def getNeighbors(self, strand):
-        sl = self._strand_list
+        sl = self.strand_array
         lsl = len(sl) 
         start, end = strand.idxs()
         if sl[start] != strand:
@@ -140,7 +150,7 @@ class StrandSet(ProxyObject):
         Returns the (tight) bounds of the contiguous stretch of unpopulated
         bases that includes the base_idx.
         """
-        sl = self._strand_list
+        sl = self.strand_array
         lsl = len(sl)
         low_idx, high_idx = 0, self.partMaxBaseIdx()  # init the return values
         # len_strands = len(sl)
@@ -171,7 +181,7 @@ class StrandSet(ProxyObject):
 
     def indexOfRightmostNonemptyBase(self):
         """Returns the high base_idx of the last strand, or 0."""
-        sl = self._strand_list
+        sl = self.strand_array
         lsl = len(sl)-1
         for i in range(lsl, -1, -1):
             if sl[i] is not None:
@@ -229,7 +239,7 @@ class StrandSet(ProxyObject):
     # end def
 
     def isStrandInSet(self, strand):
-        sl = self._strand_list
+        sl = self.strand_array
         if sl[strand.lowIdx()] == strand and sl[strand.highIdx()] == strand:
             return True
         else:
@@ -257,8 +267,8 @@ class StrandSet(ProxyObject):
     def removeAllStrands(self, use_undostack=True):
         # copy the list because we are going to shrink it and that's
         # a no no with iterators
-        #temp = [x for x in self._strand_list]
-        for strand in set(self._strand_list):
+        #temp = [x for x in self.strand_array]
+        for strand in set(self.strand_array):
             self.removeStrand(strand, use_undostack=use_undostack, solo=False)
         # end def
 
@@ -363,7 +373,7 @@ class StrandSet(ProxyObject):
     def hasStrandAt(self, idx_low, idx_high):
         """
         """
-        sl = self._strand_list
+        sl = self.strand_array
         if sl[idx_low] is None and sl[idx_high] is None:
             return False
         else:
@@ -371,7 +381,7 @@ class StrandSet(ProxyObject):
     # end def
 
     def getOverlappingStrands(self, idx_low, idx_high):
-        sl = self._strand_list
+        sl = self.strand_array
         strand_subset = set()
         out = []
         for i in range(idx_low, idx_high + 1):
@@ -385,7 +395,7 @@ class StrandSet(ProxyObject):
     # end def
 
     def hasStrandAtAndNoXover(self, idx):
-        sl = self._strand_list
+        sl = self.strand_array
         strand = sl[idx]
         if strand is None:
             return False
@@ -396,7 +406,7 @@ class StrandSet(ProxyObject):
     # end def
 
     def hasNoStrandAtOrNoXover(self, idx):
-        sl = self._strand_list
+        sl = self.strand_array
         strand = sl[idx]
         if strand is None:
             return True
@@ -408,7 +418,7 @@ class StrandSet(ProxyObject):
 
     def getStrand(self, base_idx):
         """Returns the strand that overlaps with base_idx."""
-        return self._strand_list[base_idx]
+        return self.strand_array[base_idx]
     # end def
 
     def getLegacyArray(self):
@@ -416,7 +426,7 @@ class StrandSet(ProxyObject):
         num = self._virtual_helix.number()
         ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
         if self.isDrawn5to3():
-            for strand in self._strand_list:
+            for strand in self.strand_array:
                 lo, hi = strand.idxs()
                 assert strand.idx5Prime() == lo and strand.idx3Prime() == hi
                 # map the first base (5' xover if necessary)
@@ -443,7 +453,7 @@ class StrandSet(ProxyObject):
             # end for
         # end if
         else:
-            for strand in self._strand_list:
+            for strand in self.strand_array:
                 lo, hi = strand.idxs()
                 assert strand.idx3Prime() == lo and strand.idx5Prime() == hi
                 # map the first base (3' xover if necessary)
@@ -473,29 +483,29 @@ class StrandSet(ProxyObject):
 
     ### PRIVATE SUPPORT METHODS ###
     def _addToStrandList(self, strand):
-        """Inserts strand into the _strand_list at idx."""
+        """Inserts strand into the strand_array at idx."""
         # print("Adding to strandlist")
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
-            self._strand_list[i] = strand
+            self.strand_array[i] = strand
 
     def updateStrandIdxs(self, strand, old_idxs, new_idxs):
         """update indices in the strand array/list of an existing strand"""
         for i in range(old_idxs[0], old_idxs[1]+1):
-            self._strand_list[i] = None
+            self.strand_array[i] = None
         for i in range(new_idxs[0], new_idxs[1]+1):
-            self._strand_list[i] = strand
+            self.strand_array[i] = strand
 
     def _removeFromStrandList(self, strand):
-        """Remove strand from _strand_list."""
+        """Remove strand from strand_array."""
         self._doc.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
-            self._strand_list[i] = None
+            self.strand_array[i] = None
 
     def getStrandIndex(self, strand):
         try:
-            ind = self._strand_list.index(strand)
+            ind = self.strand_array.index(strand)
             return (True, ind)
         except ValueError:
             return (False, 0)
