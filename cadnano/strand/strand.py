@@ -86,6 +86,10 @@ class Strand(ProxyObject):
                                 self._base_idx_low,
                                 self._base_idx_high)
         return s
+    # end def
+
+    def __lt__(self, other):
+        return self._base_idx_low < other._base_idx_low
 
     def generator5pStrand(self):
         """

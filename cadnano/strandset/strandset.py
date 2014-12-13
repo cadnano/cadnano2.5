@@ -1,6 +1,7 @@
 from operator import itemgetter
 from itertools import repeat
 import array
+from bisect import bisect_left, insort_left
 
 izip = zip
 
@@ -35,26 +36,13 @@ class StrandSet(ProxyObject):
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
         self.strand_array = [None]*virtual_helix.part().maxBaseIdx()
+        self.strand_heap = []
 
         # self.strand_vector = array.array('L')
         self._undo_stack = None
         self._last_strandset_idx = None
         self._strand_type = strand_type
     # end def
-
-    def strands(self):
-        strands = [x for x in self.strand_array if x is not None]
-        return set(strands)
-
-    def resize(self, delta_low, delta_high):
-        if delta_low < 0:
-            self.strand_array = self.strand_array[delta_low:]
-        if delta_high < 0:
-            self.strand_array = self.strand_array[:delta_high]
-        self.strand_array = [None]*delta_low + \
-                self.strand_array + \
-                    [None]*delta_high
-        # end def
 
     def __iter__(self):
         """Iterate over each strand in the strands list."""
@@ -85,9 +73,22 @@ class StrandSet(ProxyObject):
         return self._doc
     # end def
 
+    def strands(self):
+        return self.strand_heap
+
+    def resize(self, delta_low, delta_high):
+        if delta_low < 0:
+            self.strand_array = self.strand_array[delta_low:]
+        if delta_high < 0:
+            self.strand_array = self.strand_array[:delta_high]
+        self.strand_array = [None]*delta_low + \
+                self.strand_array + \
+                    [None]*delta_high
+    # end def
+
     def generatorStrand(self):
         """Return a generator that yields the strands in self.strand_array."""
-        return iter(self.strands())
+        return iter(self.strand_heap)
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
@@ -106,30 +107,46 @@ class StrandSet(ProxyObject):
     def length(self):
         return len(self.strand_array)
 
+    # def getNeighbors(self, strand):
+    #     sl = self.strand_array
+    #     lsl = len(sl) 
+    #     start, end = strand.idxs()
+    #     if sl[start] != strand:
+    #         raise IndexError("strand not in list")
+    #     if start != 0:
+    #         start -= 1
+    #     if end != lsl - 1:
+    #         end += 1
+    #     low_strand = None
+    #     high_strand = None
+    #     while start > -1:
+    #         if sl[start] is not None:
+    #             low_strand = sl[start]
+    #             break
+    #         else:
+    #             start -= 1
+    #     while end < lsl:
+    #         if sl[end] is not None:
+    #             high_strand = sl[end]
+    #             break
+    #         else:
+    #             end += 1
+    #     return low_strand, high_strand
+    # # end def
+
     def getNeighbors(self, strand):
-        sl = self.strand_array
-        lsl = len(sl) 
-        start, end = strand.idxs()
-        if sl[start] != strand:
-            raise IndexError("strand not in list")
-        if start != 0:
-            start -= 1
-        if end != lsl - 1:
-            end += 1
-        low_strand = None
-        high_strand = None
-        while start > -1:
-            if sl[start] is not None:
-                low_strand = sl[start]
-                break
-            else:
-                start -= 1
-        while end < lsl:
-            if sl[end] is not None:
-                high_strand = sl[end]
-                break
-            else:
-                end += 1
+        sh = self.strand_heap
+        i = bisect_left(sh, strand)
+        if sh[i] != strand:
+            raise ValueError("getNeighbors: strand not in set")
+        if i == 0:
+            low_strand = None
+        else:
+            low_strand = sh[i-1]
+        if i == len(sh) - 1:
+            high_strand = None
+        else:
+            high_strand = sh[i+1]
         return low_strand, high_strand
     # end def
 
@@ -145,47 +162,88 @@ class StrandSet(ProxyObject):
             return vh.stapleStrandSet()
     # end def
 
+    # def getBoundsOfEmptyRegionContaining(self, base_idx):
+    #     """
+    #     Returns the (tight) bounds of the contiguous stretch of unpopulated
+    #     bases that includes the base_idx.
+    #     """
+    #     sl = self.strand_array
+    #     lsl = len(sl)
+    #     low_idx, high_idx = 0, self.partMaxBaseIdx()  # init the return values
+    #     # len_strands = len(sl)
+
+    #     # if len_strands == 0:  # empty strandset, just return the part bounds
+    #     #     return (low_idx, high_idx)
+
+    #     if sl[base_idx] is not None:
+    #         # print("base already there", base_idx)
+    #         return (None, None)
+
+    #     i = base_idx
+    #     while i > -1:
+    #         if sl[i] is None:
+    #             i -= 1
+    #         else:
+    #             low_idx = i + 1
+    #             break
+
+    #     i = base_idx
+    #     while i < lsl:
+    #         if sl[i] is None:
+    #             i += 1
+    #         else:
+    #             high_idx = i - 1
+    #     return (low_idx, high_idx)
+    # # end def
+
     def getBoundsOfEmptyRegionContaining(self, base_idx):
         """
-        Returns the (tight) bounds of the contiguous stretch of unpopulated
-        bases that includes the base_idx.
+
         """
-        sl = self.strand_array
-        lsl = len(sl)
-        low_idx, high_idx = 0, self.partMaxBaseIdx()  # init the return values
-        # len_strands = len(sl)
+        class DummyStrand(object):
+            _base_idx_low = base_idx
+            def __lt__(self, other):
+                return self._base_idx_low < other._base_idx_low
 
-        # if len_strands == 0:  # empty strandset, just return the part bounds
-        #     return (low_idx, high_idx)
+        ds = DummyStrand()
+        sh = self.strand_heap
+        lsh = len(sh)
+        if lsh == 0:
+            return 0, len(self.strand_array) - 1
 
-        if sl[base_idx] is not None:
-            # print("base already there", base_idx)
-            return (None, None)
-
-        i = base_idx
-        while i > -1:
-            if sl[i] is None:
-                i -= 1
-            else:
-                low_idx = i + 1
-                break
-
-        i = base_idx
-        while i < lsl:
-            if sl[i] is None:
-                i += 1
-            else:
-                high_idx = i - 1
+        # the i-th index is the high-side strand and the i-1 index
+        # is the low-side strand since bisect_left gives the index 
+        # to insert the dummy strand at
+        i = bisect_left(sh, ds)
+        if i == 0:
+            low_idx = 0
+        else:
+            low_idx = sh[i - 1].highIdx() + 1
+        
+        # would be an append to the list effectively if inserting the dummy strand
+        if i == lsh:
+            high_idx = len(self.strand_array) - 1
+        else:
+            high_idx = sh[i].lowIdx() - 1
         return (low_idx, high_idx)
     # end def
 
+    # def indexOfRightmostNonemptyBase(self):
+    #     """Returns the high base_idx of the last strand, or 0."""
+    #     sl = self.strand_array
+    #     lsl = len(sl)-1
+    #     for i in range(lsl, -1, -1):
+    #         if sl[i] is not None:
+    #             return sl[i].highIdx()
+    # # end def
+
     def indexOfRightmostNonemptyBase(self):
-        """Returns the high base_idx of the last strand, or 0."""
-        sl = self.strand_array
-        lsl = len(sl)-1
-        for i in range(lsl, -1, -1):
-            if sl[i] is not None:
-                return sl[i].highIdx()
+           """Returns the high base_idx of the last strand, or 0."""
+           sh = self.strand_heap
+           if len(sh) > 0:
+               return sh[-1].highIdx()
+           else:
+               return 0
     # end def
 
     def partMaxBaseIdx(self):
@@ -268,7 +326,7 @@ class StrandSet(ProxyObject):
         # copy the list because we are going to shrink it and that's
         # a no no with iterators
         #temp = [x for x in self.strand_array]
-        for strand in set(self.strand_array):
+        for strand in list(self.strand_heap):
             self.removeStrand(strand, use_undostack=use_undostack, solo=False)
         # end def
 
@@ -488,6 +546,7 @@ class StrandSet(ProxyObject):
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
             self.strand_array[i] = strand
+        insort_left(self.strand_heap, strand)
 
     def updateStrandIdxs(self, strand, old_idxs, new_idxs):
         """update indices in the strand array/list of an existing strand"""
@@ -502,6 +561,8 @@ class StrandSet(ProxyObject):
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
             self.strand_array[i] = None
+        i = bisect_left(self.strand_heap, strand)
+        self.strand_heap.pop(i)
 
     def getStrandIndex(self, strand):
         try:
