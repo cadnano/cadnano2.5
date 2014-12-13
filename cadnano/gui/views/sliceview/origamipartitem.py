@@ -1,5 +1,5 @@
 
-from cadnano.gui.controllers.itemcontrollers.partitemcontroller import PartItemController
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
 from .activesliceitem import ActiveSliceItem
@@ -11,6 +11,7 @@ from cadnano import getReopen
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QPainterPath, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsRectItem
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -19,7 +20,7 @@ DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 _MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
-class PartItem(QGraphicsItem):
+class OrigamiPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part, parent=None):
@@ -31,9 +32,9 @@ class PartItem(QGraphicsItem):
         
         Order matters for deselector, probe, and setlattice
         """
-        super(PartItem, self).__init__(parent)
+        super(OrigamiPartItem, self).__init__(parent)
         self._part = model_part
-        self._controller = PartItemController(self, model_part)
+        self._controller = OrigamiPartItemController(self, model_part)
         self._active_slice_item = ActiveSliceItem(self, model_part.activeBaseIndex())
         self._scaleFactor = self._RADIUS/model_part.radius()
         self._empty_helix_hash = {}
@@ -45,11 +46,18 @@ class PartItem(QGraphicsItem):
         # If None, all slices will be redrawn and the cache will be filled.
         # Connect destructor. This is for removing a part from scenes.
         self.probe = self.IntersectionProbe(self)
-        # initialize the PartItem with an empty set of old coords
+        # initialize the OrigamiPartItem with an empty set of old coords
         self._setLattice([], model_part.generatorFullLattice())
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
         self._initModifierCircle()
+
+        # outline = QGraphicsRectItem(self.boundingRect(), self)
+        # outline.setPen(QPen(Qt.red))
+        # f.setPen(QPen(Qt.NoPen))
+        # outline.setBrush(QBrush(QColor(204, 0, 0)))
+        # outline.setRect(self.boundingRect())
+
     # end def
 
     def _initDeselector(self):
@@ -57,7 +65,7 @@ class PartItem(QGraphicsItem):
         The deselector grabs mouse events that missed a slice and clears the
         selection when it gets one.
         """
-        self.deselector = ds = PartItem.Deselector(self)
+        self.deselector = ds = OrigamiPartItem.Deselector(self)
         ds.setParentItem(self)
         ds.setFlag(QGraphicsItem.ItemStacksBehindParent)
         ds.setZValue(styles.ZDESELECTOR)
@@ -85,13 +93,13 @@ class PartItem(QGraphicsItem):
 
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
-        # print "PartItem.partParentChangedSlot"
+        # print "OrigamiPartItem.partParentChangedSlot"
         pass
 
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
         self._active_slice_item.removed()
-        self.parentItem().removePartItem(self)
+        self.parentItem().removeOrigamiPartItem(self)
         
         scene = self.scene()
         
@@ -273,11 +281,11 @@ class PartItem(QGraphicsItem):
         """The deselector lives behind all the slices and observes mouse press
         events that miss slices, emptying the selection when they do"""
         def __init__(self, parent_HGI):
-            super(PartItem.Deselector, self).__init__()
+            super(OrigamiPartItem.Deselector, self).__init__()
             self.parent_HGI = parent_HGI
         def mousePressEvent(self, event):
             self.parent_HGI.part().setSelection(())
-            super(PartItem.Deselector, self).mousePressEvent(event)
+            super(OrigamiPartItem.Deselector, self).mousePressEvent(event)
         def boundingRect(self):
             return self.parent_HGI.boundingRect()
         def paint(self, painter, option, widget=None):

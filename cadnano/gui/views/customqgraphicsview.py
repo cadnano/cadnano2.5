@@ -74,7 +74,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._scale_limit_min = 0.41
         self._scale_up_rate = 0.01
         self._scale_down_rate = 0.01
-        self._scale_fit_factor = 1  # sets initial zoom level
+        self._scale_fit_factor = .5  # sets initial zoom level
         self._show_details = True
         self._last_scale_factor = 0.0
         self.scene_root_item = None  # the item to transform

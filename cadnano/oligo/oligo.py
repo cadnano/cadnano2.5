@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+from cadnano.gui.views.pathview import pathstyles as styles
+
 import copy
 
 import cadnano.util as util
@@ -150,9 +152,9 @@ class Oligo(ProxyObject):
             return False
         if self._strand5p.isScaffold():
             return False
-        if self.length() < 18:
+        if self.length() < styles.OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
-        if self.length() > 50:
+        if self.length() > styles.OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
             return True
         return False
     # end def

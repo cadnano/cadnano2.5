@@ -20,6 +20,7 @@
         <file alias="new-spx">images/part-new-spx.png</file>
         <file alias="renum">images/part-renum.png</file>
         <file alias="new-origami">images/part-new-origami.png</file>
+        <file alias="new-dna">images/part-new-dna.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

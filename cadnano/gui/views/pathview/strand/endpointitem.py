@@ -338,7 +338,7 @@ class EndpointItem(QGraphicsPathItem):
         """Break the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
-        part_item = vhi.partItem()
+        origami_part_item = vhi.partItem()
         active_tool = self._getActiveTool()
 
         if active_tool.isFloatingXoverBegin():

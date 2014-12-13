@@ -38,13 +38,13 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # _PI = 3.141592
     # _temp = [x*_PI*0.1 for x in range(20)]
     # _temp = [(math.sin(angle) * _RADIUS, math.cos(angle) * _RADIUS) for angle in _temp]
-    def __init__(self, row, column, part_item):
+    def __init__(self, row, column, origami_part_item):
         """
         row, column is a coordinate in Lattice terms
-        part_item is a PartItem that will act as a QGraphicsItem parent
+        origami_part_item is a OrigamiPartItem that will act as a QGraphicsItem parent
         """
-        super(EmptyHelixItem, self).__init__(parent=part_item)
-        self._part_item = part_item
+        super(EmptyHelixItem, self).__init__(parent=origami_part_item)
+        self._origami_part_item = origami_part_item
         self._lastvh = None  # for decideAction
         self.hide()
         self._is_hovered = False
@@ -52,7 +52,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
         self.setNotHovered()
 
-        x, y = part_item.part().latticeCoordToPositionXY(row, column, part_item.scaleFactor())
+        x, y = origami_part_item.part().latticeCoordToPositionXY(row, column, origami_part_item.scaleFactor())
         self.setPos(x, y)
         self._coord = (row, column)
         self.show()
@@ -83,7 +83,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def part(self):
-        return self._part_item.part()
+        return self._origami_part_item.part()
     # end def
 
     def translateVH(self, delta):
@@ -105,7 +105,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def setHovered(self):
-        # self.setFlag(QGraphicsItem.ItemHasNoContents, False)  
+        # self.setFlag(QGraphicsItem.ItemHasNoContents, False)
         self.setBrush(self._HOVER_BRUSH)
         self.setPen(self._HOVER_PEN)
         self.update(self.boundingRect())
@@ -114,7 +114,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setZValue(self._Z_HOVERED)
         self.setRect(self._HOVER_RECT)
 
-        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
     # end def
 
     def hoverEnterEvent(self, event):
@@ -137,7 +137,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setZValue(self._Z_DEFAULT)
         self.setRect(self._DEFAULT_RECT)
 
-        self._part_item.updateStatusBar("")
+        self._origami_part_item.updateStatusBar("")
     # end def
 
     def hoverLeaveEvent(self, event):
@@ -155,13 +155,13 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def mouseMoveEvent(self, event):
-        part_item = self._part_item
-        pos_in_parent = part_item.mapFromItem(self, QPointF(event.pos()))
+        origami_part_item = self._origami_part_item
+        pos_in_parent = origami_part_item.mapFromItem(self, QPointF(event.pos()))
         # Qt doesn't have any way to ask for graphicsitem(s) at a
         # particular position but it *can* do intersections, so we
         # just use those instead
-        part_item.probe.setPos(pos_in_parent)
-        for ci in part_item.probe.collidingItems():
+        origami_part_item.probe.setPos(pos_in_parent)
+        for ci in origami_part_item.probe.collidingItems():
             if isinstance(ci, EmptyHelixItem):
                 self.dragSessionAction(ci)
     # end def
@@ -357,7 +357,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def nop(self):
-        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
 
     def addScafAtActiveSliceIfMissing(self):
         vh = self.virtualHelix()
@@ -370,7 +370,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         end_idx = min(idx+1, part.maxBaseIdx())
         vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
 
-        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
     # end def
 
     def addStapAtActiveSliceIfMissing(self):
@@ -385,7 +385,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         end_idx = min(idx + 1, part.maxBaseIdx())
         vh.stapleStrandSet().createStrand(start_idx, end_idx)
 
-        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
     # end def
 
     def addVHIfMissing(self):
@@ -401,7 +401,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
         u_s.endMacro()
 
-        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
     # end def
 
     if GL:

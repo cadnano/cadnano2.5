@@ -378,8 +378,4 @@ class InsertionLabel(QGraphicsTextItem):
     def updateLabel(self):
         self.setPlainText("%d" % (self.parentItem()._insertion.length()))
     # end def
-
 # end class
-
-
-

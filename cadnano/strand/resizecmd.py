@@ -36,7 +36,6 @@ class ResizeCommand(UndoCommand):
         strandset.updateStrandIdxs(std, oI, nI)
 
         if strandset.isStaple():
-            
             std.reapplySequence()
         std.strandResizedSignal.emit(std, nI)
         # for updating the Slice View displayed helices
@@ -56,7 +55,7 @@ class ResizeCommand(UndoCommand):
         std.oligo().decrementLength(self.delta)
         std.setIdxs(oI)
         strandset.updateStrandIdxs(std, nI, oI)
-        
+
         if strandset.isStaple():
             std.reapplySequence()
         std.strandResizedSignal.emit(std, oI)

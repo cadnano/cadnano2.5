@@ -192,7 +192,7 @@ def endSuperMacro(model_object):
 
 def findChild(self):
     """
-    When called when self isa QGraphicsItem, iterates through self's
+    When called when self is a QGraphicsItem, iterates through self's
     childItems(), placing a red rectangle (a sibling of self) around
     each item in sequence (press return to move between items). Since
     the index of each child item is displayed as it is highlighted,

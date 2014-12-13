@@ -10,10 +10,10 @@ from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsSimpleTextItem, QUndoComman
 
 class ActiveSliceItem(QGraphicsRectItem):
     """ActiveSliceItem for the Slice View"""
-    def __init__(self, part_item, active_base_index):
-        super(ActiveSliceItem, self).__init__(part_item)
-        self._part_item = part_item
-        self._controller = ActiveSliceItemController(self, part_item.part())
+    def __init__(self, origami_part_item, active_base_index):
+        super(ActiveSliceItem, self).__init__(origami_part_item)
+        self._origami_part_item = origami_part_item
+        self._controller = ActiveSliceItemController(self, origami_part_item.part())
         self.setFlag(QGraphicsItem.ItemHasNoContents)
     # end def
 
@@ -21,9 +21,9 @@ class ActiveSliceItem(QGraphicsRectItem):
     def strandChangedSlot(self, sender, vh):
         if vh is None:
             return
-        part_item = self._part_item
-        vhi = part_item.getVirtualHelixItemByCoord(*vh.coord())
-        active_base_idx = part_item.part().activeBaseIndex()
+        origami_part_item = self._origami_part_item
+        vhi = origami_part_item.getVirtualHelixItemByCoord(*vh.coord())
+        active_base_idx = origami_part_item.part().activeBaseIndex()
         has_scaf, has_stap = vh.hasStrandAtIdx(active_base_idx)
         vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
     # end def
@@ -34,7 +34,7 @@ class ActiveSliceItem(QGraphicsRectItem):
             return
         newly_active_vhs = set()
         active_base_idx = part.activeBaseIndex()
-        for vhi in self._part_item._virtual_helix_hash.values():
+        for vhi in self._origami_part_item._virtual_helix_hash.values():
             vh = vhi.virtualHelix()
             if vh:
                 has_scaf, has_stap = vh.hasStrandAtIdx(active_base_idx)
@@ -47,12 +47,12 @@ class ActiveSliceItem(QGraphicsRectItem):
 
     ### ACCESSORS ###
     def part(self):
-        return self._part_item.part()
+        return self._origami_part_item.part()
     # end def
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
     def removed(self):
-        self._part_item = None
+        self._origami_part_item = None
         self._controller.disconnectSignals()
         self.controller = None
     # end def

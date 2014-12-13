@@ -222,5 +222,4 @@ class VirtualHelix(ProxyObject):
     #     row, col = self._coord
     #     self._coord = row + deltaRow, col + deltaCol
     # # end def
-
 # end class

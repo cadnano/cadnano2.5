@@ -156,5 +156,4 @@ class AbstractPathTool(QGraphicsObject):
         """
         self.hide()
     # end def
-
 # end class

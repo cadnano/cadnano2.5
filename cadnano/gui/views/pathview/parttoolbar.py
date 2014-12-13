@@ -1,3 +1,4 @@
+from cadnano import app
 
 from . import pathstyles as styles
 
@@ -20,20 +21,30 @@ class PartToolBar(QToolBar):
         _sizePolicy.setVerticalStretch(0)
         _sizePolicy.setHeightForWidth(_sizePolicy.hasHeightForWidth())
         self.setSizePolicy(_sizePolicy)
-        # self.setOrientation(Qt.Vertical)  # default is horizontal
-        self.setMaximumHeight(40) # horizontal
-        # self.setMaximumWidth(46) # vertical
+        self.setOrientation(Qt.Vertical)  # default is horizontal
+        # _maxH = 40 if app().prefs.show_icon_labels else 30
+        # self.setMaximumHeight(_maxH) # horizontal
+        self.setMaximumWidth(36) # vertical
         self.setIconSize(QSize(20, 20))
         self.setLayoutDirection(Qt.LeftToRight)
-        self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+
+        if app().prefs.show_icon_labels:
+            self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # Toolbar Label
-        self.action_toolbar_label = self.setupAction("Add\nPart:", None, "action_new_honeycomb_part", None, None)
+        self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
+
+        # DNA part
+        self.action_new_dna_part = self.setupAction("Plasmid", None, 
+                                                        "action_new_dna_part", 
+                                                        ":/parttools/new-dna")
+        self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
+
 
         # Origami ToolButton
-        self.add_origamipart_button = self.setupToolButton("Origami", None, 
+        self.add_origamipart_button = self.setupToolButton("Origami\n", None, 
                                                            "add_origamipart_button", 
-                                                           ":/parttools/new-origami")
+                                                           ":/parttools/new-honeycomb")
 
         # Origami Part (Honeycomb)
         self.action_new_honeycomb_part = self.setupAction("Hcomb", None, 
@@ -44,33 +55,47 @@ class PartToolBar(QToolBar):
         # Origami Part (Square)
         self.action_new_square_part = self.setupAction("Square", None, 
                                                        "action_new_square_part", 
-                                                       ":/parttools/new-square",
+                                                       ":/parttools/new-square", 
                                                        self.add_origamipart_button)
         self.action_new_square_part.triggered.connect(self.doc.controller().actionAddSquarePartSlot)
         # Origami Part (H-PX)
         self.action_new_hpx_part = self.setupAction("H-PX", None, 
                                                         "action_new_honeypx_part", 
-                                                        ":/parttools/new-hpx",
+                                                        ":/parttools/new-hpx", 
                                                         self.add_origamipart_button)
         self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHpxPartSlot)
         # Origami Part (S-px)
         self.action_new_spx_part = self.setupAction("Sq-PX", None, 
                                                         "action_new_squarepx_part", 
-                                                        ":/parttools/new-spx",
+                                                        ":/parttools/new-spx", 
                                                         self.add_origamipart_button)
         self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSpxPartSlot)
+
     # end def
 
     def setupToolButton(self, actionText, shortcut, actionName, rc_path):
         toolbutton = QToolButton(self)
         toolbutton.setPopupMode(QToolButton.InstantPopup)
-        toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
-        # toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
+        if app().prefs.show_icon_labels:
+            toolbutton.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+            toolbutton.setFont(_FONT)
+            toolbutton.setText(QApplication.translate("MainWindow", actionText, None))
         icon = QIcon()
         icon.addPixmap(QPixmap(rc_path), QIcon.Normal, QIcon.Off)
         toolbutton.setIcon(icon)
         self.addWidget(toolbutton)
         return toolbutton
+    # end def
+
+    def setupLabel(self, actionText, actionName):
+        action = QAction(self)
+        if actionText != None:
+            action.setText(QApplication.translate("MainWindow", actionText, None))
+        if actionName != None:
+            action.setObjectName(actionName)
+        self.addAction(action)
+        return action
+    # end def
 
     def setupAction(self, actionText, shortcut, actionName, rc_path, toolbutton=None):
         """
@@ -79,7 +104,7 @@ class PartToolBar(QToolBar):
         """
         action = QAction(self)
 
-        if actionText is not None:
+        if actionText != None and app().prefs.show_icon_labels or toolbutton:
             action.setText(QApplication.translate("MainWindow", actionText, None))
         if rc_path is not None:
             icon = QIcon()
