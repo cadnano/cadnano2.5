@@ -373,7 +373,7 @@ class StrandSet(ProxyObject):
         during autostaple).
         """
         if self.strandCanBeSplit(strand, base_idx):
-            if self.isStrandInSet(low_strand):
+            if self.isStrandInSet(strand):
                 c = SplitCommand(strand, base_idx, update_sequence)
                 util.execCommandList(self, [c], desc="Split", use_undostack=use_undostack)
                 return True
@@ -428,27 +428,89 @@ class StrandSet(ProxyObject):
     def strandFilter(self):
         return "scaffold" if self._strand_type == StrandType.SCAFFOLD else "staple"
 
+    # def hasStrandAt(self, idx_low, idx_high):
+    #     """
+    #     """
+    #     sl = self.strand_array
+    #     if sl[idx_low] is None and sl[idx_high] is None:
+    #         return False
+    #     else:
+    #         return True
+    # # end def
+
     def hasStrandAt(self, idx_low, idx_high):
         """
         """
-        sl = self.strand_array
-        if sl[idx_low] is None and sl[idx_high] is None:
+        sa = self.strand_array
+        sh = self.strand_heap
+        lsh = len(sh)
+
+        strand = sa[idx_low]
+
+        if strand is None:
+            class DummyStrand(object):
+                _base_idx_low = idx_low
+                def __lt__(self, other):
+                    return self._base_idx_low < other._base_idx_low
+
+            ds = DummyStrand()
+            i = bisect_left(sh, ds)
+
+            while i < lsh:
+                strand = sh[i]
+                if strand.lowIdx() > idx_high:
+                    return False
+                elif idx_low <= strand.highIdx():
+                    return True
+                else:
+                    i += 1
             return False
         else:
             return True
     # end def
 
+    # def getOverlappingStrands(self, idx_low, idx_high):
+    #     sl = self.strand_array
+    #     strand_subset = set()
+    #     out = []
+    #     for i in range(idx_low, idx_high + 1):
+    #         strand = sl[i]
+    #         if strand is None or strand in strand_subset:
+    #             continue
+    #         else:
+    #             strand_subset.add(strand)
+    #             out.append(strand)
+    #     return out
+    # # end def
+
     def getOverlappingStrands(self, idx_low, idx_high):
-        sl = self.strand_array
-        strand_subset = set()
+        sa = self.strand_array
+        sh = self.strand_heap
+        lsh = len(sh)
+
+        strand = sa[idx_low]
         out = []
-        for i in range(idx_low, idx_high + 1):
-            strand = sl[i]
-            if strand is None or strand in strand_subset:
-                continue
-            else:
-                strand_subset.add(strand)
+        if strand is None:
+            class DummyStrand(object):
+                _base_idx_low = idx_low
+                def __lt__(self, other):
+                    return self._base_idx_low < other._base_idx_low
+
+            ds = DummyStrand()
+            i = bisect_left(sh, ds)
+        else:
+            out.append(strand)
+            i = bisect_left(sh, strand) + 1
+
+        while i < lsh:
+            strand = sh[i]
+            if strand.lowIdx() > idx_high:
+                break
+            elif idx_low <= strand.highIdx():
                 out.append(strand)
+                i += 1
+            else:
+                i += 1
         return out
     # end def
 
