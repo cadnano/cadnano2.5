@@ -72,7 +72,7 @@ def decode(document, obj):
         # num_cols = max(32, max_col_json, cadnano.app().prefs.honeycombCols)
         num_rows = max(30, max_row_json, prefs.HONEYCOMB_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.HONEYCOMB_PART_MAXCOLS)
-        part = document.addHoneycombPart(num_rows, num_cols, steps)
+        part = document.addHoneycombPart(max_row=num_rows, max_col=num_cols, max_steps=steps)
     elif lattice_type == LatticeType.SQUARE:
         is_SQ_100 = True  # check for custom SQ100 format
         for helix in obj['vstrands']:
@@ -89,7 +89,7 @@ def decode(document, obj):
         # num_cols = max(32, max_col_json, cadnano.app().prefs.squareCols)
         num_rows = max(30, max_row_json, prefs.SQUARE_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.SQUARE_PART_MAXCOLS)
-        part = document.addSquarePart(num_rows, num_cols, steps)
+        part = document.addSquarePart(max_row=num_rows, max_col=num_cols, max_steps=steps)
         # part = SquarePart(document=document, max_row=num_rows, max_col=num_cols, max_steps=steps)
     else:
         raise TypeError("Lattice type not recognized")
@@ -267,14 +267,14 @@ def decode(document, obj):
             if mod_id != 'int_instances' and mod_id != 'ext_instances':
                 part.createMod(item, mod_id)
         for key, mid in obj['modifications']['ext_instances'].items():
-            strand, idx = part.getModStrandIdx(key)
+            strand, idx, coord, isstaple = part.getModStrandIdx(key)
             try:
                 strand.addMods(mid, idx, use_undostack=False)
             except:
                 print(strand, idx)
                 raise
         for key in obj['modifications']['int_instances'].items():
-            strand, idx = part.getModStrandIdx(key)
+            strand, idx, coord, isstaple  = part.getModStrandIdx(key)
             try:
                 strand.addMods(mid, idx, use_undostack=False)
             except:

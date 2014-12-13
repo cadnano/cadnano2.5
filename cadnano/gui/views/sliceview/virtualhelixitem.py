@@ -162,7 +162,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         label = self._label
         radius = self._RADIUS
 
-        if num != None:
+        if num is not None:
             label.setText("%d" % num)
         else:
             return
@@ -271,14 +271,14 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     #     mouseMoveEvent. The action is returned from this method in the form of a
     #     callable function."""
     #     vh = self.virtualHelix()
-    #     if vh == None: return SliceHelix.addVHIfMissing
+    #     if vh is None: return SliceHelix.addVHIfMissing
     #     idx = self.part().activeSlice()
     #     if modifiers & Qt.ShiftModifier:
-    #         if vh.stap().get(idx) == None:
+    #         if vh.stap().get(idx) is None:
     #             return SliceHelix.addStapAtActiveSliceIfMissing
     #         else:
     #             return SliceHelix.nop
-    #     if vh.scaf().get(idx) == None:
+    #     if vh.scaf().get(idx) is None:
     #         return SliceHelix.addScafAtActiveSliceIfMissing
     #     return SliceHelix.nop
     # 

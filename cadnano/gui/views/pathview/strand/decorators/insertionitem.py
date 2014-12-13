@@ -183,7 +183,7 @@ class InsertionItem(QGraphicsPathItem):
 
     def _updatePath(self):
         strand = self._strand
-        if strand == None:
+        if strand is None:
             self.hide()
             return
         else:
@@ -296,7 +296,7 @@ class InsertionLabel(QGraphicsTextItem):
             insertion_size = None
         insertion = parent._insertion
         length = insertion.length()
-        if insertion_size != None and insertion_size != length:
+        if insertion_size is not None and insertion_size != length:
             parent._strand.changeInsertion(insertion.idx(), insertion_size)
             if insertion.length():
                 self.resetPosition()
@@ -378,8 +378,4 @@ class InsertionLabel(QGraphicsTextItem):
     def updateLabel(self):
         self.setPlainText("%d" % (self.parentItem()._insertion.length()))
     # end def
-
 # end class
-
-
-

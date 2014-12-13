@@ -470,7 +470,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         updateConnectivity. Updates drawing and position of the label.
         """
         lbl = self._label
-        if self._idx != None:
+        if self._idx is not None:
             bw = _BASE_WIDTH
             num = self._partner_virtual_helix.number()
             tBR = _FM.tightBoundingRect(str(num))
@@ -488,7 +488,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
             # adjust x for numeral 1
             if num == 1: label_x -= half_label_w/2.0
             # create text item
-            if lbl == None:
+            if lbl is None:
                 lbl = QGraphicsSimpleTextItem(str(num), self)
             lbl.setPos(label_x, label_y)
             lbl.setBrush(_ENAB_BRUSH)
@@ -635,7 +635,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         self._virtual_helix_item = virtual_helix_item
         self.setParentItem(virtual_helix_item.partItem())
         self._strand_type = strand5p.strandSet().strandType()
-        if self._node5 == None:
+        if self._node5 is None:
             self._node5 = ForcedXoverNode5(virtual_helix_item, self, strand5p, idx)
             self._node3 = ForcedXoverNode3(virtual_helix_item, self, strand5p, idx)
         self._node5.updateForFloatFromStrand(virtual_helix_item, strand5p, idx)

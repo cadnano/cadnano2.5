@@ -264,10 +264,10 @@ class CustomQGraphicsView(QGraphicsView):
         candidateDxDeciders = candidateDxDeciders +\
                            [cd.toGraphicsObject() for cd in candidateDxDeciders]
         for cd in candidateDxDeciders:
-            if cd == None:
+            if cd is None:
                 continue
             keyPanDXMethod = getattr(cd, 'keyPanDeltaX', None)
-            if keyPanDXMethod != None:
+            if keyPanDXMethod is not None:
                 return keyPanDXMethod()
         return 100
 
@@ -278,10 +278,10 @@ class CustomQGraphicsView(QGraphicsView):
         candidateDyDeciders = candidateDyDeciders +\
                            [cd.toGraphicsObject() for cd in candidateDyDeciders]
         for cd in candidateDyDeciders:
-            if cd == None:
+            if cd is None:
                 continue
             keyPanDYMethod = getattr(cd, 'keyPanDeltaY', None)
-            if keyPanDYMethod != None:
+            if keyPanDYMethod is not None:
                 return keyPanDYMethod()
         return 100
 

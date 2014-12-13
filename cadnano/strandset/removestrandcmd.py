@@ -6,11 +6,12 @@ class RemoveStrandCommand(UndoCommand):
     RemoveStrandCommand deletes a strand. It should only be called on
     strands with no connections to other strands.
     """
-    def __init__(self, strandset, strand, strandset_idx, solo=True):
+    # def __init__(self, strandset, strand, strandset_idx, solo=True):
+    def __init__(self, strandset, strand, solo=True):
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
         self._strand = strand
-        self._s_set_idx = strandset_idx
+        # self._s_set_idx = strandset_idx
         self._solo = solo
         self._old_strand5p = strand.connection5p()
         self._old_strand3p = strand.connection3p()
@@ -22,7 +23,7 @@ class RemoveStrandCommand(UndoCommand):
 
         # only create a new 5p oligo if there is a 3' connection
         self._new_oligo5p = olg.shallowCopy() if self._old_strand5p else None
-        if olg.isLoop() or self._old_strand3p == None:
+        if olg.isLoop() or self._old_strand3p is None:
             self._new_oligo3p = olg3p = None
             if self._new_oligo5p:
                 self._new_oligo5p.setLoop(False)
@@ -39,10 +40,10 @@ class RemoveStrandCommand(UndoCommand):
         # Remove the strand
         strand = self._strand
         strandset = self._strandset
-        # strandset._removeFromStrandList(strand)
         doc = strandset._doc
         doc.removeStrandFromSelection(strand)
-        strandset._strand_list.pop(self._s_set_idx)
+        strandset._removeFromStrandList(strand)
+
         strand5p = self._old_strand5p
         strand3p = self._old_strand3p
         oligo = self._oligo
@@ -103,8 +104,7 @@ class RemoveStrandCommand(UndoCommand):
         strandset = self._strandset
         doc = strandset._doc
         # Add the new_strand to the s_set
-        strandset._addToStrandList(strand, self._s_set_idx)
-        # strandset._strand_list.insert(self._s_set_idx, strand)
+        strandset._addToStrandList(strand)
         strand5p = self._old_strand5p
         strand3p = self._old_strand3p
         oligo = self._oligo

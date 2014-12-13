@@ -358,7 +358,7 @@ class EndpointItem(QGraphicsPathItem):
     #     """
     #     Set the allowed drag bounds for use by selectToolMouseMove.
     #     """
-    #     print "mouse press ep", self.parentItem()
+    #     print("mouse press ep", self.parentItem())
     #     # print "%s.%s [%d]" % (self, util.methodName(), self.idx())
     #     self._low_drag_bound, self._high_drag_bound = \
     #                 self._strand_item._model_strand.getResizeBounds(self.idx())
@@ -373,7 +373,7 @@ class EndpointItem(QGraphicsPathItem):
         """
         Set the allowed drag bounds for use by selectToolMouseMove.
         """
-        # print "%s.%s [%d]" % (self, util.methodName(), self.idx())
+        # print("%s.%s [%d]" % (self, util.methodName(), self.idx()))
         self._low_drag_bound, self._high_drag_bound = \
                     self._strand_item._model_strand.getResizeBounds(self.idx())
         s_i = self._strand_item
@@ -449,7 +449,7 @@ class EndpointItem(QGraphicsPathItem):
 
     def tempReparent(self, pos=None):
         vhItem = self._strand_item.virtualHelixItem()
-        if pos == None:
+        if pos is None:
             pos = self.scenePos()
         self.setParentItem(vhItem)
         tempP = vhItem.mapFromScene(pos)

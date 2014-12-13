@@ -27,13 +27,15 @@ class ResizeCommand(UndoCommand):
     def redo(self):
         std = self.strand
         nI = self.newIdxs
+        oI = self.oldIndices
         strandset = self.strand.strandSet()
         part = strandset.part()
 
         std.oligo().incrementLength(self.delta)
         std.setIdxs(nI)
+        strandset.updateStrandIdxs(std, oI, nI)
+
         if strandset.isStaple():
-            
             std.reapplySequence()
         std.strandResizedSignal.emit(std, nI)
         # for updating the Slice View displayed helices
@@ -45,12 +47,15 @@ class ResizeCommand(UndoCommand):
 
     def undo(self):
         std = self.strand
+        nI = self.newIdxs
         oI = self.oldIndices
         strandset = self.strand.strandSet()
         part = strandset.part()
 
         std.oligo().decrementLength(self.delta)
         std.setIdxs(oI)
+        strandset.updateStrandIdxs(std, nI, oI)
+
         if strandset.isStaple():
             std.reapplySequence()
         std.strandResizedSignal.emit(std, oI)

@@ -33,10 +33,10 @@ class CadnanoQt(QObject):
         if argv is None:
             argv = []
         self.argv = argv
-        if QCoreApplication.instance() == None:
+        if QCoreApplication.instance() is None:
             self.qApp = QApplication(argv)
             self.qApp.setWindowIcon(QIcon(ICON_PATH))
-            assert(QCoreApplication.instance() != None)
+            assert(QCoreApplication.instance() is not None)
             self.qApp.setOrganizationDomain("cadnano.org")
         else:
             self.qApp = qApp

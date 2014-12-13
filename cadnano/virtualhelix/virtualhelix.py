@@ -31,7 +31,7 @@ class VirtualHelix(ProxyObject):
         # in that only it may modify it through the
         # private interface. The public interface for
         # setNumber just routes the call to the parent
-        # dnapart if one is present. If self._part == None
+        # dnapart if one is present. If self._part is None
         # the virtualhelix owns self._number and may modify it.
         self._number = None
         self.setNumber(idnum)
@@ -198,7 +198,7 @@ class VirtualHelix(ProxyObject):
         # in that only it may modify it through the
         # private interface. The public interface for
         # setNumber just routes the call to the parent
-        # dnapart if one is present. If self._part == None
+        # dnapart if one is present. If self._part is None
         # the virtualhelix owns self._number and may modify it.
         self._number = idnum
     # end def
@@ -222,5 +222,4 @@ class VirtualHelix(ProxyObject):
     #     row, col = self._coord
     #     self._coord = row + deltaRow, col + deltaCol
     # # end def
-
 # end class

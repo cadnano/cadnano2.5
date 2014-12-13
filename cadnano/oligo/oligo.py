@@ -135,7 +135,7 @@ class Oligo(ProxyObject):
             raise Exception
         for strand in strand5p.generator3pStrand():
             seq = seq + Strand.sequence(strand, for_export=True)
-            if strand.connection3p() == None:  # last strand in the oligo
+            if strand.connection3p() is None:  # last strand in the oligo
                 vh_num3p = strand.virtualHelix().number()
                 idx3p = strand.idx3Prime()
         modseq5p, modseq5p_name = part.getModSequence(strand5p, idx5p, 0)
@@ -286,7 +286,7 @@ class Oligo(ProxyObject):
             self._strand5p = new_strand3p
             return
         else:
-            if old_merged_strand.connection5p() == None:
+            if old_merged_strand.connection5p() is None:
                 self._strand5p = new_strand5p
             else:
                 self._strand5p = old_merged_strand.oligo()._strand5p

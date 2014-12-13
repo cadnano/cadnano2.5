@@ -48,7 +48,7 @@ class RemoveModCommand(UndoCommand):
         mods_strand = part._mods['int_instances']
         for key in locations:        
             if key in mods_strand:
-                strand, idx = part.getModStrandIdx(key)
+                strand, idx, coord, isstaple = part.getModStrandIdx(key)
                 self._int_instances.append(key, strand, idx)
     # end def
 
@@ -101,14 +101,14 @@ class ModifyModCommand(UndoCommand):
         mods_strand = part._mods['ext_instances']
         for key in locations:        
             if key in mods_strand:
-                strand, idx = part.getModStrandIdx(key)
+                strand, idx, coord, isstaple = part.getModStrandIdx(key)
                 self._ext_instances.append((key, strand, idx))
         self._int_instances = []
         locations = params_old['int_locations']
         mods_strand = part._mods['int_instances']
         for key in locations:        
             if key in mods_strand:
-                strand, idx = part.getModStrandIdx(key)
+                strand, idx, coord, isstaple = part.getModStrandIdx(key)
                 self._int_instances.append((key, strand, idx))
 
         del params_old['ext_locations']

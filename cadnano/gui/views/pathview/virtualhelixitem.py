@@ -207,7 +207,7 @@ class VirtualHelixItem(QGraphicsPathItem):
             scaffoldY = 0
         else:
             scaffoldY = bw
-        # if self._scaffoldBackground == None:
+        # if self._scaffoldBackground is None:
         #     highlightr = QGraphicsRectItem(0, scaffoldY, bw * canvas_size, bw, self)
         #     highlightr.setBrush(QBrush(styles.scaffold_bkg_fill))
         #     highlightr.setPen(QPen(Qt.NoPen))

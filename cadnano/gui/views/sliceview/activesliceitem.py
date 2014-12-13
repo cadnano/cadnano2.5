@@ -19,7 +19,7 @@ class ActiveSliceItem(QGraphicsRectItem):
 
     ### SLOTS ###
     def strandChangedSlot(self, sender, vh):
-        if vh == None:
+        if vh is None:
             return
         origami_part_item = self._origami_part_item
         vhi = origami_part_item.getVirtualHelixItemByCoord(*vh.coord())

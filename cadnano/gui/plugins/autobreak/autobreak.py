@@ -327,12 +327,12 @@ def performBreaks(part, fullBreakptSoln):
     This function performs the breaks proposed by the solution. """
     util.beginSuperMacro(part, desc="Auto-Break")
     break_list, oligo = [], None  # Only for logging purposes
-    if fullBreakptSoln != None:  # Skip the first breakpoint
+    if fullBreakptSoln is not None:  # Skip the first breakpoint
         fullBreakptSoln = fullBreakptSoln[1]
-    while fullBreakptSoln != None:
+    while fullBreakptSoln is not None:
         curNode = fullBreakptSoln[2]
         fullBreakptSoln = fullBreakptSoln[1]  # Walk up the linked list
-        if fullBreakptSoln == None:  # Skip last breakpoint
+        if fullBreakptSoln is None:  # Skip last breakpoint
             break
         pos, strand, idx, isTerminal = curNode
         if strand.isDrawn5to3():
@@ -357,7 +357,7 @@ def possibleBreakpoints(oligo, settings):
 
     nodes = []
     strand = first_strand = oligo.strand5p()
-    isLoop = strand.connection5p() != None
+    isLoop = strand.connection5p() is not None
     pos, idx = 0, 0  # correspond to pos, idx above
     while True:
         next_strand = strand.connection3p()

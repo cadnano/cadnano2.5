@@ -48,6 +48,7 @@ class DnaSelectionItem(QGraphicsPathItem):
         path.arcTo(_DEFAULT_RECT, startAngle, spanAngle)
         self.setPath(path)
     # end def
+# end class
 
 
 class DnaHoverRegion(QGraphicsEllipseItem):
@@ -87,10 +88,11 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         self.updateHoverLine(event)
         pos = self._hoverLine.pos()
         aX, aY, angle = self.snapPosToCircle(pos, _RADIUS)
-        self._startPos = QPointF(aX, aY)
-        self._startAngle = self.updateHoverLine(event)
-        self.dummy.updateAngle(self._startAngle, 0)
-        self.dummy.show()
+        if angle != None:
+            self._startPos = QPointF(aX, aY)
+            self._startAngle = self.updateHoverLine(event)
+            self.dummy.updateAngle(self._startAngle, 0)
+            self.dummy.show()
         # mark the start
         # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
         # f.setPen(QPen(Qt.NoPen))
@@ -131,8 +133,9 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         (0 = east, 90 = north, 180 = west, 270 = south).
         """
         aX, aY, angle = self.snapPosToCircle(event.pos(), _RADIUS)
-        self._hoverLine.setPos(aX, aY)
-        self._hoverLine.setRotation(-angle)
+        if angle != None:
+            self._hoverLine.setPos(aX, aY)
+            self._hoverLine.setRotation(-angle)
         return angle
     # end def
 
@@ -144,6 +147,8 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         vX = pX - cX
         vY = pY - cY
         magV = sqrt(vX*vX + vY*vY)
+        if magV == 0:
+            return (None, None, None)
         aX = cX + vX / magV * radius
         aY = cY + vY / magV * radius
         angle = (atan2(aY-cY, aX-cX))
@@ -168,6 +173,7 @@ class DnaHoverRegion(QGraphicsEllipseItem):
                 spanAngle = (360-self._startAngle) + angle
         return spanAngle
     # end def
+# end class
 
 
 class DnaLine(QGraphicsEllipseItem):
@@ -180,6 +186,9 @@ class DnaLine(QGraphicsEllipseItem):
         # self.setSpanAngle(90*16)
         # self.setBrush(_DNA_BRUSH)
         # self.setAcceptHoverEvents(True)
+    # end def
+# end class
+
 
 class DnaPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -426,9 +435,12 @@ class DnaPartItem(QGraphicsItem):
             return self.parent_HGI.boundingRect()
         def paint(self, painter, option, widget=None):
             pass
+    # end class
 
     class IntersectionProbe(QGraphicsItem):
         def boundingRect(self):
             return QRectF(0, 0, .1, .1)
         def paint(self, painter, option, widget=None):
             pass
+    # end class
+# end class

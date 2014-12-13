@@ -22,7 +22,7 @@ def legacy_dict_from_doc(document, fname, helix_order_list):
         stap_colors = []
         stap_strandset = vh.stapleStrandSet()
         for strand in stap_strandset:
-            if strand.connection5p() == None:
+            if strand.connection5p() is None:
                 c = str(strand.oligo().color())[1:]  # drop the hash
                 stap_colors.append([strand.idx5Prime(), int(c, 16)])
 

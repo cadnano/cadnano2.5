@@ -33,7 +33,7 @@ from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from .resizepartcmd import ResizePartCommand
-from .removeallstrandscmd import RemoveAllStrandsCommand
+
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand

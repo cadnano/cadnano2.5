@@ -665,7 +665,7 @@ class StrandItem(QGraphicsLineItem):
     
     def tempReparent(self, pos=None):
         vh_item = self.virtualHelixItem()
-        if pos == None:
+        if pos is None:
             pos = self.scenePos()
         self.setParentItem(vh_item)
         tempP = vh_item.mapFromScene(pos)
