@@ -15,8 +15,8 @@ from PyQt5.QtWidgets import QUndoCommand, QStyle
 
 from math import sqrt, atan2, degrees, pi
 
-_RADIUS = 600
-HIGHLIGHT_WIDTH = 400
+_RADIUS = 60
+HIGHLIGHT_WIDTH = 40
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
