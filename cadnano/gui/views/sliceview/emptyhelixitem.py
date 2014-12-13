@@ -105,7 +105,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def setHovered(self):
-        # self.setFlag(QGraphicsItem.ItemHasNoContents, False)  
+        # self.setFlag(QGraphicsItem.ItemHasNoContents, False)
         self.setBrush(self._HOVER_BRUSH)
         self.setPen(self._HOVER_PEN)
         self.update(self.boundingRect())

@@ -450,9 +450,8 @@ class DocumentController():
     # end def
 
     def actionAddDnaPartSlot(self):
-        # part = self._document.addHpxPart()
+        part = self._document.addDnaPart()
         # self.setActivePart(part)
-        print("add DNA part")
         pass
     # end def
 

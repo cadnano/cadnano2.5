@@ -14,8 +14,8 @@ from cadnano.oligo import Oligo
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
-from cadnano.part import HoneycombPart
-from cadnano.part import SquarePart
+from cadnano.part import HoneycombPart, SquarePart
+from cadnano.part import DnaPart
 from cadnano import app
 
 class Document(ProxyObject):
@@ -442,27 +442,36 @@ class Document(ProxyObject):
                                 max_col=prefs.HONEYCOMB_PART_MAXCOLS, 
                                 max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
         """
-        Create and store a new DNAPart and instance, and return the instance.
+        Create and store a new origamipart and instance, and return the instance.
         """
-        dnapart = None
+        origamipart = None
         if len(self._parts) == 0:
-            dnapart = HoneycombPart(document=self, max_row=max_row, 
+            origamipart = HoneycombPart(document=self, max_row=max_row, 
                                 max_col=max_col, max_steps=max_steps)
-            self._addPart(dnapart)
-        return dnapart
+            self._addPart(origamipart)
+        return origamipart
 
     def addSquarePart(self, max_row=prefs.SQUARE_PART_MAXROWS, 
                             max_col=prefs.SQUARE_PART_MAXCOLS, 
                             max_steps=prefs.SQUARE_PART_MAXSTEPS):
         """
-        Create and store a new DNAPart and instance, and return the instance.
+        Create and store a new origamipart and instance, and return the instance.
         """
+        origamipart = None
+        if len(self._parts) == 0:
+            origamipart = SquarePart(document=self, max_row=max_row, 
+                                max_col=max_col, max_steps=max_steps)
+            self._addPart(origamipart)
+        return origamipart
+
+    def addDnaPart(self):
+        """Create and store a new dnapart and instance, and return the instance."""
         dnapart = None
         if len(self._parts) == 0:
-            dnapart = SquarePart(document=self, max_row=max_row, 
-                                max_col=max_col, max_steps=max_steps)
+            dnapart = DnaPart(document=self)
             self._addPart(dnapart)
         return dnapart
+    # end def
 
     def removeAllParts(self):
         """Used to reset the document. Not undoable."""
@@ -474,11 +483,12 @@ class Document(ProxyObject):
     def removePart(self, part):
         self.documentClearSelectionsSignal.emit(self)
         self._parts.remove(part)
-        
+    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def controller(self):
         return self._controller
+    # end def
 
     def setController(self, controller):
         """Called by DocumentController setDocument method."""

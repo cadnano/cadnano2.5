@@ -3,6 +3,7 @@ class ViewRootController():
         self._view_root = view_root
         self._model_document = model_document
         self.connectSignals()
+    # end def
 
     def connectSignals(self):
         m_d = self._model_document
@@ -11,7 +12,8 @@ class ViewRootController():
         m_d.documentClearSelectionsSignal.connect(v_r.clearSelectionsSlot)
         m_d.documentSelectionFilterChangedSignal.connect(v_r.selectionFilterChangedSlot)
         m_d.documentViewResetSignal.connect(v_r.resetRootItemSlot)
-        
+    # end def
+
     def disconnectSignals(self):
         m_d = self._model_document
         v_r = self._view_root
@@ -19,3 +21,5 @@ class ViewRootController():
         m_d.documentClearSelectionsSignal.disconnect(v_r.clearSelectionsSlot)
         m_d.documentSelectionFilterChangedSignal.disconnect(v_r.selectionFilterChangedSlot)
         m_d.documentViewResetSignal.disconnect(v_r.resetRootItemSlot)
+    # end def
+    

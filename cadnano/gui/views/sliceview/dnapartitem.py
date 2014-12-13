@@ -1,65 +1,210 @@
 
-from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
-from .emptyhelixitem import EmptyHelixItem
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
 from .virtualhelixitem import VirtualHelixItem
-from .activesliceitem import ActiveSliceItem
 
 from . import slicestyles as styles
 import cadnano.util as util
 from cadnano import getReopen
 
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
-from PyQt5.QtGui import QBrush, QPainterPath, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtGui import QBrush, QPainter, QPainterPath, QPen, QColor
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsTextItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QUndoCommand, QStyle
 
-_RADIUS = styles.SLICE_HELIX_RADIUS
+from math import sqrt, atan2, degrees, pi
+
+_RADIUS = 600
+HIGHLIGHT_WIDTH = 400
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
 DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
-_MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
-class OrigamiPartItem(QGraphicsItem):
+_DNA_PEN = QPen(styles.BLUE_STROKE, 1)
+_DNA_BRUSH = QBrush(QColor(153, 204, 255, 128), 1)
+_SELECT_STROKE_WIDTH = 10
+_SELECT_PEN = QPen(QColor(204, 0, 0, 64), _SELECT_STROKE_WIDTH)
+_SELECT_PEN.setCapStyle(Qt.FlatCap)
+_SELECT_BRUSH = QBrush(QColor(204, 0, 0, 128))
+
+_HOVER_PEN = QPen(QColor(255, 255, 255), 128)
+_HOVER_BRUSH = QBrush(QColor(255, 255, 255, 0))
+
+
+class DnaSelectionItem(QGraphicsPathItem):
+    def __init__(self, startAngle, spanAngle, parent=None):
+        # setup DNA line
+        super(QGraphicsPathItem, self).__init__(parent)
+        self.setPen(_SELECT_PEN)
+        self.updateAngle(startAngle, spanAngle)
+    # end def
+
+    def updateAngle(self, startAngle, spanAngle):
+        self._startAngle = startAngle
+        self._spanAngle = spanAngle
+        path = QPainterPath()
+        path.arcMoveTo(_DEFAULT_RECT, startAngle)
+        path.arcTo(_DEFAULT_RECT, startAngle, spanAngle)
+        self.setPath(path)
+    # end def
+
+
+class DnaHoverRegion(QGraphicsEllipseItem):
+    def __init__(self, rect, parent=None):
+        # setup DNA line
+        super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self.setPen(QPen(Qt.NoPen))
+        self.setBrush(_HOVER_BRUSH)
+        self.setAcceptHoverEvents(True)
+        # self.setFlag(QGraphicsItem.ItemStacksBehindParent)
+
+        # hover marker
+        self._hoverLine = QGraphicsLineItem(-_SELECT_STROKE_WIDTH/2, 0, _SELECT_STROKE_WIDTH/2, 0, self)
+        self._hoverLine.setPen(QPen(QColor(204, 0, 0), .5))
+        self._hoverLine.hide()
+
+        self._startPos = None
+        self._startAngle = None  # save selection start
+        self._clockwise = None
+        self.dummy = DnaSelectionItem(0, 0, parent)
+        self.dummy.hide()
+
+    def hoverEnterEvent(self, event):
+        self.updateHoverLine(event)
+        self._hoverLine.show()
+    # end def
+
+    def hoverMoveEvent(self, event):
+        self.updateHoverLine(event)
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self._hoverLine.hide()
+    # end def
+
+    def mousePressEvent(self, event):
+        self.updateHoverLine(event)
+        pos = self._hoverLine.pos()
+        aX, aY, angle = self.snapPosToCircle(pos, _RADIUS)
+        self._startPos = QPointF(aX, aY)
+        self._startAngle = self.updateHoverLine(event)
+        self.dummy.updateAngle(self._startAngle, 0)
+        self.dummy.show()
+        # mark the start
+        # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0)))
+    # end def
+
+    def mouseMoveEvent(self, event):
+        eventAngle = self.updateHoverLine(event)
+        # Record initial direction before calling getSpanAngle
+        if self._clockwise is None:
+            self._clockwise = False if eventAngle > self._startAngle else True
+        spanAngle = self.getSpanAngle(eventAngle)
+        self.dummy.updateAngle(self._startAngle, spanAngle)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        self.dummy.hide()
+        endAngle = self.updateHoverLine(event)
+        spanAngle = self.getSpanAngle(endAngle)
+
+        if self._startPos != None and self._clockwise != None:
+            self.parentItem().addSelection(self._startAngle, spanAngle)
+            self._startPos = self._clockwise = None
+
+        # mark the end
+        # x = self._hoverLine.x()
+        # y = self._hoverLine.y()
+        # f = QGraphicsEllipseItem(x, y, 6, 6, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
+
+    # end def
+
+    def updateHoverLine(self, event):
+        """
+        Moves red line to point (aX,aY) on DnaLine closest to event.pos.
+        Returns the angle of aX, aY, using the Qt arc coordinate system
+        (0 = east, 90 = north, 180 = west, 270 = south).
+        """
+        aX, aY, angle = self.snapPosToCircle(event.pos(), _RADIUS)
+        self._hoverLine.setPos(aX, aY)
+        self._hoverLine.setRotation(-angle)
+        return angle
+    # end def
+
+    def snapPosToCircle(self, pos, radius):
+        """Given x, y and radius, return x,y of nearest point on circle, and its angle"""
+        pX = pos.x()
+        pY = pos.y()
+        cX = cY = radius
+        vX = pX - cX
+        vY = pY - cY
+        magV = sqrt(vX*vX + vY*vY)
+        aX = cX + vX / magV * radius
+        aY = cY + vY / magV * radius
+        angle = (atan2(aY-cY, aX-cX))
+        deg = -degrees(angle) if angle < 0 else 180+(180-degrees(angle))
+        return (aX, aY, deg)
+    # end def
+
+    def getSpanAngle(self, angle):
+        """
+        Return the spanAngle angle by checking the initial direction of the selection.
+        Selections that cross 0° must be handed as an edge case.
+        """
+        if self._clockwise: # spanAngle is negative
+            if angle < self._startAngle:
+                spanAngle = angle - self._startAngle
+            else:
+                spanAngle = -(self._startAngle + (360-angle))
+        else: # counterclockwise, spanAngle is positive
+            if angle > self._startAngle:
+                spanAngle = angle - self._startAngle
+            else:
+                spanAngle = (360-self._startAngle) + angle
+        return spanAngle
+    # end def
+
+
+class DnaLine(QGraphicsEllipseItem):
+    def __init__(self, hover_rect, default_rect, parent=None):
+        # setup DNA line
+        super(QGraphicsEllipseItem, self).__init__(hover_rect, parent)
+        self.setPen(_DNA_PEN)
+        self.setRect(default_rect)
+        self.setFlag(QGraphicsItem.ItemStacksBehindParent)
+        # self.setSpanAngle(90*16)
+        # self.setBrush(_DNA_BRUSH)
+        # self.setAcceptHoverEvents(True)
+
+class DnaPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part, parent=None):
         """
         Parent should be either a SliceRootItem, or an AssemblyItem.
-
-        Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
-        where x is the cartesian product.
-        
         Order matters for deselector, probe, and setlattice
         """
-        super(OrigamiPartItem, self).__init__(parent)
+        super(DnaPartItem, self).__init__(parent)
         self._part = model_part
-        self._controller = OrigamiPartItemController(self, model_part)
-        self._active_slice_item = ActiveSliceItem(self, model_part.activeBaseIndex())
-        self._scaleFactor = self._RADIUS/model_part.radius()
-        self._empty_helix_hash = {}
-        self._virtual_helix_hash = {}
-        self._nrows, self._ncols = 0, 0
+        self._controller = DnaPartItemController(self, model_part)
         self._rect = QRectF(0, 0, 0, 0)
         self._initDeselector()
-        # Cache of VHs that were active as of last call to activeSliceChanged
-        # If None, all slices will be redrawn and the cache will be filled.
-        # Connect destructor. This is for removing a part from scenes.
         self.probe = self.IntersectionProbe(self)
-        # initialize the OrigamiPartItem with an empty set of old coords
-        self._setLattice([], model_part.generatorFullLattice())
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
-        self._initModifierCircle()
-        
-        print(self.boundingRect())
-        outline = QGraphicsRectItem(self.boundingRect(), self)
-        outline.setPen(QPen(Qt.red))
+        # self._initModifierCircle()
+        gap = 2 # gap between inner and outer strands
+        _OUTER_RECT = QRectF(-gap/2, -gap/2, 2 * _RADIUS+gap, 2 * _RADIUS+gap)
+        _INNER_RECT = QRectF(gap/2, gap/2, 2 * _RADIUS-gap, 2 * _RADIUS-gap)
+        self._outer_Line = DnaLine(_HOVER_RECT, _OUTER_RECT, self)
+        self._inner_Line = DnaLine(_HOVER_RECT, _INNER_RECT, self)
 
-        # f.setPen(QPen(Qt.NoPen))
-        # outline.setBrush(QBrush(QColor(204, 0, 0)))
-        outline.setRect(self.boundingRect())
-        
+        self.hoverRegion = DnaHoverRegion(_HOVER_RECT, self)
     # end def
 
     def _initDeselector(self):
@@ -67,16 +212,21 @@ class OrigamiPartItem(QGraphicsItem):
         The deselector grabs mouse events that missed a slice and clears the
         selection when it gets one.
         """
-        self.deselector = ds = OrigamiPartItem.Deselector(self)
+        self.deselector = ds = DnaPartItem.Deselector(self)
         ds.setParentItem(self)
         ds.setFlag(QGraphicsItem.ItemStacksBehindParent)
         ds.setZValue(styles.ZDESELECTOR)
+    # end def
 
     def _initModifierCircle(self):
         self._can_show_mod_circ = False
         self._mod_circ = m_c = QGraphicsEllipseItem(_HOVER_RECT, self)
         m_c.setPen(_MOD_PEN)
         m_c.hide()
+    # end def
+
+    def addSelection(self, startAngle, spanAngle):
+        dSI = DnaSelectionItem(startAngle, spanAngle, self)
     # end def
 
     ### SIGNALS ###
@@ -94,31 +244,16 @@ class OrigamiPartItem(QGraphicsItem):
     # end def
 
     def partParentChangedSlot(self, sender):
-        """docstring for partParentChangedSlot"""
-        # print "OrigamiPartItem.partParentChangedSlot"
+        # print "DnaPartItem.partParentChangedSlot"
         pass
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot"""
-        self._active_slice_item.removed()
-        self.parentItem().removeOrigamiPartItem(self)
-        
+        self.parentItem().removeDnaPartItem(self)
         scene = self.scene()
-        
-        self._virtual_helix_hash = None
-        
-        for item in list(self._empty_helix_hash.items()):
-            key, val = item
-            scene.removeItem(val)
-            del self._empty_helix_hash[key]
-        self._empty_helix_hash = None
-
         scene.removeItem(self)
-        
         self._part = None
         self.probe = None
         self._mod_circ = None
-        
         self.deselector = None
         self._controller.disconnectSignals()
         self._controller = None
@@ -259,8 +394,8 @@ class OrigamiPartItem(QGraphicsItem):
 
     def updateStatusBar(self, statusString):
         """Shows statusString in the MainWindow's status bar."""
+        self.window().statusBar().showMessage(statusString, timeout)
         pass  # disabled for now.
-        # self.window().statusBar().showMessage(statusString, timeout)
 
     def vhAtCoordsChanged(self, row, col):
         self._empty_helix_hash[(row, col)].update()
@@ -278,21 +413,19 @@ class OrigamiPartItem(QGraphicsItem):
         QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-
     class Deselector(QGraphicsItem):
         """The deselector lives behind all the slices and observes mouse press
         events that miss slices, emptying the selection when they do"""
         def __init__(self, parent_HGI):
-            super(OrigamiPartItem.Deselector, self).__init__()
+            super(DnaPartItem.Deselector, self).__init__()
             self.parent_HGI = parent_HGI
         def mousePressEvent(self, event):
             self.parent_HGI.part().setSelection(())
-            super(OrigamiPartItem.Deselector, self).mousePressEvent(event)
+            super(DnaPartItem.Deselector, self).mousePressEvent(event)
         def boundingRect(self):
             return self.parent_HGI.boundingRect()
         def paint(self, painter, option, widget=None):
             pass
-
 
     class IntersectionProbe(QGraphicsItem):
         def boundingRect(self):

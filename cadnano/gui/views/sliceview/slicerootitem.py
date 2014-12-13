@@ -1,4 +1,5 @@
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from .dnapartitem import DnaPartItem
 from .origamipartitem import OrigamiPartItem
 import cadnano.util as util
 
@@ -30,24 +31,32 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
         """
         self._model_part = model_part
-        origami_part_item = OrigamiPartItem(model_part, parent=self)
-        self._instance_items[origami_part_item] = origami_part_item
-        self.setModifyState(self._window.action_modify.isChecked())
+        print("partAddedSlot: ", model_part, model_part.__class__.__name__)
+
+        if model_part.__class__.__name__ == "DnaPart":
+            # print("yes DNApart")
+            dna_part_item = DnaPartItem(model_part, parent=self)
+            self._instance_items[dna_part_item] = dna_part_item
+        else:
+            # print("nope it's OrigamiPart")
+            origami_part_item = OrigamiPartItem(model_part, parent=self)
+            self._instance_items[origami_part_item] = origami_part_item
+            self.setModifyState(self._window.action_modify.isChecked())
     # end def
 
     def selectedChangedSlot(self, item_dict):
         """docstring for selectedChangedSlot"""
         pass
     # end def
-    
+
     def selectionFilterChangedSlot(self, filter_name_list):
         pass
     # end def
-    
+
     def clearSelectionsSlot(self, doc):
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
-    
+
     def resetRootItemSlot(self, doc):
         pass
     # end def
@@ -63,6 +72,10 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
+    def removeDnaPartItem(self, dna_part_item):
+        del self._instance_items[dna_part_item]
+    # end def
+
     def removeOrigamiPartItem(self, origami_part_item):
         del self._instance_items[origami_part_item]
     # end def
