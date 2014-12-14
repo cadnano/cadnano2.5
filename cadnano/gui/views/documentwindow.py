@@ -1,14 +1,16 @@
 from cadnano import app
 
-from cadnano.gui.views.pathview.pathtoolbar import PathToolBar
-from cadnano.gui.views.pathview.parttoolbar import PartToolBar
-from cadnano.gui.views.pathview.colorpanel import ColorPanel
-
-from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
+from cadnano.gui.views.outlineview.outlinerootitem import OutlineRootItem
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 
+from cadnano.gui.views.pathview.pathtoolbar import PathToolBar
+from cadnano.gui.views.pathview.parttoolbar import PartToolBar
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
+from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
+
+from cadnano.gui.views.pathview.colorpanel import ColorPanel
+
 import cadnano.gui.ui.mainwindow.ui_mainwindow as ui_mainwindow
 import cadnano.util as util
 
@@ -42,6 +44,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings = QSettings()
         self._readSettings()
 
+        # Outliner setup
+        self.outlineroot = OutlineRootItem(parent=None, window=self, document=doc)
+
+
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
         self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),\
@@ -72,7 +78,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_splitter.setHandleWidth(0)
 
         self.part_toolbar = PartToolBar(doc, self.slice_splitter)
-        self.slice_splitter.addWidget(self.slice_graphics_view) # reorder
+        self.slice_splitter.addWidget(self.outlineroot)
+        self.slice_splitter.addWidget(self.slice_graphics_view)
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -99,7 +106,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_splitter.setHandleWidth(0)
         self.path_splitter.setObjectName("path_splitter")
         self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
-        self.path_splitter.addWidget(self.selectionToolBar)
+        self.path_splitter.addWidget(self.selection_toolbar)
         self.path_toolbar = PathToolBar(doc, self.path_splitter)
         # self.path_splitter.addWidget(self.path_graphics_view) # reorder
         self.path_color_panel = ColorPanel()
@@ -139,7 +146,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([250, 550])  # balance main_splitter size
+        self.main_splitter.setSizes([350, 450])  # balance main_splitter size
         self.statusBar().showMessage("")
 
     ### ACCESSORS ###

@@ -32,6 +32,13 @@ class PartToolBar(QToolBar):
             self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
         # Toolbar Label
+        self.action_outliner = self.setupAction("Outline", None, 
+                                                        "action_outliner", 
+                                                        ":/parttools/outliner")
+        self.action_outliner.triggered.connect(self.doc.controller().actionToggleOutlinerSlot)
+
+
+        # Toolbar Label
         self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
 
         # DNA part
