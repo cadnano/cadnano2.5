@@ -37,13 +37,13 @@ class HoneycombPart(OrigamiPart):
     def __init__(self, *args, **kwargs):
         super(HoneycombPart, self).__init__(self, *args, **kwargs)
         self._max_row = kwargs.get('max_row')
-        if self._max_row == None:
+        if self._max_row is None:
             raise ValueError("%s: Need max_row kwarg" % (type(self).__name__))
         self._max_col = kwargs.get('max_col')
-        if self._max_col == None:
+        if self._max_col is None:
             raise ValueError("%s: Need max_col kwarg" % (type(self).__name__))
         self._max_base = kwargs.get('max_steps') * self._STEP - 1
-        if self._max_base == None:
+        if self._max_base is None:
             raise ValueError("%s: Need max_base kwarg" % (type(self).__name__))
 
     def crossSectionType(self):
@@ -67,7 +67,7 @@ class HoneycombPart(OrigamiPart):
         """
         neighbors = []
         vh = virtualHelix
-        if vh == None:
+        if vh is None:
             return neighbors
 
         # assign the method to a a local variable
@@ -115,3 +115,5 @@ class HoneycombPart(OrigamiPart):
     def fillSimpleRep(self, sr):
         super(HoneycombPart, self).fillSimpleRep(sr)
         sr['.class'] = 'HoneycombPart'
+    # end def
+# end class

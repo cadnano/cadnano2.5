@@ -33,7 +33,7 @@ from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from .resizepartcmd import ResizePartCommand
-from .removeallstrandscmd import RemoveAllStrandsCommand
+
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
@@ -350,7 +350,7 @@ class OrigamiPart(Part):
             for i in range(len(segments)):
                 lo, hi = segments[i]
                 ep_dict[stap_ss].extend(segments[i])
-                c = CreateStrandCommand(stap_ss, lo, hi, i)
+                c = CreateStrandCommand(stap_ss, lo, hi)
                 cmds.append(c)
         util.execCommandList(part, cmds, desc="Add tmp strands",
                                 use_undostack=False)
@@ -369,7 +369,7 @@ class OrigamiPart(Part):
                     strand = stap_ss.getStrand(idx)
                     neighbor_ss = neighbor_vh.stapleStrandSet()
                     n_strand = neighbor_ss.getStrand(idx)
-                    if strand == None or n_strand == None:
+                    if strand is None or n_strand is None:
                         continue
                     # check for bases on both strands at [idx-1:idx+3]
                     if not (strand.lowIdx() < idx and strand.highIdx() > idx + 1):
@@ -395,7 +395,7 @@ class OrigamiPart(Part):
         for vh in part.getVirtualHelices():
             stap_ss = vh.stapleStrandSet()
             for strand in stap_ss:
-                c = RemoveStrandCommand(stap_ss, strand, 0)
+                c = RemoveStrandCommand(stap_ss, strand)
                 cmds.append(c)
         util.execCommandList(part, cmds, desc="Rm tmp strands",
                                         use_undostack=False)
@@ -407,15 +407,13 @@ class OrigamiPart(Part):
         for stap_ss, ep_list in ep_dict.items():
             assert (len(ep_list) % 2 == 0)
             ep_list = sorted(ep_list)
-            ss_idx = 0
             for i in range(0, len(ep_list),2):
                 lo, hi = ep_list[i:i+2]
-                c = CreateStrandCommand(stap_ss, lo, hi, ss_idx)
+                c = CreateStrandCommand(stap_ss, lo, hi)
                 cmds.append(c)
-                ss_idx += 1
         util.execCommandList(part, cmds, desc="Create strands",
                                 use_undostack=is_slow)
-        cmds = [] 
+        cmds = []
 
         # create crossovers wherever possible (from strand5p only)
         for vh in part.getVirtualHelices():
@@ -429,7 +427,7 @@ class OrigamiPart(Part):
                     strand = stap_ss.getStrand(idx)
                     neighbor_ss = neighbor_vh.stapleStrandSet()
                     n_strand = neighbor_ss.getStrand(idx)
-                    if strand == None or n_strand == None:
+                    if strand is None or n_strand is None:
                         continue
                     if idx in strand.idxs() and idx in n_strand.idxs():
                         # only install xovers on pre-split strands
@@ -457,11 +455,11 @@ class OrigamiPart(Part):
 
         for vh in self.getVirtualHelices():
             stap_ss = vh.stapleStrandSet()
-            total_stap_strands += len(stap_ss._strand_list)
+            total_stap_strands += stap_ss.strandCount()
             for strand in stap_ss:
                 stapOligos.add(strand.oligo())
         # print("# stap oligos:", len(stapOligos), "# stap strands:", total_stap_strands)
-
+    # end def
 
     def verifyOligos(self):
         total_errors = 0
@@ -541,7 +539,6 @@ class OrigamiPart(Part):
     def addOligo(self, oligo):
         # print("adding oligo", oligo)
         self._oligos.add(oligo)
-
     # end def
 
     def createVirtualHelix(self, row, col, use_undostack=True):
@@ -587,13 +584,12 @@ class OrigamiPart(Part):
             """
             c = None
             # lookup the initial strandset index
-            found, overlap, ss_idx3p = ss3p._findIndexOfRangeFor(strand3p)
             if strand3p.idx5Prime() == idx3p:  # yes, idx already matches
                 temp5 = xo_strand3 = strand3p
             else:
                 offset3p = -1 if ss3p.isDrawn5to3() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
-                    c = SplitCommand(strand3p, idx3p + offset3p, ss_idx3p)
+                    c = SplitCommand(strand3p, idx3p + offset3p)
                     # cmds.append(c)
                     xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
                     # adjust the target 5prime strand, always necessary if a split happens here
@@ -630,7 +626,7 @@ class OrigamiPart(Part):
                     else:
                         ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
                 if ss5p.strandCanBeSplit(temp5, idx5p):
-                    d = SplitCommand(temp5, idx5p, ss_idx5p)
+                    d = SplitCommand(temp5, idx5p)
                     # cmds.append(d)
                     xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
                     if use_undostack:
@@ -657,9 +653,8 @@ class OrigamiPart(Part):
             else:  # no, let's try to split
                 offset3p = -1 if ss3p.isDrawn5to3() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
-                    found, overlap, ss_idx = ss3p._findIndexOfRangeFor(strand3p)
-                    if found:
-                        c = SplitCommand(strand3p, idx3p + offset3p, ss_idx)
+                    if ss3p.getStrandIndex(strand3p)[0]:
+                        c = SplitCommand(strand3p, idx3p + offset3p)
                         # cmds.append(c)
                         xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
                         if use_undostack:
@@ -679,9 +674,8 @@ class OrigamiPart(Part):
                 xo_strand5 = strand5p
             else:
                 if ss5p.strandCanBeSplit(strand5p, idx5p):
-                    found, overlap, ss_idx = ss5p._findIndexOfRangeFor(strand5p)
-                    if found:
-                        d = SplitCommand(strand5p, idx5p, ss_idx)
+                    if ss5p.getStrandIndex(strand5p)[0]:
+                        d = SplitCommand(strand5p, idx5p)
                         # cmds.append(d)
                         xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
                         if use_undostack:
@@ -704,7 +698,6 @@ class OrigamiPart(Part):
             self.undoStack().endMacro()
         else:
             e.redo()
-
     # end def
 
     def removeXover(self, strand5p, strand3p, use_undostack=True):
@@ -720,6 +713,8 @@ class OrigamiPart(Part):
         self.setParent(None)
         self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
+
+
 
     def generatorFullLattice(self):
         """
@@ -748,7 +743,7 @@ class OrigamiPart(Part):
         max_idx. Used in emptyhelixitem.py.
         """
         pre_xo = self._SCAFH if strand_type == StrandType.SCAFFOLD else self._STAPH
-        if max_idx == None:
+        if max_idx is None:
             max_idx = self._max_base
         steps = (self._max_base // self._STEP) + 1
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
@@ -761,7 +756,7 @@ class OrigamiPart(Part):
         """
         pre_xo = self._SCAFL if strand_type == StrandType.SCAFFOLD \
                                 else self._STAPL
-        if max_idx == None:
+        if max_idx is None:
             max_idx = self._max_base
         steps = (self._max_base // self._STEP) + 1
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
@@ -805,22 +800,6 @@ class OrigamiPart(Part):
             print("error removing oligo", oligo)
     # end def
 
-    def renumber(self, coord_list, use_undostack=True):
-        if use_undostack:
-            self.undoStack().beginMacro("Renumber VirtualHelices")
-        c = RenumberVirtualHelicesCommand(self, coord_list)
-        if use_undostack:
-            self.undoStack().push(c)
-            self.undoStack().endMacro()
-        else:
-            c.redo()
-    # end def
-
-    def resizeLattice(self):
-        """docstring for resizeLattice"""
-        pass
-    # end def
-
     def resizeVirtualHelices(self, min_delta, max_delta, use_undostack=True):
         """docstring for resizeVirtualHelices"""
         c = ResizePartCommand(self, min_delta, max_delta)
@@ -851,44 +830,6 @@ class OrigamiPart(Part):
         (row, col, baseIdx) = (sel[0], sel[1], sel[2])
         self.partPreDecoratorSelectedSignal.emit(self, row, col, baseIdx)
 
-    def xoverSnapTo(self, strand, idx, delta):
-        """
-        Returns the nearest xover position to allow snap-to behavior in
-        resizing strands via dragging selected xovers.
-        """
-        strand_type = strand.strandType()
-        if delta > 0:
-            min_idx, max_idx = idx - delta, idx + delta
-        else:
-            min_idx, max_idx = idx + delta, idx - delta
-
-        # determine neighbor strand and bind the appropriate prexover method
-        lo, hi = strand.idxs()
-        if idx == lo:
-            connected_strand = strand.connectionLow()
-            preXovers = self.getPreXoversHigh
-        else:
-            connected_strand = strand.connectionHigh()
-            preXovers = self.getPreXoversLow
-        connected_vh = connected_strand.virtualHelix()
-
-        # determine neighbor position, if any
-        neighbors = self.getVirtualHelixNeighbors(strand.virtualHelix())
-        if connected_vh in neighbors:
-            neighbor_idx = neighbors.index(connected_vh)
-            try:
-                new_idx = util.nearest(idx + delta,
-                                    preXovers(strand_type,
-                                                neighbor_idx,
-                                                min_idx=min_idx,
-                                                max_idx=max_idx)
-                                    )
-                return new_idx
-            except ValueError:
-                return None  # nearest not found in the expanded list
-        else:  # no neighbor (forced xover?)... don't snap, just return
-            return idx + delta
-
     ### PRIVATE SUPPORT METHODS ###
     def _addVirtualHelix(self, virtual_helix):
         """
@@ -918,10 +859,12 @@ class OrigamiPart(Part):
             # assert not num in self._number_to_virtual_helix
             if num in self.odd_recycle_bin:
                 self.odd_recycle_bin.remove(num)
+                # rebuild the heap since we removed a specific item
                 heapify(self.odd_recycle_bin)
                 return num
             if num in self.even_recycle_bin:
                 self.even_recycle_bin.remove(num)
+                # rebuild the heap since we removed a specific item
                 heapify(self.even_recycle_bin)
                 return num
             self.reserve_bin.add(num)
@@ -936,6 +879,7 @@ class OrigamiPart(Part):
                     while self._highest_used_even + 2 in self.reserve_bin:
                         self._highest_used_even += 2
                     self._highest_used_even += 2
+                    self.reserve_bin.add(self._highest_used_even)
                     return self._highest_used_even
             else:
                 if len(self.odd_recycle_bin):
@@ -946,6 +890,7 @@ class OrigamiPart(Part):
                     while self._highest_used_odd + 2 in self.reserve_bin:
                         self._highest_used_odd += 2
                     self._highest_used_odd += 2
+                    self.reserve_bin.add(self._highest_used_odd)
                     return self._highest_used_odd
         # end else
     # end def
@@ -1160,190 +1105,4 @@ class OrigamiPart(Part):
         self._imported_vh_order = orderedCoordList
         self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList)
 
-    def createMod(self, params, mid=None, use_undostack=True):
-        if mid is None:
-            mid =  str(uuid4())
-        elif mid in self._mods:
-            raise KeyError("createMod: Duplicate mod id: {}".format(mid))
-        
-        name = params.get('name', mid)
-        color = params.get('color', '#00FF00')
-        seq5p = params.get('seq5p', '')
-        seq3p = params.get('seq3p', '')
-        seqInt = params.get('seqInt', '')
-        note = params.get('note', '')
-
-        cmdparams = {
-            'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt,
-            'ext_locations': set(), # external mods, mod belongs to idx outside of strand
-            'int_locations': set()  # internal mods, mod belongs between idx and idx + 1
-        }
-
-        item = { 'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt
-        }
-        cmds = []
-        c = AddModCommand(self, cmdparams, mid)
-        cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Mod", \
-                                                use_undostack=use_undostack)
-        return item, mid
-    # end def
-
-    def modifyMod(self, params, mid, use_undostack=True):
-        if mid in self._mods:
-            cmds = []
-            c = ModifyModCommand(self, params, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Modify Mod", \
-                                                use_undostack=use_undostack)
-    # end def
-
-    def destroyMod(self, mid):
-        if mid in self._mods:
-            cmds = []
-            c = RemoveModCommand(self, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Mod", \
-                                                use_undostack=use_undostack)
-    # end def
-
-    def getMod(self, mid):
-        return self._mods.get(mid)
-    # end def
-
-    def mods(self):
-        """
-        """
-        mods = self._mods
-        res = {}
-        for mid in mods.keys():
-            if mid != 'int_instances' and mid != 'ext_instances':
-                res[mid] = mods[mid].copy()
-                del res[mid]['int_locations']
-                del res[mid]['ext_locations']
-        res['int_instances'] = self._mods['int_instances']
-        res['ext_instances'] = self._mods['ext_instances']
-        return res
-    #end def
-
-    def getModID(self, strand, idx):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
-        mods_strand  = self._mods['ext_instances']
-        if key in mods_strand:
-            return mods_strand[key]
-    # end def
-
-    def getModSequence(self, strand, idx, modtype):
-        mid = self.getModID(strand, idx)
-        name = '' if mid is None else self._mods[mid]['name']
-        if modtype == 0:
-            seq = '' if mid is None else self._mods[mid]['seq5p']
-        elif modtype == 1:
-            seq = '' if mid is None else self._mods[mid]['seq3p']
-        else:
-            seq = '' if mid is None else self._mods[mid]['seqInt']
-        return seq, name
-
-    def getModStrandIdx(self, key):
-        keylist = key.split(',')
-        coord = int(keylist[0]), int(keylist[1])
-        isstaple = True if keylist[2] == 'True' else False
-        idx = int(keylist[3])
-        vh = self.virtualHelixAtCoord(coord)
-        if vh:
-            strand = vh.stap(idx) if isstaple else vh.scaf(idx)
-            return strand, idx
-        else:
-            raise ValueError("getModStrandIdx: no strand for key: {}", key)
-    # end def
-
-    def addModInstance(self, coord, idx, isstaple, isinternal, mid):
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
-        mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
-        try:
-            locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
-        except:
-            print(mid, self._mods[mid])
-            raise
-        if key in mods_strands:
-            self.removeModInstance(coord, idx, isstaple, isinternal, mid)
-        self.addModInstanceKey(key, mods_strands, locations, mid)
-    # end def
-
-    def addModInstanceKey(self, key, mods_strands, locations, mid):
-        mods_strands[key] = mid # add to strand lookup
-        # add to set of locations
-        locations.add(key)
-    # end def
-
-    def addModStrandInstance(self, strand, idx, mid):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
-        if mid is not None:
-            self.addModInstance(coord, idx, isstaple, False, mid)
-    # end def
-
-    def removeModInstance(self, coord, idx, isstaple, isinternal, mid):
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
-        mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
-        locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
-        if key in mods_strands:
-            self.removeModInstanceKey(key, mods_strands, locations)
-    # end def
-
-    def removeModInstanceKey(self, key, mods_strands, locations):
-        del mods_strands[key]
-        locations.remove(key)
-    # end def
-
-    def removeModStrandInstance(self, strand, idx, mid):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
-        if mid is not None:
-            self.removeModInstance(coord, idx, isstaple, False, mid)
-    # end def
-
-    def changeModInstance(self, coord, idx, isstaple, isinternal, mid_old, mid_new):
-        if mid_new != mid_old:
-            mods = self._mods
-            if mid_old in mods and mid_new in mods:
-                self.removeModInstance(coord, idx, istaple, isinternal, mid_old)
-                self.addModInstance(coord, idx, isstaple, isinternal, mid_new)
-    # end def
-
-    def changeModLocation(self, coord, idx_old, idx, isstaple, isinternal, mid):
-        if idx_old != idx:
-            self.removeModInstance(coord, idx_old, isstaple, isinternal, mid)
-            self.addModInstance(coord, idx, isstaple, isinternal, mid)
-    # end def
-
-    def changeModStrandLocation(self, strand, idxs_old, idxs):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
-        mods_strands = self._mods['ext_instances']
-        for i in [0,1]:
-            idx_old = idxs_old[i]
-            idx = idxs[i]
-            if idx_old != idx:
-                key_old =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx_old)
-                if key_old in mods_strands:
-                    mid = mods_strands[key_old]
-                    locations = self._mods[mid]['ext_locations']
-                    self.removeModInstanceKey(key_old, mods_strands, locations)
-                    key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
-                    self.addModInstanceKey(key, mods_strands, locations, mid)
-        # end for
-    # end def
 # end class

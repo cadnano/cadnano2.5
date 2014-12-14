@@ -111,7 +111,7 @@ class PathToolManager(QObject):
         """(PathHelix, posInScene) or None, depending on where
         the mouse is (basically, pathHelix and position of
         the last event seen by the active tool)"""
-        if self._active_tool == None:
+        if self._active_tool is None:
             return None
         return self._active_tool.lastLocation()
 # end class

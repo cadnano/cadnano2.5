@@ -196,73 +196,66 @@ class Document(ProxyObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
-        min_low_delta = strandset.partMaxBaseIdx()
-        min_high_delta = strandset.partMaxBaseIdx()  # init the return values
+        
+        length = strandset.length()
+        min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
         ss_dict = self._selection_dict[strandset]
-        # get the StrandSet index of the first item in the list
-        ss_idx = strandset._findIndexOfRangeFor(selected_strand_list[0][0])[2]
-        ss_list = strandset._strand_list
-        len_ss_list = len(ss_list)
-        max_ss_idx = len_ss_list - 1
-        i = 0
+
         for strand, value in selected_strand_list:
-            while strand != ss_list[ss_idx]:
-                # incase there are gaps due to double xovers
-                ss_idx += 1
-            # end while
-            idxL, idxH = strand.idxs()
+            idx_low, idx_high = strand.idxs()
+            low_neighbor, high_neighbor = strandset.getNeighbors(strand)
+            # print(low_neighbor, high_neighbor)
             if value[0]:    # the end is selected
-                if ss_idx > 0:
-                    low_neighbor = ss_list[ss_idx - 1]
+                if low_neighbor is None:
+                    temp = idx_low - 0
+                else:
                     if low_neighbor in ss_dict:
-                        valueN = ss_dict[low_neighbor]
+                        value_N = ss_dict[low_neighbor]
                         # we only care if the low neighbor is not selected
-                        temp = min_low_delta if valueN[1] \
-                                        else idxL - low_neighbor.highIdx() - 1
+                        temp = min_low_delta if value_N[1] \
+                                        else idx_low - low_neighbor.highIdx() - 1
                     # end if
                     else:  # not selected
-                        temp = idxL - low_neighbor.highIdx() - 1
+                        temp = idx_low - low_neighbor.highIdx() - 1
                     # end else
-                else:
-                    temp = idxL - 0
-                # end else
+
                 if temp < min_low_delta:
                     min_low_delta = temp
                 # end if
                 # check the other end of the strand
                 if not value[1]:
-                    temp = idxH - idxL - 1
+                    temp = idx_high - idx_low - 1
                     if temp < min_high_delta:
                         min_high_delta = temp
+                
             # end if
             if value[1]:
-                if ss_idx < max_ss_idx:
-                    high_neighbor = ss_list[ss_idx + 1]
+                if high_neighbor is None:
+                    temp = max_ss_idx - idx_high
+                else:
                     if high_neighbor in ss_dict:
-                        valueN = ss_dict[high_neighbor]
+                        value_N = ss_dict[high_neighbor]
                         # we only care if the low neighbor is not selected
-                        temp = min_high_delta if valueN[0] \
-                                        else high_neighbor.lowIdx() - idxH - 1
+                        temp = min_high_delta if value_N[0] \
+                                        else high_neighbor.lowIdx() - idx_high - 1
                     # end if
                     else:  # not selected
-                        temp = high_neighbor.lowIdx() - idxH - 1
+                        temp = high_neighbor.lowIdx() - idx_high - 1
                     # end else
-                else:
-                    temp = strandset.partMaxBaseIdx() - idxH
+
                 # end else
                 if temp < min_high_delta:
                     min_high_delta = temp
                 # end if
                 # check the other end of the strand
                 if not value[0]:
-                    temp = idxH - idxL - 1
+                    temp = idx_high - idx_low - 1
                     if temp < min_low_delta:
                         min_low_delta = temp
             # end if
-            # increment counter
-            ss_idx += 1
         # end for
         return (min_low_delta, min_high_delta)
+
     # end def
 
     def getSelectionBounds(self):
@@ -276,7 +269,7 @@ class Document(ProxyObject):
                 min_low_delta = temp_low
             if temp_high < min_high_delta or min_high_delta < 0:
                 min_high_delta = temp_high
-        # end for Mark train bus to metro
+
         return (min_low_delta, min_high_delta)
     # end def
 
@@ -298,14 +291,14 @@ class Document(ProxyObject):
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
                 part = strand.virtualHelix().part()
-                idxL, idxH = strand.idxs()
+                idx_low, idx_high = strand.idxs()
                 strand5p = strand.connection5p()
                 strand3p = strand.connection3p()
                 # both ends are selected
                 strand_dict[strand] = selected[0] and selected[1]
 
                 # only look at 3' ends to handle xover deletion
-                sel3p = selected[0] if idxL == strand.idx3Prime() else selected[1]
+                sel3p = selected[0] if idx_low == strand.idx3Prime() else selected[1]
                 if sel3p:  # is idx3p selected?
                     if strand3p:  # is there an xover
                         xoList.append((part, strand, strand3p, use_undostack))
@@ -369,32 +362,32 @@ class Document(ProxyObject):
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
                 part = strand.virtualHelix().part()
-                idxL, idxH = strand.idxs()
-                newL, newH = strand.idxs()
-                deltaL = deltaH = delta
+                idx_low, idx_high = strand.idxs()
+                new_low, new_high = strand.idxs()
+                delta_low = delta_high = delta
 
                 # process xovers to get revised delta
                 if selected[0] and strand.connectionLow():
-                    newL = part.xoverSnapTo(strand, idxL, delta)
-                    if newL == None:
+                    new_low = part.xoverSnapTo(strand, idx_low, delta)
+                    if new_low is None:
                         return
-                    deltaH = newL-idxL
+                    delta_high = new_low-idx_low
                 if selected[1] and strand.connectionHigh():
-                    newH = part.xoverSnapTo(strand, idxH, delta)
-                    if newH == None:
+                    new_high = part.xoverSnapTo(strand, idx_high, delta)
+                    if new_high is None:
                         return
-                    deltaL = newH-idxH
+                    delta_low = new_high - idx_high
 
                 # process endpoints
                 if selected[0] and not strand.connectionLow():
-                    newL = idxL + deltaL
+                    new_low = idx_low + delta_low
                 if selected[1] and not strand.connectionHigh():
-                    newH = idxH + deltaH
+                    new_high = idx_high + delta_high
 
-                if newL > newH:  # check for illegal state
+                if new_low > new_high:  # check for illegal state
                     return
 
-                resize_list.append((strand, newL, newH))
+                resize_list.append((strand, new_low, new_high))
             # end for
         # end for
 
@@ -402,8 +395,8 @@ class Document(ProxyObject):
         if use_undostack:
             self.undoStack().beginMacro("Resize Selection")
 
-        for strand, idxL, idxH in resize_list:
-            Strand.resize(strand, (idxL, idxH), use_undostack)
+        for strand, idx_low, idx_high in resize_list:
+            Strand.resize(strand, (idx_low, idx_high), use_undostack)
 
         if use_undostack:
             self.undoStack().endMacro()
@@ -423,7 +416,7 @@ class Document(ProxyObject):
         # end for
         self._selected_changed_dict = {}
         # for ss in self._selection_dict:
-        #     print self.sortedSelectedStrands(ss)
+        #     print(self.sortedSelectedStrands(ss))
     # end def
 
     def resetViews(self):

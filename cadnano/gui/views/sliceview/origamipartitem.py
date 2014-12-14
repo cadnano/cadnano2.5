@@ -51,15 +51,13 @@ class OrigamiPartItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
         self._initModifierCircle()
-        
-        print(self.boundingRect())
-        outline = QGraphicsRectItem(self.boundingRect(), self)
-        outline.setPen(QPen(Qt.red))
 
+        # outline = QGraphicsRectItem(self.boundingRect(), self)
+        # outline.setPen(QPen(Qt.red))
         # f.setPen(QPen(Qt.NoPen))
         # outline.setBrush(QBrush(QColor(204, 0, 0)))
-        outline.setRect(self.boundingRect())
-        
+        # outline.setRect(self.boundingRect())
+
     # end def
 
     def _initDeselector(self):
@@ -243,7 +241,7 @@ class OrigamiPartItem(QGraphicsItem):
     # end def
 
     def selectionWillChange(self, newSel):
-        if self.part() == None:
+        if self.part() is None:
             return
         if self.part().selectAllBehavior():
             return

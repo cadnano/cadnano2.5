@@ -167,17 +167,20 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def autoScafMidSeam(self, strands):
-        """docstring for autoScafMidSeam"""
+        """
+        docstring for autoScafMidSeam
+        data is stored in the undostack text
+        """
         part = self.part()
         strand_type = StrandType.SCAFFOLD
         idx = part.activeBaseIndex()
         for i in range(1, len(strands)):
-            row1, col1, ss_idx1 = strands[i - 1]  # previous strand
-            row2, col2, ss_idx2 = strands[i]  # current strand
+            row1, col1, ss_base_low_idx1 = strands[i - 1]  # previous strand
+            row2, col2, ss_base_low_idx2 = strands[i]  # current strand
             vh1 = part.virtualHelixAtCoord((row1, col1))
             vh2 = part.virtualHelixAtCoord((row2, col2))
-            strand1 = vh1.scaffoldStrandSet()._strand_list[ss_idx1]
-            strand2 = vh2.scaffoldStrandSet()._strand_list[ss_idx2]
+            strand1 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
+            strand2 = vh2.scaffoldStrandSet().getStrand(ss_base_low_idx2)
             # determine if the pair of strands are neighbors
             neighbors = part.getVirtualHelixNeighbors(vh1)
             if vh2 in neighbors:
@@ -192,9 +195,13 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                             part.getPreXoversLow(strand_type, p2, min_idx=idx + 10))
                         if strand1.canResizeTo(new_lo, new_hi) and \
                            strand2.canResizeTo(new_lo, new_hi):
-                            # do the resize
+                            # do the resize and update the indices to keep track of new objects
+                            ss_base_low_idx1 = ss_base_low_idx2 = new_lo
+                            strands[i - 1][2] = strands[i][2] = new_lo
+                            
                             strand1.resize((new_lo, new_hi))
                             strand2.resize((new_lo, new_hi))
+                            
                             # install xovers
                             part.createXover(strand1, new_hi, strand2, new_hi)
                             part.createXover(strand2, new_lo, strand1, new_lo)
@@ -203,9 +210,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
                     # go back an install the internal xovers
                     if i > 2:
-                        row0, col0, ss_idx0 = strands[i - 2]  # two strands back
+                        row0, col0, ss_base_low_idx0 = strands[i - 2]  # two strands back
                         vh0 = part.virtualHelixAtCoord((row0, col0))
-                        strand0 = vh0.scaffoldStrandSet()._strand_list[ss_idx0]
+                        strand0 = vh0.scaffoldStrandSet().getStrand(ss_base_low_idx0)
                         if vh0 in neighbors:
                             p0 = neighbors.index(vh0)
                             l0, h0 = strand0.idxs()
@@ -224,8 +231,10 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                                 part.createXover(strand0, h_x, strand1, h_x)
                                 # install low xover after getting new strands
                                 # following the breaks caused by the high xover
-                                strand3 = vh0.scaffoldStrandSet()._strand_list[ss_idx0]
-                                strand4 = vh1.scaffoldStrandSet()._strand_list[ss_idx1]
+
+                                strand3 = vh0.scaffoldStrandSet().getStrand(ss_base_low_idx0)
+                                strand4 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
+
                                 part.createXover(strand4, l_x, strand3, l_x)
                             except IndexError:
                                 pass  # filter was unhappy
@@ -236,12 +245,12 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         part = self.part()
         idx = part.activeBaseIndex()
         for i in range(1, len(strands)):
-            row1, col1, ss_idx1 = strands[i - 1]  # previous strand
-            row2, col2, ss_idx2 = strands[i]  # current strand
+            row1, col1, ss_base_low_idx1 = strands[i - 1]  # previous strand
+            row2, col2, ss_base_low_idx2 = strands[i]  # current strand
             vh1 = part.virtualHelixAtCoord((row1, col1))
             vh2 = part.virtualHelixAtCoord((row2, col2))
-            strand1 = vh1.scaffoldStrandSet()._strand_list[ss_idx1]
-            strand2 = vh2.scaffoldStrandSet()._strand_list[ss_idx2]
+            strand1 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
+            strand2 = vh2.scaffoldStrandSet().getStrand(ss_base_low_idx2)
             # determine if the pair of strands are neighbors
             neighbors = part.getVirtualHelixNeighbors(vh1)
             if vh2 in neighbors:
@@ -265,8 +274,14 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
                         if strand1.canResizeTo(new_lo1, new_hi) and \
                            strand2.canResizeTo(new_lo2, new_hi):
+
+                            strands[i - 1][2] = strands[i] = new_lo1
+                            ss_base_low_idx1 = ss_base_low_idx1 = new_lo1
+
                             strand1.resize((new_lo1, new_hi))
                             strand2.resize((new_lo2, new_hi))
+
+
                         else:
                             raise ValueError
                         # install xovers
@@ -325,7 +340,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         vh = self.virtualHelix()
         part = self.part()
 
-        if vh == None:
+        if vh is None:
             return EmptyHelixItem.addVHIfMissing
 
         idx = part.activeBaseIndex()
@@ -347,7 +362,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     def addScafAtActiveSliceIfMissing(self):
         vh = self.virtualHelix()
         part = self.part()
-        if vh == None:
+        if vh is None:
             return
 
         idx = part.activeBaseIndex()
@@ -362,7 +377,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         vh = self.virtualHelix()
         part = self.part()
 
-        if vh == None:
+        if vh is None:
             return
 
         idx = part.activeBaseIndex()
@@ -378,7 +393,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         coord = self._coord
         part = self.part()
 
-        if vh != None:
+        if vh is not None:
             return
         u_s = part.undoStack()
         u_s.beginMacro("Slice Click")

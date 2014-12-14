@@ -26,12 +26,12 @@ class SliceToolManager(QObject):
         ActiveSliceHandle can later subscribe.
         """
         part = self._window.selectedPart()
-        if part != None:
+        if part is not None:
             part.setActiveBaseIndex(0)
 
     def activeSliceLastSlot(self):
         part = self._window.selectedPart()
-        if part != None:
+        if part is not None:
             part.setActiveBaseIndex(part.maxBaseIdx()-1)
 
     ### METHODS ###

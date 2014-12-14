@@ -22,10 +22,10 @@ class AutobreakHandler(object):
     def actionAutobreakSlot(self):
         """Only show the dialog if staple strands exist."""
         part = self.doc.controller().activePart()
-        if part != None:  # is there a part?
+        if part is not None:  # is there a part?
             for o in list(part.oligos()):
                 if o.isStaple():  # is there a staple oligo?
-                    if self.config_dialog == None:
+                    if self.config_dialog is None:
                         self.config_dialog = AutobreakConfig(self.win, self)
                     self.config_dialog.show()
                     return

@@ -29,7 +29,7 @@ class RenumberVirtualHelicesCommand(UndoCommand):
             for strand in oligo.strand5p().generator3pStrand():
                 strand.strandUpdateSignal.emit(strand)
     # end def
-        
+
     def undo(self):
         for vh, num in izip(self._vhs, self._old_numbers):
             vh.setNumber(num)

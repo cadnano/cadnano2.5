@@ -96,7 +96,7 @@ class AddSeqTool(AbstractPathTool):
                 apply_enabled = True
         else:  # Standard Sequence
             self.use_custom_sequence = False
-            if self.chosen_standard_sequence != None:
+            if self.chosen_standard_sequence is not None:
                 # Overwrite sequence in case custom has been applied
                 active_button = self.buttons[self.chosen_standard_sequence]
                 sequence_name = active_button.text()
