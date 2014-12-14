@@ -971,7 +971,7 @@ class DnaPart(Part):
             mid =  str(uuid4())
         elif mid in self._mods:
             raise KeyError("createMod: Duplicate mod id: {}".format(mid))
-        
+
         name = params.get('name', mid)
         color = params.get('color', '#00FF00')
         seq5p = params.get('seq5p', '')
