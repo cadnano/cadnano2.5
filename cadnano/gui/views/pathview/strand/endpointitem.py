@@ -208,11 +208,11 @@ class EndpointItem(QGraphicsPathItem):
     def mousePressEvent(self, event):
         """
         Parses a mousePressEvent, calling the approproate tool method as
-        necessary. Stores _moveIdx for future comparison.
+        necessary. Stores _move_idx for future comparison.
         """
         self.scene().views()[0].addToPressList(self)
         self._strand_item.virtualHelixItem().setActive(self.idx())
-        self._moveIdx = self.idx()
+        self._move_idx = self.idx()
         active_tool_str = self._getActiveTool().methodPrefix()
         tool_method_name = active_tool_str + "MousePress"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -226,7 +226,7 @@ class EndpointItem(QGraphicsPathItem):
     def hoverMoveEvent(self, event):
         """
         Parses a mousePressEvent, calling the approproate tool method as
-        necessary. Stores _moveIdx for future comparison.
+        necessary. Stores _move_idx for future comparison.
         """
         vhi_num = self._strand_item._virtual_helix_item.number()
         oligo_length = self._strand_item._model_strand.oligo().length()
@@ -240,20 +240,20 @@ class EndpointItem(QGraphicsPathItem):
     def mouseMoveEvent(self, event):
         """
         Parses a mouseMoveEvent, calling the approproate tool method as
-        necessary. Updates _moveIdx if it changed.
+        necessary. Updates _move_idx if it changed.
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):  # if the tool method exists
             idx = int(floor((self.x() + event.pos().x()) / _BASE_WIDTH))
-            if idx != self._moveIdx:  # did we actually move?
+            if idx != self._move_idx:  # did we actually move?
                 modifiers = event.modifiers()
-                self._moveIdx = idx
+                self._move_idx = idx
                 getattr(self, tool_method_name)(modifiers, idx)
 
     def customMouseRelease(self, event):
         """
         Parses a mouseReleaseEvent, calling the approproate tool method as
-        necessary. Deletes _moveIdx if necessary.
+        necessary. Deletes _move_idx if necessary.
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -261,7 +261,7 @@ class EndpointItem(QGraphicsPathItem):
             x = event.pos().x()
             getattr(self, tool_method_name)(modifiers, x)  # call tool method
         if hasattr(self, '_move_idx'):
-            del self._moveIdx
+            del self._move_idx
 
     ### TOOL METHODS ###
     def addSeqToolMousePress(self, modifiers, event, idx):

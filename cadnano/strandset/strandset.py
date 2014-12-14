@@ -339,7 +339,7 @@ class StrandSet(ProxyObject):
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
             strand_low, strand_high = low_and_high_strands
-            if self.isStrandInSet(low_strand):
+            if self.isStrandInSet(strand_low):
                 c = MergeCommand(strand_low, strand_high, priority_strand)
                 util.execCommandList(self, [c], desc="Merge", use_undostack=use_undostack)
     # end def
