@@ -807,6 +807,17 @@ class OrigamiPart(Part):
                                                     use_undostack=use_undostack)
     # end def
 
+    def setActiveBaseIndex(self, idx):
+        self._active_base_index = idx
+        self.partActiveSliceIndexSignal.emit(self, idx)
+    # end def
+
+    def setActiveVirtualHelix(self, virtual_helix, idx=None):
+        self._active_virtual_helix = virtual_helix
+        self._active_virtual_helix_idx = idx
+        self.partStrandChangedSignal.emit(self, virtual_helix)
+    # end def
+
     def selectPreDecorator(self, selection_list):
         """
         Handles view notifications that a predecorator has been selected.
