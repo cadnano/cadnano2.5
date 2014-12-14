@@ -10,8 +10,8 @@ from PyQt5.QtCore import Qt, QObject, QPointF, QRegExp, QSignalMapper, pyqtSigna
 from PyQt5.QtGui import QBrush, QColor, QFont, QPen, QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
 
-dnapattern = QRegExp("[^ACGTacgt]")
-
+import re
+RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
 
 class DNAHighlighter(QSyntaxHighlighter):
     def __init__(self, parent):
@@ -24,13 +24,11 @@ class DNAHighlighter(QSyntaxHighlighter):
             self.format.setUnderlineColor(styles.INVALID_DNA_COLOR)
 
     def highlightBlock(self, text):
-        index = dnapattern.indexIn(text)
-        while index >= 0:
-            length = dnapattern.matchedLength()
+        for match in re.finditer(RE_DNA_PATTERN, text):
+            index = match.start()
+            length = match.end() - index
             self.setFormat(index, length, self.format)
-            index = text.indexOf(dnapattern, index + length)
         self.setCurrentBlockState(0)
-
 
 class AddSeqTool(AbstractPathTool):
     def __init__(self, controller, parent=None):
@@ -106,14 +104,14 @@ class AddSeqTool(AbstractPathTool):
                 apply_enabled = True
         self.apply_button.setEnabled(apply_enabled)
 
-    def standardSequenceChangedSlot(self, optionChosen):
+    def standardSequenceChangedSlot(self, option_chosen):
         """
         Connected to signal_mapper to receive a signal whenever user selects
         a different sequence in the standard tab.
         """
-        sequence_name = self.buttons[optionChosen].text()
+        sequence_name = self.buttons[option_chosen].text()
         self.validated_sequence_to_apply = sequences.get(sequence_name, None)
-        self.chosen_standard_sequence = optionChosen
+        self.chosen_standard_sequence = option_chosen
         self.apply_button.setEnabled(True)
 
     def validateCustomSequence(self):
@@ -129,7 +127,7 @@ class AddSeqTool(AbstractPathTool):
         if len(user_sequence) == 0:
             self.custom_sequence_is_valid = False
             return  # tabWidgetChangedSlot will disable apply_button
-        if dnapattern.indexIn(user_sequence) == -1:  # no invalid characters
+        if re.find(RE_DNA_PATTERN, user_sequence) is None:
             self.use_custom_sequence = True
             self.custom_sequence_is_valid = True
             self.apply_button.setEnabled(True)
