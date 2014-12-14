@@ -1,6 +1,5 @@
 """
-util
-Created by Jonathan deWerd.
+util.py
 """
 import inspect
 from traceback import extract_stack
