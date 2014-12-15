@@ -8,11 +8,11 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 
 class SliceRootItem(QGraphicsRectItem):
     """
-    PathRootItem is the root item in the PathView. It gets added directly
+    SliceRootItem is the root item in the SliceView. It gets added directly
     to the pathscene by DocumentWindow. It receives two signals
     (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
 
-    PathRootItem must instantiate its own controller to receive signals
+    SliceRootItem must instantiate its own controller to receive signals
     from the model.
     """
     def __init__(self, rect, parent, window, document):
@@ -31,7 +31,6 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
         """
         self._model_part = model_part
-        print("partAddedSlot: ", model_part, model_part.__class__.__name__)
 
         if model_part.__class__.__name__ == "DnaPart":
             # print("yes DNApart")

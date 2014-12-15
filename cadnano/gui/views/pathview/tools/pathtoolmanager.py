@@ -91,13 +91,13 @@ class PathToolManager(QObject):
 
         if str(new_active_tool) == "select_tool":
             self.window.activateSelection(True)
-            self.window.selectionToolBar.show()
+            self.window.selection_toolbar.show()
         elif str(new_active_tool) == "paint_tool":
             self.window.activateSelection(True)
-            self.window.selectionToolBar.show()
+            self.window.selection_toolbar.show()
         else:
             self.window.activateSelection(False)
-            self.window.selectionToolBar.hide()
+            self.window.selection_toolbar.hide()
         self._active_tool = new_active_tool
         self._active_tool.setActive(True)
         self.activeToolChangedSignal.emit(self._active_tool.action_name)
