@@ -81,6 +81,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_splitter.addWidget(self.outlineroot)
         self.slice_splitter.addWidget(self.slice_graphics_view)
 
+        self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
+
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
         self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),\
