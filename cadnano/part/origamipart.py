@@ -773,6 +773,45 @@ class OrigamiPart(Part):
         raise NotImplementedError  # To be implemented by Part subclass
     # end def
 
+    def xoverSnapTo(self, strand, idx, delta):
+        """
+        Returns the nearest xover position to allow snap-to behavior in
+        resizing strands via dragging selected xovers.
+        """
+        strand_type = strand.strandType()
+        if delta > 0:
+            min_idx, max_idx = idx - delta, idx + delta
+        else:
+            min_idx, max_idx = idx + delta, idx - delta
+
+        # determine neighbor strand and bind the appropriate prexover method
+        lo, hi = strand.idxs()
+        if idx == lo:
+            connected_strand = strand.connectionLow()
+            preXovers = self.getPreXoversHigh
+        else:
+            connected_strand = strand.connectionHigh()
+            preXovers = self.getPreXoversLow
+        connected_vh = connected_strand.virtualHelix()
+
+        # determine neighbor position, if any
+        neighbors = self.getVirtualHelixNeighbors(strand.virtualHelix())
+        if connected_vh in neighbors:
+            neighbor_idx = neighbors.index(connected_vh)
+            try:
+                new_idx = util.nearest(idx + delta,
+                                    preXovers(strand_type,
+                                                neighbor_idx,
+                                                min_idx=min_idx,
+                                                max_idx=max_idx)
+                                    )
+                return new_idx
+            except ValueError:
+                return None  # nearest not found in the expanded list
+        else:  # no neighbor (forced xover?)... don't snap, just return
+            return idx + delta
+    # end def
+
     def positionToCoord(self, x, y, scale_factor=1.0):
         """
         Returns a tuple (row, column) lattice coordinate for a given
@@ -829,6 +868,8 @@ class OrigamiPart(Part):
         sel = selection_list[0]
         (row, col, baseIdx) = (sel[0], sel[1], sel[2])
         self.partPreDecoratorSelectedSignal.emit(self, row, col, baseIdx)
+
+
 
     ### PRIVATE SUPPORT METHODS ###
     def _addVirtualHelix(self, virtual_helix):
