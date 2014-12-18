@@ -84,9 +84,9 @@ class CadnanoQt(QObject):
             def w():
                 return self.d.controller().window()
 
-            print("\tp()\tshortcut for d().selectedPart()")
+            print("\tp()\tshortcut for d().selectedInstance()")
             def p():
-                return self.d.selectedPart()
+                return self.d.selectedInstance()
 
             print("\tpi()\tthe PartItem displaying p()")
             def pi():

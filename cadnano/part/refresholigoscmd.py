@@ -29,7 +29,7 @@ class RefreshOligosCommand(UndoCommand):
 
     def redo(self):
         visited = {}
-        doc = self._part.document()
+
         for vh in self._part.getVirtualHelices():
             stap_ss = vh.stapleStrandSet()
             for strand in stap_ss:

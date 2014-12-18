@@ -1,10 +1,10 @@
-import util
+import cadnano.util as util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoCommand, UndoStack
 
 class ObjectInstance(ProxyObject):
 
-    def __init__(self, reference_object, parent):
+    def __init__(self, reference_object, parent=None):
         super(ObjectInstance, self).__init__(reference_object)
         self._parent = parent   # parent is either a document or assembly
         self._object = reference_object
@@ -13,7 +13,7 @@ class ObjectInstance(ProxyObject):
 
     ### SIGNALS ###
     instanceDestroyedSignal = ProxySignal(ProxyObject,
-                                        "instanceDestroyedSignal")
+                                        name="instanceDestroyedSignal")
     instanceMovedSignal = ProxySignal(ProxyObject,
                                             name="instanceMovedSignal") 
     instanceParentChangedSignal = ProxySignal(ProxyObject,
@@ -26,13 +26,25 @@ class ObjectInstance(ProxyObject):
         return self._document.undoStack()
 
     def destroy(self):
-        # QObject also emits a destroyed() Signal
         self.setParent(None)
         self.deleteLater()
     # end def
 
     def reference(self):
         return self._object
+    # end def
+
+    def wipe(self, doc):
+       self._object.setDocument(None)
+       doc.setSelectedInstance(None)
+       doc.removeChild(self._object)
+    # end def
+
+    def unwipe(self, doc):
+        obj = self._object
+        obj.setDocument(doc) 
+        doc.addChild(obj)
+        doc.setSelectedInstance(obj)
     # end def
     
     def parent(self):

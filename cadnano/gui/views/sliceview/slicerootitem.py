@@ -25,21 +25,22 @@ class SliceRootItem(QGraphicsRectItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partAddedSlot(self, sender, model_part):
+    def partAddedSlot(self, sender, model_part_instance):
         """
         Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
         """
-        self._model_part = model_part
+        # self._model_part = model_part
+        model_part = model_part_instance.reference()
         print("partAddedSlot: ", model_part, model_part.__class__.__name__)
 
         if model_part.__class__.__name__ == "DnaPart":
             # print("yes DNApart")
-            dna_part_item = DnaPartItem(model_part, parent=self)
+            dna_part_item = DnaPartItem(model_part_instance, parent=self)
             self._instance_items[dna_part_item] = dna_part_item
         else:
             # print("nope it's OrigamiPart")
-            origami_part_item = OrigamiPartItem(model_part, parent=self)
+            origami_part_item = OrigamiPartItem(model_part_instance, parent=self)
             self._instance_items[origami_part_item] = origami_part_item
             self.setModifyState(self._window.action_modify.isChecked())
     # end def
@@ -64,7 +65,7 @@ class SliceRootItem(QGraphicsRectItem):
     ### ACCESSORS ###
     def sliceToolManager(self):
         """docstring for sliceToolManager"""
-        return self._window.sliceToolManager
+        return self._window.slice_tool_manager
     # end def
 
     def window(self):

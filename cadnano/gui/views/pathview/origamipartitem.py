@@ -30,10 +30,11 @@ class ProxyParentItem(QGraphicsRectItem):
 class OrigamiPartItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
-    def __init__(self, model_part, viewroot, active_tool_getter, parent):
+    def __init__(self, model_part_instance, viewroot, active_tool_getter, parent):
         """parent should always be pathrootitem"""
         super(OrigamiPartItem, self).__init__(parent)
-        self._model_part = m_p = model_part
+        self._model_instance = model_part_instance
+        self._model_part = m_p = model_part_instance.reference()
         self._viewroot = viewroot
         self._getActiveTool = active_tool_getter
         self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())

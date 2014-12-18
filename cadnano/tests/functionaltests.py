@@ -82,7 +82,7 @@ class FunctionalTests(CadnanoGuiTestCase):
         with file(inputfile) as f:
             decode(document, f.read())
         self.setWidget(self.documentController.win, False, None)
-        part = document.selectedPart()
+        part = document.selectedInstance()
         # apply one or more sequences to the design
         for sequenceName, startVhNum, startIdx in sequencesToApply:
             sequence = sequences.get(sequenceName, None)

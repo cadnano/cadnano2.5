@@ -25,12 +25,12 @@ class SliceToolManager(QObject):
         because the SliceToolManager must be instantiated first, and the
         ActiveSliceHandle can later subscribe.
         """
-        part = self._window.selectedPart()
+        part = self._window.selectedInstance()
         if part is not None:
             part.setActiveBaseIndex(0)
 
     def activeSliceLastSlot(self):
-        part = self._window.selectedPart()
+        part = self._window.selectedInstance()
         if part is not None:
             part.setActiveBaseIndex(part.maxBaseIdx()-1)
 

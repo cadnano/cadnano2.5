@@ -14,7 +14,7 @@ class RemovePartCommand(UndoCommand):
         # Remove the strand
         part = self._part
         doc = self._doc
-        doc.removePart(part)
+        doc.removeChild(part)
         part.setDocument(None)
         part.partRemovedSignal.emit(part)
     # end def

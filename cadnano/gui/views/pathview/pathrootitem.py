@@ -27,7 +27,7 @@ class PathRootItem(QGraphicsRectItem):
         self._document = document
         self._controller = ViewRootController(self, document)
         self._model_part = None
-        self._origami_part_item_for_part = {}  # Maps Part -> PartItem
+        self._part_item_for_part_instance = {}  # Maps Part -> PartItem
         self._selection_filter_dict = {}
         self._initSelections()
     # end def
@@ -37,34 +37,34 @@ class PathRootItem(QGraphicsRectItem):
     ### SLOTS ###
     def partItems(self):
         "iterator"
-        return self._origami_part_item_for_part.values()
+        return self._part_item_for_part_instance.values()
 
     def partItemForPart(self, part):
-        return self._origami_part_item_for_part[part]
+        return self._part_item_for_part_instance[part]
     
-    def partAddedSlot(self, sender, model_part):
+    def partAddedSlot(self, sender, model_part_instance):
         """
         Receives notification from the model that a part has been added.
         The Pathview doesn't need to do anything on part addition, since
         the Sliceview handles setting up the appropriate lattice.
         """
         # print "PathRootItem partAddedSlot", model_part
-        self._model_part = model_part
+        # self._model_part = model_part
         win = self._window
-        origami_part_item = OrigamiPartItem(model_part,\
+        origami_part_item = OrigamiPartItem(model_part_instance,\
                             viewroot=self, \
                             active_tool_getter=win.path_tool_manager.activeToolGetter,\
                             parent=self)
-        self._origami_part_item_for_part[model_part] = origami_part_item
+        self._part_item_for_part_instance[model_part_instance] = origami_part_item
         win.path_tool_manager.setActivePart(origami_part_item)
         self.setModifyState(win.action_modify.isChecked())
     # end def
 
-    def selectedChangedSlot(self, itemDict):
+    def selectedChangedSlot(self, item_dict):
         """Given a newly selected model_part, update the scene to indicate
         that model_part is selected and the previously selected part is
         deselected."""
-        for item, value in itemDict:
+        for item, value in item_dict:
             item.selectionProcess(value)
     # end def
 
@@ -107,27 +107,27 @@ class PathRootItem(QGraphicsRectItem):
 
     def _initSelections(self):
         """Initialize anything related to multiple selection."""
-        bType = VirtualHelixHandleSelectionBox
-        self._vhi_h_selection_group = SelectionItemGroup(boxtype=bType,\
+        b_type = VirtualHelixHandleSelectionBox
+        self._vhi_h_selection_group = SelectionItemGroup(boxtype=b_type,\
                                                       constraint='y',\
                                                       parent=self)
-        bType = EndpointHandleSelectionBox
-        self._strand_item_selection_group = SelectionItemGroup(boxtype=bType,\
+        b_type = EndpointHandleSelectionBox
+        self._strand_item_selection_group = SelectionItemGroup(boxtype=b_type,\
                                                       constraint='x',\
                                                       parent=self)
     # end def
 
     ### PUBLIC METHODS ###
-    def getSelectedPartOrderedVHList(self):
+    def getSelectedInstanceOrderedVHList(self):
         """Used for encoding."""
-        selectedPart = self._document.selectedPart()
-        return self._origami_part_item_for_part[selectedPart].getOrderedVirtualHelixList()
+        selected_instance = self._document.selectedInstance()
+        return self._part_item_for_part_instance[selected_instance].getOrderedVirtualHelixList()
     # end def
 
     def removeOrigamiPartItem(self, origami_part_item):
-        for k in self._origami_part_item_for_part.keys():
-            if k == origami_part_item:
-                del self._origami_part_item_for_part[k]
+        for k in self._part_item_for_part_instance.keys():
+            if k == part_item:
+                del self._part_item_for_part_instance[k]
                 return
     # end def
 
@@ -139,8 +139,8 @@ class PathRootItem(QGraphicsRectItem):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for origami_part_item in self._origami_part_item_for_part.values():
-            origami_part_item.setModifyState(bool)
+        for part_item in self._part_item_for_part_instance.values():
+            part_item.setModifyState(bool)
     # end def
 
     def selectionFilterDict(self):

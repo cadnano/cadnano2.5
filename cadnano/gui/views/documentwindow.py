@@ -146,8 +146,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def undoStack(self):
         return self.controller.undoStack()
 
-    def selectedPart(self):
-        return self.controller.document().selectedPart()
+    def selectedInstance(self):
+        return self.controller.document().selectedInstance()
 
     def activateSelection(self, isActive):
         self.path_graphics_view.activateSelection(isActive)

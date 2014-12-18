@@ -23,7 +23,7 @@ _MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 class OrigamiPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
-    def __init__(self, model_part, parent=None):
+    def __init__(self, model_part_instance, parent=None):
         """
         Parent should be either a SliceRootItem, or an AssemblyItem.
 
@@ -33,10 +33,12 @@ class OrigamiPartItem(QGraphicsItem):
         Order matters for deselector, probe, and setlattice
         """
         super(OrigamiPartItem, self).__init__(parent)
-        self._part = model_part
-        self._controller = OrigamiPartItemController(self, model_part)
-        self._active_slice_item = ActiveSliceItem(self, model_part.activeBaseIndex())
-        self._scaleFactor = self._RADIUS/model_part.radius()
+        self._model_instance = model_part_instance
+        self._model_part = m_p = model_part_instance.reference()
+
+        self._controller = OrigamiPartItemController(self, m_p)
+        self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
+        self._scaleFactor = self._RADIUS/m_p.radius()
         self._empty_helix_hash = {}
         self._virtual_helix_hash = {}
         self._nrows, self._ncols = 0, 0
@@ -47,7 +49,7 @@ class OrigamiPartItem(QGraphicsItem):
         # Connect destructor. This is for removing a part from scenes.
         self.probe = self.IntersectionProbe(self)
         # initialize the OrigamiPartItem with an empty set of old coords
-        self._setLattice([], model_part.generatorFullLattice())
+        self._setLattice([], m_p.generatorFullLattice())
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
         self._initModifierCircle()
@@ -113,7 +115,7 @@ class OrigamiPartItem(QGraphicsItem):
 
         scene.removeItem(self)
         
-        self._part = None
+        self._model_part = None
         self.probe = None
         self._mod_circ = None
         
@@ -134,7 +136,7 @@ class OrigamiPartItem(QGraphicsItem):
         view.centerOn(vhi)
         view.zoomIn()
         mC = self._mod_circ
-        x,y = self._part.latticeCoordToPositionXY(row, col, self.scaleFactor())
+        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
         mC.setPos(x,y)
         if self._can_show_mod_circ:
             mC.show()
@@ -168,15 +170,15 @@ class OrigamiPartItem(QGraphicsItem):
     # end def
 
     def part(self):
-        return self._part
+        return self._model_part
     # end def
 
     def scaleFactor(self):
         return self._scaleFactor
     # end def
 
-    def setPart(self, newPart):
-        self._part = newPart
+    def setPart(self, new_part):
+        self._model_part = new_part
     # end def
 
     def window(self):

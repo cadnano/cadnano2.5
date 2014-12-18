@@ -12,7 +12,7 @@ class Assembly(ProxyObject):
     An Assembly is a collection of components, comprised recursively of
     various levels of individual parts and sub-assembly modules.
     
-    The purpose of an Assembly object in CADnano is to arrange Parts into
+    The purpose of an Assembly object in radnano is to arrange Parts into
     larger groups (which may be connected or constrained in specific ways)
     to facilitate the modeling of more complex designs than a single part.
     """

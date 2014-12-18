@@ -25,7 +25,7 @@ if __name__ == "__main__":
     doc = nnodecode.decodeFile(test_path)
 
     solids = []
-    part = doc.parts()[0]
+    part = doc.children()[0]
     # print(part.radius())
     radius = part.radius() + 0.1
     # for coord, vh in part.iterVHs():

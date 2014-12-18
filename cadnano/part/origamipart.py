@@ -319,7 +319,7 @@ class OrigamiPart(Part):
         """
         ep_dict = {}  # keyed on StrandSet
         cmds = []
-        doc = part.document()
+
         # clear existing staple strands
         # part.verifyOligos()
 
@@ -529,7 +529,6 @@ class OrigamiPart(Part):
     def removeAllOligos(self, use_undostack=True):
         # clear existing oligos
         cmds = []
-        doc = self.document()
         for o in list(self.oligos()):
             cmds.append(RemoveOligoCommand(o))
         # end for

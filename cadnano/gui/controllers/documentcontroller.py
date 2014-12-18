@@ -232,7 +232,7 @@ class DocumentController():
         """
         # clear/reset the view!
         
-        if len(self._document.parts()) == 0:
+        if len(self._document.children()) == 0:
             return  # no parts
         if self.maybeSave() == False:
             return  # user canceled in maybe save
@@ -459,7 +459,7 @@ class DocumentController():
     def actionRenumberSlot(self):
         part = self.activePart()
         if part:
-            coordList = self.win.pathroot.getSelectedPartOrderedVHList()
+            coordList = self.win.pathroot.getSelectedInstanceOrderedVHList()
             part.renumber(coordList)
     # end def
 
@@ -483,7 +483,7 @@ class DocumentController():
 
     def activePart(self):
         if self._active_part is None:
-            self._active_part = self._document.selectedPart()
+            self._active_part = self._document.selectedInstance()
         return self._active_part
     # end def
 
@@ -752,7 +752,7 @@ class DocumentController():
             filename = self.filename()
         try:
             with open(filename, 'w') as f:
-                helix_order_list = self.win.pathroot.getSelectedPartOrderedVHList()
+                helix_order_list = self.win.pathroot.getSelectedInstanceOrderedVHList()
                 encode(self._document, helix_order_list, f)
         except IOError:
             flags = Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet

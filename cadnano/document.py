@@ -16,6 +16,8 @@ from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
 from cadnano.part import HoneycombPart, SquarePart
 from cadnano.part import DnaPart
+from cadnano.objectinstance import ObjectInstance
+from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano import app
 
 class Document(ProxyObject):
@@ -30,10 +32,9 @@ class Document(ProxyObject):
         super(Document, self).__init__(parent)
 
         self._undostack = UndoStack()
-        self._parts = []
-        self._assemblies = []
+        self._children = []
         self._controller = None
-        self._selected_part = None
+        self._selected_instance = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
@@ -45,6 +46,9 @@ class Document(ProxyObject):
     documentPartAddedSignal =  ProxySignal(object, 
                                         ProxyObject,
                                         name='documentPartAddedSignal') # doc, part
+    documentAssemblyAddedSignal =  ProxySignal(object, 
+                                        ProxyObject,
+                                        name='documentAssemblyAddedSignal') # doc, assembly
 
     # dict of tuples of objects using the reference as the key,
     # and the value is a tuple with meta data
@@ -72,17 +76,32 @@ class Document(ProxyObject):
         """
         return self._undostack
 
-    def parts(self):
+    def children(self):
         """Returns a list of parts associated with the document."""
-        return self._parts
+        return self._children
 
-    def assemblies(self):
-        """Returns a list of assemblies associated with the document."""
-        return self._assemblies
+    def addChild(self, child):
+        self._children.append(child)
+
+    def removeAllChildren(self):
+        """Used to reset the document. Not undoable."""
+        self.documentClearSelectionsSignal.emit(self)
+        for child in self._children:
+            child.remove(use_undostack=False)
+    # end def
+
+    def removeChild(self, child):
+        self.documentClearSelectionsSignal.emit(self)
+        self._children.remove(child)
+    # end def
+
+    # def assemblies(self):
+    #     """Returns a list of assemblies associated with the document."""
+    #     return self._assemblies
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def selectedPart(self):
-        return self._selected_part
+    def selectedInstance(self):
+        return self._selected_instance
 
     def addToSelection(self, obj, value):
         self._selection_dict[obj] = value
@@ -438,10 +457,10 @@ class Document(ProxyObject):
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
-        if len(self._parts) == 0:
+        if len(self._children) == 0:
             origamipart = HoneycombPart(document=self, max_row=max_row, 
                                 max_col=max_col, max_steps=max_steps)
-            self._addPart(origamipart)
+            self._addPart(ObjectInstance(origamipart))
         return origamipart
 
     def addSquarePart(self, max_row=prefs.SQUARE_PART_MAXROWS, 
@@ -451,31 +470,19 @@ class Document(ProxyObject):
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
-        if len(self._parts) == 0:
+        if len(self._children) == 0:
             origamipart = SquarePart(document=self, max_row=max_row, 
                                 max_col=max_col, max_steps=max_steps)
-            self._addPart(origamipart)
+            self._addPart(ObjectInstance(origamipart))
         return origamipart
 
     def addDnaPart(self):
         """Create and store a new dnapart and instance, and return the instance."""
         dnapart = None
-        if len(self._parts) == 0:
+        if len(self._children) == 0:
             dnapart = DnaPart(document=self)
             self._addPart(dnapart)
         return dnapart
-    # end def
-
-    def removeAllParts(self):
-        """Used to reset the document. Not undoable."""
-        self.documentClearSelectionsSignal.emit(self)
-        for part in self._parts:
-            part.remove(use_undostack=False)
-    # end def
-
-    def removePart(self, part):
-        self.documentClearSelectionsSignal.emit(self)
-        self._parts.remove(part)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -488,50 +495,18 @@ class Document(ProxyObject):
         self._controller = controller
     # end def
 
-    def setSelectedPart(self, newPart):
-        if self._selected_part == newPart:
+    def setSelectedInstance(self, new_instance):
+        if self._selected_instance == new_instance:
             return
-        self._selected_part = newPart
+        self._selected_instance = new_instance
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _addPart(self, part, use_undostack=True):
-        """Add part to the document via AddPartCommand."""
-        c = self.AddPartCommand(self, part)
+    def _addPart(self, part_instance, use_undostack=True):
+        """Add part to the document via AddInstanceCommand."""
+        c = AddInstanceCommand(self, part_instance)
         util.execCommandList(
                         self, [c], desc="Add part", use_undostack=use_undostack)
-        return c.part()
+        return c.instance()
     # end def
-
-    ### COMMANDS ###
-    class AddPartCommand(UndoCommand):
-        """
-        Undo ready command for deleting a part.
-        """
-        def __init__(self, document, part):
-            super(Document.AddPartCommand, self).__init__("add part")
-            self._doc = document
-            self._part = part
-        # end def
-
-        def part(self):
-            return self._part
-        # end def
-
-        def redo(self):
-            if len(self._doc._parts) == 0:
-                self._doc._parts.append(self._part)
-                self._part.setDocument(self._doc)
-                self._doc.setSelectedPart(self._part)
-                self._doc.documentPartAddedSignal.emit(self._doc, self._part)
-        # end def
-
-        def undo(self):
-            self._doc.removePart(self._part)
-            self._part.setDocument(None)
-            self._doc.setSelectedPart(None)
-            self._part.partRemovedSignal.emit(self._part)
-            # self._doc.documentPartAddedSignal.emit(self._doc, self._part)
-        # end def
-    # end class
 # end class

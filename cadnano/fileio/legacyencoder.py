@@ -2,7 +2,7 @@ from os.path import basename
 from cadnano.enum import StrandType
 
 def legacy_dict_from_doc(document, fname, helix_order_list):
-    part = document.selectedPart()
+    part = document.selectedInstance()
     num_bases = part.maxBaseIdx()+1
 
     # iterate through virtualhelix list
