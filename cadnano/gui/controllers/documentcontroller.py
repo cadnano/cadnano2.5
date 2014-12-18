@@ -455,6 +455,13 @@ class DocumentController():
         pass
     # end def
 
+    def actionToggleOutlinerSlot(self):
+        outliner = self.win.outlineroot
+        if outliner.isVisible():
+            outliner.hide()
+        else:
+            outliner.show()
+    # end def
 
     def actionRenumberSlot(self):
         part = self.activePart()

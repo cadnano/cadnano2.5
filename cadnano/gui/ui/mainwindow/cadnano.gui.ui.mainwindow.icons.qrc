@@ -21,6 +21,7 @@
         <file alias="renum">images/part-renum.png</file>
         <file alias="new-origami">images/part-new-origami.png</file>
         <file alias="new-dna">images/part-new-dna.png</file>
+        <file alias="outliner">images/part-outliner.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

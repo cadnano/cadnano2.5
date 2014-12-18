@@ -163,7 +163,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="selectionToolBar">
+  <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
      <horstretch>0</horstretch>
