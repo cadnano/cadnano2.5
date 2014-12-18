@@ -502,7 +502,7 @@ class DocumentController():
             setReopen(True)
         self._document.resetViews()
         setBatch(True)
-        self._document.removeAllParts()  # clear out old parts
+        self._document.removeAllChildren()  # clear out old parts
         setBatch(False)
         self._document.undoStack().clear()  # reset undostack
         self._filename = fname if fname else "untitled.json"

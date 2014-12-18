@@ -35,7 +35,7 @@ class StrandSet(ProxyObject):
         self._doc = virtual_helix.document()
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
-        self.strand_array = [None]*virtual_helix.part().maxBaseIdx()
+        self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
         self.strand_heap = []
 
         # self.strand_vector = array.array('L')

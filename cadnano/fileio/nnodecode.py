@@ -242,6 +242,7 @@ def decode(document, obj):
             color = Color(  (color_number >> 16) & 0xFF, 
                             (color_number >> 8) & 0xFF, 
                             color_number & 0xFF).name()
+
             strand = stap_strand_set.getStrand(base_idx)
             strand.oligo().applyColor(color, use_undostack=False) 
 
