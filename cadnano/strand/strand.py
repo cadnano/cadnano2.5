@@ -509,28 +509,28 @@ class Strand(ProxyObject):
 
         if self.hasXoverAt(idx):
             return False
-        sS = self.strandSet()
+        ss = self.strandSet()
         is_same_strand = from_strand == self
         is_strand_type_match = \
-                from_strand.strandSet().strandType() == sS.strandType() \
+                from_strand.strandSet().strandType() == ss.strandType() \
                                                 if from_strand else True
         if not is_strand_type_match:
             return False
-        is_drawn_5_to_3 = sS.isDrawn5to3()
-        indexDiffH = self.highIdx() - idx
-        indexDiffL = idx - self.lowIdx()
-        index3Lim = self.idx3Prime() - 1 if is_drawn_5_to_3 \
+        is_drawn_5_to_3 = ss.isDrawn5to3()
+        index_diff_H = self.highIdx() - idx
+        index_diff_L = idx - self.lowIdx()
+        index3_lim = self.idx3Prime() - 1 if is_drawn_5_to_3 \
                                             else self.idx3Prime() + 1
         if is_same_strand:
             indexDiffStrands = from_idx - idx
-            if idx == self.idx5Prime() or idx == index3Lim:
+            if idx == self.idx5Prime() or idx == index3_lim:
                 return True
             elif indexDiffStrands > -3 and indexDiffStrands < 3:
                 return False
         # end if for same Strand
-        if idx == self.idx5Prime() or idx == index3Lim:
+        if idx == self.idx5Prime() or idx == index3_lim:
             return True
-        elif indexDiffH > 2 and indexDiffL > 1:
+        elif index_diff_H > 2 and index_diff_L > 1:
             return True
         else:
             return False

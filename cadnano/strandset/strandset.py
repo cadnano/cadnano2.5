@@ -546,7 +546,7 @@ class StrandSet(ProxyObject):
         num = self._virtual_helix.number()
         ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
         if self.isDrawn5to3():
-            for strand in self.strand_array:
+            for strand in self.strand_heap:
                 lo, hi = strand.idxs()
                 assert strand.idx5Prime() == lo and strand.idx3Prime() == hi
                 # map the first base (5' xover if necessary)
@@ -573,7 +573,7 @@ class StrandSet(ProxyObject):
             # end for
         # end if
         else:
-            for strand in self.strand_array:
+            for strand in self.strand_heap:
                 lo, hi = strand.idxs()
                 assert strand.idx3Prime() == lo and strand.idx5Prime() == hi
                 # map the first base (3' xover if necessary)

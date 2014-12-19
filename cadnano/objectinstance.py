@@ -44,7 +44,7 @@ class ObjectInstance(ProxyObject):
         obj = self._object
         obj.setDocument(doc) 
         doc.addChild(obj)
-        doc.setSelectedInstance(obj)
+        doc.setSelectedInstance(self)
     # end def
     
     def parent(self):
