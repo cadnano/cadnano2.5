@@ -528,12 +528,25 @@ class Strand(ProxyObject):
             elif indexDiffStrands > -3 and indexDiffStrands < 3:
                 return False
         # end if for same Strand
-        if idx == self.idx5Prime() or idx == index3_lim:
-            return True
-        elif index_diff_H > 2 and index_diff_L > 1:
-            return True
         else:
-            return False
+            if idx == self.idx5Prime() or idx == index3_lim:
+                if from_strand.idx3Prime() == from_idx:
+                    return True
+                elif abs(from_strand.idx3Prime() - from_idx) > 1 and \
+                    abs(from_strand.idx5Prime() - from_idx) > 1:
+                    return True
+                else:
+                    return False
+            elif index_diff_H > 2 and index_diff_L > 1:
+                if from_strand.idx3Prime() == from_idx:
+                    return True
+                elif abs(from_strand.idx3Prime() - from_idx) > 1 and \
+                    abs(from_strand.idx5Prime() - from_idx) > 1:
+                    return True
+                else:
+                    return False
+            else:
+                return False
     #end def
 
     def insertionLengthBetweenIdxs(self, idxL, idxH):

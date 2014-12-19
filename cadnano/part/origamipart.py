@@ -550,7 +550,10 @@ class OrigamiPart(Part):
         # prexoveritem needs to store left or right, and determine
         # locally whether it is from or to
         # pass that info in here in and then do the breaks
-        print("running create xover")
+        if not strand3p.canInstallXoverAt(idx3p, strand5p, idx5p):
+            print("createXover: no xover can be installed here")
+            return
+
         ss5p = strand5p.strandSet()
         ss3p = strand3p.strandSet()
         if ss5p.strandType() != ss3p.strandType():
@@ -662,12 +665,12 @@ class OrigamiPart(Part):
                         else:
                             c.redo()
                 else:  # can't split... abort
-                    print("can't split abort 1")
                     if use_undostack:
                         self.undoStack().endMacro()
                         # unclear the applied sequence
                         if self.undoStack().canUndo() and ss5p.isScaffold():
                             self.undoStack().undo()
+                    raise ValueError("createXover: invalid call can't split abort 2")
                     return
 
             # is the 3' end ready for xover installation?
@@ -684,16 +687,14 @@ class OrigamiPart(Part):
                         else:
                             d.redo()
                 else:  # can't split... abort
-                    print("can't split abort 2")
                     if use_undostack:
                         self.undoStack().endMacro()
                         # unclear the applied sequence
                         if self.undoStack().canUndo() and ss5p.isScaffold():
                             self.undoStack().undo()
+                    raise ValueError("createXover: invalid call can't split abort 2")
                     return
         # end else
-        print("creating xover", xo_strand5, idx5p, 
-                xo_strand3, idx3p)
         e = CreateXoverCommand(self, xo_strand5, idx5p, 
                 xo_strand3, idx3p, update_oligo=update_oligo)
         if use_undostack:
