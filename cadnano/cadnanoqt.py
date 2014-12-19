@@ -6,6 +6,7 @@ from cadnano.proxyconfigure import proxyConfigure
 proxyConfigure('PyQt')
 import cadnano.util as util
 decode = None
+decodeFile = None
 Document = None
 DocumentController = None
 
@@ -56,10 +57,11 @@ class CadnanoQt(QObject):
 
     def finishInit(self):
         global decode
+        global decodeFile
         global Document
         global DocumentController
         from cadnano.document import Document
-        from cadnano.fileio.nnodecode import decode
+        from cadnano.fileio.nnodecode import decode, decodeFile
         from cadnano.gui.controllers.documentcontroller import DocumentController
         from cadnano.gui.views.pathview import pathstyles as styles
         doc = Document()
@@ -124,13 +126,11 @@ class CadnanoQt(QObject):
         global DocumentController
         default_file = os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
-            default_file = path.expanduser(default_file)
-            default_file = path.expandvars(default_file)
-            dc = DocumentController(doc)
-            with open(default_file) as fd:
-                file_contents = fd.read()
-                decode(doc, file_contents)
-                print("Loaded default document: %s" % (doc))
+            default_file = os.path.expanduser(default_file)
+            default_file = os.path.expandvars(default_file)
+            dc = DocumentController(base_doc)
+            decodeFile(default_file, document=base_doc)
+            print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)
             if doc_ctrlr_count == 0:  # first dc
