@@ -39,38 +39,65 @@
     <bool>false</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout">
-    <property name="horizontalSpacing">
-     <number>6</number>
+    <property name="leftMargin">
+     <number>0</number>
     </property>
-    <property name="margin">
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
      <number>0</number>
     </property>
     <item row="0" column="0">
      <widget class="QSplitter" name="main_splitter">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
       <property name="frameShape">
        <enum>QFrame::NoFrame</enum>
       </property>
       <property name="frameShadow">
        <enum>QFrame::Plain</enum>
       </property>
-      <property name="lineWidth">
-       <number>0</number>
-      </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <property name="opaqueResize">
-       <bool>true</bool>
-      </property>
       <property name="handleWidth">
-       <number>7</number>
+       <number>0</number>
       </property>
+      <widget class="QSplitter" name="outliner_attribute_splitter">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="handleWidth">
+        <number>0</number>
+       </property>
+       <widget class="OutlinerTreeWidget" name="outliner_widget">
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QTreeWidget" name="attribute_widget1">
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QDialogButtonBox" name="attribute_buttonbox">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel</set>
+        </property>
+        <property name="centerButtons">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
       <widget class="CustomQGraphicsView" name="slice_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -165,7 +192,7 @@
   </widget>
   <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -178,6 +205,7 @@
    </property>
    <property name="font">
     <font>
+     <pointsize>10</pointsize>
      <stylestrategy>PreferAntialias</stylestrategy>
     </font>
    </property>
@@ -186,30 +214,20 @@
    </property>
    <property name="iconSize">
     <size>
-     <width>24</width>
-     <height>24</height>
+     <width>20</width>
+     <height>20</height>
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
+    <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
-   <addaction name="action_new"/>
-   <addaction name="action_open"/>
-   <addaction name="action_save"/>
-   <addaction name="action_SVG"/>
-   <addaction name="action_export_staples"/>
    <addaction name="separator"/>
-   <addaction name="action_new_honeycomb_part"/>
-   <addaction name="action_new_square_part"/>
-   <addaction name="separator"/>
-   <addaction name="action_autostaple"/>
-   <addaction name="action_filters_label"/>
    <addaction name="action_filter_scaf"/>
    <addaction name="action_filter_stap"/>
    <addaction name="action_filter_handle"/>
@@ -230,6 +248,13 @@
      <height>0</height>
     </size>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
    <property name="windowTitle">
     <string>Path Tools</string>
    </property>
@@ -238,6 +263,12 @@
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -250,12 +281,16 @@
    </attribute>
    <addaction name="action_path_select"/>
    <addaction name="action_path_pencil"/>
-   <addaction name="action_path_break"/>
+   <addaction name="action_path_nick"/>
    <addaction name="action_path_insertion"/>
    <addaction name="action_path_skip"/>
    <addaction name="action_path_paint"/>
    <addaction name="action_path_add_seq"/>
    <addaction name="action_path_mods"/>
+   <addaction name="separator"/>
+   <addaction name="action_autostaple"/>
+   <addaction name="action_export_staples"/>
+   <addaction name="action_SVG"/>
   </widget>
   <widget class="QToolBar" name="leftToolBar">
    <property name="sizePolicy">
@@ -270,11 +305,22 @@
      <height>0</height>
     </size>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
+   </property>
    <property name="windowTitle">
     <string>Slice Tools</string>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
    </property>
    <property name="toolButtonStyle">
     <enum>Qt::ToolButtonTextUnderIcon</enum>
@@ -285,9 +331,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_slice_first"/>
-   <addaction name="action_slice_last"/>
-   <addaction name="action_renumber"/>
+   <addaction name="action_outliner"/>
+   <addaction name="action_new_part"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -315,25 +360,11 @@
     <property name="title">
      <string>Edit</string>
     </property>
-    <addaction name="action_modify"/>
-   </widget>
-   <widget class="QMenu" name="menu_plugins">
-    <property name="title">
-     <string>Plugins</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuAddPart">
-    <property name="title">
-     <string>AddPart</string>
-    </property>
-    <addaction name="action_new_honeycomb_part"/>
-    <addaction name="action_new_square_part"/>
-    <addaction name="action_new_honeypx_part"/>
+    <addaction name="action_copy"/>
+    <addaction name="action_paste"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
-   <addaction name="menuAddPart"/>
-   <addaction name="menu_plugins"/>
   </widget>
   <action name="action_new">
    <property name="icon">
@@ -423,15 +454,15 @@
     <string>Ctrl+X</string>
    </property>
   </action>
-  <action name="actionCopy">
+  <action name="action_copy">
    <property name="text">
-    <string>Copy</string>
+    <string>Copy Part</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
    </property>
   </action>
-  <action name="actionPaste">
+  <action name="action_paste">
    <property name="text">
     <string>Paste</string>
    </property>
@@ -459,7 +490,7 @@
     <string>Click to add new part with honeycomb lattice</string>
    </property>
   </action>
-  <action name="action_path_break">
+  <action name="action_path_nick">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -468,10 +499,10 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/break</normaloff>:/pathtools/break</iconset>
+     <normaloff>:/pathtools/nick</normaloff>:/pathtools/nick</iconset>
    </property>
    <property name="text">
-    <string>Break Tool</string>
+    <string>Nick</string>
    </property>
    <property name="iconText">
     <string>Break</string>
@@ -659,7 +690,7 @@
   </action>
   <action name="action_export_staples">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset>
      <normaloff>:/filetools/csv</normaloff>:/filetools/csv</iconset>
    </property>
    <property name="text">
@@ -847,7 +878,7 @@
      <normaloff>:/pathtools/autostaple</normaloff>:/pathtools/autostaple</iconset>
    </property>
    <property name="text">
-    <string>AutoStaple</string>
+    <string>Auto</string>
    </property>
    <property name="toolTip">
     <string>Create staple strands complementary to existing scaffold.</string>
@@ -859,7 +890,7 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/mods</normaloff>:/pathtools/mods</iconset>
+     <normaloff>:/pathtools/mod</normaloff>:/pathtools/mod</iconset>
    </property>
    <property name="text">
     <string>Mod</string>
@@ -886,12 +917,47 @@
     <string>Add new part honeycomb PX</string>
    </property>
   </action>
+  <action name="action_outliner">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
+   </property>
+   <property name="text">
+    <string>Parts</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Outliner</string>
+   </property>
+   <property name="shortcut">
+    <string>O</string>
+   </property>
+  </action>
+  <action name="action_new_part">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
+   </property>
+   <property name="text">
+    <string>New</string>
+   </property>
+   <property name="toolTip">
+    <string>Add new part</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
    <class>CustomQGraphicsView</class>
    <extends>QGraphicsView</extends>
    <header>cadnano.gui.views.customqgraphicsview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>OutlinerTreeWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>cadnano.gui.views.outlinerview.outlinertreewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

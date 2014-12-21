@@ -2,13 +2,13 @@ IMAGES = mainwindow/images/data-svg.png mainwindow/images/data-new_32.png mainwi
 DIALOGIMAGES = dialogs/images/path-edit_32.png dialogs/images/path-force-xover.png dialogs/images/path-paint_48.png
 
 
-all: mainwindow/icons_rc.py dialogs/dialogicons_rc.py dialogs/ui_preferences.py dialogs/ui_latticetype.py dialogs/ui_addseq.py dialogs/ui_about.py dialogs/ui_warning.py
+all: mainwindow/ui_mainwindow.py mainwindow/icons_rc.py dialogs/dialogicons_rc.py dialogs/ui_preferences.py dialogs/ui_latticetype.py dialogs/ui_addseq.py dialogs/ui_about.py dialogs/ui_warning.py
 
 mainwindow/icons_rc.py : mainwindow/cadnano.gui.ui.mainwindow.icons.qrc $(IMAGES)
 	/Library/Frameworks/Python.framework/Versions/3.4/bin/pyrcc5 -o $@ $<
 
-# mainwindow/ui_mainwindow.py : mainwindow/mainwindow.ui
-# 	/Library/Frameworks/Python.framework/Versions/3.4/bin/pyuic5 $< > $@
+mainwindow/ui_mainwindow.py : mainwindow/mainwindow.ui
+	/Library/Frameworks/Python.framework/Versions/3.4/bin/pyuic5 $< > $@
 
 dialogs/dialogicons_rc.py : dialogs/dialogicons.qrc $(DIALOGIMAGES)
 	/Library/Frameworks/Python.framework/Versions/3.4/bin/pyrcc5 -o $@ $<

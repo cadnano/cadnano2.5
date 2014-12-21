@@ -1,6 +1,6 @@
 from cadnano import app
 
-from cadnano.gui.views.outlineview.outlinerootitem import OutlineRootItem
+from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 
@@ -45,8 +45,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._readSettings()
 
         # Outliner setup
-        self.outlineroot = OutlineRootItem(parent=None, window=self, document=doc)
-
+        self.outliner_widget = OutlinerTreeWidget(parent=None, window=self, document=doc)
+        self.attribute_widget = None
+        self.attribute_widget_buttonbox = None
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
@@ -69,19 +70,17 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         splitter_size_policy.setVerticalStretch(0)
         splitter_size_policy.setHeightForWidth(self.main_splitter.sizePolicy().hasHeightForWidth())
 
-        self.slice_splitter.setSizePolicy(splitter_size_policy)
-        self.slice_splitter.setFrameShape(QFrame.NoFrame)
-        self.slice_splitter.setFrameShadow(QFrame.Plain)
-        self.slice_splitter.setLineWidth(0)
-        self.slice_splitter.setOrientation(Qt.Horizontal)
-        self.slice_splitter.setOpaqueResize(False)
-        self.slice_splitter.setHandleWidth(0)
-
-        self.part_toolbar = PartToolBar(doc, self.slice_splitter)
-        self.slice_splitter.addWidget(self.outlineroot)
-        self.slice_splitter.addWidget(self.slice_graphics_view)
-
-        self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
+        # self.slice_splitter.setSizePolicy(splitter_size_policy)
+        # self.slice_splitter.setFrameShape(QFrame.NoFrame)
+        # self.slice_splitter.setFrameShadow(QFrame.Plain)
+        # self.slice_splitter.setLineWidth(0)
+        # self.slice_splitter.setOrientation(Qt.Horizontal)
+        # self.slice_splitter.setOpaqueResize(False)
+        # self.slice_splitter.setHandleWidth(0)
+        # self.part_toolbar = PartToolBar(doc, self.slice_splitter)
+        # self.slice_splitter.addWidget(self.outlineroot)
+        # self.slice_splitter.addWidget(self.slice_graphics_view)
+        # self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -99,17 +98,17 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setName("PathView")
 
         # Path toolbar
-        self.path_splitter.setSizePolicy(splitter_size_policy)
-        self.path_splitter.setFrameShape(QFrame.NoFrame)
-        self.path_splitter.setFrameShadow(QFrame.Plain)
-        self.path_splitter.setLineWidth(0)
-        self.path_splitter.setOrientation(Qt.Horizontal)
-        self.path_splitter.setOpaqueResize(False)
-        self.path_splitter.setHandleWidth(0)
-        self.path_splitter.setObjectName("path_splitter")
-        self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
-        self.path_splitter.addWidget(self.selection_toolbar)
-        self.path_toolbar = PathToolBar(doc, self.path_splitter)
+        # self.path_splitter.setSizePolicy(splitter_size_policy)
+        # self.path_splitter.setFrameShape(QFrame.NoFrame)
+        # self.path_splitter.setFrameShadow(QFrame.Plain)
+        # self.path_splitter.setLineWidth(0)
+        # self.path_splitter.setOrientation(Qt.Horizontal)
+        # self.path_splitter.setOpaqueResize(False)
+        # self.path_splitter.setHandleWidth(0)
+        # self.path_splitter.setObjectName("path_splitter")
+        # self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
+        # self.path_splitter.addWidget(self.selection_toolbar)
+        # self.path_toolbar = PathToolBar(doc, self.path_splitter)
         # self.path_splitter.addWidget(self.path_graphics_view) # reorder
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview

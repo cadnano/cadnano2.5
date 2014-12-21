@@ -163,17 +163,11 @@ class CustomDelegate(QStyledItemDelegate):
 # end class CustomDelegate
 
 
-class OutlineRootItem(QTreeWidget):
+class OutlinerTreeWidget(QTreeWidget):
     """
-    OutlineRootItem is the root item in the OutlineView. It gets added directly
-    to the pathscene by DocumentWindow. It receives two signals
-    (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
-
-    OutlineRootItem must instantiate its own controller to receive signals
-    from the model.
     """
     def __init__(self, parent, window, document):
-        super(OutlineRootItem, self).__init__(parent)
+        super(OutlinerTreeWidget, self).__init__(parent)
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
