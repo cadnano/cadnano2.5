@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created: Sun Dec 21 00:40:10 2014
+# Created: Sun Dec 21 01:01:04 2014
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -39,6 +39,7 @@ class Ui_MainWindow(object):
         self.outliner_widget.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.outliner_widget.setStyleSheet("OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }")
         self.outliner_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.outliner_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
         self.outliner_widget.setDragEnabled(True)
         self.outliner_widget.setObjectName("outliner_widget")
         self.outliner_widget.headerItem().setText(0, "1")
@@ -494,6 +495,6 @@ class Ui_MainWindow(object):
         self.action_new_part.setText(_translate("MainWindow", "New"))
         self.action_new_part.setToolTip(_translate("MainWindow", "Add new part"))
 
-from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 import cadnano.gui.ui.mainwindow.icons_rc
