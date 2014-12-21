@@ -32,10 +32,10 @@ class BreakTool(AbstractPathTool):
         self._is_top_strand = True
 
     def __repr__(self):
-        return "break_tool"  # first letter should be lowercase
+        return "nick_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
-        return "breakTool"  # first letter should be lowercase
+        return "nickTool"  # first letter should be lowercase
 
     def paint(self, painter, option, widget=None):
         AbstractPathTool.paint(self, painter, option, widget)

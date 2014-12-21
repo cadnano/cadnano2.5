@@ -456,7 +456,7 @@ class DocumentController():
     # end def
 
     def actionToggleOutlinerSlot(self):
-        outliner = self.win.outlineroot
+        outliner = self.win.outliner_attribute_splitter
         if outliner.isVisible():
             outliner.hide()
         else:

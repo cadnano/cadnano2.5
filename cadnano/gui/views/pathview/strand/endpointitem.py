@@ -292,7 +292,7 @@ class EndpointItem(QGraphicsPathItem):
         self._getActiveTool().applyMod(m_strand, idx)
     # end def
 
-    def breakToolMouseRelease(self, modifiers, x):
+    def nickToolMouseRelease(self, modifiers, x):
         """Shift-click to merge without switching back to select tool."""
         m_strand = self._strand_item._model_strand
         if modifiers & Qt.ShiftModifier:

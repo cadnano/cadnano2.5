@@ -4,8 +4,6 @@ from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 
-from cadnano.gui.views.pathview.pathtoolbar import PathToolBar
-from cadnano.gui.views.pathview.parttoolbar import PartToolBar
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
 
@@ -45,9 +43,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._readSettings()
 
         # Outliner setup
-        self.outliner_widget = OutlinerTreeWidget(parent=None, window=self, document=doc)
-        self.attribute_widget = None
-        self.attribute_widget_buttonbox = None
+        self.outliner_widget.configure(window=self, document=doc)
+        self.action_outliner.triggered.connect(doc_ctrlr.actionToggleOutlinerSlot)
+        # self.outliner_widget.setAlternatingRowColors(True)
+
+        self.attribute_buttonbox.setVisible(False)
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
@@ -63,24 +63,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.scene_root_item = self.sliceroot
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self)
-
-        # Part toolbar
-        splitter_size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        splitter_size_policy.setHorizontalStretch(0)
-        splitter_size_policy.setVerticalStretch(0)
-        splitter_size_policy.setHeightForWidth(self.main_splitter.sizePolicy().hasHeightForWidth())
-
-        # self.slice_splitter.setSizePolicy(splitter_size_policy)
-        # self.slice_splitter.setFrameShape(QFrame.NoFrame)
-        # self.slice_splitter.setFrameShadow(QFrame.Plain)
-        # self.slice_splitter.setLineWidth(0)
-        # self.slice_splitter.setOrientation(Qt.Horizontal)
-        # self.slice_splitter.setOpaqueResize(False)
-        # self.slice_splitter.setHandleWidth(0)
-        # self.part_toolbar = PartToolBar(doc, self.slice_splitter)
-        # self.slice_splitter.addWidget(self.outlineroot)
-        # self.slice_splitter.addWidget(self.slice_graphics_view)
-        # self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -98,24 +80,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setName("PathView")
 
         # Path toolbar
-        # self.path_splitter.setSizePolicy(splitter_size_policy)
-        # self.path_splitter.setFrameShape(QFrame.NoFrame)
-        # self.path_splitter.setFrameShadow(QFrame.Plain)
-        # self.path_splitter.setLineWidth(0)
-        # self.path_splitter.setOrientation(Qt.Horizontal)
-        # self.path_splitter.setOpaqueResize(False)
-        # self.path_splitter.setHandleWidth(0)
-        # self.path_splitter.setObjectName("path_splitter")
-        # self.path_splitter.setSizes([600,0]) # for path_splitter horizontal
-        # self.path_splitter.addWidget(self.selection_toolbar)
-        # self.path_toolbar = PathToolBar(doc, self.path_splitter)
-        # self.path_splitter.addWidget(self.path_graphics_view) # reorder
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
-        self.path_tool_manager = PathToolManager(self, self.path_toolbar)
+        self.path_tool_manager = PathToolManager(self)
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
+
+        self.insertToolBarBreak(self.right_toolbar)
 
         # set the selection filter default
         doc.documentSelectionFilterChangedSignal.emit(["endpoint", "scaffold", "staple", "xover"])
@@ -147,7 +119,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([350, 450])  # balance main_splitter size
+        self.main_splitter.setSizes([150, 400, 400])  # balance main_splitter size
         self.statusBar().showMessage("")
 
     ### ACCESSORS ###

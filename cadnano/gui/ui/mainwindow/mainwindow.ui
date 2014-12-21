@@ -73,13 +73,37 @@
         <number>0</number>
        </property>
        <widget class="OutlinerTreeWidget" name="outliner_widget">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="dragEnabled">
+         <bool>true</bool>
+        </property>
         <column>
          <property name="text">
           <string notr="true">1</string>
          </property>
         </column>
        </widget>
-       <widget class="QTreeWidget" name="attribute_widget1">
+       <widget class="QTreeWidget" name="attribute_widget">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="headerHidden">
+         <bool>true</bool>
+        </property>
         <column>
          <property name="text">
           <string notr="true">1</string>
@@ -122,6 +146,12 @@
        </property>
        <property name="focusPolicy">
         <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
        </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
@@ -167,6 +197,12 @@
        <property name="focusPolicy">
         <enum>Qt::WheelFocus</enum>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
@@ -190,18 +226,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="selection_toolbar">
+  <widget class="QToolBar" name="right_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>550</width>
-     <height>0</height>
-    </size>
    </property>
    <property name="font">
     <font>
@@ -219,23 +249,29 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
+   <addaction name="action_path_select"/>
+   <addaction name="action_path_pencil"/>
+   <addaction name="action_path_nick"/>
+   <addaction name="action_path_paint"/>
+   <addaction name="action_path_insertion"/>
+   <addaction name="action_path_skip"/>
+   <addaction name="action_path_add_seq"/>
+   <addaction name="action_path_mods"/>
    <addaction name="separator"/>
-   <addaction name="action_filter_scaf"/>
-   <addaction name="action_filter_stap"/>
-   <addaction name="action_filter_handle"/>
-   <addaction name="action_filter_endpoint"/>
-   <addaction name="action_filter_xover"/>
-   <addaction name="action_filter_strand"/>
+   <addaction name="action_autostaple"/>
+   <addaction name="action_export_staples"/>
+   <addaction name="action_SVG"/>
+   <addaction name="action_renumber"/>
   </widget>
-  <widget class="QToolBar" name="rightToolBar">
+  <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
@@ -271,28 +307,22 @@
     </size>
    </property>
    <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
+    <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
     <enum>RightToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
-   <addaction name="action_path_select"/>
-   <addaction name="action_path_pencil"/>
-   <addaction name="action_path_nick"/>
-   <addaction name="action_path_insertion"/>
-   <addaction name="action_path_skip"/>
-   <addaction name="action_path_paint"/>
-   <addaction name="action_path_add_seq"/>
-   <addaction name="action_path_mods"/>
-   <addaction name="separator"/>
-   <addaction name="action_autostaple"/>
-   <addaction name="action_export_staples"/>
-   <addaction name="action_SVG"/>
+   <addaction name="action_filter_scaf"/>
+   <addaction name="action_filter_stap"/>
+   <addaction name="action_filter_handle"/>
+   <addaction name="action_filter_endpoint"/>
+   <addaction name="action_filter_xover"/>
+   <addaction name="action_filter_strand"/>
   </widget>
-  <widget class="QToolBar" name="leftToolBar">
+  <widget class="QToolBar" name="left_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
      <horstretch>0</horstretch>
@@ -333,6 +363,8 @@
    </attribute>
    <addaction name="action_outliner"/>
    <addaction name="action_new_part"/>
+   <addaction name="action_new_honeycomb_part"/>
+   <addaction name="action_new_square_part"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -470,7 +502,7 @@
     <string>Ctrl+V</string>
    </property>
   </action>
-  <action name="actionSelect_All">
+  <action name="action_select_all">
    <property name="text">
     <string>Select All</string>
    </property>
@@ -484,7 +516,7 @@
      <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
    </property>
    <property name="text">
-    <string>Honeycomb</string>
+    <string>Hc</string>
    </property>
    <property name="toolTip">
     <string>Click to add new part with honeycomb lattice</string>
@@ -559,21 +591,6 @@
     <string>Move the slice bar to the last position.</string>
    </property>
   </action>
-  <action name="action_path_erase">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset>
-     <normaloff>:/pathtools/erase</normaloff>:/pathtools/erase</iconset>
-   </property>
-   <property name="text">
-    <string>Erase</string>
-   </property>
-   <property name="toolTip">
-    <string>(E)rase Tool</string>
-   </property>
-  </action>
   <action name="action_path_pencil">
    <property name="checkable">
     <bool>true</bool>
@@ -616,7 +633,7 @@
      <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
    </property>
    <property name="text">
-    <string>Square</string>
+    <string>Sq</string>
    </property>
    <property name="toolTip">
     <string>Click to add new part with square lattice</string>
@@ -643,7 +660,7 @@
   <action name="action_renumber">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/renumber</normaloff>:/slicetools/renumber</iconset>
+     <normaloff>:/parttools/renum</normaloff>:/parttools/renum</iconset>
    </property>
    <property name="text">
     <string>Rnum</string>
@@ -690,8 +707,8 @@
   </action>
   <action name="action_export_staples">
    <property name="icon">
-    <iconset>
-     <normaloff>:/filetools/csv</normaloff>:/filetools/csv</iconset>
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/filetools/export</normaloff>:/filetools/export</iconset>
    </property>
    <property name="text">
     <string>Export</string>
@@ -919,6 +936,9 @@
   </action>
   <action name="action_outliner">
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>true</bool>
    </property>
    <property name="icon">

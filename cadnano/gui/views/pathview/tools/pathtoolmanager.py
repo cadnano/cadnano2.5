@@ -5,7 +5,6 @@ from cadnano import app
 from .selecttool import SelectTool
 from .penciltool import PencilTool
 from .breaktool import BreakTool
-from .erasetool import EraseTool
 from .insertiontool import InsertionTool
 from .skiptool import SkipTool
 from .painttool import PaintTool
@@ -20,25 +19,23 @@ class PathToolManager(QObject):
     """
     Manages the interactions between Path widgets / UI elements and the model.
     """
-    def __init__(self, win, toolbar):
+    def __init__(self, win):
         super(PathToolManager, self).__init__()
         self.window = win
-        self._toolbar = toolbar
         self._active_tool = None
         self._active_part = None
         self.select_tool = SelectTool(self)
         self.pencil_tool = PencilTool(self)
-        self.break_tool = BreakTool(self)
-        # self.erase_tool = EraseTool(self)
+        self.nick_tool = BreakTool(self)
         self.insertion_tool = InsertionTool(self)
         self.skip_tool = SkipTool(self)
         self.paint_tool = PaintTool(self) # (self, win.path_graphics_view.toolbar)
         self.add_seq_tool = AddSeqTool(self)
-        self.mod_tool = ModsTool(self)
+        self.mods_tool = ModsTool(self)
 
-        def installTool(tool_name, _toolbar):
+        def installTool(tool_name, window):
             l_tool_name = tool_name.lower()
-            tool_widget = getattr(_toolbar, 'action_path_' + l_tool_name)
+            tool_widget = getattr(window, 'action_path_' + l_tool_name)
             tool = getattr(self, l_tool_name + '_tool')
             tool.action_name = 'action_path_' + tool_name
 
@@ -55,10 +52,10 @@ class PathToolManager(QObject):
             tool_widget.triggered.connect(handler)
             return tool_widget
         # end def
-        tools = ('Select', 'Pencil', 'Break', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mod')
-        ag = QActionGroup(toolbar)
+        tools = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
+        ag = QActionGroup(win)
         # Call installTool on every tool
-        list(map((lambda tool_name: ag.addAction(installTool(tool_name, toolbar))), tools))
+        list(map((lambda tool_name: ag.addAction(installTool(tool_name, win))), tools))
         ag.setExclusive(True)
         # Select the preferred Startup tool
         startup_tool_name = app().prefs.getStartupToolName()

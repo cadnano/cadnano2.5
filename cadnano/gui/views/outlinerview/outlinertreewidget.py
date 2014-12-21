@@ -166,28 +166,16 @@ class CustomDelegate(QStyledItemDelegate):
 class OutlinerTreeWidget(QTreeWidget):
     """
     """
-    def __init__(self, parent, window, document):
+    def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
+
+    def configure(self, window, document):
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
         self._root = self.invisibleRootItem()
         self._instance_items = {}
 
-        self._configure() # setup header and drag mode
-
-        custom_delegate = CustomDelegate()
-        self.setItemDelegate(custom_delegate)
-        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
-
-        # Add some dummy items
-        p1 = self.addDummyRow("Part0", True, "#cc0000")
-        a1 = self.addDummyRow("Asm0",  True, "#00cc00")
-        self.expandItem(a1)
-        p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
-        p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
-
-    def _configure(self):
         # Appearance
         self.setFont(_FONT)
         # Columns
@@ -207,6 +195,17 @@ class OutlinerTreeWidget(QTreeWidget):
         # Dragging
         self.setDragEnabled(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
+
+        custom_delegate = CustomDelegate()
+        self.setItemDelegate(custom_delegate)
+        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
+
+        # Add some dummy items
+        p1 = self.addDummyRow("Part0", True, "#cc0000")
+        a1 = self.addDummyRow("Asm0",  True, "#00cc00")
+        self.expandItem(a1)
+        p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
+        p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
     # end def
 
     def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):

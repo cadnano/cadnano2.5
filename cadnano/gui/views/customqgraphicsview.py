@@ -60,7 +60,6 @@ class CustomQGraphicsView(QGraphicsView):
         QGraphicsView.__init__(self, parent)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setRubberBandSelectionMode(Qt.IntersectsItemShape)
-        self.setStyleSheet("QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }")
         self._no_drag = QGraphicsView.RubberBandDrag
         self._yes_drag = QGraphicsView.ScrollHandDrag
         
