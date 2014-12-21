@@ -42,6 +42,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings = QSettings()
         self._readSettings()
 
+        # Appearance pref
+        if not app().prefs.show_icon_labels:
+            self.right_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
+            self.left_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
+
+
         # Outliner setup
         self.outliner_widget.configure(window=self, document=doc)
         self.action_outliner.triggered.connect(doc_ctrlr.actionToggleOutlinerSlot)
