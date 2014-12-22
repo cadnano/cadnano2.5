@@ -20,6 +20,8 @@ DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 _MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
+_BOUNDING_RECT_PADDING = 10
+
 class OrigamiPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
@@ -54,12 +56,10 @@ class OrigamiPartItem(QGraphicsItem):
         self.setZValue(styles.ZPARTITEM)
         self._initModifierCircle()
 
-        # outline = QGraphicsRectItem(self.boundingRect(), self)
-        # outline.setPen(QPen(Qt.red))
-        # f.setPen(QPen(Qt.NoPen))
-        # outline.setBrush(QBrush(QColor(204, 0, 0)))
-        # outline.setRect(self.boundingRect())
-
+        _p = _BOUNDING_RECT_PADDING
+        _outlinerect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
+        self._outline = QGraphicsRectItem(_outlinerect, self)
+        self._outline.setPen(QPen(styles.BLUE_STROKE))
     # end def
 
     def _initDeselector(self):

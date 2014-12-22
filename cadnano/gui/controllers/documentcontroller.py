@@ -92,9 +92,9 @@ class DocumentController():
         self.win.action_close.triggered.connect(self.actionCloseSlot)
         self.win.action_save.triggered.connect(self.actionSaveSlot)
         self.win.action_save_as.triggered.connect(self.actionSaveAsSlot)
-        # self.win.action_SVG.triggered.connect(self.actionSVGSlot)
-        # self.win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
-        # self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
+        self.win.action_SVG.triggered.connect(self.actionSVGSlot)
+        self.win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
+        self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
         self.win.action_new_dna_part.triggered.connect(self.actionAddDnaPartSlot)
@@ -405,6 +405,7 @@ class DocumentController():
     # end def
 
     def actionAutostapleSlot(self):
+        print("autoStapleSlot")
         part = self.activePart()
         if part:
             self.win.path_graphics_view.setViewportUpdateOn(False)
