@@ -65,7 +65,7 @@
       <property name="handleWidth">
        <number>0</number>
       </property>
-      <widget class="QSplitter" name="outliner_attribute_splitter">
+      <widget class="QSplitter" name="outliner_property_splitter">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
@@ -77,7 +77,9 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }
+
+</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -94,26 +96,42 @@
          </property>
         </column>
        </widget>
-       <widget class="QTreeWidget" name="attribute_widget">
+       <widget class="PropertyEditorWidget" name="property_widget">
+        <property name="font">
+         <font>
+          <stylestrategy>PreferAntialias</stylestrategy>
+         </font>
+        </property>
         <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
+         <enum>Qt::StrongFocus</enum>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+        </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
         </property>
-        <property name="headerHidden">
-         <bool>true</bool>
+        <property name="columnCount">
+         <number>2</number>
         </property>
+        <attribute name="headerStretchLastSection">
+         <bool>true</bool>
+        </attribute>
         <column>
          <property name="text">
           <string notr="true">1</string>
          </property>
         </column>
+        <column>
+         <property name="text">
+          <string notr="true">2</string>
+         </property>
+        </column>
        </widget>
-       <widget class="QDialogButtonBox" name="attribute_buttonbox">
+       <widget class="QDialogButtonBox" name="property_buttonbox">
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
@@ -981,6 +999,11 @@
    <class>OutlinerTreeWidget</class>
    <extends>QTreeWidget</extends>
    <header>cadnano.gui.views.outlinerview.outlinertreewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>PropertyEditorWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>cadnano.gui.views.outlinerview.propertyeditorwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

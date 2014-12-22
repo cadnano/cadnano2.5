@@ -414,7 +414,7 @@ class DocumentController():
     def actionModifySlot(self):
         """
         Notifies that part root items that parts should respond to modifier
-        selection signals. 
+        selection signals.
         """
         pass
         # uncomment for debugging
@@ -456,7 +456,7 @@ class DocumentController():
     # end def
 
     def actionToggleOutlinerSlot(self):
-        outliner = self.win.outliner_attribute_splitter
+        outliner = self.win.outliner_property_splitter
         if outliner.isVisible():
             outliner.hide()
         else:

@@ -20,6 +20,158 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 _FONT = QFont(styles.THE_FONT, 10)
 _QCOMMONSTYLE = QCommonStyle()
 
+
+class OutlinerTreeWidget(QTreeWidget):
+    """
+    """
+    def __init__(self, parent=None):
+        super(OutlinerTreeWidget, self).__init__(parent)
+
+    def configure(self, window, document):
+        self._window = window
+        self._document = document
+        self._controller = ViewRootController(self, document)
+        self._root = self.invisibleRootItem()
+        self._instance_items = {}
+
+        # Appearance
+        self.setFont(_FONT)
+        # Columns
+        self.setColumnCount(3)
+        self.setIndentation(14)
+        # Header
+        self.setHeaderLabels(["Name", "", ""])
+        h = self.header()
+        h.setStretchLastSection(False)
+        h.setSectionResizeMode(0, QHeaderView.Stretch)
+        h.setSectionResizeMode(1, QHeaderView.Fixed)
+        h.setSectionResizeMode(2, QHeaderView.Fixed)
+        h.setSectionsMovable(True)
+        self.setColumnWidth(0, 140)
+        self.setColumnWidth(1, 18)
+        self.setColumnWidth(2, 18)
+        # Dragging
+        self.setDragEnabled(True)
+        self.setDragDropMode(QAbstractItemView.InternalMove)
+
+        custom_delegate = CustomDelegate()
+        self.setItemDelegate(custom_delegate)
+        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
+
+        # Add some dummy items
+        p1 = self.addDummyRow("Part0", True, "#cc0000")
+        a1 = self.addDummyRow("Asm0",  True, "#00cc00")
+        self.expandItem(a1)
+        p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
+        p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
+    # end def
+
+    def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):
+        if parentQTreeWidgetItem == None:
+            parentQTreeWidgetItem = self.invisibleRootItem()
+        tw_item = QTreeWidgetItem(parentQTreeWidgetItem)
+        tw_item.setData(0, Qt.EditRole, part_name)
+        tw_item.setData(1, Qt.EditRole, visible)
+        tw_item.setData(2, Qt.EditRole, color)
+        tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
+        return tw_item
+    # end def
+
+    def getInstanceCount(self):
+        return len(self._instance_items)
+
+    # def getNewPath(self, indexQModelIndex):
+    #     tw_item = self.itemFromIndex(indexQModelIndex)
+    #     pathQStringList = QFileDialog.getOpenFileNames()
+    #     if pathQStringList.count() > 0:
+    #         textQString = pathQStringList.first()
+    #         tw_item.setData(indexQModelIndex.column(), Qt.EditRole, textQString)
+    # end def
+
+    ### SIGNALS ###
+
+    ### SLOTS ###
+    # def itemClicked(self, item, column):
+    #     print("itemClicked", item, column)
+    # 
+    # def itemDoubleClicked(self, item, column):
+    #     print("itemDoubleClicked", item, column)
+
+
+    def partAddedSlot(self, sender, model_part):
+        """
+        Receives notification from the model that a part has been added.
+        Parts should add themselves to the QTreeWidget by passing parent=self.
+        """
+        part_type = model_part.__class__.__name__
+        if part_type == "DnaPart":
+            dna_part_item = DnaPartItem(model_part, parent=self)
+            # self.addTopLevelItem(dna_part_item)
+            # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
+            # self._instance_items[dna_part_item] = dna_part_item
+
+        elif part_type in ["HoneycombPart", "SquarePart"]:
+            origami_part_item = OrigamiPartItem(model_part, parent=self)
+            self.addTopLevelItem(origami_part_item)
+            # self._instance_items[origami_part_item] = origami_part_item
+            # self.setModifyState(self._window.action_modify.isChecked())
+        else:
+            print(part_type)
+            raise NotImplementedError
+
+    # end def
+
+    def clearSelectionsSlot(self, doc):
+        pass
+    # end def
+
+    def selectedChangedSlot(self, item_dict):
+        """docstring for selectedChangedSlot"""
+        pass
+    # end def
+
+    def selectionFilterChangedSlot(self, filter_name_list):
+        pass
+    # end def
+
+    def resetRootItemSlot(self, doc):
+        pass
+    # end def
+
+    ### ACCESSORS ###
+    def window(self):
+        return self._window
+    # end def
+
+    ### METHODS ###
+    def removeDnaPartItem(self, dna_part_item):
+        index = self.indexOfTopLevelItem(dna_part_item)
+        self.takeTopLevelItem(index)
+        # del self._instance_items[dna_part_item]
+    # end def
+
+    def removeOrigamiPartItem(self, origami_part_item):
+        index = self.indexOfTopLevelItem(origami_part_item)
+        self.takeTopLevelItem(index)
+        # del self._instance_items[origami_part_item]
+    # end def
+
+    def resetDocumentAndController(self, document):
+        """docstring for resetDocumentAndController"""
+        self._document = document
+        self._controller = ViewRootController(self, document)
+        if len(self._instance_items) > 0:
+            raise ImportError
+    # end def
+
+    def setModifyState(self, bool):
+        """docstring for setModifyState"""
+        for origami_part_item in self._instance_items:
+            origami_part_item.setModifyState(bool)
+    # end def
+# end class OutlinerTreeWidget
+
+
 class CustomDelegate(QStyledItemDelegate):
     # def initStyleOption(self, option, model_index):
         # pass
@@ -161,158 +313,3 @@ class CustomDelegate(QStyledItemDelegate):
             QStyledItemDelegate.paint(self, painter, option, model_index)
     # end def
 # end class CustomDelegate
-
-
-class OutlinerTreeWidget(QTreeWidget):
-    """
-    """
-    def __init__(self, parent=None):
-        super(OutlinerTreeWidget, self).__init__(parent)
-
-    def configure(self, window, document):
-        self._window = window
-        self._document = document
-        self._controller = ViewRootController(self, document)
-        self._root = self.invisibleRootItem()
-        self._instance_items = {}
-
-        # Appearance
-        self.setFont(_FONT)
-        # Columns
-        self.setColumnCount(3)
-        self.setIndentation(14)
-        # Header
-        self.setHeaderLabels(["Name", "", ""])
-        h = self.header()
-        h.setStretchLastSection(False)
-        h.setSectionResizeMode(0, QHeaderView.Stretch)
-        h.setSectionResizeMode(1, QHeaderView.Fixed)
-        h.setSectionResizeMode(2, QHeaderView.Fixed)
-        h.setSectionsMovable(True)
-        self.setColumnWidth(0, 140)
-        self.setColumnWidth(1, 18)
-        self.setColumnWidth(2, 18)
-        # Dragging
-        self.setDragEnabled(True)
-        self.setDragDropMode(QAbstractItemView.InternalMove)
-
-        custom_delegate = CustomDelegate()
-        self.setItemDelegate(custom_delegate)
-        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
-
-        # Add some dummy items
-        p1 = self.addDummyRow("Part0", True, "#cc0000")
-        a1 = self.addDummyRow("Asm0",  True, "#00cc00")
-        self.expandItem(a1)
-        p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
-        p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
-    # end def
-
-    def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):
-        if parentQTreeWidgetItem == None:
-            parentQTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parentQTreeWidgetItem)
-        tw_item.setData(0, Qt.EditRole, part_name)
-        tw_item.setData(1, Qt.EditRole, visible)
-        tw_item.setData(2, Qt.EditRole, color)
-        tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
-        return tw_item
-    # end def
-
-    def getInstanceCount(self):
-        return len(self._instance_items)
-
-    # def getNewPath(self, indexQModelIndex):
-    #     tw_item = self.itemFromIndex(indexQModelIndex)
-    #     pathQStringList = QFileDialog.getOpenFileNames()
-    #     if pathQStringList.count() > 0:
-    #         textQString = pathQStringList.first()
-    #         tw_item.setData(indexQModelIndex.column(), Qt.EditRole, textQString)
-    # end def
-
-    ### SIGNALS ###
-
-    ### SLOTS ###
-    # def itemClicked(self, item, column):
-    #     print("itemClicked", item, column)
-    # 
-    # def itemDoubleClicked(self, item, column):
-    #     print("itemDoubleClicked", item, column)
-
-
-    def partAddedSlot(self, sender, model_part):
-        """
-        Receives notification from the model that a part has been added.
-        Parts should add themselves to the QTreeWidget by passing parent=self.
-        """
-        part_type = model_part.__class__.__name__
-        if part_type == "DnaPart":
-            dna_part_item = DnaPartItem(model_part, parent=self)
-            # self.addTopLevelItem(dna_part_item)
-            # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
-            # self._instance_items[dna_part_item] = dna_part_item
-
-        elif part_type in ["HoneycombPart", "SquarePart"]:
-            origami_part_item = OrigamiPartItem(model_part, parent=self)
-            self.addTopLevelItem(origami_part_item)
-            # self._instance_items[origami_part_item] = origami_part_item
-            # self.setModifyState(self._window.action_modify.isChecked())
-        else:
-            print(part_type)
-            raise NotImplementedError
-
-    # end def
-
-    def clearSelectionsSlot(self, doc):
-        pass
-    # end def
-
-    def selectedChangedSlot(self, item_dict):
-        """docstring for selectedChangedSlot"""
-        pass
-    # end def
-
-    def selectionFilterChangedSlot(self, filter_name_list):
-        pass
-    # end def
-
-    def resetRootItemSlot(self, doc):
-        pass
-    # end def
-
-    ### ACCESSORS ###
-    # def OutlineToolManager(self):
-    #     """docstring for OutlineToolManager"""
-    #     return self._window.OutlineToolManager
-    # # end def
-
-    def window(self):
-        return self._window
-    # end def
-
-    ### METHODS ###
-    def removeDnaPartItem(self, dna_part_item):
-        index = self.indexOfTopLevelItem(dna_part_item)
-        self.takeTopLevelItem(index)
-        # del self._instance_items[dna_part_item]
-    # end def
-
-    def removeOrigamiPartItem(self, origami_part_item):
-        index = self.indexOfTopLevelItem(origami_part_item)
-        self.takeTopLevelItem(index)
-        # del self._instance_items[origami_part_item]
-    # end def
-
-    def resetDocumentAndController(self, document):
-        """docstring for resetDocumentAndController"""
-        self._document = document
-        self._controller = ViewRootController(self, document)
-        if len(self._instance_items) > 0:
-            raise ImportError
-    # end def
-
-    def setModifyState(self, bool):
-        """docstring for setModifyState"""
-        for origami_part_item in self._instance_items:
-            origami_part_item.setModifyState(bool)
-    # end def

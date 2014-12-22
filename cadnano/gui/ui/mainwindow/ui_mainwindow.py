@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created: Sun Dec 21 01:01:04 2014
+# Created: Sun Dec 21 19:12:13 2014
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -31,30 +31,38 @@ class Ui_MainWindow(object):
         self.main_splitter.setOrientation(QtCore.Qt.Horizontal)
         self.main_splitter.setHandleWidth(0)
         self.main_splitter.setObjectName("main_splitter")
-        self.outliner_attribute_splitter = QtWidgets.QSplitter(self.main_splitter)
-        self.outliner_attribute_splitter.setOrientation(QtCore.Qt.Vertical)
-        self.outliner_attribute_splitter.setHandleWidth(0)
-        self.outliner_attribute_splitter.setObjectName("outliner_attribute_splitter")
-        self.outliner_widget = OutlinerTreeWidget(self.outliner_attribute_splitter)
+        self.outliner_property_splitter = QtWidgets.QSplitter(self.main_splitter)
+        self.outliner_property_splitter.setOrientation(QtCore.Qt.Vertical)
+        self.outliner_property_splitter.setHandleWidth(0)
+        self.outliner_property_splitter.setObjectName("outliner_property_splitter")
+        self.outliner_widget = OutlinerTreeWidget(self.outliner_property_splitter)
         self.outliner_widget.setFocusPolicy(QtCore.Qt.StrongFocus)
-        self.outliner_widget.setStyleSheet("OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }")
+        self.outliner_widget.setStyleSheet("OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }\n"
+"\n"
+"")
         self.outliner_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.outliner_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
         self.outliner_widget.setDragEnabled(True)
         self.outliner_widget.setObjectName("outliner_widget")
         self.outliner_widget.headerItem().setText(0, "1")
-        self.attribute_widget = QtWidgets.QTreeWidget(self.outliner_attribute_splitter)
-        self.attribute_widget.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.attribute_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.attribute_widget.setAlternatingRowColors(True)
-        self.attribute_widget.setHeaderHidden(True)
-        self.attribute_widget.setObjectName("attribute_widget")
-        self.attribute_widget.headerItem().setText(0, "1")
-        self.attribute_buttonbox = QtWidgets.QDialogButtonBox(self.outliner_attribute_splitter)
-        self.attribute_buttonbox.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.attribute_buttonbox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
-        self.attribute_buttonbox.setCenterButtons(True)
-        self.attribute_buttonbox.setObjectName("attribute_buttonbox")
+        self.property_widget = PropertyEditorWidget(self.outliner_property_splitter)
+        font = QtGui.QFont()
+        font.setStyleStrategy(QtGui.QFont.PreferAntialias)
+        self.property_widget.setFont(font)
+        self.property_widget.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.property_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.property_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
+        self.property_widget.setAlternatingRowColors(True)
+        self.property_widget.setColumnCount(2)
+        self.property_widget.setObjectName("property_widget")
+        self.property_widget.headerItem().setText(0, "1")
+        self.property_widget.headerItem().setText(1, "2")
+        self.property_widget.header().setStretchLastSection(True)
+        self.property_buttonbox = QtWidgets.QDialogButtonBox(self.outliner_property_splitter)
+        self.property_buttonbox.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.property_buttonbox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
+        self.property_buttonbox.setCenterButtons(True)
+        self.property_buttonbox.setObjectName("property_buttonbox")
         self.slice_graphics_view = CustomQGraphicsView(self.main_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -495,6 +503,7 @@ class Ui_MainWindow(object):
         self.action_new_part.setText(_translate("MainWindow", "New"))
         self.action_new_part.setToolTip(_translate("MainWindow", "Add new part"))
 
-from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
+from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.gui.views.outlinerview.propertyeditorwidget import PropertyEditorWidget
 import cadnano.gui.ui.mainwindow.icons_rc

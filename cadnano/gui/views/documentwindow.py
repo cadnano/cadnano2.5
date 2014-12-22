@@ -52,8 +52,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.outliner_widget.configure(window=self, document=doc)
         self.action_outliner.triggered.connect(doc_ctrlr.actionToggleOutlinerSlot)
         # self.outliner_widget.setAlternatingRowColors(True)
+        
+        # PropertyEditor
+        self.property_widget.configure(window=self, document=doc)
 
-        self.attribute_buttonbox.setVisible(False)
+        self.property_buttonbox.setVisible(False)
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
