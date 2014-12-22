@@ -76,7 +76,6 @@ class Part(ProxyObject):
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
-
         self._oligos = set()
         self._coord_to_virtual_velix = {}
         self._number_to_virtual_helix = {}
@@ -85,6 +84,8 @@ class Part(ProxyObject):
         self._max_col = 50
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
+        # Appearance
+        self._color = None
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []
         self.reserve_bin = set()
@@ -103,19 +104,19 @@ class Part(ProxyObject):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int, 
+    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(ProxyObject,
                         name='partActiveSliceResizeSignal')     # self
     partDimensionsChangedSignal = ProxySignal(ProxyObject,
                         name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(ProxyObject, 
+    partInstanceAddedSignal = ProxySignal(ProxyObject,
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(ProxyObject,
                         name='partParentChangedSignal')         # self
     partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
                         name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(ProxyObject, 
+    partRemovedSignal = ProxySignal(ProxyObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, ProxyObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
@@ -132,12 +133,14 @@ class Part(ProxyObject):
     partHideSignal = ProxySignal(ProxyObject, name='partHideSignal')
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
-    partModAddedSignal = ProxySignal(object, object, object, 
-                        name='partModAddedSignal') 
+    partModAddedSignal = ProxySignal(object, object, object,
+                        name='partModAddedSignal')
     partModRemovedSignal = ProxySignal(object, object,
-                        name='partModRemovedSignal') 
+                        name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
-                        name='partModChangedSignal') 
+                        name='partModChangedSignal')
+    partColorChangedSignal = ProxySignal(object,
+                        name='partColorChangedSignal')
 
     ### SLOTS ###
 
@@ -152,6 +155,15 @@ class Part(ProxyObject):
 
     def setDocument(self, document):
         self._document = document
+    # end def
+
+    def color(self):
+        return self._color
+    # end def
+
+    def setColor(self, color):
+        self._color = color
+        self.partColorChangedSignal.emit(self)
     # end def
 
     def stepSize(self):

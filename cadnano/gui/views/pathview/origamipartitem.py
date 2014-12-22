@@ -52,7 +52,6 @@ class OrigamiPartItem(QGraphicsRectItem):
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
 
         self.setBrush(QBrush(Qt.NoBrush))
-        self.setPen(QPen(styles.BLUE_STROKE,1))
     # end def
 
     def proxy(self):
@@ -195,6 +194,11 @@ class OrigamiPartItem(QGraphicsRectItem):
             vhi = self.itemForVirtualHelix(virtual_helix)
             self.setActiveVirtualHelixItem(vhi)
             self.setPreXoverItemsVisible(self.activeVirtualHelixItem())
+    # end def
+
+    def partColorChangedSlot(self):
+        # print("pathview origamipart partColorChangedSlot")
+        pass
     # end def
 
     ### ACCESSORS ###
@@ -342,7 +346,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(styles.BLUE_STROKE))
+        self.setPen(QPen(self._model_part.color()))
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
         self.setRect(self._vh_rect.adjusted(-_p/2,-_p,_p,-_p/2))

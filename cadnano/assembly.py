@@ -1,5 +1,3 @@
-import util
-from itertools import imap
 from operator import attrgetter, methodcaller
 from collections import defaultdict
 
@@ -11,7 +9,7 @@ class Assembly(ProxyObject):
     """
     An Assembly is a collection of components, comprised recursively of
     various levels of individual parts and sub-assembly modules.
-    
+
     The purpose of an Assembly object in radnano is to arrange Parts into
     larger groups (which may be connected or constrained in specific ways)
     to facilitate the modeling of more complex designs than a single part.
@@ -21,7 +19,7 @@ class Assembly(ProxyObject):
         super(Assembly, self).__init__(document)
         self._document = document
         self._obj_instance_list = []   # This is a list of member parts
-        
+
         # This is a list of ObjectInstances of this
         # particular assembly ONLY
         # an Assembly can not have an ObjectIntanceList that contains itself
@@ -46,11 +44,11 @@ class Assembly(ProxyObject):
         self.setParent(None)
         self.deleteLater()
     # end def
-    
+
     def document(self):
         return self._document
     # end def
-    
+
     def objects(self):
         for obj in self._obj_instance_list:
             yield obj
@@ -60,11 +58,11 @@ class Assembly(ProxyObject):
         for inst in self._assembly_instances:
             yield inst
     # end def
-    
+
     def deepCopy(self):
         """
-        Deep copy the assembly by cloning the 
-        
+        Deep copy the assembly by cloning the
+
         This leaves alone assemblyInstances, and only
         
         To finish the job this deepCopy Assembly should be incorporated into
@@ -74,7 +72,7 @@ class Assembly(ProxyObject):
         asm = Assembly(doc)
         new_obj_inst_list = asm._obj_instance_list
         obj_instances = self.objects()
-        
+
         # create a dictionary mapping objects (keys) to lists of 
         # ObjectInstances ([value1, value2])
         # this uniquifies the creation of new Assemblies
@@ -83,8 +81,8 @@ class Assembly(ProxyObject):
         for x in obj_instances:
             obj = f1(x)
             object_dict[obj].append(x)
-        # end 
-        
+        # end for
+
         # copy the all the objects
         f2 = methodcaller('deepCopy')
         for key, value in object_dict:
@@ -99,7 +97,8 @@ class Assembly(ProxyObject):
         # end for
         return asm
     # end def
-    
+
     def addInstance(self, assembly_instance):
         self._assembly_instances.extend(assembly_instance)
     # end def
+# end class

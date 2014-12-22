@@ -59,7 +59,7 @@ class OrigamiPartItem(QGraphicsItem):
         _p = _BOUNDING_RECT_PADDING
         _outlinerect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_outlinerect, self)
-        self._outline.setPen(QPen(styles.BLUE_STROKE))
+        self._outline.setPen(QPen(m_p.color()))
     # end def
 
     def _initDeselector(self):
@@ -162,6 +162,10 @@ class OrigamiPartItem(QGraphicsItem):
 
     def updatePreXoverItemsSlot(self, sender, virtualHelix):
         pass
+    # end def
+
+    def partColorChangedSlot(self):
+        print("sliceview origamipart partColorChangedSlot")
     # end def
 
     ### ACCESSORS ###

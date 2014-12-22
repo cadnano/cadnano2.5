@@ -22,6 +22,8 @@ class OrigamiPartItemController(object):
         m_p.partVirtualHelixRenumberedSignal.connect(p_i.partVirtualHelixRenumberedSlot)
         m_p.partVirtualHelixResizedSignal.connect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelicesReorderedSignal.connect(p_i.partVirtualHelicesReorderedSlot)
+
+        m_p.partColorChangedSignal.connect(p_i.partColorChangedSlot)
     # end def
 
     def disconnectSignals(self):
@@ -42,5 +44,7 @@ class OrigamiPartItemController(object):
         m_p.partVirtualHelixRenumberedSignal.disconnect(p_i.partVirtualHelixRenumberedSlot)
         m_p.partVirtualHelixResizedSignal.disconnect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelicesReorderedSignal.disconnect(p_i.partVirtualHelicesReorderedSlot)
+
+        m_p.partColorChangedSignal.disconnect(p_i.partColorChangedSlot)
     # end def
 # end class

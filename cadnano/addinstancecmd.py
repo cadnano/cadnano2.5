@@ -1,4 +1,5 @@
 from cadnano.cnproxy import UndoCommand
+from cadnano.assembly import Assembly
 from cadnano.part import Part
 
 ### COMMANDS ###
@@ -19,13 +20,13 @@ class AddInstanceCommand(UndoCommand):
     def redo(self):
         doc = self._doc
         obji = self._obj_instance
-        if len(doc._children) == 0:
-            obji.unwipe(doc)
-            if isinstance(obji.object(), Part):
-                doc.documentPartAddedSignal.emit(doc, obji)
-            else:
-                # its an assembly
-                doc.documentAssemblyAddedSignal.emit(doc, obji)
+        obji.unwipe(doc)
+        if isinstance(obji.object(), Part):
+            doc.documentPartAddedSignal.emit(doc, obji)
+        elif isinstance(obji.object(), Assembly):
+            doc.documentAssemblyAddedSignal.emit(doc, obji)
+        else:
+            raise NotImplementedError
     # end def
 
     def undo(self):

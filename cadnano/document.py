@@ -215,7 +215,6 @@ class Document(ProxyObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
-        
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
         ss_dict = self._selection_dict[strandset]

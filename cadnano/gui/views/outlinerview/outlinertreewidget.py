@@ -62,11 +62,11 @@ class OutlinerTreeWidget(QTreeWidget):
         # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
 
         # Add some dummy items
-        p1 = self.addDummyRow("Part0", True, "#cc0000")
-        a1 = self.addDummyRow("Asm0",  True, "#00cc00")
-        self.expandItem(a1)
-        p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
-        p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
+        # p1 = self.addDummyRow("Part0", True, "#cc0000")
+        # a1 = self.addDummyRow("Asm0",  True, "#00cc00")
+        # self.expandItem(a1)
+        # p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
+        # p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
     # end def
 
     def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):
@@ -110,13 +110,11 @@ class OutlinerTreeWidget(QTreeWidget):
         part_type = model_part_instance.object().partType()
         if part_type == PartType.DNAPART:
             dna_part_item = DnaPartItem(model_part, parent=self)
-            # self.addTopLevelItem(dna_part_item)
             # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
-            # self._instance_items[dna_part_item] = dna_part_item
+            self._instance_items[model_part_instance] = dna_part_item
         elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
-            self.addTopLevelItem(origami_part_item)
-            # self._instance_items[origami_part_item] = origami_part_item
+            self._instance_items[model_part_instance] = origami_part_item
             # self.setModifyState(self._window.action_modify.isChecked())
         else:
             print(part_type)

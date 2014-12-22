@@ -32,3 +32,8 @@ LIGHT_ORANGE_FILL = QColor(255, 234, 183)
 LIGHT_ORANGE_STROKE = QColor(234, 132, 81)
 GRAY_FILL = QColor(238, 238, 238)  # eeeeee (was a1a1a1)
 GRAY_STROKE = QColor(102, 102, 102)  # 666666 (was 424242)
+
+
+PARTCOLORS = [QColor() for i in range(10)]
+for i in range(len(PARTCOLORS)):
+    PARTCOLORS[i].setHsvF(i/12.0, 0.5, 1.0)

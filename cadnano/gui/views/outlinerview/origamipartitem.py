@@ -1,6 +1,7 @@
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 
 import cadnano.util as util
+from cadnano.gui.views import styles
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
@@ -29,10 +30,13 @@ class OrigamiPartItem(QTreeWidgetItem):
         self.setFlags(self.flags() | Qt.ItemIsEditable)
 
         # Part
-        self._part_name = "%s%d" % (model_part.__class__.__name__,\
-                                    parent.getInstanceCount())
+        inst_num = parent.getInstanceCount()
+        self._part_name = "%s%d" % (model_part.__class__.__name__, inst_num)
         self._visible = True
-        self._color = "#cc6600"
+
+        self._color = styles.PARTCOLORS[inst_num]
+        self._part.setColor(self._color)
+
         self.setData(0, Qt.EditRole, self._part_name)
         self.setData(1, Qt.EditRole, self._visible)
         self.setData(2, Qt.EditRole, self._color)
@@ -97,4 +101,11 @@ class OrigamiPartItem(QTreeWidgetItem):
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
     # end def
+
+    def partColorChangedSlot(self):
+        # print("outlinerview origamipart partColorChangedSlot")
+        pass
+    # end def
+
+
 # end class
