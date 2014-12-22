@@ -28,6 +28,7 @@ class OutlinerTreeWidget(QTreeWidget):
     """
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
+        self.setAttribute(Qt.WA_MacShowFocusRect,0) # no mac focus halo
 
     def configure(self, window, document):
         self._window = window
