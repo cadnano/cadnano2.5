@@ -30,7 +30,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         self._controller = ActiveSliceItemController(self, origami_part_item.part())
 
         self._label = QGraphicsSimpleTextItem("", parent=self)
-        self._label.setPos(0, -18)
+        self._label.setPos(0, 2)
         self._label.setFont(_FONT)
         self._label.setBrush(_LABEL_BRUSH)
         self._label.hide()
@@ -81,7 +81,9 @@ class ActiveSliceItem(QGraphicsRectItem):
         label = self._label
         bw = _BASE_WIDTH
         bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx())
-        self.setPos(bi * bw, -styles.PATH_HELIX_PADDING)
+        # self.setPos(bi * bw, -styles.PATH_HELIX_PADDING)
+        self.setPos(bi * bw, -styles.PATH_HELIX_PADDING/2)
+
         self._active_slice = bi
         if label:
             label.setText("%d" % bi)
