@@ -6,15 +6,30 @@ class DnaPartItemController():
     # end def
 
     def connectSignals(self):
-        dna_item = self._dna_part_item
-        model_dna = self._model_dna_part
+        m_p = self._model_dna_part
+        p_i = self._dna_part_item
 
-        model_dna.partRemovedSignal.connect(dna_item.partRemovedSlot)
+        if hasattr(p_i, "partHideSlot"):
+            m_p.partHideSignal.connect(p_i.partHideSlot)
+        if hasattr(p_i, "partActiveVirtualHelixChangedSlot"):
+            m_p.partActiveVirtualHelixChangedSignal.connect(p_i.partActiveVirtualHelixChangedSlot)
+
+        m_p.partDimensionsChangedSignal.connect(p_i.partDimensionsChangedSlot)
+        m_p.partParentChangedSignal.connect(p_i.partParentChangedSlot)
+        m_p.partRemovedSignal.connect(p_i.partRemovedSlot)
     # end def
 
     def disconnectSignals(self):
-        dna_item = self._dna_part_item
-        model_dna = self._model_dna_part
+        m_p = self._model_dna_part
+        p_i = self._dna_part_item
 
-        model_dna.partRemovedSignal.disconnect(dna_item.partRemovedSlot)
+        if hasattr(p_i, "partHideSlot"):
+            m_p.partHideSignal.disconnect(p_i.partHideSlot)
+        if hasattr(p_i, "partActiveVirtualHelixChangedSlot"):
+            m_p.partActiveVirtualHelixChangedSignal.disconnect(p_i.partActiveVirtualHelixChangedSlot)
+
+        m_p.partDimensionsChangedSignal.disconnect(p_i.partDimensionsChangedSlot)
+        m_p.partParentChangedSignal.disconnect(p_i.partParentChangedSlot)
+        m_p.partPreDecoratorSelectedSignal.disconnect(p_i.partPreDecoratorSelectedSlot)
+        m_p.partRemovedSignal.disconnect(p_i.partRemovedSlot)
     # end def

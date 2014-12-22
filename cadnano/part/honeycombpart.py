@@ -1,5 +1,4 @@
 
-
 from cadnano.part.origamipart import OrigamiPart
 from cadnano.enum import LatticeType
 
@@ -45,10 +44,11 @@ class HoneycombPart(OrigamiPart):
         self._max_base = kwargs.get('max_steps') * self._STEP - 1
         if self._max_base is None:
             raise ValueError("%s: Need max_base kwarg" % (type(self).__name__))
+    # end def
 
     def crossSectionType(self):
-        """Returns the cross-section type of the DNA part."""
         return LatticeType.HONEYCOMB
+    # end def
 
     def isEvenParity(self, row, column):
         return (row % 2) == (column % 2)

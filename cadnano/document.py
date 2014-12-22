@@ -457,31 +457,28 @@ class Document(ProxyObject):
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
-        if len(self._children) == 0:
-            origamipart = HoneycombPart(document=self, max_row=max_row, 
-                                max_col=max_col, max_steps=max_steps)
-            self._addPart(ObjectInstance(origamipart))
+        origamipart = HoneycombPart(document=self, max_row=max_row,
+                            max_col=max_col, max_steps=max_steps)
+        self._addPart(ObjectInstance(origamipart))
         return origamipart
+    # end def
 
-    def addSquarePart(self, max_row=prefs.SQUARE_PART_MAXROWS, 
-                            max_col=prefs.SQUARE_PART_MAXCOLS, 
+    def addSquarePart(self, max_row=prefs.SQUARE_PART_MAXROWS,
+                            max_col=prefs.SQUARE_PART_MAXCOLS,
                             max_steps=prefs.SQUARE_PART_MAXSTEPS):
         """
         Create and store a new origamipart and instance, and return the instance.
         """
-        origamipart = None
-        if len(self._children) == 0:
-            origamipart = SquarePart(document=self, max_row=max_row, 
-                                max_col=max_col, max_steps=max_steps)
-            self._addPart(ObjectInstance(origamipart))
+        origamipart = SquarePart(document=self, max_row=max_row,
+                            max_col=max_col, max_steps=max_steps)
+        self._addPart(ObjectInstance(origamipart))
         return origamipart
+    # end def
 
     def addDnaPart(self):
         """Create and store a new dnapart and instance, and return the instance."""
-        dnapart = None
-        if len(self._children) == 0:
-            dnapart = DnaPart(document=self)
-            self._addPart(dnapart)
+        dnapart = DnaPart(document=self)
+        self._addPart(ObjectInstance(dnapart))
         return dnapart
     # end def
 

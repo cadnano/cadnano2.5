@@ -21,7 +21,6 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem,
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = QPen(styles.BLUE_STROKE)
-_BOUNDING_RECT_PADDING = 20
 
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering"""
@@ -35,7 +34,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         """parent should always be pathrootitem"""
         super(OrigamiPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.reference()
+        self._model_part = m_p = model_part_instance.object()
         self._viewroot = viewroot
         self._getActiveTool = active_tool_getter
         self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())
@@ -50,19 +49,11 @@ class OrigamiPartItem(QGraphicsRectItem):
         self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-
-        self.setBrush(QBrush(Qt.NoBrush))
-        self.setPen(QPen(styles.BLUE_STROKE,1))
     # end def
-
+    
     def proxy(self):
         return self._proxy_parent
     # end def
-
-    # def paint(self, painter, option, widget):
-    #     print("paint OrigamiPartItem")
-    #     QGraphicsRectItem.paint(self, painter, option, widget)
-    # # end def
 
     def _initModifierRect(self):
         """docstring for _initModifierRect"""
@@ -328,7 +319,7 @@ class OrigamiPartItem(QGraphicsRectItem):
             y += step
             self.updateXoverItems(vhi)
         # end for
-        self._vh_rect = QRectF(leftmost_extent, -10, -leftmost_extent + rightmost_extent, y)
+        self._vh_rect = QRectF(leftmost_extent, -40, -leftmost_extent + rightmost_extent, y + 40)
         self._virtual_helix_item_list = new_list
         if zoom_to_fit:
             self.scene().views()[0].zoomToFit()
@@ -342,10 +333,8 @@ class OrigamiPartItem(QGraphicsRectItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(styles.BLUE_STROKE))
-        # self.setRect(self.childrenBoundingRect())
-        d = _BOUNDING_RECT_PADDING
-        self.setRect(self._vh_rect.adjusted(-d/2,-d,d,-d/2))
+        self.setPen(QPen(Qt.NoPen))
+        self.setRect(self.childrenBoundingRect())
         # move and show or hide the buttons if necessary
         add_button = self._add_bases_button
         rm_button = self._remove_bases_button

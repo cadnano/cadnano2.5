@@ -193,14 +193,15 @@ class DnaLine(QGraphicsEllipseItem):
 class DnaPartItem(QGraphicsItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
-    def __init__(self, model_part, parent=None):
+    def __init__(self, model_part_instance, parent=None):
         """
         Parent should be either a SliceRootItem, or an AssemblyItem.
         Order matters for deselector, probe, and setlattice
         """
         super(DnaPartItem, self).__init__(parent)
-        self._part = model_part
-        self._controller = DnaPartItemController(self, model_part)
+        self._model_instance = model_part_instance
+        self._model_part = m_p = model_part_instance.object()
+        self._controller = DnaPartItemController(self, m_p)
         self._rect = QRectF(0, 0, 0, 0)
         self._initDeselector()
         self.probe = self.IntersectionProbe(self)
@@ -260,7 +261,7 @@ class DnaPartItem(QGraphicsItem):
         self.parentItem().removeDnaPartItem(self)
         scene = self.scene()
         scene.removeItem(self)
-        self._part = None
+        self._model_part = None
         self.probe = None
         self._mod_circ = None
         self.deselector = None
@@ -280,7 +281,7 @@ class DnaPartItem(QGraphicsItem):
         view.centerOn(vhi)
         view.zoomIn()
         mC = self._mod_circ
-        x,y = self._part.latticeCoordToPositionXY(row, col, self.scaleFactor())
+        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
         mC.setPos(x,y)
         if self._can_show_mod_circ:
             mC.show()
@@ -314,7 +315,7 @@ class DnaPartItem(QGraphicsItem):
     # end def
 
     def part(self):
-        return self._part
+        return self._model_part
     # end def
 
     def scaleFactor(self):
@@ -322,7 +323,7 @@ class DnaPartItem(QGraphicsItem):
     # end def
 
     def setPart(self, newPart):
-        self._part = newPart
+        self._model_part = newPart
     # end def
 
     def window(self):

@@ -383,7 +383,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_new_part"/>
+   <addaction name="action_new_dna_part"/>
    <addaction name="action_new_honeycomb_part"/>
    <addaction name="action_new_square_part"/>
   </widget>
@@ -943,7 +943,7 @@
   <action name="action_new_honeypx_part">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
+     <normaloff>:/parttools/new-hpx</normaloff>:/parttools/new-hpx</iconset>
    </property>
    <property name="text">
     <string>Honeycomb PX</string>
@@ -979,13 +979,22 @@
   <action name="action_new_part">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
+     <normaloff>:/parttools/new-origami</normaloff>:/parttools/new-origami</iconset>
    </property>
    <property name="text">
     <string>New</string>
    </property>
    <property name="toolTip">
     <string>Add new part</string>
+   </property>
+  </action>
+  <action name="action_new_dna_part">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/new-dna</normaloff>:/parttools/new-dna</iconset>
+   </property>
+   <property name="text">
+    <string>DNA</string>
    </property>
   </action>
  </widget>

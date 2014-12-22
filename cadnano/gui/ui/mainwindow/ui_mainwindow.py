@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created: Sun Dec 21 19:12:13 2014
+# Created: Sun Dec 21 21:44:18 2014
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -349,18 +349,27 @@ class Ui_MainWindow(object):
         self.action_path_mods.setIcon(icon26)
         self.action_path_mods.setObjectName("action_path_mods")
         self.action_new_honeypx_part = QtWidgets.QAction(MainWindow)
-        self.action_new_honeypx_part.setIcon(icon4)
+        icon27 = QtGui.QIcon()
+        icon27.addPixmap(QtGui.QPixmap(":/parttools/new-hpx"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_new_honeypx_part.setIcon(icon27)
         self.action_new_honeypx_part.setObjectName("action_new_honeypx_part")
         self.action_outliner = QtWidgets.QAction(MainWindow)
         self.action_outliner.setCheckable(True)
         self.action_outliner.setChecked(True)
-        icon27 = QtGui.QIcon()
-        icon27.addPixmap(QtGui.QPixmap(":/parttools/outliner"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.action_outliner.setIcon(icon27)
+        icon28 = QtGui.QIcon()
+        icon28.addPixmap(QtGui.QPixmap(":/parttools/outliner"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_outliner.setIcon(icon28)
         self.action_outliner.setObjectName("action_outliner")
         self.action_new_part = QtWidgets.QAction(MainWindow)
-        self.action_new_part.setIcon(icon4)
+        icon29 = QtGui.QIcon()
+        icon29.addPixmap(QtGui.QPixmap(":/parttools/new-origami"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_new_part.setIcon(icon29)
         self.action_new_part.setObjectName("action_new_part")
+        self.action_new_dna_part = QtWidgets.QAction(MainWindow)
+        icon30 = QtGui.QIcon()
+        icon30.addPixmap(QtGui.QPixmap(":/parttools/new-dna"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_new_dna_part.setIcon(icon30)
+        self.action_new_dna_part.setObjectName("action_new_dna_part")
         self.right_toolbar.addAction(self.action_path_select)
         self.right_toolbar.addAction(self.action_path_pencil)
         self.right_toolbar.addAction(self.action_path_nick)
@@ -381,7 +390,7 @@ class Ui_MainWindow(object):
         self.selection_toolbar.addAction(self.action_filter_xover)
         self.selection_toolbar.addAction(self.action_filter_strand)
         self.left_toolbar.addAction(self.action_outliner)
-        self.left_toolbar.addAction(self.action_new_part)
+        self.left_toolbar.addAction(self.action_new_dna_part)
         self.left_toolbar.addAction(self.action_new_honeycomb_part)
         self.left_toolbar.addAction(self.action_new_square_part)
         self.menu_file.addAction(self.action_about)
@@ -502,8 +511,9 @@ class Ui_MainWindow(object):
         self.action_outliner.setShortcut(_translate("MainWindow", "O"))
         self.action_new_part.setText(_translate("MainWindow", "New"))
         self.action_new_part.setToolTip(_translate("MainWindow", "Add new part"))
+        self.action_new_dna_part.setText(_translate("MainWindow", "DNA"))
 
-from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
-from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.propertyeditorwidget import PropertyEditorWidget
+from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 import cadnano.gui.ui.mainwindow.icons_rc

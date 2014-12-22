@@ -11,7 +11,7 @@ import random
 from uuid import uuid4
 
 from cadnano.cnproxy import ProxyObject, ProxySignal
-from cadnano.enum import StrandType
+from cadnano.enum import PartType, StrandType
 
 import cadnano.util as util
 import cadnano.preferences as prefs
@@ -156,6 +156,10 @@ class DnaPart(Part):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
+    def partType(self):
+        return PartType.DNAPART
+    # end def
+
     def virtualHelix(self, vhref, returnNoneIfAbsent=True):
         # vhrefs are the shiny new way to talk to part about its constituent
         # virtualhelices. Wherever you see f(...,vhref,...) you can

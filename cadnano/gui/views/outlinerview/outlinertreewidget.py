@@ -3,6 +3,8 @@ from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .dnapartitem import DnaPartItem
 from .origamipartitem import OrigamiPartItem
+
+from cadnano.enum import PartType
 import cadnano.util as util
 
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -98,19 +100,19 @@ class OutlinerTreeWidget(QTreeWidget):
     #     print("itemDoubleClicked", item, column)
 
 
-    def partAddedSlot(self, sender, model_part):
+    def partAddedSlot(self, sender, model_part_instance):
         """
         Receives notification from the model that a part has been added.
         Parts should add themselves to the QTreeWidget by passing parent=self.
         """
-        part_type = model_part.__class__.__name__
-        if part_type == "DnaPart":
+        model_part = model_part_instance.object()
+        part_type = model_part_instance.object().partType()
+        if part_type == PartType.DNAPART:
             dna_part_item = DnaPartItem(model_part, parent=self)
             # self.addTopLevelItem(dna_part_item)
             # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
             # self._instance_items[dna_part_item] = dna_part_item
-
-        elif part_type in ["HoneycombPart", "SquarePart"]:
+        elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
             self.addTopLevelItem(origami_part_item)
             # self._instance_items[origami_part_item] = origami_part_item

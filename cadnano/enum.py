@@ -1,3 +1,7 @@
+class PartType:
+    DNAPART = 0
+    ORIGAMIPART = 1
+
 
 class LatticeType:
     HONEYCOMB = 0

@@ -43,4 +43,20 @@ class DnaPartItem(QTreeWidgetItem):
         self._controller.disconnectSignals()
         self._controller = None
     # end def
+
+    def partHideSlot(self):
+        pass
+    # end def
+
+    def partDimensionsChangedSlot(self):
+        pass
+    # end def
+
+    def partParentChangedSlot(self):
+        pass
+    # end def
+
+    def partRemovedSlot(self):
+        pass
+    # end def
 # end class

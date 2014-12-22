@@ -97,6 +97,7 @@ class DocumentController():
         # self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
+        self.win.action_new_dna_part.triggered.connect(self.actionAddDnaPartSlot)
         self.win.action_new_honeycomb_part.triggered.connect(\
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\

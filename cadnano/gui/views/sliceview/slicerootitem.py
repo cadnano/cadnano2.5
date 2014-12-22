@@ -1,6 +1,9 @@
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .dnapartitem import DnaPartItem
 from .origamipartitem import OrigamiPartItem
+
+from cadnano.enum import PartType
+
 import cadnano.util as util
 
 from PyQt5.QtCore import pyqtSignal, QObject
@@ -30,19 +33,17 @@ class SliceRootItem(QGraphicsRectItem):
         Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
         """
-        # self._model_part = model_part
-        model_part = model_part_instance.reference()
-        print("partAddedSlot: ", model_part, model_part.__class__.__name__)
+        part_type = model_part_instance.object().partType()
 
-        if model_part.__class__.__name__ == "DnaPart":
-            # print("yes DNApart")
+        if part_type == PartType.DNAPART:
             dna_part_item = DnaPartItem(model_part_instance, parent=self)
             self._instance_items[dna_part_item] = dna_part_item
-        else:
-            # print("nope it's OrigamiPart")
+        elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part_instance, parent=self)
             self._instance_items[origami_part_item] = origami_part_item
-            self.setModifyState(self._window.action_modify.isChecked())
+            # self.setModifyState(self._window.action_modify.isChecked())
+        else:
+            raise NotImplementedError
     # end def
 
     def selectedChangedSlot(self, item_dict):
