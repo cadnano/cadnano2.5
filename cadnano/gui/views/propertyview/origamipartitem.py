@@ -1,4 +1,4 @@
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 
 import cadnano.util as util
 
@@ -7,33 +7,28 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
-DNAPART_ITEM_TYPE = 1100
-DNA_SELECTION_ITEM_TYPE = 1110
+ORIGAMI_ITEM_TYPE = 1200
+PROPERTY_ITEM_TYPE = 1110
 
-class DnaPartItem(QTreeWidgetItem):
+class OrigamiPartItem(QTreeWidgetItem):
     def __init__(self, model_part, parent=None):
         super(QTreeWidgetItem, self).__init__(parent, DNAPART_ITEM_TYPE)
         self._part = m_p = model_part
         self._parent_tree = parent
-        self._controller = DnaPartItemController(self, model_part)
+        self._controller = OrigamiPartItemController(self, model_part)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
 
-        # Part
-        if m_p.getProperty("name") is None:
-            self._part_name = "Dna%d" % parent.getInstanceCount()
-            m_p.setProperty("name", self._part_name)
-        self._visible = True
-        self._color = "#0066cc"
-        self.setData(0, Qt.EditRole, self._part_name)
-        self.setData(1, Qt.EditRole, self._visible)
-        self.setData(2, Qt.EditRole, self._color)
+        self._property_items = []
 
-        self.setExpanded(True)
+        for key in sorted(self._properties):
+            p_wi = QTreeWidgetItem(self, PROPERTY_ITEM_TYPE)
+            p_wi.setData(0, Qt.EditRole, key)
+            p_wi.setData(1, Qt.EditRole, self._properties[key])
     # end def
 
     # SLOTS
     def partRemovedSlot(self, sender):
-        self._parent_tree.removeDnaPartItem(self)
+        self._parent_tree.removeOrigamiPartItem(self)
         self._part = None
         self._parent_tree = None
         self._controller.disconnectSignals()
@@ -55,7 +50,7 @@ class DnaPartItem(QTreeWidgetItem):
     def partRemovedSlot(self):
         pass
     # end def
-
+    
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
         return self._part

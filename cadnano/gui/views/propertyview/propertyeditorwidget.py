@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
-_FONT = QFont(styles.THE_FONT, 13)
+_FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
 
@@ -44,19 +44,15 @@ class PropertyEditorWidget(QTreeWidget):
         # Header
         self.setHeaderLabels(["Property", "Value"])
         h = self.header()
-        h.setStretchLastSection(False)
-        h.setSectionResizeMode(0, QHeaderView.Stretch)
+        h.setSectionResizeMode(QHeaderView.Stretch)
         h.setSectionsMovable(True)
-        self.setColumnWidth(0, 100)
-        self.setColumnWidth(1, 60)
 
         custom_delegate = CustomDelegate()
         self.setItemDelegate(custom_delegate)
 
         # Add some dummy items
-        p1 = self.addDummyRow("str_property_1", "ATCGACTGATCG")
-        p2 = self.addDummyRow("int_property_2",  10)
-        p3 = self.addDummyRow("bool_property_3",  True)
+        # p1 = self.addDummyRow("sequence", "ATCGACTGATCG")
+        # p2 = self.addDummyRow("circular",  True)
     # end def
 
     def addDummyRow(self, property_name, value, parentQTreeWidgetItem = None):
@@ -72,6 +68,21 @@ class PropertyEditorWidget(QTreeWidget):
     ### SIGNALS ###
 
     ### SLOTS ###
+    def outlinerItemSelectionChanged(self):
+        o = self._window.outliner_widget
+        sel = o.selectedItems()
+        self.clear()
+        if len(sel) == 1:
+            # get the selected part
+            partitem = sel[0]
+            part = partitem.part()
+            pe_item = DnaPartItem(part, self)
+            # self.show()
+        else:
+            pass
+            # self.hide() # show nothing
+    # end def
+
     # def itemClicked(self, item, column):
     #     print("itemClicked", item, column)
     # 
@@ -87,6 +98,7 @@ class PropertyEditorWidget(QTreeWidget):
     # end def
 
     def selectedChangedSlot(self, item_dict):
+        print("prop_editor: selectedChangedSlot")
         pass
     # end def
 

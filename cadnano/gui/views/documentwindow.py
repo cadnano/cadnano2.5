@@ -1,6 +1,5 @@
 from cadnano import app
 
-from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 
@@ -47,15 +46,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.right_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
             self.left_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
-
-        # Outliner setup
+        # Outliner & PropertyEditor setup
         self.outliner_widget.configure(window=self, document=doc)
-        self.action_outliner.triggered.connect(doc_ctrlr.actionToggleOutlinerSlot)
-        # self.outliner_widget.setAlternatingRowColors(True)
-        
-        # PropertyEditor
         self.property_widget.configure(window=self, document=doc)
-
         self.property_buttonbox.setVisible(False)
 
         # Slice setup
@@ -128,7 +121,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([150, 400, 400])  # balance main_splitter size
+        self.main_splitter.setSizes([180, 400, 400])  # balance main_splitter size
         self.statusBar().showMessage("")
 
     ### ACCESSORS ###

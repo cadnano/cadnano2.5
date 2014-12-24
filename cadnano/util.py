@@ -10,7 +10,7 @@ import os
 from os import path
 import platform
 # import imp
-from itertools import dropwhile, starmap
+from itertools import dropwhile, starmap, groupby
 
 IS_PY_3 = int(sys.version_info[0] > 2)
 prng = Random()
@@ -241,3 +241,16 @@ def findChild(self):
         debugHighlighter.scene().removeItem(debugHighlighter)
         for child, wasVisible in childVisibility:
             child.setVisible(wasVisible)
+# end def
+
+
+def read_fasta(fp):
+    name, seq = None, []
+    for line in fp:
+        line = line.rstrip()
+        if line.startswith(">"):
+            if name: yield (name, ''.join(seq))
+            name, seq = line, []
+        else:
+            seq.append(line)
+    if name: yield (name, ''.join(seq))

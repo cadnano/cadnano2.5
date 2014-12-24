@@ -215,6 +215,9 @@ class DnaPartItem(QGraphicsItem):
         self._inner_Line = DnaLine(_HOVER_RECT, _INNER_RECT, self)
 
         self.hoverRegion = DnaHoverRegion(_HOVER_RECT, self)
+
+        self._initSelections()
+
     # end def
 
     def _initDeselector(self):
@@ -233,6 +236,13 @@ class DnaPartItem(QGraphicsItem):
         self._mod_circ = m_c = QGraphicsEllipseItem(_HOVER_RECT, self)
         m_c.setPen(_MOD_PEN)
         m_c.hide()
+    # end def
+
+    def _initSelections(self):
+        self._selections = self._model_part.getSelectionDict()
+        for key in sorted(self._selections):
+            (start, end) = self._selections[key]
+            # convert bases to angles
     # end def
 
     def addSelection(self, startAngle, spanAngle):

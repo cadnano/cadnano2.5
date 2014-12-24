@@ -117,9 +117,6 @@
         <property name="columnCount">
          <number>2</number>
         </property>
-        <attribute name="headerStretchLastSection">
-         <bool>true</bool>
-        </attribute>
         <column>
          <property name="text">
           <string notr="true">1</string>
@@ -1012,7 +1009,7 @@
   <customwidget>
    <class>PropertyEditorWidget</class>
    <extends>QTreeWidget</extends>
-   <header>cadnano.gui.views.outlinerview.propertyeditorwidget.h</header>
+   <header>cadnano.gui.views.propertyview.propertyeditorwidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

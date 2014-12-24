@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created: Sun Dec 21 21:44:18 2014
+# Created: Tue Dec 23 17:38:13 2014
 #      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -57,7 +57,6 @@ class Ui_MainWindow(object):
         self.property_widget.setObjectName("property_widget")
         self.property_widget.headerItem().setText(0, "1")
         self.property_widget.headerItem().setText(1, "2")
-        self.property_widget.header().setStretchLastSection(True)
         self.property_buttonbox = QtWidgets.QDialogButtonBox(self.outliner_property_splitter)
         self.property_buttonbox.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.property_buttonbox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
@@ -513,7 +512,7 @@ class Ui_MainWindow(object):
         self.action_new_part.setToolTip(_translate("MainWindow", "Add new part"))
         self.action_new_dna_part.setText(_translate("MainWindow", "DNA"))
 
-from cadnano.gui.views.outlinerview.propertyeditorwidget import PropertyEditorWidget
-from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.gui.views.propertyview.propertyeditorwidget import PropertyEditorWidget
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
+from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 import cadnano.gui.ui.mainwindow.icons_rc

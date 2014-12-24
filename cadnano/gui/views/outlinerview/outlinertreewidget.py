@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
-_FONT = QFont(styles.THE_FONT, 10)
+_FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
 
@@ -128,6 +128,7 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def selectedChangedSlot(self, item_dict):
         """docstring for selectedChangedSlot"""
+        print("outliner: selectedChangedSlot")
         pass
     # end def
 

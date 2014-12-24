@@ -56,33 +56,12 @@ class DocumentController():
         self._connectWindowSignalsToSelf()
         self.win.show()
         app().active_document = self
-
-    def _initMaya(self):
-        """
-        Initialize Maya-related state. Delete Maya nodes if there
-        is an old document left over from the same session. Set up
-        the Maya window.
-        """
-        # There will only be one document
-        if (app().active_document and app().active_document.win and
-                                not app().active_document.win.close()):
-            return
-        del app().active_document
-        app().active_document = self
-
-        import maya.OpenMayaUI as OpenMayaUI
-        import sip
-        ptr = OpenMayaUI.MQtUtil.mainWindow()
-        mayaWin = sip.wrapinstance(int(ptr), QMainWindow)
-        self.windock = QDockWidget("cadnano")
-        self.windock.setFeatures(QDockWidget.DockWidgetMovable
-                                 | QDockWidget.DockWidgetFloatable)
-        self.windock.setAllowedAreas(Qt.LeftDockWidgetArea
-                                     | Qt.RightDockWidgetArea)
-        self.windock.setWidget(self.win)
-        mayaWin.addDockWidget(Qt.DockWidgetArea(Qt.LeftDockWidgetArea),
-                                self.windock)
-        self.windock.setVisible(True)
+        
+        # Connect outliner with property editor
+        o = self.win.outliner_widget
+        p_e = self.win.property_widget
+        o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
+    # end def
 
     def _connectWindowSignalsToSelf(self):
         """This method serves to group all the signal & slot connections
@@ -97,6 +76,7 @@ class DocumentController():
         self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
+        self.win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
         self.win.action_new_dna_part.triggered.connect(self.actionAddDnaPartSlot)
         self.win.action_new_honeycomb_part.triggered.connect(\
             self.actionAddHoneycombPartSlot)
@@ -112,7 +92,6 @@ class DocumentController():
         self.win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
         self.win.action_filter_scaf.triggered.connect(self.actionFilterScafSlot)
         self.win.action_filter_stap.triggered.connect(self.actionFilterStapSlot)
-
 
     ### SLOTS ###
     def undoStackCleanChangedSlot(self):

@@ -39,6 +39,11 @@ from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
 
+import cadnano.data.fasta as fasta
+import pkgutil
+import io
+
+
 class DnaPart(Part):
     """
     DNAPart.
@@ -61,10 +66,26 @@ class DnaPart(Part):
         #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
         super(Part, self).__init__(self._document)
+
+        # set some property data (dev)
+        self._properties = {}
+        self._properties["name"] = None
+        self._properties["color"] = "#cc0000"
+        self._properties["circular"] = True
+
+        data = pkgutil.get_data('cadnano.data.fasta', '/pUC19.fasta')
+        fasta_iter = util.read_fasta(data.decode('utf-8').splitlines())
+        self._properties["dna_sequence"] = next(fasta_iter)[1]
+        print("len:",len(self._properties["dna_sequence"]))
+
+        # set some selections (dev)
+        self._selections = {}
+        self._selections["sel0"] = (0, 100)
+        self._selections["sel1"] = (250, 400)
+
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
-
         self._oligos = set()
         self._coord_to_virtual_velix = {}
         self._number_to_virtual_helix = {}
@@ -132,6 +153,22 @@ class DnaPart(Part):
     ### ACCESSORS ###
     def document(self):
         return self._document
+    # end def
+
+    def getPropertyDict(self):
+        return self._properties
+    # end def
+
+    def getSelectionDict(self):
+        return self._selections
+    # end def
+
+    def getProperty(self, key):
+        return self._properties[key]
+    # end def
+
+    def setProperty(self, key, value):
+        self._properties[key] = value
     # end def
 
     def oligos(self):
@@ -525,6 +562,4 @@ class DnaPart(Part):
         # end for
         return part
     # end def
-
-
 # end class
