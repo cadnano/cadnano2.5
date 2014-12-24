@@ -256,9 +256,6 @@ class OrigamiPartItem(QGraphicsRectItem):
         del self._addBasesDialog
         maxDelta = n // part.stepSize() * part.stepSize()
         part.resizeVirtualHelices(0, maxDelta)
-        # if app().isInMaya():
-        #     import maya.cmds as cmds
-        #     cmds.select(clear=True)
     # end def
 
     def _removeBasesClicked(self):
@@ -278,9 +275,6 @@ class OrigamiPartItem(QGraphicsRectItem):
         delta = idx - (part.maxBaseIdx() + 1)
         if delta < 0:
             part.resizeVirtualHelices(0, delta)
-            # if app().isInMaya():
-            #     import maya.cmds as cmds
-            #     cmds.select(clear=True)
     # end def
 
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):

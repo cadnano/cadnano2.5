@@ -57,33 +57,6 @@ class DocumentController():
         self.win.show()
         app().active_document = self
 
-    def _initMaya(self):
-        """
-        Initialize Maya-related state. Delete Maya nodes if there
-        is an old document left over from the same session. Set up
-        the Maya window.
-        """
-        # There will only be one document
-        if (app().active_document and app().active_document.win and
-                                not app().active_document.win.close()):
-            return
-        del app().active_document
-        app().active_document = self
-
-        import maya.OpenMayaUI as OpenMayaUI
-        import sip
-        ptr = OpenMayaUI.MQtUtil.mainWindow()
-        mayaWin = sip.wrapinstance(int(ptr), QMainWindow)
-        self.windock = QDockWidget("cadnano")
-        self.windock.setFeatures(QDockWidget.DockWidgetMovable
-                                 | QDockWidget.DockWidgetFloatable)
-        self.windock.setAllowedAreas(Qt.LeftDockWidgetArea
-                                     | Qt.RightDockWidgetArea)
-        self.windock.setWidget(self.win)
-        mayaWin.addDockWidget(Qt.DockWidgetArea(Qt.LeftDockWidgetArea),
-                                self.windock)
-        self.windock.setVisible(True)
-
     def _connectWindowSignalsToSelf(self):
         """This method serves to group all the signal & slot connections
         made by DocumentController"""
@@ -421,11 +394,6 @@ class DocumentController():
         # isChecked = self.win.actionModify.isChecked()
         # self.win.pathroot.setModifyState(isChecked)
         # self.win.sliceroot.setModifyState(isChecked)
-        # if app().isInMaya():
-        #     isChecked = self.win.actionModify.isChecked()
-        #     self.win.pathroot.setModifyState(isChecked)
-        #     self.win.sliceroot.setModifyState(isChecked)
-        #     self.win.solidroot.setModifyState(isChecked)
 
     def actionAddHoneycombPartSlot(self):
         part = self._document.addHoneycombPart()
@@ -669,10 +637,6 @@ class DocumentController():
         """Intercept close events when user attempts to close the window."""
         if self.maybeSave():
             event.accept()
-            # if app().isInMaya():
-            #     self.windock.setVisible(False)
-            #     del self.windock
-            #     self.windock = action_new_honeycomb_part
             dcs = app().document_controllers
             if self in dcs:
                 dcs.remove(self)
