@@ -7,12 +7,10 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
-DNAPART_ITEM_TYPE = 1100
-DNA_SELECTION_ITEM_TYPE = 1110
 
 class DnaPartItem(QTreeWidgetItem):
     def __init__(self, model_part, parent=None):
-        super(QTreeWidgetItem, self).__init__(parent, DNAPART_ITEM_TYPE)
+        super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._part = m_p = model_part
         self._parent_tree = parent
         self._controller = DnaPartItemController(self, model_part)
@@ -60,5 +58,4 @@ class DnaPartItem(QTreeWidgetItem):
     def part(self):
         return self._part
     # end def
-
 # end class

@@ -2,7 +2,7 @@ from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPar
 
 import cadnano.util as util
 
-from .customtreewidgetitem import CustomTreeWidgetItem
+from .customtreewidgetitems import PropertyItem, SelectionItem
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
@@ -10,48 +10,41 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 
-class DnaPartItem(CustomTreeWidgetItem):
+class DnaPartItem(PropertyItem):
     def __init__(self, model_part, parent=None):
-        super(CustomTreeWidgetItem, self).__init__(parent)
-        self._part = m_p = model_part
+        super(PropertyItem, self).__init__(parent)
+        self._model_part = m_p = model_part
         self._parent_tree = parent
         self._controller = DnaPartItemController(self, model_part)
+        self.setFlags(self.flags() | Qt.ItemIsEditable)
 
         root = parent.invisibleRootItem() # add propertyitems as siblings
 
         # Properties
         self._properties = m_p.getPropertyDict()
         for key in sorted(self._properties):
-            if key == "name": # name goes on top
+            if key == "name": # name property 
                 p_i = self
             else:
-                p_i = CustomTreeWidgetItem(root)
+                p_i = PropertyItem(m_p, key, root)
             p_i.setData(0, Qt.EditRole, key)
             p_i.setData(1, Qt.EditRole, self._properties[key])
 
         # Selections
-        self._selections_root = s_r = CustomTreeWidgetItem(root)
-        s_r.setData(0, Qt.EditRole, "Selections")
+        self._selections_root = s_r = PropertyItem(m_p, None, root)
+        s_r.setData(0, Qt.EditRole, "selections")
         s_r.setExpanded(True)
 
         self._selections = m_p.getSelectionDict()
         for key in sorted(self._selections):
             (start, end) = self._selections[key]
-            s_i = CustomTreeWidgetItem(self._selections_root)
-            s_i.setData(0, Qt.EditRole, "name")
-            s_i.setData(1, Qt.EditRole, key)
-            start_i = CustomTreeWidgetItem(s_i)
-            start_i.setData(0, Qt.EditRole, "start")
-            start_i.setData(1, Qt.EditRole, start)
-            end_i = CustomTreeWidgetItem(s_i)
-            end_i.setData(0, Qt.EditRole, "end")
-            end_i.setData(1, Qt.EditRole, end)
+            s_i = SelectionItem(m_p, key, start, end, self._selections_root)
     # end def
 
     # SLOTS
     def partRemovedSlot(self, sender):
         self._parent_tree.removeDnaPartItem(self)
-        self._part = None
+        self._model_part = None
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
@@ -75,7 +68,7 @@ class DnaPartItem(CustomTreeWidgetItem):
     
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
-        return self._part
+        return self._model_part
     # end def
 
 # end class

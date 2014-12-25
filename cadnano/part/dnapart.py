@@ -168,6 +168,7 @@ class DnaPart(Part):
     # end def
 
     def setProperty(self, key, value):
+        # use ModifyPropertyCommand here
         self._properties[key] = value
     # end def
 

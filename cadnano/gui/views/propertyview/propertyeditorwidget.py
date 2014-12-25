@@ -50,6 +50,10 @@ class PropertyEditorWidget(QTreeWidget):
         custom_delegate = CustomDelegate()
         self.setItemDelegate(custom_delegate)
 
+
+        # self.itemFromIndex(model_index).setPartProperty()
+        self.model().dataChanged.connect(self.dataChangedSlot)
+
         # Add some dummy items
         # p1 = self.addDummyRow("sequence", "ATCGACTGATCG")
         # p2 = self.addDummyRow("circular",  True)
@@ -97,6 +101,15 @@ class PropertyEditorWidget(QTreeWidget):
         pass
     # end def
 
+    def dataChangedSlot(self, top_left, bot_right):
+        """docstring for propertyChangedSlot"""
+        c_i = self.currentItem()
+        if c_i is None:
+            return
+        if c_i == self.itemFromIndex(top_left):
+            c_i.updateModel()
+    # end def
+
     def selectedChangedSlot(self, item_dict):
         print("prop_editor: selectedChangedSlot")
         pass
@@ -109,6 +122,7 @@ class PropertyEditorWidget(QTreeWidget):
     def resetRootItemSlot(self, doc):
         pass
     # end def
+
 
     ### ACCESSORS ###
     def window(self):
