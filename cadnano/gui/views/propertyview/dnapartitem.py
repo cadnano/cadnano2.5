@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
 
 import cadnano.util as util
@@ -9,6 +11,8 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
+KEY_COL = 0
+VAL_COL = 1
 
 class DnaPartItem(PropertyItem):
     def __init__(self, model_part, parent=None):
@@ -21,18 +25,20 @@ class DnaPartItem(PropertyItem):
         root = parent.invisibleRootItem() # add propertyitems as siblings
 
         # Properties
-        self._properties = m_p.getPropertyDict()
-        for key in sorted(self._properties):
-            if key == "name": # name property 
+        self._props = defaultdict(dict)
+        self._model_props = m_p.getPropertyDict()
+        for key in sorted(self._model_props):
+            if key == "name": # name on top
                 p_i = self
             else:
                 p_i = PropertyItem(m_p, key, root)
-            p_i.setData(0, Qt.EditRole, key)
-            p_i.setData(1, Qt.EditRole, self._properties[key])
+            self._props[key]["p_i"] = p_i
+            p_i.setData(KEY_COL, Qt.EditRole, key)
+            p_i.setData(VAL_COL, Qt.EditRole, self._model_props[key])
 
         # Selections
         self._selections_root = s_r = PropertyItem(m_p, None, root)
-        s_r.setData(0, Qt.EditRole, "selections")
+        s_r.setData(KEY_COL, Qt.EditRole, "selections")
         s_r.setExpanded(True)
 
         self._selections = m_p.getSelectionDict()
@@ -65,7 +71,15 @@ class DnaPartItem(PropertyItem):
     def partRemovedSlot(self):
         pass
     # end def
-    
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            p_i = self._props[property_key]["p_i"]
+            value = p_i.data(VAL_COL, Qt.DisplayRole)
+            if value != new_value:
+                p_i.setData(VAL_COL, Qt.EditRole, new_value)
+    # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
         return self._model_part

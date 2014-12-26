@@ -61,6 +61,8 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setItemDelegate(custom_delegate)
         # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
 
+        self.model().dataChanged.connect(self.dataChangedSlot)
+
         # Add some dummy items
         # p1 = self.addDummyRow("Part0", True, "#cc0000")
         # a1 = self.addDummyRow("Asm0",  True, "#00cc00")
@@ -128,7 +130,6 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def selectedChangedSlot(self, item_dict):
         """docstring for selectedChangedSlot"""
-        print("outliner: selectedChangedSlot")
         pass
     # end def
 
@@ -138,6 +139,14 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def resetRootItemSlot(self, doc):
         pass
+    # end def
+
+    def dataChangedSlot(self, top_left, bot_right):
+        c_i = self.currentItem()
+        if c_i is None:
+            return
+        if c_i == self.itemFromIndex(top_left):
+            c_i.updateModel()
     # end def
 
     ### ACCESSORS ###
@@ -184,7 +193,6 @@ class CustomDelegate(QStyledItemDelegate):
         #     option.backgroundBrush = QBrush(QColor(204,0,0))
 
     def createEditor(self, parentQWidget, option, model_index):
-        # print("createEditor")
         column = model_index.column()
         if column == 0: # Part Name
             editor = QLineEdit(parentQWidget)

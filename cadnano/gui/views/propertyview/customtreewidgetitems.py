@@ -17,6 +17,11 @@ class PropertyItem(QTreeWidgetItem):
         self._key = key
     # end def
 
+    def updateModel(self):
+        value = self.data(1, Qt.DisplayRole)
+        self._model_part.setProperty(self._key, value)
+    # end def
+
     def setPartProperty(self, key, value):
         key = self.data(0, Qt.DisplayRole)
         value = self.data(1, Qt.DisplayRole)

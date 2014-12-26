@@ -69,8 +69,10 @@ class DnaPart(Part):
 
         # set some property data (dev)
         self._properties = {}
-        self._properties["name"] = None
+
+        self._properties["name"] = "Dna%d" % len(self._document.children())
         self._properties["color"] = "#cc0000"
+        self._properties["visible"] = True
         self._properties["circular"] = True
 
         data = pkgutil.get_data('cadnano.data.fasta', '/pUC19.fasta')
@@ -147,6 +149,8 @@ class DnaPart(Part):
                         name='partModRemovedSignal') 
     partModChangedSignal = ProxySignal(object, object, object,
                         name='partModChangedSignal') 
+    partPropertyChangedSignal = ProxySignal(object, object, object,
+                        name='partPropertyChangedSignal') 
 
     ### SLOTS ###
 
@@ -170,6 +174,7 @@ class DnaPart(Part):
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
         self._properties[key] = value
+        self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
     def oligos(self):
@@ -382,7 +387,6 @@ class DnaPart(Part):
     # end def
 
     def addOligo(self, oligo):
-        # print("adding oligo", oligo)
         self._oligos.add(oligo)
     # end def
 

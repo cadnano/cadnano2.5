@@ -21,7 +21,8 @@ _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 
-_DNA_PEN = QPen(styles.BLUE_STROKE, 1)
+_DNALINE_WIDTH = 1
+_DNA_PEN = QPen(styles.BLUE_STROKE, _DNALINE_WIDTH)
 _DNA_BRUSH = QBrush(QColor(153, 204, 255, 128), 1)
 _SELECT_STROKE_WIDTH = 10
 _SELECT_PEN = QPen(QColor(204, 0, 0, 64), _SELECT_STROKE_WIDTH)
@@ -180,13 +181,21 @@ class DnaLine(QGraphicsEllipseItem):
     def __init__(self, hover_rect, default_rect, parent=None):
         # setup DNA line
         super(QGraphicsEllipseItem, self).__init__(hover_rect, parent)
-        self.setPen(_DNA_PEN)
+        if "color" in parent._model_props:
+            self.setPen(QPen(QColor(parent._model_props["color"]), _DNALINE_WIDTH))
+        else:
+            self.setPen(_DNA_PEN)
         self.setRect(default_rect)
         self.setFlag(QGraphicsItem.ItemStacksBehindParent)
         # self.setSpanAngle(90*16)
         # self.setBrush(_DNA_BRUSH)
         # self.setAcceptHoverEvents(True)
     # end def
+    
+    def updateColor(self, color):
+        """docstring for updateColor"""
+        self.setPen(QPen(color, _DNALINE_WIDTH))
+        # self.update()
 # end class
 
 
@@ -201,6 +210,7 @@ class DnaPartItem(QGraphicsItem):
         super(DnaPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.object()
+        self._model_props = m_props = m_p.getPropertyDict()
         self._controller = DnaPartItemController(self, m_p)
         self._rect = QRectF(0, 0, 0, 0)
         self._initDeselector()
@@ -217,6 +227,10 @@ class DnaPartItem(QGraphicsItem):
         self.hoverRegion = DnaHoverRegion(_HOVER_RECT, self)
 
         self._initSelections()
+
+
+
+
 
     # end def
 
@@ -318,6 +332,20 @@ class DnaPartItem(QGraphicsItem):
     def updatePreXoverItemsSlot(self, sender, virtualHelix):
         pass
     # end def
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            if property_key == "color":
+                color = QColor(new_value)
+                self._outer_Line.updateColor(color)
+                self._inner_Line.updateColor(color)
+            elif property_key == "circular":
+                pass
+            elif property_key == "dna_sequence":
+                pass
+
+    # end def
+
 
     ### ACCESSORS ###
     def boundingRect(self):
