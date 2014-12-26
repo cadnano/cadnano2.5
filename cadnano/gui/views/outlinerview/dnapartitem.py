@@ -70,10 +70,11 @@ class DnaPartItem(QTreeWidgetItem):
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
-            col = self._props[property_key]["column"]
-            value = self.data(col, Qt.DisplayRole)
-            if value != new_value:
-                self.setData(col, Qt.EditRole, new_value)
+            if property_key in self._props:
+                col = self._props[property_key]["column"]
+                value = self.data(col, Qt.DisplayRole)
+                if value != new_value:
+                    self.setData(col, Qt.EditRole, new_value)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###

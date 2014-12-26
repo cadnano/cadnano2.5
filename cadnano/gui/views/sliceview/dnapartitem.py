@@ -1,10 +1,10 @@
 
+import cadnano.util as util
+
+from cadnano import getReopen
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
 from .virtualhelixitem import VirtualHelixItem
-
 from . import slicestyles as styles
-import cadnano.util as util
-from cadnano import getReopen
 
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QPainter, QPainterPath, QPen, QColor
@@ -15,11 +15,9 @@ from PyQt5.QtWidgets import QUndoCommand, QStyle
 
 from math import sqrt, atan2, degrees, pi
 
-_RADIUS = 60
-HIGHLIGHT_WIDTH = 40
-_DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
-_HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
+
+HOVER_WIDTH = H_W = 20
+GAP = 2 # gap between inner and outer strands
 
 _DNALINE_WIDTH = 1
 _DNA_PEN = QPen(styles.BLUE_STROKE, _DNALINE_WIDTH)
@@ -37,6 +35,7 @@ class DnaSelectionItem(QGraphicsPathItem):
     def __init__(self, startAngle, spanAngle, parent=None):
         # setup DNA line
         super(QGraphicsPathItem, self).__init__(parent)
+        self._parent = parent
         self.setPen(_SELECT_PEN)
         self.updateAngle(startAngle, spanAngle)
     # end def
@@ -45,8 +44,8 @@ class DnaSelectionItem(QGraphicsPathItem):
         self._startAngle = startAngle
         self._spanAngle = spanAngle
         path = QPainterPath()
-        path.arcMoveTo(_DEFAULT_RECT, startAngle)
-        path.arcTo(_DEFAULT_RECT, startAngle, spanAngle)
+        path.arcMoveTo(self._parent._rect, startAngle)
+        path.arcTo(self._parent._rect, startAngle, spanAngle)
         self.setPath(path)
     # end def
 # end class
@@ -56,10 +55,10 @@ class DnaHoverRegion(QGraphicsEllipseItem):
     def __init__(self, rect, parent=None):
         # setup DNA line
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self._parent = parent
         self.setPen(QPen(Qt.NoPen))
         self.setBrush(_HOVER_BRUSH)
         self.setAcceptHoverEvents(True)
-        # self.setFlag(QGraphicsItem.ItemStacksBehindParent)
 
         # hover marker
         self._hoverLine = QGraphicsLineItem(-_SELECT_STROKE_WIDTH/2, 0, _SELECT_STROKE_WIDTH/2, 0, self)
@@ -86,9 +85,10 @@ class DnaHoverRegion(QGraphicsEllipseItem):
     # end def
 
     def mousePressEvent(self, event):
+        r = self._parent.radius()
         self.updateHoverLine(event)
         pos = self._hoverLine.pos()
-        aX, aY, angle = self.snapPosToCircle(pos, _RADIUS)
+        aX, aY, angle = self.snapPosToCircle(pos, r)
         if angle != None:
             self._startPos = QPointF(aX, aY)
             self._startAngle = self.updateHoverLine(event)
@@ -133,7 +133,8 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         Returns the angle of aX, aY, using the Qt arc coordinate system
         (0 = east, 90 = north, 180 = west, 270 = south).
         """
-        aX, aY, angle = self.snapPosToCircle(event.pos(), _RADIUS)
+        r = self._parent.radius()
+        aX, aY, angle = self.snapPosToCircle(event.pos(), r)
         if angle != None:
             self._hoverLine.setPos(aX, aY)
             self._hoverLine.setRotation(-angle)
@@ -178,29 +179,26 @@ class DnaHoverRegion(QGraphicsEllipseItem):
 
 
 class DnaLine(QGraphicsEllipseItem):
-    def __init__(self, hover_rect, default_rect, parent=None):
+    def __init__(self, rect, parent=None):
         # setup DNA line
-        super(QGraphicsEllipseItem, self).__init__(hover_rect, parent)
+        super(QGraphicsEllipseItem, self).__init__(rect, parent)
         if "color" in parent._model_props:
             self.setPen(QPen(QColor(parent._model_props["color"]), _DNALINE_WIDTH))
         else:
             self.setPen(_DNA_PEN)
-        self.setRect(default_rect)
+        self.setRect(rect)
         self.setFlag(QGraphicsItem.ItemStacksBehindParent)
-        # self.setSpanAngle(90*16)
-        # self.setBrush(_DNA_BRUSH)
-        # self.setAcceptHoverEvents(True)
     # end def
-    
+
     def updateColor(self, color):
-        """docstring for updateColor"""
         self.setPen(QPen(color, _DNALINE_WIDTH))
-        # self.update()
+
+    def updateRect(self, rect):
+        self.setRect(rect)
 # end class
 
 
 class DnaPartItem(QGraphicsItem):
-    _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, parent=None):
         """
@@ -218,21 +216,30 @@ class DnaPartItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
         # self._initModifierCircle()
-        gap = 2 # gap between inner and outer strands
-        _OUTER_RECT = QRectF(-gap/2, -gap/2, 2 * _RADIUS+gap, 2 * _RADIUS+gap)
-        _INNER_RECT = QRectF(gap/2, gap/2, 2 * _RADIUS-gap, 2 * _RADIUS-gap)
-        self._outer_Line = DnaLine(_HOVER_RECT, _OUTER_RECT, self)
-        self._inner_Line = DnaLine(_HOVER_RECT, _INNER_RECT, self)
 
-        self.hoverRegion = DnaHoverRegion(_HOVER_RECT, self)
+        self._outer_line = DnaLine(self._rect, self)
+        self._inner_line = DnaLine(self._rect, self)
+
+        self.updateRects()
+
+        self.hoverRegion = DnaHoverRegion(self._hover_rect, self)
 
         self._initSelections()
-
-
-
-
-
     # end def
+
+    def updateRects(self):
+        circular = self._model_props["circular"]
+        dna_length = len(self._model_props["dna_sequence"])
+        if circular:
+            diameter = dna_length * pi / 100
+            self._radius = diameter/2.
+            self._rect = QRectF(0, 0, diameter, diameter)
+            self._outer_line.updateRect(QRectF(-GAP/2, -GAP/2, diameter+GAP, diameter+GAP))
+            self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
+            self._hover_rect = self._rect.adjusted(-H_W, -H_W, H_W, H_W)
+        else:
+            pass # linear
+
 
     def _initDeselector(self):
         """
@@ -247,7 +254,7 @@ class DnaPartItem(QGraphicsItem):
 
     def _initModifierCircle(self):
         self._can_show_mod_circ = False
-        self._mod_circ = m_c = QGraphicsEllipseItem(_HOVER_RECT, self)
+        self._mod_circ = m_c = QGraphicsEllipseItem(self._hover_rect, self)
         m_c.setPen(_MOD_PEN)
         m_c.hide()
     # end def
@@ -337,17 +344,21 @@ class DnaPartItem(QGraphicsItem):
         if self._model_part == model_part:
             if property_key == "color":
                 color = QColor(new_value)
-                self._outer_Line.updateColor(color)
-                self._inner_Line.updateColor(color)
+                self._outer_line.updateColor(color)
+                self._inner_line.updateColor(color)
             elif property_key == "circular":
                 pass
             elif property_key == "dna_sequence":
-                pass
+                self.updateRects()
 
     # end def
 
 
     ### ACCESSORS ###
+    def radius(self):
+        return self._radius
+    # end def
+
     def boundingRect(self):
         return self._rect
     # end def
