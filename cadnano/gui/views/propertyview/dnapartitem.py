@@ -80,6 +80,10 @@ class DnaPartItem(PropertyItem):
                 p_i.setData(VAL_COL, Qt.EditRole, new_value)
     # end def
 
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        self.setSelected(is_selected)
+    # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
         return self._model_part

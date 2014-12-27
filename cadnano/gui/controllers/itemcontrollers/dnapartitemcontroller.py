@@ -19,6 +19,7 @@ class DnaPartItemController():
         m_p.partRemovedSignal.connect(p_i.partRemovedSlot)
 
         m_p.partPropertyChangedSignal.connect(p_i.partPropertyChangedSlot)
+        m_p.partSelectedChangedSignal.connect(p_i.partSelectedChangedSlot)
     # end def
 
     def disconnectSignals(self):
@@ -35,4 +36,5 @@ class DnaPartItemController():
         m_p.partRemovedSignal.disconnect(p_i.partRemovedSlot)
 
         m_p.partPropertyChangedSignal.disconnect(p_i.partPropertyChangedSlot)
+        m_p.partSelectedChangedSignal.disconnect(p_i.partSelectedChangedSlot)
     # end def

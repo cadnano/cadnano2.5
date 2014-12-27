@@ -101,5 +101,8 @@ class OrigamiPartItem(QTreeWidgetItem):
         pass
     # end def
 
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        self.setSelected(is_selected)
+    # end def
 
 # end class

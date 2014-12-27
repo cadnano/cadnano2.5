@@ -48,7 +48,19 @@ class OrigamiPartItem(QTreeWidgetItem):
     def partRemovedSlot(self):
         pass
     # end def
-    
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            p_i = self._props[property_key]["p_i"]
+            value = p_i.data(VAL_COL, Qt.DisplayRole)
+            if value != new_value:
+                p_i.setData(VAL_COL, Qt.EditRole, new_value)
+    # end def
+
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        self.setSelected(is_selected)
+    # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
         return self._model_part

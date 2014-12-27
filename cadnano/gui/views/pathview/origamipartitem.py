@@ -201,6 +201,9 @@ class OrigamiPartItem(QGraphicsRectItem):
         pass
     # end def
 
+    def partSelectedChangedSlot(self):
+        pass
+
     ### ACCESSORS ###
 
     def activeVirtualHelixItem(self):

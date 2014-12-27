@@ -52,7 +52,7 @@ class DnaSelectionItem(QGraphicsPathItem):
 
     def updateColor(self, color):
         c = QColor(color)
-        c.setAlpha(64)
+        c.setAlpha(128)
         self.setPen(QPen(c, _SELECT_STROKE_WIDTH))
     # end def
 # end class
@@ -220,7 +220,7 @@ class DnaDragHandle(QGraphicsEllipseItem):
     def updateRect(self, rect):
         """docstring for updateRect"""
         w = rect.width()*.6
-        self.setRect(rect.adjusted(w,w,-w,-w))
+        self.setRect(rect.adjusted(w,w,-w,-w).normalized())
     # end def
 
     def hoverEnterEvent(self, event):
@@ -237,6 +237,7 @@ class DnaDragHandle(QGraphicsEllipseItem):
 
     def mousePressEvent(self, event):
         self.setCursor(Qt.ClosedHandCursor)
+        self._parent.part().setSelected(True)
 
         # r = self._parent.radius()
         # self.updateDragHandleLine(event)
@@ -326,8 +327,8 @@ class DnaPartItem(QGraphicsItem):
         circular = self._model_props["circular"]
         dna_length = len(self._model_props["dna_sequence"])
         if circular:
-            diameter = dna_length * pi / 100
-            self._radius = diameter/2.
+            diameter = round(dna_length * pi / 100,2)
+            self._radius = round(diameter/2.,2)
             self._rect = QRectF(0, 0, diameter, diameter)
             self._outer_line.updateRect(QRectF(-GAP/2, -GAP/2, diameter+GAP, diameter+GAP))
             self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
@@ -336,7 +337,7 @@ class DnaPartItem(QGraphicsItem):
             self._drag_handle.updateRect(self._rect)
         else:
             pass # linear
-    
+
     def model_color(self):
         return self._model_props["color"]
 
@@ -453,9 +454,14 @@ class DnaPartItem(QGraphicsItem):
                 pass
             elif property_key == "dna_sequence":
                 self.updateRects()
-
     # end def
 
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        if is_selected:
+            self._drag_handle.setBrush(QBrush(QColor(styles.SELECTED_COLOR)))
+        else:
+            self._drag_handle.setBrush(QBrush(QColor(220, 220, 220)))
+    # end def
 
     ### ACCESSORS ###
     def radius(self):

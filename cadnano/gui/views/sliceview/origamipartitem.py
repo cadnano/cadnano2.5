@@ -168,6 +168,9 @@ class OrigamiPartItem(QGraphicsItem):
         print("sliceview origamipart partColorChangedSlot")
     # end def
 
+    def partSelectedChangedSlot(self):
+        pass
+
     ### ACCESSORS ###
     def boundingRect(self):
         return self._rect

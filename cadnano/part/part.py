@@ -96,7 +96,7 @@ class Part(ProxyObject):
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
         self._active_virtual_helix_idx = None
-
+        self._selected = False
     # end def
 
     def __repr__(self):
@@ -141,6 +141,8 @@ class Part(ProxyObject):
                         name='partModChangedSignal')
     partColorChangedSignal = ProxySignal(object,
                         name='partColorChangedSignal')
+    partSelectedChangedSignal = ProxySignal(object, object,
+                        name='partSelectedChangedSignal')
 
     ### SLOTS ###
 
@@ -315,7 +317,16 @@ class Part(ProxyObject):
             return None
     # end def
 
+    def selected(self):
+        return self.is_selected
+    # end def
+
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
+    def setSelected(self, is_selected):
+        self._selected = is_selected
+        self.partSelectedChangedSignal.emit(self, is_selected)
+    # end def
+
     def createMod(self, params, mid=None, use_undostack=True):
         if mid is None:
             mid =  str(uuid4())

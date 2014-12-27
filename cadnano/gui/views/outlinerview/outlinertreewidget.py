@@ -62,7 +62,7 @@ class OutlinerTreeWidget(QTreeWidget):
         # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
 
         self.model().dataChanged.connect(self.dataChangedSlot)
-
+        self.itemSelectionChanged.connect(self.selectedChangedSlot)
         # Add some dummy items
         # p1 = self.addDummyRow("Part0", True, "#cc0000")
         # a1 = self.addDummyRow("Asm0",  True, "#00cc00")
@@ -127,9 +127,12 @@ class OutlinerTreeWidget(QTreeWidget):
         pass
     # end def
 
-    def selectedChangedSlot(self, item_dict):
-        """docstring for selectedChangedSlot"""
-        pass
+    def selectedChangedSlot(self):
+        for mpi in self._instance_items:
+            if self._instance_items[mpi] in self.selectedItems():
+                mpi.object().setSelected(True)
+            else:
+                mpi.object().setSelected(False)
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
