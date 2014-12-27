@@ -20,6 +20,8 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
+import re
+COLOR_PATTERN = re.compile("#[0-9a-f].....")
 
 class PropertyEditorWidget(QTreeWidget):
     """
@@ -221,6 +223,7 @@ class CustomDelegate(QStyledItemDelegate):
     # end def
 
     def paint(self, painter, option, model_index):
+        row = model_index.row()
         column = model_index.column()
         if column == 0: # Part Name
             option.displayAlignment = Qt.AlignVCenter
@@ -229,6 +232,12 @@ class CustomDelegate(QStyledItemDelegate):
             value = model_index.model().data(model_index, Qt.EditRole)
             data_type = type(value)
             if data_type is str:
+                if COLOR_PATTERN.search(value):
+                    element = _QCOMMONSTYLE.PE_IndicatorCheckBox
+                    styleoption = QStyleOptionViewItem()
+                    styleoption.palette.setBrush(QPalette.Button, QBrush(QColor(value)))
+                    styleoption.rect = QRect(option.rect)
+                    _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
                 option.displayAlignment = Qt.AlignVCenter
                 QStyledItemDelegate.paint(self, painter, option, model_index)
             elif data_type is int:

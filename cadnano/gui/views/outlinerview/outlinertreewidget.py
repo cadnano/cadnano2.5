@@ -121,7 +121,6 @@ class OutlinerTreeWidget(QTreeWidget):
         else:
             print(part_type)
             raise NotImplementedError
-
     # end def
 
     def clearSelectionsSlot(self, doc):

@@ -27,7 +27,6 @@ class Document(ProxyObject):
     2. Track all sub-model actions on its undoStack.
     """
 
-
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 
@@ -43,10 +42,10 @@ class Document(ProxyObject):
     # end def
             
     ### SIGNALS ###
-    documentPartAddedSignal =  ProxySignal(object, 
+    documentPartAddedSignal =  ProxySignal(object,
                                         ProxyObject,
                                         name='documentPartAddedSignal') # doc, part
-    documentAssemblyAddedSignal =  ProxySignal(object, 
+    documentAssemblyAddedSignal =  ProxySignal(object,
                                         ProxyObject,
                                         name='documentAssemblyAddedSignal') # doc, assembly
 
@@ -54,15 +53,14 @@ class Document(ProxyObject):
     # and the value is a tuple with meta data
     # in the case of strands the metadata would be which endpoints of selected
     # e.g. { objectRef: (value0, value1),  ...}
-    documentSelectedChangedSignal = ProxySignal(dict, 
+    documentSelectedChangedSignal = ProxySignal(dict,
                                         name='documentSelectedChangedSignal') # tuples of items + data
-    documentSelectionFilterChangedSignal = ProxySignal(list, 
-                            name='documentSelectionFilterChangedSignal')
-
+    documentSelectionFilterChangedSignal = ProxySignal(list,
+                                        name='documentSelectionFilterChangedSignal')
     documentViewResetSignal = ProxySignal(ProxyObject, 
-                                            name='documentViewResetSignal')
+                                        name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(ProxyObject,
-                                            name='documentClearSelectionsSignal')
+                                        name='documentClearSelectionsSignal')
 
 
     ### SLOTS ###
@@ -245,7 +243,7 @@ class Document(ProxyObject):
                     temp = idx_high - idx_low - 1
                     if temp < min_high_delta:
                         min_high_delta = temp
-                
+
             # end if
             if value[1]:
                 if high_neighbor is None:
@@ -273,7 +271,6 @@ class Document(ProxyObject):
             # end if
         # end for
         return (min_low_delta, min_high_delta)
-
     # end def
 
     def getSelectionBounds(self):

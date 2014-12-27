@@ -71,14 +71,14 @@ class DnaPart(Part):
         self._properties = {}
 
         self._properties["name"] = "Dna%d" % len(self._document.children())
-        self._properties["color"] = "#cc0000"
+        self._properties["color"] = "#000000" # outlinerview will override from styles
         self._properties["visible"] = True
         self._properties["circular"] = True
 
         data = pkgutil.get_data('cadnano.data.fasta', '/pUC19.fasta')
         fasta_iter = util.read_fasta(data.decode('utf-8').splitlines())
         self._properties["dna_sequence"] = next(fasta_iter)[1]
-        print("len:",len(self._properties["dna_sequence"]))
+        print("%s len: %d" % (self._properties["name"], len(self._properties["dna_sequence"])))
 
         # set some selections (dev)
         self._selections = {}

@@ -6,12 +6,13 @@ from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPar
 from .virtualhelixitem import VirtualHelixItem
 from . import slicestyles as styles
 
-from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QPainter, QPainterPath, QPen, QColor
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsTextItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QUndoCommand, QStyle
+from PyQt5.QtWidgets import QApplication
 
 from math import sqrt, atan2, degrees, pi
 
@@ -36,8 +37,8 @@ class DnaSelectionItem(QGraphicsPathItem):
         # setup DNA line
         super(QGraphicsPathItem, self).__init__(parent)
         self._parent = parent
-        self.setPen(_SELECT_PEN)
         self.updateAngle(startAngle, spanAngle)
+        self.updateColor(parent.model_color())
     # end def
 
     def updateAngle(self, startAngle, spanAngle):
@@ -47,6 +48,12 @@ class DnaSelectionItem(QGraphicsPathItem):
         path.arcMoveTo(self._parent._rect, startAngle)
         path.arcTo(self._parent._rect, startAngle, spanAngle)
         self.setPath(path)
+    # end def
+
+    def updateColor(self, color):
+        c = QColor(color)
+        c.setAlpha(64)
+        self.setPen(QPen(c, _SELECT_STROKE_WIDTH))
     # end def
 # end class
 
@@ -70,6 +77,9 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         self._clockwise = None
         self.dummy = DnaSelectionItem(0, 0, parent)
         self.dummy.hide()
+
+    def updateRect(self, rect):
+        self.setRect(rect)
 
     def hoverEnterEvent(self, event):
         self.updateHoverLine(event)
@@ -117,14 +127,12 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         if self._startPos != None and self._clockwise != None:
             self.parentItem().addSelection(self._startAngle, spanAngle)
             self._startPos = self._clockwise = None
-
         # mark the end
         # x = self._hoverLine.x()
         # y = self._hoverLine.y()
         # f = QGraphicsEllipseItem(x, y, 6, 6, self)
         # f.setPen(QPen(Qt.NoPen))
         # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
-
     # end def
 
     def updateHoverLine(self, event):
@@ -198,6 +206,90 @@ class DnaLine(QGraphicsEllipseItem):
 # end class
 
 
+class DnaDragHandle(QGraphicsEllipseItem):
+    def __init__(self, rect, parent=None):
+        super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self._parent = parent
+        # self.setRect(rect)
+        self.setAcceptHoverEvents(True)
+        self.setAcceptedMouseButtons(Qt.LeftButton)
+        self.setPen(QPen(Qt.NoPen))
+        self.setBrush(QBrush(QColor(220, 220, 220)))
+    # end def
+
+    def updateRect(self, rect):
+        """docstring for updateRect"""
+        w = rect.width()*.6
+        self.setRect(rect.adjusted(w,w,-w,-w))
+    # end def
+
+    def hoverEnterEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+    # end def
+
+    def hoverMoveEvent(self, event):
+        pass
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.unsetCursor()
+    # end def
+
+    def mousePressEvent(self, event):
+        self.setCursor(Qt.ClosedHandCursor)
+
+        # r = self._parent.radius()
+        # self.updateDragHandleLine(event)
+        # pos = self._DragHandleLine.pos()
+        # aX, aY, angle = self.snapPosToCircle(pos, r)
+        # if angle != None:
+        #     self._startPos = QPointF(aX, aY)
+        #     self._startAngle = self.updateDragHandleLine(event)
+        #     self.dummy.updateAngle(self._startAngle, 0)
+        #     self.dummy.show()
+        # mark the start
+        # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0)))
+    # end def
+
+    def mouseMoveEvent(self, event):
+        m = QLineF(event.screenPos(), event.buttonDownScreenPos(Qt.LeftButton))
+        if m.length() < QApplication.startDragDistance():
+            return
+        p = self.mapToScene(QPointF(event.pos()) - QPointF(self.rect().center()))
+        # still need to correct for qgraphicsview translation
+        self._parent.setPos(p)
+
+        # eventAngle = self.updateDragHandleLine(event)
+        # # Record initial direction before calling getSpanAngle
+        # if self._clockwise is None:
+        #     self._clockwise = False if eventAngle > self._startAngle else True
+        # spanAngle = self.getSpanAngle(eventAngle)
+        # self.dummy.updateAngle(self._startAngle, spanAngle)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+
+        # self.dummy.hide()
+        # endAngle = self.updateDragHandleLine(event)
+        # spanAngle = self.getSpanAngle(endAngle)
+        # 
+        # if self._startPos != None and self._clockwise != None:
+        #     self.parentItem().addSelection(self._startAngle, spanAngle)
+        #     self._startPos = self._clockwise = None
+        # 
+        # mark the end
+        # x = self._DragHandleLine.x()
+        # y = self._DragHandleLine.y()
+        # f = QGraphicsEllipseItem(x, y, 6, 6, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
+    # end def
+# end class
+
+
 class DnaPartItem(QGraphicsItem):
 
     def __init__(self, model_part_instance, parent=None):
@@ -210,19 +302,22 @@ class DnaPartItem(QGraphicsItem):
         self._model_part = m_p = model_part_instance.object()
         self._model_props = m_props = m_p.getPropertyDict()
         self._controller = DnaPartItemController(self, m_p)
-        self._rect = QRectF(0, 0, 0, 0)
+        self._selection_items = {}
+        self._rect = QRectF()
+        self._hover_rect = QRectF()
         self._initDeselector()
         self.probe = self.IntersectionProbe(self)
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
-        # self._initModifierCircle()
 
         self._outer_line = DnaLine(self._rect, self)
         self._inner_line = DnaLine(self._rect, self)
-
+        self._hover_region = DnaHoverRegion(self._hover_rect, self)
+        self._drag_handle = DnaDragHandle(QRectF(0, 0, 20, 20), self)
         self.updateRects()
 
-        self.hoverRegion = DnaHoverRegion(self._hover_rect, self)
+        p = parent.childrenBoundingRect().bottomLeft()
+        self.setPos(p.x()+HOVER_WIDTH, p.y())
 
         self._initSelections()
     # end def
@@ -237,9 +332,13 @@ class DnaPartItem(QGraphicsItem):
             self._outer_line.updateRect(QRectF(-GAP/2, -GAP/2, diameter+GAP, diameter+GAP))
             self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
             self._hover_rect = self._rect.adjusted(-H_W, -H_W, H_W, H_W)
+            self._hover_region.updateRect(self._hover_rect)
+            self._drag_handle.updateRect(self._rect)
         else:
             pass # linear
-
+    
+    def model_color(self):
+        return self._model_props["color"]
 
     def _initDeselector(self):
         """
@@ -268,6 +367,7 @@ class DnaPartItem(QGraphicsItem):
 
     def addSelection(self, startAngle, spanAngle):
         dSI = DnaSelectionItem(startAngle, spanAngle, self)
+        self._selection_items[dSI] = True
     # end def
 
     ### SIGNALS ###
@@ -346,6 +446,9 @@ class DnaPartItem(QGraphicsItem):
                 color = QColor(new_value)
                 self._outer_line.updateColor(color)
                 self._inner_line.updateColor(color)
+                self._hover_region.dummy.updateColor(color)
+                for dsi in self._selection_items:
+                    dsi.updateColor(color)
             elif property_key == "circular":
                 pass
             elif property_key == "dna_sequence":

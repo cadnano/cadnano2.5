@@ -34,6 +34,21 @@ GRAY_FILL = QColor(238, 238, 238)  # eeeeee (was a1a1a1)
 GRAY_STROKE = QColor(102, 102, 102)  # 666666 (was 424242)
 
 
-PARTCOLORS = [QColor() for i in range(10)]
-for i in range(len(PARTCOLORS)):
-    PARTCOLORS[i].setHsvF(i/12.0, 0.5, 1.0)
+# PARTCOLORS = [QColor() for i in range(12)]
+# for i in range(len(PARTCOLORS)):
+#     PARTCOLORS[i].setHsvF(i/12.0, 0.75, 1.0)
+QUALITATIVE_PAIRED_N12 = [QColor(166,206,227), QColor(31,120,180), QColor(178,223,138),
+                          QColor(51,160,44), QColor(251,154,153), QColor(227,26,28), 
+                          QColor(253,191,111), QColor(255,127,0), QColor(202,178,214), 
+                          QColor(106,61,154), QColor(255,255,153), QColor(177,89,40)]
+QUALITATIVE_PAIRED_N10 =  [QColor(166,206,227),
+                          QColor(31,120,180),
+                          QColor(178,223,138),
+                          QColor(51,160,44),
+                          QColor(251,154,153),
+                          QColor(227,26,28),
+                          QColor(253,191,111),
+                          QColor(255,127,0),
+                          QColor(202,178,214),
+                          QColor(106,61,154)]
+PARTCOLORS = QUALITATIVE_PAIRED_N10

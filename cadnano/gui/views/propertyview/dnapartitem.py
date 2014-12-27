@@ -84,5 +84,4 @@ class DnaPartItem(PropertyItem):
     def part(self):
         return self._model_part
     # end def
-
 # end class

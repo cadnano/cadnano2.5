@@ -3,6 +3,7 @@ from collections import defaultdict
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
 
 import cadnano.util as util
+import cadnano.gui.views.styles as styles
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
@@ -20,6 +21,7 @@ class DnaPartItem(QTreeWidgetItem):
         self._parent_tree = parent
         self._controller = DnaPartItemController(self, model_part)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
+        self.setExpanded(True)
 
         # properties
         self._props = defaultdict(dict)
@@ -40,7 +42,11 @@ class DnaPartItem(QTreeWidgetItem):
             value = self._props[p]["value"]
             self.setData(col, Qt.EditRole, value)
 
-        self.setExpanded(True)
+        # outlinerview takes responsibility of overriding default part color
+        if self._props["color"]["value"] == "#000000":
+            index = len(m_p.document().children())
+            new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
+            self._model_part.setProperty("color", new_color)
     # end def
 
     # SLOTS
