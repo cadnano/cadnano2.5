@@ -24,9 +24,6 @@ _DNALINE_WIDTH = 1
 _DNA_PEN = QPen(styles.BLUE_STROKE, _DNALINE_WIDTH)
 _DNA_BRUSH = QBrush(QColor(153, 204, 255, 128), 1)
 _SELECT_STROKE_WIDTH = 10
-_SELECT_PEN = QPen(QColor(204, 0, 0, 64), _SELECT_STROKE_WIDTH)
-_SELECT_PEN.setCapStyle(Qt.FlatCap)
-_SELECT_BRUSH = QBrush(QColor(204, 0, 0, 128))
 
 _HOVER_PEN = QPen(QColor(255, 255, 255), 128)
 _HOVER_BRUSH = QBrush(QColor(255, 255, 255, 0))
@@ -53,7 +50,7 @@ class DnaSelectionItem(QGraphicsPathItem):
     def updateColor(self, color):
         c = QColor(color)
         c.setAlpha(128)
-        self.setPen(QPen(c, _SELECT_STROKE_WIDTH))
+        self.setPen(QPen(c, _SELECT_STROKE_WIDTH, Qt.SolidLine, Qt.FlatCap))
     # end def
 # end class
 
