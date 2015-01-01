@@ -1,10 +1,11 @@
-from .abstractpathtool import AbstractPathTool
-from cadnano.gui.views.pathview import pathstyles as styles
-import cadnano.util as util
-
 from PyQt5.QtCore import Qt, QRectF, QPointF
 from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem
+
+from cadnano.gui.views.pathview import pathstyles as styles
+
+from .abstractpathtool import AbstractPathTool
+
 
 _BW = styles.PATH_BASE_WIDTH
 _PEN = QPen(styles.RED_STROKE, 1)

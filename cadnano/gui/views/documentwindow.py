@@ -1,26 +1,21 @@
-from cadnano import app
-
-from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
-from cadnano.gui.views.pathview.pathrootitem import PathRootItem
-
-from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
-from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
-
-from cadnano.gui.views.pathview.colorpanel import ColorPanel
-
-import cadnano.gui.ui.mainwindow.ui_mainwindow as ui_mainwindow
-import cadnano.util as util
-
 from PyQt5.QtCore import pyqtSignal, Qt
 from PyQt5.QtCore import QFileInfo, QSettings
 from PyQt5.QtCore import QPoint, QSize
-
 from PyQt5.QtGui import QPaintEngine, QIcon
 from PyQt5.QtWidgets import QGraphicsObject, QGraphicsScene
 from PyQt5.QtWidgets import QGraphicsView, QMainWindow
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QApplication, QWidget, QAction
 from PyQt5.QtWidgets import QSizePolicy, QFrame
+
+from cadnano import app
+from cadnano.gui.views.pathview.colorpanel import ColorPanel
+from cadnano.gui.views.pathview.pathrootitem import PathRootItem
+from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
+from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
+from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
+from cadnano.gui.ui.mainwindow import ui_mainwindow
+
 
 # for OpenGL mode
 try:

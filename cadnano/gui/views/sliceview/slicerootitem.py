@@ -1,13 +1,12 @@
+from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtWidgets import QGraphicsRectItem
+
+from cadnano import util
+from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .dnapartitem import DnaPartItem
 from .origamipartitem import OrigamiPartItem
 
-from cadnano.enum import PartType
-
-import cadnano.util as util
-
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtWidgets import QGraphicsRectItem
 
 class SliceRootItem(QGraphicsRectItem):
     """

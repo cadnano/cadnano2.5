@@ -1,13 +1,14 @@
-from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
-from cadnano.gui.views import styles
-from cadnano.gui.views.sliceview import slicestyles
-import cadnano.util as util
-
 import os.path, zipfile, shutil, platform, subprocess, tempfile, errno
 
 from PyQt5.QtCore import pyqtSlot, Qt, QObject, QSettings
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox, QTableWidgetItem
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QMessageBox
+
+from cadnano import util
+from cadnano.gui.views import styles
+from cadnano.gui.views.sliceview import slicestyles
+from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
+
 
 class Preferences(object):
     """docstring for Preferences"""
@@ -28,7 +29,6 @@ class Preferences(object):
         self.ui_prefs.auto_scaf_combo_box.currentIndexChanged.connect(self.setAutoScaf)
         self.ui_prefs.default_tool_combo_box.currentIndexChanged.connect(self.setStartupTool)
         self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
-        # self.ui_prefs.helixAddCheckBox.toggled.connect(self.setZoomToFitOnHelixAddition)
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
         self.ui_prefs.add_plugin_button.clicked.connect(self.addPlugin)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)

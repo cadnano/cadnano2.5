@@ -1,10 +1,4 @@
-
-import cadnano.util as util
-
-from cadnano import getReopen
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
-from .virtualhelixitem import VirtualHelixItem
-from . import slicestyles as styles
+from math import sqrt, atan2, degrees, pi
 
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QPainter, QPainterPath, QPen, QColor
@@ -14,7 +8,10 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsRe
 from PyQt5.QtWidgets import QUndoCommand, QStyle
 from PyQt5.QtWidgets import QApplication
 
-from math import sqrt, atan2, degrees, pi
+from cadnano import getReopen
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from . import slicestyles as styles
+from .virtualhelixitem import VirtualHelixItem
 
 
 HOVER_WIDTH = H_W = 20
@@ -371,15 +368,8 @@ class DnaPartItem(QGraphicsItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partActiveVirtualHelixChangedSlot(self, part, virtualHelix):
-        pass
-
     def partDimensionsChangedSlot(self, sender):
         pass
-    # end def
-
-    def partHideSlot(self, sender):
-        self.hide()
     # end def
 
     def partParentChangedSlot(self, sender):

@@ -1,11 +1,11 @@
-from cadnano import app
-
-from . import pathstyles as styles
-
 from PyQt5.QtCore import  QSize, Qt
 from PyQt5.QtGui import QIcon, QFont, QPixmap
 from PyQt5.QtWidgets import QApplication, QAction, QActionGroup
 from PyQt5.QtWidgets import QToolBar, QSizePolicy
+
+from cadnano import app
+from . import pathstyles as styles
+
 
 _FONT = QFont(styles.THE_FONT, 8, QFont.Normal)
 

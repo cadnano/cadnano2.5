@@ -1,13 +1,15 @@
+from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtWidgets import QGraphicsRectItem
+
+from cadnano import util
+from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+
 from .origamipartitem import OrigamiPartItem
+from .pathselection import EndpointHandleSelectionBox
 from .pathselection import SelectionItemGroup
 from .pathselection import VirtualHelixHandleSelectionBox
-from .pathselection import EndpointHandleSelectionBox
-import cadnano.util as util
 
-from PyQt5.QtCore import QObject, pyqtSignal
-
-from PyQt5.QtWidgets import QGraphicsRectItem
 
 class PathRootItem(QGraphicsRectItem):
     """
@@ -48,16 +50,23 @@ class PathRootItem(QGraphicsRectItem):
         The Pathview doesn't need to do anything on part addition, since
         the Sliceview handles setting up the appropriate lattice.
         """
-        # print "PathRootItem partAddedSlot", model_part
-        # self._model_part = model_part
         win = self._window
-        origami_part_item = OrigamiPartItem(model_part_instance,\
-                            viewroot=self, \
-                            active_tool_getter=win.path_tool_manager.activeToolGetter,\
-                            parent=self)
-        self._part_item_for_part_instance[model_part_instance] = origami_part_item
-        win.path_tool_manager.setActivePart(origami_part_item)
-        self.setModifyState(win.action_modify.isChecked())
+        part_type = model_part_instance.object().partType()
+
+        if part_type == PartType.DNAPART:
+            pass
+            # dna_part_item = DnaPartItem(model_part_instance, parent=self)
+            # self._instance_items[dna_part_item] = dna_part_item
+        elif part_type == PartType.ORIGAMIPART:
+            origami_part_item = OrigamiPartItem(model_part_instance,\
+                                viewroot=self, \
+                                active_tool_getter=win.path_tool_manager.activeToolGetter,\
+                                parent=self)
+            self._part_item_for_part_instance[model_part_instance] = origami_part_item
+            win.path_tool_manager.setActivePart(origami_part_item)
+            self.setModifyState(win.action_modify.isChecked())
+        else:
+            raise NotImplementedError
     # end def
 
     def selectedChangedSlot(self, item_dict):

@@ -1,16 +1,15 @@
 import re
-from .abstractpathtool import AbstractPathTool
-from cadnano.enum import StrandType
-from cadnano.data.dnasequences import sequences
-from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
-from cadnano.gui.views.pathview import pathstyles as styles
-import cadnano.util as util
 
 from PyQt5.QtCore import Qt, QObject, QPointF, QRegExp, QSignalMapper, pyqtSignal, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor, QFont, QPen, QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
 
-import re
+from cadnano.data.dnasequences import sequences
+from cadnano.enum import StrandType
+from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
+from cadnano.gui.views.pathview import pathstyles as styles
+from .abstractpathtool import AbstractPathTool
+
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
 
 class DNAHighlighter(QSyntaxHighlighter):

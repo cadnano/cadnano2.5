@@ -2,23 +2,20 @@
 # encoding: utf-8
 
 from operator import itemgetter
-import cadnano.util as util
 
-import cadnano.preferences as prefs
-
+from cadnano import app
+from cadnano import preferences as prefs
+from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoStack, UndoCommand
-
-from cadnano.strand import Strand
 from cadnano.oligo import Oligo
+from cadnano.part import Part, DnaPart, HoneycombPart, SquarePart
+from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.part import Part
-from cadnano.part import HoneycombPart, SquarePart
-from cadnano.part import DnaPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano import app
+
 
 class Document(ProxyObject):
     """

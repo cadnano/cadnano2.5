@@ -2,15 +2,15 @@
 util.py
 """
 import inspect
-from traceback import extract_stack
-from random import Random
-import string
-import sys
 import os
-from os import path
 import platform
-# import imp
+import sys
+import string
 from itertools import dropwhile, starmap, groupby
+from os import path
+from random import Random
+from traceback import extract_stack
+
 
 IS_PY_3 = int(sys.version_info[0] > 2)
 prng = Random()

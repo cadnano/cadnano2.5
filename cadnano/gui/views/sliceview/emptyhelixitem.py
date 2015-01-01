@@ -1,19 +1,18 @@
 import math
 import re
 
-from cadnano import app
-
-from cadnano.enum import StrandType
-from . import slicestyles as styles
-import cadnano.util as util
-
-GL = False
-
 from PyQt5.QtCore import QPointF, Qt, QRectF
-
 from PyQt5.QtGui import QBrush, QFont, QPen, QDrag, QTransform
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsSimpleTextItem, QGraphicsTextItem
 from PyQt5.QtWidgets  import QUndoCommand, QGraphicsEllipseItem, QStyle
+
+from cadnano import app
+from cadnano import util
+from cadnano.enum import StrandType
+from . import slicestyles as styles
+
+GL = False
+
 
 # strand addition stores some meta information in the UndoCommand's text
 _strand_re = re.compile("\((\d+),(\d+)\)\.0\^(\d+)")

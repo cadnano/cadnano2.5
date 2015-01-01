@@ -1,12 +1,11 @@
 import time
-from cadnano.gui.views.pathview import pathstyles as styles
-
-import cadnano.util as util
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
-
 from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPen, QColor, QPainterPath, QPolygonF
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
+
+from cadnano.gui.views.pathview import pathstyles as styles
+
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT

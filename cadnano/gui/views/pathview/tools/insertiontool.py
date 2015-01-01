@@ -1,6 +1,6 @@
 import sys
+
 from .abstractpathtool import AbstractPathTool
-import cadnano.util
 
 
 class InsertionTool(AbstractPathTool):

@@ -1,12 +1,13 @@
 from collections import defaultdict
+
+from cadnano import preferences as prefs
+from cadnano.color import Color
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
 from cadnano.part.honeycombpart import HoneycombPart
 from cadnano.part.squarepart import SquarePart
 from cadnano.virtualhelix import VirtualHelix
 
-import cadnano.preferences as prefs
-from cadnano.color import Color
 
 NODETAG = "node"
 NAME = "name"

@@ -1,4 +1,3 @@
-
 from cadnano.color import Color
 
 HONEYCOMB_PART_MAXROWS = 10

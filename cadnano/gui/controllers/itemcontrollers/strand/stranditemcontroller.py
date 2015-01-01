@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 from .abstractstranditemcontroller import AbstractStrandItemController
 
 

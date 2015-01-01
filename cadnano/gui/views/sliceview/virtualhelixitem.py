@@ -1,15 +1,13 @@
-from . import slicestyles as styles
-from cadnano.virtualhelix import VirtualHelix
-from cadnano.enum import Parity, StrandType
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-
-import cadnano.util as util
-
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
-
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem 
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
+
+from cadnano.enum import Parity, StrandType
+from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.virtualhelix import VirtualHelix
+from . import slicestyles as styles
+
 
 class VirtualHelixItem(QGraphicsEllipseItem):
     """

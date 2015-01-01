@@ -1,8 +1,9 @@
-from cadnano.cnproxy import UndoCommand
-from cadnano.strand import Strand
-from cadnano.oligo import Oligo
-import cadnano.preferences as prefs
 import random
+
+from cadnano import preferences as prefs
+from cadnano.cnproxy import UndoCommand
+from cadnano.oligo import Oligo
+from cadnano.strand import Strand
 
 class CreateStrandCommand(UndoCommand):
     """

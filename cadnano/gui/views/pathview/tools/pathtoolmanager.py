@@ -1,6 +1,10 @@
 import os
 
+from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtWidgets import QActionGroup
+
 from cadnano import app
+from cadnano import util
 
 from .selecttool import SelectTool
 from .penciltool import PencilTool
@@ -10,10 +14,7 @@ from .skiptool import SkipTool
 from .painttool import PaintTool
 from .addseqtool import AddSeqTool
 from .modstool import ModsTool
-import cadnano.util as util
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QActionGroup
 
 class PathToolManager(QObject):
     """

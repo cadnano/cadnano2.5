@@ -1,22 +1,22 @@
 from __future__ import division
+
 from collections import defaultdict
 from math import ceil
 
-from .activesliceitem import ActiveSliceItem
-from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
-from .prexoveritem import PreXoverItem
-from .strand.xoveritem import XoverNode3
-from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
-from . import pathstyles as styles
-from .virtualhelixitem import VirtualHelixItem
-import cadnano.util as util
+from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot
+from PyQt5.QtGui import QBrush, QColor, QPen
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
 from cadnano import app, getBatch
+from cadnano import util
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
+from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
+from . import pathstyles as styles
+from .activesliceitem import ActiveSliceItem
+from .prexoveritem import PreXoverItem
+from .strand.xoveritem import XoverNode3
+from .virtualhelixitem import VirtualHelixItem
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot
-
-from PyQt5.QtGui import QBrush,  QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
@@ -36,6 +36,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         super(OrigamiPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.object()
+        self._model_props = m_props = m_p.getPropertyDict()
         self._viewroot = viewroot
         self._getActiveTool = active_tool_getter
         self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())
@@ -62,6 +63,10 @@ class OrigamiPartItem(QGraphicsRectItem):
     #     print("paint OrigamiPartItem")
     #     QGraphicsRectItem.paint(self, painter, option, widget)
     # # end def
+
+    def model_color(self):
+        return self._model_props["color"]
+    # end def
 
     def _initModifierRect(self):
         """docstring for _initModifierRect"""
@@ -95,10 +100,6 @@ class OrigamiPartItem(QGraphicsRectItem):
         pass
     # end def
 
-    def partHideSlot(self, sender):
-        self.hide()
-    # end def
-
     def partActiveVirtualHelixChangedSlot(self, part, virtual_helix):
         self.updatePreXoverItems()
     #end def
@@ -113,6 +114,13 @@ class OrigamiPartItem(QGraphicsRectItem):
         self.scene().views()[0].zoomToFit()
         self._activeSliceItem.resetBounds()
         self._updateBoundingRect()
+    # end def
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        pass
+        # if self._model_part == model_part:
+        #     if property_key == "color":
+        #         pass
     # end def
 
     def partRemovedSlot(self, sender):
@@ -349,7 +357,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(self._model_part.color()))
+        self.setPen(QPen(QColor(self.model_color())))
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
         self.setRect(self._vh_rect.adjusted(-_p/2,-_p,_p,-_p/2))

@@ -1,4 +1,3 @@
-
 from cadnano.part.origamipart import OrigamiPart
 from cadnano.enum import LatticeType
 

@@ -1,5 +1,6 @@
-import cadnano.util as util
 from PyQt5.QtGui import QColor
+
+from cadnano import util
 
 # Additional Prefs
 PREF_AUTOSCAF_INDEX = 0

@@ -1,9 +1,5 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-import cadnano.util as util
-
 from PyQt5.QtWidgets import QGraphicsPathItem
+
 
 class AbstractStrandItem(QGraphicsPathItem):
     def __init__(self, parent):

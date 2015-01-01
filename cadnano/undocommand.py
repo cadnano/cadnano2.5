@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from collections import deque
+
+
 class UndoCommand(object):
     def __init__(self, name=None):
         self.name = name

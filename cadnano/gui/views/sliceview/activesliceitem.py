@@ -1,12 +1,12 @@
-from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
-from . import slicestyles as styles
-import cadnano.util as util
-
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, QPointF, Qt, QObject
 from PyQt5.QtCore import QRectF, QEvent
-
 from PyQt5.QtGui import QBrush, QFont, QPen, QDrag
-from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsSimpleTextItem, QUndoCommand, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSimpleTextItem
+from PyQt5.QtWidgets import QUndoCommand, QGraphicsRectItem
+
+from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
+from . import slicestyles as styles
+
 
 class ActiveSliceItem(QGraphicsRectItem):
     """ActiveSliceItem for the Slice View"""

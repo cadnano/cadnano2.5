@@ -1,12 +1,11 @@
-from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.enum import StrandType
-
-import cadnano.util as util
-
 from PyQt5.QtCore import QRectF, Qt, QPointF
-
 from PyQt5.QtGui import QBrush, QPen, QFont
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsItemGroup, QGraphicsObject
+
+from cadnano import util
+from cadnano.enum import StrandType
+from cadnano.gui.views.pathview import pathstyles as styles
+
 
 _BW = styles.PATH_BASE_WIDTH
 _TOOL_RECT = QRectF(0, 0, _BW, _BW)  # protected not private

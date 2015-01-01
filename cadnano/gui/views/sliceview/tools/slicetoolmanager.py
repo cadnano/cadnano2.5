@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtWidgets import QActionGroup
 

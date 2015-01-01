@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import cadnano.util as util
+from cadnano import util
 from .abstractdecoratoritem import AbstractDecoratorItem
 
 class SkipItem(AbstractDecoratorItem):

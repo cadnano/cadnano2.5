@@ -1,14 +1,9 @@
-from cadnano.gui.views.pathview import pathstyles as styles
 
-from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import DnaPartItem
-from .origamipartitem import OrigamiPartItem
-import cadnano.util as util
+import re
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QRect, QSize
-from PyQt5.QtGui import QFont, QPalette, QPen, QBrush, QDrag
-from PyQt5.QtGui import QColor #, QPainterPath
+from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
@@ -17,11 +12,16 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
+from cadnano import util
+from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano.gui.views.pathview import pathstyles as styles
+from .dnapartitem import DnaPartItem
+from .origamipartitem import OrigamiPartItem
+
+COLOR_PATTERN = re.compile("#[0-9a-f].....")
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
-import re
-COLOR_PATTERN = re.compile("#[0-9a-f].....")
 
 class PropertyEditorWidget(QTreeWidget):
     """

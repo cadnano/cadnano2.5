@@ -1,11 +1,9 @@
-from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
-
-import cadnano.util as util
-
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
+
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 
 
 class OrigamiPartItem(QTreeWidgetItem):
@@ -31,10 +29,6 @@ class OrigamiPartItem(QTreeWidgetItem):
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
-    # end def
-
-    def partHideSlot(self):
-        pass
     # end def
 
     def partDimensionsChangedSlot(self):

@@ -3,7 +3,7 @@
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.enum import StrandType
 
-import cadnano.util as util
+from cadnano import util
 
 from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
 

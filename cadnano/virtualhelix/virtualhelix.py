@@ -1,15 +1,9 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 from cadnano.cnproxy import ProxyObject, ProxySignal
-import cadnano.util as util
-from cadnano.enum import StrandType
-
 from cadnano.cnproxy import UndoStack, UndoCommand
-
+from cadnano.enum import StrandType
 from cadnano.strandset import StrandSet
-
 from .removevhelixcmd import RemoveVirtualHelixCommand
+
 
 class VirtualHelix(ProxyObject):
     """

@@ -1,5 +1,6 @@
-from cadnano.gui.views.styles import *
 from PyQt5.QtGui import QColor, QFont, QFontMetricsF
+
+from cadnano.gui.views.styles import *
 
 # Path Sizing
 VIRTUALHELIXHANDLEITEM_RADIUS = 30

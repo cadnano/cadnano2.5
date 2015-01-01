@@ -1,15 +1,16 @@
-import sys
 from math import floor
-from .abstractpathtool import AbstractPathTool
-
-from cadnano.gui.views.pathview import pathstyles as styles
-
-import cadnano.util as util
+import sys
 
 from PyQt5.QtCore import Qt, QEvent, QPointF, QRectF
 from PyQt5.QtGui import QBrush, QColor, QFont, QFontMetrics, QPainterPath, QPen, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsSimpleTextItem
+
+from cadnano import util
+from cadnano.gui.views.pathview import pathstyles as styles
+
+from .abstractpathtool import AbstractPathTool
+
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _PENCIL_COLOR = styles.RED_STROKE

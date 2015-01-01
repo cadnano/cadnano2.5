@@ -9,7 +9,7 @@ from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 
 from cadnano.gui.views import styles
-import cadnano.util as util
+from cadnano import util
 
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir

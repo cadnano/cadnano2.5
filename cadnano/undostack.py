@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import deque
+
 from cadnano.undocommand import UndoCommand
+
 
 class UndoStack(object):
     def __init__(self, limit=10):

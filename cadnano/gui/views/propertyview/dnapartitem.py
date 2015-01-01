@@ -1,15 +1,13 @@
 from collections import defaultdict
 
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
-
-import cadnano.util as util
-
-from .customtreewidgetitems import PropertyItem, SelectionItem
-
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
+
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from .customtreewidgetitems import PropertyItem, SelectionItem
+
 
 KEY_COL = 0
 VAL_COL = 1
@@ -54,10 +52,6 @@ class DnaPartItem(PropertyItem):
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
-    # end def
-
-    def partHideSlot(self):
-        pass
     # end def
 
     def partDimensionsChangedSlot(self):

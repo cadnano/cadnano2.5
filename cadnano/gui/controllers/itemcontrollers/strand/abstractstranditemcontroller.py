@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 # from controllers.itemcontrollers.abstractitemcontroller import AbstractItemController
 
 

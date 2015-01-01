@@ -1,21 +1,16 @@
-from operator import itemgetter
-from itertools import repeat
 import array
 from bisect import bisect_left, insort_left
-
+from itertools import repeat
+from operator import itemgetter
 izip = zip
 
+from cadnano import preferences as prefs
+from cadnano import util
 from cadnano.enum import StrandType
-import cadnano.preferences as prefs
-
-import cadnano.util as util
-
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.cnproxy import ProxyObject, ProxySignal
-
-from cadnano.strand import Strand
 from cadnano.oligo import Oligo
-
+from cadnano.strand import Strand
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .splitcmd import SplitCommand

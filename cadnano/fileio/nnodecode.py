@@ -3,11 +3,11 @@ from collections import defaultdict
 import json
 import io
 
+from cadnano import preferences as prefs
+from cadnano import setBatch, getReopen, setReopen
+from cadnano.color import Color
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
-from cadnano.color import Color
-import cadnano.preferences as prefs
-from cadnano import setBatch, getReopen, setReopen
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 def decodeFile(filename, document=None):

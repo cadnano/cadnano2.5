@@ -2,16 +2,16 @@
 # encoding: utf-8
 
 from math import floor
-from cadnano.gui.views.pathview import pathstyles as styles
-
-import cadnano.gui.views.pathview.pathselection as pathselection
-
-import cadnano.util as util
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal
-
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
+
+from cadnano import util
+from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.gui.views.pathview import pathselection
+
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 

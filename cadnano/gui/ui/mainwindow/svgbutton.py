@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 from PyQt5.QtCore import QObject, pyqtSignal, Qt
 from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtSvg import QSvgRenderer

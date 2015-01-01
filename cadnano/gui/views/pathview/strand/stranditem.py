@@ -2,22 +2,22 @@
 # encoding: utf-8
 
 from math import floor
-from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
-from .endpointitem import EndpointItem
-from cadnano.gui.views.pathview import pathstyles as styles
-from .xoveritem import XoverItem
-from .decorators.insertionitem import InsertionItem
-
-import cadnano.gui.views.pathview.pathselection as pathselection
-
-import cadnano.util as util
-from cadnano import getBatch
 
 from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
-
 from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QFontMetricsF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsSimpleTextItem
+
+
+from cadnano import util
+from cadnano import getBatch
+from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
+from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.gui.views.pathview import pathselection
+from .endpointitem import EndpointItem
+from .decorators.insertionitem import InsertionItem
+from .xoveritem import XoverItem
+
 
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH

@@ -1,4 +1,6 @@
+
 from os.path import basename
+
 from cadnano.enum import StrandType
 
 def legacy_dict_from_doc(document, fname, helix_order_list):

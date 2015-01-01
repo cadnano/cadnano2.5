@@ -7,7 +7,7 @@ from cadnano.enum import StrandType
 from .strand.stranditem import StrandItem
 from . import pathstyles as styles
 from .virtualhelixhandleitem import VirtualHelixHandleItem
-import cadnano.util as util
+from cadnano import util
 
 from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
-import cadnano.util as util
+from cadnano import util
 
 from PyQt5.QtWidgets import QGraphicsPathItem
 

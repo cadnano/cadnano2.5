@@ -11,7 +11,7 @@ CustomQGraphicsView.py
 from cadnano import app
 
 from cadnano.gui.views.pathview import pathstyles as styles
-import cadnano.util as util
+from cadnano import util
 
 from PyQt5.QtCore import pyqtSignal, Qt, QTimer, QTimeLine
 

@@ -1,11 +1,12 @@
 from math import floor
-import cadnano.util as util
-from . import pathstyles as styles
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
-
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
+
+from cadnano import util
+from . import pathstyles as styles
+
 
 class SelectionItemGroup(QGraphicsItemGroup):
     """

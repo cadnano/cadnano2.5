@@ -1,8 +1,9 @@
+import random
+
+from cadnano import getBatch
+from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
-from cadnano import getBatch
-import cadnano.preferences as prefs
-import random
 
 class CreateXoverCommand(UndoCommand):
     """

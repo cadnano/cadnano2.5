@@ -1,14 +1,11 @@
-#!/usr/bin/env python
-# encoding: utf-8
-import cadnano.util as util
-from . import pathstyles as styles
-
-from cadnano.enum import StrandType
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-
 from PyQt5.QtGui import QBrush, QFont, QPen, QPolygonF, QPainterPath, QFontMetrics
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsSimpleTextItem, QUndoCommand, QGraphicsRectItem
+
+from cadnano.enum import StrandType
+from . import pathstyles as styles
+
 
 # construct paths for breakpoint handles
 def _hashMarkGen(path, p1, p2, p3):

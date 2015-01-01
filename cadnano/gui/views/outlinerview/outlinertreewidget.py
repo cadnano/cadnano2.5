@@ -1,16 +1,6 @@
-from cadnano.gui.views.pathview import pathstyles as styles
-
-from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import DnaPartItem
-from .origamipartitem import OrigamiPartItem
-
-from cadnano.enum import PartType
-import cadnano.util as util
-
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QRect, QSize
-from PyQt5.QtGui import QFont, QPalette, QPen, QBrush, QDrag
-from PyQt5.QtGui import QColor #, QPainterPath
+from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
@@ -18,6 +8,13 @@ from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
+
+from cadnano.enum import PartType
+from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from .dnapartitem import DnaPartItem
+from .origamipartitem import OrigamiPartItem
+
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()

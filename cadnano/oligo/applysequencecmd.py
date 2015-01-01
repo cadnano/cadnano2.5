@@ -1,5 +1,5 @@
 from cadnano.cnproxy import UndoCommand
-import cadnano.util as util
+from cadnano import util
 
 class ApplySequenceCommand(UndoCommand):
     def __init__(self, oligo, sequence):

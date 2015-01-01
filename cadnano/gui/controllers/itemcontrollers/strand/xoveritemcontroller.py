@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 
 class XoverItemController(object):
     def __init__(self, xover_item, model_strand5p):

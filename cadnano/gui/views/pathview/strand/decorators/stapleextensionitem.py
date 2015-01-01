@@ -3,7 +3,7 @@
 
 
 from exceptions import NotImplementedError
-import cadnano.util as util
+from cadnano import util
 from .abstractdecoratoritem import AbstractDecoratorItem
 
 class StapleExtensionItem(AbstractDecoratorItem):

@@ -1,18 +1,16 @@
 import sys, os
 
 from code import interact
-
+from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
+
 proxyConfigure('PyQt')
-import cadnano.util as util
 decode = None
 decodeFile = None
 Document = None
 DocumentController = None
 
-
 from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, Qt, QEventLoop, QSize
-
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import qApp, QApplication, QUndoGroup
 

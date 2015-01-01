@@ -1,13 +1,16 @@
+
 from math import floor
 
+from PyQt5.QtCore import QEvent, QObject, QPointF, QRectF
+from PyQt5.QtCore import Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QBrush, QFont, QPen
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QUndoCommand
+
+from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
 from . import pathstyles as styles
-import cadnano.util as util
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal, pyqtSlot, QEvent
-
-from PyQt5.QtGui import QBrush, QFont, QPen, QDrag
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSimpleTextItem, QUndoCommand, QGraphicsRectItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _BRUSH = QBrush(styles.ACTIVE_SLICE_HANDLE_FILL)

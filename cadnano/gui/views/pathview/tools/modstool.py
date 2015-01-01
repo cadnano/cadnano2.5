@@ -1,12 +1,14 @@
 import sys
-from .abstractpathtool import AbstractPathTool
-from cadnano.data.sequencemods import mods
-from cadnano.gui.ui.dialogs.ui_mods import Ui_ModsDialog
-import cadnano.util as util
 
 from PyQt5.QtCore import QSignalMapper
 from PyQt5.QtGui import QBrush, QColor
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QPushButton
+
+from cadnano.data.sequencemods import mods
+from cadnano.gui.ui.dialogs.ui_mods import Ui_ModsDialog
+
+from .abstractpathtool import AbstractPathTool
+
 
 def _fromUtf8(s):
     return s

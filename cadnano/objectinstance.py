@@ -1,4 +1,4 @@
-import cadnano.util as util
+from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoCommand, UndoStack
 

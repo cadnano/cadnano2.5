@@ -14,16 +14,15 @@ else:
     array_type = 'c'
     tostring = lambda x: x.tostring()
 
-import cadnano.util as util
-from cadnano.decorators.insertion import Insertion
-
+from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoCommand, UndoStack
-
+from cadnano.decorators.insertion import Insertion
 from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
 from .insertioncmd import ChangeInsertionCommand
 from .modscmd import AddModsCommand, RemoveModsCommand
 from .resizecmd import ResizeCommand
+
 
 class Strand(ProxyObject):
     """

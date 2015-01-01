@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-from cadnano.gui.views.pathview import pathstyles as styles
-
 import copy
 
-import cadnano.util as util
-from cadnano.strand import Strand
-from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
 
+from cadnano import util
+from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
+from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
