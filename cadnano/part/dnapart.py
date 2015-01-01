@@ -1,47 +1,31 @@
-
-from cadnano.part.part import Part
-
-from heapq import heapify, heappush, heappop
-from itertools import product, islice
-
-izip = zip
-
 from collections import defaultdict
-import random
+from heapq import heapify, heappush, heappop
 from uuid import uuid4
+import io
+import pkgutil
 
-from cadnano.cnproxy import ProxyObject, ProxySignal
-from cadnano.enum import PartType, StrandType
-
-import cadnano.util as util
-import cadnano.preferences as prefs
-
+from cadnano import util
+from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
-
-from cadnano.strand import Strand
-
+from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.data import fasta
+from cadnano.enum import PartType, StrandType
 from cadnano.oligo import Oligo
 from cadnano.oligo import RemoveOligoCommand
-
+from cadnano.part.part import Part
+from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.strandset import SplitCommand
-
+from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
-from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
-
 from .createvhelixcmd import CreateVirtualHelixCommand
-from .xovercmds import CreateXoverCommand, RemoveXoverCommand
-from .resizepartcmd import ResizePartCommand
-
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
-
-import cadnano.data.fasta as fasta
-import pkgutil
-import io
+from .resizepartcmd import ResizePartCommand
+from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
 
 class DnaPart(Part):
@@ -65,15 +49,10 @@ class DnaPart(Part):
         #     e = "This class is abstract. Perhaps you want HoneycombPart."
         #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
-        super(Part, self).__init__(self._document)
+        super(DnaPart, self).__init__(*args, **kwargs)
 
-        # set some property data (dev)
-        self._properties = {}
-
+        # Properties (OrigamiPart-specific)
         self._properties["name"] = "Dna%d" % len(self._document.children())
-        self._properties["color"] = "#000000" # outlinerview will override from styles
-        self._properties["visible"] = True
-        self._properties["circular"] = True
 
         data = pkgutil.get_data('cadnano.data.fasta', '/pUC19.fasta')
         fasta_iter = util.read_fasta(data.decode('utf-8').splitlines())
@@ -81,7 +60,6 @@ class DnaPart(Part):
         print("%s len: %d" % (self._properties["name"], len(self._properties["dna_sequence"])))
 
         # set some selections (dev)
-        self._selections = {}
         self._selections["sel0"] = (0, 100)
         self._selections["sel1"] = (250, 400)
 
@@ -140,7 +118,6 @@ class DnaPart(Part):
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
-    partHideSignal = ProxySignal(ProxyObject, name='partHideSignal')
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
     partModAddedSignal = ProxySignal(object, object, object, 
@@ -149,32 +126,12 @@ class DnaPart(Part):
                         name='partModRemovedSignal') 
     partModChangedSignal = ProxySignal(object, object, object,
                         name='partModChangedSignal') 
-    partPropertyChangedSignal = ProxySignal(object, object, object,
-                        name='partPropertyChangedSignal') 
 
     ### SLOTS ###
 
     ### ACCESSORS ###
     def document(self):
         return self._document
-    # end def
-
-    def getPropertyDict(self):
-        return self._properties
-    # end def
-
-    def getSelectionDict(self):
-        return self._selections
-    # end def
-
-    def getProperty(self, key):
-        return self._properties[key]
-    # end def
-
-    def setProperty(self, key, value):
-        # use ModifyPropertyCommand here
-        self._properties[key] = value
-        self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
     def oligos(self):
@@ -352,7 +309,6 @@ class DnaPart(Part):
         not emitted.  This causes problems with undo and redo down the road
         but works as of now.
         """
-        self.partHideSignal.emit(self)
         self._active_virtual_helix = None
         if use_undostack:
             self.undoStack().beginMacro("Delete Part")

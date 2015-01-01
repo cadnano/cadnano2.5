@@ -1,17 +1,16 @@
+from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsRectItem
 
+from cadnano import util
+from cadnano import getReopen
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
+from . import slicestyles as styles
 from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
 from .activesliceitem import ActiveSliceItem
 
-from . import slicestyles as styles
-import cadnano.util as util
-from cadnano import getReopen
-
-from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
-from PyQt5.QtGui import QBrush, QPainterPath, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsRectItem
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -37,7 +36,7 @@ class OrigamiPartItem(QGraphicsItem):
         super(OrigamiPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.object()
-
+        self._model_props = m_props = m_p.getPropertyDict()
         self._controller = OrigamiPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._scaleFactor = self._RADIUS/m_p.radius()
@@ -59,7 +58,7 @@ class OrigamiPartItem(QGraphicsItem):
         _p = _BOUNDING_RECT_PADDING
         _outlinerect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_outlinerect, self)
-        self._outline.setPen(QPen(m_p.color()))
+        self._outline.setPen(QPen(QColor(m_props["color"])))
     # end def
 
     def _initDeselector(self):
@@ -89,14 +88,27 @@ class OrigamiPartItem(QGraphicsItem):
         pass
     # end def
 
-    def partHideSlot(self, sender):
-        self.hide()
-    # end def
-
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
         # print "OrigamiPartItem.partParentChangedSlot"
         pass
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            if property_key == "color":
+                pass
+                # color = QColor(new_value)
+                # self._outer_line.updateColor(color)
+                # self._inner_line.updateColor(color)
+                # self._hover_region.dummy.updateColor(color)
+                # for dsi in self._selection_items:
+                #     dsi.updateColor(color)
+            elif property_key == "circular":
+                pass
+            elif property_key == "dna_sequence":
+                pass
+                # self.updateRects()
+    # end def
 
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""

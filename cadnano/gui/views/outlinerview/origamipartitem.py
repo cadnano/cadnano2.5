@@ -1,13 +1,18 @@
-from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 
-import cadnano.util as util
-from cadnano.gui.views import styles
+from collections import defaultdict
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 
+from cadnano.gui.views import styles
+from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
+
+
+NAME_COL = 0
+VISIBLE_COL = 1
+COLOR_COL = 2
 
 class OrigamiPartItemDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
@@ -18,22 +23,37 @@ class OrigamiPartItemDelegate(QStyledItemDelegate):
 class OrigamiPartItem(QTreeWidgetItem):
     def __init__(self, model_part, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
-        self._part = model_part
+        self._model_part = m_p = model_part
         self._parent_tree = parent
         self._controller = OrigamiPartItemController(self, model_part)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
+        self.setExpanded(True)
 
-        # Part
-        inst_num = parent.getInstanceCount()
-        self._part_name = "%s%d" % (model_part.__class__.__name__, inst_num)
-        self._visible = True
+        # properties
+        self._props = defaultdict(dict)
+        self._model_props = m_props = m_p.getPropertyDict()
 
-        self._color = styles.PARTCOLORS[inst_num]
-        self._part.setColor(self._color)
+        self._props["name"]["column"] = NAME_COL
+        self._props["visible"]["column"] = VISIBLE_COL
+        self._props["color"]["column"] = COLOR_COL
 
-        self.setData(0, Qt.EditRole, self._part_name)
-        self.setData(1, Qt.EditRole, self._visible)
-        self.setData(2, Qt.EditRole, self._color)
+        for p in self._props:
+            if p in m_props:
+                self._props[p]["value"] = m_props[p]
+            else:
+                self._props[p]["value"] = "?"
+
+        for p in self._props:
+            col = self._props[p]["column"]
+            value = self._props[p]["value"]
+            self.setData(col, Qt.EditRole, value)
+
+        # outlinerview takes responsibility of overriding default part color
+        if self._props["color"]["value"] == "#000000":
+            index = len(m_p.document().children())
+            new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
+            self._model_part.setProperty("color", new_color)
+
 
         # Scaffold
         self._scaf_twi = sc = QTreeWidgetItem(self, QTreeWidgetItem.UserType)
@@ -62,6 +82,10 @@ class OrigamiPartItem(QTreeWidgetItem):
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
+    # end def
+
+    def partActiveVirtualHelixChangedSlot(self, sender):
+        pass
     # end def
 
     def partDimensionsChangedSlot(self, sender):
@@ -95,6 +119,16 @@ class OrigamiPartItem(QTreeWidgetItem):
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
     # end def
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            if property_key in self._props:
+                col = self._props[property_key]["column"]
+                value = self.data(col, Qt.DisplayRole)
+                if value != new_value:
+                    self.setData(col, Qt.EditRole, new_value)
+    # end def
+
 
     def partColorChangedSlot(self):
         # print("outlinerview origamipart partColorChangedSlot")

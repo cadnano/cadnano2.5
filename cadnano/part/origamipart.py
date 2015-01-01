@@ -1,43 +1,31 @@
-
-from cadnano.part.part import Part
-
+import random
+from collections import defaultdict
 from heapq import heapify, heappush, heappop
 from itertools import product, islice
-
+from uuid import uuid4
 izip = zip
 
-from collections import defaultdict
-import random
-from uuid import uuid4
-
+from cadnano import util
+from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxyObject, ProxySignal
-from cadnano.enum import PartType, StrandType
-
-import cadnano.util as util
-import cadnano.preferences as prefs
-
 from cadnano.cnproxy import UndoCommand
-
-from cadnano.strand import Strand
-
+from cadnano.enum import PartType, StrandType
 from cadnano.oligo import Oligo
 from cadnano.oligo import RemoveOligoCommand
-
-from cadnano.strandset import StrandSet
-from cadnano.strandset import SplitCommand
-
-from cadnano.virtualhelix import VirtualHelix
-from cadnano.virtualhelix import RemoveVirtualHelixCommand
+from cadnano.part.part import Part
+from cadnano.strand import Strand
 from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
-
+from cadnano.strandset import SplitCommand
+from cadnano.strandset import StrandSet
+from cadnano.virtualhelix import RemoveVirtualHelixCommand
+from cadnano.virtualhelix import VirtualHelix
 from .createvhelixcmd import CreateVirtualHelixCommand
-from .xovercmds import CreateXoverCommand, RemoveXoverCommand
-from .resizepartcmd import ResizePartCommand
-
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
+from .resizepartcmd import ResizePartCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
+from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
 class OrigamiPart(Part):
     """
@@ -72,11 +60,10 @@ class OrigamiPart(Part):
         #     e = "This class is abstract. Perhaps you want HoneycombPart."
         #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
-        super(Part, self).__init__(self._document)
+        super(OrigamiPart, self).__init__(*args, **kwargs)
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
-
         self._oligos = set()
         self._coord_to_virtual_velix = {}
         self._number_to_virtual_helix = {}
@@ -85,6 +72,8 @@ class OrigamiPart(Part):
         self._max_col = 50
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
+        # Properties (OrigamiPart-specific)
+        self._properties["name"] = "Origami%d" % len(self._document.children())
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []
         self.reserve_bin = set()
@@ -129,7 +118,6 @@ class OrigamiPart(Part):
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
-    partHideSignal = ProxySignal(ProxyObject, name='partHideSignal')
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
     partModAddedSignal = ProxySignal(object, object, object, 
@@ -506,7 +494,6 @@ class OrigamiPart(Part):
         not emitted.  This causes problems with undo and redo down the road
         but works as of now.
         """
-        self.partHideSignal.emit(self)
         self._active_virtual_helix = None
         if use_undostack:
             self.undoStack().beginMacro("Delete Part")
