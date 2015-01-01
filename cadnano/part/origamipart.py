@@ -815,7 +815,7 @@ class OrigamiPart(Part):
         # remove parts from self._oligos)
         try:
             self._oligos.remove(oligo)
-            oligo.oligoRemovedSignal.emit(self)
+            oligo.oligoRemovedSignal.emit(self, oligo)
         except KeyError:
             print(util.trace(5))
             print("error removing oligo", oligo)

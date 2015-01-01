@@ -1,6 +1,5 @@
 import copy
 
-
 from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
 from cadnano.gui.views.pathview import pathstyles as styles
@@ -61,11 +60,16 @@ class Oligo(ProxyObject):
     # end def
 
     ### SIGNALS ###
-    oligoIdentityChangedSignal = ProxySignal(ProxyObject, name='oligoIdentityChangedSignal') # new oligo
-    oligoAppearanceChangedSignal = ProxySignal(ProxyObject, name='oligoAppearanceChangedSignalpyqtSignal')  # self
-    oligoRemovedSignal = ProxySignal(ProxyObject, name='oligoRemovedSignal')  # self
-    oligoSequenceAddedSignal = ProxySignal(ProxyObject, name='oligoSequenceAddedSignal') # self
-    oligoSequenceClearedSignal = ProxySignal(ProxyObject, name='oligoSequenceClearedSignal')  # self
+    oligoIdentityChangedSignal = ProxySignal(ProxyObject,
+                                        name='oligoIdentityChangedSignal') # new oligo
+    oligoAppearanceChangedSignal = ProxySignal(ProxyObject,
+                                        name='oligoAppearanceChangedSignalpyqtSignal')  # self
+    oligoRemovedSignal = ProxySignal(ProxyObject, ProxyObject,
+                                        name='oligoRemovedSignal')  # part, self
+    oligoSequenceAddedSignal = ProxySignal(ProxyObject,
+                                        name='oligoSequenceAddedSignal') # self
+    oligoSequenceClearedSignal = ProxySignal(ProxyObject, 
+                                        name='oligoSequenceClearedSignal')  # self
 
     ### SLOTS ###
 

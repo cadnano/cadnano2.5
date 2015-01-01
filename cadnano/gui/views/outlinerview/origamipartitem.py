@@ -43,7 +43,6 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
                 self._props[p]["value"] = m_props[p]
             else:
                 self._props[p]["value"] = "?"
-
         for p in self._props:
             col = self._props[p]["column"]
             value = self._props[p]["value"]
@@ -55,27 +54,26 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
             new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
             self._model_part.setProperty("color", new_color)
 
-        # Scaffold
-        self._scaf_twi = sc = QTreeWidgetItem(self, QTreeWidgetItem.UserType)
-        sc.setData(0, Qt.EditRole, "Scaffold")
-        sc.setData(1, Qt.EditRole, True)
-        sc.setData(2, Qt.EditRole, "#ffffff")
+        # child items
+        self._scaf_items = {}
+        self._stap_items = {}
+        self._mods_items = {}
 
-        # Staples
-        self._stap_twi = st = QTreeWidgetItem(self, QTreeWidgetItem.UserType)
-        st.setData(0, Qt.EditRole, "Staples")
-        st.setData(1, Qt.EditRole, True)
-        st.setData(2, Qt.EditRole, "#ffffff")
-
-        # mods
-        self._mod_twi = m = QTreeWidgetItem(self, QTreeWidgetItem.UserType)
-        m.setData(0, Qt.EditRole, "Modifications")
-        m.setData(1, Qt.EditRole, True)
-        m.setData(2, Qt.EditRole, "#ffffff")
-
-        self.setExpanded(True)
+        self._scaf_root = self._createItem("Scaffolds", True, "#ffffff", True, self)
+        self._stap_root = self._createItem("Staples", True, "#ffffff", True, self)
+        self._mods_root = self._createItem("Modifications", True, "#ffffff", True, self)
     # end def
 
+    ### PRIVATE SUPPORT METHODS ###
+    def _createItem(self, item_name, is_visible, color, is_expanded, parent):
+        twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
+        twi.setData(0, Qt.EditRole, item_name)
+        twi.setData(1, Qt.EditRole, is_visible)
+        twi.setData(2, Qt.EditRole, color)
+        twi.setExpanded(is_expanded)
+        return twi
+
+    ### SLOTS ###
     def partRemovedSlot(self, sender):
         self._parent_tree.removeOrigamiPartItem(self)
         self._part = None
@@ -85,12 +83,31 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     def partOligoAddedSlot(self, part, oligo):
-        print("outliner.origamipartitem oligo ADDED", oligo)
-        oligo.oligoRemovedSignal.connect(self.oligoRemovedSlot)
+        print("partOligoAddedSlot", part, oligo, id(oligo))
+        oligo.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
+        if oligo.isStaple():
+            oi_name = "staple%d" % len(self._stap_items) # need a better numbering system
+            oi_parent = self._stap_root
+            oi_dict = self._stap_items
+        else:
+            oi_name = "scaf%d" % len(self._scaf_items)
+            oi_parent = self._scaf_root
+            oi_dict = self._scaf_items
+        oi_color = oligo.color()
+        oi = self._createItem(oi_name, True, oi_color, True, oi_parent)
+        oi_dict[id(oligo)] = oi
     # end def
 
-    def oligoRemovedSlot(self, oligo):
-        print("outliner.origamipartitem oligo REMOVED", oligo)
+    def partOligoRemovedSlot(self, part, oligo):
+        print("partOligoRemovedSlot", oligo, id(oligo))
+        if oligo.isStaple():
+            oi_parent = self._stap_root
+            oi_dict = self._stap_items
+        else:
+            oi_parent = self._scaf_root
+            oi_dict = self._scaf_items
+        oi_parent.removeChild(oi_dict[id(oligo)])
+        del oi_dict[id(oligo)]
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
