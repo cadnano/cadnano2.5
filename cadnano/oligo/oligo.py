@@ -63,6 +63,7 @@ class Oligo(ProxyObject):
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(ProxyObject, name='oligoIdentityChangedSignal') # new oligo
     oligoAppearanceChangedSignal = ProxySignal(ProxyObject, name='oligoAppearanceChangedSignalpyqtSignal')  # self
+    oligoRemovedSignal = ProxySignal(ProxyObject, name='oligoRemovedSignal')  # self
     oligoSequenceAddedSignal = ProxySignal(ProxyObject, name='oligoSequenceAddedSignal') # self
     oligoSequenceClearedSignal = ProxySignal(ProxyObject, name='oligoSequenceClearedSignal')  # self
 
@@ -158,7 +159,8 @@ class Oligo(ProxyObject):
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def remove(self, use_undostack=True):
         c = RemoveOligoCommand(self)
-        util.execCommandList(self, [c], desc="Color Oligo", use_undostack=use_undostack)
+        util.execCommandList(self, [c], desc="Remove Oligo", use_undostack=use_undostack)
+        self.oligoRemovedSignal.emit(self._part, self)
     # end def
 
     def applyColor(self, color, use_undostack=True):

@@ -132,10 +132,13 @@ class Part(ProxyObject):
                         name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
                         name='partModChangedSignal')
-    partSelectedChangedSignal = ProxySignal(object, object,
-                        name='partSelectedChangedSignal')
-    partPropertyChangedSignal = ProxySignal(object, object, object,
-                        name='partPropertyChangedSignal') 
+    partSelectedChangedSignal = ProxySignal(ProxyObject, object,
+                        name='partSelectedChangedSignal')       # self, is_selected
+    partPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+                        name='partPropertyChangedSignal')       # self, property_name, new_value
+    partOligoAddedSignal = ProxySignal(ProxyObject, object,
+                        name='partOligoAddedSignal')            # self, oligo
+
 
 
     ### SLOTS ###
@@ -325,6 +328,21 @@ class Part(ProxyObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
+    def addOligo(self, oligo):
+        # print("adding oligo", oligo)
+        self._oligos.add(oligo)
+        self.partOligoAddedSignal.emit(self, oligo)
+    # end def
+
+    def removeAllOligos(self, use_undostack=True):
+        # clear existing oligos
+        cmds = []
+        for o in list(self.oligos()):
+            cmds.append(RemoveOligoCommand(o))
+        # end for
+        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
+    # end def
+
     def setSelected(self, is_selected):
         self._selected = is_selected
         self.partSelectedChangedSignal.emit(self, is_selected)

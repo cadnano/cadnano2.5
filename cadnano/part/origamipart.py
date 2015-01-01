@@ -516,20 +516,6 @@ class OrigamiPart(Part):
         else:
             e.redo()
     # end def
-    
-    def removeAllOligos(self, use_undostack=True):
-        # clear existing oligos
-        cmds = []
-        for o in list(self.oligos()):
-            cmds.append(RemoveOligoCommand(o))
-        # end for
-        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
-    # end def
-
-    def addOligo(self, oligo):
-        # print("adding oligo", oligo)
-        self._oligos.add(oligo)
-    # end def
 
     def createVirtualHelix(self, row, col, use_undostack=True):
         c = CreateVirtualHelixCommand(self, row, col)
@@ -829,6 +815,7 @@ class OrigamiPart(Part):
         # remove parts from self._oligos)
         try:
             self._oligos.remove(oligo)
+            oligo.oligoRemovedSignal.emit(self)
         except KeyError:
             print(util.trace(5))
             print("error removing oligo", oligo)
