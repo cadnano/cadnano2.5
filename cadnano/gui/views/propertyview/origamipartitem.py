@@ -4,9 +4,10 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 
 
-class OrigamiPartItem(QTreeWidgetItem):
+class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
     def __init__(self, model_part, parent=None):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._model_part = m_p = model_part
@@ -29,18 +30,6 @@ class OrigamiPartItem(QTreeWidgetItem):
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
-    # end def
-
-    def partDimensionsChangedSlot(self):
-        pass
-    # end def
-
-    def partParentChangedSlot(self):
-        pass
-    # end def
-
-    def partRemovedSlot(self):
-        pass
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):

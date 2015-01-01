@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano import util
 from cadnano import getReopen
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
@@ -21,7 +22,7 @@ _MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
 _BOUNDING_RECT_PADDING = 10
 
-class OrigamiPartItem(QGraphicsItem):
+class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, parent=None):
@@ -30,7 +31,7 @@ class OrigamiPartItem(QGraphicsItem):
 
         Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
         where x is the cartesian product.
-        
+
         Order matters for deselector, probe, and setlattice
         """
         super(OrigamiPartItem, self).__init__(parent)
@@ -82,15 +83,6 @@ class OrigamiPartItem(QGraphicsItem):
 
     ### SLOTS ###
     def partActiveVirtualHelixChangedSlot(self, part, virtualHelix):
-        pass
-
-    def partDimensionsChangedSlot(self, sender):
-        pass
-    # end def
-
-    def partParentChangedSlot(self, sender):
-        """docstring for partParentChangedSlot"""
-        # print "OrigamiPartItem.partParentChangedSlot"
         pass
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):

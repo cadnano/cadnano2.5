@@ -7,10 +7,10 @@ from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
-from cadnano import app, getBatch
-from cadnano import util
+from cadnano import app, getBatch, util
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem
@@ -28,7 +28,7 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
-class OrigamiPartItem(QGraphicsRectItem):
+class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
     findChild = util.findChild  # for debug
 
     def __init__(self, model_part_instance, viewroot, active_tool_getter, parent):
@@ -94,6 +94,10 @@ class OrigamiPartItem(QGraphicsRectItem):
     ### SIGNALS ###
 
     ### SLOTS ###
+    def partOligoAddedSlot(self, part, oligo):
+        pass
+    # end def
+
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
         # print "OrigamiPartItem.partParentChangedSlot"
@@ -203,14 +207,6 @@ class OrigamiPartItem(QGraphicsRectItem):
             self.setActiveVirtualHelixItem(vhi)
             self.setPreXoverItemsVisible(self.activeVirtualHelixItem())
     # end def
-
-    def partColorChangedSlot(self):
-        # print("pathview origamipart partColorChangedSlot")
-        pass
-    # end def
-
-    def partSelectedChangedSlot(self):
-        pass
 
     ### ACCESSORS ###
 

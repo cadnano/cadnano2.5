@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 
 from cadnano.gui.views import styles
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 
 
@@ -14,13 +15,13 @@ NAME_COL = 0
 VISIBLE_COL = 1
 COLOR_COL = 2
 
-class OrigamiPartItemDelegate(QStyledItemDelegate):
+class OrigamiPartItemDelegate(QStyledItemDelegate, AbstractPartItem):
     def paint(self, painter, option, index):
         print("OrigamiPartItemDelegate")
         option.rect.adjust(-5,0,0,0)
         QItemDelegate.paint(painter, option, index)
 
-class OrigamiPartItem(QTreeWidgetItem):
+class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
     def __init__(self, model_part, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._model_part = m_p = model_part
@@ -54,7 +55,6 @@ class OrigamiPartItem(QTreeWidgetItem):
             new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
             self._model_part.setProperty("color", new_color)
 
-
         # Scaffold
         self._scaf_twi = sc = QTreeWidgetItem(self, QTreeWidgetItem.UserType)
         sc.setData(0, Qt.EditRole, "Scaffold")
@@ -84,40 +84,13 @@ class OrigamiPartItem(QTreeWidgetItem):
         self._controller = None
     # end def
 
-    def partActiveVirtualHelixChangedSlot(self, sender):
-        pass
+    def partOligoAddedSlot(self, part, oligo):
+        print("outliner.origamipartitem oligo ADDED", oligo)
+        oligo.oligoRemovedSignal.connect(self.oligoRemovedSlot)
     # end def
 
-    def partDimensionsChangedSlot(self, sender):
-        pass
-    # end def
-
-    def partParentChangedSlot(self, sender):
-        pass
-    # end def
-
-    def partPreDecoratorSelectedSlot(self, sender):
-        pass
-    # end def
-
-    def updatePreXoverItemsSlot(self, sender):
-        pass
-    # end def
-
-    def partVirtualHelixAddedSlot(self, sender):
-        pass
-    # end def
-
-    def partVirtualHelixRenumberedSlot(self, sender):
-        pass
-    # end def
-
-    def partVirtualHelixResizedSlot(self, sender):
-        pass
-    # end def
-
-    def partVirtualHelicesReorderedSlot(self, sender):
-        pass
+    def oligoRemovedSlot(self, oligo):
+        print("outliner.origamipartitem oligo REMOVED", oligo)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -129,11 +102,6 @@ class OrigamiPartItem(QTreeWidgetItem):
                     self.setData(col, Qt.EditRole, new_value)
     # end def
 
-
-    def partColorChangedSlot(self):
-        # print("outlinerview origamipart partColorChangedSlot")
-        pass
-    # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
         self.setSelected(is_selected)

@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QUndoCommand, QStyle
 from PyQt5.QtWidgets import QApplication
 
 from cadnano import getReopen
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
 from . import slicestyles as styles
 from .virtualhelixitem import VirtualHelixItem
@@ -24,6 +25,304 @@ _SELECT_STROKE_WIDTH = 10
 
 _HOVER_PEN = QPen(QColor(255, 255, 255), 128)
 _HOVER_BRUSH = QBrush(QColor(255, 255, 255, 0))
+
+class DnaPartItem(QGraphicsItem, AbstractPartItem):
+
+    def __init__(self, model_part_instance, parent=None):
+        """
+        Parent should be either a SliceRootItem, or an AssemblyItem.
+        Order matters for deselector, probe, and setlattice
+        """
+        super(DnaPartItem, self).__init__(parent)
+        self._model_instance = model_part_instance
+        self._model_part = m_p = model_part_instance.object()
+        self._model_props = m_props = m_p.getPropertyDict()
+        self._controller = DnaPartItemController(self, m_p)
+        self._selection_items = {}
+        self._rect = QRectF()
+        self._hover_rect = QRectF()
+        self._initDeselector()
+        self.probe = self.IntersectionProbe(self)
+        self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
+        self.setZValue(styles.ZPARTITEM)
+
+        self._outer_line = DnaLine(self._rect, self)
+        self._inner_line = DnaLine(self._rect, self)
+        self._hover_region = DnaHoverRegion(self._hover_rect, self)
+        self._drag_handle = DnaDragHandle(QRectF(0, 0, 20, 20), self)
+        self.updateRects()
+
+        p = parent.childrenBoundingRect().bottomLeft()
+        self.setPos(p.x()+HOVER_WIDTH, p.y())
+
+        self._initSelections()
+    # end def
+
+    def updateRects(self):
+        circular = self._model_props["circular"]
+        dna_length = len(self._model_props["dna_sequence"])
+        if circular:
+            diameter = round(dna_length * pi / 100,2)
+            self._radius = round(diameter/2.,2)
+            self._rect = QRectF(0, 0, diameter, diameter)
+            self._outer_line.updateRect(QRectF(-GAP/2, -GAP/2, diameter+GAP, diameter+GAP))
+            self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
+            self._hover_rect = self._rect.adjusted(-H_W, -H_W, H_W, H_W)
+            self._hover_region.updateRect(self._hover_rect)
+            self._drag_handle.updateRect(self._rect)
+        else:
+            pass # linear
+
+    def model_color(self):
+        return self._model_props["color"]
+
+    def _initDeselector(self):
+        """
+        The deselector grabs mouse events that missed a slice and clears the
+        selection when it gets one.
+        """
+        self.deselector = ds = DnaPartItem.Deselector(self)
+        ds.setParentItem(self)
+        ds.setFlag(QGraphicsItem.ItemStacksBehindParent)
+        ds.setZValue(styles.ZDESELECTOR)
+    # end def
+
+    def _initModifierCircle(self):
+        self._can_show_mod_circ = False
+        self._mod_circ = m_c = QGraphicsEllipseItem(self._hover_rect, self)
+        m_c.setPen(_MOD_PEN)
+        m_c.hide()
+    # end def
+
+    def _initSelections(self):
+        self._selections = self._model_part.getSelectionDict()
+        for key in sorted(self._selections):
+            (start, end) = self._selections[key]
+            # convert bases to angles
+    # end def
+
+    def addSelection(self, startAngle, spanAngle):
+        dSI = DnaSelectionItem(startAngle, spanAngle, self)
+        self._selection_items[dSI] = True
+    # end def
+
+    ### SIGNALS ###
+
+    ### SLOTS ###
+    def partRemovedSlot(self, sender):
+        self.parentItem().removeDnaPartItem(self)
+        scene = self.scene()
+        scene.removeItem(self)
+        self._model_part = None
+        self.probe = None
+        self._mod_circ = None
+        self.deselector = None
+        self._controller.disconnectSignals()
+        self._controller = None
+    # end def
+
+    def partVirtualHelicesReorderedSlot(self, sender, orderedCoordList):
+        pass
+    # end def
+
+    def partPreDecoratorSelectedSlot(self, sender, row, col, baseIdx):
+        """docstring for partPreDecoratorSelectedSlot"""
+        vhi = self.getVirtualHelixItemByCoord(row, col)
+        view = self.window().slice_graphics_view
+        view.scene_root_item.resetTransform()
+        view.centerOn(vhi)
+        view.zoomIn()
+        mC = self._mod_circ
+        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
+        mC.setPos(x,y)
+        if self._can_show_mod_circ:
+            mC.show()
+    # end def
+
+    def partVirtualHelixAddedSlot(self, sender, virtual_helix):
+        vh = virtual_helix
+        coords = vh.coord()
+
+        empty_helix_item = self._empty_helix_hash[coords]
+        # TODO test to see if self._virtual_helix_hash is necessary
+        vhi = VirtualHelixItem(vh, empty_helix_item)
+        self._virtual_helix_hash[coords] = vhi
+    # end def
+
+    def partVirtualHelixRenumberedSlot(self, sender, coord):
+        pass
+    # end def
+
+    def partVirtualHelixResizedSlot(self, sender, coord):
+        pass
+    # end def
+
+    def updatePreXoverItemsSlot(self, sender, virtualHelix):
+        pass
+    # end def
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if self._model_part == model_part:
+            if property_key == "color":
+                color = QColor(new_value)
+                self._outer_line.updateColor(color)
+                self._inner_line.updateColor(color)
+                self._hover_region.dummy.updateColor(color)
+                for dsi in self._selection_items:
+                    dsi.updateColor(color)
+            elif property_key == "circular":
+                pass
+            elif property_key == "dna_sequence":
+                self.updateRects()
+    # end def
+
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        if is_selected:
+            self._drag_handle.setBrush(QBrush(QColor(styles.SELECTED_COLOR)))
+        else:
+            self._drag_handle.setBrush(QBrush(QColor(220, 220, 220)))
+    # end def
+
+    ### ACCESSORS ###
+    def radius(self):
+        return self._radius
+    # end def
+
+    def boundingRect(self):
+        return self._rect
+    # end def
+
+    def part(self):
+        return self._model_part
+    # end def
+
+    def scaleFactor(self):
+        return self._scaleFactor
+    # end def
+
+    def setPart(self, newPart):
+        self._model_part = newPart
+    # end def
+
+    def window(self):
+        return self.parentItem().window()
+    # end def
+
+    ### PRIVATE SUPPORT METHODS ###
+    def _upperLeftCornerForCoords(self, row, col):
+        pass  # subclass
+    # end def
+
+    def _updateGeometry(self):
+        self._rect = QRectF(0, 0, *self.part().dimensions())
+    # end def
+
+    def _spawnEmptyHelixItemAt(self, row, column):
+        helix = EmptyHelixItem(row, column, self)
+        # helix.setFlag(QGraphicsItem.ItemStacksBehindParent, True)
+        self._empty_helix_hash[(row, column)] = helix
+    # end def
+
+    def _killHelixItemAt(row, column):
+        s = self._empty_helix_hash[(row, column)]
+        s.scene().removeItem(s)
+        del self._empty_helix_hash[(row, column)]
+    # end def
+
+    def _setLattice(self, old_coords, new_coords):
+        """A private method used to change the number of rows,
+        cols in response to a change in the dimensions of the
+        part represented by the receiver"""
+        old_set = set(old_coords)
+        old_list = list(old_set)
+        new_set = set(new_coords)
+        new_list = list(new_set)
+        for coord in old_list:
+            if coord not in new_set:
+                self._killHelixItemAt(*coord)
+        # end for
+        for coord in new_list:
+            if coord not in old_set:
+                self._spawnEmptyHelixItemAt(*coord)
+        # end for
+        # self._updateGeometry(newCols, newRows)
+        # self.prepareGeometryChange()
+        # the Deselector copies our rect so it changes too
+        self.deselector.prepareGeometryChange()
+        if not getReopen():
+            self.zoomToFit()
+    # end def
+
+    ### PUBLIC SUPPORT METHODS ###
+    def getVirtualHelixItemByCoord(self, row, column):
+        if (row, column) in self._empty_helix_hash:
+            return self._virtual_helix_hash[(row, column)]
+        else:
+            return None
+    # end def
+
+    def paint(self, painter, option, widget=None):
+        pass
+    # end def
+
+    def selectionWillChange(self, newSel):
+        if self.part() == None:
+            return
+        if self.part().selectAllBehavior():
+            return
+        for sh in self._empty_helix_hash.values():
+            sh.setSelected(sh.virtualHelix() in newSel)
+    # end def
+
+    def setModifyState(self, bool):
+        """Hides the mod_rect when modify state disabled."""
+        self._can_show_mod_circ = bool
+        if bool == False:
+            self._mod_circ.hide()
+
+    def updateStatusBar(self, statusString):
+        """Shows statusString in the MainWindow's status bar."""
+        self.window().statusBar().showMessage(statusString, timeout)
+        pass  # disabled for now.
+
+    def vhAtCoordsChanged(self, row, col):
+        self._empty_helix_hash[(row, col)].update()
+    # end def
+
+    def zoomToFit(self):
+        thescene = self.scene()
+        theview = thescene.views()[0]
+        theview.zoomToFit()
+    # end def
+
+    ### EVENT HANDLERS ###
+    def mousePressEvent(self, event):
+        # self.createOrAddBasesToVirtualHelix()
+        QGraphicsItem.mousePressEvent(self, event)
+    # end def
+
+    class Deselector(QGraphicsItem):
+        """The deselector lives behind all the slices and observes mouse press
+        events that miss slices, emptying the selection when they do"""
+        def __init__(self, parent_HGI):
+            super(DnaPartItem.Deselector, self).__init__()
+            self.parent_HGI = parent_HGI
+        def mousePressEvent(self, event):
+            self.parent_HGI.part().setSelection(())
+            super(DnaPartItem.Deselector, self).mousePressEvent(event)
+        def boundingRect(self):
+            return self.parent_HGI.boundingRect()
+        def paint(self, painter, option, widget=None):
+            pass
+    # end class
+
+    class IntersectionProbe(QGraphicsItem):
+        def boundingRect(self):
+            return QRectF(0, 0, .1, .1)
+        def paint(self, painter, option, widget=None):
+            pass
+    # end class
+# end class
 
 
 class DnaSelectionItem(QGraphicsPathItem):
@@ -282,311 +581,4 @@ class DnaDragHandle(QGraphicsEllipseItem):
         # f.setPen(QPen(Qt.NoPen))
         # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
     # end def
-# end class
-
-
-class DnaPartItem(QGraphicsItem):
-
-    def __init__(self, model_part_instance, parent=None):
-        """
-        Parent should be either a SliceRootItem, or an AssemblyItem.
-        Order matters for deselector, probe, and setlattice
-        """
-        super(DnaPartItem, self).__init__(parent)
-        self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.object()
-        self._model_props = m_props = m_p.getPropertyDict()
-        self._controller = DnaPartItemController(self, m_p)
-        self._selection_items = {}
-        self._rect = QRectF()
-        self._hover_rect = QRectF()
-        self._initDeselector()
-        self.probe = self.IntersectionProbe(self)
-        self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
-        self.setZValue(styles.ZPARTITEM)
-
-        self._outer_line = DnaLine(self._rect, self)
-        self._inner_line = DnaLine(self._rect, self)
-        self._hover_region = DnaHoverRegion(self._hover_rect, self)
-        self._drag_handle = DnaDragHandle(QRectF(0, 0, 20, 20), self)
-        self.updateRects()
-
-        p = parent.childrenBoundingRect().bottomLeft()
-        self.setPos(p.x()+HOVER_WIDTH, p.y())
-
-        self._initSelections()
-    # end def
-
-    def updateRects(self):
-        circular = self._model_props["circular"]
-        dna_length = len(self._model_props["dna_sequence"])
-        if circular:
-            diameter = round(dna_length * pi / 100,2)
-            self._radius = round(diameter/2.,2)
-            self._rect = QRectF(0, 0, diameter, diameter)
-            self._outer_line.updateRect(QRectF(-GAP/2, -GAP/2, diameter+GAP, diameter+GAP))
-            self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
-            self._hover_rect = self._rect.adjusted(-H_W, -H_W, H_W, H_W)
-            self._hover_region.updateRect(self._hover_rect)
-            self._drag_handle.updateRect(self._rect)
-        else:
-            pass # linear
-
-    def model_color(self):
-        return self._model_props["color"]
-
-    def _initDeselector(self):
-        """
-        The deselector grabs mouse events that missed a slice and clears the
-        selection when it gets one.
-        """
-        self.deselector = ds = DnaPartItem.Deselector(self)
-        ds.setParentItem(self)
-        ds.setFlag(QGraphicsItem.ItemStacksBehindParent)
-        ds.setZValue(styles.ZDESELECTOR)
-    # end def
-
-    def _initModifierCircle(self):
-        self._can_show_mod_circ = False
-        self._mod_circ = m_c = QGraphicsEllipseItem(self._hover_rect, self)
-        m_c.setPen(_MOD_PEN)
-        m_c.hide()
-    # end def
-
-    def _initSelections(self):
-        self._selections = self._model_part.getSelectionDict()
-        for key in sorted(self._selections):
-            (start, end) = self._selections[key]
-            # convert bases to angles
-    # end def
-
-    def addSelection(self, startAngle, spanAngle):
-        dSI = DnaSelectionItem(startAngle, spanAngle, self)
-        self._selection_items[dSI] = True
-    # end def
-
-    ### SIGNALS ###
-
-    ### SLOTS ###
-    def partDimensionsChangedSlot(self, sender):
-        pass
-    # end def
-
-    def partParentChangedSlot(self, sender):
-        # print "DnaPartItem.partParentChangedSlot"
-        pass
-
-    def partRemovedSlot(self, sender):
-        self.parentItem().removeDnaPartItem(self)
-        scene = self.scene()
-        scene.removeItem(self)
-        self._model_part = None
-        self.probe = None
-        self._mod_circ = None
-        self.deselector = None
-        self._controller.disconnectSignals()
-        self._controller = None
-    # end def
-
-    def partVirtualHelicesReorderedSlot(self, sender, orderedCoordList):
-        pass
-    # end def
-
-    def partPreDecoratorSelectedSlot(self, sender, row, col, baseIdx):
-        """docstring for partPreDecoratorSelectedSlot"""
-        vhi = self.getVirtualHelixItemByCoord(row, col)
-        view = self.window().slice_graphics_view
-        view.scene_root_item.resetTransform()
-        view.centerOn(vhi)
-        view.zoomIn()
-        mC = self._mod_circ
-        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
-        mC.setPos(x,y)
-        if self._can_show_mod_circ:
-            mC.show()
-    # end def
-
-    def partVirtualHelixAddedSlot(self, sender, virtual_helix):
-        vh = virtual_helix
-        coords = vh.coord()
-
-        empty_helix_item = self._empty_helix_hash[coords]
-        # TODO test to see if self._virtual_helix_hash is necessary
-        vhi = VirtualHelixItem(vh, empty_helix_item)
-        self._virtual_helix_hash[coords] = vhi
-    # end def
-
-    def partVirtualHelixRenumberedSlot(self, sender, coord):
-        pass
-    # end def
-
-    def partVirtualHelixResizedSlot(self, sender, coord):
-        pass
-    # end def
-
-    def updatePreXoverItemsSlot(self, sender, virtualHelix):
-        pass
-    # end def
-
-    def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        if self._model_part == model_part:
-            if property_key == "color":
-                color = QColor(new_value)
-                self._outer_line.updateColor(color)
-                self._inner_line.updateColor(color)
-                self._hover_region.dummy.updateColor(color)
-                for dsi in self._selection_items:
-                    dsi.updateColor(color)
-            elif property_key == "circular":
-                pass
-            elif property_key == "dna_sequence":
-                self.updateRects()
-    # end def
-
-    def partSelectedChangedSlot(self, model_part, is_selected):
-        if is_selected:
-            self._drag_handle.setBrush(QBrush(QColor(styles.SELECTED_COLOR)))
-        else:
-            self._drag_handle.setBrush(QBrush(QColor(220, 220, 220)))
-    # end def
-
-    ### ACCESSORS ###
-    def radius(self):
-        return self._radius
-    # end def
-
-    def boundingRect(self):
-        return self._rect
-    # end def
-
-    def part(self):
-        return self._model_part
-    # end def
-
-    def scaleFactor(self):
-        return self._scaleFactor
-    # end def
-
-    def setPart(self, newPart):
-        self._model_part = newPart
-    # end def
-
-    def window(self):
-        return self.parentItem().window()
-    # end def
-
-    ### PRIVATE SUPPORT METHODS ###
-    def _upperLeftCornerForCoords(self, row, col):
-        pass  # subclass
-    # end def
-
-    def _updateGeometry(self):
-        self._rect = QRectF(0, 0, *self.part().dimensions())
-    # end def
-
-    def _spawnEmptyHelixItemAt(self, row, column):
-        helix = EmptyHelixItem(row, column, self)
-        # helix.setFlag(QGraphicsItem.ItemStacksBehindParent, True)
-        self._empty_helix_hash[(row, column)] = helix
-    # end def
-
-    def _killHelixItemAt(row, column):
-        s = self._empty_helix_hash[(row, column)]
-        s.scene().removeItem(s)
-        del self._empty_helix_hash[(row, column)]
-    # end def
-
-    def _setLattice(self, old_coords, new_coords):
-        """A private method used to change the number of rows,
-        cols in response to a change in the dimensions of the
-        part represented by the receiver"""
-        old_set = set(old_coords)
-        old_list = list(old_set)
-        new_set = set(new_coords)
-        new_list = list(new_set)
-        for coord in old_list:
-            if coord not in new_set:
-                self._killHelixItemAt(*coord)
-        # end for
-        for coord in new_list:
-            if coord not in old_set:
-                self._spawnEmptyHelixItemAt(*coord)
-        # end for
-        # self._updateGeometry(newCols, newRows)
-        # self.prepareGeometryChange()
-        # the Deselector copies our rect so it changes too
-        self.deselector.prepareGeometryChange()
-        if not getReopen():
-            self.zoomToFit()
-    # end def
-
-    ### PUBLIC SUPPORT METHODS ###
-    def getVirtualHelixItemByCoord(self, row, column):
-        if (row, column) in self._empty_helix_hash:
-            return self._virtual_helix_hash[(row, column)]
-        else:
-            return None
-    # end def
-
-    def paint(self, painter, option, widget=None):
-        pass
-    # end def
-
-    def selectionWillChange(self, newSel):
-        if self.part() == None:
-            return
-        if self.part().selectAllBehavior():
-            return
-        for sh in self._empty_helix_hash.values():
-            sh.setSelected(sh.virtualHelix() in newSel)
-    # end def
-
-    def setModifyState(self, bool):
-        """Hides the mod_rect when modify state disabled."""
-        self._can_show_mod_circ = bool
-        if bool == False:
-            self._mod_circ.hide()
-
-    def updateStatusBar(self, statusString):
-        """Shows statusString in the MainWindow's status bar."""
-        self.window().statusBar().showMessage(statusString, timeout)
-        pass  # disabled for now.
-
-    def vhAtCoordsChanged(self, row, col):
-        self._empty_helix_hash[(row, col)].update()
-    # end def
-
-    def zoomToFit(self):
-        thescene = self.scene()
-        theview = thescene.views()[0]
-        theview.zoomToFit()
-    # end def
-
-    ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
-        # self.createOrAddBasesToVirtualHelix()
-        QGraphicsItem.mousePressEvent(self, event)
-    # end def
-
-    class Deselector(QGraphicsItem):
-        """The deselector lives behind all the slices and observes mouse press
-        events that miss slices, emptying the selection when they do"""
-        def __init__(self, parent_HGI):
-            super(DnaPartItem.Deselector, self).__init__()
-            self.parent_HGI = parent_HGI
-        def mousePressEvent(self, event):
-            self.parent_HGI.part().setSelection(())
-            super(DnaPartItem.Deselector, self).mousePressEvent(event)
-        def boundingRect(self):
-            return self.parent_HGI.boundingRect()
-        def paint(self, painter, option, widget=None):
-            pass
-    # end class
-
-    class IntersectionProbe(QGraphicsItem):
-        def boundingRect(self):
-            return QRectF(0, 0, .1, .1)
-        def paint(self, painter, option, widget=None):
-            pass
-    # end class
 # end class

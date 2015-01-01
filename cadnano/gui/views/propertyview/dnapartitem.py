@@ -6,13 +6,14 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from .customtreewidgetitems import PropertyItem, SelectionItem
 
 
 KEY_COL = 0
 VAL_COL = 1
 
-class DnaPartItem(PropertyItem):
+class DnaPartItem(PropertyItem, AbstractPartItem):
     def __init__(self, model_part, parent=None):
         super(PropertyItem, self).__init__(parent)
         self._model_part = m_p = model_part
@@ -52,18 +53,6 @@ class DnaPartItem(PropertyItem):
         self._parent_tree = None
         self._controller.disconnectSignals()
         self._controller = None
-    # end def
-
-    def partDimensionsChangedSlot(self):
-        pass
-    # end def
-
-    def partParentChangedSlot(self):
-        pass
-    # end def
-
-    def partRemovedSlot(self):
-        pass
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
