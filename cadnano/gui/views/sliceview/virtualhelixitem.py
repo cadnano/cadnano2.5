@@ -18,12 +18,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     and paints its corresponding VirtualHelix number.
     """
     # set up default, hover, and active drawing styles
-    _USE_BRUSH = QBrush(styles.ORANGE_FILL)
-    _USE_PEN = QPen(styles.ORANGE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
     _RADIUS = styles.SLICE_HELIX_RADIUS
-    _OUT_OF_SLICE_PEN = QPen(styles.LIGHT_ORANGE_STROKE,\
-                         styles.SLICE_HELIX_STROKE_WIDTH)
-    _OUT_OF_SLICE_BRUSH = QBrush(styles.LIGHT_ORANGE_FILL)
     _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
     _FONT = styles.SLICE_NUM_FONT
     _ZVALUE = styles.ZSLICEHELIX+3
@@ -43,6 +38,17 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(self._ZVALUE)
         self.lastMousePressAddedBases = False
+
+        part_color = QColor(self.part().getProperty("color"))
+        part_color_A64 = QColor(part_color)
+        part_color_A64.setAlpha(64)
+        part_color_A128 = QColor(part_color)
+        part_color_A128.setAlpha(128)
+
+        self._USE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._OUT_OF_SLICE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._USE_BRUSH = QBrush(part_color_A128)
+        self._OUT_OF_SLICE_BRUSH = QBrush(part_color_A64)
 
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)

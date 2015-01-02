@@ -13,9 +13,11 @@ from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
 from cadnano import util
+from cadnano.enum import ItemType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
 from .dnapartitem import DnaPartItem
+from .oligoitem import OligoItem
 from .origamipartitem import OrigamiPartItem
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
@@ -79,11 +81,18 @@ class PropertyEditorWidget(QTreeWidget):
         sel = o.selectedItems()
         self.clear()
         if len(sel) == 1:
-            # get the selected part
-            partitem = sel[0]
-            part = partitem.part()
-            pe_item = DnaPartItem(part, self)
-            # self.show()
+            # get the selected item
+            item = sel[0]
+            item_type = item.itemType()
+            if item_type is ItemType.DNA:
+                pe_item = DnaPartItem(item.part(), self)
+                self.show()
+            elif item_type is ItemType.OLIGO:
+                print("oligo selected")
+            elif item_type is ItemType.ORIGAMI:
+                print("origami selected")
+            else:
+                raise NotImplementedError
         else:
             pass
             # self.hide() # show nothing

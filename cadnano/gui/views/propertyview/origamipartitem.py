@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
+from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 
@@ -49,4 +50,7 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
         return self._model_part
     # end def
 
+    def itemType(self):
+        return ItemType.ORIGAMI
+    # end def
 # end class

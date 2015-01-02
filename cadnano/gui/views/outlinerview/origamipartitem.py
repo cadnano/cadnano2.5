@@ -6,10 +6,11 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 
+from cadnano.enum import ItemType
 from cadnano.gui.views import styles
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
-
+from .oligoitem import OligoItem
 
 NAME_COL = 0
 VISIBLE_COL = 1
@@ -26,14 +27,13 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._model_part = m_p = model_part
         self._parent_tree = parent
-        self._controller = OrigamiPartItemController(self, model_part)
+        self._controller = OrigamiPartItemController(self, m_p)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self.setExpanded(True)
 
         # properties
         self._props = defaultdict(dict)
         self._model_props = m_props = m_p.getPropertyDict()
-
         self._props["name"]["column"] = NAME_COL
         self._props["visible"]["column"] = VISIBLE_COL
         self._props["color"]["column"] = COLOR_COL
@@ -50,28 +50,50 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
 
         # outlinerview takes responsibility of overriding default part color
         if self._props["color"]["value"] == "#000000":
-            index = len(m_p.document().children())
+            index = len(m_p.document().children())-1
             new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
             self._model_part.setProperty("color", new_color)
 
-        # child items
-        self._scaf_items = {}
-        self._stap_items = {}
-        self._mods_items = {}
-
-        self._scaf_root = self._createItem("Scaffolds", True, "#ffffff", True, self)
-        self._stap_root = self._createItem("Staples", True, "#ffffff", True, self)
-        self._mods_root = self._createItem("Modifications", True, "#ffffff", True, self)
+        # item groups
+        self._root_items = {}
+        self._root_items["Scaffolds"] = self._createRootItem("Scaffolds", self)
+        self._root_items["Staples"] = self._createRootItem("Staples", self)
+        self._root_items["Modifications"] = self._createRootItem("Modifications", self)
+        self._items = {} # children
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _createItem(self, item_name, is_visible, color, is_expanded, parent):
+    def _createRootItem(self, item_name, parent):
         twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
         twi.setData(0, Qt.EditRole, item_name)
-        twi.setData(1, Qt.EditRole, is_visible)
-        twi.setData(2, Qt.EditRole, color)
-        twi.setExpanded(is_expanded)
+        twi.setData(1, Qt.EditRole, True) # is_visible
+        twi.setData(2, Qt.EditRole, "#ffffff") # color
+        twi.setFlags(twi.flags() & ~Qt.ItemIsSelectable)
+        twi.setExpanded(True)
         return twi
+
+    ### PUBLIC SUPPORT METHODS ###
+    def rootItems(self):
+        return self._root_items
+    # end def
+
+    def itemType(self):
+        return ItemType.ORIGAMI
+    # end def
+
+    def part(self):
+        return self._model_part
+    # end def
+
+    def updateModel(self):
+        # find what changed
+        for p in self._props:
+            col = self._props[p]["column"]
+            v = self.data(col, Qt.DisplayRole)
+            m_v = self._model_part.getProperty(p)
+            if v != m_v:
+                self._model_part.setProperty(p, v)
+    # end def
 
     ### SLOTS ###
     def partRemovedSlot(self, sender):
@@ -83,31 +105,16 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     def partOligoAddedSlot(self, part, oligo):
-        print("partOligoAddedSlot", part, oligo, id(oligo))
         oligo.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        if oligo.isStaple():
-            oi_name = "staple%d" % len(self._stap_items) # need a better numbering system
-            oi_parent = self._stap_root
-            oi_dict = self._stap_items
-        else:
-            oi_name = "scaf%d" % len(self._scaf_items)
-            oi_parent = self._scaf_root
-            oi_dict = self._scaf_items
-        oi_color = oligo.color()
-        oi = self._createItem(oi_name, True, oi_color, True, oi_parent)
-        oi_dict[id(oligo)] = oi
+        o_i = OligoItem(part, oligo, self._root_items)
+        self._items[id(oligo)] = o_i
     # end def
 
     def partOligoRemovedSlot(self, part, oligo):
         print("partOligoRemovedSlot", oligo, id(oligo))
-        if oligo.isStaple():
-            oi_parent = self._stap_root
-            oi_dict = self._stap_items
-        else:
-            oi_parent = self._scaf_root
-            oi_dict = self._scaf_items
-        oi_parent.removeChild(oi_dict[id(oligo)])
-        del oi_dict[id(oligo)]
+        o_i = self._items[id(oligo)]
+        o_i.parent().removeChild(o_i)
+        del self._items[id(oligo)]
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -118,7 +125,6 @@ class OrigamiPartItem(QTreeWidgetItem, AbstractPartItem):
                 if value != new_value:
                     self.setData(col, Qt.EditRole, new_value)
     # end def
-
 
     def partSelectedChangedSlot(self, model_part, is_selected):
         self.setSelected(is_selected)

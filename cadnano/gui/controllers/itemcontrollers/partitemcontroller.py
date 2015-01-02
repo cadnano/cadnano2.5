@@ -1,7 +1,7 @@
 class PartItemController():
-    def __init__(self, dna_part_item, model_dna_part):
-        self._part_item = dna_part_item
-        self._model_part = model_dna_part
+    def __init__(self, part_item, model_part):
+        self._part_item = part_item
+        self._model_part = model_part
     # end def
 
     def connectSignals(self):

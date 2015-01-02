@@ -1,6 +1,18 @@
-class PartType:
+from enum import Enum
+
+class PartType(Enum):
     DNAPART = 0
     ORIGAMIPART = 1
+
+class ItemType(Enum):
+    DNA = 0
+    RNA = 1
+    PEPTIDE = 2
+    PROTEIN = 3
+    ORIGAMI = 4
+    OLIGO = 5
+    SELECTION = 6
+    ANNOTATION = 7
 
 
 class LatticeType:

@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
+from cadnano.enum import ItemType
 from cadnano.gui.views import styles
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
@@ -44,7 +45,7 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
 
         # outlinerview takes responsibility of overriding default part color
         if self._props["color"]["value"] == "#000000":
-            index = len(m_p.document().children())
+            index = len(m_p.document().children())-1
             new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
             self._model_part.setProperty("color", new_color)
     # end def
@@ -57,7 +58,6 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
         self._controller.disconnectSignals()
         self._controller = None
     # end def
-
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
@@ -73,6 +73,10 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
+    def itemType(self):
+        return ItemType.DNA
+    # end def
+
     def part(self):
         return self._model_part
     # end def

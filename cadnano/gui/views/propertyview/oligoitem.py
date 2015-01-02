@@ -6,20 +6,19 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.enum import ItemType
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from .customtreewidgetitems import PropertyItem, SelectionItem
-
 
 KEY_COL = 0
 VAL_COL = 1
 
-class DnaPartItem(PropertyItem, AbstractPartItem):
+class OligoItem(PropertyItem, AbstractPartItem):
     def __init__(self, model_part, parent=None):
         super(PropertyItem, self).__init__(parent)
         self._model_part = m_p = model_part
         self._parent_tree = parent
-        self._controller = DnaPartItemController(self, model_part)
+        self._controller = OligoItemController(self, model_part)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
 
         root = parent.invisibleRootItem() # add propertyitems as siblings
@@ -49,7 +48,7 @@ class DnaPartItem(PropertyItem, AbstractPartItem):
 
     # SLOTS
     def partRemovedSlot(self, sender):
-        self._parent_tree.removeDnaPartItem(self)
+        self._parent_tree.removeOligoItem(self)
         self._model_part = None
         self._parent_tree = None
         self._controller.disconnectSignals()
@@ -74,7 +73,6 @@ class DnaPartItem(PropertyItem, AbstractPartItem):
     # end def
 
     def itemType(self):
-        return ItemType.DNA
+        return ItemType.OLIGO
     # end def
-
 # end class
