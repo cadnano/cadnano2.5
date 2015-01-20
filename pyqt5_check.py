@@ -1,5 +1,6 @@
 import sys
 import distutils
+import distutils.sysconfig
 import os
 import subprocess
 import platform
