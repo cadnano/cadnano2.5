@@ -20,7 +20,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
     if os.path.exists(os.path.join(pyroot_path, qt5_zip)):
         wget_str = ''
     else:
-        wget_str = 'wget --output-file=%s http://download.qt-project.org/official_releases/qt/%s/%s/single/%s;' %\
+        wget_str = 'wget --output-document=%s http://download.qt-project.org/official_releases/qt/%s/%s/single/%s;' %\
                     (qt5_zip, QT_VERSION[0:3], QT_VERSION, qt5_zip)
     
     if os.path.exists(os.path.join(pyroot_path, qt5_src_path)):
@@ -29,7 +29,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
         extract_str = 'tar -xzf %s;' % (qt5_zip)
     
     cd_str = 'cd %s;' % (qt5_src_path)
-    mkdir_str = 'mkdir build; cd build;'
+    mkdir_str = 'mkdir -p build; cd build;'
     if sys.platform in ['linux', 'Linux']:
         config_str = '../configure %s ' % (static_str) +\
             '-opensource -prefix %s -confirm-license ' % (qt5_path) +\
@@ -121,6 +121,7 @@ def get_sip(pyroot_path, is_static=False):
 # end def
 
 def get_pyqt5(pyroot_path, qt5_path, is_static=False):
+    global PYQT5_VERSION
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     static_str = '--static' if is_static else ''
 
@@ -133,7 +134,7 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
     else:
         pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s;' %\
+        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
                         (PYQT5_VERSION, pyqt5_zip)
 
     # os.environ['QTDIR'] = qt5_path
@@ -188,6 +189,7 @@ def checker():
         else:
             print("OS is Linux or Mac")
             pyroot_path = distutils.sysconfig.BASE_PREFIX
+            print("the pypath is ", pyroot_path)
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]) )
             get_qt5(pyroot_path, qt5_path, is_static=is_static)
             try:
