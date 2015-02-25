@@ -31,13 +31,16 @@
 * `PairedPartInstance` (subclass `AbstractAssemblyInstance`)
 
 ...When you import a plasmid and want to reference a piece of it you get:
+
 ..* 1 `PairedPart`
 ..* 1-2 `PartInstances` (depending whether you wat single or double stranded)
 
 ...And you place a `PairedPartInstance` onto a `VirtualHelix` of a `Block`
+
 ..* You get all of the features that overlap the reference region
 
 ... If you want to break the share link, you create a new:
+
 ..* `PairedPart`
 ..* `PairedPartInstance`
 ..* 1 or 2 `Part`s (Depending on whether you want to edit one or both `Part`s)
