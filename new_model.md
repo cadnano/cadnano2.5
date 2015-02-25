@@ -1,18 +1,18 @@
 # Objects names need to change
 
-Strand --> Part: this is single a stranded piece of DNA
-StrandSet --> PartList or PartSet (an ordered list / hybrid datastructure
+Strand --> Part (subclass ProxyObject): this is single a stranded piece of DNA
+StrandSet --> PartList or PartSet (subclass ProxyObject) (an ordered list / hybrid datastructure
                  of PartInstances)
 
-VirtualHelix --> VirtualHelix.  A spatial origin for PartLists and container for
+VirtualHelix --> VirtualHelix (subclass ProxyObject).  A spatial origin for PartLists and container for
     references to its PairedPartInstances
 
-Oligo --> Strand
+Oligo --> Strand (subclass ProxyObject)
 
-Part --> Block (debatable)
+Part --> Block (name debatable) (subclass AbstractAssembly)
     Blocks are really just a subclass of assembly where virtual helices can live
 
-Assembly --> Assembly 
+Assembly --> Assembly (subclass AbstractAssembly)
 
     Can be assemblies of assemblies
     Can be multiple assemblies per virtualhelix
@@ -20,14 +20,15 @@ Assembly --> Assembly
 
 
 NEW STUFF
+AbstractAsseblyInstace (subclass ObjectInstance)
 
-PartInstance --> Pointer to a part or all of another Part / PartInstance.
+PartInstance (subclass ObjectInstance) --> Pointer to a part or all of another Part / PartInstance.
     offset
     length
 
-PairedPart --> assembly containing 1-2 PartInstances paired with each other
+PairedPart (subclass AbstractAssembly) --> assembly containing 1-2 PartInstances paired with each other
     
-PairedPartInstance
+PairedPartInstance (subclass AbstractAssemblyInstance)
 
     * When you import a plasmid and want to reference a piece of it you get:
         * 1 PairedPart
