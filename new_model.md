@@ -23,8 +23,8 @@
 `AbstractAssemblyInstace` (subclass `ObjectInstance`)
 
 `PartInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `Part` / `PartInstance`.
-    offset
-    length
+> * offset
+> * length
 
 `PairedPart` (subclass `AbstractAssembly`) --> assembly containing 1-2 `PartInstance`s paired with each other
     
