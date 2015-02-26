@@ -4,8 +4,8 @@
 * `StrandSet` --> `OligoList` or `OligoSet` (subclass `ProxyObject`) (an linear ordered list / hybrid datastructure
                  of `OligoInstance`s)
 
-* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin for `PartList`s and container for
-    references to its `PairedPartInstance`s
+* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin for `OligoList`s and container for
+    references to its `PartInstance`s
 
 * `Oligo` --> `Strand` (subclass `ProxyObject`) and ordered list of `StrandInstances` or `OligoInstance`s
 
@@ -22,7 +22,7 @@
 
 * `AbstractAssemblyInstace` (subclass `ObjectInstance`)
 
-* `OligoInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `Oligo` / `OligoInstance`.
+* `OligoInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `Oligo` or `OligoInstance`.
   * offset
   * length
 
