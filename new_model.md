@@ -1,6 +1,6 @@
 # Objects names need to change
 
-* `Strand` --> Oligo (subclass `ProxyObject`): this is single a stranded piece of DNA
+* `Strand` --> `Oligo` (subclass `ProxyObject`): this is single a stranded piece of DNA
 * `StrandSet` --> `OligoList` or `OligoSet` (subclass `ProxyObject`) (an linear ordered list / hybrid datastructure
                  of `OligoInstance`s)
 
@@ -20,7 +20,7 @@
 
 # NEW STUFF
 
-* `AbstractAssemblyInstace` (subclass `ObjectInstance`)
+* `AbstractAssemblyInstance` (subclass `ObjectInstance`)
 
 * `OligoInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `Oligo` or `OligoInstance`.
   * offset
