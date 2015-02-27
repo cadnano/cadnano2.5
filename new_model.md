@@ -1,13 +1,16 @@
 # Objects names need to change
 
-* `Strand` --> `Oligo` (subclass `ProxyObject`): this is single a stranded piece of DNA
-* `StrandSet` --> `OligoList` or `OligoSet` (subclass `ProxyObject`) (an linear ordered list / hybrid datastructure
+* `Strand` --> `StrandNode` (subclass `ProxyObject`): this is single a stranded piece of DNA, 
+    Oligo and Strand merge into one!  It's a tree like data structure where at each level
+    a `StrandNodeInstance` and possibly a `StrandNode` need to be created
+
+* `StrandSet` --> `VirtualStrand` (subclass `ProxyObject`) (an linear ordered list / hybrid datastructure
                  of `OligoInstance`s)
 
-* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin for `OligoList`s and container for
+* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin for `VirtualStrand`s and container for
     references to its `PartInstance`s
 
-* `Oligo` --> `Strand` (subclass `ProxyObject`) and ordered list of `StrandInstances` or `OligoInstance`s
+* `Oligo` --> `StrandNode` (subclass `ProxyObject`) an ordered list of 0 or more `StrandNodeInstances`
 
 * `Part` --> `Block` (name debatable) (subclass `AbstractAssembly`)
     Blocks are really just a subclass of assembly where virtual helices can live
@@ -22,13 +25,13 @@
 
 * `AbstractAssemblyInstance` (subclass `ObjectInstance`)
 
-* `OligoInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `Oligo` or `OligoInstance`.
+* `StrandNodeInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `StrandNode`.
   * offset
   * length
 
-* `Part` (subclass `AbstractAssembly`) --> assembly containing 2 arrays containing 0 or more `OligoInstance`s or `StrandInstances` paired with each other
+* `Part` (subclass `AbstractAssembly`) --> assembly containing 2 arrays containing 0 or more `StrandNodes`
     
-* `PartInstance` (subclass `AbstractAssemblyInstance`)
+* `PartInstance` (subclass `AbstractAssemblyInstance`).  Points to `StrandNodeInstances` of a 2 `StrandNodes`
 
    When you import a plasmid and want to reference a piece of it you get:
 
@@ -43,8 +46,8 @@
 
   * `Part`
   * `PartInstance`
-  * 1 or 2 `Oligo`s or `Strand`s (Depending on whether you want to edit one or both `Oligo`s)
-  * 1 or 2 `OligoInstance`s (etc) or `StrandInstance`s
+  * 1 or 2 `StrandNodes`s (Depending on whether you want to edit one or both `StrandNodes`s)
+  * 1 or 2 `StrandNodeInstance`s
 
 
 Every Type of object can have features/annotations
