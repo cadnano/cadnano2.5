@@ -55,6 +55,7 @@ class Strand(ProxyObject):
         self._strand3p = None  # 3' connection to another strand
         self._sequence = None
 
+        # TODO REMOVE THESE two fields
         self._decorators = {}
         self._modifiers = {}
 
@@ -793,8 +794,8 @@ class Strand(ProxyObject):
         strand to new_idxs
 
         """
-        decs = self._decorators
-        mods = self._modifiers
+        # decs = self._decorators
+        # mods = self._modifiers
         cIdxL, cIdxH = self.idxs()
         nIdxL, nIdxH = new_idxs
 

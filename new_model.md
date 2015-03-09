@@ -1,16 +1,21 @@
 # Objects names need to change
 
-* `Strand` --> `StrandNode` (subclass `ProxyObject`): this is single a stranded piece of DNA, 
-    Oligo and Strand merge into one!  It's a tree like data structure where at each level
+* `Strand` --> `VirtualPathNode`  (subclass `ProxyObject`): a reference to a 
+piece of a StrandNodeInstance mapping "Strand Space" onto "Path Space".  It has
+ indices into the strandnodeinstance, as well as indices into the VirtualStrand.  
+"PathNode" could maybe use a better word than Path.  It still maintains the 
+pointers to 5p and 3p `VirtualPathNodes`
+
+* `StrandSet` --> `VirtualStrand` (subclass `ProxyObject`) (an linear ordered 
+list / hybrid datastructure of `OligoInstance`s)
+
+* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin 
+for `VirtualStrand`s and container for references to its `PartInstance`s
+
+* `Oligo` --> `StrandNode`/`StrandNodeInstances` (subclass `ProxyObject`) an 
+ordered list of 0 or more : this is single a stranded piece of DNA,  It's a 
+tree like data structure where at each level
     a `StrandNodeInstance` and possibly a `StrandNode` need to be created
-
-* `StrandSet` --> `VirtualStrand` (subclass `ProxyObject`) (an linear ordered list / hybrid datastructure
-                 of `OligoInstance`s)
-
-* `VirtualHelix` --> `VirtualHelix` (subclass `ProxyObject`).  A spatial origin for `VirtualStrand`s and container for
-    references to its `PartInstance`s
-
-* `Oligo` --> `StrandNode` (subclass `ProxyObject`) an ordered list of 0 or more `StrandNodeInstances`
 
 * `Part` --> `Block` (name debatable) (subclass `AbstractAssembly`)
     Blocks are really just a subclass of assembly where virtual helices can live
@@ -25,13 +30,11 @@
 
 * `AbstractAssemblyInstance` (subclass `ObjectInstance`)
 
-* `StrandNodeInstance` (subclass `ObjectInstance`) --> Pointer to a part or all of another `StrandNode`.
-  * offset
-  * length
-
-* `Part` (subclass `AbstractAssembly`) --> assembly containing 2 arrays containing 0 or more `StrandNodes`
+* `Part` (subclass `AbstractAssembly`) --> assembly containing 2 arrays 
+containing 0 or more `StrandNodes`
     
-* `PartInstance` (subclass `AbstractAssemblyInstance`).  Points to `StrandNodeInstances` of a 2 `StrandNodes`
+* `PartInstance` (subclass `AbstractAssemblyInstance`).  Points to 
+`StrandNodeInstances` of a 2 `StrandNodes`
 
    When you import a plasmid and want to reference a piece of it you get:
 
