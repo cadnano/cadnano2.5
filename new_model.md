@@ -39,7 +39,7 @@ containing 0 or more `StrandNodes`
    When you import a plasmid and want to reference a piece of it you get:
 
   * 1 `Part`
-  * 1-2 `PartInstances` (depending whether you wat single or double stranded)
+  * 1-2 `PartInstances` (depending whether you want single or double stranded)
 
    And you place a `PartInstance` onto a `VirtualHelix` of a `Block`
 
