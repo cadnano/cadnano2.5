@@ -1,25 +1,14 @@
-from operator import itemgetter
-from itertools import repeat
-import array
 from bisect import bisect_left, insort_left
 
-izip = zip
-
 from cadnano.enum import StrandType
-import cadnano.preferences as prefs
-
 import cadnano.util as util
-
-from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.cnproxy import ProxyObject, ProxySignal
-
-from cadnano.strand import Strand
-from cadnano.oligo import Oligo
 
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .splitcmd import SplitCommand
 from .mergecmd import MergeCommand
+
 
 class StrandSet(ProxyObject):
     """
@@ -51,16 +40,17 @@ class StrandSet(ProxyObject):
 
     def __repr__(self):
         if self._strand_type == 0:
-            type = 'scaf'
+            st_type = 'scaf'
         else:
-            type = 'stap'
+            st_type = 'stap'
         num = self._virtual_helix.number()
-        return "<%s_StrandSet(%d)>" % (type, num)
+        return "<%s_StrandSet(%d)>" % (st_type, num)
     # end def
 
     ### SIGNALS ###
+    #pyqtSignal(QObject, QObject)  # strandset, strand
     strandsetStrandAddedSignal = ProxySignal(ProxyObject, ProxyObject,
-                                    name='strandsetStrandAddedSignal')#pyqtSignal(QObject, QObject)  # strandset, strand
+                                             name='strandsetStrandAddedSignal')
 
     ### SLOTS ###
 
@@ -109,7 +99,7 @@ class StrandSet(ProxyObject):
 
     # def getNeighbors(self, strand):
     #     sl = self.strand_array
-    #     lsl = len(sl) 
+    #     lsl = len(sl)
     #     start, end = strand.idxs()
     #     if sl[start] != strand:
     #         raise IndexError("strand not in list")
@@ -197,9 +187,7 @@ class StrandSet(ProxyObject):
     # # end def
 
     def getBoundsOfEmptyRegionContaining(self, base_idx):
-        """
-
-        """
+        """ Return the bounds of the empty region containing base index <base_idx>. """
         class DummyStrand(object):
             _base_idx_low = base_idx
             def __lt__(self, other):
@@ -212,14 +200,14 @@ class StrandSet(ProxyObject):
             return 0, len(self.strand_array) - 1
 
         # the i-th index is the high-side strand and the i-1 index
-        # is the low-side strand since bisect_left gives the index 
+        # is the low-side strand since bisect_left gives the index
         # to insert the dummy strand at
         i = bisect_left(sh, ds)
         if i == 0:
             low_idx = 0
         else:
             low_idx = sh[i - 1].highIdx() + 1
-        
+
         # would be an append to the list effectively if inserting the dummy strand
         if i == lsh:
             high_idx = len(self.strand_array) - 1
@@ -238,12 +226,12 @@ class StrandSet(ProxyObject):
     # # end def
 
     def indexOfRightmostNonemptyBase(self):
-           """Returns the high base_idx of the last strand, or 0."""
-           sh = self.strand_heap
-           if len(sh) > 0:
-               return sh[-1].highIdx()
-           else:
-               return 0
+        """Returns the high base_idx of the last strand, or 0."""
+        sh = self.strand_heap
+        if len(sh) > 0:
+            return sh[-1].highIdx()
+        else:
+            return 0
     # end def
 
     def partMaxBaseIdx(self):
@@ -252,11 +240,11 @@ class StrandSet(ProxyObject):
 
     def strandCount(self):
         return len(self.strands())
-    # end def
+
 
     def strandType(self):
         return self._strand_type
-    # end def
+
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def createStrand(self, base_idx_low, base_idx_high, use_undostack=True):
@@ -266,11 +254,10 @@ class StrandSet(ProxyObject):
         # print("sss creating strand")
         bounds_low, bounds_high = \
                             self.getBoundsOfEmptyRegionContaining(base_idx_low)
-    
+
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
-            c = CreateStrandCommand(self,
-                                        base_idx_low, base_idx_high)
+            c = CreateStrandCommand(self, base_idx_low, base_idx_high)
             row, col = self._virtual_helix.coord()
             d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
             # print("strand", d)
@@ -287,8 +274,7 @@ class StrandSet(ProxyObject):
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
         """
-        c = CreateStrandCommand(self,
-                                    base_idx_low, base_idx_high)
+        c = CreateStrandCommand(self, base_idx_low, base_idx_high)
         row, col = self._virtual_helix.coord()
         d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
         # print("strand", d)
@@ -313,13 +299,12 @@ class StrandSet(ProxyObject):
         cmds = []
 
         if not self.isStrandInSet(strand):
-                raise IndexError("Strandset.removeStrand: strand not in set")
+            raise IndexError("Strandset.removeStrand: strand not in set")
         if self.isScaffold() and strand.sequence() is not None:
             cmds.append(strand.oligo().applySequenceCMD(None))
         cmds += strand.clearDecoratorCommands()
         cmds.append(RemoveStrandCommand(self, strand, solo=solo))
         util.execCommandList(self, cmds, desc="Remove strand", use_undostack=use_undostack)
-        return strandset_idx
     # end def
 
     def removeAllStrands(self, use_undostack=True):
@@ -338,7 +323,7 @@ class StrandSet(ProxyObject):
         """
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
-            strand_low, strand_high = low_and_high_strands
+            strand_low, strand_high = low_and_high_strands  # pylint: disable=W0633
             if self.isStrandInSet(strand_low):
                 c = MergeCommand(strand_low, strand_high, priority_strand)
                 util.execCommandList(self, [c], desc="Merge", use_undostack=use_undostack)
@@ -439,8 +424,7 @@ class StrandSet(ProxyObject):
     # # end def
 
     def hasStrandAt(self, idx_low, idx_high):
-        """
-        """
+        """ Return True if strandset has a strand in the region between idx_low and idx_high (both included)."""
         sa = self.strand_array
         sh = self.strand_heap
         lsh = len(sh)
@@ -633,7 +617,7 @@ class StrandSet(ProxyObject):
         except ValueError:
             return (False, 0)
     # end def
-    
+
     def deepCopy(self, virtual_helix):
         """docstring for deepCopy"""
         pass
