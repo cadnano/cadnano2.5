@@ -1,20 +1,10 @@
-from operator import itemgetter
-from itertools import repeat
-import array
 from bisect import bisect_left, insort_left
 
-izip = zip
-
 from cadnano.enum import StrandType
-import cadnano.preferences as prefs
 
 import cadnano.util as util
 
-from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.cnproxy import ProxyObject, ProxySignal
-
-from cadnano.strand import Strand
-from cadnano.oligo import Oligo
 
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
@@ -38,7 +28,6 @@ class StrandSet(ProxyObject):
         self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
         self.strand_heap = []
 
-        # self.strand_vector = array.array('L')
         self._undo_stack = None
         self._last_strandset_idx = None
         self._strand_type = strand_type
@@ -51,11 +40,11 @@ class StrandSet(ProxyObject):
 
     def __repr__(self):
         if self._strand_type == 0:
-            type = 'scaf'
+            st = 'scaf'
         else:
-            type = 'stap'
+            st = 'stap'
         num = self._virtual_helix.number()
-        return "<%s_StrandSet(%d)>" % (type, num)
+        return "<%s_StrandSet(%d)>" % (st, num)
     # end def
 
     ### SIGNALS ###
@@ -228,22 +217,13 @@ class StrandSet(ProxyObject):
         return (low_idx, high_idx)
     # end def
 
-    # def indexOfRightmostNonemptyBase(self):
-    #     """Returns the high base_idx of the last strand, or 0."""
-    #     sl = self.strand_array
-    #     lsl = len(sl)-1
-    #     for i in range(lsl, -1, -1):
-    #         if sl[i] is not None:
-    #             return sl[i].highIdx()
-    # # end def
-
     def indexOfRightmostNonemptyBase(self):
-           """Returns the high base_idx of the last strand, or 0."""
-           sh = self.strand_heap
-           if len(sh) > 0:
-               return sh[-1].highIdx()
-           else:
-               return 0
+            """Returns the high base_idx of the last strand, or 0."""
+            sh = self.strand_heap
+            if len(sh) > 0:
+                return sh[-1].highIdx()
+            else:
+                return 0
     # end def
 
     def partMaxBaseIdx(self):
@@ -313,13 +293,12 @@ class StrandSet(ProxyObject):
         cmds = []
 
         if not self.isStrandInSet(strand):
-                raise IndexError("Strandset.removeStrand: strand not in set")
+            raise IndexError("Strandset.removeStrand: strand not in set")
         if self.isScaffold() and strand.sequence() is not None:
             cmds.append(strand.oligo().applySequenceCMD(None))
         cmds += strand.clearDecoratorCommands()
         cmds.append(RemoveStrandCommand(self, strand, solo=solo))
         util.execCommandList(self, cmds, desc="Remove strand", use_undostack=use_undostack)
-        return strandset_idx
     # end def
 
     def removeAllStrands(self, use_undostack=True):
@@ -428,15 +407,6 @@ class StrandSet(ProxyObject):
     def strandFilter(self):
         return "scaffold" if self._strand_type == StrandType.SCAFFOLD else "staple"
 
-    # def hasStrandAt(self, idx_low, idx_high):
-    #     """
-    #     """
-    #     sl = self.strand_array
-    #     if sl[idx_low] is None and sl[idx_high] is None:
-    #         return False
-    #     else:
-    #         return True
-    # # end def
 
     def hasStrandAt(self, idx_low, idx_high):
         """
@@ -468,20 +438,6 @@ class StrandSet(ProxyObject):
         else:
             return True
     # end def
-
-    # def getOverlappingStrands(self, idx_low, idx_high):
-    #     sl = self.strand_array
-    #     strand_subset = set()
-    #     out = []
-    #     for i in range(idx_low, idx_high + 1):
-    #         strand = sl[i]
-    #         if strand is None or strand in strand_subset:
-    #             continue
-    #         else:
-    #             strand_subset.add(strand)
-    #             out.append(strand)
-    #     return out
-    # # end def
 
     def getOverlappingStrands(self, idx_low, idx_high):
         sa = self.strand_array

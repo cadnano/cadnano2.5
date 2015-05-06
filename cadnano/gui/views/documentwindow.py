@@ -45,7 +45,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._readSettings()
 
         # Outliner setup
-        self.outlineroot = OutlineRootItem(parent=None, window=self, document=doc)
+        # disabled NC
+        # self.outlineroot = OutlineRootItem(parent=None, window=self, document=doc)
 
 
         # Slice setup
@@ -78,7 +79,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_splitter.setHandleWidth(0)
 
         self.part_toolbar = PartToolBar(doc, self.slice_splitter)
-        self.slice_splitter.addWidget(self.outlineroot)
+
+        # disabled NC
+        # self.slice_splitter.addWidget(self.outlineroot)
+        
         self.slice_splitter.addWidget(self.slice_graphics_view)
 
         self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
