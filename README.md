@@ -1,12 +1,13 @@
 # cadnano 2.5  (*radnano*)
-This is a development version of cadnano ported to `Qt5/PyQt5`
+This is a development version of cadnano ported to `Qt5/PyQt5`, 
+the dev branch is most up to date
 
 ## Changes
 A number of organizational and style changes have occured from cadnano 2
 
 * cadnano can be run in python without Qt installed at all
 * Python 3 compatible
-* no more camel-case'd variables
+* no more camel-case'd variables (fixes namespace collisions)
 * QUndoCommands are broken out to their own modules
 * added a STL generator to generate models for 3D printing
 * Maya code removed.
@@ -54,6 +55,10 @@ or you can manually:
 
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful for some people.
+
+### Anaconda
+
+    I'm told cadnano runs well in Anaconda with PyQt5 support built in
 
 # *nno2stl*: Conversion of cadnano .nno files to 3D STL model
 
