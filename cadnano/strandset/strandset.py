@@ -2,13 +2,13 @@ from bisect import bisect_left, insort_left
 
 from cadnano.enum import StrandType
 import cadnano.util as util
+
 from cadnano.cnproxy import ProxyObject, ProxySignal
 
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .splitcmd import SplitCommand
 from .mergecmd import MergeCommand
-
 
 class StrandSet(ProxyObject):
     """
@@ -27,7 +27,6 @@ class StrandSet(ProxyObject):
         self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
         self.strand_heap = []
 
-        # self.strand_vector = array.array('L')
         self._undo_stack = None
         self._last_strandset_idx = None
         self._strand_type = strand_type
@@ -40,17 +39,16 @@ class StrandSet(ProxyObject):
 
     def __repr__(self):
         if self._strand_type == 0:
-            st_type = 'scaf'
+            st = 'scaf'
         else:
-            st_type = 'stap'
+            st = 'stap'
         num = self._virtual_helix.number()
-        return "<%s_StrandSet(%d)>" % (st_type, num)
+        return "<%s_StrandSet(%d)>" % (st, num)
     # end def
 
     ### SIGNALS ###
-    #pyqtSignal(QObject, QObject)  # strandset, strand
     strandsetStrandAddedSignal = ProxySignal(ProxyObject, ProxyObject,
-                                             name='strandsetStrandAddedSignal')
+                                    name='strandsetStrandAddedSignal')#pyqtSignal(QObject, QObject)  # strandset, strand
 
     ### SLOTS ###
 
@@ -216,15 +214,6 @@ class StrandSet(ProxyObject):
         return (low_idx, high_idx)
     # end def
 
-    # def indexOfRightmostNonemptyBase(self):
-    #     """Returns the high base_idx of the last strand, or 0."""
-    #     sl = self.strand_array
-    #     lsl = len(sl)-1
-    #     for i in range(lsl, -1, -1):
-    #         if sl[i] is not None:
-    #             return sl[i].highIdx()
-    # # end def
-
     def indexOfRightmostNonemptyBase(self):
         """Returns the high base_idx of the last strand, or 0."""
         sh = self.strand_heap
@@ -323,7 +312,7 @@ class StrandSet(ProxyObject):
         """
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
-            strand_low, strand_high = low_and_high_strands  # pylint: disable=W0633
+            strand_low, strand_high = low_and_high_strands
             if self.isStrandInSet(strand_low):
                 c = MergeCommand(strand_low, strand_high, priority_strand)
                 util.execCommandList(self, [c], desc="Merge", use_undostack=use_undostack)
@@ -413,15 +402,6 @@ class StrandSet(ProxyObject):
     def strandFilter(self):
         return "scaffold" if self._strand_type == StrandType.SCAFFOLD else "staple"
 
-    # def hasStrandAt(self, idx_low, idx_high):
-    #     """
-    #     """
-    #     sl = self.strand_array
-    #     if sl[idx_low] is None and sl[idx_high] is None:
-    #         return False
-    #     else:
-    #         return True
-    # # end def
 
     def hasStrandAt(self, idx_low, idx_high):
         """ Return True if strandset has a strand in the region between idx_low and idx_high (both included)."""
@@ -452,20 +432,6 @@ class StrandSet(ProxyObject):
         else:
             return True
     # end def
-
-    # def getOverlappingStrands(self, idx_low, idx_high):
-    #     sl = self.strand_array
-    #     strand_subset = set()
-    #     out = []
-    #     for i in range(idx_low, idx_high + 1):
-    #         strand = sl[i]
-    #         if strand is None or strand in strand_subset:
-    #             continue
-    #         else:
-    #             strand_subset.add(strand)
-    #             out.append(strand)
-    #     return out
-    # # end def
 
     def getOverlappingStrands(self, idx_low, idx_high):
         sa = self.strand_array
