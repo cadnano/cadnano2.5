@@ -98,7 +98,7 @@ class StrandSet(ProxyObject):
 
     # def getNeighbors(self, strand):
     #     sl = self.strand_array
-    #     lsl = len(sl) 
+    #     lsl = len(sl)
     #     start, end = strand.idxs()
     #     if sl[start] != strand:
     #         raise IndexError("strand not in list")
@@ -201,14 +201,14 @@ class StrandSet(ProxyObject):
             return 0, len(self.strand_array) - 1
 
         # the i-th index is the high-side strand and the i-1 index
-        # is the low-side strand since bisect_left gives the index 
+        # is the low-side strand since bisect_left gives the index
         # to insert the dummy strand at
         i = bisect_left(sh, ds)
         if i == 0:
             low_idx = 0
         else:
             low_idx = sh[i - 1].highIdx() + 1
-        
+
         # would be an append to the list effectively if inserting the dummy strand
         if i == lsh:
             high_idx = len(self.strand_array) - 1
@@ -246,7 +246,7 @@ class StrandSet(ProxyObject):
         # print("sss creating strand")
         bounds_low, bounds_high = \
                             self.getBoundsOfEmptyRegionContaining(base_idx_low)
-    
+
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self,
@@ -589,7 +589,7 @@ class StrandSet(ProxyObject):
         except ValueError:
             return (False, 0)
     # end def
-    
+
     def deepCopy(self, virtual_helix):
         """docstring for deepCopy"""
         pass

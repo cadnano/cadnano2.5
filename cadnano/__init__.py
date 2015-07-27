@@ -34,9 +34,9 @@ def initAppWithGui(appArgs=None):
     # 1. Create the application object
     shared_app = CadnanoQt(appArgs)
     # 2. Use the object to finish importing and creating
-    # application wide objects 
+    # application wide objects
     shared_app.finishInit()
     return shared_app
-    
+
 
 __all__ = ["document", "enum", "decorators", "fileio", "oligo", "part", "strand", "strand", "strandset", "virtualhelix"]

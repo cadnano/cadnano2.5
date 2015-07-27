@@ -140,7 +140,7 @@ class RemoveXoverCommand(UndoCommand):
             n_o3p.incrementLength(strand.totalLength())
         # end def
         n_o3p.setStrand5p(strand3p)
-        
+
         self._isLoop = strand3p.oligo().isLoop()
     # end def
 

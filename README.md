@@ -1,5 +1,5 @@
 # cadnano 2.5  (*radnano*)
-This is a development version of cadnano ported to `Qt5/PyQt5`, 
+This is a development version of cadnano ported to `Qt5/PyQt5`,
 the dev branch is most up to date
 
 ## Changes
@@ -15,7 +15,7 @@ A number of organizational and style changes have occured from cadnano 2
 versions that can be destributed as binary
 * stablized code base so fewer crashes
 
-The only additional burden for development on this code base is installing PyQt5 
+The only additional burden for development on this code base is installing PyQt5
 to use the GUI which is not a one click situation.  Fortunately `pyqtdeploy`
 should make this a problem for only people who want to hack on the code base.
 
@@ -27,7 +27,7 @@ to run:
 
 ## PyQt5 Installation
 
-the requirements PyQt5 and sip are available from Riverbank Computing Limited at: 
+the requirements PyQt5 and sip are available from Riverbank Computing Limited at:
 
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
@@ -37,7 +37,7 @@ if on Windows just download the installer for your python version
 if on Linux or Mac follow this path:
 
 you can run the included `pyqt5_check.py` which will grab, build and install
-`Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using 
+`Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
 
     mkvirtualenv -p /path/to/python/of/choice/bin/python myvenv

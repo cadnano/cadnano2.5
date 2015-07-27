@@ -2,15 +2,15 @@
 # encoding: utf-8
 import sys
 import os
-LOCAL_DIR = os.path.dirname(os.path.realpath(__file__)) 
+LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR = os.path.dirname(LOCAL_DIR)
 sys.path.append(PROJECT_DIR)
 sys.path.insert(0, '.')
 
 """
-run with 
+run with:
 
-    python bin/main.py 2>/dev/null 
+    python bin/main.py 2>/dev/null
 
 to push GObject warnings to /dev/null on linux
 """
@@ -39,6 +39,6 @@ def main(args):
     #     from tests.runall import main as runTests
     #     runTests(useXMLRunner=False)
     sys.exit(app.exec_())
-    
+
 if __name__ == '__main__':
     main(sys.argv)

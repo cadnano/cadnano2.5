@@ -233,14 +233,14 @@ class Strand(ProxyObject):
         """
         """
         comp_ss = self.strandSet().complementStrandSet()
-        
+
         # the strand sequence will need to be regenerated from scratch
         # as there are no guarantees about the entirety of the strand moving
-        # i.e. both endpoints thanks to multiple selections so just redo the 
+        # i.e. both endpoints thanks to multiple selections so just redo the
         # whole thing
         self._sequence = None
-        
-        for comp_strand in comp_ss.getOverlappingStrands(self._base_idx_low, 
+
+        for comp_strand in comp_ss.getOverlappingStrands(self._base_idx_low,
                                 self._base_idx_high):
             comp_seq = comp_strand.sequence()
             used_seq = util.comp(comp_seq) if comp_seq else None
@@ -248,16 +248,16 @@ class Strand(ProxyObject):
                                         used_seq, comp_strand)
         # end for
     # end def
-    
+
     def getComplementStrands(self):
         """
         return the list of complement strands that overlap with this strand
         """
         comp_ss = self.strandSet().complementStrandSet()
-        return [comp_strand for comp_strand in 
-                            comp_ss.getOverlappingStrands(self._base_idx_low, 
+        return [comp_strand for comp_strand in
+                            comp_ss.getOverlappingStrands(self._base_idx_low,
                                                     self._base_idx_high)]
-    # end def 
+    # end def
 
     def getPreDecoratorIdxList(self):
         """
@@ -339,7 +339,7 @@ class Strand(ProxyObject):
                                                                 temp[start:end]
         # print "old sequence", self._sequence
         self._sequence = tostring(temp_self)
-        
+
         # if we need to reverse it do it now
         if not self._is_drawn_5_to_3:
             self._sequence = self._sequence[::-1]
@@ -347,7 +347,7 @@ class Strand(ProxyObject):
         # test to see if the string is empty(), annoyingly expensive
         if len(self._sequence.strip()) == 0:
             self._sequence = None
-            
+
         # print "new sequence", self._sequence
         return self._sequence
     # end def
@@ -701,7 +701,7 @@ class Strand(ProxyObject):
             # end if
         # end if
     # end def
-    
+
     def removeInsertion(self,  idx, use_undostack=True):
         cmds = []
         idx_low, idx_high = self.idxs()

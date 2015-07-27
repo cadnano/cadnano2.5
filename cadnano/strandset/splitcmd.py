@@ -22,7 +22,7 @@ class SplitCommand(UndoCommand):
         self._old_strand = strand
         old_sequence  = strand._sequence
         is5to3 = strand.isDrawn5to3()
-        
+
         # self._s_set_idx = strandset_idx
         self._s_set = s_set = strand.strandSet()
         self._old_oligo = oligo = strand.oligo()

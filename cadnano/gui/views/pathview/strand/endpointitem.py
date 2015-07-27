@@ -136,7 +136,7 @@ class EndpointItem(QGraphicsPathItem):
             if group:
                 group.addToGroup(self)
             return False
-    
+
     def safeSetPos(self, x, y):
         """
         Required to ensure proper reparenting if selected

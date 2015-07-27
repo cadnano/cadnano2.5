@@ -204,7 +204,7 @@ class DocumentController():
         3. Create a new document and swap it into the existing ctrlr/window.
         """
         # clear/reset the view!
-        
+
         if len(self._document.children()) == 0:
             return  # no parts
         if self.maybeSave() == False:
@@ -387,7 +387,7 @@ class DocumentController():
     def actionModifySlot(self):
         """
         Notifies that part root items that parts should respond to modifier
-        selection signals. 
+        selection signals.
         """
         pass
         # uncomment for debugging
@@ -531,7 +531,7 @@ class DocumentController():
     ### SLOT CALLBACKS ###
     def actionNewSlotCallback(self):
         """
-        Gets called on completion of filesavedialog after newClicked's 
+        Gets called on completion of filesavedialog after newClicked's
         maybeSave. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
@@ -564,7 +564,7 @@ class DocumentController():
 
     def newClickedCallback(self):
         """
-        Gets called on completion of filesavedialog after newClicked's 
+        Gets called on completion of filesavedialog after newClicked's
         maybeSave. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """

@@ -19,7 +19,7 @@ void QGraphicsScenePrivate::mousePressEventHandler(QGraphicsSceneMouseEvent *mou
       *** if mouseEvent->isAccepted() return ***
       ungrab
     propagate to view
-    
+
 ----- QGraphicsItem receives a mouse press -----
 The only default event->accept()ing that goes on is for popup widget closing
 bool QGraphicsItem::sceneEvent(QEvent *event)

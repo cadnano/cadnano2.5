@@ -15,7 +15,7 @@ class ObjectInstance(ProxyObject):
     instanceDestroyedSignal = ProxySignal(ProxyObject,
                                         name="instanceDestroyedSignal")
     instanceMovedSignal = ProxySignal(ProxyObject,
-                                            name="instanceMovedSignal") 
+                                            name="instanceMovedSignal")
     instanceParentChangedSignal = ProxySignal(ProxyObject,
                                         name="instanceParentChangedSignal")
 
@@ -42,11 +42,11 @@ class ObjectInstance(ProxyObject):
 
     def unwipe(self, doc):
         obj = self._object
-        obj.setDocument(doc) 
+        obj.setDocument(doc)
         doc.addChild(obj)
         doc.setSelectedInstance(self)
     # end def
-    
+
     def parent(self):
         return self._parent
 
@@ -58,7 +58,7 @@ class ObjectInstance(ProxyObject):
         oi._position = list(self._position)
         return oi
     # end def
-    
+
     def deepCopy(self, reference_object, parent):
         oi = ObjectInstance(reference_object, parent)
         oi._position = list(self._position)

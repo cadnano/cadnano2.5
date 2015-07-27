@@ -10,7 +10,7 @@ On windows, it is advised to skip the virtual environment.
 
 # PyQt5 setup debian
 
-PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules.   
+PyQt4’s QtGui module has been split into PyQt5’s QtGui, QtPrintSupport and QtWidgets modules.
 
 First install into your virtualenv sip using:
 
@@ -75,7 +75,7 @@ Install PyQt5
 
 # pyqtdeploy
 ## OSX 10.9
-    
+
 change:
 
     Qt/5.3/clang_64/mkspecs/qdevice.pri
@@ -88,10 +88,10 @@ change:
 make sub-src
 
 # build stand-along
-    
+
     pyqtdeploy cadnano.pdy
 
 copy cadnano.pro to the build directory as it has fixes for ffi.h issues
-    
+
     ~/Qt/5.3/clang_64/bin/qmake cadnano.pro
 

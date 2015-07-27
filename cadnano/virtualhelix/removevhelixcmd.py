@@ -9,14 +9,14 @@ class RemoveVirtualHelixCommand(UndoCommand):
         self._id_num = virtual_helix.number()
         # is the number even or odd?  Assumes a valid id_num, row,col combo
         self._is_parity_even = (self._id_num % 2) == 0
-        
+
     # end def
 
     def redo(self):
         vh = self._vhelix
         part = self._part
         id_num = self._id_num
-        
+
         part._removeVirtualHelix(vh)
         part._recycleHelixIDNumber(id_num)
         # clear out part references
@@ -30,7 +30,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         vh = self._vhelix
         part = self._part
         id_num = self._id_num
-        
+
         vh.setPart(part)
         part._addVirtualHelix(vh)
         # vh.setNumber(id_num)

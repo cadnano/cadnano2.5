@@ -33,8 +33,8 @@ class PartToolBar(QToolBar):
 
         # disabled NC
         # Toolbar Label
-        # self.action_outliner = self.setupAction("Outline", None, 
-        #                                                 "action_outliner", 
+        # self.action_outliner = self.setupAction("Outline", None,
+        #                                                 "action_outliner",
         #                                                 ":/parttools/outliner")
         # self.action_outliner.triggered.connect(self.doc.controller().actionToggleOutlinerSlot)
 
@@ -44,39 +44,39 @@ class PartToolBar(QToolBar):
 
         # disabled NC
         # DNA part
-        # self.action_new_dna_part = self.setupAction("Plasmid", None, 
-        #                                                 "action_new_dna_part", 
+        # self.action_new_dna_part = self.setupAction("Plasmid", None,
+        #                                                 "action_new_dna_part",
         #                                                 ":/parttools/new-dna")
         # self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
 
 
         # Origami ToolButton
-        self.add_origamipart_button = self.setupToolButton("Origami\n", None, 
-                                                           "add_origamipart_button", 
+        self.add_origamipart_button = self.setupToolButton("Origami\n", None,
+                                                           "add_origamipart_button",
                                                            ":/parttools/new-honeycomb")
 
         # Origami Part (Honeycomb)
-        self.action_new_honeycomb_part = self.setupAction("Hcomb", None, 
-                                                          "action_new_honeycomb_part", 
-                                                          ":/parttools/new-honeycomb", 
+        self.action_new_honeycomb_part = self.setupAction("Hcomb", None,
+                                                          "action_new_honeycomb_part",
+                                                          ":/parttools/new-honeycomb",
                                                           self.add_origamipart_button)
         self.action_new_honeycomb_part.triggered.connect(self.doc.controller().actionAddHoneycombPartSlot)
         # Origami Part (Square)
-        self.action_new_square_part = self.setupAction("Square", None, 
-                                                       "action_new_square_part", 
-                                                       ":/parttools/new-square", 
+        self.action_new_square_part = self.setupAction("Square", None,
+                                                       "action_new_square_part",
+                                                       ":/parttools/new-square",
                                                        self.add_origamipart_button)
         self.action_new_square_part.triggered.connect(self.doc.controller().actionAddSquarePartSlot)
         # Origami Part (H-PX)
-        self.action_new_hpx_part = self.setupAction("H-PX", None, 
-                                                        "action_new_honeypx_part", 
-                                                        ":/parttools/new-hpx", 
+        self.action_new_hpx_part = self.setupAction("H-PX", None,
+                                                        "action_new_honeypx_part",
+                                                        ":/parttools/new-hpx",
                                                         self.add_origamipart_button)
         self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHpxPartSlot)
         # Origami Part (S-px)
-        self.action_new_spx_part = self.setupAction("Sq-PX", None, 
-                                                        "action_new_squarepx_part", 
-                                                        ":/parttools/new-spx", 
+        self.action_new_spx_part = self.setupAction("Sq-PX", None,
+                                                        "action_new_squarepx_part",
+                                                        ":/parttools/new-spx",
                                                         self.add_origamipart_button)
         self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSpxPartSlot)
 

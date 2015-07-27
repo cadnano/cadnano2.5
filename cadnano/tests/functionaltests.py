@@ -76,7 +76,7 @@ class FunctionalTests(CadnanoGuiTestCase):
         the set of staple sequences."""
         # set up the document
         from model.io.decoder import decode
-        
+
         inputfile = "tests/functionaltestinputs/%s" % designname
         document = self.documentController.document()
         with file(inputfile) as f:
@@ -208,7 +208,7 @@ class FunctionalTests(CadnanoGuiTestCase):
     #     str1 = "1 Scaffold: _,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,_\n1 Staple:   _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_"
     #     self.assertEqual(repr(vh0), str0)
     #     self.assertEqual(repr(vh1), str1)
-    # 
+    #
     # def testEndpointAltClick(self):
     #     """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
     #     # Create a new Honeycomb part

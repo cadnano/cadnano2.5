@@ -19,7 +19,7 @@ if __name__ == "__main__":
     test2 = 'Nature09_squarenut.json'
 
     path_out = 'Nature09_squarenut.stl'
- 
+
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     test_path = os.path.join(root_path, 'tests', test2)
     doc = nnodecode.decodeFile(test_path)
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #     m4 = makeTranslation(x, y, 0)
     #     cylinder = Cylinder("%s" % str(coord), radius, 10)
     #     cylinder.applyMatrix(m4)
-    #     solids.append(cylinder)     
+    #     solids.append(cylinder)
     for oligo in part.oligos():
         if not oligo.isStaple():
             strand5p = oligo.strand5p()
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 x,y = part.latticeCoordToPositionXY(*vh.coord())
                 m4 = makeTranslation(x, y, z)
                 cylinder = Cylinder("%s" % str(vh.coord()), radius, length)
-                # cylinder = HalfCylinder("%s" % str(vh.coord()), 
+                # cylinder = HalfCylinder("%s" % str(vh.coord()),
                 #         radius, length, strand.length(),
                 #         twist_per_segment=part._twist_per_base)
                 cylinder.applyMatrix(m4)

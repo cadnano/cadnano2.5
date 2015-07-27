@@ -27,7 +27,7 @@ class OrigamiPartItemController(object):
     def disconnectSignals(self):
         m_p = self._model_part
         p_i = self._origami_part_item
-        
+
         if hasattr(p_i, "partHideSlot"):
             m_p.partHideSignal.disconnect(p_i.partHideSlot)
         if hasattr(p_i, "partActiveVirtualHelixChangedSlot"):

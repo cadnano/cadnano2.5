@@ -242,7 +242,7 @@ class OutlineRootItem(QTreeWidget):
     ### SLOTS ###
     # def itemClicked(self, item, column):
     #     print("itemClicked", item, column)
-    # 
+    #
     # def itemDoubleClicked(self, item, column):
     #     print("itemDoubleClicked", item, column)
 

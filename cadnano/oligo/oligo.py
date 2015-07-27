@@ -248,7 +248,7 @@ class Oligo(ProxyObject):
         if old_strand_low.oligo() == old_strand_high.oligo():
             self._is_loop = True
             self._strand5p = new_strand
-            return 
+            return
             # leave the _strand5p as is?
         # end if
 

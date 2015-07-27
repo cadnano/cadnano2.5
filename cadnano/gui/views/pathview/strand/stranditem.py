@@ -27,7 +27,7 @@ _NO_PEN = QPen(Qt.NoPen)
 
 class StrandItem(QGraphicsLineItem):
     _filter_name = "strand"
-    
+
     def __init__(self, model_strand, virtual_helix_item, viewroot):
         """The parent should be a VirtualHelixItem."""
         super(StrandItem, self).__init__(virtual_helix_item)
@@ -53,7 +53,7 @@ class StrandItem(QGraphicsLineItem):
         # self._isOnTop = virtual_helix_item.isStrandOnTop(model_strand)
         # label
         self._seq_label = QGraphicsSimpleTextItem(self)
-        
+
         self.refreshInsertionItems(model_strand)
         if not getBatch():
             self._updateSequenceText()
@@ -87,7 +87,7 @@ class StrandItem(QGraphicsLineItem):
         low_moved = self._low_cap.updatePosIfNecessary(self.idxs()[0])
         high_moved = self._high_cap.updatePosIfNecessary(self.idxs()[1])
         group = self.group()
-        self.tempReparent()  
+        self.tempReparent()
         if low_moved:
             self.updateLine(self._low_cap)
         if high_moved:
@@ -187,7 +187,7 @@ class StrandItem(QGraphicsLineItem):
         if idx == idx_h:
             self._high_cap.showMod(mod_id, color)
         else:
-            self._low_cap.showMod(mod_id, color) 
+            self._low_cap.showMod(mod_id, color)
     # end def
 
     def strandModsChangedSlot(self, strand, mod_id, idx):
@@ -196,7 +196,7 @@ class StrandItem(QGraphicsLineItem):
         if idx == idx_h:
             self._high_cap.changeMod(mod_id, color)
         else:
-            self._low_cap.changeMod(mod_id, color) 
+            self._low_cap.changeMod(mod_id, color)
     # end def
 
     def strandModsRemovedSlot(self, strand, mod_id, idx):
@@ -205,7 +205,7 @@ class StrandItem(QGraphicsLineItem):
         if idx == idx_h:
             self._high_cap.destroyMod()
         else:
-            self._low_cap.destroyMod() 
+            self._low_cap.destroyMod()
     # end def
 
     def strandModifierAddedSlot(self, strand, modifier):
@@ -258,7 +258,7 @@ class StrandItem(QGraphicsLineItem):
     def refreshInsertionItems(self, strand):
         i_items = self.insertionItems()
         i_model = strand.insertionsOnStrand()
-        
+
         was_in_use = set(i_items)
         in_use = set()
         # add in the ones supposed to be there
@@ -271,7 +271,7 @@ class StrandItem(QGraphicsLineItem):
                 i_items[insertion.idx()] = \
                     InsertionItem(self._virtual_helix_item, strand, insertion)
         # end for
-        
+
         # remove all in items
         not_in_use = was_in_use - in_use
         for index in not_in_use:
@@ -399,7 +399,7 @@ class StrandItem(QGraphicsLineItem):
 
     def _updateHighlight(self, color):
         """
-        
+
         """
         oligo = self._model_strand.oligo()
         pen_width = styles.PATH_STRAND_STROKE_WIDTH
@@ -423,7 +423,7 @@ class StrandItem(QGraphicsLineItem):
         bw = _BASE_WIDTH
         seq_lbl = self._seq_label
         strand = self.strand()
-        
+
         seq_txt = strand.sequence()
         isDrawn3to5 = not self._is_drawn_5to3
         textXCenteringOffset = styles.SEQUENCETEXTXCENTERINGOFFSET
@@ -438,7 +438,7 @@ class StrandItem(QGraphicsLineItem):
         strand_seq_list = strand.getSequenceList()
         seq_list = [x[1][0] for x in strand_seq_list]
         insert_seq_list = [(x[0], x[1][1]) for x in strand_seq_list]
-        
+
         i_items = self.insertionItems()
         for idx, seq_txt in insert_seq_list:
             if seq_txt != '':
@@ -446,9 +446,9 @@ class StrandItem(QGraphicsLineItem):
 
         if isDrawn3to5:
             seq_list = seq_list[::-1]
-            
+
         seq_txt = ''.join(seq_list)
-        
+
         # seq_lbl.setPen(QPen( Qt.NoPen))    # leave the Pen as None for unless required
         seq_lbl.setBrush(QBrush(Qt.black))
         seq_lbl.setFont(styles.SEQUENCEFONT)
@@ -632,7 +632,7 @@ class StrandItem(QGraphicsLineItem):
         m_strand = self._model_strand
         m_strand.addInsertion(idx, -1)
     # end def
-    
+
     def addSeqToolMousePress(self, event, idx):
         """
         Checks that a scaffold was clicked, and then calls apply sequence
@@ -651,7 +651,7 @@ class StrandItem(QGraphicsLineItem):
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
     # end def
-    
+
     def restoreParent(self, pos=None):
         """
         Required to restore parenting and positioning in the partItem
@@ -662,7 +662,7 @@ class StrandItem(QGraphicsLineItem):
         self.setSelectedColor(False)
         self.setSelected(False)
     # end def
-    
+
     def tempReparent(self, pos=None):
         vh_item = self.virtualHelixItem()
         if pos is None:
@@ -694,7 +694,7 @@ class StrandItem(QGraphicsLineItem):
                 viewroot = self._viewroot
                 current_filter_dict = viewroot.selectionFilterDict()
                 selection_group = viewroot.strandItemSelectionGroup()
-        
+
                 # only add if the selection_group is not locked out
                 is_normal_select = selection_group.isNormalSelect()
                 if value == True and (self._filter_name in current_filter_dict or not is_normal_select):
@@ -753,8 +753,8 @@ class StrandItem(QGraphicsLineItem):
         # check this strand's xover
         idx_l, idx_h = indices
         if con3p:
-            # perhaps change this to a direct call, but here are seeds of an 
-            # indirect way of doing selection checks    
+            # perhaps change this to a direct call, but here are seeds of an
+            # indirect way of doing selection checks
             if document.isModelStrandSelected(con3p) and document.isModelStrandSelected(strand5p):
                 val3p = document.getSelectedStrandValue(con3p)
                 # print "xover idx", indices
@@ -771,7 +771,7 @@ class StrandItem(QGraphicsLineItem):
             # end if
         # end if
         # Now check the endpoints
-        
+
         low_cap = self._low_cap
         if idx_l == True:
             if not low_cap.isSelected() or not low_cap.group():
@@ -788,7 +788,7 @@ class StrandItem(QGraphicsLineItem):
         else:
             if high_cap.isSelected() or high_cap.group():
                 high_cap.restoreParent()
-        
+
         # now check the strand itself
         if idx_l == True and idx_h == True:
             if not self.isSelected() or not self.group():
@@ -810,7 +810,7 @@ class StrandItem(QGraphicsLineItem):
         self.setSelected(True)
         self.setSelectedColor(True)
     # end def
-    
+
     def paint(self, painter, option, widget):
         painter.setPen(self.pen())
         painter.drawLine(self.line())

@@ -29,7 +29,7 @@ def normalizeV3(v):
 # end def
 
 def normalToPlane(v1, v2, v3):
-    """  Calculate unit normal to the normal to 
+    """  Calculate unit normal to the normal to
     the plane defined by vertices v1, v2, and v3
     """
     subVector = lambda a, b: Vector3(a.x - b.x, a.y - b.y, a.z - b.z)

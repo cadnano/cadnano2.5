@@ -203,7 +203,7 @@ class InsertionItem(QGraphicsPathItem):
         self._updateSequenceText()
         self._seq_item.show()
     # end def
-    
+
     def hideSequence(self):
         self._seq_item.hide()
     # end def
@@ -230,7 +230,7 @@ class InsertionItem(QGraphicsPathItem):
             fraction_arc_len_per_char = (1.0 - 2.0*_FRACTION_INSERT_TO_PAD) / (len_BT + 1)
             seq_item.setPen(QPen(Qt.NoPen))
             seq_item.setBrush(QBrush(Qt.black))
-            
+
             seq_path = QPainterPath()
             loop_path = self.path()
             for i in range(len_BT):
@@ -245,10 +245,10 @@ class InsertionItem(QGraphicsPathItem):
                 # strands
                 if not is_on_top:
                     temp_path.translate(0, -seq_font_h - insert_w)
-                    
+
                 temp_path.translate(QPointF(-seq_font_char_w / 2.,
                                           -2 if is_on_top else seq_font_h))
-                
+
 
                 mat = QTransform()
                 # 3. rotate it

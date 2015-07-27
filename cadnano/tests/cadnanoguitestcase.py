@@ -42,7 +42,7 @@ class CadnanoGuiTestCase(tests.guitestcase.GUITestCase):
         framework what you will be testing.
         """
         import sys
-        
+
         self.app = cadnano.initAppWithGui() # kick off a Gui style app
         self.documentController = list(self.app.documentControllers)[0]
         self.mainWindow = self.documentController.win

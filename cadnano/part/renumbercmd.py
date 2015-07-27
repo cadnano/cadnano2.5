@@ -9,7 +9,7 @@ class RenumberVirtualHelicesCommand(UndoCommand):
         self._vhs = [part.virtualHelixAtCoord(coord) for coord in coord_list]
         self._old_numbers = [vh.number() for vh in self._vhs]
     # end def
-        
+
     def redo(self):
         even = 0
         odd = 1

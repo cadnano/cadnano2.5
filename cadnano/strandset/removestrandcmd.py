@@ -119,7 +119,7 @@ class RemoveStrandCommand(UndoCommand):
             strand3p.setConnection5p(strand)
 
         # oligo.decrementLength(strand.totalLength())
-        
+
         # Restore the oligo
         oligo.addToPart(strandset.part())
         if olg5p:

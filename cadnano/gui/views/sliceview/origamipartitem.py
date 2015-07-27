@@ -29,7 +29,7 @@ class OrigamiPartItem(QGraphicsItem):
 
         Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
         where x is the cartesian product.
-        
+
         Order matters for deselector, probe, and setlattice
         """
         super(OrigamiPartItem, self).__init__(parent)
@@ -102,11 +102,11 @@ class OrigamiPartItem(QGraphicsItem):
         """docstring for partRemovedSlot"""
         self._active_slice_item.removed()
         self.parentItem().removeOrigamiPartItem(self)
-        
+
         scene = self.scene()
-        
+
         self._virtual_helix_hash = None
-        
+
         for item in list(self._empty_helix_hash.items()):
             key, val = item
             scene.removeItem(val)
@@ -114,11 +114,11 @@ class OrigamiPartItem(QGraphicsItem):
         self._empty_helix_hash = None
 
         scene.removeItem(self)
-        
+
         self._model_part = None
         self.probe = None
         self._mod_circ = None
-        
+
         self.deselector = None
         self._controller.disconnectSignals()
         self._controller = None

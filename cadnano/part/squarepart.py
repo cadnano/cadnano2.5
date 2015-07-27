@@ -15,7 +15,7 @@ class SquarePart(OrigamiPart):
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
     _TWIST_OFFSET = 180 + _TWIST_PER_BASE/2 # degrees
-    
+
     # Used in VirtualHelix::potentialCrossoverList
     _SCAFL = Crossovers.SQUARE_SCAF_LOW
     _SCAFH = Crossovers.SQUARE_SCAF_HIGH

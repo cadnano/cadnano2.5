@@ -41,7 +41,7 @@ class PathRootItem(QGraphicsRectItem):
 
     def partItemForPart(self, part):
         return self._part_item_for_part_instance[part]
-    
+
     def partAddedSlot(self, sender, model_part_instance):
         """
         Receives notification from the model that a part has been added.
