@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from cadnano.gui.views.pathview import pathstyles as styles
+"""
+temporary modification this broke separation and running headless
+"""
+# from cadnano.gui.views.pathview import pathstyles as styles
+
+OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 5
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 500
 
 import copy
 
@@ -152,9 +158,9 @@ class Oligo(ProxyObject):
             return False
         if self._strand5p.isScaffold():
             return False
-        if self.length() < styles.OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
+        if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
-        if self.length() > styles.OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
+        if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
             return True
         return False
     # end def

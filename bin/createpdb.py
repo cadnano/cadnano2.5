@@ -41,8 +41,8 @@ if __name__ == "__main__":
 
             vh = strand.virtualHelix()
             # z,y = part.latticeCoordToPositionXY(*vh.coord())
-            z, y = 0, 0
-            i += 1
+            z, y = 0, i
+            i += 2
             # print(z,y)
             start = offset
             end = offset + length # non-inclusive
