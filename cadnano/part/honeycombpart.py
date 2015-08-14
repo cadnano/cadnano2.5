@@ -87,14 +87,16 @@ class HoneycombPart(OrigamiPart):
         return neighbors  # Note: the order and presence of Nones is important
     # end def
 
-    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0):
+    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0, normalize=False):
         """make sure self._radius is a float"""
-        radius = self._RADIUS
+        radius = 1.0 if normalize else self._RADIUS
         x = column*radius*root3
+
         if self.isOddParity(row, column):   # odd parity
             y = row*radius*3 + radius
         else:                               # even parity
             y = row*radius*3
+        # print("xyr", x,y,radius, row, column, root3 )
         return scale_factor*x, scale_factor*y
     # end def
 

@@ -766,7 +766,7 @@ class OrigamiPart(Part):
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
         return filter(lambda x: x >= min_idx and x <= max_idx, ret)
 
-    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0):
+    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0, normalize=False):
         """
         Returns a tuple of the (x,y) position for a given lattice row and
         column.
