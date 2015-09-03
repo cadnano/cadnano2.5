@@ -23,7 +23,7 @@ if __name__ == "__main__":
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     test_path = os.path.join(root_path, 'tests', test1)
     doc = nnodecode.decodeFile(test_path)
-
+    ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     aseq_list = []
     part = doc.children()[0]
     # print(part.radius())
@@ -64,23 +64,25 @@ if __name__ == "__main__":
         aseq.applyTwist()
         # 3. move to position
         aseq.applyTransformQueue()
+
+        aseq.setChainID(ALPHABET[i])
         aseq_list.append(aseq)
         i += 1
-        if i == 2:
+        if i == 10:
             break
     # end for
     # concatenate all sequences:
-    # aseq_out = aseq_list[0]
-    # # print("length", len(aseq_list))
-    # # print(aseq_list)
-    # for aseq in aseq_list[1:]:
-    #     print(aseq_out, aseq)
-    #     aseq_out.concat(aseq)
-    # print("writing %s..." % (path_out))
-    # aseq_out.toPDB(path_out)
+    aseq_out = aseq_list[0]
+    # print("length", len(aseq_list))
+    # print(aseq_list)
+    for aseq in aseq_list[1:]:
+        print(aseq_out, aseq)
+        aseq_out.concat(aseq)
+    print("writing %s..." % (path_out))
+    aseq_out.toPDB(path_out)
     
-    filepath, ext = os.path.splitext(path_out)
-    for i, aseq in enumerate(aseq_list):
-        pout = filepath + "%d" % (i) + ext
-        print("writing %s..." % (pout))
-        aseq.toPDB(pout)
+    # filepath, ext = os.path.splitext(path_out)
+    # for i, aseq in enumerate(aseq_list):
+    #     pout = filepath + "%d" % (i) + ext
+    #     print("writing %s..." % (pout))
+    #     aseq.toPDB(pout)
