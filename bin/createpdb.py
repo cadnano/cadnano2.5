@@ -13,7 +13,7 @@ BASE_LENGTH = 0.3
 
 # 90 degrees from vertical so bases are pointing at 0 degrees when viewed from the 5' end
 THETA0 = 3*math.pi/2
-THETA_PER_BASE = 2*math.pi/10.5
+THETA_PER_BASE = -2*math.pi/10.5
 
 def transformAtomicSequence(atomic_sequence):
     # 1. Get base separation
@@ -52,7 +52,7 @@ if __name__ == "__main__":
     for oligo in oligo_list:
         oseq = oligo.sequence()
         olen = oligo.length()
-        print("o length", olen)
+        # print("o length", olen)
         # if olen < 60:
         #     print("skipping", olen)
         #     continue
@@ -86,7 +86,7 @@ if __name__ == "__main__":
 
         if len(break_points) == 0:
             break_points = [(0, 0, olen)]
-        print("break_points", break_points)
+        # print("break_points", break_points)
         bp_idx = 0
         break_point_idx = 0
         aseq = None
@@ -108,8 +108,8 @@ if __name__ == "__main__":
                 ostart = break_points[bp_idx][1]
                 oend = break_points[bp_idx][2]
                 print("creating oligo: %d.%d %d to %d" % (i, j, ostart, oend))
-                aseq = AtomicSequence(oseq[ostart:oend], 
-                            theta_offset=(THETA0+ostart*THETA_PER_BASE))
+                aseq = AtomicSequence(oseq[ostart:oend])
+                            # theta_offset=(THETA0+strand.lowIdx()*THETA_PER_BASE))
                 offset = 0
                 if bp_idx < len(break_points) - 1:
                     bp_idx += 1
