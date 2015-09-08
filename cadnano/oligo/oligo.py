@@ -97,6 +97,14 @@ class Oligo(ProxyObject):
         return self._strand5p
     # end def
 
+    def strand3p(self):
+        s5p = self._strand5p
+        if self._is_loop:
+            return s5p._strand5p
+        for strand in s5p.generator3pStrand():
+            pass
+        return strand
+
     def setStrand5p(self, strand):
         self._strand5p = strand
     # end def

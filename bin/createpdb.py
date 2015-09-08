@@ -13,6 +13,17 @@ BASE_LENGTH = 0.3
 
 # 90 degrees from vertical so bases are pointing at 0 degrees when viewed from the 5' end
 THETA0 = 3*math.pi/2
+THETA_PER_BASE = 2*math.pi/10.5
+
+def transformAtomicSequence(atomic_sequence):
+    # 1. Get base separation
+    atomic_sequence.linearize()
+    # 2. do all rotations
+    atomic_sequence.applyReverseQueue()
+    atomic_sequence.applyTwist()
+    # 3. move to position
+    atomic_sequence.applyTransformQueue()
+# end def
 
 if __name__ == "__main__":
 
@@ -25,6 +36,9 @@ if __name__ == "__main__":
 
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     test_path = os.path.join(root_path, 'tests', test2)
+    
+    break_long = True
+
     doc = nnodecode.decodeFile(test_path)
     ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     aseq_list = []
@@ -44,10 +58,66 @@ if __name__ == "__main__":
         #     continue
         if oseq is None:
             oseq = "".join(random.choice("ACGT") for x in range(olen))
-        aseq = AtomicSequence(oseq, theta_offset=THETA0)
         strand5p = oligo.strand5p()
-        offset = 0
-        for strand in strand5p.generator3pStrand():
+        strand3p = oligo.strand3p()
+        break_points = []
+        if break_long:
+            offset = 0
+            length_so_far = 0
+            end = 0
+            idx = 0
+            break_points = []
+            last_i = -1
+            for i, strand in enumerate(strand5p.generator3pStrand()):
+                length = strand.length()
+                offset += length
+                length_so_far += length
+                if length_so_far > 400 and strand5p != strand3p:
+                    start = end
+                    end = offset
+                    break_points.append((idx, start, end))
+                    idx = i + 1
+                    length_so_far = 0
+                    last_i = i
+            if last_i != -1 and last_i != i:
+                start = end
+                end = offset
+                break_points.append((idx, start, end))
+
+        if len(break_points) == 0:
+            break_points = [(0, 0, olen)]
+        print("break_points", break_points)
+        bp_idx = 0
+        break_point_idx = 0
+        aseq = None
+        offset = None
+        for j, strand in enumerate(strand5p.generator3pStrand()):
+            if j == break_point_idx:
+                # 1. Transform last aseq:
+                if aseq is not None:
+                    last_len = break_points[bp_idx-1][2] - break_points[bp_idx-1][1]
+                    try:
+                        assert(last_len == offset)
+                    except:
+                        print("len mismatch", last_len, offset)
+                    # transformAtomicSequence(aseq)
+                    aseq.setChainID(ALPHABET[i % 25])
+                    aseq_list.append(aseq)
+                    i += 1
+    
+                ostart = break_points[bp_idx][1]
+                oend = break_points[bp_idx][2]
+                print("creating oligo: %d.%d %d to %d" % (i, j, ostart, oend))
+                aseq = AtomicSequence(oseq[ostart:oend], 
+                            theta_offset=(THETA0+ostart*THETA_PER_BASE))
+                offset = 0
+                if bp_idx < len(break_points) - 1:
+                    bp_idx += 1
+                    break_point_idx = break_points[bp_idx][0]
+                else:
+                    break_point_idx = -1 # break the check
+            # end if
+            assert(offset is not None)
             idx_low, idx_high = strand.idxs()
             length = strand.length()
 
@@ -62,14 +132,8 @@ if __name__ == "__main__":
             # print(start, end, delta_x, length, offset, is5to3)
             offset += length
         # end for
-        # 1. Get base separation
-        aseq.linearize()
-        # 2. do all rotations
-        aseq.applyReverseQueue()
-        aseq.applyTwist()
-        # 3. move to position
-        aseq.applyTransformQueue()
-
+        # Transform the last aseq
+        transformAtomicSequence(aseq)
         aseq.setChainID(ALPHABET[i % 25])
         aseq_list.append(aseq)
         i += 1
