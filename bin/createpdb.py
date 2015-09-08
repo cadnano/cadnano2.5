@@ -100,7 +100,7 @@ if __name__ == "__main__":
                         assert(last_len == offset)
                     except:
                         print("len mismatch", last_len, offset)
-                    # transformAtomicSequence(aseq)
+                    transformAtomicSequence(aseq)
                     aseq.setChainID(ALPHABET[i % 25])
                     aseq_list.append(aseq)
                     i += 1
