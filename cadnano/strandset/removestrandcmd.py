@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
+import cadnano.preferences as prefs
 
 class RemoveStrandCommand(UndoCommand):
     """
