@@ -2,7 +2,7 @@ from __future__ import division
 from collections import namedtuple
 import math
 
-Matrix3 = namedtuple('Matrix3', ['n11','n12', 'n13', 
+Matrix3 = namedtuple('Matrix3', ['n11','n12', 'n13',
                                 'n21', 'n22', 'n23',
                                 'n31', 'n32', 'n33'])
 
@@ -21,14 +21,14 @@ def getInverse(m4):
     if det == 0:
         raise ValueError("getInverse(): can't invert matrix, determinant is 0")
 
-    return Matrix3(o0/det, o1/det, o2/det, 
+    return Matrix3(o0/det, o1/det, o2/det,
                     o3/det, o4/det, o5/det,
                     o6/det, o7/det, o8/det)
 # end def
 
 def transpose(m):
-    return Matrix3(m[0], m[3], m[6], 
-                    m[1], m[4], m[7], 
+    return Matrix3(m[0], m[3], m[6],
+                    m[1], m[4], m[7],
                      m[2], m[5], m[8])
 # end def
 

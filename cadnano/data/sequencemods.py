@@ -1,6 +1,6 @@
 # sequence modifications
 mods = {
-    'ed60af16-85e8-4c8b-b809-4181059b0d77': {   
+    'ed60af16-85e8-4c8b-b809-4181059b0d77': {
             'name': 'cy3_idt',
             'color': '#00ff00',
             'note': 'CY3',
@@ -8,7 +8,7 @@ mods = {
             'seq3p': '/3CY3sp/',
             'seqInt': '',
     },
-    'a4cf030b-1cd5-4927-bb94-e88b538f2da7': {   
+    'a4cf030b-1cd5-4927-bb94-e88b538f2da7': {
         'name': 'cy5_idt',
         'color': '#ff0000',
         'note': 'CY5',

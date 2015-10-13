@@ -1,5 +1,5 @@
 import sys
-import distutils
+import distutils.sysconfig
 import os
 import subprocess
 import platform
@@ -22,12 +22,12 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
     else:
         wget_str = 'wget --output-file=%s http://download.qt-project.org/official_releases/qt/%s/%s/single/%s;' %\
                     (qt5_zip, QT_VERSION[0:3], QT_VERSION, qt5_zip)
-    
+
     if os.path.exists(os.path.join(pyroot_path, qt5_src_path)):
         extract_str = ''
     else:
         extract_str = 'tar -xzf %s;' % (qt5_zip)
-    
+
     cd_str = 'cd %s;' % (qt5_src_path)
     mkdir_str = 'mkdir build; cd build;'
     if sys.platform in ['linux', 'Linux']:
@@ -58,13 +58,13 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
     def qt5Build():
         print("Building qt5")
         qt_cmds = ['%s %s %s %s %s make -j4; make install' %\
-                    (   wget_str, 
+                    (   wget_str,
                         extract_str,
                         cd_str,
                         mkdir_str,
                         config_str
                     )]
-        qt5build = subprocess.Popen(qt_cmds, shell=True, 
+        qt5build = subprocess.Popen(qt_cmds, shell=True,
                                         cwd=pyroot_path)
         qt5build.wait()
     qt5Build()
@@ -109,12 +109,12 @@ def get_sip(pyroot_path, is_static=False):
     def sipBuild():
         print("Building sip")
         qt_cmds = ['%s %s %s %s make -j2; make install;' %\
-                    (   wget_str, 
+                    (   wget_str,
                         extract_str,
                         cd_str,
                         config_str
                     )]
-        sipbuild = subprocess.Popen(qt_cmds, shell=True, 
+        sipbuild = subprocess.Popen(qt_cmds, shell=True,
                                         cwd=pyroot_path)
         sipbuild.wait()
     sipBuild()
@@ -165,11 +165,11 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
                         cd_str,
                         config_str
                     )]
-        pyqt5build = subprocess.Popen(qt_cmds, shell=True, 
+        pyqt5build = subprocess.Popen(qt_cmds, shell=True,
                                         cwd=pyroot_path)
         pyqt5build.wait()
     pyqt5Build()
-# end def    
+# end def
 
 """
 http://qt-project.org/doc/qt-5/qt-conf.html

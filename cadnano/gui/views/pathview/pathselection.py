@@ -15,7 +15,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
         super(SelectionItemGroup, self).__init__(parent)
         self._viewroot = parent
         self.setFiltersChildEvents(True)
-        
+
         # LOOK at Qt Source for deprecated code to replace this behavior
         # self.setHandlesChildEvents(True) # commented out NC
 
@@ -67,11 +67,11 @@ class SelectionItemGroup(QGraphicsItemGroup):
     def isPending(self, item):
         return item in self._pending_to_add_dict
     # end def
-    
+
     def document(self):
         return self._viewroot.document()
     # end def
-    
+
     def pendToRemove(self, item):
         if item in self._pending_to_add_dict:
             del self._pending_to_add_dict[item]
@@ -354,7 +354,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         self.setParentItem(temp)
         return temp
     # end def
-    
+
     def deleteSelection(self):
         """
         Delete selection operates outside of the documents a virtual helices
@@ -430,9 +430,9 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     def refreshPath(self):
         temp_low, temp_high = \
                     self._item_group._viewroot.document().getSelectionBounds()
-        
+
         self._bounds = (temp_low, temp_high)
-        
+
         # print("rp:", self._bounds)
         self.prepareGeometryChange()
         self.setPath(self.painterPath())
@@ -464,7 +464,7 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         delta = self.delta(r_end, r_start)
         self._item_group._viewroot.document().resizeSelection(delta)
     # end def
-    
+
     def deleteSelection(self):
         self._item_group.document().deleteSelection()
 

@@ -38,7 +38,7 @@ class ModsTool(AbstractPathTool):
         uiDlg.createButtonBox.setCenterButtons(True)
         uiDlg.custom_button_box.setObjectName(_fromUtf8("createButtonBox"))
         uiDlg.dialogGridLayout.addWidget(uiDlg.createButtonBox, 2, 0, 1, 1)
-        
+
         saveButton = QPushButton("Save", uiDlg.createButtonBox)
         uiDlg.createButtonBox.addButton(saveButton, QDialogButtonBox.ActionRole)
         saveButton.released.connect(self.saveModChecker)
@@ -73,17 +73,17 @@ class ModsTool(AbstractPathTool):
             item, mid = part.createMod(item)
             # combobox = self.uiDlg.nameComboBox
             # combobox.addItem(item['name'], mid)
-        elif part.getMod(mid) is None: 
+        elif part.getMod(mid) is None:
             item, mid = part.createMod(item, mid=mid)
         else:
             # print "modifying mod"
             part.modifyMod(item, mid)
-        return 
+        return
     # end def
 
     def deleteModChecker(self):
         part = self.current_strand.part()
-        item, mid = self.getCurrentItem() 
+        item, mid = self.getCurrentItem()
         if mid != "new":
             part.destroyMod(mid)
     # end def

@@ -16,11 +16,11 @@ from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, Qt, QEventLoop, 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import qApp, QApplication, QUndoGroup
 
-LOCAL_DIR = os.path.dirname(os.path.realpath(__file__)) 
-# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
+LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
+# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
 #                                 'images', 'cadnano2-app-icon.png')
 # print(ICON_PATH)
-ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
+ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
                                 'images', 'radnano-app-icon.png')
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
@@ -67,8 +67,8 @@ class CadnanoQt(QObject):
         doc = Document()
         self.d = self.newDocument(base_doc=doc)
         styles.setFontMetrics()
-        
-        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick 
+
+        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
@@ -103,7 +103,7 @@ class CadnanoQt(QObject):
                 partitem = pi()
                 vHelix = vh(vhref)
                 return partitem.vhItemForVH(vHelix)
-                
+
             print("\tquit()\tquit (for when the menu fails)")
             print("\tgraphicsItm.findChild()  see help(pi().findChild)")
             interact('', local={'a':self, 'd':d, 'w':w,\
@@ -112,7 +112,7 @@ class CadnanoQt(QObject):
         # else:
         #     self.exec_()
 
-    
+
     def exec_(self):
         if hasattr(self, 'qApp'):
             self.mainEventLoop = QEventLoop()

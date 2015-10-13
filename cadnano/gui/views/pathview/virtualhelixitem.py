@@ -29,7 +29,7 @@ class VirtualHelixItem(QGraphicsPathItem):
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
-        
+
         self._handle = VirtualHelixHandleItem(model_virtual_helix, part_item, viewroot)
         self._last_strand_set = None
         self._last_idx = None
@@ -45,7 +45,7 @@ class VirtualHelixItem(QGraphicsPathItem):
         pen = QPen(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
         pen.setCosmetic(shouldShowDetails)
         self.setPen(pen)
-        
+
         self.refreshPath()
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
@@ -54,14 +54,14 @@ class VirtualHelixItem(QGraphicsPathItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    
+
     def levelOfDetailChangedSlot(self, boolval):
         """Not connected to the model, only the QGraphicsView"""
         pen = self.pen()
         pen.setCosmetic(boolval)
         self.setPen(pen)
     # end def
-    
+
     def strandAddedSlot(self, sender, strand):
         """
         Instantiates a StrandItem upon notification that the model has a
@@ -88,7 +88,7 @@ class VirtualHelixItem(QGraphicsPathItem):
     def virtualHelixRemovedSlot(self, virtualHelix):
         self._controller.disconnectSignals()
         self._controller = None
-        
+
         scene = self.scene()
         self._handle.remove()
         scene.removeItem(self)
@@ -200,9 +200,9 @@ class VirtualHelixItem(QGraphicsPathItem):
         # staple-scaffold divider
         path.moveTo(0, bw)
         path.lineTo(bw * canvas_size, bw)
-        
+
         self.setPath(path)
-        
+
         if self._model_virtual_helix.scaffoldIsOnTop():
             scaffoldY = 0
         else:
@@ -215,7 +215,7 @@ class VirtualHelixItem(QGraphicsPathItem):
         #     self._scaffoldBackground = highlightr
         # else:
         #     self._scaffoldBackground.setRect(0, scaffoldY, bw * canvas_size, bw)
-            
+
     # end def
 
     def resize(self):

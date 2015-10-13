@@ -8,7 +8,7 @@ import cadnano.util as util
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
 
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem 
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
 class VirtualHelixItem(QGraphicsEllipseItem):
@@ -66,7 +66,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     ### SLOTS ###
     def virtualHelixNumberChangedSlot(self, virtualHelix):
         """
-        receives a signal containing a virtualHelix and the oldNumber 
+        receives a signal containing a virtualHelix and the oldNumber
         as a safety check
         """
         self.setNumber()
@@ -141,7 +141,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     def updateStapArrow(self, idx):
         stapStrand = self._virtual_helix.stap(idx)
         if stapStrand:
-            stapStrandColor = QColor(stapStrand.oligo().color()) 
+            stapStrandColor = QColor(stapStrand.oligo().color())
             stapAlpha = 0.9 if stapStrand.hasXoverAt(idx) else 0.3
         else:
             stapStrandColor = QColor(Qt.lightGray)
@@ -248,7 +248,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     #     action = self.decideAction(event.modifiers())
     #     action(self)
     #     self.dragSessionAction = action
-    # 
+    #
     # def mouseMoveEvent(self, event):
     #     parent = self._helixItem
     #     posInParent = parent.mapFromItem(self, QPointF(event.pos()))
@@ -281,6 +281,6 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     #     if vh.scaf().get(idx) is None:
     #         return SliceHelix.addScafAtActiveSliceIfMissing
     #     return SliceHelix.nop
-    # 
+    #
     # def nop(self):
     #     pass

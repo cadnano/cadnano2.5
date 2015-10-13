@@ -22,7 +22,7 @@ _RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 
 class XoverNode3(QGraphicsRectItem):
     """
-    This is a QGraphicsRectItem to allow actions and also a 
+    This is a QGraphicsRectItem to allow actions and also a
     QGraphicsSimpleTextItem to allow a label to be drawn
     """
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
@@ -54,7 +54,7 @@ class XoverNode3(QGraphicsRectItem):
         self.scene().views()[0].addToPressList(self)
         self._vhi.setActive(self._idx)
         xoi = self._xover_item
-        tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
+        tool_method_name = xoi._getActiveTool().methodPrefix() + "MousePress"
         if hasattr(xoi, tool_method_name):
             getattr(xoi, tool_method_name)()
     # end def
@@ -62,7 +62,7 @@ class XoverNode3(QGraphicsRectItem):
     def customMouseRelease(self, event):
         pass
     # end def
-    
+
     def virtualHelix(self):
         return self._vhi.virtualHelix()
     # end def
@@ -85,7 +85,7 @@ class XoverNode3(QGraphicsRectItem):
     def idx(self):
         return self._idx
     # end def
-    
+
     def setIdx(self, idx):
          self._idx = idx
      # end def
@@ -229,7 +229,7 @@ class XoverItem(QGraphicsPathItem):
         self._node5 = None
         self._node3 = None
         self.hide()
-        
+
         # for easier mouseclick
         self._click_area = c_a = QGraphicsRectItem(self)
         # self._click_area.setAcceptHoverEvents(True)
@@ -346,17 +346,17 @@ class XoverItem(QGraphicsPathItem):
         """
         group = self.group()
         self.tempReparent()
-        
+
         node3 = self._node3
         node5 = self._node5
 
         bw = _BASE_WIDTH
 
         parent = self.partItem()
-        
+
         vhi5 = self._virtual_helix_item
         pt5 = vhi5.mapToItem(parent, *node5.point())
-        
+
         five_is_top = node5.isOnTop()
         five_is_5to3 = node5.isDrawn5to3()
 
@@ -419,19 +419,19 @@ class XoverItem(QGraphicsPathItem):
         self.setPath(painterpath)
         node3.updatePositionAndAppearance()
         node5.updatePositionAndAppearance()
-        
+
         if group:
             group.addToGroup(self)
-            
+
         self._updateColor(strand5p)
     # end def
-    
+
     def updateLabels(self):
         if self._node3:
             self._node3._updateLabel()
         if self._node5:
             self._node5._updateLabel()
-    
+
     def _updateColor(self, strand):
         oligo = strand.oligo()
         color = self.pen().color() if self.isSelected() else QColor(oligo.color())
@@ -469,8 +469,8 @@ class XoverItem(QGraphicsPathItem):
                 return selection_group.mousePressEvent(event)
         else:
             event.setAccepted(False)
-    # end def 
-    
+    # end def
+
     def eraseToolMousePress(self):
         """Erase the strand."""
         self._strand_item.eraseToolMousePress(None, None)
@@ -488,7 +488,7 @@ class XoverItem(QGraphicsPathItem):
         viewroot = sI.viewroot()
         selection_group = viewroot.strandItemSelectionGroup()
         selection_group.clearSelection(False)
-        
+
         strand5p = self._strand5p
         strand3p = strand5p.connection3p()
         self._virtual_helix_item.part().removeXover(strand5p, strand3p)

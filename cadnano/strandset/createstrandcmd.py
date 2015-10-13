@@ -17,8 +17,8 @@ class CreateStrandCommand(UndoCommand):
         # self._s_set_idx = strandset_idx
         doc = strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
-        colorList = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-        color = random.choice(colorList).name()
+        color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
+        color = random.choice(color_list).name()
         self._new_oligo = Oligo(None, color)  # redo will set part
         self._new_oligo.setLength(self._strand.totalLength())
     # end def

@@ -152,7 +152,7 @@ class HalfCylinder(Solid):
             # self.face_vertex_uvs[ 0 ].append( [ uv1, uv2, uv3 ] )
 
             self.addFace(v1, v2, v3, normal=n1)
-            self.face_vertex_uvs[ 0 ].append( [ uv1, uv3, uv2 ] )   
+            self.face_vertex_uvs[ 0 ].append( [ uv1, uv3, uv2 ] )
         # end for
 
         # SIDE CAPS
@@ -176,7 +176,7 @@ class HalfCylinder(Solid):
 
             # self.addFace(v4, v3, v2, normal=Vector3(*n1))
             self.addFace(v3, v2, v1, normal=Vector3(*n1))
-            self.face_vertex_uvs[ 0 ].append( [ Vector2(*uv4), uv3, Vector2(*uv2) ] );  
+            self.face_vertex_uvs[ 0 ].append( [ Vector2(*uv4), uv3, Vector2(*uv2) ] )
         # end for
 
         # apply twist
@@ -188,7 +188,7 @@ class HalfCylinder(Solid):
                 m4 = makeRotationZ(y*delta_ang)
                 for x in range(radial_segments+1):
                     vert = self.vertices[i]
-                    # print(vert.z) 
+                    # print(vert.z)
                     self.vertices[i] = applyMatrix4(m4, vert)
                     i += 1
             # recompute face normals

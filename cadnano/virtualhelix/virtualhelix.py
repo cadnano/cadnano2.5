@@ -16,7 +16,7 @@ class VirtualHelix(ProxyObject):
     VirtualHelix is a container class for two StrandSet objects (one scaffold
     and one staple). The Strands all share the same helix axis. It is called
     "virtual" because many different Strands (i.e. sub-oligos) combine to
-    form the "helix", just as many fibers may be braided together to 
+    form the "helix", just as many fibers may be braided together to
     form a length of rope.
     """
 
@@ -66,11 +66,11 @@ class VirtualHelix(ProxyObject):
     def part(self):
         return self._part
     # end def
-    
+
     def document(self):
         return self._doc
     # end def
-    
+
     def setNumber(self, number):
         if self._number != number:
             num_to_vh_dict = self._part._number_to_virtual_helix
@@ -168,10 +168,10 @@ class VirtualHelix(ProxyObject):
         self.setParent(None)
         self.deleteLater()
     # end def
-    
+
     def remove(self, use_undostack=True):
         """
-        Removes a VirtualHelix from the model. Accepts a reference to the 
+        Removes a VirtualHelix from the model. Accepts a reference to the
         VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
         """
         if use_undostack:

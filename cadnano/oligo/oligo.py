@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from cadnano.gui.views.pathview import pathstyles as styles
+"""
+temporary modification this broke separation and running headless
+"""
+# from cadnano.gui.views.pathview import pathstyles as styles
+
+OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 5
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 500
 
 import copy
 
@@ -91,6 +97,14 @@ class Oligo(ProxyObject):
         return self._strand5p
     # end def
 
+    def strand3p(self):
+        s5p = self._strand5p
+        if self._is_loop:
+            return s5p._strand5p
+        for strand in s5p.generator3pStrand():
+            pass
+        return strand
+
     def setStrand5p(self, strand):
         self._strand5p = strand
     # end def
@@ -152,9 +166,9 @@ class Oligo(ProxyObject):
             return False
         if self._strand5p.isScaffold():
             return False
-        if self.length() < styles.OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
+        if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
-        if self.length() > styles.OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
+        if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
             return True
         return False
     # end def
@@ -248,7 +262,7 @@ class Oligo(ProxyObject):
         if old_strand_low.oligo() == old_strand_high.oligo():
             self._is_loop = True
             self._strand5p = new_strand
-            return 
+            return
             # leave the _strand5p as is?
         # end if
 

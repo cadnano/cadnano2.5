@@ -50,7 +50,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
     # end def
-    
+
     def proxy(self):
         return self._proxy_parent
     # end def
@@ -209,7 +209,7 @@ class OrigamiPartItem(QGraphicsRectItem):
         self._virtual_helix_item_list.remove(virtual_helix_item)
         del self._virtual_helix_hash[vh.coord()]
         ztf = not getBatch()
-        self._setVirtualHelixItemList(self._virtual_helix_item_list, 
+        self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
         self._updateBoundingRect()
 

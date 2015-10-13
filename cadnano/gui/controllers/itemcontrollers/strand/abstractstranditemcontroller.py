@@ -39,7 +39,7 @@ class AbstractStrandItemController(object):
         m_s.strandModifierAddedSignal.connect(s_i.strandModifierAddedSlot)
         m_s.strandModifierChangedSignal.connect(s_i.strandModifierChangedSlot)
         m_s.strandModifierRemovedSignal.connect(s_i.strandModifierRemovedSlot)
-        
+
         m_s.selectedChangedSignal.connect(s_i.selectedChangedSlot)
     # end def
 
@@ -67,7 +67,7 @@ class AbstractStrandItemController(object):
         m_s.strandModifierAddedSignal.disconnect(s_i.strandModifierAddedSlot)
         m_s.strandModifierChangedSignal.disconnect(s_i.strandModifierChangedSlot)
         m_s.strandModifierRemovedSignal.disconnect(s_i.strandModifierRemovedSlot)
-        
+
         m_s.selectedChangedSignal.disconnect(s_i.selectedChangedSlot)
     # end def
 

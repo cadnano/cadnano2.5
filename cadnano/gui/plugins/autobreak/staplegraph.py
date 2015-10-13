@@ -37,19 +37,19 @@ networkx
 pywin32 (maybe not)
 pyparsing
 ipython
-numpy 
+numpy
 
 A token_list === list of sequencial lengths between potential break points
 
-Given a token_list : 
-[V0, V1,V2,...,VN-1] 
+Given a token_list :
+[V0, V1,V2,...,VN-1]
 
-corresponding to predefined staple lengths 'V' in a staple strand (or staple 
+corresponding to predefined staple lengths 'V' in a staple strand (or staple
 loop) leads to....
-  
+
 <-A1><--E0=V0--><A2><-A2><--E1=V1--><A3><-A3><--E2=V2-->....<AN><-AN><--EN=VN--><A1>
 
-in linear graph form and we filter paths meeting certain edge length criterion 
+in linear graph form and we filter paths meeting certain edge length criterion
 and then weight the graph relative to an optimum edge length criterion.
 
 In order to have a positive and negative version of each node we eliminate '0'
@@ -86,24 +86,24 @@ def minimumPath(tokenlist_and_staple_limits):
     except:
         print "Oligo is unsolvable at current settings for length"
         return None
-    # else: 
+    # else:
     #     return None
 # end def
 
 class StapleGraph(object):
     """
-    
+
     """
     def __init__(self,token_list_in=[4,7,6,5,7,8,3], staple_limits=[3,18,10]):
         """
         Constructor  takes a
-        
-        token_list: list of sequential lengths between potential breaks 
+
+        token_list: list of sequential lengths between potential breaks
             points in a staple
-        staple_limits: min staple length, max staple length, optimum 
-            staple length 
+        staple_limits: min staple length, max staple length, optimum
+            staple length
         """
-            
+
         self.token_list = token_list_in
         self.token_list_length = len(self.token_list)
         self.G = nx.DiGraph()       # initialize a directed graph data structure from networkx module
@@ -114,41 +114,41 @@ class StapleGraph(object):
         self.the_min_path = []
         self.createGraph()          # create the graph
     # end def
-    
+
     def graph(self):
         return self.G
-    
+
     def createGraph(self):
         """
         constructs a directed, weighted graph of nodes [-A_n,A_n] such that
         A_n is a non-zero integer
         the n ranges [0, self.token_list_length]
-        A_n therefore ranges [1, self.token_list_length+1] 
-        
+        A_n therefore ranges [1, self.token_list_length+1]
+
         -A_n is always the start of a potential loop and A_n is the end of a loop
-        for a circular staple strand loop.  Similarly, A_n is always the end of a 
+        for a circular staple strand loop.  Similarly, A_n is always the end of a
         token and -A_n is the beginning of the next token, if you will
-        
+
         for non_circular staple strand loops the strands run from -1 to 1
-        
+
         edges are limited by a minimum and maximum staple length, and are weighted by
         the difference from the staple length from the optimum staple length
         """
-        
+
         from_node_index = 0
-        
+
         # corresponds to the node we are going to
-        to_node_index = 0   
-        
-        # this is the index of the "edge" in the token list, 
+        to_node_index = 0
+
+        # this is the index of the "edge" in the token list,
         # corresponds to the token value
-        
-        edge_index = 0      
+
+        edge_index = 0
         visit_node_counter = 0
         current_staple_length = 0
         index_to_build = 0
         token_sum = 0
-        
+
         for ind in range(self.token_list_length):
             from_node_index = ind + 1 # no '0' node all non-zero
             to_node_index = from_node_index + 1
@@ -157,7 +157,7 @@ class StapleGraph(object):
             current_staple_length = 0
             visited_edge_counter = 1
             self.G.add_weighted_edges_from([(ind+1, from_node_index,0)])
-            
+
             """
             We limit the size of the graph by using the cutoffs of max_staple_length
             and min_staple_length
@@ -193,7 +193,7 @@ class StapleGraph(object):
             from networkx import graphviz_layout
         except ImportError:
             raise ImportError("This module needs Graphiz and either PyGraphiz or Pydot")
-            
+
         # pos = nx.graphviz_layout(self.G,prog = 'twopi')
         plt.figure(figsize=(8,8))
         nx.draw_circular(self.G,node_Size=240,alpha=0.7,node_color="blue")
@@ -201,18 +201,18 @@ class StapleGraph(object):
         plt.axis('equal')
         plt.show()
     #end def
-    
+
     def showEdgeWeight(self):
         edges = self.G.edges()
         for edge in edges:
             print "Edge ", edge, ": ", self.G.get_edge_data(edge[0],edge[1])
         # end for
     # end def
-    
+
     def floydWarshall(self):
         """
-        This finds all-pairs of shortest path lengths using Floyd's algorithm 
-        and sets self.min_path_dict to [predecessor_dict, distance_dict] where 
+        This finds all-pairs of shortest path lengths using Floyd's algorithm
+        and sets self.min_path_dict to [predecessor_dict, distance_dict] where
         the two dictionaries 2D dictionaries keyed on node index.
         predecessor is the ordered list of visited nodes when going from node
         A to node B along a shortest path.
@@ -221,11 +221,11 @@ class StapleGraph(object):
         self.min_path_dict = nx.floyd_warshall_predecessor_and_distance(self.G)
         # self.truncatePathDict() # for ASCII debugging
     #end def
-    
+
     def getMinPathsFW(self):
         """
         Finds all of the minimum path start and end nodes after a Floyd-Warshall
-        
+
         """
         out_paths = []
         min_paths = self.min_path_dict[0] # gets the list of shortest path start and end nodes and the path length
@@ -247,7 +247,7 @@ class StapleGraph(object):
 
     def getShortestPathFW(self,a,b):
         """
-        Retraces the shortest path from a calculated Floyd-Warshall 
+        Retraces the shortest path from a calculated Floyd-Warshall
         predecessor list.
         """
         intermediate = self.min_path_dict[0][a][b]
@@ -261,7 +261,7 @@ class StapleGraph(object):
         path.reverse()   # need to reverse because the loopup table gives the edges in reverse order
         return path
     # end def
-    
+
     def minPathFW(self):
         """
         Returns the shortest path using Floyd-Warshall algorithm.
@@ -271,49 +271,49 @@ class StapleGraph(object):
         path = self.getShortestPathFW(the_path[1],the_path[2])
         return self.formatOutput(path)
     #end def
-    
+
     def getShortestPathDijkstra(self,a,b):
         out_node_list = nx.dijkstra_path(self.G,a,b)
         return out_node_list
     # end def
-    
+
     def minPathDijkstra(self):
         """
-        This finds the minimum path length starting at each node.   
+        This finds the minimum path length starting at each node.
         """
         min_length = sum(self.token_list)
         temp = 0
         path = []
         token_sum = 0   # keeps track of the staple break points to look at
         ind_min = 1 # just go from -1 to 1
-        # end else 
+        # end else
         path = self.getShortestPathDijkstra(-ind_min,ind_min)
         # print "the path", path
         return self.formatOutput(path)
     #end def
-    
+
     def formatOutput(self,path):
         """
         takes a path either from Dijkstra or Floyd-Warshall processing and formats
-        it for adding to a the set of a scaffold structure staples 
+        it for adding to a the set of a scaffold structure staples
         returns a list of [start_index,[L1,L2,...LN]]
-        where start_index is the first token index into the 
+        where start_index is the first token index into the
         token_list and
         L are a list of lengths of proper tokens from self.token_list
 
         this is translated from a list whose indices correspond to plus 1 from indices in
         """
-        
+
         path_start = abs(path[0])-1
         output = [path_start,[], 0]
-        
+
         # print "test 1"
         path_length = len(path)
         for ind in range(0,path_length,2):
             #print ind
             edge_length = 0
             token_idx = abs(path[ind]) - 1
-            
+
             while token_idx != (path[ind+1]-1):
                 edge_length += self.token_list[token_idx]
                 token_idx += 1
@@ -329,9 +329,9 @@ class StapleGraph(object):
         # print "test 3"
         output[2] = finalScore
         # print "test 4"
-        return output 
+        return output
     #end def
-    
+
     def truncatePathDict(self):
         """
         strictly to help visualize the output data set by removing nodes from the list
@@ -352,7 +352,7 @@ class StapleGraph(object):
         # end for
         self.min_path_dict = (temp0,temp1)
     # end def
-    
+
 # end def class
 
 

@@ -112,7 +112,7 @@ class PencilTool(AbstractPathTool):
 
     def attemptToCreateXover(self, virtual_helix_item, strand3p, idx):
         xoi = self._temp_xover
-        n5 = xoi._node5 
+        n5 = xoi._node5
         idx5 = n5._idx
         strand5p = n5._strand
         part = virtual_helix_item.part()
@@ -148,7 +148,7 @@ class ForcedStrandItem(QGraphicsLineItem):
         self._high_cap = EndpointItem(self, 'high', is_drawn_5_to_3)
         self._low_cap.disableEvents()
         self._high_cap.disableEvents()
-        
+
         # orientation
         self._is_drawn_5_to_3 = is_drawn_5_to_3
 
@@ -319,7 +319,7 @@ PPR3.addPolygon(R3_POLY)
 
 class ForcedXoverNode3(QGraphicsRectItem):
     """
-    This is a QGraphicsRectItem to allow actions and also a 
+    This is a QGraphicsRectItem to allow actions and also a
     QGraphicsSimpleTextItem to allow a label to be drawn
     """
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
@@ -591,13 +591,13 @@ class ForcedXoverItem(QGraphicsPathItem):
     def strandType(self):
         return self._strand_type
     # end def
-    
+
     def hide5prime(self):
         self._node5._path_thing.hide()
 
     def hide3prime(self):
         self._node3._path_thing.hide()
-        
+
     def show3prime(self):
         if self._node3._blank_thing.isVisible():
             self._node3._path_thing.show()
@@ -701,7 +701,7 @@ class ForcedXoverItem(QGraphicsPathItem):
             same_strand = False
             same_parity = False
             three_enter_pt = three_center_pt = three_exit_pt = pt3
-        else: 
+        else:
             pt3 = vhi3.mapToItem(origami_part_item, *node3.point())
             three_is_top = node3.isOnTop()
             three_is_5_to_3 = node3.isDrawn5to3()
@@ -826,7 +826,7 @@ class EndpointItem(QGraphicsPathItem):
         c_a.mousePressEvent = self.mousePressEvent
         c_a.mouseMoveEvent = self.mouseMoveEvent
         c_a.setPen(_NO_PEN)
-        
+
     # end def
 
     def __repr__(self):
@@ -844,7 +844,7 @@ class EndpointItem(QGraphicsPathItem):
         else:  # high or dual, doesn't matter
             return self._strand_item.idxs()[1]
     # end def
-    
+
     def partItem(self):
         return self._strand_item.partItem()
     # end def

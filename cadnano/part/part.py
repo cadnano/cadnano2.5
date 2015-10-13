@@ -103,19 +103,19 @@ class Part(ProxyObject):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int, 
+    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(ProxyObject,
                         name='partActiveSliceResizeSignal')     # self
     partDimensionsChangedSignal = ProxySignal(ProxyObject,
                         name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(ProxyObject, 
+    partInstanceAddedSignal = ProxySignal(ProxyObject,
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(ProxyObject,
                         name='partParentChangedSignal')         # self
     partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
                         name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(ProxyObject, 
+    partRemovedSignal = ProxySignal(ProxyObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, ProxyObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
@@ -125,19 +125,19 @@ class Part(ProxyObject):
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixRenumberedSignal')# self, coord
-    partVirtualHelixResizedSignal = ProxySignal(object, tuple, 
+    partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partHideSignal = ProxySignal(ProxyObject, name='partHideSignal')
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
-    partModAddedSignal = ProxySignal(object, object, object, 
-                        name='partModAddedSignal') 
+    partModAddedSignal = ProxySignal(object, object, object,
+                        name='partModAddedSignal')
     partModRemovedSignal = ProxySignal(object, object,
-                        name='partModRemovedSignal') 
+                        name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
-                        name='partModChangedSignal') 
+                        name='partModChangedSignal')
 
     ### SLOTS ###
 

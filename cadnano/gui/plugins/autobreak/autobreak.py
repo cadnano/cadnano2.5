@@ -40,7 +40,7 @@ def nxBreakStaple(oligo, settings):
     max_staple_len = settings.get('maxStapleLen', 40)
     max_staple_len_plus_one = max_staple_len+1
     tgtStapleLen = settings.get('tgtStapleLen', 35)
-    
+
     token_list = tokenizeOligo(oligo, settings)
 
     # print "tkList", token_list, oligo.length(), oligo.color()
@@ -52,7 +52,7 @@ def nxBreakStaple(oligo, settings):
         break_items, shortest_score_idx = token_cache[cache_string]
         nxPerformBreaks(oligo, break_items, token_list, shortest_score_idx, min_staple_leg_len)
     else:
-        staple_limits = [min_staple_len, max_staple_len, tgtStapleLen] 
+        staple_limits = [min_staple_len, max_staple_len, tgtStapleLen]
         token_lists = [(token_list, staple_limits,0)]
         tokenCount = token_list[0]
         if oligo.isLoop():
@@ -201,8 +201,8 @@ def getStrandAtLengthInOligo(strand_in, length):
         try:
             strand = strandGen.next()
         except:
-            print("yikes: ", 
-                strand.connection3p(), strand_counter, 
+            print("yikes: ",
+                strand.connection3p(), strand_counter,
                 length, strand.oligo().isLoop(), strand_in.oligo().length())
             raise Exception
         strand_counter += strand.totalLength()
