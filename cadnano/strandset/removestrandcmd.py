@@ -1,5 +1,7 @@
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
+import cadnano.preferences as prefs
+import random
 
 class RemoveStrandCommand(UndoCommand):
     """
@@ -30,8 +32,8 @@ class RemoveStrandCommand(UndoCommand):
         else:
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
-            colorList = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-            color = random.choice(colorList).name()
+            color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
+            color = random.choice(color_list).name()
             olg3p.setColor(color)
             olg3p.refreshLength()
     # end def
