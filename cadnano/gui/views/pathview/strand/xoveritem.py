@@ -54,7 +54,7 @@ class XoverNode3(QGraphicsRectItem):
         self.scene().views()[0].addToPressList(self)
         self._vhi.setActive(self._idx)
         xoi = self._xover_item
-        tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
+        tool_method_name = xoi._getActiveTool().methodPrefix() + "MousePress"
         if hasattr(xoi, tool_method_name):
             getattr(xoi, tool_method_name)()
     # end def
