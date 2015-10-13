@@ -1,5 +1,7 @@
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
+import cadnano.preferences as prefs
+import random
 
 class RemoveStrandCommand(UndoCommand):
     """
@@ -119,7 +121,7 @@ class RemoveStrandCommand(UndoCommand):
             strand3p.setConnection5p(strand)
 
         # oligo.decrementLength(strand.totalLength())
-        
+
         # Restore the oligo
         oligo.addToPart(strandset.part())
         if olg5p:
