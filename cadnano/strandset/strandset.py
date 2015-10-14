@@ -1,7 +1,6 @@
 from bisect import bisect_left, insort_left
 
 from cadnano.enum import StrandType
-
 import cadnano.util as util
 
 from cadnano.cnproxy import ProxyObject, ProxySignal
@@ -186,9 +185,7 @@ class StrandSet(ProxyObject):
     # # end def
 
     def getBoundsOfEmptyRegionContaining(self, base_idx):
-        """
-
-        """
+        """ Return the bounds of the empty region containing base index <base_idx>. """
         class DummyStrand(object):
             _base_idx_low = base_idx
             def __lt__(self, other):
@@ -218,12 +215,12 @@ class StrandSet(ProxyObject):
     # end def
 
     def indexOfRightmostNonemptyBase(self):
-            """Returns the high base_idx of the last strand, or 0."""
-            sh = self.strand_heap
-            if len(sh) > 0:
-                return sh[-1].highIdx()
-            else:
-                return 0
+        """Returns the high base_idx of the last strand, or 0."""
+        sh = self.strand_heap
+        if len(sh) > 0:
+            return sh[-1].highIdx()
+        else:
+            return 0
     # end def
 
     def partMaxBaseIdx(self):
@@ -232,11 +229,11 @@ class StrandSet(ProxyObject):
 
     def strandCount(self):
         return len(self.strands())
-    # end def
+
 
     def strandType(self):
         return self._strand_type
-    # end def
+
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def createStrand(self, base_idx_low, base_idx_high, use_undostack=True):
@@ -249,8 +246,7 @@ class StrandSet(ProxyObject):
 
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
-            c = CreateStrandCommand(self,
-                                        base_idx_low, base_idx_high)
+            c = CreateStrandCommand(self, base_idx_low, base_idx_high)
             row, col = self._virtual_helix.coord()
             d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
             # print("strand", d)
@@ -267,8 +263,7 @@ class StrandSet(ProxyObject):
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
         """
-        c = CreateStrandCommand(self,
-                                    base_idx_low, base_idx_high)
+        c = CreateStrandCommand(self, base_idx_low, base_idx_high)
         row, col = self._virtual_helix.coord()
         d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
         # print("strand", d)
@@ -409,8 +404,7 @@ class StrandSet(ProxyObject):
 
 
     def hasStrandAt(self, idx_low, idx_high):
-        """
-        """
+        """ Return True if strandset has a strand in the region between idx_low and idx_high (both included)."""
         sa = self.strand_array
         sh = self.strand_heap
         lsh = len(sh)

@@ -127,7 +127,7 @@ class AddSeqTool(AbstractPathTool):
         if len(user_sequence) == 0:
             self.custom_sequence_is_valid = False
             return  # tabWidgetChangedSlot will disable apply_button
-        if re.find(RE_DNA_PATTERN, user_sequence) is None:
+        if re.search(RE_DNA_PATTERN, user_sequence) is None:
             self.use_custom_sequence = True
             self.custom_sequence_is_valid = True
             self.apply_button.setEnabled(True)
