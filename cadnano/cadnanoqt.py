@@ -1,5 +1,6 @@
 import sys, os
-
+import logging
+logger = logging.getLogger(__name__)
 from code import interact
 
 from cadnano.proxyconfigure import proxyConfigure
@@ -32,6 +33,8 @@ class CadnanoQt(QObject):
         """ Create the application object
         """
         self.argns, unused = util.parse_args(argv, gui=True)
+        util.init_logging(self.argns.__dict__)
+        logger.info("CadnanoQt initializing...")
         if argv is None:
             argv = sys.argv
         self.argv = argv
@@ -130,10 +133,12 @@ class CadnanoQt(QObject):
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
             dc = DocumentController(base_doc)
+            logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)
+            logger.info("Creating new empty document...")
             if doc_ctrlr_count == 0:  # first dc
                 # dc adds itself to app.document_controllers
                 dc = DocumentController(base_doc)
