@@ -28,11 +28,12 @@ class CadnanoQt(QObject):
     documentWasCreatedSignal = pyqtSignal(object)  # doc
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
-    def __init__(self, argv):
+    def __init__(self, argv=None):
         """ Create the application object
         """
+        self.argns, unused = util.parse_args(argv, gui=True)
         if argv is None:
-            argv = []
+            argv = sys.argv
         self.argv = argv
         if QCoreApplication.instance() is None:
             self.qApp = QApplication(argv)
@@ -74,7 +75,7 @@ class CadnanoQt(QObject):
         if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
             self.shouldPerformBoilerplateStartupScript = True
         util.loadAllPlugins()
-        if "-i" in self.argv:
+        if self.argns.interactive:
             print("Welcome to cadnano's debug mode!")
             print("Some handy locals:")
             print("\ta\tcadnano.app() (the shared cadnano application object)")
@@ -124,7 +125,7 @@ class CadnanoQt(QObject):
 
     def newDocument(self, base_doc=None):
         global DocumentController
-        default_file = os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
+        default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)

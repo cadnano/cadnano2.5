@@ -18,16 +18,17 @@ to push GObject warnings to /dev/null on linux
 if "-t" in sys.argv:
     os.environ['CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME'] = 'YES'
 
-def main(args):
-    print(args)
+def main(argv=None):
+    print(argv)
     from cadnano import initAppWithGui
-    app = initAppWithGui(args)
-    if "-p" in args:
+    # Things are a lot easier if we can pass None instead of sys.argv and only fall back to sys.argv when we need to.
+    app = initAppWithGui(argv)
+    if app.argns.profile:
         print("Collecting profile data into cadnano.profile")
         import cProfile
         cProfile.runctx('app.exec_()', None, locals(), filename='cadnano.profile')
         print("Done collecting profile data. Use -P to print it out.")
-    elif "-P" in args:
+    if app.argns.print_stats:
         from pstats import Stats
         s = Stats('cadnano.profile')
         print("Internal Time Top 10:")
@@ -41,4 +42,4 @@ def main(args):
     sys.exit(app.exec_())
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()

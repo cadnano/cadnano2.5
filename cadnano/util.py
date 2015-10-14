@@ -9,6 +9,7 @@ import sys
 import os
 from os import path
 import platform
+import argparse
 # import imp
 from itertools import dropwhile, starmap
 
@@ -241,3 +242,37 @@ def findChild(self):
         debugHighlighter.scene().removeItem(debugHighlighter)
         for child, wasVisible in childVisibility:
             child.setVisible(wasVisible)
+
+def parse_args(argv=None, gui=None):
+    """
+    Uses argparse to parse commandline args.
+    Returns a NameSpace object. This can easily be converted to a regular dict through:
+        argns.__dict__
+
+    This also presents a nice command line help to the user, exposed with --help flag:
+        python main.py --help
+
+    If gui is set to "qt", then the parser will use parse_known_args.
+    Unlike parse_args(), parse_known_args() will not cause abort by show the help message and exit,
+    if it finds any unrecognized command-line arguments.
+    Alternatively, you can initialize your app via
+        app = QApplication(sys.argv)
+        parse_args(app.arguments())
+    QApplication.arguments() returns a list of arguments with all Qt arguments stripped away.
+    Qt command line args include:
+        -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
+    """
+    parser = argparse.ArgumentParser(description="Cadnano 2.5")
+    parser.add_argument("--testing", "-t", action="store_true", help="Enable testing mode/environment.")
+    parser.add_argument("--profile", "-p", action="store_true", help="Profile app execution.")
+    parser.add_argument("--print-stats", "-P", action="store_true", help="Print profiling statistics.")
+    parser.add_argument("--interactive", "-i", action="store_true", help="Enable interactive (console) mode.")
+    parser.add_argument('--loglevel',
+                        help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
+    parser.add_argument("--file", "-f", metavar="designfile.json", help="Cadnano design to load upon start up.")
+    if gui and (gui is True or gui.lower() == "qt"):
+        # Command line args might include Qt-specific switches and parameters.
+        argns, unused = parser.parse_known_args(argv)
+    else:
+        argns, unused = parser.parse_args(argv), None
+    return argns, unused
