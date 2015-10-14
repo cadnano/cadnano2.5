@@ -28,6 +28,8 @@ def main(argv=None):
         import cProfile
         cProfile.runctx('app.exec_()', None, locals(), filename='cadnano.profile')
         print("Done collecting profile data. Use -P to print it out.")
+    if not app.argns.profile and not app.argns.print_stats:
+        sys.exit(app.exec_())
     if app.argns.print_stats:
         from pstats import Stats
         s = Stats('cadnano.profile')
@@ -39,7 +41,6 @@ def main(argv=None):
     #     print("running tests")
     #     from tests.runall import main as runTests
     #     runTests(useXMLRunner=False)
-    sys.exit(app.exec_())
 
 if __name__ == '__main__':
     main()
