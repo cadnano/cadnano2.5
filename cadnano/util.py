@@ -301,7 +301,7 @@ def init_logging(args=None, logdir=None):
             elif sys.platform == 'darwin':
                 logdir = os.path.join(os.path.expanduser("~"), "Library", "Logs", appname)
             else:
-                logdir = os.path.join(os.path.expanduser("~"), appname, "logs")
+                logdir = os.path.join(os.path.expanduser("~"), "."+appname, "logs")
     if not os.path.exists(logdir):
         os.makedirs(logdir)
     logfilepath = os.path.join(logdir, appname+".log")
