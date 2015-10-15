@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 from math import floor
+import logging
+logger = logging.getLogger(__name__)
 from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
 from .endpointitem import EndpointItem
 from cadnano.gui.views.pathview import pathstyles as styles
@@ -639,7 +641,8 @@ class StrandItem(QGraphicsLineItem):
         to the clicked strand via its oligo.
         """
         m_strand = self._model_strand
-        if m_strand.isScaffold():
+        current_filter_dict = self._viewroot.selectionFilterDict()
+        if self.strandFilter() in current_filter_dict and self._filter_name in current_filter_dict:
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -650,6 +653,10 @@ class StrandItem(QGraphicsLineItem):
                     d = seqLen - olgLen
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
+        else:
+            logger.info("The clicked strand %s does not match current selection filter %s. "\
+                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_dict,
+                        self.strandFilter(), self._filter_name)
     # end def
 
     def restoreParent(self, pos=None):
