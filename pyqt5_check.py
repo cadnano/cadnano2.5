@@ -25,7 +25,7 @@ Running:
 Should be all you need to do.
 
 If something goes wrong mid-installing, this doesn't yet recover cleanly
-so you might try deleting the tha tar.gz files and extracted folders and trying
+so you might try deleting the '*.tar.gz' files and extracted folders and trying
 again if you don't have write permissions correct and are installing at the
 system level and say need to run:
 
