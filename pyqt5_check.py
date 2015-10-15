@@ -4,15 +4,19 @@ import os
 import subprocess
 import platform
 
-QT_VERSION = '5.3.2'
-SIP_VERSION = '4.16.4'
-PYQT5_VERSION = '5.3.2'
+# QT_VERSION = '5.3.2'
+QT_VERSION = '5.5.0'
+# SIP_VERSION = '4.16.4'
+SIP_VERSION = '4.16.9'
+# PYQT5_VERSION = '5.3.2'
+PYQT5_VERSION = '5.5'
+
 
 def get_qt5(pyroot_path, qt5_path, is_static=False):
     static_str = '-static' if is_static else ''
     if os.path.exists(qt5_path):
         print("Already have Qt5")
-        return
+        # return
 
     qt5_zip = 'qt-everywhere-opensource-src-%s.tar.gz' % (QT_VERSION)
     qt5_src_path = 'qt-everywhere-opensource-src-%s' % (QT_VERSION)
@@ -20,7 +24,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
     if os.path.exists(os.path.join(pyroot_path, qt5_zip)):
         wget_str = ''
     else:
-        wget_str = 'wget --output-file=%s http://download.qt-project.org/official_releases/qt/%s/%s/single/%s;' %\
+        wget_str = 'wget --output-document=%s \"http://download.qt.io/official_releases/qt/%s/%s/single/%s\";' %\
                     (qt5_zip, QT_VERSION[0:3], QT_VERSION, qt5_zip)
 
     if os.path.exists(os.path.join(pyroot_path, qt5_src_path)):
@@ -40,7 +44,8 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
             '-opensource -prefix %s -confirm-license ' % (qt5_path) +\
             '-optimized-qmake -c++11 -system-sqlite -sdk macosx10.9 ' +\
             '-no-glib -no-alsa -no-gtkstyle -no-pulseaudio -no-xcb-xlib ' +\
-            '-no-xinput2 -no-dbus -nomake examples '
+            '-no-xinput2 -nomake examples '
+            # removed no debus for os x
 
     config_str += \
         '-skip qtactiveqt -skip qtandroidextras -skip qtconnectivity ' +\
@@ -49,11 +54,13 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
         '-skip qtquickcontrols -skip qtscript -skip qtsensors ' +\
         '-skip qtserialport -skip qttools -skip qttranslations ' +\
         '-skip qtwebkit -skip qtwebkit-examples -skip qtwinextras ' +\
-        '-skip qtxmlpatterns '
+        '-skip qtxmlpatterns -skip qtwebchannel '
     if sys.platform in ['linux', 'Linux']:
         config_str += '-skip qtmacextras;'
     else:
         config_str += '-skip qtx11extras;'
+
+    print(config_str)
 
     def qt5Build():
         print("Building qt5")
@@ -125,15 +132,15 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
     static_str = '--static' if is_static else ''
 
     if sys.platform in ['linux', 'Linux']:  # hack for broken configure.py in 5.3.2
-        PYQT5_VERSION = '5.4-snapshot-837edec02d98'
-        pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
+        PYQT5_VERSION_LOCAL = '5.4-snapshot-837edec02d98'
+        pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION_LOCAL)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
         pyqturl = 'http://www.riverbankcomputing.com/static/Downloads/PyQt5/%s' %\
             (pyqt5_zip)
     else:
         pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s;' %\
+        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
                         (PYQT5_VERSION, pyqt5_zip)
 
     # os.environ['QTDIR'] = qt5_path
@@ -155,7 +162,7 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
     if sys.platform in ['linux', 'linux']:
         config_str += '--enable=QtX11Extras;'
     else:
-        config_str += '--enable=QtMacExtras;'
+        config_str += '--enable=QtMacExtras --no-python-dbus;'
 
     def pyqt5Build():
         print("Building pyqt5")
@@ -165,6 +172,7 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
                         cd_str,
                         config_str
                     )]
+        # print(qt_cmds)
         pyqt5build = subprocess.Popen(qt_cmds, shell=True,
                                         cwd=pyroot_path)
         pyqt5build.wait()
