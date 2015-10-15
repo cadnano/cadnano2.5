@@ -1,5 +1,6 @@
 import sys, os
-
+import logging
+logger = logging.getLogger(__name__)
 from code import interact
 
 from cadnano.proxyconfigure import proxyConfigure
@@ -28,11 +29,14 @@ class CadnanoQt(QObject):
     documentWasCreatedSignal = pyqtSignal(object)  # doc
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
-    def __init__(self, argv):
+    def __init__(self, argv=None):
         """ Create the application object
         """
+        self.argns, unused = util.parse_args(argv, gui=True)
+        util.init_logging(self.argns.__dict__)
+        logger.info("CadnanoQt initializing...")
         if argv is None:
-            argv = []
+            argv = sys.argv
         self.argv = argv
         if QCoreApplication.instance() is None:
             self.qApp = QApplication(argv)
@@ -74,7 +78,7 @@ class CadnanoQt(QObject):
         if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
             self.shouldPerformBoilerplateStartupScript = True
         util.loadAllPlugins()
-        if "-i" in self.argv:
+        if self.argns.interactive:
             print("Welcome to cadnano's debug mode!")
             print("Some handy locals:")
             print("\ta\tcadnano.app() (the shared cadnano application object)")
@@ -124,15 +128,17 @@ class CadnanoQt(QObject):
 
     def newDocument(self, base_doc=None):
         global DocumentController
-        default_file = os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
+        default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
             dc = DocumentController(base_doc)
+            logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)
+            logger.info("Creating new empty document...")
             if doc_ctrlr_count == 0:  # first dc
                 # dc adds itself to app.document_controllers
                 dc = DocumentController(base_doc)
