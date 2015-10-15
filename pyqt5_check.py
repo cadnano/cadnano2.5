@@ -1,3 +1,37 @@
+# -*- coding: utf-8 -*-
+"""
+script for downloading and installing Qt5, sip, and PyQt5 into python
+environment.  This is tested primarily in virtualenv using virtualenvwrapper
+on OS X and Linux.  Files get placed in your virtualenv root path which
+is at:
+
+    distutils.sysconfig.BASE_PREFIX
+
+Be sure to create your virtualenv with
+
+    mkvirtualenv --always-copy <myenv>
+
+or
+
+    virtualenv --always-copy <myenv>
+
+where <myenv> is the name you want for the environment
+since sip needs to copy sip.h to your includes directory
+
+Running:
+
+    python pyqt5_check.py
+
+Should be all you need to do.
+
+If something goes wrong mid-installing, this doesn't yet recover cleanly
+so you might try deleting the tha tar.gz files and extracted folders and trying
+again if you don't have write permissions correct and are installing at the
+system level and say need to run:
+
+    sudo pyqt5_check.py
+"""
+
 import sys
 import distutils.sysconfig
 import os
@@ -13,10 +47,12 @@ PYQT5_VERSION = '5.5'
 
 
 def get_qt5(pyroot_path, qt5_path, is_static=False):
+    """
+    """
     static_str = '-static' if is_static else ''
     if os.path.exists(qt5_path):
         print("Already have Qt5")
-        # return
+        return
 
     qt5_zip = 'qt-everywhere-opensource-src-%s.tar.gz' % (QT_VERSION)
     qt5_src_path = 'qt-everywhere-opensource-src-%s' % (QT_VERSION)
@@ -75,18 +111,6 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
                                         cwd=pyroot_path)
         qt5build.wait()
     qt5Build()
-
-    # if sys.platform in ['linux', 'Linux']:
-    #     qt_setup_file = 'qt-opensource-linux-x64-%s.run' % (QT_VERSION)
-    #     wget_str = 'wget http://download.qt-project.org/official_releases/qt/%s/%s/%s' %
-    #                                 (QT_VERSION[0:3], QT_VERSION, qt_setup_file)
-    #     './%s' % (qt_setup_file)
-    # else:
-    #     qt_setup_file = 'qt-opensource-mac-x64-clang-%s.dmg' % (QT_VERSION)
-    #     wget_str = 'wget http://download.qt-project.org/official_releases/qt/%s/%s/%s' %
-    #                                 (QT_VERSION[0:3], QT_VERSION, qt_setup_file)
-    # raise OSError("Run %s and install to %s and rerun setup" %
-    #                         (qt_setup_file, qt5_path) )
 # end def
 
 def get_sip(pyroot_path, is_static=False):
@@ -95,8 +119,9 @@ def get_sip(pyroot_path, is_static=False):
     distutils.sysconfig.get_python_inc(prefix=sys.prefix))
     so if using virtualenv you need to make it with
 
-    mkvirtualenv -p /path/to/python/bin/python in order to get write
+    mkvirtualenv --always-copy in order to get write
     access
+    to prevent issues with write access to the includes directory
     """
     static_str = '--static' if is_static else ''
     sip_str = 'sip-%s' % (SIP_VERSION)
@@ -131,17 +156,10 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     static_str = '--static' if is_static else ''
 
-    if sys.platform in ['linux', 'Linux']:  # hack for broken configure.py in 5.3.2
-        PYQT5_VERSION_LOCAL = '5.4-snapshot-837edec02d98'
-        pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION_LOCAL)
-        pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = 'http://www.riverbankcomputing.com/static/Downloads/PyQt5/%s' %\
-            (pyqt5_zip)
-    else:
-        pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
-        pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
-                        (PYQT5_VERSION, pyqt5_zip)
+    pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
+    pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
+    pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
+                    (PYQT5_VERSION, pyqt5_zip)
 
     # os.environ['QTDIR'] = qt5_path
     # os.environ['QMAKESPEC'] = os.path.join(qt5_path, 'mkspecs', 'macx-clang')
