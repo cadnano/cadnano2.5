@@ -10,6 +10,9 @@ import os
 from os import path
 import platform
 import argparse
+import logging
+import logging.handlers
+logger = logging.getLogger(__name__)
 # import imp
 from itertools import dropwhile, starmap
 
@@ -269,6 +272,10 @@ def parse_args(argv=None, gui=None):
     parser.add_argument("--interactive", "-i", action="store_true", help="Enable interactive (console) mode.")
     parser.add_argument('--loglevel',
                         help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
+    parser.add_argument("--debug-modules", nargs='*', metavar="MODULE-STR",
+                        help="Debug modules whose names start with any of the given strings. For instance, to "\
+                             "debug the cadnano file decoder, use --debug-modules cadnano.fileio.nnodecode ."\
+                             "To debug all gui modules, use --debug-modules cadnano.gui .")
     parser.add_argument("--file", "-f", metavar="designfile.json", help="Cadnano design to load upon start up.")
     if gui and (gui is True or gui.lower() == "qt"):
         # Command line args might include Qt-specific switches and parameters.
@@ -276,3 +283,84 @@ def parse_args(argv=None, gui=None):
     else:
         argns, unused = parser.parse_args(argv), None
     return argns, unused
+
+def init_logging(args=None, logdir=None):
+    """
+    Set up standard logging system based on parameters in args, e.g. loglevel and testing.
+    """
+    if args is None:
+        args = {}
+    if logdir is None:
+        appname = "cadnano"
+        try:
+            import appdirs
+            logdir = appdirs.user_log_dir(appname)
+        except ImportError:
+            if os.environ.get('APPDATA'):
+                logdir = os.path.join(os.environ['APPDATA'], appname, "Logs")
+            elif sys.platform == 'darwin':
+                logdir = os.path.join(os.path.expanduser("~"), "Library", "Logs", appname)
+            else:
+                logdir = os.path.join(os.path.expanduser("~"), "."+appname, "logs")
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+    logfilepath = os.path.join(logdir, appname+".log")
+
+    ## We want different output formatting for file vs console logging output.
+    ## File logs should be simple and easy to regex; console logs should be short and nice on the eyes
+    logfilefmt = '%(asctime)s %(levelname)-6s - %(name)s:%(lineno)s - %(funcName)s() - %(message)s'
+    logdatefmt = "%Y%m%d-%H:%M:%S"
+    loguserfmt = "%(asctime)s %(levelname)-5s %(name)30s:%(lineno)-4s%(funcName)16s() %(message)s"
+    loguserfmt = "%(asctime)s %(levelname)-5s %(module)30s:%(lineno)-4s%(funcName)16s() %(message)s"
+    logtimefmt = "%H:%M:%S" # Nice for output to user in console and testing.
+    # See https://docs.python.org/3/library/logging.html#logrecord-attributes for full list of attributes
+
+    # Loglevel (for console messages)
+    if args.get('loglevel'):
+        try:
+            loglevel = int(args['loglevel'])
+        except (TypeError, ValueError):
+            loglevel = getattr(logging, args['loglevel'].upper())
+    else:
+        loglevel = logging.DEBUG if args.get('testing') else logging.WARNING
+
+    if args.get('basic_logging', False):
+        logging.basicConfig(level=loglevel,
+                            format=loguserfmt,
+                            datefmt=logtimefmt,
+                            filename=logfilename)
+        logger.debug("Logging system initialized with loglevel %s", loglevel)
+    else:
+
+        # Set up custom logger:
+        logging.root.setLevel(logging.DEBUG)
+
+        # Add a rotating file handler:
+        logfilehandler = logging.handlers.RotatingFileHandler(logfilepath, maxBytes=2*2**20, backupCount=2)
+        logfileformatter = logging.Formatter(fmt=logfilefmt, datefmt=logdatefmt)
+        logfilehandler.setFormatter(logfileformatter)
+        logging.root.addHandler(logfilehandler)
+        print("Logging to file:", logfilepath)
+
+        # Add a custom StreamHandler for outputting to the console (default level is 0 = ANY)
+        logstreamhandler = logging.StreamHandler() # default stream is sys.stderr
+        logging.root.addHandler(logstreamhandler)
+        logstreamformatter = logging.Formatter(loguserfmt, logtimefmt)
+        logstreamhandler.setFormatter(logstreamformatter)
+
+        # Set filter for debugging:
+        if args.get('debug_modules'):
+            debug_modules = args['debug_modules']
+            def module_debug_filter(record):
+                """
+                All Filters attached to a logger or handler are asked.
+                The record is discarted if any of the attached Filters return False.
+                """
+                return any(record.name.startswith(modstr) for modstr in args['debug_modules']) \
+                    or record.levelno >= loglevel
+            logstreamhandler.addFilter(module_debug_filter)
+            # Default level is 0, which is appropriate when using module_debug_filter
+        else:
+            # only set a min level if we are not using module_debug_filter. (Level is an additional filter.)
+            logstreamhandler.setLevel(loglevel)
+    logger.info("Logging system initialized...")

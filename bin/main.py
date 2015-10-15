@@ -2,6 +2,8 @@
 # encoding: utf-8
 import sys
 import os
+import logging
+logger = logging.getLogger(__name__)
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR = os.path.dirname(LOCAL_DIR)
 sys.path.append(PROJECT_DIR)
