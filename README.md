@@ -93,6 +93,6 @@ pyqt5` or `conda install pyqt5`.
 
 There is an open issue on Anaconda to support PyQt5: [ContinuumIO/anaconda-issues#138](https://github.com/ContinuumIO/anaconda-issues/issues/138).
 
-# *nno2stl*: Conversion of cadnano .nno files to 3D STL model
+# *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 
 The purpose of this is for 3D printing cadnano designs.  see bin/creatsly.py
