@@ -90,17 +90,18 @@ class CadnanoQt(QObject):
             def w():
                 return self.d.controller().window()
 
-            print("\tp()\tshortcut for d().selectedInstance()")
+            print("\tp()\tshortcut for d().selectedInstance().reference()")
             def p():
-                return self.d.selectedInstance()
+                return self.d.selectedInstance().reference()
 
             print("\tpi()\tthe PartItem displaying p()")
             def pi():
-                return w().pathroot.partItemForPart(p())
+                part_instance = self.d.selectedInstance()
+                return w().pathroot.partItemForPart(part_instance)
 
-            print( "\tvh(i)\tshortcut for p().virtualHelix(i)")
+            print( "\tvh(i)\tshortcut for p().reference().virtualHelix(i)")
             def vh(vhref):
-                return p().virtualHelix(vhref)
+                return p().reference().virtualHelix(vhref)
 
             print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
             def vhi(vhref):
