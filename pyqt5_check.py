@@ -30,6 +30,31 @@ again if you don't have write permissions correct and are installing at the
 system level and say need to run:
 
     sudo pyqt5_check.py
+
+
+Advanced stuff Moving Qt installs around
+
+https://code.qt.io/cgit/installer-framework/installer-framework.git/tree/src/libs/installer/resources/files-to-patch-macx-emb-arm-qt5
+
+and
+
+https://code.qt.io/cgit/installer-framework/installer-framework.git/tree/src/libs/installer/qtpatch.cpp
+
+In order to move Qt5 installation around you need to rewrite path strings in the
+build binaries.  These files are:
+
+    bin/qmake
+    bin/lrelease
+    bin/qdoc
+
+    *.la
+    *.prl
+    *.pc
+    *.pri
+    *.cmake
+
+So when you build the reference Qt, make the path crazy long so that the
+patched strings will always be shorter and you can pad with zeros
 """
 
 import sys
