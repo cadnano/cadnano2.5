@@ -29,7 +29,7 @@ so you might try deleting the '*.tar.gz' files and extracted folders and trying
 again if you don't have write permissions correct and are installing at the
 system level and say need to run:
 
-    sudo pyqt5_check.py
+    sudo python pyqt5_check.py
 
 
 Advanced stuff Moving Qt installs around
