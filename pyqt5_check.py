@@ -2,7 +2,12 @@
 """
 script for downloading and installing Qt5, sip, and PyQt5 into python
 environment.  This is tested primarily in virtualenv using virtualenvwrapper
-on OS X and Linux.  Files get placed in your virtualenv root path which
+on OS X and Linux.
+
+For OS X you need Xcode installed
+
+
+Files get placed in your virtualenv root path which
 is at:
 
     distutils.sysconfig.BASE_PREFIX
@@ -61,7 +66,9 @@ import sys
 import distutils.sysconfig
 import os
 import subprocess
+from subprocess import PIPE, Popen
 import platform
+import shutil
 
 # QT_VERSION = '5.3.2'
 QT_VERSION = '5.5.0'
@@ -71,16 +78,26 @@ SIP_VERSION = '4.16.9'
 PYQT5_VERSION = '5.5'
 
 
-def get_qt5(pyroot_path, qt5_path, is_static=False):
+def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False):
     """
     """
-    static_str = '-static' if is_static else ''
-    if os.path.exists(qt5_path):
-        print("Already have Qt5")
-        return
 
     qt5_zip = 'qt-everywhere-opensource-src-%s.tar.gz' % (QT_VERSION)
     qt5_src_path = 'qt-everywhere-opensource-src-%s' % (QT_VERSION)
+
+    if clean:
+        try:
+            os.remove(os.path.join(pyroot_path, qt5_zip))
+        except:
+            pass
+        shutil.rmtree(os.path.join(pyroot_path, qt5_src_path),
+                        ignore_errors=True)
+        shutil.rmtree(qt5_path, ignore_errors=True)
+
+    static_str = '-static' if is_static else ''
+    if os.path.exists(os.path.join(qt5_path, 'bin', 'qmake')):
+        print("Already have Qt5")
+        return
 
     if os.path.exists(os.path.join(pyroot_path, qt5_zip)):
         wget_str = ''
@@ -101,9 +118,25 @@ def get_qt5(pyroot_path, qt5_path, is_static=False):
             '-optimized-qmake -c++11 -system-sqlite ' +\
             '-no-pulseaudio -nomake examples -qt-xcb -no-xcb-xlib '
     else:
+        # Get the OS X SDK
+        macsdk = "xcodebuild -showsdks | awk '/^$/{p=0};p; /OS X SDKs:/{p=1}' | tail -1 | cut -f3"
+        xcb_proc = Popen(['xcodebuild', '-showsdks'], stdout=PIPE)
+        awk_proc = Popen(['awk', '/^$/{p=0};p; /OS X SDKs:/{p=1}'], stdin=xcb_proc.stdout, stdout=PIPE)
+        tail_proc = Popen(['tail', '-1'], stdin=awk_proc.stdout, stdout=PIPE)
+        cut_proc = Popen(['cut', '-f3'], stdin=tail_proc.stdout, stdout=PIPE)
+        xcb_proc.stdout.close() # enable write error
+        awk_proc.stdout.close() # enable write error
+        tail_proc.stdout.close() # enable write error
+        out, err = cut_proc.communicate()
+        if not isinstance(out, str):
+            # output of communicate is bytes
+            macsdk_str = out.decode('utf-8').strip()
+        else:
+            macsdk_str = out.strip()
+
         config_str = '../configure %s ' % (static_str) +\
             '-opensource -prefix %s -confirm-license ' % (qt5_path) +\
-            '-optimized-qmake -c++11 -system-sqlite -sdk macosx10.9 ' +\
+            '-optimized-qmake -c++11 -system-sqlite %s ' % (macsdk_str) +\
             '-no-glib -no-alsa -no-gtkstyle -no-pulseaudio -no-xcb-xlib ' +\
             '-no-xinput2 -nomake examples '
             # removed no debus for os x
@@ -240,7 +273,7 @@ def checker():
             print("OS is Linux or Mac")
             pyroot_path = distutils.sysconfig.BASE_PREFIX
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]) )
-            get_qt5(pyroot_path, qt5_path, is_static=is_static)
+            get_qt5(pyroot_path, qt5_path, is_static=is_static, clean=True)
             try:
                 import sip
             except:

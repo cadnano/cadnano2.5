@@ -45,6 +45,10 @@ On Windows just download the installer for your python version.
 
 ### Mac and Linux
 
+OS X works for 10.10 Yosemite, but not for 10.11 El Capitan unless you
+want to get development versions of PyQt5 that support Qt 5.5.1, this should
+be fixed shortly, but for now hold tight.
+
 You can run the included `pyqt5_check.py` which will grab, build and install
 `Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
