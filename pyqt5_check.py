@@ -70,13 +70,12 @@ from subprocess import PIPE, Popen
 import platform
 import shutil
 
-# QT_VERSION = '5.3.2'
-QT_VERSION = '5.5.0'
+# QT_VERSION = '5.5.0'
+QT_VERSION = '5.5.1'
 # SIP_VERSION = '4.16.4'
 SIP_VERSION = '4.16.9'
-# PYQT5_VERSION = '5.3.2'
 PYQT5_VERSION = '5.5'
-
+# PYQT5_VERSION = '5.5.1'
 
 def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False):
     """
@@ -171,7 +170,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False):
     qt5Build()
 # end def
 
-def get_sip(pyroot_path, is_static=False):
+def get_sip(pyroot_path, is_static=False, dev=False):
     """
     sip copies sip.h to your python include path
     distutils.sysconfig.get_python_inc(prefix=sys.prefix))
@@ -182,14 +181,22 @@ def get_sip(pyroot_path, is_static=False):
     to prevent issues with write access to the includes directory
     """
     static_str = '--static' if is_static else ''
-    sip_str = 'sip-%s' % (SIP_VERSION)
-    sip_zip = '%s.tar.gz' % (sip_str)
+    if dev:
+        sip_str = "sip-4.17-snapshot-9102d6c3daf0"
+        sip_zip = '%s.tar.gz' % (sip_str)
+        sip_url = "https://www.riverbankcomputing.com/static/Downloads/sip4/%s" % (sip_zip)
+    else:
+        sip_str = 'sip-%s' % (SIP_VERSION)
+        sip_zip = '%s.tar.gz' % (sip_str)
 
     if os.path.exists(os.path.join(pyroot_path, sip_zip)):
         wget_str = ''
     else:
-        wget_str = 'wget http://sourceforge.net/projects/pyqt/files/sip/%s/%s;' %\
-                (sip_str, sip_zip)
+        if dev:
+            wget_str = "wget %s;" % (sip_url)
+        else:
+            wget_str = 'wget http://sourceforge.net/projects/pyqt/files/sip/%s/%s;' %\
+                    (sip_str, sip_zip)
     extract_str = 'tar -xzf %s;' % (sip_zip)
     cd_str = 'cd %s;' % (sip_str)
     config_str = 'python configure.py %s ' % static_str +\
@@ -210,18 +217,20 @@ def get_sip(pyroot_path, is_static=False):
     sipBuild()
 # end def
 
-def get_pyqt5(pyroot_path, qt5_path, is_static=False):
+def get_pyqt5(pyroot_path, qt5_path, is_static=False, dev=False):
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     static_str = '--static' if is_static else ''
-
-    pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
-    pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-    pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
+    if dev:
+        dev_str = "5.5.1-snapshot-13f9ece29d02"
+        pyqt5_str = 'PyQt-gpl-%s' % (dev_str)
+        pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
+        pyqturl = "https://www.riverbankcomputing.com/static/Downloads/PyQt5/%s" % (pyqt5_zip)
+    else:
+        pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
+        pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
+        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
                     (PYQT5_VERSION, pyqt5_zip)
 
-    # os.environ['QTDIR'] = qt5_path
-    # os.environ['QMAKESPEC'] = os.path.join(qt5_path, 'mkspecs', 'macx-clang')
-    # os.environ['DYLD_LIBRARY_PATH'] = ';%s/lib' % qt5_path
     if os.path.exists(os.path.join(pyroot_path, pyqt5_zip)):
         wget_str = ''
     else:
@@ -259,21 +268,22 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False):
 http://qt-project.org/doc/qt-5/qt-conf.html
 """
 
-def checker():
-    is_static = False
+def checker(do_clean_qt=False, is_static=False):
     try:
-        raise OSError()
+        if do_clean_qt:
+            raise OSError("Just jumping out of this block for cleaning")
         import PyQt5
-        print("import success!")
+        print("Import success! No need to do anything")
     except:
-        print("need to install")
+        print("Need to install PyQt5")
         if not platform.system() in ['Linux', 'Darwin']:
             raise OSError("Download PyQt5 installer from Riverbank software")
         else:
             print("OS is Linux or Mac")
             pyroot_path = distutils.sysconfig.BASE_PREFIX
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]) )
-            get_qt5(pyroot_path, qt5_path, is_static=is_static, clean=True)
+            clean = False
+            get_qt5(pyroot_path, qt5_path, is_static=is_static, clean=do_clean_)
             try:
                 import sip
             except:
@@ -282,4 +292,20 @@ def checker():
 # end def
 
 if __name__ == '__main__':
-    checker()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--cleanqt",
+                        help="clean up the Qt install",
+                        action="store_true")
+    parser.add_argument("--static",
+                        help="build Qt statically",
+                        action="store_true")
+    parser.add_argument("--dev",
+                        help="use development versions of PyQt5 and SIP hardcoded here",
+                        action="store_true")
+    args = parser.parse_args()
+    if args.cleanqt:
+        print("Removing Qt5 files and redownloading if necessary")
+    if args.static:
+        print("Doing a static Qt5/PyQt5 build")
+    checker(do_clean_qt=args.cleanqt, is_static=args.static)
