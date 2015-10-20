@@ -9,7 +9,8 @@ A number of organizational and style changes have occured from cadnano 2
 * Python 3 compatible
 * no more camel-case'd variables (fixes namespace collisions)
 * QUndoCommands are broken out to their own modules
-* added a STL generator to generate models for 3D printing
+* added a STL generator to generate models for 3D printing (experimental)
+* added a PDB file generator (experimental, requires additional dependency)
 * Maya code removed.
 * Added ability to take advantage of `pyqtdeploy` tool to build standalone
 versions that can be destributed as binary (not currently finished)
@@ -41,11 +42,15 @@ the requirements PyQt5 and sip are available from Riverbank Computing Limited at
 
 ### Windows
 
-On Windows just download the installer for your python version.
+On Windows just download the installer from Riverbank computing for your python
+version.  We have no experience with other installation methods other than
+Anaconda for Windows. See below.
 
 ### Mac and Linux
 
-These instructions can work for 10.10 Yosemite, and possibly for 10.11 El Capitan under Xcode 7.0.1, using Qt5.5.1 but this has not yet been tested.  Please provide feedback if it works for you. Linux seems to have no problems.
+These instructions can work 10.10 Yosemite and  10.11 El Capitan
+under Xcode 7.0.1 and 6.5.  It has also been tested on Debian 7.9 Wheezy
+Please provide feedback if you have problems running this in issues.
 
 You can run the included `pyqt5_check.py` which will grab, build and install
 `Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using
