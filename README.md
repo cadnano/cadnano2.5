@@ -45,7 +45,7 @@ On Windows just download the installer for your python version.
 
 ### Mac and Linux
 
-`pyqt5_check.py`for 10.10 Yosemite, and possibly for 10.11 El Capitan under Xcode 7.0.1, using Qt5.5.1 but this has not yet been tested.  Please provide feedback if it works for you.
+These instructions can works for 10.10 Yosemite, and possibly for 10.11 El Capitan under Xcode 7.0.1, using Qt5.5.1 but this has not yet been tested.  Please provide feedback if it works for you. Linux seems to have no problems.
 
 You can run the included `pyqt5_check.py` which will grab, build and install
 `Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using
@@ -58,6 +58,8 @@ and then running the script, but you can definitely install in your system
 python if you run:
 
     sudo python pyqt5_check.py
+
+This script only builds required parts of Qt5 and PyQt5 in the interest of time.
 
 Manual installation of PyQt5 is fine too, but you'll need to trouble shoot on
 your own
