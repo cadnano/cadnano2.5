@@ -147,7 +147,7 @@ class Document(ProxyObject):
     def selectionDict(self):
         return self._selection_dict
     # end def
-    
+
     def selectedOligos(self):
         """
         as long as one endpoint of a strand is in the selection, then the oligo
@@ -466,6 +466,24 @@ class Document(ProxyObject):
                             max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
         return origamipart
+    # end def
+
+    def addHpxPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS, 
+                          max_col=prefs.HONEYCOMB_PART_MAXCOLS, 
+                          max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
+        dnapart = None
+        if len(self._parts) == 0:
+            dnapart = HpxPart(document=self, max_row=max_row, 
+                              max_col=max_col, max_steps=max_steps)
+            self._addPart(dnapart)
+        return dnapart
+    # end def
+
+    def removeAllParts(self):
+        """Used to reset the document. Not undoable."""
+        self.documentClearSelectionsSignal.emit(self)
+        for part in self._parts:
+            part.remove(use_undostack=False)
     # end def
 
     def addDnaPart(self):

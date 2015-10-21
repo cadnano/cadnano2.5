@@ -82,6 +82,8 @@ class DocumentController():
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\
             self.actionAddSquarePartSlot)
+        self.win.action_new_hpx_part.triggered.connect(self.actionAddHpxPartSlot)
+        self.win.action_new_spx_part.triggered.connect(self.actionAddSpxPartSlot)
         self.win.closeEvent = self.windowCloseEventHandler
         self.win.action_about.triggered.connect(self.actionAboutSlot)
         self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
@@ -419,13 +421,12 @@ class DocumentController():
     # end def
 
     def actionAddHpxPartSlot(self):
-        # part = self._document.addHpxPart()
-        # self.setActivePart(part)
-        pass
+        part = self._document.addHpxPart()
+        self.setActivePart(part)
     # end def
 
     def actionAddSpxPartSlot(self):
-        # part = self._document.addHpxPart()
+        # part = self._document.addSpxPart()
         # self.setActivePart(part)
         pass
     # end def

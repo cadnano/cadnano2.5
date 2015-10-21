@@ -18,7 +18,8 @@ class ItemType(Enum):
 class LatticeType:
     HONEYCOMB = 0
     SQUARE = 1
-
+    HPX = 2
+    SPX = 3
 
 class EndType:
     FIVE_PRIME = 0

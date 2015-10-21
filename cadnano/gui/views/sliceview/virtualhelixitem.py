@@ -1,9 +1,12 @@
+
+import cadnano.util as util
+
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem 
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
-from cadnano.enum import Parity, StrandType
+from cadnano.enum import LatticeType, Parity, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.virtualhelix import VirtualHelix
 from . import slicestyles as styles
@@ -49,6 +52,11 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self._OUT_OF_SLICE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
         self._USE_BRUSH = QBrush(part_color_A128)
         self._OUT_OF_SLICE_BRUSH = QBrush(part_color_A64)
+
+        if self.part().crossSectionType() == LatticeType.HPX:
+            self._USE_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
+                                          styles.SLICE_HELIX_STROKE_WIDTH)
 
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)

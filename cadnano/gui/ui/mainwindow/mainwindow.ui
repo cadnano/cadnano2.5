@@ -412,6 +412,20 @@
     </property>
     <addaction name="action_copy"/>
     <addaction name="action_paste"/>
+    <addaction name="action_modify"/>
+   </widget>
+   <widget class="QMenu" name="menu_plugins">
+    <property name="title">
+     <string>Plugins</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAddPart">
+    <property name="title">
+     <string>AddPart</string>
+    </property>
+    <addaction name="action_new_honeycomb_part"/>
+    <addaction name="action_new_square_part"/>
+    <addaction name="action_new_hpx_part"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -937,7 +951,7 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_honeypx_part">
+  <action name="action_new_hpx_part">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-hpx</normaloff>:/parttools/new-hpx</iconset>
