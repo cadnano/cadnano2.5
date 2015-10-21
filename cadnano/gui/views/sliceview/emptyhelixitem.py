@@ -51,9 +51,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # part-specific styles
-        if part_item.part().crossSectionType() == LatticeType.HPX:
+        if origami_part_item.part().crossSectionType() == LatticeType.HPX:
             self._DEFAULT_PEN = QPen(styles.ORANGE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-        if part_item.part().crossSectionType() == LatticeType.SPX:
+        if origami_part_item.part().crossSectionType() == LatticeType.SPX:
             self._DEFAULT_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
 
         self.setNotHovered()

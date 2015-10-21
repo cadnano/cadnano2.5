@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
+# Form implementation generated from reading ui file 'mainwindow.ui'
 #
 # Created by: PyQt5 UI code generator 5.5
 #
@@ -157,10 +157,6 @@ class Ui_MainWindow(object):
         self.menu_file.setObjectName("menu_file")
         self.menu_edit = QtWidgets.QMenu(self.menubar)
         self.menu_edit.setObjectName("menu_edit")
-        self.menu_plugins = QtWidgets.QMenu(self.menubar)
-        self.menu_plugins.setObjectName("menu_plugins")
-        self.menuAddPart = QtWidgets.QMenu(self.menubar)
-        self.menuAddPart.setObjectName("menuAddPart")
         MainWindow.setMenuBar(self.menubar)
         self.action_new = QtWidgets.QAction(MainWindow)
         icon = QtGui.QIcon()
@@ -372,6 +368,11 @@ class Ui_MainWindow(object):
         icon30.addPixmap(QtGui.QPixmap(":/parttools/new-dna"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_new_dna_part.setIcon(icon30)
         self.action_new_dna_part.setObjectName("action_new_dna_part")
+        self.action_new_spx_part = QtWidgets.QAction(MainWindow)
+        icon31 = QtGui.QIcon()
+        icon31.addPixmap(QtGui.QPixmap(":/parttools/new-spx"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_new_spx_part.setIcon(icon31)
+        self.action_new_spx_part.setObjectName("action_new_spx_part")
         self.right_toolbar.addAction(self.action_path_select)
         self.right_toolbar.addAction(self.action_path_pencil)
         self.right_toolbar.addAction(self.action_path_nick)
@@ -394,7 +395,9 @@ class Ui_MainWindow(object):
         self.left_toolbar.addAction(self.action_outliner)
         self.left_toolbar.addAction(self.action_new_dna_part)
         self.left_toolbar.addAction(self.action_new_honeycomb_part)
+        self.left_toolbar.addAction(self.action_new_hpx_part)
         self.left_toolbar.addAction(self.action_new_square_part)
+        self.left_toolbar.addAction(self.action_new_spx_part)
         self.menu_file.addAction(self.action_about)
         self.menu_file.addAction(self.action_preferences)
         self.menu_file.addAction(self.action_new)
@@ -406,9 +409,6 @@ class Ui_MainWindow(object):
         self.menu_edit.addAction(self.action_copy)
         self.menu_edit.addAction(self.action_paste)
         self.menu_edit.addAction(self.action_modify)
-        self.menuAddPart.addAction(self.action_new_honeycomb_part)
-        self.menuAddPart.addAction(self.action_new_square_part)
-        self.menuAddPart.addAction(self.action_new_hpx_part)
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_edit.menuAction())
 
@@ -424,8 +424,6 @@ class Ui_MainWindow(object):
         self.left_toolbar.setWindowTitle(_translate("MainWindow", "Slice Tools"))
         self.menu_file.setTitle(_translate("MainWindow", "File"))
         self.menu_edit.setTitle(_translate("MainWindow", "Edit"))
-        self.menu_plugins.setTitle(_translate("MainWindow", "Plugins"))
-        self.menuAddPart.setTitle(_translate("MainWindow", "AddPart"))
         self.action_new.setText(_translate("MainWindow", "New..."))
         self.action_new.setShortcut(_translate("MainWindow", "Ctrl+N"))
         self.action_open.setText(_translate("MainWindow", "Open..."))
@@ -511,8 +509,8 @@ class Ui_MainWindow(object):
         self.action_path_mods.setText(_translate("MainWindow", "Mod"))
         self.action_path_mods.setToolTip(_translate("MainWindow", "(M)odifer Tool"))
         self.action_path_mods.setShortcut(_translate("MainWindow", "M"))
-        self.action_new_hpx_part.setText(_translate("MainWindow", "Honeycomb PX"))
-        self.action_new_hpx_part.setIconText(_translate("MainWindow", "Honey PX"))
+        self.action_new_hpx_part.setText(_translate("MainWindow", "HPX"))
+        self.action_new_hpx_part.setIconText(_translate("MainWindow", "HPX"))
         self.action_new_hpx_part.setToolTip(_translate("MainWindow", "Add new part honeycomb PX"))
         self.action_outliner.setText(_translate("MainWindow", "Parts"))
         self.action_outliner.setToolTip(_translate("MainWindow", "Toggle Outliner"))
@@ -520,6 +518,9 @@ class Ui_MainWindow(object):
         self.action_new_part.setText(_translate("MainWindow", "New"))
         self.action_new_part.setToolTip(_translate("MainWindow", "Add new part"))
         self.action_new_dna_part.setText(_translate("MainWindow", "DNA"))
+        self.action_new_spx_part.setText(_translate("MainWindow", "SPX"))
+        self.action_new_spx_part.setIconText(_translate("MainWindow", "SPX"))
+        self.action_new_spx_part.setToolTip(_translate("MainWindow", "Add new part square PX"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget

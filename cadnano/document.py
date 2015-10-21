@@ -468,15 +468,28 @@ class Document(ProxyObject):
         return origamipart
     # end def
 
-    def addHpxPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS, 
-                          max_col=prefs.HONEYCOMB_PART_MAXCOLS, 
-                          max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
-        dnapart = None
-        if len(self._parts) == 0:
-            dnapart = HpxPart(document=self, max_row=max_row, 
+    def addHpxPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
+                         max_col=prefs.HONEYCOMB_PART_MAXCOLS,
+                         max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
+        """
+        Create and store a new origamipart and instance, and return the instance.
+        """
+        origamipart = HpxPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
-            self._addPart(dnapart)
-        return dnapart
+        self._addPart(ObjectInstance(origamipart))
+        return origamipart
+    # end def
+
+    def addSpxPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
+                         max_col=prefs.SQUARE_PART_MAXCOLS,
+                         max_steps=prefs.SQUARE_PART_MAXSTEPS):
+        """
+        Create and store a new origamipart and instance, and return the instance.
+        """
+        origamipart = SpxPart(document=self, max_row=max_row,
+                              max_col=max_col, max_steps=max_steps)
+        self._addPart(ObjectInstance(origamipart))
+        return origamipart
     # end def
 
     def removeAllParts(self):

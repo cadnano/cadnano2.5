@@ -382,7 +382,9 @@
    <addaction name="action_outliner"/>
    <addaction name="action_new_dna_part"/>
    <addaction name="action_new_honeycomb_part"/>
+   <addaction name="action_new_hpx_part"/>
    <addaction name="action_new_square_part"/>
+   <addaction name="action_new_spx_part"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -413,19 +415,6 @@
     <addaction name="action_copy"/>
     <addaction name="action_paste"/>
     <addaction name="action_modify"/>
-   </widget>
-   <widget class="QMenu" name="menu_plugins">
-    <property name="title">
-     <string>Plugins</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menuAddPart">
-    <property name="title">
-     <string>AddPart</string>
-    </property>
-    <addaction name="action_new_honeycomb_part"/>
-    <addaction name="action_new_square_part"/>
-    <addaction name="action_new_hpx_part"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -957,10 +946,10 @@
      <normaloff>:/parttools/new-hpx</normaloff>:/parttools/new-hpx</iconset>
    </property>
    <property name="text">
-    <string>Honeycomb PX</string>
+    <string>HPX</string>
    </property>
    <property name="iconText">
-    <string>Honey PX</string>
+    <string>HPX</string>
    </property>
    <property name="toolTip">
     <string>Add new part honeycomb PX</string>
@@ -1006,6 +995,21 @@
    </property>
    <property name="text">
     <string>DNA</string>
+   </property>
+  </action>
+  <action name="action_new_spx_part">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/new-spx</normaloff>:/parttools/new-spx</iconset>
+   </property>
+   <property name="text">
+    <string>SPX</string>
+   </property>
+   <property name="iconText">
+    <string>SPX</string>
+   </property>
+   <property name="toolTip">
+    <string>Add new part square PX</string>
    </property>
   </action>
  </widget>
