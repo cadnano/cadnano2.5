@@ -2,24 +2,19 @@
 util.py
 """
 import inspect
-import os
-import platform
-<<<<<<< HEAD
-import sys
-import string
-from itertools import dropwhile, starmap, groupby
-from os import path
-from random import Random
 from traceback import extract_stack
-
-=======
+from random import Random
+import string
+import sys
+import os
+from os import path
+import platform
 import argparse
 import logging
 import logging.handlers
 logger = logging.getLogger(__name__)
 # import imp
 from itertools import dropwhile, starmap
->>>>>>> dev
 
 IS_PY_3 = int(sys.version_info[0] > 2)
 prng = Random()
@@ -250,21 +245,7 @@ def findChild(self):
         debugHighlighter.scene().removeItem(debugHighlighter)
         for child, wasVisible in childVisibility:
             child.setVisible(wasVisible)
-<<<<<<< HEAD
 # end def
-
-
-def read_fasta(fp):
-    name, seq = None, []
-    for line in fp:
-        line = line.rstrip()
-        if line.startswith(">"):
-            if name: yield (name, ''.join(seq))
-            name, seq = line, []
-        else:
-            seq.append(line)
-    if name: yield (name, ''.join(seq))
-=======
 
 def parse_args(argv=None, gui=None):
     """
@@ -384,4 +365,14 @@ def init_logging(args=None, logdir=None):
             # only set a min level if we are not using module_debug_filter. (Level is an additional filter.)
             logstreamhandler.setLevel(loglevel)
     logger.info("Logging system initialized...")
->>>>>>> dev
+
+def read_fasta(fp):
+    name, seq = None, []
+    for line in fp:
+        line = line.rstrip()
+        if line.startswith(">"):
+            if name: yield (name, ''.join(seq))
+            name, seq = line, []
+        else:
+            seq.append(line)
+    if name: yield (name, ''.join(seq))

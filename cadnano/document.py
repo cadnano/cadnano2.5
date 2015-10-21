@@ -212,10 +212,6 @@ class Document(ProxyObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
-<<<<<<< HEAD
-=======
-
->>>>>>> dev
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
         ss_dict = self._selection_dict[strandset]
@@ -456,16 +452,9 @@ class Document(ProxyObject):
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
-<<<<<<< HEAD
         origamipart = HoneycombPart(document=self, max_row=max_row,
                             max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
-=======
-        if len(self._children) == 0:
-            origamipart = HoneycombPart(document=self, max_row=max_row,
-                                max_col=max_col, max_steps=max_steps)
-            self._addPart(ObjectInstance(origamipart))
->>>>>>> dev
         return origamipart
     # end def
 
@@ -475,10 +464,11 @@ class Document(ProxyObject):
         """
         Create and store a new origamipart and instance, and return the instance.
         """
-<<<<<<< HEAD
-        origamipart = SquarePart(document=self, max_row=max_row,
-                            max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(origamipart))
+        origamipart = None
+        if len(self._children) == 0:
+            origamipart = SquarePart(document=self, max_row=max_row,
+                                max_col=max_col, max_steps=max_steps)
+            self._addPart(ObjectInstance(origamipart))
         return origamipart
     # end def
 
@@ -503,15 +493,6 @@ class Document(ProxyObject):
         origamipart = SpxPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
-=======
-        origamipart = None
-        if len(self._children) == 0:
-            origamipart = SquarePart(document=self, max_row=max_row,
-                                max_col=max_col, max_steps=max_steps)
-            self._addPart(ObjectInstance(origamipart))
->>>>>>> dev
-        return origamipart
-    # end def
 
     def removeAllParts(self):
         """Used to reset the document. Not undoable."""

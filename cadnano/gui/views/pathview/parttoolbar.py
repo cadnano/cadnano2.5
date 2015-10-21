@@ -31,23 +31,21 @@ class PartToolBar(QToolBar):
         if app().prefs.show_icon_labels:
             self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
 
-        # disabled NC
         # Toolbar Label
-        # self.action_outliner = self.setupAction("Outline", None,
-        #                                                 "action_outliner",
-        #                                                 ":/parttools/outliner")
-        # self.action_outliner.triggered.connect(self.doc.controller().actionToggleOutlinerSlot)
+        self.action_outliner = self.setupAction("Outline", None,
+                                                        "action_outliner",
+                                                        ":/parttools/outliner")
+        self.action_outliner.triggered.connect(self.doc.controller().actionToggleOutlinerSlot)
 
 
         # Toolbar Label
         self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
 
-        # disabled NC
         # DNA part
-        # self.action_new_dna_part = self.setupAction("Plasmid", None,
-        #                                                 "action_new_dna_part",
-        #                                                 ":/parttools/new-dna")
-        # self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
+        self.action_new_dna_part = self.setupAction("Plasmid", None,
+                                                        "action_new_dna_part",
+                                                        ":/parttools/new-dna")
+        self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
 
 
         # Origami ToolButton
