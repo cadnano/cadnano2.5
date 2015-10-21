@@ -23,7 +23,7 @@ class SplitCommand(UndoCommand):
         self._old_strand = strand
         old_sequence  = strand._sequence
         is5to3 = strand.isDrawn5to3()
-        
+
         # self._s_set_idx = strandset_idx
         self._s_set = s_set = strand.strandSet()
         self._old_oligo = oligo = strand.oligo()
@@ -36,7 +36,7 @@ class SplitCommand(UndoCommand):
         else:
             self._l_oligo = l_oligo = oligo.shallowCopy()
             self._h_oligo = h_oligo = oligo.shallowCopy()
-        colorList = prefs.STAP_COLORS if s_set.isStaple() \
+        color_list = prefs.STAP_COLORS if s_set.isStaple() \
                                         else prefs.SCAF_COLORS
         # end
 
@@ -44,12 +44,12 @@ class SplitCommand(UndoCommand):
         if is5to3:  # strand_low has priority
             i_new_low = base_idx
             color_low = oligo.color()
-            color_high = random.choice(colorList).name()
+            color_high = random.choice(color_list).name()
             olg5p, olg3p = l_oligo, h_oligo
             std5p, std3p = strand_low, strand_high
         else:  # strand_high has priority
             i_new_low = base_idx - 1
-            color_low = random.choice(colorList).name()
+            color_low = random.choice(color_list).name()
             color_high = oligo.color()
             olg5p, olg3p = h_oligo, l_oligo
             std5p, std3p = strand_high, strand_low

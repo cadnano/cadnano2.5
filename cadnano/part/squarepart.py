@@ -15,7 +15,7 @@ class SquarePart(OrigamiPart):
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
     _TWIST_OFFSET = 180 + _TWIST_PER_BASE/2 # degrees
-    
+
     # Used in VirtualHelix::potentialCrossoverList
     _SCAFL = Crossovers.SQUARE_SCAF_LOW
     _SCAFH = Crossovers.SQUARE_SCAF_HIGH
@@ -77,11 +77,11 @@ class SquarePart(OrigamiPart):
         return neighbors  # Note: the order and presence of Nones is important
     # end def
 
-    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0):
+    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0, normalize=False):
         """
         make sure self._radius is a float
         """
-        radius = self._RADIUS
+        radius = 1.0 if normalize else self._RADIUS
         y = row*2*radius
         x = column*2*radius
         return scale_factor*x, scale_factor*y

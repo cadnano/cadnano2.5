@@ -263,7 +263,7 @@ has already been installed. Replace the currently installed one?")
         mb.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
         mb.exec_()
         return mb.clickedButton() == mb.button(QMessageBox.Yes)
-        
+
     def removePluginsToBeOverwritten(self, files_in_zip):
         for file_name, file_path in files_in_zip:
             target = os.path.join(util.this_path(), 'plugins', file_name)

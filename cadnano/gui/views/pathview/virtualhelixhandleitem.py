@@ -23,7 +23,7 @@ _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     """docstring for VirtualHelixHandleItem"""
     _filter_name = "virtual_helix"
-    
+
     def __init__(self, virtual_helix, origami_part_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(origami_part_item)
         self._virtual_helix = virtual_helix
@@ -54,7 +54,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             self.setPen(_DEF_PEN)
         self.update(self.boundingRect())
     # end def
-    
+
     def virtualHelix(self):
         return self._virtual_helix
 
@@ -113,7 +113,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def number(self):
         """docstring for number"""
         return self._virtual_helix.number()
-        
+
     def partItem(self):
         return self._origami_part_item
     # end def
@@ -217,12 +217,12 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         # end if
         return QGraphicsEllipseItem.itemChange(self, change, value)
     # end def
-    
+
     def modelDeselect(self, document):
         pass
         self.restoreParent()
     # end def
-    
+
     def modelSelect(self, document):
         pass
         self.setSelected(True)

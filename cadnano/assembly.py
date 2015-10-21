@@ -28,9 +28,9 @@ class Assembly(ProxyObject):
     # end def
 
     ### SIGNALS ###
-    assemblyInstanceAddedSignal = ProxySignal(ProxyObject, 
+    assemblyInstanceAddedSignal = ProxySignal(ProxyObject,
                                 name='assemblyInstanceAddedSignal')
-    assemblyDestroyedSignal = ProxySignal(ProxyObject, 
+    assemblyDestroyedSignal = ProxySignal(ProxyObject,
                                 name='assemblyDestroyedSignal')
 
     ### SLOTS ###
@@ -64,7 +64,7 @@ class Assembly(ProxyObject):
         Deep copy the assembly by cloning the
 
         This leaves alone assemblyInstances, and only
-        
+
         To finish the job this deepCopy Assembly should be incorporated into
         a new ObjectInstance and therefore an assemblyInstance
         """
@@ -86,7 +86,7 @@ class Assembly(ProxyObject):
         # copy the all the objects
         f2 = methodcaller('deepCopy')
         for key, value in object_dict:
-            # create a new object 
+            # create a new object
             newObj = f2(key)
             # copy all of the instances relevant to this new object
             newInsts = [obj_inst.deepCopy(newObj, asm) for obj_inst in value]

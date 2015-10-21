@@ -9,10 +9,13 @@ from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.oligo import Oligo
-from cadnano.part import Part, DnaPart, HoneycombPart, SquarePart
 from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
+from cadnano.part import Part
+from cadnano.part import HoneycombPart, SquarePart
+from cadnano.part import DnaPart
+from cadnano.part.origamipart import OrigamiPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
 
@@ -37,7 +40,7 @@ class Document(ProxyObject):
         self._selected_changed_dict = {}
         app().documentWasCreatedSignal.emit(self)
     # end def
-            
+
     ### SIGNALS ###
     documentPartAddedSignal =  ProxySignal(object,
                                         ProxyObject,
@@ -51,14 +54,13 @@ class Document(ProxyObject):
     # in the case of strands the metadata would be which endpoints of selected
     # e.g. { objectRef: (value0, value1),  ...}
     documentSelectedChangedSignal = ProxySignal(dict,
-                                        name='documentSelectedChangedSignal') # tuples of items + data
+                                         name='documentSelectedChangedSignal') # tuples of items + data
     documentSelectionFilterChangedSignal = ProxySignal(list,
-                                        name='documentSelectionFilterChangedSignal')
-    documentViewResetSignal = ProxySignal(ProxyObject, 
-                                        name='documentViewResetSignal')
+                                  name='documentSelectionFilterChangedSignal')
+    documentViewResetSignal = ProxySignal(ProxyObject,
+                                               name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(ProxyObject,
-                                        name='documentClearSelectionsSignal')
-
+                                         name='documentClearSelectionsSignal')
 
     ### SLOTS ###
 
@@ -162,7 +164,7 @@ class Document(ProxyObject):
         # end for
         return selected_oligos if len(selected_oligos) > 0 else None
     #end def
-    
+
     def clearAllSelected(self):
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
@@ -210,6 +212,10 @@ class Document(ProxyObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
         ss_dict = self._selection_dict[strandset]
@@ -294,7 +300,7 @@ class Document(ProxyObject):
         Delete selected strands. First iterates through all selected strands
         and extracts refs to xovers and strands. Next, calls removeXover
         on xoverlist as part of its own macroed command for isoluation
-        purposes. Finally, calls removeStrand on all strands that were 
+        purposes. Finally, calls removeStrand on all strands that were
         fully selected (low and high), or had at least one non-xover
         endpoint selected.
         """
@@ -324,7 +330,7 @@ class Document(ProxyObject):
         if use_undostack and xoList:
             self.undoStack().beginMacro("Delete xovers")
         for part, strand, strand3p, useUndo in xoList:
-            Part.removeXover(part, strand, strand3p, useUndo)
+            OrigamiPart.removeXover(part, strand, strand3p, useUndo)
             self.removeStrandFromSelection(strand)
             self.removeStrandFromSelection(strand3p)
         self._selection_dict = {}
@@ -443,16 +449,23 @@ class Document(ProxyObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addHoneycombPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS, 
-                                max_col=prefs.HONEYCOMB_PART_MAXCOLS, 
+    def addHoneycombPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS,
+                                max_col=prefs.HONEYCOMB_PART_MAXCOLS,
                                 max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
         """
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
+<<<<<<< HEAD
         origamipart = HoneycombPart(document=self, max_row=max_row,
                             max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
+=======
+        if len(self._children) == 0:
+            origamipart = HoneycombPart(document=self, max_row=max_row,
+                                max_col=max_col, max_steps=max_steps)
+            self._addPart(ObjectInstance(origamipart))
+>>>>>>> dev
         return origamipart
     # end def
 
@@ -462,6 +475,7 @@ class Document(ProxyObject):
         """
         Create and store a new origamipart and instance, and return the instance.
         """
+<<<<<<< HEAD
         origamipart = SquarePart(document=self, max_row=max_row,
                             max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
@@ -489,6 +503,13 @@ class Document(ProxyObject):
         origamipart = SpxPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
         self._addPart(ObjectInstance(origamipart))
+=======
+        origamipart = None
+        if len(self._children) == 0:
+            origamipart = SquarePart(document=self, max_row=max_row,
+                                max_col=max_col, max_steps=max_steps)
+            self._addPart(ObjectInstance(origamipart))
+>>>>>>> dev
         return origamipart
     # end def
 

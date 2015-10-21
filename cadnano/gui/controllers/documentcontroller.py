@@ -213,7 +213,7 @@ class DocumentController():
         3. Create a new document and swap it into the existing ctrlr/window.
         """
         # clear/reset the view!
-        
+
         if len(self._document.children()) == 0:
             return  # no parts
         if self.maybeSave() == False:
@@ -404,11 +404,6 @@ class DocumentController():
         # isChecked = self.win.actionModify.isChecked()
         # self.win.pathroot.setModifyState(isChecked)
         # self.win.sliceroot.setModifyState(isChecked)
-        # if app().isInMaya():
-        #     isChecked = self.win.actionModify.isChecked()
-        #     self.win.pathroot.setModifyState(isChecked)
-        #     self.win.sliceroot.setModifyState(isChecked)
-        #     self.win.solidroot.setModifyState(isChecked)
 
     def actionAddHoneycombPartSlot(self):
         part = self._document.addHoneycombPart()
@@ -545,7 +540,7 @@ class DocumentController():
     ### SLOT CALLBACKS ###
     def actionNewSlotCallback(self):
         """
-        Gets called on completion of filesavedialog after newClicked's 
+        Gets called on completion of filesavedialog after newClicked's
         maybeSave. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
@@ -578,7 +573,7 @@ class DocumentController():
 
     def newClickedCallback(self):
         """
-        Gets called on completion of filesavedialog after newClicked's 
+        Gets called on completion of filesavedialog after newClicked's
         maybeSave. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
@@ -651,10 +646,6 @@ class DocumentController():
         """Intercept close events when user attempts to close the window."""
         if self.maybeSave():
             event.accept()
-            # if app().isInMaya():
-            #     self.windock.setVisible(False)
-            #     del self.windock
-            #     self.windock = action_new_honeycomb_part
             dcs = app().document_controllers
             if self in dcs:
                 dcs.remove(self)

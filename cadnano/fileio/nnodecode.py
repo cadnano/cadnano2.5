@@ -115,7 +115,7 @@ def decode(document, obj):
     part.setImportedVHelixOrder(ordered_coord_list)
     setReopen(False)
     setBatch(False)
-    
+
     # INSTALL STRANDS AND COLLECT XOVER LOCATIONS
     num_helices = len(obj['vstrands']) - 1
     scaf_seg = defaultdict(list)
@@ -194,7 +194,7 @@ def decode(document, obj):
             strand5p = scaf_strand_set.getStrand(idx5p)
             to_vh = part.virtualHelixAtCoord(vh_num_to_coord[to_vh_num])
             strand3p = to_vh.scaffoldStrandSet().getStrand(idx3p)
-            part.createXover(strand5p, idx5p, strand3p, idx3p, 
+            part.createXover(strand5p, idx5p, strand3p, idx3p,
                 update_oligo=False, use_undostack=False)
         # install staple xovers
         for (idx5p, to_vh_num, idx3p) in stap_xo[vh_num]:
@@ -202,12 +202,12 @@ def decode(document, obj):
             strand5p = stap_strand_set.getStrand(idx5p)
             to_vh = part.virtualHelixAtCoord(vh_num_to_coord[to_vh_num])
             strand3p = to_vh.stapleStrandSet().getStrand(idx3p)
-            part.createXover(strand5p, idx5p, strand3p, idx3p, 
+            part.createXover(strand5p, idx5p, strand3p, idx3p,
                 update_oligo=False, use_undostack=False)
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
-    RefreshOligosCommand(part, include_scaffold=True, 
+    RefreshOligosCommand(part, include_scaffold=True,
         colors=(prefs.DEFAULT_SCAF_COLOR, prefs.DEFAULT_STAP_COLOR)).redo()
 
     # SET DEFAULT COLOR
@@ -239,12 +239,12 @@ def decode(document, obj):
         # end for
         # populate colors
         for base_idx, color_number in helix['stap_colors']:
-            color = Color(  (color_number >> 16) & 0xFF, 
-                            (color_number >> 8) & 0xFF, 
+            color = Color(  (color_number >> 16) & 0xFF,
+                            (color_number >> 8) & 0xFF,
                             color_number & 0xFF).name()
 
             strand = stap_strand_set.getStrand(base_idx)
-            strand.oligo().applyColor(color, use_undostack=False) 
+            strand.oligo().applyColor(color, use_undostack=False)
 
     if 'oligos' in obj:
         for oligo in obj['oligos']:

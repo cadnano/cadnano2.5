@@ -92,19 +92,19 @@ class OrigamiPart(Part):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int, 
+    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(ProxyObject,
                         name='partActiveSliceResizeSignal')     # self
     partDimensionsChangedSignal = ProxySignal(ProxyObject,
                         name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(ProxyObject, 
+    partInstanceAddedSignal = ProxySignal(ProxyObject,
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(ProxyObject,
                         name='partParentChangedSignal')         # self
     partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
                         name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(ProxyObject, 
+    partRemovedSignal = ProxySignal(ProxyObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, ProxyObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
@@ -114,18 +114,18 @@ class OrigamiPart(Part):
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixRenumberedSignal')# self, coord
-    partVirtualHelixResizedSignal = ProxySignal(object, tuple, 
+    partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
-    partModAddedSignal = ProxySignal(object, object, object, 
-                        name='partModAddedSignal') 
+    partModAddedSignal = ProxySignal(object, object, object,
+                        name='partModAddedSignal')
     partModRemovedSignal = ProxySignal(object, object,
-                        name='partModRemovedSignal') 
+                        name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
-                        name='partModChangedSignal') 
+                        name='partModChangedSignal')
 
     ### SLOTS ###
 
@@ -423,7 +423,7 @@ class OrigamiPart(Part):
                         continue
                     if idx in strand.idxs() and idx in n_strand.idxs():
                         # only install xovers on pre-split strands
-                        part.createXover(strand, idx, n_strand, idx, 
+                        part.createXover(strand, idx, n_strand, idx,
                                             update_oligo=is_slow,
                                             use_undostack=is_slow)
 
@@ -517,6 +517,20 @@ class OrigamiPart(Part):
             e.redo()
     # end def
 
+    def removeAllOligos(self, use_undostack=True):
+        # clear existing oligos
+        cmds = []
+        for o in list(self.oligos()):
+            cmds.append(RemoveOligoCommand(o))
+        # end for
+        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
+    # end def
+
+    def addOligo(self, oligo):
+        # print("adding oligo", oligo)
+        self._oligos.add(oligo)
+    # end def
+
     def createVirtualHelix(self, row, col, use_undostack=True):
         c = CreateVirtualHelixCommand(self, row, col)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
@@ -546,16 +560,16 @@ class OrigamiPart(Part):
             1 strand becomes 1, 2 or 3 strands depending on where the xover is
             to.  1 and 2 strands happen when the xover is to 1 or more existing
             endpoints.  Since SplitCommand depends on a StrandSet index, we need
-            to adjust this strandset index depending which direction the 
+            to adjust this strandset index depending which direction the
             crossover is going in.
 
             Below describes the 3 strand process
             1) Lookup the strands strandset index (ss_idx)
             2) Split attempted on the 3 prime strand, AKA 5prime endpoint of
-            one of the new strands.  We have now created 2 strands, and the 
-            ss_idx is either the same as the first lookup, or one more than it 
+            one of the new strands.  We have now created 2 strands, and the
+            ss_idx is either the same as the first lookup, or one more than it
             depending on which way the the strand is drawn (isDrawn5to3).  If a
-            split occured the 5prime strand is definitely part of the 3prime 
+            split occured the 5prime strand is definitely part of the 3prime
             strand created in this step
             3) Split is attempted on the resulting 2 strands.  There is now 3
             strands, and the final 3 prime strand may be one of the two new
@@ -596,7 +610,7 @@ class OrigamiPart(Part):
             else:
                 ss_idx5p = ss_idx3p
                 """
-                if the strand was split for the strand3p, then we need to 
+                if the strand was split for the strand3p, then we need to
                 adjust the strandset index
                 """
                 if c:
@@ -672,7 +686,7 @@ class OrigamiPart(Part):
                     raise ValueError("createXover: invalid call can't split abort 2")
                     return
         # end else
-        e = CreateXoverCommand(self, xo_strand5, idx5p, 
+        e = CreateXoverCommand(self, xo_strand5, idx5p,
                 xo_strand3, idx3p, update_oligo=update_oligo)
         if use_undostack:
             self.undoStack().push(e)
@@ -743,7 +757,7 @@ class OrigamiPart(Part):
         ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
         return filter(lambda x: x >= min_idx and x <= max_idx, ret)
 
-    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0):
+    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0, normalize=False):
         """
         Returns a tuple of the (x,y) position for a given lattice row and
         column.
@@ -1097,7 +1111,7 @@ class OrigamiPart(Part):
             lut = (lut_scaf, lut_stap)
 
             to_strandsets = neighbor.getStrandSets()
-            for from_ss, to_ss, pts, st in izip(from_strandsets, 
+            for from_ss, to_ss, pts, st in izip(from_strandsets,
                                                 to_strandsets, lut, stand_types):
                 # test each period of each lattice for each StrandType
                 for pt, is_low_idx in izip(pts, (True, False)):

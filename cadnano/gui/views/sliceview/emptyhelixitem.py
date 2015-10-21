@@ -30,8 +30,8 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
     temp = (styles.SLICE_HELIX_HILIGHT_WIDTH - temp)/2
     _HOVER_RECT = _DEFAULT_RECT.adjusted(-temp, -temp, temp, temp)
-    _Z_DEFAULT = styles.ZSLICEHELIX 
-    _Z_HOVERED = _Z_DEFAULT + 1 
+    _Z_DEFAULT = styles.ZSLICEHELIX
+    _Z_HOVERED = _Z_DEFAULT + 1
     temp /= 2
     _ADJUSTMENT_PLUS = (temp, temp)
     _ADJUSTMENT_MINUS = (-temp, -temp)
@@ -102,7 +102,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         """
         temp = self.virtualHelixItem()
 
-        # xor the check to translate, 
+        # xor the check to translate,
         # convert to a QRectF adjustment if necessary
         check = (delta > 0) ^ self._is_hovered
         if temp and check:
@@ -195,19 +195,19 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                     # resize and install external xovers
                     try:
                         # resize to the nearest prexover on either side of idx
-                        new_lo = util.nearest(idx, 
+                        new_lo = util.nearest(idx,
                             part.getPreXoversHigh(strand_type, p2, max_idx=idx - 10))
-                        new_hi = util.nearest(idx, 
+                        new_hi = util.nearest(idx,
                             part.getPreXoversLow(strand_type, p2, min_idx=idx + 10))
                         if strand1.canResizeTo(new_lo, new_hi) and \
                            strand2.canResizeTo(new_lo, new_hi):
                             # do the resize and update the indices to keep track of new objects
                             ss_base_low_idx1 = ss_base_low_idx2 = new_lo
                             strands[i - 1][2] = strands[i][2] = new_lo
-                            
+
                             strand1.resize((new_lo, new_hi))
                             strand2.resize((new_lo, new_hi))
-                            
+
                             # install xovers
                             part.createXover(strand1, new_hi, strand2, new_hi)
                             part.createXover(strand2, new_lo, strand1, new_lo)
@@ -265,11 +265,11 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                     # resize and install external xovers
                     try:
                         # resize to the nearest prexover on either side of idx
-                        new_lo1 = new_lo2 = util.nearest(idx, 
-                            part.getPreXoversHigh(StrandType.SCAFFOLD, 
+                        new_lo1 = new_lo2 = util.nearest(idx,
+                            part.getPreXoversHigh(StrandType.SCAFFOLD,
                                 p2, max_idx=idx - 8))
-                        new_hi = util.nearest(idx, 
-                            part.getPreXoversLow(StrandType.SCAFFOLD, 
+                        new_hi = util.nearest(idx,
+                            part.getPreXoversLow(StrandType.SCAFFOLD,
                                 p2, min_idx=idx + 8))
 
                         if vh1.number() != 0:  # after the first helix
@@ -299,8 +299,8 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                     idx = part.activeBaseIndex()
                     try:
                         # resize to the nearest prexover on either side of idx
-                        new_lo = util.nearest(idx, 
-                            part.getPreXoversHigh(StrandType.SCAFFOLD, 
+                        new_lo = util.nearest(idx,
+                            part.getPreXoversHigh(StrandType.SCAFFOLD,
                                 p2, max_idx=idx - 8))
 
                         if strand1.canResizeTo(new_lo, strand1.highIdx()) and \
@@ -413,28 +413,28 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     if GL:
         def paint(self, painter, option, widget):
             painter.beginNativePainting()
-    
+
             radius = self._RADIUS
-    
+
             # GL.glPushAttrib(GL.GL_ALL_ATTRIB_BITS)
             # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
-    
+
             # Draw the filled circle
-    
+
             GL.glColor3f (1, 0.5, 0)       # Set to orange
-    
+
             GL.glBegin (GL.GL_POLYGON)
             for X, Y in self._temp:
                 GL.glVertex2f (X,Y)
             # end for
             GL.glEnd()
-    
+
             # Draw the anti-aliased outline
-    
+
             # GL.glEnable(GL.GL_BLEND)
             # GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
             # GL.glEnable(GL.GL_LINE_SMOOTH)
-    
+
             # GL.glBegin(GL.GL_LINE_LOOP)
             # for angle in [x*PI*0.01 for x in range(200)]:
             #     GL.glVertex2f(X + math.sin(angle) * radius, Y + math.cos(angle) * radius)

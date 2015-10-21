@@ -26,7 +26,7 @@ else: # linux
 
 BLUE_FILL = QColor(153, 204, 255)  # 99ccff
 BLUE_STROKE = QColor(0, 102, 204)  # 0066cc
-BLUISH_STROKE = QColor(0, 182, 250)  # 
+BLUISH_STROKE = QColor(0, 182, 250)  #
 ORANGE_FILL = QColor(255, 204, 153)  # ffcc99
 ORANGE_STROKE = QColor(204, 102, 51)  # cc6633
 LIGHT_ORANGE_FILL = QColor(255, 234, 183)

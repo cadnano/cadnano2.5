@@ -62,10 +62,10 @@ class CustomQGraphicsView(QGraphicsView):
         self.setRubberBandSelectionMode(Qt.IntersectsItemShape)
         self._no_drag = QGraphicsView.RubberBandDrag
         self._yes_drag = QGraphicsView.ScrollHandDrag
-        
+
         # reset things that are state dependent
         self.clearGraphicsView()
-        
+
         self._x0 = 0
         self._y0 = 0
         self._scale_size = 1.0
@@ -188,7 +188,7 @@ class CustomQGraphicsView(QGraphicsView):
             # self.is_GL_switch_allowed = False
             self.setGLView(False)
             self._show_details = True
-            self.levelOfDetailChangedSignal.emit(True) # zoomed in 
+            self.levelOfDetailChangedSignal.emit(True) # zoomed in
             self.qTimer.singleShot(500, self.allowGLSwitch)
     # end def
 
@@ -487,7 +487,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def resetScale(self):
         """reset the scale to 1"""
-        # use the transform value if you want to get how much the view 
+        # use the transform value if you want to get how much the view
         # has been scaled
         self._scale_size = self.transform().m11()
 
@@ -517,7 +517,7 @@ class CustomQGraphicsView(QGraphicsView):
             self.toolbar.setPos(self.mapToScene(0, 0))
         self.fitInView(scene_rect, Qt.KeepAspectRatio) # fit in view
         self.resetScale() # adjust scaling so that translation works
-        # adjust scaling so that the items don't fill 100% of the view 
+        # adjust scaling so that the items don't fill 100% of the view
         # this is good for selection
         self.scale(self._scale_fit_factor, self._scale_fit_factor)
         self._scale_size *= self._scale_fit_factor

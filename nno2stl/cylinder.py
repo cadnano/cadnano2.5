@@ -145,8 +145,7 @@ class Cylinder(Solid):
             # self.face_vertex_uvs[ 0 ].append( [ uv1, uv2, uv3 ] )
 
             self.addFace(v1, v3, v2, normal=n1)
-            self.face_vertex_uvs[ 0 ].append( [ uv1, uv3, uv2 ] )   
-        # end for
+            self.face_vertex_uvs[ 0 ].append( [ uv1, uv3, uv2 ] )
 
     # end def
 # end class

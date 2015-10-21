@@ -14,7 +14,7 @@ class AddModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.addModInstance(self._coord, self._idx, 
+        part.addModInstance(self._coord, self._idx,
             isstaple, False, mid)
         strand.strandModsAddedSignal.emit(strand, mid, self._idx)
     # end def
@@ -24,7 +24,7 @@ class AddModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.removeModInstance(self._coord, self._idx, 
+        part.removeModInstance(self._coord, self._idx,
             isstaple, False, self._mod_id)
         strand.strandModsRemovedSignal.emit(strand, mid, self._idx)
     # end def
@@ -44,7 +44,7 @@ class RemoveModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.removeModInstance(self._coord, self._idx, 
+        part.removeModInstance(self._coord, self._idx,
             isstaple, False, mid)
         strand.strandModsRemovedSignal.emit(strand, mid, self._idx)
     # end def
@@ -54,7 +54,7 @@ class RemoveModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.addModInstance(self._coord, self._idx, 
+        part.addModInstance(self._coord, self._idx,
             isstaple, False, mid)
         strand.strandModsAddedSignal.emit(strand, mid, self._idx)
     # end def

@@ -1,5 +1,6 @@
 import sys, os
-
+import logging
+logger = logging.getLogger(__name__)
 from code import interact
 from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
@@ -14,11 +15,11 @@ from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, Qt, QEventLoop, 
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import qApp, QApplication, QUndoGroup
 
-LOCAL_DIR = os.path.dirname(os.path.realpath(__file__)) 
-# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
+LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
+# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
 #                                 'images', 'cadnano2-app-icon.png')
 # print(ICON_PATH)
-ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 
+ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
                                 'images', 'radnano-app-icon.png')
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
@@ -26,11 +27,14 @@ class CadnanoQt(QObject):
     documentWasCreatedSignal = pyqtSignal(object)  # doc
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
-    def __init__(self, argv):
+    def __init__(self, argv=None):
         """ Create the application object
         """
+        self.argns, unused = util.parse_args(argv, gui=True)
+        util.init_logging(self.argns.__dict__)
+        logger.info("CadnanoQt initializing...")
         if argv is None:
-            argv = []
+            argv = sys.argv
         self.argv = argv
         if QCoreApplication.instance() is None:
             self.qApp = QApplication(argv)
@@ -65,14 +69,14 @@ class CadnanoQt(QObject):
         doc = Document()
         self.d = self.newDocument(base_doc=doc)
         styles.setFontMetrics()
-        
-        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick 
+
+        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
             self.shouldPerformBoilerplateStartupScript = True
         util.loadAllPlugins()
-        if "-i" in self.argv:
+        if self.argns.interactive:
             print("Welcome to cadnano's debug mode!")
             print("Some handy locals:")
             print("\ta\tcadnano.app() (the shared cadnano application object)")
@@ -84,24 +88,25 @@ class CadnanoQt(QObject):
             def w():
                 return self.d.controller().window()
 
-            print("\tp()\tshortcut for d().selectedInstance()")
+            print("\tp()\tshortcut for d().selectedInstance().reference()")
             def p():
-                return self.d.selectedInstance()
+                return self.d.selectedInstance().reference()
 
             print("\tpi()\tthe PartItem displaying p()")
             def pi():
-                return w().pathroot.partItemForPart(p())
+                part_instance = self.d.selectedInstance()
+                return w().pathroot.partItemForPart(part_instance)
 
-            print( "\tvh(i)\tshortcut for p().virtualHelix(i)")
+            print( "\tvh(i)\tshortcut for p().reference().virtualHelix(i)")
             def vh(vhref):
-                return p().virtualHelix(vhref)
+                return p().reference().virtualHelix(vhref)
 
             print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
             def vhi(vhref):
                 partitem = pi()
                 vHelix = vh(vhref)
                 return partitem.vhItemForVH(vHelix)
-                
+
             print("\tquit()\tquit (for when the menu fails)")
             print("\tgraphicsItm.findChild()  see help(pi().findChild)")
             interact('', local={'a':self, 'd':d, 'w':w,\
@@ -110,7 +115,7 @@ class CadnanoQt(QObject):
         # else:
         #     self.exec_()
 
-    
+
     def exec_(self):
         if hasattr(self, 'qApp'):
             self.mainEventLoop = QEventLoop()
@@ -122,15 +127,17 @@ class CadnanoQt(QObject):
 
     def newDocument(self, base_doc=None):
         global DocumentController
-        default_file = os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
+        default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
             dc = DocumentController(base_doc)
+            logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)
+            logger.info("Creating new empty document...")
             if doc_ctrlr_count == 0:  # first dc
                 # dc adds itself to app.document_controllers
                 dc = DocumentController(base_doc)

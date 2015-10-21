@@ -41,6 +41,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.right_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
             self.left_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
+        # Outliner setup
+        # disabled NC
+        # self.outlineroot = OutlineRootItem(parent=None, window=self, document=doc)
+
         # Outliner & PropertyEditor setup
         self.outliner_widget.configure(window=self, document=doc)
         self.property_widget.configure(window=self, document=doc)
@@ -61,6 +65,32 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self)
 
+<<<<<<< HEAD
+=======
+        # Part toolbar
+        splitter_size_policy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        splitter_size_policy.setHorizontalStretch(0)
+        splitter_size_policy.setVerticalStretch(0)
+        splitter_size_policy.setHeightForWidth(self.main_splitter.sizePolicy().hasHeightForWidth())
+
+        self.slice_splitter.setSizePolicy(splitter_size_policy)
+        self.slice_splitter.setFrameShape(QFrame.NoFrame)
+        self.slice_splitter.setFrameShadow(QFrame.Plain)
+        self.slice_splitter.setLineWidth(0)
+        self.slice_splitter.setOrientation(Qt.Horizontal)
+        self.slice_splitter.setOpaqueResize(False)
+        self.slice_splitter.setHandleWidth(0)
+
+        self.part_toolbar = PartToolBar(doc, self.slice_splitter)
+
+        # disabled NC
+        # self.slice_splitter.addWidget(self.outlineroot)
+
+        self.slice_splitter.addWidget(self.slice_graphics_view)
+
+        self.slice_splitter.setSizes([36,150,200]) # for path_splitter horizontal
+
+>>>>>>> dev
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
         self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),\
@@ -159,7 +189,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     """
     #     if painter.paintEngine().type() != QPaintEngine.OpenGL and \
     #         painter.paintEngine().type() != QPaintEngine.OpenGL2:
-    # 
+    #
     #         qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
     #         return
     #     # end if
@@ -167,10 +197,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     GL.glDisable(GL.GL_DEPTH_TEST) # disable for 2D drawing
     #     GL.glClearColor(1.0, 1.0, 1.0, 1.0)
     #     GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-    # 
+    #
     #     painter.endNativePainting()
     # # end def
-    
+
     # def drawBackgroundNonGL(self, painter, rect):
     #     """
     #     This method is for overloading the QGraphicsScene.

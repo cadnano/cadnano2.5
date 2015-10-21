@@ -120,7 +120,7 @@ class Part(ProxyObject):
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixRenumberedSignal')# self, coord
-    partVirtualHelixResizedSignal = ProxySignal(object, tuple, 
+    partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
@@ -138,8 +138,6 @@ class Part(ProxyObject):
                         name='partPropertyChangedSignal')       # self, property_name, new_value
     partOligoAddedSignal = ProxySignal(ProxyObject, object,
                         name='partOligoAddedSignal')            # self, oligo
-
-
 
     ### SLOTS ###
 

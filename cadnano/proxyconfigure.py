@@ -1,12 +1,12 @@
 import cadnano.cnproxy as cnp
 
 def proxyConfigure(signal_type=None):
-    """ call once per application at the start of 
+    """ call once per application at the start of
     the import chain
     """
     if signal_type == "blinker":
         import blinker
-        
+
         def emit(self, a, *args):
             self.send(a, data=args)
 
@@ -20,7 +20,7 @@ def proxyConfigure(signal_type=None):
 
         cnp.ProxySignal = newsignal
         cnp.ProxyObject = cnp.CNObject
-        import cadnano    
+        import cadnano
         cadnano.app = cnp.app
 
     elif signal_type == "PyQt":
@@ -35,7 +35,7 @@ def proxyConfigure(signal_type=None):
         cnp.ProxyObject = cnp.CNObject
         # cnp.UndoCommand = cnp.UndoCommand
         # cnp.UndoStack = cnp.UndoStack
-        import cadnano    
+        import cadnano
         cadnano.app = cnp.app
 
     # from cadnano.document import Document

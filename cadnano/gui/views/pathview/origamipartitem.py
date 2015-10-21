@@ -229,7 +229,7 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         self._virtual_helix_item_list.remove(virtual_helix_item)
         del self._virtual_helix_hash[vh.coord()]
         ztf = not getBatch()
-        self._setVirtualHelixItemList(self._virtual_helix_item_list, 
+        self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
         self._updateBoundingRect()
 
@@ -276,9 +276,6 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         del self._addBasesDialog
         maxDelta = n // part.stepSize() * part.stepSize()
         part.resizeVirtualHelices(0, maxDelta)
-        # if app().isInMaya():
-        #     import maya.cmds as cmds
-        #     cmds.select(clear=True)
     # end def
 
     def _removeBasesClicked(self):
@@ -298,9 +295,6 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         delta = idx - (part.maxBaseIdx() + 1)
         if delta < 0:
             part.resizeVirtualHelices(0, delta)
-            # if app().isInMaya():
-            #     import maya.cmds as cmds
-            #     cmds.select(clear=True)
     # end def
 
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):

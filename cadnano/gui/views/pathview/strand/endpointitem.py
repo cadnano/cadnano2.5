@@ -3,6 +3,13 @@
 
 from math import floor
 
+import logging
+logger = logging.getLogger(__name__)
+
+import cadnano.gui.views.pathview.pathselection as pathselection
+
+import cadnano.util as util
+
 from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
@@ -136,7 +143,7 @@ class EndpointItem(QGraphicsPathItem):
             if group:
                 group.addToGroup(self)
             return False
-    
+
     def safeSetPos(self, x, y):
         """
         Required to ensure proper reparenting if selected
@@ -270,7 +277,11 @@ class EndpointItem(QGraphicsPathItem):
         to the clicked strand via its oligo.
         """
         m_strand = self._strand_item._model_strand
-        if m_strand.isScaffold():
+        s_i = self._strand_item
+        viewroot = s_i.viewroot()
+        current_filter_dict = viewroot.selectionFilterDict()
+        if s_i.strandFilter() in current_filter_dict \
+                                    and self._filter_name in current_filter_dict:
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -281,6 +292,10 @@ class EndpointItem(QGraphicsPathItem):
                     d = seqLen - olgLen
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
+        else:
+            logger.info("The clicked strand %s does not match current selection filter %s. "\
+                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_dict,
+                        s_i.strandFilter(), self._filter_name)
     # end def
 
     def modsToolMousePress(self, modifiers, event, idx):

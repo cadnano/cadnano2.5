@@ -5,7 +5,7 @@ from cadnano.part import Part
 ### COMMANDS ###
 class AddInstanceCommand(UndoCommand):
     """
-    Undo ready command for deleting an instance.
+    Undo ready command for adding an instance.
     """
     def __init__(self, document, obj_instance):
         super(AddInstanceCommand, self).__init__("add instance")
@@ -31,7 +31,10 @@ class AddInstanceCommand(UndoCommand):
 
     def undo(self):
         obji = self._obj_instance
+        if isinstance(obji.reference(), Part):
+            obji.reference().partRemovedSignal.emit(obji)
+        else:
+            obji.reference().assemblyRemovedSignal.emit(obji)
         obji.wipe(self._doc)
-        obji.partRemovedSignal.emit(obji)
     # end def
 # end class

@@ -25,7 +25,7 @@ def write_binary(filename, solids):
     with io.open(filename, "wb") as fd:
         fd.write(struct.pack('<B', 0)*80)   # 80 bytes header
         fd.write(struct.pack('<I', sum([len(s.faces) for s in solids]))) # 4 bytes
-        
+
         data_list = []
         for solid in solids:
             for face in solid.faces:

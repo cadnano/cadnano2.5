@@ -11,6 +11,6 @@ class SkipTool(AbstractPathTool):
 
     def __repr__(self):
         return "skip_tool"  # first letter should be lowercase
-    
+
     def methodPrefix(self):
         return "skipTool"  # first letter should be lowercase

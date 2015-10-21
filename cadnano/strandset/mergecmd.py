@@ -47,13 +47,13 @@ class MergeCommand(UndoCommand):
         self._new_strand = new_strand
         # Update the oligo for things like its 5prime end and isLoop
         self._new_oligo.strandMergeUpdate(strand_low, strand_high, new_strand)
-        
+
         # set the new sequence by concatenating the sequence properly
         if strand_low._sequence or strand_high._sequence:
             tL = strand_low.totalLength()
             tH = strand_high.totalLength()
             seqL = strand_low._sequence if strand_low._sequence else "".join([" " for i in range(tL)])
-            seqH = strand_high._sequence if strand_high._sequence else "".join([" " for i in range(tH)])    
+            seqH = strand_high._sequence if strand_high._sequence else "".join([" " for i in range(tH)])
             if new_strand.isDrawn5to3():
                 new_strand._sequence = seqL + seqH
             else:

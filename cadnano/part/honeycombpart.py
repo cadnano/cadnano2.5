@@ -23,7 +23,7 @@ class HoneycombPart(OrigamiPart):
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
     _TWIST_OFFSET = 0 # degrees
-    
+
     _active_base_index = _STEP
     _SUB_STEP_SIZE = _STEP / 3
     # Used in VirtualHelix::potentialCrossoverList
@@ -86,14 +86,16 @@ class HoneycombPart(OrigamiPart):
         return neighbors  # Note: the order and presence of Nones is important
     # end def
 
-    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0):
+    def latticeCoordToPositionXY(self, row, column, scale_factor=1.0, normalize=False):
         """make sure self._radius is a float"""
-        radius = self._RADIUS
+        radius = 1.0 if normalize else self._RADIUS
         x = column*radius*root3
+
         if self.isOddParity(row, column):   # odd parity
             y = row*radius*3 + radius
         else:                               # even parity
             y = row*radius*3
+        # print("xyr", x,y,radius, row, column, root3 )
         return scale_factor*x, scale_factor*y
     # end def
 
