@@ -13,7 +13,7 @@ import argparse
 import logging
 import logging.handlers
 logger = logging.getLogger(__name__)
-# import imp
+import imp
 from itertools import dropwhile, starmap
 
 IS_PY_3 = int(sys.version_info[0] > 2)
@@ -131,50 +131,56 @@ def this_path():
     return os.path.abspath(os.path.dirname(__file__))
 
 # maps plugin path (extension stripped) -> plugin module
-loadedPlugins = {}
+loaded_plugins = {}
 
-def unloadedPlugins():
+def unloadedPlugins(internal_plugin_path):
     """ Returns a list of plugin paths that have yet to
     be loaded but are in the top level of one of the
-    search directories specified in pluginDirs"""
-    internalPlugins = os.path.join(this_path(), 'plugins')
-    pluginDirs = [internalPlugins]
+    search directories specified in plugin_dirs"""
+    plugin_dirs = [internal_plugin_path]
     results = []
-    for pluginDir in pluginDirs:
-        if not os.path.isdir(pluginDir):
+    for plugin_dir in plugin_dirs:
+        if not os.path.isdir(plugin_dir):
             continue
-        for dirent in os.listdir(pluginDir):
-            f = os.path.join(pluginDir, dirent)
-            isfile = os.path.isfile(f)
-            hasValidSuffix = dirent.endswith(('.py', '.so'))
-            if isfile and hasValidSuffix:
+        for dirent in os.listdir(plugin_dir):
+            f = os.path.join(plugin_dir, dirent)
+            is_file = os.path.isfile(f)
+            has_valid_suffix = dirent.endswith(('.py', '.so'))
+            if is_file and has_valid_suffix and not dirent.startswith('__'):
                 results.append(f)
-            if os.path.isdir(f) and\
+            # make sure folders have an __init__.py
+            if os.path.isdir(f) and \
                os.path.isfile(os.path.join(f, '__init__.py')):
                 results.append(f)
-    return list(filter(lambda x: x not in loadedPlugins, results))
+    return list(filter(lambda x: x not in loaded_plugins, results))
 
 def loadPlugin(f):
-    pass
-    # path, fname = os.path.split(f)
-    # name, ext = os.path.splitext(fname)
-    # pluginKey = os.path.join(path, name)
-    # try:
-    #     mod = loadedPlugins[pluginKey]
-    #     return mod
-    # except KeyError:
-    #     pass
-    # file, filename, data = imp.find_module(name, [path])
-    # mod = imp.load_module(name, file, filename, data)
-    # loadedPlugins[pluginKey] = mod
-    # return mod
+    path, fname = os.path.split(f)
+    name, ext = os.path.splitext(fname)
+    plugin_key = os.path.join(path, name)
+    try:
+        mod = loaded_plugins[plugin_key]
+        return mod
+    except KeyError:
+        pass
+    # print("Trying to load:", name, path)
+    the_file, filename, data = imp.find_module(name, [path])
+    mod = imp.load_module(name, the_file, filename, data)
+    loaded_plugins[plugin_key] = mod
+    return mod
 
 def loadAllPlugins():
-    loadedAPlugin = False
-    for p in unloadedPlugins():
+    # add plugin directory to path
+    internal_plugin_path = os.path.join(this_path(), 'gui', 'plugins')
+    sys.path.insert(0, internal_plugin_path)
+
+    loaded_a_plugin = False
+    unloaded_plugins = unloadedPlugins(internal_plugin_path)
+    # print("unloadedPlugins:", unloaded_plugins)
+    for p in unloaded_plugins:
         loadPlugin(p)
-        loadedAPlugin = True
-    return loadedAPlugin
+        loaded_a_plugin = True
+    return loaded_a_plugin
 
 def beginSuperMacro(model_object, desc=None):
     """
@@ -215,15 +221,15 @@ def findChild(self):
 
     children = self.childItems()
     parent = self.parentItem()
-    childVisibility = [(child, child.isVisible()) for child in children]
+    child_visibility = [(child, child.isVisible()) for child in children]
     for n in range(len(children)):
         child = children[n]
-        print("Highlighting %s.childItems()[%i] = %s"%(self, n, child))
+        print("Highlighting %s.childItems()[%i] = %s" % (self, n, child))
         childBR = child.mapToItem(parent, child.boundingRect())
         childBR = childBR.boundingRect()  # xform gives us a QPolygonF
-        debugHighlighter = QGraphicsRectItem(childBR, parent)
-        debugHighlighter.setPen(QPen(Qt.red))
-        debugHighlighter.setZValue(9001)
+        debug_highlighter = QGraphicsRectItem(childBR, parent)
+        debug_highlighter.setPen(QPen(Qt.red))
+        debug_highlighter.setZValue(9001)
         while True:
             # wait for return to be pressed while spinning the event loop.
             # also process single-character commands.
@@ -237,14 +243,14 @@ def findChild(self):
                     c.hide()
                 child.show()
             elif command == 'r':  # Return current child
-                for child, wasVisible in childVisibility:
-                    child.setVisible(wasVisible)
+                for child, was_visible in child_visibility:
+                    child.setVisible(was_visible)
                 return child
             else:
                 break
-        debugHighlighter.scene().removeItem(debugHighlighter)
-        for child, wasVisible in childVisibility:
-            child.setVisible(wasVisible)
+        debug_highlighter.scene().removeItem(debug_highlighter)
+        for child, was_visible in child_visibility:
+            child.setVisible(was_visible)
 
 def parse_args(argv=None, gui=None):
     """

@@ -75,7 +75,7 @@ class Preferences(object):
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
         self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         ptw = self.ui_prefs.plugin_table_widget
-        loaded_plugin_paths = util.loadedPlugins.keys()
+        loaded_plugin_paths = list(util.loaded_plugins) # get the keys
         ptw.setRowCount(len(loaded_plugin_paths))
         for i in range(len(loaded_plugin_paths)):
             row = QTableWidgetItem(loaded_plugin_paths[i])

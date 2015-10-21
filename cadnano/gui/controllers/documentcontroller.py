@@ -28,7 +28,7 @@ class DocumentController():
         """docstring for __init__"""
         # initialize variables
         self._document = document
-        print("the doc", self._document)
+        # print("the doc", self._document)
         self._document.setController(self)
         self._active_part = None
         self._filename = None

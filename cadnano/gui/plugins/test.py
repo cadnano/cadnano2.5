@@ -1,2 +1,2 @@
 import cadnano
-print "Plugin loaded, has access to cadnano: %s"%cadnano
+print("Test plugin loaded, has access to cadnano: %s" % (cadnano))

@@ -1,9 +1,9 @@
-import util, cadnano
+import cadnano.util as util
 import heapq
-from model.strandset import StrandSet
-from model.enum import StrandType
-from model.parts.part import Part
-from model.oligo import Oligo
+from cadnano.strandset import StrandSet
+from cadnano.enum import StrandType
+from cadnano.part.part import Part
+from cadnano.oligo import Oligo
 from multiprocessing import Pool, cpu_count
 from operator import itemgetter
 
@@ -33,13 +33,13 @@ def breakStaples(part, settings):
 # end def
 
 def nxBreakStaple(oligo, settings):
-    stapleScorer = settings.get('stapleScorer', tgtLengthStapleScorer)
+    staple_scorer = settings.get('stapleScorer', tgtLengthStapleScorer)
     min_staple_leg_len = settings.get('minStapleLegLen', 3)
     min_staple_len = settings.get('minStapleLen', 30)
     min_staple_len_minus_one = min_staple_len-1
     max_staple_len = settings.get('maxStapleLen', 40)
     max_staple_len_plus_one = max_staple_len+1
-    tgtStapleLen = settings.get('tgtStapleLen', 35)
+    tgt_staple_len = settings.get('tgtStapleLen', 35)
 
     token_list = tokenizeOligo(oligo, settings)
 
@@ -52,7 +52,7 @@ def nxBreakStaple(oligo, settings):
         break_items, shortest_score_idx = token_cache[cache_string]
         nxPerformBreaks(oligo, break_items, token_list, shortest_score_idx, min_staple_leg_len)
     else:
-        staple_limits = [min_staple_len, max_staple_len, tgtStapleLen]
+        staple_limits = [min_staple_len, max_staple_len, tgt_staple_len]
         token_lists = [(token_list, staple_limits,0)]
         tokenCount = token_list[0]
         if oligo.isLoop():
@@ -246,7 +246,7 @@ def breakStaple(oligo, settings):
     # nodes.
 
     # The minimum number of bases after a crossover
-    stapleScorer = settings.get('stapleScorer', tgtLengthStapleScorer)
+    staple_scorer = settings.get('stapleScorer', tgtLengthStapleScorer)
     min_staple_leg_len = settings.get('minStapleLegLen', 2)
     min_staple_len = settings.get('minStapleLen', 30)
     min_staple_len_minus_one = min_staple_len - 1
@@ -395,4 +395,4 @@ def possibleBreakpoints(oligo, settings):
     #     print ' '.join(str(n[0])+':'+str(n[2]) for n in nodes) + (' :: %i'%oligo.length()) + repr(nodes[-1])
     return nodes
 
-cadnano.app().breakStaples = breakStaples
+# cadnano.app().breakStaples = breakStaples

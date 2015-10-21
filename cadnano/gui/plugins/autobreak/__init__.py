@@ -1,6 +1,8 @@
-from autobreakconfig import AutobreakConfig
-import cadnano, util
-util.qtWrapImport('QtGui', globals(), ['QIcon', 'QPixmap', 'QAction'])
+from .autobreakconfig import AutobreakConfig
+import cadnano
+
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QAction
 
 class AutobreakHandler(object):
     def __init__(self, document, window):
@@ -15,8 +17,8 @@ class AutobreakHandler(object):
         self.action_autobreak.triggered.connect(self.actionAutobreakSlot)
         self.win.menu_plugins.addAction(self.action_autobreak)
         # add to main tool bar
-        self.win.selection_toolbar.insertAction(self.win.actionFiltersLabel, self.action_autobreak)
-        self.win.selection_toolbar.insertSeparator(self.win.actionFiltersLabel)
+        self.win.selection_toolbar.insertAction(self.win.action_filters_label, self.action_autobreak)
+        self.win.selection_toolbar.insertSeparator(self.win.action_filters_label)
         self.config_dialog = None
 
     def actionAutobreakSlot(self):
@@ -31,10 +33,10 @@ class AutobreakHandler(object):
                     return
 
 def documentWindowWasCreatedSlot(doc, win):
-    doc.autobreakHandler = AutobreakHandler(doc, win)
+    doc.autobreak_handler = AutobreakHandler(doc, win)
 
-# Initialization
-for c in cadnano.app().documentControllers:
+# # Initialization
+for c in cadnano.app().document_controllers:
     doc, win = c.document(), c.window()
-    doc.autobreakHandler = AutobreakHandler(doc, win)
+    doc.autobreak_handler = AutobreakHandler(doc, win)
 cadnano.app().documentWindowWasCreatedSignal.connect(documentWindowWasCreatedSlot)
