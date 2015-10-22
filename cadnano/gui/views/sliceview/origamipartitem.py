@@ -1,7 +1,8 @@
-from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtWidgets import QApplication
 
 from cadnano import util
 from cadnano import getReopen
@@ -60,6 +61,9 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
         _outlinerect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_outlinerect, self)
         self._outline.setPen(QPen(QColor(m_props["color"])))
+
+        self._drag_handle = OrigamiDragHandle(QRectF(_outlinerect), self)
+
     # end def
 
     def _initDeselector(self):
@@ -310,3 +314,91 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
             return QRectF(0, 0, .1, .1)
         def paint(self, painter, option, widget=None):
             pass
+
+
+class OrigamiDragHandle(QGraphicsRectItem):
+    def __init__(self, rect, parent=None):
+        super(QGraphicsRectItem, self).__init__(rect, parent)
+        self._parent = parent
+        # self.setRect(rect)
+        self.setAcceptHoverEvents(True)
+        self.setAcceptedMouseButtons(Qt.LeftButton)
+        self.setPen(QPen(Qt.NoPen))
+        col = QColor(parent._model_props["color"])
+        col.setAlpha(10)
+        self.setBrush(QBrush(col))
+        print("draghandle", col, col.alpha())
+    # end def
+
+    def updateRect(self, rect):
+        """docstring for updateRect"""
+        w = rect.width()*.6
+        self.setRect(rect.adjusted(w,w,-w,-w).normalized())
+    # end def
+
+    def hoverEnterEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+    # end def
+
+    def hoverMoveEvent(self, event):
+        pass
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.unsetCursor()
+    # end def
+
+    def mousePressEvent(self, event):
+        self.setCursor(Qt.ClosedHandCursor)
+        self._parent.part().setSelected(True)
+        self._drag_mousedown_pos = event.pos()
+        # r = self._parent.radius()
+        # self.updateDragHandleLine(event)
+        # pos = self._DragHandleLine.pos()
+        # aX, aY, angle = self.snapPosToCircle(pos, r)
+        # if angle != None:
+        #     self._startPos = QPointF(aX, aY)
+        #     self._startAngle = self.updateDragHandleLine(event)
+        #     self.dummy.updateAngle(self._startAngle, 0)
+        #     self.dummy.show()
+        # mark the start
+        # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0)))
+    # end def
+
+    def mouseMoveEvent(self, event):
+        m = QLineF(event.screenPos(), event.buttonDownScreenPos(Qt.LeftButton))
+        if m.length() < QApplication.startDragDistance():
+            return
+        p = self.mapToScene(QPointF(event.pos()) - QPointF(self._drag_mousedown_pos))
+        # still need to correct for qgraphicsview translation
+        self._parent.setPos(p)
+
+        # eventAngle = self.updateDragHandleLine(event)
+        # # Record initial direction before calling getSpanAngle
+        # if self._clockwise is None:
+        #     self._clockwise = False if eventAngle > self._startAngle else True
+        # spanAngle = self.getSpanAngle(eventAngle)
+        # self.dummy.updateAngle(self._startAngle, spanAngle)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+
+        # self.dummy.hide()
+        # endAngle = self.updateDragHandleLine(event)
+        # spanAngle = self.getSpanAngle(endAngle)
+        # 
+        # if self._startPos != None and self._clockwise != None:
+        #     self.parentItem().addSelection(self._startAngle, spanAngle)
+        #     self._startPos = self._clockwise = None
+        # 
+        # mark the end
+        # x = self._DragHandleLine.x()
+        # y = self._DragHandleLine.y()
+        # f = QGraphicsEllipseItem(x, y, 6, 6, self)
+        # f.setPen(QPen(Qt.NoPen))
+        # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
+    # end def
+# end class
