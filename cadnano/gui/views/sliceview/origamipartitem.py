@@ -58,11 +58,11 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
         self._initModifierCircle()
 
         _p = _BOUNDING_RECT_PADDING
-        _outlinerect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
-        self._outline = QGraphicsRectItem(_outlinerect, self)
+        self._outlinerect = _orect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
+        self._outline = QGraphicsRectItem(_orect, self)
         self._outline.setPen(QPen(QColor(m_props["color"])))
 
-        self._drag_handle = OrigamiDragHandle(QRectF(_outlinerect), self)
+        self._drag_handle = OrigamiDragHandle(QRectF(_orect), self)
 
     # end def
 
@@ -336,12 +336,34 @@ class OrigamiDragHandle(QGraphicsRectItem):
         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
     # end def
 
+    def getCursor(self, pos):
+        _r = self._parent._outlinerect
+        _x, _y = pos.x(), pos.y()
+        _width = 6
+        _atLeft = True if abs(_x - _r.left()) < _width else False
+        _atRight = True if abs(_x - _r.right()) < _width else False
+        _atTop = True  if abs(_y - _r.top()) < _width else False
+        _atBottom = True  if abs(_y - _r.bottom()) < _width else False
+        if ((_atLeft and _atBottom) or (_atRight and _atTop)):
+            _cursor = Qt.SizeBDiagCursor
+        elif ((_atLeft and _atTop) or (_atRight and _atBottom)):
+            _cursor = Qt.SizeFDiagCursor
+        elif ((_atLeft or _atRight) and not (_atTop or _atBottom)):
+            _cursor = Qt.SizeHorCursor 
+        elif ((_atTop or _atBottom) and not (_atLeft or _atRight)):
+            _cursor = Qt.SizeVerCursor 
+        else:
+            _cursor = Qt.OpenHandCursor
+        return _cursor
+
     def hoverEnterEvent(self, event):
-        self.setCursor(Qt.OpenHandCursor)
+        _cursor = self.getCursor(event.pos())
+        self.setCursor(_cursor)
     # end def
 
     def hoverMoveEvent(self, event):
-        pass
+        _cursor = self.getCursor(event.pos())
+        self.setCursor(_cursor)
     # end def
 
     def hoverLeaveEvent(self, event):
