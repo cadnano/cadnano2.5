@@ -176,8 +176,13 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
         print("sliceview origamipart partColorChangedSlot")
     # end def
 
-    def partSelectedChangedSlot(self):
-        pass
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        if is_selected:
+            self._drag_handle.resetBrush(styles.SELECTED_ALPHA)
+            self.setZValue(styles.ZPARTITEM+1)
+        else:
+            self._drag_handle.resetBrush(styles.DEFAULT_ALPHA)
+            self.setZValue(styles.ZPARTITEM)
 
     ### ACCESSORS ###
     def boundingRect(self):
@@ -290,6 +295,7 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         # self.createOrAddBasesToVirtualHelix()
+        self.part().setSelected(True)
         QGraphicsItem.mousePressEvent(self, event)
     # end def
 
@@ -320,20 +326,22 @@ class OrigamiDragHandle(QGraphicsRectItem):
     def __init__(self, rect, parent=None):
         super(QGraphicsRectItem, self).__init__(rect, parent)
         self._parent = parent
-        # self.setRect(rect)
         self.setAcceptHoverEvents(True)
         self.setAcceptedMouseButtons(Qt.LeftButton)
         self.setPen(QPen(Qt.NoPen))
-        col = QColor(parent._model_props["color"])
-        col.setAlpha(10)
-        self.setBrush(QBrush(col))
-        print("draghandle", col, col.alpha())
+        self.resetBrush(styles.DEFAULT_ALPHA)
     # end def
 
     def updateRect(self, rect):
         """docstring for updateRect"""
         w = rect.width()*.6
         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
+    # end def
+
+    def resetBrush(self, alpha):
+        col = QColor(self._parent._model_props["color"])
+        col.setAlpha(alpha)
+        self.setBrush(QBrush(col))
     # end def
 
     def getCursor(self, pos):
@@ -372,21 +380,26 @@ class OrigamiDragHandle(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         self.setCursor(Qt.ClosedHandCursor)
-        self._parent.part().setSelected(True)
+        # select this part and deselect everything else
+        for _part in self._parent.part().document().children():
+            if _part is self._parent.part():
+                _part.setSelected(True)
+            else:
+                _part.setSelected(False)
         self._drag_mousedown_pos = event.pos()
-        # r = self._parent.radius()
-        # self.updateDragHandleLine(event)
-        # pos = self._DragHandleLine.pos()
-        # aX, aY, angle = self.snapPosToCircle(pos, r)
-        # if angle != None:
-        #     self._startPos = QPointF(aX, aY)
-        #     self._startAngle = self.updateDragHandleLine(event)
-        #     self.dummy.updateAngle(self._startAngle, 0)
-        #     self.dummy.show()
-        # mark the start
-        # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
-        # f.setPen(QPen(Qt.NoPen))
-        # f.setBrush(QBrush(QColor(204, 0, 0)))
+
+        # _startZ = _maxZ = self.zValue()
+        # _colliding = self.collidingItems(Qt.IntersectsItemBoundingRect)
+        # # print(self, _startZ)
+        # for item in _colliding:
+        #     # print(item, item.zValue(), _maxZ)
+        #     if item.zValue() >= _maxZ:
+        #         _maxZ = item.zValue() + 1
+        # if _maxZ > _startZ:
+        #     self.setZValue(_maxZ)
+        #     # print (_startZ, _maxZ)
+
+
     # end def
 
     def mouseMoveEvent(self, event):
