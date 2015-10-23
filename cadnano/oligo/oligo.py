@@ -36,7 +36,7 @@ class Oligo(ProxyObject):
         self._strand5p = None
         self._length = 0
         self._is_loop = False
-        self._color = color if color else "#0066cc"
+        self._color = color if color else "#cc0000"
     # end def
 
     def __repr__(self):
