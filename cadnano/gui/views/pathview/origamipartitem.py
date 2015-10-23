@@ -51,8 +51,7 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-
-        self.setBrush(QBrush(Qt.NoBrush))
+        # self.setBrush(QBrush(Qt.NoBrush))
     # end def
 
     def proxy(self):
@@ -347,7 +346,11 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(QColor(self.model_color())))
+        col = QColor(self.model_color())
+        self.setPen(QPen(col))
+        col.setAlpha(styles.DEFAULT_ALPHA)
+        self.setBrush(QBrush(col))
+
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
         self.setRect(self._vh_rect.adjusted(-_p/2,-_p,_p,-_p/2))

@@ -64,6 +64,17 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
 
         self._drag_handle = OrigamiDragHandle(QRectF(_orect), self)
 
+        # move down
+        if len(m_p.document().children()) > 1:
+            p = parent.childrenBoundingRect().bottomLeft()
+            self.setPos(p.x() + _p, p.y() + _p*2)
+
+        # select upon creation
+        for _part in m_p.document().children():
+            if _part is m_p:
+                _part.setSelected(True)
+            else:
+                _part.setSelected(False)
     # end def
 
     def _initDeselector(self):
