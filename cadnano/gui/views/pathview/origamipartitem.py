@@ -112,12 +112,21 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
             vhi = self._virtual_helix_item_list[0]
             vhi_rect = vhi.boundingRect()
             vhi_h_rect = vhi.handle().boundingRect()
-            self._vh_rect.setLeft(vhi_h_rect.left())
+            self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
             self._vh_rect.setRight(vhi_rect.right())
         self.scene().views()[0].zoomToFit()
         self._activeSliceItem.resetBounds()
         self._updateBoundingRect()
     # end def
+
+    def partSelectedChangedSlot(self, model_part, is_selected):
+        if is_selected:
+            self.resetBrush(styles.SELECTED_ALPHA)
+            # self.setZValue(styles.ZPARTITEM+1)
+        else:
+            self.resetBrush(styles.DEFAULT_ALPHA)
+            # self.setZValue(styles.ZPARTITEM)
+
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         pass
@@ -164,10 +173,19 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi
+        
+        # reposition when first VH is added
+        if len(self._virtual_helix_item_list) == 0:
+            view = self.window().path_graphics_view
+            p = view.scene_root_item.childrenBoundingRect().bottomLeft()
+            _p = _BOUNDING_RECT_PADDING
+            self.setPos(p.x() + _p*6 + styles.VIRTUALHELIXHANDLEITEM_RADIUS, p.y() + _p*3)
+
         self._virtual_helix_item_list.append(vhi)
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
         self._updateBoundingRect()
+
     # end def
 
     def partVirtualHelixRenumberedSlot(self, sender, coord):
@@ -338,6 +356,12 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
             self.scene().views()[0].zoomToFit()
     # end def
 
+    def resetBrush(self, alpha):
+        col = QColor(self.model_color())
+        col.setAlpha(alpha)
+        self.setBrush(QBrush(col))
+    # end def
+
     def _updateBoundingRect(self):
         """
         Updates the bounding rect to the size of the childrenBoundingRect,
@@ -346,10 +370,8 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        col = QColor(self.model_color())
-        self.setPen(QPen(col))
-        col.setAlpha(styles.DEFAULT_ALPHA)
-        self.setBrush(QBrush(col))
+        self.setPen(QPen(QColor(self.model_color())))
+        self.resetBrush(styles.DEFAULT_ALPHA)
 
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
@@ -357,6 +379,7 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         # move and show or hide the buttons if necessary
         add_button = self._add_bases_button
         rm_button = self._remove_bases_button
+
         if len(self._virtual_helix_item_list) > 0:
             addRect = add_button.boundingRect()
             rmRect = rm_button.boundingRect()
