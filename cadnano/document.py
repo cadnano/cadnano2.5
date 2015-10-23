@@ -495,10 +495,13 @@ class Document(ProxyObject):
         self._addPart(ObjectInstance(origamipart))
 
     def removeAllParts(self):
-        """Used to reset the document. Not undoable."""
+        """Used to reset the document. Not undoable.
+        DEPRECATED, use removeAllChildren
+        """
         self.documentClearSelectionsSignal.emit(self)
-        for part in self._parts:
-            part.remove(use_undostack=False)
+        for item in self._children:
+            if isinstance(item, Part):
+                part.remove(use_undostack=False)
     # end def
 
     def addDnaPart(self):
