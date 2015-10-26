@@ -4,8 +4,10 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QApplication
 
+
 from cadnano import util
 from cadnano import getReopen
+from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.origamipartitemcontroller import OrigamiPartItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
@@ -60,8 +62,8 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
         _p = _BOUNDING_RECT_PADDING
         self._outlinerect = _orect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_orect, self)
-        self._outline.setPen(QPen(QColor(m_props["color"])))
-
+        # self._outline.setPen(QPen(QColor(m_props["color"])))
+        self._outline.setPen(QPen(Qt.NoPen))
         self._drag_handle = OrigamiDragHandle(QRectF(_orect), self)
 
         # move down
@@ -188,11 +190,12 @@ class OrigamiPartItem(QGraphicsItem, AbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
+        """Set this Z to front, and return other Zs to default."""
         if is_selected:
-            self._drag_handle.resetBrush(styles.SELECTED_ALPHA)
+            self._drag_handle.resetAppearance(styles.SELECTED_ALPHA)
             self.setZValue(styles.ZPARTITEM+1)
         else:
-            self._drag_handle.resetBrush(styles.DEFAULT_ALPHA)
+            self._drag_handle.resetAppearance(styles.DEFAULT_ALPHA)
             self.setZValue(styles.ZPARTITEM)
 
     ### ACCESSORS ###
@@ -339,8 +342,10 @@ class OrigamiDragHandle(QGraphicsRectItem):
         self._parent = parent
         self.setAcceptHoverEvents(True)
         self.setAcceptedMouseButtons(Qt.LeftButton)
-        self.setPen(QPen(Qt.NoPen))
-        self.resetBrush(styles.DEFAULT_ALPHA)
+        self._resizingRect = QGraphicsRectItem(self.rect(), self)
+        self._bound = PartEdges.NONE
+        self._resizing = False
+        self.resetAppearance(styles.DEFAULT_ALPHA)
     # end def
 
     def updateRect(self, rect):
@@ -349,39 +354,49 @@ class OrigamiDragHandle(QGraphicsRectItem):
         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
     # end def
 
-    def resetBrush(self, alpha):
-        col = QColor(self._parent._model_props["color"])
-        col.setAlpha(alpha)
-        self.setBrush(QBrush(col))
+    def resetAppearance(self, alpha):
+        self.setPen(QPen(Qt.NoPen))
+        color = QColor(self._parent._model_props["color"])
+        self._resizingRect.setPen(QPen(color))
+        color.setAlpha(alpha)
+        self.setBrush(QBrush(color))
     # end def
 
-    def getCursor(self, pos):
+    def getBound(self, pos):
         _r = self._parent._outlinerect
         _x, _y = pos.x(), pos.y()
         _width = 6
-        _atLeft = True if abs(_x - _r.left()) < _width else False
-        _atRight = True if abs(_x - _r.right()) < _width else False
-        _atTop = True  if abs(_y - _r.top()) < _width else False
-        _atBottom = True  if abs(_y - _r.bottom()) < _width else False
-        if ((_atLeft and _atBottom) or (_atRight and _atTop)):
-            _cursor = Qt.SizeBDiagCursor
-        elif ((_atLeft and _atTop) or (_atRight and _atBottom)):
+        _bound = PartEdges.NONE
+        if abs(_y - _r.top()) < _width: _bound |= PartEdges.TOP
+        if abs(_x - _r.left()) < _width: _bound |= PartEdges.LEFT 
+        if abs(_x - _r.right()) < _width: _bound |= PartEdges.RIGHT 
+        if abs(_y - _r.bottom()) < _width: _bound |= PartEdges.BOTTOM
+        return _bound
+
+    def getCursor(self, bound):
+        if ((bound&PartEdges.TOP and bound&PartEdges.LEFT) or
+           (bound&PartEdges.BOTTOM and bound&PartEdges.RIGHT)):
             _cursor = Qt.SizeFDiagCursor
-        elif ((_atLeft or _atRight) and not (_atTop or _atBottom)):
-            _cursor = Qt.SizeHorCursor 
-        elif ((_atTop or _atBottom) and not (_atLeft or _atRight)):
-            _cursor = Qt.SizeVerCursor 
+        elif ((bound&PartEdges.TOP and bound&PartEdges.RIGHT) or
+             (bound&PartEdges.BOTTOM and bound&PartEdges.LEFT)):
+            _cursor = Qt.SizeBDiagCursor
+        elif (bound&PartEdges.LEFT or bound&PartEdges.RIGHT):
+            _cursor = Qt.SizeHorCursor
+        elif (bound&PartEdges.TOP or bound&PartEdges.BOTTOM):
+            _cursor = Qt.SizeVerCursor
         else:
             _cursor = Qt.OpenHandCursor
         return _cursor
 
     def hoverEnterEvent(self, event):
-        _cursor = self.getCursor(event.pos())
+        _bound = self.getBound(event.pos())
+        _cursor = self.getCursor(_bound)
         self.setCursor(_cursor)
     # end def
 
     def hoverMoveEvent(self, event):
-        _cursor = self.getCursor(event.pos())
+        _bound = self.getBound(event.pos())
+        _cursor = self.getCursor(_bound)
         self.setCursor(_cursor)
     # end def
 
@@ -390,14 +405,26 @@ class OrigamiDragHandle(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
-        self.setCursor(Qt.ClosedHandCursor)
+        self._edgesToResize = self.getBound(event.pos())
+        _cursor = self.getCursor(self._edgesToResize)
+
         # select this part and deselect everything else
         for _part in self._parent.part().document().children():
             if _part is self._parent.part():
                 _part.setSelected(True)
             else:
                 _part.setSelected(False)
+
         self._drag_mousedown_pos = event.pos()
+
+        if _cursor is Qt.ClosedHandCursor:
+            self._resizing = False
+        elif _cursor in [Qt.SizeBDiagCursor,
+                         Qt.SizeFDiagCursor,
+                         Qt.SizeHorCursor,
+                         Qt.SizeVerCursor]:
+            self._resizing = True
+        print("resizing:",self._resizing)
 
         # _startZ = _maxZ = self.zValue()
         # _colliding = self.collidingItems(Qt.IntersectsItemBoundingRect)
@@ -419,7 +446,17 @@ class OrigamiDragHandle(QGraphicsRectItem):
             return
         p = self.mapToScene(QPointF(event.pos()) - QPointF(self._drag_mousedown_pos))
         # still need to correct for qgraphicsview translation
-        self._parent.setPos(p)
+        if self._resizing:
+            _x, _y = event.pos().x(), event.pos().y()
+            _r = QRectF(self._parent._outlinerect)
+            _e = self._edgesToResize
+            if _e&PartEdges.TOP: _r.setTop(_y)
+            if _e&PartEdges.LEFT: _r.setLeft(_x)
+            if _e&PartEdges.RIGHT: _r.setRight(_x)
+            if _e&PartEdges.BOTTOM: _r.setBottom(_y)
+            self._resizingRect.setRect(_r)
+        else:
+            self._parent.setPos(p)
 
         # eventAngle = self.updateDragHandleLine(event)
         # # Record initial direction before calling getSpanAngle
@@ -431,7 +468,8 @@ class OrigamiDragHandle(QGraphicsRectItem):
 
     def mouseReleaseEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
-
+        self._edgesToResize = PartEdges.NONE
+        self._resizingRect.setRect(self._parent._outlinerect)
         # self.dummy.hide()
         # endAngle = self.updateDragHandleLine(event)
         # spanAngle = self.getSpanAngle(endAngle)
