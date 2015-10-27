@@ -174,12 +174,16 @@ class ForcedStrandItem(QGraphicsLineItem):
     ### SLOTS ###
     def strandResizedSlot(self, idxs):
         """docstring for strandResizedSlot"""
-        lowMoved = self._low_cap.updatePosIfNecessary(idxs[0])
-        highMoved = self._high_cap.updatePosIfNecessary(idxs[1])
-        if lowMoved:
+        low_moved, group_low = self._low_cap.updatePosIfNecessary(idxs[0])
+        high_moved, group_high = self._high_cap.updatePosIfNecessary(idxs[1])
+        if low_moved:
             self.updateLine(self._low_cap)
-        if highMoved:
+        if high_moved:
             self.updateLine(self._high_cap)
+        if group_low is not None:
+            group_low.addToGroup(self._low_cap)
+        if group_high is not None:
+            group_high.addToGroup(self._high_cap)
     # end def
 
     def strandRemovedSlot(self):

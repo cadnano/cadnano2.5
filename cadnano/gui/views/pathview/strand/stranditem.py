@@ -86,8 +86,8 @@ class StrandItem(QGraphicsLineItem):
     ### SLOTS ###
     def strandResizedSlot(self, strand, indices):
         """docstring for strandResizedSlot"""
-        low_moved = self._low_cap.updatePosIfNecessary(self.idxs()[0])
-        high_moved = self._high_cap.updatePosIfNecessary(self.idxs()[1])
+        low_moved, group_low = self._low_cap.updatePosIfNecessary(self.idxs()[0])
+        high_moved, group_high = self._high_cap.updatePosIfNecessary(self.idxs()[1])
         group = self.group()
         self.tempReparent()
         if low_moved:
@@ -100,6 +100,10 @@ class StrandItem(QGraphicsLineItem):
         self._updateSequenceText()
         if group:
             group.addToGroup(self)
+        if group_low is not None:
+            group_low.addToGroup(self._low_cap)
+        if group_high is not None:
+            group_high.addToGroup(self._high_cap)
     # end def
 
     def sequenceAddedSlot(self, oligo):
@@ -296,6 +300,8 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def updateLine(self, moved_cap):
+        """ must be called when parented to a VirtualHelixItem
+        """
         # setup
         bw = _BASE_WIDTH
         c_a = self._click_area
@@ -304,6 +310,7 @@ class StrandItem(QGraphicsLineItem):
         if moved_cap == self._low_cap:
             p1 = line.p1()
             new_x = self._low_cap.pos().x() + bw
+            # new_x = self.mapFromScene(self._low_cap.pos()).x() + bw
             p1.setX(new_x)
             line.setP1(p1)
             temp = c_a.rect()
@@ -312,6 +319,7 @@ class StrandItem(QGraphicsLineItem):
         else:
             p2 = line.p2()
             new_x = self._high_cap.pos().x()
+            #new_x = self.mapFromScene(self._high_cap.pos()).x() + bw
             p2.setX(new_x)
             line.setP2(p2)
             temp = c_a.rect()

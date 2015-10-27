@@ -235,7 +235,8 @@ class SelectionItemGroup(QGraphicsItemGroup):
             if self._added_to_press_list == False:
                 # print "kid added"
                 self.setFocus()  # this is to get delete keyPressEvents
-                self.setParentItem(self.selectionbox.boxParent())
+                self.selectionbox.boxParent()
+                # self.setParentItem(self.selectionbox.boxParent())
                 self._added_to_press_list = True
                 self.scene().views()[0].addToPressList(self)
             return
@@ -470,7 +471,7 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         self._item_group.document().deleteSelection()
 
     def boxParent(self):
-        temp = self._item_group.childItems()[0].partItem()
+        temp = self._item_group.childItems()[0].partItem().proxy()
         self.setParentItem(temp)
         return temp
     # end def

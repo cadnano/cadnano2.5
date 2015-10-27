@@ -136,13 +136,13 @@ class EndpointItem(QGraphicsPathItem):
         x = int(idx * _BASE_WIDTH)
         if x != self.x():
             self.setPos(x, self.y())
-            if group:
-                group.addToGroup(self)
-            return True
+            # if group:
+            #     group.addToGroup(self)
+            return True, group
         else:
-            if group:
-                group.addToGroup(self)
-            return False
+            # if group:
+            #     group.addToGroup(self)
+            return False, group
 
     def safeSetPos(self, x, y):
         """
