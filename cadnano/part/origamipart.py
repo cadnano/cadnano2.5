@@ -50,6 +50,13 @@ class OrigamiPart(Part):
     _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
 
+    __count = 0
+
+    @classmethod
+    def _count(cls):
+        OrigamiPart.__count += 1
+        return OrigamiPart.__count
+
     def __init__(self, *args, **kwargs):
         """
         Sets the parent document, sets bounds for part dimensions, and sets up
@@ -73,7 +80,8 @@ class OrigamiPart(Part):
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
         # Properties (OrigamiPart-specific)
-        self._properties["name"] = "Origami%d" % len(self._document.children())
+        # self._properties["name"] = "Origami%d" % len(self._document.children())
+        self._properties["name"] = "Origami%d" % self._count()
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []
         self.reserve_bin = set()
