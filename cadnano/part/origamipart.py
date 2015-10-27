@@ -203,9 +203,9 @@ class OrigamiPart(Part):
         return self._active_virtual_helix_idx
      # end def
 
-    def dimensions(self):
+    def dimensions(self, scale_factor=1.0):
         """Returns a tuple of the max X and maxY coordinates of the lattice."""
-        return self.latticeCoordToPositionXY(self._max_row, self._max_col)
+        return self.latticeCoordToPositionXY(self._max_row, self._max_col, scale_factor)
     # end def
 
     def getStapleSequences(self):

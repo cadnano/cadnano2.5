@@ -92,6 +92,10 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         return self._origami_part_item.part()
     # end def
 
+    def coord(self):
+        return self._coord
+    # end def
+
     def translateVH(self, delta):
         """
         used to update a child virtual helix position on a hover event

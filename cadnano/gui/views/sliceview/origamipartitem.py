@@ -342,7 +342,7 @@ class OrigamiDragHandle(QGraphicsRectItem):
         self._parent = parent
         self.setAcceptHoverEvents(True)
         self.setAcceptedMouseButtons(Qt.LeftButton)
-        self._resizingRect = QGraphicsRectItem(self.rect(), self)
+        self._resizingRectItem = QGraphicsRectItem(self.rect(), self)
         self._bound = PartEdges.NONE
         self._resizing = False
         self.resetAppearance(styles.DEFAULT_ALPHA)
@@ -357,7 +357,7 @@ class OrigamiDragHandle(QGraphicsRectItem):
     def resetAppearance(self, alpha):
         self.setPen(QPen(Qt.NoPen))
         color = QColor(self._parent._model_props["color"])
-        self._resizingRect.setPen(QPen(color))
+        self._resizingRectItem.setPen(QPen(color))
         color.setAlpha(alpha)
         self.setBrush(QBrush(color))
     # end def
@@ -424,20 +424,6 @@ class OrigamiDragHandle(QGraphicsRectItem):
                          Qt.SizeHorCursor,
                          Qt.SizeVerCursor]:
             self._resizing = True
-        print("resizing:",self._resizing)
-
-        # _startZ = _maxZ = self.zValue()
-        # _colliding = self.collidingItems(Qt.IntersectsItemBoundingRect)
-        # # print(self, _startZ)
-        # for item in _colliding:
-        #     # print(item, item.zValue(), _maxZ)
-        #     if item.zValue() >= _maxZ:
-        #         _maxZ = item.zValue() + 1
-        # if _maxZ > _startZ:
-        #     self.setZValue(_maxZ)
-        #     # print (_startZ, _maxZ)
-
-
     # end def
 
     def mouseMoveEvent(self, event):
@@ -454,35 +440,40 @@ class OrigamiDragHandle(QGraphicsRectItem):
             if _e&PartEdges.LEFT: _r.setLeft(_x)
             if _e&PartEdges.RIGHT: _r.setRight(_x)
             if _e&PartEdges.BOTTOM: _r.setBottom(_y)
-            self._resizingRect.setRect(_r)
+            self._resizingRectItem.setRect(_r)
         else:
             self._parent.setPos(p)
-
-        # eventAngle = self.updateDragHandleLine(event)
-        # # Record initial direction before calling getSpanAngle
-        # if self._clockwise is None:
-        #     self._clockwise = False if eventAngle > self._startAngle else True
-        # spanAngle = self.getSpanAngle(eventAngle)
-        # self.dummy.updateAngle(self._startAngle, spanAngle)
     # end def
 
     def mouseReleaseEvent(self, event):
+        _p = _BOUNDING_RECT_PADDING
+        m_p = self._parent._model_part
         self.setCursor(Qt.OpenHandCursor)
-        self._edgesToResize = PartEdges.NONE
-        self._resizingRect.setRect(self._parent._outlinerect)
-        # self.dummy.hide()
-        # endAngle = self.updateDragHandleLine(event)
-        # spanAngle = self.getSpanAngle(endAngle)
-        # 
-        # if self._startPos != None and self._clockwise != None:
-        #     self.parentItem().addSelection(self._startAngle, spanAngle)
-        #     self._startPos = self._clockwise = None
-        # 
-        # mark the end
-        # x = self._DragHandleLine.x()
-        # y = self._DragHandleLine.y()
-        # f = QGraphicsEllipseItem(x, y, 6, 6, self)
-        # f.setPen(QPen(Qt.NoPen))
-        # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
+
+        if self._resizing:
+            # start bounds with topLeft at max, botRight at min
+            x1, y1 = m_p.dimensions(self._parent._scaleFactor)
+            x2, y2 = 0, 0
+            rRect = self.mapRectToScene(self._resizingRectItem.rect())
+            # only show helices >50% inside rRect
+            for _ehi in self._parent._empty_helix_hash.values():
+                if rRect.contains(self.mapToScene(_ehi.pos()+_ehi.boundingRect().center())):
+                    _ehi.show() # _ehi.setHovered()
+                    # update bounds
+                    x1 = min(x1, _ehi.pos().x())
+                    y1 = min(y1, _ehi.pos().y())
+                    x2 = max(x2, _ehi.pos().x() + _ehi.boundingRect().width())
+                    y2 = max(y2, _ehi.pos().y() + _ehi.boundingRect().height())
+                else:
+                    _ehi.hide() # _ehi.setNotHovered()
+            # update everything to new rect after padding
+            self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
+            self._resizingRectItem.setRect(_newRect)
+            self._resizing = False
+            self.setRect(_newRect)
+            self._edgesToResize = PartEdges.NONE
+        else:
+            pass
+        # self._resizingRect.setRect(self._parent._outlinerect)
     # end def
 # end class
