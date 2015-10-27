@@ -39,20 +39,24 @@ class DnaPart(Part):
     _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
 
+    __count = 0
+
+    @classmethod
+    def _count(cls):
+        DnaPart.__count += 1
+        return DnaPart.__count
+
     def __init__(self, *args, **kwargs):
         """
         Sets the parent document, sets bounds for part dimensions, and sets up
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
         """
-        # if self.__class__ == Part:
-        #     e = "This class is abstract. Perhaps you want HoneycombPart."
-        #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
         super(DnaPart, self).__init__(*args, **kwargs)
 
-        # Properties (OrigamiPart-specific)
-        self._properties["name"] = "Dna%d" % len(self._document.children())
+        # Properties (DnaPart-specific)
+        self._properties["name"] = "Dna%d" % self._count()
 
         data = pkgutil.get_data('cadnano.data.fasta', '/pUC19.fasta')
         fasta_iter = util.read_fasta(data.decode('utf-8').splitlines())
