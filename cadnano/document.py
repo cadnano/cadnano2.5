@@ -77,6 +77,13 @@ class Document(ProxyObject):
         """Returns a list of parts associated with the document."""
         return self._children
 
+    def getPartsDict(self):
+        out = {}
+        for item in self._children:
+            if isinstance(item, Part):
+                out[item.getName()] = item
+        return out
+
     def addChild(self, child):
         self._children.append(child)
 

@@ -159,6 +159,10 @@ class Part(ProxyObject):
         return self._properties[key]
     # end def
 
+    def getName(self):
+        return self._properties['name']
+    # end def
+
     def getPropertyDict(self):
         return self._properties
     # end def

@@ -257,7 +257,7 @@ class StrandSet(ProxyObject):
             bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self, base_idx_low, base_idx_high)
             row, col = self._virtual_helix.coord()
-            d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
+            d = "%s:(%d,%d).%d^%d" % (self.part().getName(), row, col, self._strand_type, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return 0

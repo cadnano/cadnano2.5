@@ -1,5 +1,6 @@
 import math
 import re
+from collections import defaultdict
 
 from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtGui import QBrush, QFont, QPen, QDrag, QTransform
@@ -16,7 +17,7 @@ GL = False
 
 
 # strand addition stores some meta information in the UndoCommand's text
-_strand_re = re.compile("\((\d+),(\d+)\)\.0\^(\d+)")
+_strand_re = re.compile("(\w+)\:\((\d+),(\d+)\)\.0\^(\d+)")
 
 class EmptyHelixItem(QGraphicsEllipseItem):
     """docstring for EmptyHelixItem"""
@@ -172,91 +173,89 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                 self.dragSessionAction(ci)
     # end def
 
-    def autoScafMidSeam(self, strands):
+    def autoScafMidSeam(self, part_strand_dict):
         """
         docstring for autoScafMidSeam
         data is stored in the undostack text
         """
-        part = self.part()
         strand_type = StrandType.SCAFFOLD
-        idx = part.activeBaseIndex()
-        for i in range(1, len(strands)):
-            row1, col1, ss_base_low_idx1 = strands[i - 1]  # previous strand
-            row2, col2, ss_base_low_idx2 = strands[i]  # current strand
-            vh1 = part.virtualHelixAtCoord((row1, col1))
-            vh2 = part.virtualHelixAtCoord((row2, col2))
-            strand1 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
-            strand2 = vh2.scaffoldStrandSet().getStrand(ss_base_low_idx2)
-            # determine if the pair of strands are neighbors
-            neighbors = part.getVirtualHelixNeighbors(vh1)
-            if vh2 in neighbors:
-                p2 = neighbors.index(vh2)
-                if vh2.number() % 2 == 1:
-                    # resize and install external xovers
-                    try:
-                        # resize to the nearest prexover on either side of idx
-                        new_lo = util.nearest(idx,
-                            part.getPreXoversHigh(strand_type, p2, max_idx=idx - 10))
-                        new_hi = util.nearest(idx,
-                            part.getPreXoversLow(strand_type, p2, min_idx=idx + 10))
-                        if strand1.canResizeTo(new_lo, new_hi) and \
-                           strand2.canResizeTo(new_lo, new_hi):
-                            # do the resize and update the indices to keep track of new objects
-                            ss_base_low_idx1 = ss_base_low_idx2 = new_lo
-                            strands[i - 1][2] = strands[i][2] = new_lo
+        for part in part_strand_dict:
+            vh_and_strands = part_strand_dict[part]
+            idx = part.activeBaseIndex()
+            for i in range(1, len(vh_and_strands)):
+                vh1, strand1, low_idx1 = vh_and_strands[i - 1]  # previous strand
+                vh2, strand2, low_idx2 = vh_and_strands[i]  # current strand
+                # determine if the pair of strands are neighbors
+                neighbors = part.getVirtualHelixNeighbors(vh1)
+                if vh2 in neighbors:
+                    p2 = neighbors.index(vh2)
+                    if vh2.number() % 2 == 1:
+                        # resize and install external xovers
+                        try:
+                            # resize to the nearest prexover on either side of idx
+                            new_lo = util.nearest(idx,
+                                part.getPreXoversHigh(strand_type, p2, max_idx=idx - 10))
+                            new_hi = util.nearest(idx,
+                                part.getPreXoversLow(strand_type, p2, min_idx=idx + 10))
+                            if strand1.canResizeTo(new_lo, new_hi) and \
+                               strand2.canResizeTo(new_lo, new_hi):
+                                # do the resize and update the indices to keep track of new objects
+                                low_idx1 = low_idx2 = new_lo
+                                vh_and_strands[i - 1][2] = vh_and_strands[i][2] = new_lo
 
-                            strand1.resize((new_lo, new_hi))
-                            strand2.resize((new_lo, new_hi))
+                                strand1.resize((new_lo, new_hi))
+                                strand2.resize((new_lo, new_hi))
 
-                            # install xovers
-                            part.createXover(strand1, new_hi, strand2, new_hi)
-                            part.createXover(strand2, new_lo, strand1, new_lo)
-                    except ValueError:
-                        pass  # nearest not found in the expanded list
+                                # install xovers
+                                part.createXover(strand1, new_hi, strand2, new_hi)
+                                part.createXover(strand2, new_lo, strand1, new_lo)
+                        except ValueError:
+                            pass  # nearest not found in the expanded list
 
-                    # go back an install the internal xovers
-                    if i > 2:
-                        row0, col0, ss_base_low_idx0 = strands[i - 2]  # two strands back
-                        vh0 = part.virtualHelixAtCoord((row0, col0))
-                        strand0 = vh0.scaffoldStrandSet().getStrand(ss_base_low_idx0)
-                        if vh0 in neighbors:
-                            p0 = neighbors.index(vh0)
-                            l0, h0 = strand0.idxs()
-                            l1, h1 = strand1.idxs()
-                            o_low, o_high = util.overlap(l0, h0, l1, h1)
-                            try:
-                                l_list = list(filter(lambda x: x > o_low and \
-                                        x < o_high,
-                                        part.getPreXoversLow(strand_type, p0)))
-                                l_x = l_list[len(l_list) // 2]
-                                h_list = list(filter(lambda x: x > o_low and \
-                                        x < o_high,
-                                        part.getPreXoversHigh(strand_type, p0)))
-                                h_x = h_list[len(h_list) // 2]
-                                # install high xover first
-                                part.createXover(strand0, h_x, strand1, h_x)
-                                # install low xover after getting new strands
-                                # following the breaks caused by the high xover
+                        # go back an install the internal xovers
+                        if i > 2:
+                            vh0, strand0, low_idx0 = vh_and_strands[i - 2]  # two strands back
+                            if vh0 in neighbors:
+                                p0 = neighbors.index(vh0)
+                                l0, h0 = strand0.idxs()
+                                l1, h1 = strand1.idxs()
+                                o_low, o_high = util.overlap(l0, h0, l1, h1)
+                                try:
+                                    l_list = list(filter(lambda x: x > o_low and \
+                                            x < o_high,
+                                            part.getPreXoversLow(strand_type, p0)))
+                                    l_x = l_list[len(l_list) // 2]
+                                    h_list = list(filter(lambda x: x > o_low and \
+                                            x < o_high,
+                                            part.getPreXoversHigh(strand_type, p0)))
+                                    h_x = h_list[len(h_list) // 2]
+                                    # install high xover first
+                                    part.createXover(strand0, h_x, strand1, h_x)
+                                    # install low xover after getting new strands
+                                    # following the breaks caused by the high xover
 
-                                strand3 = vh0.scaffoldStrandSet().getStrand(ss_base_low_idx0)
-                                strand4 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
+                                    strand3 = vh0.scaffoldStrandSet().getStrand(low_idx0)
+                                    strand4 = vh1.scaffoldStrandSet().getStrand(low_idx1)
 
-                                part.createXover(strand4, l_x, strand3, l_x)
-                            except IndexError:
-                                pass  # filter was unhappy
+                                    part.createXover(strand4, l_x, strand3, l_x)
+                                except IndexError:
+                                    pass  # filter was unhappy
+                        # end if
+                    # end if
+                # end if
+            # end for
+        # end for
+    # end def
 
 
     def autoScafRaster(self, strands):
         """docstring for autoScafRaster"""
-        part = self.part()
-        idx = part.activeBaseIndex()
-        for i in range(1, len(strands)):
-            row1, col1, ss_base_low_idx1 = strands[i - 1]  # previous strand
-            row2, col2, ss_base_low_idx2 = strands[i]  # current strand
-            vh1 = part.virtualHelixAtCoord((row1, col1))
-            vh2 = part.virtualHelixAtCoord((row2, col2))
-            strand1 = vh1.scaffoldStrandSet().getStrand(ss_base_low_idx1)
-            strand2 = vh2.scaffoldStrandSet().getStrand(ss_base_low_idx2)
+        for part in part_strand_dict:
+            vh_and_strands = part_strand_dict[part]
+            idx = part.activeBaseIndex()
+            for i in range(1, len(vh_and_strands)):
+                vh1, strand1, low_idx1 = vh_and_strands[i - 1]  # previous strand
+                vh2, strand2, low_idx2 = vh_and_strands[i]  # current strand
             # determine if the pair of strands are neighbors
             neighbors = part.getVirtualHelixNeighbors(vh1)
             if vh2 in neighbors:
@@ -281,8 +280,8 @@ class EmptyHelixItem(QGraphicsEllipseItem):
                         if strand1.canResizeTo(new_lo1, new_hi) and \
                            strand2.canResizeTo(new_lo2, new_hi):
 
-                            strands[i - 1][2] = strands[i] = new_lo1
-                            ss_base_low_idx1 = ss_base_low_idx1 = new_lo1
+                            vh_and_strands[i - 1][2] = vh_and_strands[i][2] = new_lo1
+                            low_idx1 = low_idx2 = new_lo1
 
                             strand1.resize((new_lo1, new_hi))
                             strand2.resize((new_lo2, new_hi))
@@ -318,24 +317,39 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         """docstring for mouseReleaseEvent"""
         part = self.part()
         u_s = part.undoStack()
-        strands = []
+        strand_coords = []
+        f_list = lambda x: [x[0], int(x[1]), int(x[2]), int(x[3])]
         # Look at the undo stack in reverse order
         for i in range(u_s.index() - 1, 0, -1):
             # Check for contiguous strand additions
             m = _strand_re.match(u_s.text(i))
             if m:
-                strands.insert(0, list(map(int, m.groups())))
+                strand_coords.insert(0, f_list(m.groups()))
             else:
                 break
 
-        if len(strands) > 1:
+
+        if len(strand_coords) > 1:
             auto_scaf_type = app().prefs.getAutoScafType()
             util.beginSuperMacro(part, "Auto-connect")
             if auto_scaf_type == "Mid-seam":
-                self.autoScafMidSeam(strands)
+                self.autoScafMidSeam(self.groupStrandsByPart(strand_coords))
             elif auto_scaf_type == "Raster":
-                self.autoScafRaster(strands)
+                self.autoScafRaster(self.groupStrandsByPart(strand_coords))
             util.endSuperMacro(part)
+    # end def
+
+    def groupStrandsByPart(self, strand_coords):
+        part_strand_dict = defaultdict(list)
+        doc = self.part().document()
+        parts_name_dict = doc.getPartsDict()
+        for part_name, row, col, ss_base_low_idx in strand_coords:
+                part = parts_name_dict[part_name]
+                vh = part.virtualHelixAtCoord((row, col))
+                strand = vh.scaffoldStrandSet().getStrand(ss_base_low_idx)
+                part_strand_dict[part].append([vh, strand, ss_base_low_idx])
+        return part_strand_dict
+    # end
 
     def decideAction(self, modifiers):
         """ On mouse press, an action (add scaffold at the active slice, add
@@ -376,7 +390,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         end_idx = min(idx+1, part.maxBaseIdx())
         vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
 
-        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
+        co = self._coord
+        tup = part.getName(), co[0], co[1]
+        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     def addStapAtActiveSliceIfMissing(self):
@@ -391,7 +407,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         end_idx = min(idx + 1, part.maxBaseIdx())
         vh.stapleStrandSet().createStrand(start_idx, end_idx)
 
-        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
+        co = self._coord
+        tup = part.getName(), co[0], co[1]
+        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     def addVHIfMissing(self):
@@ -407,7 +425,9 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
         u_s.endMacro()
 
-        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
+        co = self._coord
+        tup = part.getName(), co[0], co[1]
+        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     if GL:
@@ -446,4 +466,3 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # end def
     # end if
 
-    
