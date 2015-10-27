@@ -74,6 +74,7 @@ class Part(ProxyObject):
         self._max_base = 2 * self._STEP - 1
         # Properties
         self._properties = {}
+        self._properties["name"] = "Part%d" % len(self._document.children())
         self._properties["color"] = "#000000" # outlinerview will override from styles
         self._properties["visible"] = True
         self._properties["circular"] = True
