@@ -380,11 +380,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_new_dna_part"/>
    <addaction name="action_new_honeycomb_part"/>
-   <addaction name="action_new_hpx_part"/>
+   <addaction name="action_new_hcdnapart"/>
    <addaction name="action_new_square_part"/>
-   <addaction name="action_new_spx_part"/>
+   <addaction name="action_new_sqdnapart"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -940,19 +939,19 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_hpx_part">
+  <action name="action_new_hcdnapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-hpx</normaloff>:/parttools/new-hpx</iconset>
+     <normaloff>:/parttools/hcpro</normaloff>:/parttools/hcpro</iconset>
    </property>
    <property name="text">
-    <string>HPX</string>
+    <string>HcPro</string>
    </property>
    <property name="iconText">
-    <string>HPX</string>
+    <string>HcPro</string>
    </property>
    <property name="toolTip">
-    <string>Add new part honeycomb PX</string>
+    <string>Add honeycomb-lattice DnaPart </string>
    </property>
   </action>
   <action name="action_outliner">
@@ -988,28 +987,31 @@
     <string>Add new part</string>
    </property>
   </action>
-  <action name="action_new_dna_part">
+  <action name="action_new_plasmidpart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-dna</normaloff>:/parttools/new-dna</iconset>
    </property>
    <property name="text">
-    <string>DNA</string>
-   </property>
-  </action>
-  <action name="action_new_spx_part">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-spx</normaloff>:/parttools/new-spx</iconset>
-   </property>
-   <property name="text">
-    <string>SPX</string>
-   </property>
-   <property name="iconText">
-    <string>SPX</string>
+    <string>Plasmid</string>
    </property>
    <property name="toolTip">
-    <string>Add new part square PX</string>
+    <string>Plasmid</string>
+   </property>
+  </action>
+  <action name="action_new_sqdnapart">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/sqpro</normaloff>:/parttools/sqpro</iconset>
+   </property>
+   <property name="text">
+    <string>SqPro</string>
+   </property>
+   <property name="iconText">
+    <string>SqPro</string>
+   </property>
+   <property name="toolTip">
+    <string>Add square-lattice DnaPart </string>
    </property>
   </action>
  </widget>
