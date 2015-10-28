@@ -3,13 +3,14 @@ import re
 from collections import defaultdict
 
 from PyQt5.QtCore import QPointF, Qt, QRectF
-from PyQt5.QtGui import QBrush, QFont, QPen, QDrag, QTransform
+from PyQt5.QtGui import QBrush, QFont, QPen, QDrag, QTransform, QColor
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsSimpleTextItem, QGraphicsTextItem
 from PyQt5.QtWidgets  import QUndoCommand, QGraphicsEllipseItem, QStyle
 
 from cadnano import app
 from cadnano import util
-from cadnano.enum import LatticeType, StrandType
+from cadnano.enum import LatticeType, PartType, StrandType
 
 from . import slicestyles as styles
 
@@ -52,10 +53,17 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # part-specific styles
-        if origami_part_item.part().crossSectionType() == LatticeType.HPX:
-            self._DEFAULT_PEN = QPen(styles.ORANGE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-        if origami_part_item.part().crossSectionType() == LatticeType.SPX:
-            self._DEFAULT_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+        if origami_part_item.part().partType() == PartType.DNAPART:
+            self._DEFAULT_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._DEFAULT_BRUSH = QBrush(QColor(102, 102, 102))
+            # self._HOVER_BRUSH = QBrush(styles.BLUE_FILL)
+            self._HOVER_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
+
+            glow = QGraphicsDropShadowEffect()
+            glow.setColor(QColor(238, 47, 241))
+            glow.setBlurRadius(1)
+            glow.setOffset(1)
+            self.setGraphicsEffect(glow)
 
         self.setNotHovered()
 

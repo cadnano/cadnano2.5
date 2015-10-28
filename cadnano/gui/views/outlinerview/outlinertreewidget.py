@@ -12,9 +12,9 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 from cadnano.enum import PartType
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from .dnapartitem import DnaPartItem
 from .plasmidpartitem import PlasmidPartItem
 from .origamipartitem import OrigamiPartItem
-
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -114,6 +114,10 @@ class OutlinerTreeWidget(QTreeWidget):
         elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = origami_part_item
+            # self.setModifyState(self._window.action_modify.isChecked())
+        elif part_type == PartType.DNAPART:
+            dna_part_item = DnaPartItem(model_part, parent=self)
+            self._instance_items[model_part_instance] = dna_part_item
             # self.setModifyState(self._window.action_modify.isChecked())
         else:
             print(part_type)

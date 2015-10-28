@@ -41,23 +41,23 @@ class Enum(_Enum):
 class PartType(_Enum):
     PLASMIDPART = 0
     ORIGAMIPART = 1
+    DNAPART = 2
 
 class ItemType(_Enum):
     DNA = 0
-    RNA = 1
-    PEPTIDE = 2
-    PROTEIN = 3
-    ORIGAMI = 4
-    OLIGO = 5
-    SELECTION = 6
-    ANNOTATION = 7
+    PLASMID = 1
+    RNA = 2
+    PEPTIDE = 3
+    PROTEIN = 4
+    ORIGAMI = 5
+    OLIGO = 6
+    SELECTION = 7
+    ANNOTATION = 8
 
 
 class LatticeType:
     HONEYCOMB = 0
     SQUARE = 1
-    HPX = 2
-    SPX = 3
 
 class EndType:
     FIVE_PRIME = 0

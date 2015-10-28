@@ -12,7 +12,7 @@ class Crossovers:
 
 root3 = 1.732051
 
-class HpxPart(DnaPart):
+class HoneycombDnaPart(DnaPart):
     _STEP = 21  # 32 in square
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
@@ -28,7 +28,7 @@ class HpxPart(DnaPart):
     _STAPH = Crossovers.HPX_STAP_HIGH
 
     def __init__(self, *args, **kwargs):
-        super(HpxPart, self).__init__(self, *args, **kwargs)
+        super(HoneycombDnaPart, self).__init__(self, *args, **kwargs)
         self._max_row = kwargs.get('max_row')
         if self._max_row == None:
             raise ValueError("%s: Need max_row kwarg" % (type(self).__name__))
@@ -38,11 +38,11 @@ class HpxPart(DnaPart):
         self._max_base = kwargs.get('max_steps') * self._STEP - 1
         if self._max_base == None:
             raise ValueError("%s: Need max_base kwarg" % (type(self).__name__))
-        print("new HpxPart")
+        print("new HoneycombDnaPart")
 
     def crossSectionType(self):
         """Returns the cross-section type of the DNA part."""
-        return LatticeType.HPX
+        return LatticeType.HONEYCOMB
 
     def isEvenParity(self, row, column):
         return (row % 2) == (column % 2)
@@ -107,5 +107,5 @@ class HpxPart(DnaPart):
 
     ########################## Archiving / Unarchiving #########################
     def fillSimpleRep(self, sr):
-        super(HoneycombPart, self).fillSimpleRep(sr)
-        sr['.class'] = 'HpxPart'
+        super(HonecombDnaPart, self).fillSimpleRep(sr)
+        sr['.class'] = 'HonecombDnaPart'

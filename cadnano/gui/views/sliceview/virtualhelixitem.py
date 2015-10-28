@@ -53,7 +53,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self._USE_BRUSH = QBrush(part_color_A128)
         self._OUT_OF_SLICE_BRUSH = QBrush(part_color_A64)
 
-        if self.part().crossSectionType() == LatticeType.HPX:
+        if self.part().crossSectionType() == LatticeType.HONEYCOMB:
             self._USE_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
             self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
                                           styles.SLICE_HELIX_STROKE_WIDTH)

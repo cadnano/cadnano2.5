@@ -76,13 +76,13 @@ class DocumentController():
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
         self.win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
-        self.win.action_new_dna_part.triggered.connect(self.actionAddPlasmidPartSlot)
+        self.win.action_new_plasmidpart.triggered.connect(self.actionAddPlasmidPartSlot)
         self.win.action_new_honeycomb_part.triggered.connect(\
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\
             self.actionAddSquarePartSlot)
-        self.win.action_new_hpx_part.triggered.connect(self.actionAddHpxPartSlot)
-        self.win.action_new_spx_part.triggered.connect(self.actionAddSpxPartSlot)
+        self.win.action_new_hcdnapart.triggered.connect(self.actionAddHcDnaPart)
+        self.win.action_new_sqdnapart.triggered.connect(self.actionAddSqDnaPart)
         self.win.closeEvent = self.windowCloseEventHandler
         self.win.action_about.triggered.connect(self.actionAboutSlot)
         self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
@@ -414,13 +414,13 @@ class DocumentController():
         self.setActivePart(part)
     # end def
 
-    def actionAddHpxPartSlot(self):
-        part = self._document.addHpxPart()
+    def actionAddHcDnaPart(self):
+        part = self._document.addHcDnaPart()
         self.setActivePart(part)
     # end def
 
-    def actionAddSpxPartSlot(self):
-        # part = self._document.addSpxPart()
+    def actionAddSqDnaPart(self):
+        # part = self._document.addSqDnaPart()
         # self.setActivePart(part)
         pass
     # end def

@@ -14,7 +14,7 @@ from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
 from cadnano.part import HoneycombPart, SquarePart
-from cadnano.part import PlasmidPart
+from cadnano.part import HoneycombDnaPart #, SquareDnaPart
 from cadnano.part.origamipart import OrigamiPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
@@ -472,34 +472,33 @@ class Document(ProxyObject):
         Create and store a new origamipart and instance, and return the instance.
         """
         origamipart = None
-        if len(self._children) == 0:
-            origamipart = SquarePart(document=self, max_row=max_row,
-                                max_col=max_col, max_steps=max_steps)
-            self._addPart(ObjectInstance(origamipart))
+        origamipart = SquarePart(document=self, max_row=max_row,
+                                 max_col=max_col, max_steps=max_steps)
+        self._addPart(ObjectInstance(origamipart))
         return origamipart
     # end def
 
-    def addHpxPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
+    def addHcDnaPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
                          max_col=prefs.HONEYCOMB_PART_MAXCOLS,
                          max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
         """
-        Create and store a new origamipart and instance, and return the instance.
+        Create and store a new honeycomb-dnapart and instance, and return the instance.
         """
-        origamipart = HpxPart(document=self, max_row=max_row,
+        dnapart = HoneycombDnaPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(origamipart))
-        return origamipart
+        self._addPart(ObjectInstance(dnapart))
+        return dnapart
     # end def
 
-    def addSpxPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
+    def addSqDnaPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
                          max_col=prefs.SQUARE_PART_MAXCOLS,
                          max_steps=prefs.SQUARE_PART_MAXSTEPS):
         """
-        Create and store a new origamipart and instance, and return the instance.
+        Create and store a new square-dnapart and instance, and return the instance.
         """
-        origamipart = SpxPart(document=self, max_row=max_row,
+        dnapart = SquareDnaPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(origamipart))
+        self._addPart(ObjectInstance(dnapart))
 
     def removeAllParts(self):
         """Used to reset the document. Not undoable.

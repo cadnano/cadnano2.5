@@ -29,9 +29,11 @@ BLUE_STROKE = QColor(0, 102, 204)  # 0066cc
 BLUISH_STROKE = QColor(0, 182, 250)  #
 ORANGE_FILL = QColor(255, 204, 153)  # ffcc99
 ORANGE_STROKE = QColor(204, 102, 51)  # cc6633
+PINK_STROKE = QColor(204, 49, 214)  # cc6633
 LIGHT_ORANGE_FILL = QColor(255, 234, 183)
 LIGHT_ORANGE_STROKE = QColor(234, 132, 81)
 GRAY_FILL = QColor(238, 238, 238)  # eeeeee (was a1a1a1)
+MIDGRAY_FILL = QColor(154, 154, 154)  # eeeeee (was a1a1a1)
 GRAY_STROKE = QColor(102, 102, 102)  # 666666 (was 424242)
 
 

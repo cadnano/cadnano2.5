@@ -158,7 +158,7 @@ class DnaPart(Part):
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def partType(self):
-        return PartType.DnaPart
+        return PartType.DNAPART
     # end def
 
     def virtualHelix(self, vhref, returnNoneIfAbsent=True):

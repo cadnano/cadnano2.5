@@ -70,13 +70,13 @@ class PartToolBar(QToolBar):
                                                         "action_new_honeypx_part",
                                                         ":/parttools/new-hpx",
                                                         self.add_origamipart_button)
-        self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHpxPartSlot)
+        self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHcDnaPart)
         # Origami Part (S-px)
         self.action_new_spx_part = self.setupAction("Sq-PX", None,
                                                         "action_new_squarepx_part",
                                                         ":/parttools/new-spx",
                                                         self.add_origamipart_button)
-        self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSpxPartSlot)
+        self.action_new_spx_part.triggered.connect(self.doc.controller().actionAddSqDnaPart)
 
     # end def
 
