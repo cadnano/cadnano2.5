@@ -51,12 +51,11 @@ class DocumentController():
     def _initWindow(self):
         """docstring for initWindow"""
         self.win = DocumentWindow(doc_ctrlr=self)
-        # self.win.setWindowIcon(app().icon)
         app().documentWindowWasCreatedSignal.emit(self._document, self.win)
         self._connectWindowSignalsToSelf()
         self.win.show()
         app().active_document = self
-        
+
         # Connect outliner with property editor
         o = self.win.outliner_widget
         p_e = self.win.property_widget
