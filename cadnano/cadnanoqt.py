@@ -16,11 +16,19 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import qApp, QApplication, QUndoGroup
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
-# ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
-#                                 'images', 'cadnano2-app-icon.png')
-# print(ICON_PATH)
-ICON_PATH = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow',
-                                'images', 'radnano-app-icon.png')
+
+ICON_DIR = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 'images')
+ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
+ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
+ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
+
+import platform
+
+if platform.system() == 'Windows':
+    import ctypes
+    myappid = 'cadnano.cadnano.radnano.2.5.0' # arbitrary string
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
     shouldPerformBoilerplateStartupScript = False
@@ -38,7 +46,6 @@ class CadnanoQt(QObject):
         self.argv = argv
         if QCoreApplication.instance() is None:
             self.qApp = QApplication(argv)
-            self.qApp.setWindowIcon(QIcon(ICON_PATH))
             assert(QCoreApplication.instance() is not None)
             self.qApp.setOrganizationDomain("cadnano.org")
         else:
@@ -46,9 +53,10 @@ class CadnanoQt(QObject):
         super(CadnanoQt, self).__init__()
         from cadnano.gui.views.preferences import Preferences
         self.prefs = Preferences()
-        icon = QIcon(ICON_PATH)
+        icon = QIcon(ICON_PATH1)
+        icon.addFile(ICON_PATH2, QSize(256,256))
+        icon.addFile(ICON_PATH3, QSize(48,48))
         self.qApp.setWindowIcon(icon)
-
 
         self.document_controllers = set()  # Open documents
         self.active_document = None
