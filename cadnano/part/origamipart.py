@@ -87,7 +87,7 @@ class OrigamiPart(Part):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = None
+        self._imported_vh_order = []
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -124,7 +124,7 @@ class OrigamiPart(Part):
                         name='partVirtualHelixRenumberedSignal')# self, coord
     partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
-    partVirtualHelicesReorderedSignal = ProxySignal(object, list,
+    partVirtualHelicesReorderedSignal = ProxySignal(object, list, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
@@ -881,7 +881,9 @@ class OrigamiPart(Part):
         private method for adding a virtual_helix to the Parts data structure
         of virtual_helix references
         """
-        self._coord_to_virtual_velix[virtual_helix.coord()] = virtual_helix
+        coord = virtual_helix.coord()
+        self._coord_to_virtual_velix[coord] = virtual_helix
+        self._imported_vh_order.append(coord)
     # end def
 
     def _removeVirtualHelix(self, virtual_helix):
@@ -889,7 +891,9 @@ class OrigamiPart(Part):
         private method for adding a virtual_helix to the Parts data structure
         of virtual_helix references
         """
-        del self._coord_to_virtual_velix[virtual_helix.coord()]
+        coord = virtual_helix.coord()
+        del self._coord_to_virtual_velix[coord]
+        self._imported_vh_order.remove(coord)
     # end def
 
     def _reserveHelixIDNumber(self, is_parity_even=True, requested_id_num=None):
@@ -1145,10 +1149,10 @@ class OrigamiPart(Part):
                 to_ss.hasStrandAtAndNoXover(idx)
     # end def
 
-    def setImportedVHelixOrder(self, orderedCoordList):
+    def setImportedVHelixOrder(self, orderedCoordList, check_batch=True):
         """Used on file import to store the order of the virtual helices."""
         self._imported_vh_order = orderedCoordList
-        self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList)
+        self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList, check_batch)
     # end def
 
 # end class

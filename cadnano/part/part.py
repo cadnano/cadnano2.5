@@ -86,7 +86,7 @@ class Part(ProxyObject):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = None
+        self._imported_vh_order = []
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -220,6 +220,23 @@ class Part(ProxyObject):
         dcvh = self._coord_to_virtual_velix
         for coord, vh in dcvh.items():
             yield coord, vh
+    # end def
+
+    def iterVirtualHelixByNumber(self):
+        """ Iterate over VirtualHelix objects in order of their number
+        for semi deterministic
+        """
+        number_to_virtual_helix = self._number_to_virtual_helix
+        keys = sorted(list(number_to_virtual_helix.keys()))
+        for key in keys:
+            yield number_to_virtual_helix[key]
+    # end def
+
+    def getImportVirtualHelixOrder(self):
+        """ the order of VirtualHelix items in the path view
+        each element is the coord of the virtual helix
+        """
+        return self._imported_vh_order
     # end def
 
     def activeBaseIndex(self):

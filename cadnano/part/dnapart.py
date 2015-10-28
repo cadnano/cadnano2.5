@@ -80,7 +80,7 @@ class DnaPart(Part):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = None
+        self._imported_vh_order = []
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -117,7 +117,7 @@ class DnaPart(Part):
                         name='partVirtualHelixRenumberedSignal')# self, coord
     partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
-    partVirtualHelicesReorderedSignal = ProxySignal(object, list,
+    partVirtualHelicesReorderedSignal = ProxySignal(object, list, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
                         name='partActiveVirtualHelixChangedSignal')
@@ -1138,10 +1138,10 @@ class DnaPart(Part):
                 to_ss.hasStrandAtAndNoXover(idx)
     # end def
 
-    def setImportedVHelixOrder(self, orderedCoordList):
+    def setImportedVHelixOrder(self, orderedCoordList, check_batch=True):
         """Used on file import to store the order of the virtual helices."""
         self._imported_vh_order = orderedCoordList
-        self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList)
+        self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList, check_batch)
     # end def
 
 # end class

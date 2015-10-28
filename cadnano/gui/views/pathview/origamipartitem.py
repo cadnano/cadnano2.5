@@ -204,14 +204,15 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         vh.resize()
     # end def
 
-    def partVirtualHelicesReorderedSlot(self, sender, ordered_coord_list):
+    def partVirtualHelicesReorderedSlot(self, sender, ordered_coord_list, check_batch):
         """docstring for partVirtualHelicesReorderedSlot"""
         new_list = self._virtual_helix_item_list
         decorated = [(ordered_coord_list.index(vhi.coord()), vhi)\
                         for vhi in self._virtual_helix_item_list]
         decorated.sort()
         new_list = [vhi for idx, vhi in decorated]
-        ztf = not getBatch()
+
+        ztf = not getBatch() if check_batch == True else False
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
@@ -445,7 +446,8 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         # end else
 
         # call the method to move the items and store the list
-        self._setVirtualHelixItemList(new_list, zoom_to_fit=False)
+        self.part().setImportedVHelixOrder([vhi.coord() for vhi in new_list], check_batch=False)
+        # self._setVirtualHelixItemList(new_list, zoom_to_fit=False)
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):
