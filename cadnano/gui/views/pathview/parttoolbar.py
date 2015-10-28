@@ -45,7 +45,7 @@ class PartToolBar(QToolBar):
         self.action_new_dna_part = self.setupAction("Plasmid", None,
                                                         "action_new_dna_part",
                                                         ":/parttools/new-dna")
-        self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddDnaPartSlot)
+        self.action_new_dna_part.triggered.connect(self.doc.controller().actionAddPlasmidPartSlot)
 
 
         # Origami ToolButton

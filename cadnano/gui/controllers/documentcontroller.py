@@ -28,7 +28,6 @@ class DocumentController():
         """docstring for __init__"""
         # initialize variables
         self._document = document
-        print("the doc", self._document)
         self._document.setController(self)
         self._active_part = None
         self._filename = None
@@ -77,7 +76,7 @@ class DocumentController():
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
         self.win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
-        self.win.action_new_dna_part.triggered.connect(self.actionAddDnaPartSlot)
+        self.win.action_new_dna_part.triggered.connect(self.actionAddPlasmidPartSlot)
         self.win.action_new_honeycomb_part.triggered.connect(\
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\
@@ -426,8 +425,8 @@ class DocumentController():
         pass
     # end def
 
-    def actionAddDnaPartSlot(self):
-        part = self._document.addDnaPart()
+    def actionAddPlasmidPartSlot(self):
+        part = self._document.addPlasmidPart()
         # self.setActivePart(part)
         pass
     # end def

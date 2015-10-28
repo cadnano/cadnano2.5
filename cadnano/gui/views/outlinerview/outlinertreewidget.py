@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 from cadnano.enum import PartType
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import DnaPartItem
+from .plasmidpartitem import PlasmidPartItem
 from .origamipartitem import OrigamiPartItem
 
 
@@ -107,10 +107,10 @@ class OutlinerTreeWidget(QTreeWidget):
         """
         model_part = model_part_instance.object()
         part_type = model_part_instance.object().partType()
-        if part_type == PartType.DNAPART:
-            dna_part_item = DnaPartItem(model_part, parent=self)
-            # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
-            self._instance_items[model_part_instance] = dna_part_item
+        if part_type == PartType.PLASMIDPART:
+            plasmid_part_item = PlasmidPartItem(model_part, parent=self)
+            # self.itemDoubleClicked.connect(plasmid_part_item.doubleClickedSlot)
+            self._instance_items[model_part_instance] = plasmid_part_item
         elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = origami_part_item
@@ -154,10 +154,10 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     ### METHODS ###
-    def removeDnaPartItem(self, dna_part_item):
-        index = self.indexOfTopLevelItem(dna_part_item)
+    def removePlasmidPartItem(self, plasmid_part_item):
+        index = self.indexOfTopLevelItem(plasmid_part_item)
         self.takeTopLevelItem(index)
-        # del self._instance_items[dna_part_item]
+        # del self._instance_items[plasmid_part_item]
     # end def
 
     def removeOrigamiPartItem(self, origami_part_item):
@@ -414,11 +414,11 @@ class OutlineRootItem(QTreeWidget):
         Parts should add themselves to the QTreeWidget by passing parent=self.
         """
         part_type = model_part.__class__.__name__
-        if part_type == "DnaPart":
-            dna_part_item = DnaPartItem(model_part, parent=self)
-            # self.addTopLevelItem(dna_part_item)
-            # self.itemDoubleClicked.connect(dna_part_item.doubleClickedSlot)
-            # self._instance_items[dna_part_item] = dna_part_item
+        if part_type == "PlasmidPart":
+            plasmid_part_item = PlasmidPartItem(model_part, parent=self)
+            # self.addTopLevelItem(plasmid_part_item)
+            # self.itemDoubleClicked.connect(plasmid_part_item.doubleClickedSlot)
+            # self._instance_items[plasmid_part_item] = plasmid_part_item
 
         elif part_type in ["HoneycombPart", "SquarePart"]:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
@@ -459,10 +459,10 @@ class OutlineRootItem(QTreeWidget):
     # end def
 
     ### METHODS ###
-    def removeDnaPartItem(self, dna_part_item):
-        index = self.indexOfTopLevelItem(dna_part_item)
+    def removePlasmidPartItem(self, plasmid_part_item):
+        index = self.indexOfTopLevelItem(plasmid_part_item)
         self.takeTopLevelItem(index)
-        # del self._instance_items[dna_part_item]
+        # del self._instance_items[plasmid_part_item]
     # end def
 
     def removeOrigamiPartItem(self, origami_part_item):

@@ -1149,5 +1149,6 @@ class OrigamiPart(Part):
         """Used on file import to store the order of the virtual helices."""
         self._imported_vh_order = orderedCoordList
         self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList)
+    # end def
 
 # end class

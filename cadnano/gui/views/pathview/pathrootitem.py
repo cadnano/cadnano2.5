@@ -53,10 +53,10 @@ class PathRootItem(QGraphicsRectItem):
         win = self._window
         part_type = model_part_instance.object().partType()
 
-        if part_type == PartType.DNAPART:
+        if part_type == PartType.PLASMIDPART:
             pass
-            # dna_part_item = DnaPartItem(model_part_instance, parent=self)
-            # self._instance_items[dna_part_item] = dna_part_item
+            # plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
+            # self._instance_items[plasmid_part_item] = plasmid_part_item
         elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part_instance,\
                                 viewroot=self, \

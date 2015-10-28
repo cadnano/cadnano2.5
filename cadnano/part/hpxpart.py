@@ -1,6 +1,6 @@
 
 
-from cadnano.part.part import Part
+from cadnano.part.dnapart import DnaPart
 from cadnano.enum import LatticeType
 
 
@@ -12,12 +12,12 @@ class Crossovers:
 
 root3 = 1.732051
 
-class HpxPart(Part):
+class HpxPart(DnaPart):
     _STEP = 21  # 32 in square
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
-    _TWIST_OFFSET = 0 # degrees
+    _TWIST_OFFSET = 20 # degrees
 
     _active_base_index = _STEP
     _SUB_STEP_SIZE = _STEP / 3

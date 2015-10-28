@@ -307,6 +307,7 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx, five_vh, five_idx, three_v
     if (five_vh != -1 and three_vh == -1):
         return True
     return False
+# end def
 
 def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
     """Returns True of the three_vh doesn't match vh_num, or three_idx
@@ -323,3 +324,4 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
         return True
     if (vh_num % 2 == 1 and three_vh == vh_num and three_idx != base_idx-offset):
         return True
+# end def

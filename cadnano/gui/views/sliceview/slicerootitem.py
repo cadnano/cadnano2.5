@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import DnaPartItem
+from .plasmidpartitem import PlasmidPartItem
 from .origamipartitem import OrigamiPartItem
 
 
@@ -34,9 +34,9 @@ class SliceRootItem(QGraphicsRectItem):
         """
         part_type = model_part_instance.object().partType()
 
-        if part_type == PartType.DNAPART:
-            dna_part_item = DnaPartItem(model_part_instance, parent=self)
-            self._instance_items[dna_part_item] = dna_part_item
+        if part_type == PartType.PLASMIDPART:
+            plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
+            self._instance_items[plasmid_part_item] = plasmid_part_item
         elif part_type == PartType.ORIGAMIPART:
             origami_part_item = OrigamiPartItem(model_part_instance, parent=self)
             self._instance_items[origami_part_item] = origami_part_item
@@ -73,8 +73,8 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
-    def removeDnaPartItem(self, dna_part_item):
-        del self._instance_items[dna_part_item]
+    def removePlasmidPartItem(self, plasmid_part_item):
+        del self._instance_items[plasmid_part_item]
     # end def
 
     def removeOrigamiPartItem(self, origami_part_item):

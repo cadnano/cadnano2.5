@@ -39,7 +39,7 @@ class Enum(_Enum):
         else: raise
 
 class PartType(_Enum):
-    DNAPART = 0
+    PLASMIDPART = 0
     ORIGAMIPART = 1
 
 class ItemType(_Enum):

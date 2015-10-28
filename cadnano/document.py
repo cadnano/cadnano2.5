@@ -14,7 +14,7 @@ from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
 from cadnano.part import HoneycombPart, SquarePart
-from cadnano.part import DnaPart
+from cadnano.part import PlasmidPart
 from cadnano.part.origamipart import OrigamiPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
@@ -511,11 +511,11 @@ class Document(ProxyObject):
                 part.remove(use_undostack=False)
     # end def
 
-    def addDnaPart(self):
-        """Create and store a new dnapart and instance, and return the instance."""
-        dnapart = DnaPart(document=self)
-        self._addPart(ObjectInstance(dnapart))
-        return dnapart
+    def addPlasmidPart(self):
+        """Create and store a new PlasmidPart and instance, and return the instance."""
+        plasmidpart = PlasmidPart(document=self)
+        self._addPart(ObjectInstance(plasmidpart))
+        return PlasmidPart
     # end def
 
     ### PUBLIC SUPPORT METHODS ###

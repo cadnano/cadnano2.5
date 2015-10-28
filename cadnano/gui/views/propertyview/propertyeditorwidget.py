@@ -16,7 +16,7 @@ from cadnano import util
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
-from .dnapartitem import DnaPartItem
+from .plasmidpartitem import PlasmidPartItem
 from .oligoitem import OligoItem
 from .origamipartitem import OrigamiPartItem
 
@@ -85,7 +85,7 @@ class PropertyEditorWidget(QTreeWidget):
             item = sel[0]
             item_type = item.itemType()
             if item_type is ItemType.DNA:
-                pe_item = DnaPartItem(item.part(), self)
+                pe_item = PlasmidPartItem(item.part(), self)
                 self.show()
             elif item_type is ItemType.OLIGO:
                 print("oligo selected")
