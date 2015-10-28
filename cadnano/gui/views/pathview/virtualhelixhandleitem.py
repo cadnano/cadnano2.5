@@ -173,18 +173,19 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """
 
         # map the position
+        self.tempReparent(pos=pos)
+        self.setSelectedColor(False)
+        assert(self.group() is None)
+        self.setSelected(False)
+    # end def
+
+    def tempReparent(self, pos=None):
         origami_part_item = self._origami_part_item
         if pos is None:
             pos = self.scenePos()
         self.setParentItem(origami_part_item)
-        self.setSelectedColor(False)
-
-        assert(self.parentItem() == origami_part_item)
-        # print "restore", self.number(), self.parentItem(), self.group()
-        assert(self.group() is None)
-        temp_p = origami_part_item.mapFromScene(pos)
-        self.setPos(temp_p)
-        self.setSelected(False)
+        temp_point = origami_part_item.mapFromScene(pos)
+        self.setPos(temp_point)
     # end def
 
     def itemChange(self, change, value):

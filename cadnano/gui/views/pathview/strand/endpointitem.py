@@ -457,18 +457,18 @@ class EndpointItem(QGraphicsPathItem):
         """
         # map the position
         # print "restoring parent ep"
-        self.tempReparent(pos)
+        self.tempReparent(pos=pos)
         self.setSelectedColor(False)
         self.setSelected(False)
     # end def
 
     def tempReparent(self, pos=None):
-        vhItem = self._strand_item.virtualHelixItem()
+        vh_item = self._strand_item.virtualHelixItem()
         if pos is None:
             pos = self.scenePos()
-        self.setParentItem(vhItem)
-        tempP = vhItem.mapFromScene(pos)
-        self.setPos(tempP)
+        self.setParentItem(vh_item)
+        temp_point = vh_item.mapFromScene(pos)
+        self.setPos(temp_point)
     # end def
 
     def setSelectedColor(self, value):

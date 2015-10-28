@@ -173,7 +173,7 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi
-        
+
         # reposition when first VH is added
         if len(self._virtual_helix_item_list) == 0:
             view = self.window().path_graphics_view
@@ -327,7 +327,7 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
         scene = self.scene()
         vhi_rect = None
         vhi_h_rect = None
-
+        vhi_h_selection_group = self._viewroot._vhi_h_selection_group
         for vhi in new_list:
             vhi.setPos(0, y)
             if vhi_rect is None:
@@ -337,8 +337,11 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
 
             # get the VirtualHelixHandleItem
             vhi_h = vhi.handle()
-            if vhi_h.parentItem() != self._viewroot._vhi_h_selection_group:
-                vhi_h.setParentItem(self)
+            do_reselect = False
+            if vhi_h.parentItem() == vhi_h_selection_group:
+                do_reselect = True
+
+            vhi_h.tempReparent()    # so positioning works
 
             if vhi_h_rect is None:
                 vhi_h_rect = vhi_h.boundingRect()
@@ -349,6 +352,8 @@ class OrigamiPartItem(QGraphicsRectItem, AbstractPartItem):
             rightmost_extent = max(rightmost_extent, vhi_rect.width())
             y += step
             self.updateXoverItems(vhi)
+            if do_reselect:
+                vhi_h_selection_group.addToGroup(vhi_h)
         # end for
         self._vh_rect = QRectF(leftmost_extent, -10, -leftmost_extent + rightmost_extent, y)
         self._virtual_helix_item_list = new_list
