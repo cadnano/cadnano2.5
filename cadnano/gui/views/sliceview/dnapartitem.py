@@ -358,8 +358,8 @@ class DnaDragHandle(QGraphicsRectItem):
         self.setPen(QPen(Qt.NoPen))
         color = QColor(self._parent._model_props["color"])
         self._resizingRectItem.setPen(QPen(color))
-        self.setBrush(QBrush(QColor (10,10,10) ))
-        self.setBrush(QBrush(styles.MIDGRAY_FILL))
+        self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
+        # self.setBrush(QBrush(styles.MIDGRAY_FILL))
         
         # color.setAlpha(alpha) 230,230,230
         # self.setBrush(QBrush(color))

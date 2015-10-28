@@ -40,34 +40,45 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # _PI = 3.141592
     # _temp = [x*_PI*0.1 for x in range(20)]
     # _temp = [(math.sin(angle) * _RADIUS, math.cos(angle) * _RADIUS) for angle in _temp]
-    def __init__(self, row, column, origami_part_item):
+    def __init__(self, row, column, part_item):
         """
         row, column is a coordinate in Lattice terms
-        origami_part_item is a OrigamiPartItem that will act as a QGraphicsItem parent
+        part_item is a OrigamiPartItem that will act as a QGraphicsItem parent
         """
-        super(EmptyHelixItem, self).__init__(parent=origami_part_item)
-        self._origami_part_item = origami_part_item
+        super(EmptyHelixItem, self).__init__(parent=part_item)
+        self._part_item = part_item
         self._lastvh = None  # for decideAction
         self.hide()
         self._is_hovered = False
         self.setAcceptHoverEvents(True)
 
         # part-specific styles
-        if origami_part_item.part().partType() == PartType.DNAPART:
-            self._DEFAULT_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._DEFAULT_BRUSH = QBrush(QColor(102, 102, 102))
-            # self._HOVER_BRUSH = QBrush(styles.BLUE_FILL)
-            self._HOVER_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
+        if part_item.part().partType() == PartType.DNAPART:
+            part_color = QColor(self.part().getProperty("color"))
+            part_color_A64 = QColor(part_color)
+            part_color_A64.setAlpha(64)
+            part_color_A128 = QColor(part_color)
+            part_color_A128.setAlpha(128)
+
+            # radnano theme
+            # self._DEFAULT_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+            # self._DEFAULT_BRUSH = QBrush(QColor(102, 102, 102))
+            self._HOVER_BRUSH = QBrush(styles.BLUE_FILL)
+            self._HOVER_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
+
+            self._DEFAULT_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._DEFAULT_BRUSH = QBrush(part_color_A64)
+
 
             glow = QGraphicsDropShadowEffect()
-            glow.setColor(QColor(238, 47, 241))
+            glow.setColor(part_color)
             glow.setBlurRadius(1)
             glow.setOffset(1)
             self.setGraphicsEffect(glow)
 
         self.setNotHovered()
 
-        x, y = origami_part_item.part().latticeCoordToPositionXY(row, column, origami_part_item.scaleFactor())
+        x, y = part_item.part().latticeCoordToPositionXY(row, column, part_item.scaleFactor())
         self.setPos(x, y)
         self._coord = (row, column)
         self.show()
@@ -98,7 +109,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def part(self):
-        return self._origami_part_item.part()
+        return self._part_item.part()
     # end def
 
     def translateVH(self, delta):
@@ -129,7 +140,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setZValue(self._Z_HOVERED)
         self.setRect(self._HOVER_RECT)
 
-        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
     # end def
 
     def hoverEnterEvent(self, event):
@@ -152,7 +163,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setZValue(self._Z_DEFAULT)
         self.setRect(self._DEFAULT_RECT)
 
-        self._origami_part_item.updateStatusBar("")
+        self._part_item.updateStatusBar("")
     # end def
 
     def hoverLeaveEvent(self, event):
@@ -170,13 +181,13 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def mouseMoveEvent(self, event):
-        origami_part_item = self._origami_part_item
-        pos_in_parent = origami_part_item.mapFromItem(self, QPointF(event.pos()))
+        part_item = self._part_item
+        pos_in_parent = part_item.mapFromItem(self, QPointF(event.pos()))
         # Qt doesn't have any way to ask for graphicsitem(s) at a
         # particular position but it *can* do intersections, so we
         # just use those instead
-        origami_part_item.probe.setPos(pos_in_parent)
-        for ci in origami_part_item.probe.collidingItems():
+        part_item.probe.setPos(pos_in_parent)
+        for ci in part_item.probe.collidingItems():
             if isinstance(ci, EmptyHelixItem):
                 self.dragSessionAction(ci)
     # end def
@@ -385,7 +396,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     # end def
 
     def nop(self):
-        self._origami_part_item.updateStatusBar("(%d, %d)" % self._coord)
+        self._part_item.updateStatusBar("(%d, %d)" % self._coord)
 
     def addScafAtActiveSliceIfMissing(self):
         vh = self.virtualHelix()
@@ -400,7 +411,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
         co = self._coord
         tup = part.getName(), co[0], co[1]
-        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
+        self._part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     def addStapAtActiveSliceIfMissing(self):
@@ -417,7 +428,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
         co = self._coord
         tup = part.getName(), co[0], co[1]
-        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
+        self._part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     def addVHIfMissing(self):
@@ -435,7 +446,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
 
         co = self._coord
         tup = part.getName(), co[0], co[1]
-        self._origami_part_item.updateStatusBar("%s:(%d, %d)" % tup)
+        self._part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
     if GL:

@@ -56,8 +56,8 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
 
         # item groups
         self._root_items = {}
-        self._root_items["Scaffolds"] = self._createRootItem("Scaffolds", self)
-        self._root_items["Staples"] = self._createRootItem("Staples", self)
+        self._root_items["Strands"] = self._createRootItem("Strands", self)
+        # self._root_items["Staples"] = self._createRootItem("Staples", self)
         self._root_items["Modifications"] = self._createRootItem("Modifications", self)
         self._items = {} # children
     # end def

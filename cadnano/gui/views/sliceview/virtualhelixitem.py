@@ -3,10 +3,11 @@ import cadnano.util as util
 
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
+from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
-from cadnano.enum import LatticeType, Parity, StrandType
+from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.virtualhelix import VirtualHelix
 from . import slicestyles as styles
@@ -47,6 +48,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         part_color_A64.setAlpha(64)
         part_color_A128 = QColor(part_color)
         part_color_A128.setAlpha(128)
+        part_color_LITE = QColor(part_color).lighter(180)
 
         self._USE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
         self._OUT_OF_SLICE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
@@ -57,6 +59,15 @@ class VirtualHelixItem(QGraphicsEllipseItem):
             self._USE_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
             self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
                                           styles.SLICE_HELIX_STROKE_WIDTH)
+
+        if self.part().partType() == PartType.DNAPART:
+            self._OUT_OF_SLICE_BRUSH = QBrush(QColor(250, 250, 250))
+            self._USE_BRUSH = QBrush(part_color_LITE) #QBrush(QColor(250, 250, 250))
+            glow = QGraphicsDropShadowEffect()
+            glow.setColor(part_color_A128)
+            glow.setBlurRadius(2) # default
+            glow.setOffset(2)
+            self.setGraphicsEffect(glow)
 
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)
@@ -134,14 +145,17 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # end def
 
     def updateScafArrow(self, idx):
-        scafStrand = self._virtual_helix.scaf(idx)
-        if scafStrand:
-            scafStrandColor = QColor(scafStrand.oligo().color())
-            scafAlpha = 0.9 if scafStrand.hasXoverAt(idx) else 0.3
+        if self.part().partType() == PartType.DNAPART:
+            scafStrandColor = QColor(255,255,255,128)
         else:
-            scafStrandColor = QColor(Qt.gray)
-            scafAlpha = 0.1
-        scafStrandColor.setAlphaF(scafAlpha)
+            scafStrand = self._virtual_helix.scaf(idx)
+            if scafStrand:
+                scafStrandColor = QColor(scafStrand.oligo().color())
+                scafAlpha = 0.9 if scafStrand.hasXoverAt(idx) else 0.3
+            else:
+                scafStrandColor = QColor(Qt.gray)
+                scafAlpha = 0.1
+            scafStrandColor.setAlphaF(scafAlpha)
         self._pen1.setBrush(scafStrandColor)
         self.arrow1.setPen(self._pen1)
         part = self.part()
