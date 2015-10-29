@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 from cadnano.enum import PartType
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import DnaPartItem
+from .dnapartitem import NucleicAcidPartItem
 from .plasmidpartitem import PlasmidPartItem
 from .origamipartitem import OrigamiPartItem
 
@@ -116,8 +116,8 @@ class OutlinerTreeWidget(QTreeWidget):
             self._instance_items[model_part_instance] = origami_part_item
             # self.setModifyState(self._window.action_modify.isChecked())
         elif part_type == PartType.DNAPART:
-            dna_part_item = DnaPartItem(model_part, parent=self)
-            self._instance_items[model_part_instance] = dna_part_item
+            na_part_item = NucleicAcidPartItem(model_part, parent=self)
+            self._instance_items[model_part_instance] = na_part_item
             # self.setModifyState(self._window.action_modify.isChecked())
         else:
             print(part_type)

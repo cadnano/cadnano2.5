@@ -4,16 +4,16 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.enum import ItemType
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 
 
-class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
+class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     def __init__(self, model_part, parent=None):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._model_part = m_p = model_part
         self._parent_tree = parent
-        self._controller = DnaPartItemController(self, model_part)
+        self._controller = NucleicAcidPartItemController(self, model_part)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
 
         self._property_items = []
@@ -26,7 +26,7 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
 
     # SLOTS
     def partRemovedSlot(self, sender):
-        self._parent_tree.removeDnaPartItem(self)
+        self._parent_tree.removeNucleicAcidPartItem(self)
         self._model_part = None
         self._parent_tree = None
         self._controller.disconnectSignals()

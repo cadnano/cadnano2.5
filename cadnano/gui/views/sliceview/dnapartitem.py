@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication
 from cadnano import util
 from cadnano import getReopen
 from cadnano.enum import PartEdges
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .emptyhelixitem import EmptyHelixItem
@@ -25,7 +25,7 @@ _MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
 _BOUNDING_RECT_PADDING = 10
 
-class DnaPartItem(QGraphicsItem, AbstractPartItem):
+class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, parent=None):
@@ -37,11 +37,11 @@ class DnaPartItem(QGraphicsItem, AbstractPartItem):
 
         Order matters for deselector, probe, and setlattice
         """
-        super(DnaPartItem, self).__init__(parent)
+        super(NucleicAcidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.object()
         self._model_props = m_props = m_p.getPropertyDict()
-        self._controller = DnaPartItemController(self, m_p)
+        self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._scaleFactor = self._RADIUS/m_p.radius()
         self._empty_helix_hash = {}
@@ -53,7 +53,7 @@ class DnaPartItem(QGraphicsItem, AbstractPartItem):
         # If None, all slices will be redrawn and the cache will be filled.
         # Connect destructor. This is for removing a part from scenes.
         self.probe = self.IntersectionProbe(self)
-        # initialize the DnaPartItem with an empty set of old coords
+        # initialize the NucleicAcidPartItem with an empty set of old coords
         self._setLattice([], m_p.generatorFullLattice())
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
@@ -84,7 +84,7 @@ class DnaPartItem(QGraphicsItem, AbstractPartItem):
         The deselector grabs mouse events that missed a slice and clears the
         selection when it gets one.
         """
-        self.deselector = ds = DnaPartItem.Deselector(self)
+        self.deselector = ds = NucleicAcidPartItem.Deselector(self)
         ds.setParentItem(self)
         ds.setFlag(QGraphicsItem.ItemStacksBehindParent)
         ds.setZValue(styles.ZDESELECTOR)
@@ -122,7 +122,7 @@ class DnaPartItem(QGraphicsItem, AbstractPartItem):
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
         self._active_slice_item.removed()
-        self.parentItem().removeDnaPartItem(self)
+        self.parentItem().removeNucleicAcidPartItem(self)
 
         scene = self.scene()
 
@@ -318,11 +318,11 @@ class DnaPartItem(QGraphicsItem, AbstractPartItem):
         """The deselector lives behind all the slices and observes mouse press
         events that miss slices, emptying the selection when they do"""
         def __init__(self, parent_HGI):
-            super(DnaPartItem.Deselector, self).__init__()
+            super(NucleicAcidPartItem.Deselector, self).__init__()
             self.parent_HGI = parent_HGI
         def mousePressEvent(self, event):
             self.parent_HGI.part().setSelection(())
-            super(DnaPartItem.Deselector, self).mousePressEvent(event)
+            super(NucleicAcidPartItem.Deselector, self).mousePressEvent(event)
         def boundingRect(self):
             return self.parent_HGI.boundingRect()
         def paint(self, painter, option, widget=None):

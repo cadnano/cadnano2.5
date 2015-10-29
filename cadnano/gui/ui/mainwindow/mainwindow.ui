@@ -338,7 +338,9 @@
    <addaction name="action_filter_handle"/>
    <addaction name="action_filter_endpoint"/>
    <addaction name="action_filter_xover"/>
-   <addaction name="action_filter_strand"/>
+   <addaction name="separator"/>
+   <addaction name="action_filter_pre_axover"/>
+   <addaction name="action_filter_pre_pxover"/>
   </widget>
   <widget class="QToolBar" name="left_toolbar">
    <property name="sizePolicy">
@@ -380,9 +382,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_new_honeycomb_part"/>
    <addaction name="action_new_hcdnapart"/>
-   <addaction name="action_new_square_part"/>
    <addaction name="action_new_sqdnapart"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -948,10 +948,10 @@
     <string>HcPro</string>
    </property>
    <property name="iconText">
-    <string>HcPro</string>
+    <string>Hc</string>
    </property>
    <property name="toolTip">
-    <string>Add honeycomb-lattice DnaPart </string>
+    <string>Add HoneycombDNucleicAcidPart </string>
    </property>
   </action>
   <action name="action_outliner">
@@ -1005,13 +1005,49 @@
      <normaloff>:/parttools/sqpro</normaloff>:/parttools/sqpro</iconset>
    </property>
    <property name="text">
-    <string>SqPro</string>
+    <string>Sq</string>
    </property>
    <property name="iconText">
-    <string>SqPro</string>
+    <string>Sq</string>
    </property>
    <property name="toolTip">
-    <string>Add square-lattice DnaPart </string>
+    <string>Add SquareDNucleicAcidPart </string>
+   </property>
+  </action>
+  <action name="action_filter_pre_axover">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-pre-pxover</normaloff>:/parttools/filter-pre-pxover</iconset>
+   </property>
+   <property name="text">
+    <string>filter_pre_axover</string>
+   </property>
+   <property name="toolTip">
+    <string>Antiparallel Xovers ([)</string>
+   </property>
+   <property name="shortcut">
+    <string>[, ]</string>
+   </property>
+  </action>
+  <action name="action_filter_pre_pxover">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-pre-axover</normaloff>:/parttools/filter-pre-axover</iconset>
+   </property>
+   <property name="text">
+    <string>filter-pre-pxover</string>
+   </property>
+   <property name="toolTip">
+    <string>Parallel Xovers (\)</string>
+   </property>
+   <property name="shortcut">
+    <string>\, /</string>
    </property>
   </action>
  </widget>

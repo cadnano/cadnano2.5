@@ -27,10 +27,10 @@ from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
-class DnaPart(Part):
+class NucleicAcidPart(Part):
     """
-    DnaPart is a group of VirtualHelix items that are on the same lattice.
-    The DnaPart model component is different from the OrigamiPart:
+    NucleicAcidPart is a group of VirtualHelix items that are on the same lattice.
+    The NucleicAcidPart model component is different from the OrigamiPart:
 
     - it does not enforce distinction between scaffold and staple strands
     - specific crossover types are not enforced (i.e. antiparallel)
@@ -47,8 +47,8 @@ class DnaPart(Part):
 
     @classmethod
     def _count(cls):
-        DnaPart.__count += 1
-        return DnaPart.__count
+        NucleicAcidPart.__count += 1
+        return NucleicAcidPart.__count
 
     def __init__(self, *args, **kwargs):
         """
@@ -60,7 +60,7 @@ class DnaPart(Part):
         #     e = "This class is abstract. Perhaps you want HoneycombPart."
         #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
-        super(DnaPart, self).__init__(*args, **kwargs)
+        super(NucleicAcidPart, self).__init__(*args, **kwargs)
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
@@ -72,7 +72,7 @@ class DnaPart(Part):
         self._max_col = 50
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
-        # Properties (DnaPart-specific)
+        # Properties (NucleicAcidPart-specific)
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties["name"] = "Origami%d" % self._count()
         # ID assignment

@@ -1,14 +1,14 @@
 from .partitemcontroller import PartItemController
 
-class DnaPartItemController(PartItemController):
-    def __init__(self, plasmid_part_item, model_dna_part):
-        super(DnaPartItemController, self).__init__(plasmid_part_item, model_dna_part)
+class NucleicAcidPartItemController(PartItemController):
+    def __init__(self, plasmid_part_item, model_na_part):
+        super(NucleicAcidPartItemController, self).__init__(plasmid_part_item, model_na_part)
         self.connectSignals()
     # end def
 
     def connectSignals(self):
         PartItemController.connectSignals(self)
-        # DnaPart-specific signals go here
+        # NucleicAcidPart-specific signals go here
         m_p = self._model_part
         p_i = self._part_item
         m_p.partActiveVirtualHelixChangedSignal.connect(p_i.partActiveVirtualHelixChangedSlot)
@@ -22,7 +22,7 @@ class DnaPartItemController(PartItemController):
 
     def disconnectSignals(self):
         PartItemController.disconnectSignals(self)
-        # DnaPart-specific signals go here
+        # NucleicAcidPart-specific signals go here
         m_p = self._model_part
         p_i = self._Dna_part_item
         m_p.partActiveVirtualHelixChangedSignal.disconnect(p_i.partActiveVirtualHelixChangedSlot)

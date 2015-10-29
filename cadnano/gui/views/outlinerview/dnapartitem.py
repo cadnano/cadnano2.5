@@ -9,25 +9,25 @@ from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
 
 NAME_COL = 0
 VISIBLE_COL = 1
 COLOR_COL = 2
 
-class DnaPartItemDelegate(QStyledItemDelegate, AbstractPartItem):
+class NucleicAcidPartItemDelegate(QStyledItemDelegate, AbstractPartItem):
     def paint(self, painter, option, index):
-        print("DnaPartItemDelegate")
+        print("NucleicAcidPartItemDelegate")
         option.rect.adjust(-5,0,0,0)
         QItemDelegate.paint(painter, option, index)
 
-class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
+class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     def __init__(self, model_part, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._model_part = m_p = model_part
         self._parent_tree = parent
-        self._controller = DnaPartItemController(self, m_p)
+        self._controller = NucleicAcidPartItemController(self, m_p)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self.setExpanded(True)
 
@@ -97,7 +97,7 @@ class DnaPartItem(QTreeWidgetItem, AbstractPartItem):
 
     ### SLOTS ###
     def partRemovedSlot(self, sender):
-        self._parent_tree.removeDnaPartItem(self)
+        self._parent_tree.removeNucleicAcidPartItem(self)
         self._part = None
         self._parent_tree = None
         self._controller.disconnectSignals()

@@ -24,6 +24,8 @@
         <file alias="outliner">images/part-outliner.png</file>
         <file alias="hcpro">images/part-new-hcpro.png</file>
         <file alias="sqpro">images/part-new-sqpro.png</file>
+        <file alias="filter-pre-pxover">images/part-filter-pre-pxover.png</file>
+        <file alias="filter-pre-axover">images/part-filter-pre-axover.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

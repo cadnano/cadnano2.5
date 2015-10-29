@@ -1,8 +1,8 @@
 from .partitemcontroller import PartItemController
 
 class OrigamiPartItemController(PartItemController):
-    def __init__(self, plasmid_part_item, model_dna_part):
-        super(OrigamiPartItemController, self).__init__(plasmid_part_item, model_dna_part)
+    def __init__(self, plasmid_part_item, model_na_part):
+        super(OrigamiPartItemController, self).__init__(plasmid_part_item, model_na_part)
         self.connectSignals()
     # end def
 

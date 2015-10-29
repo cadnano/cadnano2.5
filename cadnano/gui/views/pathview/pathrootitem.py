@@ -5,7 +5,7 @@ from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 
-from .dnapartitem import DnaPartItem
+from .dnapartitem import NucleicAcidPartItem
 from .origamipartitem import OrigamiPartItem
 from .pathselection import EndpointHandleSelectionBox
 from .pathselection import SelectionItemGroup
@@ -67,12 +67,12 @@ class PathRootItem(QGraphicsRectItem):
             win.path_tool_manager.setActivePart(origami_part_item)
             self.setModifyState(win.action_modify.isChecked())
         elif part_type == PartType.DNAPART:
-            dna_part_item = DnaPartItem(model_part_instance,\
+            na_part_item = NucleicAcidPartItem(model_part_instance,\
                                 viewroot=self, \
                                 active_tool_getter=win.path_tool_manager.activeToolGetter,\
                                 parent=self)
-            self._part_item_for_part_instance[model_part_instance] = dna_part_item
-            win.path_tool_manager.setActivePart(dna_part_item)
+            self._part_item_for_part_instance[model_part_instance] = na_part_item
+            win.path_tool_manager.setActivePart(na_part_item)
             self.setModifyState(win.action_modify.isChecked())
         else:
             raise NotImplementedError

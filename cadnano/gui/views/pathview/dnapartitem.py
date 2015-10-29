@@ -8,7 +8,7 @@ from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
 from cadnano import app, getBatch, util
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import DnaPartItemController
+from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
@@ -28,12 +28,12 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
-class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
+class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     findChild = util.findChild  # for debug
 
     def __init__(self, model_part_instance, viewroot, active_tool_getter, parent):
         """parent should always be pathrootitem"""
-        super(DnaPartItem, self).__init__(parent)
+        super(NucleicAcidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.object()
         self._model_props = m_props = m_p.getPropertyDict()
@@ -41,7 +41,7 @@ class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
         self._getActiveTool = active_tool_getter
         self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
-        self._controller = DnaPartItemController(self, m_p)
+        self._controller = NucleicAcidPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
         self._virtual_helix_hash = {}
         self._virtual_helix_item_list = []
@@ -59,7 +59,7 @@ class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     # def paint(self, painter, option, widget):
-    #     print("paint DnaPartItem")
+    #     print("paint NucleicAcidPartItem")
     #     QGraphicsRectItem.paint(self, painter, option, widget)
     # # end def
 
@@ -99,7 +99,7 @@ class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
-        # print "DnaPartItem.partParentChangedSlot"
+        # print "NucleicAcidPartItem.partParentChangedSlot"
         pass
     # end def
 
@@ -138,7 +138,7 @@ class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
         self._activeSliceItem.removed()
-        self.parentItem().removeDnaPartItem(self)
+        self.parentItem().removeNucleicAcidPartItem(self)
         scene = self.scene()
         scene.removeItem(self)
         self._model_part = None
@@ -169,7 +169,7 @@ class DnaPartItem(QGraphicsRectItem, AbstractPartItem):
         When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
         """
-        # print("DnaPartItem.partVirtualHelixAddedSlot")
+        # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi

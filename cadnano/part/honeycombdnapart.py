@@ -1,6 +1,5 @@
 
-
-from cadnano.part.dnapart import DnaPart
+from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.enum import LatticeType
 
 
@@ -12,7 +11,7 @@ class Crossovers:
 
 root3 = 1.732051
 
-class HoneycombDnaPart(DnaPart):
+class HoneycombDnaPart(NucleicAcidPart):
     _STEP = 21  # 32 in square
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
@@ -107,5 +106,5 @@ class HoneycombDnaPart(DnaPart):
 
     ########################## Archiving / Unarchiving #########################
     def fillSimpleRep(self, sr):
-        super(HonecombDnaPart, self).fillSimpleRep(sr)
-        sr['.class'] = 'HonecombDnaPart'
+        super(HonecombNucleicAcidPart, self).fillSimpleRep(sr)
+        sr['.class'] = 'HonecombNucleicAcidPart'

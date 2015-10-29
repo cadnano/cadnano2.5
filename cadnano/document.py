@@ -452,53 +452,36 @@ class Document(ProxyObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addHoneycombPart(self,  max_row=prefs.HONEYCOMB_PART_MAXROWS,
-                                max_col=prefs.HONEYCOMB_PART_MAXCOLS,
-                                max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
-        """
-        Create and store a new origamipart and instance, and return the instance.
-        """
-        origamipart = None
-        origamipart = HoneycombPart(document=self, max_row=max_row,
-                            max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(origamipart))
-        return origamipart
-    # end def
-
-    def addSquarePart(self, max_row=prefs.SQUARE_PART_MAXROWS,
-                            max_col=prefs.SQUARE_PART_MAXCOLS,
-                            max_steps=prefs.SQUARE_PART_MAXSTEPS):
-        """
-        Create and store a new origamipart and instance, and return the instance.
-        """
-        origamipart = None
-        origamipart = SquarePart(document=self, max_row=max_row,
-                                 max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(origamipart))
-        return origamipart
-    # end def
-
-    def addHcDnaPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
+    def addHoneycombDnaPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
                          max_col=prefs.HONEYCOMB_PART_MAXCOLS,
                          max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
         """
-        Create and store a new honeycomb-dnapart and instance, and return the instance.
+        Create and store a new HoneycombDnaPart and instance, and return the instance.
         """
-        dnapart = HoneycombDnaPart(document=self, max_row=max_row,
+        honeycombdnapart = HoneycombDnaPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(dnapart))
-        return dnapart
+        self._addPart(ObjectInstance(honeycombdnapart))
+        return honeycombdnapart
     # end def
 
-    def addSqDnaPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
+    def addSquareDnaPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
                          max_col=prefs.SQUARE_PART_MAXCOLS,
                          max_steps=prefs.SQUARE_PART_MAXSTEPS):
         """
-        Create and store a new square-dnapart and instance, and return the instance.
+        Create and store a new SquareDnaPart and instance, and return the instance.
         """
-        dnapart = SquareDnaPart(document=self, max_row=max_row,
+        squarednapart = SquareDnaPart(document=self, max_row=max_row,
                               max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(dnapart))
+        self._addPart(ObjectInstance(squarednapart))
+        return squarednapart
+    # end def
+
+    def addPlasmidPart(self):
+        """Create and store a new PlasmidPart and instance, and return the instance."""
+        plasmidpart = PlasmidPart(document=self)
+        self._addPart(ObjectInstance(plasmidpart))
+        return PlasmidPart
+    # end def
 
     def removeAllParts(self):
         """Used to reset the document. Not undoable.
@@ -508,13 +491,6 @@ class Document(ProxyObject):
         for item in self._children:
             if isinstance(item, Part):
                 part.remove(use_undostack=False)
-    # end def
-
-    def addPlasmidPart(self):
-        """Create and store a new PlasmidPart and instance, and return the instance."""
-        plasmidpart = PlasmidPart(document=self)
-        self._addPart(ObjectInstance(plasmidpart))
-        return PlasmidPart
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
