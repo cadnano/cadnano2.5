@@ -73,11 +73,14 @@ class Part(ProxyObject):
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
         # Properties
+        self.view_properties = self._document.newViewProperties()
+
         self._properties = {}
         self._properties["name"] = "Part%d" % len(self._document.children())
         self._properties["color"] = "#000000" # outlinerview will override from styles
         self._properties["visible"] = True
         self._properties["circular"] = True
+
         # Selections
         self._selections = {}
 
@@ -86,7 +89,7 @@ class Part(ProxyObject):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = []
+
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -157,6 +160,14 @@ class Part(ProxyObject):
 
     def getProperty(self, key):
         return self._properties[key]
+    # end def
+
+    def setViewProperty(self, view, key, value):
+        self.view_properties[view][key] = value
+    # end def
+
+    def getViewProperty(self, view, key):
+        return self.view_properties[view][key]
     # end def
 
     def getName(self):
@@ -236,7 +247,7 @@ class Part(ProxyObject):
         """ the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
         """
-        return self._imported_vh_order
+        return self.getViewProperty('path', 'virtual_helix_order')
     # end def
 
     def activeBaseIndex(self):

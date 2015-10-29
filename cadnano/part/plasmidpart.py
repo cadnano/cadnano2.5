@@ -83,7 +83,7 @@ class PlasmidPart(Part):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = None
+
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None

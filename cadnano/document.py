@@ -36,6 +36,7 @@ class Document(ProxyObject):
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
         self._selected_changed_dict = {}
+        self.view_names = []
         app().documentWasCreatedSignal.emit(self)
     # end def
 
@@ -442,14 +443,36 @@ class Document(ProxyObject):
     # end def
 
     def resetViews(self):
-        # This is a fast way to clear selections and the views.
-        # We could manually deselect each item from the Dict, but we'll just
-        # let them be garbage collect
-        # the dictionary maintains what is selected
+        """
+        This is a fast way to clear selections and the views.
+        We could manually deselect each item from the Dict, but we'll just
+        let them be garbage collect
+        the dictionary maintains what is selected
+        """
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
         self._selected_changed_dict = {}
         self.documentViewResetSignal.emit(self)
+    # end def
+
+    def setViewNames(self, view_name_list, do_clear=False):
+        """ tell the model what views the document should support
+        Allows non-visible views to be used.
+        Intended to be called at application launch only at
+        present
+        """
+        view_names = [] if do_clear else self.view_names
+        for view_name in view_name_list:
+            if not view_name in view_names:
+                view_names.append(view_name)
+        self.view_names = view_names
+    # end def
+
+    def newViewProperties(self):
+        """ get a dictionary prepopulated with a view dictionary
+        for use with view specific parameters
+        """
+        return {key:{} for key in self.view_names}
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###

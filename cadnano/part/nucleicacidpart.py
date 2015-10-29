@@ -80,7 +80,7 @@ class NucleicAcidPart(Part):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
-        self._imported_vh_order = []
+
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -1154,10 +1154,10 @@ class NucleicAcidPart(Part):
                     toSS.hasStrandAtAndNoXover(idx - 1)
     # end def
 
-    def setImportedVHelixOrder(self, orderedCoordList, check_batch=True):
+    def setImportedVHelixOrder(self, ordered_coord_list, check_batch=True):
         """Used on file import to store the order of the virtual helices."""
-        self._imported_vh_order = orderedCoordList
-        self.partVirtualHelicesReorderedSignal.emit(self, orderedCoordList, check_batch)
+        self.setViewProperty('path', 'virtual_helix_order', ordered_coord_list)
+        self.partVirtualHelicesReorderedSignal.emit(self, ordered_coord_list, check_batch)
     # end def
 
 # end class

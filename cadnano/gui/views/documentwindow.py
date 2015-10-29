@@ -120,6 +120,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.main_splitter.setSizes([180, 400, 400])  # balance main_splitter size
         self.statusBar().showMessage("")
 
+        doc.setViewNames(['slice', 'path'])
+    # end def
+
     ### ACCESSORS ###
     def undoStack(self):
         return self.controller.undoStack()
@@ -160,7 +163,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     """
     #     if painter.paintEngine().type() != QPaintEngine.OpenGL and \
     #         painter.paintEngine().type() != QPaintEngine.OpenGL2:
-    # 
+    #
     #         qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
     #         return
     #     # end if
@@ -168,10 +171,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     GL.glDisable(GL.GL_DEPTH_TEST) # disable for 2D drawing
     #     GL.glClearColor(1.0, 1.0, 1.0, 1.0)
     #     GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-    # 
+    #
     #     painter.endNativePainting()
     # # end def
-    
+
     # def drawBackgroundNonGL(self, painter, rect):
     #     """
     #     This method is for overloading the QGraphicsScene.
