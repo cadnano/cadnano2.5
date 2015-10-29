@@ -80,8 +80,8 @@ class DocumentController():
             self.actionAddHoneycombPartSlot)
         self.win.action_new_square_part.triggered.connect(\
             self.actionAddSquarePartSlot)
-        self.win.action_new_hcdnapart.triggered.connect(self.actionAddHcNucleicAcidPart)
-        self.win.action_new_sqdnapart.triggered.connect(self.actionAddSqNucleicAcidPart)
+        self.win.action_new_honeycombdnapart.triggered.connect(self.actionAddHoneycombDnaPart)
+        self.win.action_new_squarednapart.triggered.connect(self.actionAddSquareDnaPart)
         self.win.closeEvent = self.windowCloseEventHandler
         self.win.action_about.triggered.connect(self.actionAboutSlot)
         self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
@@ -413,12 +413,12 @@ class DocumentController():
         self.setActivePart(part)
     # end def
 
-    def actionAddHcNucleicAcidPart(self):
+    def actionAddHoneycombDnaPart(self):
         part = self._document.addHoneycombDnaPart()
         self.setActivePart(part)
     # end def
 
-    def actionAddSqNucleicAcidPart(self):
+    def actionAddSquareDnaPart(self):
         # part = self._document.addSquareDnaPart()
         # self.setActivePart(part)
         pass

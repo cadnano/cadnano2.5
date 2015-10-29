@@ -382,8 +382,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_new_hcdnapart"/>
-   <addaction name="action_new_sqdnapart"/>
+   <addaction name="action_new_honeycombdnapart"/>
+   <addaction name="action_new_squarednapart"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -939,7 +939,7 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_hcdnapart">
+  <action name="action_new_honeycombdnapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/hcpro</normaloff>:/parttools/hcpro</iconset>
@@ -951,7 +951,7 @@
     <string>Hc</string>
    </property>
    <property name="toolTip">
-    <string>Add HoneycombDNucleicAcidPart </string>
+    <string>Add HoneycombDNAPart </string>
    </property>
   </action>
   <action name="action_outliner">
@@ -999,7 +999,7 @@
     <string>Plasmid</string>
    </property>
   </action>
-  <action name="action_new_sqdnapart">
+  <action name="action_new_squarednapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/sqpro</normaloff>:/parttools/sqpro</iconset>
@@ -1011,16 +1011,19 @@
     <string>Sq</string>
    </property>
    <property name="toolTip">
-    <string>Add SquareDNucleicAcidPart </string>
+    <string>Add SquareDNAPart </string>
    </property>
   </action>
   <action name="action_filter_pre_axover">
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-pre-pxover</normaloff>:/parttools/filter-pre-pxover</iconset>
+     <normaloff>:/parttools/filter-pre-axover</normaloff>:/parttools/filter-pre-axover</iconset>
    </property>
    <property name="text">
     <string>filter_pre_axover</string>
@@ -1038,7 +1041,7 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-pre-axover</normaloff>:/parttools/filter-pre-axover</iconset>
+     <normaloff>:/parttools/filter-pre-pxover</normaloff>:/parttools/filter-pre-pxover</iconset>
    </property>
    <property name="text">
     <string>filter-pre-pxover</string>

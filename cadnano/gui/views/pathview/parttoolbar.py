@@ -42,10 +42,10 @@ class PartToolBar(QToolBar):
         self.action_toolbar_label = self.setupLabel("Add\nPart:", "action_new_honeycomb_part")
 
         # DNA part
-        self.action_new_na_part = self.setupAction("Plasmid", None,
-                                                        "action_new_na_part",
+        self.action_new_plasmidpart = self.setupAction("Plasmid", None,
+                                                        "action_new_plasmidpart",
                                                         ":/parttools/new-dna")
-        self.action_new_na_part.triggered.connect(self.doc.controller().actionAddPlasmidPartSlot)
+        self.action_new_plasmidpart.triggered.connect(self.doc.controller().actionAddPlasmidPartSlot)
 
 
         # Origami ToolButton
@@ -70,7 +70,7 @@ class PartToolBar(QToolBar):
                                                         "action_new_honeypx_part",
                                                         ":/parttools/new-hpx",
                                                         self.add_origamipart_button)
-        self.action_new_hpx_part.triggered.connect(self.doc.controller().actionAddHcNucleicAcidPart)
+        self.action_new_hpx_part.triggered.connect(self.doc.controller().addHoneycombDnaPart)
         # Origami Part (S-px)
         self.action_new_spx_part = self.setupAction("Sq-PX", None,
                                                         "action_new_squarepx_part",
