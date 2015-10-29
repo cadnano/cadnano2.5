@@ -88,6 +88,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         # set the selection filter default
         doc.documentSelectionFilterChangedSignal.emit(["endpoint", "scaffold", "staple", "xover"])
+        doc.documentPreXoverFilterChangedSignal.emit("prexover_a")
 
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()

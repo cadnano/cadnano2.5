@@ -1032,7 +1032,7 @@
     <string>Antiparallel Xovers ([)</string>
    </property>
    <property name="shortcut">
-    <string>[, ]</string>
+    <string>]</string>
    </property>
   </action>
   <action name="action_filter_pre_pxover">
@@ -1050,7 +1050,7 @@
     <string>Parallel Xovers (\)</string>
    </property>
    <property name="shortcut">
-    <string>\, /</string>
+    <string>\</string>
    </property>
   </action>
  </widget>

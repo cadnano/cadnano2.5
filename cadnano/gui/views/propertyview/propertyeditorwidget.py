@@ -18,7 +18,7 @@ from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
 from .plasmidpartitem import PlasmidPartItem
 from .oligoitem import OligoItem
-from .origamipartitem import OrigamiPartItem
+from .nucleicacidpartitem import NucleicAcidPartItem
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
 _FONT = QFont(styles.THE_FONT, 12)
@@ -89,8 +89,8 @@ class PropertyEditorWidget(QTreeWidget):
                 self.show()
             elif item_type is ItemType.OLIGO:
                 print("oligo selected")
-            elif item_type is ItemType.ORIGAMI:
-                print("origami selected")
+            elif item_type is ItemType.NUCLEICACID:
+                print("nucleicacid selected")
             else:
                 raise NotImplementedError
         else:
@@ -130,10 +130,13 @@ class PropertyEditorWidget(QTreeWidget):
         pass
     # end def
 
-    def resetRootItemSlot(self, doc):
+    def preXoverFilterChangedSlot(self, filter_name):
         pass
     # end def
 
+    def resetRootItemSlot(self, doc):
+        pass
+    # end def
 
     ### ACCESSORS ###
     def window(self):

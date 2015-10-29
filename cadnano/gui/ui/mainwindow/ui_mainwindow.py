@@ -536,10 +536,10 @@ class Ui_MainWindow(object):
         self.action_new_squarednapart.setToolTip(_translate("MainWindow", "Add SquareDNAPart "))
         self.action_filter_pre_axover.setText(_translate("MainWindow", "filter_pre_axover"))
         self.action_filter_pre_axover.setToolTip(_translate("MainWindow", "Antiparallel Xovers ([)"))
-        self.action_filter_pre_axover.setShortcut(_translate("MainWindow", "[, ]"))
+        self.action_filter_pre_axover.setShortcut(_translate("MainWindow", "]"))
         self.action_filter_pre_pxover.setText(_translate("MainWindow", "filter-pre-pxover"))
         self.action_filter_pre_pxover.setToolTip(_translate("MainWindow", "Parallel Xovers (\\)"))
-        self.action_filter_pre_pxover.setShortcut(_translate("MainWindow", "\\, /"))
+        self.action_filter_pre_pxover.setShortcut(_translate("MainWindow", "\\"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget

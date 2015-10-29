@@ -12,9 +12,8 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 from cadnano.enum import PartType
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import NucleicAcidPartItem
+from .nucleicacidpartitem import NucleicAcidPartItem
 from .plasmidpartitem import PlasmidPartItem
-from .origamipartitem import OrigamiPartItem
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -111,11 +110,7 @@ class OutlinerTreeWidget(QTreeWidget):
             plasmid_part_item = PlasmidPartItem(model_part, parent=self)
             # self.itemDoubleClicked.connect(plasmid_part_item.doubleClickedSlot)
             self._instance_items[model_part_instance] = plasmid_part_item
-        elif part_type == PartType.ORIGAMIPART:
-            origami_part_item = OrigamiPartItem(model_part, parent=self)
-            self._instance_items[model_part_instance] = origami_part_item
-            # self.setModifyState(self._window.action_modify.isChecked())
-        elif part_type == PartType.DNAPART:
+        elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = na_part_item
             # self.setModifyState(self._window.action_modify.isChecked())
@@ -137,6 +132,10 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
+        pass
+    # end def
+
+    def preXoverFilterChangedSlot(self, filter_name):
         pass
     # end def
 
@@ -164,12 +163,6 @@ class OutlinerTreeWidget(QTreeWidget):
         # del self._instance_items[plasmid_part_item]
     # end def
 
-    def removeOrigamiPartItem(self, origami_part_item):
-        index = self.indexOfTopLevelItem(origami_part_item)
-        self.takeTopLevelItem(index)
-        # del self._instance_items[origami_part_item]
-    # end def
-
     def resetDocumentAndController(self, document):
         """docstring for resetDocumentAndController"""
         self._document = document
@@ -180,8 +173,8 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for origami_part_item in self._instance_items:
-            origami_part_item.setModifyState(bool)
+        for part_item in self._instance_items:
+            part_item.setModifyState(bool)
     # end def
 # end class OutlinerTreeWidget
 
@@ -444,13 +437,17 @@ class OutlineRootItem(QTreeWidget):
         pass
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
-        pass
-    # end def
+    # def selectionFilterChangedSlot(self, filter_name_list):
+    #     pass
+    # # end def
 
-    def resetRootItemSlot(self, doc):
-        pass
-    # end def
+    # def preXoverFilterChangedSlot(self, filter_name):
+    #     pass
+    # # end def
+
+    # def resetRootItemSlot(self, doc):
+    #     pass
+    # # end def
 
     ### ACCESSORS ###
     # def OutlineToolManager(self):

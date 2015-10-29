@@ -4,9 +4,8 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .dnapartitem import NucleicAcidPartItem
+from .nucleicacidpartitem import NucleicAcidPartItem
 from .plasmidpartitem import PlasmidPartItem
-from .origamipartitem import OrigamiPartItem
 
 
 class SliceRootItem(QGraphicsRectItem):
@@ -38,11 +37,7 @@ class SliceRootItem(QGraphicsRectItem):
         if part_type == PartType.PLASMIDPART:
             plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
             self._instance_items[plasmid_part_item] = plasmid_part_item
-        elif part_type == PartType.ORIGAMIPART:
-            origami_part_item = OrigamiPartItem(model_part_instance, parent=self)
-            self._instance_items[origami_part_item] = origami_part_item
-            # self.setModifyState(self._window.action_modify.isChecked())
-        elif part_type == PartType.DNAPART:
+        elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance, parent=self)
             self._instance_items[na_part_item] = na_part_item
         else:
@@ -55,6 +50,10 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
+        pass
+    # end def
+
+    def preXoverFilterChangedSlot(self, filter_name):
         pass
     # end def
 
