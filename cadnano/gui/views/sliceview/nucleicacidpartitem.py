@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QApplication
 from cadnano import util
 from cadnano import getReopen
 from cadnano.enum import PartEdges
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
+from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .emptyhelixitem import EmptyHelixItem

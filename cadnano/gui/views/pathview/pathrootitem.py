@@ -5,8 +5,7 @@ from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 
-from .dnapartitem import NucleicAcidPartItem
-from .origamipartitem import OrigamiPartItem
+from .nucleicacidpartitem import NucleicAcidPartItem
 from .pathselection import EndpointHandleSelectionBox
 from .pathselection import SelectionItemGroup
 from .pathselection import VirtualHelixHandleSelectionBox
@@ -32,6 +31,7 @@ class PathRootItem(QGraphicsRectItem):
         self._model_part = None
         self._part_item_for_part_instance = {}  # Maps Part -> PartItem
         self._selection_filter_dict = {}
+        self._prexover_filter = None
         self._initSelections()
     # end def
 
@@ -58,15 +58,7 @@ class PathRootItem(QGraphicsRectItem):
             pass
             # plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
             # self._instance_items[plasmid_part_item] = plasmid_part_item
-        elif part_type == PartType.ORIGAMIPART:
-            origami_part_item = OrigamiPartItem(model_part_instance,\
-                                viewroot=self, \
-                                active_tool_getter=win.path_tool_manager.activeToolGetter,\
-                                parent=self)
-            self._part_item_for_part_instance[model_part_instance] = origami_part_item
-            win.path_tool_manager.setActivePart(origami_part_item)
-            self.setModifyState(win.action_modify.isChecked())
-        elif part_type == PartType.DNAPART:
+        elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,\
                                 viewroot=self, \
                                 active_tool_getter=win.path_tool_manager.activeToolGetter,\
@@ -98,6 +90,11 @@ class PathRootItem(QGraphicsRectItem):
         self.clearSelectionFilterDict()
         for filter_name in filter_name_list:
             self.addToSelectionFilterDict(filter_name)
+    # end def
+
+    def preXoverFilterChangedSlot(self, filter_name):
+        print("path updating preXovers", filter_name)
+        self._prexover_filter = filter_name
     # end def
 
     def resetRootItemSlot(self, doc):
@@ -164,6 +161,9 @@ class PathRootItem(QGraphicsRectItem):
     def selectionFilterDict(self):
         return self._selection_filter_dict
     # end def
+
+    def preXoverFilter(self):
+        return self._prexover_filter
 
     def addToSelectionFilterDict(self, filter_name):
         self._selection_filter_dict[filter_name] = True

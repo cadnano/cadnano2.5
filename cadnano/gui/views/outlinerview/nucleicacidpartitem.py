@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
+from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
 
 NAME_COL = 0

@@ -158,7 +158,7 @@ class NucleicAcidPart(Part):
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def partType(self):
-        return PartType.DNAPART
+        return PartType.NUCLEICACIDPART
     # end def
 
     def virtualHelix(self, vhref, returnNoneIfAbsent=True):
@@ -548,8 +548,11 @@ class NucleicAcidPart(Part):
 
         ss5p = strand5p.strandSet()
         ss3p = strand3p.strandSet()
-        if ss5p.strandType() != ss3p.strandType():
-            return
+
+        # commenting out if statement below allows scaf-to-stap xovers
+        # if ss5p.strandType() != ss3p.strandType():
+        #     return
+
         if use_undostack:
             self.undoStack().beginMacro("Create Xover")
         if ss5p.isScaffold() and use_undostack:  # ignore on import
@@ -1052,7 +1055,7 @@ class NucleicAcidPart(Part):
             virtual_helixA == virtual_helixB
     # end def
 
-    def potentialCrossoverList(self, virtual_helix, idx=None):
+    def potentialCrossoverList(self, virtual_helix, idx=None, xover_p=False):
         """
         Returns a list of tuples
             (neighborVirtualHelix, index, strand_type, is_low_idx)
@@ -1117,10 +1120,12 @@ class NucleicAcidPart(Part):
                 # test each period of each lattice for each StrandType
                 for pt, is_low_idx in izip(pts, (True, False)):
                     for i, j in product(base_range_full, pt):
-                        index = i + j
+                        index = to_index = i + j
+                        if xover_p: # selection flag passed in from nucleicacidpartitem
+                            to_index = index+1 if is_low_idx else index-1
                         if index < num_bases:
                             if from_ss.hasNoStrandAtOrNoXover(index) and \
-                                    to_ss.hasNoStrandAtOrNoXover(index):
+                                    to_ss.hasNoStrandAtOrNoXover(to_index):
                                 ret.append((neighbor, index, st, is_low_idx))
                             # end if
                         # end if
@@ -1131,11 +1136,22 @@ class NucleicAcidPart(Part):
         return ret
     # end def
 
-    def possibleXoverAt(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
+    def isPossibleXoverA(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
         from_ss = from_virtual_helix.getStrandSetByType(strand_type)
         to_ss = to_virtual_helix.getStrandSetByType(strand_type)
         return from_ss.hasStrandAtAndNoXover(idx) and \
                 to_ss.hasStrandAtAndNoXover(idx)
+    # end def
+
+    def isPossibleXoverP(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
+        fromSS = from_virtual_helix.getStrandSetByType(strand_type)
+        toSS = to_virtual_helix.getStrandSetByType(strand_type)
+        if fromSS.isDrawn5to3():
+            return fromSS.hasStrandAtAndNoXover(idx) and \
+                    toSS.hasStrandAtAndNoXover(idx + 1)
+        else:
+            return fromSS.hasStrandAtAndNoXover(idx) and \
+                    toSS.hasStrandAtAndNoXover(idx - 1)
     # end def
 
     def setImportedVHelixOrder(self, orderedCoordList, check_batch=True):

@@ -13,9 +13,7 @@ from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
-from cadnano.part import HoneycombPart, SquarePart
 from cadnano.part import HoneycombDnaPart #, SquareDnaPart
-from cadnano.part.origamipart import OrigamiPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
 
@@ -57,6 +55,9 @@ class Document(ProxyObject):
                                          name='documentSelectedChangedSignal') # tuples of items + data
     documentSelectionFilterChangedSignal = ProxySignal(list,
                                   name='documentSelectionFilterChangedSignal')
+    documentPreXoverFilterChangedSignal = ProxySignal(str,
+                                   name='documentPreXoverFilterChangedSignal')
+
     documentViewResetSignal = ProxySignal(ProxyObject,
                                                name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(ProxyObject,

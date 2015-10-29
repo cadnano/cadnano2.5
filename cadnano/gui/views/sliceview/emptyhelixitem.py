@@ -53,7 +53,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # part-specific styles
-        if part_item.part().partType() == PartType.DNAPART:
+        if part_item.part().partType() == PartType.NUCLEICACIDPART:
             part_color = QColor(self.part().getProperty("color"))
             part_color_A64 = QColor(part_color)
             part_color_A64.setAlpha(64)

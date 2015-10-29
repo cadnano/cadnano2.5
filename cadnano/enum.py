@@ -39,9 +39,8 @@ class Enum(_Enum):
         else: raise
 
 class PartType(_Enum):
-    PLASMIDPART = 0
-    ORIGAMIPART = 1
-    DNAPART = 2
+    NUCLEICACIDPART = 1
+    PLASMIDPART = 2
 
 class ItemType(_Enum):
     DNA = 0
@@ -49,7 +48,6 @@ class ItemType(_Enum):
     RNA = 2
     PEPTIDE = 3
     PROTEIN = 4
-    ORIGAMI = 5
     OLIGO = 6
     SELECTION = 7
     ANNOTATION = 8

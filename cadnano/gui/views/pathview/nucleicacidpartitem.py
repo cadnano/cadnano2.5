@@ -8,12 +8,14 @@ from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
 from cadnano import app, getBatch, util
-from cadnano.gui.controllers.itemcontrollers.dnapartitemcontroller import NucleicAcidPartItemController
+from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem
+from .prexoveraitem import PreXoverAItem
+from .prexoverpitem import PreXoverPItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
 
@@ -480,15 +482,22 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         list(map(PreXoverItem.remove, self._pre_xover_items))
         self._pre_xover_items = []
 
-        potential_xovers = part.potentialCrossoverList(vh, idx)
+        if self._viewroot.preXoverFilter() == "prexover_p":
+            xover_p = True
+            _PXI = PreXoverPItem
+        else:
+            xover_p = False
+            _PXI = PreXoverAItem
+
+        potential_xovers = part.potentialCrossoverList(vh, idx, xover_p)
         for neighbor, index, strand_type, is_low_idx in potential_xovers:
             # create one half
             neighbor_vhi = self.itemForVirtualHelix(neighbor)
-            pxi = PreXoverItem(vhi, neighbor_vhi, index, strand_type, is_low_idx)
+            pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
             # add to list
             self._pre_xover_items.append(pxi)
             # create the complement
-            pxi = PreXoverItem(neighbor_vhi, vhi, index, strand_type, is_low_idx)
+            pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
             # add to list
             self._pre_xover_items.append(pxi)
         # end for

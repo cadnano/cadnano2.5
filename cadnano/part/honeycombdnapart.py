@@ -4,10 +4,10 @@ from cadnano.enum import LatticeType
 
 
 class Crossovers:
-    HPX_SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
-    HPX_SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
-    HPX_STAP_LOW = [[6, 16], [3, 13], [10, 20]]
-    HPX_STAP_HIGH = [[7, 17], [4, 14], [0, 11]]
+    SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
+    SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
+    STAP_LOW = [[6, 16], [3, 13], [10, 20]]
+    STAP_HIGH = [[7, 17], [4, 14], [0, 11]]
 
 root3 = 1.732051
 
@@ -21,10 +21,10 @@ class HoneycombDnaPart(NucleicAcidPart):
     _active_base_index = _STEP
     _SUB_STEP_SIZE = _STEP / 3
     # Used in VirtualHelix::potentialCrossoverList
-    _SCAFL = Crossovers.HPX_SCAF_LOW
-    _SCAFH = Crossovers.HPX_SCAF_HIGH
-    _STAPL = Crossovers.HPX_STAP_LOW
-    _STAPH = Crossovers.HPX_STAP_HIGH
+    _SCAFL = Crossovers.SCAF_LOW
+    _SCAFH = Crossovers.SCAF_HIGH
+    _STAPL = Crossovers.STAP_LOW
+    _STAPH = Crossovers.STAP_HIGH
 
     def __init__(self, *args, **kwargs):
         super(HoneycombDnaPart, self).__init__(self, *args, **kwargs)

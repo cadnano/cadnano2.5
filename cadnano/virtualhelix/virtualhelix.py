@@ -145,6 +145,13 @@ class VirtualHelix(ProxyObject):
         return is_even == is_scaf
     # end def
 
+    # may need new method that doesn't rely on strandype
+    # this doesn't generalize but is copied from old px branch
+    def newIsDrawn5to3(self, strandset):
+        is_scaf = strandset == self._scaf_strandset
+        return is_scaf # "scaf" always on top for parallel xovers
+    # end def
+
     def isEvenParity(self):
         return self._part.isEvenParity(*self._coord)
     # end def

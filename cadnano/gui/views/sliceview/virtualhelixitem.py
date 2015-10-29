@@ -60,7 +60,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
             self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
                                           styles.SLICE_HELIX_STROKE_WIDTH)
 
-        if self.part().partType() == PartType.DNAPART:
+        if self.part().partType() == PartType.NUCLEICACIDPART:
             self._OUT_OF_SLICE_BRUSH = QBrush(QColor(250, 250, 250))
             self._USE_BRUSH = QBrush(part_color_LITE) #QBrush(QColor(250, 250, 250))
             glow = QGraphicsDropShadowEffect()
@@ -145,7 +145,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # end def
 
     def updateScafArrow(self, idx):
-        if self.part().partType() == PartType.DNAPART:
+        if self.part().partType() == PartType.NUCLEICACIDPART:
             scafStrandColor = QColor(255,255,255,128)
         else:
             scafStrand = self._virtual_helix.scaf(idx)
