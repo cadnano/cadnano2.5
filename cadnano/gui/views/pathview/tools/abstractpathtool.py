@@ -124,7 +124,7 @@ class AbstractPathTool(QGraphicsObject):
         # else:
         #     strand_type = (StrandType.STAPLE, StrandType.SCAFFOLD)[util.clamp(strand_idx, 0, 1)]
 
-        strandType = (StrandType.SCAFFOLD, StrandType.STAPLE)[util.clamp(strandIdx, 0, 1)]
+        strand_type = (StrandType.SCAFFOLD, StrandType.STAPLE)[util.clamp(strand_idx, 0, 1)]
         return (strand_type, x, strand_idx)
 
     def helixIndex(self, point):

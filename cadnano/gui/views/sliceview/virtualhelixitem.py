@@ -24,8 +24,13 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # set up default, hover, and active drawing styles
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
+    rect_gain = 0.25
+    _RECT = _RECT.adjusted(rect_gain, rect_gain, rect_gain, rect_gain)
     _FONT = styles.SLICE_NUM_FONT
     _ZVALUE = styles.ZSLICEHELIX+3
+    # _OUT_OF_SLICE_PEN = QPen(styles.LIGHT_ORANGE_STROKE,\
+    #                      styles.SLICE_HELIX_STROKE_WIDTH)
+    # _OUT_OF_SLICE_BRUSH = QBrush(styles.LIGHT_ORANGE_FILL)
 
     def __init__(self, model_virtual_helix, empty_helix_item):
         """
@@ -63,11 +68,11 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         if self.part().partType() == PartType.NUCLEICACIDPART:
             self._OUT_OF_SLICE_BRUSH = QBrush(QColor(250, 250, 250))
             self._USE_BRUSH = QBrush(part_color_LITE) #QBrush(QColor(250, 250, 250))
-            glow = QGraphicsDropShadowEffect()
-            glow.setColor(part_color_A128)
-            glow.setBlurRadius(2) # default
-            glow.setOffset(2)
-            self.setGraphicsEffect(glow)
+            # glow = QGraphicsDropShadowEffect()
+            # glow.setColor(part_color_A128)
+            # glow.setBlurRadius(2) # default
+            # glow.setOffset(2)
+            # self.setGraphicsEffect(glow)
 
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)
