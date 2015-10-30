@@ -468,12 +468,12 @@ class Document(ProxyObject):
         self.view_names = view_names
     # end def
 
-    def newViewProperties(self):
-        """ get a dictionary prepopulated with a view dictionary
-        for use with view specific parameters
-        """
-        return {key:{} for key in self.view_names}
-    # end def
+    # def newViewProperties(self):
+    #     """ get a dictionary prepopulated with a view dictionary
+    #     for use with view specific parameters
+    #     """
+    #     return {key:{} for key in self.view_names}
+    # # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def addHoneycombDnaPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,

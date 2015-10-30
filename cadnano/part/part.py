@@ -73,7 +73,7 @@ class Part(ProxyObject):
         self._min_base = 0
         self._max_base = 2 * self._STEP - 1
         # Properties
-        self.view_properties = self._document.newViewProperties()
+        self.view_properties = {} #self._document.newViewProperties()
 
         self._properties = {}
         self._properties["name"] = "Part%d" % len(self._document.children())
@@ -162,12 +162,12 @@ class Part(ProxyObject):
         return self._properties[key]
     # end def
 
-    def setViewProperty(self, view, key, value):
-        self.view_properties[view][key] = value
+    def setViewProperty(self, key, value):
+        self.view_properties[key] = value
     # end def
 
-    def getViewProperty(self, view, key):
-        return self.view_properties[view][key]
+    def getViewProperty(self, key):
+        return self.view_properties[key]
     # end def
 
     def getName(self):
