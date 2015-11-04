@@ -110,7 +110,7 @@ class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
 
     ### SLOTS ###
     def partRemovedSlot(self, sender):
-        self.parentItem().removePlasmidPartItem(self)
+        self.parentItem().removePartItem(self)
         scene = self.scene()
         scene.removeItem(self)
         self._model_part = None
@@ -569,11 +569,11 @@ class DnaDragHandle(QGraphicsEllipseItem):
         # self.dummy.hide()
         # endAngle = self.updateDragHandleLine(event)
         # spanAngle = self.getSpanAngle(endAngle)
-        # 
+        #
         # if self._startPos != None and self._clockwise != None:
         #     self.parentItem().addSelection(self._startAngle, spanAngle)
         #     self._startPos = self._clockwise = None
-        # 
+        #
         # mark the end
         # x = self._DragHandleLine.x()
         # y = self._DragHandleLine.y()

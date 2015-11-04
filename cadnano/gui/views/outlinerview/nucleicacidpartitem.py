@@ -78,7 +78,7 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     def itemType(self):
-        return ItemType.DNA
+        return ItemType.NUCLEICACID
     # end def
 
     def part(self):

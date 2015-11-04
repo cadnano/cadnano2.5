@@ -84,13 +84,15 @@ class PropertyEditorWidget(QTreeWidget):
             # get the selected item
             item = sel[0]
             item_type = item.itemType()
-            if item_type is ItemType.DNA:
+            if item_type is ItemType.PLASMID:
                 pe_item = PlasmidPartItem(item.part(), self)
                 self.show()
             elif item_type is ItemType.OLIGO:
                 print("oligo selected")
             elif item_type is ItemType.NUCLEICACID:
                 print("nucleicacid selected")
+                pe_item = NucleicAcidPartItem(item.part(), self)
+                self.show()
             else:
                 raise NotImplementedError
         else:
@@ -100,7 +102,7 @@ class PropertyEditorWidget(QTreeWidget):
 
     # def itemClicked(self, item, column):
     #     print("itemClicked", item, column)
-    # 
+    #
     # def itemDoubleClicked(self, item, column):
     #     print("itemDoubleClicked", item, column)
 

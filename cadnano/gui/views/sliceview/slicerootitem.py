@@ -76,13 +76,13 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
-    def removePlasmidPartItem(self, plasmid_part_item):
-        del self._instance_items[plasmid_part_item]
+    def removePartItem(self, part_item):
+        del self._instance_items[part_item]
     # end def
 
-    def removeOrigamiPartItem(self, origami_part_item):
-        del self._instance_items[origami_part_item]
-    # end def
+    # def removeOrigamiPartItem(self, origami_part_item):
+    #     del self._instance_items[origami_part_item]
+    # # end def
 
     def resetDocumentAndController(self, document):
         """docstring for resetDocumentAndController"""

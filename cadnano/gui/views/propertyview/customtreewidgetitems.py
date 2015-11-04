@@ -11,7 +11,7 @@ class PropertyItem(QTreeWidgetItem):
     PropertyItem sets some default flags like ItemIsEditable.
     """
     def __init__(self, model_part, key, parent):
-        super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
+        super(PropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self._model_part = model_part
         self._key = key

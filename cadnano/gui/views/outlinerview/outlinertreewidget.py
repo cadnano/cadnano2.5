@@ -94,7 +94,7 @@ class OutlinerTreeWidget(QTreeWidget):
     ### SLOTS ###
     # def itemClicked(self, item, column):
     #     print("itemClicked", item, column)
-    # 
+    #
     # def itemDoubleClicked(self, item, column):
     #     print("itemDoubleClicked", item, column)
 
@@ -157,8 +157,8 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     ### METHODS ###
-    def removePlasmidPartItem(self, plasmid_part_item):
-        index = self.indexOfTopLevelItem(plasmid_part_item)
+    def removePartItem(self, part_item):
+        index = self.indexOfTopLevelItem(part_item)
         self.takeTopLevelItem(index)
         # del self._instance_items[plasmid_part_item]
     # end def
@@ -460,16 +460,10 @@ class OutlineRootItem(QTreeWidget):
     # end def
 
     ### METHODS ###
-    def removePlasmidPartItem(self, plasmid_part_item):
-        index = self.indexOfTopLevelItem(plasmid_part_item)
+    def removePartItem(self, part_item):
+        index = self.indexOfTopLevelItem(part_item)
         self.takeTopLevelItem(index)
         # del self._instance_items[plasmid_part_item]
-    # end def
-
-    def removeOrigamiPartItem(self, origami_part_item):
-        index = self.indexOfTopLevelItem(origami_part_item)
-        self.takeTopLevelItem(index)
-        # del self._instance_items[origami_part_item]
     # end def
 
     def resetDocumentAndController(self, document):

@@ -2,6 +2,7 @@ from os.path import basename
 
 from cadnano.enum import StrandType
 import json
+import io
 
 def encodeToFile(filename, document):
     json_string = encode(document, nno_dict)

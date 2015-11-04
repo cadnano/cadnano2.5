@@ -52,7 +52,7 @@ class PlasmidPartItem(QTreeWidgetItem, AbstractPartItem):
 
     # SLOTS
     def partRemovedSlot(self, sender):
-        self._parent_tree.removePlasmidPartItem(self)
+        self._parent_tree.removePartItem(self)
         self._model_part = None
         self._parent_tree = None
         self._controller.disconnectSignals()
@@ -74,7 +74,7 @@ class PlasmidPartItem(QTreeWidgetItem, AbstractPartItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
-        return ItemType.DNA
+        return ItemType.PLASMID
     # end def
 
     def part(self):
