@@ -13,7 +13,6 @@ class OligoItem(AbstractPropertyPartItem):
     def __init__(self, model_part, parent=None):
         super(AbstractPropertyPartItem, self).__init__(model_part, parent)
         self._controller = OligoItemController(self, model_part)
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
     # end def
 
     def itemType(self):
