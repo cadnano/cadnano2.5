@@ -65,8 +65,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #     QGraphicsRectItem.paint(self, painter, option, widget)
     # # end def
 
-    def model_color(self):
-        return self._model_props["color"]
+    def modelColor(self):
+        return self._model_props['color']
     # end def
 
     def _initModifierRect(self):
@@ -131,10 +131,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        pass
-        # if self._model_part == model_part:
-        #     if property_key == "color":
-        #         pass
+        if self._model_part == model_part:
+            self._model_props[property_key] = new_value
+            if property_key == 'color':
+                self._updateBoundingRect()
     # end def
 
     def partRemovedSlot(self, sender):
@@ -365,7 +365,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def resetBrush(self, alpha):
-        col = QColor(self.model_color())
+        col = QColor(self.modelColor())
         col.setAlpha(alpha)
         self.setBrush(QBrush(col))
     # end def
@@ -378,7 +378,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(QColor(self.model_color())))
+        self.setPen(QPen(QColor(self.modelColor())))
         self.resetBrush(styles.DEFAULT_ALPHA)
 
         # self.setRect(self.childrenBoundingRect())

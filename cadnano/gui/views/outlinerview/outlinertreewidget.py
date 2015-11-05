@@ -24,7 +24,7 @@ class OutlinerTreeWidget(QTreeWidget):
     """
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
-        self.setAttribute(Qt.WA_MacShowFocusRect,0) # no mac focus halo
+        self.setAttribute(Qt.WA_MacShowFocusRect, 0) # no mac focus halo
 
     def configure(self, window, document):
         self._window = window
@@ -53,9 +53,8 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setDragEnabled(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
 
-        custom_delegate = CustomDelegate()
+        custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
-        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
 
         self.model().dataChanged.connect(self.dataChangedSlot)
         self.itemSelectionChanged.connect(self.selectedChangedSlot)
@@ -67,10 +66,10 @@ class OutlinerTreeWidget(QTreeWidget):
         # p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
     # end def
 
-    def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):
-        if parentQTreeWidgetItem == None:
-            parentQTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parentQTreeWidgetItem)
+    def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
+        if parent_QTreeWidgetItem is None:
+            parent_QTreeWidgetItem = self.invisibleRootItem()
+        tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
         tw_item.setData(0, Qt.EditRole, part_name)
         tw_item.setData(1, Qt.EditRole, visible)
         tw_item.setData(2, Qt.EditRole, color)
@@ -81,24 +80,9 @@ class OutlinerTreeWidget(QTreeWidget):
     def getInstanceCount(self):
         return len(self._instance_items)
 
-    # def getNewPath(self, indexQModelIndex):
-    #     tw_item = self.itemFromIndex(indexQModelIndex)
-    #     pathQStringList = QFileDialog.getOpenFileNames()
-    #     if pathQStringList.count() > 0:
-    #         textQString = pathQStringList.first()
-    #         tw_item.setData(indexQModelIndex.column(), Qt.EditRole, textQString)
-    # end def
-
     ### SIGNALS ###
 
     ### SLOTS ###
-    # def itemClicked(self, item, column):
-    #     print("itemClicked", item, column)
-    #
-    # def itemDoubleClicked(self, item, column):
-    #     print("itemDoubleClicked", item, column)
-
-
     def partAddedSlot(self, sender, model_part_instance):
         """
         Receives notification from the model that a part has been added.
@@ -108,12 +92,10 @@ class OutlinerTreeWidget(QTreeWidget):
         part_type = model_part_instance.object().partType()
         if part_type == PartType.PLASMIDPART:
             plasmid_part_item = PlasmidPartItem(model_part, parent=self)
-            # self.itemDoubleClicked.connect(plasmid_part_item.doubleClickedSlot)
             self._instance_items[model_part_instance] = plasmid_part_item
         elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = na_part_item
-            # self.setModifyState(self._window.action_modify.isChecked())
         else:
             print(part_type)
             raise NotImplementedError
@@ -160,7 +142,6 @@ class OutlinerTreeWidget(QTreeWidget):
     def removePartItem(self, part_item):
         index = self.indexOfTopLevelItem(part_item)
         self.takeTopLevelItem(index)
-        # del self._instance_items[plasmid_part_item]
     # end def
 
     def resetDocumentAndController(self, document):
@@ -179,15 +160,7 @@ class OutlinerTreeWidget(QTreeWidget):
 # end class OutlinerTreeWidget
 
 
-class CustomDelegate(QStyledItemDelegate):
-    # def initStyleOption(self, option, model_index):
-        # pass
-        # option.palette.setBrush(QPalette.Text, Qt.red) # doesn't work
-        # option.backgroundBrush = QBrush(Qt.black)
-        # column = model_index.column()
-        # if column == 2:
-        #     option.backgroundBrush = QBrush(QColor(204,0,0))
-
+class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parentQWidget, option, model_index):
         column = model_index.column()
         if column == 0: # Part Name
@@ -215,8 +188,8 @@ class CustomDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, model_index):
         column = model_index.column()
         if column == 0: # Part Name
-            textQString = model_index.model().data(model_index, Qt.EditRole)
-            editor.setText(textQString)
+            text_QString = model_index.model().data(model_index, Qt.EditRole)
+            editor.setText(text_QString)
         elif column == 1: # Visibility
             value = model_index.model().data(model_index, Qt.EditRole)
             editor.setChecked(value)
@@ -233,14 +206,13 @@ class CustomDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, model_index):
         column = model_index.column()
         if column == 0: # Part Name
-            textQString = editor.text()
-            model.setData(model_index, textQString, Qt.EditRole)
+            text_QString = editor.text()
+            model.setData(model_index, text_QString, Qt.EditRole)
         elif column == 1: # Visibility
             value = editor.isChecked()
             model.setData(model_index, value, Qt.EditRole)
         elif column == 2: # Color
             color = editor.text()
-            # textQString = editor.text()
             model.setData(model_index, color, Qt.EditRole)
         # elif column == 3: # SpinBox Example
         #     value = editor.value()
@@ -255,7 +227,7 @@ class CustomDelegate(QStyledItemDelegate):
             editor.setGeometry(option.rect)
         elif column == 1:
             rect = QRect(option.rect)
-            delta = option.rect.width()/2 - 9
+            delta = option.rect.width() / 2 - 9
             rect.setX(option.rect.x() + delta) # Hack to center the checkbox
             editor.setGeometry(rect)
         elif column == 2:
@@ -270,8 +242,6 @@ class CustomDelegate(QStyledItemDelegate):
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
         if column == 1: # Visibility
-            # option.displayAlignment = Qt.AlignHCenter | Qt.AlignVCenter
-            # element = _QCOMMONSTYLE.CE_CheckBox
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionButton()
             styleoption.rect = QRect(option.rect)
@@ -282,8 +252,6 @@ class CustomDelegate(QStyledItemDelegate):
                 element =  _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
 
-            # _QCOMMONSTYLE.drawControl(element, styleoption, painter)
-            # QStyledItemDelegate.paint(self, painter, option, model_index)
         elif column == 2: # Color
             color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
@@ -291,10 +259,6 @@ class CustomDelegate(QStyledItemDelegate):
             styleoption.palette.setBrush(QPalette.Button, QBrush(QColor(color)))
             styleoption.rect = QRect(option.rect)
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
-
-            # option.displayAlignment = Qt.AlignHCenter | Qt.AlignVCenter
-            # option.backgroundBrush = QBrush(QColor(204,0,0, 128))
-            # QStyledItemDelegate.paint(self, painter, option, model_index)
 
         # elif column == 3: # SpinBox Example
         #     value = model_index.model().data(model_index, Qt.EditRole)
@@ -309,16 +273,16 @@ class CustomDelegate(QStyledItemDelegate):
         #                                             spinBoxQStyleOptionSpinBox, \
         #                                             painter)
         # elif column == 4: # PushButton example
-        #     textQString = model_index.model().data(model_index, Qt.EditRole)
+        #     text_QString = model_index.model().data(model_index, Qt.EditRole)
         #     buttonQStyleOptionButton = QStyleOptionButton()
         #     buttonQStyleOptionButton.rect = QRect(option.rect)
-        #     buttonQStyleOptionButton.text = textQString
+        #     buttonQStyleOptionButton.text = text_QString
         #     buttonQStyleOptionButton.state = QStyle.State_Active
         #     _QCOMMONSTYLE.drawControl(_QCOMMONSTYLE.CE_PushButton, buttonQStyleOptionButton, painter)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)
     # end def
-# end class CustomDelegate
+# end class CustomStyleItemDelegate
 
 
 class OutlineRootItem(QTreeWidget):
@@ -340,9 +304,8 @@ class OutlineRootItem(QTreeWidget):
 
         self._configure() # setup header and drag mode
 
-        custom_delegate = CustomDelegate()
+        custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
-        # self.connect(custom_delegate, QtCore.SIGNAL('requestNewPath'), self.getNewPath)
 
         # Add some dummy items
         p1 = self.addDummyRow("Part0", True, "#cc0000")
@@ -373,10 +336,10 @@ class OutlineRootItem(QTreeWidget):
         self.setDragDropMode(QAbstractItemView.InternalMove)
     # end def
 
-    def addDummyRow(self, part_name, visible, color, parentQTreeWidgetItem = None):
-        if parentQTreeWidgetItem == None:
-            parentQTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parentQTreeWidgetItem)
+    def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
+        if parent_QTreeWidgetItem == None:
+            parent_QTreeWidgetItem = self.invisibleRootItem()
+        tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
         tw_item.setData(0, Qt.EditRole, part_name)
         tw_item.setData(1, Qt.EditRole, visible)
         tw_item.setData(2, Qt.EditRole, color)
@@ -387,24 +350,9 @@ class OutlineRootItem(QTreeWidget):
     def getInstanceCount(self):
         return len(self._instance_items)
 
-    # def getNewPath(self, indexQModelIndex):
-    #     tw_item = self.itemFromIndex(indexQModelIndex)
-    #     pathQStringList = QFileDialog.getOpenFileNames()
-    #     if pathQStringList.count() > 0:
-    #         textQString = pathQStringList.first()
-    #         tw_item.setData(indexQModelIndex.column(), Qt.EditRole, textQString)
-    # end def
-
     ### SIGNALS ###
 
     ### SLOTS ###
-    # def itemClicked(self, item, column):
-    #     print("itemClicked", item, column)
-    #
-    # def itemDoubleClicked(self, item, column):
-    #     print("itemDoubleClicked", item, column)
-
-
     def partAddedSlot(self, sender, model_part):
         """
         Receives notification from the model that a part has been added.
@@ -413,15 +361,9 @@ class OutlineRootItem(QTreeWidget):
         part_type = model_part.__class__.__name__
         if part_type == "PlasmidPart":
             plasmid_part_item = PlasmidPartItem(model_part, parent=self)
-            # self.addTopLevelItem(plasmid_part_item)
-            # self.itemDoubleClicked.connect(plasmid_part_item.doubleClickedSlot)
-            # self._instance_items[plasmid_part_item] = plasmid_part_item
-
         elif part_type in ["HoneycombPart", "SquarePart"]:
             origami_part_item = OrigamiPartItem(model_part, parent=self)
             self.addTopLevelItem(origami_part_item)
-            # self._instance_items[origami_part_item] = origami_part_item
-            # self.setModifyState(self._window.action_modify.isChecked())
         else:
             print(part_type)
             raise NotImplementedError
@@ -471,7 +413,7 @@ class OutlineRootItem(QTreeWidget):
         self._document = document
         self._controller = ViewRootController(self, document)
         if len(self._instance_items) > 0:
-            raise ImportError
+            raise ImportError("resetDocumentAndController no _instance_items")
     # end def
 
     def setModifyState(self, bool):

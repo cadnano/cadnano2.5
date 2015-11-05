@@ -42,13 +42,27 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self.hide()
         # drawing related
 
-        self.isHovered = False
+        # self.is_hovered = False
         self.setAcceptHoverEvents(True)
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(self._ZVALUE)
         self.lastMousePressAddedBases = False
 
-        part_color = QColor(self.part().getProperty("color"))
+        self.updateProperty()
+
+        # handle the label specific stuff
+        self._label = self.createLabel()
+        self.setNumber()
+        self._pen1, self._pen2 = (QPen(), QPen())
+        self.createArrows()
+
+        self._controller = VirtualHelixItemController(self, model_virtual_helix)
+
+        self.show()
+    # end def
+
+    def updateProperty(self):
+        part_color = QColor(self.part().getProperty('color'))
         part_color_A64 = QColor(part_color)
         part_color_A64.setAlpha(64)
         part_color_A128 = QColor(part_color)
@@ -77,16 +91,6 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)
         self.setRect(self._RECT)
-
-        # handle the label specific stuff
-        self._label = self.createLabel()
-        self.setNumber()
-        self._pen1, self._pen2 = (QPen(), QPen())
-        self.createArrows()
-
-        self._controller = VirtualHelixItemController(self, model_virtual_helix)
-
-        self.show()
     # end def
 
     ### SIGNALS ###

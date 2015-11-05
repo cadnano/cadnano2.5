@@ -34,31 +34,30 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
         # properties
         self._props = defaultdict(dict)
         self._model_props = m_props = m_p.getPropertyDict()
-        self._props["name"]["column"] = NAME_COL
-        self._props["visible"]["column"] = VISIBLE_COL
-        self._props["color"]["column"] = COLOR_COL
+        self._props['name']['column'] = NAME_COL
+        self._props['visible']['column'] = VISIBLE_COL
+        self._props['color']['column'] = COLOR_COL
 
         for p in self._props:
             if p in m_props:
-                self._props[p]["value"] = m_props[p]
+                self._props[p]['value'] = m_props[p]
             else:
-                self._props[p]["value"] = "?"
+                self._props[p]['value'] = "?"
         for p in self._props:
-            col = self._props[p]["column"]
-            value = self._props[p]["value"]
+            col = self._props[p]['column']
+            value = self._props[p]['value']
             self.setData(col, Qt.EditRole, value)
 
         # outlinerview takes responsibility of overriding default part color
-        if self._props["color"]["value"] == "#000000":
-            index = len(m_p.document().children())-1
+        if self._props['color']['value'] == "#000000":
+            index = len(m_p.document().children()) - 1
             new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
-            self._model_part.setProperty("color", new_color)
+            self._model_part.setProperty('color', new_color)
 
         # item groups
         self._root_items = {}
-        self._root_items["Strands"] = self._createRootItem("Strands", self)
-        # self._root_items["Staples"] = self._createRootItem("Staples", self)
-        self._root_items["Modifications"] = self._createRootItem("Modifications", self)
+        self._root_items['Strands'] = self._createRootItem('Strands', self)
+        self._root_items['Modifications'] = self._createRootItem('Modifications', self)
         self._items = {} # children
     # end def
 
@@ -88,7 +87,7 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     def updateModel(self):
         # find what changed
         for p in self._props:
-            col = self._props[p]["column"]
+            col = self._props[p]['column']
             v = self.data(col, Qt.DisplayRole)
             m_v = self._model_part.getProperty(p)
             if v != m_v:
@@ -120,7 +119,7 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
             if property_key in self._props:
-                col = self._props[property_key]["column"]
+                col = self._props[property_key]['column']
                 value = self.data(col, Qt.DisplayRole)
                 if value != new_value:
                     self.setData(col, Qt.EditRole, new_value)

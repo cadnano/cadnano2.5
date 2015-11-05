@@ -43,7 +43,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self._model_props = m_props = m_p.getPropertyDict()
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
-        self._scaleFactor = self._RADIUS/m_p.radius()
+        self._scaleFactor = self._RADIUS / m_p.radius()
         self._empty_helix_hash = {}
         self._virtual_helix_hash = {}
         self._nrows, self._ncols = 0, 0
@@ -104,17 +104,14 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
-            if property_key == "color":
+            if property_key == 'color':
+                for _, vhi in self._virtual_helix_hash.items():
+                    vhi.updateProperty()
+                for _, ehi in self._empty_helix_hash.items():
+                    ehi.updateProperty()
+            elif property_key == 'circular':
                 pass
-                # color = QColor(new_value)
-                # self._outer_line.updateColor(color)
-                # self._inner_line.updateColor(color)
-                # self._hover_region.dummy.updateColor(color)
-                # for dsi in self._selection_items:
-                #     dsi.updateColor(color)
-            elif property_key == "circular":
-                pass
-            elif property_key == "dna_sequence":
+            elif property_key == 'dna_sequence':
                 pass
                 # self.updateRects()
     # end def
@@ -156,11 +153,11 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         view.scene_root_item.resetTransform()
         view.centerOn(vhi)
         view.zoomIn()
-        mC = self._mod_circ
+        m_c = self._mod_circ
         x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
-        mC.setPos(x,y)
+        m_c.setPos(x,y)
         if self._can_show_mod_circ:
-            mC.show()
+            m_c.show()
     # end def
 
     def partVirtualHelixAddedSlot(self, sender, virtual_helix):
@@ -193,7 +190,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         """Set this Z to front, and return other Zs to default."""
         if is_selected:
             self._drag_handle.resetAppearance(styles.SELECTED_ALPHA)
-            self.setZValue(styles.ZPARTITEM+1)
+            self.setZValue(styles.ZPARTITEM + 1)
         else:
             self._drag_handle.resetAppearance(styles.DEFAULT_ALPHA)
             self.setZValue(styles.ZPARTITEM)
@@ -360,7 +357,7 @@ class DnaDragHandle(QGraphicsRectItem):
         self._resizingRectItem.setPen(QPen(color))
         self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
         # self.setBrush(QBrush(styles.MIDGRAY_FILL))
-        
+
         # color.setAlpha(alpha) 230,230,230
         # self.setBrush(QBrush(color))
     # end def
@@ -371,21 +368,21 @@ class DnaDragHandle(QGraphicsRectItem):
         _width = 6
         _bound = PartEdges.NONE
         if abs(_y - _r.top()) < _width: _bound |= PartEdges.TOP
-        if abs(_x - _r.left()) < _width: _bound |= PartEdges.LEFT 
-        if abs(_x - _r.right()) < _width: _bound |= PartEdges.RIGHT 
+        if abs(_x - _r.left()) < _width: _bound |= PartEdges.LEFT
+        if abs(_x - _r.right()) < _width: _bound |= PartEdges.RIGHT
         if abs(_y - _r.bottom()) < _width: _bound |= PartEdges.BOTTOM
         return _bound
 
     def getCursor(self, bound):
-        if ((bound&PartEdges.TOP and bound&PartEdges.LEFT) or
-           (bound&PartEdges.BOTTOM and bound&PartEdges.RIGHT)):
+        if ((bound & PartEdges.TOP and bound & PartEdges.LEFT) or
+           (bound & PartEdges.BOTTOM and bound & PartEdges.RIGHT)):
             _cursor = Qt.SizeFDiagCursor
-        elif ((bound&PartEdges.TOP and bound&PartEdges.RIGHT) or
-             (bound&PartEdges.BOTTOM and bound&PartEdges.LEFT)):
+        elif ((bound & PartEdges.TOP and bound & PartEdges.RIGHT) or
+             (bound & PartEdges.BOTTOM and bound & PartEdges.LEFT)):
             _cursor = Qt.SizeBDiagCursor
-        elif (bound&PartEdges.LEFT or bound&PartEdges.RIGHT):
+        elif (bound & PartEdges.LEFT or bound & PartEdges.RIGHT):
             _cursor = Qt.SizeHorCursor
-        elif (bound&PartEdges.TOP or bound&PartEdges.BOTTOM):
+        elif (bound & PartEdges.TOP or bound & PartEdges.BOTTOM):
             _cursor = Qt.SizeVerCursor
         else:
             _cursor = Qt.OpenHandCursor
@@ -439,10 +436,10 @@ class DnaDragHandle(QGraphicsRectItem):
             _x, _y = event.pos().x(), event.pos().y()
             _r = QRectF(self._parent._outlinerect)
             _e = self._edgesToResize
-            if _e&PartEdges.TOP: _r.setTop(_y)
-            if _e&PartEdges.LEFT: _r.setLeft(_x)
-            if _e&PartEdges.RIGHT: _r.setRight(_x)
-            if _e&PartEdges.BOTTOM: _r.setBottom(_y)
+            if _e & PartEdges.TOP: _r.setTop(_y)
+            if _e & PartEdges.LEFT: _r.setLeft(_x)
+            if _e & PartEdges.RIGHT: _r.setRight(_x)
+            if _e & PartEdges.BOTTOM: _r.setBottom(_y)
             self._resizingRectItem.setRect(_r)
         else:
             self._parent.setPos(p)
@@ -460,7 +457,7 @@ class DnaDragHandle(QGraphicsRectItem):
             rRect = self.mapRectToScene(self._resizingRectItem.rect())
             # only show helices >50% inside rRect
             for _ehi in self._parent._empty_helix_hash.values():
-                if rRect.contains(self.mapToScene(_ehi.pos()+_ehi.boundingRect().center())):
+                if rRect.contains(self.mapToScene(_ehi.pos() + _ehi.boundingRect().center())):
                     _ehi.show() # _ehi.setHovered()
                     # update bounds
                     x1 = min(x1, _ehi.pos().x())
@@ -470,7 +467,8 @@ class DnaDragHandle(QGraphicsRectItem):
                 else:
                     _ehi.hide() # _ehi.setNotHovered()
             # update everything to new rect after padding
-            self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
+            self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),
+                                                            QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
             self._resizingRectItem.setRect(_newRect)
             self._resizing = False
             self.setRect(_newRect)

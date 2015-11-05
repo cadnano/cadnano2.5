@@ -23,10 +23,6 @@ _strand_re = re.compile("(\w+)\:\((\d+),(\d+)\)\.0\^(\d+)")
 class EmptyHelixItem(QGraphicsEllipseItem):
     """docstring for EmptyHelixItem"""
     # set up default, hover, and active drawing styles
-    _DEFAULT_BRUSH = QBrush(styles.GRAY_FILL)
-    _DEFAULT_PEN = QPen(styles.GRAY_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-    _HOVER_BRUSH = QBrush(styles.BLUE_FILL)
-    _HOVER_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
     _RADIUS = styles.SLICE_HELIX_RADIUS
     temp = styles.SLICE_HELIX_STROKE_WIDTH
     _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -52,9 +48,20 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self._is_hovered = False
         self.setAcceptHoverEvents(True)
 
+        self.updateProperty()
+
+        self.setNotHovered()
+
+        x, y = part_item.part().latticeCoordToPositionXY(row, column, part_item.scaleFactor())
+        self.setPos(x, y)
+        self._coord = (row, column)
+        self.show()
+    # end def
+
+    def updateProperty(self):
         # part-specific styles
-        if part_item.part().partType() == PartType.NUCLEICACIDPART:
-            part_color = QColor(self.part().getProperty("color"))
+        if self._part_item.part().partType() == PartType.NUCLEICACIDPART:
+            part_color = QColor(self.part().getProperty('color'))
             part_color_A64 = QColor(part_color)
             part_color_A64.setAlpha(64)
             part_color_A128 = QColor(part_color)
@@ -70,18 +77,14 @@ class EmptyHelixItem(QGraphicsEllipseItem):
             self._DEFAULT_BRUSH = QBrush(part_color_A64)
 
 
-            glow = QGraphicsDropShadowEffect()
-            glow.setColor(part_color)
-            glow.setBlurRadius(1)
-            glow.setOffset(1)
-            self.setGraphicsEffect(glow)
-
-        self.setNotHovered()
-
-        x, y = part_item.part().latticeCoordToPositionXY(row, column, part_item.scaleFactor())
-        self.setPos(x, y)
-        self._coord = (row, column)
-        self.show()
+            # glow = QGraphicsDropShadowEffect()
+            # glow.setColor(part_color)
+            # glow.setBlurRadius(1)
+            # glow.setOffset(1)
+            # self.setGraphicsEffect(glow)
+            self.setBrush(self._DEFAULT_BRUSH)
+            self.setPen(self._DEFAULT_PEN)
+            self.setRect(self._DEFAULT_RECT)
     # end def
 
     def virtualHelix(self):
@@ -158,6 +161,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # self.setFlag(QGraphicsItem.ItemHasNoContents, drawMe)
         self.setBrush(self._DEFAULT_BRUSH)
         self.setPen(self._DEFAULT_PEN)
+        self.update(self.boundingRect())
         # self.translateVH(self._ADJUSTMENT_MINUS)
         self._is_hovered = False
         self.setZValue(self._Z_DEFAULT)
@@ -449,39 +453,39 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self._part_item.updateStatusBar("%s:(%d, %d)" % tup)
     # end def
 
-    if GL:
-        def paint(self, painter, option, widget):
-            painter.beginNativePainting()
+    # if GL:
+    #     def paint(self, painter, option, widget):
+    #         painter.beginNativePainting()
 
-            radius = self._RADIUS
+    #         radius = self._RADIUS
 
-            # GL.glPushAttrib(GL.GL_ALL_ATTRIB_BITS)
-            # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
+    #         # GL.glPushAttrib(GL.GL_ALL_ATTRIB_BITS)
+    #         # GL.glClear(GL.GL_COLOR_BUFFER_BIT)
 
-            # Draw the filled circle
+    #         # Draw the filled circle
 
-            GL.glColor3f (1, 0.5, 0)       # Set to orange
+    #         GL.glColor3f (1, 0.5, 0)       # Set to orange
 
-            GL.glBegin (GL.GL_POLYGON)
-            for X, Y in self._temp:
-                GL.glVertex2f (X,Y)
-            # end for
-            GL.glEnd()
+    #         GL.glBegin (GL.GL_POLYGON)
+    #         for X, Y in self._temp:
+    #             GL.glVertex2f (X,Y)
+    #         # end for
+    #         GL.glEnd()
 
-            # Draw the anti-aliased outline
+    #         # Draw the anti-aliased outline
 
-            # GL.glEnable(GL.GL_BLEND)
-            # GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
-            # GL.glEnable(GL.GL_LINE_SMOOTH)
+    #         # GL.glEnable(GL.GL_BLEND)
+    #         # GL.glBlendFunc(GL.GL_SRC_ALPHA, GL.GL_ONE_MINUS_SRC_ALPHA)
+    #         # GL.glEnable(GL.GL_LINE_SMOOTH)
 
-            # GL.glBegin(GL.GL_LINE_LOOP)
-            # for angle in [x*PI*0.01 for x in range(200)]:
-            #     GL.glVertex2f(X + math.sin(angle) * radius, Y + math.cos(angle) * radius)
-            # # end for
-            # GL.glDisable(GL.GL_BLEND)
-            # GL.glEnd()
-            # GL.glPopAttrib()
-            painter.endNativePainting()
-        # end def
+    #         # GL.glBegin(GL.GL_LINE_LOOP)
+    #         # for angle in [x*PI*0.01 for x in range(200)]:
+    #         #     GL.glVertex2f(X + math.sin(angle) * radius, Y + math.cos(angle) * radius)
+    #         # # end for
+    #         # GL.glDisable(GL.GL_BLEND)
+    #         # GL.glEnd()
+    #         # GL.glPopAttrib()
+    #         painter.endNativePainting()
+    #     # end def
     # end if
 

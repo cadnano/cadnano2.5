@@ -5,11 +5,11 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QRect, QSize
 from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
-from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
+from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
-from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QSpinBox, QLineEdit
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
-from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
+from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
 from cadnano import util
@@ -32,7 +32,7 @@ class PropertyEditorWidget(QTreeWidget):
     """
     def __init__(self, parent=None):
         super(PropertyEditorWidget, self).__init__(parent)
-        self.setAttribute(Qt.WA_MacShowFocusRect,0) # no mac focus halo
+        self.setAttribute(Qt.WA_MacShowFocusRect, 0) # no mac focus halo
 
     def configure(self, window, document):
         self._window = window
@@ -51,11 +51,9 @@ class PropertyEditorWidget(QTreeWidget):
         h.setSectionResizeMode(QHeaderView.Stretch)
         h.setSectionsMovable(True)
 
-        custom_delegate = CustomDelegate()
+        custom_delegate = CustomStyleItemDelegate(self)
         self.setItemDelegate(custom_delegate)
 
-
-        # self.itemFromIndex(model_index).setPartProperty()
         self.model().dataChanged.connect(self.dataChangedSlot)
 
         # Add some dummy items
@@ -63,10 +61,10 @@ class PropertyEditorWidget(QTreeWidget):
         # p2 = self.addDummyRow("circular",  True)
     # end def
 
-    def addDummyRow(self, property_name, value, parentQTreeWidgetItem = None):
-        if parentQTreeWidgetItem == None:
-            parentQTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parentQTreeWidgetItem)
+    def addDummyRow(self, property_name, value, parent_QTreeWidgetItem=None):
+        if parent_QTreeWidgetItem is None:
+            parent_QTreeWidgetItem = self.invisibleRootItem()
+        tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
         tw_item.setData(0, Qt.EditRole, property_name)
         tw_item.setData(1, Qt.EditRole, value)
         tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
@@ -78,11 +76,11 @@ class PropertyEditorWidget(QTreeWidget):
     ### SLOTS ###
     def outlinerItemSelectionChanged(self):
         o = self._window.outliner_widget
-        sel = o.selectedItems()
-        self.clear()
-        if len(sel) == 1:
+        selected_items = o.selectedItems()
+        self.clear()    # remove pre-existing items
+        if len(selected_items) == 1:
             # get the selected item
-            item = sel[0]
+            item = selected_items[0]
             item_type = item.itemType()
             if item_type is ItemType.PLASMID:
                 pe_item = PlasmidPartItem(item.part(), self)
@@ -152,28 +150,28 @@ class PropertyEditorWidget(QTreeWidget):
         self._controller = ViewRootController(self, document)
     # end def
 
-# end class CustomDelegate
+# end class PropertyEditorWidget
 
 
-class CustomDelegate(QStyledItemDelegate):
-    def createEditor(self, parentQWidget, option, model_index):
+class CustomStyleItemDelegate(QStyledItemDelegate):
+    def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
         if column == 0: # Property Name
             return None
         elif column == 1: # Visibility checkbox
             data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
             if data_type is str:
-                editor = QLineEdit(parentQWidget)
+                editor = QLineEdit(parent_QWidget)
             elif data_type is int:
-                editor = QSpinBox(parentQWidget)
+                editor = QSpinBox(parent_QWidget)
             elif data_type is bool:
-                editor = QCheckBox(parentQWidget)
+                editor = QCheckBox(parent_QWidget)
             else:
                 raise NotImplementedError
             return editor
         else:
             return QStyledItemDelegate.createEditor(self, \
-                            parentQWidget, option, model_index)
+                            parent_QWidget, option, model_index)
     # end def
 
     def setEditorData(self, editor, model_index):
@@ -227,7 +225,7 @@ class CustomDelegate(QStyledItemDelegate):
             data_type = type(value)
             if data_type is bool:
                 rect = QRect(option.rect)
-                delta = option.rect.width()/2 - 9
+                delta = option.rect.width() / 2 - 9
                 rect.setX(option.rect.x() + delta) # Hack to center the checkbox
                 editor.setGeometry(rect)
             else:
@@ -272,4 +270,4 @@ class CustomDelegate(QStyledItemDelegate):
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)
     # end def
-# end class CustomDelegate
+# end class CustomStyleItemDelegate
