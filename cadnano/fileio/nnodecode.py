@@ -5,7 +5,7 @@ import io
 
 from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
-from cadnano.color import Color
+from cadnano.color import Color, intToColor
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
@@ -72,7 +72,7 @@ def decode(document, obj):
         # num_cols = max(32, max_col_json, cadnano.app().prefs.honeycombCols)
         num_rows = max(30, max_row_json, prefs.HONEYCOMB_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.HONEYCOMB_PART_MAXCOLS)
-        part = document.addHoneycombPart(max_row=num_rows, max_col=num_cols, max_steps=steps)
+        part = document.addHoneycombDnaPart(max_row=num_rows, max_col=num_cols, max_steps=steps)
     elif lattice_type == LatticeType.SQUARE:
         is_SQ_100 = True  # check for custom SQ100 format
         for helix in obj['vstrands']:
@@ -89,7 +89,7 @@ def decode(document, obj):
         # num_cols = max(32, max_col_json, cadnano.app().prefs.squareCols)
         num_rows = max(30, max_row_json, prefs.SQUARE_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.SQUARE_PART_MAXCOLS)
-        part = document.addSquarePart(max_row=num_rows, max_col=num_cols, max_steps=steps)
+        part = document.addSquareDnaPart(max_row=num_rows, max_col=num_cols, max_steps=steps)
         # part = SquarePart(document=document, max_row=num_rows, max_col=num_cols, max_steps=steps)
     else:
         raise TypeError("Lattice type not recognized")
@@ -239,10 +239,10 @@ def decode(document, obj):
         # end for
         # populate colors
         for base_idx, color_number in helix['stap_colors']:
-            color = Color(  (color_number >> 16) & 0xFF,
-                            (color_number >> 8) & 0xFF,
-                            color_number & 0xFF).name()
-
+            # color = Color(  (color_number >> 16) & 0xFF,
+            #                 (color_number >> 8) & 0xFF,
+            #                 color_number & 0xFF).name()
+            color = intToColor(color_number).name()
             strand = stap_strand_set.getStrand(base_idx)
             strand.oligo().applyColor(color, use_undostack=False)
 
