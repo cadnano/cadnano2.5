@@ -133,9 +133,11 @@ class RemoveXoverCommand(UndoCommand):
         self._strand3p = strand3p
         self._strand3p_idx = strand3p.idx5Prime()
         n_o3p = self._new_oligo3p = strand3p.oligo().shallowCopy()
-        colorList = prefs.STAP_COLORS if strand5p.strandSet().isStaple() \
-                                        else prefs.SCAF_COLORS
-        n_o3p.setColor(random.choice(colorList).name())
+        # color_list = prefs.STAP_COLORS if strand5p.strandSet().isStaple() \
+        #                                 else prefs.SCAF_COLORS
+        color_list = prefs.STAP_COLORS if strand5p.strandSet().isStaple() \
+                                        else [part.getColor()]
+        n_o3p.setColor(random.choice(color_list).name())
         n_o3p.setLength(0)
         for strand in strand3p.generator3pStrand():
             n_o3p.incrementLength(strand.totalLength())

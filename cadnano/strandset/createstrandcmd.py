@@ -23,7 +23,7 @@ class CreateStrandCommand(UndoCommand):
             color = random.choice(color_list).name()
         else:
             #prefs.SCAF_COLORS
-            color = strandset.part().getPropertyDict()["color"]
+            color = strandset.part().getProperty('color')
         self._new_oligo = Oligo(None, color)  # redo will set part
         self._new_oligo.setLength(self._strand.totalLength())
     # end def

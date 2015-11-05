@@ -6,6 +6,9 @@ except:
             self.setRgb(r, g, b, a)
         # end def
 
+        def __repr__(self):
+            return self.hex()
+
         def setRgb(self, r, g, b, a=255):
             self.r = r
             self.g = g

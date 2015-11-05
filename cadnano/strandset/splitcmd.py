@@ -36,8 +36,10 @@ class SplitCommand(UndoCommand):
         else:
             self._l_oligo = l_oligo = oligo.shallowCopy()
             self._h_oligo = h_oligo = oligo.shallowCopy()
+        # color_list = prefs.STAP_COLORS if s_set.isStaple() \
+        #                                 else prefs.SCAF_COLORS
         color_list = prefs.STAP_COLORS if s_set.isStaple() \
-                                        else prefs.SCAF_COLORS
+                                            else [strand.part().getColor()]
         # end
 
         # Determine oligo retention based on strand priority
