@@ -5,15 +5,15 @@ from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPen, QColor, QPainterPath,
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT
 # precalculate the height of a number font.  Assumes a fixed font
 # and that only numbers will be used for labels
 _FM = QFontMetrics(_toHelixNumFont)
-_ENAB_BRUSH = QBrush(Qt.SolidPattern)  # Also for the helix number label
-_NO_BRUSH = QBrush(Qt.NoBrush)
+_ENAB_BRUSH = getSolidBrush() # Also for the helix number label
+_NO_BRUSH = getNoBrush()
 # _RECT = QRectF(0, 0, baseWidth, baseWidth)
 _X_SCALE = styles.PATH_XOVER_LINE_SCALE_X  # control point x constant
 _Y_SCALE = styles.PATH_XOVER_LINE_SCALE_Y  # control point y constant
@@ -35,9 +35,8 @@ class XoverNode3(QGraphicsRectItem):
 
         self.setPartnerVirtualHelix(strand3p)
 
-        self.setPen(QPen(Qt.NoPen))
+        self.setPen(getNoPen())
         self._label = None
-        self.setPen(QPen(Qt.NoPen))
         self.setBrush(_NO_BRUSH)
         self.setRect(_RECT)
         self.setZValue(styles.ZXOVERITEM)
@@ -235,7 +234,7 @@ class XoverItem(QGraphicsPathItem):
         # c_a.hoverMoveEvent = self.hoverMoveEvent
         c_a.mousePressEvent = self.mousePressEvent
         c_a.mouseMoveEvent = self.mouseMoveEvent
-        c_a.setPen(QPen(Qt.NoPen))
+        c_a.setPen(getNoPen())
 
         self._getActiveTool = strand_item._getActiveTool
 
@@ -433,15 +432,14 @@ class XoverItem(QGraphicsPathItem):
 
     def _updateColor(self, strand):
         oligo = strand.oligo()
-        color = self.pen().color() if self.isSelected() else QColor(oligo.color())
-        # print "update xover color", color.value(), self.isSelected(), self.group(), self.parentItem()
-        pen_width = styles.PATH_STRAND_STROKE_WIDTH
+        color = self.pen().color().name() if self.isSelected() else oligo.color()
         if oligo.shouldHighlight():
             pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
-            color.setAlpha(128)
-        pen = QPen(color, pen_width)
-        # pen.setCosmetic(True)
-        pen.setCapStyle(Qt.FlatCap)
+            alpha = 128
+        else:
+            pen_width = styles.PATH_STRAND_STROKE_WIDTH
+            alpha = 255
+        pen = getPenObj(color, pen_width, alpha=alpha, capstyle=Qt.FlatCap)
         self.setPen(pen)
     # end def
 

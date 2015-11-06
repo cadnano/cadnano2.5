@@ -1,3 +1,8 @@
+"""
+Module for caching QColor, QPen, and QBrush objects
+could also cache QFont objects as well
+"""
+
 from PyQt5.QtGui import QColor, QPen, QBrush
 from PyQt5.QtCore import Qt
 
