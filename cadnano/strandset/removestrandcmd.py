@@ -34,7 +34,7 @@ class RemoveStrandCommand(UndoCommand):
             olg3p.setStrand5p(self._old_strand3p)
             # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
             color_list = prefs.STAP_COLORS if strandset.isStaple() else [part.getColor()]
-            color = random.choice(color_list).name()
+            color = random.choice(color_list)
             olg3p.setColor(color)
             olg3p.refreshLength()
     # end def

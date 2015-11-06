@@ -49,3 +49,6 @@ def intToColor(color_number):
     """ legacy color support
     """
     return Color('#' + hex(color_number)[2:])
+
+def intToColorHex(color_number):
+    return '#' + hex(color_number)[2:]

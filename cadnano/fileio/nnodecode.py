@@ -5,7 +5,7 @@ import io
 
 from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
-from cadnano.color import Color, intToColor
+from cadnano.color import intToColorHex
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
@@ -239,10 +239,7 @@ def decode(document, obj):
         # end for
         # populate colors
         for base_idx, color_number in helix['stap_colors']:
-            # color = Color(  (color_number >> 16) & 0xFF,
-            #                 (color_number >> 8) & 0xFF,
-            #                 color_number & 0xFF).name()
-            color = intToColor(color_number).name()
+            color = intToColorHex(color_number)
             strand = stap_strand_set.getStrand(base_idx)
             strand.oligo().applyColor(color, use_undostack=False)
 

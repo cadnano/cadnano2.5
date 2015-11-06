@@ -3,7 +3,7 @@ import re
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QRect, QSize
-from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
+from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 
 from cadnano import util
 from cadnano.enum import ItemType
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
 from .plasmidpartitem import PlasmidPartItem
@@ -247,7 +248,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 if COLOR_PATTERN.search(value):
                     element = _QCOMMONSTYLE.PE_IndicatorCheckBox
                     styleoption = QStyleOptionViewItem()
-                    styleoption.palette.setBrush(QPalette.Button, QBrush(QColor(value)))
+                    styleoption.palette.setBrush(QPalette.Button, getBrushObj(value))
                     styleoption.rect = QRect(option.rect)
                     _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
                 option.displayAlignment = Qt.AlignVCenter

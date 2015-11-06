@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QApplication
 from cadnano import getReopen
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import PlasmidPartItemController
+from cadnano.gui.palette import getPenObj, getBrushObj
 from . import slicestyles as styles
 from .virtualhelixitem import VirtualHelixItem
 
@@ -19,12 +20,12 @@ HOVER_WIDTH = H_W = 20
 GAP = 2 # gap between inner and outer strands
 
 _DNALINE_WIDTH = 1
-_DNA_PEN = QPen(styles.BLUE_STROKE, _DNALINE_WIDTH)
-_DNA_BRUSH = QBrush(QColor(153, 204, 255, 128), 1)
+_DNA_PEN = getPenObj(styles.BLUE_STROKE, _DNALINE_WIDTH)
+_DNA_BRUSH = getBrushObj('#8099ccff')
 _SELECT_STROKE_WIDTH = 10
 
-_HOVER_PEN = QPen(QColor(255, 255, 255), 128)
-_HOVER_BRUSH = QBrush(QColor(255, 255, 255, 0))
+_HOVER_PEN = getPenObj('#ffffff', 128)
+_HOVER_BRUSH = getBrushObj('#ffffff')
 
 class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
 

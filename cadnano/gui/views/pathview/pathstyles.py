@@ -1,4 +1,4 @@
-from PyQt5.QtGui import QColor, QFont, QFontMetricsF
+from PyQt5.QtGui import QFont, QFontMetricsF
 
 from cadnano.gui.views.styles import *
 
@@ -25,51 +25,41 @@ PATH_XOVER_LINE_SCALE_X = 0.035
 PATH_XOVER_LINE_SCALE_Y = 0.035
 
 # Path Colors
-SCAFFOLD_BKG_FILL = QColor(230, 230, 230)
-ACTIVE_SLICE_HANDLE_FILL = QColor(255, 204, 153, 128)  # ffcc99
-ACTIVE_SLICE_HANDLE_STROKE = QColor(204, 102, 51, 128)  # cc6633
-MINOR_GRID_STROKE = QColor(204, 204, 204)  # 999999
-MAJOR_GRID_STROKE = QColor(153, 153, 153)  # 333333
-SCAF_STROKE = QColor(0, 102, 204)  # 0066cc
-HANDLE_FILL = QColor(0, 102, 204)  # 0066cc
-PXI_SCAF_STROKE = QColor(0, 102, 204, 153)
-PXI_STAP_STROKE = QColor(204, 0, 0, 153)
-PXI_DISAB_STROKE = QColor(204, 204, 204, 255)
-RED_STROKE = QColor(204, 0, 0)
-ERASE_FILL = QColor(204, 0, 0, 63)
-FORCE_FILL = QColor(0, 255, 255, 63)
-BREAK_FILL = QColor(204, 0, 0, 255)
-COLORBOX_FILL = QColor(204, 0, 0)
-COLORBOX_STROKE = QColor(102, 102, 102)
-STAP_COLORS = [QColor(204, 0, 0),
-              QColor(247, 67, 8),
-              QColor(247, 147, 30),
-              QColor(170, 170, 0),
-              QColor(87, 187, 0),
-              QColor(0, 114, 0),
-              QColor(3, 182, 162),
-              QColor(23, 0, 222),
-              QColor(115, 0, 222),
-              QColor(184, 5, 108),
-              QColor(51, 51, 51),
-              QColor(136, 136, 136)]
-SCAF_COLORS = [QColor(0, 102, 204)]
-              # QColor(64, 138, 212),
-              # QColor(0, 38, 76),
-              # QColor(23, 50, 76),
-              # QColor(0, 76, 153)]
+SCAFFOLD_BKG_FILL = '#e6e6e6'
+ACTIVE_SLICE_HANDLE_FILL = '#80ffcc99'
+ACTIVE_SLICE_HANDLE_STROKE = '#80cc6633'
+MINOR_GRID_STROKE = '#999999'
+MAJOR_GRID_STROKE = '#333333'
+SCAF_STROKE = '#0066cc'
+HANDLE_FILL = '#0066cc'
+PXI_SCAF_STROKE = '#990066cc'
+PXI_STAP_STROKE = '#99cc0000'
+PXI_DISAB_STROKE = '#ffcccccc'
+RED_STROKE = '#cc0000'
+ERASE_FILL = '#3fcc0000'
+FORCE_FILL = '#3f00ffff'
+BREAK_FILL = '#ffcc0000'
+COLORBOX_FILL = '#cc0000'
+COLORBOX_STROKE = '#666666'
+STAP_COLORS = ['#cc0000',
+              '#f74308',
+              '#f7931e',
+              '#aaaa00',
+              '#57bb00',
+              '#007200',
+              '#03b6a2',
+              '#1700de',
+              '#7300de',
+              '#b8056c',
+              '#333333',
+              '#888888']
+SCAF_COLORS = ['#0066cc']
+
 DEFAULT_STAP_COLOR = "#888888"
 DEFAULT_SCAF_COLOR = "#cc0000"
-SELECTED_COLOR = QColor(255, 51, 51)
+SELECTED_COLOR = '#ff3333'
 SELECTED_ALPHA = 12
 DEFAULT_ALPHA = 4
-
-# brightColors = [QColor() for i in range(10)]
-# for i in range(len(brightColors)):
-#     brightColors[i].setHsvF(i/12.0, 1.0, 1.0)
-# bright_palette = Palette(brightColors)
-# cadnn1_palette = Palette(cadnn1Colors)
-# default_palette = cadnn1_palette
 
 SELECTIONBOX_PEN_WIDTH = 2.5
 
@@ -78,7 +68,7 @@ INSERTWIDTH = 2
 SKIPWIDTH = 2
 
 # Add Sequence Tool
-INVALID_DNA_COLOR = QColor(204, 0, 0)
+INVALID_DNA_COLOR = '#cc0000'
 UNDERLINE_INVALID_DNA = True
 
 #Z values
@@ -132,4 +122,4 @@ def setFontMetrics():
 
 XOVER_LABEL_FONT = QFont(THE_FONT, THE_FONT_SIZE, QFont.Bold)
 VIRTUALHELIXHANDLEITEM_FONT = QFont(THE_FONT, 3*THE_FONT_SIZE, QFont.Bold)
-XOVER_LABEL_COLOR = QColor(0,0,0) 
+XOVER_LABEL_COLOR = QColor(0,0,0)

@@ -1,4 +1,5 @@
 from cadnano import util
+from cadnano.gui.palette import getPenObj, getBrushObj
 from . import pathstyles as styles
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
@@ -11,12 +12,12 @@ from PyQt5.QtWidgets import QUndoCommand, QGraphicsEllipseItem, QStyle
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
 _RECT = QRectF(0, 0, 2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,\
         2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-_DEF_BRUSH = QBrush(styles.GRAY_FILL)
-_DEF_PEN = QPen(styles.GRAY_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-_HOV_BRUSH = QBrush(styles.BLUE_FILL)
-_HOV_PEN = QPen(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-_USE_BRUSH = QBrush(styles.ORANGE_FILL)
-_USE_PEN = QPen(styles.ORANGE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+_DEF_BRUSH = getBrushObj(styles.GRAY_FILL)
+_DEF_PEN = getPenObj(styles.GRAY_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+_HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
+_HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+_USE_BRUSH = getBrushObj(styles.ORANGE_FILL)
+_USE_PEN = getPenObj(styles.ORANGE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
 

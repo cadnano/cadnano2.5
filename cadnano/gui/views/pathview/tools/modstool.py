@@ -1,7 +1,6 @@
 import sys
 
 from PyQt5.QtCore import QSignalMapper
-from PyQt5.QtGui import QBrush, QColor
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QPushButton
 
 from cadnano.data.sequencemods import mods

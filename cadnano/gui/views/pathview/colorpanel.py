@@ -4,6 +4,7 @@ from PyQt5.QtGui import QBrush, QFont, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSimpleTextItem, QColorDialog
 
 from cadnano import util
+from cadnano.gui.palette import getPenObj, getBrushObj, newBrushObj, getColorObj
 from . import pathstyles as styles
 
 
@@ -11,8 +12,8 @@ _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 
 
 class ColorPanel(QGraphicsItem):
-    _scaf_colors = styles.SCAF_COLORS
-    _stap_colors = styles.STAP_COLORS
+    _scaf_colors = [getColorObj(x) for x in styles.SCAF_COLORS]
+    _stap_colors = [getColorObj(x) for x in styles.STAP_COLORS]
     _PEN = Qt.NoPen
 
     def __init__(self, parent=None):

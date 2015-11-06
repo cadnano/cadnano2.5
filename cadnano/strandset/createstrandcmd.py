@@ -20,7 +20,7 @@ class CreateStrandCommand(UndoCommand):
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
         if strandset.isStaple():
             color_list = prefs.STAP_COLORS
-            color = random.choice(color_list).name()
+            color = random.choice(color_list)
         else:
             #prefs.SCAF_COLORS
             color = strandset.part().getProperty('color')

@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QApplication
 
 
 from cadnano import util
+from cadnano.gui.palette import getPenObj, getBrushObj
+
 from cadnano import getReopen
 from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
@@ -21,7 +23,7 @@ _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
 DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
-_MOD_PEN = QPen(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
+_MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
 _BOUNDING_RECT_PADDING = 10
 

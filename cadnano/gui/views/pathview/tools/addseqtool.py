@@ -1,13 +1,15 @@
 import re
 
 from PyQt5.QtCore import Qt, QObject, QPointF, QRegExp, QSignalMapper, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QBrush, QColor, QFont, QPen, QTextCharFormat, QSyntaxHighlighter
+from PyQt5.QtGui import QFont, QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
 
 from cadnano.data.dnasequences import sequences
 from cadnano.enum import StrandType
 from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+
 from .abstractpathtool import AbstractPathTool
 
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
@@ -17,10 +19,10 @@ class DNAHighlighter(QSyntaxHighlighter):
         QSyntaxHighlighter.__init__(self, parent)
         self.parent = parent
         self.format = QTextCharFormat()
-        self.format.setForeground(QBrush(styles.INVALID_DNA_COLOR))
+        self.format.setForeground(getBrushObj(styles.INVALID_DNA_COLOR))
         if styles.UNDERLINE_INVALID_DNA:
             self.format.setFontUnderline(True)
-            self.format.setUnderlineColor(styles.INVALID_DNA_COLOR)
+            self.format.setUnderlineColor(getColorObj(styles.INVALID_DNA_COLOR))
 
     def highlightBlock(self, text):
         for match in re.finditer(RE_DNA_PATTERN, text):

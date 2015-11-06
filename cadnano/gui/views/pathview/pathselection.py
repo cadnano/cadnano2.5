@@ -1,10 +1,11 @@
 from math import floor
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
+from PyQt5.QtGui import QPen, QPainterPath
 from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
 
 from cadnano import util
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from . import pathstyles as styles
 
 
@@ -25,7 +26,8 @@ class SelectionItemGroup(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemHasNoContents)
 
         self._rect = QRectF()
-        self._PEN = QPen(styles.BLUE_STROKE, styles.PATH_SELECTBOX_STROKE_WIDTH)
+        self._PEN = getPenObj(styles.BLUE_STROKE,
+                                styles.PATH_SELECTBOX_STROKE_WIDTH)
 
         self.selectionbox = boxtype(self)
 
@@ -119,13 +121,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
     def setSelectionLock(self, selection_group):
         self._viewroot.setSelectionLock(selection_group)
     # end def
-
-    # def paint(self, painter, option, widget=None):
-    #     # painter.setBrush(QBrush(QColor(255,128,255,128)))
-    #     painter.setPen(QPen(styles.RED_STROKE))
-    #     painter.drawRect(self.boundingRect())
-    #     pass
-    # # end def
 
     def keyPressEvent(self, event):
         """
@@ -282,7 +277,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     _HELIX_HEIGHT = styles.PATH_HELIX_HEIGHT + styles.PATH_HELIX_PADDING
     _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
     _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
-    _BOX_PEN = QPen(styles.BLUE_STROKE, _PEN_WIDTH)
+    _BOX_PEN = getPenObj(styles.BLUE_STROKE, _PEN_WIDTH)
 
     def __init__(self, item_group):
         """
@@ -386,7 +381,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
 
 class EndpointHandleSelectionBox(QGraphicsPathItem):
     _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
-    _BOX_PEN = QPen(styles.SELECTED_COLOR, _PEN_WIDTH)
+    _BOX_PEN = getPenObj(styles.SELECTED_COLOR, _PEN_WIDTH)
     _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
     def __init__(self, item_group):

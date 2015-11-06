@@ -6,19 +6,15 @@ from math import floor
 import logging
 logger = logging.getLogger(__name__)
 
-import cadnano.gui.views.pathview.pathselection as pathselection
-
-import cadnano.util as util
-
 from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
 
 from cadnano import util
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.views.pathview import pathselection
-
+import cadnano.gui.views.pathview.pathselection as pathselection
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
@@ -171,7 +167,7 @@ class EndpointItem(QGraphicsPathItem):
 
     def changeMod(self, mod_id, color):
         self._mod_id = mod_id
-        self._mod_item.setBrush(QBrush(QColor(color)))
+        self._mod_item.setBrush(QBrush(getColorObj(color)))
     # end def
 
     def destroyMod(self):
@@ -473,12 +469,13 @@ class EndpointItem(QGraphicsPathItem):
 
     def setSelectedColor(self, value):
         if value == True:
-            color = styles.SELECTED_COLOR
+            color = getColorObj(styles.SELECTED_COLOR)
         else:
             oligo = self._strand_item.strand().oligo()
-            color = QColor(oligo.color())
             if oligo.shouldHighlight():
-                color.setAlpha(128)
+                color = getColorObj(oligo.color(), alpha=128)
+            else:
+                color = getColorObj(oligo.color())
         brush = self.brush()
         brush.setColor(color)
         self.setBrush(brush)

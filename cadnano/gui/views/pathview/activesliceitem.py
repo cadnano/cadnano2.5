@@ -9,13 +9,14 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QUndoCommand
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.activesliceitemcontroller import ActiveSliceItemController
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from . import pathstyles as styles
 
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
-_BRUSH = QBrush(styles.ACTIVE_SLICE_HANDLE_FILL)
-_LABEL_BRUSH = QBrush(styles.ORANGE_STROKE)
-_PEN = QPen(styles.ACTIVE_SLICE_HANDLE_STROKE,\
+_BRUSH = getBrushObj(styles.ACTIVE_SLICE_HANDLE_FILL)
+_LABEL_BRUSH = getBrushObj(styles.ORANGE_STROKE)
+_PEN = getPenObj(styles.ACTIVE_SLICE_HANDLE_STROKE,\
             styles.SLICE_HANDLE_STROKE_WIDTH)
 _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 

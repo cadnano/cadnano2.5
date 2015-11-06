@@ -12,6 +12,7 @@ from cadnano import util
 from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
+from cadnano.gui.palette import newPenObj, getPenObj, getBrushObj, getNoBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 # _gridPen = QPen(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
@@ -33,17 +34,17 @@ class VirtualHelixItem(QGraphicsPathItem):
         self._handle = VirtualHelixHandleItem(model_virtual_helix, part_item, viewroot)
         self._last_strand_set = None
         self._last_idx = None
-        self._scaffoldBackground = None
+        self._scaffold_background = None
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
-        self.setBrush(QBrush(Qt.NoBrush))
+        self.setBrush(getNoBrush())
 
         view = viewroot.scene().views()[0]
         view.levelOfDetailChangedSignal.connect(self.levelOfDetailChangedSlot)
-        shouldShowDetails = view.shouldShowDetails()
+        should_show_details = view.shouldShowDetails()
 
-        pen = QPen(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
-        pen.setCosmetic(shouldShowDetails)
+        pen = newPenObj(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
+        pen.setCosmetic(should_show_details)
         self.setPen(pen)
 
         self.refreshPath()
@@ -207,15 +208,6 @@ class VirtualHelixItem(QGraphicsPathItem):
             scaffoldY = 0
         else:
             scaffoldY = bw
-        # if self._scaffoldBackground is None:
-        #     highlightr = QGraphicsRectItem(0, scaffoldY, bw * canvas_size, bw, self)
-        #     highlightr.setBrush(QBrush(styles.scaffold_bkg_fill))
-        #     highlightr.setPen(QPen(Qt.NoPen))
-        #     highlightr.setFlag(QGraphicsItem.ItemStacksBehindParent)
-        #     self._scaffoldBackground = highlightr
-        # else:
-        #     self._scaffoldBackground.setRect(0, scaffoldY, bw * canvas_size, bw)
-
     # end def
 
     def resize(self):

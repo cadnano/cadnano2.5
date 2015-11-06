@@ -12,7 +12,6 @@ OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 500
 import copy
 
 from cadnano import util
-from cadnano.color import Color
 from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.strand import Strand
@@ -37,7 +36,7 @@ class Oligo(ProxyObject):
         self._strand5p = None
         self._length = 0
         self._is_loop = False
-        self._color = color if color else Color("#cc0000")
+        self._color = color if color else "#cc0000"
     # end def
 
     def __repr__(self):

@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
@@ -51,7 +52,7 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
         # outlinerview takes responsibility of overriding default part color
         if self._props['color']['value'] == "#000000":
             index = len(m_p.document().children()) - 1
-            new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)].name()
+            new_color = styles.PARTCOLORS[index % len(styles.PARTCOLORS)]
             self._model_part.setProperty('color', new_color)
 
         # item groups

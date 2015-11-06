@@ -363,7 +363,7 @@ class DocumentController():
             dialogWarning.title.setText("Staple validation failed")
             dialogWarning.message.setText(msg)
             for o in stap_loop_olgs:
-                o.applyColor(styles.stapColors[0].name())
+                o.applyColor(styles.stapColors[0])
             dialog.exec_()
             return
 

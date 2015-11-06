@@ -6,7 +6,6 @@ from uuid import uuid4
 izip = zip
 
 from cadnano import util
-from cadnano.color import Color
 from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoCommand
@@ -164,7 +163,7 @@ class Part(ProxyObject):
     # end def
 
     def getColor(self):
-        return Color(self._properties['color'])
+        return self._properties['color']
 
     def setViewProperty(self, key, value):
         self.view_properties[key] = value

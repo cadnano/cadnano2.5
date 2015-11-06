@@ -5,7 +5,7 @@ from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPen, QColor, QPainterPath,
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.gui.views.pathview import pathstyles as styles
-
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT

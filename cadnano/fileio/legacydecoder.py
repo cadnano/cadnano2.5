@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from cadnano import preferences as prefs
-from cadnano.color import Color
+from cadnano.color import intToColorHex
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
 from cadnano.part.honeycombpart import HoneycombPart
@@ -199,8 +199,8 @@ def import_legacy_dict(document, obj, lattice_type=LatticeType.HONEYCOMB):
                 strand.addInsertion(base_idx, sum_of_insert_skip, use_undostack=False)
         # end for
         # populate colors
-        for base_idx, colorNumber in helix['STAP_COLORS']:
-            color = QColor((colorNumber>>16)&0xFF, (colorNumber>>8)&0xFF, colorNumber&0xFF).name()
+        for base_idx, color_number in helix['STAP_COLORS']:
+            color = intToColorHex(color_number)
             strand = stap_strand_set.getStrand(base_idx)
             strand.oligo().applyColor(color, use_undostack=False)
 

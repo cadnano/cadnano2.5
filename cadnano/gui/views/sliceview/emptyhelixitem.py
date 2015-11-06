@@ -10,6 +10,7 @@ from PyQt5.QtWidgets  import QUndoCommand, QGraphicsEllipseItem, QStyle
 
 from cadnano import app
 from cadnano import util
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.enum import LatticeType, PartType, StrandType
 
 from . import slicestyles as styles
@@ -61,20 +62,16 @@ class EmptyHelixItem(QGraphicsEllipseItem):
     def updateProperty(self):
         # part-specific styles
         if self._part_item.part().partType() == PartType.NUCLEICACIDPART:
-            part_color = QColor(self.part().getProperty('color'))
-            part_color_A64 = QColor(part_color)
-            part_color_A64.setAlpha(64)
-            part_color_A128 = QColor(part_color)
-            part_color_A128.setAlpha(128)
+            part_color_hex = self.part().getProperty('color')
 
             # radnano theme
             # self._DEFAULT_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
             # self._DEFAULT_BRUSH = QBrush(QColor(102, 102, 102))
-            self._HOVER_BRUSH = QBrush(styles.BLUE_FILL)
-            self._HOVER_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
+            self._HOVER_BRUSH = getBrushObj(styles.BLUE_FILL)
+            self._HOVER_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
 
-            self._DEFAULT_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._DEFAULT_BRUSH = QBrush(part_color_A64)
+            self._DEFAULT_PEN = getPenObj(part_color_hex, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._DEFAULT_BRUSH = getBrushObj(part_color_hex, alpha=64)
 
 
             # glow = QGraphicsDropShadowEffect()

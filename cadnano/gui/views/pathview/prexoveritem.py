@@ -4,19 +4,23 @@ from PyQt5.QtGui import QBrush, QFont, QPen, QPolygonF, QPainterPath, QFontMetri
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsSimpleTextItem, QUndoCommand, QGraphicsRectItem
 
 from cadnano.enum import StrandType
+from cadnano.gui.palette import getPenObj, getBrushObj, getSolidBrush
 from . import pathstyles as styles
 
-_SCAF_PEN = QPen(styles.PXI_SCAF_STROKE, styles.PATH_STRAND_STROKE_WIDTH)
-_SCAF_PEN.setCapStyle(Qt.FlatCap)  # or Qt.RoundCap
-_SCAF_PEN.setJoinStyle(Qt.RoundJoin)
-_STAP_PEN = QPen(styles.PXI_STAP_STROKE, styles.PATH_STRAND_STROKE_WIDTH)
-_STAP_PEN.setCapStyle(Qt.FlatCap)  # or Qt.RoundCap
-_STAP_PEN.setJoinStyle(Qt.RoundJoin)
-_DISAB_PEN = QPen(styles.PXI_DISAB_STROKE, styles.PATH_STRAND_STROKE_WIDTH)
-_DISAB_PEN.setCapStyle(Qt.FlatCap)
-_DISAB_PEN.setJoinStyle(Qt.RoundJoin)
-_DISAB_BRUSH = QBrush(styles.PXI_DISAB_STROKE)  # For the helix number label
-_ENAB_BRUSH = QBrush(Qt.SolidPattern)  # Also for the helix number label
+_SCAF_PEN = getPenObj(styles.PXI_SCAF_STROKE,
+                    styles.PATH_STRAND_STROKE_WIDTH,
+                    capstyle=Qt.FlatCap,
+                    joinstyle=Qt.RoundJoin)
+_STAP_PEN = getPenObj(styles.PXI_STAP_STROKE,
+                    styles.PATH_STRAND_STROKE_WIDTH,
+                    capstyle=Qt.FlatCap,
+                    joinstyle=Qt.RoundJoin)
+_DISAB_PEN = getPenObj(styles.PXI_DISAB_STROKE,
+                styles.PATH_STRAND_STROKE_WIDTH,
+                capstyle=Qt.FlatCap,
+                joinstyle=Qt.RoundJoin)
+_DISAB_BRUSH = getBrushObj(styles.PXI_DISAB_STROKE)  # For the helix number label
+_ENAB_BRUSH = getSolidBrush()  # Also for the helix number label
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _RECT = QRectF(0, 0, styles.PATH_BASE_WIDTH, 1.2*styles.PATH_BASE_WIDTH)
 _TO_HELIX_NUM_FONT = styles.XOVER_LABEL_FONT

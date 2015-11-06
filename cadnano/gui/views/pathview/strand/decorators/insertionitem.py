@@ -4,6 +4,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.enum import StrandType
 
 from cadnano import util
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 
 from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
 
@@ -16,9 +17,9 @@ _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _HALF_BASE_WIDTH = _HBW = _BASE_WIDTH / 2
 _OFFSET1 = _BASE_WIDTH / 4
 _DEFAULT_RECT = QRectF(0, 0, _BW, _BW)
-_B_PEN = QPen(styles.BLUE_STROKE, styles.INSERTWIDTH)
-_R_PEN = QPen(styles.RED_STROKE, styles.SKIPWIDTH)
-_NO_PEN = QPen(Qt.NoPen)
+_B_PEN = getPenObj(styles.BLUE_STROKE, styles.INSERTWIDTH)
+_R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH)
+_NO_PEN = getNoPen()
 
 def _insertGen(path, start, c1, p1, c2):
     path.moveTo(start)
@@ -48,7 +49,7 @@ _INSERT_PATH_DOWNRect = _INSERT_PATH_DOWN.boundingRect()
 
 _BIG_RECT = _DEFAULT_RECT.united(_INSERT_PATH_UP_RECT)
 _BIG_RECT = _BIG_RECT.united(_INSERT_PATH_DOWNRect)
-_B_PEN2 = QPen(styles.BLUE_STROKE, 2)
+_B_PEN2 = getPenObj(styles.BLUE_STROKE, 2)
 _OFFSET2   = _BW*0.75
 _FONT = QFont(styles.THE_FONT, 10, QFont.Bold)
 _BIG_RECT.adjust(-15, -15, 30, 30)

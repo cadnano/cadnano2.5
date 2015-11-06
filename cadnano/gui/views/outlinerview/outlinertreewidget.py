@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
 from cadnano.enum import PartType
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import NucleicAcidPartItem
@@ -256,7 +257,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionViewItem()
-            styleoption.palette.setBrush(QPalette.Button, QBrush(QColor(color)))
+            styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
             styleoption.rect = QRect(option.rect)
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
 

@@ -10,6 +10,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.virtualhelix import VirtualHelix
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from . import slicestyles as styles
 
 
@@ -31,6 +32,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # _OUT_OF_SLICE_PEN = QPen(styles.LIGHT_ORANGE_STROKE,\
     #                      styles.SLICE_HELIX_STROKE_WIDTH)
     # _OUT_OF_SLICE_BRUSH = QBrush(styles.LIGHT_ORANGE_FILL)
+    _OUT_OF_SLICE_BRUSH_DEFAULT = QBrush(QColor(250, 250, 250))
 
     def __init__(self, model_virtual_helix, empty_helix_item):
         """
@@ -62,26 +64,21 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # end def
 
     def updateProperty(self):
-        part_color = QColor(self.part().getProperty('color'))
-        part_color_A64 = QColor(part_color)
-        part_color_A64.setAlpha(64)
-        part_color_A128 = QColor(part_color)
-        part_color_A128.setAlpha(128)
-        part_color_LITE = QColor(part_color).lighter(180)
+        part_color = self.part().getProperty('color')
 
-        self._USE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._OUT_OF_SLICE_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._USE_BRUSH = QBrush(part_color_A128)
-        self._OUT_OF_SLICE_BRUSH = QBrush(part_color_A64)
+        self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
+        self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
 
         if self.part().crossSectionType() == LatticeType.HONEYCOMB:
-            self._USE_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._OUT_OF_SLICE_PEN = QPen(styles.BLUE_STROKE,\
+            self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
                                           styles.SLICE_HELIX_STROKE_WIDTH)
 
         if self.part().partType() == PartType.NUCLEICACIDPART:
-            self._OUT_OF_SLICE_BRUSH = QBrush(QColor(250, 250, 250))
-            self._USE_BRUSH = QBrush(part_color_LITE) #QBrush(QColor(250, 250, 250))
+            self._OUT_OF_SLICE_BRUSH = self._OUT_OF_SLICE_BRUSH_DEFAULT
+            self._USE_BRUSH = getBrushObj(part_color, lighter=180)
             # glow = QGraphicsDropShadowEffect()
             # glow.setColor(part_color_A128)
             # glow.setBlurRadius(2) # default
@@ -154,18 +151,16 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     # end def
 
     def updateScafArrow(self, idx):
-        if self.part().partType() == PartType.NUCLEICACIDPART:
-            scafStrandColor = QColor(255,255,255,128)
+        scaf_strand = self._virtual_helix.scaf(idx)
+        if scaf_strand:
+            scaf_strand_color = scaf_strand.oligo().color()
+            scaf_alpha = 230 if scaf_strand.hasXoverAt(idx) else 77
         else:
-            scafStrand = self._virtual_helix.scaf(idx)
-            if scafStrand:
-                scafStrandColor = QColor(scafStrand.oligo().color())
-                scafAlpha = 0.9 if scafStrand.hasXoverAt(idx) else 0.3
-            else:
-                scafStrandColor = QColor(Qt.gray)
-                scafAlpha = 0.1
-            scafStrandColor.setAlphaF(scafAlpha)
-        self._pen1.setBrush(scafStrandColor)
+            scaf_strand_color = '#a0a0a4' #Qt.gray
+            scaf_alpha = 26
+
+        scaf_strand_color_obj = getColorObj(scaf_strand_color, alpha=scaf_alpha)
+        self._pen1.setBrush(scaf_strand_color_obj)
         self.arrow1.setPen(self._pen1)
         part = self.part()
         tpb = part._TWIST_PER_BASE
@@ -174,15 +169,15 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self.arrow1.setRotation(angle + part._TWIST_OFFSET)
 
     def updateStapArrow(self, idx):
-        stapStrand = self._virtual_helix.stap(idx)
-        if stapStrand:
-            stapStrandColor = QColor(stapStrand.oligo().color())
-            stapAlpha = 0.9 if stapStrand.hasXoverAt(idx) else 0.3
+        stap_strand = self._virtual_helix.stap(idx)
+        if stap_strand:
+            stap_strand_color = stap_strand.oligo().color()
+            stap_alpha = 230 if stap_strand.hasXoverAt(idx) else 77
         else:
-            stapStrandColor = QColor(Qt.lightGray)
-            stapAlpha = 0.1
-        stapStrandColor.setAlphaF(stapAlpha)
-        self._pen2.setBrush(stapStrandColor)
+            stap_strand_color = '#c0c0c0' # Qt.lightGray
+            stap_alpha = 26
+        stap_strand_color_obj = getColorObj(stap_strand_color, alpha=stap_alpha)
+        self._pen2.setBrush(stap_strand_color_obj)
         self.arrow2.setPen(self._pen2)
         part = self.part()
         tpb = part._TWIST_PER_BASE

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsItemGroup, QGraphicsObject
 from cadnano import util
 from cadnano.enum import StrandType
 from cadnano.gui.views.pathview import pathstyles as styles
-
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoBrush
 
 _BW = styles.PATH_BASE_WIDTH
 _TOOL_RECT = QRectF(0, 0, _BW, _BW)  # protected not private
@@ -13,8 +13,8 @@ _RECT = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,\
                -styles.PATH_BASE_HL_STROKE_WIDTH,\
                _BW + 2*styles.PATH_BASE_HL_STROKE_WIDTH,\
                _BW + 2*styles.PATH_BASE_HL_STROKE_WIDTH)
-_PEN = QPen(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
-_BRUSH = QBrush(Qt.NoBrush)
+_PEN = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
+_BRUSH = getNoBrush()
 
 # There's a bug where C++ will free orphaned graphics items out from
 # under pyqt. To avoid this, "_mother" adopts orphaned graphics items.

@@ -8,6 +8,7 @@ from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
 from cadnano import app, getBatch, util
+from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractpartitem import AbstractPartItem
@@ -22,7 +23,7 @@ from .virtualhelixitem import VirtualHelixItem
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
-_MOD_PEN = QPen(styles.BLUE_STROKE)
+_MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 _BOUNDING_RECT_PADDING = 20
 
 class ProxyParentItem(QGraphicsRectItem):
@@ -365,9 +366,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def resetBrush(self, alpha):
-        col = QColor(self.modelColor())
-        col.setAlpha(alpha)
-        self.setBrush(QBrush(col))
+        brush = getBrushObj(self.modelColor(), alpha=alpha)
+        self.setBrush(brush)
     # end def
 
     def _updateBoundingRect(self):
@@ -378,7 +378,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
-        self.setPen(QPen(QColor(self.modelColor())))
+        self.setPen(getPenObj(self.modelColor(), 0))
         self.resetBrush(styles.DEFAULT_ALPHA)
 
         # self.setRect(self.childrenBoundingRect())

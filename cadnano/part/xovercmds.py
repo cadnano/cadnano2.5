@@ -137,7 +137,7 @@ class RemoveXoverCommand(UndoCommand):
         #                                 else prefs.SCAF_COLORS
         color_list = prefs.STAP_COLORS if strand5p.strandSet().isStaple() \
                                         else [part.getColor()]
-        n_o3p.setColor(random.choice(color_list).name())
+        n_o3p.setColor(random.choice(color_list))
         n_o3p.setLength(0)
         for strand in strand3p.generator3pStrand():
             n_o3p.incrementLength(strand.totalLength())
