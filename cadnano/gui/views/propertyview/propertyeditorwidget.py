@@ -86,9 +86,10 @@ class PropertyEditorWidget(QTreeWidget):
                 pe_item = PlasmidPartItem(item.part(), self)
                 self.show()
             elif item_type is ItemType.OLIGO:
-                print("oligo selected")
+                # print("oligo selected")
+                pass
             elif item_type is ItemType.NUCLEICACID:
-                print("nucleicacid selected")
+                # print("nucleicacid selected")
                 pe_item = NucleicAcidPartItem(item.part(), self)
                 self.show()
             else:

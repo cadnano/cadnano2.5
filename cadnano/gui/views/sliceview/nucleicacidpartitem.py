@@ -53,30 +53,50 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         # If None, all slices will be redrawn and the cache will be filled.
         # Connect destructor. This is for removing a part from scenes.
         self.probe = self.IntersectionProbe(self)
+        self.hide() # hide while until after attemptResize() to avoid flicker
         # initialize the NucleicAcidPartItem with an empty set of old coords
         self._setLattice([], m_p.generatorFullLattice())
         self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
         self._initModifierCircle()
-
         _p = _BOUNDING_RECT_PADDING
         self._outlinerect = _orect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_orect, self)
-        # self._outline.setPen(QPen(QColor(m_props["color"])))
         self._outline.setPen(QPen(Qt.NoPen))
         self._drag_handle = DnaDragHandle(QRectF(_orect), self)
-
-        # move down
-        if len(m_p.document().children()) > 1:
-            p = parent.childrenBoundingRect().bottomLeft()
-            self.setPos(p.x() + _p, p.y() + _p*2)
-
+        self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
+        if len(m_p.document().children()) > 1: 
+            self._adjustPosition()
+        self.show()
         # select upon creation
         for _part in m_p.document().children():
             if _part is m_p:
                 _part.setSelected(True)
             else:
                 _part.setSelected(False)
+    # end def
+
+    def _adjustPosition(self):
+        """Find the left-most bottom-most sibling, and reposition below."""
+        _p = _BOUNDING_RECT_PADDING
+        _visible_topleft_pos = self.visibleTopLeftScenePos()
+        _bot_left_sib = self.mapToScene(QPointF(-_p*2,-_p*2)) # choose a starting point
+        for sibling in self.parentItem().childItems():
+            if sibling is self:
+                continue
+            _sib = sibling.visibleBottomLeftScenePos()
+            if (_sib.x() >= _bot_left_sib.x() and _sib.y() >= _bot_left_sib.y()):
+                _bot_left_sib = _sib
+        # reposition visible-topleft curner under sibling, plus padding
+        self.setPos(-_visible_topleft_pos + _bot_left_sib + QPointF(0, 2*_p) )
+    # end def
+
+    def visibleTopLeftScenePos(self):
+        return self.mapToScene(self._outlinerect.topLeft())
+    # end def
+
+    def visibleBottomLeftScenePos(self):
+        return self.mapToScene(self._outlinerect.bottomLeft())
     # end def
 
     def _initDeselector(self):
@@ -215,6 +235,8 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     def window(self):
         return self.parentItem().window()
     # end def
+
+
 
     ### PRIVATE SUPPORT METHODS ###
     def _upperLeftCornerForCoords(self, row, col):
@@ -355,14 +377,14 @@ class DnaDragHandle(QGraphicsRectItem):
         self.setPen(QPen(Qt.NoPen))
         color = QColor(self._parent._model_props["color"])
         self._resizingRectItem.setPen(QPen(color))
-        self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
+        # self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
         # self.setBrush(QBrush(styles.MIDGRAY_FILL))
-
-        # color.setAlpha(alpha) 230,230,230
-        # self.setBrush(QBrush(color))
+        color.setAlpha(alpha) # 230,230,230
+        self.setBrush(QBrush(color))
     # end def
 
     def getBound(self, pos):
+        """return the types of edges that are hovered at pos."""
         _r = self._parent._outlinerect
         _x, _y = pos.x(), pos.y()
         _width = 6
@@ -446,35 +468,41 @@ class DnaDragHandle(QGraphicsRectItem):
     # end def
 
     def mouseReleaseEvent(self, event):
-        _p = _BOUNDING_RECT_PADDING
-        m_p = self._parent._model_part
         self.setCursor(Qt.OpenHandCursor)
 
         if self._resizing:
-            # start bounds with topLeft at max, botRight at min
-            x1, y1 = m_p.dimensions(self._parent._scaleFactor)
-            x2, y2 = 0, 0
-            rRect = self.mapRectToScene(self._resizingRectItem.rect())
-            # only show helices >50% inside rRect
-            for _ehi in self._parent._empty_helix_hash.values():
-                if rRect.contains(self.mapToScene(_ehi.pos() + _ehi.boundingRect().center())):
-                    _ehi.show() # _ehi.setHovered()
-                    # update bounds
-                    x1 = min(x1, _ehi.pos().x())
-                    y1 = min(y1, _ehi.pos().y())
-                    x2 = max(x2, _ehi.pos().x() + _ehi.boundingRect().width())
-                    y2 = max(y2, _ehi.pos().y() + _ehi.boundingRect().height())
-                else:
-                    _ehi.hide() # _ehi.setNotHovered()
-            # update everything to new rect after padding
-            self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),
-                                                            QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
-            self._resizingRectItem.setRect(_newRect)
+            self.attemptResize(self._resizingRectItem.rect())
             self._resizing = False
-            self.setRect(_newRect)
             self._edgesToResize = PartEdges.NONE
         else:
             pass
         # self._resizingRect.setRect(self._parent._outlinerect)
     # end def
+
+    def attemptResize(self, rect):
+        _p = _BOUNDING_RECT_PADDING
+        m_p = self._parent._model_part
+
+        # start bounds with topLeft at max, botRight at min
+        x1, y1 = m_p.dimensions(self._parent._scaleFactor)
+        x2, y2 = 0, 0
+        rRect = self.mapRectToScene(rect)
+        # only show helices >50% inside rRect
+        for _ehi in self._parent._empty_helix_hash.values():
+            if rRect.contains(self.mapToScene(_ehi.pos() + _ehi.boundingRect().center())):
+                _ehi.show() # _ehi.setHovered()
+                # update bounds
+                x1 = min(x1, _ehi.pos().x())
+                y1 = min(y1, _ehi.pos().y())
+                x2 = max(x2, _ehi.pos().x() + _ehi.boundingRect().width())
+                y2 = max(y2, _ehi.pos().y() + _ehi.boundingRect().height())
+            else:
+                _ehi.hide() # _ehi.setNotHovered()
+        # print("resize to", x1,y1,x2,y2)
+        self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),
+                          QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
+        self.updateRect(_newRect)
+        self._resizingRectItem.setRect(_newRect)
+        self.setRect(_newRect)
+
 # end class
