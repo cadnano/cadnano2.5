@@ -66,7 +66,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self._outline = QGraphicsRectItem(_orect, self)
         self._outline.setPen(QPen(Qt.NoPen))
         self._drag_handle = DnaDragHandle(QRectF(_orect), self)
-        self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
+        # self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
         if len(m_p.document().children()) > 1: 
             self._adjustPosition()
         self.show()
