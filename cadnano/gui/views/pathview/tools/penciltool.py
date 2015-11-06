@@ -380,7 +380,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def configurePath(self):
-        self._path_thing.setBrush(QBrush(styles.RED_STROKE))
+        self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
         path = PPR3 if self._is_drawn_5_to_3 else PPL3
         offset = -_BASE_WIDTH if self._is_drawn_5_to_3 else _BASE_WIDTH
         self._path_thing.setPath(path)
@@ -528,7 +528,7 @@ class ForcedXoverNode5(ForcedXoverNode3):
     # end def
 
     def configurePath(self):
-        self._path_thing.setBrush(QBrush(styles.RED_STROKE))
+        self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
         path = PPL5 if self._is_drawn_5_to_3 else PPR5
         offset = _BASE_WIDTH if self._is_drawn_5_to_3 else -_BASE_WIDTH
         self._path_thing.setPath(path)
@@ -765,7 +765,7 @@ class ForcedXoverItem(QGraphicsPathItem):
 
     def _updateFloatPen(self):
         pen_width = styles.PATH_STRAND_STROKE_WIDTH
-        pen = QPen(_PENCIL_COLOR, pen_width)
+        pen = getPenObj(_PENCIL_COLOR, pen_width)
         pen.setCapStyle(Qt.FlatCap)
         self.setPen(pen)
     # end def
