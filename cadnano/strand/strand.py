@@ -511,11 +511,12 @@ class Strand(ProxyObject):
             return False
         ss = self.strandSet()
         is_same_strand = from_strand == self
-        is_strand_type_match = \
-                from_strand.strandSet().strandType() == ss.strandType() \
-                                                if from_strand else True
-        if not is_strand_type_match:
-            return False
+        # commenting out to allow same-strand xovers
+        # is_strand_type_match = \
+        #         from_strand.strandSet().strandType() == ss.strandType() \
+        #                                         if from_strand else True
+        # if not is_strand_type_match:
+        #     return False
         is_drawn_5_to_3 = ss.isDrawn5to3()
         index_diff_H = self.highIdx() - idx
         index_diff_L = idx - self.lowIdx()

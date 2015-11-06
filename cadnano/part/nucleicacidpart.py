@@ -1144,6 +1144,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def isPossibleXoverP(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
+        to_strand_type = StrandType.SCAFFOLD if strand_type == StrandType.STAPLE else StrandType.STAPLE
         fromSS = from_virtual_helix.getStrandSetByType(strand_type)
         toSS = to_virtual_helix.getStrandSetByType(strand_type)
         if fromSS.isDrawn5to3():
