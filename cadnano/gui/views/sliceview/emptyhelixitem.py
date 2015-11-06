@@ -63,7 +63,6 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # part-specific styles
         if self._part_item.part().partType() == PartType.NUCLEICACIDPART:
             part_color_hex = self.part().getProperty('color')
-
             # radnano theme
             # self._DEFAULT_PEN = QPen(styles.PINK_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
             # self._DEFAULT_BRUSH = QBrush(QColor(102, 102, 102))
@@ -71,8 +70,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
             self._HOVER_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
 
             self._DEFAULT_PEN = getPenObj(part_color_hex, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._DEFAULT_BRUSH = getBrushObj(part_color_hex, alpha=64)
-
+            self._DEFAULT_BRUSH = getBrushObj(part_color_hex, alpha=4)
 
             # glow = QGraphicsDropShadowEffect()
             # glow.setColor(part_color)
