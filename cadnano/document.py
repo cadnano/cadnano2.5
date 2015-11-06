@@ -14,6 +14,7 @@ from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
 from cadnano.part import HoneycombDnaPart #, SquareDnaPart
+from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
 
@@ -335,7 +336,7 @@ class Document(ProxyObject):
         if use_undostack and xoList:
             self.undoStack().beginMacro("Delete xovers")
         for part, strand, strand3p, useUndo in xoList:
-            OrigamiPart.removeXover(part, strand, strand3p, useUndo)
+            NucleicAcidPart.removeXover(part, strand, strand3p, useUndo)
             self.removeStrandFromSelection(strand)
             self.removeStrandFromSelection(strand3p)
         self._selection_dict = {}
