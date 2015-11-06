@@ -62,8 +62,8 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         # part-specific styles
         if self._part_item.part().partType() == PartType.NUCLEICACIDPART:
             part_color = QColor(self.part().getProperty('color'))
-            part_color_A64 = QColor(part_color)
-            part_color_A64.setAlpha(64)
+            part_color_A4 = QColor(part_color)
+            part_color_A4.setAlpha(4)
             part_color_A128 = QColor(part_color)
             part_color_A128.setAlpha(128)
 
@@ -74,7 +74,8 @@ class EmptyHelixItem(QGraphicsEllipseItem):
             self._HOVER_PEN = QPen(styles.BLUE_STROKE, styles.SLICE_HELIX_HILIGHT_WIDTH)
 
             self._DEFAULT_PEN = QPen(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._DEFAULT_BRUSH = QBrush(part_color_A64)
+            # self._DEFAULT_BRUSH = QBrush(QColor(230, 230, 230))
+            self._DEFAULT_BRUSH = QBrush(part_color_A4)
 
 
             # glow = QGraphicsDropShadowEffect()

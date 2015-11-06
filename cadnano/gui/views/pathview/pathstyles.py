@@ -61,8 +61,8 @@ SCAF_COLORS = [QColor(0, 102, 204)]
 DEFAULT_STAP_COLOR = "#888888"
 DEFAULT_SCAF_COLOR = "#cc0000"
 SELECTED_COLOR = QColor(255, 51, 51)
-SELECTED_ALPHA = 12
-DEFAULT_ALPHA = 4
+SELECTED_ALPHA = 24
+DEFAULT_ALPHA = 12
 
 # brightColors = [QColor() for i in range(10)]
 # for i in range(len(brightColors)):
