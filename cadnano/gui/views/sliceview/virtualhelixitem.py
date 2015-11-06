@@ -3,7 +3,6 @@ import cadnano.util as util
 
 from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
-from PyQt5.QtWidgets import QGraphicsDropShadowEffect
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
@@ -29,10 +28,9 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     _RECT = _RECT.adjusted(rect_gain, rect_gain, rect_gain, rect_gain)
     _FONT = styles.SLICE_NUM_FONT
     _ZVALUE = styles.ZSLICEHELIX+3
-    # _OUT_OF_SLICE_PEN = QPen(styles.LIGHT_ORANGE_STROKE,\
-    #                      styles.SLICE_HELIX_STROKE_WIDTH)
-    # _OUT_OF_SLICE_BRUSH = QBrush(styles.LIGHT_ORANGE_FILL)
-    _OUT_OF_SLICE_BRUSH_DEFAULT = QBrush(QColor(250, 250, 250))
+    _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
+    _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
+    _OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
     def __init__(self, model_virtual_helix, empty_helix_item):
         """
@@ -50,13 +48,13 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self.setZValue(self._ZVALUE)
         self.lastMousePressAddedBases = False
 
-        self.updateProperty()
-
         # handle the label specific stuff
         self._label = self.createLabel()
         self.setNumber()
         self._pen1, self._pen2 = (QPen(), QPen())
         self.createArrows()
+
+        self.updateProperty()
 
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
 
@@ -78,13 +76,10 @@ class VirtualHelixItem(QGraphicsEllipseItem):
 
         if self.part().partType() == PartType.NUCLEICACIDPART:
             self._OUT_OF_SLICE_BRUSH = self._OUT_OF_SLICE_BRUSH_DEFAULT
-            self._USE_BRUSH = getBrushObj(part_color, lighter=180)
-            # glow = QGraphicsDropShadowEffect()
-            # glow.setColor(part_color_A128)
-            # glow.setBlurRadius(2) # default
-            # glow.setOffset(2)
-            # self.setGraphicsEffect(glow)
+            # self._USE_BRUSH = getBrushObj(part_color, lighter=180)
+            self._USE_BRUSH = getBrushObj(part_color, alpha=150)
 
+        self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
         self.setPen(self._OUT_OF_SLICE_PEN)
         self.setRect(self._RECT)
@@ -154,7 +149,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         scaf_strand = self._virtual_helix.scaf(idx)
         if scaf_strand:
             scaf_strand_color = scaf_strand.oligo().color()
-            scaf_alpha = 230 if scaf_strand.hasXoverAt(idx) else 77
+            scaf_alpha = 230 if scaf_strand.hasXoverAt(idx) else 128
         else:
             scaf_strand_color = '#a0a0a4' #Qt.gray
             scaf_alpha = 26
@@ -172,7 +167,7 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         stap_strand = self._virtual_helix.stap(idx)
         if stap_strand:
             stap_strand_color = stap_strand.oligo().color()
-            stap_alpha = 230 if stap_strand.hasXoverAt(idx) else 77
+            stap_alpha = 230 if stap_strand.hasXoverAt(idx) else 128
         else:
             stap_strand_color = '#c0c0c0' # Qt.lightGray
             stap_alpha = 26
@@ -224,11 +219,13 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         if has_scaf:
             self.setPen(self._USE_PEN)
             self.setBrush(self._USE_BRUSH)
+            self._label.setBrush(self._USE_TEXT_BRUSH)
             self.updateScafArrow(idx)
             self.arrow1.show()
         else:
             self.setPen(self._OUT_OF_SLICE_PEN)
             self.setBrush(self._OUT_OF_SLICE_BRUSH)
+            self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
             self.arrow1.hide()
         if has_stap:
             self.updateStapArrow(idx)
