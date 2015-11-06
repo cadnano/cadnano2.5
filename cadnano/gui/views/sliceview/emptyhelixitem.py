@@ -346,15 +346,16 @@ class EmptyHelixItem(QGraphicsEllipseItem):
             else:
                 break
 
-
-        if len(strand_coords) > 1:
-            auto_scaf_type = app().prefs.getAutoScafType()
-            util.beginSuperMacro(part, "Auto-connect")
-            if auto_scaf_type == "Mid-seam":
-                self.autoScafMidSeam(self.groupStrandsByPart(strand_coords))
-            elif auto_scaf_type == "Raster":
-                self.autoScafRaster(self.groupStrandsByPart(strand_coords))
-            util.endSuperMacro(part)
+        # only auto-connect when antiparallel xovers are enabled 
+        if self._part_item.window().action_filter_pre_axover.isChecked():
+            if len(strand_coords) > 1:
+                auto_scaf_type = app().prefs.getAutoScafType()
+                util.beginSuperMacro(part, "Auto-connect")
+                if auto_scaf_type == "Mid-seam":
+                    self.autoScafMidSeam(self.groupStrandsByPart(strand_coords))
+                elif auto_scaf_type == "Raster":
+                    self.autoScafRaster(self.groupStrandsByPart(strand_coords))
+                util.endSuperMacro(part)
     # end def
 
     def groupStrandsByPart(self, strand_coords):
