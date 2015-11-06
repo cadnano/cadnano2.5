@@ -5,7 +5,7 @@ from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPen, QColor, QPainterPath,
 from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT
@@ -512,12 +512,13 @@ class XoverItem(QGraphicsPathItem):
 
     def setSelectedColor(self, value):
         if value == True:
-            color = styles.SELECTED_COLOR
+            color = getColorObj(styles.SELECTED_COLOR)
         else:
             oligo = self._strand_item.strand().oligo()
-            color = QColor(oligo.color())
             if oligo.shouldHighlight():
-                color.setAlpha(128)
+                color = getColorObj(oligo.color(), alpha=128)
+            else:
+                color = getColorObj(oligo.color())
         pen = self.pen()
         pen.setColor(color)
         self.setPen(pen)
