@@ -26,6 +26,8 @@
         <file alias="sqpro">images/part-new-sqpro.png</file>
         <file alias="filter-pre-pxover">images/part-filter-pre-pxover.png</file>
         <file alias="filter-pre-axover">images/part-filter-pre-axover.png</file>
+        <file alias="filter-odd">images/part-filter-odd.png</file>
+        <file alias="filter-even">images/part-filter-even.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>
