@@ -71,7 +71,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self._outlinerect = _orect = self.childrenBoundingRect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_orect, self)
         self._outline.setPen(QPen(Qt.NoPen))
-        self._drag_handle = DnaDragHandle(QRectF(_orect), self)
+        self._drag_handle = DragHandle(QRectF(_orect), self)
         # self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
         if len(m_p.document().children()) > 1: 
             self._adjustPosition()
@@ -367,7 +367,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
             pass
 
 
-class DnaDragHandle(QGraphicsRectItem):
+class DragHandle(QGraphicsRectItem):
     def __init__(self, rect, parent=None):
         super(QGraphicsRectItem, self).__init__(rect, parent)
         self._parent = parent
@@ -381,7 +381,7 @@ class DnaDragHandle(QGraphicsRectItem):
     # end def
 
     def updateRect(self, rect):
-        """docstring for updateRect"""
+        """adds some padding to the DragHandle"""
         w = rect.width()*.6
         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
     # end def
@@ -390,15 +390,6 @@ class DnaDragHandle(QGraphicsRectItem):
         self._resizingRectItem.setPen(getPenObj(color, width))
         self.setBrush(getBrushObj(color, alpha=alpha))
     # end def
-
-    # def resetAppearance(self, alpha):
-    #     self.setPen(QPen(Qt.NoPen))
-    #     color = QColor(self._parent._model_props["color"])
-    #     self._resizingRectItem.setPen(QPen(color))
-    #     # self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
-    #     # self.setBrush(QBrush(styles.MIDGRAY_FILL))
-    #     color.setAlpha(alpha) # 230,230,230
-    #     self.setBrush(QBrush(color))
 
     def getBound(self, pos):
         """return the types of edges that are hovered at pos."""

@@ -92,8 +92,10 @@ class DocumentController():
         self.win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
         self.win.action_filter_scaf.triggered.connect(self.actionFilterScafSlot)
         self.win.action_filter_stap.triggered.connect(self.actionFilterStapSlot)
-        self.win.action_filter_pre_axover.triggered.connect(self.actionFilterPreAXover)
-        self.win.action_filter_pre_pxover.triggered.connect(self.actionFilterPrePXover)
+        self.win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
+        self.win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
+
+
 
     ### SLOTS ###
     def undoStackCleanChangedSlot(self):
@@ -123,20 +125,41 @@ class DocumentController():
             fS.setChecked(False)
         if fX.isChecked():
             fX.setChecked(False)
-        self._document.documentSelectionFilterChangedSignal.emit(["virtual_helix"])
+        types = ["virtual_helix"]
+        f0 = self.win.action_filter_even
+        f1 = self.win.action_filter_odd
+        if f0.isChecked():
+            types.append("even")
+        if f1.isChecked():
+            types.append("odd")
+        self._document.documentSelectionFilterChangedSignal.emit(types)
 
-    def actionFilterPreAXover(self):
-        self.win.action_filter_pre_axover.setChecked(True)
-        if self.win.action_filter_pre_pxover.isChecked():
-            self.win.action_filter_pre_pxover.setChecked(False)
-        self._document.documentPreXoverFilterChangedSignal.emit("prexover_a")
+    def actionFilterEvenSlot(self):
+        fH = self.win.action_filter_handle
+        if not fH.isChecked():
+            return
+        f0 = self.win.action_filter_even
+        f1 = self.win.action_filter_odd
+        types = ["virtual_helix"]
+        if f0.isChecked():
+            types.append("even")
+        if f1.isChecked():
+            types.append("odd")
+        self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
-    def actionFilterPrePXover(self):
-        self.win.action_filter_pre_pxover.setChecked(True)
-        if self.win.action_filter_pre_axover.isChecked():
-            self.win.action_filter_pre_axover.setChecked(False)
-        self._document.documentPreXoverFilterChangedSignal.emit("prexover_p")
+    def actionFilterOddSlot(self):
+        fH = self.win.action_filter_handle
+        if not fH.isChecked():
+            return
+        f0 = self.win.action_filter_even
+        f1 = self.win.action_filter_odd
+        types = ["virtual_helix"]
+        if f0.isChecked():
+            types.append("even")
+        if f1.isChecked():
+            types.append("odd")
+        self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
     def actionFilterEndpointSlot(self):

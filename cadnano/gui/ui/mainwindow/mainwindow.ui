@@ -335,13 +335,12 @@
    </attribute>
    <addaction name="action_filter_scaf"/>
    <addaction name="action_filter_stap"/>
-   <addaction name="action_filter_vh_even"/>
-   <addaction name="action_filter_odd"/>
    <addaction name="action_filter_endpoint"/>
    <addaction name="action_filter_xover"/>
    <addaction name="separator"/>
-   <addaction name="action_filter_pre_axover"/>
-   <addaction name="action_filter_pre_pxover"/>
+   <addaction name="action_filter_handle"/>
+   <addaction name="action_filter_even"/>
+   <addaction name="action_filter_odd"/>
   </widget>
   <widget class="QToolBar" name="left_toolbar">
    <property name="sizePolicy">
@@ -1054,7 +1053,7 @@
     <string>\</string>
    </property>
   </action>
-  <action name="action_filter_vh_even">
+  <action name="action_filter_even">
    <property name="checkable">
     <bool>true</bool>
    </property>

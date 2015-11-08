@@ -85,6 +85,7 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
+        print("viewroot: selectionFilterChangedSlot",filter_name_list)
         self._vhi_h_selection_group.clearSelection(False)
         self._strand_item_selection_group.clearSelection(False)
         self.clearSelectionFilterDict()
