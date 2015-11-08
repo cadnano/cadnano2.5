@@ -25,6 +25,12 @@ DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
 
+_DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
+_DEFAULT_ALPHA = styles.DEFAULT_ALPHA
+_SELECTED_COLOR = styles.SELECTED_COLOR
+_SELECTED_WIDTH = styles.SELECTED_PEN_WIDTH
+_SELECTED_ALPHA = styles.SELECTED_ALPHA
+
 _BOUNDING_RECT_PADDING = 10
 
 class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
@@ -211,10 +217,10 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     def partSelectedChangedSlot(self, model_part, is_selected):
         """Set this Z to front, and return other Zs to default."""
         if is_selected:
-            self._drag_handle.resetAppearance(styles.SELECTED_ALPHA)
-            self.setZValue(styles.ZPARTITEM + 1)
+            self._drag_handle.resetAppearance(_SELECTED_COLOR, _SELECTED_WIDTH, _SELECTED_ALPHA)
+            self.setZValue(styles.ZPARTITEM+1)
         else:
-            self._drag_handle.resetAppearance(styles.DEFAULT_ALPHA)
+            self._drag_handle.resetAppearance(self.modelColor(), _DEFAULT_WIDTH, _DEFAULT_ALPHA)
             self.setZValue(styles.ZPARTITEM)
 
     ### ACCESSORS ###
@@ -224,6 +230,10 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
 
     def part(self):
         return self._model_part
+    # end def
+
+    def modelColor(self):
+        return self._model_props['color']
     # end def
 
     def scaleFactor(self):
@@ -366,7 +376,8 @@ class DnaDragHandle(QGraphicsRectItem):
         self._resizingRectItem = QGraphicsRectItem(self.rect(), self)
         self._bound = PartEdges.NONE
         self._resizing = False
-        self.resetAppearance(styles.DEFAULT_ALPHA)
+        self.setPen(QPen(Qt.NoPen))
+        self.resetAppearance(parent.modelColor(), _DEFAULT_WIDTH, _DEFAULT_ALPHA)
     # end def
 
     def updateRect(self, rect):
@@ -375,15 +386,19 @@ class DnaDragHandle(QGraphicsRectItem):
         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
     # end def
 
-    def resetAppearance(self, alpha):
-        self.setPen(QPen(Qt.NoPen))
-        color = QColor(self._parent._model_props["color"])
-        self._resizingRectItem.setPen(QPen(color))
-        # self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
-        # self.setBrush(QBrush(styles.MIDGRAY_FILL))
-        color.setAlpha(alpha) # 230,230,230
-        self.setBrush(QBrush(color))
+    def resetAppearance(self, color, width, alpha):
+        self._resizingRectItem.setPen(getPenObj(color, width))
+        self.setBrush(getBrushObj(color, alpha=alpha))
     # end def
+
+    # def resetAppearance(self, alpha):
+    #     self.setPen(QPen(Qt.NoPen))
+    #     color = QColor(self._parent._model_props["color"])
+    #     self._resizingRectItem.setPen(QPen(color))
+    #     # self.setBrush(QBrush(QColor(50,50,50)))  #80,80,50
+    #     # self.setBrush(QBrush(styles.MIDGRAY_FILL))
+    #     color.setAlpha(alpha) # 230,230,230
+    #     self.setBrush(QBrush(color))
 
     def getBound(self, pos):
         """return the types of edges that are hovered at pos."""

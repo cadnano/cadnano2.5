@@ -124,10 +124,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partSelectedChangedSlot(self, model_part, is_selected):
         if is_selected:
-            self.resetBrush(styles.SELECTED_ALPHA)
+            self.resetPen(styles.SELECTED_COLOR, styles.SELECTED_PEN_WIDTH)
+            self.resetBrush(styles.SELECTED_BRUSH_COLOR, styles.SELECTED_ALPHA)
             # self.setZValue(styles.ZPARTITEM+1)
         else:
-            self.resetBrush(styles.DEFAULT_ALPHA)
+            self.resetPen(self.modelColor())
+            self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
             # self.setZValue(styles.ZPARTITEM)
 
 
@@ -365,8 +367,13 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self.scene().views()[0].zoomToFit()
     # end def
 
-    def resetBrush(self, alpha):
-        brush = getBrushObj(self.modelColor(), alpha=alpha)
+    def resetPen(self, color, width=0):
+        pen = getPenObj(color, width)
+        self.setPen(pen)
+    # end def
+
+    def resetBrush(self, color, alpha):
+        brush = getBrushObj(color, alpha=alpha)
         self.setBrush(brush)
     # end def
 
@@ -379,7 +386,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         removeVirtualHelixItem.
         """
         self.setPen(getPenObj(self.modelColor(), 0))
-        self.resetBrush(styles.DEFAULT_ALPHA)
+        self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
 
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
