@@ -37,7 +37,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         # clear out part references
         vh.setNumber(None)  # must come before setPart(None)
         vh.setPart(None)
-        vh.virtualHelixRemovedSignal.emit(vh)
+        vh.virtualHelixRemovedSignal.emit(part, vh)
         part.partActiveSliceResizeSignal.emit(part)
     # end def
 # end class

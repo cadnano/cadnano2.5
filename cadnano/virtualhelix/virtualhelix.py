@@ -39,9 +39,9 @@ class VirtualHelix(ProxyObject):
         return "<%s(%d)>" % (self.__class__.__name__, self._number)
 
     ### SIGNALS ###
-    virtualHelixRemovedSignal = ProxySignal(ProxyObject, 
+    virtualHelixRemovedSignal = ProxySignal(ProxyObject, ProxyObject,
                                             name='virtualHelixRemovedSignal')  # self
-    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int, 
+    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int,
                                             name='virtualHelixNumberChangedSignal')  # self, num
     virtualHelixPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
                                             name='virtualHelixPropertyChangedSignal')  # self, transform
