@@ -2,24 +2,25 @@
 # encoding: utf-8
 
 from math import floor
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.enum import StrandType
-from .strand.stranditem import StrandItem
-from . import pathstyles as styles
-from .virtualhelixhandleitem import VirtualHelixHandleItem
 from cadnano import util
+from cadnano.enum import StrandType
+from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.gui.palette import newPenObj, getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from .strand.stranditem import StrandItem
+from .virtualhelixhandleitem import VirtualHelixHandleItem
+from . import pathstyles as styles
 
 from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from cadnano.gui.palette import newPenObj, getPenObj, getBrushObj, getNoBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 # _gridPen = QPen(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
 # _gridPen.setCosmetic(True)
 
 
-class VirtualHelixItem(QGraphicsPathItem):
+class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     """VirtualHelixItem for PathView"""
     findChild = util.findChild  # for debug
 
@@ -82,11 +83,15 @@ class VirtualHelixItem(QGraphicsPathItem):
         """
         pass
 
-    def virtualHelixNumberChangedSlot(self, virtualHelix, number):
+    def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         self._handle.setNumber()
     # end def
 
-    def virtualHelixRemovedSlot(self, virtualHelix):
+    def virtualHelixTransformChangedSlot(self, virtual_helix, transform):
+        self._handle.setTransform()
+    # end def
+
+    def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()
         self._controller = None
 

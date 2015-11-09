@@ -126,6 +126,8 @@ class Part(ProxyObject):
                         name='partVirtualHelixRenumberedSignal')# self, coord
     partVirtualHelixResizedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixResizedSignal')   # self, coord
+    partVirtualHelixTransformedSignal = ProxySignal(object, tuple,
+                        name='partVirtualHelixTransformedSignal')   # self, transform
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
@@ -363,7 +365,7 @@ class Part(ProxyObject):
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def addOligo(self, oligo):
-        # print("adding oligo", oligo)
+        print("part: adding oligo", oligo)
         self._oligos.add(oligo)
         self.partOligoAddedSignal.emit(self, oligo)
     # end def

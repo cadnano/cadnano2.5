@@ -18,6 +18,7 @@ class VirtualHelix(ProxyObject):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)
         self._coord = (row, col) # col, row
+        self._transform = (0,0,0,0,0,0) # x,y,z,x°,y°,z°
         self._part = part
         self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
         self._stap_strandset = StrandSet(StrandType.STAPLE, self)
@@ -29,14 +30,17 @@ class VirtualHelix(ProxyObject):
         # the virtualhelix owns self._number and may modify it.
         self._number = None
         self.setNumber(idnum)
+
+        self._properties = {'x':0, 'y':0, 'z':0, 'eulerX':0, 'eulerY':0, 'eulerZ':0}
     # end def
 
     def __repr__(self):
         return "<%s(%d)>" % (self.__class__.__name__, self._number)
 
     ### SIGNALS ###
-    virtualHelixRemovedSignal = ProxySignal(ProxyObject, name='virtualHelixRemovedSignal')  #pyqtSignal(QObject)  # self
-    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int, name='virtualHelixNumberChangedSignal') #pyqtSignal(QObject, int)  # self, num
+    virtualHelixRemovedSignal = ProxySignal(ProxyObject, name='virtualHelixRemovedSignal')  # self
+    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int, name='virtualHelixNumberChangedSignal')  # self, num
+    virtualHelixTransformChangedSignal = ProxySignal(ProxyObject, tuple, name='virtualHelixTransformChangedSignal')  # self, transform
 
     ### SLOTS ###
 
@@ -53,6 +57,10 @@ class VirtualHelix(ProxyObject):
         return self._coord
     # end def
 
+    def transform(self):
+        return self._transform
+    # end def
+
     def number(self):
         return self._number
     # end def
@@ -65,6 +73,36 @@ class VirtualHelix(ProxyObject):
         return self._doc
     # end def
 
+    def getProperty(self, key):
+        return self._properties[key]
+    # end def
+
+    def getColor(self):
+        return self._properties['color']
+
+    def setViewProperty(self, key, value):
+        self.view_properties[key] = value
+    # end def
+
+    def getViewProperty(self, key):
+        return self.view_properties[key]
+    # end def
+
+    def getName(self):
+        return self._properties['name']
+    # end def
+
+    def getPropertyDict(self):
+        return self._properties
+    # end def
+
+    def setProperty(self, key, value):
+        # use ModifyPropertyCommand here
+        self._properties[key] = value
+        self.partPropertyChangedSignal.emit(self, key, value)
+    # end def
+
+
     def setNumber(self, number):
         if self._number != number:
             num_to_vh_dict = self._part._number_to_virtual_helix
@@ -73,6 +111,12 @@ class VirtualHelix(ProxyObject):
             self._number = number
             self.virtualHelixNumberChangedSignal.emit(self, number)
             num_to_vh_dict[number] = self
+    # end def
+
+    def setTransform(self, transform):
+        if self._transform != transform:
+            self._transform = transform
+            self.virtualHelixTransformChangedSignal.emit(self, transform)
     # end def
 
     def setPart(self, new_part):
@@ -195,6 +239,7 @@ class VirtualHelix(ProxyObject):
         """
         vh = VirtualHelix(part, self._number)
         vh._coords = (self._coord[0], self._coord[1])
+        vh._theta = self._theta
         # If self._part exists, it owns self._number
         # in that only it may modify it through the
         # private interface. The public interface for

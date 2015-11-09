@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import PlasmidPartItemController
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from .customtreewidgetitems import PropertyItem, SelectionItem
 
 

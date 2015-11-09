@@ -8,12 +8,13 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
 from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from . import slicestyles as styles
 
 
-class VirtualHelixItem(QGraphicsEllipseItem):
+class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     """
     The VirtualHelixItem is an individual circle that gets drawn in the SliceView
     as a child of the OrigamiPartItem. Taken as a group, many SliceHelix
@@ -88,15 +89,19 @@ class VirtualHelixItem(QGraphicsEllipseItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def virtualHelixNumberChangedSlot(self, virtualHelix):
+    def virtualHelixNumberChangedSlot(self, virtual_helix):
         """
-        receives a signal containing a virtualHelix and the oldNumber
+        receives a signal containing a virtual_helix and the oldNumber
         as a safety check
         """
         self.setNumber()
     # end def
 
-    def virtualHelixRemovedSlot(self, virtualHelix):
+    def virtualHelixTransformChangedSlot(self, virtual_helix, transform):
+        pass
+    # end def
+
+    def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()
         self._controller = None
         self._empty_helix_item.setNotHovered()
@@ -105,10 +110,6 @@ class VirtualHelixItem(QGraphicsEllipseItem):
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
-    # end def
-
-    def strandAddedSlot(self, sender, strand):
-        pass
     # end def
 
     def createLabel(self):

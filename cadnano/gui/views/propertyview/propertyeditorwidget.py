@@ -20,6 +20,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 from .plasmidpartitem import PlasmidPartItem
 from .oligoitem import OligoItem
 from .nucleicacidpartitem import NucleicAcidPartItem
+from .virtualhelixitem import VirtualHelixItem
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
 _FONT = QFont(styles.THE_FONT, 12)
@@ -79,6 +80,7 @@ class PropertyEditorWidget(QTreeWidget):
         o = self._window.outliner_widget
         selected_items = o.selectedItems()
         self.clear()    # remove pre-existing items
+        print("selected:",selected_items)
         if len(selected_items) == 1:
             # get the selected item
             item = selected_items[0]
@@ -89,6 +91,8 @@ class PropertyEditorWidget(QTreeWidget):
             elif item_type is ItemType.OLIGO:
                 # print("oligo selected")
                 pass
+            elif item_type is ItemType.VIRTUALHELIX:
+                pe_item = VirtualHelixItem(item.modelVirtualHelix(), self)
             elif item_type is ItemType.NUCLEICACID:
                 # print("nucleicacid selected")
                 pe_item = NucleicAcidPartItem(item.part(), self)

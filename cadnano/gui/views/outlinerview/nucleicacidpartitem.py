@@ -9,9 +9,10 @@ from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
+from .virtualhelixitem import VirtualHelixItem
 
 NAME_COL = 0
 VISIBLE_COL = 1
@@ -57,8 +58,9 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
 
         # item groups
         self._root_items = {}
-        self._root_items['Strands'] = self._createRootItem('Strands', self)
-        self._root_items['Modifications'] = self._createRootItem('Modifications', self)
+        self._root_items['VHelixList'] = self._createRootItem('VHelixList', self)
+        self._root_items['OligoList'] = self._createRootItem('OligoList', self)
+        # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
         self._items = {} # children
     # end def
 
@@ -104,17 +106,34 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
         self._controller = None
     # end def
 
-    def partOligoAddedSlot(self, part, oligo):
-        oligo.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        o_i = OligoItem(part, oligo, self._root_items)
-        self._items[id(oligo)] = o_i
+    def partOligoAddedSlot(self, model_part, model_oligo):
+        print("partOligoAddedSlot")
+        m_o = model_oligo
+        m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
+        o_i = OligoItem(model_part, m_o, self._root_items['OligoList'])
+        self._items[id(m_o)] = o_i
     # end def
 
-    def partOligoRemovedSlot(self, part, oligo):
-        print("partOligoRemovedSlot", oligo, id(oligo))
-        o_i = self._items[id(oligo)]
+    def partOligoRemovedSlot(self, model_part, model_oligo):
+        m_o = model_oligo
+        o_i = self._items[id(m_o)]
         o_i.parent().removeChild(o_i)
-        del self._items[id(oligo)]
+        del self._items[id(m_o)]
+    # end def
+
+    def partVirtualHelixAddedSlot(self, model_part, model_virtual_helix):
+        print("partVirtualHelixAddedSlot", model_part, model_virtual_helix)
+        m_vh = model_virtual_helix
+        m_vh.virtualHelixRemovedSignal.connect(self.partVirtualHelixRemovedSlot)
+        vh_i = VirtualHelixItem(model_part, m_vh, self._root_items['VHelixList'])
+        self._items[id(m_vh)] = vh_i
+
+    def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):
+        m_vh = model_virtual_helix
+        print("partVirtualHelixRemovedSlot", m_vh, id(m_vh))
+        vh_i = self._items[id(m_vh)]
+        vh_i.parent().removeChild(vh_i)
+        del self._items[id(m_vh)]
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -129,5 +148,4 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     def partSelectedChangedSlot(self, model_part, is_selected):
         self.setSelected(is_selected)
     # end def
-
 # end class

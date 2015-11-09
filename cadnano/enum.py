@@ -52,7 +52,7 @@ class ItemType(_Enum):
     SELECTION = 7
     ANNOTATION = 8
     NUCLEICACID = 9
-
+    VIRTUALHELIX = 10
 
 class LatticeType:
     HONEYCOMB = 0
