@@ -375,11 +375,6 @@ class OutlineRootItem(QTreeWidget):
         pass
     # end def
 
-    def selectedChangedSlot(self, item_dict):
-        """docstring for selectedChangedSlot"""
-        pass
-    # end def
-
     # def selectionFilterChangedSlot(self, filter_name_list):
     #     pass
     # # end def

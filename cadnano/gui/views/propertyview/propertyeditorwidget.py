@@ -80,7 +80,6 @@ class PropertyEditorWidget(QTreeWidget):
         o = self._window.outliner_widget
         selected_items = o.selectedItems()
         self.clear()    # remove pre-existing items
-        print("selected:",selected_items)
         if len(selected_items) == 1:
             # get the selected item
             item = selected_items[0]
@@ -89,7 +88,7 @@ class PropertyEditorWidget(QTreeWidget):
                 pe_item = PlasmidPartItem(item.part(), self)
                 self.show()
             elif item_type is ItemType.OLIGO:
-                # print("oligo selected")
+                pe_item = OligoItem(item.modelOligo(), self)
                 pass
             elif item_type is ItemType.VIRTUALHELIX:
                 pe_item = VirtualHelixItem(item.modelVirtualHelix(), self)
@@ -124,11 +123,11 @@ class PropertyEditorWidget(QTreeWidget):
         if c_i is None:
             return
         if c_i == self.itemFromIndex(top_left):
+            print (c_i)
             c_i.updateModel()
     # end def
 
     def selectedChangedSlot(self, item_dict):
-        print("prop_editor: selectedChangedSlot")
         pass
     # end def
 
@@ -172,6 +171,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 editor = QSpinBox(parent_QWidget)
             elif data_type is bool:
                 editor = QCheckBox(parent_QWidget)
+            elif data_type is type(None):
+                return None
             else:
                 raise NotImplementedError
             return editor
@@ -215,6 +216,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 new_value = editor.value()
             elif data_type is bool:
                 new_value = editor.isChecked()
+            elif data_type is type(None):
+                return
             else:
                 raise NotImplementedError
             model.setData(model_index, new_value, Qt.EditRole)

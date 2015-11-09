@@ -107,22 +107,24 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     def partOligoAddedSlot(self, model_part, model_oligo):
-        print("partOligoAddedSlot")
         m_o = model_oligo
         m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
         o_i = OligoItem(model_part, m_o, self._root_items['OligoList'])
+        print ("partOligoAddedSlot", id(m_o), self._items.keys())
         self._items[id(m_o)] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
         m_o = model_oligo
+        m_o.oligoRemovedSignal.disconnect(self.partOligoRemovedSlot)
+        print ("partOligoRemovedSlot", id(m_o), self._items.keys())
         o_i = self._items[id(m_o)]
         o_i.parent().removeChild(o_i)
         del self._items[id(m_o)]
+
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, model_virtual_helix):
-        print("partVirtualHelixAddedSlot", model_part, model_virtual_helix)
         m_vh = model_virtual_helix
         m_vh.virtualHelixRemovedSignal.connect(self.partVirtualHelixRemovedSlot)
         vh_i = VirtualHelixItem(model_part, m_vh, self._root_items['VHelixList'])
@@ -130,7 +132,6 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
 
     def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):
         m_vh = model_virtual_helix
-        print("partVirtualHelixRemovedSlot", m_vh, id(m_vh))
         vh_i = self._items[id(m_vh)]
         vh_i.parent().removeChild(vh_i)
         del self._items[id(m_vh)]

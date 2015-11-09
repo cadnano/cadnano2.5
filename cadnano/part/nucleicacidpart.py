@@ -528,8 +528,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def addOligo(self, oligo):
-        # print("adding oligo", oligo)
         self._oligos.add(oligo)
+        self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
     def createVirtualHelix(self, row, col, use_undostack=True):

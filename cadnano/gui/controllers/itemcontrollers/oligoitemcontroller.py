@@ -11,6 +11,7 @@ class OligoItemController():
         m_o.oligoAppearanceChangedSignal.connect(o_i.oligoAppearanceChangedSlot)
         m_o.oligoSequenceAddedSignal.connect(o_i.oligoSequenceAddedSlot)
         m_o.oligoSequenceClearedSignal.connect(o_i.oligoSequenceClearedSlot)
+        m_o.oligoPropertyChangedSignal.connect(o_i.oligoPropertyChangedSlot)
     # end def
 
     def disconnectSignals(self):
@@ -19,4 +20,5 @@ class OligoItemController():
         m_o.oligoAppearanceChangedSignal.disconnect(o_i.oligoAppearanceChangedSlot)
         m_o.oligoSequenceAddedSignal.disconnect(o_i.oligoSequenceAddedSlot)
         m_o.oligoSequenceClearedSignal.disconnect(o_i.oligoSequenceClearedSlot)
+        m_o.oligoPropertyChangedSignal.connect(o_i.oligoPropertyChangedSlot)
     # end def

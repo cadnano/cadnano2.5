@@ -12,6 +12,8 @@ class AbstractOligoItem(object):
         pass
     def oligoSequenceClearedSlot(self, oligo):
         pass
+    def oligoPropertyChangedSlot(self, property_key, new_value):
+        pass
 # end class
 
 

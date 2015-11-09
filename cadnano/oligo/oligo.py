@@ -36,7 +36,10 @@ class Oligo(ProxyObject):
         self._strand5p = None
         self._length = 0
         self._is_loop = False
-        self._color = color if color else "#cc0000"
+        self._properties = {}
+        self._properties['name'] = "oligo%s" % str(id(self))[-4:]
+        self._properties['color'] = color if color else "#cc0000"
+        # self._color = color if color else "#cc0000"
     # end def
 
     def __repr__(self):
@@ -57,7 +60,8 @@ class Oligo(ProxyObject):
         olg._strand5p = self._strand5p
         olg._length = self._length
         olg._is_loop = self._is_loop
-        olg._color = self._color
+        # olg._color = self._color
+        olg._color = self._properties['color']
         return olg
     # end def
 
@@ -66,27 +70,47 @@ class Oligo(ProxyObject):
         olg._strand5p = None
         olg._length = self._length
         olg._is_loop = self._is_loop
-        olg._color = self._color
+        # olg._color = self._color
+        olg._properties = self._properties
         return olg
     # end def
 
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(ProxyObject,
-                                        name='oligoIdentityChangedSignal') # new oligo
+                                        name='oligoIdentityChangedSignal')  # new oligo
     oligoAppearanceChangedSignal = ProxySignal(ProxyObject,
                                         name='oligoAppearanceChangedSignalpyqtSignal')  # self
     oligoRemovedSignal = ProxySignal(ProxyObject, ProxyObject,
                                         name='oligoRemovedSignal')  # part, self
     oligoSequenceAddedSignal = ProxySignal(ProxyObject,
-                                        name='oligoSequenceAddedSignal') # self
+                                        name='oligoSequenceAddedSignal')  # self
     oligoSequenceClearedSignal = ProxySignal(ProxyObject,
                                         name='oligoSequenceClearedSignal')  # self
+    oligoPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+                                        name='oligoPropertyChangedSignal')  # self, property_name, new_value
 
     ### SLOTS ###
 
     ### ACCESSORS ###
+    def getProperty(self, key):
+        return self._properties[key]
+    # end def
+
+    def getPropertyDict(self):
+        return self._properties
+    # end def
+
+    def setProperty(self, key, value):
+        # use ModifyPropertyCommand here
+        self._properties[key] = value
+        if key == 'color':
+            self.oligoAppearanceChangedSignal.emit(self)
+        self.oligoPropertyChangedSignal.emit(self, key, value)
+    # end def
+
     def color(self):
-        return self._color
+        # return self._color
+        return self._properties['color']
     # end def
 
     def locString(self):
@@ -110,6 +134,7 @@ class Oligo(ProxyObject):
         for strand in s5p.generator3pStrand():
             pass
         return strand
+    # end def
 
     def setStrand5p(self, strand):
         self._strand5p = strand
@@ -122,12 +147,14 @@ class Oligo(ProxyObject):
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def isLoop(self):
         return self._is_loop
+    # end def
 
     def isStaple(self):
         if self._strand5p is not None:
             return self._strand5p.isStaple()
         else:
             return False
+    # end def
 
     def length(self):
         return self._length
@@ -163,7 +190,7 @@ class Oligo(ProxyObject):
         seq = modseq5p + seq + modseq3p
         output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
                 (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
-                    self._color, modseq5p_name, modseq3p_name)
+                    self.color(), modseq5p_name, modseq3p_name)
         return output
     # end def
 
@@ -187,7 +214,7 @@ class Oligo(ProxyObject):
     # end def
 
     def applyColor(self, color, use_undostack=True):
-        if color == self._color:
+        if color == self.color():
             return  # oligo already has color
         c = ApplyColorCommand(self, color)
         util.execCommandList(self, [c], desc="Color Oligo", use_undostack=use_undostack)
@@ -204,6 +231,7 @@ class Oligo(ProxyObject):
 
     def setLoop(self, bool):
         self._is_loop = bool
+    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def addToPart(self, part):
@@ -249,7 +277,8 @@ class Oligo(ProxyObject):
     # end def
 
     def setColor(self, color):
-        self._color = color
+        self._properties['color'] = color
+        # self._color = color
     # end def
 
     def setLength(self, length):

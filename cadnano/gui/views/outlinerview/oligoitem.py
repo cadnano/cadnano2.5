@@ -7,8 +7,9 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 
 from cadnano.enum import ItemType
+from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views import styles
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 
 
@@ -16,20 +17,16 @@ NAME_COL = 0
 VISIBLE_COL = 1
 COLOR_COL = 2
 
-class OligoItemDelegate(QStyledItemDelegate, AbstractPartItem):
+class OligoItemDelegate(QStyledItemDelegate, AbstractOligoItem):
     def paint(self, painter, option, index):
         print("OligoItemDelegate")
         option.rect.adjust(-5,0,0,0)
         QItemDelegate.paint(painter, option, index)
 
-class OligoItem(QTreeWidgetItem, AbstractPartItem):
-    def __init__(self, model_part, model_oligo, parent_dict):
+class OligoItem(QTreeWidgetItem, AbstractOligoItem):
+    def __init__(self, model_part, model_oligo, parent):
         self._model_part = m_p = model_part
         self._model_oligo = m_o = model_oligo
-        if m_o.isStaple():
-            parent = parent_dict["Staples"]
-        else:
-            parent = parent_dict["Scaffolds"]
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
 
         self._controller = OligoItemController(self, model_oligo)
@@ -50,29 +47,40 @@ class OligoItem(QTreeWidgetItem, AbstractPartItem):
     # end def
 
     def part(self):
+        return self.model_part
+    # end def
+
+    def modelOligo(self):
         return self._model_oligo
     # end def
 
     def updateModel(self):
-        # find what changed
-        for p in self._props:
-            col = self._props[p]["column"]
-            v = self.data(col, Qt.DisplayRole)
-            m_v = self._model_oligo.getProperty(p)
-            if v != m_v:
-                self._model_oligo.setProperty(p, v)
+        # this works only for color. uncomment below to generalize to properties
+        print("outliner oligoItem - updateModel")
+        m_o = self._model_oligo
+        name = self.data(NAME_COL, Qt.DisplayRole)
+        color = self.data(COLOR_COL, Qt.DisplayRole)
+        model_props = m_o.getPropertyDict()
+        if name != model_props['name']:
+            m_o.setProperty('name', name)
+        if color != model_props['color']:
+            m_o.setProperty('color', color)
     # end def
 
     ### SLOTS ###
-    def oligoAppearanceChangedSlot(self):
-        pass
+    def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
+        if key == 'name':
+            self.setData(NAME_COL, Qt.EditRole, new_value)
+        elif key == 'color': 
+            self.setData(COLOR_COL, Qt.EditRole, new_value)
     # end def
-    
-    def oligoSequenceAddedSlot(self):
-        pass
+
+    def oligoAppearanceChangedSlot(self, model_oligo):
+        color = model_oligo.color()
+        displayed_color = self.data(COLOR_COL, Qt.DisplayRole)
+        if displayed_color != color:
+            self.setData(COLOR_COL, Qt.EditRole, color)
     # end def
-    
-    def oligoSequenceClearedSlot(self):
-        pass
-    # end def
+   
+
 # end class
