@@ -138,6 +138,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self._model_props[property_key] = new_value
             if property_key == 'color':
                 self._updateBoundingRect()
+                for vhi in self._virtual_helix_item_list:
+                    vhi.handle().refreshColor()
     # end def
 
     def partRemovedSlot(self, sender):

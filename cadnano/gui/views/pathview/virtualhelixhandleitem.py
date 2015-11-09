@@ -16,8 +16,6 @@ _DEF_BRUSH = getBrushObj(styles.GRAY_FILL)
 _DEF_PEN = getPenObj(styles.GRAY_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-_USE_BRUSH = getBrushObj(styles.ORANGE_FILL)
-_USE_PEN = getPenObj(styles.ORANGE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
 
@@ -29,9 +27,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
         self._virtual_helix = virtual_helix
         self._nucleicacid_part_item = nucleicacid_part_item
+        self._model_part = nucleicacid_part_item.part()
         self._viewroot = viewroot
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
+        self.refreshColor()
         # handle the label specific stuff
         self._label = self.createLabel()
         self.setNumber()
@@ -42,14 +42,23 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setRect(_RECT)
     # end def
 
+    def refreshColor(self):
+        part_color = self._model_part.getProperty('color')
+        self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
+        self.setPen(self._USE_PEN)
+        self.setBrush(self._USE_BRUSH)
+        self.update(self.boundingRect())
+    # end def
+
     def setSelectedColor(self, value):
         if self.number() >= 0:
             if value == True:
                 self.setBrush(_HOV_BRUSH)
                 self.setPen(_HOV_PEN)
             else:
-                self.setBrush(_USE_BRUSH)
-                self.setPen(_USE_PEN)
+                self.setBrush(self._USE_BRUSH)
+                self.setPen(self._USE_PEN)
         else:
             self.setBrush(_DEF_BRUSH)
             self.setPen(_DEF_PEN)
@@ -129,7 +138,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
                 if self.isSelected():
                     self.setBrush(_HOV_BRUSH)
                 else:
-                    self.setBrush(_USE_BRUSH)
+                    self.setBrush(self._USE_BRUSH)
             else:
                 self.setBrush(_DEF_BRUSH)
             self.setPen(_HOV_PEN)

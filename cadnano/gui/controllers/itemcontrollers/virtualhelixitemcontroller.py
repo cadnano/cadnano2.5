@@ -29,3 +29,4 @@ class VirtualHelixItemController():
         for strandSet in mvh.getStrandSets():
             strandSet.strandsetStrandAddedSignal.disconnect(vh_item.strandAddedSlot)
             # strandSet.decoratorAddedSignal.disconnect(vh_item.decoratorAddedSlot)
+    # end def
