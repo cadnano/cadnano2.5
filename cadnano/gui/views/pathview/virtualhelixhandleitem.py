@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QUndoCommand, QStyle
 
 from cadnano import util
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj
 from . import pathstyles as styles
 
 
@@ -33,6 +33,26 @@ _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WI
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
 
+class PreXoverItemGroup(QGraphicsEllipseItem):
+    def __init__(self, rect, parent=None):
+        super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self._parent = parent
+        self.setPen(getNoPen())
+        iw = _ITEM_WIDTH = 6
+        x = _RECT.width() - 2*styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH - 1
+        y = _RECT.center().y()
+        prexo_items = {}
+        angles = [0, 240, 120, 150, 30, 270]
+        colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
+        for i in range(len(angles)):
+            item = QGraphicsEllipseItem(x, y, iw, iw, self)
+            item.setPen(QPen(Qt.NoPen))
+            item.setBrush(getBrushObj(colors[i]))
+            item.setTransformOriginPoint(_RECT.center())
+            item.setRotation(angles[i])
+            prexo_items[i] = item
+    # end def
+
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
 
@@ -55,6 +75,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setRect(_RECT)
         self.setTransformOriginPoint(self.boundingRect().center())
 
+
         # rotation 
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
@@ -62,10 +83,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._outer_line = RotaryDialLine(self._rect, self)
         self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
         self.show()
+
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
+        _pxig.setTransformOriginPoint(_RECT.center())
+
     # end def
 
     def rotateWithCenterOrigin(self, angle):
-        self.setRotation(angle)
+        self._prexoveritemgroup.setRotation(angle)
     # end def
 
     def part(self):
