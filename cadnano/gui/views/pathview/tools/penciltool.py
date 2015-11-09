@@ -560,12 +560,12 @@ class ForcedXoverItem(QGraphicsPathItem):
     XoverItem should be a child of a PartItem.
     """
 
-    def __init__(self, tool, origami_part_item, virtual_helix_item):
+    def __init__(self, tool, nucleicacid_part_item, virtual_helix_item):
         """
         strand_item is a the model representation of the 5prime most strand
         of a Xover
         """
-        super(ForcedXoverItem, self).__init__(origami_part_item)
+        super(ForcedXoverItem, self).__init__(nucleicacid_part_item)
         self._tool = tool
         self._virtual_helix_item = virtual_helix_item
         self._strand_type = None
@@ -660,7 +660,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         self.updateFloatPath()
     # end def
 
-    def updateFloatingFromPartItem(self, origami_part_item, pt):
+    def updateFloatingFromPartItem(self, nucleicacid_part_item, pt):
         self._node3.hideItems()
         self.updateFloatPath(pt)
     # end def
@@ -682,8 +682,8 @@ class ForcedXoverItem(QGraphicsPathItem):
         bw = _BASE_WIDTH
 
         vhi5 = self._virtual_helix_item
-        origami_part_item = vhi5.partItem()
-        pt5 = vhi5.mapToItem(origami_part_item, *node5.floatPoint())
+        nucleicacid_part_item = vhi5.partItem()
+        pt5 = vhi5.mapToItem(nucleicacid_part_item, *node5.floatPoint())
 
         five_is_top = node5.isOnTop()
         five_is_5_to_3 = node5.isDrawn5to3()
@@ -704,7 +704,7 @@ class ForcedXoverItem(QGraphicsPathItem):
             same_parity = False
             three_enter_pt = three_center_pt = three_exit_pt = pt3
         else:
-            pt3 = vhi3.mapToItem(origami_part_item, *node3.point())
+            pt3 = vhi3.mapToItem(nucleicacid_part_item, *node3.point())
             three_is_top = node3.isOnTop()
             three_is_5_to_3 = node3.isDrawn5to3()
             same_strand = (node5.strandType() == node3.strandType()) and vhi3 == vhi5

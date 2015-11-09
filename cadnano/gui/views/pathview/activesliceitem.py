@@ -24,14 +24,14 @@ _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 class ActiveSliceItem(QGraphicsRectItem):
     """ActiveSliceItem for the Path View"""
 
-    def __init__(self, origami_part_item, active_base_index):
-        super(ActiveSliceItem, self).__init__(origami_part_item)
-        self._origami_part_item = origami_part_item
-        self._getActiveTool = origami_part_item._getActiveTool
+    def __init__(self, nucleicacid_part_item, active_base_index):
+        super(ActiveSliceItem, self).__init__(nucleicacid_part_item)
+        self._nucleicacid_part_item = nucleicacid_part_item
+        self._getActiveTool = nucleicacid_part_item._getActiveTool
         self._active_slice = 0
         self._low_drag_bound = 0
         self._high_drag_bound = self.part().maxBaseIdx()
-        self._controller = ActiveSliceItemController(self, origami_part_item.part())
+        self._controller = ActiveSliceItemController(self, nucleicacid_part_item.part())
 
         self._label = QGraphicsSimpleTextItem("", parent=self)
         self._label.setPos(0, 2)
@@ -43,7 +43,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         self.setAcceptHoverEvents(True)
         self.setZValue(styles.ZACTIVESLICEHANDLE)
         self.setRect(QRectF(0, 0, _BASE_WIDTH,\
-                      self._origami_part_item.boundingRect().height()))
+                      self._nucleicacid_part_item.boundingRect().height()))
         self.setPos(active_base_index*_BASE_WIDTH, 0)
         self.setBrush(_BRUSH)
         self.setPen(_PEN)
@@ -71,7 +71,7 @@ class ActiveSliceItem(QGraphicsRectItem):
     def updateRectSlot(self, part):
         bw = _BASE_WIDTH
         new_rect = QRectF(0, 0, bw,\
-                    self._origami_part_item.virtualHelixBoundingRect().height())
+                    self._nucleicacid_part_item.virtualHelixBoundingRect().height())
         if new_rect != self.rect():
             self.setRect(new_rect)
         self._hideIfEmptySelection()
@@ -100,11 +100,11 @@ class ActiveSliceItem(QGraphicsRectItem):
     # end def
 
     def part(self):
-        return self._origami_part_item.part()
+        return self._nucleicacid_part_item.part()
     # end def
 
     def partItem(self):
-        return self._origami_part_item
+        return self._nucleicacid_part_item
     # end def
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
@@ -112,7 +112,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         scene = self.scene()
         scene.removeItem(self._label)
         scene.removeItem(self)
-        self._origami_part_item = None
+        self._nucleicacid_part_item = None
         self._label = None
         self._controller.disconnectSignals()
         self.controller = None
@@ -137,13 +137,13 @@ class ActiveSliceItem(QGraphicsRectItem):
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
-        self._origami_part_item.updateStatusBar("%d" % self.part().activeBaseIndex())
+        self._nucleicacid_part_item.updateStatusBar("%d" % self.part().activeBaseIndex())
         QGraphicsItem.hoverEnterEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):
         self.setCursor(Qt.ArrowCursor)
-        self._origami_part_item.updateStatusBar("")
+        self._nucleicacid_part_item.updateStatusBar("")
         QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
 
@@ -254,5 +254,5 @@ class ActiveSliceItem(QGraphicsRectItem):
         self.setPos(x, self.y())
         self.updateIndexSlot(None, idx)
         self._setActiveBaseIndex(idx)
-        self._origami_part_item.updateStatusBar("%d" % self.part().activeBaseIndex())
+        self._nucleicacid_part_item.updateStatusBar("%d" % self.part().activeBaseIndex())
     # end def

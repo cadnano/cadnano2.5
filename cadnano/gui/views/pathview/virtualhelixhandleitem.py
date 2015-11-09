@@ -25,10 +25,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     """docstring for VirtualHelixHandleItem"""
     _filter_name = "virtual_helix"
 
-    def __init__(self, virtual_helix, origami_part_item, viewroot):
-        super(VirtualHelixHandleItem, self).__init__(origami_part_item)
+    def __init__(self, virtual_helix, nucleicacid_part_item, viewroot):
+        super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
         self._virtual_helix = virtual_helix
-        self._origami_part_item = origami_part_item
+        self._nucleicacid_part_item = nucleicacid_part_item
         self._viewroot = viewroot
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
@@ -116,7 +116,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._virtual_helix.number()
 
     def partItem(self):
-        return self._origami_part_item
+        return self._nucleicacid_part_item
     # end def
 
     def hoverEnterEvent(self, event):
@@ -170,7 +170,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def restoreParent(self, pos=None):
         """
-        Required to restore parenting and positioning in the origami_part_item
+        Required to restore parenting and positioning in the nucleicacid_part_item
         """
 
         # map the position
@@ -181,11 +181,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def tempReparent(self, pos=None):
-        origami_part_item = self._origami_part_item
+        nucleicacid_part_item = self._nucleicacid_part_item
         if pos is None:
             pos = self.scenePos()
-        self.setParentItem(origami_part_item)
-        temp_point = origami_part_item.mapFromScene(pos)
+        self.setParentItem(nucleicacid_part_item)
+        temp_point = nucleicacid_part_item.mapFromScene(pos)
         self.setPos(temp_point)
     # end def
 

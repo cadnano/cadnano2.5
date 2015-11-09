@@ -80,8 +80,8 @@ class SliceRootItem(QGraphicsRectItem):
         del self._instance_items[part_item]
     # end def
 
-    # def removeOrigamiPartItem(self, origami_part_item):
-    #     del self._instance_items[origami_part_item]
+    # def removeOrigamiPartItem(self, nucleicacid_part_item):
+    #     del self._instance_items[nucleicacid_part_item]
     # # end def
 
     def resetDocumentAndController(self, document):
@@ -94,6 +94,6 @@ class SliceRootItem(QGraphicsRectItem):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for origami_part_item in self._instance_items:
-            origami_part_item.setModifyState(bool)
+        for nucleicacid_part_item in self._instance_items:
+            nucleicacid_part_item.setModifyState(bool)
     # end def

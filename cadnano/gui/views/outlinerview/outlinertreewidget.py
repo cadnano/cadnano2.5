@@ -363,8 +363,8 @@ class OutlineRootItem(QTreeWidget):
         if part_type == "PlasmidPart":
             plasmid_part_item = PlasmidPartItem(model_part, parent=self)
         elif part_type in ["HoneycombPart", "SquarePart"]:
-            origami_part_item = OrigamiPartItem(model_part, parent=self)
-            self.addTopLevelItem(origami_part_item)
+            nucleicacid_part_item = OrigamiPartItem(model_part, parent=self)
+            self.addTopLevelItem(nucleicacid_part_item)
         else:
             print(part_type)
             raise NotImplementedError
@@ -414,6 +414,6 @@ class OutlineRootItem(QTreeWidget):
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for origami_part_item in self._instance_items:
-            origami_part_item.setModifyState(bool)
+        for nucleicacid_part_item in self._instance_items:
+            nucleicacid_part_item.setModifyState(bool)
     # end def

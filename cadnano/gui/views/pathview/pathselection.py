@@ -339,11 +339,11 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
             indexDelta = int((delta + mid_height) / helix_height)
         # sort on y to determine the extremes of the selection group
         items = sorted(self._item_group.childItems(), key=lambda vhhi: vhhi.y())
-        origami_part_item = items[0].partItem()
-        origami_part_item.reorderHelices(items[0].number(),\
+        nucleicacid_part_item = items[0].partItem()
+        nucleicacid_part_item.reorderHelices(items[0].number(),\
                                 items[-1].number(),\
                                 indexDelta)
-        origami_part_item.updateStatusBar("")
+        nucleicacid_part_item.updateStatusBar("")
     # end def
 
     def boxParent(self):
