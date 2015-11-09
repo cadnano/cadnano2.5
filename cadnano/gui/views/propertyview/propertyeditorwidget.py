@@ -123,7 +123,6 @@ class PropertyEditorWidget(QTreeWidget):
         if c_i is None:
             return
         if c_i == self.itemFromIndex(top_left):
-            print (c_i)
             c_i.updateModel()
     # end def
 

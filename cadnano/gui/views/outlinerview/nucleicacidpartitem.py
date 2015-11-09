@@ -110,14 +110,12 @@ class NucleicAcidPartItem(QTreeWidgetItem, AbstractPartItem):
         m_o = model_oligo
         m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
         o_i = OligoItem(model_part, m_o, self._root_items['OligoList'])
-        print ("partOligoAddedSlot", id(m_o), self._items.keys())
         self._items[id(m_o)] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
         m_o = model_oligo
         m_o.oligoRemovedSignal.disconnect(self.partOligoRemovedSlot)
-        print ("partOligoRemovedSlot", id(m_o), self._items.keys())
         o_i = self._items[id(m_o)]
         o_i.parent().removeChild(o_i)
         del self._items[id(m_o)]
