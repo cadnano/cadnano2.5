@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
+from PyQt5.QtWidgets import QColorDialog
 
 from cadnano.enum import PartType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
@@ -162,28 +163,28 @@ class OutlinerTreeWidget(QTreeWidget):
 
 
 class CustomStyleItemDelegate(QStyledItemDelegate):
-    def createEditor(self, parentQWidget, option, model_index):
+    def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
         if column == 0: # Part Name
-            editor = QLineEdit(parentQWidget)
+            editor = QLineEdit(parent_QWidget)
             editor.setAlignment(Qt.AlignVCenter)
             return editor
         elif column == 1: # Visibility checkbox
-            editor = QCheckBox(parentQWidget)
+            editor = QCheckBox(parent_QWidget)
             # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
             return editor
-        # elif column == 2: # Color Picker
-        #     editor = QPushButton(parentQWidget)
-        #     return editor
+        elif column == 2: # Color Picker
+            editor = QColorDialog(parent_QWidget)
+            return editor
         # elif column == 3: # SpinBox Example
-        #     editor = QSpinBox(parentQWidget)
+        #     editor = QSpinBox(parent_QWidget)
         #     editor.setAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
         #     editor.setMinimum(0)
         #     editor.setMaximum(100)
         #     return editor
         else:
             return QStyledItemDelegate.createEditor(self, \
-                            parentQWidget, option, model_index)
+                            parent_QWidget, option, model_index)
     # end def
 
     def setEditorData(self, editor, model_index):
@@ -196,7 +197,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             editor.setChecked(value)
         elif column == 2: # Color
             value = model_index.model().data(model_index, Qt.EditRole)
-            editor.setText(value)
+            # editor.setText(value)
+            editor.setCurrentColor(QColor(value))
         # elif column == 3: # SpinBox Example
         #     value = model_index.model().data(model_index, Qt.EditRole)
         #     editor.setValue(value)
@@ -213,8 +215,11 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             value = editor.isChecked()
             model.setData(model_index, value, Qt.EditRole)
         elif column == 2: # Color
-            color = editor.text()
-            model.setData(model_index, color, Qt.EditRole)
+            # color = editor.text()
+            # model.setData(model_index, color, Qt.EditRole)
+            color = editor.currentColor()
+            model.setData(model_index, color.name(), Qt.EditRole)
+
         # elif column == 3: # SpinBox Example
         #     value = editor.value()
         #     model.setData(model_index, value, Qt.EditRole)
@@ -232,7 +237,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             rect.setX(option.rect.x() + delta) # Hack to center the checkbox
             editor.setGeometry(rect)
         elif column == 2:
-            editor.setGeometry(option.rect)
+            pass
+            # editor.setGeometry(option.rect)
         else:
             QStyledItemDelegate.updateEditorGeometry(self, editor, option, model_index)
     # end def
