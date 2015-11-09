@@ -57,15 +57,15 @@ class HoneycombPart(OrigamiPart):
         return (row % 2) ^ (column % 2)
     # end def
 
-    def getVirtualHelixNeighbors(self, virtualHelix):
+    def getVirtualHelixNeighbors(self, virtual_helix):
         """
         returns the list of neighboring virtualHelices based on parity of an
-        input virtualHelix
+        input virtual_helix
 
         If a potential neighbor doesn't exist, None is returned in it's place
         """
         neighbors = []
-        vh = virtualHelix
+        vh = virtual_helix
         if vh is None:
             return neighbors
 

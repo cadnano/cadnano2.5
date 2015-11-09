@@ -29,13 +29,13 @@ class HoneycombDnaPart(NucleicAcidPart):
     def __init__(self, *args, **kwargs):
         super(HoneycombDnaPart, self).__init__(self, *args, **kwargs)
         self._max_row = kwargs.get('max_row')
-        if self._max_row == None:
+        if self._max_row is None:
             raise ValueError("%s: Need max_row kwarg" % (type(self).__name__))
         self._max_col = kwargs.get('max_col')
-        if self._max_col == None:
+        if self._max_col is None:
             raise ValueError("%s: Need max_col kwarg" % (type(self).__name__))
         self._max_base = kwargs.get('max_steps') * self._STEP - 1
-        if self._max_base == None:
+        if self._max_base is None:
             raise ValueError("%s: Need max_base kwarg" % (type(self).__name__))
         print("new HoneycombDnaPart")
 
@@ -51,16 +51,16 @@ class HoneycombDnaPart(NucleicAcidPart):
         return (row % 2) ^ (column % 2)
     # end def
 
-    def getVirtualHelixNeighbors(self, virtualHelix):
+    def getVirtualHelixNeighbors(self, virtual_helix):
         """
-        returns the list of neighboring virtualHelices based on parity of an
-        input virtualHelix
+        returns the list of neighboring virtual_helices based on parity of an
+        input virtual_helix
 
         If a potential neighbor doesn't exist, None is returned in it's place
         """
         neighbors = []
-        vh = virtualHelix
-        if vh == None:
+        vh = virtual_helix
+        if vh is None:
             return neighbors
 
         # assign the method to a a local variable

@@ -160,9 +160,10 @@ class PropertyEditorWidget(QTreeWidget):
 class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
+        treewidgetitem = self.parent().itemFromIndex(model_index)
         if column == 0: # Property Name
             return None
-        elif column == 1: # Visibility checkbox
+        elif column == 1:
             data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
             if data_type is str:
                 editor = QLineEdit(parent_QWidget)
