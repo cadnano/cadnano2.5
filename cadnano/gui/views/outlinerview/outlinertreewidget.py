@@ -196,9 +196,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             value = model_index.model().data(model_index, Qt.EditRole)
             editor.setChecked(value)
         elif column == 2: # Color
-            # value = model_index.model().data(model_index, Qt.EditRole)
+            value = model_index.model().data(model_index, Qt.EditRole)
             # editor.setText(value)
-            value = model_index.model().data(model_index, Qt.DecorationRole)
             editor.setCurrentColor(QColor(value))
         # elif column == 3: # SpinBox Example
         #     value = model_index.model().data(model_index, Qt.EditRole)
@@ -219,7 +218,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             # color = editor.text()
             # model.setData(model_index, color, Qt.EditRole)
             color = editor.currentColor()
-            model.setData(model_index, color.name(),  Qt.DecorationRole)
+            model.setData(model_index, color.name(), Qt.EditRole)
 
         # elif column == 3: # SpinBox Example
         #     value = editor.value()
@@ -261,8 +260,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
 
         elif column == 2: # Color
-            # color = model_index.model().data(model_index, Qt.EditRole)
-            color = model_index.model().data(model_index,  Qt.DecorationRole)
+            color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionViewItem()
             styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
