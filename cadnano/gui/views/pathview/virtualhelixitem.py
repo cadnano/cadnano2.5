@@ -87,7 +87,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
-            self._handle.setRotation(new_value)
+            self._handle.rotateWithCenterOrigin(new_value)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
