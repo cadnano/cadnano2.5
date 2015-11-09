@@ -18,34 +18,18 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-
         self._model_virtual_helix = m_vh = model_virtual_helix
         self._parent_tree = parent
-
         root = parent.invisibleRootItem() # add propertyitems as siblings
-
         # Properties
         self._prop_items = {}
         self._model_props = m_vh.getPropertyDict()
+        # add properties alphabetically, but with 'name' on top
         for key in sorted(self._model_props):
-            if key == "name": # name on top
-                p_i = self
-            else:
-                p_i = PropertyItem(m_vh, key, root)
+            p_i = self if key == 'name' else PropertyItem(m_vh, key, root)
             self._prop_items[key] = p_i
             p_i.setData(KEY_COL, Qt.EditRole, key)
             p_i.setData(VAL_COL, Qt.EditRole, self._model_props[key])
-
-        # Selections
-        # self._selections_root = s_r = PropertyItem(m_vh, None, root)
-        # s_r.setData(KEY_COL, Qt.EditRole, "selections")
-        # s_r.setExpanded(True)
-
-        # self._selections = m_vh.part().getSelectionDict()
-        # for key in sorted(self._selections):
-        #     print(self._selections[key])
-        #     (start, end) = self._selections[key]
-        #     s_i = SelectionItem(m_vh, key, start, end, self._selections_root)
     # end def
 
     # SLOTS
@@ -56,5 +40,13 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
 
     def itemType(self):
         return ItemType.VIRTUALHELIX
+    # end def
+
+    def updateModel(self):
+        m_vh = self._model_virtual_helix
+        for m_key, m_val in m_vh.getPropertyDict().iterItems():
+            item_val = self._prop_items[key].data(VAL_COL, Qt.DisplayRole)
+            if m_val != item_val:
+                m_vh.setProperty(key, item_val)
     # end def
 # end class

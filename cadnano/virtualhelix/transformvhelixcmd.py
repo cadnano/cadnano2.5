@@ -14,7 +14,7 @@ class TransformVirtualHelixCommand(UndoCommand):
         vh = self._virtual_helix
         part = self._part
         tr = self._transform
-        vh.virtualHelixTransformChangedSignal.emit(vh, tr)
+        vh.virtualHelixPropertyChangedSignal.emit(vh, tr)
         part.partActiveSliceResizeSignal.emit(part)
     # end def
 

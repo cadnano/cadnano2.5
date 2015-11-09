@@ -64,7 +64,7 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
     # end def
 
     ### SLOTS ###
-    def virtualHelixTransformChangedSlot(self, model_part, property_key, new_value):
+    def virtualHelixPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
             if property_key in self._props:
                 col = self._props[property_key]["column"]

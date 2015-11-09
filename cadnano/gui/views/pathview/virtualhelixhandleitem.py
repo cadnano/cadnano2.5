@@ -40,6 +40,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setSelectedColor(False)
         self.setZValue(styles.ZPATHHELIX)
         self.setRect(_RECT)
+        self.setTransformOriginPoint(self.boundingRect().center())
     # end def
 
     def refreshColor(self):

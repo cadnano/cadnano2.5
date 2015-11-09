@@ -97,8 +97,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.setNumber()
     # end def
 
-    def virtualHelixTransformChangedSlot(self, virtual_helix, transform):
-        pass
+    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
+        if property_key == 'eulerZ':
+            self.setTransformOriginPoint(self.boundingRect().center())
+            self.setRotation(new_value)
     # end def
 
     def virtualHelixRemovedSlot(self, virtual_helix):

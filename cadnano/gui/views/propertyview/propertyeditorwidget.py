@@ -168,6 +168,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 editor = QLineEdit(parent_QWidget)
             elif data_type is int:
                 editor = QSpinBox(parent_QWidget)
+                editor.setMaximum(359)
             elif data_type is bool:
                 editor = QCheckBox(parent_QWidget)
             elif data_type is type(None):

@@ -16,8 +16,6 @@ from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
-# _gridPen = QPen(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
-# _gridPen.setCosmetic(True)
 
 
 class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
@@ -87,8 +85,14 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self._handle.setNumber()
     # end def
 
-    def virtualHelixTransformChangedSlot(self, virtual_helix, transform):
-        self._handle.setTransform()
+    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
+        if property_key == 'eulerZ':
+            self._handle.setRotation(new_value)
+    # end def
+
+    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        if property_key == 'color':
+            self._handle.refreshColor()
     # end def
 
     def virtualHelixRemovedSlot(self, virtual_helix):

@@ -31,16 +31,20 @@ class VirtualHelix(ProxyObject):
         self._number = None
         self.setNumber(idnum)
 
-        self._properties = {'x':0, 'y':0, 'z':0, 'eulerX':0, 'eulerY':0, 'eulerZ':0}
+        # self._properties = {'x':0, 'y':0, 'z':0, 'eulerX':0, 'eulerY':0, 'eulerZ':0}
+        self._properties = {'eulerZ':0}
     # end def
 
     def __repr__(self):
         return "<%s(%d)>" % (self.__class__.__name__, self._number)
 
     ### SIGNALS ###
-    virtualHelixRemovedSignal = ProxySignal(ProxyObject, name='virtualHelixRemovedSignal')  # self
-    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int, name='virtualHelixNumberChangedSignal')  # self, num
-    virtualHelixTransformChangedSignal = ProxySignal(ProxyObject, tuple, name='virtualHelixTransformChangedSignal')  # self, transform
+    virtualHelixRemovedSignal = ProxySignal(ProxyObject, 
+                                            name='virtualHelixRemovedSignal')  # self
+    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int, 
+                                            name='virtualHelixNumberChangedSignal')  # self, num
+    virtualHelixPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+                                            name='virtualHelixPropertyChangedSignal')  # self, transform
 
     ### SLOTS ###
 
@@ -99,7 +103,7 @@ class VirtualHelix(ProxyObject):
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
         self._properties[key] = value
-        self.partPropertyChangedSignal.emit(self, key, value)
+        self.virtualHelixPropertyChangedSignal.emit(self, key, value)
     # end def
 
 
@@ -116,7 +120,7 @@ class VirtualHelix(ProxyObject):
     def setTransform(self, transform):
         if self._transform != transform:
             self._transform = transform
-            self.virtualHelixTransformChangedSignal.emit(self, transform)
+            self.virtualHelixPropertyChangedSignal.emit(self, transform)
     # end def
 
     def setPart(self, new_part):

@@ -8,7 +8,7 @@ class AbstractVirtualHelixItem(object):
     """
     def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         raise NotImplementedError
-    def virtualHelixTransformChangedSlot(self, virtual_helix, transform):
+    def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
         pass
     def virtualHelixRemovedSlot(self, virtual_helix):
         raise NotImplementedError
