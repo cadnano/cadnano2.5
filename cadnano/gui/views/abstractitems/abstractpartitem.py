@@ -20,28 +20,22 @@ class AbstractPartItem(object):
         pass
     def partSelectedChangedSlot(self, model_part, is_selected):
         pass
-
     def partActiveVirtualHelixChangedSlot(self, sender):
         pass
-    # end def
     def partPreDecoratorSelectedSlot(self, sender):
         pass
-    # end def
     def updatePreXoverItemsSlot(self, sender):
         pass
-    # end def
     def partVirtualHelixAddedSlot(self, sender):
         pass
-    # end def
     def partVirtualHelixRenumberedSlot(self, sender):
         pass
-    # end def
     def partVirtualHelixResizedSlot(self, sender):
         pass
-    # end def
+    def partVirtualHelixTransformedSlot(self, sender):
+        pass
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
-    # end def
 # end class
 
 

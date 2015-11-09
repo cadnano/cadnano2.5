@@ -11,7 +11,7 @@ from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano import getReopen
 from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem

@@ -11,7 +11,7 @@ from cadnano import app, getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem

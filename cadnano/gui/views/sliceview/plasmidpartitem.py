@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QUndoCommand, QStyle
 from PyQt5.QtWidgets import QApplication
 
 from cadnano import getReopen
-from cadnano.gui.views.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import PlasmidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj
 from . import slicestyles as styles
