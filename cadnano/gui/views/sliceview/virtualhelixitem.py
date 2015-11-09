@@ -11,7 +11,7 @@ from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj
 from . import slicestyles as styles
 
 
@@ -25,9 +25,6 @@ _ZVALUE = styles.ZSLICEHELIX+3
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 
-HOVER_WIDTH = H_W = 20
-GAP = 2 # gap between inner and outer strands
-
 _ROTARYDIAL_STROKE_WIDTH = 1
 _ROTARYDIAL_PEN = getPenObj(styles.BLUE_STROKE, _ROTARYDIAL_STROKE_WIDTH)
 _ROTARYDIAL_BRUSH = getBrushObj('#8099ccff')
@@ -35,6 +32,29 @@ _ROTARY_DELTA_WIDTH = 10
 
 _HOVER_PEN = getPenObj('#ffffff', 128)
 _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
+
+
+
+class PreXoverItemGroup(QGraphicsEllipseItem):
+    def __init__(self, rect, parent=None):
+        super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self._parent = parent
+        self.setPen(getNoPen())
+
+        x = _RECT.width() - 2*rect_gain - 2*styles.SLICE_HELIX_STROKE_WIDTH - 1
+        y = _RECT.center().y()
+        prexo_items = {}
+        angles = [0, 240, 120, 150, 30, 270]
+        colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
+        for i in range(len(angles)):
+            item = QGraphicsEllipseItem(x, y, 3, 3, self)
+            item.setPen(QPen(Qt.NoPen))
+            item.setBrush(getBrushObj(colors[i]))
+            item.setTransformOriginPoint(_RECT.center())
+            item.setRotation(angles[i])
+            prexo_items[i] = item
+    # end def
+
 
 
 class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
@@ -53,7 +73,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._virtual_helix = model_virtual_helix
         self._empty_helix_item = empty_helix_item
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
-        self.setTransformOriginPoint(_RECT.center())
 
         self.hide()
 
@@ -69,6 +88,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.createArrows()
         self.updateProperty()
 
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
+        _pxig.setTransformOriginPoint(_RECT.center())
         # self._rect = QRectF(_RECT)
         # self._hover_rect = QRectF(_RECT)
         # self._outer_line = RotaryDialLine(self._rect, self)
@@ -118,7 +139,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
-            self.setRotation(new_value)
+            self._prexoveritemgroup.setRotation(new_value)
     # end def
 
     def virtualHelixRemovedSlot(self, virtual_helix):

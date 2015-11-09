@@ -16,7 +16,7 @@ class HoneycombDnaPart(NucleicAcidPart):
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
-    _TWIST_OFFSET = 20 # degrees
+    _TWIST_OFFSET = 0 # degrees
 
     _active_base_index = _STEP
     _SUB_STEP_SIZE = _STEP / 3
