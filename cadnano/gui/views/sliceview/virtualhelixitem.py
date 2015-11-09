@@ -24,7 +24,6 @@ _FONT = styles.SLICE_NUM_FONT
 _ZVALUE = styles.ZSLICEHELIX+3
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
-_OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
 HOVER_WIDTH = H_W = 20
 GAP = 2 # gap between inner and outer strands
@@ -70,10 +69,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.createArrows()
         self.updateProperty()
 
-        self._rect = QRectF(_RECT)
-        self._hover_rect = QRectF(_RECT)
-        self._outer_line = RotaryDialLine(self._rect, self)
-        self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
+        # self._rect = QRectF(_RECT)
+        # self._hover_rect = QRectF(_RECT)
+        # self._outer_line = RotaryDialLine(self._rect, self)
+        # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
         self.show()
     # end def
 
@@ -85,23 +84,24 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         part_color = self.part().getProperty('color')
 
         self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        _OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
         self._USE_BRUSH = getBrushObj(part_color, alpha=128)
-        _OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
+        self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
+        self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
         if self.part().crossSectionType() == LatticeType.HONEYCOMB:
             self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-            _OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
+            self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
                                           styles.SLICE_HELIX_STROKE_WIDTH)
 
         if self.part().partType() == PartType.NUCLEICACIDPART:
-            _OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
+            self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
             # self._USE_BRUSH = getBrushObj(part_color, lighter=180)
             self._USE_BRUSH = getBrushObj(part_color, alpha=150)
 
-        self._label.setBrush(_OUT_OF_SLICE_TEXT_BRUSH)
-        self.setBrush(_OUT_OF_SLICE_BRUSH)
-        self.setPen(_OUT_OF_SLICE_PEN)
+        self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
+        self.setBrush(self._OUT_OF_SLICE_BRUSH)
+        self.setPen(self._OUT_OF_SLICE_PEN)
         self.setRect(_RECT)
     # end def
 
@@ -243,9 +243,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             self.updateScafArrow(idx)
             self.arrow1.show()
         else:
-            self.setPen(_OUT_OF_SLICE_PEN)
-            self.setBrush(_OUT_OF_SLICE_BRUSH)
-            self._label.setBrush(_OUT_OF_SLICE_TEXT_BRUSH)
+            self.setPen(self._OUT_OF_SLICE_PEN)
+            self.setBrush(self._OUT_OF_SLICE_BRUSH)
+            self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
             self.arrow1.hide()
         if has_stap:
             self.updateStapArrow(idx)
