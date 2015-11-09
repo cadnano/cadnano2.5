@@ -5,7 +5,7 @@ from math import floor
 from cadnano import util
 from cadnano.enum import StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import newPenObj, getNoPen, getPenObj, getBrushObj, getNoBrush
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
@@ -14,8 +14,55 @@ from . import pathstyles as styles
 from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
+
+class PreXoverItemGroup(QGraphicsRectItem):
+    def __init__(self, parent=None):
+        super(QGraphicsRectItem, self).__init__(parent)
+        self._parent = parent
+        self.setPen(getNoPen())
+        iw = _ITEM_WIDTH = 6
+        bw = _BASE_WIDTH
+        bw2 = 2 * bw
+        part = parent.part()
+        path = QPainterPath()
+        sub_step_size = part.subStepSize()
+        canvas_size = part.maxBaseIdx() + 1
+        self.setRect(0, 0, bw * canvas_size, 2 * bw)
+        forward_bases = [0,7,14]
+        forward_colors = ['#cc0000', '#00cc00', '#0000cc']
+        reverse_colors = ['#80cc0000', '#8000cc00', '#800000cc']
+        self._prexo_items = {}
+
+        for i in range(0,part.maxBaseIdx(),7):
+            item = QGraphicsEllipseItem(0, 0, iw, iw, self)
+            item.setPen(QPen(Qt.NoPen))
+            item.setBrush(getBrushObj(forward_colors[int(i/7%3)]))
+            self._prexo_items[i] = item
+            fx = bw*i + bw/2 - 2  # base_index + base_middle - my_width
+            fy = -iw/2
+            item.setPos(fx,fy)
+            rx = bw*(i+5) + bw/2 - 2  # base_index + base_middle - my_width
+            ry = bw2 - iw/2
+            ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
+            ritem.setPen(QPen(Qt.NoPen))
+            ritem.setBrush(getBrushObj(reverse_colors[int((i+5)/7%3)]))
+            ritem.setPos(rx,ry)
+            self._prexo_items[i+5] = ritem
+    # end def
+
+    def updatePositionsAfterRotation(self, angle):
+        bw = _BASE_WIDTH
+        part = self._parent.part()
+        canvas_size = part.maxBaseIdx() + 1
+        step_size = part.stepSize()
+        xdelta = angle/360. * bw*step_size
+        for i, item in self._prexo_items.items():
+            x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
+            item.setX(x)
+    # end def
 
 
 class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
@@ -49,6 +96,8 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.refreshPath()
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
+
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
     # end def
 
     ### SIGNALS ###
@@ -88,6 +137,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
             self._handle.rotateWithCenterOrigin(new_value)
+            self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
