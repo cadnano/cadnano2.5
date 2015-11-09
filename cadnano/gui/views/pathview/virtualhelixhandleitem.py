@@ -15,10 +15,10 @@ from . import pathstyles as styles
 HOVER_WIDTH = H_W = 20
 GAP = 0 # gap between inner and outer strands
 
-_ROTATELINE_WIDTH = 1
-_ROTATE_PEN = getPenObj(styles.BLUE_STROKE, _ROTATELINE_WIDTH)
-_ROTATE_BRUSH = getBrushObj('#8099ccff')
-_SELECT_STROKE_WIDTH = 10
+_ROTARYDIAL_STROKE_WIDTH = 1
+_ROTARYDIAL_PEN = getPenObj(styles.BLUE_STROKE, _ROTARYDIAL_STROKE_WIDTH)
+_ROTARYDIAL_BRUSH = getBrushObj('#8099ccff')
+_ROTARY_DELTA_WIDTH = 10
 
 _HOVER_PEN = getPenObj('#ffffff', 128)
 _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
@@ -56,11 +56,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setTransformOriginPoint(self.boundingRect().center())
 
         # rotation 
-        self._rect = QRectF()
-        self._hover_rect = QRectF()
-        self._outer_line = RotateLine(self._rect, self)
-        self._hover_region = RotateHoverRegion(self._hover_rect, self)
-        self.updateRects()
+        self._radius = _RADIUS
+        self._rect = QRectF(_RECT)
+        self._hover_rect = QRectF(_RECT)
+        self._outer_line = RotaryDialLine(self._rect, self)
+        self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
         self.show()
     # end def
 
@@ -72,24 +72,8 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._model_part
     # end def
 
-    def radius(self):
-        return self._radius
-    # end def
-
     def modelColor(self):
         return self.part().getProperty('color')
-    # end def
-
-
-    def updateRects(self):
-        diameter = self.boundingRect().width()/2 # round(dna_length * pi / 100,2)
-        self._radius = _RADIUS
-        diameter = _RADIUS * 2
-        self._rect = QRectF(0, 0, diameter, diameter)
-        self._outer_line.updateRect(QRectF(-GAP, -GAP, diameter+GAP*2, diameter+GAP*2))
-        # self._inner_line.updateRect(QRectF(GAP/2, GAP/2, diameter-GAP, diameter-GAP))
-        # self._hover_rect = self._rect.adjusted(-H_W, -H_W, H_W, H_W)
-        self._hover_region.updateRect(self._rect)
     # end def
 
     def refreshColor(self):
@@ -292,7 +276,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
 
 
-class RotateSelectionItem(QGraphicsPathItem):
+class RotaryDialDeltaItem(QGraphicsPathItem):
     def __init__(self, startAngle, spanAngle, parent=None):
         # setup DNA line
         super(QGraphicsPathItem, self).__init__(parent)
@@ -311,11 +295,11 @@ class RotateSelectionItem(QGraphicsPathItem):
     # end def
 
     def updateColor(self, color):
-        self.setPen(getPenObj(color,_SELECT_STROKE_WIDTH, alpha=128, capstyle=Qt.FlatCap))
+        self.setPen(getPenObj(color,_ROTARY_DELTA_WIDTH, alpha=128, capstyle=Qt.FlatCap))
     # end def
 # end class
 
-class RotateHoverRegion(QGraphicsEllipseItem):
+class RotaryDialHoverRegion(QGraphicsEllipseItem):
     def __init__(self, rect, parent=None):
         # setup DNA line
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
@@ -325,14 +309,14 @@ class RotateHoverRegion(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # hover marker
-        self._hoverLine = QGraphicsLineItem(-_SELECT_STROKE_WIDTH/2, 0, _SELECT_STROKE_WIDTH/2, 0, self)
+        self._hoverLine = QGraphicsLineItem(-_ROTARY_DELTA_WIDTH/2, 0, _ROTARY_DELTA_WIDTH/2, 0, self)
         self._hoverLine.setPen(getPenObj('#00cc', 0.5))
         self._hoverLine.hide()
 
         self._startPos = None
         self._startAngle = None  # save selection start
         self._clockwise = None
-        self.dummy = RotateSelectionItem(0, 0, parent)
+        self.dummy = RotaryDialDeltaItem(0, 0, parent)
         self.dummy.hide()
 
     def updateRect(self, rect):
@@ -352,7 +336,7 @@ class RotateHoverRegion(QGraphicsEllipseItem):
     # end def
 
     def mousePressEvent(self, event):
-        r = self._parent.radius()
+        r = _RADIUS # self._parent.radius()
         self.updateHoverLine(event)
         pos = self._hoverLine.pos()
         aX, aY, angle = self.snapPosToCircle(pos, r)
@@ -393,11 +377,11 @@ class RotateHoverRegion(QGraphicsEllipseItem):
 
     def updateHoverLine(self, event):
         """
-        Moves red line to point (aX,aY) on RotateLine closest to event.pos.
+        Moves red line to point (aX,aY) on RotaryDialLine closest to event.pos.
         Returns the angle of aX, aY, using the Qt arc coordinate system
         (0 = east, 90 = north, 180 = west, 270 = south).
         """
-        r = self._parent.radius()
+        r = _RADIUS # self._parent.radius()
         aX, aY, angle = self.snapPosToCircle(event.pos(), r)
         if angle != None:
             self._hoverLine.setPos(aX, aY)
@@ -441,7 +425,7 @@ class RotateHoverRegion(QGraphicsEllipseItem):
     # end def
 # end class
 
-class RotateLine(QGraphicsEllipseItem):
+class RotaryDialLine(QGraphicsEllipseItem):
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self.updateColor(parent.modelColor())
@@ -450,7 +434,7 @@ class RotateLine(QGraphicsEllipseItem):
     # end def
 
     def updateColor(self, color):
-        self.setPen(getPenObj(color, _ROTATELINE_WIDTH))
+        self.setPen(getPenObj(color, _ROTARYDIAL_STROKE_WIDTH))
 
     def updateRect(self, rect):
         self.setRect(rect)

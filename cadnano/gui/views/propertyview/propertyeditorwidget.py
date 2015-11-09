@@ -7,7 +7,7 @@ from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
-from PyQt5.QtWidgets import QSpinBox, QLineEdit
+from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
@@ -169,6 +169,10 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             elif data_type is int:
                 editor = QSpinBox(parent_QWidget)
                 editor.setRange(-359,359)
+            elif data_type is float:
+                editor = QDoubleSpinBox(parent_QWidget)
+                editor.setDecimals(0)
+                editor.setRange(-359,359)
             elif data_type is bool:
                 editor = QCheckBox(parent_QWidget)
             elif data_type is type(None):
@@ -194,6 +198,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 editor.setText(value)
             elif data_type is int:
                 editor.setValue(value)
+            elif data_type is float:
+                editor.setValue(value)
             elif data_type is bool:
                 editor.setChecked(value)
             else:
@@ -213,6 +219,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             if data_type is str:
                 new_value = editor.text()
             elif data_type is int:
+                new_value = editor.value()
+            elif data_type is float:
                 new_value = editor.value()
             elif data_type is bool:
                 new_value = editor.isChecked()
@@ -262,6 +270,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 option.displayAlignment = Qt.AlignVCenter
                 QStyledItemDelegate.paint(self, painter, option, model_index)
             elif data_type is int:
+                option.displayAlignment = Qt.AlignVCenter
+                QStyledItemDelegate.paint(self, painter, option, model_index)
+            elif data_type is float:
                 option.displayAlignment = Qt.AlignVCenter
                 QStyledItemDelegate.paint(self, painter, option, model_index)
             elif data_type is bool:

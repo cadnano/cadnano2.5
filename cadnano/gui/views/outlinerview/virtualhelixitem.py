@@ -12,15 +12,7 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
-NAME_COL = 0
-VISIBLE_COL = 1
-COLOR_COL = 2
-
-class VirtualHelixItemDelegate(QStyledItemDelegate, AbstractVirtualHelixItem):
-    def paint(self, painter, option, index):
-        print("VirtualHelixItemDelegate")
-        option.rect.adjust(-5,0,0,0)
-        QItemDelegate.paint(painter, option, index)
+_PROPERTIES = {'name':0, 'is_visible': 1, 'color':2}
 
 class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
     def __init__(self, model_part, model_vh, parent):
@@ -54,23 +46,33 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
     # end def
 
     def updateModel(self):
-        # find what changed
-        for p in self._props:
-            col = self._props[p]["column"]
-            v = self.data(col, Qt.DisplayRole)
-            m_v = self._model_vh.getProperty(p)
-            if v != m_v:
-                self._model_vh.setProperty(p, v)
+        for key, column in _PROPERTIES.iterItems():
+            item_value = self.data(column, Qt.DisplayRole)
+            model_value = self._model_vh.getProperty(key)
+            if item_value != model_value:
+                self._model_vh.setProperty(key, model_value)
+    # end def
+
+    def updateView(self):
+        m_vh = self._model_virtual_helix
+        for key, column in _PROPERTIES.iterItems():
+            item_value = self.data(column, Qt.DisplayRole)
+            model_value = self._model_virtual_helix.getProperty(key)
+        if item_value != model_value:
+            self.setData(column, Qt.EditRole, model_value)
+    # end def
+
+    def updateViewProperty(self, property_key):
+        column = _PROPERTIES[property_key]
+        item_value = self.data(column, Qt.DisplayRole)
+        model_value = self._model_virtual_helix.getProperty(property_key)
+        if item_value != model_value:
+            self.setData(column, Qt.EditRole, model_value)
     # end def
 
     ### SLOTS ###
-    def virtualHelixPropertyChangedSlot(self, model_part, property_key, new_value):
-        if self._model_part == model_part:
-            if property_key in self._props:
-                col = self._props[property_key]["column"]
-                value = self.data(col, Qt.DisplayRole)
-                if value != new_value:
-                    self.setData(col, Qt.EditRole, new_value)
+    def virtualHelixPropertyChangedSlot(self, model_vh, property_key, new_value):
+        if self._model_vh == model_vh and property_key in _PROPERTIES:
+            self.updateViewProperty(property_key)
     # end def
-
 # end class

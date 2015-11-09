@@ -29,10 +29,20 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
             p_i = self if key == 'name' else PropertyItem(m_vh, key, root)
             self._prop_items[key] = p_i
             p_i.setData(KEY_COL, Qt.EditRole, key)
-            p_i.setData(VAL_COL, Qt.EditRole, self._model_props[key])
+            model_value = m_vh.getProperty(key)
+            p_i.setData(VAL_COL, Qt.EditRole, model_value)
     # end def
 
     # SLOTS
+    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
+        if property_key == 'eulerZ':
+            self._handle.rotateWithCenterOrigin(new_value)
+    # end def
+
+    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
+        if self._model_virtual_helix == virtual_helix:
+            self.updateViewProperty(property_key)
+
     ### PUBLIC SUPPORT METHODS ###
     def part(self):
         return self._model_part
@@ -49,4 +59,20 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
             if m_val != item_val:
                 m_vh.setProperty(key, item_val)
     # end def
+
+    def updateViewProperty(self, property_key):
+        model_value = self._model_virtual_helix.getProperty(property_key)
+        item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
+        if model_value != item_value:
+            self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
+    # end def
+
+    # def updateViewProperties(self):
+    #     m_vh = self._model_virtual_helix
+    #     for m_key, m_val in m_vh.getPropertyDict().iterItems():
+    #         item_val = self._prop_items[key].data(VAL_COL, Qt.DisplayRole)
+    #         if m_val != item_val:
+    #             self.setData(VAL_COL, Qt.EditRole, m_val)
+
+
 # end class

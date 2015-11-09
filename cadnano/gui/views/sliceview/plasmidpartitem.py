@@ -22,7 +22,7 @@ GAP = 2 # gap between inner and outer strands
 _DNALINE_WIDTH = 1
 _DNA_PEN = getPenObj(styles.BLUE_STROKE, _DNALINE_WIDTH)
 _DNA_BRUSH = getBrushObj('#8099ccff')
-_SELECT_STROKE_WIDTH = 10
+_ROTARY_DELTA_WIDTH = 10
 
 _HOVER_PEN = getPenObj('#ffffff', 128)
 _HOVER_BRUSH = getBrushObj('#ffffff')
@@ -347,7 +347,7 @@ class DnaSelectionItem(QGraphicsPathItem):
     def updateColor(self, color):
         c = QColor(color)
         c.setAlpha(128)
-        self.setPen(QPen(c, _SELECT_STROKE_WIDTH, Qt.SolidLine, Qt.FlatCap))
+        self.setPen(QPen(c, _ROTARY_DELTA_WIDTH, Qt.SolidLine, Qt.FlatCap))
     # end def
 # end class
 
@@ -362,7 +362,7 @@ class DnaHoverRegion(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # hover marker
-        self._hoverLine = QGraphicsLineItem(-_SELECT_STROKE_WIDTH/2, 0, _SELECT_STROKE_WIDTH/2, 0, self)
+        self._hoverLine = QGraphicsLineItem(-_ROTARY_DELTA_WIDTH/2, 0, _ROTARY_DELTA_WIDTH/2, 0, self)
         self._hoverLine.setPen(QPen(QColor(204, 0, 0), .5))
         self._hoverLine.hide()
 
