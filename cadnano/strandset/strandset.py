@@ -94,11 +94,11 @@ class StrandSet(ProxyObject):
     # end def
 
     def isStaple(self):
-        return self._strand_type == StrandType.STAPLE
+        return self._strand_type is StrandType.STAPLE
     # end def
 
     def isScaffold(self):
-        return self._strand_type == StrandType.SCAFFOLD
+        return self._strand_type is StrandType.SCAFFOLD
     # end def
 
     def length(self):

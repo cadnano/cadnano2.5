@@ -68,9 +68,11 @@ class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
             editor = QLineEdit(parent_QWidget)
         elif key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
-            editor.setSingleStep(m_vh.part().twistPerBase())
-            editor.setDecimals(1)
-            editor.setRange(-359,359)
+            # maybe restore once we converge on other parameters?
+            # editor.setSingleStep(m_vh.part().twistPerBase())
+            # editor.setDecimals(1)
+            editor.setDecimals(0)
+            editor.setRange(0,359)
         else:
             raise NotImplementedError
         return editor

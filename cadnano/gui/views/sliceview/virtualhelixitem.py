@@ -11,7 +11,7 @@ from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj
+from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
 from . import slicestyles as styles
 
 
@@ -41,17 +41,29 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._parent = parent
         self.setPen(getNoPen())
 
+        iw = _ITEM_WIDTH = 3
         x = _RECT.width() - 2*rect_gain - 2*styles.SLICE_HELIX_STROKE_WIDTH - 1
         y = _RECT.center().y()
         prexo_items = {}
-        angles = [0, 240, 120, 150, 30, 270]
-        colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
-        for i in range(len(angles)):
-            item = QGraphicsEllipseItem(x, y, 3, 3, self)
-            item.setPen(QPen(Qt.NoPen))
-            item.setBrush(getBrushObj(colors[i]))
+        fwd_angles = [0, 240, 120]
+        fwd_colors = ['#cc0000', '#00cc00', '#0000cc']
+        for i in range(len(fwd_angles)):
+            item = QGraphicsEllipseItem(x, y, iw, iw, self)
+            item.setPen(getNoPen())
+            item.setBrush(getBrushObj(fwd_colors[i]))
             item.setTransformOriginPoint(_RECT.center())
-            item.setRotation(angles[i])
+            item.setRotation(fwd_angles[i])
+            prexo_items[i] = item
+
+        rev_angles = [150, 30, 270]
+        rev_colors = ['#800000cc', '#80cc0000', '#8000cc00']
+        # rev_colors = ['#ff00ff', '#3399ff', '#ff6600']
+        for i in range(len(fwd_angles)):
+            item = QGraphicsEllipseItem(x, y, iw, iw, self)
+            item.setPen(getPenObj(rev_colors[i],0.5))
+            item.setBrush(getNoBrush())
+            item.setTransformOriginPoint(_RECT.center())
+            item.setRotation(rev_angles[i])
             prexo_items[i] = item
     # end def
 

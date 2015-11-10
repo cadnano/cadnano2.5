@@ -31,26 +31,48 @@ class PreXoverItemGroup(QGraphicsRectItem):
         sub_step_size = part.subStepSize()
         canvas_size = part.maxBaseIdx() + 1
         self.setRect(0, 0, bw * canvas_size, 2 * bw)
-        forward_bases = [0,7,14]
-        forward_colors = ['#cc0000', '#00cc00', '#0000cc']
-        reverse_colors = ['#80cc0000', '#8000cc00', '#800000cc']
-        self._prexo_items = {}
+        fwd_bases = [0,3,7,10,14,17]
+        rev_bases = [3,6,10,13,16,20]
+        fwd_colors = ['#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc', '#00cc00']
+        rev_colors = ['#00cc00', '#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc']
+        self._fwd_pxo_items = {}
+        self._rev_pxo_items = {}
 
-        for i in range(0,part.maxBaseIdx(),7):
-            item = QGraphicsEllipseItem(0, 0, iw, iw, self)
-            item.setPen(QPen(Qt.NoPen))
-            item.setBrush(getBrushObj(forward_colors[int(i/7%3)]))
-            self._prexo_items[i] = item
-            fx = bw*i + bw/2 - 2  # base_index + base_middle - my_width
-            fy = -iw/2
-            item.setPos(fx,fy)
-            rx = bw*(i+5) + bw/2 - 2  # base_index + base_middle - my_width
-            ry = bw2 - iw/2
-            ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
-            ritem.setPen(QPen(Qt.NoPen))
-            ritem.setBrush(getBrushObj(reverse_colors[int((i+5)/7%3)]))
-            ritem.setPos(rx,ry)
-            self._prexo_items[i+5] = ritem
+        for i in range(0,part.maxBaseIdx(),part.stepSize()):
+            for j in range(len(fwd_bases)):
+                idx = fwd_bases[j]
+                item = QGraphicsEllipseItem(0, 0, iw, iw, self)
+                item.setPen(QPen(Qt.NoPen))
+                item.setBrush(getBrushObj(fwd_colors[j]))
+                self._fwd_pxo_items[i+idx] = item
+                fx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
+                fy = -iw/2
+                item.setPos(fx,fy)
+            for j in range(len(rev_bases)):
+                idx = rev_bases[j]
+                ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
+                ritem.setPen(getPenObj(rev_colors[j],1))
+                ritem.setBrush(getNoBrush())
+                self._rev_pxo_items[i+idx] = ritem
+                rx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
+                ry = bw2 - iw/2
+                ritem.setPos(rx,ry)
+
+        # for i in range(0,part.maxBaseIdx(),7):
+        #     item = QGraphicsEllipseItem(0, 0, iw, iw, self)
+        #     item.setPen(QPen(Qt.NoPen))
+        #     item.setBrush(getBrushObj(fwd_colors[int(i/7%3)]))
+        #     self._prexo_items[i] = item
+        #     fx = bw*i + bw/2 - 2  # base_index + base_middle - my_width
+        #     fy = -iw/2
+        #     item.setPos(fx,fy)
+        #     rx = bw*(i+5) + bw/2 - 2  # base_index + base_middle - my_width
+        #     ry = bw2 - iw/2
+        #     ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
+        #     ritem.setPen(getPenObj(rev_colors[int((i+5)/7%3)],1))
+        #     ritem.setBrush(getNoBrush())
+        #     ritem.setPos(rx,ry)
+        #     self._prexo_items[i+5] = ritem
     # end def
 
     def updatePositionsAfterRotation(self, angle):
@@ -59,7 +81,10 @@ class PreXoverItemGroup(QGraphicsRectItem):
         canvas_size = part.maxBaseIdx() + 1
         step_size = part.stepSize()
         xdelta = angle/360. * bw*step_size
-        for i, item in self._prexo_items.items():
+        for i, item in self._fwd_pxo_items.items():
+            x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
+            item.setX(x)
+        for i, item in self._rev_pxo_items.items():
             x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
             item.setX(x)
     # end def
@@ -195,16 +220,18 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     ### DRAWING METHODS ###
     def isStrandOnTop(self, strand):
-        sS = strand.strandSet()
-        isEvenParity = self._model_virtual_helix.isEvenParity()
-        return isEvenParity and sS.isScaffold() or\
-               not isEvenParity and sS.isStaple()
+        return strand.strandSet().isScaffold()
+        # sS = strand.strandSet()
+        # isEvenParity = self._model_virtual_helix.isEvenParity()
+        # return isEvenParity and sS.isScaffold() or\
+        #        not isEvenParity and sS.isStaple()
     # end def
 
     def isStrandTypeOnTop(self, strand_type):
-        isEvenParity = self._model_virtual_helix.isEvenParity()
-        return isEvenParity and strand_type == StrandType.SCAFFOLD or \
-               not isEvenParity and strand_type == StrandType.STAPLE
+        return strand_type is StrandType.SCAFFOLD
+        # isEvenParity = self._model_virtual_helix.isEvenParity()
+        # return isEvenParity and strand_type is StrandType.SCAFFOLD or \
+        #        not isEvenParity and strand_type is StrandType.STAPLE
     # end def
 
     def upperLeftCornerOfBase(self, idx, strand):

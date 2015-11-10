@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QUndoCommand, QStyle
 
 from cadnano import util
-from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj
+from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj, getNoBrush
 from . import pathstyles as styles
 
 
@@ -42,15 +42,36 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         x = _RECT.width() - 2*styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH - 1
         y = _RECT.center().y()
         prexo_items = {}
-        angles = [0, 240, 120, 150, 30, 270]
-        colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
-        for i in range(len(angles)):
+        fwd_angles = [0, 240, 120]
+        fwd_colors = ['#cc0000', '#00cc00', '#0000cc']
+        for i in range(len(fwd_angles)):
             item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(QPen(Qt.NoPen))
-            item.setBrush(getBrushObj(colors[i]))
+            item.setPen(getNoPen())
+            item.setBrush(getBrushObj(fwd_colors[i]))
             item.setTransformOriginPoint(_RECT.center())
-            item.setRotation(angles[i])
+            item.setRotation(fwd_angles[i])
             prexo_items[i] = item
+
+        rev_angles = [150, 30, 270]
+        rev_colors = ['#0000cc', '#cc0000', '#00cc00']
+        # rev_colors = ['#ff00ff', '#3399ff', '#ff6600']
+        for i in range(len(fwd_angles)):
+            item = QGraphicsEllipseItem(x, y, iw, iw, self)
+            item.setPen(getPenObj(rev_colors[i],0.5))
+            item.setBrush(getNoBrush())
+            item.setTransformOriginPoint(_RECT.center())
+            item.setRotation(rev_angles[i])
+            prexo_items[i] = item
+    # # end def
+    #     angles = [0, 240, 120, 150, 30, 270]
+    #     colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
+    #     for i in range(len(angles)):
+    #         item = QGraphicsEllipseItem(x, y, iw, iw, self)
+    #         item.setPen(QPen(Qt.NoPen))
+    #         item.setBrush(getBrushObj(colors[i]))
+    #         item.setTransformOriginPoint(_RECT.center())
+    #         item.setRotation(angles[i])
+    #         prexo_items[i] = item
     # end def
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):

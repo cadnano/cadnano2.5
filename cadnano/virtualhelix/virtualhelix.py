@@ -142,7 +142,8 @@ class VirtualHelix(ProxyObject):
 
     ### METHODS FOR QUERYING THE MODEL ###
     def scaffoldIsOnTop(self):
-        return self.isEvenParity()
+        return True
+        # return self.isEvenParity()
 
     def getStrandSetByIdx(self, idx):
         """
@@ -151,19 +152,24 @@ class VirtualHelix(ProxyObject):
         idx == 1 means bottom strand
         """
         if idx == 0:
-            if self.isEvenParity():
-                return self._scaf_strandset
-            else:
-                return self._stap_strandset
+            return self._scaf_strandset
         else:
-            if self.isEvenParity():
-                return self._stap_strandset
-            else:
-                return self._scaf_strandset
+            return self._stap_strandset
+
+        # if idx == 0:
+        #     if self.isEvenParity():
+        #         return self._scaf_strandset
+        #     else:
+        #         return self._stap_strandset
+        # else:
+        #     if self.isEvenParity():
+        #         return self._stap_strandset
+        #     else:
+        #         return self._scaf_strandset
     # end def
 
     def getStrandSetByType(self, strand_type):
-        if strand_type == StrandType.SCAFFOLD:
+        if strand_type is StrandType.SCAFFOLD:
             return self._scaf_strandset
         else:
             return self._stap_strandset
@@ -188,9 +194,10 @@ class VirtualHelix(ProxyObject):
     # end def
 
     def isDrawn5to3(self, strandset):
-        is_scaf = strandset == self._scaf_strandset
-        is_even = self.isEvenParity()
-        return is_even == is_scaf
+        return strandset is self._scaf_strandset
+        # is_scaf = strandset == self._scaf_strandset
+        # is_even = self.isEvenParity()
+        # return is_even == is_scaf
     # end def
 
     # may need new method that doesn't rely on strandype
