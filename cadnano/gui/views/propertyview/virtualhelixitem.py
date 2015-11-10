@@ -9,84 +9,46 @@ from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from .customtreewidgetitems import PropertyItem, SelectionItem
 
-KEY_COL = 0
-VAL_COL = 1
+from .cnpropertyitem import CNPropertyItem
 
-class VirtualHelixItem(QTreeWidgetItem, AbstractVirtualHelixItem):
+class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     def __init__(self, model_virtual_helix, parent, key=None):
-        super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
-        self._model_virtual_helix = m_vh = model_virtual_helix
-        if key is None: # this is the root iem
+        super(VirtualHelixItem, self).__init__(model_virtual_helix, parent, key=key)
+        if key is None:
             self._controller = VirtualHelixItemController(self, model_virtual_helix)
-            self._parent_tree = parent
-            root = parent.invisibleRootItem() # add propertyitems as siblings
-            # Properties
-            self._prop_items = {}
-            model_props = m_vh.getPropertyDict()
-            # add properties alphabetically, but with 'name' on top
-
-            name = "vh%s" % str(m_vh.number())
-            self._key = key = "name"
-            self._prop_items[key] = name
-            self.setData(KEY_COL, Qt.EditRole, key)
-            self.setData(VAL_COL, Qt.EditRole, name) #Qt.DisplayRole
-
-            for key in sorted(model_props):
-                p_i = VirtualHelixItem(m_vh, parent=root, key=key)
-                self._prop_items[key] = p_i
-                p_i.setData(KEY_COL, Qt.EditRole, key)
-                model_value = m_vh.getProperty(key)
-                p_i.setData(VAL_COL, Qt.EditRole, model_value)
-        else:
-            self._key = key
     # end def
-
-    def key(self):
-        return self._key
 
     # SLOTS
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
-        if self._model_virtual_helix == virtual_helix:
+        if self._cn_model == virtual_helix:
             self.updateViewProperty(property_key)
 
-    ### PUBLIC SUPPORT METHODS ###
-    def part(self):
-        return self._model_part
-    # end def
+    def virtualHelixRemovedSlot(self, virtual_helix):
+        self._cn_model = None
+        self._controller.disconnectSignals()
+        self._controller = None
+        self.parent().removeChild(self)
 
+    ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
         return ItemType.VIRTUALHELIX
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
-        m_vh = self._model_virtual_helix
+        m_vh = self._cn_model
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
         elif key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
             # maybe restore once we converge on other parameters?
-            # editor.setSingleStep(m_vh.part().twistPerBase())
-            # editor.setDecimals(1)
-            editor.setDecimals(0)
+            editor.setSingleStep(m_vh.part().twistPerBase())
+            editor.setDecimals(1)
+            # editor.setDecimals(0)
             editor.setRange(0,359)
         else:
-            raise NotImplementedError
+            editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor
-    # end def
-
-    def updateModel(self):
-        value = self.data(1, Qt.DisplayRole)
-        self._model_virtual_helix.setProperty(self._key, value)
-    # end def
-
-    def updateViewProperty(self, property_key):
-        model_value = self._model_virtual_helix.getProperty(property_key)
-        item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
-        if model_value != item_value:
-            self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
     # end def
 # end class

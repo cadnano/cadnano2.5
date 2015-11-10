@@ -108,6 +108,10 @@ class Oligo(ProxyObject):
         self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 
+    def getName(self):
+        return self._properties['name']
+    # end def
+
     def color(self):
         # return self._color
         return self._properties['color']

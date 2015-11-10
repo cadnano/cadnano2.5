@@ -89,9 +89,10 @@ class PropertyEditorWidget(QTreeWidget):
                 self.show()
             elif item_type is ItemType.OLIGO:
                 pe_item = OligoItem(item.modelOligo(), self)
-                pass
+                self.show()
             elif item_type is ItemType.VIRTUALHELIX:
                 pe_item = VirtualHelixItem(item.modelVirtualHelix(), self)
+                self.show()
             elif item_type is ItemType.NUCLEICACID:
                 # print("nucleicacid selected")
                 pe_item = NucleicAcidPartItem(item.part(), self)
@@ -164,24 +165,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         if column == 0: # Property Name
             return None
         elif column == 1:
-            if isinstance(treewidgetitem, VirtualHelixItem):
-                return treewidgetitem.configureEditor(parent_QWidget, option, model_index)
-            data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
-            if data_type is str:
-                editor = QLineEdit(parent_QWidget)
-            elif data_type is int:
-                editor = QSpinBox(parent_QWidget)
-                editor.setRange(-359,359)
-            elif data_type is float:
-                editor = QDoubleSpinBox(parent_QWidget)
-                editor.setDecimals(0)
-                editor.setRange(-359,359)
-            elif data_type is bool:
-                editor = QCheckBox(parent_QWidget)
-            elif data_type is type(None):
-                return None
-            else:
-                raise NotImplementedError
+            editor = treewidgetitem.configureEditor(parent_QWidget, option, model_index)
             return editor
         else:
             return QStyledItemDelegate.createEditor(self, \
@@ -264,7 +248,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             value = model_index.model().data(model_index, Qt.EditRole)
             data_type = type(value)
             if data_type is str:
+                # print("val", value)
                 if COLOR_PATTERN.search(value):
+                    # print("found color")
                     element = _QCOMMONSTYLE.PE_IndicatorCheckBox
                     styleoption = QStyleOptionViewItem()
                     styleoption.palette.setBrush(QPalette.Button, getBrushObj(value))

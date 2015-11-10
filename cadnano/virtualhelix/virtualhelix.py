@@ -93,7 +93,11 @@ class VirtualHelix(ProxyObject):
     # end def
 
     def getName(self):
-        return self._properties['name']
+        name = self._properties.get('name')
+        if name is None:
+            return "vh%d" % (self._number)
+        else:
+            return name
     # end def
 
     def getPropertyDict(self):

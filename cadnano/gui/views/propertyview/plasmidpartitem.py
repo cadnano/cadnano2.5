@@ -11,9 +11,10 @@ from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import Pl
 from .abstractproppartitem import AbstractPropertyPartItem
 
 class PlasmidPartItem(AbstractPropertyPartItem):
-    def __init__(self, model_part, parent=None):
-        super(PlasmidPartItem, self).__init__(model_part, parent)
-        self._controller = PlasmidPartItemController(self, model_part)
+    def __init__(self, model_part, parent, key=None):
+        super(PlasmidPartItem, self).__init__(odel_part, parent, key=ke)
+        if key is None:
+        	self._controller = PlasmidPartItemController(self, model_part)
     # end def
 
     def itemType(self):

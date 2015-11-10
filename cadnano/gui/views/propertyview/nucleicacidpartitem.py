@@ -8,10 +8,10 @@ from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller impor
 from .abstractproppartitem import AbstractPropertyPartItem
 
 class NucleicAcidPartItem(AbstractPropertyPartItem):
-    def __init__(self, model_part, parent=None):
-        super(NucleicAcidPartItem, self).__init__(model_part, parent)
-        self._controller = NucleicAcidPartItemController(self, model_part)
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
+    def __init__(self, model_part, parent, key=None):
+        super(NucleicAcidPartItem, self).__init__(model_part, parent, key=key)
+        if key is None:
+            self._controller = NucleicAcidPartItemController(self, model_part)
     # end def
 
     def itemType(self):
