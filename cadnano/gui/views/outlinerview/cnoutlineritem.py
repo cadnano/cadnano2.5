@@ -6,9 +6,10 @@ NAME_COL = 0
 VISIBLE_COL = 1
 COLOR_COL = 2
 
-_PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
-
 class CNOutlinerItem(QTreeWidgetItem):
+
+    _PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
+
     def __init__(self, cn_model, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = cn_model
