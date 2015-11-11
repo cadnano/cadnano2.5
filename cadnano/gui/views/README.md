@@ -1,6 +1,10 @@
+# QGraphicsScene-event-dispatching-overview
+
 Here is a brief overview of the functions through which a mouse press event will descend until it finally reaches a QGraphicsItem.
 
------ Run loop sends a mouse press ------
+## Run loop sends a mouse press 
+
+```
 bool QGraphicsScene::event(QEvent *event)  //Returns true
 void QGraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
 void QGraphicsScenePrivate::mousePressEventHandler(QGraphicsSceneMouseEvent *mouseEvent)
@@ -19,14 +23,18 @@ void QGraphicsScenePrivate::mousePressEventHandler(QGraphicsSceneMouseEvent *mou
       *** if mouseEvent->isAccepted() return ***
       ungrab
     propagate to view
+```
 
------ QGraphicsItem receives a mouse press -----
+## QGraphicsItem receives a mouse press
+```
 The only default event->accept()ing that goes on is for popup widget closing
 bool QGraphicsItem::sceneEvent(QEvent *event)
   void QGraphicsItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
   ignore mousePressEvent retval and return true
+```
 
------ Rubber Banding -----
+## Rubber Banding
+```
 void QGraphicsView::mouseMoveEvent(QMouseEvent *event)
   If dragMode is QGraphicsView::RubberBandDrag and scene interaction allowed, proceed.
   If rubberBanding, proceed
@@ -38,4 +46,5 @@ void QGraphicsView::mouseMoveEvent(QMouseEvent *event)
         item->setSelected(true)
     foreach unselectedItem
       item->setSelected(false)
-    emit selectionChanged();
+    emit selectionChanged()
+```
