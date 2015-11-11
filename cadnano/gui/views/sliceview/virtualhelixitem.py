@@ -2,7 +2,7 @@ from math import sqrt, atan2, degrees, pi
 
 import cadnano.util as util
 
-from PyQt5.QtCore import QPointF, Qt, QRectF, QEvent
+from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
@@ -83,7 +83,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         """
         super(VirtualHelixItem, self).__init__(parent=empty_helix_item)
         self._virtual_helix = model_virtual_helix
-        self._empty_helix_item = empty_helix_item
+        self._empty_helix_item = ehi = empty_helix_item
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
 
         self.hide()
@@ -102,12 +102,53 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
         _pxig.setTransformOriginPoint(_RECT.center())
+        _pxig.setRotation(self._virtual_helix.getProperty('eulerZ'))
         # self._rect = QRectF(_RECT)
         # self._hover_rect = QRectF(_RECT)
         # self._outer_line = RotaryDialLine(self._rect, self)
         # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
         self.show()
+
+        self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
+        self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+        self.getNeighbors()
+        self._right_mouse_move = False
     # end def
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            self._right_mouse_move = True
+            self._button_down_pos = event.pos()
+    # end def
+
+    def mouseMoveEvent(self, event):
+        if self._right_mouse_move:
+            p = self.mapToScene(event.pos()) - self._button_down_pos
+            self._empty_helix_item.setPos(p)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        if self._right_mouse_move and event.button() == Qt.RightButton:
+            self._right_mouse_move = False
+            p = self.mapToScene(event.pos()) - self._button_down_pos
+            self._empty_helix_item.setPos(p)
+            ehi = self._empty_helix_item
+            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
+            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+            self.getNeighbors()
+    # end def
+
+    def getNeighbors(self):
+        items = filter(lambda x: type(x) is VirtualHelixItem, self.collidingItems())
+        nlist = '[' + ' '.join([nvhi.virtualHelix().getName() for nvhi in items]) + ']'
+        self._virtual_helix.setProperty('neighbors', nlist)
+        # name = self._virtual_helix.getName()
+        # pos = self.scenePos()
+        # print("\n%s (%d, %d)" % (name, pos.x(), pos.y()))
+        # for nvhi in items:
+        #     npos = nvhi.scenePos()
+        #     line = QLineF(pos, npos)
+        #     print("\t%s (%d, %d) %d" % (nvhi.virtualHelix().getName(), npos.x(), npos.y(), line.length()))
 
     def modelColor(self):
         return self.part().getProperty('color')
@@ -159,7 +200,14 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             eulerZ = self._virtual_helix.getProperty('eulerZ') 
             if eulerZ != new_value: 
                 self._virtual_helix.setProperty('eulerZ', new_value)
+        elif property_key == 'ehiX':
+            ehi_pos = self._empty_helix_item.scenePos()
+            self._empty_helix_item.setPos(new_value, ehi_pos.y())
+        elif property_key == 'ehiY':
+            ehi_pos = self._empty_helix_item.scenePos()
+            self._empty_helix_item.setPos(ehi_pos.x(),new_value)
     # end def
+
 
     def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()

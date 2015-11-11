@@ -49,6 +49,11 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
             editor.setSingleStep(m_vh.part().twistPerBase())
             editor.setDecimals(1)
             editor.setRange(0,359)
+        elif key in ['ehiX', 'ehiY']:
+            editor = QDoubleSpinBox(parent_QWidget)
+            editor.setSingleStep(5)
+            editor.setDecimals(4)
+            editor.setRange(0,1000)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor
