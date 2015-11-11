@@ -45,14 +45,14 @@ class SplitCommand(UndoCommand):
         # Determine oligo retention based on strand priority
         if is5to3:  # strand_low has priority
             i_new_low = base_idx
-            color_low = oligo.color()
+            color_low = oligo.getColor()
             color_high = random.choice(color_list)
             olg5p, olg3p = l_oligo, h_oligo
             std5p, std3p = strand_low, strand_high
         else:  # strand_high has priority
             i_new_low = base_idx - 1
             color_low = random.choice(color_list)
-            color_high = oligo.color()
+            color_high = oligo.getColor()
             olg5p, olg3p = h_oligo, l_oligo
             std5p, std3p = strand_high, strand_low
         # this is for updating a connected xover view object

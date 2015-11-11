@@ -82,7 +82,7 @@ class VirtualHelix(ProxyObject):
     # end def
 
     def getColor(self):
-        return self._properties['color']
+        return "#ffffff" #self._properties['color']
 
     def setViewProperty(self, key, value):
         self.view_properties[key] = value

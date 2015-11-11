@@ -43,7 +43,7 @@ def nxBreakStaple(oligo, settings):
 
     token_list = tokenizeOligo(oligo, settings)
 
-    # print "tkList", token_list, oligo.length(), oligo.color()
+    # print "tkList", token_list, oligo.length(), oligo.getColor()
     if len(token_list) == 0:
         return
     cache_string = stringifyToken(oligo, token_list)

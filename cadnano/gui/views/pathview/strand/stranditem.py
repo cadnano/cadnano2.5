@@ -403,7 +403,7 @@ class StrandItem(QGraphicsLineItem):
 
     def _updateColor(self, strand):
         oligo = self._model_strand.oligo()
-        color = QColor(oligo.color())
+        color = QColor(oligo.getColor())
         self._updateHighlight(color)
     # end def
 
@@ -692,7 +692,7 @@ class StrandItem(QGraphicsLineItem):
             color = QColor("#ff3333")
         else:
             oligo = self._model_strand.oligo()
-            color = QColor(oligo.color())
+            color = QColor(oligo.getColor())
             if oligo.shouldHighlight():
                 color.setAlpha(128)
         pen = self.pen()

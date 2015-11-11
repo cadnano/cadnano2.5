@@ -1,7 +1,7 @@
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
+from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit, QCheckBox
 
 KEY_COL = 0
 VAL_COL = 1
@@ -45,7 +45,7 @@ class CNPropertyItem(QTreeWidgetItem):
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cn_model(self):
+    def cnModel(self):
         return self._cn_model
     # end def
 
@@ -80,6 +80,13 @@ class CNPropertyItem(QTreeWidgetItem):
     def updateModel(self):
         value = self.data(1, Qt.DisplayRole)
         self._cn_model.setProperty(self._key, value)
+    # end def
+
+    def setValue(self, property_key, new_value):
+        p_i = self._prop_items[property_key]
+        current_value = p_i.data(VAL_COL, Qt.DisplayRole)
+        if current_value != new_value:
+            p_i.setData(VAL_COL, Qt.EditRole, new_value)
     # end def
 
     def getItemValue(self, property_key):

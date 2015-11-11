@@ -25,20 +25,15 @@ class OligoItem(CNPropertyItem, AbstractOligoItem):
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
         if self._cn_model == model_oligo:
             print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)
-            self.updateViewProperty(key)
-        # p_i = self._prop_items[key]
-        # displayed_value = p_i.data(VAL_COL, Qt.DisplayRole)
-        # if displayed_value != new_value:
-        #     p_i.setData(VAL_COL, Qt.EditRole, new_value)
+            self.setValue(key, new_value)
     # end def
 
     def oligoAppearanceChangedSlot(self, model_oligo):
         print("prop: appearance changed")
-        color = model_oligo.color()
+        color = model_oligo.getColor()
         displayed_color = self.getItemValue('color')
         if displayed_color != color:
-            self.updateViewProperty('color')
-            # p_i.setData(VAL_COL, Qt.EditRole, color)
+            self.setValue('color', color)
     # end def
 
     # def updateModel(self):

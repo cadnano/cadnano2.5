@@ -27,10 +27,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._cn_model == model_part:
-            p_i = self._prop_items[property_key]
-            value = p_i.data(VAL_COL, Qt.DisplayRole)
-            if value != new_value:
-                p_i.setData(VAL_COL, Qt.EditRole, new_value)
+            self.setValue(property_key, new_value)
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):

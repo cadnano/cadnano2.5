@@ -165,7 +165,7 @@ class OutlinerTreeWidget(QTreeWidget):
 class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
-        if column == 0: # Part Name
+        if column == 0: # Model name
             editor = QLineEdit(parent_QWidget)
             editor.setAlignment(Qt.AlignVCenter)
             return editor

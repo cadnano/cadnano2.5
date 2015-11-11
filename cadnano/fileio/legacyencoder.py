@@ -25,7 +25,7 @@ def legacy_dict_from_doc(document, fname, helix_order_list):
         stap_strandset = vh.stapleStrandSet()
         for strand in stap_strandset:
             if strand.connection5p() is None:
-                c = str(strand.oligo().color())[1:]  # drop the hash
+                c = str(strand.oligo().getColor())[1:]  # drop the hash
                 stap_colors.append([strand.idx5Prime(), int(c, 16)])
 
         vh_dict = {"row": row,

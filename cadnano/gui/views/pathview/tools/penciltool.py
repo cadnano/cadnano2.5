@@ -753,7 +753,7 @@ class ForcedXoverItem(QGraphicsPathItem):
 
     # def _updatePen(self, strand5p):
     #     oligo = strand5p.oligo()
-    #     color = QColor(oligo.color())
+    #     color = QColor(oligo.getColor())
     #     penWidth = styles.PATH_STRAND_STROKE_WIDTH
     #     if oligo.shouldHighlight():
     #         penWidth = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH

@@ -5,7 +5,7 @@ class ApplyColorCommand(UndoCommand):
         super(ApplyColorCommand, self).__init__("apply color")
         self._oligo = oligo
         self._new_color = color
-        self._old_color = oligo.color()
+        self._old_color = oligo.getColor()
     # end def
 
     def redo(self):

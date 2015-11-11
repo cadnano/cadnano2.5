@@ -202,7 +202,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def updateScafArrow(self, idx):
         scaf_strand = self._virtual_helix.scaf(idx)
         if scaf_strand:
-            scaf_strand_color = scaf_strand.oligo().color()
+            scaf_strand_color = scaf_strand.oligo().getColor()
             scaf_alpha = 230 if scaf_strand.hasXoverAt(idx) else 128
         else:
             scaf_strand_color = '#a0a0a4' #Qt.gray
@@ -220,7 +220,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def updateStapArrow(self, idx):
         stap_strand = self._virtual_helix.stap(idx)
         if stap_strand:
-            stap_strand_color = stap_strand.oligo().color()
+            stap_strand_color = stap_strand.oligo().getColor()
             stap_alpha = 230 if stap_strand.hasXoverAt(idx) else 128
         else:
             stap_strand_color = '#c0c0c0' # Qt.lightGray

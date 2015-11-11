@@ -85,17 +85,17 @@ class PropertyEditorWidget(QTreeWidget):
             item = selected_items[0]
             item_type = item.itemType()
             if item_type is ItemType.PLASMID:
-                pe_item = PlasmidPartItem(item.part(), self)
+                pe_item = PlasmidPartItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.OLIGO:
-                pe_item = OligoItem(item.modelOligo(), self)
+                pe_item = OligoItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem(item.modelVirtualHelix(), self)
+                pe_item = VirtualHelixItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.NUCLEICACID:
                 # print("nucleicacid selected")
-                pe_item = NucleicAcidPartItem(item.part(), self)
+                pe_item = NucleicAcidPartItem(item.cnModel(), self)
                 self.show()
             else:
                 raise NotImplementedError

@@ -112,7 +112,7 @@ class Oligo(ProxyObject):
         return self._properties['name']
     # end def
 
-    def color(self):
+    def getColor(self):
         # return self._color
         return self._properties['color']
     # end def
@@ -194,7 +194,7 @@ class Oligo(ProxyObject):
         seq = modseq5p + seq + modseq3p
         output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
                 (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
-                    self.color(), modseq5p_name, modseq3p_name)
+                    self.getColor(), modseq5p_name, modseq3p_name)
         return output
     # end def
 
@@ -218,7 +218,7 @@ class Oligo(ProxyObject):
     # end def
 
     def applyColor(self, color, use_undostack=True):
-        if color == self.color():
+        if color == self.getColor():
             return  # oligo already has color
         c = ApplyColorCommand(self, color)
         util.execCommandList(self, [c], desc="Color Oligo", use_undostack=use_undostack)

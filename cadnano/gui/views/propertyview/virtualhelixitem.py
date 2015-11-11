@@ -22,7 +22,7 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     # SLOTS
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if self._cn_model == virtual_helix:
-            self.updateViewProperty(property_key)
+            self.setValue(property_key, new_value)
 
     def virtualHelixRemovedSlot(self, virtual_helix):
         self._cn_model = None
