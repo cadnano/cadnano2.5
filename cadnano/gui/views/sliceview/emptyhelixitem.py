@@ -49,7 +49,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self._is_hovered = False
         self.setAcceptHoverEvents(True)
 
-        self.updateProperty()
+        self.updateAppearance()
 
         self.setNotHovered()
 
@@ -59,7 +59,7 @@ class EmptyHelixItem(QGraphicsEllipseItem):
         self.show()
     # end def
 
-    def updateProperty(self):
+    def updateAppearance(self):
         # part-specific styles
         if self._part_item.part().partType() == PartType.NUCLEICACIDPART:
             part_color_hex = self.part().getProperty('color')

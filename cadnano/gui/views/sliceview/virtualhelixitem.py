@@ -98,7 +98,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.setNumber()
         self._pen1, self._pen2 = (QPen(), QPen())
         self.createArrows()
-        self.updateProperty()
+        self.updateAppearance()
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
         _pxig.setTransformOriginPoint(_RECT.center())
@@ -113,7 +113,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return self.part().getProperty('color')
     # end def
 
-    def updateProperty(self):
+    def updateAppearance(self):
         part_color = self.part().getProperty('color')
 
         self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)

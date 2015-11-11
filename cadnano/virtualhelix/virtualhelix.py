@@ -18,7 +18,6 @@ class VirtualHelix(ProxyObject):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)
         self._coord = (row, col) # col, row
-        self._transform = (0,0,0,0,0,0) # x,y,z,x°,y°,z°
         self._part = part
         self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
         self._stap_strandset = StrandSet(StrandType.STAPLE, self)
@@ -31,7 +30,6 @@ class VirtualHelix(ProxyObject):
         self._number = None
         self.setNumber(idnum)
 
-        # self._properties = {'x':0, 'y':0, 'z':0, 'eulerX':0, 'eulerY':0, 'eulerZ':0}
         self._properties = {'eulerZ':0}
     # end def
 
@@ -59,10 +57,6 @@ class VirtualHelix(ProxyObject):
 
     def coord(self):
         return self._coord
-    # end def
-
-    def transform(self):
-        return self._transform
     # end def
 
     def number(self):
@@ -110,7 +104,6 @@ class VirtualHelix(ProxyObject):
         self.virtualHelixPropertyChangedSignal.emit(self, key, value)
     # end def
 
-
     def setNumber(self, number):
         if self._number != number:
             num_to_vh_dict = self._part._number_to_virtual_helix
@@ -119,12 +112,6 @@ class VirtualHelix(ProxyObject):
             self._number = number
             self.virtualHelixNumberChangedSignal.emit(self, number)
             num_to_vh_dict[number] = self
-    # end def
-
-    def setTransform(self, transform):
-        if self._transform != transform:
-            self._transform = transform
-            self.virtualHelixPropertyChangedSignal.emit(self, transform)
     # end def
 
     def setPart(self, new_part):

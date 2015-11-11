@@ -134,9 +134,9 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         if self._model_part == model_part:
             if property_key == 'color':
                 for _, vhi in self._virtual_helix_hash.items():
-                    vhi.updateProperty()
+                    vhi.updateAppearance()
                 for _, ehi in self._empty_helix_hash.items():
-                    ehi.updateProperty()
+                    ehi.updateAppearance()
             elif property_key == 'circular':
                 pass
             elif property_key == 'dna_sequence':
