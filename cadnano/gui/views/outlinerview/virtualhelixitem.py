@@ -1,4 +1,4 @@
-    from cadnano.enum import ItemType
+from cadnano.enum import ItemType
 
 from .cnoutlineritem import CNOutlinerItem
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
