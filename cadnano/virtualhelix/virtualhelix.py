@@ -30,7 +30,7 @@ class VirtualHelix(ProxyObject):
         self._number = None
         self.setNumber(idnum)
 
-        self._properties = {'eulerZ':0}
+        self._properties = {'eulerZ':0, 'scamZ':0}
     # end def
 
     def __repr__(self):

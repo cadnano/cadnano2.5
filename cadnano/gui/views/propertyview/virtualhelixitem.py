@@ -42,10 +42,12 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
             editor = QLineEdit(parent_QWidget)
         elif key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
-            # maybe restore once we converge on other parameters?
+            editor.setDecimals(0)
+            editor.setRange(0,359)
+        elif key == 'scamZ':
+            editor = QDoubleSpinBox(parent_QWidget)
             editor.setSingleStep(m_vh.part().twistPerBase())
             editor.setDecimals(1)
-            # editor.setDecimals(0)
             editor.setRange(0,359)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)

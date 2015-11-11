@@ -152,6 +152,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
             self._prexoveritemgroup.setRotation(new_value)
+            scamZ = self._virtual_helix.getProperty('scamZ') 
+            if scamZ != new_value: 
+                self._virtual_helix.setProperty('scamZ', new_value)
+        elif property_key == 'scamZ':
+            eulerZ = self._virtual_helix.getProperty('eulerZ') 
+            if eulerZ != new_value: 
+                self._virtual_helix.setProperty('eulerZ', new_value)
     # end def
 
     def virtualHelixRemovedSlot(self, virtual_helix):
