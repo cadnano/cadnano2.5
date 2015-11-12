@@ -1,4 +1,3 @@
-
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 
@@ -8,7 +7,7 @@ COLOR_COL = 2
 
 class CNOutlinerItem(QTreeWidgetItem):
 
-    _PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
+    PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
 
     def __init__(self, cn_model, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
@@ -34,9 +33,9 @@ class CNOutlinerItem(QTreeWidgetItem):
 
     def createRootItem(self, item_name, parent):
         twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
-        twi.setData(0, Qt.EditRole, item_name)
-        twi.setData(1, Qt.EditRole, True) # is_visible
-        twi.setData(2, Qt.EditRole, "#ffffff") # color
+        twi.setData(NAME_COL, Qt.EditRole, item_name)
+        twi.setData(VISIBLE_COL, Qt.EditRole, True) # is_visible
+        twi.setData(COLOR_COL, Qt.EditRole, "#ffffff") # color
         twi.setFlags(twi.flags() & ~Qt.ItemIsSelectable)
         twi.setExpanded(True)
         return twi
@@ -48,9 +47,9 @@ class CNOutlinerItem(QTreeWidgetItem):
         cn_model = self._cn_model
         name = self.data(NAME_COL, Qt.DisplayRole)
         color = self.data(COLOR_COL, Qt.DisplayRole)
-        if name != cn_model.getProperty('name'):
+        if name != cn_model.getName():
             cn_model.setProperty('name', name)
-        if color != cn_model.getProperty('color'):
+        if color != cn_model.getColor():
             cn_model.setProperty('color', color)
     # end def
 
@@ -62,7 +61,7 @@ class CNOutlinerItem(QTreeWidgetItem):
                 self.setData(NAME_COL, Qt.EditRole, value)
         elif key == 'color':
             color = self.data(COLOR_COL, Qt.DisplayRole)
-            if color != cn_model.getProperty('color'):
+            if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
         else:
             raise KeyError("No property %s in cn_model" % (key))

@@ -20,7 +20,7 @@ class VirtualHelixItem(CNOutlinerItem, AbstractVirtualHelixItem):
 
     ### SLOTS ###
     def virtualHelixPropertyChangedSlot(self, model_vh, property_key, new_value):
-        if property_key in CNOutlinerItem._PROPERTIES:
+        if property_key in CNOutlinerItem.PROPERTIES:
             self.setValue(property_key, new_value)
     # end def
 # end class
