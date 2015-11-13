@@ -24,7 +24,7 @@ class CNPropertyItem(QTreeWidgetItem):
             if name is None:
                 name = "generic"
             self._key = key = "name"
-            self._prop_items[key] = name
+            self._prop_items[key] = self
             self.setData(KEY_COL, Qt.EditRole, key)
             self.setData(VAL_COL, Qt.EditRole, name) #Qt.DisplayRole
 

@@ -172,53 +172,53 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                             parent_QWidget, option, model_index)
     # end def
 
-    def setEditorData(self, editor, model_index):
-        column = model_index.column()
-        if column == 0: # Property
-            # textQString = model_index.model().data(model_index, Qt.EditRole)
-            # editor.setText(textQString)
-            return
-        elif column == 1: # Value
-            value = model_index.model().data(model_index, Qt.EditRole)
-            data_type = type(value)
-            if data_type is str:
-                editor.setText(value)
-            elif data_type is int:
-                editor.setValue(value)
-            elif data_type is float:
-                editor.setValue(value)
-            elif data_type is bool:
-                editor.setChecked(value)
-            else:
-                raise NotImplementedError
-        else:
-            QStyledItemDelegate.setEditorData(self, editor, model_index)
-    # end def
+    # def setEditorData(self, editor, model_index):
+    #     column = model_index.column()
+    #     if column == 0: # Property
+    #         # textQString = model_index.model().data(model_index, Qt.EditRole)
+    #         # editor.setText(textQString)
+    #         return
+    #     elif column == 1: # Value
+    #         value = model_index.model().data(model_index, Qt.EditRole)
+    #         data_type = type(value)
+    #         if data_type is str:
+    #             editor.setText(value)
+    #         elif data_type is int:
+    #             editor.setValue(value)
+    #         elif data_type is float:
+    #             editor.setValue(value)
+    #         elif data_type is bool:
+    #             editor.setChecked(value)
+    #         else:
+    #             raise NotImplementedError
+    #     else:
+    #         QStyledItemDelegate.setEditorData(self, editor, model_index)
+    # # end def
 
-    def setModelData(self, editor, model, model_index):
-        column = model_index.column()
-        if column == 0: # Property
-            # textQString = editor.text()
-            # model.setData(model_index, textQString, Qt.EditRole)
-            return
-        elif column == 1: # Value
-            data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
-            if data_type is str:
-                new_value = editor.text()
-            elif data_type is int:
-                new_value = editor.value()
-            elif data_type is float:
-                new_value = editor.value()
-            elif data_type is bool:
-                new_value = editor.isChecked()
-            elif data_type is type(None):
-                return
-            else:
-                raise NotImplementedError
-            model.setData(model_index, new_value, Qt.EditRole)
-        else:
-            QStyledItemDelegate.setModelData(self, editor, model, model_index)
-    # end def
+    # def setModelData(self, editor, model, model_index):
+    #     column = model_index.column()
+    #     if column == 0: # Property
+    #         # textQString = editor.text()
+    #         # model.setData(model_index, textQString, Qt.EditRole)
+    #         return
+    #     elif column == 1: # Value
+    #         data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
+    #         if data_type is str:
+    #             new_value = editor.text()
+    #         elif data_type is int:
+    #             new_value = editor.value()
+    #         elif data_type is float:
+    #             new_value = editor.value()
+    #         elif data_type is bool:
+    #             new_value = editor.isChecked()
+    #         elif data_type is type(None):
+    #             return
+    #         else:
+    #             raise NotImplementedError
+    #         model.setData(model_index, new_value, Qt.EditRole)
+    #     else:
+    #         QStyledItemDelegate.setModelData(self, editor, model, model_index)
+    # # end def
 
     def updateEditorGeometry(self, editor, option, model_index):
         column = model_index.column()
