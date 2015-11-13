@@ -77,7 +77,7 @@ class CNPropertyItem(QTreeWidgetItem):
         return editor
     # end def
 
-    def updateModel(self):
+    def updateCNModel(self):
         value = self.data(1, Qt.DisplayRole)
         self._cn_model.setProperty(self._key, value)
     # end def

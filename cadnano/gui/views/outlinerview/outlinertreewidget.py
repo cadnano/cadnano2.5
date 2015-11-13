@@ -132,7 +132,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if c_i is None:
             return
         if c_i == self.itemFromIndex(top_left):
-            c_i.updateModel()
+            c_i.updateCNModel()
     # end def
 
     ### ACCESSORS ###

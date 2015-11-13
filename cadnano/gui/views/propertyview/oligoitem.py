@@ -35,15 +35,4 @@ class OligoItem(CNPropertyItem, AbstractOligoItem):
         if displayed_color != color:
             self.setValue('color', color)
     # end def
-
-    # def updateModel(self):
-    #     m_o = self._cn_model
-    #     name = self._prop_items['name'].data(VAL_COL, Qt.DisplayRole)
-    #     color = self._prop_items['color'].data(VAL_COL, Qt.DisplayRole)
-    #     model_props = m_o.getPropertyDict()
-    #     if name != model_props['name']:
-    #         m_o.setProperty('name', name)
-    #     if color != model_props['color']:
-    #         m_o.setProperty('color', color)
-    # # end def
 # end class
