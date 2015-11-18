@@ -116,28 +116,28 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._right_mouse_move = False
     # end def
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
-            self._right_mouse_move = True
-            self._button_down_pos = event.pos()
-    # end def
+    # def mousePressEvent(self, event):
+    #     if event.button() == Qt.RightButton:
+    #         self._right_mouse_move = True
+    #         self._button_down_pos = event.pos()
+    # # end def
 
-    def mouseMoveEvent(self, event):
-        if self._right_mouse_move:
-            p = self.mapToScene(event.pos()) - self._button_down_pos
-            self._empty_helix_item.setPos(p)
-    # end def
+    # def mouseMoveEvent(self, event):
+    #     if self._right_mouse_move:
+    #         p = self.mapToScene(event.pos()) - self._button_down_pos
+    #         self._empty_helix_item.setPos(p)
+    # # end def
 
-    def mouseReleaseEvent(self, event):
-        if self._right_mouse_move and event.button() == Qt.RightButton:
-            self._right_mouse_move = False
-            p = self.mapToScene(event.pos()) - self._button_down_pos
-            self._empty_helix_item.setPos(p)
-            ehi = self._empty_helix_item
-            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-            self.getNeighbors()
-    # end def
+    # def mouseReleaseEvent(self, event):
+    #     if self._right_mouse_move and event.button() == Qt.RightButton:
+    #         self._right_mouse_move = False
+    #         p = self.mapToScene(event.pos()) - self._button_down_pos
+    #         self._empty_helix_item.setPos(p)
+    #         ehi = self._empty_helix_item
+    #         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
+    #         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+    #         self.getNeighbors()
+    # # end def
 
     def getNeighbors(self):
         vhlist = self._part_item.getVHItemList()
