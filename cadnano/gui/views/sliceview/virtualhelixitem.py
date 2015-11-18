@@ -112,7 +112,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-        self.getNeighbors()
+        # self.getNeighbors()
         self._right_mouse_move = False
     # end def
 
@@ -142,7 +142,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def getNeighbors(self):
         vhlist = self._part_item.getVHItemList()
         alllist = '[' + ' '.join([vhi.virtualHelix().getName() for vhi in vhlist]) + ']'
-        print(alllist, self.virtualHelix().getName(), self in vhlist)
+        # print(alllist, self.virtualHelix().getName(), self in vhlist)
 
         items = filter(lambda x: type(x) is VirtualHelixItem, self.collidingItems())
         nlist = '[' + ' '.join([nvhi.virtualHelix().getName() for nvhi in items]) + ']'
