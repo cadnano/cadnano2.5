@@ -1,21 +1,20 @@
+from collections import OrderedDict
+
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QApplication
 
-
-from cadnano import util
-from cadnano.gui.palette import getPenObj, getBrushObj
-
-from cadnano import getReopen
+from cadnano import getReopen, util
 from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
+from .activesliceitem import ActiveSliceItem
 from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
-from .activesliceitem import ActiveSliceItem
 
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -83,6 +82,9 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
             else:
                 _part.setSelected(False)
     # end def
+
+    def getVHItemList(self):
+        return sorted(self._virtual_helix_hash.values(), key=lambda t:t.number())
 
     def _adjustPosition(self):
         """Find the left-most bottom-most sibling, and reposition below."""
