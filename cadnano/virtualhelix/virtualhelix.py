@@ -33,12 +33,12 @@ class VirtualHelix(ProxyObject):
         self._properties = {'eulerZ':0, 'scamZ':0, 'neighbors':'[]'}
 
         # rotate to honeycomb defaults
-        if self.isEvenParity():
-            self._properties['eulerZ'] = 10
-            self._properties['scamZ'] = 10
-        else:
-            self._properties['eulerZ'] = 190
-            self._properties['scamZ'] = 190
+        # if self.isEvenParity():
+        #     self._properties['eulerZ'] = 10
+        #     self._properties['scamZ'] = 10
+        # else:
+        #     self._properties['eulerZ'] = 190
+        #     self._properties['scamZ'] = 190
     # end def
 
     def __repr__(self):

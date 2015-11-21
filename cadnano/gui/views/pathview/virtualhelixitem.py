@@ -11,12 +11,50 @@ from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
 
-from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
+from PyQt5.QtCore import QRectF, Qt, QObject, QPointF, pyqtSignal
+from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
+
+
+PHOS_ITEM_WIDTH = 6
+PHOS = QPainterPath()  # Left 5', Right 3' PainterPath
+P_POLY = QPolygonF()
+P_POLY.append(QPointF(0, 0))
+P_POLY.append(QPointF(0.75 * PHOS_ITEM_WIDTH, 0.5 * PHOS_ITEM_WIDTH))
+P_POLY.append(QPointF(0, PHOS_ITEM_WIDTH))
+P_POLY.append(QPointF(0, 0))
+BOX = QPolygonF()
+BOX.append(QPointF(0, 0))
+BOX.append(QPointF(0, PHOS_ITEM_WIDTH))
+BOX.append(QPointF(PHOS_ITEM_WIDTH, PHOS_ITEM_WIDTH))
+BOX.append(QPointF(PHOS_ITEM_WIDTH, 0))
+BOX.append(QPointF(0, 0))
+# PHOS.addPolygon(BOX)
+PHOS.addPolygon(P_POLY)
+
+
+class PreXoverItem(QGraphicsPathItem):
+    def __init__(self, parent=None):
+        super(QGraphicsPathItem, self).__init__(parent)
+    # end def
+
+    def hoverEnterEvent(self, event):
+        pass
+    # end def
+
+    def hoverMoveEvent(self, event):
+        pass
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        pass
+    # end def
+
+# end class
+
 
 class PreXoverItemGroup(QGraphicsRectItem):
     def __init__(self, parent=None):
@@ -28,31 +66,41 @@ class PreXoverItemGroup(QGraphicsRectItem):
         bw2 = 2 * bw
         part = parent.part()
         path = QPainterPath()
+        step_size = part.stepSize()
         sub_step_size = part.subStepSize()
         canvas_size = part.maxBaseIdx() + 1
         self.setRect(0, 0, bw * canvas_size, 2 * bw)
-        fwd_bases = [0,3,7,10,14,17]
-        rev_bases = [3,6,10,13,16,20]
-        fwd_colors = ['#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc', '#00cc00']
-        rev_colors = ['#00cc00', '#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc']
+
+        fwd_bases = range(step_size)
+        rev_bases = range(step_size)
+        fwd_colors = [QColor() for i in range(step_size)]
+        for i in range(len(fwd_colors)):
+            fwd_colors[i].setHsvF(i/step_size, 0.75, 0.8)
+        rev_colors = [QColor() for i in range(step_size)]
+        for i in range(len(rev_colors)):
+            rev_colors[i].setHsvF(i/step_size, 0.75, 0.8)
+        rev_colors = rev_colors[::-1]
+
         self._fwd_pxo_items = {}
         self._rev_pxo_items = {}
 
         for i in range(0,part.maxBaseIdx(),part.stepSize()):
             for j in range(len(fwd_bases)):
                 idx = fwd_bases[j]
-                item = QGraphicsEllipseItem(0, 0, iw, iw, self)
+                item = QGraphicsPathItem(PHOS, self)
                 item.setPen(QPen(Qt.NoPen))
-                item.setBrush(getBrushObj(fwd_colors[j]))
+                item.setBrush(getBrushObj(fwd_colors[j].name()))
                 self._fwd_pxo_items[i+idx] = item
                 fx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
                 fy = -iw/2
                 item.setPos(fx,fy)
             for j in range(len(rev_bases)):
                 idx = rev_bases[j]
-                ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
-                ritem.setPen(getPenObj(rev_colors[j],1))
+                ritem = QGraphicsPathItem(PHOS, self)
+                ritem.setPen(getPenObj(rev_colors[j].name(),1))
                 ritem.setBrush(getNoBrush())
+                ritem.setTransformOriginPoint(ritem.boundingRect().center())
+                ritem.setRotation(180)
                 self._rev_pxo_items[i+idx] = ritem
                 rx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
                 ry = bw2 - iw/2

@@ -19,7 +19,7 @@ from . import slicestyles as styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 rect_gain = 0.25
-_RECT = _RECT.adjusted(rect_gain, rect_gain, rect_gain, rect_gain)
+_RECT = _RECT.adjusted(0, 0, rect_gain, rect_gain)
 _FONT = styles.SLICE_NUM_FONT
 _ZVALUE = styles.ZSLICEHELIX+3
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
@@ -30,43 +30,108 @@ _ROTARYDIAL_PEN = getPenObj(styles.BLUE_STROKE, _ROTARYDIAL_STROKE_WIDTH)
 _ROTARYDIAL_BRUSH = getBrushObj('#8099ccff')
 _ROTARY_DELTA_WIDTH = 10
 
-_HOVER_PEN = getPenObj('#ffffff', 128)
-_HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
+_HOVER_PEN = getPenObj('#ff0080', .5)
+_HOVER_BRUSH = getBrushObj('#ff0080')
+
+# BOX = QPolygonF()
+# BOX.append(QPointF(0, 0))
+# BOX.append(QPointF(0, PXI_PP_ITEM_WIDTH))
+# BOX.append(QPointF(PXI_PP_ITEM_WIDTH, PXI_PP_ITEM_WIDTH))
+# BOX.append(QPointF(PXI_PP_ITEM_WIDTH, 0))
+# BOX.append(QPointF(0, 0))
+# PXI_PP.addPolygon(BOX)
+
+PXI_PP_ITEM_WIDTH = 1.5
+P_POLY = QPolygonF()
+P_POLY.append(QPointF(0, 0))
+P_POLY.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
+P_POLY.append(QPointF(0, PXI_PP_ITEM_WIDTH))
+P_POLY.append(QPointF(0, 0))
+PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
+PXI_PP.addPolygon(P_POLY)
 
 
+
+class PreXoverItem(QGraphicsPathItem):
+    def __init__(self, base_idx, color, show_outline_only=False, parent=None):
+        super(QGraphicsPathItem, self).__init__(PXI_PP, parent)
+        self.setAcceptHoverEvents(True)
+        self._name = "%s%d" % ("r" if show_outline_only else "f", base_idx)
+        self._base_idx = base_idx
+        self._color = color
+        self._show_outline_only = show_outline_only
+        self._parent = parent
+
+        if show_outline_only:
+            self.setPen(getPenObj(color,0.25))
+            self.setBrush(getNoBrush())
+        else:
+            self.setPen(getNoPen())
+            self.setBrush(getBrushObj(color))
+    # end def
+
+    def hoverEnterEvent(self, event):
+        self.setBrush(_HOVER_BRUSH)
+        self._parent.updateHoveredItem(self._name)
+    # end def
+
+    def hoverMoveEvent(self, event):
+        pass
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        if self._show_outline_only:
+            self.setBrush(getNoBrush())
+        else:
+            self.setBrush(getBrushObj(self._color))
+        self._parent.updateHoveredItem("None")
+    # end def
+
+# end class
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
+        self._virtual_helix = parent._virtual_helix
         self.setPen(getNoPen())
-
-        iw = _ITEM_WIDTH = 3
-        x = _RECT.width() - 2*rect_gain - 2*styles.SLICE_HELIX_STROKE_WIDTH - 1
-        y = _RECT.center().y()
+        STEPSIZE = 21
+        iw = PXI_PP_ITEM_WIDTH
+        # _x = _RECT.width() - 2*rect_gain - styles.SLICE_HELIX_STROKE_WIDTH
+        _x = _RECT.width() - PXI_PP_ITEM_WIDTH 
+        _y = _RECT.center().y()
         prexo_items = {}
-        fwd_angles = [0, 240, 120]
-        fwd_colors = ['#cc0000', '#00cc00', '#0000cc']
+
+        fwd_angles = [round(360*x/10.5,2) for x in range(STEPSIZE)]
+        fwd_colors = [QColor() for i in range(STEPSIZE)]
+        for i in range(len(fwd_colors)):
+            fwd_colors[i].setHsvF(i/STEPSIZE, 0.75, 0.8)
+
         for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getNoPen())
-            item.setBrush(getBrushObj(fwd_colors[i]))
-            item.setTransformOriginPoint(_RECT.center())
+            color = fwd_colors[i].name()
+            item = PreXoverItem(i, color, parent=self)
+            item.setPos(_x,_y)
+            item.setTransformOriginPoint(iw-_RECT.width()/2,0)
             item.setRotation(fwd_angles[i])
             prexo_items[i] = item
 
-        rev_angles = [150, 30, 270]
-        rev_colors = ['#800000cc', '#80cc0000', '#8000cc00']
-        # rev_colors = ['#ff00ff', '#3399ff', '#ff6600']
-        for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getPenObj(rev_colors[i],0.5))
-            item.setBrush(getNoBrush())
-            item.setTransformOriginPoint(_RECT.center())
+        rev_angles = [round(360*x/10.5 + 150,2) for x in range(STEPSIZE)]
+        rev_colors = [QColor() for i in range(STEPSIZE)]
+        for i in range(len(rev_colors)):
+            rev_colors[i].setHsvF(i/STEPSIZE, 0.75, 0.8)
+        rev_colors = rev_colors[::-1] # reverse antiparallel color order 
+
+        for i in range(len(rev_colors)):
+            color = rev_colors[i].name()
+            item = PreXoverItem(i, color, show_outline_only=True, parent=self)
+            item.setPos(_x,_y)
+            item.setTransformOriginPoint(iw-_RECT.width()/2,0)
             item.setRotation(rev_angles[i])
             prexo_items[i] = item
     # end def
 
+    def updateHoveredItem(self, index):
+        self._virtual_helix.setProperty('hoveredPXI', index)
 
 
 class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
@@ -112,32 +177,32 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-        # self.getNeighbors()
+        self.getNeighbors()
         self._right_mouse_move = False
     # end def
 
-    # def mousePressEvent(self, event):
-    #     if event.button() == Qt.RightButton:
-    #         self._right_mouse_move = True
-    #         self._button_down_pos = event.pos()
-    # # end def
+    def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            self._right_mouse_move = True
+            self._button_down_pos = event.pos()
+    # end def
 
-    # def mouseMoveEvent(self, event):
-    #     if self._right_mouse_move:
-    #         p = self.mapToScene(event.pos()) - self._button_down_pos
-    #         self._empty_helix_item.setPos(p)
-    # # end def
+    def mouseMoveEvent(self, event):
+        if self._right_mouse_move:
+            p = self.mapToScene(event.pos()) - self._button_down_pos
+            self._empty_helix_item.setPos(p)
+    # end def
 
-    # def mouseReleaseEvent(self, event):
-    #     if self._right_mouse_move and event.button() == Qt.RightButton:
-    #         self._right_mouse_move = False
-    #         p = self.mapToScene(event.pos()) - self._button_down_pos
-    #         self._empty_helix_item.setPos(p)
-    #         ehi = self._empty_helix_item
-    #         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-    #         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-    #         self.getNeighbors()
-    # # end def
+    def mouseReleaseEvent(self, event):
+        if self._right_mouse_move and event.button() == Qt.RightButton:
+            self._right_mouse_move = False
+            p = self.mapToScene(event.pos()) - self._button_down_pos
+            self._empty_helix_item.setPos(p)
+            ehi = self._empty_helix_item
+            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
+            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+            self.getNeighbors()
+    # end def
 
     def getNeighbors(self):
         vhlist = self._part_item.getVHItemList()
