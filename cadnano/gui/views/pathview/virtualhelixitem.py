@@ -75,10 +75,10 @@ class PreXoverItemGroup(QGraphicsRectItem):
         rev_bases = range(step_size)
         fwd_colors = [QColor() for i in range(step_size)]
         for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/step_size, 0.75, 0.8)
+            fwd_colors[i].setHsvF(i/(step_size*1.6), 0.75, 0.8)
         rev_colors = [QColor() for i in range(step_size)]
         for i in range(len(rev_colors)):
-            rev_colors[i].setHsvF(i/step_size, 0.75, 0.8)
+            rev_colors[i].setHsvF(i/(step_size*1.6), 0.75, 0.8)
         rev_colors = rev_colors[::-1]
 
         self._fwd_pxo_items = {}
