@@ -226,7 +226,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         tpb = part._TWIST_PER_BASE
         angle = idx*tpb
         eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
-        self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 150)
+        self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 180)
     # end def
 
     def setNumber(self):
