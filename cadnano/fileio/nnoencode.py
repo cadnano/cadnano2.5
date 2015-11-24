@@ -16,7 +16,7 @@ def encode(document):
     return json_string
 
 def legacy_dict_from_doc(document):
-    part = document.selectedInstance().object()
+    part = document.selectedInstance().reference()
     num_bases = part.maxBaseIdx()+1
     return encodePart(part, name=fname)
 

@@ -21,9 +21,9 @@ class AddInstanceCommand(UndoCommand):
         doc = self._doc
         obji = self._obj_instance
         obji.unwipe(doc)
-        if isinstance(obji.object(), Part):
+        if isinstance(obji.reference(), Part):
             doc.documentPartAddedSignal.emit(doc, obji)
-        elif isinstance(obji.object(), Assembly):
+        elif isinstance(obji.reference(), Assembly):
             doc.documentAssemblyAddedSignal.emit(doc, obji)
         else:
             raise NotImplementedError

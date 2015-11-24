@@ -90,8 +90,8 @@ class OutlinerTreeWidget(QTreeWidget):
         Receives notification from the model that a part has been added.
         Parts should add themselves to the QTreeWidget by passing parent=self.
         """
-        model_part = model_part_instance.object()
-        part_type = model_part_instance.object().partType()
+        model_part = model_part_instance.reference()
+        part_type = model_part.partType()
         if part_type == PartType.PLASMIDPART:
             plasmid_part_item = PlasmidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = plasmid_part_item
@@ -110,9 +110,9 @@ class OutlinerTreeWidget(QTreeWidget):
     def selectedChangedSlot(self):
         for mpi in self._instance_items:
             if self._instance_items[mpi] in self.selectedItems():
-                mpi.object().setSelected(True)
+                mpi.reference().setSelected(True)
             else:
-                mpi.object().setSelected(False)
+                mpi.reference().setSelected(False)
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):

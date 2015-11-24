@@ -38,11 +38,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """parent should always be pathrootitem"""
         super(NucleicAcidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.object()
+        self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
         self._viewroot = viewroot
         self._getActiveTool = active_tool_getter
-        self._activeSliceItem = ActiveSliceItem(self, m_p.activeBaseIndex())
+        self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
@@ -110,7 +110,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.updatePreXoverItems()
     #end def
 
-    def partDimensionsChangedSlot(self, part):
+    def partDimensionsChangedSlot(self, model_part):
         if len(self._virtual_helix_item_list) > 0:
             vhi = self._virtual_helix_item_list[0]
             vhi_rect = vhi.boundingRect()
@@ -118,7 +118,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
             self._vh_rect.setRight(vhi_rect.right())
         self.scene().views()[0].zoomToFit()
-        self._activeSliceItem.resetBounds()
+        self._active_slice_item.resetBounds()
         self._updateBoundingRect()
     # end def
 
@@ -144,8 +144,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
-        self._activeSliceItem.removed()
-        self.parentItem().removeNucleicAcidPartItem(self)
+        self._active_slice_item.removed()
+        self.parentItem().removePartItem(self)
         scene = self.scene()
         scene.removeItem(self)
         self._model_part = None

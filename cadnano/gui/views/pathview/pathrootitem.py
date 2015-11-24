@@ -52,7 +52,7 @@ class PathRootItem(QGraphicsRectItem):
         the Sliceview handles setting up the appropriate lattice.
         """
         win = self._window
-        part_type = model_part_instance.object().partType()
+        part_type = model_part_instance.reference().partType()
 
         if part_type == PartType.PLASMIDPART:
             pass
@@ -139,7 +139,7 @@ class PathRootItem(QGraphicsRectItem):
         return self._part_item_for_part_instance[selected_instance].getOrderedVirtualHelixList()
     # end def
 
-    def removeOrigamiPartItem(self, part_item):
+    def removePartItem(self, part_item):
         for k in self._part_item_for_part_instance.keys():
             if k == part_item:
                 del self._part_item_for_part_instance[k]

@@ -3,12 +3,12 @@ class AbstractPartItem(object):
     AbstractPartItem is a base class for partitems in all views.
     It includes slots that get connected in PartItemController which
     can be overridden.
-    
+
     If you want to add a new signal to the model, adding the slot here
     means it's not necessary to add the same slot to every item across
     all views.
     """
-    def partDimensionsChangedSlot(self, sender):
+    def partDimensionsChangedSlot(self, part):
         pass
     def partOligoAddedSlot(self, part, oligo):
         pass

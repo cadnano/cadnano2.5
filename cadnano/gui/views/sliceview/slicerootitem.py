@@ -32,7 +32,7 @@ class SliceRootItem(QGraphicsRectItem):
         Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
         """
-        part_type = model_part_instance.object().partType()
+        part_type = model_part_instance.reference().partType()
 
         if part_type == PartType.PLASMIDPART:
             plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)

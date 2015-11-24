@@ -30,7 +30,7 @@ class ObjectInstance(ProxyObject):
         self.deleteLater()
     # end def
 
-    def object(self):
+    def reference(self):
         return self._object
     # end def
 
