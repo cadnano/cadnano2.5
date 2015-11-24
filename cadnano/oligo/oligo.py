@@ -1,19 +1,12 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
-"""
-temporary modification this broke separation and running headless
-"""
-# from cadnano.gui.views.pathview import pathstyles as styles
-
-OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 5
-OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 500
+OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
 
 import copy
 
 from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
-from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
@@ -30,7 +23,6 @@ class Oligo(ProxyObject):
     responsible for updating the affected Oligos.
     """
     def __init__(self, part, color=None):
-        # self.__class__.__base__.__init__(self, part)
         super(Oligo, self).__init__(part)
         self._part = part
         self._strand5p = None
@@ -39,7 +31,6 @@ class Oligo(ProxyObject):
         self._properties = {}
         self._properties['name'] = "oligo%s" % str(id(self))[-4:]
         self._properties['color'] = color if color else "#cc0000"
-        # self._color = color if color else "#cc0000"
     # end def
 
     def __repr__(self):

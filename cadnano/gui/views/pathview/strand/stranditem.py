@@ -12,6 +12,7 @@ from .xoveritem import XoverItem
 from .decorators.insertionitem import InsertionItem
 
 import cadnano.gui.views.pathview.pathselection as pathselection
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
 
 import cadnano.util as util
 from cadnano import getBatch
@@ -397,29 +398,21 @@ class StrandItem(QGraphicsLineItem):
         self.setLine(lx, ly, hx, hy)
         rectf = QRectF(l_upper_left_x + bw, l_upper_left_y, bw*(high_idx - low_idx - 1), bw)
         self._click_area.setRect(rectf)
-        # self._updateHighlight(self.pen().color())
         self._updateColor(strand)
     # end def
 
     def _updateColor(self, strand):
-        oligo = self._model_strand.oligo()
-        color = QColor(oligo.getColor())
-        self._updateHighlight(color)
-    # end def
-
-    def _updateHighlight(self, color):
-        """
-
-        """
-        oligo = self._model_strand.oligo()
-        pen_width = styles.PATH_STRAND_STROKE_WIDTH
+        oligo = strand.oligo()
+        color = oligo.getColor()
         if oligo.shouldHighlight():
-            color.setAlpha(128)
+            alpha = 128
             pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
-        pen = QPen(color, pen_width)
-        # pen.setCosmetic(True)
-        brush = QBrush(color)
-        pen.setCapStyle(Qt.FlatCap)
+        else:
+            pen_width = styles.PATH_STRAND_STROKE_WIDTH
+            alpha = None
+        self._xover3pEnd._updateColor(strand)
+        pen = getPenObj(color, pen_width, alpha=alpha, capstyle=Qt.FlatCap)
+        brush = getBrushObj(color, alpha=alpha)
         self.setPen(pen)
         self._low_cap.updateHighlight(brush)
         self._high_cap.updateHighlight(brush)
