@@ -187,12 +187,17 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         # self._hover_rect = QRectF(_RECT)
         # self._outer_line = RotaryDialLine(self._rect, self)
         # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
-        self.show()
 
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-        self.getNeighbors()
+
+        self._gizmos = {}
+        self._neighbor_vh_items = []
+        self.updateNeighbors()
         self._right_mouse_move = False
+
+
+        self.show()
     # end def
 
     def mousePressEvent(self, event):
@@ -215,24 +220,66 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             ehi = self._empty_helix_item
             self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
             self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-            self.getNeighbors()
+            self.updateNeighbors()
+            self.updateGizmos()
     # end def
 
-    def getNeighbors(self):
-        vhlist = self._part_item.getVHItemList()
-        alllist = '[' + ' '.join([vhi.virtualHelix().getName() for vhi in vhlist]) + ']'
-        # print(alllist, self.virtualHelix().getName(), self in vhlist)
+    def updateGizmos(self):
+        # clear all
+        for name, item in self._gizmos.items():
+            self.scene().removeItem(item)
+        self._gizmos.clear()
 
-        items = filter(lambda x: type(x) is VirtualHelixItem, self.collidingItems())
-        nlist = '[' + ' '.join([nvhi.virtualHelix().getName() for nvhi in items]) + ']'
-        self._virtual_helix.setProperty('neighbors', nlist)
-        # name = self._virtual_helix.getName()
-        # pos = self.scenePos()
-        # print("\n%s (%d, %d)" % (name, pos.x(), pos.y()))
-        # for nvhi in items:
-        #     npos = nvhi.scenePos()
-        #     line = QLineF(pos, npos)
-        #     print("\t%s (%d, %d) %d" % (nvhi.virtualHelix().getName(), npos.x(), npos.y(), line.length()))
+        pos = self.scenePos()
+        for nvhi in self._neighbor_items:
+            line = QLineF(self.scenePos(), nvhi.scenePos())
+            line.translate(_RADIUS-pos.x(),_RADIUS-pos.y())
+            line.setLength(_RADIUS)
+            linegizmo = QGraphicsLineItem(line, self)
+            self._gizmos[nvhi.virtualHelix().getName()] = linegizmo
+            linegizmo.setPen(getPenObj("#5a8bff", 0.25))
+
+    def updateNeighbors(self):
+        name = self.virtualHelix().getName()
+        old_neighbors = self._virtual_helix.getProperty('neighbors').split()
+        print(name, "in updateNeighbors", old_neighbors)
+        vhlist = self._part_item.getVHItemList()
+        self._neighbor_items = items = list(filter( \
+                lambda x: type(x) is VirtualHelixItem, self.collidingItems()))
+
+        for name, item in self._gizmos.items():
+            self.scene().removeItem(item)
+        self._gizmos.clear()
+
+        pos = self.scenePos()
+        for nvhi in items:
+            line = QLineF(self.scenePos(), nvhi.scenePos())
+            line.translate(_RADIUS-pos.x(),_RADIUS-pos.y())
+            line.setLength(_RADIUS)
+            linegizmo = QGraphicsLineItem(line, self)
+            self._gizmos[nvhi.virtualHelix().getName()] = linegizmo
+            linegizmo.setPen(getPenObj("#5a8bff", 0.25))
+
+
+        neighbors = ['%s:%02d' % (nvhi.virtualHelix().getName(), 
+                                 self._gizmos[nvhi.virtualHelix().getName()].line().angle())
+                                 for nvhi in items]
+        print("old",old_neighbors, "new", neighbors)
+        diff = list(set(old_neighbors) ^ set(neighbors))
+        print("old",old_neighbors, "new", neighbors, "diff", diff)
+        if diff:
+            self._virtual_helix.setProperty('neighbors', ' '.join(neighbors))
+            for nvhi in self._part_item.getVHItemList(): # check all items
+                print(name, "checking", nvhi.virtualHelix().getName(), "in", diff)
+                nvhi_name = nvhi.virtualHelix().getName()
+                if nvhi_name in self._gizmos:
+                    angle = self._gizmos[nvhi_name].line().angle()
+                    nvhi_key = '%s:%02d' % (nvhi_name, angle)
+                    if nvhi_key in diff:
+                        print(nvhi_name, "found!")
+                        nvhi.updateNeighbors()
+                        nvhi.updateGizmos()
+
 
     def modelColor(self):
         return self.part().getProperty('color')
@@ -406,6 +453,11 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def part(self):
         return self._empty_helix_item.part()
+    # end def
+
+    def parent(self):
+        return self._empty_helix_item
+    # end def
 
     def virtualHelix(self):
         return self._virtual_helix
@@ -413,6 +465,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def number(self):
         return self.virtualHelix().number()
+    # end def
 
     def setActiveSliceView(self, idx, has_fwd, has_rev):
         if has_fwd:
