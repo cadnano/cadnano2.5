@@ -36,7 +36,7 @@ class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
         """
         super(PlasmidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.object()
+        self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
         self._controller = PlasmidPartItemController(self, m_p)
         self._selection_items = {}

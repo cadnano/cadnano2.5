@@ -27,8 +27,6 @@ class NucleicAcidPartItemController(PartItemController):
         m_p = self._model_part
         p_i = self._part_item
         m_p.partActiveVirtualHelixChangedSignal.disconnect(p_i.partActiveVirtualHelixChangedSlot)
-        m_p.partDimensionsChangedSignal.disconnect(p_i.partDimensionsChangedSlot)
-        m_p.partParentChangedSignal.disconnect(p_i.partParentChangedSlot)
         m_p.partPreDecoratorSelectedSignal.disconnect(p_i.partPreDecoratorSelectedSlot)
         m_p.partStrandChangedSignal.disconnect(p_i.updatePreXoverItemsSlot)
         m_p.partVirtualHelixAddedSignal.disconnect(p_i.partVirtualHelixAddedSlot)

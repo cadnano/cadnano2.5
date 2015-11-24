@@ -42,8 +42,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
 
     ### SLOTS ###
     def partRemovedSlot(self, sender):
-        self._cn_model = None
         self._controller.disconnectSignals()
+        self._cn_model = None
         self._controller = None
     # end def
 

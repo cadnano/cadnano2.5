@@ -8,7 +8,7 @@ class AbstractPartItem(object):
     means it's not necessary to add the same slot to every item across
     all views.
     """
-    def partDimensionsChangedSlot(self, sender):
+    def partDimensionsChangedSlot(self, part):
         pass
     def partOligoAddedSlot(self, part, oligo):
         pass

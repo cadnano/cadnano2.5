@@ -46,7 +46,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         """
         super(NucleicAcidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.object()
+        self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
@@ -149,7 +149,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
         self._active_slice_item.removed()
-        self.parentItem().removeNucleicAcidPartItem(self)
+        self.parentItem().removePartItem(self)
 
         scene = self.scene()
 
