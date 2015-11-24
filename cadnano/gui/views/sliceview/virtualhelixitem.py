@@ -193,9 +193,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         self._gizmos = []
         self._neighbor_vh_items = []
-        self.updateNeighbors()
         self._right_mouse_move = False
-
+        self.refreshCollidingItems()
 
         self.show()
     # end def
@@ -251,7 +250,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             added_names = [a.split(':')[0] for a in added]
             removed_names = [r.split(':')[0] for r in removed]
             if nvhi_name in added_names or nvhi_name in removed_names:
-                nvhi.updateNeighbors()
+                nvhi.refreshCollidingItems()
         # end for
     # end def
 
