@@ -491,12 +491,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         list(map(PreXoverItem.remove, self._pre_xover_items))
         self._pre_xover_items = []
 
-        if self._viewroot.preXoverFilter() == "prexover_p":
-            xover_p = True
-            _PXI = PreXoverPItem
-        else:
-            xover_p = False
-            _PXI = PreXoverAItem
+        # if self._viewroot.preXoverFilter() == "prexover_p":
+        #     xover_p = True
+        #     _PXI = PreXoverPItem
+        # else:
+        xover_p = False
+        _PXI = PreXoverAItem
 
         potential_xovers = part.potentialCrossoverList(vh, idx, xover_p)
         for neighbor, index, strand_type, is_low_idx in potential_xovers:

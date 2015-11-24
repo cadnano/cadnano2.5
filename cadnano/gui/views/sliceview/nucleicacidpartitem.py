@@ -72,7 +72,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self._outline.setPen(QPen(Qt.NoPen))
         self._drag_handle = DragHandle(QRectF(_orect), self)
         # self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
-        if len(m_p.document().children()) > 1: 
+        if len(m_p.document().children()) > 1:
             self._adjustPosition()
         self.show()
         # select upon creation
@@ -436,58 +436,58 @@ class DragHandle(QGraphicsRectItem):
         self.unsetCursor()
     # end def
 
-    def mousePressEvent(self, event):
-        self._edgesToResize = self.getBound(event.pos())
-        _cursor = self.getCursor(self._edgesToResize)
+    # def mousePressEvent(self, event):
+    #     self._edgesToResize = self.getBound(event.pos())
+    #     _cursor = self.getCursor(self._edgesToResize)
 
-        # select this part and deselect everything else
-        for _part in self._parent.part().document().children():
-            if _part is self._parent.part():
-                _part.setSelected(True)
-            else:
-                _part.setSelected(False)
+    #     # select this part and deselect everything else
+    #     for _part in self._parent.part().document().children():
+    #         if _part is self._parent.part():
+    #             _part.setSelected(True)
+    #         else:
+    #             _part.setSelected(False)
 
-        self._drag_mousedown_pos = event.pos()
+    #     self._drag_mousedown_pos = event.pos()
 
-        if _cursor is Qt.ClosedHandCursor:
-            self._resizing = False
-        elif _cursor in [Qt.SizeBDiagCursor,
-                         Qt.SizeFDiagCursor,
-                         Qt.SizeHorCursor,
-                         Qt.SizeVerCursor]:
-            self._resizing = True
-    # end def
+    #     if _cursor is Qt.ClosedHandCursor:
+    #         self._resizing = False
+    #     elif _cursor in [Qt.SizeBDiagCursor,
+    #                      Qt.SizeFDiagCursor,
+    #                      Qt.SizeHorCursor,
+    #                      Qt.SizeVerCursor]:
+    #         self._resizing = True
+    # # end def
 
-    def mouseMoveEvent(self, event):
-        m = QLineF(event.screenPos(), event.buttonDownScreenPos(Qt.LeftButton))
-        if m.length() < QApplication.startDragDistance():
-            return
-        p = self.mapToScene(QPointF(event.pos()) - QPointF(self._drag_mousedown_pos))
-        # still need to correct for qgraphicsview translation
-        if self._resizing:
-            _x, _y = event.pos().x(), event.pos().y()
-            _r = QRectF(self._parent._outlinerect)
-            _e = self._edgesToResize
-            if _e & PartEdges.TOP: _r.setTop(_y)
-            if _e & PartEdges.LEFT: _r.setLeft(_x)
-            if _e & PartEdges.RIGHT: _r.setRight(_x)
-            if _e & PartEdges.BOTTOM: _r.setBottom(_y)
-            self._resizingRectItem.setRect(_r)
-        else:
-            self._parent.setPos(p)
-    # end def
+    # def mouseMoveEvent(self, event):
+    #     m = QLineF(event.screenPos(), event.buttonDownScreenPos(Qt.LeftButton))
+    #     if m.length() < QApplication.startDragDistance():
+    #         return
+    #     p = self.mapToScene(QPointF(event.pos()) - QPointF(self._drag_mousedown_pos))
+    #     # still need to correct for qgraphicsview translation
+    #     if self._resizing:
+    #         _x, _y = event.pos().x(), event.pos().y()
+    #         _r = QRectF(self._parent._outlinerect)
+    #         _e = self._edgesToResize
+    #         if _e & PartEdges.TOP: _r.setTop(_y)
+    #         if _e & PartEdges.LEFT: _r.setLeft(_x)
+    #         if _e & PartEdges.RIGHT: _r.setRight(_x)
+    #         if _e & PartEdges.BOTTOM: _r.setBottom(_y)
+    #         self._resizingRectItem.setRect(_r)
+    #     else:
+    #         self._parent.setPos(p)
+    # # end def
 
-    def mouseReleaseEvent(self, event):
-        self.setCursor(Qt.OpenHandCursor)
+    # def mouseReleaseEvent(self, event):
+    #     self.setCursor(Qt.OpenHandCursor)
 
-        if self._resizing:
-            self.attemptResize(self._resizingRectItem.rect())
-            self._resizing = False
-            self._edgesToResize = PartEdges.NONE
-        else:
-            pass
-        # self._resizingRect.setRect(self._parent._outlinerect)
-    # end def
+    #     if self._resizing:
+    #         self.attemptResize(self._resizingRectItem.rect())
+    #         self._resizing = False
+    #         self._edgesToResize = PartEdges.NONE
+    #     else:
+    #         pass
+    #     # self._resizingRect.setRect(self._parent._outlinerect)
+    # # end def
 
     def attemptResize(self, rect):
         _p = _BOUNDING_RECT_PADDING

@@ -174,7 +174,7 @@ class StapleGraph(object):
                 # end if
                 current_staple_length += self.token_list[edge_index]
                 if (current_staple_length > self.min_staple_length):
-                    root_mean_sq = abs(current_staple_length-self.optimum_staple)
+                    root_mean_sq = abs(current_staple_length - self.optimum_staple)
                     self.G.add_weighted_edges_from([(from_node_index, to_node_index, root_mean_sq)])
                 # end if
                 to_node_index += 1

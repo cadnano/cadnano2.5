@@ -18,78 +18,6 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
-class PreXoverItemGroup(QGraphicsRectItem):
-    def __init__(self, parent=None):
-        super(QGraphicsRectItem, self).__init__(parent)
-        self._parent = parent
-        self.setPen(getNoPen())
-        iw = _ITEM_WIDTH = 6
-        bw = _BASE_WIDTH
-        bw2 = 2 * bw
-        part = parent.part()
-        path = QPainterPath()
-        sub_step_size = part.subStepSize()
-        canvas_size = part.maxBaseIdx() + 1
-        self.setRect(0, 0, bw * canvas_size, 2 * bw)
-        fwd_bases = [0,3,7,10,14,17]
-        rev_bases = [3,6,10,13,16,20]
-        fwd_colors = ['#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc', '#00cc00']
-        rev_colors = ['#00cc00', '#cc0000', '#0000cc', '#00cc00', '#cc0000', '#0000cc']
-        self._fwd_pxo_items = {}
-        self._rev_pxo_items = {}
-
-        for i in range(0,part.maxBaseIdx(),part.stepSize()):
-            for j in range(len(fwd_bases)):
-                idx = fwd_bases[j]
-                item = QGraphicsEllipseItem(0, 0, iw, iw, self)
-                item.setPen(QPen(Qt.NoPen))
-                item.setBrush(getBrushObj(fwd_colors[j]))
-                self._fwd_pxo_items[i+idx] = item
-                fx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
-                fy = -iw/2
-                item.setPos(fx,fy)
-            for j in range(len(rev_bases)):
-                idx = rev_bases[j]
-                ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
-                ritem.setPen(getPenObj(rev_colors[j],1))
-                ritem.setBrush(getNoBrush())
-                self._rev_pxo_items[i+idx] = ritem
-                rx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
-                ry = bw2 - iw/2
-                ritem.setPos(rx,ry)
-
-        # for i in range(0,part.maxBaseIdx(),7):
-        #     item = QGraphicsEllipseItem(0, 0, iw, iw, self)
-        #     item.setPen(QPen(Qt.NoPen))
-        #     item.setBrush(getBrushObj(fwd_colors[int(i/7%3)]))
-        #     self._prexo_items[i] = item
-        #     fx = bw*i + bw/2 - 2  # base_index + base_middle - my_width
-        #     fy = -iw/2
-        #     item.setPos(fx,fy)
-        #     rx = bw*(i+5) + bw/2 - 2  # base_index + base_middle - my_width
-        #     ry = bw2 - iw/2
-        #     ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
-        #     ritem.setPen(getPenObj(rev_colors[int((i+5)/7%3)],1))
-        #     ritem.setBrush(getNoBrush())
-        #     ritem.setPos(rx,ry)
-        #     self._prexo_items[i+5] = ritem
-    # end def
-
-    def updatePositionsAfterRotation(self, angle):
-        bw = _BASE_WIDTH
-        part = self._parent.part()
-        canvas_size = part.maxBaseIdx() + 1
-        step_size = part.stepSize()
-        xdelta = angle/360. * bw*step_size
-        for i, item in self._fwd_pxo_items.items():
-            x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
-            item.setX(x)
-        for i, item in self._rev_pxo_items.items():
-            x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
-            item.setX(x)
-    # end def
-
-
 class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     """VirtualHelixItem for PathView"""
     findChild = util.findChild  # for debug
@@ -122,7 +50,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
 
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
     # end def
 
     ### SIGNALS ###
@@ -157,12 +84,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         self._handle.setNumber()
-    # end def
-
-    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
-        if property_key == 'eulerZ':
-            self._handle.rotateWithCenterOrigin(new_value)
-            self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -220,18 +141,18 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     ### DRAWING METHODS ###
     def isStrandOnTop(self, strand):
-        return strand.strandSet().isScaffold()
-        # sS = strand.strandSet()
-        # isEvenParity = self._model_virtual_helix.isEvenParity()
-        # return isEvenParity and sS.isScaffold() or\
-        #        not isEvenParity and sS.isStaple()
+        # return strand.strandSet().isScaffold()
+        sset = strand.strandSet()
+        is_even_parity = self._model_virtual_helix.isEvenParity()
+        return is_even_parity and sset.isScaffold() or\
+               not is_even_parity and sset.isStaple()
     # end def
 
     def isStrandTypeOnTop(self, strand_type):
-        return strand_type is StrandType.SCAFFOLD
-        # isEvenParity = self._model_virtual_helix.isEvenParity()
-        # return isEvenParity and strand_type is StrandType.SCAFFOLD or \
-        #        not isEvenParity and strand_type is StrandType.STAPLE
+        # return strand_type is StrandType.SCAFFOLD
+        is_even_parity = self._model_virtual_helix.isEvenParity()
+        return is_even_parity and strand_type is StrandType.SCAFFOLD or \
+               not is_even_parity and strand_type is StrandType.STAPLE
     # end def
 
     def upperLeftCornerOfBase(self, idx, strand):
@@ -366,17 +287,17 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         on the top or bottom edge, resulting in a negative y value.
         """
         x, y = pos.x(), pos.y()
-        mVH = self._model_virtual_helix
+        m_vh = self._model_virtual_helix
         base_idx = int(floor(x / _BASE_WIDTH))
-        min_base, max_base = 0, mVH.part().maxBaseIdx()
+        min_base, max_base = 0, m_vh.part().maxBaseIdx()
         if base_idx < min_base or base_idx >= max_base:
             base_idx = util.clamp(base_idx, min_base, max_base)
         if y < 0:
             y = 0  # HACK: zero out y due to erroneous click
-        strandIdx = floor(y * 1. / _BASE_WIDTH)
-        if strandIdx < 0 or strandIdx > 1:
-            strandIdx = int(util.clamp(strandIdx, 0, 1))
-        strand_set = mVH.getStrandSetByIdx(strandIdx)
+        strand_idx = floor(y * 1. / _BASE_WIDTH)
+        if strand_idx < 0 or strand_idx > 1:
+            strand_idx = int(util.clamp(strand_idx, 0, 1))
+        strand_set = m_vh.getStrandSetByIdx(strand_idx)
         return (strand_set, base_idx)
     # end def
 
@@ -410,7 +331,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     ### TOOL METHODS ###
     def pencilToolMousePress(self, strand_set, idx):
         """strand.getDragBounds"""
-        # print "%s: %s[%s]" % (util.methodName(), strand_set, idx)
+        # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
         if not active_tool.isDrawingStrand():
             active_tool.initStrandItemFromVHI(self, strand_set, idx)
@@ -419,7 +340,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def pencilToolMouseMove(self, strand_set, idx):
         """strand.getDragBounds"""
-        # print "%s: %s[%s]" % (util.methodName(), strand_set, idx)
+        # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
         if active_tool.isDrawingStrand():
             active_tool.updateStrandItemFromVHI(self, strand_set, idx)
@@ -427,7 +348,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def pencilToolMouseRelease(self, strand_set, idx):
         """strand.getDragBounds"""
-        # print "%s: %s[%s]" % (util.methodName(), strand_set, idx)
+        # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
         if active_tool.isDrawingStrand():
             active_tool.setIsDrawingStrand(False)

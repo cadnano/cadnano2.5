@@ -1121,8 +1121,8 @@ class NucleicAcidPart(Part):
                 for pt, is_low_idx in izip(pts, (True, False)):
                     for i, j in product(base_range_full, pt):
                         index = to_index = i + j
-                        if xover_p: # selection flag passed in from nucleicacidpartitem
-                            to_index = index+1 if is_low_idx else index-1
+                        # if xover_p: # selection flag passed in from nucleicacidpartitem
+                        #     to_index = index+1 if is_low_idx else index-1
                         if index < num_bases:
                             if from_ss.hasNoStrandAtOrNoXover(index) and \
                                     to_ss.hasNoStrandAtOrNoXover(to_index):
