@@ -7,12 +7,14 @@ class Crossovers:
     HONEYCOMB_SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
     HONEYCOMB_STAP_LOW = [[6], [13], [20]]
     HONEYCOMB_STAP_HIGH = [[7], [14], [0]]
+    TWIST_OFFSET = 0
 
     # # from 0: DR U DL aka 210 90 330
     # HONEYCOMB_SCAF_LOW = [[1, 12], [8, 19], [5, 15]]
     # HONEYCOMB_SCAF_HIGH = [[2, 13], [9, 20], [6, 16]]
     # HONEYCOMB_STAP_LOW = [[17], [3], [10]]
     # HONEYCOMB_STAP_HIGH = [[18], [4], [11]]
+    # TWIST_OFFSET = 0
 
 root3 = 1.732051
 

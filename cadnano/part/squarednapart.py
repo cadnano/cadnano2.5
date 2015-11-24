@@ -1,5 +1,5 @@
 from cadnano.enum import LatticeType
-from cadnano.part.origamipart import OrigamiPart
+from cadnano.part.nucleicacidpart import NucleicAcidPart
 
 class Crossovers:
     SQUARE_SCAF_LOW = [[4, 26, 15], [18, 28, 7], [10, 20, 31], [2, 12, 23]]
@@ -8,7 +8,7 @@ class Crossovers:
     SQUARE_STAP_HIGH = [[0], [24], [16], [8]]
 
 
-class SquarePart(OrigamiPart):
+class SquareDnaPart(NucleicAcidPart):
     _STEP = 32  # 21 in honeycomb
     _SUB_STEP_SIZE = _STEP / 4
     _TURNS_PER_STEP = 3.0
@@ -23,7 +23,7 @@ class SquarePart(OrigamiPart):
     _STAPH = Crossovers.SQUARE_STAP_HIGH
 
     def __init__(self, *args, **kwargs):
-        super(SquarePart, self).__init__(self, *args, **kwargs)
+        super(SquareDnaPart, self).__init__(self, *args, **kwargs)
         self._max_row = kwargs.get('max_row')
         if self._max_row is None:
             raise ValueError("%s: Need max_row kwarg" % (type(self).__name__))

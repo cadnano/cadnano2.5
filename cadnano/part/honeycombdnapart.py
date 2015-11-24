@@ -4,10 +4,23 @@ from cadnano.enum import LatticeType
 
 
 class Crossovers:
-    SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
-    SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
-    STAP_LOW = [[6, 16], [3, 13], [10, 20]]
-    STAP_HIGH = [[7, 17], [4, 14], [0, 11]]
+    # SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
+    # SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
+    # STAP_LOW = [[6, 16], [3, 13], [10, 20]]
+    # STAP_HIGH = [[7, 17], [4, 14], [0, 11]]
+
+    # SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
+    # SCAF_HIGH = [[2, 12], [9, 19], [5, 16]]
+    # STAP_LOW = [[6], [13], [20]]
+    # STAP_HIGH = [[7], [14], [0]]
+    # TWIST_OFFSET = -8.57
+
+    # # from 0: DR U DL aka 210 90 330
+    SCAF_LOW = [[1, 12], [8, 19], [5, 15]]
+    SCAF_HIGH = [[2, 13], [9, 20], [6, 16]]
+    STAP_LOW = [[17], [3], [10]]
+    STAP_HIGH = [[18], [4], [11]]
+    TWIST_OFFSET = -(360/10.5)*1.0
 
 root3 = 1.732051
 
@@ -16,7 +29,7 @@ class HoneycombDnaPart(NucleicAcidPart):
     _TURNS_PER_STEP = 2.0
     _HELICAL_PITCH = _STEP/_TURNS_PER_STEP
     _TWIST_PER_BASE = 360/_HELICAL_PITCH # degrees
-    _TWIST_OFFSET = 0 # degrees
+    _TWIST_OFFSET = Crossovers.TWIST_OFFSET # degrees
 
     _active_base_index = _STEP
     _SUB_STEP_SIZE = _STEP / 3
@@ -37,7 +50,6 @@ class HoneycombDnaPart(NucleicAcidPart):
         self._max_base = kwargs.get('max_steps') * self._STEP - 1
         if self._max_base is None:
             raise ValueError("%s: Need max_base kwarg" % (type(self).__name__))
-        print("new HoneycombDnaPart")
 
     def crossSectionType(self):
         """Returns the cross-section type of the DNA part."""

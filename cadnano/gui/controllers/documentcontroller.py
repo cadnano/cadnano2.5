@@ -443,13 +443,15 @@ class DocumentController():
         # self.win.sliceroot.setModifyState(isChecked)
 
     def actionAddHoneycombPartSlot(self):
-        part = self._document.addHoneycombPart()
-        self.setActivePart(part)
+        # part = self._document.addHoneycombPart()
+        # self.setActivePart(part)
+        pass
     # end def
 
     def actionAddSquarePartSlot(self):
-        part = self._document.addSquarePart()
-        self.setActivePart(part)
+        # part = self._document.addSquarePart()
+        # self.setActivePart(part)
+        pass
     # end def
 
     def actionAddHoneycombDnaPart(self):
@@ -458,13 +460,13 @@ class DocumentController():
     # end def
 
     def actionAddSquareDnaPart(self):
-        # part = self._document.addSquareDnaPart()
-        # self.setActivePart(part)
+        part = self._document.addSquareDnaPart()
+        self.setActivePart(part)
         pass
     # end def
 
     def actionAddPlasmidPartSlot(self):
-        part = self._document.addPlasmidPart()
+        # part = self._document.addPlasmidPart()
         # self.setActivePart(part)
         pass
     # end def

@@ -13,7 +13,7 @@ from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
-from cadnano.part import HoneycombDnaPart #, SquareDnaPart
+from cadnano.part import HoneycombDnaPart, SquareDnaPart
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
