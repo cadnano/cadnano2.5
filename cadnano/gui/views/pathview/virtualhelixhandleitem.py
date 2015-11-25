@@ -171,9 +171,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         vh_name = self._virtual_helix.getName()
         vh_angle = self._virtual_helix.getProperty('eulerZ')
         step_idx = pre_xover_item.step_idx() # (f|r).step_idx
-        total_angle = (vh_angle + pre_xover_item.rotation()) % 360
+        facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
         is_fwd = 1 if pre_xover_item.is_fwd() else 0
-        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, total_angle)
+        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
         self._virtual_helix.setProperty('active_pxi', value)
     # end def
 

@@ -215,8 +215,9 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         elif property_key == 'active_pxi':
             hpxig = self._handle._prexoveritemgroup
             if new_value:
-                vh_name, is_fwd, step_idx, total_angle = new_value.split('.')
-                new_active_item = hpxig.getItem(int(is_fwd), int(step_idx))
+                vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
+                is_fwd = 1 if fwd_str == 'fwd' else 0
+                new_active_item = hpxig.getItem(is_fwd, int(step_idx))
                 hpxig.refreshActive(new_active_item)
             else:
                 hpxig.refreshActive(None)

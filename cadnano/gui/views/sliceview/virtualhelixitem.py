@@ -17,6 +17,7 @@ from . import slicestyles as styles
 
 
 _MINOR_GROOVE_ANGLE = 171 # this should go in part eventually
+_VALID_XOVER_ANGLE = 15
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -48,7 +49,7 @@ PXI_PP.addPolygon(P_POLY)
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsPathItem, self).__init__(PXI_PP, parent)
-        self._angle = 0
+        self._parent = parent
         self._step_idx = step_idx
         self._color = color
         self._is_fwd = is_fwd
@@ -63,6 +64,10 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     ### ACCESSORS ###
+    def facing_angle(self):
+        facing_angle = self._parent.virtual_helix_angle() + self.rotation()
+        return facing_angle
+
     def name(self):
         return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
 
@@ -83,6 +88,7 @@ class PreXoverItem(QGraphicsPathItem):
 
     def hoverLeaveEvent(self, event):
         self._parent.setActivePreXoverItem(None)
+        self._parent.refreshAppearanceAll()
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -152,6 +158,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     ### ACCESSORS ###
+    def virtual_helix_angle(self):
+        return self._virtual_helix.getProperty('eulerZ')
+
     def getItem(self, is_fwd, step_idx):
         items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
         if step_idx in items:
@@ -159,6 +168,19 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         else:
             return None
     # end def
+
+    def refreshAppearanceAll(self):
+        for item in self.fwd_prexo_items.values():
+            item.refreshAppearance(False)
+        for item in self.rev_prexo_items.values():
+            item.refreshAppearance(False)
+
+    def getItemsFacingNearAngle(self, angle):
+        lowZ = angle-_VALID_XOVER_ANGLE
+        highZ = angle+_VALID_XOVER_ANGLE
+        fwd = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.fwd_prexo_items.values()))
+        rev = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.rev_prexo_items.values()))
+        return (fwd,rev)
 
     ### EVENT HANDLERS ###
 
@@ -173,9 +195,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         vh_name = self._virtual_helix.getName()
         vh_angle = self._virtual_helix.getProperty('eulerZ')
         step_idx = pre_xover_item.step_idx() # (f|r).step_idx
-        total_angle = (vh_angle + pre_xover_item.rotation()) % 360
-        is_fwd = 1 if pre_xover_item.is_fwd() else 0
-        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, total_angle)
+        facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
+        is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
+        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
         self._virtual_helix.setProperty('active_pxi', value)
     # end def
 
@@ -188,6 +210,34 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             self._active_item = new_active_item
     # end def
 
+    def showPotentialXovers(self, new_active_item, facing_angle):
+        pass
+    # end def
+
+class LineGizmo(QGraphicsLineItem):
+    def __init__(self, line, color, nvhi, parent=None):
+        super(QGraphicsLineItem, self).__init__(line, parent)
+        self.nvhi = nvhi
+        self.nvhi_name = nvhi.virtualHelix().getName()
+
+        lo = QLineF(line)
+        hi = QLineF(line)
+        lo.setAngle(line.angle()-_VALID_XOVER_ANGLE)
+        hi.setAngle(line.angle()+_VALID_XOVER_ANGLE)
+
+        pi = QGraphicsPathItem(self)
+        pi.setPen(getNoPen())
+        pi.setBrush(getBrushObj(color, alpha=64))
+        path = QPainterPath()
+        path.moveTo(lo.p1())
+        path.lineTo(lo.p2())
+        path.lineTo(hi.p2())
+        path.lineTo(hi.p1())
+        pi.setPath(path)
+
+    def angle(self):
+        return 360-self.line().angle()
+# end class
 
 class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     """
@@ -232,7 +282,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
 
-        self._gizmos = []
+        self._gizmos = [] # key = 
         self._neighbor_vh_items = []
         self._right_mouse_move = False
         self.refreshCollidingItems()
@@ -278,10 +328,12 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             line.translate(_RADIUS-pos.x(),_RADIUS-pos.y())
             color = '#5a8bff' if line.length() > (_RADIUS*1.99) else '#cc0000'
             line.setLength(_RADIUS)
-            line_item = QGraphicsLineItem(line, self)
+            line_item = LineGizmo(line, color, nvhi, self)
             line_item.setPen(getPenObj(color, 0.25))
             self._gizmos.append(line_item) # save ref to clear later
-            neighbors.append('%s:%02d' % (nvhi_name, line.angle()))
+            neighbors.append('%s:%02d' % (nvhi_name, 360-line.angle()))
+
+
         # end for
         self._virtual_helix.setProperty('neighbors', ' '.join(sorted(neighbors)))
         added = list(set(neighbors) - set(old_neighbors)) # includes new angles
@@ -357,13 +409,43 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         elif property_key == 'active_pxi':
             pxig = self._prexoveritemgroup
             if new_value:
-                vh_name, is_fwd, step_idx, total_angle = new_value.split('.')
+                vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
+                is_fwd = 1 if fwd_str == 'fwd' else 0
                 new_active_item = pxig.getItem(int(is_fwd), int(step_idx))
                 pxig.refreshActive(new_active_item)
+                hovered_item = '%s.%s.%s' % (vh_name, fwd_str, step_idx)
+                nearby_items = self.getNearbyPreXoverItems(hovered_item, int(facing_angle))
+                pxig.showPotentialXovers(new_active_item, nearby_items)
             else:
                 pxig.refreshActive(None)
-
     # end def
+
+    def getPreXoverItemsFacingNearAngle(self, angle):
+        return self._prexoveritemgroup.getItemsFacingNearAngle(angle)
+    # end def
+
+    def getNearbyPreXoverItems(self, hovered_item, facing_angle):
+        """Return a list of proximal neighbors pxis."""
+        # An active PXI was hovered. It is oriented toward facing_angle
+        # If a neighbor VHI is near the facing_angle, we want references 
+        # its PXIs that are nearby the active one.
+
+        # LineGizmos know neighbors' angles, so just get the gizmos
+        # that are pointing in the valid angle range
+        lowZ  = facing_angle-_VALID_XOVER_ANGLE
+        highZ = facing_angle+_VALID_XOVER_ANGLE
+        nearby = list(filter(lambda g: lowZ < g.angle() < highZ , self._gizmos))
+
+        print("hovered_item %s at angle %d" % (hovered_item, facing_angle))
+        for g in nearby:
+            # get PXIs facing the opposite direction as our facing_angle
+            opposite_angle = (facing_angle+180)%360
+            print("checking", g.nvhi_name, "at", opposite_angle)
+            fwd_items, rev_items = g.nvhi.getPreXoverItemsFacingNearAngle(opposite_angle)
+            for item in fwd_items:
+                item.refreshAppearance(True)
+            for item in rev_items:
+                item.refreshAppearance(True)
 
 
     def virtualHelixRemovedSlot(self, virtual_helix):
