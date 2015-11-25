@@ -16,6 +16,8 @@ from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, g
 from . import slicestyles as styles
 
 
+_MINOR_GROOVE_ANGLE = 171 # this should go in part eventually
+
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -26,8 +28,6 @@ _ZVALUE = styles.ZSLICEHELIX+3
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 
-_REV_ANGLE = 171
-
 _ROTARYDIAL_STROKE_WIDTH = 1
 _ROTARYDIAL_PEN = getPenObj(styles.BLUE_STROKE, _ROTARYDIAL_STROKE_WIDTH)
 _ROTARYDIAL_BRUSH = getBrushObj('#8099ccff')
@@ -35,14 +35,6 @@ _ROTARY_DELTA_WIDTH = 10
 
 _HOVER_PEN = getPenObj('#ff0080', .5)
 _HOVER_BRUSH = getBrushObj('#ff0080')
-
-# BOX = QPolygonF()
-# BOX.append(QPointF(0, 0))
-# BOX.append(QPointF(0, PXI_PP_ITEM_WIDTH))
-# BOX.append(QPointF(PXI_PP_ITEM_WIDTH, PXI_PP_ITEM_WIDTH))
-# BOX.append(QPointF(PXI_PP_ITEM_WIDTH, 0))
-# BOX.append(QPointF(0, 0))
-# PXI_PP.addPolygon(BOX)
 
 PXI_PP_ITEM_WIDTH = 1.5
 P_POLY = QPolygonF()
@@ -53,35 +45,36 @@ P_POLY.append(QPointF(0, 0))
 PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
 PXI_PP.addPolygon(P_POLY)
 
-
-
 class PreXoverItem(QGraphicsPathItem):
-    def __init__(self, base_idx, color, is_rev=False, parent=None):
+    def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsPathItem, self).__init__(PXI_PP, parent)
-        self._name = "%s%d" % ("r" if is_rev else "f", base_idx)
-        self._base_idx = base_idx
+        self._angle = 0
+        self._step_idx = step_idx
         self._color = color
-        self._is_rev = is_rev
+        self._is_fwd = is_fwd
         self._parent = parent
         self.setAcceptHoverEvents(True)
         self.setPen(getNoPen())
         self.setBrush(getNoBrush())
-
-        if self._is_rev:
-            self.setPen(getPenObj(self._color, 0.25, alpha=128))
-        else:
+        if self._is_fwd:
             self.setBrush(getBrushObj(self._color, alpha=128))
+        else:
+            self.setPen(getPenObj(self._color, 0.25, alpha=128))
     # end def
 
+    ### ACCESSORS ###
+    def name(self):
+        return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
+
+    def step_idx(self):
+        return self._step_idx
+
+    def is_fwd(self):
+        return self._is_fwd
+
+    ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        if self._is_rev:
-            self.setPen(getPenObj(self._color, 0.25))
-            self.setPen(getPenObj("#ff3333", 0.25))
-        else:
-            self.setBrush(getBrushObj(self._color))
-            self.setBrush(getBrushObj("#ff3333"))
-        # self.setCursor(Qt.CrossCursor)
-        self._parent.updateHoveredItem(self._name)
+        self._parent.setActivePreXoverItem(self)
     # end def
 
     def hoverMoveEvent(self, event):
@@ -89,63 +82,111 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def hoverLeaveEvent(self, event):
-        if self._is_rev:
-            self.setPen(getPenObj(self._color, 0.25, alpha=128))
-        else:
-            self.setBrush(getBrushObj(self._color, alpha=128))
-        # self.unsetCursor()
-        self._parent.updateHoveredItem("None")
+        self._parent.setActivePreXoverItem(None)
     # end def
 
+    ### PUBLIC SUPPORT METHODS ###
+    def refreshAppearance(self, is_active):
+        if is_active:
+            if self._is_fwd:
+                self.setBrush(getBrushObj(self._color))
+                self.setBrush(getBrushObj("#ff3333"))
+            else:
+                self.setPen(getPenObj(self._color, 0.25))
+                self.setPen(getPenObj("#ff3333", 0.25))
+        else:
+            if self._is_fwd:
+                self.setBrush(getBrushObj(self._color, alpha=128))
+            else:
+                self.setPen(getPenObj(self._color, 0.25, alpha=128))
+    # end def
 # end class
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
+    HUE_FACTOR = 1.6
+    SPIRAL_FACTOR = 0.25
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
         self._virtual_helix = parent._virtual_helix
+        self.fwd_prexo_items = {}
+        self.rev_prexo_items = {}
+        self._active_item = None
         self.setPen(getNoPen())
         STEPSIZE = 21
         iw = PXI_PP_ITEM_WIDTH
         _ctr = self.mapToParent(_RECT).boundingRect().center()
         _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
-        prexo_items = {}
 
         # fwd_angles = [round(360*x/10.5,2) for x in range(STEPSIZE)]
         fwd_angles = [round(34.29*x,3) for x in range(STEPSIZE)]
         fwd_colors = [QColor() for i in range(STEPSIZE)]
         for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/(STEPSIZE*1.6), 0.75, 0.8)
+            fwd_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
 
         for i in range(len(fwd_angles)):
             color = fwd_colors[i].name()
-            item = PreXoverItem(i, color, parent=self)
-            _deltaR = i*.25 # spiral layout
+            item = PreXoverItem(i, color, is_fwd=True, parent=self)
+            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
             item.setPos(_x - _deltaR, _y)
             item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(fwd_angles[i])
-            prexo_items[i] = item
+            self.fwd_prexo_items[i] = item
 
-        # rev_angles = [round(360*x/10.5 + _REV_ANGLE,2) for x in range(STEPSIZE)]
-        rev_angles = [round(34.29*x+_REV_ANGLE,3) for x in range(STEPSIZE)]
+        # rev_angles = [round(360*x/10.5 + _MINOR_GROOVE_ANGLE,2) for x in range(STEPSIZE)]
+        rev_angles = [round(34.29*x+_MINOR_GROOVE_ANGLE,3) for x in range(STEPSIZE)]
         rev_colors = [QColor() for i in range(STEPSIZE)]
         for i in range(len(rev_colors)):
-            rev_colors[i].setHsvF(i/(STEPSIZE*1.6), 0.75, 0.8)
+            rev_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
         rev_colors = rev_colors[::-1] # reverse antiparallel color order 
 
         for i in range(len(rev_colors)):
             color = rev_colors[i].name()
-            item = PreXoverItem(i, color, is_rev=True, parent=self)
-            _deltaR = i*.25 # spiral layout
+            item = PreXoverItem(i, color, is_fwd=False, parent=self)
+            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
             item.setPos(_x - _deltaR,_y)
             item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(rev_angles[i])
-            prexo_items[i] = item
+            self.rev_prexo_items[i] = item
     # end def
 
-    def updateHoveredItem(self, index):
-        self._virtual_helix.setProperty('hoveredPXI', index)
+    ### ACCESSORS ###
+    def getItem(self, is_fwd, step_idx):
+        items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
+        if step_idx in items:
+            return items[step_idx]
+        else:
+            return None
+    # end def
+
+    ### EVENT HANDLERS ###
+
+    ### PRIVATE SUPPORT METHODS ###
+
+    ### PUBLIC SUPPORT METHODS ###
+    def setActivePreXoverItem(self, pre_xover_item):
+        """Notify model of pre_xover_item hover state."""
+        if pre_xover_item is None:
+            self._virtual_helix.setProperty('active_pxi', None)
+            return
+        vh_name = self._virtual_helix.getName()
+        vh_angle = self._virtual_helix.getProperty('eulerZ')
+        step_idx = pre_xover_item.step_idx() # (f|r).step_idx
+        total_angle = (vh_angle + pre_xover_item.rotation()) % 360
+        is_fwd = 1 if pre_xover_item.is_fwd() else 0
+        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, total_angle)
+        self._virtual_helix.setProperty('active_pxi', value)
+    # end def
+
+    def refreshActive(self, new_active_item=None):
+        """Refresh appearance of items whose active state changed."""
+        if self._active_item:
+            self._active_item.refreshAppearance(False)
+        if new_active_item:
+            new_active_item.refreshAppearance(True)
+            self._active_item = new_active_item
+    # end def
 
 
 class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
@@ -313,6 +354,15 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         elif property_key == 'ehiY':
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
+        elif property_key == 'active_pxi':
+            pxig = self._prexoveritemgroup
+            if new_value:
+                vh_name, is_fwd, step_idx, total_angle = new_value.split('.')
+                new_active_item = pxig.getItem(int(is_fwd), int(step_idx))
+                pxig.refreshActive(new_active_item)
+            else:
+                pxig.refreshActive(None)
+
     # end def
 
 

@@ -211,6 +211,15 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         if property_key == 'eulerZ':
             self._handle.rotateWithCenterOrigin(new_value)
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
+
+        elif property_key == 'active_pxi':
+            hpxig = self._handle._prexoveritemgroup
+            if new_value:
+                vh_name, is_fwd, step_idx, total_angle = new_value.split('.')
+                new_active_item = hpxig.getItem(int(is_fwd), int(step_idx))
+                hpxig.refreshActive(new_active_item)
+            else:
+                hpxig.refreshActive(None)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):

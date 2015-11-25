@@ -2,6 +2,7 @@ from math import sqrt, atan2, degrees, pi
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QTransform
+from PyQt5.QtGui import QPolygonF, QColor
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsSimpleTextItem
 from PyQt5.QtWidgets import QGraphicsLineItem
@@ -32,47 +33,159 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
+_MINOR_GROOVE_ANGLE = 171 # this should go in part eventually
+PXI_PP_ITEM_WIDTH = 3
+P_POLY = QPolygonF()
+P_POLY.append(QPointF(0, 0))
+P_POLY.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
+P_POLY.append(QPointF(0, PXI_PP_ITEM_WIDTH))
+P_POLY.append(QPointF(0, 0))
+PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
+PXI_PP.addPolygon(P_POLY)
+
+class PreXoverItem(QGraphicsPathItem):
+    def __init__(self, step_idx, color, is_fwd=True, parent=None):
+        super(QGraphicsPathItem, self).__init__(PXI_PP, parent)
+        self._angle = 0
+        self._step_idx = step_idx
+        self._color = color
+        self._is_fwd = is_fwd
+        self._parent = parent
+        self.setAcceptHoverEvents(True)
+        self.setPen(getNoPen())
+        self.setBrush(getNoBrush())
+        if self._is_fwd:
+            self.setBrush(getBrushObj(self._color, alpha=128))
+        else:
+            self.setPen(getPenObj(self._color, 0.25, alpha=128))
+    # end def
+
+    ### ACCESSORS ###
+    def name(self):
+        return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
+
+    def step_idx(self):
+        return self._step_idx
+
+    def is_fwd(self):
+        return self._is_fwd
+
+    ### EVENT HANDLERS ###
+    def hoverEnterEvent(self, event):
+        self._parent.setActivePreXoverItem(self)
+    # end def
+
+    def hoverMoveEvent(self, event):
+        pass
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self._parent.setActivePreXoverItem(None)
+    # end def
+
+    ### PUBLIC SUPPORT METHODS ###
+    def refreshAppearance(self, is_active):
+        if is_active:
+            if self._is_fwd:
+                self.setBrush(getBrushObj(self._color))
+                self.setBrush(getBrushObj("#ff3333"))
+            else:
+                self.setPen(getPenObj(self._color, 0.25))
+                self.setPen(getPenObj("#ff3333", 0.25))
+        else:
+            if self._is_fwd:
+                self.setBrush(getBrushObj(self._color, alpha=128))
+            else:
+                self.setPen(getPenObj(self._color, 0.25, alpha=128))
+    # end def    
+# end class
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
+    HUE_FACTOR = 1.6
+    SPIRAL_FACTOR = 0.5
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
+        self._virtual_helix = parent._virtual_helix
+        self.fwd_prexo_items = {}
+        self.rev_prexo_items = {}
+        self._active_item = None
         self.setPen(getNoPen())
-        iw = _ITEM_WIDTH = 6
-        x = _RECT.width() - 2*styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH - 1
-        y = _RECT.center().y()
-        prexo_items = {}
-        fwd_angles = [0, 240, 120]
-        fwd_colors = ['#cc0000', '#00cc00', '#0000cc']
-        for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getNoPen())
-            item.setBrush(getBrushObj(fwd_colors[i]))
-            item.setTransformOriginPoint(_RECT.center())
-            item.setRotation(fwd_angles[i])
-            prexo_items[i] = item
+        STEPSIZE = 21
+        iw = PXI_PP_ITEM_WIDTH
+        _ctr = self.mapToParent(_RECT).boundingRect().center()
+        _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
+        _y = _ctr.y()
 
-        rev_angles = [150, 30, 270]
-        rev_colors = ['#0000cc', '#cc0000', '#00cc00']
-        # rev_colors = ['#ff00ff', '#3399ff', '#ff6600']
+        # fwd_angles = [round(360*x/10.5,2) for x in range(STEPSIZE)]
+        fwd_angles = [round(34.29*x,3) for x in range(STEPSIZE)]
+        fwd_colors = [QColor() for i in range(STEPSIZE)]
+        for i in range(len(fwd_colors)):
+            fwd_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+
         for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getPenObj(rev_colors[i],0.5))
-            item.setBrush(getNoBrush())
-            item.setTransformOriginPoint(_RECT.center())
+            color = fwd_colors[i].name()
+            item = PreXoverItem(i, color, is_fwd=True, parent=self)
+            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
+            item.setPos(_x - _deltaR, _y)
+            item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
+            item.setRotation(fwd_angles[i])
+            self.fwd_prexo_items[i] = item
+
+        # rev_angles = [round(360*x/10.5 + _MINOR_GROOVE_ANGLE,2) for x in range(STEPSIZE)]
+        rev_angles = [round(34.29*x+_MINOR_GROOVE_ANGLE,3) for x in range(STEPSIZE)]
+        rev_colors = [QColor() for i in range(STEPSIZE)]
+        for i in range(len(rev_colors)):
+            rev_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+        rev_colors = rev_colors[::-1] # reverse antiparallel color order 
+
+        for i in range(len(rev_colors)):
+            color = rev_colors[i].name()
+            item = PreXoverItem(i, color, is_fwd=False, parent=self)
+            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
+            item.setPos(_x - _deltaR,_y)
+            item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(rev_angles[i])
-            prexo_items[i] = item
-    # # end def
-    #     angles = [0, 240, 120, 150, 30, 270]
-    #     colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
-    #     for i in range(len(angles)):
-    #         item = QGraphicsEllipseItem(x, y, iw, iw, self)
-    #         item.setPen(QPen(Qt.NoPen))
-    #         item.setBrush(getBrushObj(colors[i]))
-    #         item.setTransformOriginPoint(_RECT.center())
-    #         item.setRotation(angles[i])
-    #         prexo_items[i] = item
+            self.rev_prexo_items[i] = item
     # end def
+
+    ### ACCESSORS ###
+    def getItem(self, is_fwd, step_idx):
+        items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
+        if step_idx in items:
+            return items[step_idx]
+        else:
+            return None
+    # end def
+
+    ### EVENT HANDLERS ###
+
+    ### PRIVATE SUPPORT METHODS ###
+
+    ### PUBLIC SUPPORT METHODS ###
+    def setActivePreXoverItem(self, pre_xover_item):
+        """Notify model of pre_xover_item hover state."""
+        if pre_xover_item is None:
+            self._virtual_helix.setProperty('active_pxi', '')
+            return
+        vh_name = self._virtual_helix.getName()
+        vh_angle = self._virtual_helix.getProperty('eulerZ')
+        step_idx = pre_xover_item.step_idx() # (f|r).step_idx
+        total_angle = (vh_angle + pre_xover_item.rotation()) % 360
+        is_fwd = 1 if pre_xover_item.is_fwd() else 0
+        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, total_angle)
+        self._virtual_helix.setProperty('active_pxi', value)
+    # end def
+
+    def refreshActive(self, new_active_item=None):
+        """Refresh appearance of items whose active state changed."""
+        if self._active_item:
+            self._active_item.refreshAppearance(False)
+        if new_active_item:
+            new_active_item.refreshAppearance(True)
+            self._active_item = new_active_item
+    # end def
+# end class
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
@@ -110,6 +223,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     # end def
 
+    def updateActivePreXoverItem(self, is_fwd, step_idx):
+        self._prexoveritemgroup.updateActivePreXoverItem(is_fwd, step_idx)
+        pass
+
     def rotateWithCenterOrigin(self, angle):
         self._prexoveritemgroup.setRotation(angle)
     # end def
@@ -125,7 +242,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def refreshColor(self):
         part_color = self._model_part.getProperty('color')
         self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
+        self._USE_BRUSH = getBrushObj(styles.HANDLE_FILL, alpha=128)
         self.setPen(self._USE_PEN)
         self.setBrush(self._USE_BRUSH)
         self.update(self.boundingRect())
