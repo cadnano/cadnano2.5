@@ -43,7 +43,7 @@ class CNOutlinerItem(QTreeWidgetItem):
 
     def updateCNModel(self):
         # this works only for color. uncomment below to generalize to properties
-        print("outliner %s - updateCNModel" % (str(type(self))))
+        # print("outliner %s - updateCNModel" % (str(type(self))))
         cn_model = self._cn_model
         name = self.data(NAME_COL, Qt.DisplayRole)
         color = self.data(COLOR_COL, Qt.DisplayRole)

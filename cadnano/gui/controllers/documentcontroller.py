@@ -375,7 +375,7 @@ class DocumentController():
             return
         stap_loop_olgs = part.getStapleLoopOligos()
         if stap_loop_olgs:
-            from ui.dialogs.ui_warning import Ui_Warning
+            from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
             dialogWarning = Ui_Warning()  # reusing this dialog, should rename
             dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
