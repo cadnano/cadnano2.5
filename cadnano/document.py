@@ -374,14 +374,15 @@ class Document(ProxyObject):
         if use_undostack:
             self.undoStack().endMacro()
 
-    def resizeSelection(self, delta, use_undostack=True):
+    def resizeSelection(self, delta, do_maximize=False, use_undostack=True):
         """
         Moves the selected idxs by delta by first iterating over all strands
         to calculate new idxs (method will return if snap-to behavior would
         create illegal state), then applying a resize command to each strand.
         """
         resize_list = []
-
+        if do_maximize:
+            print("this could be maximized")
         # calculate new idxs
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
@@ -395,7 +396,7 @@ class Document(ProxyObject):
                     new_low = part.xoverSnapTo(strand, idx_low, delta)
                     if new_low is None:
                         return
-                    delta_high = new_low-idx_low
+                    delta_high = new_low - idx_low
                 if selected[1] and strand.connectionHigh():
                     new_high = part.xoverSnapTo(strand, idx_high, delta)
                     if new_high is None:

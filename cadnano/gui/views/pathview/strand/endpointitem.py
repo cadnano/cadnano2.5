@@ -408,7 +408,8 @@ class EndpointItem(QGraphicsPathItem):
         calculate the new x coordinate for self, move there, and notify the
         parent strandItem to redraw its horizontal line.
         """
-        idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
+        pass
+        # idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
         # x = int(idx * _BASE_WIDTH)
         # self.setPos(x, self.y())
         # self._strand_item.updateLine(self)
@@ -424,18 +425,19 @@ class EndpointItem(QGraphicsPathItem):
             alt = extend to max drag bound
         """
         m_strand = self._strand_item._model_strand
-        base_idx = int(floor(self.x() / _BASE_WIDTH))
+        # base_idx = int(floor(self.x() / _BASE_WIDTH))
         # if base_idx != self.idx():
         #     new_idxs = self._getNewIdxsForResize(base_idx)
         #     m_strand.resize(new_idxs)
 
-        if modifiers & Qt.AltModifier:
-            if self._cap_type == 'low':
-                new_idxs = self._getNewIdxsForResize(self._low_drag_bound)
-            else:
-                new_idxs = self._getNewIdxsForResize(self._high_drag_bound)
-            m_strand.resize(new_idxs)
-        elif modifiers & Qt.ShiftModifier:
+        # if modifiers & Qt.AltModifier:
+        #     if self._cap_type == 'low':
+        #         new_idxs = self._getNewIdxsForResize(self._low_drag_bound)
+        #     else:
+        #         new_idxs = self._getNewIdxsForResize(self._high_drag_bound)
+        #     m_strand.resize(new_idxs)
+
+        if modifiers & Qt.ShiftModifier:
             self.setSelected(False)
             self.restoreParent()
             m_strand.merge(self.idx())

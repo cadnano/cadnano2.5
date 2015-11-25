@@ -194,7 +194,8 @@ class SelectionItemGroup(QGraphicsItemGroup):
         self._drag_enable = False
         # now do stuff
         if not (self._r0 == 0 and self._r == 0):
-            self.selectionbox.processSelectedItems(self._r0, self._r)
+            modifiers = event.modifiers()
+            self.selectionbox.processSelectedItems(self._r0, self._r, modifiers)
         # end if
         self._r0 = 0  # reset
         self._r = 0  # reset
@@ -324,7 +325,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         return path
     # end def
 
-    def processSelectedItems(self, r_start, r_end):
+    def processSelectedItems(self, r_start, r_end, modifiers):
         """docstring for processSelectedItems"""
         margin = styles.VIRTUALHELIXHANDLEITEM_RADIUS
         delta = (r_end - r_start)  # r delta
@@ -339,11 +340,11 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
             indexDelta = int((delta + mid_height) / helix_height)
         # sort on y to determine the extremes of the selection group
         items = sorted(self._item_group.childItems(), key=lambda vhhi: vhhi.y())
-        nucleicacid_part_item = items[0].partItem()
-        nucleicacid_part_item.reorderHelices(items[0].number(),\
+        part_item = items[0].partItem()
+        part_item.reorderHelices(items[0].number(),\
                                 items[-1].number(),\
                                 indexDelta)
-        nucleicacid_part_item.updateStatusBar("")
+        part_item.updateStatusBar("")
     # end def
 
     def boxParent(self):
@@ -456,10 +457,15 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         return path
     # end def
 
-    def processSelectedItems(self, r_start, r_end):
+    def processSelectedItems(self, r_start, r_end, modifiers):
         """docstring for processSelectedItems"""
         delta = self.delta(r_end, r_start)
-        self._item_group._viewroot.document().resizeSelection(delta)
+
+        if modifiers & Qt.AltModifier:
+            do_maximize = True
+
+        self._item_group._viewroot.document().resizeSelection(delta,
+                                                do_maximize=do_maximize)
     # end def
 
     def deleteSelection(self):
