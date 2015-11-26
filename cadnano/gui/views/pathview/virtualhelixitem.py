@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
-
+_BASE_RECT = QRectF(0,0,_BASE_WIDTH,_BASE_WIDTH)
 
 PHOS_ITEM_WIDTH = 6
 PHOS = QPainterPath()  # Left 5', Right 3' PainterPath
@@ -36,13 +36,26 @@ BOX.append(QPointF(0, 0))
 PHOS.addPolygon(P_POLY)
 
 
-class PreXoverItem(QGraphicsPathItem):
+
+class ActiveBaseItem(QGraphicsRectItem):
     def __init__(self, parent=None):
+        super(QGraphicsRectItem, self).__init__(_BASE_RECT, parent)
+        self.setPen(getNoPen())
+        self.hide()
+    # end def
+
+    def update(self, is_fwd, step_idx):
+        pass
+
+
+class PreXoverItem(QGraphicsPathItem):
+    def __init__(self, angle, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self._angle = angle
     # end def
 
     def hoverEnterEvent(self, event):
-        pass
+        self._parent.setActivePreXoverItem(self)
     # end def
 
     def hoverMoveEvent(self, event):
@@ -50,8 +63,24 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def hoverLeaveEvent(self, event):
-        pass
+        self._parent.setActivePreXoverItem(None)
     # end def
+
+    def facing_angle(self):
+        facing_angle = self._parent.virtual_helix_angle() + self._angle
+        return facing_angle
+
+    def color(self):
+        return self._color
+
+    def name(self):
+        return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
+
+    def step_idx(self):
+        return self._step_idx
+
+    def is_fwd(self):
+        return self._is_fwd
 
 # end class
 
@@ -64,15 +93,19 @@ class PreXoverItemGroup(QGraphicsRectItem):
         iw = _ITEM_WIDTH = 6
         bw = _BASE_WIDTH
         bw2 = 2 * bw
+
         part = parent.part()
-        path = QPainterPath()
         step_size = part.stepSize()
+        minor_groove_angle = part.minorGrooveAngle()
         sub_step_size = part.subStepSize()
         canvas_size = part.maxBaseIdx() + 1
         self.setRect(0, 0, bw * canvas_size, 2 * bw)
 
         fwd_bases = range(step_size)
         rev_bases = range(step_size)
+        fwd_angles = [round(34.29*x,3) for x in range(step_size)]
+        rev_angles = [round(34.29*x+minor_groove_angle,3) for x in range(step_size)]
+
         fwd_colors = [QColor() for i in range(step_size)]
         for i in range(len(fwd_colors)):
             fwd_colors[i].setHsvF(i/(step_size*1.6), 0.75, 0.8)
@@ -87,16 +120,17 @@ class PreXoverItemGroup(QGraphicsRectItem):
         for i in range(0,part.maxBaseIdx(),part.stepSize()):
             for j in range(len(fwd_bases)):
                 idx = fwd_bases[j]
-                item = QGraphicsPathItem(PHOS, self)
+                item = PreXoverItem(PHOS, self)
                 item.setPen(QPen(Qt.NoPen))
                 item.setBrush(getBrushObj(fwd_colors[j].name()))
                 self._fwd_pxo_items[i+idx] = item
                 fx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
                 fy = -iw/2
                 item.setPos(fx,fy)
+            # end for
             for j in range(len(rev_bases)):
                 idx = rev_bases[j]
-                ritem = QGraphicsPathItem(PHOS, self)
+                ritem = PreXoverItem(PHOS, self)
                 ritem.setPen(getPenObj(rev_colors[j].name(),1))
                 ritem.setBrush(getNoBrush())
                 ritem.setTransformOriginPoint(ritem.boundingRect().center())
@@ -105,24 +139,15 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 rx = bw*(i+idx) + bw/2 - 2  # base_index + base_middle - my_width
                 ry = bw2 - iw/2
                 ritem.setPos(rx,ry)
-
-        # for i in range(0,part.maxBaseIdx(),7):
-        #     item = QGraphicsEllipseItem(0, 0, iw, iw, self)
-        #     item.setPen(QPen(Qt.NoPen))
-        #     item.setBrush(getBrushObj(fwd_colors[int(i/7%3)]))
-        #     self._prexo_items[i] = item
-        #     fx = bw*i + bw/2 - 2  # base_index + base_middle - my_width
-        #     fy = -iw/2
-        #     item.setPos(fx,fy)
-        #     rx = bw*(i+5) + bw/2 - 2  # base_index + base_middle - my_width
-        #     ry = bw2 - iw/2
-        #     ritem = QGraphicsEllipseItem(0, 0, iw, iw, self)
-        #     ritem.setPen(getPenObj(rev_colors[int((i+5)/7%3)],1))
-        #     ritem.setBrush(getNoBrush())
-        #     ritem.setPos(rx,ry)
-        #     self._prexo_items[i+5] = ritem
+            # end for
+        # end for
     # end def
 
+    ### EVENT HANDLERS ###
+
+    ### PRIVATE SUPPORT METHODS ###
+
+    ### PUBLIC SUPPORT METHODS ###
     def updatePositionsAfterRotation(self, angle):
         bw = _BASE_WIDTH
         part = self._parent.part()
@@ -135,6 +160,20 @@ class PreXoverItemGroup(QGraphicsRectItem):
         for i, item in self._rev_pxo_items.items():
             x = ((bw*i + bw/2 - 2) + xdelta) % (bw*canvas_size)
             item.setX(x)
+    # end def
+
+    def setActivePreXoverItem(self, pre_xover_item):
+        """Notify model of pre_xover_item hover state."""
+        if pre_xover_item is None:
+            self._virtual_helix.setProperty('active_pxi', None)
+            return
+        vh_name = self._virtual_helix.getName()
+        vh_angle = self._virtual_helix.getProperty('eulerZ')
+        step_idx = pre_xover_item.step_idx() # (f|r).step_idx
+        facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
+        is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
+        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
+        self._virtual_helix.setProperty('active_pxi', value)
     # end def
 
 
@@ -171,6 +210,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setZValue(styles.ZPATHHELIX)
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
+        self._activebaseitem = ActiveBaseItem(self)
     # end def
 
     ### SIGNALS ###
@@ -217,9 +257,11 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             if new_value:
                 vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
                 is_fwd = 1 if fwd_str == 'fwd' else 0
+                self._activebaseitem.update(is_fwd, step_idx)
                 new_active_item = hpxig.getItem(is_fwd, int(step_idx))
                 hpxig.refreshActive(new_active_item)
             else:
+                self._activebaseitem.hide()
                 hpxig.refreshActive(None)
     # end def
 

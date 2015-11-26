@@ -33,7 +33,6 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
-_MINOR_GROOVE_ANGLE = 171 # this should go in part eventually
 PXI_PP_ITEM_WIDTH = 3
 P_POLY = QPolygonF()
 P_POLY.append(QPointF(0, 0))
@@ -111,17 +110,22 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.rev_prexo_items = {}
         self._active_item = None
         self.setPen(getNoPen())
-        STEPSIZE = 21
+
+        part = parent.part()
+        step_size = part.stepSize()
+        minor_groove_angle = part.minorGrooveAngle()
+
+        step_size = 21
         iw = PXI_PP_ITEM_WIDTH
         _ctr = self.mapToParent(_RECT).boundingRect().center()
         _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
 
-        # fwd_angles = [round(360*x/10.5,2) for x in range(STEPSIZE)]
-        fwd_angles = [round(34.29*x,3) for x in range(STEPSIZE)]
-        fwd_colors = [QColor() for i in range(STEPSIZE)]
+        # fwd_angles = [round(360*x/10.5,2) for x in range(step_size)]
+        fwd_angles = [round(34.29*x,3) for x in range(step_size)]
+        fwd_colors = [QColor() for i in range(step_size)]
         for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+            fwd_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
 
         for i in range(len(fwd_angles)):
             color = fwd_colors[i].name()
@@ -132,11 +136,10 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setRotation(fwd_angles[i])
             self.fwd_prexo_items[i] = item
 
-        # rev_angles = [round(360*x/10.5 + _MINOR_GROOVE_ANGLE,2) for x in range(STEPSIZE)]
-        rev_angles = [round(34.29*x+_MINOR_GROOVE_ANGLE,3) for x in range(STEPSIZE)]
-        rev_colors = [QColor() for i in range(STEPSIZE)]
+        rev_angles = [round(34.29*x+minor_groove_angle,3) for x in range(step_size)]
+        rev_colors = [QColor() for i in range(step_size)]
         for i in range(len(rev_colors)):
-            rev_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+            rev_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
         rev_colors = rev_colors[::-1] # reverse antiparallel color order 
 
         for i in range(len(rev_colors)):
