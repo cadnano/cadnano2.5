@@ -42,6 +42,7 @@ class NucleicAcidPart(Part):
     _TURNS_PER_STEP = 2
     _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
+    _MINOR_GROOVE_ANGLE = 171
 
     __count = 0
 
@@ -145,6 +146,10 @@ class NucleicAcidPart(Part):
 
     def stepSize(self):
         return self._STEP
+    # end def
+
+    def minorGrooveAngle(self):
+        return self._MINOR_GROOVE_ANGLE
     # end def
 
     def subStepSize(self):
