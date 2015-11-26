@@ -4,6 +4,7 @@ import cadnano.util as util
 
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
+from PyQt5.QtGui import QRadialGradient
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsSimpleTextItem
@@ -16,7 +17,6 @@ from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, g
 from . import slicestyles as styles
 
 
-_MINOR_GROOVE_ANGLE = 171 # this should go in part eventually
 _VALID_XOVER_ANGLE = 15
 
 # set up default, hover, and active drawing styles
@@ -24,6 +24,7 @@ _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 rect_gain = 0.25
 _RECT = _RECT.adjusted(0, 0, rect_gain, rect_gain)
+_RECT_CENTERPT = _RECT.center()
 _FONT = styles.SLICE_NUM_FONT
 _ZVALUE = styles.ZSLICEHELIX+3
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
@@ -43,6 +44,7 @@ P_POLY.append(QPointF(0, 0))
 P_POLY.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
 P_POLY.append(QPointF(0, PXI_PP_ITEM_WIDTH))
 P_POLY.append(QPointF(0, 0))
+P_POLY.translate(0, -PXI_PP_ITEM_WIDTH/2)
 PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
 PXI_PP.addPolygon(P_POLY)
 
@@ -68,6 +70,9 @@ class PreXoverItem(QGraphicsPathItem):
         facing_angle = self._parent.virtual_helix_angle() + self.rotation()
         return facing_angle
 
+    def color(self):
+        return self._color
+
     def name(self):
         return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
 
@@ -82,9 +87,9 @@ class PreXoverItem(QGraphicsPathItem):
         self._parent.setActivePreXoverItem(self)
     # end def
 
-    def hoverMoveEvent(self, event):
-        pass
-    # end def
+    # def hoverMoveEvent(self, event):
+    #     pass
+    # # end def
 
     def hoverLeaveEvent(self, event):
         self._parent.setActivePreXoverItem(None)
@@ -96,10 +101,10 @@ class PreXoverItem(QGraphicsPathItem):
         if is_active:
             if self._is_fwd:
                 self.setBrush(getBrushObj(self._color))
-                self.setBrush(getBrushObj("#ff3333"))
+                # self.setBrush(getBrushObj("#ff3333"))
             else:
                 self.setPen(getPenObj(self._color, 0.25))
-                self.setPen(getPenObj("#ff3333", 0.25))
+                # self.setPen(getPenObj("#ff3333", 0.25))
         else:
             if self._is_fwd:
                 self.setBrush(getBrushObj(self._color, alpha=128))
@@ -118,18 +123,23 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.fwd_prexo_items = {}
         self.rev_prexo_items = {}
         self._active_item = None
+        self._wedge_gizmo = WedgeGizmo(self)
         self.setPen(getNoPen())
-        STEPSIZE = 21
+
+        part = parent.part()
+        step_size = part.stepSize()
+        minor_groove_angle = part.minorGrooveAngle()
+
         iw = PXI_PP_ITEM_WIDTH
         _ctr = self.mapToParent(_RECT).boundingRect().center()
         _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
 
-        # fwd_angles = [round(360*x/10.5,2) for x in range(STEPSIZE)]
-        fwd_angles = [round(34.29*x,3) for x in range(STEPSIZE)]
-        fwd_colors = [QColor() for i in range(STEPSIZE)]
+        # fwd_angles = [round(360*x/10.5,2) for x in range(step_size)]
+        fwd_angles = [round(34.29*x,3) for x in range(step_size)]
+        fwd_colors = [QColor() for i in range(step_size)]
         for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+            fwd_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
 
         for i in range(len(fwd_angles)):
             color = fwd_colors[i].name()
@@ -140,11 +150,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setRotation(fwd_angles[i])
             self.fwd_prexo_items[i] = item
 
-        # rev_angles = [round(360*x/10.5 + _MINOR_GROOVE_ANGLE,2) for x in range(STEPSIZE)]
-        rev_angles = [round(34.29*x+_MINOR_GROOVE_ANGLE,3) for x in range(STEPSIZE)]
-        rev_colors = [QColor() for i in range(STEPSIZE)]
+        # rev_angles = [round(360*x/10.5 + minor_groove_angle,2) for x in range(step_size)]
+        rev_angles = [round(34.29*x+minor_groove_angle,3) for x in range(step_size)]
+        rev_colors = [QColor() for i in range(step_size)]
         for i in range(len(rev_colors)):
-            rev_colors[i].setHsvF(i/(STEPSIZE*self.HUE_FACTOR), 0.75, 0.8)
+            rev_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
         rev_colors = rev_colors[::-1] # reverse antiparallel color order 
 
         for i in range(len(rev_colors)):
@@ -205,8 +215,10 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Refresh appearance of items whose active state changed."""
         if self._active_item:
             self._active_item.refreshAppearance(False)
+            self._wedge_gizmo.hide()
         if new_active_item:
             new_active_item.refreshAppearance(True)
+            self._wedge_gizmo.update(new_active_item)
             self._active_item = new_active_item
     # end def
 
@@ -219,25 +231,98 @@ class LineGizmo(QGraphicsLineItem):
         super(QGraphicsLineItem, self).__init__(line, parent)
         self.nvhi = nvhi
         self.nvhi_name = nvhi.virtualHelix().getName()
-
-        lo = QLineF(line)
-        hi = QLineF(line)
-        lo.setAngle(line.angle()-_VALID_XOVER_ANGLE)
-        hi.setAngle(line.angle()+_VALID_XOVER_ANGLE)
-
-        pi = QGraphicsPathItem(self)
-        pi.setPen(getNoPen())
-        pi.setBrush(getBrushObj(color, alpha=64))
-        path = QPainterPath()
-        path.moveTo(lo.p1())
-        path.lineTo(lo.p2())
-        path.lineTo(hi.p2())
-        path.lineTo(hi.p1())
-        pi.setPath(path)
+        self.setPen(getPenObj(color, 0.25))
 
     def angle(self):
         return 360-self.line().angle()
 # end class
+
+class WedgeGizmo(QGraphicsPathItem):
+    def __init__(self, parent=None):
+        super(QGraphicsPathItem, self).__init__(parent)
+        self.setPen(getNoPen())
+
+    def showWedge(self, pos, angle, color, extended=False, rev_gradient=False):
+        _c = _RECT_CENTERPT
+        _line = QLineF(_c, pos)
+        line1 = QLineF(_c, pos)
+        line2 = QLineF(_c, pos)
+
+        _EXT = 1.35 if extended else 1.0
+        _line.setLength(_RADIUS*_EXT*1.111) # for quadTo control point
+        line1.setLength(_RADIUS*_EXT)
+        line2.setLength(_RADIUS*_EXT)
+
+        _line.setAngle(angle)
+        line1.setAngle(angle-_VALID_XOVER_ANGLE)
+        line2.setAngle(angle+_VALID_XOVER_ANGLE)
+
+        gradient = QRadialGradient(_c, _RADIUS*_EXT*1.11)
+
+        color1 = getColorObj(color, alpha=80)
+        color2 = getColorObj(color, alpha=24)
+        if rev_gradient:
+            color1, color2 = color2, color1
+
+        if extended:
+            gradient.setColorAt(0, color1)
+            gradient.setColorAt(0.66, color1)
+            gradient.setColorAt(0.67, color2)
+            gradient.setColorAt(1, color2)
+        else:
+            gradient.setColorAt(0, color2)
+        brush = QBrush(gradient)
+        self.setBrush(brush)
+
+        path = QPainterPath()
+        path.moveTo(line1.p1())
+        path.lineTo(line1.p2())
+        path.quadTo(_line.p2(), line2.p2())
+        path.lineTo(line2.p1())
+        self.setPath(path)
+        self.show()
+
+
+    def update(self, pre_xover_item):
+        pxi = pre_xover_item
+        pos = pxi.pos()
+        angle = -pxi.rotation()
+        color = pxi.color()
+        if pxi.is_fwd():
+            self.showWedge(pos, angle, color, extended=True)
+        else:
+            self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
+
+        # _line = QLineF(_RECT_CENTERPT, pxi.pos())
+        # line1 = QLineF(_RECT_CENTERPT, pxi.pos())
+        # line2 = QLineF(_RECT_CENTERPT, pxi.pos())
+        # _line.setLength(_RADIUS*1.5)
+        # line1.setLength(_RADIUS*1.35)
+        # line2.setLength(_RADIUS*1.35)
+        # _line.setAngle(angle)
+        # line1.setAngle(angle-_VALID_XOVER_ANGLE)
+        # line2.setAngle(angle+_VALID_XOVER_ANGLE)
+
+        # gradient = QLinearGradient(_line.p1(), _line.p2())
+        # gradient = QRadialGradient(_RECT_CENTERPT, _RADIUS*1.5)
+        # color = getColorObj(pxi.color(), alpha=80)
+        # fade_color = getColorObj(pxi.color(), alpha=24)
+        # if pxi.is_fwd():
+        #     gradient.setColorAt(0, color)
+        #     gradient.setColorAt(0.66, color)
+        #     gradient.setColorAt(0.67, fade_color)
+        #     gradient.setColorAt(1, fade_color)
+        # else:
+        #     gradient.setColorAt(0, fade_color)
+        #     gradient.setColorAt(0.66, fade_color)
+        #     gradient.setColorAt(0.67, color)
+        #     gradient.setColorAt(1, color)
+        # brush = QBrush(gradient)
+        # self.setBrush(brush)
+
+
+# end class
+
 
 class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     """
@@ -282,7 +367,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
 
-        self._gizmos = [] # key = 
+        self._line_gizmos = []
+        self._wedge_gizmos = []
         self._neighbor_vh_items = []
         self._right_mouse_move = False
         self.refreshCollidingItems()
@@ -319,8 +405,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         old_neighbors = self._virtual_helix.getProperty('neighbors').split()
         self._neighbor_items = items = list(filter(lambda x: 
                             type(x) is VirtualHelixItem, self.collidingItems()))
-        while self._gizmos: # clear old gizmos
-            self.scene().removeItem(self._gizmos.pop())
+        while self._line_gizmos: # clear old gizmos
+            self.scene().removeItem(self._line_gizmos.pop())
+        while self._wedge_gizmos:
+            self.scene().removeItem(self._wedge_gizmos.pop())
         for nvhi in items:
             nvhi_name = nvhi.virtualHelix().getName()
             pos = self.scenePos()
@@ -329,8 +417,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             color = '#5a8bff' if line.length() > (_RADIUS*1.99) else '#cc0000'
             line.setLength(_RADIUS)
             line_item = LineGizmo(line, color, nvhi, self)
-            line_item.setPen(getPenObj(color, 0.25))
-            self._gizmos.append(line_item) # save ref to clear later
+            wedge_item = WedgeGizmo(self)
+            wedge_item.showWedge(line.p1(), line.angle(), color)
+            self._line_gizmos.append(line_item) # save ref to clear later
+            self._wedge_gizmos.append(wedge_item)
             neighbors.append('%s:%02d' % (nvhi_name, 360-line.angle()))
 
 
@@ -434,13 +524,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         # that are pointing in the valid angle range
         lowZ  = facing_angle-_VALID_XOVER_ANGLE
         highZ = facing_angle+_VALID_XOVER_ANGLE
-        nearby = list(filter(lambda g: lowZ < g.angle() < highZ , self._gizmos))
+        nearby = list(filter(lambda g: lowZ < g.angle() < highZ , self._line_gizmos))
 
-        print("hovered_item %s at angle %d" % (hovered_item, facing_angle))
+        # print("hovered_item %s at angle %d" % (hovered_item, facing_angle))
         for g in nearby:
             # get PXIs facing the opposite direction as our facing_angle
             opposite_angle = (facing_angle+180)%360
-            print("checking", g.nvhi_name, "at", opposite_angle)
+            # print("checking", g.nvhi_name, "at", opposite_angle)
             fwd_items, rev_items = g.nvhi.getPreXoverItemsFacingNearAngle(opposite_angle)
             for item in fwd_items:
                 item.refreshAppearance(True)
