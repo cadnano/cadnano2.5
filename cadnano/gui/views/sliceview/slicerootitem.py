@@ -77,10 +77,6 @@ class SliceRootItem(QGraphicsRectItem):
 
     ### METHODS ###
     def removePartItem(self, part_item):
-        for k in self._part_item_for_part_instance.keys():
-            if k == part_item:
-                del self._part_item_for_part_instance[k]
-                return
         del self._instance_items[part_item]
     # end def
 
