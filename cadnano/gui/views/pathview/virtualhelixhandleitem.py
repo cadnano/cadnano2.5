@@ -34,13 +34,13 @@ _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WI
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
 PXI_PP_ITEM_WIDTH = 3
-P_POLY = QPolygonF()
-P_POLY.append(QPointF(0, 0))
-P_POLY.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
-P_POLY.append(QPointF(0, PXI_PP_ITEM_WIDTH))
-P_POLY.append(QPointF(0, 0))
+TRIANGLE = QPolygonF()
+TRIANGLE.append(QPointF(0, 0))
+TRIANGLE.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, PXI_PP_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, 0))
 PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
-PXI_PP.addPolygon(P_POLY)
+PXI_PP.addPolygon(TRIANGLE)
 
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):

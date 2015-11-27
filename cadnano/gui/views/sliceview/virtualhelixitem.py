@@ -4,7 +4,7 @@ import cadnano.util as util
 
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
-from PyQt5.QtGui import QRadialGradient
+from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsSimpleTextItem
@@ -13,7 +13,8 @@ from cadnano.enum import LatticeType, Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import getColorObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import getPenObj, newPenObj, getNoPen
 from . import slicestyles as styles
 
 
@@ -39,18 +40,22 @@ _HOVER_PEN = getPenObj('#ff0080', .5)
 _HOVER_BRUSH = getBrushObj('#ff0080')
 
 PXI_PP_ITEM_WIDTH = 1.5
-P_POLY = QPolygonF()
-P_POLY.append(QPointF(0, 0))
-P_POLY.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
-P_POLY.append(QPointF(0, PXI_PP_ITEM_WIDTH))
-P_POLY.append(QPointF(0, 0))
-P_POLY.translate(0, -PXI_PP_ITEM_WIDTH/2)
-PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
-PXI_PP.addPolygon(P_POLY)
+TRIANGLE = QPolygonF()
+TRIANGLE.append(QPointF(0, 0))
+TRIANGLE.append(QPointF(0.75*PXI_PP_ITEM_WIDTH, 0.5*PXI_PP_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, PXI_PP_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, 0))
+TRIANGLE.translate(-0.375*PXI_PP_ITEM_WIDTH, -0.5*PXI_PP_ITEM_WIDTH)
+fwd_t, rev_t = QTransform(), QTransform()
+fwd_t.rotate(90)
+rev_t.rotate(-90)
+FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
+FWDPXI_PP.addPolygon(fwd_t.map(TRIANGLE))
+REVPXI_PP.addPolygon(rev_t.map(TRIANGLE))
 
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
-        super(QGraphicsPathItem, self).__init__(PXI_PP, parent)
+        super(QGraphicsPathItem, self).__init__(parent)
         self._parent = parent
         self._step_idx = step_idx
         self._color = color
@@ -60,8 +65,10 @@ class PreXoverItem(QGraphicsPathItem):
         self.setPen(getNoPen())
         self.setBrush(getNoBrush())
         if self._is_fwd:
+            self.setPath(FWDPXI_PP)
             self.setBrush(getBrushObj(self._color, alpha=128))
         else:
+            self.setPath(REVPXI_PP)
             self.setPen(getPenObj(self._color, 0.25, alpha=128))
     # end def
 
@@ -115,7 +122,7 @@ class PreXoverItem(QGraphicsPathItem):
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
     HUE_FACTOR = 1.6
-    SPIRAL_FACTOR = 0.25
+    SPIRAL_FACTOR = 0.4
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
@@ -125,6 +132,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._active_item = None
         self._wedge_gizmo = WedgeGizmo(self)
         self.setPen(getNoPen())
+
+        fwd_spiral = QGraphicsPathItem(self)
+        rev_spiral = QGraphicsPathItem(self)
 
         part = parent.part()
         step_size = part.stepSize()
@@ -165,6 +175,20 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(rev_angles[i])
             self.rev_prexo_items[i] = item
+
+
+        fwd_PP = QPainterPath()
+        rev_PP = QPainterPath()
+        fwd_PP.moveTo(self.mapFromScene(self.fwd_prexo_items[0].scenePos()))
+        rev_PP.moveTo(self.mapFromScene(self.rev_prexo_items[0].scenePos()))
+        for i in range(1, len(self.fwd_prexo_items)):
+            fwd_PP.lineTo(self.mapFromScene(self.fwd_prexo_items[i].scenePos()))
+            rev_PP.lineTo(self.mapFromScene(self.rev_prexo_items[i].scenePos()))
+        fwd_spiral.setPen(getPenObj('#cc0000', 0.25, alpha=32))
+        rev_spiral.setPen(getPenObj('#0066cc', 0.25, alpha=32))
+        fwd_spiral.setPath(fwd_PP)
+        rev_spiral.setPath(rev_PP)
+
     # end def
 
     ### ACCESSORS ###
@@ -242,14 +266,14 @@ class WedgeGizmo(QGraphicsPathItem):
         super(QGraphicsPathItem, self).__init__(parent)
         self.setPen(getNoPen())
 
-    def showWedge(self, pos, angle, color, extended=False, rev_gradient=False):
+    def showWedge(self, pos, angle, color, extended=False, rev_gradient=False, outline_only=False):
         _c = _RECT_CENTERPT
         _line = QLineF(_c, pos)
         line1 = QLineF(_c, pos)
         line2 = QLineF(_c, pos)
 
         _EXT = 1.35 if extended else 1.0
-        _line.setLength(_RADIUS*_EXT*1.111) # for quadTo control point
+        _line.setLength(_RADIUS*_EXT*1.05) # for quadTo control point
         line1.setLength(_RADIUS*_EXT)
         line2.setLength(_RADIUS*_EXT)
 
@@ -257,22 +281,26 @@ class WedgeGizmo(QGraphicsPathItem):
         line1.setAngle(angle-_VALID_XOVER_ANGLE)
         line2.setAngle(angle+_VALID_XOVER_ANGLE)
 
-        gradient = QRadialGradient(_c, _RADIUS*_EXT*1.11)
-
-        color1 = getColorObj(color, alpha=80)
-        color2 = getColorObj(color, alpha=24)
-        if rev_gradient:
-            color1, color2 = color2, color1
-
-        if extended:
-            gradient.setColorAt(0, color1)
-            gradient.setColorAt(0.66, color1)
-            gradient.setColorAt(0.67, color2)
-            gradient.setColorAt(1, color2)
+        if outline_only:
+            pen = newPenObj(color, 0.25, alpha=80)
+            pen.setStyle(Qt.DotLine)
+            self.setPen(pen)
         else:
-            gradient.setColorAt(0, color2)
-        brush = QBrush(gradient)
-        self.setBrush(brush)
+            gradient = QRadialGradient(_c, _RADIUS*_EXT*1.11)
+            color1 = getColorObj(color, alpha=80)
+            color2 = getColorObj(color, alpha=24)
+            if rev_gradient:
+                color1, color2 = color2, color1
+
+            if extended:
+                gradient.setColorAt(0, color1)
+                gradient.setColorAt(0.66, color1)
+                gradient.setColorAt(0.67, color2)
+                gradient.setColorAt(1, color2)
+            else:
+                gradient.setColorAt(0, color2)
+            brush = QBrush(gradient)
+            self.setBrush(brush)
 
         path = QPainterPath()
         path.moveTo(line1.p1())
@@ -417,8 +445,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             color = '#5a8bff' if line.length() > (_RADIUS*1.99) else '#cc0000'
             line.setLength(_RADIUS)
             line_item = LineGizmo(line, color, nvhi, self)
+            line_item.hide()
             wedge_item = WedgeGizmo(self)
-            wedge_item.showWedge(line.p1(), line.angle(), color)
+            wedge_item.showWedge(line.p1(), line.angle(), color, outline_only=True)
             self._line_gizmos.append(line_item) # save ref to clear later
             self._wedge_gizmos.append(wedge_item)
             neighbors.append('%s:%02d' % (nvhi_name, 360-line.angle()))

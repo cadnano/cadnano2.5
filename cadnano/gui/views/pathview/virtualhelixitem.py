@@ -21,11 +21,11 @@ _BASE_RECT = QRectF(0,0,_BASE_WIDTH,_BASE_WIDTH)
 
 PHOS_ITEM_WIDTH = 6
 PHOS = QPainterPath()  # Left 5', Right 3' PainterPath
-P_POLY = QPolygonF()
-P_POLY.append(QPointF(0, 0))
-P_POLY.append(QPointF(0.75 * PHOS_ITEM_WIDTH, 0.5 * PHOS_ITEM_WIDTH))
-P_POLY.append(QPointF(0, PHOS_ITEM_WIDTH))
-P_POLY.append(QPointF(0, 0))
+TRIANGLE = QPolygonF()
+TRIANGLE.append(QPointF(0, 0))
+TRIANGLE.append(QPointF(0.75 * PHOS_ITEM_WIDTH, 0.5 * PHOS_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, PHOS_ITEM_WIDTH))
+TRIANGLE.append(QPointF(0, 0))
 BOX = QPolygonF()
 BOX.append(QPointF(0, 0))
 BOX.append(QPointF(0, PHOS_ITEM_WIDTH))
@@ -33,7 +33,7 @@ BOX.append(QPointF(PHOS_ITEM_WIDTH, PHOS_ITEM_WIDTH))
 BOX.append(QPointF(PHOS_ITEM_WIDTH, 0))
 BOX.append(QPointF(0, 0))
 # PHOS.addPolygon(BOX)
-PHOS.addPolygon(P_POLY)
+PHOS.addPolygon(TRIANGLE)
 
 
 
@@ -51,6 +51,7 @@ class ActiveBaseItem(QGraphicsRectItem):
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, angle, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self.setPath(PHOS)
         self._angle = angle
     # end def
 
