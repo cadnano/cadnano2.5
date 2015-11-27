@@ -344,7 +344,7 @@ class OutlineRootItem(QTreeWidget):
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
-        if parent_QTreeWidgetItem == None:
+        if parent_QTreeWidgetItem is None:
             parent_QTreeWidgetItem = self.invisibleRootItem()
         tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
         tw_item.setData(0, Qt.EditRole, part_name)

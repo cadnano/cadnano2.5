@@ -25,7 +25,7 @@ class AutobreakHandler(object):
         if part != None:  # is there a part?
             for o in list(part.oligos()):
                 if o.isStaple():  # is there a staple oligo?
-                    if self.config_dialog == None:
+                    if self.config_dialog is None:
                         self.config_dialog = AutobreakConfig(self.win, self)
                     self.config_dialog.show()
                     return
