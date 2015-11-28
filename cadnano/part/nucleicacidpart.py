@@ -76,6 +76,7 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties['name'] = 'Origami%d' % self._count()
+        self._properties['crossover_span_angle'] = 30
         self._properties['neighbor_active_angle'] = ''
 
         # ID assignment

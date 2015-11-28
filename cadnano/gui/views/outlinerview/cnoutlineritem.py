@@ -63,6 +63,8 @@ class CNOutlinerItem(QTreeWidgetItem):
             color = self.data(COLOR_COL, Qt.DisplayRole)
             if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
+        elif key == 'crossover_span_angle':
+            pass
         elif key == 'neighbor_active_angle':
             pass
         else:

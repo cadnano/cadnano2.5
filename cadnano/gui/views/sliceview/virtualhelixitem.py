@@ -18,8 +18,6 @@ from cadnano.gui.palette import getPenObj, newPenObj, getNoPen
 from . import slicestyles as styles
 
 
-_VALID_XOVER_ANGLE = 15
-
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -45,7 +43,8 @@ TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75*PXI_PP_ITEM_WIDTH, 0.5*PXI_PP_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, PXI_PP_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, 0))
-TRIANGLE.translate(-0.375*PXI_PP_ITEM_WIDTH, -0.5*PXI_PP_ITEM_WIDTH)
+# TRIANGLE.translate(0, -0.5*PXI_PP_ITEM_WIDTH)
+TRIANGLE.translate(-0.75*PXI_PP_ITEM_WIDTH, -0.5*PXI_PP_ITEM_WIDTH)
 fwd_t, rev_t = QTransform(), QTransform()
 fwd_t.rotate(90)
 rev_t.rotate(-90)
@@ -69,14 +68,14 @@ class PreXoverItem(QGraphicsPathItem):
         self.setBrush(getNoBrush())
         if self._is_fwd:
             self.setPath(FWDPXI_PP)
-            self._bond_p1_offset = 0.375*PXI_PP_ITEM_WIDTH
+            # self._bond_p1_offset = 0.375*PXI_PP_ITEM_WIDTH
             self.setBrush(getBrushObj(self._color, alpha=128))
             self._bond_pen = getPenObj(self._color, 0.25, alpha=42, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, capstyle=Qt.RoundCap)
             self._bond_line.setPen(self._bond_pen)
         else:
             self.setPath(REVPXI_PP)
-            self._bond_p1_offset = -0.375*PXI_PP_ITEM_WIDTH
+            # self._bond_p1_offset = -0.375*PXI_PP_ITEM_WIDTH
             self.setPen(getPenObj(self._color, 0.25, alpha=128))
             self._bond_pen = getPenObj(self._color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
@@ -86,7 +85,7 @@ class PreXoverItem(QGraphicsPathItem):
     ### ACCESSORS ###
     def facing_angle(self):
         facing_angle = self._parent.virtual_helix_angle() + self.rotation()
-        return facing_angle
+        return facing_angle % 360
 
     def color(self):
         return self._color
@@ -100,7 +99,7 @@ class PreXoverItem(QGraphicsPathItem):
     def is_fwd(self):
         return self._is_fwd
 
-    def set_bond_line_length(self, value):
+    def setBondLineLength(self, value):
         self._bond_line_len = value
 
     ### EVENT HANDLERS ###
@@ -122,7 +121,8 @@ class PreXoverItem(QGraphicsPathItem):
     ### PUBLIC SUPPORT METHODS ###
     def setActiveBondPos(self, is_active):
         if is_active:
-            self._bond_line.setLine(QLineF(0,self._bond_p1_offset,self._bond_line_len,0))
+            self._bond_line.setLine(QLineF(0,0,self._bond_line_len,0))
+            # self._bond_line.setLine(QLineF(0,self._bond_p1_offset,self._bond_line_len,0))
             self._bond_line.setPen(self._active_pen)
             self._bond_line.show()
         elif self._default_line:
@@ -134,8 +134,8 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def setDefaultBondPos(self, scenePos):
-        # p1 = QPointF(0,0)
-        p1 = QPointF(0,self._bond_p1_offset)
+        p1 = QPointF(0,0)
+        # p1 = QPointF(0,self._bond_p1_offset)
         p2 = self.mapFromScene(scenePos)
         self._default_line = QLineF(p1,p2)
         self._bond_line.setLine(self._default_line)
@@ -192,7 +192,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setPos(_x - _deltaR, _y)
             item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(fwd_angles[i])
-            item.set_bond_line_length(_deltaR+iw)
+            item.setBondLineLength(_deltaR+iw)
             self.fwd_prexo_items[i] = item
 
         # rev_angles = [round(360*x/10.5 + minor_groove_angle,2) for x in range(step_size)]
@@ -209,7 +209,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setPos(_x - _deltaR, _y)
             item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
             item.setRotation(rev_angles[i])
-            item.set_bond_line_length(_deltaR+iw)
+            item.setBondLineLength(_deltaR+iw)
             self.rev_prexo_items[i] = item
 
         for i in range(len(self.fwd_prexo_items)-1):
@@ -274,8 +274,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def getItemsFacingNearAngle(self, angle):
-        lowZ = angle-_VALID_XOVER_ANGLE
-        highZ = angle+_VALID_XOVER_ANGLE
+        _span = self._parent.partCrossoverSpanAngle()/2
+        lowZ = angle-_span
+        highZ = angle+_span
         fwd = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.fwd_prexo_items.values()))
         rev = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.rev_prexo_items.values()))
         return (fwd, rev)
@@ -309,9 +310,13 @@ class LineGizmo(QGraphicsLineItem):
 class WedgeGizmo(QGraphicsPathItem):
     def __init__(self, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self._parent = parent
         self.setPen(getNoPen())
+        self._last_params = None
 
     def showWedge(self, pos, angle, color, extended=False, rev_gradient=False, outline_only=False):
+        self._last_params = (pos, angle, color, extended, rev_gradient, outline_only)
+        _span = self._parent.partCrossoverSpanAngle()/2
         _r = _RADIUS+(rect_gain/2)
         _c = _RECT_CENTERPT
         _EXT = 1.35 if extended else 1.0
@@ -322,8 +327,8 @@ class WedgeGizmo(QGraphicsPathItem):
         line1.setLength(_r*_EXT)
         line2.setLength(_r*_EXT)
         _line.setAngle(angle)
-        line1.setAngle(angle-_VALID_XOVER_ANGLE)
-        line2.setAngle(angle+_VALID_XOVER_ANGLE)
+        line1.setAngle(angle-_span)
+        line2.setAngle(angle+_span)
 
         path = QPainterPath()
 
@@ -358,6 +363,10 @@ class WedgeGizmo(QGraphicsPathItem):
         self.show()
     # end def
 
+    def updateWedgeAngle(self):
+        self.showWedge(*self._last_params)
+    # end def
+
     def update(self, pre_xover_item):
         pxi = pre_xover_item
         pos = pxi.pos()
@@ -388,14 +397,14 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._empty_helix_item = ehi = empty_helix_item
         self._part_item = ehi._part_item
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
 
-        self.hide()
-
-        self.setAcceptHoverEvents(True)
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
         self.lastMousePressAddedBases = False
 
+        self.hide()
         # handle the label specific stuff
         self._label = self.createLabel()
         self.setNumber()
@@ -403,27 +412,70 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.createArrows()
         self.updateAppearance()
 
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
-        _pxig.setTransformOriginPoint(_RECT.center())
-        _pxig.setRotation(self._virtual_helix.getProperty('eulerZ'))
-        # self._rect = QRectF(_RECT)
-        # self._hover_rect = QRectF(_RECT)
-        # self._outer_line = RotaryDialLine(self._rect, self)
-        # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
-
         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
 
+        _pxig.setTransformOriginPoint(_RECT.center())
+        _pxig.setRotation(self._virtual_helix.getProperty('eulerZ'))
         self._line_gizmos = []
         self._wedge_gizmos = []
         self._prexo_gizmos = []
         self._neighbor_vh_items = []
         self._right_mouse_move = False
         self.refreshCollidingItems()
-
         self.show()
     # end def
 
+    ### ACCESSORS ###
+    def part(self):
+        return self._empty_helix_item.part()
+    # end def
+
+    def parent(self):
+        return self._empty_helix_item
+    # end def
+
+    def modelColor(self):
+        return self.part().getProperty('color')
+    # end def
+
+    def partCrossoverSpanAngle(self):
+        return float(self.part().getProperty('crossover_span_angle'))
+    # end def
+
+    def virtualHelix(self):
+        return self._virtual_helix
+    # end def
+
+    def number(self):
+        return self.virtualHelix().number()
+    # end def
+
+    def setNumber(self):
+        """docstring for setNumber"""
+        vh = self._virtual_helix
+        num = vh.number()
+        label = self._label
+
+        if num is not None:
+            label.setText("%d" % num)
+        else:
+            return
+
+        y_val = _RADIUS / 3
+        if num < 10:
+            label.setPos(_RADIUS / 1.5, y_val)
+        elif num < 100:
+            label.setPos(_RADIUS / 3, y_val)
+        else: # _number >= 100
+            label.setPos(0, y_val)
+        b_rect = label.boundingRect()
+        posx = b_rect.width()/2
+        posy = b_rect.height()/2
+        label.setPos(_RADIUS-posx, _RADIUS-posy)
+    # end def
+
+    ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             self._right_mouse_move = True
@@ -434,6 +486,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         if self._right_mouse_move:
             p = self.mapToScene(event.pos()) - self._button_down_pos
             self._empty_helix_item.setPos(p)
+            ehi = self._empty_helix_item
+            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
+            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+            self.refreshCollidingItems()
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -445,6 +501,15 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
             self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
             self.refreshCollidingItems()
+    # end def
+
+    ### PRIVATE SUPPORT METHODS ###
+
+    ### PUBLIC SUPPORT METHODS ###
+
+    def refreshCrossoverSpanAngles(self):
+        for wg in self._wedge_gizmos:
+            wg.updateWedgeAngle()
     # end def
 
     def refreshCollidingItems(self):
@@ -490,10 +555,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                 nvhi.refreshCollidingItems()
 
         # end for
-    # end def
-
-    def modelColor(self):
-        return self.part().getProperty('color')
     # end def
 
     def updateAppearance(self):
@@ -574,6 +635,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                 _pxig.resetAllItemsAppearance()
     # end def
 
+
     def getPreXoverItemsFacingNearAngle(self, angle):
         return self._prexoveritemgroup.getItemsFacingNearAngle(angle)
     # end def
@@ -587,8 +649,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         facing_angle = item.facing_angle()
         ret = []
-        lowZ  = facing_angle - _VALID_XOVER_ANGLE
-        highZ = facing_angle + _VALID_XOVER_ANGLE
+        span = self.partCrossoverSpanAngle()/2
+        lowZ  = facing_angle - span
+        highZ = facing_angle + span
         neighbors = _vh.getProperty('neighbors').split()
         for n in neighbors:
             n_name, n_angle = n.split(':')
@@ -681,46 +744,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         angle = idx*tpb
         eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
         self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 150)
-    # end def
-
-    def setNumber(self):
-        """docstring for setNumber"""
-        vh = self._virtual_helix
-        num = vh.number()
-        label = self._label
-
-        if num is not None:
-            label.setText("%d" % num)
-        else:
-            return
-
-        y_val = _RADIUS / 3
-        if num < 10:
-            label.setPos(_RADIUS / 1.5, y_val)
-        elif num < 100:
-            label.setPos(_RADIUS / 3, y_val)
-        else: # _number >= 100
-            label.setPos(0, y_val)
-        b_rect = label.boundingRect()
-        posx = b_rect.width()/2
-        posy = b_rect.height()/2
-        label.setPos(_RADIUS-posx, _RADIUS-posy)
-    # end def
-
-    def part(self):
-        return self._empty_helix_item.part()
-    # end def
-
-    def parent(self):
-        return self._empty_helix_item
-    # end def
-
-    def virtualHelix(self):
-        return self._virtual_helix
-    # end def
-
-    def number(self):
-        return self.virtualHelix().number()
     # end def
 
     def setActiveSliceView(self, idx, has_fwd, has_rev):

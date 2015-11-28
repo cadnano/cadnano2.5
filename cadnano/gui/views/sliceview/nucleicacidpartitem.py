@@ -154,7 +154,9 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
                         nap = vh.getProperty('neighbor_active_angle')
                         if nap:
                             vh.setProperty('neighbor_active_angle', '')
-
+            elif property_key == 'crossover_span_angle':
+                for _, vhi in self._virtual_helix_hash.items():
+                    vhi.refreshCrossoverSpanAngles()
             elif property_key == 'dna_sequence':
                 pass
                 # self.updateRects()
