@@ -63,6 +63,8 @@ class CNOutlinerItem(QTreeWidgetItem):
             color = self.data(COLOR_COL, Qt.DisplayRole)
             if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
+        elif key == 'neighbor_active_angle':
+            pass
         else:
             raise KeyError("No property %s in cn_model" % (key))
     # end def

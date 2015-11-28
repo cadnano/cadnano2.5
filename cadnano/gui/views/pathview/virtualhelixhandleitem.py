@@ -71,7 +71,7 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self._parent.setActivePreXoverItem(self)
+        self._parent.updateModelActivePhos(self)
     # end def
 
     def hoverMoveEvent(self, event):
@@ -79,11 +79,11 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.setActivePreXoverItem(None)
+        self._parent.updateModelActivePhos(None)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def refreshAppearance(self, is_active):
+    def updateItemApperance(self, is_active):
         if is_active:
             if self._is_fwd:
                 self.setBrush(getBrushObj(self._color))
@@ -166,7 +166,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PRIVATE SUPPORT METHODS ###
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActivePreXoverItem(self, pre_xover_item):
+    def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
             self._virtual_helix.setProperty('active_pxi', '')
@@ -180,12 +180,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._virtual_helix.setProperty('active_pxi', value)
     # end def
 
-    def refreshActive(self, new_active_item=None):
+    def updateViewActivePhos(self, new_active_item=None):
         """Refresh appearance of items whose active state changed."""
         if self._active_item:
-            self._active_item.refreshAppearance(False)
+            self._active_item.updateItemApperance(False)
         if new_active_item:
-            new_active_item.refreshAppearance(True)
+            new_active_item.updateItemApperance(True)
             self._active_item = new_active_item
     # end def
 # end class

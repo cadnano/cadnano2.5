@@ -30,7 +30,11 @@ class VirtualHelix(ProxyObject):
         self._number = None
         self.setNumber(idnum)
 
-        self._properties = {'eulerZ':0, 'scamZ':0, 'neighbors':'', 'active_pxi':None}
+        self._properties = {'eulerZ':0,
+                            'scamZ':0, 
+                            'active_phos':None,
+                            'neighbor_active_angle':'',
+                            'neighbors':''} # use so we can split() later
 
         # rotate to honeycomb defaults
         # if self.isEvenParity():

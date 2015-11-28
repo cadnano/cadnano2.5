@@ -75,7 +75,9 @@ class NucleicAcidPart(Part):
         self._max_base = 2 * self._STEP - 1
         # Properties (NucleicAcidPart-specific)
         # self._properties["name"] = "Origami%d" % len(self._document.children())
-        self._properties["name"] = "Origami%d" % self._count()
+        self._properties['name'] = 'Origami%d' % self._count()
+        self._properties['neighbor_active_angle'] = ''
+
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []
         self.reserve_bin = set()

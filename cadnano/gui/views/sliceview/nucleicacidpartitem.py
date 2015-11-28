@@ -139,8 +139,22 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
                     vhi.updateAppearance()
                 for _, ehi in self._empty_helix_hash.items():
                     ehi.updateAppearance()
-            elif property_key == 'circular':
-                pass
+            elif property_key == 'neighbor_active_angle':
+                if new_value:
+                    near_active = dict(item.split(":") for item in new_value.split())
+                    for _, vhi in self._virtual_helix_hash.items():
+                        vh = vhi.virtualHelix()
+                        name = vh.getName()
+                        if name in near_active:
+                            angle = near_active[name]
+                            vh.setProperty('neighbor_active_angle', angle)
+                else: # reset to inactive
+                    for _, vhi in self._virtual_helix_hash.items():
+                        vh = vhi.virtualHelix()
+                        nap = vh.getProperty('neighbor_active_angle')
+                        if nap:
+                            vh.setProperty('neighbor_active_angle', '')
+
             elif property_key == 'dna_sequence':
                 pass
                 # self.updateRects()

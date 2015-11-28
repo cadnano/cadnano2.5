@@ -1,7 +1,10 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
 from math import floor
+
+from PyQt5.QtCore import QRectF, Qt, QObject, QPointF, pyqtSignal
+from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
+
 from cadnano import util
 from cadnano.enum import StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
@@ -11,10 +14,6 @@ from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
 
-from PyQt5.QtCore import QRectF, Qt, QObject, QPointF, pyqtSignal
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _BASE_RECT = QRectF(0,0,_BASE_WIDTH,_BASE_WIDTH)
@@ -56,7 +55,7 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def hoverEnterEvent(self, event):
-        self._parent.setActivePreXoverItem(self)
+        self._parent.updateModelActivePhos(self)
     # end def
 
     def hoverMoveEvent(self, event):
@@ -64,7 +63,7 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.setActivePreXoverItem(None)
+        self._parent.updateModelActivePhos(None)
     # end def
 
     def facing_angle(self):
@@ -163,10 +162,10 @@ class PreXoverItemGroup(QGraphicsRectItem):
             item.setX(x)
     # end def
 
-    def setActivePreXoverItem(self, pre_xover_item):
+    def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
-            self._virtual_helix.setProperty('active_pxi', None)
+            self._virtual_helix.setProperty('active_phos', None)
             return
         vh_name = self._virtual_helix.getName()
         vh_angle = self._virtual_helix.getProperty('eulerZ')
@@ -174,7 +173,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
         is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
         value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
-        self._virtual_helix.setProperty('active_pxi', value)
+        self._virtual_helix.setProperty('active_phos', value)
     # end def
 
 
@@ -253,17 +252,20 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             self._handle.rotateWithCenterOrigin(new_value)
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
 
-        elif property_key == 'active_pxi':
+        elif property_key == 'active_phos':
             hpxig = self._handle._prexoveritemgroup
             if new_value:
                 vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
                 is_fwd = 1 if fwd_str == 'fwd' else 0
                 self._activebaseitem.update(is_fwd, step_idx)
                 new_active_item = hpxig.getItem(is_fwd, int(step_idx))
-                hpxig.refreshActive(new_active_item)
+                hpxig.updateViewActivePhos(new_active_item)
             else:
                 self._activebaseitem.hide()
-                hpxig.refreshActive(None)
+                hpxig.updateViewActivePhos(None)
+        elif property_key == 'neighbor_active_angle':
+            if new_value:
+                pass # show bases
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
