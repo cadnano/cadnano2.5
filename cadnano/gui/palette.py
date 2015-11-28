@@ -27,17 +27,20 @@ pen_cache = {}
 def getPenObj(hex_string, stroke_width,
                 alpha=None,
                 lighter=None,
+                penstyle=None,
                 capstyle=None,
                 joinstyle=None):
     global pen_cache
     if alpha is not None:
         hex_string = '#%0.2x%s' % (alpha, hex_string[1:])
     # print(hex_string)
-    key = (hex_string, stroke_width, lighter, capstyle, joinstyle)
+    key = (hex_string, stroke_width, lighter, penstyle, capstyle, joinstyle)
     pen = pen_cache.get(key)
     if pen is None:
         color = getColorObj(hex_string, lighter=lighter)
         pen = QPen(color, stroke_width)
+        if penstyle is not None:
+            pen.setStyle(penstyle)
         if capstyle is not None:
             pen.setCapStyle(capstyle)
         if joinstyle is not None:
