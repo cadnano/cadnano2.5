@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize

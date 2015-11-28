@@ -7,10 +7,11 @@ from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import PlasmidPartItemController
+from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 
-from .abstractproppartitem import AbstractPropertyPartItem
+from .cnpropertyitem import CNPropertyItem
 
-class PlasmidPartItem(AbstractPropertyPartItem):
+class PlasmidPartItem(CNPropertyItem, AbstractPartItem):
     def __init__(self, model_part, parent, key=None):
         super(PlasmidPartItem, self).__init__(odel_part, parent, key=ke)
         if key is None:
