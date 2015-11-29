@@ -36,22 +36,46 @@ PHOS.addPolygon(TRIANGLE)
 
 
 
-class ActiveBaseItem(QGraphicsRectItem):
+class ActivePhosItem(QGraphicsPathItem):
     def __init__(self, parent=None):
-        super(QGraphicsRectItem, self).__init__(_BASE_RECT, parent)
+        super(QGraphicsPathItem, self).__init__(parent)
+        self._part = parent.part()
+        self._max = self._part.maxBaseIdx()+1
         self.setPen(getNoPen())
         self.hide()
     # end def
 
-    def update(self, is_fwd, step_idx):
-        pass
+    def getPath(self):
+        path = QPainterPath()
+        _step = self._part.stepSize()
+        for i in range(0, self._max, _step):
+            rect = QRectF(_BASE_RECT)
+            rect.translate(_BASE_WIDTH*i, 0)
+            path.addRect(rect)
+        return path
+    # end def
 
+    def update(self, is_fwd, step_idx, color):
+        if self.path().isEmpty() or (self._max != self._part.maxBaseIdx()+1):
+            self.setPath(self.getPath())
+        self.setBrush(getBrushObj(color, alpha=128))
+        x = _BASE_WIDTH*step_idx
+        y = -_BASE_WIDTH if is_fwd else _BASE_WIDTH*2
+        # print(x,y)
+        self.setPos(x,y)
+        self.show()
+    # end def
+# end class
 
 class PreXoverItem(QGraphicsPathItem):
-    def __init__(self, angle, parent=None):
+    def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self._step_idx = step_idx
+        self._color = color
+        self._is_fwd = is_fwd
+        self._parent = parent
+        self.setAcceptHoverEvents(True)
         self.setPath(PHOS)
-        self._angle = angle
     # end def
 
     def hoverEnterEvent(self, event):
@@ -86,6 +110,8 @@ class PreXoverItem(QGraphicsPathItem):
 
 
 class PreXoverItemGroup(QGraphicsRectItem):
+    HUE_FACTOR = 1.6
+
     def __init__(self, parent=None):
         super(QGraphicsRectItem, self).__init__(parent)
         self._parent = parent
@@ -103,12 +129,11 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
         fwd_bases = range(step_size)
         rev_bases = range(step_size)
-        fwd_angles = [round(34.29*x,3) for x in range(step_size)]
-        rev_angles = [round(34.29*x+minor_groove_angle,3) for x in range(step_size)]
 
+        fwd_angles = [round(34.29*x,3)%360 for x in range(step_size)]
         fwd_colors = [QColor() for i in range(step_size)]
         for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/(step_size*1.6), 0.75, 0.8)
+            fwd_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
         rev_colors = [QColor() for i in range(step_size)]
         for i in range(len(rev_colors)):
             rev_colors[i].setHsvF(i/(step_size*1.6), 0.75, 0.8)
@@ -120,7 +145,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
         for i in range(0,part.maxBaseIdx(),part.stepSize()):
             for j in range(len(fwd_bases)):
                 idx = fwd_bases[j]
-                item = PreXoverItem(PHOS, self)
+                color = fwd_colors[j].name()
+                item = PreXoverItem(i, color, is_fwd=True, parent=self)
                 item.setPen(QPen(Qt.NoPen))
                 item.setBrush(getBrushObj(fwd_colors[j].name()))
                 self._fwd_pxo_items[i+idx] = item
@@ -130,7 +156,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
             # end for
             for j in range(len(rev_bases)):
                 idx = rev_bases[j]
-                ritem = PreXoverItem(PHOS, self)
+                color = rev_colors[j].name()
+                ritem = PreXoverItem(i, color, is_fwd=False, parent=self)
                 ritem.setPen(getPenObj(rev_colors[j].name(),1))
                 ritem.setBrush(getNoBrush())
                 ritem.setTransformOriginPoint(ritem.boundingRect().center())
@@ -210,7 +237,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setZValue(styles.ZPATHHELIX)
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
-        self._activebaseitem = ActiveBaseItem(self)
+        self._activephositem = ActivePhosItem(self)
     # end def
 
     ### SIGNALS ###
@@ -255,14 +282,19 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         elif property_key == 'active_phos':
             hpxig = self._handle._prexoveritemgroup
             if new_value:
+                # vh-handle
                 vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
                 is_fwd = 1 if fwd_str == 'fwd' else 0
-                self._activebaseitem.update(is_fwd, step_idx)
-                new_active_item = hpxig.getItem(is_fwd, int(step_idx))
-                hpxig.updateViewActivePhos(new_active_item)
+                item = hpxig.getItem(is_fwd, int(step_idx))
+                hpxig.updateViewActivePhos(item)
+                # vh
+                self._activephositem.update(is_fwd, int(step_idx), item.color())
             else:
-                self._activebaseitem.hide()
+                # vh-handle
+                self._activephositem.hide()
                 hpxig.updateViewActivePhos(None)
+                # vh
+                self._activephositem.hide()
         elif property_key == 'neighbor_active_angle':
             if new_value:
                 pass # show bases

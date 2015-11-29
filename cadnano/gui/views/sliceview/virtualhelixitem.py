@@ -55,7 +55,6 @@ REVPXI_PP.addPolygon(rev_t.map(TRIANGLE))
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
-        self._parent = parent
         self._step_idx = step_idx
         self._color = color
         self._is_fwd = is_fwd
@@ -160,6 +159,7 @@ class PreXoverItem(QGraphicsPathItem):
 class PreXoverItemGroup(QGraphicsEllipseItem):
     HUE_FACTOR = 1.6
     SPIRAL_FACTOR = 0.4
+
     def __init__(self, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
@@ -167,56 +167,41 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.fwd_prexo_items = {}
         self.rev_prexo_items = {}
         self.old_active_item = None
-        # self._wedge_gizmo = WedgeGizmo(self)
         self.setPen(getNoPen())
 
         part = parent.part()
-        step_size = part.stepSize()
-        minor_groove_angle = part.minorGrooveAngle()
+        _step = part.stepSize()
+        _twist = part._TWIST_PER_BASE
+        _groove = part.minorGrooveAngle()
+        _hue_scale = _step*self.HUE_FACTOR
 
-        iw = PXI_PP_ITEM_WIDTH
+        _iw = PXI_PP_ITEM_WIDTH
         _ctr = self.mapToParent(_RECT).boundingRect().center()
         _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
 
-        # fwd_angles = [round(360*x/10.5,2) for x in range(step_size)]
-        fwd_angles = [round(34.29*x,3)%360 for x in range(step_size)]
-        fwd_colors = [QColor() for i in range(step_size)]
-        for i in range(len(fwd_colors)):
-            fwd_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
+        colors = [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() for i in range(_step)]
 
-        for i in range(len(fwd_angles)):
-            color = fwd_colors[i].name()
-            item = PreXoverItem(i, color, is_fwd=True, parent=self)
-            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
-            item.setPos(_x - _deltaR, _y)
-            item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
-            item.setRotation(fwd_angles[i])
-            item.setBondLineLength(_deltaR+iw)
-            self.fwd_prexo_items[i] = item
+        for i in range(_step):
+            inset = i*self.SPIRAL_FACTOR # spiral layout
+            fwd = PreXoverItem(i, colors[i], is_fwd=True, parent=self)
+            rev = PreXoverItem(i, colors[-1-i], is_fwd=False, parent=self)
+            fwd.setPos(_x-inset, _y)
+            rev.setPos(_x-inset, _y)
+            fwd.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
+            rev.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
+            fwd.setRotation(round((i*_twist) % 360, 3))
+            rev.setRotation(round((i*_twist+_groove) % 360, 3))
+            fwd.setBondLineLength(inset+_iw)
+            rev.setBondLineLength(inset+_iw)
+            self.fwd_prexo_items[i] = fwd
+            self.rev_prexo_items[i] = rev
 
-        # rev_angles = [round(360*x/10.5 + minor_groove_angle,2) for x in range(step_size)]
-        rev_angles = [round(34.29*x+minor_groove_angle,3)%360 for x in range(step_size)]
-        rev_colors = [QColor() for i in range(step_size)]
-        for i in range(len(rev_colors)):
-            rev_colors[i].setHsvF(i/(step_size*self.HUE_FACTOR), 0.75, 0.8)
-        rev_colors = rev_colors[::-1] # reverse antiparallel color order 
-
-        for i in range(len(rev_colors)):
-            color = rev_colors[i].name()
-            item = PreXoverItem(i, color, is_fwd=False, parent=self)
-            _deltaR = i*self.SPIRAL_FACTOR # spiral layout
-            item.setPos(_x - _deltaR, _y)
-            item.setTransformOriginPoint((-_RADIUS + iw + _deltaR), 0)
-            item.setRotation(rev_angles[i])
-            item.setBondLineLength(_deltaR+iw)
-            self.rev_prexo_items[i] = item
-
-        for i in range(len(self.fwd_prexo_items)-1):
+        for i in range(_step-1):
             fwd, next_fwd = self.fwd_prexo_items[i], self.fwd_prexo_items[i+1]
+            j = (_step-1)-i
+            rev, next_rev = self.rev_prexo_items[j], self.rev_prexo_items[j-1]
             fwd.setDefaultBondPos(next_fwd.scenePos())
-        for i in range(1, len(self.rev_prexo_items)):
-            rev, next_rev = self.rev_prexo_items[i], self.rev_prexo_items[i-1]
             rev.setDefaultBondPos(next_rev.scenePos())
     # end def
 
@@ -259,10 +244,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Refresh appearance of items whose active state changed."""
         if self.old_active_item:
             self.old_active_item.updateItemApperance(False)
-            # self._wedge_gizmo.hide()
         if new_active_item:
             new_active_item.updateItemApperance(True)
-            # self._wedge_gizmo.update(new_active_item)
             self.old_active_item = new_active_item
     # end def
 
@@ -614,7 +597,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
         elif property_key == 'active_phos':
-
             if new_value:
                 vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
                 is_fwd = 1 if fwd_str == 'fwd' else 0

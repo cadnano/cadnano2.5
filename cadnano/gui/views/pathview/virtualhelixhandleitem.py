@@ -60,14 +60,17 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     ### ACCESSORS ###
+    def color(self):
+        return self._color
+
+    def is_fwd(self):
+        return self._is_fwd
+
     def name(self):
         return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
 
     def step_idx(self):
         return self._step_idx
-
-    def is_fwd(self):
-        return self._is_fwd
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
