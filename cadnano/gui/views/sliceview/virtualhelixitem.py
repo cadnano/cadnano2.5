@@ -43,14 +43,13 @@ TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75*PXI_PP_ITEM_WIDTH, 0.5*PXI_PP_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, PXI_PP_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, 0))
-# TRIANGLE.translate(0, -0.5*PXI_PP_ITEM_WIDTH)
 TRIANGLE.translate(-0.75*PXI_PP_ITEM_WIDTH, -0.5*PXI_PP_ITEM_WIDTH)
-fwd_t, rev_t = QTransform(), QTransform()
-fwd_t.rotate(90)
-rev_t.rotate(-90)
+T90, T270 = QTransform(), QTransform()
+T90.rotate(90)
+T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
-FWDPXI_PP.addPolygon(fwd_t.map(TRIANGLE))
-REVPXI_PP.addPolygon(rev_t.map(TRIANGLE))
+FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
+REVPXI_PP.addPolygon(T270.map(TRIANGLE))
 
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
@@ -63,19 +62,17 @@ class PreXoverItem(QGraphicsPathItem):
         self._bond_line = QGraphicsLineItem(self)
         self._bond_line.hide()
         self.setAcceptHoverEvents(True)
-        self.setPen(getNoPen())
-        self.setBrush(getNoBrush())
         if self._is_fwd:
             self.setPath(FWDPXI_PP)
-            # self._bond_p1_offset = 0.375*PXI_PP_ITEM_WIDTH
+            self.setPen(getNoPen())
             self.setBrush(getBrushObj(self._color, alpha=128))
             self._bond_pen = getPenObj(self._color, 0.25, alpha=42, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, capstyle=Qt.RoundCap)
             self._bond_line.setPen(self._bond_pen)
         else:
             self.setPath(REVPXI_PP)
-            # self._bond_p1_offset = -0.375*PXI_PP_ITEM_WIDTH
             self.setPen(getPenObj(self._color, 0.25, alpha=128))
+            self.setBrush(getNoBrush())
             self._bond_pen = getPenObj(self._color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
             self._bond_line.setPen(self._bond_pen)
@@ -105,10 +102,6 @@ class PreXoverItem(QGraphicsPathItem):
     def hoverEnterEvent(self, event):
         self._parent.updateModelActivePhos(self)
     # end def
-
-    # def hoverMoveEvent(self, event):
-    #     pass
-    # # end def
 
     def hoverLeaveEvent(self, event):
         self._parent.updateModelActivePhos(None)
@@ -164,12 +157,35 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
         self._parent = parent
         self._virtual_helix = parent._virtual_helix
+        self._active_item = None
+        self._active_wedge_gizmo = WedgeGizmo(self)
         self.fwd_prexo_items = {}
         self.rev_prexo_items = {}
-        self.old_active_item = None
-        self.setPen(getNoPen())
+        self._colors = self._get_colors()
+        self._add_pxitems()
 
-        part = parent.part()
+        self.setPen(getNoPen())
+        self.setZValue(styles.ZPXIGROUP)
+    # end def
+
+    ### ACCESSORS ###
+    def virtual_helix_angle(self):
+        return self._virtual_helix.getProperty('eulerZ')
+
+    def getItem(self, is_fwd, step_idx):
+        items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
+        if step_idx in items:
+            return items[step_idx]
+        else:
+            return None
+
+    # end def
+
+    ### EVENT HANDLERS ###
+
+    ### PRIVATE SUPPORT METHODS ###
+    def _add_pxitems(self):
+        part = self._parent.part()
         _step = part.stepSize()
         _twist = part._TWIST_PER_BASE
         _groove = part.minorGrooveAngle()
@@ -180,18 +196,16 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
 
-        colors = [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() for i in range(_step)]
-
         for i in range(_step):
             inset = i*self.SPIRAL_FACTOR # spiral layout
-            fwd = PreXoverItem(i, colors[i], is_fwd=True, parent=self)
-            rev = PreXoverItem(i, colors[-1-i], is_fwd=False, parent=self)
+            fwd = PreXoverItem(i, self._colors[i], is_fwd=True, parent=self)
+            rev = PreXoverItem(i, self._colors[-1-i], is_fwd=False, parent=self)
             fwd.setPos(_x-inset, _y)
             rev.setPos(_x-inset, _y)
             fwd.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
             rev.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
-            fwd.setRotation(round((i*_twist) % 360, 3))
-            rev.setRotation(round((i*_twist+_groove) % 360, 3))
+            fwd.setRotation(round((i*_twist)%360, 3))
+            rev.setRotation(round((i*_twist+_groove)%360, 3))
             fwd.setBondLineLength(inset+_iw)
             rev.setBondLineLength(inset+_iw)
             self.fwd_prexo_items[i] = fwd
@@ -205,23 +219,17 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             rev.setDefaultBondPos(next_rev.scenePos())
     # end def
 
-    ### ACCESSORS ###
-    def virtual_helix_angle(self):
-        return self._virtual_helix.getProperty('eulerZ')
+    def _get_colors(self):
+        part = self._parent.part()
+        _step = part.stepSize()
+        _hue_scale = _step*self.HUE_FACTOR
+        return [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() for i in range(_step)]
 
-    def getItem(self, is_fwd, step_idx):
-        items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
-        if step_idx in items:
-            return items[step_idx]
-        else:
-            return None
-    # end def
-
-    ### EVENT HANDLERS ###
-
-    ### PRIVATE SUPPORT METHODS ###
 
     ### PUBLIC SUPPORT METHODS ###
+    def partCrossoverSpanAngle(self):
+        return self._parent.partCrossoverSpanAngle()
+
     def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
@@ -242,11 +250,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def updateViewActivePhos(self, new_active_item=None):
         """Refresh appearance of items whose active state changed."""
-        if self.old_active_item:
-            self.old_active_item.updateItemApperance(False)
+        if self._active_item:
+            self._active_item.updateItemApperance(False)
+            self._active_wedge_gizmo.hide()
         if new_active_item:
             new_active_item.updateItemApperance(True)
-            self.old_active_item = new_active_item
+            self._active_wedge_gizmo.showActive(new_active_item)
+            self._active_item = new_active_item
     # end def
 
     def resetAllItemsAppearance(self):
@@ -260,10 +270,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         _span = self._parent.partCrossoverSpanAngle()/2
         lowZ = angle-_span
         highZ = angle+_span
-        fwd = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.fwd_prexo_items.values()))
-        rev = list(filter(lambda p: lowZ < p.facing_angle() < highZ , self.rev_prexo_items.values()))
+        fwd = list(filter(lambda p: lowZ<p.facing_angle()<highZ,\
+                                  self.fwd_prexo_items.values()))
+        rev = list(filter(lambda p: lowZ<p.facing_angle()<highZ,\
+                                  self.rev_prexo_items.values()))
         return (fwd, rev)
     # end def
+# end class
 
 
 class PreCrossoverGizmo(QGraphicsLineItem):
@@ -295,6 +308,7 @@ class WedgeGizmo(QGraphicsPathItem):
         super(QGraphicsPathItem, self).__init__(parent)
         self._parent = parent
         self.setPen(getNoPen())
+        self.setZValue(styles.ZWEDGEGIZMO)
         self._last_params = None
 
     def showWedge(self, pos, angle, color, extended=False, rev_gradient=False, outline_only=False):
@@ -322,16 +336,16 @@ class WedgeGizmo(QGraphicsPathItem):
             self.setPath(path)
             self.show()
         else:
-            gradient = QRadialGradient(_c, _r*_EXT*1.11)
+            gradient = QRadialGradient(_c, _r*_EXT)
             color1 = getColorObj(color, alpha=80)
-            color2 = getColorObj(color, alpha=24)
+            color2 = getColorObj(color, alpha=0)
             if rev_gradient:
                 color1, color2 = color2, color1
 
             if extended:
                 gradient.setColorAt(0, color1)
-                gradient.setColorAt(0.66, color1)
-                gradient.setColorAt(0.67, color2)
+                gradient.setColorAt(_r/(_r*_EXT), color1)
+                gradient.setColorAt(_r/(_r*_EXT)+0.01, color2)
                 gradient.setColorAt(1, color2)
             else:
                 gradient.setColorAt(0, getColorObj(color, alpha=50))
@@ -350,15 +364,18 @@ class WedgeGizmo(QGraphicsPathItem):
         self.showWedge(*self._last_params)
     # end def
 
-    def update(self, pre_xover_item):
+    def showActive(self, pre_xover_item):
         pxi = pre_xover_item
         pos = pxi.pos()
         angle = -pxi.rotation()
         color = pxi.color()
+        # self.showWedge(pos, angle, color, span=5.0)
         if pxi.is_fwd():
-            self.showWedge(pos, angle, color, extended=True)
+            self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
+            # self.showWedge(pos, angle, color, extended=True)
         else:
             self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
+            # self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
     # end def
 # end class
 
@@ -604,7 +621,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                 _pxig.updateViewActivePhos(new_active_item)
                 self.updateNeighborsNearActivePhos(new_active_item, True)
             else:
-                self.updateNeighborsNearActivePhos(_pxig.old_active_item, False)
+                self.updateNeighborsNearActivePhos(_pxig._active_item, False)
                 _pxig.updateViewActivePhos(None)
                 self._virtual_helix.setProperty('neighbor_active_angle', '')
         elif property_key == 'neighbor_active_angle':
