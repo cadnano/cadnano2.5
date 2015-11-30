@@ -84,6 +84,8 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     # end def
 
     def getVHItemList(self):
+        if not self._virtual_helix_hash:
+            return []
         return sorted(self._virtual_helix_hash.values(), key=lambda t:t.number())
 
     def _adjustPosition(self):

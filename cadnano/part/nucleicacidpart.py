@@ -78,6 +78,7 @@ class NucleicAcidPart(Part):
         self._properties['name'] = 'Origami%d' % self._count()
         self._properties['crossover_span_angle'] = 30
         self._properties['neighbor_active_angle'] = ''
+        self._properties['active_phos'] = None
 
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []

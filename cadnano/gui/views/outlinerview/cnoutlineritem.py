@@ -67,6 +67,8 @@ class CNOutlinerItem(QTreeWidgetItem):
             pass
         elif key == 'neighbor_active_angle':
             pass
+        elif key == 'active_phos':
+            pass
         else:
             raise KeyError("No property %s in cn_model" % (key))
     # end def

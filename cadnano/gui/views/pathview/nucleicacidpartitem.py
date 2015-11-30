@@ -47,6 +47,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
         self._virtual_helix_hash = {}
+        self._virtual_helix_name_hash = {}
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -150,6 +151,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         scene.removeItem(self)
         self._model_part = None
         self._virtual_helix_hash = None
+        self._virtual_helix_name_hash = None
         self._virtual_helix_item_list = None
         self._controller.disconnectSignals()
         self._controller = None
@@ -180,7 +182,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi
-
+        self._virtual_helix_name_hash[vh.getName()] = vhi
         # reposition when first VH is added
         if len(self._virtual_helix_item_list) == 0:
             view = self.window().path_graphics_view
@@ -253,6 +255,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vh = virtual_helix_item.virtualHelix()
         self._virtual_helix_item_list.remove(virtual_helix_item)
         del self._virtual_helix_hash[vh.coord()]
+        del self._virtual_helix_name_hash[vh.getName()]
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
@@ -263,6 +266,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def itemForVirtualHelix(self, virtual_helix):
         return self._virtual_helix_hash[virtual_helix.coord()]
     # end def
+
+    def getVHItemByName(self, vh_name):
+        return self._virtual_helix_name_hash[vh_name]
 
     def virtualHelixBoundingRect(self):
         return self._vh_rect

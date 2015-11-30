@@ -3,6 +3,7 @@ from math import sqrt, atan2, degrees, pi
 import cadnano.util as util
 
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
+# from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsItem
@@ -50,6 +51,7 @@ T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
 FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
 REVPXI_PP.addPolygon(T270.map(TRIANGLE))
+
 
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
@@ -234,6 +236,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
             # self._virtual_helix.part().setProperty('active_phos_pos', None)
+            self._parent.part().setProperty('active_phos', None)
             self._virtual_helix.setProperty('active_phos', None)
             return
         vh_name = self._virtual_helix.getName()
@@ -245,6 +248,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         # p = pre_xover_item.scenePos()
         # pos = '%d,%d' % (p.x(), p.y())
         # self._virtual_helix.part().setProperty('active_phos_pos', pos)
+        self._parent.part().setProperty('active_phos', value)
         self._virtual_helix.setProperty('active_phos', value)
     # end def
 
@@ -285,7 +289,7 @@ class PreCrossoverGizmo(QGraphicsLineItem):
         p1 = parent.mapFromScene(pre_xover_item.scenePos())
         p2 = parent.mapFromScene(active_scenePos)
         self.setLine(QLineF(p1, p2))
-        color = pre_xover_item.color()
+        color = pre_xover_item.getColor()
         self.setPen(getPenObj(color, 0.25, alpha=32, capstyle=Qt.RoundCap))
         # self.setZValue(styles.ZGIZMO)
     # end def
@@ -450,7 +454,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def number(self):
-        return self.virtualHelix().number()
+        return self._virtual_helix.number()
     # end def
 
     def setNumber(self):
@@ -617,9 +621,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
         elif property_key == 'active_phos':
             if new_value:
-                vh_name, fwd_str, step_idx, facing_angle = new_value.split('.')
-                is_fwd = 1 if fwd_str == 'fwd' else 0
-                new_active_item = _pxig.getItem(int(is_fwd), int(step_idx))
+                vh_name, fwd_str, base_idx, facing_angle = new_value.split('.')
+                is_fwd = True if fwd_str == 'fwd' else False
+                step_idx = int(base_idx) % self.part().stepSize()
+                new_active_item = _pxig.getItem(is_fwd, step_idx)
                 _pxig.updateViewActivePhos(new_active_item)
                 self.updateNeighborsNearActivePhos(new_active_item, True)
             else:
