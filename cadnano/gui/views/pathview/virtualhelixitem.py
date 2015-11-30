@@ -65,6 +65,7 @@ class ActivePhosItem(QGraphicsPathItem):
     # end def
 # end class
 
+
 class PreXoverItem(QGraphicsRectItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsRectItem, self).__init__(_BASE_RECT, parent)
@@ -133,8 +134,10 @@ class PreXoverItem(QGraphicsRectItem):
     ### PUBLIC SUPPORT METHODS ###
     def setActive(self, is_active):
         if is_active:
+            self.setBrush(getBrushObj(self._color, alpha=128))
             self._phos_item.setRotation(-90)
         else:
+            self.setBrush(getNoBrush())
             self._phos_item.setRotation(0)
     # end def
 # end class
@@ -155,6 +158,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                                     for i in range(step_size)]
         self._fwd_pxo_items = {}
         self._rev_pxo_items = {}
+        self._active_items = []
         self._add_pxitems(0, self._max_base, step_size)
     # end def
 
@@ -202,6 +206,22 @@ class PreXoverItemGroup(QGraphicsRectItem):
         else:
             self._rm_last_n_pxitems(old_max-new_max)
         self._max_base = new_max
+    # end def
+
+    def setActive(self, fwd_rev_idxs):
+        if fwd_rev_idxs:
+            fwd_idxs, rev_idxs = fwd_rev_idxs
+            for i in fwd_idxs:
+                item = self._fwd_pxo_items[i]
+                item.setActive(True)
+                self._active_items.append(item)
+            for i in rev_idxs:
+                item = self._rev_pxo_items[i]
+                item.setActive(True)
+                self._active_items.append(item)
+        else:
+            while self._active_items:
+                self._active_items.pop().setActive(False)
     # end def
 
     def updatePositionsAfterRotation(self, angle):
@@ -322,7 +342,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 _tbp = self.part()._TWIST_PER_BASE
                 offset = round(vh_angle/_tbp, 0)
                 idx = int(step_idx) + offset
-                # print (step_idx, offset)
                 self._activephositem.update(is_fwd, idx, item.color())
             else:
                 # vh-handle
@@ -331,8 +350,17 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 # vh
                 self._activephositem.hide()
         elif property_key == 'neighbor_active_angle':
+            hpxig = self._handle._prexoveritemgroup
+            pxig = self._prexoveritemgroup
             if new_value:
-                pass # show bases
+                local_angle = (int(new_value)+180) % 360
+                fwd_items, rev_items = hpxig.getItemsFacingNearAngle(local_angle)
+                fwd_idxs = [item.step_idx() for item in fwd_items]
+                rev_idxs = [item.step_idx() for item in rev_items]
+                self._prexoveritemgroup.setActive((fwd_idxs, rev_idxs))
+            else:
+                hpxig.resetAllItemsAppearance()
+                self._prexoveritemgroup.setActive(None)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):

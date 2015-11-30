@@ -66,6 +66,10 @@ class PreXoverItem(QGraphicsPathItem):
     def is_fwd(self):
         return self._is_fwd
 
+    def facing_angle(self):
+        facing_angle = self._parent.virtual_helix_angle() + self.rotation()
+        return facing_angle % 360
+
     def name(self):
         return "%s.%d" % ("r" if self._is_fwd else "f", self._step_idx)
 
@@ -164,11 +168,32 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             return None
     # end def
 
+    def virtual_helix_angle(self):
+        return self._virtual_helix.getProperty('eulerZ')
+
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
 
     ### PUBLIC SUPPORT METHODS ###
+    def getItemsFacingNearAngle(self, angle):
+        _span = self._parent.partCrossoverSpanAngle()/2
+        fwd = list(filter(lambda p: \
+                            180-abs(abs(p.facing_angle()-angle)-180)<_span,\
+                            self.fwd_prexo_items.values()))
+        rev = list(filter(lambda p: \
+                            180-abs(abs(p.facing_angle()-angle)-180)<_span,\
+                            self.rev_prexo_items.values()))
+        return (fwd, rev)
+    # end def
+
+    def resetAllItemsAppearance(self):
+        for item in self.fwd_prexo_items.values():
+            item.updateItemApperance(False)
+        for item in self.rev_prexo_items.values():
+            item.updateItemApperance(False)
+    # end def
+
     def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
@@ -191,6 +216,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             new_active_item.updateItemApperance(True)
             self._active_item = new_active_item
     # end def
+
+
 # end class
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
@@ -329,6 +356,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def partItem(self):
         return self._nucleicacid_part_item
+    # end def
+
+    def partCrossoverSpanAngle(self):
+        return float(self._model_part.getProperty('crossover_span_angle'))
     # end def
 
     def hoverEnterEvent(self, event):

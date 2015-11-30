@@ -651,14 +651,12 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         facing_angle = item.facing_angle()
         ret = []
         span = self.partCrossoverSpanAngle()/2
-        lowZ  = facing_angle - span
-        highZ = facing_angle + span
         neighbors = _vh.getProperty('neighbors').split()
         for n in neighbors:
             n_name, n_angle = n.split(':')
             n_angle = int(n_angle)
             d = n_angle-facing_angle
-            if lowZ < n_angle < highZ:
+            if 180-abs(abs(d)-180)<span:
                 ret.append('%s:%d' % (n_name, n_angle+d))
         _vh.part().setProperty('neighbor_active_angle', ' '.join(ret))
 
