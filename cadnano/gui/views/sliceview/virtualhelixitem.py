@@ -268,12 +268,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def getItemsFacingNearAngle(self, angle):
         _span = self._parent.partCrossoverSpanAngle()/2
-        lowZ = angle-_span
-        highZ = angle+_span
-        fwd = list(filter(lambda p: lowZ<p.facing_angle()<highZ,\
-                                  self.fwd_prexo_items.values()))
-        rev = list(filter(lambda p: lowZ<p.facing_angle()<highZ,\
-                                  self.rev_prexo_items.values()))
+        fwd = list(filter(lambda p: \
+                            180-abs(abs(p.facing_angle()-angle)-180)<_span,\
+                            self.fwd_prexo_items.values()))
+        rev = list(filter(lambda p: \
+                            180-abs(abs(p.facing_angle()-angle)-180)<_span,\
+                            self.rev_prexo_items.values()))
         return (fwd, rev)
     # end def
 # end class
@@ -320,7 +320,9 @@ class WedgeGizmo(QGraphicsPathItem):
         _line = QLineF(_c, pos)
         line1 = QLineF(_c, pos)
         line2 = QLineF(_c, pos)
-        _line.setLength(_r*_EXT*1.02) # for quadTo control point
+        
+        _quad_scale = 1+(.22*(_span-5)/55) # lo+(hi-lo)*(val-min)/(max-min)
+        _line.setLength(_r*_EXT*_quad_scale) # for quadTo control point
         line1.setLength(_r*_EXT)
         line2.setLength(_r*_EXT)
         _line.setAngle(angle)

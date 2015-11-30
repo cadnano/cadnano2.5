@@ -46,7 +46,7 @@ class NucleicAcidPartItem(CNPropertyItem, AbstractPartItem):
             # editor = QDoubleSpinBox(parent_QWidget)
             # editor.setDecimals(0)
             editor = QSlider(Qt.Horizontal, parent_QWidget)
-            editor.setRange(5,60)
+            editor.setRange(5, 60)
             editor.valueChanged.connect(self.setCrossoverSpanAngle)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
