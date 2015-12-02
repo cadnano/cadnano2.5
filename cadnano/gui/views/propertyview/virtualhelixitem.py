@@ -3,7 +3,8 @@ from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
+from PyQt5.QtWidgets import QSpinBox, QLineEdit
+from PyQt5.QtWidgets import QDoubleSpinBox, QSlider
 
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
@@ -34,15 +35,21 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
         return ItemType.VIRTUALHELIX
     # end def
 
+    def setEulerZ(self, new_value):
+        self._cn_model.setProperty('eulerZ', new_value)
+
     def configureEditor(self, parent_QWidget, option, model_index):
         m_vh = self._cn_model
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
         elif key == 'eulerZ':
-            editor = QDoubleSpinBox(parent_QWidget)
-            editor.setDecimals(0)
-            editor.setRange(0,359)
+            editor = QSlider(Qt.Horizontal, parent_QWidget)
+            editor.setRange(0, 359)
+            editor.valueChanged.connect(self.setEulerZ)
+            # editor = QDoubleSpinBox(parent_QWidget)
+            # editor.setDecimals(0)
+            # editor.setRange(0,359)
         elif key == 'scamZ':
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setSingleStep(m_vh.part().twistPerBase())

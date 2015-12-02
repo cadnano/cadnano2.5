@@ -26,6 +26,8 @@ _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 _BOUNDING_RECT_PADDING = 20
 
+_VH_XOFFSET = styles.VIRTUALHELIXHANDLEITEM_RADIUS + 100
+
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering"""
     findChild = util.findChild  # for debug
@@ -188,7 +190,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             view = self.window().path_graphics_view
             p = view.scene_root_item.childrenBoundingRect().bottomLeft()
             _p = _BOUNDING_RECT_PADDING
-            self.setPos(p.x() + _p*6 + styles.VIRTUALHELIXHANDLEITEM_RADIUS, p.y() + _p*3)
+            self.setPos(p.x() + _VH_XOFFSET, p.y() + _p*3)
 
         self._virtual_helix_item_list.append(vhi)
         ztf = not getBatch()

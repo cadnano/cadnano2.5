@@ -33,6 +33,8 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
+_VH_XOFFSET = _RADIUS+100
+
 PXI_PP_ITEM_WIDTH = 3
 TRIANGLE = QPolygonF()
 TRIANGLE.append(QPointF(0, 0))
@@ -223,10 +225,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
 
-    def __init__(self, virtual_helix, nucleicacid_part_item, viewroot):
+    def __init__(self, nucleicacid_part_item, virtual_helix_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
-        self._virtual_helix = virtual_helix
         self._nucleicacid_part_item = nucleicacid_part_item
+        self._virtual_helix_item = virtual_helix_item
+        self._virtual_helix = virtual_helix_item.virtualHelix()
         self._model_part = nucleicacid_part_item.part()
         self._viewroot = viewroot
         self._being_hovered_over = False
@@ -247,12 +250,13 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
         self._hover_rect = QRectF(_RECT)
-        self._outer_line = RotaryDialLine(self._rect, self)
-        self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
+        # self._outer_line = RotaryDialLine(self._rect, self)
+        # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
         self.show()
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
         _pxig.setTransformOriginPoint(_RECT.center())
+        _pxig.hide()
 
     # end def
 
@@ -396,6 +400,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)
+        elif event.button() == Qt.RightButton:
+            self._right_mouse_move = True
+            self._button_down_pos = event.pos()
+            self._button_down_coords = (event.scenePos(), self.pos())
+            # print(['%d,%d'%(p.x(),p.y()) for p in self._button_down_coords])
         else:
             QGraphicsItem.mousePressEvent(self, event)
     # end def
@@ -407,9 +416,22 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)
+        elif self._right_mouse_move:
+            event_start, handle_start = self._button_down_coords
+            delta = self.mapToScene(event.pos()) - event_start
+            
+            self.setX(handle_start.x()+delta.x())
+            self._virtual_helix_item.setX(handle_start.x()+delta.x()+_VH_XOFFSET)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
+
+
+    def mouseReleaseEvent(self, event):
+        if self._right_mouse_move and event.button() == Qt.RightButton:
+            self._right_mouse_move = False
+            p = self.mapToScene(event.pos()) - self._button_down_pos
+
 
     def restoreParent(self, pos=None):
         """
