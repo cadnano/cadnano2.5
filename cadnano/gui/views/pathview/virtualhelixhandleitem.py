@@ -223,8 +223,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 # end class
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
-    _filter_name = "virtual_helix"
-
     def __init__(self, nucleicacid_part_item, virtual_helix_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
         self._nucleicacid_part_item = nucleicacid_part_item
@@ -339,6 +337,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
         if num is not None:
             label.setText("%d" % num)
+            self._filter_name = 'even_virtual_helix' if num%2 == 0 else 'odd_virtual_helix'
         else:
             return
         y_val = radius / 3
@@ -404,7 +403,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             self._right_mouse_move = True
             self._button_down_pos = event.pos()
             self._button_down_coords = (event.scenePos(), self.pos())
-            # print(['%d,%d'%(p.x(),p.y()) for p in self._button_down_coords])
         else:
             QGraphicsItem.mousePressEvent(self, event)
     # end def

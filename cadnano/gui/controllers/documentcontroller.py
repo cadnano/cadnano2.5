@@ -129,9 +129,9 @@ class DocumentController():
         f0 = self.win.action_filter_even
         f1 = self.win.action_filter_odd
         if f0.isChecked():
-            types.append("even")
+            types.append('even_virtual_helix')
         if f1.isChecked():
-            types.append("odd")
+            types.append('odd_virtual_helix')
         self._document.documentSelectionFilterChangedSignal.emit(types)
 
     def actionFilterEvenSlot(self):
@@ -142,9 +142,9 @@ class DocumentController():
         f1 = self.win.action_filter_odd
         types = ["virtual_helix"]
         if f0.isChecked():
-            types.append("even")
+            types.append('even_virtual_helix')
         if f1.isChecked():
-            types.append("odd")
+            types.append('odd_virtual_helix')
         self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
@@ -156,9 +156,9 @@ class DocumentController():
         f1 = self.win.action_filter_odd
         types = ["virtual_helix"]
         if f0.isChecked():
-            types.append("even")
+            types.append('even_virtual_helix')
         if f1.isChecked():
-            types.append("odd")
+            types.append('odd_virtual_helix')
         self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
