@@ -51,3 +51,25 @@ def applyMatrix4(m, v):
     z = m[8] * v.x + m[9] * v.y + m[10] * v.z + m[11]
     return Vector3(x, y, z)
 # end def
+
+def v3SetX(v, x):
+    return Vector3(x, v.y, v.z)
+
+def v3SetY(v, y):
+    return Vector3(v.x, y, v.z)
+
+def v3SetZ(v, z):
+    return Vector3(v.x, v.y, z)
+
+def addVectors(v1, v2):
+    return Vector3(v1.x+v2.x, v1.y+v2.y, v1.z+v2.z)
+
+def subVectors(v1, v2):
+    """ return v1 - v2
+    """
+    return Vector3(v1.x-v2.x, v1.y-v2.y, v1.z-v2.z)
+
+def multiplyScalar(v, s):
+    """ return v1*s
+    """
+    return Vector3(v.x*s, v.y*s, v.z*s)
