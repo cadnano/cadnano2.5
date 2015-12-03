@@ -23,18 +23,18 @@ class MergeCommand(UndoCommand):
         # Store strands
         self._strand_low = strand_low
         self._strand_high = strand_high
-        pS = priority_strand
-        self._s_set = s_set = pS.strandSet()
+
+        self._s_set = s_set = priority_strand.strandSet()
         # Store oligos
-        self._new_oligo = pS.oligo().shallowCopy()
-        self._s_low_oligo = sLOlg = strand_low.oligo()
-        self._s_high_oligo = sHOlg = strand_high.oligo()
+        self._new_oligo = priority_strand.oligo().shallowCopy()
+        self._s_low_oligo = s_low_olg = strand_low.oligo()
+        self._s_high_oligo = s_high_olg = strand_high.oligo()
 
         # self._s_set_idx = low_strandset_idx
 
         # update the new oligo length if it's not a loop
-        if sLOlg != sHOlg:
-            self._new_oligo.setLength(sLOlg.length() + sHOlg.length())
+        if s_low_olg != s_high_olg:
+            self._new_oligo.setLength(s_low_olg.length() + s_high_olg.length())
 
         # Create the new_strand by copying the priority strand to
         # preserve its properties

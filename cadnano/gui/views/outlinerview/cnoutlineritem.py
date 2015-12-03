@@ -64,7 +64,9 @@ class CNOutlinerItem(QTreeWidgetItem):
             if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
         else:
-            raise KeyError("No property %s in cn_model" % (key))
+            "property not supported"
+            # pass
+            # raise KeyError("No property %s in cn_model" % (key))
     # end def
 
 # end class

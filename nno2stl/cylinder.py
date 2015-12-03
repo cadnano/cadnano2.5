@@ -8,8 +8,8 @@ if __name__ == "__main__":
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.append(root_path)
 
-from nno2stl.vector import Vector3, Vector2, normalizeV3
-from nno2stl.solid import Solid
+from cadnano.math.vector import Vector3, Vector2, normalizeV3
+from cadnano.math.solid import Solid
 
 class Cylinder(Solid):
     def __init__(self, name, radius,  length, radial_segments=32):

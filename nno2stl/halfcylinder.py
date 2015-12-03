@@ -8,9 +8,9 @@ if __name__ == "__main__":
     root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.append(root_path)
 
-from nno2stl.vector import Vector3, Vector2, normalizeV3, applyMatrix4
-from nno2stl.solid import Solid
-from nno2stl.matrix4 import makeRotationZ
+from cadnano.math.vector import Vector3, Vector2, normalizeV3, applyMatrix4
+from cadnano.math.solid import Solid
+from cadnano.math.matrix4 import makeRotationZ
 
 class HalfCylinder(Solid):
     def __init__(self, name, radius, length, height_segments,

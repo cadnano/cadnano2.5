@@ -463,6 +463,8 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
 
         if modifiers & Qt.AltModifier:
             do_maximize = True
+        else:
+            do_maximize = False
 
         self._item_group._viewroot.document().resizeSelection(delta,
                                                 do_maximize=do_maximize)

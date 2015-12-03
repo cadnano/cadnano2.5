@@ -43,7 +43,7 @@ class Part(ProxyObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-
+    editable_properties = ['name', 'color']
     _STEP = 21  # this is the period (in bases) of the part lattice
     _RADIUS = 1.125  # nanometers
     _TURNS_PER_STEP = 2

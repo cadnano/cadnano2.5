@@ -889,14 +889,14 @@ class Strand(ProxyObject):
         needs to be shallow copied as well, but wouldn't be if copy.copy()
         is used, and copy.deepcopy is undesired
         """
-        nS = Strand(self._strandset, *self.idxs())
-        nS._oligo = self._oligo
-        nS._strand5p = self._strand5p
-        nS._strand3p = self._strand3p
+        new_s = Strand(self._strandset, *self.idxs())
+        new_s._oligo = self._oligo
+        new_s._strand5p = self._strand5p
+        new_s._strand3p = self._strand3p
         # required to shallow copy the dictionary
-        nS._decorators = dict(self._decorators.items())
-        nS._sequence = None  # self._sequence
-        return nS
+        new_s._decorators = dict(self._decorators.items())
+        new_s._sequence = None  # self._sequence
+        return new_s
     # end def
 
     def deepCopy(self, strandset, oligo):
@@ -905,13 +905,13 @@ class Strand(ProxyObject):
         needs to be shallow copied as well, but wouldn't be if copy.copy()
         is used, and copy.deepcopy is undesired
         """
-        nS = Strand(strandset, *self.idxs())
-        nS._oligo = oligo
-        decs = nS._decorators
-        for key, decOrig in self._decorators:
-            decs[key] = decOrig.deepCopy()
+        new_s = Strand(strandset, *self.idxs())
+        new_s._oligo = oligo
+        decs = new_s._decorators
+        for key, dec_orig in self._decorators:
+            decs[key] = dec_orig.deepCopy()
         # end fo
-        nS._sequence = self._sequence
-        return nS
+        new_s._sequence = self._sequence
+        return new_s
     # end def
 # end class

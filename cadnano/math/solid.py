@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from nno2stl.vector import normalToPlane, normalizeV3, applyMatrix3, applyMatrix4
-from nno2stl.matrix3 import getNormalMatrix
+from cadnano.math.vector import normalToPlane, normalizeV3, applyMatrix3, applyMatrix4
+from cadnano.math.matrix3 import getNormalMatrix
 
-from nno2stl.face import Face
+from cadnano.math.face import Face
 
 class Solid(object):
     def __init__(self, name):

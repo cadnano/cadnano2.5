@@ -13,7 +13,7 @@ class VirtualHelix(ProxyObject):
     form the "helix", just as many fibers may be braided together to
     form a length of rope.
     """
-
+    editable_properties = ['name', 'color']
     def __init__(self, part, row, col, idnum=0):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)

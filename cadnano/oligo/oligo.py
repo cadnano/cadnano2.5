@@ -22,15 +22,18 @@ class Oligo(ProxyObject):
     Commands that affect Strands (e.g. create, remove, merge, split) are also
     responsible for updating the affected Oligos.
     """
+    editable_properties = ['name', 'color']
+
     def __init__(self, part, color=None):
         super(Oligo, self).__init__(part)
         self._part = part
         self._strand5p = None
-        self._length = 0
+        # self._length = 0
         self._is_loop = False
         self._properties = {}
         self._properties['name'] = "oligo%s" % str(id(self))[-4:]
         self._properties['color'] = color if color else "#cc0000"
+        self._properties['length'] = 0
     # end def
 
     def __repr__(self):
@@ -49,22 +52,25 @@ class Oligo(ProxyObject):
     def shallowCopy(self):
         olg = Oligo(self._part)
         olg._strand5p = self._strand5p
-        olg._length = self._length
         olg._is_loop = self._is_loop
-        # olg._color = self._color
-        olg._color = self._properties['color']
+        olg._properties = self._properties.copy()
         return olg
     # end def
 
-    def deepCopy(self, part):
-        olg = Oligo(part)
-        olg._strand5p = None
-        olg._length = self._length
-        olg._is_loop = self._is_loop
-        # olg._color = self._color
-        olg._properties = self._properties
-        return olg
-    # end def
+    def copyProperties(self):
+        return self._properties()
+    # end
+
+    # def deepCopy(self, part):
+    #     """ not sure this actually gets called anywhere
+    #     """
+    #     olg = Oligo(part)
+    #     olg._strand5p = None
+    #     olg._is_loop = self._is_loop
+    #     # do we copy length?
+    #     olg._properties = self._properties.copy()
+    #     return olg
+    # # end def
 
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(ProxyObject,
@@ -152,7 +158,8 @@ class Oligo(ProxyObject):
     # end def
 
     def length(self):
-        return self._length
+        # return self._length
+        return self._properties['length']
     # end def
 
     def sequence(self):
@@ -242,11 +249,11 @@ class Oligo(ProxyObject):
     # end def
 
     def decrementLength(self, delta):
-        self.setLength(self._length-delta)
+        self.setLength(self.length() - delta)
     # end def
 
     def incrementLength(self, delta):
-        self.setLength(self._length+delta)
+        self.setLength(self.length() + delta)
     # end def
 
     def refreshLength(self):
@@ -278,7 +285,8 @@ class Oligo(ProxyObject):
 
     def setLength(self, length):
         before = self.shouldHighlight()
-        self._length = length
+        # self._length = length
+        self.setProperty('length', length)
         if before != self.shouldHighlight():
             self.oligoSequenceClearedSignal.emit(self)
             self.oligoAppearanceChangedSignal.emit(self)

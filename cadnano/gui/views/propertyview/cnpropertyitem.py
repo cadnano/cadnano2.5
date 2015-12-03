@@ -54,10 +54,12 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
-        m_vh = self._cn_model
+        cn_m = self._cn_model
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
+        elif key not in cn_m.editable_properties:
+            return None
         data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
         if data_type is str:
             editor = QLineEdit(parent_QWidget)

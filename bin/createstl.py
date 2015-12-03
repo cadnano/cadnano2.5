@@ -9,7 +9,7 @@ from nno2stl.cylinder import Cylinder
 
 from nno2stl.halfcylinder import HalfCylinder
 
-from nno2stl.matrix4 import makeTranslation
+from cadnano.math.matrix4 import makeTranslation
 
 BASE_LENGTH = 0.3
 
@@ -55,4 +55,4 @@ if __name__ == "__main__":
                 print("length:", strand.length())
     # stlwriter.write(path_out, solids, format="ascii")
     print("writing %s..." % (path_out))
-    stlwriter.write(path_out, solids, format="binary") 
+    stlwriter.write(path_out, solids, format="binary")
