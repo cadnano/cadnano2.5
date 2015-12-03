@@ -2,6 +2,7 @@ from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.enum import StrandType
 from cadnano.strandset import StrandSet
+from cadnano.math.vector import Vector3
 from .removevhelixcmd import RemoveVirtualHelixCommand
 
 
@@ -17,6 +18,8 @@ class VirtualHelix(ProxyObject):
     def __init__(self, part, row, col, idnum=0):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)
+        x, y = part.latticeCoordToPositionXY(row, col)
+        self._location = Vector3(x, y, 0.)
         self._coord = (row, col) # col, row
         self._part = part
         self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
@@ -65,6 +68,15 @@ class VirtualHelix(ProxyObject):
 
     def coord(self):
         return self._coord
+    # end def
+
+    def rect(self):
+        """ return tuple of:
+        (x_lower_left, y_lower_left, x_upper_right, y_upper_right)
+        """
+        radius = self._part.radius()
+        x, y, z = self._location
+        return x - radius, y - radius, x + radius, y + radius
     # end def
 
     def number(self):

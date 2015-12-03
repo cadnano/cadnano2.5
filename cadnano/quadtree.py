@@ -1,101 +1,112 @@
-# dericed from MIT licensed
-# https://github.com/mdrasmus/compbio/blob/master/rasmus/quadtree.py
-# adds in joins
-
-class Quadtree:
-    MAX = 10
+"""
+derived from MIT licensed
+https://github.com/mdrasmus/compbio/blob/master/rasmus/quadtree.py
+adds in joins
+"""
+class Quadtree(object):
+    SPLIT_THRESHOLD = 10
     MAX_DEPTH = 20
 
     def __init__(self, x, y, size, depth=0):
         self.nodes = []     # if this is a leaf then len(nodes) > 0
         self.children = []  # if this is not a leaf then len(children) >= 0
-        self.center = [x, y]
+        self.center = (x, y)
         self.size = size
         self.depth = depth
 
-    def insert(self, item):
+    def insertNode(self, node):
+        nodes = self.nodes
         if len(self.children) == 0:
-            self.nodes.append(item)
-
-            if len(self.nodes) > self.MAX and self.depth < self.MAX_DEPTH:
+            nodes.append(node)
+            if len(nodes) > self.SPLIT_THRESHOLD and \
+                    self.depth < self.MAX_DEPTH:
                 self.split()
-                return item
+                return node
         else:
-            return self.insert_into_children(item)
+            return self.insertIntoChildren(node)
     # end def
 
-    def remove(self, item, update=True):
-        items, parents = self.query(item.rect)
+    def removeNode(self, node, update=True):
+        nodes, parents = self.query(node.rect())
         for i in range(len(parents)):
-            found_item = items[i]
-            if found_item == item:
+            found_node = nodes[i]
+            if found_node == node:
                 parent = parents[i]
-                parent.nodes.remove(item)
-                if update:
-                    parent.update()
+                parent.nodes.remove(node)
+                total_nodes = parent.getSize()
+                if total_nodes < self.SPLIT_THRESHOLD:
+                    parent.join()
+                return
     # end def
 
-    def update(self):
-        total_nodes = 0
+    # def update(self):
+    #     total_nodes = 0
 
-        if len(self.children) > 0:
-            for child in self.children:
-                total_nodes += child.update()
+    #     if len(self.children) > 0:
+    #         for child in self.children:
+    #             total_nodes += child.update()
 
-            if total_nodes <= self.join_threshold:
-                self.join()
-        else:
-            total_nodes = len(self.nodes)
+    #         if total_nodes < self.SPLIT_THRESHOLD:
+    #             self.join()
+    #     else:
+    #         total_nodes = len(self.nodes)
 
-            if total_nodes >= self.split_threshold:
-                if self.split():
-                    # If it split successfully, see if we can do it again
-                    self.update()
-        return total_nodes
+    #         if total_nodes > self.SPLIT_THRESHOLD and self.depth < self.MAX_DEPTH:
+    #             if self.split():
+    #                 # If it split successfully, see if we can do it again
+    #                 self.update()
+    #     return total_nodes
     # end def
 
-    def insert_into_children(self, item):
+    def insertIntoChildren(self, node):
 
         # if rect spans center then insert here
-        rect = item.rect()
-        if ((rect[0] <= self.center[0] and rect[2] > self.center[0]) and
-                (rect[1] <= self.center[1] and rect[3] > self.center[1])):
-            self.nodes.append(item)
-            return item
+        rect = node.rect()
+        x1, y1, x2, y2 = rect
+        x_center, y_center = self.center
+        children = self.children
+        if (x1 <= x_center and x2 > x_center) and \
+                (y1 <= y_center and y2 > y_center):
+            self.nodes.append(node)
+            return node
         else:
-
             # try to insert into children
-            if rect[0] <= self.center[0]:
-                if rect[1] <= self.center[1]:
-                    return self.children[0].insert(item, rect)
-                if rect[3] > self.center[1]:
-                    return self.children[1].insert(item, rect)
-            if rect[2] > self.center[0]:
-                if rect[1] <= self.center[1]:
-                    return self.children[2].insert(item, rect)
-                if rect[3] > self.center[1]:
-                    return self.children[3].insert(item, rect)
-            for child in self.children:
-                if child.box.containsPoint
+            if x1 <= x_center:
+                if y1 <= y_center:
+                    return children[0].insertNode(node)
+                if y2 > y_center:
+                    return children[1].insertNode(node)
+            if x2 > x_center:
+                if y1 <= y_center:
+                    return children[2].insertNode(node)
+                if y2 > y_center:
+                    return children[3].insertNode(node)
+    # end def
 
     def split(self):
-        self.children = [QuadTree(self.center[0] - self.size/2,
-                                  self.center[1] - self.size/2,
-                                  self.size/2, self.depth + 1),
-                         QuadTree(self.center[0] - self.size/2,
-                                  self.center[1] + self.size/2,
-                                  self.size/2, self.depth + 1),
-                         QuadTree(self.center[0] + self.size/2,
-                                  self.center[1] - self.size/2,
-                                  self.size/2, self.depth + 1),
-                         QuadTree(self.center[0] + self.size/2,
-                                  self.center[1] + self.size/2,
-                                  self.size/2, self.depth + 1)]
+        # if len(children) > 0:
+        #     return False
+        next_depth = self.depth + 1
+        next_size = self.size / 2
+        x_center, y_center = self.center
+        self.children = [QuadTree(x_center - next_size,
+                                  y_center - next_size,
+                                  next_size, next_depth),
+                         QuadTree(x_center - next_size,
+                                  y_center + next_size,
+                                  next_size, next_depth),
+                         QuadTree(x_center + next_size,
+                                  y_center - next_size,
+                                  next_size, next_depth),
+                         QuadTree(x_center + next_size,
+                                  y_center + next_size,
+                                  next_size, next_depth)]
 
         nodes = self.nodes
         self.nodes = []
         for node in nodes:
-            self.insert_into_children(item)
+            self.insertIntoChildren(node)
+        return True
     # end def
 
     def join(self):
@@ -111,39 +122,61 @@ class Quadtree:
         self.children = []  # just clear children Quadtrees
     # end def
 
-    def query(self, rect, item_results=None, parent_results=None):
+    def query(self, rect, node_results=None, parent_results=None):
 
-        if item_results is None:
-            item_results = []
+        if node_results is None:
+            node_results = []
             parent_results = []     # keep track of parents for deletion
 
         # search children
+        x1, y1, x2, y2 = rect
+        x_center, y_center = self.center
         if len(self.children) > 0:
-            if rect[0] <= self.center[0]:
-                if rect[1] <= self.center[1]:
-                    self.children[0].query(rect, item_results, parent_results)
-                if rect[3] > self.center[1]:
-                    self.children[1].query(rect, item_results, parent_results)
-            if rect[2] > self.center[0]:
-                if rect[1] <= self.center[1]:
-                    self.children[2].query(rect, item_results, parent_results)
-                if rect[3] > self.center[1]:
-                    self.children[3].query(rect, item_results, parent_results)
+            if x1 <= x_center:
+                if y1 <= y_center:
+                    self.children[0].query(rect, node_results, parent_results)
+                if y2] > y_center:
+                    self.children[1].query(rect, node_results, parent_results)
+            if x2 > x_center:
+                if y1 <= y_center:
+                    self.children[2].query(rect, node_results, parent_results)
+                if y2] > y_center:
+                    self.children[3].query(rect, node_results, parent_results)
         else:
             # search node at this level
-            for item in self.nodes:
-                if item.rect[2] > rect[0] and item.rect[0] <= rect[2] and
-                        item.rect[3] > rect[1] and item.rect[1] <= rect[3]:
-                    item_parent = self
-                    item_results.append(item)
-                    parent_results.append(item_parent)
-        return (item_results, parent_results)
+            for node in self.nodes:
+                x1, y1, x2, y2 = node.rect()
+                if x2 > rect[0] and x1 <= rect[2] and \
+                        y2 > rect[1] and y1 <= rect[3]:
+                    node_parent = self
+                    node_results.append(node)
+                    parent_results.append(node_parent)
+        return (node_results, parent_results)
     # end def
 
-    def get_size(self):
+    def getSize(self):
         size = 0
         for child in self.children:
-            size += child.get_size()
+            size += child.getSize()
         size += len(self.nodes)
         return size
     # end def
+
+if __name__ == '__main__':
+    class DummyNode(object):
+        def __init__(self, x, y, radius):
+            self.location = (x, y)
+            self.radius = radius
+        def rect(self):
+            radius = self.radius
+            x, y = self.location
+            return x - radius, y - radius, x + radius, y + radius
+
+    qt = QuadTree(0, 0, 100)
+    items = []
+
+    for i in range(100):
+        node = DummyNode(0, 0, 3)
+        items.append(node)
+        qt.insertNode(node)
+    print("Size of quadtree:", qt.getSize())
