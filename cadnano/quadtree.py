@@ -3,8 +3,8 @@ derived from MIT licensed
 https://github.com/mdrasmus/compbio/blob/master/rasmus/quadtree.py
 adds in joins and ability to remove nodes
 """
-class Quadtree(object):
-    """ QuadTree that has a configurable lower size limit of a box
+class QuadtreeBase(object):
+    """ QuadTreeBase that has a configurable lower size limit of a box
     set class min_size before using with:
 
     Quadtree.min_size = my_min_size
@@ -14,15 +14,15 @@ class Quadtree(object):
     """
     SPLIT_THRESHOLD = 10
     MAX_DEPTH = 20
-    min_size = 4 # lower limit of quad
 
-    def __init__(self, x, y, size, parent=None, depth=0):
+    def __init__(self, x, y, size, min_size, parent=None, depth=0):
         self.nodes = []     # if this is a leaf then len(nodes) > 0
         self.children = []  # if this is not a leaf then len(children) >= 0
         self.center = (x, y)
         self.size = size
-        self.depth = depth
+        self.min_size = min_size # lower limit of quadtree
         self.parent = parent
+        self.depth = depth
     # end def
 
     def insertNode(self, node):
@@ -56,20 +56,6 @@ class Quadtree(object):
                     parent_parent.join()
             return True
         return False
-
-        # nodes, parents = self.query(node.rect())
-        # for i in range(len(parents)):
-        #     found_node = nodes[i]
-        #     if found_node == node:
-        #         parent = parents[i]
-        #         parent.nodes.remove(node)
-        #         parent_parent = parent.parent
-        #         if parent_parent is not None:
-        #             total_nodes = parent_parent.getSize()
-        #             if total_nodes < self.SPLIT_THRESHOLD:
-        #                 parent_parent.join()
-        #         return True
-        # return False
     # end def
 
     def insertIntoChildren(self, node):
@@ -108,24 +94,28 @@ class Quadtree(object):
         quarter_size = next_size / 2
         min_size = self.min_size
         x_center, y_center = self.center
-        self.children = [Quadtree(x_center - quarter_size,
+        self.children = [QuadtreeBase(x_center - quarter_size,
                                   y_center - quarter_size,
                                   next_size,
+                                  min_size,
                                   self,
                                   next_depth),
-                         Quadtree(x_center - quarter_size,
+                         QuadtreeBase(x_center - quarter_size,
                                   y_center + quarter_size,
                                   next_size,
+                                  min_size,
                                   self,
                                   next_depth),
-                         Quadtree(x_center + quarter_size,
+                         QuadtreeBase(x_center + quarter_size,
                                   y_center - quarter_size,
                                   next_size,
+                                  min_size,
                                   self,
                                   next_depth),
-                         Quadtree(x_center + quarter_size,
+                         QuadtreeBase(x_center + quarter_size,
                                   y_center + quarter_size,
                                   next_size,
+                                  min_size,
                                   self,
                                   next_depth)]
 
@@ -149,26 +139,21 @@ class Quadtree(object):
         return True
     # end def
 
-    def query(self, rect, node_results=None, parent_results=None):
-
-        if node_results is None:
-            node_results = []
-            parent_results = []     # keep track of parents for deletion
-
+    def query(self, rect, node_results):
         # search children
         x1, y1, x2, y2 = rect
         x_center, y_center = self.center
         if len(self.children) > 0:
             if x1 <= x_center:
                 if y1 <= y_center:
-                    self.children[0].query(rect, node_results, parent_results)
+                    self.children[0].query(rect, node_results)
                 if y2 > y_center:
-                    self.children[1].query(rect, node_results, parent_results)
+                    self.children[1].query(rect, node_results)
             if x2 > x_center:
                 if y1 <= y_center:
-                    self.children[2].query(rect, node_results, parent_results)
+                    self.children[2].query(rect, node_results)
                 if y2 > y_center:
-                    self.children[3].query(rect, node_results, parent_results)
+                    self.children[3].query(rect, node_results)
 
         # search node at this level
         for node in self.nodes:
@@ -176,16 +161,14 @@ class Quadtree(object):
             nx1, ny1, nx2, ny2 = node.rect()
             if nx2 > x1 and nx1 <= x2 and \
                     ny2 > y1 and ny1 <= y2:
-                node_parent = self
-                node_results.append(node)
-                parent_results.append(node_parent)
-        return (node_results, parent_results)
+                node_results.add(node)
+        return node_results
     # end def
 
     def findNode(self, query_node):
         """ look for the exact node
         assumes same node doesn't exist more than once in Quadtree
-        return the Node and the nodes par
+        return the Node and the nodes parent
         """
         # search node at this level
         for node in self.nodes:
@@ -234,6 +217,37 @@ class Quadtree(object):
                 depth = new_depth
         return depth
     # end def
+# end class
+
+class Quadtree(QuadtreeBase):
+    def __init__(self, x, y, size, min_size=4):
+        super(Quadtree, self).__init__(x, y, size, min_size)
+        self._query_cache = {}
+    # end def
+
+    def queryNode(self, node):
+        qc = self._query_cache
+        rect = node.rect()
+        res = qc.get(rect)
+        if node in qc:
+            return qc.get(rect)
+        else:
+            node_results = set()
+            res = QuadtreeBase.query(self, node.rect(), node_results)
+            qc[rect] =  res
+            return res
+    # end def
+
+    def removeNode(self, node):
+        self._query_cache = {} # clear cache
+        return QuadtreeBase.removeNode(self, node)
+    # end def
+
+    def insertNode(self, node):
+        self._query_cache = {} # clear cache
+        return QuadtreeBase.insertNode(self, node)
+    # end def
+# end class
 
 if __name__ == '__main__':
     class DummyNode(object):
