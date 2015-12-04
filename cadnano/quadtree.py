@@ -4,8 +4,14 @@ https://github.com/mdrasmus/compbio/blob/master/rasmus/quadtree.py
 adds in joins
 """
 class Quadtree(object):
+    """ QuadTree that has a configurable lower size limit of a box
+    set class min_size before using with:
+
+    Quadtree.min_size = my_min_size
+    """
     SPLIT_THRESHOLD = 10
     MAX_DEPTH = 20
+    min_size = 1 # lower limit of quad
 
     def __init__(self, x, y, size, depth=0):
         self.nodes = []     # if this is a leaf then len(nodes) > 0
@@ -13,13 +19,16 @@ class Quadtree(object):
         self.center = (x, y)
         self.size = size
         self.depth = depth
+    # end def
 
     def insertNode(self, node):
+        """
+        """
         nodes = self.nodes
         if len(self.children) == 0:
             nodes.append(node)
             if len(nodes) > self.SPLIT_THRESHOLD and \
-                    self.depth < self.MAX_DEPTH:
+                    self.size > self.min_size:
                 self.split()
                 return node
         else:
@@ -88,19 +97,23 @@ class Quadtree(object):
         #     return False
         next_depth = self.depth + 1
         next_size = self.size / 2
+        min_size = self.min_size
         x_center, y_center = self.center
         self.children = [QuadTree(x_center - next_size,
                                   y_center - next_size,
                                   next_size, next_depth),
                          QuadTree(x_center - next_size,
                                   y_center + next_size,
-                                  next_size, next_depth),
+                                  next_size,
+                                  next_depth),
                          QuadTree(x_center + next_size,
                                   y_center - next_size,
-                                  next_size, next_depth),
+                                  next_size,
+                                  next_depth),
                          QuadTree(x_center + next_size,
                                   y_center + next_size,
-                                  next_size, next_depth)]
+                                  next_size,
+                                  next_depth)]
 
         nodes = self.nodes
         self.nodes = []
@@ -145,9 +158,9 @@ class Quadtree(object):
         else:
             # search node at this level
             for node in self.nodes:
-                x1, y1, x2, y2 = node.rect()
-                if x2 > rect[0] and x1 <= rect[2] and \
-                        y2 > rect[1] and y1 <= rect[3]:
+                nx1, ny1, nx2, ny2 = node.rect()
+                if nx2 > x1 and nx1 <= x2 and \
+                        ny2 > y1 and ny1 <= y3:
                     node_parent = self
                     node_results.append(node)
                     parent_results.append(node_parent)
