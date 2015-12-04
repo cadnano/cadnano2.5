@@ -267,6 +267,7 @@ if __name__ == '__main__':
         items.append(node)
         qt.insertNode(node)
     print("Size of quadtree:", qt.getSize(), qt.getDepth())
+    print([x.rect() for x in qt.queryNode(items[50])])
     for item in items:
         did_remove = qt.removeNode(item)
         if not did_remove:
