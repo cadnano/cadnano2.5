@@ -74,7 +74,9 @@ class VirtualHelix(ProxyObject):
         """ return tuple of:
         (x_lower_left, y_lower_left, x_upper_right, y_upper_right)
         """
-        radius = self._part.radius()
+        # increase bounding box to
+        # collide with neighbors
+        radius = 1.1*self._part.radius()
         x, y, z = self._location
         return x - radius, y - radius, x + radius, y + radius
     # end def
