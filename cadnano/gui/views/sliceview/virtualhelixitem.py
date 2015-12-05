@@ -59,12 +59,6 @@ class PropertyWrapperObject(QObject):
         self._item = item
         self._animations = {}
 
-    def __get_rotation(self):
-        return self._item.rotation()
-
-    def __set_rotation(self, angle):
-        self._item.setRotation(angle)
-
     def __get_bondP2(self):
         return self._item.line().p2()
 
@@ -72,27 +66,55 @@ class PropertyWrapperObject(QObject):
         line = QLineF(0,0,p2.x(),p2.y())
         self._item.setLine(line)
 
+    def __get_rotation(self):
+        return self._item.rotation()
+
+    def __set_rotation(self, angle):
+        self._item.setRotation(angle)
+
+    def __get_penAlpha(self):
+        return self._item.pen().color().alpha()
+ 
+    def __set_penAlpha(self, alpha):
+        pen = QPen(self._item.pen())
+        color = QColor(self._item.pen().color())
+        color.setAlpha(alpha)
+        pen.setColor(color)
+        self._item.setPen(pen)
+
     def saveRef(self, property_name, animation):
         self._animations[property_name] = animation
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
+    pen_alpha = pyqtProperty(int, __get_penAlpha, __set_penAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
 # end class
 
 class Triangle(QGraphicsPathItem):
-    def __init__(self, painter_path, parent=None):
-        super(QGraphicsPathItem, self).__init__(painter_path, parent)
+    def __init__(self, is_fwd, parent=None):
+        super(QGraphicsPathItem, self).__init__(parent)
+        color = parent._color
         self.adapter = PropertyWrapperObject(self)
-        self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
+        if is_fwd:
+            self.setPath(FWDPXI_PP)
+            self.setPen(getNoPen())
+            self.setBrush(getBrushObj(color, alpha=128))
+        else:
+            self.setPath(REVPXI_PP)
+            self.setPen(getPenObj(color, 0.25, alpha=128))
     # end def
 # end class
 
 class PhosBond(QGraphicsLineItem):
-    def __init__(self, parent=None):
+    def __init__(self, is_fwd, parent=None):
         super(PhosBond, self).__init__(parent)
         self.adapter = PropertyWrapperObject(self)
-        # self.setPen(getNoPen())
+        color = parent._color
+        if is_fwd: # lighter solid
+            self.setPen(getPenObj(color, 0.25, alpha=42, capstyle=Qt.RoundCap))
+        else: # darker, dotted
+            self.setPen(getPenObj(color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
     # end def
 # end class
 
@@ -104,27 +126,12 @@ class PreXoverItem(QGraphicsPathItem):
         self._is_fwd = is_fwd
         self._parent = parent
         self._default_line = QLineF()
-        self._bond_line = PhosBond(self)
-        self._default_p2 = QPointF(0.001,0.001)
-        # self._bond_line = QGraphicsLineItem(self)
-        # self._bond_line.hide()
-        self.adapter = PropertyWrapperObject(self)
+        self._default_p2 = QPointF(0,0)
+        self._bond_line = PhosBond(is_fwd, self)
+        self._phos_item = Triangle(is_fwd, self)
+        # self.adapter = PropertyWrapperObject(self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
-
-        if self._is_fwd:
-            phos = Triangle(FWDPXI_PP, self)
-            phos.setBrush(getBrushObj(self._color, alpha=128))
-            self._bond_pen = getPenObj(self._color, 0.25, alpha=42, capstyle=Qt.RoundCap)
-            self._active_pen = getPenObj(self._color, 0.25, alpha=128, capstyle=Qt.RoundCap)
-            self._bond_line.setPen(self._bond_pen)
-        else:
-            phos = Triangle(REVPXI_PP, self)
-            phos.setPen(getPenObj(self._color, 0.25, alpha=128))
-            self._bond_pen = getPenObj(self._color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
-            self._active_pen = getPenObj(self._color, 0.25, alpha=128, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
-            self._bond_line.setPen(self._bond_pen)
-        self._phos_item = phos
     # end def
 
     ### ACCESSORS ###
@@ -173,16 +180,18 @@ class PreXoverItem(QGraphicsPathItem):
     def setActiveBondPos(self, is_active):
         phos = self._phos_item
         bond = self._bond_line
-
         if is_active:
-            bond.setPen(self._active_pen)
             angle = -90 if self._is_fwd else 90
-            self.animate(phos, 'rotation', 500, 0, angle)
-            self.animate(bond, 'bondp2', 500, self._default_p2, self._active_p2)
+            self.animate(phos, 'rotation', 300, 0, angle)
+            self.animate(bond, 'bondp2', 300, self._default_p2, self._active_p2)
+            alpha = 42 if self._is_fwd else 64
+            self.animate(bond, 'pen_alpha', 300, alpha, 180)
         else:
-            bond.setPen(self._bond_pen)
-            self.animate(phos, 'rotation', 500, phos.rotation(), 0)
-            self.animate(bond, 'bondp2', 500, bond.line().p2(), self._default_p2)
+            self.animate(phos, 'rotation', 300, phos.rotation(), 0)
+            self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2)
+            start_alpha = bond.pen().color().alpha()
+            end_alpha = 42 if self._is_fwd else 64
+            self.animate(bond, 'pen_alpha', 300, start_alpha, end_alpha)
     # end def
 
     def setDefaultBondPos(self, scenePos):
@@ -197,16 +206,6 @@ class PreXoverItem(QGraphicsPathItem):
 
     def updateItemApperance(self, is_active):
         self.setActiveBondPos(is_active)
-        if is_active:
-            if self._is_fwd:
-                self.setBrush(getBrushObj(self._color))
-            else:
-                self.setPen(getPenObj(self._color, 0.25))
-        else:
-            if self._is_fwd:
-                self.setBrush(getBrushObj(self._color, alpha=128))
-            else:
-                self.setPen(getPenObj(self._color, 0.25, alpha=128))
     # end def
 # end class
 

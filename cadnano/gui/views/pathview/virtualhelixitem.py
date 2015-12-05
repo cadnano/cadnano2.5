@@ -51,7 +51,6 @@ class PropertyWrapperObject(QObject):
         brush = QBrush(self._item.brush())
         color = QColor(brush.color())
         color.setAlpha(alpha)
-
         self._item.setBrush(QBrush(color))
 
     def __get_rotation(self):
