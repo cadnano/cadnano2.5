@@ -2,8 +2,8 @@ from math import sqrt, atan2, degrees, pi
 
 import cadnano.util as util
 
-from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
-# from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
+from PyQt5.QtCore import QEvent, QLineF, QObject, QPointF, Qt, QRectF
+from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsItem
@@ -53,6 +53,49 @@ FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
 REVPXI_PP.addPolygon(T270.map(TRIANGLE))
 
 
+class PropertyWrapperObject(QObject):
+    def __init__(self, item):
+        super(PropertyWrapperObject, self).__init__()
+        self._item = item
+        self._animations = {}
+
+    def __get_rotation(self):
+        return self._item.rotation()
+
+    def __set_rotation(self, angle):
+        self._item.setRotation(angle)
+
+    def __get_bondP2(self):
+        return self._item.line().p2()
+
+    def __set_bondP2(self, p2):
+        line = QLineF(0,0,p2.x(),p2.y())
+        self._item.setLine(line)
+
+    def saveRef(self, property_name, animation):
+        self._animations[property_name] = animation
+
+    bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
+    rotation = pyqtProperty(float, __get_rotation, __set_rotation)
+# end class
+
+class Triangle(QGraphicsPathItem):
+    def __init__(self, painter_path, parent=None):
+        super(QGraphicsPathItem, self).__init__(painter_path, parent)
+        self.adapter = PropertyWrapperObject(self)
+        self.setPen(getNoPen())
+        self.setAcceptHoverEvents(True)
+    # end def
+# end class
+
+class PhosBond(QGraphicsLineItem):
+    def __init__(self, parent=None):
+        super(PhosBond, self).__init__(parent)
+        self.adapter = PropertyWrapperObject(self)
+        # self.setPen(getNoPen())
+    # end def
+# end class
+
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, is_fwd=True, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
@@ -61,23 +104,27 @@ class PreXoverItem(QGraphicsPathItem):
         self._is_fwd = is_fwd
         self._parent = parent
         self._default_line = QLineF()
-        self._bond_line = QGraphicsLineItem(self)
-        self._bond_line.hide()
+        self._bond_line = PhosBond(self)
+        self._default_p2 = QPointF(0.001,0.001)
+        # self._bond_line = QGraphicsLineItem(self)
+        # self._bond_line.hide()
+        self.adapter = PropertyWrapperObject(self)
         self.setAcceptHoverEvents(True)
+        self.setFiltersChildEvents(True)
+
         if self._is_fwd:
-            self.setPath(FWDPXI_PP)
-            self.setPen(getNoPen())
-            self.setBrush(getBrushObj(self._color, alpha=128))
+            phos = Triangle(FWDPXI_PP, self)
+            phos.setBrush(getBrushObj(self._color, alpha=128))
             self._bond_pen = getPenObj(self._color, 0.25, alpha=42, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, capstyle=Qt.RoundCap)
             self._bond_line.setPen(self._bond_pen)
         else:
-            self.setPath(REVPXI_PP)
-            self.setPen(getPenObj(self._color, 0.25, alpha=128))
-            self.setBrush(getNoBrush())
+            phos = Triangle(REVPXI_PP, self)
+            phos.setPen(getPenObj(self._color, 0.25, alpha=128))
             self._bond_pen = getPenObj(self._color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
             self._active_pen = getPenObj(self._color, 0.25, alpha=128, penstyle=Qt.DotLine, capstyle=Qt.RoundCap)
             self._bond_line.setPen(self._bond_pen)
+        self._phos_item = phos
     # end def
 
     ### ACCESSORS ###
@@ -99,6 +146,7 @@ class PreXoverItem(QGraphicsPathItem):
 
     def setBondLineLength(self, value):
         self._bond_line_len = value
+        self._active_p2 = QPointF(value, 0)
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
@@ -111,26 +159,37 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
+    def animate(self, item, property_name, duration, start_value, end_value):
+        b_name = property_name.encode('ascii')
+        anim = QPropertyAnimation(item.adapter, b_name)
+        anim.setDuration(duration)
+        anim.setStartValue(start_value)
+        anim.setEndValue(end_value)
+        anim.start()
+        item.adapter.saveRef(property_name, anim)
+
 
     ### PUBLIC SUPPORT METHODS ###
     def setActiveBondPos(self, is_active):
+        phos = self._phos_item
+        bond = self._bond_line
+
         if is_active:
-            self._bond_line.setLine(QLineF(0,0,self._bond_line_len,0))
-            # self._bond_line.setLine(QLineF(0,self._bond_p1_offset,self._bond_line_len,0))
-            self._bond_line.setPen(self._active_pen)
-            self._bond_line.show()
-        elif self._default_line:
-            self._bond_line.setLine(self._default_line)
-            self._bond_line.setPen(self._bond_pen)
-            self._bond_line.show()
+            bond.setPen(self._active_pen)
+            angle = -90 if self._is_fwd else 90
+            self.animate(phos, 'rotation', 500, 0, angle)
+            self.animate(bond, 'bondp2', 500, self._default_p2, self._active_p2)
         else:
-            self._bond_line.hide()
+            bond.setPen(self._bond_pen)
+            self.animate(phos, 'rotation', 500, phos.rotation(), 0)
+            self.animate(bond, 'bondp2', 500, bond.line().p2(), self._default_p2)
     # end def
 
     def setDefaultBondPos(self, scenePos):
         p1 = QPointF(0,0)
         # p1 = QPointF(0,self._bond_p1_offset)
         p2 = self.mapFromScene(scenePos)
+        self._default_p2 = p2
         self._default_line = QLineF(p1,p2)
         self._bond_line.setLine(self._default_line)
         self._bond_line.show()
@@ -219,6 +278,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             rev, next_rev = self.rev_prexo_items[j], self.rev_prexo_items[j-1]
             fwd.setDefaultBondPos(next_fwd.scenePos())
             rev.setDefaultBondPos(next_rev.scenePos())
+
+
     # end def
 
     def _get_colors(self):
@@ -627,6 +688,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                 new_active_item = _pxig.getItem(is_fwd, step_idx)
                 _pxig.updateViewActivePhos(new_active_item)
                 self.updateNeighborsNearActivePhos(new_active_item, True)
+                self.setZValue(_ZVALUE+1)
             else:
                 self.updateNeighborsNearActivePhos(_pxig._active_item, False)
                 _pxig.updateViewActivePhos(None)

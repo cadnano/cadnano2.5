@@ -1,8 +1,7 @@
-from math import ceil
+
 
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QValidator, QIntValidator
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 from PyQt5.QtWidgets import QSpinBox, QSlider

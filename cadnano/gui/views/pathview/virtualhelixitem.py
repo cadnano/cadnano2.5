@@ -232,9 +232,7 @@ class PreXoverItem(QGraphicsRectItem):
             # self._phos_item.setRotation(0)
     # end def
 
-
     def animate(self, item, property_name, duration, start_value, end_value):
-        item.adapter
         b_name = property_name.encode('ascii')
         anim = QPropertyAnimation(item.adapter, b_name)
         anim.setDuration(duration)
