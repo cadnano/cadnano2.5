@@ -6,6 +6,7 @@ from uuid import uuid4
 izip = zip
 
 from cadnano import util
+from cadnano.quadtree import Quadtree
 from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoCommand
@@ -65,7 +66,8 @@ class NucleicAcidPart(Part):
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
         self._oligos = set()
-        self._coord_to_virtual_velix = {}
+        self._quadtree = Quadtree(0, 0, 100, min_size=(4.1*self._RADIUS))
+        self._coord_to_virtual_helix = {}
         self._number_to_virtual_helix = {}
         # Dimensions
         self._max_row = 50  # subclass overrides based on prefs
@@ -173,7 +175,11 @@ class NucleicAcidPart(Part):
         if type(vhref) in (int,):
             vh = self._number_to_virtual_helix.get(vhref, None)
         elif type(vhref) in (tuple, list):
-            vh = self._coord_to_virtual_velix.get(vhref, None)
+            radius = self._RADIUS
+            x, y = self.latticeCoordToPositionXY(*vhref)
+            rect = (x - radius, y - radius, x + radius, y + radius)
+            vh, _ = self._quadtree.findNodeByRect(rect)
+            # vh = self._coord_to_virtual_velix.get(vhref, None)
         else:
             vh = vhref
         if not isinstance(vh, VirtualHelix):
@@ -219,7 +225,9 @@ class NucleicAcidPart(Part):
 
     def getVirtualHelices(self):
         """yield an iterator to the virtual_helix references in the part"""
-        return self._coord_to_virtual_velix.values()
+        for vh in self._quadtree:
+            yield vh
+        # return self._coord_to_virtual_velix.values()
     # end def
 
     def indexOfRightmostNonemptyBase(self):
@@ -290,10 +298,18 @@ class NucleicAcidPart(Part):
         Looks for a virtual_helix at the coordinate, coord = (row, colum)
         if it exists it is returned, else None is returned
         """
-        try:
-            return self._coord_to_virtual_velix[coord]
-        except:
+        radius = self._RADIUS
+        x, y = self.latticeCoordToPositionXY(*coord)
+        rect = (x - radius, y - radius, x + radius, y + radius)
+        res = self._quadtree.findNodeByRect(rect)
+        if res is not None:
+            return res[0]
+        else:
             return None
+        # try:
+        #     return self._coord_to_virtual_velix[coord]
+        # except:
+        #     return None
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
@@ -477,7 +493,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def removeVirtualHelices(self, use_undostack=True):
-        vhs = [vh for vh in self._coord_to_virtual_velix.values()]
+        # vhs = [vh for vh in self._coord_to_virtual_velix.values()]
+        vhs = [vh for vh in self._quadtree]
         for vh in vhs:
             vh.remove(use_undostack)
         # end for
@@ -501,7 +518,8 @@ class NucleicAcidPart(Part):
         # remove strands and oligos
         self.removeAllOligos(use_undostack)
         # remove VHs
-        vhs = [v for v in self._coord_to_virtual_velix.values()]
+        # vhs = [v for v in self._coord_to_virtual_velix.values()]
+        vhs = [vh for vh in self._quadtree]
         for vh in vhs:
             d = RemoveVirtualHelixCommand(self, vh)
             if use_undostack:
@@ -877,6 +895,7 @@ class NucleicAcidPart(Part):
         private method for adding a virtual_helix to the Parts data structure
         of virtual_helix references
         """
+        self._quadtree.insertNode(virtual_helix)
         self._coord_to_virtual_velix[virtual_helix.coord()] = virtual_helix
     # end def
 
@@ -885,6 +904,7 @@ class NucleicAcidPart(Part):
         private method for adding a virtual_helix to the Parts data structure
         of virtual_helix references
         """
+        self._quadtree.removeNode(virtual_helix)
         del self._coord_to_virtual_velix[virtual_helix.coord()]
     # end def
 
