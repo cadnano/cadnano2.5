@@ -34,7 +34,8 @@ class VirtualHelix(ProxyObject):
                             'scamZ':0, 
                             'active_phos':None,
                             'neighbor_active_angle':'',
-                            'neighbors':''} # use so we can split() later
+                            'neighbors':'',
+                            'z':0}
 
         # rotate to honeycomb defaults
         # if self.isEvenParity():

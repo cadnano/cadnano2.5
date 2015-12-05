@@ -1,14 +1,20 @@
+from math import ceil
+
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtGui import QValidator, QIntValidator
 from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
-from PyQt5.QtWidgets import QDoubleSpinBox, QSlider
+from PyQt5.QtWidgets import QSpinBox, QSlider
 
+from cadnano import util
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.customwidgets.stepwisespinbox import StepwiseSpinBox
 
 from .cnpropertyitem import CNPropertyItem
+
 
 class NucleicAcidPartItem(CNPropertyItem, AbstractPartItem):
     def __init__(self, model_part, parent, key=None):
@@ -17,9 +23,8 @@ class NucleicAcidPartItem(CNPropertyItem, AbstractPartItem):
             self._controller = NucleicAcidPartItemController(self, model_part)
     # end def
 
-    # SLOTS
+    ### SLOTS ###
     def partRemovedSlot(self, sender):
-        # self.parent.removePartItem(self)
         self._cn_model = None
         self._controller.disconnectSignals()
         self._controller = None
@@ -34,28 +39,28 @@ class NucleicAcidPartItem(CNPropertyItem, AbstractPartItem):
         self.setSelected(is_selected)
     # end def
 
-
-    def itemType(self):
-        return ItemType.NUCLEICACID
+    ### PRIVATE SUPPORT METHODS ###
+    def _setCrossoverSpanAngle(self, new_value):
+        self._cn_model.setProperty('crossover_span_angle', new_value)
     # end def
 
+    ### PUBLIC METHODS ###
     def configureEditor(self, parent_QWidget, option, model_index):
-        m_vh = self._cn_model
+        part = self._cn_model
         key = self.key()
         if key == 'crossover_span_angle':
-            # editor = QDoubleSpinBox(parent_QWidget)
-            # editor.setDecimals(0)
             editor = QSlider(Qt.Horizontal, parent_QWidget)
             editor.setRange(5, 60)
-            editor.valueChanged.connect(self.setCrossoverSpanAngle)
+            editor.valueChanged.connect(self._setCrossoverSpanAngle) # fire immediately
+        elif key == 'max_vhelix_length':
+            step_size = part.stepSize()
+            editor = StepwiseSpinBox(step_size*2, 10000, step_size, parent_QWidget)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor
     # end def
 
-    def setCrossoverSpanAngle(self, new_value):
-        self._cn_model.setProperty('crossover_span_angle', new_value)
-        # self.setValue('crossover_span_angle', new_value)
+    def itemType(self):
+        return ItemType.NUCLEICACID
     # end def
-
 # end class

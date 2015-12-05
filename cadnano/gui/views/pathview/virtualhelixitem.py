@@ -22,6 +22,7 @@ from . import pathstyles as styles
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _BASE_RECT = QRectF(0,0,_BASE_WIDTH,_BASE_WIDTH)
+_VH_XOFFSET = styles.VH_XOFFSET
 
 PHOS_ITEM_WIDTH = 0.25*_BASE_WIDTH
 TRIANGLE = QPolygonF()
@@ -284,10 +285,11 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self.setRect(0, 0, bw*canvas_size, bw2)
     # end def
 
-    def _rm_last_n_pxitems(self, n):
-        for i in range(n):
-            self.scene().removeItem(self._fwd_pxo_items.pop(-1))
-            self.scene().removeItem(self._fwd_pxo_items.pop(-1))
+    def _rm_pxitems_after(self, new_max):
+        # print("_rm_last_n_pxitems", n, len(self._fwd_pxo_items))
+        for i in range(new_max+1, self._max_base+1):
+            self.scene().removeItem(self._fwd_pxo_items.pop(i))
+            self.scene().removeItem(self._rev_pxo_items.pop(i))
     # end def
 
     def _vh_name(self):
@@ -306,14 +308,14 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
     def resize(self):
         part = self._parent.part()
-        old_max = self._max_base
+        old_max = self._parent._max_base
         new_max = part.maxBaseIdx()
         if new_max == old_max:
             return
         elif new_max > old_max:
-            self._add_pxitems(old_max, new_max, part.stepSize())
+            self._add_pxitems(old_max+1, new_max, part.stepSize())
         else:
-            self._rm_last_n_pxitems(old_max-new_max)
+            self._rm_pxitems_after(new_max)
         self._max_base = new_max
     # end def
 
@@ -403,6 +405,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
 
+        self._max_base = self.part().maxBaseIdx()
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
         self._activephositem = ActivePhosItem(self)
     # end def
@@ -442,10 +445,14 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     # end def
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
-        if property_key == 'eulerZ':
+        if property_key == 'z':
+            z = float(new_value)
+            self.setX(z)
+            self._handle.setX(z-_VH_XOFFSET)
+            self.part().partDimensionsChangedSignal.emit(self.part())
+        elif property_key == 'eulerZ':
             self._handle.rotateWithCenterOrigin(new_value)
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
-
         elif property_key == 'active_phos':
             hpxig = self._handle._prexoveritemgroup
             if new_value:
@@ -629,6 +636,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.refreshPath()
         self._prexoveritemgroup.resize()
         self._activephositem.resize()
+        self._max_base = self.part().maxBaseIdx()
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive(self, idx):

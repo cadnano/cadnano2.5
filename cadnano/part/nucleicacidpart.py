@@ -76,9 +76,10 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties['name'] = 'Origami%d' % self._count()
-        self._properties['crossover_span_angle'] = 30
-        self._properties['neighbor_active_angle'] = ''
         self._properties['active_phos'] = None
+        self._properties['crossover_span_angle'] = 30
+        self._properties['max_vhelix_length'] = self._STEP*2
+        self._properties['neighbor_active_angle'] = ''
 
         # ID assignment
         self.odd_recycle_bin, self.even_recycle_bin = [], []
@@ -849,7 +850,6 @@ class NucleicAcidPart(Part):
     # end def
 
     def resizeVirtualHelices(self, min_delta, max_delta, use_undostack=True):
-        """docstring for resizeVirtualHelices"""
         c = ResizePartCommand(self, min_delta, max_delta)
         util.execCommandList(self, [c], desc="Resize part", \
                                                     use_undostack=use_undostack)
