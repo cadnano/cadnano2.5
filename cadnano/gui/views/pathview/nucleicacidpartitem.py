@@ -26,7 +26,7 @@ _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 _BOUNDING_RECT_PADDING = 20
 
-_VH_XOFFSET = styles.VIRTUALHELIXHANDLEITEM_RADIUS + 100
+_VH_XOFFSET = styles.VH_XOFFSET
 
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering"""
@@ -54,7 +54,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
         self._initModifierRect()
-        self._initResizeButtons()
+        # self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         # self.setBrush(QBrush(Qt.NoBrush))
@@ -63,11 +63,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def proxy(self):
         return self._proxy_parent
     # end def
-
-    # def paint(self, painter, option, widget):
-    #     print("paint NucleicAcidPartItem")
-    #     QGraphicsRectItem.paint(self, painter, option, widget)
-    # # end def
 
     def modelColor(self):
         return self._model_props['color']
@@ -105,7 +100,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partParentChangedSlot(self, sender):
         """docstring for partParentChangedSlot"""
-        # print "NucleicAcidPartItem.partParentChangedSlot"
         pass
     # end def
 
@@ -114,12 +108,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #end def
 
     def partDimensionsChangedSlot(self, part):
-        if len(self._virtual_helix_item_list) > 0:
-            vhi = self._virtual_helix_item_list[0]
-            vhi_rect = vhi.boundingRect()
-            vhi_h_rect = vhi.handle().boundingRect()
-            self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
-            self._vh_rect.setRight(vhi_rect.right())
         self.scene().views()[0].zoomToFit()
         self._active_slice_item.resetBounds()
         self._updateBoundingRect()
@@ -143,6 +131,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 self._updateBoundingRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
+            elif property_key == 'max_vhelix_length':
+                vhis = self._virtual_helix_item_list
+                if vhis:
+                    old_value = vhis[0]._max_base+1
+                    delta = int(new_value)-old_value
+                    self.part().resizeVirtualHelices(0, delta)
+                    for vhi in vhis:
+                        vhi.resize()
+                self._updateBoundingRect()
     # end def
 
     def partRemovedSlot(self, sender):
@@ -180,7 +177,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
         """
-        # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
         self._virtual_helix_hash[vh.coord()] = vhi
@@ -337,6 +333,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         position them as well.
         """
         y = 0  # How far down from the top the next PH should be
+        _z = 0
         leftmost_extent = 0
         rightmost_extent = 0
 
@@ -345,7 +342,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot._vhi_h_selection_group
         for vhi in new_list:
-            vhi.setPos(0, y)
+            vh = vhi.virtualHelix()
+            _z = vh.getProperty('z')
+            vhi.setPos(_z, y)
             if vhi_rect is None:
                 vhi_rect = vhi.boundingRect()
                 step = vhi_rect.height() + styles.PATH_HELIX_PADDING
@@ -362,16 +361,18 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             if vhi_h_rect is None:
                 vhi_h_rect = vhi_h.boundingRect()
 
-            vhi_h.setPos(-2 * vhi_h_rect.width(), y + (vhi_rect.height() - vhi_h_rect.height()) / 2)
+            vhi_h_x = _z-_VH_XOFFSET
+            vhi_h_y = y+(vhi_rect.height() - vhi_h_rect.height()) / 2
+            vhi_h.setPos(vhi_h_x, vhi_h_y)
 
-            leftmost_extent = min(leftmost_extent, -2 * vhi_h_rect.width())
+            leftmost_extent = min(leftmost_extent, vhi_h_x)
             rightmost_extent = max(rightmost_extent, vhi_rect.width())
             y += step
             self.updateXoverItems(vhi)
             if do_reselect:
                 vhi_h_selection_group.addToGroup(vhi_h)
         # end for
-        self._vh_rect = QRectF(leftmost_extent, -10, -leftmost_extent + rightmost_extent, y)
+
         self._virtual_helix_item_list = new_list
         if zoom_to_fit:
             self.scene().views()[0].zoomToFit()
@@ -397,26 +398,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """
         self.setPen(getPenObj(self.modelColor(), 0))
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
-
-        # self.setRect(self.childrenBoundingRect())
+        self._vh_rect = self.childrenBoundingRect()
         _p = _BOUNDING_RECT_PADDING
-        self.setRect(self._vh_rect.adjusted(-_p/2,-_p,_p,-_p/2))
-        # move and show or hide the buttons if necessary
-        add_button = self._add_bases_button
-        rm_button = self._remove_bases_button
-
-        if len(self._virtual_helix_item_list) > 0:
-            addRect = add_button.boundingRect()
-            rmRect = rm_button.boundingRect()
-            x = self._vh_rect.right()
-            y = -styles.PATH_HELIX_PADDING
-            add_button.setPos(x, y)
-            rm_button.setPos(x-rmRect.width(), y)
-            add_button.show()
-            rm_button.show()
-        else:
-            add_button.hide()
-            rm_button.hide()
+        self.setRect(self._vh_rect.adjusted(-_p,-_p,_p,_p))
     # end def
 
     ### PUBLIC METHODS ###

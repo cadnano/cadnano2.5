@@ -418,8 +418,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.createArrows()
         self.updateAppearance()
 
-        self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-        self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+        self._virtual_helix.setProperty('x', ehi.mapToScene(0,0).x())
+        self._virtual_helix.setProperty('y', ehi.mapToScene(0,0).y())
 
         _pxig.setTransformOriginPoint(_RECT.center())
         _pxig.setRotation(self._virtual_helix.getProperty('eulerZ'))
@@ -493,8 +493,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             p = self.mapToScene(event.pos()) - self._button_down_pos
             self._empty_helix_item.setPos(p)
             ehi = self._empty_helix_item
-            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+            self._virtual_helix.setProperty('x', ehi.mapToScene(0,0).x())
+            self._virtual_helix.setProperty('y', ehi.mapToScene(0,0).y())
             self.refreshCollidingItems()
     # end def
 
@@ -504,8 +504,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             p = self.mapToScene(event.pos()) - self._button_down_pos
             self._empty_helix_item.setPos(p)
             ehi = self._empty_helix_item
-            self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-            self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
+            self._virtual_helix.setProperty('x', ehi.mapToScene(0,0).x())
+            self._virtual_helix.setProperty('y', ehi.mapToScene(0,0).y())
             self.refreshCollidingItems()
     # end def
 
@@ -613,10 +613,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             eulerZ = self._virtual_helix.getProperty('eulerZ') 
             if eulerZ != new_value: 
                 self._virtual_helix.setProperty('eulerZ', new_value)
-        elif property_key == 'ehiX':
+        elif property_key == 'x':
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(new_value, ehi_pos.y())
-        elif property_key == 'ehiY':
+        elif property_key == 'y':
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
         elif property_key == 'active_phos':

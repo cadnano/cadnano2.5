@@ -76,10 +76,9 @@ class Part(ProxyObject):
         self.view_properties = {} #self._document.newViewProperties()
 
         self._properties = {}
-        self._properties["name"] = "Part%d" % len(self._document.children())
-        self._properties["color"] = "#000000" # outlinerview will override from styles
-        self._properties["visible"] = True
-        self._properties["circular"] = True
+        self._properties['name'] = "Part%d" % len(self._document.children())
+        self._properties['color'] = "#000000" # outlinerview will override from styles
+        self._properties['visible'] = True
 
         # Selections
         self._selections = {}
@@ -118,8 +117,6 @@ class Part(ProxyObject):
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, ProxyObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
-    # partVirtualHelixAddedSignal = ProxySignal(object, ProxyObject,
-    #                     name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixAddedSignal = ProxySignal(object, object,
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,

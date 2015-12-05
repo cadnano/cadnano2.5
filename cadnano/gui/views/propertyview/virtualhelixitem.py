@@ -9,8 +9,10 @@ from PyQt5.QtWidgets import QDoubleSpinBox, QSlider
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.gui.views.pathview import pathstyles
 
 from .cnpropertyitem import CNPropertyItem
+
 
 class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     def __init__(self, model_virtual_helix, parent, key=None):
@@ -38,6 +40,9 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     def setEulerZ(self, new_value):
         self._cn_model.setProperty('eulerZ', new_value)
 
+    def setZ(self, new_value):
+        self._cn_model.setProperty('z', new_value)
+
     def configureEditor(self, parent_QWidget, option, model_index):
         m_vh = self._cn_model
         key = self.key()
@@ -47,19 +52,22 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
             editor = QSlider(Qt.Horizontal, parent_QWidget)
             editor.setRange(0, 359)
             editor.valueChanged.connect(self.setEulerZ)
-            # editor = QDoubleSpinBox(parent_QWidget)
-            # editor.setDecimals(0)
-            # editor.setRange(0,359)
         elif key == 'scamZ':
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setSingleStep(m_vh.part().twistPerBase())
             editor.setDecimals(1)
             editor.setRange(0,359)
-        elif key in ['ehiX', 'ehiY']:
+        elif key in ['x', 'y']:
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setSingleStep(5)
             editor.setDecimals(4)
             editor.setRange(0,1000)
+        elif key == 'z':
+            editor = QDoubleSpinBox(parent_QWidget)
+            editor.setSingleStep(pathstyles.PATH_BASE_WIDTH)
+            editor.setDecimals(4)
+            editor.setRange(-9999,9999)
+            editor.valueChanged.connect(self.setZ)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor

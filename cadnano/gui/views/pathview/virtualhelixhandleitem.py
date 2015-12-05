@@ -33,7 +33,7 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
-_VH_XOFFSET = _RADIUS+100
+_VH_XOFFSET = styles.VH_XOFFSET
 
 PXI_PP_ITEM_WIDTH = 3
 TRIANGLE = QPolygonF()
@@ -230,6 +230,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._virtual_helix = virtual_helix_item.virtualHelix()
         self._model_part = nucleicacid_part_item.part()
         self._viewroot = viewroot
+        self._right_mouse_move = False
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
         self.refreshColor()
@@ -429,7 +430,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         if self._right_mouse_move and event.button() == Qt.RightButton:
             self._right_mouse_move = False
             p = self.mapToScene(event.pos()) - self._button_down_pos
-
+            z = self._virtual_helix_item.x()
+            self._virtual_helix.setProperty('z', z)
+    # end def
 
     def restoreParent(self, pos=None):
         """
