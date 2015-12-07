@@ -268,7 +268,7 @@ class Quadtree(QuadtreeBase):
         self._all_nodes = []
     # end def
 
-    def queryNode(self, node):
+    def queryNode(self, node, scale_factor=1.0):
         qc = self._query_cache
         rect = node.rect()
         res = qc.get(rect)
@@ -276,7 +276,9 @@ class Quadtree(QuadtreeBase):
             return qc.get(rect)
         else:
             node_results = set()
-            res = QuadtreeBase.query(self, node.rect(), node_results)
+            res = QuadtreeBase.query(self,
+                                    node.rect(scale_factor=scale_factor),
+                                    node_results)
             qc[rect] =  res
             return res
     # end def
@@ -291,6 +293,10 @@ class Quadtree(QuadtreeBase):
         self._query_cache = {} # clear cache
         self._all_nodes.append(node)
         return QuadtreeBase.insertNode(self, node)
+    # end def
+
+    def getSize(self):
+        return len(self._all_nodes)
     # end def
 
     def __iter__(self):

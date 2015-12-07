@@ -70,13 +70,15 @@ class VirtualHelix(ProxyObject):
         return self._coord
     # end def
 
-    def rect(self, scalefactor=1.0):
+    def rect(self, scale_factor=1.0):
         """ return tuple of:
         (x_lower_left, y_lower_left, x_upper_right, y_upper_right)
+
+        scale_factor allows creating a larger bounding box
         """
         # increase bounding box to
         # collide with neighbors
-        radius = scalefactor*self._part.radius()
+        radius = scale_factor*self._part.radius()
         x, y, z = self._location
         return x - radius, y - radius, x + radius, y + radius
     # end def

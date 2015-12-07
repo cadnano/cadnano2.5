@@ -28,12 +28,7 @@ if __name__ == "__main__":
     part = doc.children()[0]
     # print(part.radius())
     radius = part.radius() + 0.1
-    # for coord, vh in part.iterVHs():
-    #     x,y = part.latticeCoordToPositionXY(*coord)
-    #     m4 = makeTranslation(x, y, 0)
-    #     cylinder = Cylinder("%s" % str(coord), radius, 10)
-    #     cylinder.applyMatrix(m4)
-    #     solids.append(cylinder)
+
     for oligo in part.oligos():
         if not oligo.isStaple():
             strand5p = oligo.strand5p()

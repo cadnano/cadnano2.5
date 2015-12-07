@@ -71,7 +71,6 @@ class PlasmidPart(Part):
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
         self._oligos = set()
-        self._coord_to_virtual_velix = {}
         self._number_to_virtual_helix = {}
         # Dimensions
         self._max_row = 50  # subclass overrides based on prefs
@@ -164,36 +163,30 @@ class PlasmidPart(Part):
         return PartType.PLASMIDPART
     # end def
 
-    def virtualHelix(self, vhref, returnNoneIfAbsent=True):
-        # vhrefs are the shiny new way to talk to part about its constituent
-        # virtualhelices. Wherever you see f(...,vhref,...) you can
-        # f(...,27,...)         use the virtualhelix's id number
-        # f(...,vh,...)         use an actual virtualhelix
-        # f(...,(1,42),...)     use the coordinate representation of its position
-        """A vhref is the number of a virtual helix, the (row, col) of a virtual helix,
-        or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
-        vh = None
-        if type(vhref) in (int,):
-            vh = self._number_to_virtual_helix.get(vhref, None)
-        elif type(vhref) in (tuple, list):
-            vh = self._coord_to_virtual_velix.get(vhref, None)
-        else:
-            vh = vhref
-        if not isinstance(vh, VirtualHelix):
-            if returnNoneIfAbsent:
-                return None
-            else:
-                err = "Couldn't find the virtual helix in part %s "+\
-                      "referenced by index %s" % (self, vhref)
-                raise IndexError(err)
-        return vh
-    # end def
-
-    def iterVHs(self):
-        dcvh = self._coord_to_virtual_velix
-        for coord, vh in dcvh.items():
-            yield coord, vh
-    # end def
+    # def virtualHelix(self, vhref, returnNoneIfAbsent=True):
+    #     # vhrefs are the shiny new way to talk to part about its constituent
+    #     # virtualhelices. Wherever you see f(...,vhref,...) you can
+    #     # f(...,27,...)         use the virtualhelix's id number
+    #     # f(...,vh,...)         use an actual virtualhelix
+    #     # f(...,(1,42),...)     use the coordinate representation of its position
+    #     """A vhref is the number of a virtual helix, the (row, col) of a virtual helix,
+    #     or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
+    #     vh = None
+    #     if type(vhref) in (int,):
+    #         vh = self._number_to_virtual_helix.get(vhref, None)
+    #     elif type(vhref) in (tuple, list):
+    #         vh = self._coord_to_virtual_velix.get(vhref, None)
+    #     else:
+    #         vh = vhref
+    #     if not isinstance(vh, VirtualHelix):
+    #         if returnNoneIfAbsent:
+    #             return None
+    #         else:
+    #             err = "Couldn't find the virtual helix in part %s "+\
+    #                   "referenced by index %s" % (self, vhref)
+    #             raise IndexError(err)
+    #     return vh
+    # # end def
 
     def activeBaseIndex(self):
         return self._active_base_index
@@ -220,10 +213,10 @@ class PlasmidPart(Part):
                 s = s + oligo.sequenceExport()
         return s
 
-    def getVirtualHelices(self):
-        """yield an iterator to the virtual_helix references in the part"""
-        return self._coord_to_virtual_velix.values()
-    # end def
+    # def getVirtualHelices(self):
+    #     """yield an iterator to the virtual_helix references in the part"""
+    #     return self._coord_to_virtual_velix.values()
+    # # end def
 
     def indexOfRightmostNonemptyBase(self):
         """
@@ -260,10 +253,6 @@ class PlasmidPart(Part):
                 stap_loop_olgs.append(o)
         return stap_loop_olgs
 
-    def hasVirtualHelixAtCoord(self, coord):
-        return coord in self._coord_to_virtual_velix
-    # end def
-
     def maxBaseIdx(self):
         return self._max_base
     # end def
@@ -272,9 +261,9 @@ class PlasmidPart(Part):
         return self._min_base
     # end def
 
-    def numberOfVirtualHelices(self):
-        return len(self._coord_to_virtual_velix)
-    # end def
+    # def numberOfVirtualHelices(self):
+    #     return len(self._coord_to_virtual_velix)
+    # # end def
 
     def radius(self):
         return self._RADIUS
@@ -288,53 +277,42 @@ class PlasmidPart(Part):
         return self._TWIST_PER_BASE
     # end def
 
-    def virtualHelixAtCoord(self, coord):
-        """
-        Looks for a virtual_helix at the coordinate, coord = (row, colum)
-        if it exists it is returned, else None is returned
-        """
-        try:
-            return self._coord_to_virtual_velix[coord]
-        except:
-            return None
-    # end def
-
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
 
-    def remove(self, use_undostack=True):
-        """
-        This method assumes all strands are and all VirtualHelices are
-        going away, so it does not maintain a valid model state while
-        the command is being executed.
-        Everything just gets pushed onto the undostack more or less as is.
-        Except that strandSets are actually cleared then restored, but this
-        is neglible performance wise.  Also, decorators/insertions are assumed
-        to be parented to strands in the view so their removal Signal is
-        not emitted.  This causes problems with undo and redo down the road
-        but works as of now.
-        """
-        self._active_virtual_helix = None
-        if use_undostack:
-            self.undoStack().beginMacro("Delete Part")
-        # remove strands and oligos
-        self.removeAllOligos(use_undostack)
-        # remove VHs
-        vhs = [v for v in self._coord_to_virtual_velix.values()]
-        for vh in vhs:
-            d = RemoveVirtualHelixCommand(self, vh)
-            if use_undostack:
-                self.undoStack().push(d)
-            else:
-                d.redo()
-        # end for
-        # remove the part
-        e = RemovePartCommand(self)
-        if use_undostack:
-            self.undoStack().push(e)
-            self.undoStack().endMacro()
-        else:
-            e.redo()
-    # end def
+    # def remove(self, use_undostack=True):
+    #     """
+    #     This method assumes all strands are and all VirtualHelices are
+    #     going away, so it does not maintain a valid model state while
+    #     the command is being executed.
+    #     Everything just gets pushed onto the undostack more or less as is.
+    #     Except that strandSets are actually cleared then restored, but this
+    #     is neglible performance wise.  Also, decorators/insertions are assumed
+    #     to be parented to strands in the view so their removal Signal is
+    #     not emitted.  This causes problems with undo and redo down the road
+    #     but works as of now.
+    #     """
+    #     self._active_virtual_helix = None
+    #     if use_undostack:
+    #         self.undoStack().beginMacro("Delete Part")
+    #     # remove strands and oligos
+    #     self.removeAllOligos(use_undostack)
+    #     # remove VHs
+    #     vhs = [v for v in self._coord_to_virtual_velix.values()]
+    #     for vh in vhs:
+    #         d = RemoveVirtualHelixCommand(self, vh)
+    #         if use_undostack:
+    #             self.undoStack().push(d)
+    #         else:
+    #             d.redo()
+    #     # end for
+    #     # remove the part
+    #     e = RemovePartCommand(self)
+    #     if use_undostack:
+    #         self.undoStack().push(e)
+    #         self.undoStack().endMacro()
+    #     else:
+    #         e.redo()
+    # # end def
 
     def removeAllOligos(self, use_undostack=True):
         # clear existing oligos
@@ -398,21 +376,21 @@ class PlasmidPart(Part):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _addVirtualHelix(self, virtual_helix):
-        """
-        private method for adding a virtual_helix to the Parts data structure
-        of virtual_helix references
-        """
-        self._coord_to_virtual_velix[virtual_helix.coord()] = virtual_helix
-    # end def
+    # def _addVirtualHelix(self, virtual_helix):
+    #     """
+    #     private method for adding a virtual_helix to the Parts data structure
+    #     of virtual_helix references
+    #     """
+    #     self._coord_to_virtual_velix[virtual_helix.coord()] = virtual_helix
+    # # end def
 
-    def _removeVirtualHelix(self, virtual_helix):
-        """
-        private method for adding a virtual_helix to the Parts data structure
-        of virtual_helix references
-        """
-        del self._coord_to_virtual_velix[virtual_helix.coord()]
-    # end def
+    # def _removeVirtualHelix(self, virtual_helix):
+    #     """
+    #     private method for adding a virtual_helix to the Parts data structure
+    #     of virtual_helix references
+    #     """
+    #     del self._coord_to_virtual_velix[virtual_helix.coord()]
+    # # end def
 
     def _reserveHelixIDNumber(self, is_parity_even=True, requested_id_num=None):
         """
