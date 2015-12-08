@@ -73,3 +73,10 @@ def multiplyScalar(v, s):
     """ return v1*s
     """
     return Vector3(v.x*s, v.y*s, v.z*s)
+
+def v2DistanceAndAngle(a, b):
+    dx = b[0] - a[0]
+    dy = b[1] - a[1]
+    dist = math.sqrt(dx*dx + dy*dy)
+    angle = math.atan2(dy, dx)
+    return dist, angle

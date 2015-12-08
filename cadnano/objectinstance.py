@@ -1,8 +1,9 @@
 from cadnano import util
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand, UndoStack
 
-class ObjectInstance(ProxyObject):
+class ObjectInstance(CNObject):
     def __init__(self, reference_object, parent=None):
         super(ObjectInstance, self).__init__(reference_object)
         self._parent = parent   # parent is either a document or assembly
@@ -11,11 +12,11 @@ class ObjectInstance(ProxyObject):
     # end def
 
     ### SIGNALS ###
-    instanceDestroyedSignal = ProxySignal(ProxyObject,
+    instanceDestroyedSignal = ProxySignal(CNObject,
                                         name="instanceDestroyedSignal")
-    instanceMovedSignal = ProxySignal(ProxyObject,
+    instanceMovedSignal = ProxySignal(CNObject,
                                         name="instanceMovedSignal")
-    instanceParentChangedSignal = ProxySignal(ProxyObject,
+    instanceParentChangedSignal = ProxySignal(CNObject,
                                         name="instanceParentChangedSignal")
 
     ### SLOTS ###

@@ -2,10 +2,11 @@ from operator import attrgetter, methodcaller
 from collections import defaultdict
 
 from cadnano.part import Part
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand, UndoStack
 
-class Assembly(ProxyObject):
+class Assembly(CNObject):
     """
     An Assembly is a collection of components, comprised recursively of
     various levels of individual parts and sub-assembly modules.
@@ -28,9 +29,9 @@ class Assembly(ProxyObject):
     # end def
 
     ### SIGNALS ###
-    assemblyInstanceAddedSignal = ProxySignal(ProxyObject,
+    assemblyInstanceAddedSignal = ProxySignal(CNObject,
                                 name='assemblyInstanceAddedSignal')
-    assemblyDestroyedSignal = ProxySignal(ProxyObject,
+    assemblyDestroyedSignal = ProxySignal(CNObject,
                                 name='assemblyDestroyedSignal')
 
     ### SLOTS ###
@@ -73,7 +74,7 @@ class Assembly(ProxyObject):
         new_obj_inst_list = asm._obj_instance_list
         obj_instances = self.objects()
 
-        # create a dictionary mapping objects (keys) to lists of 
+        # create a dictionary mapping objects (keys) to lists of
         # ObjectInstances ([value1, value2])
         # this uniquifies the creation of new Assemblies
         object_dict = defaultdict(list)

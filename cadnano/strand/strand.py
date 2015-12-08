@@ -15,7 +15,8 @@ else:
     tostring = lambda x: x.tostring()
 
 from cadnano import util
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand, UndoStack
 from cadnano.decorators.insertion import Insertion
 from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
@@ -24,7 +25,7 @@ from .modscmd import AddModsCommand, RemoveModsCommand
 from .resizecmd import ResizeCommand
 
 
-class Strand(ProxyObject):
+class Strand(CNObject):
     """
     A Strand is a continuous stretch of bases that are all in the same
     StrandSet (recall: a VirtualHelix is made up of two StrandSets).
@@ -133,37 +134,37 @@ class Strand(ProxyObject):
         return self._strandset.strandFilter()
 
     ### SIGNALS ###
-    strandHasNewOligoSignal = ProxySignal(ProxyObject, name='strandHasNewOligoSignal') #pyqtSignal(QObject)  # strand
-    strandRemovedSignal = ProxySignal(ProxyObject, name='strandRemovedSignal') #pyqtSignal(QObject)  # strand
-    strandResizedSignal = ProxySignal(ProxyObject, tuple, name='strandResizedSignal') #pyqtSignal(QObject, tuple)
+    strandHasNewOligoSignal = ProxySignal(CNObject, name='strandHasNewOligoSignal') #pyqtSignal(QObject)  # strand
+    strandRemovedSignal = ProxySignal(CNObject, name='strandRemovedSignal') #pyqtSignal(QObject)  # strand
+    strandResizedSignal = ProxySignal(CNObject, tuple, name='strandResizedSignal') #pyqtSignal(QObject, tuple)
 
     # Parameters: (strand3p, strand5p)
-    strandXover5pChangedSignal = ProxySignal(ProxyObject, ProxyObject, name='strandXover5pChangedSignal') #pyqtSignal(QObject, QObject)
-    strandXover5pRemovedSignal = ProxySignal(ProxyObject, ProxyObject, name='strandXover5pRemovedSignal') #pyqtSignal(QObject, QObject)
+    strandXover5pChangedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pChangedSignal') #pyqtSignal(QObject, QObject)
+    strandXover5pRemovedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pRemovedSignal') #pyqtSignal(QObject, QObject)
 
     # Parameters: (strand)
-    strandUpdateSignal = ProxySignal(ProxyObject, name='strandUpdateSignal') #pyqtSignal(QObject)
+    strandUpdateSignal = ProxySignal(CNObject, name='strandUpdateSignal') #pyqtSignal(QObject)
 
     # Parameters: (strand, insertion object)
-    strandInsertionAddedSignal = ProxySignal(ProxyObject, object, name='strandInsertionAddedSignal') #pyqtSignal(QObject, object)
-    strandInsertionChangedSignal = ProxySignal(ProxyObject, object, name='strandInsertionChangedSignal') #pyqtSignal(QObject, object)
+    strandInsertionAddedSignal = ProxySignal(CNObject, object, name='strandInsertionAddedSignal') #pyqtSignal(QObject, object)
+    strandInsertionChangedSignal = ProxySignal(CNObject, object, name='strandInsertionChangedSignal') #pyqtSignal(QObject, object)
     # Parameters: (strand, insertion index)
-    strandInsertionRemovedSignal = ProxySignal(ProxyObject, int, name='strandInsertionRemovedSignal') #pyqtSignal(QObject, int)
+    strandInsertionRemovedSignal = ProxySignal(CNObject, int, name='strandInsertionRemovedSignal') #pyqtSignal(QObject, int)
 
     # Parameters: (strand, decorator object)
-    strandModsAddedSignal = ProxySignal(ProxyObject, object, int, name='strandModsAddedSignal') #pyqtSignal(QObject, object)
-    strandModsChangedSignal = ProxySignal(ProxyObject, object, int, name='strandModsChangedSignal') #pyqtSignal(QObject, object)
+    strandModsAddedSignal = ProxySignal(CNObject, object, int, name='strandModsAddedSignal') #pyqtSignal(QObject, object)
+    strandModsChangedSignal = ProxySignal(CNObject, object, int, name='strandModsChangedSignal') #pyqtSignal(QObject, object)
     # Parameters: (strand, decorator index)
-    strandModsRemovedSignal = ProxySignal(ProxyObject, object, int, name='strandModsRemovedSignal') #pyqtSignal(QObject, int)
+    strandModsRemovedSignal = ProxySignal(CNObject, object, int, name='strandModsRemovedSignal') #pyqtSignal(QObject, int)
 
     # Parameters: (strand, modifier object)
-    strandModifierAddedSignal = ProxySignal(ProxyObject, object, name='strandModifierAddedSignal') #pyqtSignal(QObject, object)
-    strandModifierChangedSignal = ProxySignal(ProxyObject, object, name='strandModifierChangedSignal') #pyqtSignal(QObject, object)
+    strandModifierAddedSignal = ProxySignal(CNObject, object, name='strandModifierAddedSignal') #pyqtSignal(QObject, object)
+    strandModifierChangedSignal = ProxySignal(CNObject, object, name='strandModifierChangedSignal') #pyqtSignal(QObject, object)
     # Parameters: (strand, modifier index)
-    strandModifierRemovedSignal = ProxySignal(ProxyObject, int, name='strandModifierRemovedSignal') #pyqtSignal(QObject, int)
+    strandModifierRemovedSignal = ProxySignal(CNObject, int, name='strandModifierRemovedSignal') #pyqtSignal(QObject, int)
 
     # Parameters: (strand, value)
-    selectedChangedSignal = ProxySignal(ProxyObject, tuple, name='selectedChangedSignal') #pyqtSignal(QObject, tuple)
+    selectedChangedSignal = ProxySignal(CNObject, tuple, name='selectedChangedSignal') #pyqtSignal(QObject, tuple)
 
     ### SLOTS ###
     ### ACCESSORS ###

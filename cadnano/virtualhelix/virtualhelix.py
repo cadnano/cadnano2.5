@@ -1,4 +1,5 @@
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.enum import StrandType
 from cadnano.strandset import StrandSet
@@ -6,7 +7,7 @@ from cadnano.math.vector import Vector3
 from .removevhelixcmd import RemoveVirtualHelixCommand
 
 
-class VirtualHelix(ProxyObject):
+class VirtualHelix(CNObject):
     """
     VirtualHelix is a container class for two StrandSet objects (one scaffold
     and one staple). The Strands all share the same helix axis. It is called
@@ -48,11 +49,11 @@ class VirtualHelix(ProxyObject):
         return "<%s(%d)>" % (self.__class__.__name__, self._number)
 
     ### SIGNALS ###
-    virtualHelixRemovedSignal = ProxySignal(ProxyObject, ProxyObject,
+    virtualHelixRemovedSignal = ProxySignal(CNObject, CNObject,
                                             name='virtualHelixRemovedSignal')  # self
-    virtualHelixNumberChangedSignal = ProxySignal(ProxyObject, int,
+    virtualHelixNumberChangedSignal = ProxySignal(CNObject, int,
                                             name='virtualHelixNumberChangedSignal')  # self, num
-    virtualHelixPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+    virtualHelixPropertyChangedSignal = ProxySignal(CNObject, object, object,
                                             name='virtualHelixPropertyChangedSignal')  # self, transform
 
     ### SLOTS ###

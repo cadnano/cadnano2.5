@@ -1,4 +1,4 @@
-class CNObject(object):
+class ProxyObject(object):
     def __init__(self, parent):
         self.parent = parent
         self._signals = {}
@@ -80,7 +80,7 @@ from cadnano import undostack
 from cadnano import undocommand
 
 ProxySignal = DummySignal
-ProxyObject = CNObject
+BaseObject = ProxyObject
 UndoCommand = undocommand.UndoCommand
 UndoStack = undostack.UndoStack
 

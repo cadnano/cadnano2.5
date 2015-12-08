@@ -7,7 +7,8 @@ izip = zip
 
 from cadnano import util
 from cadnano import preferences as prefs
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
 from cadnano.enum import StrandType
 from cadnano.oligo import Oligo
@@ -27,7 +28,7 @@ from .renumbercmd import RenumberVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
 
-class Part(ProxyObject):
+class Part(CNObject):
     """
     A Part is a group of VirtualHelix items that are on the same lattice.
     Parts are the model component that most directly corresponds to a
@@ -101,23 +102,23 @@ class Part(ProxyObject):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int,
+    partActiveSliceIndexSignal = ProxySignal(CNObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
-    partActiveSliceResizeSignal = ProxySignal(ProxyObject,
+    partActiveSliceResizeSignal = ProxySignal(CNObject,
                         name='partActiveSliceResizeSignal')     # self
-    partDimensionsChangedSignal = ProxySignal(ProxyObject,
+    partDimensionsChangedSignal = ProxySignal(CNObject,
                         name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(ProxyObject,
+    partInstanceAddedSignal = ProxySignal(CNObject,
                         name='partInstanceAddedSignal')         # self
-    partParentChangedSignal = ProxySignal(ProxyObject,
+    partParentChangedSignal = ProxySignal(CNObject,
                         name='partParentChangedSignal')         # self
     partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
                         name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(ProxyObject,
+    partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
-    partStrandChangedSignal = ProxySignal(object, ProxyObject,
+    partStrandChangedSignal = ProxySignal(object, CNObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
-    # partVirtualHelixAddedSignal = ProxySignal(object, ProxyObject,
+    # partVirtualHelixAddedSignal = ProxySignal(object, CNObject,
     #                     name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixAddedSignal = ProxySignal(object, object,
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
@@ -129,7 +130,7 @@ class Part(ProxyObject):
                         name='partVirtualHelixTransformedSignal')   # self, transform
     partVirtualHelicesReorderedSignal = ProxySignal(object, list,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
-    partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
                         name='partActiveVirtualHelixChangedSignal')
     partModAddedSignal = ProxySignal(object, object, object,
                         name='partModAddedSignal')
@@ -137,11 +138,11 @@ class Part(ProxyObject):
                         name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
                         name='partModChangedSignal')
-    partSelectedChangedSignal = ProxySignal(ProxyObject, object,
+    partSelectedChangedSignal = ProxySignal(CNObject, object,
                         name='partSelectedChangedSignal')       # self, is_selected
-    partPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+    partPropertyChangedSignal = ProxySignal(CNObject, object, object,
                         name='partPropertyChangedSignal')       # self, property_name, new_value
-    partOligoAddedSignal = ProxySignal(ProxyObject, object,
+    partOligoAddedSignal = ProxySignal(CNObject, object,
                         name='partOligoAddedSignal')            # self, oligo
 
     ### SLOTS ###

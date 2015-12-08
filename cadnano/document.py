@@ -6,7 +6,8 @@ from operator import itemgetter
 from cadnano import app
 from cadnano import preferences as prefs
 from cadnano import util
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.oligo import Oligo
 from cadnano.strand import Strand
@@ -19,7 +20,7 @@ from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
 
 
-class Document(ProxyObject):
+class Document(CNObject):
     """
     The Document class is the root of the model. It has two main purposes:
     1. Serve as the parent all Part objects within the model.
@@ -43,10 +44,10 @@ class Document(ProxyObject):
 
     ### SIGNALS ###
     documentPartAddedSignal =  ProxySignal(object,
-                                        ProxyObject,
+                                        CNObject,
                                         name='documentPartAddedSignal') # doc, part
     documentAssemblyAddedSignal =  ProxySignal(object,
-                                        ProxyObject,
+                                        CNObject,
                                         name='documentAssemblyAddedSignal') # doc, assembly
 
     # dict of tuples of objects using the reference as the key,
@@ -60,9 +61,9 @@ class Document(ProxyObject):
     documentPreXoverFilterChangedSignal = ProxySignal(str,
                                    name='documentPreXoverFilterChangedSignal')
 
-    documentViewResetSignal = ProxySignal(ProxyObject,
+    documentViewResetSignal = ProxySignal(CNObject,
                                                name='documentViewResetSignal')
-    documentClearSelectionsSignal = ProxySignal(ProxyObject,
+    documentClearSelectionsSignal = ProxySignal(CNObject,
                                          name='documentClearSelectionsSignal')
 
     ### SLOTS ###

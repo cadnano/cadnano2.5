@@ -7,9 +7,10 @@ izip = zip
 
 from cadnano import util
 from cadnano.quadtree import Quadtree
-from cadnano.math import v2DistanceAndAngle
+from cadnano.math.vector import v2DistanceAndAngle
 from cadnano import preferences as prefs
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
 from cadnano.enum import PartType, StrandType
 from cadnano.oligo import Oligo
@@ -95,23 +96,23 @@ class NucleicAcidPart(Part):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(ProxyObject, int,
+    partActiveSliceIndexSignal = ProxySignal(CNObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
-    partActiveSliceResizeSignal = ProxySignal(ProxyObject,
+    partActiveSliceResizeSignal = ProxySignal(CNObject,
                         name='partActiveSliceResizeSignal')     # self
-    partDimensionsChangedSignal = ProxySignal(ProxyObject,
+    partDimensionsChangedSignal = ProxySignal(CNObject,
                         name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(ProxyObject,
+    partInstanceAddedSignal = ProxySignal(CNObject,
                         name='partInstanceAddedSignal')         # self
-    partParentChangedSignal = ProxySignal(ProxyObject,
+    partParentChangedSignal = ProxySignal(CNObject,
                         name='partParentChangedSignal')         # self
     partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
                         name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(ProxyObject,
+    partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
-    partStrandChangedSignal = ProxySignal(object, ProxyObject,
+    partStrandChangedSignal = ProxySignal(object, CNObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
-    # partVirtualHelixAddedSignal = ProxySignal(object, ProxyObject,
+    # partVirtualHelixAddedSignal = ProxySignal(object, CNObject,
     #                     name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixAddedSignal = ProxySignal(object, object,
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
@@ -121,7 +122,7 @@ class NucleicAcidPart(Part):
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelicesReorderedSignal = ProxySignal(object, list, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
-    partActiveVirtualHelixChangedSignal = ProxySignal(ProxyObject, ProxyObject,
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
                         name='partActiveVirtualHelixChangedSignal')
     partModAddedSignal = ProxySignal(object, object, object,
                         name='partModAddedSignal')

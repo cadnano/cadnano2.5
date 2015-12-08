@@ -10,7 +10,8 @@ from cadnano import preferences as prefs
 from cadnano.enum import StrandType
 from cadnano.enum import StrandType
 from cadnano.cnproxy import UndoStack, UndoCommand
-from cadnano.cnproxy import ProxyObject, ProxySignal
+from cadnano.cnproxy import ProxySignal
+from cadnano.cnobject import CNObject
 from cadnano.oligo import Oligo
 from cadnano.strand import Strand
 
@@ -19,7 +20,7 @@ from .removestrandcmd import RemoveStrandCommand
 from .splitcmd import SplitCommand
 from .mergecmd import MergeCommand
 
-class StrandSet(ProxyObject):
+class StrandSet(CNObject):
     """
     StrandSet is a container class for Strands, and provides the several
     publicly accessible methods for editing strands, including operations
@@ -56,7 +57,7 @@ class StrandSet(ProxyObject):
     # end def
 
     ### SIGNALS ###
-    strandsetStrandAddedSignal = ProxySignal(ProxyObject, ProxyObject,
+    strandsetStrandAddedSignal = ProxySignal(CNObject, CNObject,
                                     name='strandsetStrandAddedSignal')#pyqtSignal(QObject, QObject)  # strandset, strand
 
     ### SLOTS ###

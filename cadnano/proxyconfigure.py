@@ -27,12 +27,12 @@ def proxyConfigure(signal_type=None):
         from PyQt5.QtCore import QObject, pyqtSignal
         from PyQt5.QtWidgets import QUndoCommand, QUndoStack
         cnp.ProxySignal = pyqtSignal
-        cnp.ProxyObject = QObject
+        cnp.BaseObject = QObject
         cnp.UndoCommand = QUndoCommand
         cnp.UndoStack = QUndoStack
     else:
         cnp.ProxySignal = cnp.DummySignal
-        cnp.ProxyObject = cnp.CNObject
+        cnp.BaseObject = cnp.ProxyObject
         # cnp.UndoCommand = cnp.UndoCommand
         # cnp.UndoStack = cnp.UndoStack
         import cadnano

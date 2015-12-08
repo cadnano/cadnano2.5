@@ -6,13 +6,14 @@ OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
 import copy
 
 from cadnano import util
-from cadnano.cnproxy import ProxyObject, ProxySignal, UndoCommand
+from cadnano.cnproxy import ProxySignal, UndoCommand
+from cadnano.cnobject import CNObject
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 
-class Oligo(ProxyObject):
+class Oligo(CNObject):
     """
     Oligo is a group of Strands that are connected via 5' and/or 3'
     connections. It corresponds to the physical DNA strand, and is thus
@@ -73,17 +74,17 @@ class Oligo(ProxyObject):
     # # end def
 
     ### SIGNALS ###
-    oligoIdentityChangedSignal = ProxySignal(ProxyObject,
+    oligoIdentityChangedSignal = ProxySignal(CNObject,
                                         name='oligoIdentityChangedSignal')  # new oligo
-    oligoAppearanceChangedSignal = ProxySignal(ProxyObject,
+    oligoAppearanceChangedSignal = ProxySignal(CNObject,
                                         name='oligoAppearanceChangedSignalpyqtSignal')  # self
-    oligoRemovedSignal = ProxySignal(ProxyObject, ProxyObject,
+    oligoRemovedSignal = ProxySignal(CNObject, CNObject,
                                         name='oligoRemovedSignal')  # part, self
-    oligoSequenceAddedSignal = ProxySignal(ProxyObject,
+    oligoSequenceAddedSignal = ProxySignal(CNObject,
                                         name='oligoSequenceAddedSignal')  # self
-    oligoSequenceClearedSignal = ProxySignal(ProxyObject,
+    oligoSequenceClearedSignal = ProxySignal(CNObject,
                                         name='oligoSequenceClearedSignal')  # self
-    oligoPropertyChangedSignal = ProxySignal(ProxyObject, object, object,
+    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object,
                                         name='oligoPropertyChangedSignal')  # self, property_name, new_value
 
     ### SLOTS ###
