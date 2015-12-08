@@ -103,8 +103,8 @@ class NucleicAcidPart(Part):
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(ProxyObject,
                         name='partActiveSliceResizeSignal')     # self
-    partDimensionsChangedSignal = ProxySignal(ProxyObject,
-                        name='partDimensionsChangedSignal')     # self
+    partDimensionsChangedSignal = ProxySignal(ProxyObject, bool,
+                        name='partDimensionsChangedSignal')     # self, ztf
     partInstanceAddedSignal = ProxySignal(ProxyObject,
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(ProxyObject,
@@ -1063,6 +1063,8 @@ class NucleicAcidPart(Part):
         return virtual_helixB in self.getVirtualHelixNeighbors(virtual_helixA) or \
             virtual_helixA == virtual_helixB
     # end def
+
+
 
     def potentialCrossoverList(self, virtual_helix, idx=None, xover_p=False):
         """

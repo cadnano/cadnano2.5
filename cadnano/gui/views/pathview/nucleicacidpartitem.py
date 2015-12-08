@@ -3,7 +3,7 @@ from __future__ import division
 from collections import defaultdict
 from math import ceil
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot
+from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot, QSignalMapper
 from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
@@ -15,8 +15,6 @@ from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem
-from .prexoveraitem import PreXoverAItem
-from .prexoverpitem import PreXoverPItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
 
@@ -54,10 +52,14 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
         self._initModifierRect()
-        # self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-        # self.setBrush(QBrush(Qt.NoBrush))
+
+        self._sm = sm = QSignalMapper()
+        for shortcut, action in self.window().keyActions.items():
+            action.triggered.connect(sm.map)
+            sm.setMapping(action, shortcut)
+        sm.mapped.connect(self._handleKeyPress)
     # end def
 
     def proxy(self):
@@ -107,8 +109,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.updatePreXoverItems()
     #end def
 
-    def partDimensionsChangedSlot(self, part):
-        self.scene().views()[0].zoomToFit()
+    def partDimensionsChangedSlot(self, part, zoom_to_fit):
+        if zoom_to_fit:
+            self.scene().views()[0].zoomToFit()
         self._active_slice_item.resetBounds()
         self._updateBoundingRect()
     # end def
@@ -403,7 +406,36 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setRect(self._vh_rect.adjusted(-_p,-_p,_p,_p))
     # end def
 
+    def _handleKeyPress(self, key):
+        if key not in self._keyPressDict:
+            return
+
+        # active item
+        a_p = self._model_part.getProperty('active_phos')
+        vh_name, fwd_str, base_idx, facing_angle = a_p.split('.')
+        is_fwd = True if fwd_str == 'fwd' else False
+        vhi = self.getVHItemByName(vh_name)
+
+        if key != 0: # snap to align phosphates in z
+            delta_idx = self._keyPressDict[key]
+            z = _BASE_WIDTH*delta_idx
+            vhi.virtualHelix().moveBy(0, 0, z)
+        else:
+            neighbor = self._keyPressDict[key]
+            n_vh_name, n_fwd_str, n_base_idx, n_facing_angle = neighbor.split('.')
+            n_is_fwd = True if n_fwd_str == 'fwd' else False
+
+            if is_fwd == n_is_fwd:
+                print("parallel xover", a_p, neighbor)
+            else:
+                print("anti-parallel xover", a_p, neighbor)
+    # end def
+
     ### PUBLIC METHODS ###
+    def setKeyPressDict(self, shortcut_item_dict):
+        self._keyPressDict = shortcut_item_dict
+
+
     def setModifyState(self, bool):
         """Hides the modRect when modify state disabled."""
         self._can_show_mod_rect = bool
@@ -483,25 +515,20 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         list(map(PreXoverItem.remove, self._pre_xover_items))
         self._pre_xover_items = []
 
-        if self._viewroot.preXoverFilter() == "prexover_p":
-            xover_p = True
-            _PXI = PreXoverPItem
-        else:
-            xover_p = False
-            _PXI = PreXoverAItem
+        _PXI = PreXoverItem
+        potential_xovers = part.potentialCrossoverList(vh, idx)
 
-        potential_xovers = part.potentialCrossoverList(vh, idx, xover_p)
-        for neighbor, index, strand_type, is_low_idx in potential_xovers:
-            # create one half
-            neighbor_vhi = self.itemForVirtualHelix(neighbor)
-            pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
-            # add to list
-            self._pre_xover_items.append(pxi)
-            # create the complement
-            pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
-            # add to list
-            self._pre_xover_items.append(pxi)
-        # end for
+        # for neighbor, index, strand_type, is_low_idx in potential_xovers:
+        #     # create one half
+        #     neighbor_vhi = self.itemForVirtualHelix(neighbor)
+        #     pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
+        #     # add to list
+        #     self._pre_xover_items.append(pxi)
+        #     # create the complement
+        #     pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
+        #     # add to list
+        #     self._pre_xover_items.append(pxi)
+        # # end for
     # end def
 
     def updatePreXoverItems(self):

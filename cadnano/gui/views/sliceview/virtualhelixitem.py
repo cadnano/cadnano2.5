@@ -63,7 +63,8 @@ class PropertyWrapperObject(QObject):
         return self._item.line().p2()
 
     def __set_bondP2(self, p2):
-        line = QLineF(0,0,p2.x(),p2.y())
+        p1 = self._item.line().p1()
+        line = QLineF(p1.x(),p1.y(),p2.x(),p2.y())
         self._item.setLine(line)
 
     def __get_rotation(self):
@@ -107,14 +108,14 @@ class Triangle(QGraphicsPathItem):
 # end class
 
 class PhosBond(QGraphicsLineItem):
-    def __init__(self, is_fwd, parent=None):
+    def __init__(self, is_fwd, width, parent=None):
         super(PhosBond, self).__init__(parent)
         self.adapter = PropertyWrapperObject(self)
         color = parent._color
         if is_fwd: # lighter solid
-            self.setPen(getPenObj(color, 0.25, alpha=42, capstyle=Qt.RoundCap))
+            self.setPen(getPenObj(color, width, alpha=42, capstyle=Qt.RoundCap))
         else: # darker, dotted
-            self.setPen(getPenObj(color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
+            self.setPen(getPenObj(color, width, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
     # end def
 # end class
 
@@ -125,10 +126,15 @@ class PreXoverItem(QGraphicsPathItem):
         self._color = color
         self._is_fwd = is_fwd
         self._parent = parent
-        self._default_line = QLineF()
-        self._default_p2 = QPointF(0,0)
-        self._bond_line = PhosBond(is_fwd, self)
         self._phos_item = Triangle(is_fwd, self)
+        self._item_5p = None
+        self._item_3p = None
+        self._default_line_5p = QLineF()
+        self._default_line_3p = QLineF()
+        self._default_p2_5p = QPointF(0,0)
+        self._default_p2_3p = QPointF(0,0)
+        self._5p_line = PhosBond(is_fwd, 0.5, self)
+        self._3p_line = PhosBond(is_fwd, 0.25, self)
         # self.adapter = PropertyWrapperObject(self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
@@ -152,8 +158,8 @@ class PreXoverItem(QGraphicsPathItem):
         return self._is_fwd
 
     def setBondLineLength(self, value):
-        self._bond_line_len = value
-        self._active_p2 = QPointF(value, 0)
+        self._active_p2_3p = QPointF(value, 0)
+        self._active_p2_5p = QPointF(value, 0)
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
@@ -177,35 +183,67 @@ class PreXoverItem(QGraphicsPathItem):
 
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActiveBondPos(self, is_active):
+    def setActive5p(self, is_active):
+        bond = self._5p_line
+        if bond is None: return
+
+        if is_active:
+            bond.show()
+            if self._item_5p:
+                print("hiding", self._item_5p)
+                self._item_5p._3p_line.hide()
+            # print("anim 5p bond", self._default_p2_5p, self._active_p2_5p)
+            self.animate(bond, 'bondp2', 2000, self._default_p2_5p, self._active_p2_5p)
+        else:
+            if self._item_5p: self._item_5p._3p_line.show()
+            self.animate(bond, 'bondp2', 2000, self._active_p2_5p, self._default_p2_5p)
+            # self.animate(bond, 'bondp2', 300, self._active_p2, self._default_p2_5p)
+
+    def setActive3p(self, is_active):
         phos = self._phos_item
-        bond = self._bond_line
+        bond = self._3p_line
+        if self._5p_line: self._5p_line.hide()
         if is_active:
             angle = -90 if self._is_fwd else 90
             self.animate(phos, 'rotation', 300, 0, angle)
-            self.animate(bond, 'bondp2', 300, self._default_p2, self._active_p2)
+            self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
             alpha = 42 if self._is_fwd else 64
             self.animate(bond, 'pen_alpha', 300, alpha, 180)
         else:
             self.animate(phos, 'rotation', 300, phos.rotation(), 0)
-            self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2)
+            self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2_3p)
             start_alpha = bond.pen().color().alpha()
             end_alpha = 42 if self._is_fwd else 64
             self.animate(bond, 'pen_alpha', 300, start_alpha, end_alpha)
     # end def
 
-    def setDefaultBondPos(self, scenePos):
+    def set5pItem(self, item_5p):
+        self._item_5p = item_5p
+        scenePos = item_5p.scenePos()
         p1 = QPointF(0,0)
-        # p1 = QPointF(0,self._bond_p1_offset)
         p2 = self.mapFromScene(scenePos)
-        self._default_p2 = p2
-        self._default_line = QLineF(p1,p2)
-        self._bond_line.setLine(self._default_line)
-        self._bond_line.show()
+        self._default_p2_5p = p2
+        self._default_line_5p = QLineF(p1,p2)
+        self._5p_line.setLine(self._default_line_5p)
+        self._5p_line.hide()
     # end def
 
-    def updateItemApperance(self, is_active):
-        self.setActiveBondPos(is_active)
+    def set3pItem(self, item_3p):
+        self._item_3p = item_3p
+        scenePos = item_3p.scenePos()
+        p1 = QPointF(0,0)
+        p2 = self.mapFromScene(scenePos)
+        self._default_p2_3p = p2
+        self._default_line_3p = QLineF(p1,p2)
+        self._3p_line.setLine(self._default_line_3p)
+        self._3p_line.show()
+    # end def
+
+    def updateItemApperance(self, is_active, show_3p=True):
+        if show_3p:
+            self.setActive3p(is_active)
+        else:
+            self.setActive5p(is_active)
     # end def
 # end class
 
@@ -275,10 +313,10 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             fwd, next_fwd = self.fwd_prexo_items[i], self.fwd_prexo_items[i+1]
             j = (_step-1)-i
             rev, next_rev = self.rev_prexo_items[j], self.rev_prexo_items[j-1]
-            fwd.setDefaultBondPos(next_fwd.scenePos())
-            rev.setDefaultBondPos(next_rev.scenePos())
-
-
+            fwd.set3pItem(next_fwd)
+            rev.set3pItem(next_rev)
+            next_fwd.set5pItem(fwd)
+            next_rev.set5pItem(rev)
     # end def
 
     def _get_colors(self):
@@ -315,19 +353,19 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def updateViewActivePhos(self, new_active_item=None):
         """Refresh appearance of items whose active state changed."""
         if self._active_item:
-            self._active_item.updateItemApperance(False)
+            self._active_item.updateItemApperance(False, show_3p=True)
             self._active_wedge_gizmo.hide()
         if new_active_item:
-            new_active_item.updateItemApperance(True)
+            new_active_item.updateItemApperance(True, show_3p=True)
             self._active_wedge_gizmo.showActive(new_active_item)
             self._active_item = new_active_item
     # end def
 
     def resetAllItemsAppearance(self):
         for item in self.fwd_prexo_items.values():
-            item.updateItemApperance(False)
+            item.updateItemApperance(False, show_3p=False)
         for item in self.rev_prexo_items.values():
-            item.updateItemApperance(False)
+            item.updateItemApperance(False, show_3p=False)
     # end def
 
     def getItemsFacingNearAngle(self, angle):
@@ -541,9 +579,24 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         label.setPos(_RADIUS-posx, _RADIUS-posy)
     # end def
 
+    def addStrandsAtActiveSliceIfMissing(self):
+        vh = self.virtualHelix()
+        part = self.part()
+        if vh is None:
+            return
+
+        idx = part.activeBaseIndex()
+        start_idx = max(0,idx-1)
+        end_idx = min(idx+1, part.maxBaseIdx())
+        vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
+        vh.stapleStrandSet().createStrand(start_idx, end_idx)
+    # end def
+
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
+        if event.button() == Qt.LeftButton:
+            self.addStrandsAtActiveSliceIfMissing()
+        elif event.button() == Qt.RightButton:
             self._right_mouse_move = True
             self._button_down_pos = event.pos()
     # end def
@@ -697,7 +750,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                 local_angle = (int(new_value)+180) % 360
                 fwd_items, rev_items = _pxig.getItemsFacingNearAngle(local_angle)
                 for item in fwd_items+rev_items:
-                    item.updateItemApperance(True)
+                    item.updateItemApperance(True, show_3p=False)
             else:
                 _pxig.resetAllItemsAppearance()
     # end def
@@ -812,6 +865,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def setActiveSliceView(self, idx, has_fwd, has_rev):
+        return
         if has_fwd:
             self.setPen(self._USE_PEN)
             self.setBrush(self._USE_BRUSH)

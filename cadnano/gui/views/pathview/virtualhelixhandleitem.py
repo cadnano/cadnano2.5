@@ -1,4 +1,4 @@
-from math import sqrt, atan2, degrees, pi
+from math import atan2, degrees, floor, pi, sqrt
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QTransform
@@ -33,6 +33,7 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
+_BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
 
 PXI_PP_ITEM_WIDTH = 3
@@ -418,9 +419,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         elif self._right_mouse_move:
             event_start, handle_start = self._button_down_coords
             delta = self.mapToScene(event.pos()) - event_start
-            
-            self.setX(handle_start.x()+delta.x())
-            self._virtual_helix_item.setX(handle_start.x()+delta.x()+_VH_XOFFSET)
+            x = handle_start.x() + int(floor(delta.x())/_BASE_WIDTH)*_BASE_WIDTH
+            self.setX(x)
+            self._virtual_helix_item.setX(x+_VH_XOFFSET)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def

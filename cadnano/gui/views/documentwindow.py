@@ -121,6 +121,18 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])
+
+
+        self.keyActions = {0:self.action_key_0,
+                           1:self.action_key_1,
+                           2:self.action_key_2,
+                           3:self.action_key_3,
+                           4:self.action_key_4,
+                           5:self.action_key_5,
+                           6:self.action_key_6,
+                           7:self.action_key_7,
+                           8:self.action_key_8,
+                           9:self.action_key_9}
     # end def
 
     ### ACCESSORS ###

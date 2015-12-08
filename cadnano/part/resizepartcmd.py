@@ -27,7 +27,7 @@ class ResizePartCommand(UndoCommand):
             part.partVirtualHelixResizedSignal.emit(part, vh.coord())
         if self._old_active_idx > part._max_base:
             part.setActiveBaseIndex(part._max_base)
-        part.partDimensionsChangedSignal.emit(part)
+        part.partDimensionsChangedSignal.emit(part, True)
     # end def
 
     def undo(self):
@@ -42,7 +42,7 @@ class ResizePartCommand(UndoCommand):
             part.partVirtualHelixResizedSignal.emit(part, vh.coord())
         if self._old_active_idx != part.activeBaseIndex():
             part.setActiveBaseIndex(self._old_active_idx)
-        part.partDimensionsChangedSignal.emit(part)
+        part.partDimensionsChangedSignal.emit(part, True)
     # end def
 
     def deltaLowIdx(self, part, low_idx_delta):

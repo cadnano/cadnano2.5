@@ -223,6 +223,18 @@ class VirtualHelix(ProxyObject):
     # end def
 
     ### METHODS FOR EDITING THE MODEL ###
+    def moveBy(self, dx, dy, dz):
+        if dx:
+            x = self.getProperty('x')
+            self.setProperty('x', x+dx)
+        if dy:
+            y = self.getProperty('y')
+            self.setProperty('y', y+dy)
+        if dz:
+            z = self.getProperty('z')
+            self.setProperty('z', z+dz)
+    # end def
+
     def destroy(self):
         # QObject also emits a destroyed() Signal
         self.setParent(None)

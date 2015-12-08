@@ -199,14 +199,14 @@ class Oligo(ProxyObject):
     # end def
 
     def shouldHighlight(self):
-        if not self._strand5p:
-            return False
-        if self._strand5p.isScaffold():
-            return False
-        if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
-            return True
-        if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
-            return True
+        # if not self._strand5p:
+        #     return False
+        # if self._strand5p.isScaffold():
+        #     return False
+        # if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
+        #     return True
+        # if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
+        #     return True
         return False
     # end def
 
