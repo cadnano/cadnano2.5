@@ -3,7 +3,7 @@ from math import sqrt, atan2, degrees, pi
 import cadnano.util as util
 
 from PyQt5.QtCore import QEvent, QLineF, QObject, QPointF, Qt, QRectF
-from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
+from PyQt5.QtCore import QPropertyAnimation, pyqtProperty, QTimer
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsItem
@@ -108,14 +108,14 @@ class Triangle(QGraphicsPathItem):
 # end class
 
 class PhosBond(QGraphicsLineItem):
-    def __init__(self, is_fwd, width, parent=None):
+    def __init__(self, is_fwd, parent=None):
         super(PhosBond, self).__init__(parent)
         self.adapter = PropertyWrapperObject(self)
         color = parent._color
         if is_fwd: # lighter solid
-            self.setPen(getPenObj(color, width, alpha=42, capstyle=Qt.RoundCap))
+            self.setPen(getPenObj(color, 0.25, alpha=42, capstyle=Qt.RoundCap))
         else: # darker, dotted
-            self.setPen(getPenObj(color, width, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
+            self.setPen(getPenObj(color, 0.25, alpha=64, penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
     # end def
 # end class
 
@@ -133,8 +133,8 @@ class PreXoverItem(QGraphicsPathItem):
         self._default_line_3p = QLineF()
         self._default_p2_5p = QPointF(0,0)
         self._default_p2_3p = QPointF(0,0)
-        self._5p_line = PhosBond(is_fwd, 0.5, self)
-        self._3p_line = PhosBond(is_fwd, 0.25, self)
+        self._5p_line = PhosBond(is_fwd, self)
+        self._3p_line = PhosBond(is_fwd, self)
         # self.adapter = PropertyWrapperObject(self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
@@ -184,20 +184,23 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active):
+        phos = self._phos_item
         bond = self._5p_line
         if bond is None: return
 
         if is_active:
+            angle = 90 if self._is_fwd else -90
+            self.animate(phos, 'rotation', 300, 0, angle)
             bond.show()
             if self._item_5p:
-                print("hiding", self._item_5p)
                 self._item_5p._3p_line.hide()
-            # print("anim 5p bond", self._default_p2_5p, self._active_p2_5p)
-            self.animate(bond, 'bondp2', 2000, self._default_p2_5p, self._active_p2_5p)
+            self.animate(bond, 'bondp2', 300, self._default_p2_5p, self._active_p2_5p)
         else:
-            if self._item_5p: self._item_5p._3p_line.show()
-            self.animate(bond, 'bondp2', 2000, self._active_p2_5p, self._default_p2_5p)
-            # self.animate(bond, 'bondp2', 300, self._active_p2, self._default_p2_5p)
+            QTimer.singleShot(300, bond.hide)
+            self.animate(phos, 'rotation', 300, phos.rotation(), 0)
+            if self._item_5p: QTimer.singleShot(300, self._item_5p._3p_line.show)
+            self.animate(bond, 'bondp2', 300, self._active_p2_5p, self._default_p2_5p)
+    # end def
 
     def setActive3p(self, is_active):
         phos = self._phos_item
