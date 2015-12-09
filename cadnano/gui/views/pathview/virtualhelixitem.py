@@ -213,7 +213,7 @@ class PreXoverItem(QGraphicsRectItem):
     def name(self):
         vh_name = self._parent._vh_name()
         fwd_str = 'fwd' if self._is_fwd else 'rev'
-        idx = self._step_idx
+        idx = self.base_idx()
         angle = self.facing_angle()
         return '%s.%s.%d.%d' % (vh_name, fwd_str, idx, angle)
 
@@ -384,45 +384,34 @@ class PreXoverItemGroup(QGraphicsRectItem):
     def setActiveNeighbors(self, active_item, fwd_rev_idxs):
         # active_item is a PreXoverItem
         if active_item:
-            local_offset = self._vh_Z()/_BASE_WIDTH
+            # local_offset = self._vh_Z()/_BASE_WIDTH
             active_absolute_idx = active_item.absolute_idx()
             part = self._parent.part()
             cutoff = part.stepSize()
             active_idx = active_item.base_idx()
             step_idxs = range(0, part.maxBaseIdx(), part.stepSize())
             fwd_idxs, rev_idxs = fwd_rev_idxs
-            k = 1
-            snap_deltas = {}
+            k = 0
+            pre_xovers = {}
             for i,j in product(fwd_idxs, step_idxs):
-                # local_idx = util.clamp(i+j+local_offset, 0, part.maxBaseIdx()) 
-                delta = (i+j)-active_absolute_idx
-                if delta + local_offset == 0:
-                    item = self._fwd_pxo_items[i+j]
-                    item.setActiveNeighbor(True, shortcut='0', active_item=active_item)
-                    snap_deltas[0] = item.name()
-                    self._active_items.append(item)
-                elif abs(delta)<cutoff:
-                    item = self._fwd_pxo_items[i+j]
-                    item.setActiveNeighbor(True, shortcut=k, active_item=active_item)
-                    snap_deltas[k] = delta + local_offset
+                item = self._fwd_pxo_items[i+j]
+                delta = item.absolute_idx()-active_absolute_idx
+                if abs(delta)<cutoff:
+                    item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
+                    pre_xovers[k] = item.name()
                     k+=1
                     self._active_items.append(item)
             for i,j in product(rev_idxs, step_idxs):
-                # local_idx = util.clamp(i+j+local_offset, 0, part.maxBaseIdx()) 
-                delta = (i+j)-active_absolute_idx
-                if delta+local_offset == 0:
-                    item = self._rev_pxo_items[(i+j)]
-                    item.setActiveNeighbor(True, shortcut='0', active_item=active_item)
-                    snap_deltas[0] = item.name()
-                    self._active_items.append(item)
-                elif abs(delta)<cutoff:
-                    item = self._rev_pxo_items[(i+j)]
-                    item.setActiveNeighbor(True, shortcut=k, active_item=active_item)
-                    snap_deltas[k] = delta + local_offset
+                item = self._rev_pxo_items[i+j]
+                delta = item.absolute_idx()-active_absolute_idx
+                if abs(delta)<cutoff:
+                    item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
+                    pre_xovers[k] = item.name()
                     k+=1
                     self._active_items.append(item)
-            self._parent.partItem().setKeyPressDict(snap_deltas)
+            self._parent.partItem().setKeyPressDict(pre_xovers)
         else:
+            self._parent.partItem().setKeyPressDict({})
             while self._active_items:
                 self._active_items.pop().setActiveNeighbor(False)
     # end def
@@ -563,10 +552,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 # vh
                 item = pxig.getItem(is_fwd, step_idx)
                 pxig.updateViewActivePhos(item)
-                # _tbp = self.part()._TWIST_PER_BASE
-                # offset = round(vh_angle/_tbp, 0)
-                # idx = int(step_idx) + offset
-                # self._activephositem.update(is_fwd, step_idx, item.color())
             else:
                 hpxig.updateViewActivePhos(None) # vh-handle
                 pxig.updateViewActivePhos(None) # vh

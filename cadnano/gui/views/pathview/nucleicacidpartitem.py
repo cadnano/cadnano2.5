@@ -411,24 +411,31 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             return
 
         # active item
-        a_p = self._model_part.getProperty('active_phos')
-        vh_name, fwd_str, base_idx, facing_angle = a_p.split('.')
-        is_fwd = True if fwd_str == 'fwd' else False
-        vhi = self.getVHItemByName(vh_name)
+        active = self._model_part.getProperty('active_phos')
+        a_vh_name, a_fwd_str, a_base_idx, a_facing_angle = active.split('.')
+        a_strand_idx = 0 if a_fwd_str == 'fwd' else 1
+        a_idx = int(a_base_idx)
+        a_vhi = self.getVHItemByName(a_vh_name)
+        a_vh = a_vhi.virtualHelix()
 
-        if key != 0: # snap to align phosphates in z
-            delta_idx = self._keyPressDict[key]
-            z = _BASE_WIDTH*delta_idx
-            vhi.virtualHelix().moveBy(0, 0, z)
-        else:
-            neighbor = self._keyPressDict[key]
-            n_vh_name, n_fwd_str, n_base_idx, n_facing_angle = neighbor.split('.')
-            n_is_fwd = True if n_fwd_str == 'fwd' else False
 
-            if is_fwd == n_is_fwd:
-                print("parallel xover", a_p, neighbor)
-            else:
-                print("anti-parallel xover", a_p, neighbor)
+        neighbor = self._keyPressDict[key]
+        n_vh_name, n_fwd_str, n_base_idx, n_facing_angle = neighbor.split('.')
+        n_strand_idx = 0 if n_fwd_str == 'fwd' else 1
+        n_idx = int(n_base_idx)
+        n_vhi = self.getVHItemByName(n_vh_name)
+        n_vh = n_vhi.virtualHelix()
+
+        if not a_vh.hasStrandAtIdx(a_idx)[a_strand_idx]: return
+        if not n_vh.hasStrandAtIdx(n_idx)[n_strand_idx]: return
+
+        a_strandset = a_vh.getStrandSetByIdx(a_strand_idx)
+        n_strandset = n_vh.getStrandSetByIdx(n_strand_idx)
+
+        strand5p = a_strandset.getStrand(a_idx)
+        strand3p = n_strandset.getStrand(n_idx)
+        print("createXover", strand5p, a_idx, strand3p, n_idx)
+        self.part().createXover(strand5p, a_idx, strand3p, n_idx)
     # end def
 
     ### PUBLIC METHODS ###
