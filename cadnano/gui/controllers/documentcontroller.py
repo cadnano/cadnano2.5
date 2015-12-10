@@ -75,13 +75,9 @@ class DocumentController():
         self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
         self.win.action_modify.triggered.connect(self.actionModifySlot)
         self.win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
-        self.win.action_new_plasmidpart.triggered.connect(self.actionAddPlasmidPartSlot)
-        self.win.action_new_honeycomb_part.triggered.connect(\
-            self.actionAddHoneycombPartSlot)
-        self.win.action_new_square_part.triggered.connect(\
-            self.actionAddSquarePartSlot)
-        self.win.action_new_honeycombdnapart.triggered.connect(self.actionAddHoneycombDnaPart)
-        self.win.action_new_squarednapart.triggered.connect(self.actionAddSquareDnaPart)
+
+        self.win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
+
         self.win.closeEvent = self.windowCloseEventHandler
         self.win.action_about.triggered.connect(self.actionAboutSlot)
         self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
@@ -442,33 +438,10 @@ class DocumentController():
         # self.win.pathroot.setModifyState(isChecked)
         # self.win.sliceroot.setModifyState(isChecked)
 
-    def actionAddHoneycombPartSlot(self):
-        # part = self._document.addHoneycombPart()
-        # self.setActivePart(part)
-        pass
-    # end def
 
-    def actionAddSquarePartSlot(self):
-        # part = self._document.addSquarePart()
-        # self.setActivePart(part)
-        pass
-    # end def
-
-    def actionAddHoneycombDnaPart(self):
+    def actionAddDnaPart(self):
         part = self._document.addHoneycombDnaPart()
         self.setActivePart(part)
-    # end def
-
-    def actionAddSquareDnaPart(self):
-        part = self._document.addSquareDnaPart()
-        self.setActivePart(part)
-        pass
-    # end def
-
-    def actionAddPlasmidPartSlot(self):
-        # part = self._document.addPlasmidPart()
-        # self.setActivePart(part)
-        pass
     # end def
 
     def actionToggleOutlinerSlot(self):

@@ -46,10 +46,13 @@ class QuadtreeBase(object):
             return self.insertIntoChildren(node)
     # end def
 
-    def rect(self):
+    def rect(self, scale_factor=1.0):
         x, y = self.center
-        half_size = self.size / 2
+        x *= scale_factor
+        y *= scale_factor
+        half_size = scale_factor*(self.size / 2)
         return x - half_size, y - half_size, x + half_size, y + half_size
+    # end def
 
     def removeNode(self, node):
         res = self.findNodeByNode(node)

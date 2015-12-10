@@ -12,11 +12,11 @@ class SliceToolManager(AbstractToolManager):
         We store mainWindow because a controller's got to have
         references to both the layer above (UI) and the layer below (model)
         """
-        super(SliceToolManager, self).__init__('slice', window)
-        self.tool_names = ('Select', 'Create')
-        self.select_tool = SelectSliceTool(self)
+        super(SliceToolManager, self).__init__('vhelix', window)
+        self.tool_names = ('Create', 'Select')
         self.create_tool = CreateSliceTool(self)
-        # self.installTools()
+        self.select_tool = SelectSliceTool(self)
+        self.installTools()
         self._connectWindowSignalsToSelf()
     # end def
 

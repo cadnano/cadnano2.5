@@ -491,25 +491,6 @@ class Document(CNObject):
         return honeycombdnapart
     # end def
 
-    def addSquareDnaPart(self, max_row=prefs.SQUARE_PART_MAXROWS,
-                         max_col=prefs.SQUARE_PART_MAXCOLS,
-                         max_steps=prefs.SQUARE_PART_MAXSTEPS):
-        """
-        Create and store a new SquareDnaPart and instance, and return the instance.
-        """
-        squarednapart = SquareDnaPart(document=self, max_row=max_row,
-                              max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(squarednapart))
-        return squarednapart
-    # end def
-
-    def addPlasmidPart(self):
-        """Create and store a new PlasmidPart and instance, and return the instance."""
-        plasmidpart = PlasmidPart(document=self)
-        self._addPart(ObjectInstance(plasmidpart))
-        return PlasmidPart
-    # end def
-
     def removeAllParts(self):
         """Used to reset the document. Not undoable.
         DEPRECATED, use removeAllChildren

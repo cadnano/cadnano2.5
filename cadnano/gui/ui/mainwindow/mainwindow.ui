@@ -382,10 +382,11 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_create_helix"/>
-   <addaction name="action_move_helix"/>
-   <addaction name="action_snap_helix"/>
-   <addaction name="action_select_helix_angles"/>
+   <addaction name="action_new_dnapart"/>
+   <addaction name="action_vhelix_create"/>
+   <addaction name="action_vhelix_select"/>
+   <addaction name="action_vhelix_snap"/>
+   <addaction name="action_vhelix_set_angles"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -941,19 +942,19 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_honeycombdnapart">
+  <action name="action_new_dnapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/hcpro</normaloff>:/parttools/hcpro</iconset>
    </property>
    <property name="text">
-    <string>HcPro</string>
+    <string>dnap</string>
    </property>
    <property name="iconText">
-    <string>Hc</string>
+    <string>dna</string>
    </property>
    <property name="toolTip">
-    <string>Add HoneycombDNAPart </string>
+    <string>Add DNAPart </string>
    </property>
   </action>
   <action name="action_outliner">
@@ -968,7 +969,7 @@
      <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
    </property>
    <property name="text">
-    <string>Parts</string>
+    <string>browser</string>
    </property>
    <property name="toolTip">
     <string>Toggle Outliner</string>
@@ -1097,7 +1098,7 @@
     <string>1</string>
    </property>
   </action>
-  <action name="action_create_helix">
+  <action name="action_vhelix_create">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/create-helix</normaloff>:/slicetools/create-helix</iconset>
@@ -1151,7 +1152,7 @@
     <string>R</string>
    </property>
   </action>
-  <action name="action_move_helix">
+  <action name="action_vhelix_select">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1160,13 +1161,13 @@
      <normaloff>:/slicetools/move-helix</normaloff>:/slicetools/move-helix</iconset>
    </property>
    <property name="text">
-    <string>move</string>
+    <string>select</string>
    </property>
    <property name="toolTip">
-    <string>Move Helix</string>
+    <string>Select Helix</string>
    </property>
   </action>
-  <action name="action_snap_helix">
+  <action name="action_vhelix_snap">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1181,7 +1182,7 @@
     <string>Snap Helix</string>
    </property>
   </action>
-  <action name="action_select_helix_angles">
+  <action name="action_vhelix_set_angles">
    <property name="checkable">
     <bool>true</bool>
    </property>

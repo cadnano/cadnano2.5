@@ -34,10 +34,7 @@ class SliceRootItem(QGraphicsRectItem):
         """
         part_type = model_part_instance.reference().partType()
 
-        if part_type == PartType.PLASMIDPART:
-            plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
-            self._instance_items[plasmid_part_item] = plasmid_part_item
-        elif part_type == PartType.NUCLEICACIDPART:
+        if part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
                 active_tool_getter=self._window.slice_tool_manager.activeToolGetter,
                 parent=self)
