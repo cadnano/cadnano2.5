@@ -434,8 +434,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         strand5p = a_strandset.getStrand(a_idx)
         strand3p = n_strandset.getStrand(n_idx)
-        print("createXover", strand5p, a_idx, strand3p, n_idx)
-        self.part().createXover(strand5p, a_idx, strand3p, n_idx)
+        # print("createXover", strand5p, a_idx, strand3p, n_idx)
+        if not strand5p.connection3p():
+            self.part().createXover(strand5p, a_idx, strand3p, n_idx)
     # end def
 
     ### PUBLIC METHODS ###
