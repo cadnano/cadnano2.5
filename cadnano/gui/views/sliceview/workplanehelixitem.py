@@ -152,18 +152,6 @@ class WorkplaneHelixItem(QGraphicsEllipseItem):
                 self.dragSessionAction(ci)
     # end def
 
-    def groupStrandsByPart(self, strand_coords):
-        part_strand_dict = defaultdict(list)
-        doc = self.part().document()
-        parts_name_dict = doc.getPartsDict()
-        for part_name, row, col, ss_base_low_idx in strand_coords:
-                part = parts_name_dict[part_name]
-                vh = part.virtualHelixAtCoord((row, col))
-                strand = vh.scaffoldStrandSet().getStrand(ss_base_low_idx)
-                part_strand_dict[part].append([vh, strand, ss_base_low_idx])
-        return part_strand_dict
-    # end
-
     def getPartPosition(self):
         """return position within part item
         """
@@ -207,22 +195,6 @@ class WorkplaneHelixItem(QGraphicsEllipseItem):
 
     def nop(self):
         self._part_item.updateStatusBar("(%d, %d)" % self._coord)
-
-    def addScafAtActiveSliceIfMissing(self):
-        vh = self.virtualHelix()
-        part = self.part()
-        if vh is None:
-            return
-
-        idx = part.activeBaseIndex()
-        start_idx = max(0, idx - 1)
-        end_idx = min(idx+1, part.maxBaseIdx())
-        vh.scaffoldStrandSet().createStrand(start_idx, end_idx)
-
-        x, y = self._coord
-        tup = (part.getName(), x, y)
-        self._part_item.updateStatusBar("%s:(%d, %d)" % tup)
-    # end def
 
     def addStapAtActiveSliceIfMissing(self):
         vh = self.virtualHelix()
