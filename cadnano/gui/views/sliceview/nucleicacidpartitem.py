@@ -35,7 +35,7 @@ _BOUNDING_RECT_PADDING = 10
 class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
-    def __init__(self, model_part_instance, parent=None):
+    def __init__(self, model_part_instance, active_tool_getter, parent=None):
         """
         Parent should be either a SliceRootItem, or an AssemblyItem.
 
@@ -48,9 +48,12 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
+
+        self._getActiveTool = active_tool_getter
+
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
-        self._scaleFactor = self._RADIUS / m_p.radius()
+        self._scale_factor = self._RADIUS / m_p.radius()
         self._empty_helix_hash = {}
         self._virtual_helix_hash = {}
         self._nrows, self._ncols = 0, 0
@@ -239,7 +242,7 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
     # end def
 
     def scaleFactor(self):
-        return self._scaleFactor
+        return self._scale_factor
     # end def
 
     def setPart(self, new_part):
@@ -345,6 +348,35 @@ class NucleicAcidPartItem(QGraphicsItem, AbstractPartItem):
         self.part().setSelected(True)
         QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    ### EVENT HANDLERS ###
+    def newmousePressEvent(self, event):
+        """
+        Parses a mousePressEvent to extract strand_set and base index,
+        forwarding them to approproate tool method as necessary.
+        """
+        # self.scene().views()[0].addToPressList(self)
+        tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
+
+        ### uncomment for debugging modifier selection
+        # strand_set, idx = self.baseAtPoint()
+        # row, col = strand_set.virtualHelix().coord()
+        # self._part_item.part().selectPreDecorator([(row,col,idx)])
+        x, y = self.getModelPos(event.pos())
+
+        if hasattr(self, tool_method_name):
+            self._last_strand_set, self._last_idx = strand_set, idx
+            getattr(self, tool_method_name)(strand_set, idx)
+        else:
+            event.setAccepted(False)
+    # end def
+
+    def getModelPos(self, pos):
+        sf = self._scale_factor
+        x, y = pos.x()/sf, pos.y()/sf
+        print("model position", x, y)
+    # end def
+
 
 
     class Deselector(QGraphicsItem):
@@ -494,7 +526,7 @@ class DragHandle(QGraphicsRectItem):
         m_p = self._parent._model_part
 
         # start bounds with topLeft at max, botRight at min
-        x1, y1 = m_p.dimensions(self._parent._scaleFactor)
+        x1, y1 = m_p.dimensions(self._parent._scale_factor)
         x2, y2 = 0, 0
         rRect = self.mapRectToScene(rect)
         # only show helices >50% inside rRect

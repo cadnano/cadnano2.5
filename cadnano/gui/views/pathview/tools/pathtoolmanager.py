@@ -54,10 +54,10 @@ class PathToolManager(QObject):
             return tool_widget
         # end def
         tools = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
-        ag = QActionGroup(win)
+        self.ag = QActionGroup(win)
         # Call installTool on every tool
-        list(map((lambda tool_name: ag.addAction(installTool(tool_name, win))), tools))
-        ag.setExclusive(True)
+        list(map((lambda tool_name: self.ag.addAction(installTool(tool_name, win))), tools))
+        self.ag.setExclusive(True)
         # Select the preferred Startup tool
         startup_tool_name = app().prefs.getStartupToolName()
         getattr(self, 'choose' + startup_tool_name + 'Tool')()
