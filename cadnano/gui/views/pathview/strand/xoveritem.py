@@ -80,6 +80,11 @@ class XoverNode3(QGraphicsRectItem):
             self._partner_virtual_helix = None
     # end def
 
+    def absolute_idx(self):
+        offset = self._vhi.x() / _BASE_WIDTH
+        return self._idx + offset
+    # end def
+
     def idx(self):
         return self._idx
     # end def
@@ -414,14 +419,15 @@ class XoverItem(QGraphicsPathItem):
         tempR = painterpath.boundingRect()
         tempR.adjust(-bw/2, 0, bw, 0)
         self._click_area.setRect(tempR)
-        self.setPath(painterpath)
         node3.updatePositionAndAppearance()
         node5.updatePositionAndAppearance()
+        self._updateColor(strand5p)
+        self.setPath(painterpath)
 
         if group:
             group.addToGroup(self)
 
-        self._updateColor(strand5p)
+
     # end def
 
     def updateLabels(self):
@@ -433,12 +439,18 @@ class XoverItem(QGraphicsPathItem):
     def _updateColor(self, strand):
         oligo = strand.oligo()
         color = self.pen().color().name() if self.isSelected() else oligo.getColor()
-        if oligo.shouldHighlight():
-            pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
-            alpha = 128
-        else:
-            pen_width = styles.PATH_STRAND_STROKE_WIDTH
-            alpha = 255
+        # if oligo.shouldHighlight():
+        #     pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
+        #     alpha = 128
+        # else:
+        #     pen_width = styles.PATH_STRAND_STROKE_WIDTH
+        #     alpha = 255
+        pen_width = styles.PATH_STRAND_STROKE_WIDTH
+        alpha = 255
+        if self._node5 and self._node3:
+            if self._node5.absolute_idx() != self._node3.absolute_idx():
+                pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
+                alpha = 128
         pen = getPenObj(color, pen_width, alpha=alpha, capstyle=Qt.FlatCap)
         self.setPen(pen)
     # end def

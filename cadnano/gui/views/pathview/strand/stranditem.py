@@ -70,7 +70,7 @@ class StrandItem(QGraphicsLineItem):
 
         self.setZValue(styles.ZSTRANDITEM)
 
-        # xover comming from the 3p end
+        # xover coming from the 3p end
         self._xover3pEnd = XoverItem(self, virtual_helix_item)
         if not getBatch():
             # initial refresh

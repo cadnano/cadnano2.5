@@ -533,9 +533,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             self.setX(z)
             self._handle.setX(z-_VH_XOFFSET)
             self.part().partDimensionsChangedSignal.emit(self.part(), True)
-
-            # todo: redraw all xover lines
-
+            # self._part_item.updateXoverItems(self)
         elif property_key == 'eulerZ':
             self._handle.rotateWithCenterOrigin(new_value)
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
