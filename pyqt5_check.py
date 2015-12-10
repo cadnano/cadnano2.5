@@ -187,7 +187,12 @@ def checker():
             raise OSError("Download PyQt5 installer from Riverbank software")
         else:
             print("OS is Linux or Mac")
-            pyroot_path = distutils.sysconfig.BASE_PREFIX
+            try:
+                pyroot_path = distutils.sysconfig.BASE_PREFIX
+            except:
+                vinfo = sys.version_info
+                print("Probably running python 2: {}.{}".format(vinfo[0], vinfo[1]))
+                pyroot_path = distutils.sysconfig.PREFIX
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]) )
             get_qt5(pyroot_path, qt5_path, is_static=is_static)
             try:
