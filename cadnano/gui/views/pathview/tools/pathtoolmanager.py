@@ -1,10 +1,8 @@
 import os
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from PyQt5.QtWidgets import QActionGroup
+from PyQt5.QtCore import pyqtSignal
 
-from cadnano import app
-from cadnano import util
+from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
 
 from .selecttool import SelectTool
 from .penciltool import PencilTool
@@ -16,15 +14,13 @@ from .addseqtool import AddSeqTool
 from .modstool import ModsTool
 
 
-class PathToolManager(QObject):
+class PathToolManager(AbstractToolManager):
     """
     Manages the interactions between Path widgets / UI elements and the model.
     """
-    def __init__(self, win):
-        super(PathToolManager, self).__init__()
-        self.window = win
-        self._active_tool = None
-        self._active_part = None
+    def __init__(self, window):
+        super(PathToolManager, self).__init__('path', window)
+        self.tool_names = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
         self.select_tool = SelectTool(self)
         self.pencil_tool = PencilTool(self)
         self.nick_tool = BreakTool(self)
@@ -33,37 +29,10 @@ class PathToolManager(QObject):
         self.paint_tool = PaintTool(self) # (self, win.path_graphics_view.toolbar)
         self.add_seq_tool = AddSeqTool(self)
         self.mods_tool = ModsTool(self)
-
-        def installTool(tool_name, window):
-            l_tool_name = tool_name.lower()
-            tool_widget = getattr(window, 'action_path_' + l_tool_name)
-            tool = getattr(self, l_tool_name + '_tool')
-            tool.action_name = 'action_path_' + tool_name
-
-            def clickHandler(self):
-                tool_widget.setChecked(True)
-                self.setActiveTool(tool)
-                if hasattr(tool, 'widgetClicked'):
-                    tool.widgetClicked()
-            # end def
-
-            select_tool_method_name = 'choose' + tool_name + 'Tool'
-            setattr(self.__class__, select_tool_method_name, clickHandler)
-            handler = getattr(self, select_tool_method_name)
-            tool_widget.triggered.connect(handler)
-            return tool_widget
-        # end def
-        tools = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
-        self.ag = QActionGroup(win)
-        # Call installTool on every tool
-        list(map((lambda tool_name: self.ag.addAction(installTool(tool_name, win))), tools))
-        self.ag.setExclusive(True)
-        # Select the preferred Startup tool
-        startup_tool_name = app().prefs.getStartupToolName()
-        getattr(self, 'choose' + startup_tool_name + 'Tool')()
+        self.installTools()
+    # end def
 
     ### SIGNALS ###
-    activeToolChangedSignal = pyqtSignal(str)
 
     ### SLOTS ###
 
@@ -73,9 +42,6 @@ class PathToolManager(QObject):
 
     def setActivePart(self, part):
         self._active_part = part
-
-    def activeToolGetter(self):
-        return self._active_tool
 
     def setActiveTool(self, new_active_tool):
         if new_active_tool == self._active_tool:
