@@ -333,8 +333,8 @@
    <attribute name="toolBarBreak">
     <bool>true</bool>
    </attribute>
-   <addaction name="action_filter_scaf"/>
-   <addaction name="action_filter_stap"/>
+   <addaction name="action_filter_fwd"/>
+   <addaction name="action_filter_rev"/>
    <addaction name="action_filter_endpoint"/>
    <addaction name="action_filter_xover"/>
    <addaction name="separator"/>
@@ -382,8 +382,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_new_honeycombdnapart"/>
-   <addaction name="action_new_squarednapart"/>
+   <addaction name="action_create_helix"/>
+   <addaction name="action_move_helix"/>
+   <addaction name="action_snap_helix"/>
+   <addaction name="action_select_helix_angles"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1093,6 +1095,105 @@
    </property>
    <property name="shortcut">
     <string>1</string>
+   </property>
+  </action>
+  <action name="action_create_helix">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/create-helix</normaloff>:/slicetools/create-helix</iconset>
+   </property>
+   <property name="text">
+    <string>create</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Helix</string>
+   </property>
+  </action>
+  <action name="action_filter_fwd">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-fwd</normaloff>:/parttools/filter-fwd</iconset>
+   </property>
+   <property name="text">
+    <string>filter-fwd</string>
+   </property>
+   <property name="toolTip">
+    <string>(F)wd</string>
+   </property>
+   <property name="shortcut">
+    <string>F</string>
+   </property>
+  </action>
+  <action name="action_filter_rev">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-rev</normaloff>:/parttools/filter-rev</iconset>
+   </property>
+   <property name="text">
+    <string>filter-rev</string>
+   </property>
+   <property name="toolTip">
+    <string>(R)ev</string>
+   </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
+  </action>
+  <action name="action_move_helix">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/move-helix</normaloff>:/slicetools/move-helix</iconset>
+   </property>
+   <property name="text">
+    <string>move</string>
+   </property>
+   <property name="toolTip">
+    <string>Move Helix</string>
+   </property>
+  </action>
+  <action name="action_snap_helix">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/snap-helix</normaloff>:/slicetools/snap-helix</iconset>
+   </property>
+   <property name="text">
+    <string>snap</string>
+   </property>
+   <property name="toolTip">
+    <string>Snap Helix</string>
+   </property>
+  </action>
+  <action name="action_select_helix_angles">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/select-snap-angles</normaloff>:/slicetools/select-snap-angles</iconset>
+   </property>
+   <property name="text">
+    <string>angles</string>
+   </property>
+   <property name="toolTip">
+    <string>Helix angle</string>
    </property>
   </action>
  </widget>
