@@ -28,6 +28,8 @@
         <file alias="filter-pre-axover">images/part-filter-pre-axover.png</file>
         <file alias="filter-odd">images/part-filter-odd.png</file>
         <file alias="filter-even">images/part-filter-even.png</file>
+        <file alias="filter-rev">images/part-filter-rev.png</file>
+        <file alias="filter-fwd">images/part-filter-fwd.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>
@@ -36,6 +38,10 @@
         <file alias="select">images/slice-edit.png</file>
         <file alias="go-last">images/slice-go-last.png</file>
         <file alias="go-first">images/slice-go-first.png</file>
+        <file alias="create-helix">images/slice-create-helix.png</file>
+        <file alias="move-helix">images/slice-move-helix.png</file>
+        <file alias="snap-helix">images/slice-snap-helix.png</file>
+        <file alias="select-snap-angles">images/slice-snap-angles.png</file>
     </qresource>
     <qresource prefix="/pathtools">
         <file alias="autobreak">images/path-autobreak.png</file>
