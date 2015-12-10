@@ -420,8 +420,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             event_start, handle_start = self._button_down_coords
             delta = self.mapToScene(event.pos()) - event_start
             x = handle_start.x() + int(floor(delta.x())/_BASE_WIDTH)*_BASE_WIDTH
-            self.setX(x)
-            self._virtual_helix_item.setX(x+_VH_XOFFSET)
+            if x != self.x():
+                self.setX(x)
+                self._virtual_helix_item.setX(x+_VH_XOFFSET)
+                self.partItem().updateXoverItems(self._virtual_helix_item)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
