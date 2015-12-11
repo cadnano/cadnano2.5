@@ -401,6 +401,7 @@ class Ui_MainWindow(object):
         self.action_filter_odd.setIcon(icon35)
         self.action_filter_odd.setObjectName("action_filter_odd")
         self.action_vhelix_create = QtWidgets.QAction(MainWindow)
+        self.action_vhelix_create.setCheckable(True)
         icon36 = QtGui.QIcon()
         icon36.addPixmap(QtGui.QPixmap(":/slicetools/create-helix"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_vhelix_create.setIcon(icon36)

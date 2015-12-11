@@ -187,12 +187,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partVirtualHelixAddedSlot(self, sender, virtual_helix):
         vh = virtual_helix
-        coords = vh.coord()
-
-        empty_helix_item = self._empty_helix_hash[coords]
         # TODO test to see if self._virtual_helix_hash is necessary
-        vhi = VirtualHelixItem(vh, empty_helix_item)
-        self._virtual_helix_hash[coords] = vhi
+        vhi = VirtualHelixItem(vh, self)
+        # self._virtual_helix_hash[coords] = vhi
     # end def
 
     def partVirtualHelixRenumberedSlot(self, sender, coord):
@@ -256,17 +253,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._rect = QRectF(*self.part().dimensions(self._scale_factor))
     # end def
 
-    def _spawnEmptyHelixItemAt(self, row, column):
-        helix = EmptyHelixItem(row, column, self)
-        # helix.setFlag(QGraphicsItem.ItemStacksBehindParent, True)
-        self._empty_helix_hash[(row, column)] = helix
-    # end def
-
-    def _killHelixItemAt(row, column):
-        s = self._empty_helix_hash[(row, column)]
-        s.scene().removeItem(s)
-        del self._empty_helix_hash[(row, column)]
-    # end def
 
     def _setLattice(self, old_coords, new_coords):
         """A private method used to change the number of rows,
@@ -337,53 +323,28 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         self.part().setSelected(True)
-        self.newmousePressEvent(event)
-        QGraphicsItem.mousePressEvent(self, event)
-    # end def
-
-    ### EVENT HANDLERS ###
-    def newmousePressEvent(self, event):
-        """
-        Parses a mousePressEvent to extract strand_set and base index,
-        forwarding them to approproate tool method as necessary.
-        """
-        # self.scene().views()[0].addToPressList(self)
         tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
-
-        ### uncomment for debugging modifier selection
-        # strand_set, idx = self.baseAtPoint()
-        # row, col = strand_set.virtualHelix().coord()
-        # self._part_item.part().selectPreDecorator([(row,col,idx)])
-        x, y = self.getModelPos(event.pos())
-
-        # if hasattr(self, tool_method_name):
-        #     getattr(self, tool_method_name)(strand_set, idx)
-        # else:
-        #     event.setAccepted(False)
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(event)
+        else:
+            event.setAccepted(False)
+            QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def getModelPos(self, pos):
         sf = self._scale_factor
         x, y = pos.x()/sf, pos.y()/sf
-        print("model position", x, y)
         return x,y
     # end def
 
     def createToolMousePress(self, event):
-        event.setAccepted(False)
-        current_filter_dict = self._viewroot.selectionFilterDict()
-        if self.strandFilter() in current_filter_dict and self._filter_name in current_filter_dict:
-            selection_group = self._viewroot.strandItemSelectionGroup()
-            mod = Qt.MetaModifier
-            if not (event.modifiers() & mod):
-                 selection_group.clearSelection(False)
-            selection_group.setSelectionLock(selection_group)
-            selection_group.pendToAdd(self)
-            selection_group.pendToAdd(self._low_cap)
-            selection_group.pendToAdd(self._high_cap)
-            selection_group.processPendingToAddList()
-            event.setAccepted(True)
-            return selection_group.mousePressEvent(event)
+        # 1. get point in model coordinates:
+        x, y = self.getModelPos(event.pos())
+        mod = Qt.MetaModifier
+        if not (event.modifiers() & mod):
+            pass
+        print("create tool model position", x, y)
+        self._model_part.createVirtualHelix(x, y)
     # end def
 
 

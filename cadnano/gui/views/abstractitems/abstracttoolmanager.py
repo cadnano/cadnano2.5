@@ -45,6 +45,8 @@ class AbstractToolManager(QObject):
         tool = getattr(self, l_tool_name + '_tool')
         tool.action_name = action_name
 
+        set_active_tool_method_name = 'choose%sTool' % (tool_name)
+
         def clickHandler(self):
             tool_widget.setChecked(True)
             self.setActiveTool(tool)
@@ -52,9 +54,8 @@ class AbstractToolManager(QObject):
                 tool.widgetClicked()
         # end def
 
-        select_tool_method_name = 'choose%sTool' % (tool_name)
-        setattr(self.__class__, select_tool_method_name, clickHandler)
-        handler = getattr(self, select_tool_method_name)
+        setattr(self.__class__, set_active_tool_method_name, clickHandler)
+        handler = getattr(self, set_active_tool_method_name)
         tool_widget.triggered.connect(handler)
         return tool_widget
     # end def

@@ -1100,6 +1100,9 @@
    </property>
   </action>
   <action name="action_vhelix_create">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/create-helix</normaloff>:/slicetools/create-helix</iconset>

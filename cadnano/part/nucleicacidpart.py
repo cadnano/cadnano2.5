@@ -79,10 +79,9 @@ class NucleicAcidPart(Part):
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties["name"] = "Origami%d" % self._count()
         # ID assignment
-        self.odd_recycle_bin, self.even_recycle_bin = [], []
+        self.recycle_bin = []
         self.reserve_bin = set()
-        self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
-        self._highest_used_even = -2  # same
+        self._highest_used = -1  # Used in _reserveHelixIDNumber
 
         # Runtime state
         self._active_base_index = self._STEP
@@ -533,8 +532,8 @@ class NucleicAcidPart(Part):
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def createVirtualHelix(self, row, col, use_undostack=True):
-        c = CreateVirtualHelixCommand(self, row, col)
+    def createVirtualHelix(self, x, y, use_undostack=True):
+        c = CreateVirtualHelixCommand(self, x, y)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
                                                 use_undostack=use_undostack)
     # end def
@@ -889,7 +888,7 @@ class NucleicAcidPart(Part):
         self._quadtree.removeNode(virtual_helix)
     # end def
 
-    def _reserveHelixIDNumber(self, is_parity_even=True, requested_id_num=None):
+    def _reserveHelixIDNumber(self, requested_id_num=None):
         """
         Reserves and returns a unique numerical label appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
@@ -899,41 +898,25 @@ class NucleicAcidPart(Part):
         if num is not None:  # We are handling a request for a particular number
             assert num >= 0, int(num) == num
             # assert not num in self._number_to_virtual_helix
-            if num in self.odd_recycle_bin:
-                self.odd_recycle_bin.remove(num)
+            if num in self.recycle_bin:
+                self.recycle_bin.remove(num)
                 # rebuild the heap since we removed a specific item
-                heapify(self.odd_recycle_bin)
-                return num
-            if num in self.even_recycle_bin:
-                self.even_recycle_bin.remove(num)
-                # rebuild the heap since we removed a specific item
-                heapify(self.even_recycle_bin)
+                heapify(self.recycle_bin)
                 return num
             self.reserve_bin.add(num)
             return num
         # end if
         else:
-            # Just find any valid index (subject to parity constraints)
-            if is_parity_even:
-                if len(self.even_recycle_bin):
-                    return heappop(self.even_recycle_bin)
-                else:
-                    while self._highest_used_even + 2 in self.reserve_bin:
-                        self._highest_used_even += 2
-                    self._highest_used_even += 2
-                    self.reserve_bin.add(self._highest_used_even)
-                    return self._highest_used_even
+            if len(self.recycle_bin):
+                return heappop(self.recycle_bin)
             else:
-                if len(self.odd_recycle_bin):
-                    return heappop(self.odd_recycle_bin)
-                else:
-                    # use self._highest_used_odd iff the recycle bin is empty
-                    # and highestUsedOdd+2 is not in the reserve bin
-                    while self._highest_used_odd + 2 in self.reserve_bin:
-                        self._highest_used_odd += 2
-                    self._highest_used_odd += 2
-                    self.reserve_bin.add(self._highest_used_odd)
-                    return self._highest_used_odd
+                # use self._highest_used if the recycle bin is empty
+                # and _highest_used + 1 is not in the reserve bin
+                while self._highest_used + 1 in self.reserve_bin:
+                    self._highest_used += 1
+                self._highest_used += 1
+                self.reserve_bin.add(self._highest_used)
+                return self._highest_used
         # end else
     # end def
 

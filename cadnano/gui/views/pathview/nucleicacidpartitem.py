@@ -179,7 +179,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
-        self._virtual_helix_hash[vh.coord()] = vhi
+        # self._virtual_helix_hash[vh.coord()] = vhi
 
         # reposition when first VH is added
         if len(self._virtual_helix_item_list) == 0:

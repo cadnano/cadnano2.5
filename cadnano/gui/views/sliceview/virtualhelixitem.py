@@ -36,17 +36,17 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
     and paints its corresponding VirtualHelix number.
     """
-    def __init__(self, model_virtual_helix, empty_helix_item):
+    def __init__(self, model_virtual_helix, part_item):
         """
         empty_helix_item is a EmptyHelixItem that will act as a QGraphicsItem parent
         """
-        super(VirtualHelixItem, self).__init__(parent=empty_helix_item)
+        super(VirtualHelixItem, self).__init__(parent=part_item)
         self._virtual_helix = model_virtual_helix
-        self._empty_helix_item = ehi = empty_helix_item
-        self._part_item = ehi._part_item
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
 
         self.hide()
+        x, y = model_virtual_helix.location(part_item.scaleFactor())
+        self.setPos(x, y)
 
         self.setAcceptHoverEvents(True)
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -148,9 +148,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()
         self._controller = None
-        self._empty_helix_item.setNotHovered()
+        # self._empty_helix_item.setNotHovered()
         self._virtual_helix = None
-        self._empty_helix_item = None
+        # self._empty_helix_item = None
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
@@ -254,7 +254,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def part(self):
-        return self._empty_helix_item.part()
+        return self._virtual_helix.part()
 
     def virtualHelix(self):
         return self._virtual_helix
@@ -301,22 +301,22 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         QGraphicsItem.sceneEvent(self, event)
         return False
 
-    def hoverEnterEvent(self, event):
-        """
-        If the selection is configured to always select
-        everything, we don't draw a focus ring around everything,
-        instead we only draw a focus ring around the hovered obj.
-        """
-        # if self.selectAllBehavior():
-        #     self.setSelected(True)
-        # forward the event to the empty_helix_item as well
-        self._empty_helix_item.hoverEnterEvent(event)
-    # end def
+    # def hoverEnterEvent(self, event):
+    #     """
+    #     If the selection is configured to always select
+    #     everything, we don't draw a focus ring around everything,
+    #     instead we only draw a focus ring around the hovered obj.
+    #     """
+    #     # if self.selectAllBehavior():
+    #     #     self.setSelected(True)
+    #     # forward the event to the empty_helix_item as well
+    #     # self._empty_helix_item.hoverEnterEvent(event)
+    # # end def
 
-    def hoverLeaveEvent(self, event):
-        # if self.selectAllBehavior():
-        #     self.setSelected(False)
-        self._empty_helix_item.hoverEnterEvent(event)
-    # end def
+    # def hoverLeaveEvent(self, event):
+    #     # if self.selectAllBehavior():
+    #     #     self.setSelected(False)
+    #     self._empty_helix_item.hoverEnterEvent(event)
+    # # end def
 # end class
 

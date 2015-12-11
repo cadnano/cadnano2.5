@@ -450,7 +450,7 @@ class CustomQGraphicsView(QGraphicsView):
         scale_change = new_scale_level / current_scale_level
         self.scale(scale_change, scale_change)
 
-        self.resetGL()
+        # self.resetGL()
     # end def
 
     def zoomIn(self, fraction_of_max=0.5):
@@ -521,7 +521,7 @@ class CustomQGraphicsView(QGraphicsView):
         # this is good for selection
         self.scale(self._scale_fit_factor, self._scale_fit_factor)
         self._scale_size *= self._scale_fit_factor
-        self.resetGL()
+        # self.resetGL()
     # end def
 
     def paintEvent(self, event):

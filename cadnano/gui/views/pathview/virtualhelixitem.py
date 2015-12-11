@@ -211,10 +211,10 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
         self.setPath(path)
 
-        if self._model_virtual_helix.scaffoldIsOnTop():
-            scaffoldY = 0
-        else:
-            scaffoldY = bw
+        # if self._model_virtual_helix.scaffoldIsOnTop():
+        #     scaffoldY = 0
+        # else:
+        scaffoldY = bw
     # end def
 
     def resize(self):

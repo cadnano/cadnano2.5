@@ -24,6 +24,11 @@ class AbstractSliceTool(QGraphicsObject):
     # def boundingRect(self):
     #     return self._rect
 
+    def widgetClicked(self):
+        """Called every time a widget representing self gets clicked,
+        not just when changing tools."""
+        pass
+
     def setActive(self, will_be_active, old_tool=None):
         """
         Called by SliceToolManager.setActiveTool when the tool becomes

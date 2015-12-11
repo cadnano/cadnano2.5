@@ -2,13 +2,11 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.virtualhelix import VirtualHelix
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(self, part, row, col):
+    def __init__(self, part, x, y):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self._part = part
-        self._is_parity_even = part.isEvenParity(row, col)
-        id_num = part._reserveHelixIDNumber(self._is_parity_even,
-                                            requested_id_num=None)
-        self._vhelix = VirtualHelix(part, row, col, id_num)
+        id_num = part._reserveHelixIDNumber(requested_id_num=None)
+        self._vhelix = VirtualHelix(part, x, y, id_num)
         self._id_num = id_num
         # self._batch = batch
     # end def
@@ -21,8 +19,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         part._addVirtualHelix(vh)
         vh.setNumber(id_num)
         # need to always reserve an id
-        part._reserveHelixIDNumber(self._is_parity_even,
-                                    requested_id_num=id_num)
+        part._reserveHelixIDNumber(requested_id_num=id_num)
         # end if
         part.partVirtualHelixAddedSignal.emit(part, vh)
         part.partActiveSliceResizeSignal.emit(part)

@@ -66,7 +66,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partVirtualHelixAddedSlot(self, model_part, model_virtual_helix):
         m_vh = model_virtual_helix
         m_vh.virtualHelixRemovedSignal.connect(self.partVirtualHelixRemovedSlot)
-        vh_i = VirtualHelixItem(m_vh, self._root_items['VHelixList'])
+        vh_i = VirtualHelixItem(m_vh, self)
         self._items[id(m_vh)] = vh_i
 
     def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):

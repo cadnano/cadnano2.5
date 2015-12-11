@@ -16,12 +16,11 @@ class VirtualHelix(CNObject):
     form a length of rope.
     """
     editable_properties = ['name', 'color']
-    def __init__(self, part, row, col, idnum=0):
+    def __init__(self, part, x, y, idnum=0):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)
-        x, y = part.latticeCoordToPositionXY(row, col)
         self._location = Vector3(x, y, 0.)
-        self._coord = (row, col) # col, row
+
         self._part = part
         self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
         self._stap_strandset = StrandSet(StrandType.STAPLE, self)
@@ -37,12 +36,8 @@ class VirtualHelix(CNObject):
         self._properties = {'eulerZ':0, 'scamZ':0, 'neighbors':'[]'}
 
         # rotate to honeycomb defaults
-        if self.isEvenParity():
-            self._properties['eulerZ'] = 10
-            self._properties['scamZ'] = 10
-        else:
-            self._properties['eulerZ'] = 190
-            self._properties['scamZ'] = 190
+        self._properties['eulerZ'] = 10
+        self._properties['scamZ'] = 10
     # end def
 
     def __repr__(self):
@@ -67,10 +62,6 @@ class VirtualHelix(CNObject):
         """ Returns the strand at idx in self's scaffold, if any """
         return self._stap_strandset.getStrand(idx)
 
-    def coord(self):
-        return self._coord
-    # end def
-
     def rect(self, scale_factor=1.0):
         """ return tuple of:
         (x_lower_left, y_lower_left, x_upper_right, y_upper_right)
@@ -81,7 +72,14 @@ class VirtualHelix(CNObject):
         # collide with neighbors
         radius = scale_factor*self._part.radius()
         x, y, z = self._location
+        x *= scale_factor
+        y *= scale_factor
         return x - radius, y - radius, x + radius, y + radius
+    # end def
+
+    def location(self, scale_factor=1.0):
+        x, y, z = self._location
+        return scale_factor*x, scale_factor*y
     # end def
 
     def number(self):
@@ -167,21 +165,10 @@ class VirtualHelix(CNObject):
         idx == 0 means top strand
         idx == 1 means bottom strand
         """
-        # if idx == 0:
-        #     return self._scaf_strandset
-        # else:
-        #     return self._stap_strandset
-
         if idx == 0:
-            if self.isEvenParity():
-                return self._scaf_strandset
-            else:
-                return self._stap_strandset
+            return self._scaf_strandset
         else:
-            if self.isEvenParity():
-                return self._stap_strandset
-            else:
-                return self._scaf_strandset
+            return self._stap_strandset
     # end def
 
     def getStrandSetByType(self, strand_type):
@@ -223,10 +210,6 @@ class VirtualHelix(CNObject):
         return is_scaf # "scaf" always on top for parallel xovers
     # end def
 
-    def isEvenParity(self):
-        return self._part.isEvenParity(*self._coord)
-    # end def
-
     def strandSetBounds(self, idx_helix, idx_type):
         """
         forwards the query to the strandset
@@ -265,7 +248,6 @@ class VirtualHelix(CNObject):
         strands get copied at the oligo and added to the Virtual Helix
         """
         vh = VirtualHelix(part, self._number)
-        vh._coords = (self._coord[0], self._coord[1])
         vh._theta = self._theta
         # If self._part exists, it owns self._number
         # in that only it may modify it through the
@@ -287,12 +269,4 @@ class VirtualHelix(CNObject):
         pass
     # end def
 
-    # def translateCoords(self, deltaCoords):
-    #     """
-    #     for expanding a helix
-    #     """
-    #     deltaRow, deltaCol = deltaCoords
-    #     row, col = self._coord
-    #     self._coord = row + deltaRow, col + deltaCol
-    # # end def
 # end class
