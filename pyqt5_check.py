@@ -300,7 +300,14 @@ def checker(do_clean_qt=False, is_static=False):
                 use_wget = True    # use wget on Linux
             else:
                 use_wget = False    # use curl on OS X
-            pyroot_path = distutils.sysconfig.BASE_PREFIX
+
+            try:
+                pyroot_path = distutils.sysconfig.BASE_PREFIX
+            except:
+                vinfo = sys.version_info
+                print("Probably running python 2: {}.{}".format(vinfo[0], vinfo[1]))
+                pyroot_path = distutils.sysconfig.PREFIX
+
             print("the pypath is ", pyroot_path)
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]) )
             clean = False
