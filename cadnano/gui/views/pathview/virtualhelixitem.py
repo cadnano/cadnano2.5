@@ -566,11 +566,15 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 active_idx = int(base_idx)
                 vh = self._part_item.getVHItemByName(vh_name)
                 active_item = vh._prexoveritemgroup.getItem(is_fwd, active_idx)
-                local_angle = (int(new_value)+180) % 360
-                fwd_items, rev_items = hpxig.getItemsFacingNearAngle(local_angle)
-                fwd_idxs = [item.step_idx() for item in fwd_items]
-                rev_idxs = [item.step_idx() for item in rev_items]
-                self._prexoveritemgroup.setActiveNeighbors(active_item, (fwd_idxs, rev_idxs))
+                neighbors = self._model_virtual_helix.getProperty('neighbors').split()
+                for n in neighbors:
+                    n_name, n_angle = n.split(':')
+                    if n_name == vh_name:
+                        local_angle = (int(n_angle)+180) % 360
+                        fwd_items, rev_items = hpxig.getItemsFacingNearAngle(local_angle)
+                        fwd_idxs = [item.step_idx() for item in fwd_items]
+                        rev_idxs = [item.step_idx() for item in rev_items]
+                        self._prexoveritemgroup.setActiveNeighbors(active_item, (fwd_idxs, rev_idxs))
             else:
                 hpxig.resetAllItemsAppearance()
                 self._prexoveritemgroup.setActiveNeighbors(None, None)
