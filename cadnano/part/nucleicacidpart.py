@@ -169,15 +169,15 @@ class NucleicAcidPart(Part):
         # f(...,27,...)         use the virtualhelix's id number
         # f(...,vh,...)         use an actual virtualhelix
         # f(...,(1,42),...)     use the coordinate representation of its position
-        """A vhref is the number of a virtual helix, the (row, col) of a virtual helix,
+        """A vhref is the number of a virtual helix, the point of a virtual helix,
         or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
         vh = None
         if type(vhref) in (int,):
             vh = self._number_to_virtual_helix.get(vhref, None)
         elif type(vhref) in (tuple, list):
-            radius = self._RADIUS
-            point = self.latticeCoordToPositionXY(*vhref)
-            vh, _ = self._quadtree.findNodeByPoint(point)
+            res = self._quadtree.findNodeByPoint(vhref)
+            if res is not None:
+                return res[0]
         else:
             vh = vhref
         if not isinstance(vh, VirtualHelix):

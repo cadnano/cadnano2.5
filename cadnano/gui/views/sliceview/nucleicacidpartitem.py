@@ -64,6 +64,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setRect(self._rect)
+        self.setAcceptHoverEvents(True)
         # self._initDeselector()
         # Cache of VHs that were active as of last call to activeSliceChanged
         # If None, all slices will be redrawn and the cache will be filled.
@@ -343,6 +344,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
+    def hoverMoveEvent(self, event):
+        tool_method_name = self._getActiveTool().methodPrefix() + "HoverMove"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(event)
+        else:
+            event.setAccepted(False)
+            QGraphicsItem.mouseMoveEvent(self, event)
+    # end def
+
     def getModelPos(self, pos):
         sf = self._scale_factor
         x, y = pos.x()/sf, pos.y()/sf
@@ -368,8 +378,21 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         else:
             # x, y = x/sf, y/sf
             part.createVirtualHelix(*pt)
+            virtual_helix = part.virtualHelix(pt)
+            vhi = self._virtual_helix_item_hash[virtual_helix]
+            tool = self._getActiveTool()
+            tool.setVirtualHelixItem(vhi)
     # end def
 
+    def createToolHoverMove(self, event):
+        # 1. get point in model coordinates:
+        # pos = event.pos()
+        # x, y = pos.x(), pos.y()
+        # sf = self._scale_factor
+        tool = self._getActiveTool()
+        tool.hoverMoveEvent(event)
+        return QGraphicsItem.hoverMoveEvent(self, event)
+    # end def
 
     class Deselector(QGraphicsItem):
         """The deselector lives behind all the slices and observes mouse press
