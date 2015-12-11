@@ -42,6 +42,8 @@
         <file alias="move-helix">images/slice-move-helix.png</file>
         <file alias="snap-helix">images/slice-snap-helix.png</file>
         <file alias="select-snap-angles">images/slice-snap-angles.png</file>
+        <file alias="new-dna-part">images/slice-new-part.png</file>
+        <file alias="select-helix">images/slice-select-helix.png</file>
     </qresource>
     <qresource prefix="/pathtools">
         <file alias="autobreak">images/path-autobreak.png</file>

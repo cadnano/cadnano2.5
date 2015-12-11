@@ -383,8 +383,9 @@
    </attribute>
    <addaction name="action_outliner"/>
    <addaction name="action_new_dnapart"/>
-   <addaction name="action_vhelix_create"/>
+   <addaction name="separator"/>
    <addaction name="action_vhelix_select"/>
+   <addaction name="action_vhelix_create"/>
    <addaction name="action_vhelix_snap"/>
    <addaction name="action_vhelix_set_angles"/>
   </widget>
@@ -945,10 +946,10 @@
   <action name="action_new_dnapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/hcpro</normaloff>:/parttools/hcpro</iconset>
+     <normaloff>:/slicetools/new-dna-part</normaloff>:/slicetools/new-dna-part</iconset>
    </property>
    <property name="text">
-    <string>dnap</string>
+    <string>dna</string>
    </property>
    <property name="iconText">
     <string>dna</string>
@@ -1158,7 +1159,7 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/move-helix</normaloff>:/slicetools/move-helix</iconset>
+     <normaloff>:/slicetools/select-helix</normaloff>:/slicetools/select-helix</iconset>
    </property>
    <property name="text">
     <string>select</string>
