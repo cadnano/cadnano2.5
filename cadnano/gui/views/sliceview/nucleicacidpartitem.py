@@ -55,7 +55,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._scale_factor = self._RADIUS / m_p.radius()
 
-        self._virtual_helix_hash = {}
+        self._virtual_helix_item_hash = {}
 
         self.hide() # hide while until after attemptResize() to avoid flicker
 
@@ -167,11 +167,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._controller = None
     # end def
 
-    def partVirtualHelicesReorderedSlot(self, sender, orderedCoordList):
+    def partVirtualHelicesReorderedSlot(self, sender, ordered_coord_list):
         pass
     # end def
 
-    def partPreDecoratorSelectedSlot(self, sender, row, col, baseIdx):
+    def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):
         """docstring for partPreDecoratorSelectedSlot"""
         vhi = self.getVirtualHelixItemByCoord(row, col)
         view = self.window().slice_graphics_view
@@ -189,7 +189,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vh = virtual_helix
         # TODO test to see if self._virtual_helix_hash is necessary
         vhi = VirtualHelixItem(vh, self)
-        # self._virtual_helix_hash[coords] = vhi
+        # self._virtual_helix_item_list.append(virtual_helix_item)
+        self._virtual_helix_item_hash[virtual_helix] = vhi
     # end def
 
     def partVirtualHelixRenumberedSlot(self, sender, coord):
@@ -200,7 +201,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass
     # end def
 
-    def updatePreXoverItemsSlot(self, sender, virtualHelix):
+    def updatePreXoverItemsSlot(self, sender, virtual_helix):
         pass
     # end def
 
@@ -240,6 +241,17 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def window(self):
         return self.parentItem().window()
+    # end def
+
+    def removeVirtualHelixItem(self, virtual_helix_item):
+        vh = virtual_helix_item.virtualHelix()
+        # self._virtual_helix_item_list.remove(virtual_helix_item)
+        del self._virtual_helix_item_hash[vh]
+        # del self._virtual_helix_hash[vh.coord()]
+        # ztf = not getBatch()
+        # self._setVirtualHelixItemList(self._virtual_helix_item_list,
+        #     zoom_to_fit=ztf)
+        # self._updateBoundingRect()
     # end def
 
 
@@ -334,17 +346,28 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def getModelPos(self, pos):
         sf = self._scale_factor
         x, y = pos.x()/sf, pos.y()/sf
-        return x,y
+        return x, y
     # end def
 
     def createToolMousePress(self, event):
         # 1. get point in model coordinates:
-        x, y = self.getModelPos(event.pos())
+        # pos = event.pos()
+        # x, y = pos.x(), pos.y()
+        # sf = self._scale_factor
+        pt = self.getModelPos(event.pos())
         mod = Qt.MetaModifier
         if not (event.modifiers() & mod):
             pass
-        print("create tool model position", x, y)
-        self._model_part.createVirtualHelix(x, y)
+        # print("create tool model position", x, y)
+        part = self._model_part
+        # don't create a new VirtualHelix if the click overlaps with existing
+        # VirtualHelix
+        check = part.isVirtualHelixAtPoint(pt)
+        if check:
+            return
+        else:
+            # x, y = x/sf, y/sf
+            part.createVirtualHelix(*pt)
     # end def
 
 

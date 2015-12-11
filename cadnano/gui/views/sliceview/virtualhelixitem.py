@@ -43,10 +43,11 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         super(VirtualHelixItem, self).__init__(parent=part_item)
         self._virtual_helix = model_virtual_helix
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
-
+        self._part_item = part_item
         self.hide()
         x, y = model_virtual_helix.location(part_item.scaleFactor())
-        self.setPos(x, y)
+        # set position to offset for radius
+        self.setPos(x - _RADIUS, y - _RADIUS)
 
         self.setAcceptHoverEvents(True)
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -148,9 +149,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()
         self._controller = None
-        # self._empty_helix_item.setNotHovered()
+        self._part_item.removeVirtualHelixItem(self)
         self._virtual_helix = None
-        # self._empty_helix_item = None
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
@@ -254,7 +254,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def part(self):
-        return self._virtual_helix.part()
+        return self._part_item.part()
 
     def virtualHelix(self):
         return self._virtual_helix

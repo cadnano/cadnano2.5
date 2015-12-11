@@ -6,7 +6,7 @@ from uuid import uuid4
 izip = zip
 
 from cadnano import util
-from cadnano.quadtree import Quadtree
+from cadnano.pointquadtree import Quadtree
 from cadnano.math.vector import v2DistanceAndAngle
 from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxySignal
@@ -176,9 +176,8 @@ class NucleicAcidPart(Part):
             vh = self._number_to_virtual_helix.get(vhref, None)
         elif type(vhref) in (tuple, list):
             radius = self._RADIUS
-            x, y = self.latticeCoordToPositionXY(*vhref)
-            rect = (x - radius, y - radius, x + radius, y + radius)
-            vh, _ = self._quadtree.findNodeByRect(rect)
+            point = self.latticeCoordToPositionXY(*vhref)
+            vh, _ = self._quadtree.findNodeByPoint(point)
         else:
             vh = vhref
         if not isinstance(vh, VirtualHelix):
@@ -189,6 +188,14 @@ class NucleicAcidPart(Part):
                       "referenced by index %s" % (self, vhref)
                 raise IndexError(err)
         return vh
+    # end def
+
+    def isVirtualHelixAtPoint(self, point):
+        radius = self._RADIUS
+        res = self._quadtree.queryPoint(point, 2*radius)
+        if len(res) > 0:
+            return True
+        return False
     # end def
 
     def activeBaseIndex(self):
@@ -206,7 +213,6 @@ class NucleicAcidPart(Part):
     def dimensions(self, scale_factor=1.0):
         """Returns a tuple of the max X and maxY coordinates of the lattice."""
         return self._quadtree.rect(scale_factor=scale_factor)
-        # return self.latticeCoordToPositionXY(self._max_row, self._max_col, scale_factor)
     # end def
 
     def getStapleSequences(self):
@@ -286,10 +292,10 @@ class NucleicAcidPart(Part):
         Looks for a virtual_helix at the coordinate, coord = (row, colum)
         if it exists it is returned, else None is returned
         """
-        radius = self._RADIUS
-        x, y = self.latticeCoordToPositionXY(*coord)
-        rect = (x - radius, y - radius, x + radius, y + radius)
-        res = self._quadtree.findNodeByRect(rect)
+        # radius = self._RADIUS
+        point = self.latticeCoordToPositionXY(*coord)
+        # rect = (x - radius, y - radius, x + radius, y + radius)
+        res = self._quadtree.findNodeByPoint(point)
         if res is not None:
             return res[0]
         else:
@@ -1046,13 +1052,15 @@ class NucleicAcidPart(Part):
             threshold = 2.25*self._RADIUS
 
         qt = self._quadtree
-        neighbor_candidates = qt.queryNode(vh, scale_factor=1.1)
-        for candidate in neighbor_candidates:
-            dist, angle = v2DistanceAndAngle(vh, candidate)
-            if dist < threshold and candidate is not vh:
-                # when ready, enable returning angles and distanaces
-                # neighbors.append((candidate, dist, angle))
-                neighbors.append(candidate)
+        neighbor_candidates = qt.queryNode(vh, threshold, scale_factor=1.1)
+        # for candidate in neighbor_candidates:
+        #     dist, angle = v2DistanceAndAngle(vh, candidate)
+        #     if candidate is not vh:
+        #         # when ready, enable returning angles and distanaces
+        #         # neighbors.append((candidate, dist, angle))
+        #         neighbors.append(candidate)
+        if vh in neighbors:
+            neighbors.remove(vh)
         return neighbors
     # end def
 

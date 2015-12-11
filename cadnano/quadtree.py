@@ -274,7 +274,6 @@ class Quadtree(QuadtreeBase):
     def queryNode(self, node, scale_factor=1.0):
         qc = self._query_cache
         rect = node.rect()
-        res = qc.get(rect)
         if node in qc:
             return qc.get(rect)
         else:
@@ -284,6 +283,14 @@ class Quadtree(QuadtreeBase):
                                     node_results)
             qc[rect] =  res
             return res
+    # end def
+
+    def queryRect(self, rect):
+        node_results = set()
+        res = QuadtreeBase.query(self,
+                                rect,
+                                node_results)
+        return res
     # end def
 
     def removeNode(self, node):
