@@ -159,17 +159,6 @@ class VirtualHelix(ProxyObject):
             return self._scaf_strandset
         else:
             return self._stap_strandset
-
-        # if idx == 0:
-        #     if self.isEvenParity():
-        #         return self._scaf_strandset
-        #     else:
-        #         return self._stap_strandset
-        # else:
-        #     if self.isEvenParity():
-        #         return self._stap_strandset
-        #     else:
-        #         return self._scaf_strandset
     # end def
 
     def getStrandSetByType(self, strand_type):

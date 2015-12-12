@@ -180,6 +180,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def getItemsFacingNearAngle(self, angle):
+        # the expression "180-abs(abs(a1-a2)-180)" determines the smallest
+        # angle between a1 and a2, assuming both are in [0, 360]
         _span = self._parent.partCrossoverSpanAngle()/2
         fwd = list(filter(lambda p: \
                             180-abs(abs(p.facing_angle()-angle)-180)<_span,\
