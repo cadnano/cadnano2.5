@@ -257,11 +257,6 @@ class PreXoverItem(QGraphicsRectItem):
 
     def setActiveNeighbor(self, is_active, shortcut=None, active_item=None):
         if is_active:
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 500, 0, 128)
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
-            self.setLabel(shortcut)
-
             p1 = self._phos_item.scenePos()
             p2 = active_pos = active_item._phos_item.scenePos()
             scale = 3
@@ -269,12 +264,26 @@ class PreXoverItem(QGraphicsRectItem):
             delta2 = _BASE_WIDTH*scale if active_item.is_fwd() else -_BASE_WIDTH*scale
             c1 = self.mapFromScene(QPointF(p1.x(), p1.y()+delta1))
             c2 = self.mapFromScene(QPointF(p2.x(), p2.y()-delta2))
-            
             pp = QPainterPath()
             pp.moveTo(self._phos_item.pos())
-            pp.cubicTo(c1,c2,self._bond_item.mapFromScene(p2))
+            pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
             self._bond_item.setPath(pp)
             self._bond_item.show()
+
+            alpha = 32
+            if self._is_fwd != active_item.is_fwd():
+                if self.absolute_idx() == active_item.absolute_idx():
+                    alpha = 255
+            elif self.absolute_idx() == active_item.absolute_idx()+1:
+                alpha = 255
+            elif self.absolute_idx() == active_item.absolute_idx()-1:
+                alpha = 255
+
+            self.setBrush(getBrushObj(self._color, alpha=alpha))
+            self.animate(self, 'brush_alpha', 500, 0, alpha)
+            self.animate(self._phos_item, 'rotation', 500, 0, -90)
+            self.setLabel(shortcut)
+
         else:
             self.setBrush(getBrushObj(self._color, alpha=0))
             self.animate(self, 'brush_alpha', 1000, 128, 0)
@@ -387,7 +396,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
             # local_offset = self._vh_Z()/_BASE_WIDTH
             active_absolute_idx = active_item.absolute_idx()
             part = self._parent.part()
-            cutoff = part.stepSize()
+            cutoff = part.stepSize()/2
             active_idx = active_item.base_idx()
             step_idxs = range(0, part.maxBaseIdx(), part.stepSize())
             fwd_idxs, rev_idxs = fwd_rev_idxs
@@ -570,8 +579,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 for n in neighbors:
                     n_name, n_angle = n.split(':')
                     if n_name == vh_name:
-                        local_angle = (int(n_angle)+180) % 360
-                        fwd_items, rev_items = hpxig.getItemsFacingNearAngle(local_angle)
+                        fwd_items, rev_items = hpxig.getItemsFacingNearAngle(int(n_angle))
                         fwd_idxs = [item.step_idx() for item in fwd_items]
                         rev_idxs = [item.step_idx() for item in rev_items]
                         self._prexoveritemgroup.setActiveNeighbors(active_item, (fwd_idxs, rev_idxs))
