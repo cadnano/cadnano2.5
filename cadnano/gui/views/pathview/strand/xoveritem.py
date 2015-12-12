@@ -439,18 +439,36 @@ class XoverItem(QGraphicsPathItem):
     def _updateColor(self, strand):
         oligo = strand.oligo()
         color = self.pen().color().name() if self.isSelected() else oligo.getColor()
+
+        # highlight by default
+        pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
+        alpha = 128
+
+        # don't highlight if idx positioning looks good
+        if not self._node5 or not self._node3:
+            return
+
+        idx5 = self._node5.absolute_idx()
+        idx3 = self._node3.absolute_idx()
+        if self._node5._is_on_top:
+            if self._node3._is_on_top: # parallel, idx should increase
+                if idx5+1 == idx3:
+                    pen_width = styles.PATH_STRAND_STROKE_WIDTH
+                    alpha = 255
+            elif idx5 == idx3: # anti-parallel, same idx
+                pen_width = styles.PATH_STRAND_STROKE_WIDTH
+                alpha = 255
+        else:
+            if not self._node3._is_on_top: # parallel, idx should decrease
+                if idx5-1 == idx3:
+                    pen_width = styles.PATH_STRAND_STROKE_WIDTH
+                    alpha = 255
+            elif idx5 == idx3: # anti-parallel
+                pen_width = styles.PATH_STRAND_STROKE_WIDTH
+                alpha = 255
         # if oligo.shouldHighlight():
         #     pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
         #     alpha = 128
-        # else:
-        #     pen_width = styles.PATH_STRAND_STROKE_WIDTH
-        #     alpha = 255
-        pen_width = styles.PATH_STRAND_STROKE_WIDTH
-        alpha = 255
-        if self._node5 and self._node3:
-            if self._node5.absolute_idx() != self._node3.absolute_idx():
-                pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
-                alpha = 128
         pen = getPenObj(color, pen_width, alpha=alpha, capstyle=Qt.FlatCap)
         self.setPen(pen)
     # end def

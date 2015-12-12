@@ -1,23 +1,21 @@
 import os
-import sys
-
-from cadnano import app, setReopen, setBatch
-from cadnano.fileio.nnodecode import decode, decodeFile
-from cadnano.fileio.encoder import encode
-
-from cadnano.gui.views.documentwindow import DocumentWindow
-from cadnano.gui.ui.dialogs.ui_about import Ui_About
-
-from cadnano.gui.views import styles
-from cadnano import util
+from json import dumps
 
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
-
 from PyQt5.QtGui import QPainter, QIcon, QKeySequence
 from PyQt5.QtWidgets import QApplication, QDialog, QDockWidget, QFileDialog
 from PyQt5.QtWidgets import QGraphicsItem, QMainWindow, QMessageBox, QStyleOptionGraphicsItem
 from PyQt5.QtSvg import QSvgGenerator
+
+from cadnano import app, setReopen, setBatch, util
+from cadnano.fileio.c25decode import decode, decodeFile
+from cadnano.fileio.encoder import encode
+from cadnano.gui.views.documentwindow import DocumentWindow
+from cadnano.gui.ui.dialogs.ui_about import Ui_About
+from cadnano.gui.views import styles
+from cadnano.objectinstance import ObjectInstance
+
 
 class DocumentController():
     """
@@ -94,7 +92,7 @@ class DocumentController():
         self.win.action_filter_stap.triggered.connect(self.actionFilterStapSlot)
         self.win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
         self.win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
-
+        self.win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
 
 
     ### SLOTS ###
@@ -401,7 +399,7 @@ class DocumentController():
                             self.win,
                             "%s - Export As" % QApplication.applicationName(),
                             directory,
-                            "(*.csv)")
+                            "(*.aseq)")
             self.saveStaplesDialog = None
             self.exportStaplesCallback(fname)
         else:  # access through non-blocking callback
@@ -409,7 +407,7 @@ class DocumentController():
                             self.win,
                             "%s - Export As" % QApplication.applicationName(),
                             directory,
-                            "(*.csv)")
+                            "(*.aseq)")
             fdialog.setAcceptMode(QFileDialog.AcceptSave)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
@@ -418,17 +416,23 @@ class DocumentController():
             fdialog.open()
     # end def
 
+    def actionPathAddSeqSlot(self):
+        self.activePart().setAbstractSequences()
+    # end def
+
+
     def actionPrefsSlot(self):
         app().prefsClicked()
     # end def
 
     def actionAutostapleSlot(self):
-        print("autoStapleSlot")
-        part = self.activePart()
-        if part:
-            self.win.path_graphics_view.setViewportUpdateOn(False)
-            part.autoStaple()
-            self.win.path_graphics_view.setViewportUpdateOn(True)
+        print("autoStaple is disabled")
+        return
+        # part = self.activePart()
+        # if part:
+        #     self.win.path_graphics_view.setViewportUpdateOn(False)
+        #     part.autoStaple()
+        #     self.win.path_graphics_view.setViewportUpdateOn(True)
     # end def
 
     def actionModifySlot(self):
@@ -441,6 +445,7 @@ class DocumentController():
         # isChecked = self.win.actionModify.isChecked()
         # self.win.pathroot.setModifyState(isChecked)
         # self.win.sliceroot.setModifyState(isChecked)
+    # end def
 
     def actionAddHoneycombPartSlot(self):
         part = self._document.addHoneycombPart()
@@ -504,7 +509,8 @@ class DocumentController():
 
     def activePart(self):
         if self._active_part is None:
-            self._active_part = self._document.selectedInstance()
+            print("getting self._active_part from _document")
+            self._active_part = self._document.selectedInstance().reference()
         return self._active_part
     # end def
 
@@ -543,7 +549,7 @@ class DocumentController():
                             self.win,
                             "%s - Save As" % QApplication.applicationName(),
                             directory,
-                            "%s (*.json)" % QApplication.applicationName())
+                            "%s (*.c25)" % QApplication.applicationName())
             if isinstance(fname, (list, tuple)):
                 fname = fname[0]
             self.writeDocumentToFile(fname)
@@ -552,7 +558,7 @@ class DocumentController():
                             self.win,
                             "%s - Save As" % QApplication.applicationName(),
                             directory,
-                            "%s (*.json)" % QApplication.applicationName())
+                            "%s (*.c25)" % QApplication.applicationName())
             fdialog.setAcceptMode(QFileDialog.AcceptSave)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
@@ -595,17 +601,19 @@ class DocumentController():
             fname = selected
         if fname is None or os.path.isdir(fname):
             return False
-        if not fname.lower().endswith(".csv"):
-            fname += ".csv"
+        if not fname.lower().endswith(".aseq"):
+            fname += ".aseq"
         if self.saveStaplesDialog is not None:
             self.saveStaplesDialog.filesSelected.disconnect(self.exportStaplesCallback)
             # manual garbage collection to prevent hang (in osx)
             del self.saveStaplesDialog
             self.saveStaplesDialog = None
         # write the file
+        obj = self.activePart().getAbstractSequences()
         output = self.activePart().getStapleSequences()
+        json_string = dumps(obj, separators=(',',':'))
         with open(fname, 'w') as f:
-            f.write(output)
+            f.write(json_string)
     # end def
 
     def newClickedCallback(self):
@@ -668,8 +676,8 @@ class DocumentController():
             fname = selected
         if fname is None or os.path.isdir(fname):
             return False
-        if not fname.lower().endswith(".json"):
-            fname += ".json"
+        if not fname.lower().endswith(".c25"):
+            fname += ".c25"
         if self.filesavedialog is not None:
             self.filesavedialog.filesSelected.disconnect(
                                                 self.saveFileDialogCallback)
@@ -719,7 +727,7 @@ class DocumentController():
             fname = QFileDialog.getOpenFileName(
                         None,
                         "Open Document", path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.cadnano)")
+                        "cadnano1 / cadnano2 Files (*.c25 *.json)")
             self.filesavedialog = None
             self.openAfterMaybeSaveCallback(fname)
         else:  # access through non-blocking callback
@@ -727,7 +735,7 @@ class DocumentController():
                         self.win,
                         "Open Document",
                         path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.cadnano)")
+                        "cadnano1 / cadnano2 Files (*.c25 *.json)")
             fdialog.setAcceptMode(QFileDialog.AcceptOpen)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)

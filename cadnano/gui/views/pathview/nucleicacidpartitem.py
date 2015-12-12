@@ -418,7 +418,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         a_vhi = self.getVHItemByName(a_vh_name)
         a_vh = a_vhi.virtualHelix()
 
-
         neighbor = self._keyPressDict[key]
         n_vh_name, n_fwd_str, n_base_idx, n_facing_angle = neighbor.split('.')
         n_strand_idx = 0 if n_fwd_str == 'fwd' else 1
@@ -431,12 +430,21 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         a_strandset = a_vh.getStrandSetByIdx(a_strand_idx)
         n_strandset = n_vh.getStrandSetByIdx(n_strand_idx)
+        a_strand = a_strandset.getStrand(a_idx)
+        n_strand = n_strandset.getStrand(n_idx)
 
-        strand5p = a_strandset.getStrand(a_idx)
-        strand3p = n_strandset.getStrand(n_idx)
-        # print("createXover", strand5p, a_idx, strand3p, n_idx)
-        if not strand5p.connection3p():
-            self.part().createXover(strand5p, a_idx, strand3p, n_idx)
+        if a_strand.hasXoverAt(a_idx): return
+        if n_strand.hasXoverAt(n_idx): return
+
+        # SPECIAL CASE: neighbor already has a 3' end, and active has
+        # a 5' end, so assume the user wants to install a returning xover
+        if a_strand.idx5Prime() == a_idx and n_strand.idx3Prime() == n_idx:
+            self.part().createXover(n_strand, n_idx, a_strand, a_idx)
+            return
+
+        # DEFAULT CASE: the active strand acts as strand5p,
+        # install a crossover to the neighbor acting as strand3p
+        self.part().createXover(a_strand, a_idx, n_strand, n_idx)
     # end def
 
     ### PUBLIC METHODS ###
