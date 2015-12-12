@@ -198,6 +198,24 @@ class Oligo(ProxyObject):
         return output
     # end def
 
+    def abstractSequenceExport(self):
+        '''returns a dictionary to be exported'''
+        vhNum5p = self.strand5p().virtualHelix().number()
+        idx5p = self.strand5p().idx5Prime()
+        seq = []
+        if self.isLoop():
+            # print "A loop exists"
+            raise Exception
+        for strand in self.strand5p().generator3pStrand():
+            seq = seq + Strand.abstractSequence(strand, forExport=True)
+            if strand.connection3p() == None:  # last strand in the oligo
+                vhNum3p = strand.virtualHelix().number()
+                idx3p = strand.idx3Prime()
+        start = "%d[%d]" % (vhNum5p, idx5p)
+        end = "%d[%d]" % (vhNum3p, idx3p)
+        return {"start": start, "end":end, "vSeq":seq, "color":self.getColor()}
+    # end def
+
     def shouldHighlight(self):
         # if not self._strand5p:
         #     return False
@@ -215,6 +233,30 @@ class Oligo(ProxyObject):
         c = RemoveOligoCommand(self)
         util.execCommandList(self, [c], desc="Remove Oligo", use_undostack=use_undostack)
         self.oligoRemovedSignal.emit(self._part, self)
+    # end def
+
+    def applyAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.applyVirtualSequence()
+    # end def
+
+    def clearAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.clearVirtualSequence()
+    # end def
+
+    def displayAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.copyVirtualSequenceToSequence()
     # end def
 
     def applyColor(self, color, use_undostack=True):

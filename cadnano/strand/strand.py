@@ -3,6 +3,7 @@
 
 from operator import attrgetter
 from array import array
+from string import ascii_letters
 import sys
 IS_PY_3 = int(sys.version_info[0] > 2)
 if IS_PY_3:
@@ -54,6 +55,7 @@ class Strand(ProxyObject):
         self._strand5p = None  # 5' connection to another strand
         self._strand3p = None  # 3' connection to another strand
         self._sequence = None
+        self._abstractSequence = {}
 
         # TODO REMOVE THESE two fields
         self._decorators = {}
@@ -201,12 +203,22 @@ class Strand(ProxyObject):
         return ''
     # end def
 
+    def abstractSequence(self, forExport=False):
+        '''returns a list of abstractSequence bases, ordered from lowIdx to highIdx'''
+        vSeq = []
+        parity = 1 if self._is_drawn_5_to_3 else -1
+        for i in range(self.lowIdx(), self.highIdx() + 1)[::parity]:
+            vSeq.append(self._abstractSequence[i])
+        return vSeq
+    # end def
+
     def strandSet(self):
         return self._strandset
     # end def
 
     def strandType(self):
         return self._strandset.strandType()
+    # end def
 
     def virtualHelix(self):
         return self._strandset.virtualHelix()
@@ -286,13 +298,13 @@ class Strand(ProxyObject):
     def setComplementSequence(self, sequence_string, strand):
         """
         This version takes anothers strand and only sets the indices that
-        align with the given complimentary strand
+        align with the given complementary strand
 
         return the used portion of the sequence_string
 
         As it depends which direction this is going, and strings are stored in
         memory left to right, we need to test for is_drawn_5_to_3 to map the
-        reverse compliment appropriately, as we traverse overlapping strands.
+        reverse complement appropriately, as we traverse overlapping strands.
 
         We reverse the sequence ahead of time if we are applying it 5' to 3',
         otherwise we reverse the sequence post parsing if it's 3' to 5'
@@ -310,7 +322,7 @@ class Strand(ProxyObject):
         low_idx, high_idx = util.overlap(s_low_idx, s_high_idx, c_low_idx, c_high_idx)
 
         # only get the characters we're using, while we're at it, make it the
-        # reverse compliment
+        # reverse complement
 
         total_length = self.totalLength()
 
@@ -329,7 +341,7 @@ class Strand(ProxyObject):
             temp_self = array(array_type, sixb(self._sequence) if self._is_drawn_5_to_3 \
                                                     else sixb(self._sequence[::-1]))
 
-        # generate the index into the compliment string
+        # generate the index into the complement string
         a = self.insertionLengthBetweenIdxs(s_low_idx, low_idx - 1)
         b = self.insertionLengthBetweenIdxs(low_idx, high_idx)
         c = strand.insertionLengthBetweenIdxs(c_low_idx, low_idx - 1)
@@ -350,6 +362,62 @@ class Strand(ProxyObject):
 
         # print "new sequence", self._sequence
         return self._sequence
+    # end def
+
+    def setVirtualSequenceNumberAt(self, idx, abstractSequenceNum):
+        """assign abstractSequenceNum to position idx"""
+        vSeq = self._abstractSequence
+        vSeq[idx] = abstractSequenceNum
+
+    def clearVirtualSequence(self):
+        self._abstractSequence = {}
+
+    # needs to apply a abstractSequenceNum to each location
+    def applyVirtualSequence(self):
+        """
+        Assigns virtual index from 5' to 3' on strand and it's complement location.
+        """
+        vSeq = self._abstractSequence
+        sLowIdx, sHighIdx = self._base_idx_low, self._base_idx_high
+        counter = self.part().abstractSequenceCounter()
+
+        # make sure we apply numbers from 5' to 3'
+        if self._is_drawn_5_to_3:
+            sOrder, cOrder = 1, -1
+        else:
+            sOrder, cOrder = -1, 1
+
+        # assign virtual sequence to self
+        for i in range(sLowIdx, sHighIdx+1)[::sOrder]:
+            if i in vSeq:
+                # print self, i, vSeq[i]
+                pass
+            else:
+                abstractSequenceNum = next(counter)
+                # print self, i, abstractSequenceNum, "*"
+                self.setVirtualSequenceNumberAt(i, abstractSequenceNum)
+
+        # assign matching virtual sequence to overlap regions of complement strands
+        for strand in self.getComplementStrands():
+            cLowIdx, cHighIdx = strand.idxs()
+            lowIdx, highIdx = util.overlap(sLowIdx, sHighIdx, cLowIdx, cHighIdx)
+
+            for i in range(lowIdx, highIdx+1)[::cOrder]:
+                if i in vSeq:
+                    # print strand, i, vSeq[i]
+                    strand.setVirtualSequenceNumberAt(i, vSeq[i])
+                else:
+                    abstractSequenceNum = next(counter)
+                    # print strand, i, abstractSequenceNum, "*"
+                    strand.setVirtualSequenceNumberAt(i, abstractSequenceNum)
+    # end def
+
+    def copyVirtualSequenceToSequence(self):
+        vSeq = self._abstractSequence
+        sLowIdx, sHighIdx = self._base_idx_low, self._base_idx_high
+        self._sequence = ''.join([ascii_letters[vSeq[i] % 52] for i in range(sLowIdx, sHighIdx+1)])
+        if not self._is_drawn_5_to_3:
+            self._sequence = self._sequence[::-1]
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
@@ -491,7 +559,7 @@ class Strand(ProxyObject):
 
     def hasXoverAt(self, idx):
         """
-        An xover is necessarily at an enpoint of a strand
+        An xover is necessarily at an endpoint of a strand
         """
         if idx == self.highIdx():
             return True if self.connectionHigh() is not None else False

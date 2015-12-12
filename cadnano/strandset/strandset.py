@@ -502,59 +502,71 @@ class StrandSet(ProxyObject):
 
     def getLegacyArray(self):
         """docstring for getLegacyArray"""
-        num = self._virtual_helix.number()
-        ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
+        num = self.virtualHelix().number()
+        ret = [[-1, -1, -1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
         if self.isDrawn5to3():
-            for strand in self.strand_heap:
+            for strand in self.strands():
                 lo, hi = strand.idxs()
                 assert strand.idx5Prime() == lo and strand.idx3Prime() == hi
                 # map the first base (5' xover if necessary)
                 s5p = strand.connection5p()
-                if s5p is not None:
+                if s5p != None:
                     ret[lo][0] = s5p.virtualHelix().number()
-                    ret[lo][1] = s5p.idx3Prime()
-                ret[lo][2] = num
-                ret[lo][3] = lo + 1
+                    ret[lo][1] = 0 if s5p.isDrawn5to3() else 1
+                    ret[lo][2] = s5p.idx3Prime()
+                ret[lo][3] = num
+                ret[lo][4] = 0 # self.isDrawn5to3()
+                ret[lo][5] = lo + 1
                 # map the internal bases
                 for idx in range(lo + 1, hi):
                     ret[idx][0] = num
-                    ret[idx][1] = idx - 1
-                    ret[idx][2] = num
-                    ret[idx][3] = idx + 1
+                    ret[idx][1] = 0 # self.isDrawn5to3()
+                    ret[idx][2] = idx - 1
+                    ret[idx][3] = num
+                    ret[idx][4] = 0 # self.isDrawn5to3()
+                    ret[idx][5] = idx + 1
                 # map the last base (3' xover if necessary)
                 ret[hi][0] = num
-                ret[hi][1] = hi - 1
+                ret[hi][1] = 0 # self.isDrawn5to3()
+                ret[hi][2] = hi - 1
                 s3p = strand.connection3p()
-                if s3p is not None:
-                    ret[hi][2] = s3p.virtualHelix().number()
-                    ret[hi][3] = s3p.idx5Prime()
+                if s3p != None:
+                    ret[hi][3] = s3p.virtualHelix().number()
+                    ret[hi][4] = 0 if s3p.isDrawn5to3() else 1
+                    ret[hi][5] = s3p.idx5Prime()
                 # end if
             # end for
         # end if
         else:
-            for strand in self.strand_heap:
+            for strand in self.strands():
                 lo, hi = strand.idxs()
                 assert strand.idx3Prime() == lo and strand.idx5Prime() == hi
                 # map the first base (3' xover if necessary)
                 ret[lo][0] = num
-                ret[lo][1] = lo + 1
+                ret[lo][1] = 1 # self.isDrawn5to3()
+                ret[lo][2] = lo + 1
                 s3p = strand.connection3p()
-                if s3p is not None:
-                    ret[lo][2] = s3p.virtualHelix().number()
-                    ret[lo][3] = s3p.idx5Prime()
+                if s3p != None:
+                    ret[lo][3] = s3p.virtualHelix().number()
+                    ret[lo][4] = 0 if s3p.isDrawn5to3() else 1
+                    ret[lo][5] = s3p.idx5Prime()
                 # map the internal bases
                 for idx in range(lo + 1, hi):
                     ret[idx][0] = num
-                    ret[idx][1] = idx + 1
-                    ret[idx][2] = num
-                    ret[idx][3] = idx - 1
+                    ret[idx][1] = 1 # self.isDrawn5to3()
+                    ret[idx][2] = idx + 1
+                    ret[idx][3] = num
+                    ret[idx][4] = 1 # self.isDrawn5to3()
+                    ret[idx][5] = idx - 1
                 # map the last base (5' xover if necessary)
-                ret[hi][2] = num
-                ret[hi][3] = hi - 1
+                ret[hi][3] = num
+                ret[hi][4] = 1 # self.isDrawn5to3()
+                ret[hi][5] = hi - 1
                 s5p = strand.connection5p()
-                if s5p is not None:
+                if s5p != None:
                     ret[hi][0] = s5p.virtualHelix().number()
-                    ret[hi][1] = s5p.idx3Prime()
+                    ret[hi][1] = 0 if s5p.isDrawn5to3() else 1
+                    ret[hi][2] = s5p.idx3Prime()
                 # end if
             # end for
         return ret

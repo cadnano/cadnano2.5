@@ -1,7 +1,7 @@
 import random
 from collections import defaultdict
 from heapq import heapify, heappush, heappop
-from itertools import product, islice
+from itertools import count, product, islice
 from uuid import uuid4
 izip = zip
 
@@ -74,7 +74,6 @@ class Part(ProxyObject):
         self._max_base = 2 * self._STEP - 1
         # Properties
         self.view_properties = {} #self._document.newViewProperties()
-
         self._properties = {}
         self._properties['name'] = "Part%d" % len(self._document.children())
         self._properties['color'] = "#000000" # outlinerview will override from styles
@@ -88,6 +87,7 @@ class Part(ProxyObject):
         self.reserve_bin = set()
         self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
         self._highest_used_even = -2  # same
+        self._abstractSequenceNum = None
 
         # Runtime state
         self._active_base_index = self._STEP
@@ -276,6 +276,39 @@ class Part(ProxyObject):
             if oligo.strand5p().strandSet().isStaple():
                 s = s + oligo.sequenceExport()
         return s
+
+    def abstractSequenceCounter(self):
+        return self._abstractSequenceNum
+
+    def setAbstractSequences(self):
+        """Reset, assign, and display virtual sequence numbers."""
+        # reset all sequence numbers
+        for oligo in self._oligos:
+            oligo.clearAbstractSequences()
+
+        # assign new sequence numbers
+        self._abstractSequenceNum = count(0)
+        for oligo in self._oligos:
+            oligo.applyAbstractSequences()
+
+        # display new sequence numbers
+        for oligo in self._oligos:
+            oligo.displayAbstractSequences()
+            oligo.oligoSequenceAddedSignal.emit(oligo)
+    # end def
+
+    def getAbstractSequences(self):
+        """
+        Returns a list of dicts be converted to json and written to file.
+        Called by doc controller exportStaplesCallback.
+        """
+        # extract and output sequence numbers
+        s = []
+        for oligo in self._oligos:
+            abstract_seq_dict = oligo.abstractSequenceExport()
+            s.append(abstract_seq_dict)
+        return s
+    # end def
 
     def getVirtualHelices(self):
         """yield an iterator to the virtual_helix references in the part"""
