@@ -323,6 +323,26 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             next_rev.set5pItem(rev)
     # end def
 
+    def updateTwist(self, twist_per_base):
+        part = self._parent.part()
+        _step = part.stepSize()
+        _groove = part.minorGrooveAngle()
+        for i in range(_step):
+            fwd = self.fwd_prexo_items[i]
+            rev = self.rev_prexo_items[i]
+            fwd.setRotation(round((i*twist_per_base)%360, 3))
+            rev.setRotation(round((i*twist_per_base+_groove)%360, 3))
+        for i in range(_step-1):
+            fwd, next_fwd = self.fwd_prexo_items[i], self.fwd_prexo_items[i+1]
+            j = (_step-1)-i
+            rev, next_rev = self.rev_prexo_items[j], self.rev_prexo_items[j-1]
+            fwd.set3pItem(next_fwd)
+            rev.set3pItem(next_rev)
+            next_fwd.set5pItem(fwd)
+            next_rev.set5pItem(rev)
+    # end def
+
+
     def _get_colors(self):
         part = self._parent.part()
         _step = part.stepSize()
@@ -757,6 +777,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                     item.updateItemApperance(True, show_3p=False)
             else:
                 _pxig.resetAllItemsAppearance()
+        elif property_key == 'twist_per_base':
+            _pxig.updateTwist(float(new_value))
+
     # end def
 
 

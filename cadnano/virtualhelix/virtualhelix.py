@@ -35,7 +35,8 @@ class VirtualHelix(ProxyObject):
                             'active_phos':None,
                             'neighbor_active_angle':'',
                             'neighbors':'',
-                            'z':0}
+                            'z':0,
+                            'twist_per_base':34.286}
 
         # rotate to honeycomb defaults
         # if self.isEvenParity():

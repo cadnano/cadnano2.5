@@ -40,6 +40,9 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     def setEulerZ(self, new_value):
         self._cn_model.setProperty('eulerZ', new_value)
 
+    def setTwistPerBase(self, new_value):
+        self._cn_model.setProperty('twist_per_base', new_value)
+
     def setZ(self, new_value):
         self._cn_model.setProperty('z', new_value)
 
@@ -48,6 +51,12 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
+        elif key == 'twist_per_base':
+            editor = QDoubleSpinBox(parent_QWidget)
+            editor.setDecimals(3)
+            editor.setSingleStep(0.25)
+            editor.setRange(32,36)
+            editor.valueChanged.connect(self.setTwistPerBase)
         elif key == 'eulerZ':
             editor = QSlider(Qt.Horizontal, parent_QWidget)
             editor.setRange(0, 359)
