@@ -13,7 +13,6 @@ class ResizeVirtualHelixCommand(UndoCommand):
         self._vhelix = virtual_helix
         self._id_num = virtual_helix.number()
         self._high_idx_delta = high_helix_delta
-        print ("ResizeVirtualHelixCommand", part, virtual_helix, high_helix_delta)
     # end def
 
     def redo(self):
@@ -21,7 +20,6 @@ class ResizeVirtualHelixCommand(UndoCommand):
         vh = self._vhelix
         vh._max_base += self._high_idx_delta
         for ss in vh.getStrandSets():
-            print("resizing ss", self._high_idx_delta)
             ss.resize(0, self._high_idx_delta)
         part.partVirtualHelixResizedSignal.emit(part, vh.coord())
         part.partDimensionsChangedSignal.emit(part, True)

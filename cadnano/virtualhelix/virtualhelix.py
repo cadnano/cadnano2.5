@@ -148,7 +148,6 @@ class VirtualHelix(ProxyObject):
             self.virtualHelixPropertyChangedSignal.emit(self, '_max_length', ml)
 
             delta = ml-old_max_length
-            print("setProperty ml delta", delta)
             if delta:
                 self.resize(delta)
     # end def

@@ -526,7 +526,6 @@ class DragHandle(QGraphicsRectItem):
                 y2 = max(y2, _ehi.pos().y() + _ehi.boundingRect().height())
             else:
                 _ehi.hide() # _ehi.setNotHovered()
-        # print("resize to", x1,y1,x2,y2)
         self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),
                           QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
         self.updateRect(_newRect)
