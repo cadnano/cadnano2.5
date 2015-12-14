@@ -26,6 +26,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.started = False
         self.angles = [x*math.pi/180 for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
+        self._direction = None
         # print(self.vectors)
 
     ######################## Drawing #######################################
@@ -40,7 +41,7 @@ class AbstractSliceTool(QGraphicsObject):
     def setVectors(self):
         rad = self._RADIUS
         return [QLineF(rad, rad,
-                    rad*(1 + math.cos(x)), rad*(1+ math.sin(x))) for x in self.angles]
+                    rad*(1 + 2*math.cos(x)), rad*(1+ 2*math.sin(x))) for x in self.angles]
 
 
     # end def
@@ -54,24 +55,43 @@ class AbstractSliceTool(QGraphicsObject):
         self.started = True
     # end def
 
-    def hoverMoveEvent(self, event):
+    def getAdjacentPoint(self, part_item, pt):
+        """ takes and returns a QPointF
+        """
+        part_item.mapFromItem(self._line_item, pt)
+    # end def
+
+    def eventToPosition(self, part_item, event):
+        """ take an event and return a position as a QPointF
+
+        update widget as well
+        """
+        li = self._line_item
+        pos = li.mapFromScene(event.scenePos())
         if self.started:
-            li = self._line_item
             line = li.line()
-            pos = li.mapFromScene(event.scenePos())
             mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
             angle_min = 9999
-            direction = None
+            direction_min = None
             for vector in self.vectors:
                 angle_new = mouse_point_vec.angleTo(vector)
                 if angle_new < angle_min:
-                    direction = vector
+                    direction_min = vector
                     angle_min = angle_new
-            line.setP2(pos)
-            if direction is not None:
-                li.setLine(direction)
+            if direction_min is not None:
+                self._direction_min = direction_min
+                li.setLine(direction_min)
+                return part_item.mapFromItem(li, direction_min.p2())
             else:
+                line.setP2(pos)
                 li.setLine(line)
+                return part_item.mapFromItem(li, pos)
+        else:
+            return event.pos()
+    # end def
+
+    def hoverMoveEvent(self, part_item, event):
+        return self.eventToPosition(part_item, event)
     # end def
 
     def widgetClicked(self):

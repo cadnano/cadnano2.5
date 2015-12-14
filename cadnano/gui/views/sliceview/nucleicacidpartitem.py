@@ -361,36 +361,30 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def createToolMousePress(self, event):
         # 1. get point in model coordinates:
-        # pos = event.pos()
-        # x, y = pos.x(), pos.y()
-        # sf = self._scale_factor
-        pt = self.getModelPos(event.pos())
+        tool = self._getActiveTool()
+        pt = tool.eventToPosition(self, event)
+        part_pt_tuple = self.getModelPos(pt)
+
         mod = Qt.MetaModifier
         if not (event.modifiers() & mod):
             pass
-        # print("create tool model position", x, y)
         part = self._model_part
+
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
-        check = part.isVirtualHelixAtPoint(pt)
+        check = part.isVirtualHelixAtPoint(part_pt_tuple)
         if check:
             return
         else:
-            # x, y = x/sf, y/sf
-            part.createVirtualHelix(*pt)
-            virtual_helix = part.virtualHelix(pt)
+            part.createVirtualHelix(*part_pt_tuple)
+            virtual_helix = part.virtualHelix(part_pt_tuple)
             vhi = self._virtual_helix_item_hash[virtual_helix]
-            tool = self._getActiveTool()
             tool.setVirtualHelixItem(vhi)
     # end def
 
     def createToolHoverMove(self, event):
-        # 1. get point in model coordinates:
-        # pos = event.pos()
-        # x, y = pos.x(), pos.y()
-        # sf = self._scale_factor
         tool = self._getActiveTool()
-        tool.hoverMoveEvent(event)
+        tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
