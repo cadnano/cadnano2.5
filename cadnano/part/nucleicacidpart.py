@@ -169,6 +169,12 @@ class NucleicAcidPart(Part):
         return  self._number_to_virtual_helix.get(vhref, None)
     # end def
 
+    def getVirtualHelicesInArea(self, rect):
+        nodes_results = set()
+        res = self._quadtree.queryRect(rect, nodes_results)
+        return res
+    # end def
+
     def getVirtualHelixAtPoint(self, point):
         radius = self._RADIUS
         res = self._quadtree.queryPoint(point, radius)

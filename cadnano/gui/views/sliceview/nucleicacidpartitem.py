@@ -374,6 +374,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
         check = part.isVirtualHelixNearPoint(part_pt_tuple)
+        tool.setPartItem(self)
         if check:
             virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
             if virtual_helix is not None:
@@ -388,6 +389,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 print(vh)
             vhi = self._virtual_helix_item_hash[virtual_helix]
             tool.setVirtualHelixItem(vhi)
+        return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def createToolHoverMove(self, tool, event):
@@ -398,6 +400,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def selectToolMousePress(self, tool, event):
         """
         """
+        tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
         part = self._model_part
@@ -406,8 +409,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             if vh is not None:
                 print(vh)
                 loc = vh.location()
-                # print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
-                #     loc[0], loc[1] ))
+                print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
+                    loc[0], loc[1] ))
+        return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     class Deselector(QGraphicsItem):

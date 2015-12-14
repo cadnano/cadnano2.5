@@ -182,6 +182,32 @@ class QuadtreeBase(object):
         return node_results
     # end def
 
+    def queryRect(self, rect, node_results):
+        # search children
+        x1, y1, x2, y2 = rect
+        x_center, y_center = self.center
+        if len(self.children) > 0:
+            if x1 <= x_center:
+                if y1 <= y_center:
+                    self.children[0].queryRect(rect, node_results)
+                if y2 > y_center:
+                    self.children[1].queryRect(rect, node_results)
+            if x2 > x_center:
+                if y1 <= y_center:
+                    self.children[2].queryRect(rect, node_results)
+                if y2:
+                    self.children[3].queryRect(rect, node_results)
+
+        # search node at this level
+        for node in self.nodes:
+            # check overlap
+            nx1, ny1, nx2, ny2 = node.rect()
+            if nx2 > x1 and nx1 <= x2 and \
+                    ny2 > y1 and ny1 <= y2:
+                node_results.add(node)
+        return node_results
+    # end def
+
     def findNodeByNode(self, query_node):
         """ look for the exact node
         assumes same node doesn't exist more than once in Quadtree

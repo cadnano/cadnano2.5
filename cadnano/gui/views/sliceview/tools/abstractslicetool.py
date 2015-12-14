@@ -27,6 +27,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.angles = [x*math.pi/180 for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
         self._direction = None
+        self.part_item = None
     # end def
 
     ######################## Drawing #######################################
@@ -54,6 +55,10 @@ class AbstractSliceTool(QGraphicsObject):
         li.setLine(rad, rad, rad, rad)
         li.show()
         self.is_started = True
+    # end def
+
+    def setPartItem(self, part_item):
+        self.part_item = part_item
     # end def
 
     def getAdjacentPoint(self, part_item, pt):
@@ -113,6 +118,7 @@ class AbstractSliceTool(QGraphicsObject):
     def deactivate(self):
         self.is_started = False
         self._vhi = None
+        self.part_item = None
         self.hide()
     # end def
 
