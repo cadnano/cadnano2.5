@@ -194,6 +194,11 @@ class NucleicAcidPart(Part):
         radius = self._RADIUS
         res = self._quadtree.queryPoint(point, 2*radius)
         if len(res) > 0:
+            existing = res.pop().location()
+            print("vh\n{}\n{}\ndx: {}, dy: {}".format(existing,
+                                            point,
+                                            existing[0] - point[0],
+                                            existing[1] - point[1]))
             return True
         return False
     # end def

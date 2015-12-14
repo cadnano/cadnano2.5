@@ -40,8 +40,9 @@ class AbstractSliceTool(QGraphicsObject):
 
     def setVectors(self):
         rad = self._RADIUS
-        return [QLineF(rad, rad,
-                    rad*(1 + 2*math.cos(x)), rad*(1+ 2*math.sin(x))) for x in self.angles]
+        return [QLineF( rad, rad,
+                        rad*(1 + 2*math.cos(x)), rad*(1 + 2*math.sin(x))
+                        ) for x in self.angles]
 
 
     # end def
