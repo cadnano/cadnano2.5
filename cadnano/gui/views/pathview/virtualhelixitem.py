@@ -324,16 +324,11 @@ class PreXoverItemGroup(QGraphicsRectItem):
         super(QGraphicsRectItem, self).__init__(parent)
         self._parent = parent
         self.setPen(getNoPen())
-        part = parent.part()
-        self._max_base = part.maxBaseIdx()
-        step_size = part.stepSize()
-        _hue_scale = step_size*self.HUE_FACTOR
-        self._colors = [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() \
-                                    for i in range(step_size)]
+        self._colors = []
         self._fwd_pxo_items = {}
         self._rev_pxo_items = {}
         self._active_items = []
-        self._add_pxitems(0, self._max_base+1, step_size)
+        self.updateBasesPerRepeat()
     # end def
 
     ### ACCESSORS ###
@@ -343,7 +338,19 @@ class PreXoverItemGroup(QGraphicsRectItem):
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
-    def _add_pxitems(self, start_idx, end_idx, step_size):
+    def addRepeats(self, n=None):
+        """
+        Adds n*bases_per_repeat PreXoverItems to fwd and rev groups.
+        If n is None, get the value from the parent VHI.
+        """
+        step_size = self._parent._bases_per_repeat
+        if n is None:
+            n = self._parent._repeats
+            start_idx = 0
+        else:
+            start_idx = len(self._fwd_pxo_items)
+        end_idx = start_idx + n*step_size
+
         iw, half_iw = PHOS_ITEM_WIDTH, 0.5*PHOS_ITEM_WIDTH
         bw, half_bw, bw2 = _BASE_WIDTH, 0.5*_BASE_WIDTH, 2*_BASE_WIDTH
         for i in range(start_idx, end_idx, step_size):
@@ -356,14 +363,37 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 self._rev_pxo_items[i+j] = rev
             # end for
         # end for
-        canvas_size = self._parent.part().maxBaseIdx()+1
+        canvas_size = self._parent._max_length
         self.setRect(0, 0, bw*canvas_size, bw2)
     # end def
 
-    def _rm_pxitems_after(self, new_max):
-        for i in range(new_max+1, self._max_base+1):
-            self.scene().removeItem(self._fwd_pxo_items.pop(i))
-            self.scene().removeItem(self._rev_pxo_items.pop(i))
+    def removeRepeats(self, n=None):
+        """
+        Adds n*bases_per_repeat PreXoverItems to fwd and rev groups.
+        If n is None, remove all PreXoverItems from fwd and rev groups.
+        """
+        if n:
+            step_size = self._parent._bases_per_repeat
+            end_idx = len(self._fwd_pxo_items)
+            start_idx = end_idx - n*step_size
+            for i in range(start_idx, end_idx):
+                self.scene().removeItem(self._fwd_pxo_items.pop(i))
+                self.scene().removeItem(self._rev_pxo_items.pop(i))
+        else:
+            while self._fwd_pxo_items:
+                self.scene().removeItem(self._fwd_pxo_items.pop(i))
+            while self._rev_pxo_items:
+                self.scene().removeItem(self._rev_pxo_items.pop(i))
+    # end def
+
+    def updateBasesPerRepeat(self):
+        """Recreates colors, all vhi"""
+        step_size = self._parent._bases_per_repeat
+        _hue_scale = step_size*self.HUE_FACTOR
+        self._colors = [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() \
+                                    for i in range(step_size)]
+        self.removeRepeats()
+        self.addRepeats()
     # end def
 
     def part(self):
@@ -390,9 +420,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def resize(self):
-        part = self._parent.part()
-        old_max = self._parent._max_base
-        new_max = part.maxBaseIdx()
+        old_max = len(self._fwd_pxo_items) 
+        new_max = self._parent._max_length
         if new_max == old_max:
             return
         elif new_max > old_max:
@@ -478,13 +507,17 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
 
 class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
-    """VirtualHelixItem for PathView"""
-    findChild = util.findChild  # for debug
+    """
+    VirtualHelixItem for PathView.
 
+    VHI maintains local copies of model_virtual_helix properties.
+    When refreshing appearance, VHI children should ask parent VHI for current
+    values, introspect for comparison, and update if necessary.
+    """
     def __init__(self, part_item, model_virtual_helix, viewroot):
         super(VirtualHelixItem, self).__init__(part_item.proxy())
         self._part_item = part_item
-        self._model_virtual_helix = _mvh = model_virtual_helix
+        self._model_virtual_helix = mvh = model_virtual_helix
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
@@ -493,9 +526,17 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self._last_strand_set = None
         self._last_idx = None
         self._scaffold_background = None
+
+        self._repeats = mvh.getProperty('repeats')
+        self._bases_per_repeat = mvh.getProperty('bases_per_repeat')
+        # self._turns_per_repeat = mvh.getProperty('turns_per_repeat')
+        self._max_length = mvh.getProperty('_max_length')
+
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         self.setBrush(getNoBrush())
+        self.setAcceptHoverEvents(True)  # for pathtools
+        self.setZValue(styles.ZPATHHELIX)
 
         view = viewroot.scene().views()[0]
         view.levelOfDetailChangedSignal.connect(self.levelOfDetailChangedSlot)
@@ -506,14 +547,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setPen(pen)
 
         self.refreshPath()
-        self.setAcceptHoverEvents(True)  # for pathtools
-        self.setZValue(styles.ZPATHHELIX)
 
-        self._max_base = self.virtualHelix().getProperty('_max_length')
-        
-        self._repeats = mvh.getProperty('repeats')
-        self._bases_per_repeat = mvh.getProperty('bases_per_repeat')
-        self._turns_per_repeat = mvh.getProperty('turns_per_repeat')
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
         # self._activephositem = ActivePhosItem(self)
     # end def
@@ -564,14 +598,12 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
         ### GEOMETRY PROPERTIES ###
         elif property_key == 'repeats':
-            print(virtual_helix, property_key, new_value)
-            pass
+            self.updateRepeats(int(new_value))
         elif property_key == 'bases_per_repeat':
-            print(virtual_helix, property_key, new_value)
-            pass
-        elif property_key == 'turns_per_repeat':
-            print(virtual_helix, property_key, new_value)
-            pass
+            self.updateBasesPerRepeat(int(new_value))
+        # elif property_key == 'turns_per_repeat':
+        #     print(virtual_helix, property_key, new_value)
+        #     pass
         ### RUNTIME PROPERTIES ###
         elif property_key == 'active_phos':
             hpxig = self._handle._prexoveritemgroup
@@ -696,7 +728,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     # end def
 
     # http://stackoverflow.com/questions/6800193/
-    def factors(n):
+    def prime_factors(self, n):
         return set(x for tup in ([i, n//i] 
                     for i in range(1, int(n**0.5)+1) if n % i == 0) for x in tup)
 
@@ -706,20 +738,18 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         The path also includes a border outline and a midline for
         dividing scaffold and staple bases.
         """
-        bw = _BASE_WIDTH
-        bw2 = 2 * bw
-        part = self.part()
         path = QPainterPath()
 
-        # sub_step_size = part.subStepSize()
-        # just use second largest factor here
-        factor_list = sorted(factors(self._bases_per_repeat))
-        sub_step_size = factor_list[-2] if len(factor_list) > 2 else self._bases_per_repeat
+        bw = _BASE_WIDTH
+        bw2 = 2 * bw
+        canvas_size = self._max_length
 
-        canvas_size = part.maxBaseIdx() + 1
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
-        # minor tick marks
+
+        # minor tick marks at second-largest prime factor
+        factor_list = sorted(self.prime_factors(self._bases_per_repeat))
+        sub_step_size = factor_list[-2] if len(factor_list) > 2 else self._bases_per_repeat
         for i in range(canvas_size):
             x = round(bw * i) #+ .5
             if i % sub_step_size == 0:
@@ -733,21 +763,38 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 path.lineTo(x + .25, 0)
                 path.lineTo(x + .5,  0)
                 path.lineTo(x + .5,  bw2)
-
             else:
                 path.moveTo(x, 0)
                 path.lineTo(x, 2 * bw)
 
-        # staple-scaffold divider
+        # fwd-rev divider
         path.moveTo(0, bw)
         path.lineTo(bw * canvas_size, bw)
-
         self.setPath(path)
+    # end def
 
-        if self._model_virtual_helix.scaffoldIsOnTop():
-            scaffoldY = 0
-        else:
-            scaffoldY = bw
+    def updateRepeats(self, new_value):
+        if self._repeats == new_value:
+            return
+        pxig = self._prexoveritemgroup
+        if self._repeats < new_value:
+            n = new_value - self._repeats
+            self._repeats = new_value
+            pxig.addRepeats(n)
+        elif self._repeats > new_value:
+            n = self._repeats - new_value
+            self._repeats = new_value
+            pxig.removeRepeats(n)
+        self._max_length = self._model_virtual_helix.getMaxLength()
+        self.refreshPath()
+    # end def
+
+    def updateBasesPerRepeat(self, new_value):
+        pxig = self._prexoveritemgroup
+        if self._bases_per_repeat != new_value:
+            self._bases_per_repeat = new_value
+            pxig.addRepeats.updateBasesPerRepeat()
+            self.refreshPath()
     # end def
 
     def resize(self):
@@ -755,7 +802,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.refreshPath()
         self._prexoveritemgroup.resize()
         # self._activephositem.resize()
-        self._max_base = self.part().maxBaseIdx()
+        # self._max_base = self.part().maxBaseIdx()
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive(self, idx):

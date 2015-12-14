@@ -39,8 +39,8 @@ class VirtualHelix(ProxyObject):
                             'bases_per_repeat':21,
                             'turns_per_repeat':2,
                             'repeats':2,
-                            '_bases_per_turn':10.5,
-                            '_twist_per_base':360/10.5,
+                            '_bases_per_turn':10.5, # bases_per_repeat/turns_per_repeat
+                            '_twist_per_base':360/10.5, # 360/_bases_per_turn
                             '_max_length':42
                             }
     # end def
@@ -109,6 +109,11 @@ class VirtualHelix(ProxyObject):
         else:
             return name
     # end def
+
+    def getMaxLength(self):
+        bpr = int(self._properties['bases_per_repeat'])
+        r = int(self._properties['repeats'])
+        return bpr*r
 
     def getPropertyDict(self):
         return self._properties
