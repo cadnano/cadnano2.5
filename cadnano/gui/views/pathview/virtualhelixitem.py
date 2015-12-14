@@ -380,9 +380,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 self.scene().removeItem(self._fwd_pxo_items.pop(i))
                 self.scene().removeItem(self._rev_pxo_items.pop(i))
         else:
-            while self._fwd_pxo_items:
+            for i in range(len(self._fwd_pxo_items)):
                 self.scene().removeItem(self._fwd_pxo_items.pop(i))
-            while self._rev_pxo_items:
                 self.scene().removeItem(self._rev_pxo_items.pop(i))
     # end def
 
@@ -793,7 +792,8 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         pxig = self._prexoveritemgroup
         if self._bases_per_repeat != new_value:
             self._bases_per_repeat = new_value
-            pxig.addRepeats.updateBasesPerRepeat()
+            pxig.updateBasesPerRepeat()
+            self._max_length = self._model_virtual_helix.getMaxLength()
             self.refreshPath()
     # end def
 

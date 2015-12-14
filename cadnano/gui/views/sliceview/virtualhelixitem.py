@@ -264,8 +264,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.fwd_prexo_items = {}
         self.rev_prexo_items = {}
         self._colors = self._get_colors()
-        self._add_pxitems()
-
+        self.addItems()
         self.setPen(getNoPen())
         self.setZValue(styles.ZPXIGROUP)
     # end def
@@ -286,11 +285,17 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
-    def _add_pxitems(self):
-        part = self._parent.part()
-        _step = part.stepSize()
-        _twist = part._TWIST_PER_BASE
-        _groove = part.minorGrooveAngle()
+    def _get_colors(self):
+        step_size = self._parent._bases_per_repeat
+        _hue_scale = step_size*self.HUE_FACTOR
+        return [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() for i in range(step_size)]
+    # end def
+
+    ### PUBLIC SUPPORT METHODS ###
+    def addItems(self):
+        _step = self._parent._bases_per_repeat
+        _twist = self._parent._twist_per_base
+        _groove = self._parent.part().minorGrooveAngle()
         _hue_scale = _step*self.HUE_FACTOR
 
         _iw = PXI_PP_ITEM_WIDTH
@@ -323,18 +328,30 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             next_rev.set5pItem(rev)
     # end def
 
-    def updateTwist(self, twist_per_base):
-        part = self._parent.part()
-        _step = part.stepSize()
-        _groove = part.minorGrooveAngle()
-        for i in range(_step):
+    def removeItems(self):
+        for i in range(len(self.fwd_prexo_items)):
+            self.scene().removeItem(self.fwd_prexo_items.pop(i))
+            self.scene().removeItem(self.rev_prexo_items.pop(i))
+    # end def
+
+    def updateBasesPerRepeat(self):
+        self._colors = self._get_colors()
+        self.removeItems()
+        self.addItems()
+    # end def
+
+    def updateTwistPerBase(self):
+        twist_per_base = self._parent._twist_per_base
+        step_size = self._parent._bases_per_repeat
+        _groove = self._parent.part().minorGrooveAngle()
+        for i in range(step_size):
             fwd = self.fwd_prexo_items[i]
             rev = self.rev_prexo_items[i]
             fwd.setRotation(round((i*twist_per_base)%360, 3))
             rev.setRotation(round((i*twist_per_base+_groove)%360, 3))
-        for i in range(_step-1):
+        for i in range(step_size-1):
             fwd, next_fwd = self.fwd_prexo_items[i], self.fwd_prexo_items[i+1]
-            j = (_step-1)-i
+            j = (step_size-1)-i
             rev, next_rev = self.rev_prexo_items[j], self.rev_prexo_items[j-1]
             fwd.set3pItem(next_fwd)
             rev.set3pItem(next_rev)
@@ -342,15 +359,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             next_rev.set5pItem(rev)
     # end def
 
-
-    def _get_colors(self):
-        part = self._parent.part()
-        _step = part.stepSize()
-        _hue_scale = _step*self.HUE_FACTOR
-        return [QColor.fromHsvF(i/_hue_scale, 0.75, 0.8).name() for i in range(_step)]
-
-
-    ### PUBLIC SUPPORT METHODS ###
     def partCrossoverSpanAngle(self):
         return self._parent.partCrossoverSpanAngle()
 
@@ -525,6 +533,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._empty_helix_item = ehi = empty_helix_item
         self._part_item = ehi._part_item
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
+        self._bases_per_repeat = model_virtual_helix.getProperty('bases_per_repeat')
+        self._twist_per_base = model_virtual_helix.getProperty('_twist_per_base')
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
 
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
@@ -758,14 +768,18 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
         ### GEOMETRY PROPERTIES ###
+        elif property_key == 'bases_per_repeat':
+            self._bases_per_repeat = int(new_value)
+            _pxig.updateBasesPerRepeat()
         elif property_key == '_twist_per_base':
-            _pxig.updateTwist(float(new_value))
+            self._twist_per_base = float(new_value)
+            _pxig.updateTwistPerBase()
         ### RUNTIME PROPERTIES ###
         elif property_key == 'active_phos':
             if new_value:
                 vh_name, fwd_str, base_idx, facing_angle = new_value.split('.')
                 is_fwd = True if fwd_str == 'fwd' else False
-                step_idx = int(base_idx) % self.part().stepSize()
+                step_idx = int(base_idx) % self._bases_per_repeat
                 new_active_item = _pxig.getItem(is_fwd, step_idx)
                 _pxig.updateViewActivePhos(new_active_item)
                 self.updateNeighborsNearActivePhos(new_active_item, True)
@@ -869,7 +883,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._pen1.setBrush(fwd_strand_color_obj)
         self.arrow1.setPen(self._pen1)
         part = self.part()
-        tpb = part._TWIST_PER_BASE
+        tpb = self._twist_per_base
         angle = idx*tpb
         # for some reason rotation is CW and not CCW with increasing angle
         eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
@@ -887,7 +901,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._pen2.setBrush(rev_strand_color_obj)
         self.arrow2.setPen(self._pen2)
         part = self.part()
-        tpb = part._TWIST_PER_BASE
+        tpb = self._twist_per_base
         angle = idx*tpb
         eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
         self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 150)
