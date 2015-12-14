@@ -37,30 +37,31 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
         return ItemType.VIRTUALHELIX
     # end def
 
-    def setEulerZ(self, new_value):
+    ### PRIVATE SUPPORT METHODS ###
+    def _setEulerZ(self, new_value):
         self._cn_model.setProperty('eulerZ', new_value)
 
-    def setTwistPerBase(self, new_value):
-        self._cn_model.setProperty('twist_per_base', new_value)
-
-    def setZ(self, new_value):
+    def _setZ(self, new_value):
         self._cn_model.setProperty('z', new_value)
+
+    def _setBasesPerRepeat(self, new_value):
+        self._cn_model.setProperty('bases_per_repeat', new_value)
+
+    def _setRepeats(self, new_value):
+        self._cn_model.setProperty('repeats', new_value)
+
+    def _setTurnsPerRepeat(self, new_value):
+        self._cn_model.setProperty('turns_per_repeat', new_value)
 
     def configureEditor(self, parent_QWidget, option, model_index):
         m_vh = self._cn_model
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
-        elif key == 'twist_per_base':
-            editor = QDoubleSpinBox(parent_QWidget)
-            editor.setDecimals(3)
-            editor.setSingleStep(0.25)
-            editor.setRange(32,36)
-            editor.valueChanged.connect(self.setTwistPerBase)
         elif key == 'eulerZ':
             editor = QSlider(Qt.Horizontal, parent_QWidget)
             editor.setRange(0, 359)
-            editor.valueChanged.connect(self.setEulerZ)
+            editor.valueChanged.connect(self._setEulerZ)
         elif key == 'scamZ':
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setSingleStep(m_vh.part().twistPerBase())
@@ -76,7 +77,28 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
             editor.setSingleStep(pathstyles.PATH_BASE_WIDTH)
             editor.setDecimals(4)
             editor.setRange(-9999,9999)
-            editor.valueChanged.connect(self.setZ)
+            editor.valueChanged.connect(self._setZ)
+        elif key == 'bases_per_repeat':
+            editor = QSpinBox(parent_QWidget)
+            editor.setRange(10,32)
+            editor.valueChanged.connect(self._setBasesPerRepeat)
+        elif key == 'turns_per_repeat':
+            editor = QSpinBox(parent_QWidget)
+            editor.setRange(1,3)
+            editor.valueChanged.connect(self._setTurnsPerRepeat)
+        elif key == 'repeats':
+            editor = QSpinBox(parent_QWidget)
+            editor.setRange(2,100)
+            editor.valueChanged.connect(self._setRepeats)
+        elif key == '_bases_per_turn':
+            editor = QLineEdit(parent_QWidget)
+            editor.setReadOnly(True)
+        elif key == '_twist_per_base':
+            editor = QLineEdit(parent_QWidget)
+            editor.setReadOnly(True)
+        elif key == '_max_length':
+            editor = QLineEdit(parent_QWidget)
+            editor.setReadOnly(True)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor

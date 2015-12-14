@@ -28,11 +28,31 @@ class CNPropertyItem(QTreeWidgetItem):
             self.setData(KEY_COL, Qt.EditRole, key)
             self.setData(VAL_COL, Qt.EditRole, name) #Qt.DisplayRole
 
+            # groups
+            geometry_group = QTreeWidgetItem(root, QTreeWidgetItem.UserType)
+            geometry_group.setData(KEY_COL, Qt.EditRole, "geometry")
+            geometry_group.setExpanded(True)
+            transform_group = QTreeWidgetItem(root, QTreeWidgetItem.UserType)
+            transform_group.setData(KEY_COL, Qt.EditRole, "transform")
+            transform_group.setExpanded(True)
+            runtime_group = QTreeWidgetItem(root, QTreeWidgetItem.UserType)
+            runtime_group.setData(KEY_COL, Qt.EditRole, "runtime")
+            runtime_group.setExpanded(True)
+
             constructor = type(self)
             for key in sorted(model_props):
                 if key == 'name':
                     continue
-                p_i = constructor(cn_model, root, key=key)
+                elif key in ['bases_per_repeat', 'turns_per_repeat', 'repeats',
+                             '_bases_per_turn', '_twist_per_base', '_max_length']:
+                    _parent = geometry_group
+                elif key in ['x', 'y', 'z', 'eulerZ', 'scamZ']:
+                    _parent = transform_group
+                elif key in ['active_phos', 'neighbor_active_angle', 'neighbors']:
+                    _parent = runtime_group
+                else:
+                    _parent = root
+                p_i = constructor(cn_model, _parent, key=key)
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
                 model_value = cn_model.getProperty(key)
@@ -63,11 +83,11 @@ class CNPropertyItem(QTreeWidgetItem):
             editor = QLineEdit(parent_QWidget)
         elif data_type is int:
             editor = QSpinBox(parent_QWidget)
-            editor.setRange(-359,359)
+            editor.setRange(0,10000)
         elif data_type is float:
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setDecimals(0)
-            editor.setRange(-359,359)
+            editor.setRange(0,10000)
         elif data_type is bool:
             editor = QCheckBox(parent_QWidget)
         elif data_type is type(None):

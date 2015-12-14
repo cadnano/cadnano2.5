@@ -36,15 +36,13 @@ class VirtualHelix(ProxyObject):
                             'neighbor_active_angle':'',
                             'neighbors':'',
                             'z':0,
-                            'twist_per_base':34.286}
-
-        # rotate to honeycomb defaults
-        # if self.isEvenParity():
-        #     self._properties['eulerZ'] = 10
-        #     self._properties['scamZ'] = 10
-        # else:
-        #     self._properties['eulerZ'] = 190
-        #     self._properties['scamZ'] = 190
+                            'bases_per_repeat':21,
+                            'turns_per_repeat':2,
+                            'repeats':2,
+                            '_bases_per_turn':10.5,
+                            '_twist_per_base':360/10.5,
+                            '_max_length':42
+                            }
     # end def
 
     def __repr__(self):
@@ -89,6 +87,10 @@ class VirtualHelix(ProxyObject):
         return self._properties[key]
     # end def
 
+    def getReadOnlyProperty(self, key):
+        return self._read_only_properties[key]
+    # end def
+
     def getColor(self):
         return "#ffffff" #self._properties['color']
 
@@ -114,8 +116,21 @@ class VirtualHelix(ProxyObject):
 
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
+        if key in self._properties:
+            if self._properties[key] == value:
+                return
         self._properties[key] = value
         self.virtualHelixPropertyChangedSignal.emit(self, key, value)
+        if key in ['bases_per_repeat', 'turns_per_repeat', 'repeats']:
+            bpr = int(self._properties['bases_per_repeat'])
+            tpr = int(self._properties['turns_per_repeat'])
+            r = int(self._properties['repeats'])
+            self._properties['_bases_per_turn'] = bpt = round(bpr/tpr,3)
+            self._properties['_twist_per_base'] = tpb = 360/bpt
+            self._properties['_max_length'] = ml = bpr*r
+            self.virtualHelixPropertyChangedSignal.emit(self, '_bases_per_turn', bpt)
+            self.virtualHelixPropertyChangedSignal.emit(self, '_twist_per_base', tpb)
+            self.virtualHelixPropertyChangedSignal.emit(self, '_max_length', ml)
     # end def
 
     def setNumber(self, number):

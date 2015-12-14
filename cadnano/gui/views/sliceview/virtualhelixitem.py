@@ -738,6 +738,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         _pxig = self._prexoveritemgroup
+        ### TRANSFORM PROPERTIES ###
         if property_key == 'eulerZ':
             _pxig.setRotation(new_value)
             scamZ = self._virtual_helix.getProperty('scamZ') 
@@ -756,6 +757,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         elif property_key == 'y':
             ehi_pos = self._empty_helix_item.scenePos()
             self._empty_helix_item.setPos(ehi_pos.x(),new_value)
+        ### GEOMETRY PROPERTIES ###
+        elif property_key == '_twist_per_base':
+            _pxig.updateTwist(float(new_value))
+        ### RUNTIME PROPERTIES ###
         elif property_key == 'active_phos':
             if new_value:
                 vh_name, fwd_str, base_idx, facing_angle = new_value.split('.')
@@ -777,9 +782,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
                     item.updateItemApperance(True, show_3p=False)
             else:
                 _pxig.resetAllItemsAppearance()
-        elif property_key == 'twist_per_base':
-            _pxig.updateTwist(float(new_value))
-
     # end def
 
 

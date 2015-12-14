@@ -126,7 +126,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         self.setFont(self._XO_FONT)
         # self.setNumberAndPos(idx)
         self.setBrush(getBrushObj('#666666'))
-
+    # end def
 
     def setNumberAndPos(self, num):
         self._num = num
@@ -146,8 +146,8 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 
         self.setPos(labelX, labelY)
         self.setText(str_num)
-
-
+    # end def
+# end class
 
 
 class PreXoverItem(QGraphicsRectItem):
@@ -202,7 +202,13 @@ class PreXoverItem(QGraphicsRectItem):
         return self._color
 
     def facing_angle(self):
-        return (self._parent._vh_angle() + self.rotation()) % 360
+        _twist = float(self._parent._vh_twist_per_base())
+        if self._is_fwd:
+            angle = round(((self._step_idx+(self._parent._vh_Z() / _BASE_WIDTH))*_twist)%360, 3)
+        else:
+            _groove = self._parent.part().minorGrooveAngle()
+            angle = round(((self._step_idx+(self._parent._vh_Z() / _BASE_WIDTH))*_twist+_groove)%360, 3)
+        return (self._parent._vh_angle() + angle) % 360
 
     def is_fwd(self):
         return self._is_fwd
@@ -360,11 +366,17 @@ class PreXoverItemGroup(QGraphicsRectItem):
             self.scene().removeItem(self._rev_pxo_items.pop(i))
     # end def
 
+    def part(self):
+        return self._parent.part()
+
     def _vh_name(self):
         return self._parent.virtualHelix().getName()
 
     def _vh_angle(self):
         return self._parent.virtualHelix().getProperty('eulerZ')
+
+    def _vh_twist_per_base(self):
+        return self._parent.virtualHelix().getProperty('_twist_per_base')
 
     def _vh_Z(self):
         return self._parent.virtualHelix().getProperty('z')
@@ -448,10 +460,10 @@ class PreXoverItemGroup(QGraphicsRectItem):
             return
         vh_name = vh.getName()
         vh_angle = vh.getProperty('eulerZ')
-        step_idx = pre_xover_item.base_idx() # (f|r).step_idx
+        idx = pre_xover_item.absolute_idx() # (f|r).step_idx
         facing_angle = pre_xover_item.facing_angle()
         is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
-        value = '%s.%s.%d.%d' % (vh_name, is_fwd, step_idx, facing_angle)
+        value = '%s.%s.%d.%d' % (vh_name, is_fwd, idx, facing_angle)
         self._parent.part().setProperty('active_phos', value)
         vh.setProperty('active_phos', value)
     # end def
@@ -472,7 +484,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     def __init__(self, part_item, model_virtual_helix, viewroot):
         super(VirtualHelixItem, self).__init__(part_item.proxy())
         self._part_item = part_item
-        self._model_virtual_helix = model_virtual_helix
+        self._model_virtual_helix = _mvh = model_virtual_helix
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
@@ -497,7 +509,11 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
 
-        self._max_base = self.part().maxBaseIdx()
+        self._max_base = self.virtualHelix().getProperty('_max_length')
+        
+        self._repeats = mvh.getProperty('repeats')
+        self._bases_per_repeat = mvh.getProperty('bases_per_repeat')
+        self._turns_per_repeat = mvh.getProperty('turns_per_repeat')
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
         # self._activephositem = ActivePhosItem(self)
     # end def
@@ -537,15 +553,26 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     # end def
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
+        ### TRANSFORM PROPERTIES ###
         if property_key == 'z':
             z = float(new_value)
             self.setX(z)
             self._handle.setX(z-_VH_XOFFSET)
             self.part().partDimensionsChangedSignal.emit(self.part(), True)
-            # self._part_item.updateXoverItems(self)
         elif property_key == 'eulerZ':
             self._handle.rotateWithCenterOrigin(new_value)
             self._prexoveritemgroup.updatePositionsAfterRotation(new_value)
+        ### GEOMETRY PROPERTIES ###
+        elif property_key == 'repeats':
+            print(virtual_helix, property_key, new_value)
+            pass
+        elif property_key == 'bases_per_repeat':
+            print(virtual_helix, property_key, new_value)
+            pass
+        elif property_key == 'turns_per_repeat':
+            print(virtual_helix, property_key, new_value)
+            pass
+        ### RUNTIME PROPERTIES ###
         elif property_key == 'active_phos':
             hpxig = self._handle._prexoveritemgroup
             pxig = self._prexoveritemgroup
@@ -668,6 +695,11 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         return x, y
     # end def
 
+    # http://stackoverflow.com/questions/6800193/
+    def factors(n):
+        return set(x for tup in ([i, n//i] 
+                    for i in range(1, int(n**0.5)+1) if n % i == 0) for x in tup)
+
     def refreshPath(self):
         """
         Returns a QPainterPath object for the minor grid lines.
@@ -678,7 +710,12 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         bw2 = 2 * bw
         part = self.part()
         path = QPainterPath()
-        sub_step_size = part.subStepSize()
+
+        # sub_step_size = part.subStepSize()
+        # just use second largest factor here
+        factor_list = sorted(factors(self._bases_per_repeat))
+        sub_step_size = factor_list[-2] if len(factor_list) > 2 else self._bases_per_repeat
+
         canvas_size = part.maxBaseIdx() + 1
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
@@ -696,11 +733,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 path.lineTo(x + .25, 0)
                 path.lineTo(x + .5,  0)
                 path.lineTo(x + .5,  bw2)
-
-                # path.moveTo(x-.5, 0)
-                # path.lineTo(x-.5, 2 * bw)
-                # path.lineTo(x+.5, 2 * bw)
-                # path.lineTo(x+.5, 0)
 
             else:
                 path.moveTo(x, 0)
