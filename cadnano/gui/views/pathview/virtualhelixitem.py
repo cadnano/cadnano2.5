@@ -80,6 +80,7 @@ class Triangle(QGraphicsPathItem):
 class ActivePhosItem(QGraphicsPathItem):
     def __init__(self, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self._parent = parent
         self._part = parent.part()
         self.adapter = PropertyWrapperObject(self)
         self.setPen(getNoPen())
@@ -88,7 +89,7 @@ class ActivePhosItem(QGraphicsPathItem):
 
     def getPath(self):
         path = QPainterPath()
-        _step = self._part.stepSize()
+        _step = self._parent._bases_per_repeat
         # max_idx = self._part.maxBaseIdx()
         # for i in range(0, self._part.maxBaseIdx()+1, _step):
         #     rect = QRectF(_BASE_RECT)
@@ -413,9 +414,12 @@ class PreXoverItemGroup(QGraphicsRectItem):
     ### PUBLIC SUPPORT METHODS ###
     def getItem(self, is_fwd, idx):
         if is_fwd:
-            return self._fwd_pxo_items[idx]
+            if idx in self._fwd_pxo_items:
+                return self._fwd_pxo_items[idx]
         else:
-            return self._rev_pxo_items[idx]
+            if idx in self._rev_pxo_items:
+                return self._rev_pxo_items[idx]
+        return None
     # end def
 
     def resize(self):
@@ -424,7 +428,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         if new_max == old_max:
             return
         elif new_max > old_max:
-            self._add_pxitems(old_max+1, new_max, part.stepSize())
+            self._add_pxitems(old_max+1, new_max, self._parent._bases_per_repeat)
         else:
             self._rm_pxitems_after(new_max)
         self._max_base = new_max
@@ -438,7 +442,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
             part = self._parent.part()
             cutoff = part.stepSize()/2
             active_idx = active_item.base_idx()
-            step_idxs = range(0, part.maxBaseIdx(), part.stepSize())
+            step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
             fwd_idxs, rev_idxs = fwd_rev_idxs
             k = 0
             pre_xovers = {}
@@ -468,8 +472,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
     def updatePositionsAfterRotation(self, angle):
         bw = _BASE_WIDTH
         part = self._parent.part()
-        canvas_size = part.maxBaseIdx() + 1
-        step_size = part.stepSize()
+        canvas_size = self._parent._max_length
+        step_size = self._parent._bases_per_repeat
         xdelta = angle/360. * bw*step_size
         for i, item in self._fwd_pxo_items.items():
             x = (bw*i + xdelta) % (bw*canvas_size)
@@ -611,7 +615,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                 # vh-handle
                 vh_name, fwd_str, base_idx, facing_angle = new_value.split('.')
                 is_fwd = 1 if fwd_str == 'fwd' else 0
-                step_idx = int(base_idx) % self.part().stepSize()
+                step_idx = int(base_idx) % self._bases_per_repeat
                 h_item = hpxig.getItem(is_fwd, step_idx)
                 hpxig.updateViewActivePhos(h_item)
                 # vh
