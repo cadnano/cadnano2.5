@@ -28,6 +28,15 @@ def normalizeV3(v):
         return Vector3(v.x/mag, v.y/mag, v.z/mag)
 # end def
 
+def normalizeV2(v):
+    x, y = v
+    mag = math.sqrt(x**2 + y**2)
+    if mag < 1e-8:
+        return Vector3(0,0,0)
+    else:
+        return x/mag, v.y/mag
+# end def
+
 def normalToPlane(v1, v2, v3):
     """  Calculate unit normal to the normal to
     the plane defined by vertices v1, v2, and v3
@@ -80,3 +89,18 @@ def v2DistanceAndAngle(a, b):
     dist = math.sqrt(dx*dx + dy*dy)
     angle = math.atan2(dy, dx)
     return dist, angle
+
+def v2dot(a, b):
+    return a[0]*b[0]+a[1]*b[1]
+
+def v2AngleBetween(a, b):
+    a = normalizeV2(a)
+    b = normalizeV2(b)
+    numerator = v2dot(a, b)
+    xa, xa = a
+    xb, yb = a
+    maga = math.sqrt(xa**2 + ya**2)
+    magb = math.sqrt(xb**2 + yb**2)
+    return math.acos(num/(maga*magb))
+# end def
+# end def

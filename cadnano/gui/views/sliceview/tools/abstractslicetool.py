@@ -1,12 +1,15 @@
-from cadnano import util
-from PyQt5.QtCore import pyqtSignal, QObject
+import math
+
+from PyQt5.QtCore import pyqtSignal, QObject, QPointF, QLineF
 from PyQt5.QtWidgets import QActionGroup, QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
+
 from cadnano.gui.views.sliceview import slicestyles as styles
+from cadnano.math.vector import v2AngleBetween
 
 class AbstractSliceTool(QGraphicsObject):
     _RADIUS = styles.SLICE_HELIX_RADIUS
-
+    _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     """Abstract base class to be subclassed by all other pathview tools."""
     def __init__(self, controller, parent=None):
         super(AbstractSliceTool, self).__init__(parent)
@@ -21,7 +24,9 @@ class AbstractSliceTool(QGraphicsObject):
         # self._pen = _PEN
         self.hide()
         self.started = False
-
+        self.angles = [x*math.pi/180 for x in range(0, 360, 30)]
+        self.vectors = self.setVectors()
+        # print(self.vectors)
 
     ######################## Drawing #######################################
     # def paint(self, painter, option, widget=None):
@@ -32,6 +37,13 @@ class AbstractSliceTool(QGraphicsObject):
     # def boundingRect(self):
     #     return self._rect
 
+    def setVectors(self):
+        rad = self._RADIUS
+        return [QLineF(rad, rad,
+                    rad*(1 + math.cos(x)), rad*(1+ math.sin(x))) for x in self.angles]
+
+
+    # end def
     def setVirtualHelixItem(self, virtual_helix_item):
         rad = self._RADIUS
         self._vhi = virtual_helix_item
@@ -47,8 +59,19 @@ class AbstractSliceTool(QGraphicsObject):
             li = self._line_item
             line = li.line()
             pos = li.mapFromScene(event.scenePos())
+            mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
+            angle_min = 9999
+            direction = None
+            for vector in self.vectors:
+                angle_new = mouse_point_vec.angleTo(vector)
+                if angle_new < angle_min:
+                    direction = vector
+                    angle_min = angle_new
             line.setP2(pos)
-            li.setLine(line)
+            if direction is not None:
+                li.setLine(direction)
+            else:
+                li.setLine(line)
     # end def
 
     def widgetClicked(self):

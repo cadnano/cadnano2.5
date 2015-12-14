@@ -1,4 +1,5 @@
 from .abstractslicetool import AbstractSliceTool
+import math
 
 class CreateSliceTool(AbstractSliceTool):
     """"""
