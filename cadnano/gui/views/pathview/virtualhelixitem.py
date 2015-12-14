@@ -150,6 +150,8 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     # end def
 # end class
 
+ACTIVE_ALPHA = 128
+PROX_ALPHA = 64
 
 class PreXoverItem(QGraphicsRectItem):
     def __init__(self, step, step_idx, color, is_fwd=True, parent=None):
@@ -165,6 +167,7 @@ class PreXoverItem(QGraphicsRectItem):
         self._bond_item.hide()
         self._label = PreXoverLabel(step_idx, is_fwd, color, self)
         self._label.hide()
+        self._has_neighbor = False
 
         self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
@@ -257,9 +260,22 @@ class PreXoverItem(QGraphicsRectItem):
             self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
         else:
-            self.setBrush(getBrushObj(self._color, alpha=0))
-            self.animate(self, 'brush_alpha', 1000, 128, 0)
+            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
+    # end def
+
+    def setProximal(self, has_neighbor, colliding):
+        color = '#cc0000' if colliding else self._color
+        if has_neighbor:
+            self._has_neighbor = True
+            self.setBrush(getBrushObj(color, alpha=PROX_ALPHA))
+            # self.animate(self, 'brush_alpha', 1, 0, PROX_ALPHA) # overwrite running anim
+        else:
+            self._has_neighbor = False
+            self.setBrush(getBrushObj(color, alpha=0))
+            # self.animate(self, 'brush_alpha', 1000, PROX_ALPHA, 0)
     # end def
 
     def setActiveNeighbor(self, is_active, shortcut=None, active_item=None):
@@ -286,14 +302,16 @@ class PreXoverItem(QGraphicsRectItem):
             elif self.absolute_idx() == active_item.absolute_idx()-1:
                 alpha = 255
 
-            self.setBrush(getBrushObj(self._color, alpha=alpha))
-            self.animate(self, 'brush_alpha', 500, 0, alpha)
+            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
             self.setLabel(shortcut)
 
         else:
-            self.setBrush(getBrushObj(self._color, alpha=0))
-            self.animate(self, 'brush_alpha', 1000, 128, 0)
+            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            self.setBrush(getBrushObj(self._color, alpha=128))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
             self._bond_item.hide()
             self.setLabel()
@@ -329,6 +347,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self._fwd_pxo_items = {}
         self._rev_pxo_items = {}
         self._active_items = []
+        self._prox_items = []
         self.updateBasesPerRepeat()
     # end def
 
@@ -434,16 +453,13 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self._max_base = new_max
     # end def
 
-    def setActiveNeighbors(self, active_item, fwd_rev_idxs):
+    def setActiveNeighbors(self, active_item, fwd_idxs, rev_idxs):
         # active_item is a PreXoverItem
         if active_item:
-            # local_offset = self._vh_Z()/_BASE_WIDTH
             active_absolute_idx = active_item.absolute_idx()
-            part = self._parent.part()
-            cutoff = self._parent._bases_per_repeat/2
+            cutoff = self._parent._bases_per_repeat
             active_idx = active_item.base_idx()
             step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
-            fwd_idxs, rev_idxs = fwd_rev_idxs
             k = 0
             pre_xovers = {}
             for i,j in product(fwd_idxs, step_idxs):
@@ -475,6 +491,33 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 self._active_items.pop().setActiveNeighbor(False)
     # end def
 
+    def setProximalItems(self, prox_groups):
+        inactive_fwd = set(range(self._parent._max_length))
+        inactive_rev = set(range(self._parent._max_length))
+
+        step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
+
+        for fwd_idxs, rev_idxs, colliding in prox_groups:
+            for i,j in product(fwd_idxs, step_idxs):
+                idx = i+j
+                if not idx in self._fwd_pxo_items:
+                    continue
+                item = self._fwd_pxo_items[i+j]
+                item.setProximal(True, colliding)
+                inactive_fwd.remove(idx)
+            for i,j in product(rev_idxs, step_idxs):
+                idx = i+j
+                if not idx in self._rev_pxo_items:
+                    continue
+                item = self._rev_pxo_items[i+j]
+                item.setProximal(True, colliding)
+                inactive_rev.remove(idx)
+        for idx in list(inactive_fwd):
+            self._fwd_pxo_items[idx].setProximal(False, False)
+        for idx in list(inactive_rev):
+            self._rev_pxo_items[idx].setProximal(False, False)
+
+
     def updatePositionsAfterRotation(self, angle):
         bw = _BASE_WIDTH
         part = self._parent.part()
@@ -498,7 +541,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
             return
         vh_name = vh.getName()
         vh_angle = vh.getProperty('eulerZ')
-        idx = pre_xover_item.absolute_idx() # (f|r).step_idx
+        idx = pre_xover_item.base_idx() # (f|r).step_idx
         facing_angle = pre_xover_item.facing_angle()
         is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
         value = '%s.%s.%d.%d' % (vh_name, is_fwd, idx, facing_angle)
@@ -651,10 +694,29 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                         fwd_items, rev_items = hpxig.getItemsFacingNearAngle(int(n_angle))
                         fwd_idxs = [item.step_idx() for item in fwd_items]
                         rev_idxs = [item.step_idx() for item in rev_items]
-                        self._prexoveritemgroup.setActiveNeighbors(active_item, (fwd_idxs, rev_idxs))
+                        pxig.setActiveNeighbors(active_item, fwd_idxs, rev_idxs)
             else:
                 hpxig.resetAllItemsAppearance()
-                self._prexoveritemgroup.setActiveNeighbors(None, None)
+                self._prexoveritemgroup.setActiveNeighbors(None, None, None)
+        elif property_key == 'neighbors':
+            pxig = self._prexoveritemgroup
+            self.refreshProximalItems()
+    # end def
+
+    def refreshProximalItems(self):
+        """Make PXIs visible if they have proximal neighbors."""
+        hpxig = self._handle._prexoveritemgroup
+        pxig = self._prexoveritemgroup
+        prox_groups = []
+        neighbors = self._model_virtual_helix.getProperty('neighbors').split()
+        for n in neighbors:
+            n_name, n_angle = n.split(':')
+            fwd_items, rev_items = hpxig.getItemsFacingNearAngle(int(n_angle))
+            fwd_idxs = [item.step_idx() for item in fwd_items]
+            rev_idxs = [item.step_idx() for item in rev_items]
+            colliding = True if n_name[-1] == '*' else False
+            prox_groups.append((fwd_idxs, rev_idxs, colliding))
+        pxig.setProximalItems(prox_groups)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):

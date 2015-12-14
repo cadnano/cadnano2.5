@@ -134,6 +134,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 self._updateBoundingRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
+            elif property_key == 'crossover_span_angle':
+                for _, vhi in self._virtual_helix_hash.items():
+                    vhi.refreshProximalItems()
             elif property_key == 'max_vhelix_length':
                 vhis = self._virtual_helix_item_list
                 if vhis:
