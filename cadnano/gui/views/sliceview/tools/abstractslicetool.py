@@ -23,11 +23,11 @@ class AbstractSliceTool(QGraphicsObject):
         # self._rect = _RECT
         # self._pen = _PEN
         self.hide()
-        self.started = False
+        self.is_started = False
         self.angles = [x*math.pi/180 for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
         self._direction = None
-        # print(self.vectors)
+    # end def
 
     ######################## Drawing #######################################
     # def paint(self, painter, option, widget=None):
@@ -43,7 +43,7 @@ class AbstractSliceTool(QGraphicsObject):
         return [QLineF( rad, rad,
                         rad*(1 + 2*math.cos(x)), rad*(1 + 2*math.sin(x))
                         ) for x in self.angles]
-
+    # end def
 
     # end def
     def setVirtualHelixItem(self, virtual_helix_item):
@@ -53,7 +53,7 @@ class AbstractSliceTool(QGraphicsObject):
         li.setParentItem(virtual_helix_item)
         li.setLine(rad, rad, rad, rad)
         li.show()
-        self.started = True
+        self.is_started = True
     # end def
 
     def getAdjacentPoint(self, part_item, pt):
@@ -69,7 +69,7 @@ class AbstractSliceTool(QGraphicsObject):
         """
         li = self._line_item
         pos = li.mapFromScene(event.scenePos())
-        if self.started:
+        if self.is_started:
             line = li.line()
             mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
             angle_min = 9999
@@ -95,10 +95,10 @@ class AbstractSliceTool(QGraphicsObject):
         return self.eventToPosition(part_item, event)
     # end def
 
-    def widgetClicked(self):
-        """Called every time a widget representing self gets clicked,
-        not just when changing tools."""
-        pass
+    # def widgetClicked(self):
+    #     """Called every time a widget representing self gets clicked,
+    #     not just when changing tools."""
+    #     pass
 
     def setActive(self, will_be_active, old_tool=None):
         """
@@ -111,6 +111,8 @@ class AbstractSliceTool(QGraphicsObject):
     # end def
 
     def deactivate(self):
+        self.is_started = False
+        self._vhi = None
         self.hide()
     # end def
 

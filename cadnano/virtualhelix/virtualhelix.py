@@ -41,7 +41,10 @@ class VirtualHelix(CNObject):
     # end def
 
     def __repr__(self):
-        return "<%s(%d)>" % (self.__class__.__name__, self._number)
+        loc = self._location
+        return("VirtualHelix #{} at ({:.3f}, {:.3f})".format(self._number,
+                    loc[0], loc[1] ))
+        # return "<%s(%d)>" % (self.__class__.__name__, self._number)
 
     ### SIGNALS ###
     virtualHelixRemovedSignal = ProxySignal(CNObject, CNObject,
@@ -75,6 +78,10 @@ class VirtualHelix(CNObject):
         x *= scale_factor
         y *= scale_factor
         return x - radius, y - radius, x + radius, y + radius
+    # end def
+
+    def radius(self):
+        return self._part.radius()
     # end def
 
     def location(self, scale_factor=1.0):

@@ -336,21 +336,23 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         self.part().setSelected(True)
-        tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
+        tool = self._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "MousePress"
         if hasattr(self, tool_method_name):
-            getattr(self, tool_method_name)(event)
+            getattr(self, tool_method_name)(tool, event)
         else:
             event.setAccepted(False)
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def hoverMoveEvent(self, event):
-        tool_method_name = self._getActiveTool().methodPrefix() + "HoverMove"
+        tool = self._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
-            getattr(self, tool_method_name)(event)
+            getattr(self, tool_method_name)(tool, event)
         else:
             event.setAccepted(False)
-            QGraphicsItem.mouseMoveEvent(self, event)
+            QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def getModelPos(self, pos):
@@ -359,9 +361,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return x, y
     # end def
 
-    def createToolMousePress(self, event):
+    def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
-        tool = self._getActiveTool()
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
 
@@ -372,20 +373,41 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
-        check = part.isVirtualHelixAtPoint(part_pt_tuple)
+        check = part.isVirtualHelixNearPoint(part_pt_tuple)
         if check:
-            return
+            virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
+            if virtual_helix is not None:
+                vhi = self._virtual_helix_item_hash[virtual_helix]
+                tool.setVirtualHelixItem(vhi)
         else:
             part.createVirtualHelix(*part_pt_tuple)
-            virtual_helix = part.virtualHelix(part_pt_tuple)
+            virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
+            neighbors = part.getVirtualHelixNeighbors(virtual_helix)
+            print("neighbors to {}:".format(virtual_helix.number()))
+            for vh in neighbors:
+                print(vh)
             vhi = self._virtual_helix_item_hash[virtual_helix]
             tool.setVirtualHelixItem(vhi)
     # end def
 
-    def createToolHoverMove(self, event):
-        tool = self._getActiveTool()
+    def createToolHoverMove(self, tool, event):
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
+    # end def
+
+    def selectToolMousePress(self, tool, event):
+        """
+        """
+        pt = tool.eventToPosition(self, event)
+        part_pt_tuple = self.getModelPos(pt)
+        part = self._model_part
+        if part.isVirtualHelixNearPoint(part_pt_tuple):
+            vh = part.getVirtualHelixAtPoint(part_pt_tuple)
+            if vh is not None:
+                print(vh)
+                loc = vh.location()
+                # print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
+                #     loc[0], loc[1] ))
     # end def
 
     class Deselector(QGraphicsItem):

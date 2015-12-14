@@ -46,36 +46,36 @@ class SquareDnaPart(NucleicAcidPart):
         return (row % 2) ^ (column % 2)
     # end def
 
-    def getVirtualHelixNeighbors(self, virtual_helix):
-        """
-        returns the list of neighboring virtualHelices based on parity of an
-        input virtual_helix
+    # def getVirtualHelixNeighbors(self, virtual_helix):
+    #     """
+    #     returns the list of neighboring virtualHelices based on parity of an
+    #     input virtual_helix
 
-        If a potential neighbor doesn't exist, None is returned in it's place
-        """
-        neighbors = []
-        vh = virtual_helix
-        if vh is None:
-            return neighbors
+    #     If a potential neighbor doesn't exist, None is returned in it's place
+    #     """
+    #     neighbors = []
+    #     vh = virtual_helix
+    #     if vh is None:
+    #         return neighbors
 
-        # assign the method to a a local variable
-        getVH = self.virtualHelixAtCoord
-        # get the vh's row and column r,c
-        (r,c) = vh.coord()
+    #     # assign the method to a a local variable
+    #     getVH = self.virtualHelixAtCoord
+    #     # get the vh's row and column r,c
+    #     (r,c) = vh.coord()
 
-        if self.isEvenParity(r, c):
-            neighbors.append(getVH((r,      c + 1   )))  # p0 neighbor (p0 is a direction)
-            neighbors.append(getVH((r + 1,  c       )))  # p1 neighbor
-            neighbors.append(getVH((r,      c - 1   )))  # p2 neighbor
-            neighbors.append(getVH((r - 1,  c       )))  # p2 neighbor
-        else:
-            neighbors.append(getVH((r,      c - 1   )))  # p0 neighbor (p0 is a direction)
-            neighbors.append(getVH((r - 1,  c       )))  # p1 neighbor
-            neighbors.append(getVH((r,      c + 1   )))  # p2 neighbor
-            neighbors.append(getVH((r + 1,  c       )))  # p3 neighbor
-        # For indices of available directions, use range(0, len(neighbors))
-        return neighbors  # Note: the order and presence of Nones is important
-    # end def
+    #     if self.isEvenParity(r, c):
+    #         neighbors.append(getVH((r,      c + 1   )))  # p0 neighbor (p0 is a direction)
+    #         neighbors.append(getVH((r + 1,  c       )))  # p1 neighbor
+    #         neighbors.append(getVH((r,      c - 1   )))  # p2 neighbor
+    #         neighbors.append(getVH((r - 1,  c       )))  # p2 neighbor
+    #     else:
+    #         neighbors.append(getVH((r,      c - 1   )))  # p0 neighbor (p0 is a direction)
+    #         neighbors.append(getVH((r - 1,  c       )))  # p1 neighbor
+    #         neighbors.append(getVH((r,      c + 1   )))  # p2 neighbor
+    #         neighbors.append(getVH((r + 1,  c       )))  # p3 neighbor
+    #     # For indices of available directions, use range(0, len(neighbors))
+    #     return neighbors  # Note: the order and presence of Nones is important
+    # # end def
 
     def latticeCoordToPositionXY(self, row, column, scale_factor=1.0, normalize=False):
         """

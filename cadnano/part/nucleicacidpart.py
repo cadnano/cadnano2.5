@@ -163,34 +163,24 @@ class NucleicAcidPart(Part):
         return PartType.NUCLEICACIDPART
     # end def
 
-    def virtualHelix(self, vhref, return_none_if_absent=True):
-        # vhrefs are the shiny new way to talk to part about its constituent
-        # virtualhelices. Wherever you see f(...,vhref,...) you can
-        # f(...,27,...)         use the virtualhelix's id number
-        # f(...,vh,...)         use an actual virtualhelix
-        # f(...,(1,42),...)     use the coordinate representation of its position
+    def virtualHelixToNumber(self, number):
         """A vhref is the number of a virtual helix, the point of a virtual helix,
         or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
-        vh = None
-        if type(vhref) in (int,):
-            vh = self._number_to_virtual_helix.get(vhref, None)
-        elif type(vhref) in (tuple, list):
-            res = self._quadtree.findNodeByPoint(vhref)
-            if res is not None:
-                return res[0]
-        else:
-            vh = vhref
-        if not isinstance(vh, VirtualHelix):
-            if return_none_if_absent:
-                return None
-            else:
-                err = "Couldn't find the virtual helix in part %s "+\
-                      "referenced by index %s" % (self, vhref)
-                raise IndexError(err)
-        return vh
+        return  self._number_to_virtual_helix.get(vhref, None)
     # end def
 
-    def isVirtualHelixAtPoint(self, point):
+    def getVirtualHelixAtPoint(self, point):
+        radius = self._RADIUS
+        res = self._quadtree.queryPoint(point, radius)
+        if len(res) > 0:
+            return res.pop()
+        return None
+    # end def
+
+    def isVirtualHelixNearPoint(self, point):
+        """ Is a VirtualHelix near a point
+        multiples of radius
+        """
         radius = self._RADIUS
         res = self._quadtree.queryPoint(point, 2*radius)
         if len(res) > 0:
@@ -297,10 +287,10 @@ class NucleicAcidPart(Part):
         Looks for a virtual_helix at the coordinate, coord = (row, colum)
         if it exists it is returned, else None is returned
         """
-        # radius = self._RADIUS
-        point = self.latticeCoordToPositionXY(*coord)
-        # rect = (x - radius, y - radius, x + radius, y + radius)
-        res = self._quadtree.findNodeByPoint(point)
+        radius = self._RADIUS
+        x, y = self.latticeCoordToPositionXY(*coord)
+        rect = (x - radius, y - radius, x + radius, y + radius)
+        res = self._quadtree.findNodeByRect(point)
         if res is not None:
             return res[0]
         else:
@@ -1049,7 +1039,7 @@ class NucleicAcidPart(Part):
 
         If a potential neighbor doesn't exist, None is returned in it's place
         """
-        neighbors = []
+        neighbors = set()
         vh = virtual_helix
         if vh is None:
             return neighbors
@@ -1057,16 +1047,10 @@ class NucleicAcidPart(Part):
             threshold = 2.25*self._RADIUS
 
         qt = self._quadtree
-        neighbor_candidates = qt.queryNode(vh, threshold, scale_factor=1.1)
-        # for candidate in neighbor_candidates:
-        #     dist, angle = v2DistanceAndAngle(vh, candidate)
-        #     if candidate is not vh:
-        #         # when ready, enable returning angles and distanaces
-        #         # neighbors.append((candidate, dist, angle))
-        #         neighbors.append(candidate)
-        if vh in neighbors:
-            neighbors.remove(vh)
-        return neighbors
+        neighbor_candidates = qt.queryPoint(vh.location(), 2.1*self._RADIUS)
+        if vh in neighbor_candidates:
+            neighbor_candidates.remove(vh)
+        return neighbor_candidates
     # end def
 
     def areSameOrNeighbors(self, virtual_helixA, virtual_helixB):

@@ -46,7 +46,7 @@ class QuadtreeBase(object):
             if len(nodes) > self.SPLIT_THRESHOLD and \
                     self.size > self.min_size:
                 self.split()
-                return node
+            return node
         else:
             return self.insertIntoChildren(node)
     # end def
@@ -75,28 +75,35 @@ class QuadtreeBase(object):
 
     def insertIntoChildren(self, node):
 
-        # if rect spans center then insert here
-        xn, yn  = node.location()
-        x_center, y_center = self.center
-        # x1, y1, x2, y2 = self.rect()
-        children = self.children
-        # try to insert into children
-        if xn <= x_center:
-            if yn <= y_center:
-                return children[0].insertNode(node)
-            else:
-                return children[1].insertNode(node)
+        # if node is close to the center then insert here
+        # multiply by sqrt(2) == 1.4142...-> 1.4143 rounded
+        nloc = node.location()
+        ctr = self.center
+        if v2Distance(nloc, ctr) < 1.4143*node.radius():
+            self.nodes.append(node)
+            return node
         else:
-            if yn <= y_center:
-                return children[2].insertNode(node)
+            xn, yn = nloc
+            x_center, y_center = ctr
+            children = self.children
+
+            # try to insert into children
+            if xn <= x_center:
+                if yn <= y_center:
+                    return children[0].insertNode(node)
+                else:
+                    return children[1].insertNode(node)
             else:
-                return children[3].insertNode(node)
+                if yn <= y_center:
+                    return children[2].insertNode(node)
+                else:
+                    return children[3].insertNode(node)
     # end def
 
     def split(self):
         if len(self.children) > 0:
             return False
-        # print("Splitting")
+        print("Splitting", self.depth)
         next_depth = self.depth + 1
         next_size = self.size / 2
         quarter_size = next_size / 2
@@ -131,6 +138,7 @@ class QuadtreeBase(object):
         self.nodes = []
         for node in nodes:
             self.insertIntoChildren(node)
+        print("Split", self.depth, self.getDepth())
         return True
     # end def
 
@@ -147,29 +155,32 @@ class QuadtreeBase(object):
         return True
     # end def
 
-    def query(self, point, distance, node_results):
+    def query(self, point, rect, distance, node_results):
         # search children
-        x, y = point
+        x1, y1, x2, y2 = rect
         x_center, y_center = self.center
         if len(self.children) > 0:
-            if x <= x_center:
-                if y <= y_center:
-                    self.children[0].query(point, distance, node_results)
-                else:
-                    self.children[1].query(point, distance, node_results)
-            else:
-                if y <= y_center:
-                    self.children[2].query(point, distance, node_results)
-                else:
-                    self.children[3].query(point, distance, node_results)
+            if x1 <= x_center:
+                if y1 <= y_center:
+                    self.children[0].query(point, rect, distance, node_results)
+                if y2 > y_center:
+                    self.children[1].query(point, rect, distance, node_results)
+            if x2 > x_center:
+                if y1 <= y_center:
+                    self.children[2].query(point, rect, distance, node_results)
+                if y2:
+                    self.children[3].query(point, rect, distance, node_results)
 
         # search node at this level
+        query_dist = distance - 1e-5    # correction for floating point errors
         for node in self.nodes:
             # check overlap
             nloc = node.location()
             mdistance = v2Distance(nloc, point)
-            if mdistance < distance:
+            if mdistance < query_dist:
                 node_results.add(node)
+            else:
+                print("no dice", node, mdistance, query_dist)
         return node_results
     # end def
 
@@ -184,31 +195,31 @@ class QuadtreeBase(object):
             if node == query_node:
                 return node, self
         # search children
-        x, y = query_node.location()
+        x1, y1, x2, y2 = query_node.rect()
         x_center, y_center = self.center
         if len(self.children) > 0:
-            if x <= x_center:
-                if y <= y_center:
+            if x1 <= x_center:
+                if y1 <= y_center:
                     res = self.children[0].findNodeByNode(query_node)
                     if res is not None:
                         return res
-                else:
+                if y2 > y_center:
                     res = self.children[1].findNodeByNode(query_node)
                     if res is not None:
                         return res
-            else:
-                if y <= y_center:
+            if x2 > x_center:
+                if y1 <= y_center:
                     res = self.children[2].findNodeByNode(query_node)
                     if res is not None:
                         return res
-                else:
+                if y2 > y_center:
                     res = self.children[3].findNodeByNode(query_node)
                     if res is not None:
                         return res
         return None
     # end def
 
-    def findNodeByPoint(self, query_point):
+    def findNodeByRect(self, rect):
         """ look for the exact node
         assumes same node doesn't exist more than once in Quadtree
         return the Node and the nodes parent
@@ -216,28 +227,28 @@ class QuadtreeBase(object):
         # search node at this level
         for node in self.nodes:
             # check overlap
-            if allClose(node.location(), query_point):
+            if allClose(node.rect(), rect):
                 return node, self
         # search children
-        x, y = query_point
+        x1, y1, x2, y2 = rect
         x_center, y_center = self.center
         if len(self.children) > 0:
-            if x <= x_center:
-                if y <= y_center:
-                    res = self.children[0].findNodeByPoint(query_point)
+            if x1 <= x_center:
+                if y1 <= y_center:
+                    res = self.children[0].findNodeByRect(rect)
                     if res is not None:
                         return res
-                else:
-                    res = self.children[1].findNodeByPoint(query_point)
+                if y2 > y_center:
+                    res = self.children[1].findNodeByRect(rect)
                     if res is not None:
                         return res
-            else:
-                if y <= y_center:
-                    res = self.children[2].findNodeByPoint(query_point)
+            if x2 > x_center:
+                if y1 <= y_center:
+                    res = self.children[2].findNodeByRect(rect)
                     if res is not None:
                         return res
-                else:
-                    res = self.children[3].findNodeByPoint(query_point)
+                if y2 > y_center:
+                    res = self.children[3].findNodeByRect(rect)
                     if res is not None:
                         return res
         return None
@@ -276,8 +287,12 @@ class Quadtree(QuadtreeBase):
             return qc.get(location)
         else:
             node_results = set()
+            x, y = location
+            rect = (x - distance, y - distance,
+                        x + distance, y + distance)
             res = QuadtreeBase.query(self,
                                     location,
+                                    rect,
                                     distance,
                                     node_results)
             qc[location] =  res
@@ -286,8 +301,12 @@ class Quadtree(QuadtreeBase):
 
     def queryPoint(self, query_point, distance):
         node_results = set()
+        x, y = query_point
+        rect = (x - distance, y - distance,
+                x + distance, y + distance)
         res = QuadtreeBase.query(self,
                                 query_point,
+                                rect,
                                 distance,
                                 node_results)
         return res

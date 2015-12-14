@@ -106,8 +106,8 @@ class CadnanoQt(QObject):
                 return w().pathroot.partItemForPart(part_instance)
 
             print( "\tvh(i)\tshortcut for p().reference().virtualHelix(i)")
-            def vh(vhref):
-                return p().reference().virtualHelix(vhref)
+            def vh(number):
+                return p().reference().virtualHelixToNumber(number)
 
             print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
             def vhi(vhref):

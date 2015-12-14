@@ -300,23 +300,5 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             return True
         QGraphicsItem.sceneEvent(self, event)
         return False
-
-    # def hoverEnterEvent(self, event):
-    #     """
-    #     If the selection is configured to always select
-    #     everything, we don't draw a focus ring around everything,
-    #     instead we only draw a focus ring around the hovered obj.
-    #     """
-    #     # if self.selectAllBehavior():
-    #     #     self.setSelected(True)
-    #     # forward the event to the empty_helix_item as well
-    #     # self._empty_helix_item.hoverEnterEvent(event)
-    # # end def
-
-    # def hoverLeaveEvent(self, event):
-    #     # if self.selectAllBehavior():
-    #     #     self.setSelected(False)
-    #     self._empty_helix_item.hoverEnterEvent(event)
-    # # end def
 # end class
 
