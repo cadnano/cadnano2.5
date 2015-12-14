@@ -103,7 +103,7 @@ class QuadtreeBase(object):
     def split(self):
         if len(self.children) > 0:
             return False
-        print("Splitting", self.depth)
+        # print("Splitting", self.depth)
         next_depth = self.depth + 1
         next_size = self.size / 2
         quarter_size = next_size / 2
@@ -138,7 +138,7 @@ class QuadtreeBase(object):
         self.nodes = []
         for node in nodes:
             self.insertIntoChildren(node)
-        print("Split", self.depth, self.getDepth())
+        # print("Split", self.depth, self.getDepth())
         return True
     # end def
 
@@ -179,8 +179,6 @@ class QuadtreeBase(object):
             mdistance = v2Distance(nloc, point)
             if mdistance < query_dist:
                 node_results.add(node)
-            else:
-                print("no dice", node, mdistance, query_dist)
         return node_results
     # end def
 
