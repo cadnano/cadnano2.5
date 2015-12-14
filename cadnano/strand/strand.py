@@ -517,9 +517,9 @@ class Strand(ProxyObject):
         """
         low_neighbor, high_neighbor = self._strandset.getNeighbors(self)
         low_bound = low_neighbor.highIdx() if low_neighbor \
-                                            else self.part().minBaseIdx()
+                                            else self.virtualHelix().minBaseIdx()
         high_bound = high_neighbor.lowIdx() if high_neighbor \
-                                            else self.part().maxBaseIdx()
+                                            else self.virtualHelix().maxBaseIdx()
 
         if new_low > low_bound and new_high < high_bound:
             return True
@@ -545,14 +545,14 @@ class Strand(ProxyObject):
             if neighbors[0] is not None:
                 low = neighbors[0].highIdx() + 1
             else:
-                low = self.part().minBaseIdx()
+                low = self.virtualHelix().minBaseIdx()
             # print("A", low, self._base_idx_high - 1 )
             return low, self._base_idx_high - 1
         else:  # self._base_idx_high
             if neighbors[1] is not None:
                 high = neighbors[1].lowIdx() - 1
             else:
-                high = self.part().maxBaseIdx()
+                high = self.virtualHelix().maxBaseIdx()
             # print("B", self._base_idx_low+1, high)
             return self._base_idx_low + 1, high
     # end def

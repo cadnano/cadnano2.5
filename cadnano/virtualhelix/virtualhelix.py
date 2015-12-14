@@ -1,8 +1,10 @@
+from cadnano import util
 from cadnano.cnproxy import ProxyObject, ProxySignal
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.enum import StrandType
 from cadnano.strandset import StrandSet
 from .removevhelixcmd import RemoveVirtualHelixCommand
+from .resizevhelixcmd import ResizeVirtualHelixCommand
 
 
 class VirtualHelix(ProxyObject):
@@ -19,8 +21,6 @@ class VirtualHelix(ProxyObject):
         super(VirtualHelix, self).__init__(part)
         self._coord = (row, col) # col, row
         self._part = part
-        self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
-        self._stap_strandset = StrandSet(StrandType.STAPLE, self)
         # If self._part exists, it owns self._number
         # in that only it may modify it through the
         # private interface. The public interface for
@@ -29,7 +29,6 @@ class VirtualHelix(ProxyObject):
         # the virtualhelix owns self._number and may modify it.
         self._number = None
         self.setNumber(idnum)
-
         self._properties = {'eulerZ':0,
                             'scamZ':0, 
                             'active_phos':None,
@@ -43,6 +42,10 @@ class VirtualHelix(ProxyObject):
                             '_twist_per_base':360/10.5, # 360/_bases_per_turn
                             '_max_length':42
                             }
+        self._min_base = 0
+        self._max_base = self._properties['_max_length']-1
+        self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
+        self._stap_strandset = StrandSet(StrandType.STAPLE, self)
     # end def
 
     def __repr__(self):
@@ -110,6 +113,12 @@ class VirtualHelix(ProxyObject):
             return name
     # end def
 
+    def minBaseIdx(self):
+        return 0
+
+    def maxBaseIdx(self):
+        return self.getMaxLength()-1
+
     def getMaxLength(self):
         bpr = int(self._properties['bases_per_repeat'])
         r = int(self._properties['repeats'])
@@ -127,6 +136,7 @@ class VirtualHelix(ProxyObject):
         self._properties[key] = value
         self.virtualHelixPropertyChangedSignal.emit(self, key, value)
         if key in ['bases_per_repeat', 'turns_per_repeat', 'repeats']:
+            old_max_length = self._properties['_max_length']
             bpr = int(self._properties['bases_per_repeat'])
             tpr = int(self._properties['turns_per_repeat'])
             r = int(self._properties['repeats'])
@@ -136,6 +146,11 @@ class VirtualHelix(ProxyObject):
             self.virtualHelixPropertyChangedSignal.emit(self, '_bases_per_turn', bpt)
             self.virtualHelixPropertyChangedSignal.emit(self, '_twist_per_base', tpb)
             self.virtualHelixPropertyChangedSignal.emit(self, '_max_length', ml)
+
+            delta = ml-old_max_length
+            print("setProperty ml delta", delta)
+            if delta:
+                self.resize(delta)
     # end def
 
     def setNumber(self, number):
@@ -266,6 +281,12 @@ class VirtualHelix(ProxyObject):
             self.undoStack().endMacro()
         else:
             c.redo()
+    # end def
+
+    def resize(self, max_delta, use_undostack=True):
+        c = ResizeVirtualHelixCommand(self.part(), self, max_delta)
+        util.execCommandList(self, [c], desc="Resize VHelix", \
+                                                    use_undostack=use_undostack)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###

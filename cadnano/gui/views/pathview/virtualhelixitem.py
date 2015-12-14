@@ -440,13 +440,16 @@ class PreXoverItemGroup(QGraphicsRectItem):
             # local_offset = self._vh_Z()/_BASE_WIDTH
             active_absolute_idx = active_item.absolute_idx()
             part = self._parent.part()
-            cutoff = part.stepSize()/2
+            cutoff = self._parent._bases_per_repeat/2
             active_idx = active_item.base_idx()
             step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
             fwd_idxs, rev_idxs = fwd_rev_idxs
             k = 0
             pre_xovers = {}
             for i,j in product(fwd_idxs, step_idxs):
+                idx = i+j
+                if not idx in self._fwd_pxo_items:
+                    continue
                 item = self._fwd_pxo_items[i+j]
                 delta = item.absolute_idx()-active_absolute_idx
                 if abs(delta)<cutoff:
@@ -455,6 +458,9 @@ class PreXoverItemGroup(QGraphicsRectItem):
                     k+=1
                     self._active_items.append(item)
             for i,j in product(rev_idxs, step_idxs):
+                idx = i+j
+                if not idx in self._fwd_pxo_items:
+                    continue
                 item = self._rev_pxo_items[i+j]
                 delta = item.absolute_idx()-active_absolute_idx
                 if abs(delta)<cutoff:
@@ -591,6 +597,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         ### TRANSFORM PROPERTIES ###
+        mvh = self._model_virtual_helix
         if property_key == 'z':
             z = float(new_value)
             self.setX(z)
@@ -876,7 +883,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         x, y = pos.x(), pos.y()
         mVH = self._model_virtual_helix
         base_idx = int(floor(x / _BASE_WIDTH))
-        min_base, max_base = 0, mVH.part().maxBaseIdx()
+        min_base, max_base = 0, mVH.maxBaseIdx()
         if base_idx < min_base or base_idx >= max_base:
             base_idx = util.clamp(base_idx, min_base, max_base)
         if y < 0:

@@ -33,7 +33,7 @@ class StrandSet(ProxyObject):
         self._doc = virtual_helix.document()
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
-        self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
+        self.strand_array = [None]*(virtual_helix.maxBaseIdx()+1)
         self.strand_heap = []
 
         self._undo_stack = None
@@ -78,9 +78,7 @@ class StrandSet(ProxyObject):
             self.strand_array = self.strand_array[delta_low:]
         if delta_high < 0:
             self.strand_array = self.strand_array[:delta_high]
-        self.strand_array = [None]*delta_low + \
-                self.strand_array + \
-                    [None]*delta_high
+        self.strand_array = [None]*delta_low + self.strand_array + [None]*delta_high
     # end def
 
     def generatorStrand(self):
