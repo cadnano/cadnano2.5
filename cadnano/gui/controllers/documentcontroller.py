@@ -13,6 +13,7 @@ from cadnano.fileio.c25decode import decode, decodeFile
 from cadnano.fileio.encoder import encode
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
+from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
 from cadnano.gui.views import styles
 from cadnano.objectinstance import ObjectInstance
 
@@ -371,22 +372,23 @@ class DocumentController():
         part = self.activePart()
         if part is None:
             return
-        stap_loop_olgs = part.getStapleLoopOligos()
-        if stap_loop_olgs:
-            from ui.dialogs.ui_warning import Ui_Warning
-            dialog = QDialog()
-            dialogWarning = Ui_Warning()  # reusing this dialog, should rename
-            dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
-            dialogWarning.setupUi(dialog)
 
-            locs = ", ".join([o.locString() for o in stap_loop_olgs])
-            msg = "Part contains staple loop(s) at %s.\n\nUse the break tool to introduce 5' & 3' ends before exporting. Loops have been colored red; use undo to revert." % locs
-            dialogWarning.title.setText("Staple validation failed")
-            dialogWarning.message.setText(msg)
-            for o in stap_loop_olgs:
-                o.applyColor(styles.stapColors[0])
-            dialog.exec_()
-            return
+        print("actionExportSequencesSlot: FYI, not checking for loops.")
+        # stap_loop_olgs = part.getStapleLoopOligos()
+        # if stap_loop_olgs:
+        #     dialog = QDialog()
+        #     dialogWarning = Ui_Warning()  # reusing this dialog, should rename
+        #     dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
+        #     dialogWarning.setupUi(dialog)
+
+        #     locs = ", ".join([o.locString() for o in stap_loop_olgs])
+        #     msg = "Part contains staple loop(s) at %s.\n\nUse the break tool to introduce 5' & 3' ends before exporting. Loops have been colored red; use undo to revert." % locs
+        #     dialogWarning.title.setText("Staple validation failed")
+        #     dialogWarning.message.setText(msg)
+        #     for o in stap_loop_olgs:
+        #         o.applyColor(styles.stapColors[0])
+        #     dialog.exec_()
+        #     return
 
         # Proceed with staple export.
         fname = self.filename()
