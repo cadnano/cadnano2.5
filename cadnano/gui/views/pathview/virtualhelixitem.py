@@ -626,8 +626,8 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self.setPen(pen)
 
         self.refreshPath()
-
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(self)
+        self.refreshProximalItems()
         # self._activephositem = ActivePhosItem(self)
     # end def
 
