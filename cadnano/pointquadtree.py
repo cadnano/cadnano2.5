@@ -43,7 +43,7 @@ class QuadtreeBase(object):
         nodes = self.nodes
         if len(self.children) == 0:
             nodes.append(node)
-            if len(nodes) > self.SPLIT_THRESHOLD and \
+            if len(nodes) == self.SPLIT_THRESHOLD and \
                     self.size > self.min_size:
                 self.split()
             return node
@@ -67,7 +67,7 @@ class QuadtreeBase(object):
             parent_parent = parent.parent
             if parent_parent is not None:
                 total_nodes = parent_parent.getSize()
-                if total_nodes < self.SPLIT_THRESHOLD:
+                if total_nodes == (self.SPLIT_THRESHOLD - 1):
                     parent_parent.join()
             return True
         return False

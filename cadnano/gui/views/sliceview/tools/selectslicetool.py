@@ -95,30 +95,39 @@ class SelectSliceTool(AbstractSliceTool):
             vhi = part_item.getVirtualHelixItem(vh)
             group.addToGroup(vhi)
         self.is_selection_active = True
-        group.setSelectionRect()
-        print("showing")
-        group.show()
-        # self.deselectItems()
+        if len(group.childItems()) > 0:
+            group.setSelectionRect()
+            # print("showing")
+            group.show()
+        else:
+            print("Nothing in selection_set")
     # end def
 
     def deselectItems(self):
+        group = self.group
         if self.is_selection_active:
             part_item = self.part_item
-            group = self.group
             for vh in self.selection_set:
                 vhi = part_item.getVirtualHelixItem(vh)
                 group.removeFromGroup(vhi)
+            self.selection_set.clear()
+            group.clearSelectionRect()
             group.hide()
+            # print(group.boundingRect())
             self.is_selection_active = False
             return True
+        group.clearSelectionRect()
         return False
     # end def
 
     def moveSelection(self, dx, dy):
+        """ Y-axis is inverted in Qt +y === DOWN
+        """
         part_item = self.part_item
+        sf = part_item.scaleFactor()
         part = part_item.part()
-        print("translational delta:", dx, dy)
-        part.moveVirtualHelices(self.selection_set, dx, dy)
+        # print("translational delta:", dx, dy)
+        part.translateVirtualHelices(self.selection_set, dx / sf, -dy / sf)
     # end def
 
     def deactivate(self):
@@ -139,7 +148,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
-        self.bounding_rect_item = QGraphicsRectItem(self)
+        self.bounding_rect_item = QGraphicsRectItem()
         self.bounding_rect_item.hide()
         self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
                                             _SELECT_PEN_WIDTH))
@@ -149,8 +158,15 @@ class SliceSelectionGroup(QGraphicsItemGroup):
 
     def setSelectionRect(self):
         bri = self.bounding_rect_item
-        bri.setRect(self.boundingRect())
+        bri.setRect(self.childrenBoundingRect())
+        self.addToGroup(bri)
         bri.show()
+    # end def
+
+    def clearSelectionRect(self):
+        bri = self.bounding_rect_item
+        bri.hide()
+        self.removeFromGroup(bri)
     # end def
 
     def mousePressEvent(self, event):
@@ -170,7 +186,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             # print("positions:", event.lastScenePos(), event.scenePos(), event.pos())
             delta = event.lastScenePos() - self.drag_start_position
             # invert y axis since qt y is positive in the down direction
-            dx, dy = delta.x(), -1.*delta.y()
+            dx, dy = delta.x(), delta.y()
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
                 self.tool.moveSelection(dx, dy)
             else:

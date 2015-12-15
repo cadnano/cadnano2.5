@@ -12,6 +12,7 @@ class VirtualHelixItemController():
         mvh.virtualHelixNumberChangedSignal.connect(vh_item.virtualHelixNumberChangedSlot)
         mvh.virtualHelixPropertyChangedSignal.connect(vh_item.virtualHelixPropertyChangedSlot)
         mvh.virtualHelixRemovedSignal.connect(vh_item.virtualHelixRemovedSlot)
+        mvh.virtualHelixTranslatedSignal.connect(vh_item.virtualHelixTranslatedSlot)
 
         for strandSet in mvh.getStrandSets():
             strandSet.strandsetStrandAddedSignal.connect(vh_item.strandAddedSlot)
@@ -25,6 +26,7 @@ class VirtualHelixItemController():
         mvh.virtualHelixNumberChangedSignal.disconnect(vh_item.virtualHelixNumberChangedSlot)
         mvh.virtualHelixPropertyChangedSignal.disconnect(vh_item.virtualHelixPropertyChangedSlot)
         mvh.virtualHelixRemovedSignal.disconnect(vh_item.virtualHelixRemovedSlot)
+        mvh.virtualHelixTranslatedSignal.disconnect(vh_item.virtualHelixTranslatedSlot)
 
         for strandSet in mvh.getStrandSets():
             strandSet.strandsetStrandAddedSignal.disconnect(vh_item.strandAddedSlot)

@@ -17,7 +17,7 @@ from . import slicestyles as styles
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
-_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
+_RECT = QRectF(0, 0, 2. * _RADIUS, 2. * _RADIUS)
 rect_gain = 0.25
 _RECT = _RECT.adjusted(rect_gain, rect_gain, rect_gain, rect_gain)
 _FONT = styles.SLICE_NUM_FONT
@@ -44,7 +44,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
         self._part_item = part_item
         self.hide()
-        x, y = model_virtual_helix.location(part_item.scaleFactor())
+        x, y = model_virtual_helix.locationQt(part_item.scaleFactor())
         # set position to offset for radius
         self.setCenterPos(x, y)
 
@@ -65,7 +65,17 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def setCenterPos(self, x, y):
+        # invert the y axis
         self.setPos(x - _RADIUS, y - _RADIUS)
+    # end def
+
+    def getCenterPos(self):
+        """ get the scene position in case parented by a selection
+        group.  Shouldn't be
+        """
+        pos = self.scenePos()
+        pos = self._part_item.mapFromScene(pos)
+        return pos.x() + _RADIUS, pos.y() + _RADIUS
     # end def
 
     # def mousePressEvent(self, event):
@@ -128,6 +138,20 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     ### SIGNALS ###
 
     ### SLOTS ###
+
+    def virtualHelixTranslatedSlot(self, virtual_helix):
+        """
+        """
+        # print("tslot {}".format(virtual_helix))
+        sf = self._part_item.scaleFactor()
+        x, y = virtual_helix.locationQt(self._part_item.scaleFactor())
+        xc, yc = self.getCenterPos()
+        if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
+            # set position to offset for radius
+            # print("moving tslot", yc, y, (yc-y)/sf)
+            self.setCenterPos(x, y)
+    # end def
+
     def virtualHelixNumberChangedSlot(self, virtual_helix):
         """
         receives a signal containing a virtual_helix and the oldNumber
@@ -160,13 +184,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
-    # end def
-
-
-    def virtualHelixTranslatedSlot(self, virtual_helix):
-        x, y = self._virtual_helix.location(self._part_item.scaleFactor())
-        # set position to offset for radius
-        self.setPos(x - _RADIUS, y - _RADIUS)
     # end def
 
     def createLabel(self):

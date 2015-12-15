@@ -22,6 +22,8 @@ from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
 from cadnano.virtualhelix import VirtualHelix
+from cadnano.virtualhelix import TranslateVirtualHelicesCommand
+
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from .resizepartcmd import ResizePartCommand
@@ -853,13 +855,27 @@ class NucleicAcidPart(Part):
                                                     use_undostack=use_undostack)
     # end def
 
-    def moveVirtualHelices(self, vh_set, dx, dy, use_undostack=False):
+    def translateVirtualHelices(self, vh_set, dx, dy, use_undostack=False):
+        if use_undostack:
+            c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy)
+            util.execCommandList(self, [c], desc="Resize part", \
+                                                        use_undostack=True)
+        else:
+            self._translateVirtualHelices(vh_set, dx, dy)
+    # end def
+
+    def _translateVirtualHelices(self, vh_set, dx, dy):
         qt = self._quadtree
         for vh in vh_set:
-            qt.removeNode(vh)
-            vh.translate(dx, dy)
-            qt.insertNode(vh)
-    # end def
+            if qt.removeNode(vh):
+                vh.translate(dx, dy)
+                qt.insertNode(vh)
+            else:
+                raise ValueError("{} not in set".format(vh))
+        for vh in vh_set:
+            # print("translated {}".format(vh))
+            vh.virtualHelixTranslatedSignal.emit(vh)
+    #end def
 
     def setActiveBaseIndex(self, idx):
         self._active_base_index = idx

@@ -356,8 +356,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def getModelPos(self, pos):
+        """ Y-axis is inverted in Qt +y === DOWN
+        """
         sf = self._scale_factor
-        x, y = pos.x()/sf, pos.y()/sf
+        x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def
 

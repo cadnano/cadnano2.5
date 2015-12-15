@@ -3,7 +3,7 @@ from PyQt5.QtGui import QColor, QFont
 from cadnano.gui.views.styles import *
 
 # Slice Sizing
-SLICE_HELIX_RADIUS = 15
+SLICE_HELIX_RADIUS = 15.
 SLICE_HELIX_STROKE_WIDTH = 0.5
 SLICE_HELIX_HILIGHT_WIDTH = 2.5
 SLICE_HELIX_MOD_HILIGHT_WIDTH = 1
