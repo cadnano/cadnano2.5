@@ -53,6 +53,8 @@ class VirtualHelix(CNObject):
                                             name='virtualHelixNumberChangedSignal')  # self, num
     virtualHelixPropertyChangedSignal = ProxySignal(CNObject, object, object,
                                             name='virtualHelixPropertyChangedSignal')  # self, transform
+    virtualHelixTranslatedSignnal = ProxySignal(CNObject, object, object,
+                                        name='virtualHelixTranslatedSignnal')  # self, transform
 
     ### SLOTS ###
 
@@ -87,6 +89,11 @@ class VirtualHelix(CNObject):
     def location(self, scale_factor=1.0):
         x, y, z = self._location
         return scale_factor*x, scale_factor*y
+    # end def
+
+    def setLocation(self, new_x, new_y):
+        x, y, z = self._location
+        self._location = Vector3(new_x, new_y, z)
     # end def
 
     def number(self):

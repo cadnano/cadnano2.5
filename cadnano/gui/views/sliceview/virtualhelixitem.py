@@ -38,7 +38,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     """
     def __init__(self, model_virtual_helix, part_item):
         """
-        empty_helix_item is a EmptyHelixItem that will act as a QGraphicsItem parent
         """
         super(VirtualHelixItem, self).__init__(parent=part_item)
         self._virtual_helix = model_virtual_helix
@@ -47,12 +46,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.hide()
         x, y = model_virtual_helix.location(part_item.scaleFactor())
         # set position to offset for radius
-        self.setPos(x - _RADIUS, y - _RADIUS)
+        self.setCenterPos(x, y)
 
         self.setAcceptHoverEvents(True)
-        # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setZValue(_ZVALUE)
-        self.lastMousePressAddedBases = False
 
         # handle the label specific stuff
         self._label = self.createLabel()
@@ -61,22 +58,31 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.createArrows()
         self.updateAppearance()
 
-
         self.show()
 
         self._right_mouse_move = False
+        self._button_down_pos = QPointF()
+    # end def
+
+    def setCenterPos(self, x, y):
+        self.setPos(x - _RADIUS, y - _RADIUS)
     # end def
 
     # def mousePressEvent(self, event):
-    #     if event.button() == Qt.RightButton:
-    #         self._right_mouse_move = True
-    #         self._button_down_pos = event.pos()
+    #     # if event.button() == Qt.RightButton:
+    #     self._right_mouse_move = True
+    #     self._button_down_pos = event.pos()
+    #     # return False
+    #     # return QGraphicsItem.mousePressEvent(self, event)
     # # end def
 
     # def mouseMoveEvent(self, event):
-    #     if self._right_mouse_move:
-    #         p = self.mapToScene(event.pos()) - self._button_down_pos
-    #         self._empty_helix_item.setPos(p)
+    #     # if self._right_mouse_move:
+    #     p = event.pos() - self._button_down_pos
+    #     self.setPos(p)
+    #         # self.setPos(event.pos())
+    #     # return False
+    #     # return QGraphicsItem.mouseMoveEvent(self, event)
     # # end def
 
     # def mouseReleaseEvent(self, event):
@@ -154,6 +160,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
+    # end def
+
+
+    def virtualHelixTranslatedSlot(self, virtual_helix):
+        x, y = self._virtual_helix.location(self._part_item.scaleFactor())
+        # set position to offset for radius
+        self.setPos(x - _RADIUS, y - _RADIUS)
     # end def
 
     def createLabel(self):
@@ -283,22 +296,22 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     ############################ User Interaction ############################
-    def sceneEvent(self, event):
-        """Included for unit testing in order to grab events that are sent
-        via QGraphicsScene.sendEvent()."""
-        # if self._parent.sliceController.testRecorder:
-        #     coord = (self._row, self._col)
-        #     self._parent.sliceController.testRecorder.sliceSceneEvent(event, coord)
-        if event.type() == QEvent.MouseButtonPress:
-            self.mousePressEvent(event)
-            return True
-        elif event.type() == QEvent.MouseButtonRelease:
-            self.mouseReleaseEvent(event)
-            return True
-        elif event.type() == QEvent.MouseMove:
-            self.mouseMoveEvent(event)
-            return True
-        QGraphicsItem.sceneEvent(self, event)
-        return False
+    # def sceneEvent(self, event):
+    #     """Included for unit testing in order to grab events that are sent
+    #     via QGraphicsScene.sendEvent()."""
+    #     # if self._parent.sliceController.testRecorder:
+    #     #     coord = (self._row, self._col)
+    #     #     self._parent.sliceController.testRecorder.sliceSceneEvent(event, coord)
+    #     if event.type() == QEvent.MouseButtonPress:
+    #         self.mousePressEvent(event)
+    #         return True
+    #     elif event.type() == QEvent.MouseButtonRelease:
+    #         self.mouseReleaseEvent(event)
+    #         return True
+    #     elif event.type() == QEvent.MouseMove:
+    #         self.mouseMoveEvent(event)
+    #         return True
+    #     QGraphicsItem.sceneEvent(self, event)
+    #     return False
 # end class
 

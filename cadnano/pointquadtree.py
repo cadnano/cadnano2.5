@@ -168,7 +168,7 @@ class QuadtreeBase(object):
             if x2 > x_center:
                 if y1 <= y_center:
                     self.children[2].query(point, rect, distance, node_results)
-                if y2:
+                if y2 > y_center:
                     self.children[3].query(point, rect, distance, node_results)
 
         # search node at this level
@@ -195,7 +195,7 @@ class QuadtreeBase(object):
             if x2 > x_center:
                 if y1 <= y_center:
                     self.children[2].queryRect(rect, node_results)
-                if y2:
+                if y2 > y_center:
                     self.children[3].queryRect(rect, node_results)
 
         # search node at this level

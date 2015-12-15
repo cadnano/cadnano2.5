@@ -361,6 +361,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return x, y
     # end def
 
+    def getVirtualHelixItem(self, virtual_helix):
+        return self._virtual_helix_item_hash[virtual_helix]
+
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
         pt = tool.eventToPosition(self, event)
@@ -384,9 +387,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             part.createVirtualHelix(*part_pt_tuple)
             virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
             neighbors = part.getVirtualHelixNeighbors(virtual_helix)
-            print("neighbors to {}:".format(virtual_helix.number()))
-            for vh in neighbors:
-                print(vh)
+            # print("neighbors to {}:".format(virtual_helix.number()))
+            # for vh in neighbors:
+            #     print(vh)
             vhi = self._virtual_helix_item_hash[virtual_helix]
             tool.setVirtualHelixItem(vhi)
         return QGraphicsItem.mousePressEvent(self, event)
