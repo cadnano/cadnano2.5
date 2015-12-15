@@ -96,6 +96,14 @@ class AbstractSliceTool(QGraphicsObject):
             return event.pos()
     # end def
 
+    def hideLineItem(self):
+        li = self._line_item
+        line = li.line()
+        line.setP2(self._CENTER_OF_HELIX)
+        li.setLine(line)
+        li.hide()
+    # end def
+
     def hoverMoveEvent(self, part_item, event):
         return self.eventToPosition(part_item, event)
     # end def
@@ -119,6 +127,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.is_started = False
         self._vhi = None
         self.part_item = None
+        self.hideLineItem()
         self.hide()
     # end def
 

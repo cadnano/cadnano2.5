@@ -1,6 +1,8 @@
 from .abstractslicetool import AbstractSliceTool
-from PyQt5.QtCore import QRect, QRectF, QPointF
+from PyQt5.QtCore import QRect, QRectF, QPointF, Qt
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem
+
 from cadnano.gui.palette import getPenObj
 
 def normalizeRect(rect):
@@ -15,6 +17,7 @@ def normalizeRect(rect):
 
 _SELECT_PEN_WIDTH = 2
 _SELECT_COLOR = "#ff0000"
+
 class SelectSliceTool(AbstractSliceTool):
     """"""
     def __init__(self, controller, parent=None):
@@ -22,11 +25,10 @@ class SelectSliceTool(AbstractSliceTool):
         self.sgv = None
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = None
-        self.group = QGraphicsItemGroup()
-        self.bounding_rect_item = QGraphicsRectItem()
-        self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
-                                            _SELECT_PEN_WIDTH))
-        self.bounding_rect_item.hide()
+        self.group = SliceSelectionGroup(self)
+        self.group.hide()
+        self.is_selection_active = False
+    # end def
 
     def __repr__(self):
         return "select_tool"  # first letter should be lowercase
@@ -38,13 +40,12 @@ class SelectSliceTool(AbstractSliceTool):
         if self.sgv is not None:
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
+        self.deselectItems()
         self.part_item = part_item
         self.group.setParentItem(part_item)
-        self.bounding_rect_item.setParentItem(part_item)
         self.sgv = part_item.window().slice_graphics_view
         self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
-
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
@@ -81,9 +82,7 @@ class SelectSliceTool(AbstractSliceTool):
             res = part.getVirtualHelicesInArea(query_rect)
             # print(res)
             self.selection_set = res
-            bounding_rect = self.getSelectionBoundingRect()
-            self.bounding_rect_item.setRect(bounding_rect)
-            self.bounding_rect_item.show()
+            self.getSelectionBoundingRect()
         else:
             self.last_rubberband_vals = (rect, from_pt, to_point)
     # end def
@@ -91,20 +90,93 @@ class SelectSliceTool(AbstractSliceTool):
     def getSelectionBoundingRect(self):
         part_item = self.part_item
         group = self.group
+        self.deselectItems()
         for vh in self.selection_set:
             vhi = part_item.getVirtualHelixItem(vh)
             group.addToGroup(vhi)
-        bounding_rect = group.boundingRect()
-        for vh in self.selection_set:
-            vhi = part_item.getVirtualHelixItem(vh)
-            group.removeFromGroup(vhi)
-        return bounding_rect
+        self.is_selection_active = True
+        group.setSelectionRect()
+        print("showing")
+        group.show()
+        # self.deselectItems()
+    # end def
+
+    def deselectItems(self):
+        if self.is_selection_active:
+            part_item = self.part_item
+            group = self.group
+            for vh in self.selection_set:
+                vhi = part_item.getVirtualHelixItem(vh)
+                group.removeFromGroup(vhi)
+            group.hide()
+            self.is_selection_active = False
+            return True
+        return False
+    # end def
+
+    def moveSelection(self, dx, dy):
+        part_item = self.part_item
+        part = part_item.part()
+        print("translational delta:", dx, dy)
+        part.moveVirtualHelices(self.selection_set, dx, dy)
     # end def
 
     def deactivate(self):
-        AbstractSliceTool.deactivate(self)
         if self.sgv is not None:
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
+        self.deselectItems()
+        AbstractSliceTool.deactivate(self)
+    # end def
+# end class
+
+class SliceSelectionGroup(QGraphicsItemGroup):
+    def __init__(self, tool, parent=None):
+        super(SliceSelectionGroup, self).__init__(parent)
+        self.tool = tool
+        self.setFiltersChildEvents(True)
+        # self.setFlag(QGraphicsItem.ItemIsSelectable)
+        self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
+        self.setFlag(QGraphicsItem.ItemIsMovable)
+
+        self.bounding_rect_item = QGraphicsRectItem(self)
         self.bounding_rect_item.hide()
+        self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
+                                            _SELECT_PEN_WIDTH))
+        self.drag_start_position = QPointF()
+        self.current_position = QPointF()
+    # end def
+
+    def setSelectionRect(self):
+        bri = self.bounding_rect_item
+        bri.setRect(self.boundingRect())
+        bri.show()
+    # end def
+
+    def mousePressEvent(self, event):
+        if event.button() != Qt.LeftButton:
+            return QGraphicsItemGroup.mousePressEvent(self, event)
+        else:
+            self.drag_start_position = event.scenePos()
+            self.current_position = self.pos()
+            return QGraphicsItemGroup.mousePressEvent(self, event)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        """
+        """
+        MOVE_THRESHOLD = 0.01   # ignore small moves
+        if event.button() == Qt.LeftButton:
+            # print("positions:", event.lastScenePos(), event.scenePos(), event.pos())
+            delta = event.lastScenePos() - self.drag_start_position
+            # invert y axis since qt y is positive in the down direction
+            dx, dy = delta.x(), -1.*delta.y()
+            if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
+                self.tool.moveSelection(dx, dy)
+            else:
+                print("small move", dx, dy)
+                # restore starting position
+                self.setPos(self.current_position)
+                # self.setPos(self.current_position + delta)
+        return QGraphicsItemGroup.mouseReleaseEvent(self, event)
     # end def

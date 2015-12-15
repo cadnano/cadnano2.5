@@ -853,6 +853,14 @@ class NucleicAcidPart(Part):
                                                     use_undostack=use_undostack)
     # end def
 
+    def moveVirtualHelices(self, vh_set, dx, dy, use_undostack=False):
+        qt = self._quadtree
+        for vh in vh_set:
+            qt.removeNode(vh)
+            vh.translate(dx, dy)
+            qt.insertNode(vh)
+    # end def
+
     def setActiveBaseIndex(self, idx):
         self._active_base_index = idx
         self.partActiveSliceIndexSignal.emit(self, idx)
