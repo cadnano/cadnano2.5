@@ -116,28 +116,31 @@ class ActivePhosItem(QGraphicsPathItem):
 
 class PreXoverLabel(QGraphicsSimpleTextItem):
     _XO_FONT = styles.XOVER_LABEL_FONT
+    _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
     _FM = QFontMetrics(_XO_FONT)
 
     def __init__(self, idx, is_fwd, color, parent=None):
         super(QGraphicsSimpleTextItem, self).__init__(parent)
-        self._num = idx
+        self._txt = ''
+        self._idx = idx
         self._is_fwd = is_fwd
         self._color = color
         self._parent = parent
+        self._tbr = None
+        self._outline = QGraphicsRectItem(self)
         self.setFont(self._XO_FONT)
-        # self.setNumberAndPos(idx)
         self.setBrush(getBrushObj('#666666'))
     # end def
 
-    def setNumberAndPos(self, num):
-        self._num = num
-        str_num = str(num)
-        tBR = self._FM.tightBoundingRect(str_num)
+    def setTextAndStyle(self, text, outline=False):
+        self._txt = text
+        str_txt = str(text)
+        self._tbr = tBR = self._FM.tightBoundingRect(str_txt)
         half_label_H = tBR.height()/2.0
         half_label_W = tBR.width()/2.0
 
         labelX = _BASE_WIDTH/2.0 - half_label_W #
-        if num == 1:  # adjust for the number one
+        if text == 1:  # adjust for the number one
             labelX -= half_label_W/2.0
 
         if self._is_fwd:
@@ -146,8 +149,25 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
             labelY = 2*half_label_H
 
         self.setPos(labelX, labelY)
-        self.setText(str_num)
+        self.setText(str_txt)
+
+        if outline:
+            self.setFont(self._XO_BOLD)
+            self.setBrush(getBrushObj('#ff0000'))
+        else:
+            self.setFont(self._XO_FONT)
+            self.setBrush(getBrushObj('#666666'))
+
+        if outline:
+            r = QRectF(self._tbr).adjusted(-half_label_W,0,half_label_W,half_label_H)
+            self._outline.setRect(r)
+            self._outline.setPen(getPenObj('#ff0000', 0.5))
+            self._outline.setY(2*half_label_H)
+            self._outline.show()
+        else:
+            self._outline.hide()
     # end def
+
 # end class
 
 ACTIVE_ALPHA = 128
@@ -165,6 +185,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
+        self._label_txt = None
         self._label = PreXoverLabel(step_idx, is_fwd, color, self)
         self._label.hide()
         self._has_neighbor = False
@@ -266,15 +287,19 @@ class PreXoverItem(QGraphicsRectItem):
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
 
-    def setProximal(self, has_neighbor, colliding):
-        color = '#cc0000' if colliding else self._color
+    def setProximal(self, has_neighbor, vh_num=None, colliding=False):
         if has_neighbor:
             self._has_neighbor = True
+            color = '#cc0000' if colliding else self._color
             self.setBrush(getBrushObj(color, alpha=PROX_ALPHA))
+            self._label_txt = vh_num
+            self.setLabel(vh_num)
             # self.animate(self, 'brush_alpha', 1, 0, PROX_ALPHA) # overwrite running anim
         else:
             self._has_neighbor = False
-            self.setBrush(getBrushObj(color, alpha=0))
+            self.setBrush(getBrushObj(self._color, alpha=0))
+            self._label_txt = None
+            self.setLabel()
             # self.animate(self, 'brush_alpha', 1000, PROX_ALPHA, 0)
     # end def
 
@@ -306,7 +331,7 @@ class PreXoverItem(QGraphicsRectItem):
             self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
             self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
-            self.setLabel(shortcut)
+            self.setLabel(text=shortcut, outline=True)
 
         else:
             inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
@@ -314,13 +339,13 @@ class PreXoverItem(QGraphicsRectItem):
             self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
             self._bond_item.hide()
-            self.setLabel()
+            self.setLabel(text=self._label_txt)
     # end def
 
-    def setLabel(self, shortcut=None):
-        if shortcut:
+    def setLabel(self, text=None, outline=False):
+        if text:
+            self._label.setTextAndStyle(text=text, outline=outline)
             self._label.show()
-            self._label.setNumberAndPos(shortcut)
         else:
             self._label.hide()
 
@@ -457,7 +482,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # active_item is a PreXoverItem
         if active_item:
             active_absolute_idx = active_item.absolute_idx()
-            cutoff = self._parent._bases_per_repeat
+            cutoff = self._parent._bases_per_repeat/2
             active_idx = active_item.base_idx()
             step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
             k = 0
@@ -468,7 +493,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                     continue
                 item = self._fwd_pxo_items[i+j]
                 delta = item.absolute_idx()-active_absolute_idx
-                if abs(delta)<cutoff:
+                if abs(delta)<cutoff and k<10:
                     item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
                     pre_xovers[k] = item.name()
                     k+=1
@@ -479,7 +504,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                     continue
                 item = self._rev_pxo_items[i+j]
                 delta = item.absolute_idx()-active_absolute_idx
-                if abs(delta)<cutoff:
+                if abs(delta)<cutoff and k<10:
                     item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
                     pre_xovers[k] = item.name()
                     k+=1
@@ -497,25 +522,27 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
         step_idxs = range(0, self._parent._max_length, self._parent._bases_per_repeat)
 
-        for fwd_idxs, rev_idxs, colliding in prox_groups:
+        for vh_num, fwd_idxs, rev_idxs, is_colliding in prox_groups:
             for i,j in product(fwd_idxs, step_idxs):
                 idx = i+j
                 if not idx in self._fwd_pxo_items:
                     continue
                 item = self._fwd_pxo_items[i+j]
-                item.setProximal(True, colliding)
-                inactive_fwd.remove(idx)
+                item.setProximal(True, vh_num=vh_num, colliding=is_colliding)
+                if idx in inactive_fwd:
+                    inactive_fwd.remove(idx)
             for i,j in product(rev_idxs, step_idxs):
                 idx = i+j
                 if not idx in self._rev_pxo_items:
                     continue
                 item = self._rev_pxo_items[i+j]
-                item.setProximal(True, colliding)
-                inactive_rev.remove(idx)
+                item.setProximal(True, vh_num=vh_num, colliding=is_colliding)
+                if idx in inactive_rev:
+                    inactive_rev.remove(idx)
         for idx in list(inactive_fwd):
-            self._fwd_pxo_items[idx].setProximal(False, False)
+            self._fwd_pxo_items[idx].setProximal(False)
         for idx in list(inactive_rev):
-            self._rev_pxo_items[idx].setProximal(False, False)
+            self._rev_pxo_items[idx].setProximal(False)
 
 
     def updatePositionsAfterRotation(self, angle):
@@ -715,7 +742,8 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             fwd_idxs = [item.step_idx() for item in fwd_items]
             rev_idxs = [item.step_idx() for item in rev_items]
             colliding = True if n_name[-1] == '*' else False
-            prox_groups.append((fwd_idxs, rev_idxs, colliding))
+            vh_num = n_name[2:]
+            prox_groups.append((vh_num, fwd_idxs, rev_idxs, colliding))
         pxig.setProximalItems(prox_groups)
     # end def
 
