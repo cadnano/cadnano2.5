@@ -172,6 +172,17 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass
     # end def
 
+    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, do_deselect):
+        if do_deselect:
+            tool = self._getActiveTool()
+            if tool.methodPrefix() == "selectTool":
+                if tool.isSelectionActive():
+                    tool.deselectItems()
+        for vh in vh_set:
+            vhi = self._virtual_helix_item_hash[vh]
+            vhi.updatePosition()
+    # end def
+
     def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):
         """docstring for partPreDecoratorSelectedSlot"""
         vhi = self.getVirtualHelixItemByCoord(row, col)

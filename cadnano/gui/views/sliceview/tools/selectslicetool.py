@@ -36,6 +36,10 @@ class SelectSliceTool(AbstractSliceTool):
     def methodPrefix(self):
         return "selectTool"  # first letter should be lowercase
 
+    def isSelectionActive(self):
+        return self.is_selection_active
+    # end def
+
     def setPartItem(self, part_item):
         if self.sgv is not None:
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)

@@ -22,7 +22,7 @@ from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
 from cadnano.virtualhelix import VirtualHelix
-from cadnano.virtualhelix import TranslateVirtualHelicesCommand
+from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
@@ -117,14 +117,16 @@ class NucleicAcidPart(Part):
     #                     name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixAddedSignal = ProxySignal(object, object,
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
-    partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
+    partVirtualHelixRenumberedSignal = ProxySignal(CNObject, CNObject,
                         name='partVirtualHelixRenumberedSignal')# self, coord
-    partVirtualHelixResizedSignal = ProxySignal(object, tuple,
-                        name='partVirtualHelixResizedSignal')   # self, coord
+    partVirtualHelixResizedSignal = ProxySignal(CNObject, CNObject,
+                        name='partVirtualHelixResizedSignal')   # self, virtualhelix
     partVirtualHelicesReorderedSignal = ProxySignal(object, list, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
                         name='partActiveVirtualHelixChangedSignal')
+    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, bool,
+                                        name='partVirtualHelicesTranslatedSignal')  # self, transform
     partModAddedSignal = ProxySignal(object, object, object,
                         name='partModAddedSignal')
     partModRemovedSignal = ProxySignal(object, object,
@@ -855,16 +857,21 @@ class NucleicAcidPart(Part):
                                                     use_undostack=use_undostack)
     # end def
 
-    def translateVirtualHelices(self, vh_set, dx, dy, use_undostack=False):
+    def translateVirtualHelices(self, vh_set, dx, dy, use_undostack=True):
         if use_undostack:
             c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy)
-            util.execCommandList(self, [c], desc="Resize part", \
+            util.execCommandList(self, [c], desc="Translate VHs", \
                                                         use_undostack=True)
         else:
-            self._translateVirtualHelices(vh_set, dx, dy)
+            self._translateVirtualHelices(vh_set, dx, dy, False)
     # end def
 
-    def _translateVirtualHelices(self, vh_set, dx, dy):
+    def _translateVirtualHelices(self, vh_set, dx, dy, do_deselect):
+        """
+        do_deselect tells a view to clear selections that might have
+        undesirable Object parenting to make sure the translations are set
+        correctly.  set to True when "undo-ing"
+        """
         qt = self._quadtree
         for vh in vh_set:
             if qt.removeNode(vh):
@@ -872,9 +879,7 @@ class NucleicAcidPart(Part):
                 qt.insertNode(vh)
             else:
                 raise ValueError("{} not in set".format(vh))
-        for vh in vh_set:
-            # print("translated {}".format(vh))
-            vh.virtualHelixTranslatedSignal.emit(vh)
+        self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, do_deselect)
     #end def
 
     def setActiveBaseIndex(self, idx):

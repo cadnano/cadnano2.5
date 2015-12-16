@@ -3,7 +3,6 @@ from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.enum import StrandType
 from cadnano.strandset import StrandSet
-from cadnano.math.vector import Vector3
 from .removevhelixcmd import RemoveVirtualHelixCommand
 
 
@@ -19,7 +18,6 @@ class VirtualHelix(CNObject):
     def __init__(self, part, x, y, idnum=0):
         self._doc = part.document()
         super(VirtualHelix, self).__init__(part)
-        self._location = Vector3(x, y, 0.)
 
         self._part = part
         self._scaf_strandset = StrandSet(StrandType.SCAFFOLD, self)
@@ -33,15 +31,18 @@ class VirtualHelix(CNObject):
         self._number = None
         self.setNumber(idnum)
 
-        self._properties = {'eulerZ':0, 'scamZ':0, 'neighbors':'[]'}
+        self._properties = {'name':"vh%d" % (self._number),
+                            'color': '#fffffff',
+                            'location': (x, y),
+                            'eulerZ':10,
+                            'scamZ':10,
+                            'neighbors':'[]'}
 
         # rotate to honeycomb defaults
-        self._properties['eulerZ'] = 10
-        self._properties['scamZ'] = 10
     # end def
 
     def __repr__(self):
-        loc = self._location
+        loc = self._properties['location']
         return("VirtualHelix #{} at ({:.3f}, {:.3f})".format(self._number,
                     loc[0], loc[1] ))
         # return "<%s(%d)>" % (self.__class__.__name__, self._number)
@@ -53,8 +54,6 @@ class VirtualHelix(CNObject):
                                             name='virtualHelixNumberChangedSignal')  # self, num
     virtualHelixPropertyChangedSignal = ProxySignal(CNObject, object, object,
                                             name='virtualHelixPropertyChangedSignal')  # self, transform
-    virtualHelixTranslatedSignal = ProxySignal(CNObject,
-                                        name='virtualHelixTranslatedSignal')  # self, transform
 
     ### SLOTS ###
 
@@ -76,7 +75,7 @@ class VirtualHelix(CNObject):
         # increase bounding box to
         # collide with neighbors
         radius = scale_factor*self._part.radius()
-        x, y, z = self._location
+        x, y = self._properties['location']
         x *= scale_factor
         y *= scale_factor
         return x - radius, y - radius, x + radius, y + radius
@@ -87,27 +86,27 @@ class VirtualHelix(CNObject):
     # end def
 
     def location(self, scale_factor=1.0):
-        x, y, z = self._location
+        x, y = self._properties['location']
         return scale_factor*x, scale_factor*y
     # end def
 
     def locationQt(self, scale_factor=1.0):
         """ Y-axis is inverted in Qt +y === DOWN
         """
-        x, y, z = self._location
+        x, y = self._properties['location']
         return scale_factor*x, -scale_factor*y
     # end def
 
     def setLocation(self, new_x, new_y):
-        x, y, z = self._location
-        self._location = Vector3(new_x, new_y, z)
+        # x, y = self._location
+        self._properties['location'] = (new_x, new_y, z)
     # end def
 
     def translate(self, dx, dy):
         """ update the location and return the old location
         """
-        x, y, z = self._location
-        self._location = Vector3(x + dx, y + dy, z)
+        x, y = self._properties['location']
+        self._properties['location'] = (x + dx, y + dy)
         return (x, y)
     # end def
 

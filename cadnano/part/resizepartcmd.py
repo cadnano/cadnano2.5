@@ -24,7 +24,7 @@ class ResizePartCommand(UndoCommand):
         for vh in part._coord_to_virtual_velix.values():
             for ss in vh.getStrandSets():
                 ss.resize(self._low_idx_delta, self._high_idx_delta)
-            part.partVirtualHelixResizedSignal.emit(part, vh.coord())
+            part.partVirtualHelixResizedSignal.emit(part, vh)
         if self._old_active_idx > part._max_base:
             part.setActiveBaseIndex(part._max_base)
         part.partDimensionsChangedSignal.emit(part)
@@ -39,7 +39,7 @@ class ResizePartCommand(UndoCommand):
         for vh in part._coord_to_virtual_velix.values():
             for ss in vh.getStrandSets():
                 ss.resize(-self._low_idx_delta, -self._high_idx_delta)
-            part.partVirtualHelixResizedSignal.emit(part, vh.coord())
+            part.partVirtualHelixResizedSignal.emit(part, vh)
         if self._old_active_idx != part.activeBaseIndex():
             part.setActiveBaseIndex(self._old_active_idx)
         part.partDimensionsChangedSignal.emit(part)

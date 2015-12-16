@@ -91,7 +91,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def vhItemForVH(self, vhref):
         """Returns the pathview VirtualHelixItem corresponding to vhref"""
         vh = self._model_part.virtualHelix(vhref)
-        return self._virtual_helix_hash.get(vh.coord())
+        return self._virtual_helix_hash.get(vh)
 
     ### SIGNALS ###
 
@@ -179,7 +179,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vh = model_virtual_helix
         vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
-        # self._virtual_helix_hash[vh.coord()] = vhi
+        self._virtual_helix_hash[vh] = vhi
 
         # reposition when first VH is added
         if len(self._virtual_helix_item_list) == 0:
@@ -195,9 +195,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     # end def
 
-    def partVirtualHelixRenumberedSlot(self, sender, coord):
+    def partVirtualHelixRenumberedSlot(self, sender, vh):
         """Notifies the virtualhelix at coord to change its number"""
-        vh = self._virtual_helix_hash[coord]
         # check for new number
         # notify VirtualHelixHandleItem to update its label
         # notify VirtualHelix to update its xovers
@@ -205,9 +204,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass
     # end def
 
-    def partVirtualHelixResizedSlot(self, sender, coord):
+    def partVirtualHelixResizedSlot(self, sender, vh):
         """Notifies the virtualhelix at coord to resize."""
-        vh = self._virtual_helix_hash[coord]
+        vh = self._virtual_helix_hash[vh]
         vh.resize()
     # end def
 
@@ -252,7 +251,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def removeVirtualHelixItem(self, virtual_helix_item):
         vh = virtual_helix_item.virtualHelix()
         self._virtual_helix_item_list.remove(virtual_helix_item)
-        del self._virtual_helix_hash[vh.coord()]
+        del self._virtual_helix_hash[vh]
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
@@ -261,7 +260,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def itemForVirtualHelix(self, virtual_helix):
-        return self._virtual_helix_hash[virtual_helix.coord()]
+        return self._virtual_helix_hash[virtual_helix]
     # end def
 
     def virtualHelixBoundingRect(self):

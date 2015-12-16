@@ -36,6 +36,8 @@ class CNPropertyItem(QTreeWidgetItem):
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
                 model_value = cn_model.getProperty(key)
+                if isinstance(model_value, tuple):
+                    model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
             self._key = key

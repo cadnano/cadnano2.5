@@ -14,8 +14,6 @@ class AbstractVirtualHelixItem(object):
         pass
     def strandAddedSlot(self, sender, strand):
         pass
-    def virtualHelixTranslatedSlot(self, sender):
-        pass
 # end class
 
 

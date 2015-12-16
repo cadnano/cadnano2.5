@@ -19,6 +19,7 @@ class NucleicAcidPartItemController(PartItemController):
         m_p.partVirtualHelixResizedSignal.connect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelixTransformedSignal.connect(p_i.partVirtualHelixTransformedSlot)
         m_p.partVirtualHelicesReorderedSignal.connect(p_i.partVirtualHelicesReorderedSlot)
+        m_p.partVirtualHelicesTranslatedSignal.connect(p_i.partVirtualHelicesTranslatedSlot)
     # end def
 
     def disconnectSignals(self):
@@ -34,5 +35,6 @@ class NucleicAcidPartItemController(PartItemController):
         m_p.partVirtualHelixResizedSignal.disconnect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelixTransformedSignal.disconnect(p_i.partVirtualHelixTransformedSlot)
         m_p.partVirtualHelicesReorderedSignal.disconnect(p_i.partVirtualHelicesReorderedSlot)
+        m_p.partVirtualHelicesTranslatedSignal.disconnect(p_i.partVirtualHelicesTranslatedSlot)
     # end def
 # end class

@@ -40,6 +40,8 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
+        # elif key == 'location':
+        #     editor = QLineEdit(parent_QWidget)
         elif key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
             editor.setDecimals(0)

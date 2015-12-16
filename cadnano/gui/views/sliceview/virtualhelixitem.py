@@ -139,12 +139,14 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     ### SLOTS ###
 
-    def virtualHelixTranslatedSlot(self, virtual_helix):
+    def updatePosition(self):
         """
         """
         # print("tslot {}".format(virtual_helix))
-        sf = self._part_item.scaleFactor()
-        x, y = virtual_helix.locationQt(self._part_item.scaleFactor())
+        vh = self._virtual_helix
+        pi = self._part_item
+        sf = pi.scaleFactor()
+        x, y = vh.locationQt(pi.scaleFactor())
         xc, yc = self.getCenterPos()
         if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
             # set position to offset for radius

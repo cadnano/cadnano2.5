@@ -28,13 +28,15 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelixAddedSlot(self, sender):
         pass
-    def partVirtualHelixRenumberedSlot(self, sender):
+    def partVirtualHelixRenumberedSlot(self, sender, vh):
         pass
-    def partVirtualHelixResizedSlot(self, sender):
+    def partVirtualHelixResizedSlot(self, sender, vh):
         pass
     def partVirtualHelixTransformedSlot(self, sender):
         pass
     def partVirtualHelicesReorderedSlot(self, sender):
+        pass
+    def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
 # end class
 
