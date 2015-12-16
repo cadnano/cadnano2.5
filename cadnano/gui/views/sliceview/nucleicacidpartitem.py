@@ -418,6 +418,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 loc = vh.location()
                 print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
                     loc[0], loc[1] ))
+            else:
+                tool.deselectItems()
+        else:
+            tool.deselectItems()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 

@@ -24,10 +24,11 @@ class SelectSliceTool(AbstractSliceTool):
         super(SelectSliceTool, self).__init__(controller)
         self.sgv = None
         self.last_rubberband_vals = (None, None, None)
-        self.selection_set = None
+        self.selection_set = set()
         self.group = SliceSelectionGroup(self)
         self.group.hide()
         self.is_selection_active = False
+        self.individual_pick = False
     # end def
 
     def __repr__(self):
@@ -41,28 +42,29 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def setPartItem(self, part_item):
-        if self.sgv is not None:
-            self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-            self.sgv = None
-        self.deselectItems()
-        self.part_item = part_item
-        self.group.setParentItem(part_item)
-        self.sgv = part_item.window().slice_graphics_view
-        self.sgv.rubberBandChanged.connect(self.selectRubberband)
+        if part_item != self.part_item:
+            if self.sgv is not None:
+                self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
+                self.sgv = None
+            self.deselectItems()
+            self.part_item = part_item
+            self.group.setParentItem(part_item)
+            self.sgv = part_item.window().slice_graphics_view
+            self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.RightButton:
-            self._right_mouse_move = True
-            self._button_down_pos = event.pos()
-    # end def
+    # def mousePressEvent(self, event):
+    #     if event.button() == Qt.RightButton:
+    #         self._right_mouse_move = True
+    #         self._button_down_pos = event.pos()
+    # # end def
 
-    def mouseMoveEvent(self, event):
-        if self._right_mouse_move:
-            # p = event.pos() - self._button_down_pos
-            # self.setPos(p)
-            self.setCenterPos(p)
-    # end def
+    # def mouseMoveEvent(self, event):
+    #     if self._right_mouse_move:
+    #         # p = event.pos() - self._button_down_pos
+    #         # self.setPos(p)
+    #         self.setCenterPos(p)
+    # # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
         rbr_last, fp_last, tp_last = self.last_rubberband_vals
@@ -108,6 +110,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def deselectItems(self):
+        # print("deselecting")
         group = self.group
         if self.is_selection_active:
             part_item = self.part_item
@@ -117,20 +120,30 @@ class SelectSliceTool(AbstractSliceTool):
             self.selection_set.clear()
             group.clearSelectionRect()
             group.hide()
-            # print(group.boundingRect())
             self.is_selection_active = False
             return True
         group.clearSelectionRect()
         return False
     # end def
 
+    def addToSelection(self, vhi):
+        group = self.group
+        group.addToGroup(vhi)
+        self.selection_set.add(vhi.virtualHelix())
+        if len(group.childItems()) > 0:
+            self.is_selection_active = True
+            group.setSelectionRect()
+            group.show()
+            self.individual_pick = True
+    # end def
+
     def moveSelection(self, dx, dy):
         """ Y-axis is inverted in Qt +y === DOWN
         """
+        # print("moveSelection: {}, {}", dx, dy)
         part_item = self.part_item
         sf = part_item.scaleFactor()
         part = part_item.part()
-        # print("translational delta:", dx, dy)
         part.translateVirtualHelices(self.selection_set, dx / sf, -dy / sf)
     # end def
 
@@ -148,7 +161,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         super(SliceSelectionGroup, self).__init__(parent)
         self.tool = tool
         self.setFiltersChildEvents(True)
-        # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
@@ -174,6 +186,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mousePressEvent(self, event):
+        self.tool.individual_pick = False
         if event.button() != Qt.LeftButton:
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
@@ -186,7 +199,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         """
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
-        if event.button() == Qt.LeftButton:
+        if not self.tool.individual_pick and event.button() == Qt.LeftButton:
             # print("positions:", event.lastScenePos(), event.scenePos(), event.pos())
             delta = event.lastScenePos() - self.drag_start_position
             # invert y axis since qt y is positive in the down direction
@@ -198,5 +211,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 # restore starting position
                 self.setPos(self.current_position)
                 # self.setPos(self.current_position + delta)
+        self.tool.individual_pick = False
         return QGraphicsItemGroup.mouseReleaseEvent(self, event)
     # end def

@@ -78,32 +78,31 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return pos.x() + _RADIUS, pos.y() + _RADIUS
     # end def
 
-    # def mousePressEvent(self, event):
-    #     # if event.button() == Qt.RightButton:
-    #     self._right_mouse_move = True
-    #     self._button_down_pos = event.pos()
-    #     # return False
-    #     # return QGraphicsItem.mousePressEvent(self, event)
-    # # end def
+    def mousePressEvent(self, event):
+        part_item = self._part_item
+        tool = part_item._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "MousePress"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
+        else:
+            event.setAccepted(False)
+            QGraphicsItem.mousePressEvent(self, event)
+    # end def
 
-    # def mouseMoveEvent(self, event):
-    #     # if self._right_mouse_move:
-    #     p = event.pos() - self._button_down_pos
-    #     self.setPos(p)
-    #         # self.setPos(event.pos())
-    #     # return False
-    #     # return QGraphicsItem.mouseMoveEvent(self, event)
-    # # end def
+    def selectToolMousePress(self, tool, part_item, event):
+        part = part_item.part()
+        part.setSelected(True)
+        tool.setPartItem(part_item)
+        if event.modifiers() != Qt.ShiftModifier:
+            # print("indie deselect")
+            tool.deselectItems()
+        tool.addToSelection(self)
+        # return QGraphicsItem.mousePressEvent(self, event)
+    # end def
 
-    # def mouseReleaseEvent(self, event):
-    #     if self._right_mouse_move and event.button() == Qt.RightButton:
-    #         self._right_mouse_move = False
-    #         p = self.mapToScene(event.pos()) - self._button_down_pos
-    #         self._empty_helix_item.setPos(p)
-    #         ehi = self._empty_helix_item
-    #         self._virtual_helix.setProperty('ehiX', ehi.mapToScene(0,0).x())
-    #         self._virtual_helix.setProperty('ehiY', ehi.mapToScene(0,0).y())
-    #         self.getNeighbors()
+    # def selectToolMouseMove(self, tool, event):
+    #     tool.mouseMoveEvent(self, event)
+    #     return QGraphicsItem.hoverMoveEvent(self, event)
     # # end def
 
     def modelColor(self):
