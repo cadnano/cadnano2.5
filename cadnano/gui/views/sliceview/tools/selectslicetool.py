@@ -3,6 +3,7 @@ from PyQt5.QtCore import QRect, QRectF, QPointF, Qt
 from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsItem
 
+from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
 from cadnano.gui.palette import getPenObj
 
 def normalizeRect(rect):
@@ -190,6 +191,20 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         if event.button() != Qt.LeftButton:
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
+            # check to see if we are clicking on a previously selected item
+            if self.tool.is_selection_active:
+                # strategy #1
+                pos = event.scenePos()
+                for item in self.tool.sgv.scene().items(pos):
+                    if isinstance(item, VirtualHelixItem):
+                        print("origin", item.virtualHelix())
+                # strategy #2
+                # pos = event.pos()
+                # mapper = self.mapToItem
+                # for item in self.childItems():
+                #     pos_local = mapper(item, pos)
+                #     if isinstance(item, VirtualHelixItem) and item.contains(pos_local):
+                #         print("origin", item.virtualHelix())
             self.drag_start_position = event.scenePos()
             self.current_position = self.pos()
             return QGraphicsItemGroup.mousePressEvent(self, event)
