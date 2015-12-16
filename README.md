@@ -1,6 +1,10 @@
 # cadnano 2.5  (*radnano*)
 This is a development version of cadnano ported to `Qt5/PyQt5`, 
-the dev branch is most up to date
+the dev branch is most up to date.
+
+12/16/2015 cadnano2.5 is currently under heavy development, 
+and while master is stable, we will be updating master soon 
+with many new features.
 
 ## Changes
 A number of organizational and style changes have occured from cadnano 2
