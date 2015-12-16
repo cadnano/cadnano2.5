@@ -13,7 +13,6 @@ from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .activesliceitem import ActiveSliceItem
-from .emptyhelixitem import EmptyHelixItem
 from .virtualhelixitem import VirtualHelixItem
 
 
@@ -131,10 +130,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             if property_key == 'color':
                 self._model_props['color'] = new_value
                 self._outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
-                for _, vhi in self._virtual_helix_hash.items():
+                for vhi in self._virtual_helix_hash.items():
                     vhi.updateAppearance()
-                for _, ehi in self._empty_helix_hash.items():
-                    ehi.updateAppearance()
             elif property_key == 'circular':
                 pass
             elif property_key == 'dna_sequence':
@@ -150,12 +147,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         scene = self.scene()
 
         self._virtual_helix_hash = None
-
-        for item in list(self._empty_helix_hash.items()):
-            key, val = item
-            scene.removeItem(val)
-            del self._empty_helix_hash[key]
-        self._empty_helix_hash = None
 
         scene.removeItem(self)
 

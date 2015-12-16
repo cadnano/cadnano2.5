@@ -51,15 +51,15 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         m_o = model_oligo
         m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
         o_i = OligoItem(m_o, self._root_items['OligoList'])
-        self._items[id(m_o)] = o_i
+        self._items[m_o] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
         m_o = model_oligo
         m_o.oligoRemovedSignal.disconnect(self.partOligoRemovedSlot)
-        o_i = self._items[id(m_o)]
+        o_i = self._items[m_o]
         o_i.parent().removeChild(o_i)
-        del self._items[id(m_o)]
+        del self._items[m_o]
 
     # end def
 
@@ -67,13 +67,13 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         m_vh = model_virtual_helix
         m_vh.virtualHelixRemovedSignal.connect(self.partVirtualHelixRemovedSlot)
         vh_i = VirtualHelixItem(m_vh, self)
-        self._items[id(m_vh)] = vh_i
+        self._items[m_vh] = vh_i
 
     def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):
         m_vh = model_virtual_helix
-        vh_i = self._items[id(m_vh)]
+        vh_i = self._items[m_vh]
         vh_i.parent().removeChild(vh_i)
-        del self._items[id(m_vh)]
+        del self._items[m_vh]
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
