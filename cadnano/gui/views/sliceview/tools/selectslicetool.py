@@ -30,6 +30,7 @@ class SelectSliceTool(AbstractSliceTool):
         self.group.hide()
         self.is_selection_active = False
         self.individual_pick = False
+        self.snap_origin_item = None
     # end def
 
     def __repr__(self):
@@ -178,26 +179,39 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         bri.setRect(self.childrenBoundingRect())
         self.addToGroup(bri)
         bri.show()
+        self.setFocus(True)
     # end def
 
     def clearSelectionRect(self):
         bri = self.bounding_rect_item
         bri.hide()
         self.removeFromGroup(bri)
+        self.setFocus(False)
+    # end def
+
+    def keyPressEvent(self, event):
+        """ event.key() seems to be capital only? """
+        print("press", ord('g'))
+        if event.text() == 'g':
+            print("hey het")
+        return QGraphicsItem.keyPressEvent(self, event)
     # end def
 
     def mousePressEvent(self, event):
-        self.tool.individual_pick = False
+        tool = self.tool
+        tool.individual_pick = False
         if event.button() != Qt.LeftButton:
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
             # check to see if we are clicking on a previously selected item
-            if self.tool.is_selection_active:
+            if tool.is_selection_active:
                 # strategy #1
                 pos = event.scenePos()
-                for item in self.tool.sgv.scene().items(pos):
+                for item in tool.sgv.scene().items(pos):
                     if isinstance(item, VirtualHelixItem):
                         print("origin", item.virtualHelix())
+                        tool.snap_origin_item = item
+                        break
                 # strategy #2
                 # pos = event.pos()
                 # mapper = self.mapToItem
@@ -205,6 +219,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 #     pos_local = mapper(item, pos)
                 #     if isinstance(item, VirtualHelixItem) and item.contains(pos_local):
                 #         print("origin", item.virtualHelix())
+                #         tool.snap_origin_item = item
+                #         break
             self.drag_start_position = event.scenePos()
             self.current_position = self.pos()
             return QGraphicsItemGroup.mousePressEvent(self, event)
