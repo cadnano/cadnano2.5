@@ -85,7 +85,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, part_item, event)
         else:
-            event.setAccepted(False)
+            # event.setAccepted(False)
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
@@ -138,21 +138,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     ### SLOTS ###
 
-    def updatePosition(self):
-        """
-        """
-        # print("tslot {}".format(virtual_helix))
-        vh = self._virtual_helix
-        pi = self._part_item
-        sf = pi.scaleFactor()
-        x, y = vh.locationQt(pi.scaleFactor())
-        xc, yc = self.getCenterPos()
-        if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
-            # set position to offset for radius
-            # print("moving tslot", yc, y, (yc-y)/sf)
-            self.setCenterPos(x, y)
-    # end def
-
     def virtualHelixNumberChangedSlot(self, virtual_helix):
         """
         receives a signal containing a virtual_helix and the oldNumber
@@ -180,11 +165,33 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def virtualHelixRemovedSlot(self, virtual_helix):
         self._controller.disconnectSignals()
         self._controller = None
-        self._part_item.removeVirtualHelixItem(self)
+        part_item = self._part_item
+        tool = part_item._getActiveTool()
+        tool.hideLineItem()
+        part_item.removeVirtualHelixItem(self)
         self._virtual_helix = None
         self.scene().removeItem(self._label)
         self._label = None
         self.scene().removeItem(self)
+    # end def
+
+    def updatePosition(self):
+        """
+        """
+        # print("tslot {}".format(virtual_helix))
+        vh = self._virtual_helix
+        pi = self._part_item
+        sf = pi.scaleFactor()
+        x, y = vh.locationQt(pi.scaleFactor())
+        xc, yc = self.getCenterPos()
+        if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
+            # set position to offset for radius
+            # print("moving tslot", yc, y, (yc-y)/sf)
+            self.setCenterPos(x, y)
+    # end def
+
+    def partItem(self):
+        return self._part_item
     # end def
 
     def createLabel(self):
@@ -312,24 +319,5 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         else:
             self.arrow2.hide()
     # end def
-
-    ############################ User Interaction ############################
-    # def sceneEvent(self, event):
-    #     """Included for unit testing in order to grab events that are sent
-    #     via QGraphicsScene.sendEvent()."""
-    #     # if self._parent.sliceController.testRecorder:
-    #     #     coord = (self._row, self._col)
-    #     #     self._parent.sliceController.testRecorder.sliceSceneEvent(event, coord)
-    #     if event.type() == QEvent.MouseButtonPress:
-    #         self.mousePressEvent(event)
-    #         return True
-    #     elif event.type() == QEvent.MouseButtonRelease:
-    #         self.mouseReleaseEvent(event)
-    #         return True
-    #     elif event.type() == QEvent.MouseMove:
-    #         self.mouseMoveEvent(event)
-    #         return True
-    #     QGraphicsItem.sceneEvent(self, event)
-    #     return False
 # end class
 

@@ -46,7 +46,6 @@ class AbstractSliceTool(QGraphicsObject):
                         ) for x in self.angles]
     # end def
 
-    # end def
     def setVirtualHelixItem(self, virtual_helix_item):
         rad = self._RADIUS
         self._vhi = virtual_helix_item
@@ -69,7 +68,6 @@ class AbstractSliceTool(QGraphicsObject):
 
     def eventToPosition(self, part_item, event):
         """ take an event and return a position as a QPointF
-
         update widget as well
         """
         li = self._line_item
@@ -98,10 +96,12 @@ class AbstractSliceTool(QGraphicsObject):
 
     def hideLineItem(self):
         li = self._line_item
+        li.setParentItem(self)
         line = li.line()
         line.setP2(self._CENTER_OF_HELIX)
         li.setLine(line)
         li.hide()
+        self.is_started = False
     # end def
 
     def hoverMoveEvent(self, part_item, event):
