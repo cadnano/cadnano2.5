@@ -1,5 +1,4 @@
 import json
-# from .legacydecoder import import_legacy_dict
 from .legacydecoder import import_legacy_dict
 
 from cadnano.gui.ui.dialogs.ui_latticetype import Ui_LatticeType

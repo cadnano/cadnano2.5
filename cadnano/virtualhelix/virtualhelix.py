@@ -167,8 +167,16 @@ class VirtualHelix(ProxyObject):
         self.setParent(new_part)
     # end def
 
+    def fwdStrandSet(self):
+        return self._scaf_strandset
+    # end def
+
     def scaffoldStrandSet(self):
         return self._scaf_strandset
+    # end def
+
+    def revStrandSet(self):
+        return self._stap_strandset
     # end def
 
     def stapleStrandSet(self):

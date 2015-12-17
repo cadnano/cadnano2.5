@@ -501,7 +501,7 @@ class StrandSet(ProxyObject):
     def getLegacyArray(self):
         """docstring for getLegacyArray"""
         num = self.virtualHelix().number()
-        ret = [[-1, -1, -1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
+        ret = [[-1, -1, -1, -1, -1, -1] for i in range(len(self.strand_array)+1)]
         if self.isDrawn5to3():
             for strand in self.strands():
                 lo, hi = strand.idxs()
