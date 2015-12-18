@@ -654,6 +654,7 @@ class DocumentController():
 
         self.newDocument(fname=fname)
         decodeFile(fname, document=self._document)
+        print("decoded file", fname)
 
         self.win.path_graphics_view.setViewportUpdateOn(True)
         self.win.slice_graphics_view.setViewportUpdateOn(True)

@@ -105,7 +105,6 @@ def decode(document, obj):
             insertions = helix['insertions']
             deletions = helix['deletions']
             vh = part.virtualHelixAtCoord((row, col))
-            print("decode", vh_num, len(fwd_ss), len(insertions), len(deletions))
             fwd_strandset = vh.fwdStrandSet()
             rev_strandset = vh.revStrandSet()
             assert(len(fwd_ss) == len(rev_ss) and \
