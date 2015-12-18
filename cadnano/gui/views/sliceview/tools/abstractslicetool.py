@@ -113,6 +113,8 @@ class AbstractSliceTool(QGraphicsObject):
         for i, vector in enumerate(self.vectors):
             if vector.p2() == pos:
                 return part_item.mapFromItem(li, self.vectors[i - 1].p2())
+        # origin VirtualHelixItem is overlapping destination VirtualHelixItem
+        return part_item.mapFromItem(li, self.vectors[0].p2())
     # end def
 
     def hideLineItem(self):

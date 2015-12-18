@@ -156,6 +156,7 @@ class SelectSliceTool(AbstractSliceTool):
         origin = self.snap_origin_item.getCenterScenePos()
         self.setVirtualHelixItem(virtual_helix_item)
         destination = self.findNearestPoint(part_item, origin)
+        origin = part_item.mapFromScene(origin)
         if destination is None:
             destination = origin
         if origin == destination:
