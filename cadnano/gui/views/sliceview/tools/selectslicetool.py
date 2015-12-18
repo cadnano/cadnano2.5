@@ -114,6 +114,7 @@ class SelectSliceTool(AbstractSliceTool):
     def deselectItems(self):
         # print("deselecting")
         group = self.group
+        self.snap_origin_item = None
         if self.is_selection_active:
             part_item = self.part_item
             for vh in self.selection_set:
@@ -125,7 +126,6 @@ class SelectSliceTool(AbstractSliceTool):
             self.is_selection_active = False
             return True
         group.clearSelectionRect()
-        self.snap_origin_item = None
         return False
     # end def
 
@@ -138,6 +138,7 @@ class SelectSliceTool(AbstractSliceTool):
             group.setSelectionRect()
             group.show()
             self.individual_pick = True
+            self.snap_origin_item = None
     # end def
 
     def selectOrSnap(self, part_item, virtual_helix_item, event):
@@ -155,15 +156,20 @@ class SelectSliceTool(AbstractSliceTool):
         origin = self.snap_origin_item.getCenterScenePos()
         self.setVirtualHelixItem(virtual_helix_item)
         destination = self.findNearestPoint(part_item, origin)
+        if destination is None:
+            destination = origin
         if origin == destination:
             # snap clockwise
             destination = self.findNextPoint(part_item, origin)
+        if origin is None or destination is None:
+            print("o", origin, "d", destination)
         delta = destination - origin
         dx, dy = delta.x(), delta.y()
         group = self.group
         pos = group.pos() + delta
         self.group.setPos(pos)
         self.moveSelection(dx, dy)
+        self.hideLineItem()
     # end def
 
     def moveSelection(self, dx, dy):
@@ -181,7 +187,7 @@ class SelectSliceTool(AbstractSliceTool):
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
         self.deselectItems()
-        snap_origin_item = None
+        self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def
 # end class
