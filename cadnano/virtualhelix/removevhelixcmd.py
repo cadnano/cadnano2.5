@@ -17,10 +17,12 @@ class RemoveVirtualHelixCommand(UndoCommand):
         part = self._part
         id_num = self._id_num
 
-        part._removeVirtualHelix(vh)
-        part._recycleHelixIDNumber(id_num)
         # clear out part references
         vh.virtualHelixRemovedSignal.emit(part, vh)
+
+        part._removeVirtualHelix(vh)
+        part._recycleHelixIDNumber(id_num)
+
         part.partActiveSliceResizeSignal.emit(part)
         # vh.setPart(None)
         # vh.setNumber(None)

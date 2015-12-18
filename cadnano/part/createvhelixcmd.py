@@ -29,12 +29,15 @@ class CreateVirtualHelixCommand(UndoCommand):
         vh = self._vhelix
         part = self._part
         id_num = self._id_num
+
+        # since we're hashing on the object in the views do this first
+        vh.virtualHelixRemovedSignal.emit(part, vh)
+
         part._removeVirtualHelix(vh)
         part._recycleHelixIDNumber(id_num)
         # clear out part references
         vh.setNumber(None)  # must come before setPart(None)
         vh.setPart(None)
-        vh.virtualHelixRemovedSignal.emit(part, vh)
         part.partActiveSliceResizeSignal.emit(part)
     # end def
 # end class

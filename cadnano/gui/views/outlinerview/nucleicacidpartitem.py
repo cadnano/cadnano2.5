@@ -72,8 +72,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):
         m_vh = model_virtual_helix
         vh_i = self._items[m_vh]
-        vh_i.parent().removeChild(vh_i)
         del self._items[m_vh]
+        vh_i.parent().removeChild(vh_i)
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
