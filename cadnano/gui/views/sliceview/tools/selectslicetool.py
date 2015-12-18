@@ -125,6 +125,7 @@ class SelectSliceTool(AbstractSliceTool):
             self.is_selection_active = False
             return True
         group.clearSelectionRect()
+        self.snap_origin_item = None
         return False
     # end def
 
@@ -137,6 +138,32 @@ class SelectSliceTool(AbstractSliceTool):
             group.setSelectionRect()
             group.show()
             self.individual_pick = True
+    # end def
+
+    def selectOrSnap(self, part_item, virtual_helix_item, event):
+        self.setPartItem(part_item)
+        if self.snap_origin_item is not None and event.modifiers() != Qt.ShiftModifier:
+            self.doSnap(part_item, virtual_helix_item)
+            self.individual_pick = False
+        else: # just do a selection
+            if event.modifiers() != Qt.ShiftModifier:
+                self.deselectItems()
+            self.addToSelection(virtual_helix_item)
+    # end def
+
+    def doSnap(self, part_item, virtual_helix_item):
+        origin = self.snap_origin_item.getCenterScenePos()
+        self.setVirtualHelixItem(virtual_helix_item)
+        destination = self.findNearestPoint(part_item, origin)
+        if origin == destination:
+            # snap clockwise
+            destination = self.findNextPoint(part_item, origin)
+        delta = destination - origin
+        dx, dy = delta.x(), delta.y()
+        group = self.group
+        pos = group.pos() + delta
+        self.group.setPos(pos)
+        self.moveSelection(dx, dy)
     # end def
 
     def moveSelection(self, dx, dy):
@@ -154,6 +181,7 @@ class SelectSliceTool(AbstractSliceTool):
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
         self.deselectItems()
+        snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def
 # end class
@@ -177,6 +205,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     def setSelectionRect(self):
         bri = self.bounding_rect_item
         bri.setRect(self.childrenBoundingRect())
+        bri.setPos(bri.mapFromItem(self, self.pos()))
         self.addToGroup(bri)
         bri.show()
         self.setFocus(True)
@@ -187,6 +216,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         bri.hide()
         self.removeFromGroup(bri)
         self.setFocus(False)
+        # self.setPos(QPointF(0,0))
     # end def
 
     def keyPressEvent(self, event):
@@ -237,7 +267,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             dx, dy = delta.x(), delta.y()
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
                 self.tool.moveSelection(dx, dy)
-            else:
+            elif dx != 0.0 and dy != 0.0:
                 print("small move", dx, dy)
                 # restore starting position
                 self.setPos(self.current_position)

@@ -11,3 +11,8 @@ class CreateSliceTool(AbstractSliceTool):
 
     def methodPrefix(self):
         return "createTool"  # first letter should be lowercase
+
+    def startCreation(self):
+        self._line_item.show()
+        self.is_started = True
+    # end def

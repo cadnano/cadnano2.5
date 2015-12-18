@@ -78,6 +78,12 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return pos.x() + _RADIUS, pos.y() + _RADIUS
     # end def
 
+    def getCenterScenePos(self):
+        """ return QPointF of the scenePos of the center
+        """
+        return self.scenePos() + QPointF(_RADIUS, _RADIUS)
+    # end def
+
     def mousePressEvent(self, event):
         part_item = self._part_item
         tool = part_item._getActiveTool()
@@ -92,11 +98,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def selectToolMousePress(self, tool, part_item, event):
         part = part_item.part()
         part.setSelected(True)
-        tool.setPartItem(part_item)
-        if event.modifiers() != Qt.ShiftModifier:
-            # print("indie deselect")
-            tool.deselectItems()
-        tool.addToSelection(self)
+        tool.selectOrSnap(part_item, self, event)
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 

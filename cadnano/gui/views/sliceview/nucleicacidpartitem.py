@@ -64,7 +64,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setRect(self._rect)
         self.setAcceptHoverEvents(True)
-        # self._initDeselector()
+
         # Cache of VHs that were active as of last call to activeSliceChanged
         # If None, all slices will be redrawn and the cache will be filled.
         # Connect destructor. This is for removing a part from scenes.
@@ -371,6 +371,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
         pt = tool.eventToPosition(self, event)
+        if pt is None:
+            tool.deactivate()
+            return QGraphicsItem.mousePressEvent(self, event)
+
         part_pt_tuple = self.getModelPos(pt)
 
         mod = Qt.MetaModifier
@@ -387,6 +391,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             if virtual_helix is not None:
                 vhi = self._virtual_helix_item_hash[virtual_helix]
                 tool.setVirtualHelixItem(vhi)
+                tool.startCreation()
         else:
             part.createVirtualHelix(*part_pt_tuple)
             virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
@@ -396,6 +401,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             #     print(vh)
             vhi = self._virtual_helix_item_hash[virtual_helix]
             tool.setVirtualHelixItem(vhi)
+            tool.startCreation()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
@@ -425,172 +431,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    class Deselector(QGraphicsItem):
-        """The deselector lives behind all the slices and observes mouse press
-        events that miss slices, emptying the selection when they do"""
-        def __init__(self, parent_HGI):
-            super(NucleicAcidPartItem.Deselector, self).__init__()
-            self.parent_HGI = parent_HGI
-        def mousePressEvent(self, event):
-            self.parent_HGI.part().setSelection(())
-            super(NucleicAcidPartItem.Deselector, self).mousePressEvent(event)
-        def boundingRect(self):
-            return self.parent_HGI.boundingRect()
-        def paint(self, painter, option, widget=None):
-            pass
-
-
     class IntersectionProbe(QGraphicsItem):
         def boundingRect(self):
             return QRectF(0, 0, .1, .1)
         def paint(self, painter, option, widget=None):
             pass
 
-
-# class DragHandle(QGraphicsRectItem):
-#     def __init__(self, rect, parent=None):
-#         super(QGraphicsRectItem, self).__init__(rect, parent)
-#         self._parent = parent
-#         self.setAcceptHoverEvents(True)
-#         self.setAcceptedMouseButtons(Qt.LeftButton)
-#         self._resizingRectItem = QGraphicsRectItem(self.rect(), self)
-#         self._bound = PartEdges.NONE
-#         self._resizing = False
-#         self.setPen(QPen(Qt.NoPen))
-#         self.resetAppearance(parent.modelColor(), _DEFAULT_WIDTH, _DEFAULT_ALPHA)
-#     # end def
-
-#     def updateRect(self, rect):
-#         """adds some padding to the DragHandle"""
-#         w = rect.width()*.6
-#         self.setRect(rect.adjusted(w,w,-w,-w).normalized())
-#     # end def
-
-#     def resetAppearance(self, color, width, alpha):
-#         self._resizingRectItem.setPen(getPenObj(color, width))
-#         self.setBrush(getBrushObj(color, alpha=alpha))
-#     # end def
-
-#     def getBound(self, pos):
-#         """return the types of edges that are hovered at pos."""
-#         _r = self._parent._outlinerect
-#         _x, _y = pos.x(), pos.y()
-#         _width = 6
-#         _bound = PartEdges.NONE
-#         if abs(_y - _r.top()) < _width: _bound |= PartEdges.TOP
-#         if abs(_x - _r.left()) < _width: _bound |= PartEdges.LEFT
-#         if abs(_x - _r.right()) < _width: _bound |= PartEdges.RIGHT
-#         if abs(_y - _r.bottom()) < _width: _bound |= PartEdges.BOTTOM
-#         return _bound
-
-#     def getCursor(self, bound):
-#         if ((bound & PartEdges.TOP and bound & PartEdges.LEFT) or
-#            (bound & PartEdges.BOTTOM and bound & PartEdges.RIGHT)):
-#             _cursor = Qt.SizeFDiagCursor
-#         elif ((bound & PartEdges.TOP and bound & PartEdges.RIGHT) or
-#              (bound & PartEdges.BOTTOM and bound & PartEdges.LEFT)):
-#             _cursor = Qt.SizeBDiagCursor
-#         elif (bound & PartEdges.LEFT or bound & PartEdges.RIGHT):
-#             _cursor = Qt.SizeHorCursor
-#         elif (bound & PartEdges.TOP or bound & PartEdges.BOTTOM):
-#             _cursor = Qt.SizeVerCursor
-#         else:
-#             _cursor = Qt.OpenHandCursor
-#         return _cursor
-
-#     def hoverEnterEvent(self, event):
-#         _bound = self.getBound(event.pos())
-#         _cursor = self.getCursor(_bound)
-#         self.setCursor(_cursor)
-#     # end def
-
-#     def hoverMoveEvent(self, event):
-#         _bound = self.getBound(event.pos())
-#         _cursor = self.getCursor(_bound)
-#         self.setCursor(_cursor)
-#     # end def
-
-#     def hoverLeaveEvent(self, event):
-#         self.unsetCursor()
-#     # end def
-
-#     # def mousePressEvent(self, event):
-#     #     self._edgesToResize = self.getBound(event.pos())
-#     #     _cursor = self.getCursor(self._edgesToResize)
-
-#     #     # select this part and deselect everything else
-#     #     for _part in self._parent.part().document().children():
-#     #         if _part is self._parent.part():
-#     #             _part.setSelected(True)
-#     #         else:
-#     #             _part.setSelected(False)
-
-#     #     self._drag_mousedown_pos = event.pos()
-
-#     #     if _cursor is Qt.ClosedHandCursor:
-#     #         self._resizing = False
-#     #     elif _cursor in [Qt.SizeBDiagCursor,
-#     #                      Qt.SizeFDiagCursor,
-#     #                      Qt.SizeHorCursor,
-#     #                      Qt.SizeVerCursor]:
-#     #         self._resizing = True
-#     # # end def
-
-#     # def mouseMoveEvent(self, event):
-#     #     m = QLineF(event.screenPos(), event.buttonDownScreenPos(Qt.LeftButton))
-#     #     if m.length() < QApplication.startDragDistance():
-#     #         return
-#     #     p = self.mapToScene(QPointF(event.pos()) - QPointF(self._drag_mousedown_pos))
-#     #     # still need to correct for qgraphicsview translation
-#     #     if self._resizing:
-#     #         _x, _y = event.pos().x(), event.pos().y()
-#     #         _r = QRectF(self._parent._outlinerect)
-#     #         _e = self._edgesToResize
-#     #         if _e & PartEdges.TOP: _r.setTop(_y)
-#     #         if _e & PartEdges.LEFT: _r.setLeft(_x)
-#     #         if _e & PartEdges.RIGHT: _r.setRight(_x)
-#     #         if _e & PartEdges.BOTTOM: _r.setBottom(_y)
-#     #         self._resizingRectItem.setRect(_r)
-#     #     else:
-#     #         self._parent.setPos(p)
-#     # # end def
-
-#     # def mouseReleaseEvent(self, event):
-#     #     self.setCursor(Qt.OpenHandCursor)
-
-#     #     if self._resizing:
-#     #         self.attemptResize(self._resizingRectItem.rect())
-#     #         self._resizing = False
-#     #         self._edgesToResize = PartEdges.NONE
-#     #     else:
-#     #         pass
-#     #     # self._resizingRect.setRect(self._parent._outlinerect)
-#     # # end def
-
-#     def attemptResize(self, rect):
-#         _p = _BOUNDING_RECT_PADDING
-#         m_p = self._parent._model_part
-
-#         # start bounds with topLeft at max, botRight at min
-#         x1, y1 = m_p.dimensions(self._parent._scale_factor)
-#         x2, y2 = 0, 0
-#         rRect = self.mapRectToScene(rect)
-#         # only show helices >50% inside rRect
-#         for _ehi in self._parent._empty_helix_hash.values():
-#             if rRect.contains(self.mapToScene(_ehi.pos() + _ehi.boundingRect().center())):
-#                 _ehi.show() # _ehi.setHovered()
-#                 # update bounds
-#                 x1 = min(x1, _ehi.pos().x())
-#                 y1 = min(y1, _ehi.pos().y())
-#                 x2 = max(x2, _ehi.pos().x() + _ehi.boundingRect().width())
-#                 y2 = max(y2, _ehi.pos().y() + _ehi.boundingRect().height())
-#             else:
-#                 _ehi.hide() # _ehi.setNotHovered()
-#         # print("resize to", x1,y1,x2,y2)
-#         self._parent._outlinerect = _newRect = QRectF(QPointF(x1,y1),
-#                           QPointF(x2,y2)).adjusted(-_p, -_p, _p, _p)
-#         self.updateRect(_newRect)
-#         self._resizingRectItem.setRect(_newRect)
-#         self.setRect(_newRect)
 
 # end class

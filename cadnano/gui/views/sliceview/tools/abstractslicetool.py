@@ -52,8 +52,6 @@ class AbstractSliceTool(QGraphicsObject):
         li = self._line_item
         li.setParentItem(virtual_helix_item)
         li.setLine(rad, rad, rad, rad)
-        li.show()
-        self.is_started = True
     # end def
 
     def setPartItem(self, part_item):
@@ -70,28 +68,51 @@ class AbstractSliceTool(QGraphicsObject):
         """ take an event and return a position as a QPointF
         update widget as well
         """
-        li = self._line_item
-        pos = li.mapFromScene(event.scenePos())
         if self.is_started:
-            line = li.line()
-            mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
-            angle_min = 9999
-            direction_min = None
-            for vector in self.vectors:
-                angle_new = mouse_point_vec.angleTo(vector)
-                if angle_new < angle_min:
-                    direction_min = vector
-                    angle_min = angle_new
-            if direction_min is not None:
-                self._direction_min = direction_min
-                li.setLine(direction_min)
-                return part_item.mapFromItem(li, direction_min.p2())
-            else:
-                line.setP2(pos)
-                li.setLine(line)
-                return part_item.mapFromItem(li, pos)
+            return self.findNearestPoint(part_item, event.scenePos())
         else:
             return event.pos()
+    # end def
+
+    def findNearestPoint(self, part_item, target_scenepos):
+        """
+        """
+        li = self._line_item
+        pos = li.mapFromScene(target_scenepos)
+
+        line = li.line()
+        mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
+
+        # Check if the click happened on the origin VH
+        if mouse_point_vec.length() < self._RADIUS:
+            # return part_item.mapFromScene(target_scenepos)
+            return None
+
+        angle_min = 9999
+        direction_min = None
+        for vector in self.vectors:
+            angle_new = mouse_point_vec.angleTo(vector)
+            if angle_new < angle_min:
+                direction_min = vector
+                angle_min = angle_new
+        if direction_min is not None:
+            self._direction_min = direction_min
+            li.setLine(direction_min)
+            return part_item.mapFromItem(li, direction_min.p2())
+        else:
+            line.setP2(pos)
+            li.setLine(line)
+            return part_item.mapFromItem(li, pos)
+    # end def
+
+    def findNextPoint(self, part_item, target_part_pos):
+        """
+        """
+        li = self._line_item
+        pos = li.mapFromItem(part_item, target_part_pos)
+        for i, vector in enumerate(self.vectors):
+            if vector.p2() == pos:
+                return part_item.mapFromItem(li, self.vectors[i - 1].p2())
     # end def
 
     def hideLineItem(self):
