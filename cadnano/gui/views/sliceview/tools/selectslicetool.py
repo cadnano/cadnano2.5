@@ -119,7 +119,8 @@ class SelectSliceTool(AbstractSliceTool):
             part_item = self.part_item
             for vh in self.selection_set:
                 vhi = part_item.getVirtualHelixItem(vh)
-                group.removeFromGroup(vhi)
+                if vhi is not None:
+                    group.removeFromGroup(vhi)
             self.selection_set.clear()
             group.clearSelectionRect()
             group.hide()

@@ -366,7 +366,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def getVirtualHelixItem(self, virtual_helix):
-        return self._virtual_helix_item_hash[virtual_helix]
+        return self._virtual_helix_item_hash.get(virtual_helix)
 
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
