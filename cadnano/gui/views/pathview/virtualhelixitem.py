@@ -140,13 +140,10 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         half_label_W = tBR.width()/2.0
 
         labelX = _BASE_WIDTH/2.0 - half_label_W #
-        if text == 1:  # adjust for the number one
-            labelX -= half_label_W/2.0
+        if str_txt == '1':  # adjust for the number one
+            labelX -= tBR.width()
 
-        if self._is_fwd:
-            labelY = half_label_H
-        else:
-            labelY = 2*half_label_H
+        labelY = half_label_H if self._is_fwd else (_BASE_WIDTH-tBR.height())/2
 
         self.setPos(labelX, labelY)
         self.setText(str_txt)
@@ -706,6 +703,13 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
             hpxig = self._handle._prexoveritemgroup
             pxig = self._prexoveritemgroup
             if new_value:
+                # handle
+                local_angle = (int(new_value)+180) % 360
+                h_fwd_items, h_rev_items = hpxig.getItemsFacingNearAngle(local_angle)
+                for h_item in h_fwd_items+h_rev_items:
+                    h_item.updateItemApperance(True, show_3p=False)
+                # path
+
                 active_value = self.part().getProperty('active_phos')
                 if not active_value:
                     return
@@ -723,8 +727,17 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
                         rev_idxs = [item.step_idx() for item in rev_items]
                         pxig.setActiveNeighbors(active_item, fwd_idxs, rev_idxs)
             else:
+                # handle
                 hpxig.resetAllItemsAppearance()
-                self._prexoveritemgroup.setActiveNeighbors(None, None, None)
+                # path
+                pxig.setActiveNeighbors(None, None, None)
+        # elif property_key == 'neighbor_active_angle':
+        #     hpxig = self._handle._prexoveritemgroup
+        #     pxig = self._prexoveritemgroup
+        #     if new_value:
+        #     else:
+        #         hpxig.resetAllItemsAppearance()
+        #         self._prexoveritemgroup.setActiveNeighbors(None, None, None)
         elif property_key == 'neighbors':
             pxig = self._prexoveritemgroup
             self.refreshProximalItems()
@@ -853,19 +866,15 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         for i in range(canvas_size):
             x = round(bw * i) #+ .5
             if i % sub_step_size == 0:
-                path.moveTo(x - .5,  0)
-                path.lineTo(x - .5,  bw2)
-                path.lineTo(x - .25, bw2)
-                path.lineTo(x - .25, 0)
-                path.lineTo(x,       0)
-                path.lineTo(x,       bw2)
-                path.lineTo(x + .25, bw2)
-                path.lineTo(x + .25, 0)
-                path.lineTo(x + .5,  0)
-                path.lineTo(x + .5,  bw2)
+                path.moveTo(x-.25, bw2)
+                path.lineTo(x-.25, 0)
+                path.lineTo(x,     0)
+                path.lineTo(x,     bw2)
+                path.lineTo(x+.25, bw2)
+                path.lineTo(x+.25, 0)
             else:
                 path.moveTo(x, 0)
-                path.lineTo(x, 2 * bw)
+                path.lineTo(x, bw2)
 
         # fwd-rev divider
         path.moveTo(0, bw)

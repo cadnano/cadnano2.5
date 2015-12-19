@@ -18,7 +18,7 @@ _BRUSH = getBrushObj(styles.ACTIVE_SLICE_HANDLE_FILL)
 _LABEL_BRUSH = getBrushObj(styles.ORANGE_STROKE)
 _PEN = getPenObj(styles.ACTIVE_SLICE_HANDLE_STROKE,\
             styles.SLICE_HANDLE_STROKE_WIDTH)
-_FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
+_FONT = styles.ACTIVE_SLICE_ITEM_FONT
 
 
 class ActiveSliceItem(QGraphicsRectItem):
