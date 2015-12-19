@@ -22,8 +22,8 @@ from . import slicestyles as styles
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-rect_gain = 0.25
-_RECT = _RECT.adjusted(0, 0, rect_gain, rect_gain)
+_RECT_GAIN = 0.25
+_RECT = _RECT.adjusted(0, 0, _RECT_GAIN, _RECT_GAIN)
 _RECT_CENTERPT = _RECT.center()
 _FONT = styles.SLICE_NUM_FONT
 _ZVALUE = styles.ZSLICEHELIX+3
@@ -255,12 +255,14 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     HUE_FACTOR = 1.6
     SPIRAL_FACTOR = 0.4
 
-    def __init__(self, rect, parent=None):
+    def __init__(self, radius, rect, parent=None):
         super(QGraphicsEllipseItem, self).__init__(rect, parent)
+        self._radius = radius
+        self._rect = rect
         self._parent = parent
         self._virtual_helix = parent._virtual_helix
         self._active_item = None
-        self._active_wedge_gizmo = WedgeGizmo(self)
+        self._active_wedge_gizmo = WedgeGizmo(radius, rect, self)
         self.fwd_prexo_items = {}
         self.rev_prexo_items = {}
         self._colors = self._get_colors()
@@ -272,6 +274,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### ACCESSORS ###
     def virtual_helix_angle(self):
         return self._virtual_helix.getProperty('eulerZ')
+    # end def
 
     def getItem(self, is_fwd, step_idx):
         items = self.fwd_prexo_items if is_fwd else self.rev_prexo_items
@@ -279,7 +282,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             return items[step_idx]
         else:
             return None
-
     # end def
 
     ### EVENT HANDLERS ###
@@ -293,14 +295,15 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
+        _radius = self._radius
         _step = self._parent._bases_per_repeat
         _twist = self._parent._twist_per_base
         _groove = self._parent.part().minorGrooveAngle()
         _hue_scale = _step*self.HUE_FACTOR
 
         _iw = PXI_PP_ITEM_WIDTH
-        _ctr = self.mapToParent(_RECT).boundingRect().center()
-        _x = _ctr.x() + _RADIUS - PXI_PP_ITEM_WIDTH 
+        _ctr = self.mapToParent(self._rect).boundingRect().center()
+        _x = _ctr.x() + _radius - PXI_PP_ITEM_WIDTH 
         _y = _ctr.y()
 
         for i in range(_step):
@@ -309,8 +312,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             rev = PreXoverItem(i, self._colors[-1-i], is_fwd=False, parent=self)
             fwd.setPos(_x-inset, _y)
             rev.setPos(_x-inset, _y)
-            fwd.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
-            rev.setTransformOriginPoint((-_RADIUS+_iw+inset), 0)
+            fwd.setTransformOriginPoint((-_radius+_iw+inset), 0)
+            rev.setTransformOriginPoint((-_radius+_iw+inset), 0)
             fwd.setRotation(round((i*_twist)%360, 3))
             rev.setRotation(round((i*_twist+_groove)%360, 3))
             fwd.setBondLineLength(inset+_iw)
@@ -365,7 +368,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
-            # self._virtual_helix.part().setProperty('active_phos_pos', None)
             self._parent.part().setProperty('active_phos', None)
             self._virtual_helix.setProperty('active_phos', None)
             return
@@ -375,9 +377,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
         is_fwd = 'fwd' if pre_xover_item.is_fwd() else 'rev'
         value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
-        # p = pre_xover_item.scenePos()
-        # pos = '%d,%d' % (p.x(), p.y())
-        # self._virtual_helix.part().setProperty('active_phos_pos', pos)
         self._parent.part().setProperty('active_phos', value)
         self._virtual_helix.setProperty('active_phos', value)
     # end def
@@ -438,8 +437,10 @@ class LineGizmo(QGraphicsLineItem):
 # end class
 
 class WedgeGizmo(QGraphicsPathItem):
-    def __init__(self, parent=None):
+    def __init__(self, radius, rect, parent=None):
         super(QGraphicsPathItem, self).__init__(parent)
+        self._radius = radius
+        self._rect = rect
         self._parent = parent
         self.setPen(getNoPen())
         self.setZValue(styles.ZWEDGEGIZMO)
@@ -447,9 +448,10 @@ class WedgeGizmo(QGraphicsPathItem):
 
     def showWedge(self, pos, angle, color, extended=False, rev_gradient=False, outline_only=False):
         self._last_params = (pos, angle, color, extended, rev_gradient, outline_only)
+        _radius = self._radius
         _span = self._parent.partCrossoverSpanAngle()/2
-        _r = _RADIUS+(rect_gain/2)
-        _c = _RECT_CENTERPT
+        _r = _radius+(_RECT_GAIN/2)
+        _c = self._rect.center()
         _EXT = 1.35 if extended else 1.0
         _line = QLineF(_c, pos)
         line1 = QLineF(_c, pos)
@@ -529,13 +531,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         empty_helix_item is a EmptyHelixItem that will act as a QGraphicsItem parent
         """
         super(VirtualHelixItem, self).__init__(parent=empty_helix_item)
-        self._virtual_helix = model_virtual_helix
+        self._virtual_helix = m_vh = model_virtual_helix
         self._empty_helix_item = ehi = empty_helix_item
         self._part_item = ehi._part_item
-        self._controller = VirtualHelixItemController(self, model_virtual_helix)
-        self._bases_per_repeat = model_virtual_helix.getProperty('bases_per_repeat')
-        self._twist_per_base = model_virtual_helix.getProperty('_twist_per_base')
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
+        self._controller = VirtualHelixItemController(self, m_vh)
+        self._bases_per_repeat = m_vh.getProperty('bases_per_repeat')
+        self._twist_per_base = m_vh.getProperty('_twist_per_base')
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self)
 
         # self.setFlag(QGraphicsItem.ItemIsSelectable)
         self.setAcceptHoverEvents(True)
@@ -689,7 +691,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             line.setLength(_RADIUS)
             line_item = LineGizmo(line, color, nvhi, self)
             line_item.hide()
-            wedge_item = WedgeGizmo(self)
+            wedge_item = WedgeGizmo(_RADIUS, _RECT, self)
             wedge_item.showWedge(line.p1(), line.angle(), color, outline_only=False)
             self._line_gizmos.append(line_item) # save ref to clear later
             self._wedge_gizmos.append(wedge_item)
