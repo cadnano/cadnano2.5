@@ -15,12 +15,6 @@ from cadnano.gui.views.sliceview.virtualhelixitem import PreXoverItem, PreXoverI
 from . import pathstyles as styles
 
 
-# HOVER_WIDTH = H_W = 20
-# GAP = 0 # gap between inner and outer strands
-
-# _HOVER_PEN = getPenObj('#ffffff', 128)
-# _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
-
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
 _RECT = QRectF(0, 0, 2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,\
         2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
@@ -33,15 +27,6 @@ _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
 
-# PXI_PP_ITEM_WIDTH = 3
-# TRIANGLE = QPolygonF()
-# TRIANGLE.append(QPointF(0, 0))
-# TRIANGLE.append(QPointF(0.75 * PXI_PP_ITEM_WIDTH, 0.5 * PXI_PP_ITEM_WIDTH))
-# TRIANGLE.append(QPointF(0, PXI_PP_ITEM_WIDTH))
-# TRIANGLE.append(QPointF(0, 0))
-# PXI_PP = QPainterPath()  # Left 5', Right 3' PainterPath
-# PXI_PP.addPolygon(TRIANGLE)
-
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def __init__(self, nucleicacid_part_item, virtual_helix_item, viewroot):
@@ -50,12 +35,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._virtual_helix_item = virtual_helix_item
         self._virtual_helix = m_vh = virtual_helix_item.virtualHelix()
         self._model_part = nucleicacid_part_item.part()
-
-        self._repeats = m_vh.getProperty('repeats')
-        self._bases_per_repeat = m_vh.getProperty('bases_per_repeat')
-        self._max_length = m_vh.getProperty('_max_length')
-        self._twist_per_base = m_vh.getProperty('_twist_per_base')
-
         self._viewroot = viewroot
         self._right_mouse_move = False
         self._being_hovered_over = False
@@ -70,28 +49,23 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setZValue(styles.ZPATHHELIX)
         self.setRect(_RECT)
         self.setTransformOriginPoint(self.boundingRect().center())
-
-
         # rotation 
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
         self._hover_rect = QRectF(_RECT)
-        # self._outer_line = RotaryDialLine(self._rect, self)
-        # self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
-
         self._prexoveritemgroup = PreXoverItemGroup(_RADIUS, _RECT, self)
-        # _pxig.setTransformOriginPoint(_RECT.center())
-        # _pxig.hide()
-
     # end def
 
-    def updateActivePreXoverItem(self, is_fwd, step_idx):
-        self._prexoveritemgroup.updateActivePreXoverItem(is_fwd, step_idx)
-        pass
+    ### ACCESSORS ###
 
-    def rotateWithCenterOrigin(self, angle):
-        self._prexoveritemgroup.setRotation(angle)
-    # end def
+    def basesPerRepeat(self):
+        return self._virtual_helix_item.basesPerRepeat()
+
+    def turnsPerRepeat(self):
+        return self._virtual_helix_item.turnsPerRepeat()
+
+    def twistPerBase(self):
+        return self._virtual_helix_item.twistPerBase()
 
     def part(self):
         return self._model_part
@@ -101,13 +75,8 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self.part().getProperty('color')
     # end def
 
-    def refreshColor(self):
-        part_color = self._model_part.getProperty('color')
-        self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-        self._USE_BRUSH = getBrushObj(styles.HANDLE_FILL, alpha=128)
-        self.setPen(self._USE_PEN)
-        self.setBrush(self._USE_BRUSH)
-        self.update(self.boundingRect())
+    def partCrossoverSpanAngle(self):
+        return float(self._model_part.getProperty('crossover_span_angle'))
     # end def
 
     def setSelectedColor(self, value):
@@ -126,12 +95,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def virtualHelix(self):
         return self._virtual_helix
-
-    def paint(self, painter, option, widget):
-        painter.setPen(self.pen())
-        painter.setBrush(self.brush())
-        painter.drawEllipse(self.rect())
-    # end def
 
     def remove(self):
         scene = self.scene()
@@ -188,10 +151,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._nucleicacid_part_item
     # end def
 
-    def partCrossoverSpanAngle(self):
-        return float(self._model_part.getProperty('crossover_span_angle'))
-    # end def
-
+    ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         """
         hoverEnterEvent changes the PathHelixHandle brush and pen from default
@@ -253,7 +213,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
 
-
     def mouseReleaseEvent(self, event):
         if self._right_mouse_move and event.button() == Qt.RightButton:
             self._right_mouse_move = False
@@ -262,11 +221,36 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             self._virtual_helix.setProperty('z', z)
     # end def
 
+    ### PRIVATE SUPPORT METHODS ###
+
+    ### PUBLIC SUPPORT METHODS ###
+    def refreshColor(self):
+        part_color = self._model_part.getProperty('color')
+        self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+        self._USE_BRUSH = getBrushObj(styles.HANDLE_FILL, alpha=128)
+        self.setPen(self._USE_PEN)
+        self.setBrush(self._USE_BRUSH)
+        self.update(self.boundingRect())
+    # end def
+
+    def updateActivePreXoverItem(self, is_fwd, step_idx):
+        self._prexoveritemgroup.updateActivePreXoverItem(is_fwd, step_idx)
+    # end def
+
+    def updateBasesPerRepeat(self):
+        self._prexoveritemgroup.updateBasesPerRepeat()
+
+    def updateTurnsPerRepeat(self):
+        self._prexoveritemgroup.updateTurnsPerRepeat()
+
+    def rotateWithCenterOrigin(self, angle):
+        self._prexoveritemgroup.setRotation(angle)
+    # end def
+
     def restoreParent(self, pos=None):
         """
         Required to restore parenting and positioning in the nucleicacid_part_item
         """
-
         # map the position
         self.tempReparent(pos=pos)
         self.setSelectedColor(False)
