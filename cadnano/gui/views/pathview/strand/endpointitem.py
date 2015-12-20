@@ -84,7 +84,7 @@ class EndpointItem(QGraphicsPathItem):
         self._high_drag_bound = None
         self._mod_item = None
         self._initCapSpecificState(is_drawn5to3)
-        self.setPen(QPen())
+        self.setPen(getPenObj('#333333', styles.ENDPOINT_STROKE_WIDTH))
         # for easier mouseclick
         self._click_area = cA = QGraphicsRectItem(_DEFAULT_RECT, self)
         self._click_area.setAcceptHoverEvents(True)
