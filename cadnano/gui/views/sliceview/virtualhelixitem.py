@@ -13,7 +13,7 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
 from . import slicestyles as styles
-
+from .sliceextras import PreXoverItemGroup
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -48,6 +48,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         # set position to offset for radius
         self.setCenterPos(x, y)
 
+        self._bases_per_repeat = model_virtual_helix.getProperty('bases_per_repeat')
+        self._turns_per_repeat = model_virtual_helix.getProperty('turns_per_repeat')
+        self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, _RECT, self)
+
         self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
 
@@ -63,6 +67,33 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._right_mouse_move = False
         self._button_down_pos = QPointF()
     # end def
+
+    ### ACCESSORS ###
+    def part(self):
+        return self._part_item.part()
+    # end def
+
+    def partItem(self):
+        return self._part_item
+    # end def
+
+    def virtualHelix(self):
+        return self._virtual_helix
+    # end def
+
+    def number(self):
+        return self.virtualHelix().number()
+    # end def
+
+    def basesPerRepeat(self):
+        return self._bases_per_repeat
+
+    def turnsPerRepeat(self):
+        return self._turns_per_repeat
+
+    def twistPerBase(self):
+        bases_per_turn = self._bases_per_repeat/self._turns_per_repeat
+        return 360./bases_per_turn
 
     def setCenterPos(self, x, y):
         # invert the y axis
@@ -84,6 +115,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return self.scenePos() + QPointF(_RADIUS, _RADIUS)
     # end def
 
+    def modelColor(self):
+        return self.part().getProperty('color')
+    # end def
+
+    ### SIGNALS ###
+
+    ### SLOTS ###
     def mousePressEvent(self, event):
         part_item = self._part_item
         tool = part_item._getActiveTool()
@@ -106,39 +144,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     #     tool.mouseMoveEvent(self, event)
     #     return QGraphicsItem.hoverMoveEvent(self, event)
     # # end def
-
-    def modelColor(self):
-        return self.part().getProperty('color')
-    # end def
-
-    def updateAppearance(self):
-        part_color = self.part().getProperty('color')
-
-        self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
-        self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
-        self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
-
-        # if self.part().crossSectionType() == LatticeType.HONEYCOMB:
-        #     self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-        #     self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
-        #                                   styles.SLICE_HELIX_STROKE_WIDTH)
-
-        if self.part().partType() == PartType.NUCLEICACIDPART:
-            self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
-            # self._USE_BRUSH = getBrushObj(part_color, lighter=180)
-            self._USE_BRUSH = getBrushObj(part_color, alpha=150)
-
-        self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
-        self.setBrush(self._OUT_OF_SLICE_BRUSH)
-        self.setPen(self._OUT_OF_SLICE_PEN)
-        self.setRect(_RECT)
-    # end def
-
-    ### SIGNALS ###
-
-    ### SLOTS ###
 
     def virtualHelixNumberChangedSlot(self, virtual_helix):
         """
@@ -177,6 +182,31 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.scene().removeItem(self)
     # end def
 
+    def updateAppearance(self):
+        part_color = self.part().getProperty('color')
+
+        self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
+        self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
+        self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
+
+        # if self.part().crossSectionType() == LatticeType.HONEYCOMB:
+        #     self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+        #     self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
+        #                                   styles.SLICE_HELIX_STROKE_WIDTH)
+
+        if self.part().partType() == PartType.NUCLEICACIDPART:
+            self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
+            # self._USE_BRUSH = getBrushObj(part_color, lighter=180)
+            self._USE_BRUSH = getBrushObj(part_color, alpha=150)
+
+        self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
+        self.setBrush(self._OUT_OF_SLICE_BRUSH)
+        self.setPen(self._OUT_OF_SLICE_PEN)
+        self.setRect(_RECT)
+    # end def
+
     def updatePosition(self):
         """
         """
@@ -190,10 +220,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             # set position to offset for radius
             # print("moving tslot", yc, y, (yc-y)/sf)
             self.setCenterPos(x, y)
-    # end def
-
-    def partItem(self):
-        return self._part_item
     # end def
 
     def createLabel(self):
@@ -292,16 +318,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         posy = b_rect.height()/2
         label.setPos(_RADIUS-posx, _RADIUS-posy)
     # end def
-
-    def part(self):
-        return self._part_item.part()
-
-    def virtualHelix(self):
-        return self._virtual_helix
-    # end def
-
-    def number(self):
-        return self.virtualHelix().number()
 
     def setActiveSliceView(self, idx, has_fwd, has_rev):
         if has_fwd:

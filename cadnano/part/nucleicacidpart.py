@@ -48,6 +48,7 @@ class NucleicAcidPart(Part):
     _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
     _SUB_STEP_SIZE = _STEP / 3
+    _MINOR_GROOVE_ANGLE = 171
 
     __count = 0
 
@@ -81,6 +82,12 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties["name"] = "Origami%d" % self._count()
+        self._properties['active_phos'] = None
+        self._properties['active_phos'] = None
+        self._properties['crossover_span_angle'] = 45
+        self._properties['max_vhelix_length'] = self._STEP*2
+        self._properties['neighbor_active_angle'] = ''
+
         # ID assignment
         self.recycle_bin = []
         self.reserve_bin = set()
@@ -152,6 +159,10 @@ class NucleicAcidPart(Part):
 
     def stepSize(self):
         return self._STEP
+    # end def
+
+    def minorGrooveAngle(self):
+        return self._MINOR_GROOVE_ANGLE
     # end def
 
     def subStepSize(self):

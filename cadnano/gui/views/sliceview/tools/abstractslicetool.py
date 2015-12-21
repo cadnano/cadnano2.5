@@ -31,14 +31,6 @@ class AbstractSliceTool(QGraphicsObject):
     # end def
 
     ######################## Drawing #######################################
-    # def paint(self, painter, option, widget=None):
-    #     painter.setPen(self._pen)
-    #     painter.setBrush(_BRUSH)
-    #     painter.drawRect(_TOOL_RECT)
-
-    # def boundingRect(self):
-    #     return self._rect
-
     def setVectors(self):
         rad = self._RADIUS
         return [QLineF( rad, rad,
@@ -130,11 +122,6 @@ class AbstractSliceTool(QGraphicsObject):
     def hoverMoveEvent(self, part_item, event):
         return self.eventToPosition(part_item, event)
     # end def
-
-    # def widgetClicked(self):
-    #     """Called every time a widget representing self gets clicked,
-    #     not just when changing tools."""
-    #     pass
 
     def setActive(self, will_be_active, old_tool=None):
         """

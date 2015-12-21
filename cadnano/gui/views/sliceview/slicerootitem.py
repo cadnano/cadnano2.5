@@ -39,7 +39,8 @@ class SliceRootItem(QGraphicsRectItem):
                 active_tool_getter=window.slice_tool_manager.activeToolGetter,
                 parent=self)
             self._instance_items[na_part_item] = na_part_item
-            window.slice_graphics_view.zoomToFit()
+            na_part_item.zoomToFit()
+            # window.slice_graphics_view.zoomToFit()
         else:
             raise NotImplementedError
     # end def

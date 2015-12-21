@@ -27,6 +27,7 @@ pen_cache = {}
 def getPenObj(hex_string, stroke_width,
                 alpha=None,
                 lighter=None,
+                penstyle=None,
                 capstyle=None,
                 joinstyle=None):
     global pen_cache
@@ -38,6 +39,8 @@ def getPenObj(hex_string, stroke_width,
     if pen is None:
         color = getColorObj(hex_string, lighter=lighter)
         pen = QPen(color, stroke_width)
+        if penstyle is not None:
+            pen.setStyle(penstyle)
         if capstyle is not None:
             pen.setCapStyle(capstyle)
         if joinstyle is not None:

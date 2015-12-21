@@ -36,7 +36,17 @@ class VirtualHelix(CNObject):
                             'location': (x, y),
                             'eulerZ':10,
                             'scamZ':10,
-                            'neighbors':'[]'}
+                            'active_phos':None,
+                            'neighbor_active_angle':'',
+                            'neighbors':'[]', # or ''
+                            'z':0,
+                            'bases_per_repeat':21,
+                            'turns_per_repeat':2,
+                            'repeats':2,
+                            '_bases_per_turn':10.5, # bases_per_repeat/turns_per_repeat
+                            '_twist_per_base':360 / 10.5, # 360/_bases_per_turn
+                            '_max_length':42
+                            }
 
         # rotate to honeycomb defaults
     # end def
