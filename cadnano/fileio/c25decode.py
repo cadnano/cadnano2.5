@@ -89,6 +89,15 @@ def decode(document, obj):
     setReopen(False)
     setBatch(False)
 
+    # SET PROPERTIES
+    for helix in obj['vstrands']:
+        vh_num = helix['num']
+        row = helix['row']
+        col = helix['col']
+        vh = part.virtualHelixAtCoord((row, col))
+        for key in ['x', 'y', 'z', 'eulerZ', 'repeats', 'bases_per_repeat', 'turns_per_repeat']:
+            vh.setProperty(key, helix[key])
+
     # INSTALL STRANDS AND COLLECT XOVER LOCATIONS
     num_helices = len(obj['vstrands']) - 1
     fwd_ss_seg = defaultdict(list)
@@ -161,8 +170,10 @@ def decode(document, obj):
         from_vh = part.virtualHelixAtCoord((row, col))
         fwd_strandset = from_vh.fwdStrandSet()
         rev_strandset = from_vh.revStrandSet()
+
         # install fwd_strandset xovers
         for (idx5p, to_vh_num, to_strand3p, idx3p) in fwd_ss_xo[vh_num]:
+            print(idx5p, to_vh_num, to_strand3p, idx3p)
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
             strand5p = fwd_strandset.getStrand(idx5p)
             to_vh = part.virtualHelixAtCoord(vh_num_to_coord[to_vh_num])
@@ -197,7 +208,7 @@ def decode(document, obj):
     #         default_color = prefs.DEFAULT_SCAF_COLOR
     #     oligo.applyColor(default_color, use_undostack=False)
 
-    # COLORS, INSERTIONS, SKIPS, PROPERTIES
+    # COLORS, INSERTIONS, SKIPS
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row = helix['row']
@@ -221,9 +232,6 @@ def decode(document, obj):
             strandset = fwd_strandset if strand_type == 0 else rev_strandset
             strand = strandset.getStrand(base_idx) 
             strand.oligo().applyColor(color, use_undostack=False)
-        # set properties
-        for key in ['x', 'y', 'z', 'eulerZ', 'bases_per_repeat', 'turns_per_repeat', 'repeats']:
-            vh.setProperty(key, helix[key])
 
 
     if 'oligos' in obj:
