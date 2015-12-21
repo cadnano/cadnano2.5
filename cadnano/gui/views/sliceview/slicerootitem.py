@@ -33,12 +33,13 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
         """
         part_type = model_part_instance.reference().partType()
-
+        window = self._window
         if part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
-                active_tool_getter=self._window.slice_tool_manager.activeToolGetter,
+                active_tool_getter=window.slice_tool_manager.activeToolGetter,
                 parent=self)
             self._instance_items[na_part_item] = na_part_item
+            window.slice_graphics_view.zoomToFit()
         else:
             raise NotImplementedError
     # end def
