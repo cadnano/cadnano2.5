@@ -20,12 +20,6 @@ class Preferences(object):
         self.readPreferences()
         self.widget.addAction(self.ui_prefs.actionClose)
         self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
-        self.ui_prefs.honeycomb_rows_spin_box.valueChanged.connect(self.setHoneycombRows)
-        self.ui_prefs.honeycomb_cols_spin_box.valueChanged.connect(self.setHoneycombCols)
-        self.ui_prefs.honeycomb_steps_spin_box.valueChanged.connect(self.setHoneycombSteps)
-        self.ui_prefs.square_rows_spin_box.valueChanged.connect(self.setSquareRows)
-        self.ui_prefs.square_cols_spin_box.valueChanged.connect(self.setSquareCols)
-        self.ui_prefs.square_steps_spin_box.valueChanged.connect(self.setSquareSteps)
         self.ui_prefs.auto_scaf_combo_box.currentIndexChanged.connect(self.setAutoScaf)
         self.ui_prefs.default_tool_combo_box.currentIndexChanged.connect(self.setStartupTool)
         self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
@@ -52,24 +46,12 @@ class Preferences(object):
 
     def readPreferences(self):
         self.qs.beginGroup("Preferences")
-        self.honeycomb_rows = self.qs.value("honeycomb_rows", slicestyles.HONEYCOMB_PART_MAXROWS)
-        self.honeycomb_cols = self.qs.value("honeycomb_cols", slicestyles.HONEYCOMB_PART_MAXCOLS)
-        self.honeycomb_steps = self.qs.value("honeycomb_steps", slicestyles.HONEYCOMB_PART_MAXSTEPS)
-        self.square_rows = self.qs.value("square_rows", slicestyles.SQUARE_PART_MAXROWS)
-        self.square_cols = self.qs.value("square_cols", slicestyles.SQUARE_PART_MAXCOLS)
-        self.square_steps = self.qs.value("square_steps", slicestyles.SQUARE_PART_MAXSTEPS)
         self.auto_scaf_index = self.qs.value("autoScaf", styles.PREF_AUTOSCAF_INDEX)
         self.startup_tool_index = self.qs.value("startup_tool", styles.PREF_STARTUP_TOOL_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
         self.zoom_on_helix_add = self.qs.value("zoom_on_helix_add", styles.PREF_ZOOM_AFTER_HELIX_ADD)
         self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
-        self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", self.honeycomb_rows)
-        self.ui_prefs.honeycomb_cols_spin_box.setProperty("value", self.honeycomb_cols)
-        self.ui_prefs.honeycomb_steps_spin_box.setProperty("value", self.honeycomb_steps)
-        self.ui_prefs.square_rows_spin_box.setProperty("value", self.square_rows)
-        self.ui_prefs.square_cols_spin_box.setProperty("value", self.square_cols)
-        self.ui_prefs.square_steps_spin_box.setProperty("value", self.square_steps)
         self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(self.auto_scaf_index)
         self.ui_prefs.default_tool_combo_box.setCurrentIndex(self.startup_tool_index)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
@@ -85,54 +67,12 @@ class Preferences(object):
     # end def
 
     def restoreDefaults(self):
-        self.ui_prefs.honeycomb_rows_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXROWS)
-        self.ui_prefs.honeycomb_cols_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXCOLS)
-        self.ui_prefs.honeycomb_steps_spin_box.setProperty("value", slicestyles.HONEYCOMB_PART_MAXSTEPS)
-        self.ui_prefs.square_rows_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXROWS)
-        self.ui_prefs.square_cols_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXCOLS)
-        self.ui_prefs.square_steps_spin_box.setProperty("value", slicestyles.SQUARE_PART_MAXSTEPS)
         self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(styles.PREF_AUTOSCAF_INDEX)
         self.ui_prefs.default_tool_combo_box.setCurrentIndex(styles.PREF_STARTUP_TOOL_INDEX)
         self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)
         self.ui_prefs.show_icon_labels.setChecked("value", self.PREF_SHOW_ICON_LABELS)
         # self.ui_prefs.helixAddCheckBox.setChecked(styles.PREF_ZOOM_AFTER_HELIX_ADD)
     # end def
-
-    def setHoneycombRows(self, rows):
-        self.honeycomb_rows = rows
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("honeycomb_rows", self.honeycomb_rows)
-        self.qs.endGroup()
-
-    def setHoneycombCols(self, cols):
-        self.honeycomb_cols = cols
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("honeycomb_cols", self.honeycomb_cols)
-        self.qs.endGroup()
-
-    def setHoneycombSteps(self, steps):
-        self.honeycomb_steps = steps
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("honeycomb_steps", self.honeycomb_steps)
-        self.qs.endGroup()
-
-    def setSquareRows(self, rows):
-        self.square_rows = rows
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("square_rows", self.square_rows)
-        self.qs.endGroup()
-
-    def setSquareCols(self, cols):
-        self.square_cols = cols
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("square_cols", self.square_cols)
-        self.qs.endGroup()
-
-    def setSquareSteps(self, steps):
-        self.square_steps = steps
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("square_steps", self.square_steps)
-        self.qs.endGroup()
 
     def setAutoScaf(self, index):
         self.auto_scaf_index = index

@@ -47,6 +47,7 @@ class NucleicAcidPart(Part):
     _TURNS_PER_STEP = 2
     _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
+    _SUB_STEP_SIZE = _STEP / 3
 
     __count = 0
 
@@ -154,7 +155,6 @@ class NucleicAcidPart(Part):
     # end def
 
     def subStepSize(self):
-        """Note: _SUB_STEP_SIZE is defined in subclasses."""
         return self._SUB_STEP_SIZE
     # end def
 

@@ -4,8 +4,7 @@ from cadnano import preferences as prefs
 from cadnano.color import intToColorHex
 from cadnano.document import Document
 from cadnano.enum import LatticeType, StrandType
-from cadnano.part.honeycombpart import HoneycombPart
-from cadnano.part.squarepart import SquarePart
+from .lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.virtualhelix import VirtualHelix
 
 
@@ -42,9 +41,7 @@ def import_legacy_dict(document, obj, lattice_type=LatticeType.HONEYCOMB):
     # CREATE PART ACCORDING TO LATTICE TYPE
     if lattice_type == LatticeType.HONEYCOMB:
         steps = num_bases/21
-        n_rows = max(30, max_row_json, prefs.HONEYCOMB_PART_MAXROWS)
-        n_cols = max(32, max_col_json, prefs.HONEYCOMB_PART_MAXCOLS)
-        part = HoneycombPart(document=document, max_row=n_rows, max_col=n_cols, max_steps=steps)
+        part = HoneycombPart(document=document)
     elif lattice_type == LatticeType.SQUARE:
         isSQ100 = True  # check for custom SQ100 format
         for helix in obj['vstrands']:

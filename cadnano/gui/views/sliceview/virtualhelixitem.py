@@ -7,7 +7,7 @@ from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
-from cadnano.enum import LatticeType, Parity, PartType, StrandType
+from cadnano.enum import Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.virtualhelix import VirtualHelix
@@ -120,10 +120,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
         self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
-        if self.part().crossSectionType() == LatticeType.HONEYCOMB:
-            self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
-                                          styles.SLICE_HELIX_STROKE_WIDTH)
+        # if self.part().crossSectionType() == LatticeType.HONEYCOMB:
+        #     self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
+        #     self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
+        #                                   styles.SLICE_HELIX_STROKE_WIDTH)
 
         if self.part().partType() == PartType.NUCLEICACIDPART:
             self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT

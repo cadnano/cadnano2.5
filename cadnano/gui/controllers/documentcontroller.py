@@ -440,7 +440,7 @@ class DocumentController():
 
 
     def actionAddDnaPart(self):
-        part = self._document.addHoneycombDnaPart()
+        part = self._document.addDnaPart()
         self.setActivePart(part)
     # end def
 

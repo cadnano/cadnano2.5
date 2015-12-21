@@ -14,7 +14,6 @@ from cadnano.strand import Strand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.part import Part
-from cadnano.part import HoneycombDnaPart, SquareDnaPart
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
@@ -479,16 +478,13 @@ class Document(CNObject):
     # # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addHoneycombDnaPart(self, max_row=prefs.HONEYCOMB_PART_MAXROWS,
-                         max_col=prefs.HONEYCOMB_PART_MAXCOLS,
-                         max_steps=prefs.HONEYCOMB_PART_MAXSTEPS):
+    def addDnaPart(self):
         """
-        Create and store a new HoneycombDnaPart and instance, and return the instance.
+        Create and store a new DnaPart and instance, and return the instance.
         """
-        honeycombdnapart = HoneycombDnaPart(document=self, max_row=max_row,
-                              max_col=max_col, max_steps=max_steps)
-        self._addPart(ObjectInstance(honeycombdnapart))
-        return honeycombdnapart
+        dnapart = NucleicAcidPart(document=self)
+        self._addPart(ObjectInstance(dnapart))
+        return dnapart
     # end def
 
     def removeAllParts(self):

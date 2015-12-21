@@ -7,7 +7,7 @@ from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
 from cadnano.color import intToColorHex
 from cadnano.document import Document
-from cadnano.enum import LatticeType, StrandType
+from cadnano.enum import StrandType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 def decodeFile(filename, document=None):
