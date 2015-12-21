@@ -151,6 +151,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._nucleicacid_part_item
     # end def
 
+    ### DRAWING ###
+    def paint(self, painter, option, widget):
+        """Need to override paint so selection appearance is correct."""
+        painter.setPen(self.pen())
+        painter.setBrush(self.brush())
+        painter.drawEllipse(self.rect())
+    # end def
+
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         """
