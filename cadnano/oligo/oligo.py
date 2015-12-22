@@ -202,12 +202,11 @@ class Oligo(ProxyObject):
         '''returns a dictionary to be exported'''
         vhNum5p = self.strand5p().virtualHelix().number()
         idx5p = self.strand5p().idx5Prime()
-        start = "%d[%d]" % (vhNum5p, idx5p)
+        start = end = "%d[%d]" % (vhNum5p, idx5p)
         vhNum3p = None
         seq = []
         if self.isLoop():
             print("A loop exists")
-            end = start
             # raise Exception
         for strand in self.strand5p().generator3pStrand():
             seq = seq + Strand.abstractSequence(strand, forExport=True)
