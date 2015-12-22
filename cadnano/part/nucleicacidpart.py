@@ -133,7 +133,7 @@ class NucleicAcidPart(Part):
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
                         name='partActiveVirtualHelixChangedSignal')
-    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, bool,
+    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
                                         name='partVirtualHelicesTranslatedSignal')  # self, transform
     partModAddedSignal = ProxySignal(object, object, object,
                         name='partModAddedSignal')
@@ -886,13 +886,32 @@ class NucleicAcidPart(Part):
         correctly.  set to True when "undo-ing"
         """
         qt = self._quadtree
+        # 1. get old neighbor list
+        old_neighbors = set()
+        for vh in vh_set:
+            neighbors = self.getVirtualHelixNeighbors(vh)
+            old_neighbors.update(neighbors)
+        # 2. move in the quadtree
         for vh in vh_set:
             if qt.removeNode(vh):
                 vh.translate(dx, dy)
                 qt.insertNode(vh)
             else:
                 raise ValueError("{} not in set".format(vh))
-        self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, do_deselect)
+        # 3. update neighbor calculations
+        new_neighbors = set()
+        for vh in vh_set:
+            neighbors = self.getVirtualHelixNeighbors(vh)
+            vh.setProperty('neighbors', list(neighbors))
+            new_neighbors.update(neighbors)
+            # print(vh, neighbors)
+
+        # now update the old and new neighbors that were not in the vh set
+        left_overs = new_neighbors.union(old_neighbors).difference(vh_set)
+        for vh in left_overs:
+            neighbors = self.getVirtualHelixNeighbors(vh)
+            vh.setProperty('neighbors', list(neighbors))
+        self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
     #end def
 
     def setActiveBaseIndex(self, idx):
@@ -927,6 +946,11 @@ class NucleicAcidPart(Part):
         of virtual_helix references
         """
         self._quadtree.insertNode(virtual_helix)
+        neighbors = self.getVirtualHelixNeighbors(virtual_helix)
+        virtual_helix.setProperty('neighbors', list(neighbors))
+        for nvh in neighbors:
+            neighbor_list = nvh.getProperty('neighbors')
+            neighbor_list.append(virtual_helix)
     # end def
 
     def _removeVirtualHelix(self, virtual_helix):
@@ -934,7 +958,11 @@ class NucleicAcidPart(Part):
         private method for adding a virtual_helix to the Parts data structure
         of virtual_helix references
         """
+        neighbors = self.getVirtualHelixNeighbors(virtual_helix)
         self._quadtree.removeNode(virtual_helix)
+        for nvh in neighbors:
+            neighbor_list = nvh.getProperty('neighbors')
+            neighbor_list.remove(virtual_helix)
     # end def
 
     def _reserveHelixIDNumber(self, requested_id_num=None):

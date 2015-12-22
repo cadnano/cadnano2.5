@@ -14,6 +14,7 @@ from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .activesliceitem import ActiveSliceItem
 from .virtualhelixitem import VirtualHelixItem
+from .sliceextras import PreXoverItemGroup
 
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -163,15 +164,47 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass
     # end def
 
-    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, do_deselect):
+    def partVirtualHelicesTranslatedSlot(self, sender,
+                                                vh_set, left_overs,
+                                                do_deselect):
+        """
+        left_overs are neighbors that need updating due to changes
+        """
         if do_deselect:
             tool = self._getActiveTool()
             if tool.methodPrefix() == "selectTool":
                 if tool.isSelectionActive():
                     tool.deselectItems()
+
+        all_done_set = set()
         for vh in vh_set:
             vhi = self._virtual_helix_item_hash[vh]
             vhi.updatePosition()
+            self.refreshVirtualHelixItemGizmos(vh, vhi, all_done_set)
+        for vh in left_overs:
+            vhi = self._virtual_helix_item_hash[vh]
+            vhi.updatePosition()
+            self.refreshVirtualHelixItemGizmos(vh, vhi, all_done_set)
+    # end def
+
+    def refreshVirtualHelixItemGizmos(self, vh, vhi, all_done_set):
+        """Update props and appearance of self & recent neighbors."""
+        neighbors = vh.getProperty('neighbors')
+
+        # 1. Clear old gizmos
+        vhi.line_gizmos = []
+        scene = self.scene()
+        while vhi.wedge_gizmos:
+            scene.removeItem(vhi.wedge_gizmos.pop())
+
+        # update neighbors gizmos
+        for nvh in neighbors:
+            if nvh in all_done_set:
+                continue
+            nvhi = self._virtual_helix_item_hash[nvh]
+            vhi.createWedgeGizmo(nvhi)
+        # end for
+        all_done_set.add(vh)
     # end def
 
     def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):

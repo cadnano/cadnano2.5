@@ -154,6 +154,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def doSnap(self, part_item, virtual_helix_item):
+        print("snapping")
         origin = self.snap_origin_item.getCenterScenePos()
         self.setVirtualHelixItem(virtual_helix_item)
         destination = self.findNearestPoint(part_item, origin)
@@ -170,7 +171,7 @@ class SelectSliceTool(AbstractSliceTool):
         group = self.group
         pos = group.pos() + delta
         self.group.setPos(pos)
-        self.moveSelection(dx, dy, True)
+        self.moveSelection(dx, dy, False, use_undostack=True)
         self.hideLineItem()
     # end def
 

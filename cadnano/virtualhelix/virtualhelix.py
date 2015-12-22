@@ -38,7 +38,7 @@ class VirtualHelix(CNObject):
                             'scamZ':10,
                             'active_phos':None,
                             'neighbor_active_angle':'',
-                            'neighbors':'[]', # or ''
+                            'neighbors':[], # or ''
                             'z':0,
                             'bases_per_repeat':21,
                             'turns_per_repeat':2,

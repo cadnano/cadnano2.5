@@ -25,6 +25,12 @@ FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
 FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
 REVPXI_PP.addPolygon(T270.map(TRIANGLE))
 
+_RADIUS = styles.SLICE_HELIX_RADIUS
+_WEDGE_RECT_GAIN = 0.25
+WEDGE_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
+WEDGE_RECT = WEDGE_RECT.adjusted(0, 0, _WEDGE_RECT_GAIN, _WEDGE_RECT_GAIN)
+_PXIF_RECT_CENTERPT = WEDGE_RECT.center()
+
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
         super(PropertyWrapperObject, self).__init__()
@@ -419,7 +425,7 @@ class WedgeGizmo(QGraphicsPathItem):
         self._last_params = (pos, angle, color, extended, rev_gradient, outline_only)
         radius = self._radius
         span = self._parent.partCrossoverSpanAngle() / 2
-        row = radius + (_RECT_GAIN / 2)
+        row = radius + (_WEDGE_RECT_GAIN / 2)
         column = self._rect.center()
         EXT = 1.35 if extended else 1.0
         line0 = QLineF(column, pos)
