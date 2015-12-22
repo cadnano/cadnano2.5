@@ -154,10 +154,6 @@ class PlasmidPart(Part):
         return self._SUB_STEP_SIZE
     # end def
 
-    def undoStack(self):
-        return self._document.undoStack()
-    # end def
-
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def partType(self):
         return PartType.PLASMIDPART

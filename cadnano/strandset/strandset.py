@@ -31,7 +31,7 @@ class StrandSet(CNObject):
     which a strand can be created or resized.
     """
     def __init__(self, strand_type, virtual_helix):
-        self._doc = virtual_helix.document()
+        self._document = virtual_helix.document()
         super(StrandSet, self).__init__(virtual_helix)
         self._virtual_helix = virtual_helix
         self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
@@ -68,7 +68,7 @@ class StrandSet(CNObject):
     # end def
 
     def document(self):
-        return self._doc
+        return self._document
     # end def
 
     def strands(self):
@@ -401,11 +401,6 @@ class StrandSet(CNObject):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def undoStack(self):
-        if self._undo_stack is None:
-            self._undo_stack = self._virtual_helix.undoStack()
-        return self._undo_stack
-
     def virtualHelix(self):
         return self._virtual_helix
 
@@ -579,7 +574,7 @@ class StrandSet(CNObject):
 
     def _removeFromStrandList(self, strand):
         """Remove strand from strand_array."""
-        self._doc.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
+        self._document.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
             self.strand_array[i] = None

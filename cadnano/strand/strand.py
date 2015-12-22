@@ -168,9 +168,6 @@ class Strand(CNObject):
 
     ### SLOTS ###
     ### ACCESSORS ###
-    def undoStack(self):
-        return self._strandset.undoStack()
-
     def decorators(self):
         return self._decorators
     # end def

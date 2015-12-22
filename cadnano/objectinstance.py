@@ -22,10 +22,6 @@ class ObjectInstance(CNObject):
     ### SLOTS ###
 
     ### METHODS ###
-    def undoStack(self):
-        return self._document.undoStack()
-    # end def
-
     def destroy(self):
         self.setParent(None)
         self.deleteLater()

@@ -202,10 +202,6 @@ class Part(CNObject):
         return self._SUB_STEP_SIZE
     # end def
 
-    def undoStack(self):
-        return self._document.undoStack()
-    # end def
-
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     # def virtualHelix(self, vhref, returnNoneIfAbsent=True):
     #     # vhrefs are the shiny new way to talk to part about its constituent

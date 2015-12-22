@@ -127,6 +127,28 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
             c.redo()
 # end def
 
+def finalizeCommands(model_object, commands, desc=None):
+    """
+    used to enable interaction with the model but not push
+    commands to the undostack.  In practice:
+
+    1. Call a bunch of commands and don't push them to the undostack AKA:
+        cmd.redo()
+    2. call finalizeCommands() to push the cummulative change to the stack
+
+    this assumes that the UndoCommands provided this function are respresent
+    a transition from the initial state to the final state
+    """
+    # 1. undo the command to get back to the initial _state
+    for c in commands:
+        c.undo()
+    # 2. push all the "undoable" commands to the undostac
+    model_object.undoStack().beginMacro(desc)
+    for c in commands:
+        model_object.undoStack().push(c)
+    model_object.undoStack().endMacro()
+# end def
+
 def this_path():
     return os.path.abspath(os.path.dirname(__file__))
 

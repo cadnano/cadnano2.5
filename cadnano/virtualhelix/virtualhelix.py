@@ -188,10 +188,6 @@ class VirtualHelix(CNObject):
         return self._stap_strandset
     # end def
 
-    def undoStack(self):
-        return self._part.undoStack()
-    # end def
-
     ### METHODS FOR QUERYING THE MODEL ###
     def scaffoldIsOnTop(self):
         # return True

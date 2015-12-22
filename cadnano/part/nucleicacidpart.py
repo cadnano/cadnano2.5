@@ -169,10 +169,6 @@ class NucleicAcidPart(Part):
         return self._SUB_STEP_SIZE
     # end def
 
-    def undoStack(self):
-        return self._document.undoStack()
-    # end def
-
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def partType(self):
         return PartType.NUCLEICACIDPART
@@ -868,11 +864,17 @@ class NucleicAcidPart(Part):
                                                     use_undostack=use_undostack)
     # end def
 
-    def translateVirtualHelices(self, vh_set, dx, dy, use_undostack=True):
+    def translateVirtualHelices(self,   vh_set,
+                                        dx, dy,
+                                        finalize,
+                                        use_undostack=False):
         if use_undostack:
             c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy)
-            util.execCommandList(self, [c], desc="Translate VHs", \
-                                                        use_undostack=True)
+            if finalize:
+                util.finalizeCommands(self, [c], desc="Translate VHs")
+            else:
+                util.execCommandList(self, [c], desc="Translate VHs", \
+                                                            use_undostack=True)
         else:
             self._translateVirtualHelices(vh_set, dx, dy, False)
     # end def

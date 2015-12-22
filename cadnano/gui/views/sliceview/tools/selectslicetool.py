@@ -170,18 +170,21 @@ class SelectSliceTool(AbstractSliceTool):
         group = self.group
         pos = group.pos() + delta
         self.group.setPos(pos)
-        self.moveSelection(dx, dy)
+        self.moveSelection(dx, dy, True)
         self.hideLineItem()
     # end def
 
-    def moveSelection(self, dx, dy):
+    def moveSelection(self, dx, dy, finalize, use_undostack=True):
         """ Y-axis is inverted in Qt +y === DOWN
         """
         # print("moveSelection: {}, {}", dx, dy)
         part_item = self.part_item
         sf = part_item.scaleFactor()
         part = part_item.part()
-        part.translateVirtualHelices(self.selection_set, dx / sf, -dy / sf)
+        part.translateVirtualHelices(self.selection_set,
+                                        dx / sf, -dy / sf,
+                                        finalize,
+                                        use_undostack=use_undostack)
     # end def
 
     def deactivate(self):
@@ -207,24 +210,27 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
                                             _SELECT_PEN_WIDTH))
         self.drag_start_position = QPointF()
-        self.current_position = QPointF()
+        self.drag_last_position = QPointF()
     # end def
 
     def setSelectionRect(self):
         bri = self.bounding_rect_item
-        bri.setRect(self.childrenBoundingRect())
-        bri.setPos(bri.mapFromItem(self, self.pos()))
+        rect = self.childrenBoundingRect()
         self.addToGroup(bri)
+        bri.setRect(bri.mapRectFromParent(rect))
         bri.show()
         self.setFocus(True)
     # end def
 
     def clearSelectionRect(self):
+        """ reset positions to zero to keep things in check
+        """
         bri = self.bounding_rect_item
+        bri.setPos(QPointF(0,0))
         bri.hide()
         self.removeFromGroup(bri)
         self.setFocus(False)
-        # self.setPos(QPointF(0,0))
+        self.setPos(QPointF(0,0))
     # end def
 
     def keyPressEvent(self, event):
@@ -259,27 +265,44 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 #         print("origin", item.virtualHelix())
                 #         tool.snap_origin_item = item
                 #         break
-            self.drag_start_position = event.scenePos()
-            self.current_position = self.pos()
+            self.drag_start_position = sp = self.pos()
+            self.drag_last_position = sp
             return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 
-    def mouseReleaseEvent(self, event):
+    def mouseMoveEvent(self, event):
+        """ because SliceSelectionGroup has the flag
+        QGraphicsItem.ItemIsMovable
+        we need only get the position of the item to figure
+        out what to submit to the model
         """
+        # watch out for bugs here?  everything seems OK for now, but
+        # could be weird window switching edge cases
+        if not self.tool.individual_pick and event.buttons() == Qt.LeftButton:
+            new_pos = self.pos()
+            delta = new_pos - self.drag_last_position
+            self.drag_last_position = new_pos
+            dx, dy = delta.x(), delta.y()
+            self.tool.moveSelection(dx, dy, False)
+        return QGraphicsItemGroup.mouseMoveEvent(self, event)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        """ because SliceSelectionGroup has the flag
+        QGraphicsItem.ItemIsMovable
+        we need only get the position of the item to figure
+        out what to submit to the model
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
         if not self.tool.individual_pick and event.button() == Qt.LeftButton:
-            # print("positions:", event.lastScenePos(), event.scenePos(), event.pos())
-            delta = event.lastScenePos() - self.drag_start_position
-            # invert y axis since qt y is positive in the down direction
+            delta = self.pos() - self.drag_start_position
             dx, dy = delta.x(), delta.y()
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
-                self.tool.moveSelection(dx, dy)
+                self.tool.moveSelection(dx, dy, True)
             elif dx != 0.0 and dy != 0.0:
                 print("small move", dx, dy)
                 # restore starting position
-                self.setPos(self.current_position)
-                # self.setPos(self.current_position + delta)
+                self.setPos(self.drag_start_position)
         self.tool.individual_pick = False
         return QGraphicsItemGroup.mouseReleaseEvent(self, event)
     # end def

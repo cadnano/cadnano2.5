@@ -276,8 +276,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
             # set position to offset for radius
             # print("moving tslot", yc, y, (yc-y)/sf)
-            # self.setCenterPos(x, y)
-            self.setPos(x, y)
+            self.setCenterPos(x, y)
+            # self.setPos(x, y)
     # end def
 
     def createLabel(self):

@@ -393,8 +393,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 class LineGizmo(QGraphicsLineItem):
     def __init__(self, line, color, nvhi, parent=None):
         super(LineGizmo, self).__init__(line, parent)
-        self.
-nvhi = nvhi
+        self.nvhi = nvhi
         self.nvhi_name = nvhi.virtualHelix().getName()
         self.setPen(getPenObj(color, 0.25))
     # end def
