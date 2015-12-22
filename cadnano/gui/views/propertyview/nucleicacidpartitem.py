@@ -49,7 +49,7 @@ class NucleicAcidPartItem(CNPropertyItem, AbstractPartItem):
         key = self.key()
         if key == 'crossover_span_angle':
             editor = QSlider(Qt.Horizontal, parent_QWidget)
-            editor.setRange(5, 60)
+            editor.setRange(5, 75)
             editor.valueChanged.connect(self._setCrossoverSpanAngle) # fire immediately
         elif key == 'max_vhelix_length':
             step_size = part.stepSize()

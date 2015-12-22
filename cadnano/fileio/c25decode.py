@@ -173,7 +173,6 @@ def decode(document, obj):
 
         # install fwd_strandset xovers
         for (idx5p, to_vh_num, to_strand3p, idx3p) in fwd_ss_xo[vh_num]:
-            print(idx5p, to_vh_num, to_strand3p, idx3p)
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
             strand5p = fwd_strandset.getStrand(idx5p)
             to_vh = part.virtualHelixAtCoord(vh_num_to_coord[to_vh_num])

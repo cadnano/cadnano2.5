@@ -77,7 +77,7 @@ class NucleicAcidPart(Part):
         # self._properties["name"] = "Origami%d" % len(self._document.children())
         self._properties['name'] = 'Origami%d' % self._count()
         self._properties['active_phos'] = None
-        self._properties['crossover_span_angle'] = 45
+        self._properties['crossover_span_angle'] = 60
         self._properties['max_vhelix_length'] = self._STEP*2
         self._properties['neighbor_active_angle'] = ''
 
