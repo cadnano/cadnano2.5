@@ -176,34 +176,26 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 if tool.isSelectionActive():
                     tool.deselectItems()
 
-        all_done_set = set()
         for vh in vh_set:
             vhi = self._virtual_helix_item_hash[vh]
             vhi.updatePosition()
-            self.refreshVirtualHelixItemGizmos(vh, vhi, all_done_set)
+            self.refreshVirtualHelixItemGizmos(vh, vhi)
         for vh in left_overs:
             vhi = self._virtual_helix_item_hash[vh]
             vhi.updatePosition()
-            self.refreshVirtualHelixItemGizmos(vh, vhi, all_done_set)
+            self.refreshVirtualHelixItemGizmos(vh, vhi)
     # end def
 
-    def refreshVirtualHelixItemGizmos(self, vh, vhi, all_done_set):
+    def refreshVirtualHelixItemGizmos(self, vh, vhi):
         """Update props and appearance of self & recent neighbors."""
         neighbors = vh.getProperty('neighbors')
 
-        # 1. Clear old gizmos
-        vhi.line_gizmos = []
-        scene = self.scene()
-        while vhi.wedge_gizmos:
-            scene.removeItem(vhi.wedge_gizmos.pop())
-
-        # update neighbors gizmos
+        vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
-            if nvh in all_done_set:
-                continue
             nvhi = self._virtual_helix_item_hash[nvh]
-            vhi.createWedgeGizmo(nvhi)
+            vhi.setWedgeGizmo(nvh, nvhi)
         # end for
+        vhi.endAddWedgeGizmos()
         all_done_set.add(vh)
     # end def
 

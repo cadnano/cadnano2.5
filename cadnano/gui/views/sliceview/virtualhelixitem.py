@@ -52,8 +52,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self._turns_per_repeat = model_virtual_helix.getProperty('turns_per_repeat')
         self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
 
-        self.line_gizmos = []
-        self.wedge_gizmos = []
+        self.wedge_gizmos = {}
+        self._added_wedge_gizmos = set()
         self._prexo_gizmos = []
 
         self.setAcceptHoverEvents(True)
@@ -239,8 +239,28 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return label
     # end def
 
-    def createWedgeGizmo(self, neighbor_virtual_helix_item):
+    def beginAddWedgeGizmos(self):
+        self._added_wedge_gizmos.clear()
+    # end def
+
+    def endAddWedgeGizmos(self):
+        remove_list = []
+        scene = self.scene()
+        wg_dict = self.wedge_gizmos
+        recently_added = self._added_wedge_gizmos
+        for neighbor_virtual_helix in wg_dict.keys():
+            if neighbor_virtual_helix not in recently_added:
+                remove_list.append(neighbor_virtual_helix)
+        for nvh in remove_list:
+            wg = wg_dict.get(nvh)
+            del wg_dict[nvh]
+            scene.removeItem(wg)
+    # end def
+
+    def setWedgeGizmo(self, neighbor_virtual_helix, neighbor_virtual_helix_item):
+        wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
+
         nvhi_name = nvhi.virtualHelix().getName()
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
@@ -251,10 +271,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
             color = '#cc0000'
             nvhi_name = nvhi_name + '*' # mark as invalid
         line.setLength(_RADIUS)
-        wedge_item = WedgeGizmo(_RADIUS, WEDGE_RECT, self)
+        if neighbor_virtual_helix in wg_dict:
+            wedge_item = wg_dict[neighbor_virtual_helix]
+        else:
+            wedge_item = WedgeGizmo(_RADIUS, WEDGE_RECT, self)
+            wg_dict[neighbor_virtual_helix] = wedge_item
         wedge_item.showWedge(line.p1(), line.angle(), color, outline_only=False)
-        # self.line_gizmos.append(line) # save ref to clear later
-        self.wedge_gizmos.append(wedge_item)
+        self._added_wedge_gizmos.add(neighbor_virtual_helix)
     # end def
 
     def createArrows(self):

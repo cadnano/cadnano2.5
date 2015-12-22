@@ -395,19 +395,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 # end class
 
-
-class LineGizmo(QGraphicsLineItem):
-    def __init__(self, line, color, nvhi, parent=None):
-        super(LineGizmo, self).__init__(line, parent)
-        self.nvhi = nvhi
-        self.nvhi_name = nvhi.virtualHelix().getName()
-        self.setPen(getPenObj(color, 0.25))
-    # end def
-
-    def angle(self):
-        return 360-self.line().angle()
-# end class
-
 class WedgeGizmo(QGraphicsPathItem):
     def __init__(self, radius, rect, parent):
         """ parent could be a PreXoverItemGroup or a VirtualHelixItem
