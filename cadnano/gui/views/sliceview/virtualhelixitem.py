@@ -13,7 +13,7 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.virtualhelix import VirtualHelix
 from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
 from . import slicestyles as styles
-from .sliceextras import PreXoverItemGroup
+from .sliceextras import PreXoverItemGroup, LineGizmo, WedgeGizmo
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -46,11 +46,17 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.hide()
         x, y = model_virtual_helix.locationQt(part_item.scaleFactor())
         # set position to offset for radius
+        # self.setTransformOriginPoint(_RADIUS, _RADIUS)
         self.setCenterPos(x, y)
+        # self.setPos(x, y)
 
         self._bases_per_repeat = model_virtual_helix.getProperty('bases_per_repeat')
         self._turns_per_repeat = model_virtual_helix.getProperty('turns_per_repeat')
         self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, _RECT, self)
+
+        self._line_gizmos = []
+        self._wedge_gizmos = []
+        self._prexo_gizmos = []
 
         self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
@@ -65,7 +71,6 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.show()
 
         self._right_mouse_move = False
-        self._button_down_pos = QPointF()
     # end def
 
     ### ACCESSORS ###
@@ -106,6 +111,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         """
         pos = self.scenePos()
         pos = self._part_item.mapFromScene(pos)
+        # return pos
         return pos.x() + _RADIUS, pos.y() + _RADIUS
     # end def
 
@@ -117,6 +123,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def modelColor(self):
         return self.part().getProperty('color')
+    # end def
+
+    def partCrossoverSpanAngle(self):
+        return float(self.part().getProperty('crossover_span_angle'))
     # end def
 
     ### SIGNALS ###
@@ -207,6 +217,53 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         self.setRect(_RECT)
     # end def
 
+
+    # def refreshCollidingItems(self):
+    #     """Update props and appearance of self & recent neighbors."""
+    #     # neighbors = []
+    #     neighbors = self._virtual_helix.getProperty('neighbors').split()
+
+    #     # items = list(filter(lambda x: type(x) is VirtualHelixItem, self.collidingItems()))
+    #     while self._line_gizmos: # clear old gizmos
+    #         self.scene().removeItem(self._line_gizmos.pop())
+    #     while self._wedge_gizmos:
+    #         self.scene().removeItem(self._wedge_gizmos.pop())
+    #     for nvhi in items:
+    #         nvhi_name = nvhi.virtualHelix().getName()
+    #         pos = self.scenePos()
+    #         line = QLineF(pos, nvhi.scenePos())
+    #         line.translate(_RADIUS-pos.x(),_RADIUS-pos.y())
+
+    #         if line.length() > (_RADIUS*1.99):
+    #             color = '#5a8bff'
+    #         else:
+    #             color = '#cc0000'
+    #             nvhi_name = nvhi_name + '*' # mark as invalid
+    #         line.setLength(_RADIUS)
+    #         line_item = LineGizmo(line, color, nvhi, self)
+    #         line_item.hide()
+    #         wedge_item = WedgeGizmo(_RADIUS, _RECT, self)
+    #         wedge_item.showWedge(line.p1(), line.angle(), color, outline_only=False)
+    #         self._line_gizmos.append(line_item) # save ref to clear later
+    #         self._wedge_gizmos.append(wedge_item)
+    #         neighbors.append('%s:%02d' % (nvhi_name, 360-line.angle()))
+    #     # end for
+
+    #     self._virtual_helix.setProperty('neighbors', ' '.join(sorted(neighbors)))
+    #     added = list(set(neighbors) - set(old_neighbors)) # includes new angles
+    #     removed = list(set(old_neighbors) - set(neighbors))
+    #     for nvhi in self._part_item.getVHItemList(): # check all items
+    #         nvhi_name = nvhi.virtualHelix().getName()
+    #         alt_name = nvhi_name + '*'
+    #         changed_names = [a.split(':')[0] for a in added] + \
+    #                         [r.split(':')[0] for r in removed]
+    #         if nvhi_name in changed_names or alt_name in changed_names:
+    #             nvhi.refreshCollidingItems()
+
+    #     # end for
+    # # end def
+
+
     def updatePosition(self):
         """
         """
@@ -219,7 +276,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
             # set position to offset for radius
             # print("moving tslot", yc, y, (yc-y)/sf)
-            self.setCenterPos(x, y)
+            # self.setCenterPos(x, y)
+            self.setPos(x, y)
     # end def
 
     def createLabel(self):

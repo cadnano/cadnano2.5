@@ -10,6 +10,7 @@ from cadnano.math.vector import v2AngleBetween
 class AbstractSliceTool(QGraphicsObject):
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
+    # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
     def __init__(self, controller, parent=None):
         super(AbstractSliceTool, self).__init__(parent)
@@ -36,6 +37,9 @@ class AbstractSliceTool(QGraphicsObject):
         return [QLineF( rad, rad,
                         rad*(1 + 2*math.cos(x)), rad*(1 + 2*math.sin(x))
                         ) for x in self.angles]
+        # return [QLineF( 0, 0,
+        #                 rad*(0 + 2*math.cos(x)), rad*(0 + 2*math.sin(x))
+        #                 ) for x in self.angles]
     # end def
 
     def setVirtualHelixItem(self, virtual_helix_item):
@@ -44,6 +48,7 @@ class AbstractSliceTool(QGraphicsObject):
         li = self._line_item
         li.setParentItem(virtual_helix_item)
         li.setLine(rad, rad, rad, rad)
+        # li.setLine(0., 0., 0., 0.)
     # end def
 
     def setPartItem(self, part_item):
