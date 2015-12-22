@@ -196,7 +196,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             vhi.setWedgeGizmo(nvh, nvhi)
         # end for
         vhi.endAddWedgeGizmos()
-        all_done_set.add(vh)
     # end def
 
     def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):
