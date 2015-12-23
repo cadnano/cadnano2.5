@@ -29,7 +29,7 @@ _RADIUS = styles.SLICE_HELIX_RADIUS
 _WEDGE_RECT_GAIN = 0.25
 WEDGE_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 WEDGE_RECT = WEDGE_RECT.adjusted(0, 0, _WEDGE_RECT_GAIN, _WEDGE_RECT_GAIN)
-_PXIF_RECT_CENTERPT = WEDGE_RECT.center()
+_WEDGE_RECT_CENTERPT = WEDGE_RECT.center()
 
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
@@ -407,22 +407,27 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setZValue(styles.ZWEDGEGIZMO)
         self._last_params = None
 
-    def showWedge(self, pos, angle, color,
+    def showWedge(self, angle, color,
                     extended=False, rev_gradient=False, outline_only=False):
-        self._last_params = (pos, angle, color, extended, rev_gradient, outline_only)
+        self._last_params = (angle, color, extended, rev_gradient, outline_only)
         radius = self._radius
         span = self._parent.partCrossoverSpanAngle() / 2
-        row = radius + (_WEDGE_RECT_GAIN / 2)
-        column = self._rect.center()
+        radius_adjusted = radius + (_WEDGE_RECT_GAIN / 2)
+
+        tip = QPointF(radius_adjusted, radius_adjusted)
         EXT = 1.35 if extended else 1.0
-        line0 = QLineF(column, pos)
-        line1 = QLineF(column, pos)
-        line2 = QLineF(column, pos)
+
+        # print("wtf", tip, pos)
+        base_p2 = QPointF(1, 1)
+
+        line0 = QLineF(tip, QPointF(base_p2))
+        line1 = QLineF(tip, QPointF(base_p2))
+        line2 = QLineF(tip, QPointF(base_p2))
 
         quad_scale = 1 + (.22*(span - 5) / 55) # lo+(hi-lo)*(val-min)/(max-min)
-        line0.setLength(row * EXT*quad_scale) # for quadTo control point
-        line1.setLength(row * EXT)
-        line2.setLength(row * EXT)
+        line0.setLength(radius_adjusted * EXT*quad_scale) # for quadTo control point
+        line1.setLength(radius_adjusted * EXT)
+        line2.setLength(radius_adjusted * EXT)
         line0.setAngle(angle)
         line1.setAngle(angle - span)
         line2.setAngle(angle + span)
@@ -436,7 +441,7 @@ class WedgeGizmo(QGraphicsPathItem):
             self.setPath(path)
             self.show()
         else:
-            gradient = QRadialGradient(column, row * EXT)
+            gradient = QRadialGradient(tip, radius_adjusted * EXT)
             color1 = getColorObj(color, alpha=80)
             color2 = getColorObj(color, alpha=0)
             if rev_gradient:
@@ -444,8 +449,8 @@ class WedgeGizmo(QGraphicsPathItem):
 
             if extended:
                 gradient.setColorAt(0, color1)
-                gradient.setColorAt(row/ (row * EXT), color1)
-                gradient.setColorAt(row/ (row * EXT) + 0.01, color2)
+                gradient.setColorAt(radius_adjusted / (radius_adjusted * EXT), color1)
+                gradient.setColorAt(radius_adjusted / (radius_adjusted * EXT) + 0.01, color2)
                 gradient.setColorAt(1, color2)
             else:
                 gradient.setColorAt(0, getColorObj(color, alpha=50))
@@ -469,12 +474,12 @@ class WedgeGizmo(QGraphicsPathItem):
         pos = pxi.pos()
         angle = -pxi.rotation()
         color = pxi.color()
-        # self.showWedge(pos, angle, color, span=5.0)
+        # self.showWedge(angle, color, span=5.0)
         if pxi.is_fwd:
-            self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
-            # self.showWedge(pos, angle, color, extended=True)
+            self.showWedge(angle, color, extended=True, rev_gradient=True)
+            # self.showWedge(angle, color, extended=True)
         else:
-            self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
-            # self.showWedge(pos, angle, color, extended=True, rev_gradient=True)
+            self.showWedge(angle, color, extended=True, rev_gradient=True)
+            # self.showWedge(angle, color, extended=True, rev_gradient=True)
     # end def
 # end class

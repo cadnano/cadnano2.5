@@ -100,7 +100,12 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def setCenterPos(self, x, y):
         # invert the y axis
-        self.setPos(x - _RADIUS, y - _RADIUS)
+        part_item = self._part_item
+        parent_item = self.parentItem()
+        pos = QPointF(x - _RADIUS, y- _RADIUS)
+        if parent_item != part_item:
+            pos = parent_item.mapFromItem(part_item, pos)
+        self.setPos(pos)
     # end def
 
     def getCenterPos(self):
@@ -110,7 +115,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         pos = self.scenePos()
         pos = self._part_item.mapFromScene(pos)
         # return pos
-        return pos.x() + _RADIUS, pos.y() + _RADIUS
+        return QPointF(pos.x() + _RADIUS, pos.y() + _RADIUS)
     # end def
 
     def getCenterScenePos(self):
@@ -217,18 +222,24 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def updatePosition(self):
         """
+        coordinates in the model are always in the part
+        coordinate frame
         """
-        # print("tslot {}".format(virtual_helix))
         vh = self._virtual_helix
-        pi = self._part_item
-        sf = pi.scaleFactor()
-        x, y = vh.locationQt(pi.scaleFactor())
-        xc, yc = self.getCenterPos()
-        if abs(xc - x) > 0.001 or abs(yc - y) > 0.001:
-            # set position to offset for radius
-            # print("moving tslot", yc, y, (yc-y)/sf)
-            self.setCenterPos(x, y)
-            # self.setPos(x, y)
+        part_item = self._part_item
+        sf = part_item.scaleFactor()
+        x, y = vh.locationQt(part_item.scaleFactor())
+        new_pos = QPointF(x - _RADIUS, y - _RADIUS)
+        ctr_pos = part_item.mapFromScene(self.scenePos())
+        """
+        better to compare QPointF's since it handles difference
+        tolerances for you with !=
+        """
+        if new_pos != ctr_pos:
+            parent_item = self.parentItem()
+            if parent_item != part_item:
+                new_pos = parent_item.mapFromItem(part_item, new_pos)
+            self.setPos(new_pos)
     # end def
 
     def createLabel(self):
@@ -276,7 +287,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         else:
             wedge_item = WedgeGizmo(_RADIUS, WEDGE_RECT, self)
             wg_dict[neighbor_virtual_helix] = wedge_item
-        wedge_item.showWedge(line.p1(), line.angle(), color, outline_only=False)
+        wedge_item.showWedge(line.angle(), color, outline_only=False)
         self._added_wedge_gizmos.add(neighbor_virtual_helix)
     # end def
 

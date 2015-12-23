@@ -22,4 +22,13 @@ class TranslateVirtualHelicesCommand(UndoCommand):
         vh_set = self._vhelix_set
         part._translateVirtualHelices(vh_set, -dx, -dy, True)
     # end def
+
+    def specialUndo(self):
+        """ does not deselect
+        """
+        dx, dy = self.delta
+        part = self._part
+        vh_set = self._vhelix_set
+        part._translateVirtualHelices(vh_set, -dx, -dy, False)
+    # end def
 # end class

@@ -138,10 +138,13 @@ def finalizeCommands(model_object, commands, desc=None):
 
     this assumes that the UndoCommands provided this function are respresent
     a transition from the initial state to the final state
+    UndoCommands need to implement specialUndo which could just call normal
+    undo
     """
     # 1. undo the command to get back to the initial _state
     for c in commands:
-        c.undo()
+        c.specialUndo()
+        # c.undo()
     # 2. push all the "undoable" commands to the undostac
     model_object.undoStack().beginMacro(desc)
     for c in commands:

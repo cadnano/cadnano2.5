@@ -176,13 +176,16 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 if tool.isSelectionActive():
                     tool.deselectItems()
 
+        # 1. move everything that moved
         for vh in vh_set:
             vhi = self._virtual_helix_item_hash[vh]
             vhi.updatePosition()
+        # 2. now redraw what makes sense to be redrawn
+        for vh in vh_set:
+            vhi = self._virtual_helix_item_hash[vh]
             self.refreshVirtualHelixItemGizmos(vh, vhi)
         for vh in left_overs:
             vhi = self._virtual_helix_item_hash[vh]
-            vhi.updatePosition()
             self.refreshVirtualHelixItemGizmos(vh, vhi)
     # end def
 
@@ -437,6 +440,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def selectToolMousePress(self, tool, event):
         """
         """
+        print("select tool part item")
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)

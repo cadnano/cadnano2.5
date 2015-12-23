@@ -99,9 +99,16 @@ class SelectSliceTool(AbstractSliceTool):
         part_item = self.part_item
         group = self.group
         self.deselectItems()
+
+        for vh in self.selection_set:
+            vhi = part_item.getVirtualHelixItem(vh)
+            group.resetGroupPos(vhi)
+            break
+
         for vh in self.selection_set:
             vhi = part_item.getVirtualHelixItem(vh)
             group.addToGroup(vhi)
+
         self.is_selection_active = True
         if len(group.childItems()) > 0:
             group.setSelectionRect()
@@ -132,6 +139,7 @@ class SelectSliceTool(AbstractSliceTool):
 
     def addToSelection(self, vhi):
         group = self.group
+        group.resetGroupPos(vhi)
         group.addToGroup(vhi)
         self.selection_set.add(vhi.virtualHelix())
         if len(group.childItems()) > 0:
@@ -154,7 +162,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def doSnap(self, part_item, virtual_helix_item):
-        print("snapping")
+        # print("snapping")
         origin = self.snap_origin_item.getCenterScenePos()
         self.setVirtualHelixItem(virtual_helix_item)
         destination = self.findNearestPoint(part_item, origin)
@@ -214,24 +222,41 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.drag_last_position = QPointF()
     # end def
 
+    def resetGroupPos(self, child):
+        """ call this to prevent the group from drifting position over time
+        """
+        if len(self.childItems()) == 0:
+            parent_item = self.parentItem()
+            self.setPos(parent_item.mapFromItem(child, child.pos()))
+    # end def
+
     def setSelectionRect(self):
         bri = self.bounding_rect_item
         rect = self.childrenBoundingRect()
         self.addToGroup(bri)
-        bri.setRect(bri.mapRectFromParent(rect))
+        # bri.setPos(bri.mapFromItem(self, self.pos()))
+        # bri.setRect(bri.mapRectFromParent(rect))
+        bri.setPos(QPointF(0., 0.))
+        bri.setRect(rect)
         bri.show()
         self.setFocus(True)
+    # end def
+
+    """ reimplement boundingRect if you want to call resetGroupPos
+    """
+    def boundingRect(self):
+        return self.childrenBoundingRect()
     # end def
 
     def clearSelectionRect(self):
         """ reset positions to zero to keep things in check
         """
         bri = self.bounding_rect_item
-        bri.setPos(QPointF(0,0))
+        # bri.setPos(QPointF(0,0))
         bri.hide()
         self.removeFromGroup(bri)
         self.setFocus(False)
-        self.setPos(QPointF(0,0))
+        # self.setPos(QPointF(0,0))
     # end def
 
     def keyPressEvent(self, event):
@@ -250,6 +275,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         else:
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
+                print("clicking the box")
                 # strategy #1
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):
@@ -268,6 +294,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 #         break
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
+            # self.drag_start_scene_position = event.scenePos()
+            # self.drag_last_position = self.pos()
             return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 
@@ -277,6 +305,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         we need only get the position of the item to figure
         out what to submit to the model
         """
+        # 1. call this super class method first to get the item position updated
+        res = QGraphicsItemGroup.mouseMoveEvent(self, event)
         # watch out for bugs here?  everything seems OK for now, but
         # could be weird window switching edge cases
         if not self.tool.individual_pick and event.buttons() == Qt.LeftButton:
@@ -284,8 +314,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             delta = new_pos - self.drag_last_position
             self.drag_last_position = new_pos
             dx, dy = delta.x(), delta.y()
-            self.tool.moveSelection(dx, dy, False)
-        return QGraphicsItemGroup.mouseMoveEvent(self, event)
+            self.tool.moveSelection(dx, dy, False, use_undostack=False)
+        return res
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -298,12 +328,13 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         if not self.tool.individual_pick and event.button() == Qt.LeftButton:
             delta = self.pos() - self.drag_start_position
             dx, dy = delta.x(), delta.y()
+            # self.tool.moveSelection(dx, dy, True)
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
                 self.tool.moveSelection(dx, dy, True)
-            elif dx != 0.0 and dy != 0.0:
-                print("small move", dx, dy)
-                # restore starting position
-                self.setPos(self.drag_start_position)
+            # elif dx != 0.0 and dy != 0.0:
+            #     print("small move", dx, dy)
+            #     # restore starting position
+            #     self.setPos(self.drag_start_position)
         self.tool.individual_pick = False
         return QGraphicsItemGroup.mouseReleaseEvent(self, event)
     # end def
