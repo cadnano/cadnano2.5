@@ -18,6 +18,7 @@ def normalizeRect(rect):
 
 _SELECT_PEN_WIDTH = 2
 _SELECT_COLOR = "#ff0000"
+_TEST_COLOR = "#00ff00"
 
 class SelectSliceTool(AbstractSliceTool):
     """"""
@@ -102,11 +103,6 @@ class SelectSliceTool(AbstractSliceTool):
 
         for vh in self.selection_set:
             vhi = part_item.getVirtualHelixItem(vh)
-            group.resetGroupPos(vhi)
-            break
-
-        for vh in self.selection_set:
-            vhi = part_item.getVirtualHelixItem(vh)
             group.addToGroup(vhi)
 
         self.is_selection_active = True
@@ -139,7 +135,6 @@ class SelectSliceTool(AbstractSliceTool):
 
     def addToSelection(self, vhi):
         group = self.group
-        group.resetGroupPos(vhi)
         group.addToGroup(vhi)
         self.selection_set.add(vhi.virtualHelix())
         if len(group.childItems()) > 0:
@@ -226,37 +221,38 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         """ call this to prevent the group from drifting position over time
         """
         if len(self.childItems()) == 0:
-            parent_item = self.parentItem()
-            self.setPos(parent_item.mapFromItem(child, child.pos()))
+            self.setPos(self.mapFromScene(child.scenePos()))
     # end def
 
     def setSelectionRect(self):
         bri = self.bounding_rect_item
         rect = self.childrenBoundingRect()
+        point = rect.topLeft() + self.scenePos()
+        bri.setPos(bri.mapFromScene(point))
+        bri.setRect(bri.mapRectFromItem(self, rect))
         self.addToGroup(bri)
-        # bri.setPos(bri.mapFromItem(self, self.pos()))
-        # bri.setRect(bri.mapRectFromParent(rect))
-        bri.setPos(QPointF(0., 0.))
-        bri.setRect(rect)
         bri.show()
         self.setFocus(True)
     # end def
 
     """ reimplement boundingRect if you want to call resetGroupPos
     """
-    def boundingRect(self):
-        return self.childrenBoundingRect()
-    # end def
+    # def boundingRect(self):
+    #     return self.childrenBoundingRect()
+    # # end def
+
+    # def paint(self, painter, option, widget=None):
+    #     painter.setPen(getPenObj(_TEST_COLOR,
+    #                                         _SELECT_PEN_WIDTH))
+    #     painter.drawRect(self.boundingRect())
 
     def clearSelectionRect(self):
         """ reset positions to zero to keep things in check
         """
         bri = self.bounding_rect_item
-        # bri.setPos(QPointF(0,0))
         bri.hide()
         self.removeFromGroup(bri)
         self.setFocus(False)
-        # self.setPos(QPointF(0,0))
     # end def
 
     def keyPressEvent(self, event):
