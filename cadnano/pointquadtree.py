@@ -37,6 +37,84 @@ class QuadtreeBase(object):
         self.depth = depth
     # end def
 
+    def resize(self):
+        quadtree = QuadtreeBase()
+        new_children = []
+        full_size = self.size
+        new_size = full_size*2
+        min_size = self.min_size
+        x_center, y_center = self.center
+        new_children = [
+                QuadtreeBase(x_center - full_size,
+                                          y_center - full_size,
+                                          new_size,
+                                          min_size,
+                                          self,
+                                          1),
+                QuadtreeBase(x_center - full_size,
+                                          y_center + full_size,
+                                          new_size,
+                                          min_size,
+                                          self,
+                                          1),
+                QuadtreeBase(x_center + full_size,
+                                          y_center - full_size,
+                                          new_size,
+                                          min_size,
+                                          self,
+                                          1),
+                QuadtreeBase(x_center + full_size,
+                                          y_center + full_size,
+                                          new_size,
+                                          min_size,
+                                          self,
+                                          1)]
+        if len(self.children) > 0:
+            for qt in new_children:
+                next_depth = 2
+                next_size = self.size
+                quarter_size = next_size / 2
+                min_size = self.min_size
+                x_center, y_center = qt.center
+                qt.children = [QuadtreeBase(x_center - quarter_size,
+                                          y_center - quarter_size,
+                                          next_size,
+                                          min_size,
+                                          self,
+                                          next_depth),
+                                 QuadtreeBase(x_center - quarter_size,
+                                          y_center + quarter_size,
+                                          next_size,
+                                          min_size,
+                                          self,
+                                          next_depth),
+                                 QuadtreeBase(x_center + quarter_size,
+                                          y_center - quarter_size,
+                                          next_size,
+                                          min_size,
+                                          self,
+                                          next_depth),
+                                 QuadtreeBase(x_center + quarter_size,
+                                          y_center + quarter_size,
+                                          next_size,
+                                          min_size,
+                                          self,
+                                          next_depth)]
+            # end for
+            """
+            0 --> 3
+            1 --> 2
+            2 --> 1
+            3 --> 0
+            """
+            for i, node in enumerate(self.children):
+                qt = new_children[i]
+                node.depth = 2
+                node.parent = qt
+                qt.children[3 - i] = node
+            # end for
+    # end def
+
     def insertNode(self, node):
         """
         """
