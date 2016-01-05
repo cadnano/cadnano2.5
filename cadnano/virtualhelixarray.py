@@ -34,33 +34,33 @@ def generatePhosphateCoordinates(x, y, num_bases, is_5_to_3):
 
 class VirtualHelixArray(object):
     def __init__(self):
-        self.virtual_helix_coords = np.zeros((0, 2), dtype=float))
+        self.coords = np.zeros((0, 2), dtype=float))
         self._query_cache = {}
         self.removed_set = set()
     # end def
 
     def addCoordinate(self, x, y, idx):
-        vhc = self.virtual_helix_coords
-        len_vhc = len(vhc)
+        coords = self.coords
+        len_coords = len(coords)
         self._query_cache = {} # clear cache
 
-        if len_vhc > idx:    # insert
+        if len_coords > idx:    # insert
             self.removed_set.remove(idx)
-            vhc[idx] = x, y
-        elif len_vhc == idx:
+            coords[idx] = x, y
+        elif len_coords == idx:
             new_rows = np.array((x, y), dtype=float))
-            self.virtual_helix_coords = np.append(vhc, new_rows)
+            self.coords = np.append(coords, new_rows)
         else:
-            new_rows = np.zeros((idx - len_vhc + 1, 2), dtype=float)
-            vhc =  np.append(vhc, new_rows)
-            vhc[idx, :] = x, y
-            self.virtual_helix_coords = vhc
+            new_rows = np.zeros((idx - len_coords + 1, 2), dtype=float)
+            coords =  np.append(coords, new_rows)
+            coords[idx, :] = x, y
+            self.coords = coords
     # end def
 
     def removeCoordinate(self, idx):
-        vhc = self.virtual_helix_coords
-        len_vhc = len(vhc)
-        if idx < len_vhc:
+        coords = self.coords
+        len_coords = len(coords)
+        if idx < len_coords:
             self._query_cache = {} # clear cache
             self.removed_set.add(idx)
     # end def
@@ -68,7 +68,7 @@ class VirtualHelixArray(object):
     def truncateCoordinates(self, idx):
         """ idx: the index of the first coordinate to truncate at
         """
-        self.virtual_helix_coords = self.virtual_helix_coords[:idx, :]
+        self.coords = self.coords[:idx, :]
         removed_set = self.removed_set
         removed_list = list(removed_set)
         for item in removed_list:
@@ -92,7 +92,7 @@ class VirtualHelixArray(object):
         """ return the indices of all virtual helices closer
         than radius
         """
-        difference = self.virtual_helix_coords - (x, y)
+        difference = self.coords - (x, y)
         # compute square of distance to point
         delta = inner1d(difference, difference)
         close_points = np.where(delta < radius*radius)
