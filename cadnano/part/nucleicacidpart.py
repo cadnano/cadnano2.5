@@ -1120,10 +1120,10 @@ class NucleicAcidPart(Part):
         if vh is None:
             return neighbors
         if threshold is None:
-            threshold = 2.25*self._RADIUS
+            threshold = 2.1*self._RADIUS
 
         qt = self._quadtree
-        neighbor_candidates = qt.queryPoint(vh.location(), 2.1*self._RADIUS)
+        neighbor_candidates = qt.queryPoint(vh.location(), threshold)
         if vh in neighbor_candidates:
             neighbor_candidates.remove(vh)
         return neighbor_candidates

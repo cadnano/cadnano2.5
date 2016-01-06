@@ -24,46 +24,69 @@ class VirtualHelixGroup(object):
         self._cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
     # end def
 
+    def getOffsetAndSize(self, label):
+        offset_and_size = self.offset_and_size
+        offset_and_size[label] if label < len(offset_and_size) else return None
+    # end def
+
     def getCoordinates(self, label):
         """ return a view onto the numpy array for a
         given label
         """
-        offset_and_size = self.offset_and_size
-        coords = self.coords
-        if label < len(offset_and_size):
-            match_label_idxs = offset_and_size[label]
-        else:
-            match_label_idxs = None
+        match_label_idxs = self.getOffsetAndSize(label)
         if match_label_idxs is None:
             raise KeyError("label {} not in VirtualHelixGroup".format(label))
         else:
             offset, size = match_label_idxs
             lo, hi = offset, offset + size
-            return coords[lo:hi]
+            return self.coords[lo:hi]
     # end def
 
     def getCoordinate(self, label, idx):
         """
+        given a label get the coordinate at a given index
         """
-        pass
+        match_label_idxs = self.getOffsetAndSize(label)
+        if match_label_idxs is None:
+            raise KeyError("label {} not in VirtualHelixGroup".format(label))
+        else:
+            offset, size = match_label_idxs
+            if idx < size:
+                return self.coords[offset + idx]
+            else:
+                raise IndexError("idx {} greater than size {}".format(idx, size))
+    # end def
+
+    def translateCoordinates(self, labels, delta):
+        """ delta is a sequence of floats of length 3
+        """
+        for label in labels:
+            coords = self.getCoordinates(label)
+            coords += delta # use += to modify the view
     # end def
 
     def getIndices(self, label):
         """ return a view onto the numpy array for a
         given label
         """
-        offset_and_size = self.offset_and_size
-        indices = self.indices
-        if label < len(offset_and_size):
-            match_label_idxs = offset_and_size[label]
-        else:
-            match_label_idxs = None
+        match_label_idxs = self.getOffsetAndSize(label)
         if match_label_idxs is None:
             raise KeyError("label {} not in VirtualHelixGroup".format(label))
         else:
             offset, size = match_label_idxs
             lo, hi = offset, offset + size
-            return indices[lo:hi]
+            return self.indices[lo:hi]
+    # end def
+
+    def getNeighbors(self, label, radius, idx=0):
+        """ might use radius = 2.1*RADIUS
+        """
+        match_label_idxs = self.getOffsetAndSize(label)
+        coord = self.getCoordinate(label, idx)
+        neighbors, indices = self.queryPoint(threshold, *coord)
+        neighbor_candidates = set(neighbors)
+        neighbor_candidates.discard(label)
+        return neighbor_candidates
     # end def
 
     def addCoordinates(self, label, points, is_append):
@@ -136,9 +159,10 @@ class VirtualHelixGroup(object):
     # end def
 
     def removeCoordinates(self, label, length, is_start):
-        """ remove coordinates given a slice, reindex as necessary
+        """ remove coordinates given a length, reindex as necessary
         is_start means whether the removal occurs at the start or the
-        end of a virtual helix
+        end of a virtual helix since virtual helix arrays are always
+        contiguous
         """
         labels = self.labels
         offset_and_size = self.offset_and_size[label]
@@ -183,13 +207,13 @@ class VirtualHelixGroup(object):
         self.indices = np.delete(indices, the_slice, axis=0)
     # end def
 
-    def queryPoint(self, x, y, z, radius):
+    def queryPoint(self, radius, x, y, z):
         qc = self._query_cache
-        query = (x, y, z, radius)
+        query = (radius, x, y, z)
         if query in self._query_cache:
             return qc.get(query)
         else:
-            res = self._queryPoint(x, y, z, radius)
+            res = self._queryPoint(radius, x, y, z)
             self._cache_keys.append(query)
             qc[query] =  res
             # limit the size of the cache
@@ -198,7 +222,7 @@ class VirtualHelixGroup(object):
             return res
     # end def
 
-    def _queryPoint(self, x, y, z, radius):
+    def _queryPoint(self, radius, x, y, z):
         """ return the indices of all virtual helices closer
         than radius
         """
@@ -206,8 +230,10 @@ class VirtualHelixGroup(object):
         # compute square of distance to point
         delta = inner1d(difference, difference)
         close_points = np.where(delta < radius*radius)
-        return list(zip(    np.take(self.labels, close_points),
-                            np.take(self.indices, close_points) ))
+        # return list(zip(    np.take(self.labels, close_points),
+        #                     np.take(self.indices, close_points) ))
+        return (np.take(self.labels, close_points),
+                            np.take(self.indices, close_points) )
     # end def
 
 # end class
