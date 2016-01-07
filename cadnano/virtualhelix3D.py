@@ -2,6 +2,12 @@ import numpy as np
 import math
 import pandas as pd
 from collections import deque
+"""
+inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
+equivalent to np.sum(a*a, axis=1)
+but faster
+"""
+from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
 
@@ -17,6 +23,7 @@ def defaultProperties(label):
     ('bases_per_repeat', 21)
     ('turns_per_repeat', 2)
     ('repeats', 2)
+    ('helical_pitch', 1.)
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
     ('twist_per_base', 360 / 10.5) # 360/_bases_per_turn
     ]
@@ -197,7 +204,7 @@ class VirtualHelixGroup(object):
             number_of_new_elements = label - len(offset_and_size) + 1
             offset_and_size += [None]*number_of_new_elements
 
-            hi_idx_limit = len_coords
+            lo_idx_limit = len_coords
             new_lims = (len_coords, len_coords + num_points)
             offset_and_size[label] = (len_coords, num_points)
             # B2. assign origin on creation, resizing as needed
@@ -258,19 +265,16 @@ class VirtualHelixGroup(object):
         move_idx_end = move_idx_start + total_points - insert_idx
 
         coords[move_idx_start:move_idx_end] = coords[insert_idx:total_points]
+        coords[insert_idx:move_idx_start] = points
+
         directions[move_idx_start:move_idx_end] = directions[insert_idx:total_points]
         fwd_phosphates[move_idx_start:move_idx_end] = fwd_phosphates[insert_idx:total_points]
         rev_phosphates[move_idx_start:move_idx_end] = rev_phosphates[insert_idx:total_points]
-        labels[move_idx_start:move_idx_end] = labels[insert_idx:total_points]
-        if is_append:
-            indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points]
-            indices[insert_idx:move_idx_start] = list(range(*new_lims))
-        else:
-            indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points] + num_points
-            indices[insert_idx:move_idx_start] = list(range(num_points))
 
-        coords[insert_idx:move_idx_start] = points
-        labels[insert_idx:move_idx_start] = num_points*[label]
+        # just overwrite everything for indices and labels no need to move
+        labels[insert_idx:move_idx_start] = label
+        indices[lo_idx_limit:move_idx_start] = list(range(num_points + size))
+
 
         self.total_points += num_points
     # end def
@@ -294,6 +298,94 @@ class VirtualHelixGroup(object):
             lo = offset + idx_start
             hi = lo + len(points)
             self.coords[lo:hi] = points
+    # end def
+
+    def getDirections(self, label):
+        pass
+    # end def
+
+    def normalize(self, v):
+        norm = np.linalg.norm(v)
+        if norm == 0:
+           return v
+        return v / norm
+    # end def
+
+    def lengthSq(self, v):
+        return inner1d(v, v)
+
+    def cross(self, a, b):
+        ax, ay, az = a
+        bx, by, bz = b
+        c = [ay*bz - az*by,
+             az*bx - ax*bz,
+             ax*by - ay*bx]
+        return c
+    # end def
+
+    # def makeRotation(self, v1, v2):
+    #     if v1 == v2:
+    #         return
+    #     m = np.zeros((3,3), dtype=float)
+    #     m[:, 0] = normalize(v1)
+    #     m[:, 1] = self.normalize(self.cross(v1, v2))
+    #     m[:, 2] = self.normalize(self.cross(m[:, 2], v1))
+    #     return m
+    # # end def
+
+    def makeRotation(self, v1, v2):
+        """ create a rotation matrix for an object pointing
+        in the v1 direction to the v2 direction
+
+        see http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/180436#180436
+        """
+        if v1 == v2:
+            return np.eye(3,3)
+
+        v1 = self.normalize(v1)
+        v2 = self.normalize(v2)
+
+        v = np.cross(v1, v2)
+        sin_squared = inner1d(v, v)
+        cos_ = inner1d(v1, v2) # fast dot product
+
+        m = np.zeros((3,3), dtype=float)
+        m[1, 0] =  v[2]
+        m[0, 1] =  -v[2]
+        m[2, 0] =  -v[1]
+        m[0, 2] =  v[1]
+        m[2, 1] =  v[0]
+        m[1, 2] =  -v[0]
+
+        return np.eye(3, 3) + m + np.dot(m, m)*((1 - cos_)/sin_squared)
+    # end def
+
+    def pointsFromDirection(self, label, origin, direction, num_points):
+        """
+        origin: (1,3) ndarray or length 3 sequence
+        direction: (1,3) ndarray or length 3 sequence
+        """
+        rad = self.radius
+        hp, twist_per_base, eulerZ = self.properties.loc[label,
+                                                            ['helical_pitch',
+                                                            'twist_per_base',
+                                                            'eulerZ']]
+        twist_per_base *= math.pi/180.
+        fwd_angles = [i*twist_per_base + eulerZ for i in range(num_points)]
+        rev_angles = [a + math.pi for a in fwd_angles]
+        z_pts = np.arange(num_points)
+        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
+                                        np.sin(fwd_angles),
+                                        np.zeros(num_points)))
+        fwd_pts[:,2] = z_pts
+        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
+                                        np.sin(rev_angles),
+                                        np.zeros(num_points)))
+        rev_pts[:,2] = z_pts
+        # rotate about 0 index and then translate
+        m = self.makeRotation((1, 0, 0), direction)
+        fwd_pts = np.dot(m, fwd_pts.T).T + origin
+        rev_pts = np.dot(m, rev_pts.T).T + origin
     # end def
 
     def setZCoordinates(self, label, z_points, idx_start=0):
