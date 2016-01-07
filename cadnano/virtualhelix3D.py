@@ -1,4 +1,5 @@
 import numpy as np
+import math
 import pandas as pd
 from collections import deque
 
@@ -28,6 +29,8 @@ def defaultDataFrame(size):
     df = pd.DataFrame([row for i in range(size)], columns=columns)
     return df
 # end def
+DEFAULT_SIZE = 256
+DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
 
 class VirtualHelixGroup(object):
     def __init__(self):
@@ -37,19 +40,32 @@ class VirtualHelixGroup(object):
             in their index order per label
         2. contains the label per coordinate
         """
-        self.coords = np.zeros((0, 3), dtype=float))
-        self.labels = np.zeros((0, 1), dtype=int)
-        self.indices = np.zeros((0, 1), dtype=int)
 
-        # for doing 2D X,Y manipulation for now.  keep track of
-        # XY position of virtual helices
-        self.origins = np.zeros((0, 2), dtype=float)
+        # 1. per virtual base pair allocations
+        self.total_points = 0
+        self.coords = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
+        self.directions = np.zeros((DEFAULT_FULL_SIZE, 3), dtype=float))
+        self.fwd_phosphates = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
+        self.rev_phosphates = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
+        self.labels = np.zeros((DEFAULT_FULL_SIZE, 1), dtype=int)
+        self.indices = np.zeros((DEFAULT_FULL_SIZE, 1), dtype=int)
 
-        # book keeping for fast lookup of indices for insertions and deletions
-        # and coordinate points
+        # 2. per virtual helix allocations
+        self.total_labels = 0
+        """
+        for doing 2D X,Y manipulation for now.  keep track of
+        XY position of virtual helices
+        """
+        self.origins = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
+
+        """
+        book keeping for fast lookup of indices for insertions and deletions
+        and coordinate points
+        the length of this is the max label used
+        """
         self.offset_and_size = []
 
-        self.properties = defaultDataFrame(200)
+        self.properties = defaultDataFrame(DEFAULT_SIZE)
 
         self.fwd_strandsets = []
         self.rev_strandsets = []
@@ -192,11 +208,54 @@ class VirtualHelixGroup(object):
                 self.properties = self.properties.append(defaultDataFrame(100),
                                                         ignore_index=True)
             self.properties.loc[label, 'name'] = "vh%d" % (label)
+            self.total_labels += 1
 
-        self.coords = np.insert(coords, insert_idx, points, axis=0)
-        # insertions are always extending an existing label
-        self.labels = np.insert(labels, hi_idx_limit, num_points*[label], axis=0)
-        self.indices = np.insert(indices, hi_idx_limit, list(range(*new_lims)), axis=0)
+        # Did exceed allocation???
+        if self.total_points + num_points > len_coords:
+            diff = self.total_points + num_points - len_coords
+            number_of_new_elements = math.ceil(diff / DEFAULT_FULL_SIZE)*DEFAULT_SIZE
+            # resize per virtual base allocations
+            coords = np.append(coords,
+                                np.full((number_of_new_elements, 3),
+                                        np.inf, dtype=float),
+                                axis=0)
+            directions = np.append(directions,
+                                np.zeros(number_of_new_elements, 3),
+                                            dtype=float),
+                                axis=0)
+            fwd_phosphates = np.append(rev_phosphates,
+                                np.full((number_of_new_elements, 3),
+                                        np.inf, dtype=float),
+                                axis=0)
+            rev_phosphates = np.append(rev_phosphates,
+                                np.full((number_of_new_elements, 3),
+                                        np.inf, dtype=float),
+                                axis=0)
+            labels = np.append(labels,
+                                np.zeros((number_of_new_elements, 3),
+                                            dtype=float),
+                                axis=0)
+            indices = np.append(indices,
+                                np.zeros((number_of_new_elements, 3),
+                                        dtype=float),
+                                axis=0)
+
+        # end if exceeded allocation
+        move_idx_start = insert_idx + num_points
+        move_idx_end = move_idx_start + total_points - insert_idx
+        coords[move_idx_start:move_idx_end] = coords[insert_idx:total_points]
+        directions[move_idx_start:move_idx_end] = directions[insert_idx:total_points]
+        fwd_phosphates[move_idx_start:move_idx_end] = fwd_phosphates[insert_idx:total_points]
+        rev_phosphates[move_idx_start:move_idx_end] = rev_phosphates[insert_idx:total_points]
+        labels[move_idx_start:move_idx_end] = labels[insert_idx:total_points]
+        indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points]
+
+
+        # self.coords = np.insert(coords, insert_idx, points, axis=0)
+        # # insertions are always extending an existing label
+        # self.labels = np.insert(labels, hi_idx_limit, num_points*[label], axis=0)
+        # self.indices = np.insert(indices, hi_idx_limit, list(range(*new_lims)), axis=0)
+        self.total_points += num_points
     # end def
 
     def setCoordinates(self, label, points, idx_start=0):
@@ -278,7 +337,6 @@ class VirtualHelixGroup(object):
                     else:
                         break
                 self.offset_and_size = offset_and_size[:old_length - remove_count]
-                self.origins = self.origins[:old_length - remove_count]
             if is_start:
                 idx_start, idx_stop = lo, lo + length
             else:
