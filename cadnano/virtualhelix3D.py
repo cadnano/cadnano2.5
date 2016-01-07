@@ -47,7 +47,7 @@ class VirtualHelixGroup(object):
         self.directions = np.zeros((DEFAULT_FULL_SIZE, 3), dtype=float))
         self.fwd_phosphates = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
         self.rev_phosphates = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
-        self.labels = np.zeros((DEFAULT_FULL_SIZE, 1), dtype=int)
+        self.labels = np.full((DEFAULT_FULL_SIZE, 1), -1, dtype=int)
         self.indices = np.zeros((DEFAULT_FULL_SIZE, 1), dtype=int)
 
         # 2. per virtual helix allocations
@@ -170,17 +170,16 @@ class VirtualHelixGroup(object):
         points are stored in order and by index
         """
         offset_and_size = self.offset_and_size
-        coords = self.coords
-        len_coords = len(coords)
-        labels = self.labels
-        indices = self.indices
+        len_coords = len(self.coords)
         num_points = len(points)
 
         self._point_cache = {} # clear cache
 
         match_label_idxs = self.getOffsetAndSize(label)
 
+        # 1. Find insert indices
         if match_label_idxs is not None:
+            # A. existing label
             offset, size = match_label_idxs
             lo_idx_limit, hi_idx_limit = offset, offset + size
             if is_append:
@@ -190,71 +189,89 @@ class VirtualHelixGroup(object):
             new_lims = (hi_idx_limit, hi_idx_limit + num_points)
             old_offset, old_size = offset_and_size[label]
             offset_and_size[label] = (old_offset, old_size + num_points)
-        else: # new label / virtual helix insert after all other points
+        else:
+            # B1. New label / virtual helix insert after all other points
             # expand offset and size as required
-            number_of_new_elements = (label - len(offset_and_size) + 1)
-            offset_and_size += [None]*number_of_new_elements
             self._origin_cache = {} # clear cache
+
+            number_of_new_elements = label - len(offset_and_size) + 1
+            offset_and_size += [None]*number_of_new_elements
+
             hi_idx_limit = len_coords
             new_lims = (len_coords, len_coords + num_points)
             offset_and_size[label] = (len_coords, num_points)
-            # assign origin on creation, resizing as needed
-            self.origins = np.append(   self.origins,
-                                        np.full((number_of_new_elements, 2),
+            # B2. assign origin on creation, resizing as needed
+            if label >= len(self.origins):
+                diff = label - len(self.origins)
+                number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
+                self.origins = np.append(   self.origins,
+                                            np.full((number_of_new_elements, 2),
                                                 np.inf, dtype=float),
-                                        axis=0)
+                                            axis=0)
+                self.properties = self.properties.append(
+                                            defaultDataFrame(number_of_new_elements),
+                                            ignore_index=True)
             self.origins[label] = points[0][:2] # x, y only
-            if not label < len(self.properties):
-                self.properties = self.properties.append(defaultDataFrame(100),
-                                                        ignore_index=True)
             self.properties.loc[label, 'name'] = "vh%d" % (label)
             self.total_labels += 1
 
-        # Did exceed allocation???
+        # 2. Did exceed allocation???
         if self.total_points + num_points > len_coords:
             diff = self.total_points + num_points - len_coords
-            number_of_new_elements = math.ceil(diff / DEFAULT_FULL_SIZE)*DEFAULT_SIZE
+            number_of_new_elements = math.ceil(diff / DEFAULT_FULL_SIZE)*DEFAULT_FULL_SIZE
             # resize per virtual base allocations
-            coords = np.append(coords,
-                                np.full((number_of_new_elements, 3),
-                                        np.inf, dtype=float),
-                                axis=0)
-            directions = np.append(directions,
-                                np.zeros(number_of_new_elements, 3),
-                                            dtype=float),
-                                axis=0)
-            fwd_phosphates = np.append(rev_phosphates,
-                                np.full((number_of_new_elements, 3),
-                                        np.inf, dtype=float),
-                                axis=0)
-            rev_phosphates = np.append(rev_phosphates,
-                                np.full((number_of_new_elements, 3),
-                                        np.inf, dtype=float),
-                                axis=0)
-            labels = np.append(labels,
-                                np.zeros((number_of_new_elements, 3),
-                                            dtype=float),
-                                axis=0)
-            indices = np.append(indices,
-                                np.zeros((number_of_new_elements, 3),
-                                        dtype=float),
-                                axis=0)
+            self.coords = np.append(self.coords,
+                                    np.full((number_of_new_elements, 3),
+                                            np.inf, dtype=float),
+                                    axis=0)
+            self.directions = np.append(self.directions,
+                                        np.zeros((number_of_new_elements, 3),
+                                                dtype=float),
+                                        axis=0)
+            self.fwd_phosphates = np.append(self.fwd_phosphates,
+                                            np.full((number_of_new_elements, 3),
+                                                    np.inf, dtype=float),
+                                            axis=0)
+            self.rev_phosphates = np.append(self.rev_phosphates,
+                                            np.full((number_of_new_elements, 3),
+                                                    np.inf, dtype=float),
+                                            axis=0)
+            self.labels = np.append(self.labels,
+                                    np.full((number_of_new_elements, 3),
+                                            -1, dtype=int),
+                                    axis=0)
+            self.indices = np.append(self.indices,
+                                    np.zeros((number_of_new_elements, 3),
+                                            dtype=int),
+                                    axis=0)
 
         # end if exceeded allocation
+        coords = self.coords
+        directions = self.directions
+        fwd_phosphates = self.fwd_phosphates
+        rev_phosphates = self.rev_phosphates
+        labels = self.labels
+        indices = self.indices
+
+        # 3. Move Existing data
         move_idx_start = insert_idx + num_points
         move_idx_end = move_idx_start + total_points - insert_idx
+
         coords[move_idx_start:move_idx_end] = coords[insert_idx:total_points]
         directions[move_idx_start:move_idx_end] = directions[insert_idx:total_points]
         fwd_phosphates[move_idx_start:move_idx_end] = fwd_phosphates[insert_idx:total_points]
         rev_phosphates[move_idx_start:move_idx_end] = rev_phosphates[insert_idx:total_points]
         labels[move_idx_start:move_idx_end] = labels[insert_idx:total_points]
-        indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points]
+        if is_append:
+            indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points]
+            indices[insert_idx:move_idx_start] = list(range(*new_lims))
+        else:
+            indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points] + num_points
+            indices[insert_idx:move_idx_start] = list(range(num_points))
 
+        coords[insert_idx:move_idx_start] = points
+        labels[insert_idx:move_idx_start] = num_points*[label]
 
-        # self.coords = np.insert(coords, insert_idx, points, axis=0)
-        # # insertions are always extending an existing label
-        # self.labels = np.insert(labels, hi_idx_limit, num_points*[label], axis=0)
-        # self.indices = np.insert(indices, hi_idx_limit, list(range(*new_lims)), axis=0)
         self.total_points += num_points
     # end def
 
@@ -307,36 +324,17 @@ class VirtualHelixGroup(object):
         end of a virtual helix since virtual helix arrays are always
         contiguous
         """
-        labels = self.labels
         offset_and_size = self.offset_and_size[label]
-        indices = self.indices
-        coords = self.coords
-
         current_offset_and_size_length = len(offset_and_size)
-        if label < current_offset_and_size_length:
-            match_label_idxs = offset_and_size[label]
-        else:
-            raise IndexError("Label {} out of range".format(label))
 
+        match_label_idxs = self.getOffsetAndSize(label)
         self._point_cache = {} # clear cache
 
         if match_label_idxs is not None:
             offset, size = match_label_idxs
-            lo, hi = offset, offset + size
             if length > size:
                 raise IndexError("length longer {} than indices existing".format(length))
-            elif offset_and_size[label][1] == length:
-                self._origin_cache = {} # clear cache
-                offset_and_size[label] = None
-                self.origins[label] = (np.inf, np.inf)  # set off to infinity
-                # trim the unused labels at the end
-                remove_count = 0
-                for i in range(current_offset_and_size_length - 1, label - 1, -1):
-                    if offset_and_size[i] is None:
-                        remove_count += 1
-                    else:
-                        break
-                self.offset_and_size = offset_and_size[:old_length - remove_count]
+            lo, hi = offset, offset + size
             if is_start:
                 idx_start, idx_stop = lo, lo + length
             else:
@@ -344,12 +342,61 @@ class VirtualHelixGroup(object):
         else:
             raise KeyError("Label {} not in VirtualHelixGroup".format(label))
 
-        the_slice = np.s_[idx_start:idx_stop]
-        self.coords = np.delete(coords, the_slice, axis=0)
-        self.labels = np.delete(labels, the_slice, axis=0)
-        if is_start: # we need to renumber indices
-            indices[idx_stop:hi] -= length
-        self.indices = np.delete(indices, the_slice, axis=0)
+        # Move the data
+
+        relocate_idx_end = idx_start + total_points - length
+        total_points = self.total_points
+
+        coords = self.coords
+        coords[idx_start:relocate_idx_end] = coords[idx_stop:total_points]
+        coords[relocate_idx_end:total_points] = np.inf
+
+        directions = self.directions
+        directions[idx_start:relocate_idx_end] = directions[idx_stop:total_points]
+        directions[relocate_idx_end:total_points] = 0.
+
+        fwd_phosphates = self.fwd_phosphates
+        fwd_phosphates[idx_start:relocate_idx_end] = fwd_phosphates[idx_stop:total_points]
+        fwd_phosphates[relocate_idx_end:total_points] = np.inf
+
+        rev_phosphates = self.rev_phosphates
+        rev_phosphates[idx_start:relocate_idx_end] = rev_phosphates[idx_stop:total_points]
+        rev_phosphates[relocate_idx_end:total_points] = np.inf
+
+        labels = self.labels
+        labels[idx_start:relocate_idx_end] = labels[idx_stop:total_points]
+        labels[relocate_idx_end:total_points] = -1
+
+        indices = self.indices
+        indices[idx_start:relocate_idx_end] = indices[idx_stop:total_points]
+        indices[relocate_idx_end:total_points] = 0
+        if is_start:
+            # We need to adjust the base index
+            # lo offset index should not change for a given label
+            indices[lo:lo+length] -= length
+
+        # Adjust the offsets of labels greater than label
+        for i, item in enumerate(offset_and_size[label:]):
+            if item is not None:
+                offset, size = item
+                offset_and_size[i+label] = (offset - length, size)
+
+        # remove Virtual Helix
+        if offset_and_size[label][1] == length:
+            self.total_labels -= 1
+            self._origin_cache = {} # clear cache
+            offset_and_size[label] = None
+            self.origins[label] = (np.inf, np.inf)  # set off to infinity
+            # trim the unused labels at the end
+            remove_count = 0
+            for i in range(current_offset_and_size_length - 1, label - 1, -1):
+                if offset_and_size[i] is None:
+                    remove_count += 1
+                else:
+                    break
+            self.offset_and_size = offset_and_size[:old_length - remove_count]
+
+        self.total_points -= length
     # end def
 
     def queryPoint(self, radius, x, y, z):
