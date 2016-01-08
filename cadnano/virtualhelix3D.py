@@ -2,6 +2,10 @@ import numpy as np
 import math
 import pandas as pd
 from collections import deque
+from cadnano.strandset import StrandSet
+from cadnano.enum import StrandType
+from cadnano.cnobject import CNObject
+
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
 equivalent to np.sum(a*a, axis=1)
@@ -39,14 +43,16 @@ def defaultDataFrame(size):
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
 
-class VirtualHelixGroup(object):
-    def __init__(self):
+class VirtualHelixGroup(CNObject):
+    def __init__(self, part):
         """ this is composed of a group of arrays
         that
         1. contain the coordinates of every virtual base stored
             in their index order per label
         2. contains the label per coordinate
         """
+        super(VirtualHelixGroup, self).__init__(part)
+
         self.radius = 2     # probably a property???
 
         # 1. per virtual base pair allocations
@@ -309,7 +315,7 @@ class VirtualHelixGroup(object):
         m1 = self.m3_scratch1
         m2 = self.m3_scratch2
         m0 = self.m3_scratch0
-        m0 = m0.fill(0.)
+        m0[:] = 0.
 
         m0[1, 0] =  v[2]
         m0[0, 1] =  -v[2]
@@ -342,6 +348,8 @@ class VirtualHelixGroup(object):
 
         number_of_new_elements = label - len(offset_and_size) + 1
         offset_and_size += [None]*number_of_new_elements
+        self.fwd_strandsets += [None]*number_of_new_elements
+        self.rev_strandsets += [None]*number_of_new_elements
 
         lo_idx_limit = len_axis_pts
         new_lims = (len_axis_pts, len_axis_pts + num_points)
@@ -358,7 +366,7 @@ class VirtualHelixGroup(object):
             self.origin_pts[len_origin_pts:, :] = np.inf
 
             self.directions.resize((total_rows, 3))
-            self.directions[len_origin_pts:, :] = 0    # unnecessary
+            self.directions[len_origin_pts:, :] = 0 # unnecessary as resize fills with zeros
 
             self.properties = self.properties.append(
                                         defaultDataFrame(number_of_new_elements),
@@ -367,6 +375,9 @@ class VirtualHelixGroup(object):
         self.origin_pts[label] = origin[:2]
         self.directions[label] = direction
         self.properties.loc[label, 'name'] = "vh%d" % (label)
+        self.fwd_strandsets[label] = StrandSet(StrandType.FWD, label, self, num_points)
+        self.rev_strandsets[label] = StrandSet(StrandType.REV, label, self, num_points)
+
         self.total_labels += 1
 
         # 3. Create points
@@ -452,13 +463,24 @@ class VirtualHelixGroup(object):
             points = self.pointsFromDirection(label, origin, direction, delta, index)
             self.addCoordinates(label, points, is_right=is_right)
             # TODO add checks for resizing strandsets here
-
+            if is_right:
+                self.fwd_strandsets[label].resize(0, delta)
+                self.rev_strandsets[label].resize(0, delta)
+            else:
+                self.fwd_strandsets[label].resize(delta, 0)
+                self.rev_strandsets[label].resize(delta, 0)
         elif delta < 0: # trimming points
             if abs(delta) >= size:
                 raise ValueError("can't delete virtual helix this way")
             # TODO add checks for strandsets etc here:
 
             self.removeCoordinates(label, abs(delta), is_right)
+            if is_right:
+                self.fwd_strandsets[label].resize(0, delta)
+                self.rev_strandsets[label].resize(0, delta)
+            else:
+                self.fwd_strandsets[label].resize(delta, 0)
+                self.rev_strandsets[label].resize(delta, 0)
         else: # delta == 0
             return
     # end def

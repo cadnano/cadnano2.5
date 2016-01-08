@@ -30,11 +30,11 @@ class StrandSet(CNObject):
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
     """
-    def __init__(self, strand_type, virtual_helix):
+    def __init__(self, strand_type, label, virtual_helix_group, initial_size):
         self._document = virtual_helix.document()
-        super(StrandSet, self).__init__(virtual_helix)
+        super(StrandSet, self).__init__(virtual_helix_group)
         self._virtual_helix = virtual_helix
-        self.strand_array = [None]*(virtual_helix.part().maxBaseIdx()+1)
+        self.strand_array = [None]*(initial_size)
         self.strand_heap = []
 
         self._undo_stack = None

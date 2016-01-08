@@ -62,6 +62,8 @@ class EndType:
 class StrandType:
     SCAFFOLD = 0
     STAPLE = 1
+    FWD = 0
+    REV = 1
 
 
 class Parity:
