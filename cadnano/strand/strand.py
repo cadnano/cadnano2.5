@@ -49,6 +49,8 @@ class Strand(CNObject):
         self._doc = strandset.document()
         super(Strand, self).__init__(strandset)
         self._strandset = strandset
+        self._id_num = strandset.idNum()
+
         self._base_idx_low = base_idx_low  # base index of the strand's left bound
         self._base_idx_high = base_idx_high  # base index of the right bound
         self._oligo = oligo
@@ -182,6 +184,10 @@ class Strand(CNObject):
         return self._strandset.part()
     # end def
 
+    def idNum(self):
+        return self._id_num
+    # end def
+
     def document(self):
         return self._doc
     # end def
@@ -205,10 +211,6 @@ class Strand(CNObject):
 
     def strandType(self):
         return self._strandset.strandType()
-
-    def virtualHelix(self):
-        return self._strandset.virtualHelix()
-    # end def
 
     def setSequence(self, sequence_string):
         """
@@ -564,8 +566,7 @@ class Strand(CNObject):
         if passed indices it will use those as a bounds
         """
         insertions = []
-        coord = self.virtualHelix().coord()
-        insertionsDict = self.part().insertions()[coord]
+        insertionsDict = self.part().insertions()[self._id_num]
         sortedIndices = sorted(insertionsDict.keys())
         if idxL is None:
             idxL, idxH = self.idxs()
@@ -583,11 +584,11 @@ class Strand(CNObject):
         """
         mods = []
         modsDict = self.part().mods()['ext_instances']
-        coord = self.virtualHelix().coord()
+        id_num = self._id_num
         isstaple = self.isStaple()
         idxL, idxH = self.idxs()
-        keyL =  "{},{},{}".format(coord, isstaple, idxL)
-        keyH =  "{},{},{}".format(coord, isstaple, idxH)
+        keyL =  "{},{},{}".format(id_num, isstaple, idxL)
+        keyH =  "{},{},{}".format(id_num, isstaple, idxH)
         if keyL in modsDict:
             mods.append(modsDict[keyL])
         if keyH in modsDict:
@@ -863,17 +864,15 @@ class Strand(CNObject):
         Iterate through dict of insertions for this strand's virtualhelix
         and return True of any of the indices overlap with the strand.
         """
-        coord = self.virtualHelix().coord()
-        insts = self.part().insertions()[coord]
-        for i in range(self._base_idx_low, self._base_idx_high+1):
+        insts = self.part().insertions()[self._id_num]
+        for i in range(self._base_idx_low, self._base_idx_high + 1):
             if i in insts:
                 return True
         return False
     # end def
 
     def hasInsertionAt(self, idx):
-        coord = self.virtualHelix().coord()
-        insts = self.part().insertions()[coord]
+        insts = self.part().insertions()[self._id_num]
         return idx in insts
     # end def
 

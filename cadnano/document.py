@@ -314,7 +314,7 @@ class Document(CNObject):
         strand_dict = {}
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
-                part = strand.virtualHelix().part()
+                part = strand.part()
                 idx_low, idx_high = strand.idxs()
                 strand5p = strand.connection5p()
                 strand3p = strand.connection3p()
@@ -386,7 +386,7 @@ class Document(CNObject):
         # calculate new idxs
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
-                part = strand.virtualHelix().part()
+                part = strand.part()
                 idx_low, idx_high = strand.idxs()
                 new_low, new_high = strand.idxs()
                 delta_low = delta_high = delta

@@ -5,8 +5,8 @@ class AddInsertionCommand(UndoCommand):
     def __init__(self, strand, idx, length):
         super(AddInsertionCommand, self).__init__("add insertion")
         self._strand = strand
-        coord = strand.virtualHelix().coord()
-        self._insertions = strand.part().insertions()[coord]
+        id_num = strand.idNum()
+        self._insertions = strand.part().insertions()[id_num]
         self._idx = idx
         self._length = length
         self._insertion = Insertion(idx, length)
@@ -46,8 +46,8 @@ class RemoveInsertionCommand(UndoCommand):
         super(RemoveInsertionCommand, self).__init__("remove insertion")
         self._strand = strand
         self._idx = idx
-        coord = strand.virtualHelix().coord()
-        self._insertions = strand.part().insertions()[coord]
+        id_num = strand.idNum()
+        self._insertions = strand.part().insertions()[id_num]
         self._insertion = self._insertions[idx]
         self._comp_strand = \
                     strand.strandSet().complementStrandSet().getStrand(idx)
@@ -90,11 +90,11 @@ class ChangeInsertionCommand(UndoCommand):
     def __init__(self, strand, idx, newLength):
         super(ChangeInsertionCommand, self).__init__("change insertion")
         self._strand = strand
-        coord = strand.virtualHelix().coord()
-        self._insertions = strand.part().insertions()[coord]
+        id_num = strand.idNum()
+        self._insertions = strand.part().insertions()[id_num]
         self._idx = idx
-        self._newLength = newLength
-        self._oldLength = self._insertions[idx].length()
+        self._new_length = newLength
+        self._old_length = self._insertions[idx].length()
         self._comp_strand = \
                     strand.strandSet().complementStrandSet().getStrand(idx)
     # end def
@@ -103,12 +103,12 @@ class ChangeInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertions[self._idx]
-        inst.setLength(self._newLength)
-        strand.oligo().incrementLength(self._newLength - self._oldLength)
+        inst.setLength(self._new_length)
+        strand.oligo().incrementLength(self._new_length - self._old_length)
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo().incrementLength(
-                                        self._newLength - self._oldLength)
+                                        self._new_length - self._old_length)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 
@@ -116,12 +116,12 @@ class ChangeInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertions[self._idx]
-        inst.setLength(self._oldLength)
-        strand.oligo().decrementLength(self._newLength - self._oldLength)
+        inst.setLength(self._old_length)
+        strand.oligo().decrementLength(self._new_length - self._old_length)
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo().decrementLength(
-                                        self._newLength - self._oldLength)
+                                        self._new_length - self._old_length)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 # end class

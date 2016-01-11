@@ -77,9 +77,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
 
-    def __init__(self, virtual_helix, nucleicacid_part_item, viewroot):
+    def __init__(self, id_num, nucleicacid_part_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
-        self._virtual_helix = virtual_helix
+        self._id_num = id_num
         self._nucleicacid_part_item = nucleicacid_part_item
         self._model_part = nucleicacid_part_item.part()
         self._viewroot = viewroot
@@ -97,7 +97,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setTransformOriginPoint(self.boundingRect().center())
 
 
-        # rotation 
+        # rotation
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
         self._hover_rect = QRectF(_RECT)
@@ -118,6 +118,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._model_part
     # end def
 
+    def getProperty(self, key):
+        return self._model_part.virtualHelixGroup().getProperties(self._id_num)
+    # end def
+
     def modelColor(self):
         return self.part().getProperty('color')
     # end def
@@ -132,7 +136,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def setSelectedColor(self, value):
-        if self.number() >= 0:
+        if self._id_num >= 0:
             if value == True:
                 self.setBrush(_HOV_BRUSH)
                 self.setPen(_HOV_PEN)
@@ -144,9 +148,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             self.setPen(_DEF_PEN)
         self.update(self.boundingRect())
     # end def
-
-    def virtualHelix(self):
-        return self._virtual_helix
 
     def paint(self, painter, option, widget):
         painter.setPen(self.pen())
@@ -169,7 +170,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def createLabel(self):
-        label = QGraphicsSimpleTextItem("%d" % self._virtual_helix.number())
+        label = QGraphicsSimpleTextItem("%d" % (self._id_num))
         label.setFont(_FONT)
         label.setZValue(styles.ZPATHHELIX)
         label.setParentItem(self)
@@ -178,8 +179,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def setNumber(self):
         """docstring for setNumber"""
-        vh = self._virtual_helix
-        num = vh.number()
+        num = self._id_num
         label = self._label
         radius = _RADIUS
 
@@ -200,10 +200,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         label.setPos(radius-posx, radius-posy)
     # end def
 
-    def number(self):
-        """docstring for number"""
-        return self._virtual_helix.number()
-
     def partItem(self):
         return self._nucleicacid_part_item
     # end def
@@ -214,7 +210,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         to the hover colors if necessary.
         """
         if not self.isSelected():
-            if self.number() >= 0:
+            if self._id_num >= 0:
                 if self.isSelected():
                     self.setBrush(_HOV_BRUSH)
                 else:
@@ -341,7 +337,8 @@ class RotaryDialDeltaItem(QGraphicsPathItem):
     # end def
 
     def updateColor(self, color):
-        self.setPen(getPenObj(color,_ROTARY_DELTA_WIDTH, alpha=128, capstyle=Qt.FlatCap))
+        self.setPen(getPenObj(color,_ROTARY_DELTA_WIDTH,
+                                alpha=128, capstyle=Qt.FlatCap))
     # end def
 # end class
 
@@ -355,7 +352,9 @@ class RotaryDialHoverRegion(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
 
         # hover marker
-        self._hoverLine = QGraphicsLineItem(-_ROTARY_DELTA_WIDTH/2, 0, _ROTARY_DELTA_WIDTH/2, 0, self)
+        self._hoverLine = QGraphicsLineItem(-_ROTARY_DELTA_WIDTH/2, 0,
+                                            _ROTARY_DELTA_WIDTH/2, 0,
+                                            self)
         self._hoverLine.setPen(getPenObj('#00cc', 0.5))
         self._hoverLine.hide()
 
@@ -410,9 +409,10 @@ class RotaryDialHoverRegion(QGraphicsEllipseItem):
         self.dummy.hide()
         endAngle = self.updateHoverLine(event)
         spanAngle = self.getSpanAngle(endAngle)
-        angle = self._parent.virtualHelix().getProperty('eulerZ')
-        self._parent.virtualHelix().setProperty('eulerZ', round((angle - spanAngle) % 360,0))
-        
+        angle = self._parent.getProperty('eulerZ')
+        self._parent.setProperty('eulerZ',
+                                round((angle - spanAngle) % 360., 0))
+
         # mark the end
         # x = self._hoverLine.x()
         # y = self._hoverLine.y()
@@ -447,8 +447,8 @@ class RotaryDialHoverRegion(QGraphicsEllipseItem):
             return (None, None, None)
         aX = cX + vX / magV * radius
         aY = cY + vY / magV * radius
-        angle = (atan2(aY-cY, aX-cX))
-        deg = -degrees(angle) if angle < 0 else 180+(180-degrees(angle))
+        angle = (atan2(aY - cY, aX - cX))
+        deg = -degrees(angle) if angle < 0 else 180 + (180 - degrees(angle))
         return (aX, aY, deg)
     # end def
 
@@ -461,12 +461,12 @@ class RotaryDialHoverRegion(QGraphicsEllipseItem):
             if angle < self._startAngle:
                 spanAngle = angle - self._startAngle
             else:
-                spanAngle = -(self._startAngle + (360-angle))
+                spanAngle = -(self._startAngle + (360 - angle))
         else: # counterclockwise, spanAngle is positive
             if angle > self._startAngle:
                 spanAngle = angle - self._startAngle
             else:
-                spanAngle = (360-self._startAngle) + angle
+                spanAngle = (360 - self._startAngle) + angle
         return spanAngle
     # end def
 # end class

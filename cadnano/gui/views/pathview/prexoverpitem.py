@@ -75,8 +75,8 @@ class PreXoverPItem(PreXoverItem):
         If a PreXover can be installed the pen is a bold color,
         otherwise the PreXover is drawn with a disabled or muted color
         """
-        from_vh = self._from_vh_item.virtualHelix()
-        to_vh = self._to_vh_item.virtualHelix()
+        from_vh = self._from_vh_item.idNum()
+        to_vh = self._to_vh_item.idNum()
         part = self._from_vh_item.part()
         pen = _DISAB_PEN
         self._label_brush = _DISAB_BRUSH
@@ -97,8 +97,8 @@ class PreXoverPItem(PreXoverItem):
             return  # ignore shift click, user is probably trying to merge
 
         if self._is_active:
-            from_vh = self._from_vh_item.virtualHelix()
-            to_vh = self._to_vh_item.virtualHelix()
+            from_vh = self._from_vh_item.idNum()
+            to_vh = self._to_vh_item.idNum()
             from_ss = from_vh.getStrandSetByType(self._strand_type)
             to_ss = to_vh.getStrandSetByType(self._strand_type)
             from_strand = from_ss.getStrand(self._idx)

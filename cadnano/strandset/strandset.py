@@ -30,16 +30,18 @@ class StrandSet(CNObject):
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
     """
-    def __init__(self, strand_type, label, virtual_helix_group, initial_size):
+    def __init__(self, strand_type, id_num, virtual_helix_group, initial_size):
         self._document = virtual_helix.document()
         super(StrandSet, self).__init__(virtual_helix_group)
-        self._virtual_helix = virtual_helix
+        self._strand_type = strand_type
+        self._id_num = id_num
+        self._virtual_helix_group = virtual_helix_group
+
         self.strand_array = [None]*(initial_size)
         self.strand_heap = []
 
         self._undo_stack = None
         self._last_strandset_idx = None
-        self._strand_type = strand_type
     # end def
 
     def __iter__(self):
@@ -64,7 +66,7 @@ class StrandSet(CNObject):
 
     ### ACCESSORS ###
     def part(self):
-        return self._virtual_helix.part()
+        return self._virtual_helix_group.part()
     # end def
 
     def document(self):
@@ -94,16 +96,19 @@ class StrandSet(CNObject):
         return self._virtual_helix.isDrawn5to3(self)
     # end def
 
-    def isStaple(self):
-        return self._strand_type is StrandType.STAPLE
+    def isForward(self):
+        return self._strand_type is StrandType.FWD
     # end def
 
-    def isScaffold(self):
-        return self._strand_type is StrandType.SCAFFOLD
+    def isReverse(self):
+        return self._strand_type is StrandType.REV
     # end def
 
     def length(self):
         return len(self.strand_array)
+
+    def idNum(self):
+        return self._id_num
 
     # def getNeighbors(self, strand):
     #     sl = self.strand_array
@@ -153,11 +158,9 @@ class StrandSet(CNObject):
         Returns the complementary strandset. Used for insertions and
         sequence application.
         """
-        vh = self.virtualHelix()
-        if self.isStaple():
-            return vh.scaffoldStrandSet()
-        else:
-            return vh.stapleStrandSet()
+        vhg = self._virtual_helix_group
+        fwd_ss, rev_ss = vhg.getStrandSet(self.id_num)
+        return rev_ss if self._strand_type == StrandType.FWD else fwd_ss
     # end def
 
     # def getBoundsOfEmptyRegionContaining(self, base_idx):
@@ -235,7 +238,7 @@ class StrandSet(CNObject):
 
     def partMaxBaseIdx(self):
         """Return the bounds of the StrandSet as defined in the part."""
-        return self.length()-1    # end def
+        return self.length() - 1    # end def
 
     def strandCount(self):
         return len(self.strands())
@@ -257,8 +260,8 @@ class StrandSet(CNObject):
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self, base_idx_low, base_idx_high)
-            row, col = self._virtual_helix.coord()
-            d = "%s:(%d,%d).%d^%d" % (self.part().getName(), row, col, self._strand_type, base_idx_low)
+            x, y = self._virtual_helix_group.getOrigin(self._id_num)
+            d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._strand_type, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return 0
@@ -274,8 +277,8 @@ class StrandSet(CNObject):
         we assume that deserialized strands will not cause collisions.
         """
         c = CreateStrandCommand(self, base_idx_low, base_idx_high)
-        row, col = self._virtual_helix.coord()
-        d = "(%d,%d).%d^%d" % (row, col, self._strand_type, base_idx_low)
+        x, y = self._virtual_helix_group.getOrigin(self._id_num)
+        d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._strand_type, base_idx_low)
         # print("strand", d)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
         return 0
@@ -498,7 +501,7 @@ class StrandSet(CNObject):
 
     def getLegacyArray(self):
         """docstring for getLegacyArray"""
-        num = self._virtual_helix.number()
+        num = self._id_num
         ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
         if self.isDrawn5to3():
             for strand in self.strand_heap:

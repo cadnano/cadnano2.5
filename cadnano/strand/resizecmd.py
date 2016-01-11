@@ -1,23 +1,23 @@
 from cadnano.cnproxy import UndoCommand
 
 class ResizeCommand(UndoCommand):
-    def __init__(self, strand, newIdxs):
+    def __init__(self, strand, new_idxs):
         super(ResizeCommand, self).__init__("resize strand")
         self.strand = strand
-        self.oldIndices = oI = strand.idxs()
-        self.newIdxs = newIdxs
+        self.old_indices = o_i = strand.idxs()
+        self.new_idxs = new_idxs
         # an increase in length leads to positive delta
-        self.delta = (newIdxs[1] - newIdxs[0]) - (oI[1] - oI[0])
+        self.delta = (new_idxs[1] - new_idxs[0]) - (o_i[1] - o_i[0])
         # now handle insertion deltas
-        oldInsertions = strand.insertionsOnStrand(*oI)
-        newInsertions = strand.insertionsOnStrand(*newIdxs)
-        oL = 0
+        oldInsertions = strand.insertionsOnStrand(*o_i)
+        newInsertions = strand.insertionsOnStrand(*new_idxs)
+        o_l = 0
         for i in oldInsertions:
-            oL += i.length()
-        nL = 0
+            o_l += i.length()
+        n_l = 0
         for i in newInsertions:
-            nL += i.length()
-        self.delta += (nL-oL)
+            n_l += i.length()
+        self.delta += (n_l - o_l)
 
         # the strand sequence will need to be regenerated from scratch
         # as there are no guarantees about the entirety of the strand moving
@@ -26,18 +26,18 @@ class ResizeCommand(UndoCommand):
 
     def redo(self):
         std = self.strand
-        nI = self.newIdxs
-        oI = self.oldIndices
+        n_i = self.new_idxs
+        o_i = self.old_indices
         strandset = self.strand.strandSet()
         part = strandset.part()
 
         std.oligo().incrementLength(self.delta)
-        std.setIdxs(nI)
-        strandset.updateStrandIdxs(std, oI, nI)
+        std.setIdxs(n_i)
+        strandset.updateStrandIdxs(std, o_i, n_i)
 
         if strandset.isStaple():
             std.reapplySequence()
-        std.strandResizedSignal.emit(std, nI)
+        std.strandResizedSignal.emit(std, n_i)
         # for updating the Slice View displayed helices
         part.partStrandChangedSignal.emit(part, strandset.virtualHelix())
         std5p = std.connection5p()
@@ -47,18 +47,18 @@ class ResizeCommand(UndoCommand):
 
     def undo(self):
         std = self.strand
-        nI = self.newIdxs
-        oI = self.oldIndices
+        n_i = self.new_idxs
+        o_i = self.old_indices
         strandset = self.strand.strandSet()
         part = strandset.part()
 
         std.oligo().decrementLength(self.delta)
-        std.setIdxs(oI)
-        strandset.updateStrandIdxs(std, nI, oI)
+        std.setIdxs(o_i)
+        strandset.updateStrandIdxs(std, n_i, o_i)
 
         if strandset.isStaple():
             std.reapplySequence()
-        std.strandResizedSignal.emit(std, oI)
+        std.strandResizedSignal.emit(std, o_i)
         # for updating the Slice View displayed helices
         part.partStrandChangedSignal.emit(part, strandset.virtualHelix())
         std5p = std.connection5p()

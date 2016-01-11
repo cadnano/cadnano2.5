@@ -30,9 +30,9 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelixRemovedSlot(self, id_num):
         pass
-    def partVirtualHelixRenumberedSlot(self, sender, vh):
+    def partVirtualHelixRenumberedSlot(self, sender, id_num):
         pass
-    def partVirtualHelixResizedSlot(self, sender, vh):
+    def partVirtualHelixResizedSlot(self, sender, id_num):
         pass
     def partVirtualHelixTransformedSlot(self, sender):
         pass

@@ -341,8 +341,8 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         # sort on y to determine the extremes of the selection group
         items = sorted(self._item_group.childItems(), key=lambda vhhi: vhhi.y())
         part_item = items[0].partItem()
-        part_item.reorderHelices(items[0].number(),\
-                                items[-1].number(),\
+        part_item.reorderHelices(items[0].idNum(),\
+                                items[-1].idNum(),\
                                 indexDelta)
         part_item.updateStatusBar("")
     # end def
@@ -358,11 +358,13 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         Delete selection operates outside of the documents a virtual helices
         are not actually selected in the model
         """
-        v_helices = [vhh.virtualHelix() for vhh in self._item_group.childItems()]
+
+        vh_handle_items = self._item_group.childItems()
         u_s = self._item_group.document().undoStack()
         u_s.beginMacro("delete Virtual Helices")
-        for vh in v_helices:
-            vh.remove()
+        for vhhi in vh_handle_items:
+            part = vhhi.part()
+            part.removeVirtualHelix(vhhi.idNum())
         u_s.endMacro()
     # end def
 

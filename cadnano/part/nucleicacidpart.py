@@ -88,11 +88,6 @@ class NucleicAcidPart(Part):
         self._properties['max_vhelix_length'] = self._STEP*2
         self._properties['neighbor_active_angle'] = ''
 
-        # ID assignment
-        self.recycle_bin = []
-        self.reserve_bin = set()
-        self._highest_used = -1  # Used in _reserveHelixIDNumber
-
         # Runtime state
         self._active_base_index = self._STEP
         self._active_virtual_helix = None
@@ -120,15 +115,15 @@ class NucleicAcidPart(Part):
     partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, CNObject,
-                        name='partStrandChangedSignal')         # self, virtual_helix label
+                        name='partStrandChangedSignal')         # self, virtual_helix id_num
     partVirtualHelixAddedSignal = ProxySignal(object, int,
-                        name='partVirtualHelixAddedSignal')     # self, virtual_helix label
+                        name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
     partVirtualHelixRemovedSignal = ProxySignal(object, int,
-                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix label
+                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
     partVirtualHelixRenumberedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixRenumberedSignal')# self, virtual_helix label
+                        name='partVirtualHelixRenumberedSignal')# self, virtual_helix id_num
     partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixResizedSignal')   # self, virtual_helix label
+                        name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
     partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,
@@ -556,6 +551,24 @@ class NucleicAcidPart(Part):
                                                 use_undostack=use_undostack)
     # end def
 
+    def removeVirtualHelix(self, id_num, use_undostack=True):
+        """
+        Removes a VirtualHelix from the model. Accepts a reference to the
+        VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
+        """
+        if use_undostack:
+            self.undoStack().beginMacro("Delete VirtualHelix")
+        fwd_ss, rev_ss = self._virtual_helix_group.getStrandSet(id_num)
+        fwd_ss.remove(use_undostack)
+        rev_ss.remove(use_undostack)
+        c = RemoveVirtualHelixCommand(self, id_num)
+        if use_undostack:
+            self.undoStack().push(c)
+            self.undoStack().endMacro()
+        else:
+            c.redo()
+    # end def
+
     def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True, use_undostack=True):
         # prexoveritem needs to store left or right, and determine
         # locally whether it is from or to
@@ -963,50 +976,6 @@ class NucleicAcidPart(Part):
         for nvh in neighbors:
             neighbor_list = nvh.getProperty('neighbors')
             neighbor_list.remove(virtual_helix)
-    # end def
-
-    def _reserveHelixIDNumber(self, requested_id_num=None):
-        """
-        Reserves and returns a unique numerical label appropriate for a
-        virtualhelix of a given parity. If a specific index is preferable
-        (say, for undo/redo) it can be requested in num.
-        """
-        num = requested_id_num
-        if num is not None:  # We are handling a request for a particular number
-            assert num >= 0, int(num) == num
-            # assert not num in self._number_to_virtual_helix
-            if num in self.recycle_bin:
-                self.recycle_bin.remove(num)
-                # rebuild the heap since we removed a specific item
-                heapify(self.recycle_bin)
-                return num
-            self.reserve_bin.add(num)
-            return num
-        # end if
-        else:
-            if len(self.recycle_bin):
-                return heappop(self.recycle_bin)
-            else:
-                # use self._highest_used if the recycle bin is empty
-                # and _highest_used + 1 is not in the reserve bin
-                while self._highest_used + 1 in self.reserve_bin:
-                    self._highest_used += 1
-                self._highest_used += 1
-                self.reserve_bin.add(self._highest_used)
-                return self._highest_used
-        # end else
-    # end def
-
-    def _recycleHelixIDNumber(self, n):
-        """
-        The caller's contract is to ensure that n is not used in *any* helix
-        at the time of the calling of this function (or afterwards, unless
-        reserveLabelForHelix returns the label again).
-        """
-        if n % 2 == 0:
-            heappush(self.even_recycle_bin, n)
-        else:
-            heappush(self.odd_recycle_bin, n)
     # end def
 
     def _splitBeforeAutoXovers(self, vh5p, vh3p, idx, use_undostack=True):
