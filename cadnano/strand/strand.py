@@ -212,6 +212,9 @@ class Strand(CNObject):
     def strandType(self):
         return self._strandset.strandType()
 
+    def isForward(self):
+        return self._strandset.isForward()
+
     def setSequence(self, sequence_string):
         """
         Applies sequence string from 5' to 3'
@@ -447,11 +450,13 @@ class Strand(CNObject):
         Checks to see if a resize is allowed. Similar to getResizeBounds
         but works for two bounds at once.
         """
+        part = self.part()
+        id_num = self._id_num
         low_neighbor, high_neighbor = self._strandset.getNeighbors(self)
         low_bound = low_neighbor.highIdx() if low_neighbor \
-                                            else self.part().minBaseIdx()
+                                            else 0
         high_bound = high_neighbor.lowIdx() if high_neighbor \
-                                            else self.part().maxBaseIdx()
+                                            else part.maxBaseIdx(id_num)
 
         if new_low > low_bound and new_high < high_bound:
             return True
@@ -472,19 +477,20 @@ class Strand(CNObject):
 
         When a neighbor is not present, just use the Part boundary.
         """
+        part = self.part()
         neighbors = self._strandset.getNeighbors(self)
         if idx == self._base_idx_low:
             if neighbors[0] is not None:
                 low = neighbors[0].highIdx() + 1
             else:
-                low = self.part().minBaseIdx()
+                low = 0
             # print("A", low, self._base_idx_high - 1 )
             return low, self._base_idx_high - 1
         else:  # self._base_idx_high
             if neighbors[1] is not None:
                 high = neighbors[1].lowIdx() - 1
             else:
-                high = self.part().maxBaseIdx()
+                high = part.maxBaseIdx(self._id_num)
             # print("B", self._base_idx_low+1, high)
             return self._base_idx_low + 1, high
     # end def

@@ -201,20 +201,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi.endAddWedgeGizmos()
     # end def
 
-    def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):
-        """docstring for partPreDecoratorSelectedSlot"""
-        vhi = self.getVirtualHelixItemByCoord(row, col)
-        view = self.window().slice_graphics_view
-        view.scene_root_item.resetTransform()
-        view.centerOn(vhi)
-        view.zoomIn()
-        m_c = self._mod_circ
-        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
-        m_c.setPos(x,y)
-        if self._can_show_mod_circ:
-            m_c.show()
-    # end def
-
     def partVirtualHelixAddedSlot(self, sender, virtual_helix):
         vh = virtual_helix
         # TODO test to see if self._virtual_helix_hash is necessary

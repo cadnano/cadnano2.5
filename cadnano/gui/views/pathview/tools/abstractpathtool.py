@@ -117,13 +117,6 @@ class AbstractPathTool(QGraphicsObject):
         to pt in virtual_helix_item."""
         x, strand_idx = self.helixIndex(pt)
 
-        # Disabled SD (may break antiparallel xover origami)
-        # vh = virtual_helix_item.virtualHelix()
-        # if vh.isEvenParity():
-        #     strand_type = (StrandType.SCAFFOLD, StrandType.STAPLE)[util.clamp(strand_idx, 0, 1)]
-        # else:
-        #     strand_type = (StrandType.STAPLE, StrandType.SCAFFOLD)[util.clamp(strand_idx, 0, 1)]
-
         strand_type = (StrandType.SCAFFOLD, StrandType.STAPLE)[util.clamp(strand_idx, 0, 1)]
         return (strand_type, x, strand_idx)
 

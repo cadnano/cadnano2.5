@@ -69,7 +69,7 @@ class FunctionalTests(CadnanoGuiTestCase):
         """docstring for testFunctional1"""
         pass
 
-    def getTestSequences(self, designname, sequencesToApply):
+    def getTestSequences(self, designname, sequences_to_apply):
         """
         Called by a sequence-verification functional test to read in a file
         (designname), apply scaffold sequence(s) to that design, and return
@@ -84,11 +84,12 @@ class FunctionalTests(CadnanoGuiTestCase):
         self.setWidget(self.documentController.win, False, None)
         part = document.selectedInstance()
         # apply one or more sequences to the design
-        for sequenceName, startVhNum, startIdx in sequencesToApply:
+        for sequenceName, start_id_num, start_idx in sequences_to_apply:
             sequence = sequences.get(sequenceName, None)
-            for vh in part.getVirtualHelices():
-                if vh.number() == startVhNum:
-                    strand = vh.scaffoldStrandSet().getStrand(startIdx)
+            for id_num in part.getIdNums():
+                fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+                if id_num == start_id_num:
+                    strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)
         generatedSequences = part.getStapleSequences()
         return set(generatedSequences.splitlines())

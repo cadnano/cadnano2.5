@@ -126,19 +126,19 @@ class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
         pass
     # end def
 
-    def partPreDecoratorSelectedSlot(self, sender, row, col, baseIdx):
-        """docstring for partPreDecoratorSelectedSlot"""
-        vhi = self.getVirtualHelixItemByCoord(row, col)
-        view = self.window().slice_graphics_view
-        view.scene_root_item.resetTransform()
-        view.centerOn(vhi)
-        view.zoomIn()
-        mC = self._mod_circ
-        x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
-        mC.setPos(x,y)
-        if self._can_show_mod_circ:
-            mC.show()
-    # end def
+    # def partPreDecoratorSelectedSlot(self, sender, row, col, baseIdx):
+    #     """docstring for partPreDecoratorSelectedSlot"""
+    #     vhi = self.getVirtualHelixItemByCoord(row, col)
+    #     view = self.window().slice_graphics_view
+    #     view.scene_root_item.resetTransform()
+    #     view.centerOn(vhi)
+    #     view.zoomIn()
+    #     mC = self._mod_circ
+    #     x,y = self._model_part.latticeCoordToPositionXY(row, col, self.scaleFactor())
+    #     mC.setPos(x,y)
+    #     if self._can_show_mod_circ:
+    #         mC.show()
+    # # end def
 
     def partVirtualHelixAddedSlot(self, sender, virtual_helix):
         vh = virtual_helix
@@ -201,8 +201,8 @@ class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
         return self._scaleFactor
     # end def
 
-    def setPart(self, newPart):
-        self._model_part = newPart
+    def setPart(self, new_part):
+        self._model_part = new_part
     # end def
 
     def window(self):

@@ -33,7 +33,7 @@ class RemoveStrandCommand(UndoCommand):
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
             # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-            color_list = prefs.STAP_COLORS if strandset.isStaple() else [part.getColor()]
+            color_list = prefs.STAP_COLORS if strandset.isReverse() else [part.getColor()]
             color = random.choice(color_list)
             olg3p.setColor(color)
             olg3p.refreshLength()
@@ -69,8 +69,8 @@ class RemoveStrandCommand(UndoCommand):
             olg5p.addToPart(strandset.part())
             if self._solo:
                 part = strandset.part()
-                vh = strandset.virtualHelix()
-                part.partActiveVirtualHelixChangedSignal.emit(part, vh)
+                id_num = strandset.idNum()
+                part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 #strand5p.strandXover5pChangedSignal.emit(strand5p, strand)
             strand5p.strandUpdateSignal.emit(strand5p)
         # end if
@@ -82,8 +82,8 @@ class RemoveStrandCommand(UndoCommand):
                 olg3p.addToPart(strandset.part())
             if self._solo:
                 part = strandset.part()
-                vh = strandset.virtualHelix()
-                part.partActiveVirtualHelixChangedSignal.emit(part, vh)
+                id_num = strandset.idNum(
+                part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 # strand.strandXover5pChangedSignal.emit(strand, strand3p)
             strand3p.strandUpdateSignal.emit(strand3p)
         # end if
@@ -98,7 +98,7 @@ class RemoveStrandCommand(UndoCommand):
             # strand.strandModsRemovedSignal.emit(strand, self.mids[1], strand.highIdx())
 
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
     # end def
 
     def undo(self):
@@ -144,14 +144,14 @@ class RemoveStrandCommand(UndoCommand):
             strand.strandModsAddedSignal.emit(strand, self.mids[1], strand.highIdx())
 
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
 
         # Restore connections to this strand
         if strand5p is not None:
             if self._solo:
                 part = strandset.part()
-                vh = strandset.virtualHelix()
-                part.partActiveVirtualHelixChangedSignal.emit(part, vh)
+                id_num = strandset.idNum()
+                part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 # strand5p.strandXover5pChangedSignal.emit(
                 #                                        strand5p, strand)
             strand5p.strandUpdateSignal.emit(strand5p)
@@ -160,8 +160,8 @@ class RemoveStrandCommand(UndoCommand):
         if strand3p is not None:
             if self._solo:
                 part = strandset.part()
-                vh = strandset.virtualHelix()
-                part.partActiveVirtualHelixChangedSignal.emit(part, vh)
+                id_num = strandset.idNum()
+                part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 # strand.strandXover5pChangedSignal.emit(strand, strand3p)
             strand3p.strandUpdateSignal.emit(strand3p)
             strand.strandUpdateSignal.emit(strand)

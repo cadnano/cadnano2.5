@@ -24,7 +24,7 @@ class RemoveOligoCommand(UndoCommand):
             # emit a signal to notify on completion
             strand.strandRemovedSignal.emit(strand)
             # for updating the Slice View displayed helices
-            strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+            strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
         # end def
         # set the 3p strand for the undo
         self._strand3p = strand
@@ -48,7 +48,7 @@ class RemoveOligoCommand(UndoCommand):
             # Emit a signal to notify on completion
             strandset.strandsetStrandAddedSignal.emit(strandset, strand)
             # for updating the Slice View displayed helices
-            part.partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+            part.partStrandChangedSignal.emit(strandset.part(),  strandset.idNum())
         # end def
 
         # add Oligo to part but don't set parent to None?

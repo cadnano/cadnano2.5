@@ -404,11 +404,8 @@ class StrandSet(CNObject):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def virtualHelix(self):
-        return self._virtual_helix
-
     def strandFilter(self):
-        return "scaffold" if self._strand_type == StrandType.SCAFFOLD else "staple"
+        return "forward" if self._strand_type is StrandType.FWD else "reverse"
 
 
     def hasStrandAt(self, idx_low, idx_high):
@@ -510,7 +507,7 @@ class StrandSet(CNObject):
                 # map the first base (5' xover if necessary)
                 s5p = strand.connection5p()
                 if s5p is not None:
-                    ret[lo][0] = s5p.virtualHelix().number()
+                    ret[lo][0] = s5p.idNum()
                     ret[lo][1] = s5p.idx3Prime()
                 ret[lo][2] = num
                 ret[lo][3] = lo + 1
@@ -525,7 +522,7 @@ class StrandSet(CNObject):
                 ret[hi][1] = hi - 1
                 s3p = strand.connection3p()
                 if s3p is not None:
-                    ret[hi][2] = s3p.virtualHelix().number()
+                    ret[hi][2] = s3p.idNum()
                     ret[hi][3] = s3p.idx5Prime()
                 # end if
             # end for
@@ -539,7 +536,7 @@ class StrandSet(CNObject):
                 ret[lo][1] = lo + 1
                 s3p = strand.connection3p()
                 if s3p is not None:
-                    ret[lo][2] = s3p.virtualHelix().number()
+                    ret[lo][2] = s3p.idNum()
                     ret[lo][3] = s3p.idx5Prime()
                 # map the internal bases
                 for idx in range(lo + 1, hi):
@@ -552,7 +549,7 @@ class StrandSet(CNObject):
                 ret[hi][3] = hi - 1
                 s5p = strand.connection5p()
                 if s5p is not None:
-                    ret[hi][0] = s5p.virtualHelix().number()
+                    ret[hi][0] = s5p.idNum()
                     ret[hi][1] = s5p.idx3Prime()
                 # end if
             # end for

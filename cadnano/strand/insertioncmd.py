@@ -70,7 +70,6 @@ class RemoveInsertionCommand(UndoCommand):
     def undo(self):
         strand = self._strand
         c_strand = self._comp_strand
-        coord = strand.virtualHelix().coord()
         inst = self._insertion
         strand.oligo().incrementLength(inst.length())
         self._insertions[self._idx] = inst

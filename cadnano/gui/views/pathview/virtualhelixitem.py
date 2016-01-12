@@ -25,10 +25,10 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     def __init__(self, id_num, part_item, viewroot):
         super(VirtualHelixItem, self).__init__(part_item.proxy())
         self._part_item = part_item
+        self._model_part
         self._id_num = id_num
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
-        self._controller = VirtualHelixItemController(self, model_virtual_helix)
 
         self._handle = VirtualHelixHandleItem(model_virtual_helix, part_item, viewroot)
         self._last_strand_set = None
@@ -54,7 +54,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     ### SIGNALS ###
 
-    ### SLOTS ###
+    ### SLOTS indericectly called from the part ###
 
     def levelOfDetailChangedSlot(self, boolval):
         """Not connected to the model, only the QGraphicsView"""
@@ -114,35 +114,11 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         return self._handle
     # end def
 
-    def part(self):
-        return self._part_item.part()
-    # end def
-
-    def partItem(self):
-        return self._part_item
-    # end def
-
-    def number(self):
-        return self._model_virtual_helix.number()
-    # end def
-
-    def virtualHelix(self):
-        return self._model_virtual_helix
-    # end def
-
     def window(self):
         return self._part_item.window()
     # end def
 
     ### DRAWING METHODS ###
-    def isStrandOnTop(self, strand):
-        # return strand.strandSet().isScaffold()
-        sset = strand.strandSet()
-        is_even_parity = self._model_virtual_helix.isEvenParity()
-        return is_even_parity and sset.isScaffold() or\
-               not is_even_parity and sset.isStaple()
-    # end def
-
     def isStrandTypeOnTop(self, strand_type):
         # return strand_type is StrandType.SCAFFOLD
         is_even_parity = self._model_virtual_helix.isEvenParity()
@@ -152,13 +128,13 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
     def upperLeftCornerOfBase(self, idx, strand):
         x = idx * _BASE_WIDTH
-        y = 0 if self.isStrandOnTop(strand) else _BASE_WIDTH
+        y = 0 if strand.isForward() else _BASE_WIDTH
         return x, y
     # end def
 
     def upperLeftCornerOfBaseType(self, idx, strand_type):
         x = idx * _BASE_WIDTH
-        y = 0 if self.isStrandTypeOnTop(strand_type) else _BASE_WIDTH
+        y = 0 if strand_type is StrandType.FWD else _BASE_WIDTH
         return x, y
     # end def
 
@@ -173,7 +149,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         part = self.part()
         path = QPainterPath()
         sub_step_size = part.subStepSize()
-        canvas_size = part.maxBaseIdx() + 1
+        canvas_size = part.maxBaseIdx(self._id_num) + 1
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks
@@ -219,7 +195,7 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     ### PUBLIC SUPPORT METHODS ###
     def setActive(self, idx):
         """Makes active the virtual helix associated with this item."""
-        self.part().setActiveVirtualHelix(self._model_virtual_helix, idx)
+        self.part().setActiveVirtualHelix(self._id_num, idx)
     # end def
 
     ### EVENT HANDLERS ###
@@ -277,9 +253,9 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         on the top or bottom edge, resulting in a negative y value.
         """
         x, y = pos.x(), pos.y()
-        m_vh = self._model_virtual_helix
+        part = self._model_part
         base_idx = int(floor(x / _BASE_WIDTH))
-        min_base, max_base = 0, m_vh.part().maxBaseIdx()
+        min_base, max_base = 0, part.maxBaseIdx(self._id_num)
         if base_idx < min_base or base_idx >= max_base:
             base_idx = util.clamp(base_idx, min_base, max_base)
         if y < 0:

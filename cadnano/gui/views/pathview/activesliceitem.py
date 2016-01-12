@@ -30,7 +30,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         self._getActiveTool = nucleicacid_part_item._getActiveTool
         self._active_slice = 0
         self._low_drag_bound = 0
-        self._high_drag_bound = self.part().maxBaseIdx()
+        self._high_drag_bound = self.part().maxBaseIdx()    # TODO fix this
         self._controller = ActiveSliceItemController(self, nucleicacid_part_item.part())
 
         self._label = QGraphicsSimpleTextItem("", parent=self)
@@ -84,7 +84,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         the part and changes the receiver to reflect the part"""
         label = self._label
         bw = _BASE_WIDTH
-        bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx())
+        bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx())   # TODO fix this
         # self.setPos(bi * bw, -styles.PATH_HELIX_PADDING)
         self.setPos(bi * bw, -styles.PATH_HELIX_PADDING/2)
 
@@ -120,7 +120,7 @@ class ActiveSliceItem(QGraphicsRectItem):
 
     def resetBounds(self):
         """Call after resizing virtualhelix canvas."""
-        self._high_drag_bound = self.part().maxBaseIdx()
+        self._high_drag_bound = self.part().maxBaseIdx()    # TODO fix this
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -195,11 +195,13 @@ class ActiveSliceItem(QGraphicsRectItem):
         Set the allowed drag bounds for use by selectToolMouseMove.
         """
         if (modifiers & Qt.AltModifier) and (modifiers & Qt.ShiftModifier):
-            self.part().undoStack().beginMacro("Auto-drag Scaffold(s)")
-            for vh in self.part().getVirtualHelices():
+            part = self.part()
+            part.undoStack().beginMacro("Auto-drag Scaffold(s)")
+            for id_num in part.getIdNums():
                 # SCAFFOLD
                 # resize 3' first
-                for strand in vh.scaffoldStrandSet():
+                fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+                for strand in fwd_ss:
                     idx5p = strand.idx5Prime()
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
@@ -209,7 +211,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                         else:
                             strand.resize((lo, idx5p))
                 # resize 5' second
-                for strand in vh.scaffoldStrandSet():
+                for strand in fwd_ss:
                     idx5p = strand.idx5Prime()
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx5p):
@@ -220,7 +222,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                             strand.resize((idx3p, hi))
                 # STAPLE
                 # resize 3' first
-                for strand in vh.stapleStrandSet():
+                for strand in rev_ss:
                     idx5p = strand.idx5Prime()
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
@@ -230,7 +232,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                         else:
                             strand.resize((lo, idx5p))
                 # resize 5' second
-                for strand in vh.stapleStrandSet():
+                for strand in rev_ss:
                     idx5p = strand.idx5Prime()
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
@@ -240,7 +242,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                         else:
                             strand.resize((idx3p, hi))
 
-            self.part().undoStack().endMacro()
+            part.undoStack().endMacro()
     # end def
 
     def selectToolMouseMove(self, modifiers, idx):

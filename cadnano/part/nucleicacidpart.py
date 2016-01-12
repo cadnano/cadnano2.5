@@ -42,12 +42,7 @@ class NucleicAcidPart(Part):
     - sequence output is more abstract ("virtual sequences" are used)
     """
 
-    _STEP = 21  # this is the period (in bases) of the part lattice
-    _RADIUS = 1.125  # nanometers
-    _TURNS_PER_STEP = 2
-    _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
-    _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
-    _SUB_STEP_SIZE = _STEP / 3
+    _SUB_STEP_SIZE = _STEP_SIZE / 3
     _MINOR_GROOVE_ANGLE = 171
 
     __count = 0
@@ -75,27 +70,13 @@ class NucleicAcidPart(Part):
 
         self._virtual_helix_group = VirtualHelixGroup(self)
 
-        self._quadtree = Quadtree(0, 0, 100, min_size=(4.1*self._RADIUS))
-        self._number_to_virtual_helix = {}
-        # Dimensions
-        self._max_row = 50  # subclass overrides based on prefs
-        self._max_col = 50
-        self._min_base = 0
-        self._max_base = 2 * self._STEP - 1
         # Properties (NucleicAcidPart-specific)
-        # self._properties["name"] = "Origami%d" % len(self._document.children())
-        self._properties["name"] = "Origami%d" % self._count()
+        self._properties["name"] = "NaPart%d" % self._count()
         self._properties['active_phos'] = None
         self._properties['active_phos'] = None
         self._properties['crossover_span_angle'] = 45
-        self._properties['max_vhelix_length'] = self._STEP*2
+        self._properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._properties['neighbor_active_angle'] = ''
-
-        # Runtime state
-        self._active_base_index = self._STEP
-        self._active_virtual_helix = None
-        self._active_virtual_helix_idx = None
-
     # end def
 
     def __repr__(self):
@@ -103,8 +84,6 @@ class NucleicAcidPart(Part):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceIndexSignal = ProxySignal(CNObject, int,
-                        name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(CNObject,
                         name='partActiveSliceResizeSignal')     # self
     partDimensionsChangedSignal = ProxySignal(CNObject,
@@ -113,12 +92,10 @@ class NucleicAcidPart(Part):
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(CNObject,
                         name='partParentChangedSignal')         # self
-    partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
-                        name='partPreDecoratorSelectedSignal')  # self, row, col, idx
+    # partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
+    #                     name='partPreDecoratorSelectedSignal')  # self, row, col, idx
     partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
-    partStrandChangedSignal = ProxySignal(object, CNObject,
-                        name='partStrandChangedSignal')         # self, virtual_helix id_num
     partVirtualHelixAddedSignal = ProxySignal(object, int,
                         name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
     partVirtualHelixRemovedSignal = ProxySignal(object, int,
@@ -143,22 +120,6 @@ class NucleicAcidPart(Part):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def document(self):
-        return self._document
-    # end def
-
-    def oligos(self):
-        return self._oligos
-    # end def
-
-    def setDocument(self, document):
-        self._document = document
-    # end def
-
-    def stepSize(self):
-        return self._STEP
-    # end def
-
     def minorGrooveAngle(self):
         return self._MINOR_GROOVE_ANGLE
     # end def
@@ -206,21 +167,10 @@ class NucleicAcidPart(Part):
         return self._virtual_helix_group
     # end def
 
-    def activeBaseIndex(self):
-        return self._active_base_index
-    # end def
-
-    def activeVirtualHelix(self):
-        return self._active_virtual_helix
-     # end def
-
-    def activeVirtualHelixIdx(self):
-        return self._active_virtual_helix_idx
-     # end def
-
     def dimensions(self, scale_factor=1.0):
-        """Returns a tuple of the max X and maxY coordinates of the lattice."""
-        return self._quadtree.rect(scale_factor=scale_factor)
+        """Returns a tuple of rectangle definining the XY limits of a part"""
+        xLL, yLL, xUR, yUR = self._virtual_helix_group.getOriginLimits()
+        return xLL*scale_factor, yLL*scale_factor, xUR*scale_factor, yUR*scale_factor
     # end def
 
     def getStapleSequences(self):
@@ -231,32 +181,9 @@ class NucleicAcidPart(Part):
                 s = s + oligo.sequenceExport()
         return s
 
-    def getVirtualHelices(self):
-        """yield an iterator to the virtual_helix references in the part"""
-        return self._quadtree.__iter__()
-    # end def
-
-    def indexOfRightmostNonemptyBase(self):
-        """
-        During reduction of the number of bases in a part, the first click
-        removes empty bases from the right hand side of the part (red
-        left-facing arrow). This method returns the new numBases that will
-        effect that reduction.
-        """
-        ret = self._STEP - 1
-        for vh in self.getVirtualHelices():
-            ret = max(ret, vh.indexOfRightmostNonemptyBase())
-        return ret
-    # end def
-
-    def insertions(self):
-        """Return dictionary of insertions."""
-        return self._insertions
-    # end def
-
-    def isEvenParity(self, row, column):
-        """Should be overridden when subclassing."""
-        raise NotImplementedError
+    def getIdNums(self):
+        """return the set of all ids used"""
+        return self._virtual_helix_group.reserved_ids
     # end def
 
     def getStapleLoopOligos(self):
@@ -271,12 +198,9 @@ class NucleicAcidPart(Part):
                 stap_loop_olgs.append(o)
         return stap_loop_olgs
 
-    def maxBaseIdx(self):
-        return self._max_base
-    # end def
-
-    def minBaseIdx(self):
-        return self._min_base
+    def maxBaseIdx(self, id_num):
+        _, size = self._virtual_helix_group.getOffsetAndSize(id_num)
+        return size
     # end def
 
     def numberOfVirtualHelices(self):
@@ -295,177 +219,17 @@ class NucleicAcidPart(Part):
         return self._TWIST_PER_BASE
     # end def
 
-    def virtualHelixAtCoord(self, coord):
-        """
-        Looks for a virtual_helix at the coordinate, coord = (row, colum)
-        if it exists it is returned, else None is returned
-        """
-        radius = self._RADIUS
-        x, y = self.latticeCoordToPositionXY(*coord)
-        rect = (x - radius, y - radius, x + radius, y + radius)
-        res = self._quadtree.findNodeByRect(point)
-        if res is not None:
-            return res[0]
-        else:
-            return None
-    # end def
-
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def autoStaple(part, is_slow=True):
-        """Autostaple does the following:
-        1. Clear existing staple strands by iterating over each strand
-        and calling RemoveStrandCommand on each. The next strand to remove
-        is always at index 0.
-        2. Create temporary strands that span regions where scaffold is present.
-        3. Determine where actual strands will go based on strand overlap with
-        prexovers.
-        4. Delete temporary strands and create new strands.
-
-        is_slow: True --> undoable
-                : False --> not undoable
-        """
-        ep_dict = {}  # keyed on StrandSet
-        cmds = []
-
-        # clear existing staple strands
-        # part.verifyOligos()
-
-        for o in list(part.oligos()):
-            if not o.isStaple():
-                continue
-            c = RemoveOligoCommand(o)
-            cmds.append(c)
-        # end for
-        util.execCommandList(part, cmds, desc="Clear staples",
-                                            use_undostack=False)
-        cmds = []
-
-        # create strands that span all bases where scaffold is present
-        for vh in part.getVirtualHelices():
-            segments = []
-            scaf_ss = vh.scaffoldStrandSet()
-            for strand in scaf_ss:
-                lo, hi = strand.idxs()
-                if len(segments) == 0:
-                    segments.append([lo, hi])  # insert 1st strand
-                elif segments[-1][1] == lo - 1:
-                    segments[-1][1] = hi  # extend
-                else:
-                    segments.append([lo, hi])  # insert another strand
-            stap_ss = vh.stapleStrandSet()
-            ep_dict[stap_ss] = []
-            for i in range(len(segments)):
-                lo, hi = segments[i]
-                ep_dict[stap_ss].extend(segments[i])
-                c = CreateStrandCommand(stap_ss, lo, hi)
-                cmds.append(c)
-        util.execCommandList(part, cmds, desc="Add tmp strands",
-                                use_undostack=False)
-        cmds = []
-
-        # determine where xovers should be installed
-        for vh in part.getVirtualHelices():
-            stap_ss = vh.stapleStrandSet()
-            scaf_ss = vh.scaffoldStrandSet()
-            is5to3 = stap_ss.isDrawn5to3()
-            potential_xovers = part.potentialCrossoverList(vh)
-            for neighbor_vh, idx, strand_type, is_low_idx in potential_xovers:
-                if strand_type != StrandType.STAPLE:
-                    continue
-                if is_low_idx and is5to3:
-                    strand = stap_ss.getStrand(idx)
-                    neighbor_ss = neighbor_vh.stapleStrandSet()
-                    n_strand = neighbor_ss.getStrand(idx)
-                    if strand is None or n_strand is None:
-                        continue
-                    # check for bases on both strands at [idx-1:idx+3]
-                    if not (strand.lowIdx() < idx and strand.highIdx() > idx + 1):
-                        continue
-                    if not (n_strand.lowIdx() < idx and n_strand.highIdx() > idx + 1):
-                        continue
-
-                    # # check for nearby scaffold xovers
-                    # scaf_strand_L = scaf_ss.getStrand(idx-4)
-                    # scaf_strand_H = scaf_ss.getStrand(idx+5)
-                    # if scaf_strand_L:
-                    #     if scaf_strand_L.hasXoverAt(idx-4):
-                    #         continue
-                    # if scaf_strand_H:
-                    #     if scaf_strand_H.hasXoverAt(idx+5):
-                    #         continue
-
-                    # Finally, add the xovers to install
-                    ep_dict[stap_ss].extend([idx, idx+1])
-                    ep_dict[neighbor_ss].extend([idx, idx+1])
-
-        # clear temporary staple strands
-        for vh in part.getVirtualHelices():
-            stap_ss = vh.stapleStrandSet()
-            for strand in stap_ss:
-                c = RemoveStrandCommand(stap_ss, strand)
-                cmds.append(c)
-        util.execCommandList(part, cmds, desc="Rm tmp strands",
-                                        use_undostack=False)
-        cmds = []
-
-        if is_slow:
-            part.undoStack().beginMacro("Auto-Staple")
-
-        for stap_ss, ep_list in ep_dict.items():
-            assert (len(ep_list) % 2 == 0)
-            ep_list = sorted(ep_list)
-            for i in range(0, len(ep_list),2):
-                lo, hi = ep_list[i:i+2]
-                c = CreateStrandCommand(stap_ss, lo, hi)
-                cmds.append(c)
-        util.execCommandList(part, cmds, desc="Create strands",
-                                use_undostack=is_slow)
-        cmds = []
-
-        # create crossovers wherever possible (from strand5p only)
-        for vh in part.getVirtualHelices():
-            stap_ss = vh.stapleStrandSet()
-            is5to3 = stap_ss.isDrawn5to3()
-            potential_xovers = part.potentialCrossoverList(vh)
-            for neighbor_vh, idx, strand_type, is_low_idx in potential_xovers:
-                if strand_type != StrandType.STAPLE:
-                    continue
-                if (is_low_idx and is5to3) or (not is_low_idx and not is5to3):
-                    strand = stap_ss.getStrand(idx)
-                    neighbor_ss = neighbor_vh.stapleStrandSet()
-                    n_strand = neighbor_ss.getStrand(idx)
-                    if strand is None or n_strand is None:
-                        continue
-                    if idx in strand.idxs() and idx in n_strand.idxs():
-                        # only install xovers on pre-split strands
-                        part.createXover(strand, idx, n_strand, idx,
-                                            update_oligo=is_slow,
-                                            use_undostack=is_slow)
-
-        if not is_slow:
-            c = RefreshOligosCommand(part)
-            cmds.append(c)
-            util.execCommandList(part, cmds, desc="Assign oligos",
-                                            use_undostack=False)
-
-        cmds = []
-        if is_slow:
-            part.undoStack().endMacro()
-        else:
-            part.undoStack().clear()
-    # end def
-
     def verifyOligoStrandCounts(self):
         total_stap_strands = 0
-        stapOligos = set()
+        rev_oligos = set()
         total_stap_oligos = 0
 
-        for vh in self.getVirtualHelices():
-            stap_ss = vh.stapleStrandSet()
-            total_stap_strands += stap_ss.strandCount()
-            for strand in stap_ss:
-                stapOligos.add(strand.oligo())
-        # print("# stap oligos:", len(stapOligos), "# stap strands:", total_stap_strands)
+        for id_num in self.getIdNums():
+            fwd_ss, rev_ss = part.virtualHelixGroup().getStrandSets(id_num)
+            total_stap_strands += rev_ss.strandCount()
+            for strand in rev_ss:
+                rev_oligos.add(strand.oligo())
     # end def
 
     def verifyOligos(self):
@@ -490,13 +254,6 @@ class NucleicAcidPart(Part):
         # print("Total Passed: ", total_passed, "/", total_passed+total_errors)
     # end def
 
-    def removeVirtualHelices(self, use_undostack=True):
-        vhs = [vh for vh in self._quadtree]
-        for vh in vhs:
-            vh.remove(use_undostack)
-        # end for
-    # end def
-
     def remove(self, use_undostack=True):
         """
         This method assumes all strands are and all VirtualHelices are
@@ -515,13 +272,8 @@ class NucleicAcidPart(Part):
         # remove strands and oligos
         self.removeAllOligos(use_undostack)
         # remove VHs
-        vhs = [vh for vh in self._quadtree]
-        for vh in vhs:
-            d = RemoveVirtualHelixCommand(self, vh)
-            if use_undostack:
-                self.undoStack().push(d)
-            else:
-                d.redo()
+        for id_num in list(self.getIdNums()):
+            self.removeVirtualHelix(id_num, use_undostack=use_undostack)
         # end for
         # remove the part
         e = RemovePartCommand(self)
@@ -745,29 +497,6 @@ class NucleicAcidPart(Part):
         self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
 
-
-
-    def generatorFullLattice(self):
-        """
-        Returns a generator that yields the row, column lattice points to draw
-        relative to the part origin.
-        """
-        return product(range(self._max_row), range(self._max_col))
-    # end def
-
-    def generatorSpatialLattice(self, scale_factor=1.0):
-        """
-        Returns a generator that yields the XY spatial lattice points to draw
-        relative to the part origin.
-        """
-        # nested for loop in one line
-        latticeCoordToPositionXY = self.latticeCoordToPositionXY
-        for latticeCoord in product(range(self._max_row), range(self._max_col)):
-            row, col = latticeCoord
-            x, y = latticeCoordToPositionXY(row, col, scale_factor)
-            yield x, y, row, col
-    # end def
-
     def getPreXoversHigh(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
         """
         Returns all prexover positions for neighbor_type that are below
@@ -776,8 +505,8 @@ class NucleicAcidPart(Part):
         pre_xo = self._SCAFH if strand_type == StrandType.SCAFFOLD else self._STAPH
         if max_idx is None:
             max_idx = self._max_base
-        steps = (self._max_base // self._STEP) + 1
-        ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
+        steps = (self._max_base // self._STEP_SIZE) + 1
+        ret = [i * self._STEP_SIZE + j for i in range(steps) for j in pre_xo[neighbor_type]]
         return filter(lambda x: x >= min_idx and x <= max_idx, ret)
 
     def getPreXoversLow(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
@@ -789,20 +518,9 @@ class NucleicAcidPart(Part):
                                 else self._STAPL
         if max_idx is None:
             max_idx = self._max_base
-        steps = (self._max_base // self._STEP) + 1
-        ret = [i * self._STEP + j for i in range(steps) for j in pre_xo[neighbor_type]]
+        steps = (self._max_base // self._STEP_SIZE) + 1
+        ret = [i * self._STEP_SIZE + j for i in range(steps) for j in pre_xo[neighbor_type]]
         return filter(lambda x: x >= min_idx and x <= max_idx, ret)
-
-    def latticeCoordToPositionXY(self, row, col, scale_factor=1.0, normalize=False):
-        """
-        Returns a tuple of the (x,y) position for a given lattice row and
-        column.
-
-        Note: The x,y position is the upperLeftCorner for the given
-        coordinate, and relative to the part instance.
-        """
-        raise NotImplementedError  # To be implemented by Part subclass
-    # end def
 
     def xoverSnapTo(self, strand, idx, delta):
         """
@@ -823,10 +541,10 @@ class NucleicAcidPart(Part):
         else:
             connected_strand = strand.connectionHigh()
             preXovers = self.getPreXoversLow
-        connected_vh = connected_strand.virtualHelix()
+        connected_vh = connected_strand.idNum()
 
         # determine neighbor position, if any
-        neighbors = self.getVirtualHelixNeighbors(strand.virtualHelix())
+        neighbors = self.getVirtualHelixNeighbors(strand.idNum())
         if connected_vh in neighbors:
             neighbor_idx = neighbors.index(connected_vh)
             try:
@@ -841,18 +559,6 @@ class NucleicAcidPart(Part):
                 return None  # nearest not found in the expanded list
         else:  # no neighbor (forced xover?)... don't snap, just return
             return idx + delta
-    # end def
-
-    def positionToCoord(self, x, y, scale_factor=1.0):
-        """
-        Returns a tuple (row, column) lattice coordinate for a given
-        x and y position that is within +/- 0.5 of a true valid lattice
-        position.
-
-        Note: mapping should account for int-to-float rounding errors.
-        x,y is relative to the Part Instance Position.
-        """
-        raise NotImplementedError  # To be implemented by Part subclass
     # end def
 
     def newPart(self):
@@ -928,97 +634,7 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
     #end def
 
-    def setActiveBaseIndex(self, idx):
-        self._active_base_index = idx
-        self.partActiveSliceIndexSignal.emit(self, idx)
-    # end def
-
-    def setActiveVirtualHelix(self, virtual_helix, idx=None):
-        self._active_virtual_helix = virtual_helix
-        self._active_virtual_helix_idx = idx
-        self.partStrandChangedSignal.emit(self, virtual_helix)
-    # end def
-
-    def selectPreDecorator(self, selection_list):
-        """
-        Handles view notifications that a predecorator has been selected.
-        """
-        if (len(selection_list) == 0):
-            return
-            # print("all PreDecorators were unselected")
-            # partPreDecoratorUnSelectedSignal.emit()
-        sel = selection_list[0]
-        (row, col, baseIdx) = (sel[0], sel[1], sel[2])
-        self.partPreDecoratorSelectedSignal.emit(self, row, col, baseIdx)
-
-
-
     ### PRIVATE SUPPORT METHODS ###
-    def _addVirtualHelix(self, virtual_helix):
-        """
-        private method for adding a virtual_helix to the Parts data structure
-        of virtual_helix references
-        """
-        self._quadtree.insertNode(virtual_helix)
-        neighbors = self.getVirtualHelixNeighbors(virtual_helix)
-        virtual_helix.setProperty('neighbors', list(neighbors))
-        for nvh in neighbors:
-            neighbor_list = nvh.getProperty('neighbors')
-            neighbor_list.append(virtual_helix)
-    # end def
-
-    def _removeVirtualHelix(self, virtual_helix):
-        """
-        private method for adding a virtual_helix to the Parts data structure
-        of virtual_helix references
-        """
-        neighbors = self.getVirtualHelixNeighbors(virtual_helix)
-        self._quadtree.removeNode(virtual_helix)
-        for nvh in neighbors:
-            neighbor_list = nvh.getProperty('neighbors')
-            neighbor_list.remove(virtual_helix)
-    # end def
-
-    def _splitBeforeAutoXovers(self, vh5p, vh3p, idx, use_undostack=True):
-        # prexoveritem needs to store left or right, and determine
-        # locally whether it is from or to
-        # pass that info in here in and then do the breaks
-        ss5p = strand5p.strandSet()
-        ss3p = strand3p.strandSet()
-        cmds = []
-
-        # is the 5' end ready for xover installation?
-        if strand3p.idx5Prime() == idx5p:  # yes, idx already matches
-            xo_strand3 = strand3p
-        else:  # no, let's try to split
-            offset3p = -1 if ss3p.isDrawn5to3() else 1
-            if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
-                found, overlap, ss_idx = ss3p._findIndexOfRangeFor(strand3p)
-                if found:
-                    c = SplitCommand(strand3p, idx3p + offset3p, ss_idx)
-                    cmds.append(c)
-                    xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
-            else:  # can't split... abort
-                return
-
-        # is the 3' end ready for xover installation?
-        if strand5p.idx3Prime() == idx5p:  # yes, idx already matches
-            xo_strand5 = strand5p
-        else:
-            if ss5p.strandCanBeSplit(strand5p, idx5p):
-                found, overlap, ss_idx = ss5p._findIndexOfRangeFor(strand5p)
-                if found:
-                    d = SplitCommand(strand5p, idx5p, ss_idx)
-                    cmds.append(d)
-                    xo_strand5 = d._strand_low if ss5p.isDrawn5to3() \
-                                                else d._strand_high
-            else:  # can't split... abort
-                return
-        c = CreateXoverCommand(self, xo_strand5, idx5p, xo_strand3, idx3p)
-        cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Xover", \
-                                                use_undostack=use_undostack)
-    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def shallowCopy(self):
@@ -1054,7 +670,7 @@ class NucleicAcidPart(Part):
             new_oligo = oligo.deepCopy(part)
             last_strand = None
             for strand in strandGenerator:
-                id_num = strand.virtualHelix().number()
+                id_num = strand.idNum()
                 newVHelix = part._virtual_helices[id_num]
                 new_strandset = newVHelix().getStrandSetByType(strand_type)
                 new_strand = strand.deepCopy(new_strandset, new_oligo)
@@ -1078,133 +694,24 @@ class NucleicAcidPart(Part):
         return part
     # end def
 
-    def getVirtualHelixNeighbors(self, virtual_helix, threshold=None):
-        """
-        returns the list of neighboring virtual_helices based on parity of an
-        input virtual_helix
-
-        If a potential neighbor doesn't exist, None is returned in it's place
-        """
-        neighbors = set()
-        vh = virtual_helix
-        if vh is None:
-            return neighbors
-        if threshold is None:
-            threshold = 2.1*self._RADIUS
-
-        qt = self._quadtree
-        neighbor_candidates = qt.queryPoint(vh.location(), threshold)
-        if vh in neighbor_candidates:
-            neighbor_candidates.remove(vh)
-        return neighbor_candidates
-    # end def
-
-    def areSameOrNeighbors(self, virtual_helixA, virtual_helixB):
-        """
-        returns True or False
-        """
-        return virtual_helixB in self.getVirtualHelixNeighbors(virtual_helixA) or \
-            virtual_helixA == virtual_helixB
-    # end def
-
-    def potentialCrossoverList(self, virtual_helix, idx=None, xover_p=False):
-        """
-        Returns a list of tuples
-            (neighborVirtualHelix, index, strand_type, is_low_idx)
-
-        where:
-
-        neighborVirtualHelix is a virtual_helix neighbor of the arg virtual_helix
-        index is the index where a potential Xover might occur
-        strand_type is from the enum (StrandType.SCAFFOLD, StrandType.STAPLE)
-        is_low_idx is whether or not it's the at the low index (left in the Path
-        view) of a potential Xover site
-        """
-        vh = virtual_helix
-        ret = []  # LUT = Look Up Table
-        part = self
-        # these are the list of crossover points simplified
-        # they depend on whether the strand_type is scaffold or staple
-        # create a list of crossover points for each neighbor of the form
-        # [(_SCAFL[i], _SCAFH[i], _STAPL[i], _STAPH[i]), ...]
-        luts_neighbor = list(
-                            izip(
-                                part._SCAFL,
-                                part._SCAFH,
-                                part._STAPL,
-                                part._STAPH
-                                )
-                            )
-
-        stand_types = (StrandType.SCAFFOLD, StrandType.STAPLE)
-        num_bases = part.maxBaseIdx()
-
-        # create a range for the helical length dimension of the Part,
-        # incrementing by the lattice step size.
-        base_range_unit = list(range(0, num_bases, part._STEP))
-
-        if idx is not None:
-            base_range_full = list(filter(lambda x: x >= idx - 3 * part._STEP and \
-                                        x <= idx + 2 * part._STEP, base_range_unit))
-        else:
-            base_range_full = base_range_unit
-
-        from_strandsets = vh.getStrandSets()
-        neighbors = self.getVirtualHelixNeighbors(vh)
-
-        # print(neighbors, luts_neighbor)
-        for neighbor, lut in izip(neighbors, luts_neighbor):
-            if not neighbor:
-                continue
-
-            """
-            now arrange again for iteration
-            ( (_SCAFL[i], _SCAFH[i]), (_STAPL[i], _STAPH[i]) )
-            so we can pair by StrandType
-            """
-            lut_scaf = lut[0:2]
-            lut_stap = lut[2:4]
-            lut = (lut_scaf, lut_stap)
-
-            to_strandsets = neighbor.getStrandSets()
-            for from_ss, to_ss, pts, st in izip(from_strandsets,
-                                                to_strandsets, lut, stand_types):
-                # test each period of each lattice for each StrandType
-                for pt, is_low_idx in izip(pts, (True, False)):
-                    for i, j in product(base_range_full, pt):
-                        index = to_index = i + j
-                        # if xover_p: # selection flag passed in from nucleicacidpartitem
-                        #     to_index = index+1 if is_low_idx else index-1
-                        if index < num_bases:
-                            if from_ss.hasNoStrandAtOrNoXover(index) and \
-                                    to_ss.hasNoStrandAtOrNoXover(to_index):
-                                ret.append((neighbor, index, st, is_low_idx))
-                            # end if
-                        # end if
-                    # end for
-                # end for
-            # end for
-        # end for
-        return ret
-    # end def
-
-    def isPossibleXoverA(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
-        from_ss = from_virtual_helix.getStrandSetByType(strand_type)
-        to_ss = to_virtual_helix.getStrandSetByType(strand_type)
+    def isPossibleXoverA(self, from_id_num, to_id_num, strand_type, idx):
+        from_ss = from_id_num.getStrandSetByType(strand_type)
+        to_ss = to_id_num.getStrandSetByType(strand_type)
         return from_ss.hasStrandAtAndNoXover(idx) and \
                 to_ss.hasStrandAtAndNoXover(idx)
     # end def
 
-    def isPossibleXoverP(self, from_virtual_helix, to_virtual_helix, strand_type, idx):
-        to_strand_type = StrandType.SCAFFOLD if strand_type == StrandType.STAPLE else StrandType.STAPLE
-        fromSS = from_virtual_helix.getStrandSetByType(strand_type)
-        toSS = to_virtual_helix.getStrandSetByType(strand_type)
-        if fromSS.isDrawn5to3():
-            return fromSS.hasStrandAtAndNoXover(idx) and \
-                    toSS.hasStrandAtAndNoXover(idx + 1)
+    def isPossibleXoverP(self, from_id_num, to_id_num, strand_type, idx):
+        vhg = self._virtual_helix_group
+        to_strand_type = StrandType.FWD if strand_type is StrandType.REV else StrandType.REV
+        from_ss = vhg.getStrandSets(from_id_num)[strand_type]
+        to_ss = vhg.getStrandSets(to_id_num)[to_strand_type]
+        if from_ss.isDrawn5to3():
+            return from_ss.hasStrandAtAndNoXover(idx) and \
+                    to_ss.hasStrandAtAndNoXover(idx + 1)
         else:
-            return fromSS.hasStrandAtAndNoXover(idx) and \
-                    toSS.hasStrandAtAndNoXover(idx - 1)
+            return from_ss.hasStrandAtAndNoXover(idx) and \
+                    to_ss.hasStrandAtAndNoXover(idx - 1)
     # end def
 
     def setImportedVHelixOrder(self, ordered_coord_list, check_batch=True):

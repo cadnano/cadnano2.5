@@ -105,8 +105,8 @@ class PlasmidPart(Part):
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(ProxyObject,
                         name='partParentChangedSignal')         # self
-    partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
-                        name='partPreDecoratorSelectedSignal')  # self, row, col, idx
+    # partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
+    #                     name='partPreDecoratorSelectedSignal')  # self, row, col, idx
     partRemovedSignal = ProxySignal(ProxyObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, ProxyObject,
@@ -159,31 +159,6 @@ class PlasmidPart(Part):
         return PartType.PLASMIDPART
     # end def
 
-    # def virtualHelix(self, vhref, returnNoneIfAbsent=True):
-    #     # vhrefs are the shiny new way to talk to part about its constituent
-    #     # virtualhelices. Wherever you see f(...,vhref,...) you can
-    #     # f(...,27,...)         use the virtualhelix's id number
-    #     # f(...,vh,...)         use an actual virtualhelix
-    #     # f(...,(1,42),...)     use the coordinate representation of its position
-    #     """A vhref is the number of a virtual helix, the (row, col) of a virtual helix,
-    #     or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
-    #     vh = None
-    #     if type(vhref) in (int,):
-    #         vh = self._number_to_virtual_helix.get(vhref, None)
-    #     elif type(vhref) in (tuple, list):
-    #         vh = self._coord_to_virtual_velix.get(vhref, None)
-    #     else:
-    #         vh = vhref
-    #     if not isinstance(vh, VirtualHelix):
-    #         if returnNoneIfAbsent:
-    #             return None
-    #         else:
-    #             err = "Couldn't find the virtual helix in part %s "+\
-    #                   "referenced by index %s" % (self, vhref)
-    #             raise IndexError(err)
-    #     return vh
-    # # end def
-
     def activeBaseIndex(self):
         return self._active_base_index
     # end def
@@ -214,19 +189,6 @@ class PlasmidPart(Part):
     #     return self._coord_to_virtual_velix.values()
     # # end def
 
-    def indexOfRightmostNonemptyBase(self):
-        """
-        During reduction of the number of bases in a part, the first click
-        removes empty bases from the right hand side of the part (red
-        left-facing arrow). This method returns the new numBases that will
-        effect that reduction.
-        """
-        ret = self._STEP - 1
-        for vh in self.getVirtualHelices():
-            ret = max(ret, vh.indexOfRightmostNonemptyBase())
-        return ret
-    # end def
-
     def insertions(self):
         """Return dictionary of insertions."""
         return self._insertions
@@ -248,14 +210,6 @@ class PlasmidPart(Part):
             if o.isStaple() and o.isLoop():
                 stap_loop_olgs.append(o)
         return stap_loop_olgs
-
-    def maxBaseIdx(self):
-        return self._max_base
-    # end def
-
-    def minBaseIdx(self):
-        return self._min_base
-    # end def
 
     # def numberOfVirtualHelices(self):
     #     return len(self._coord_to_virtual_velix)
@@ -478,7 +432,7 @@ class PlasmidPart(Part):
             new_oligo = oligo.deepCopy(part)
             last_strand = None
             for strand in strandGenerator:
-                id_num = strand.virtualHelix().number()
+                id_num = strand.idNum()
                 newVHelix = part._virtual_helices[id_num]
                 new_strandset = newVHelix().getStrandSetByType(strand_type)
                 new_strand = strand.deepCopy(new_strandset, new_oligo)

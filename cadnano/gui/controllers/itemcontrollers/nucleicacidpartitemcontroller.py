@@ -12,7 +12,7 @@ class NucleicAcidPartItemController(PartItemController):
         m_p = self._model_part
         p_i = self._part_item
         m_p.partActiveVirtualHelixChangedSignal.connect(p_i.partActiveVirtualHelixChangedSlot)
-        m_p.partPreDecoratorSelectedSignal.connect(p_i.partPreDecoratorSelectedSlot)
+        # m_p.partPreDecoratorSelectedSignal.connect(p_i.partPreDecoratorSelectedSlot)
         m_p.partStrandChangedSignal.connect(p_i.updatePreXoverItemsSlot)
         m_p.partVirtualHelixAddedSignal.connect(p_i.partVirtualHelixAddedSlot)
         m_p.partVirtualHelixRemovedSignal.connect(p_i.partVirtualHelixRemovedSlot)
@@ -29,7 +29,7 @@ class NucleicAcidPartItemController(PartItemController):
         m_p = self._model_part
         p_i = self._part_item
         m_p.partActiveVirtualHelixChangedSignal.disconnect(p_i.partActiveVirtualHelixChangedSlot)
-        m_p.partPreDecoratorSelectedSignal.disconnect(p_i.partPreDecoratorSelectedSlot)
+        # m_p.partPreDecoratorSelectedSignal.disconnect(p_i.partPreDecoratorSelectedSlot)
         m_p.partStrandChangedSignal.disconnect(p_i.updatePreXoverItemsSlot)
         m_p.partVirtualHelixAddedSignal.disconnect(p_i.partVirtualHelixAddedSlot)
         m_p.partVirtualHelixRemovedSignal.disconnect(p_i.partVirtualHelixRemovedSlot)

@@ -105,15 +105,14 @@ class CadnanoQt(QObject):
                 part_instance = self.d.selectedInstance()
                 return w().pathroot.partItemForPart(part_instance)
 
-            print( "\tvh(i)\tshortcut for p().reference().virtualHelix(i)")
-            def vh(number):
-                return p().reference().virtualHelixToNumber(number)
+            print( "\tvh(i)\tshortcut for p().reference().virtualHelixGroup().getStrandSets(i)")
+            def strandsets(id_num):
+                return p().reference().virtualHelixGroup().getStrandSets(id_num)
 
             print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
-            def vhi(vhref):
+            def vhi(id_num):
                 partitem = pi()
-                vHelix = vh(vhref)
-                return partitem.vhItemForVH(vHelix)
+                return partitem.vhItemForIdNum(id_num)
 
             print("\tquit()\tquit (for when the menu fails)")
             print("\tgraphicsItm.findChild()  see help(pi().findChild)")

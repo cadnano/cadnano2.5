@@ -20,24 +20,21 @@ class RefreshOligosCommand(UndoCommand):
 
     This command is meant for undoable steps, like file-io and autostaple
     """
-    def __init__(self, part, include_scaffold=False, colors=None):
+    def __init__(self, part, colors=None):
         super(RefreshOligosCommand, self).__init__("refresh oligos")
         self._part = part
-        self.include_scaffold = include_scaffold
         self.colors = colors
     # end def
 
     def redo(self):
         visited = {}
-
-        for vh in self._part.getVirtualHelices():
-            stap_ss = vh.stapleStrandSet()
-            for strand in stap_ss:
+        part = self._part
+        for id_num in part.getIdNums():
+            fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+            for strand in rev_ss:
                 visited[strand] = False
-            if self.include_scaffold:
-                scap_ss = vh.scaffoldStrandSet()
-                for strand in scap_ss:
-                    visited[strand] = False
+            for strand in fwd_ss:
+                visited[strand] = False
 
         colors = self.colors
         for strand in list(visited.keys()):

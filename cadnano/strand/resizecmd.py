@@ -39,7 +39,7 @@ class ResizeCommand(UndoCommand):
             std.reapplySequence()
         std.strandResizedSignal.emit(std, n_i)
         # for updating the Slice View displayed helices
-        part.partStrandChangedSignal.emit(part, strandset.virtualHelix())
+        part.partStrandChangedSignal.emit(part, strandset.idNum())
         std5p = std.connection5p()
         if std5p:
             std5p.strandResizedSignal.emit(std5p, std5p.idxs())
@@ -60,7 +60,7 @@ class ResizeCommand(UndoCommand):
             std.reapplySequence()
         std.strandResizedSignal.emit(std, o_i)
         # for updating the Slice View displayed helices
-        part.partStrandChangedSignal.emit(part, strandset.virtualHelix())
+        part.partStrandChangedSignal.emit(part, strandset.idNum())
         std5p = std.connection5p()
         if std5p:
             std5p.strandResizedSignal.emit(std5p, std5p.idxs())

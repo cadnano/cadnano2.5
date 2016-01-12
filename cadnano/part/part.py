@@ -45,10 +45,10 @@ class Part(CNObject):
     Part(), with a mutable parent and position field.
     """
     editable_properties = ['name', 'color']
-    _STEP = 21  # this is the period (in bases) of the part lattice
+    _STEP_SIZE = 21  # this is the period (in bases) of the part lattice
     _RADIUS = 1.125  # nanometers
     _TURNS_PER_STEP = 2
-    _HELICAL_PITCH = _STEP / _TURNS_PER_STEP
+    _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
 
     def __init__(self, *args, **kwargs):
@@ -57,21 +57,12 @@ class Part(CNObject):
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
         """
-        # if self.__class__ == Part:
-        #     e = "This class is abstract. Perhaps you want HoneycombPart."
-        #     raise NotImplementedError(e)
         self._document = kwargs.get('document', None)
         super(Part, self).__init__(self._document)
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
         self._oligos = set()
-        self._number_to_virtual_helix = {}
-        # Dimensions
-        self._max_row = 50  # subclass overrides based on prefs
-        self._max_col = 50
-        self._min_base = 0
-        self._max_base = 2 * self._STEP - 1
         # Properties
         self.view_properties = {} #self._document.newViewProperties()
 
@@ -79,22 +70,19 @@ class Part(CNObject):
         self._properties["name"] = "Part%d" % len(self._document.children())
         self._properties["color"] = "#000000" # outlinerview will override from styles
         self._properties["visible"] = True
-        self._properties["circular"] = True
 
         # Selections
         self._selections = {}
 
-        # ID assignment
-        self.odd_recycle_bin, self.even_recycle_bin = [], []
-        self.reserve_bin = set()
-        self._highest_used_odd = -1  # Used in _reserveHelixIDNumber
-        self._highest_used_even = -2  # same
-
         # Runtime state
-        self._active_base_index = self._STEP
-        self._active_virtual_helix = None
-        self._active_virtual_helix_idx = None
+        self._active_base_index = self._STEP_SIZE
+        self._active_id_num = None
+        self._active_id_num_idx = None
         self._selected = False
+
+        if self.__class__ == Part:
+            e = "This class is abstract. Perhaps you want HoneycombPart."
+            raise NotImplementedError(e)
     # end def
 
     def __repr__(self):
@@ -112,14 +100,12 @@ class Part(CNObject):
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(CNObject,
                         name='partParentChangedSignal')         # self
-    partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
-                        name='partPreDecoratorSelectedSignal')  # self, row, col, idx
+    # partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
+    #                     name='partPreDecoratorSelectedSignal')  # self, row, col, idx
     partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
     partStrandChangedSignal = ProxySignal(object, CNObject,
                         name='partStrandChangedSignal')         # self, virtual_helix
-    # partVirtualHelixAddedSignal = ProxySignal(object, CNObject,
-    #                     name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixAddedSignal = ProxySignal(object, object,
                         name='partVirtualHelixAddedSignal')     # self, virtualhelix
     partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
@@ -128,8 +114,6 @@ class Part(CNObject):
                         name='partVirtualHelixResizedSignal')   # self, coord
     partVirtualHelixTransformedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixTransformedSignal')   # self, transform
-    partVirtualHelicesReorderedSignal = ProxySignal(object, list,
-                        name='partVirtualHelicesReorderedSignal') # self, list of coords
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
                         name='partActiveVirtualHelixChangedSignal')
     partModAddedSignal = ProxySignal(object, object, object,
@@ -150,10 +134,6 @@ class Part(CNObject):
     ### ACCESSORS ###
     def document(self):
         return self._document
-    # end def
-
-    def oligos(self):
-        return self._oligos
     # end def
 
     def setDocument(self, document):
@@ -193,51 +173,15 @@ class Part(CNObject):
         return self._selections
     # end def
 
-    def stepSize(self):
-        return self._STEP
+    def oligos(self):
+        return self._oligos
     # end def
 
-    def subStepSize(self):
-        """Note: _SUB_STEP_SIZE is defined in subclasses."""
-        return self._SUB_STEP_SIZE
+    def stepSize(self):
+        return self._STEP_SIZE
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    # def virtualHelix(self, vhref, returnNoneIfAbsent=True):
-    #     # vhrefs are the shiny new way to talk to part about its constituent
-    #     # virtualhelices. Wherever you see f(...,vhref,...) you can
-    #     # f(...,27,...)         use the virtualhelix's id number
-    #     # f(...,vh,...)         use an actual virtualhelix
-    #     # f(...,(1,42),...)     use the coordinate representation of its position
-    #     """A vhref is the number of a virtual helix, the (row, col) of a virtual helix,
-    #     or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
-    #     vh = None
-    #     if type(vhref) in (int,):
-    #         vh = self._number_to_virtual_helix.get(vhref, None)
-    #     elif type(vhref) in (tuple, list):
-    #         vh = self._coord_to_virtual_velix.get(vhref, None)
-    #     else:
-    #         vh = vhref
-    #     if not isinstance(vh, VirtualHelix):
-    #         if returnNoneIfAbsent:
-    #             return None
-    #         else:
-    #             err = "Couldn't find the virtual helix in part %s "+\
-    #                   "referenced by index %s" % (self, vhref)
-    #             raise IndexError(err)
-    #     return vh
-    # # end def
-
-    def iterVirtualHelixByNumber(self):
-        """ Iterate over VirtualHelix objects in order of their number
-        for semi deterministic
-        """
-        number_to_virtual_helix = self._number_to_virtual_helix
-        keys = sorted(list(number_to_virtual_helix.keys()))
-        for key in keys:
-            yield number_to_virtual_helix[key]
-    # end def
-
     def getImportVirtualHelixOrder(self):
         """ the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
@@ -245,47 +189,23 @@ class Part(CNObject):
         return self.getViewProperty('path', 'virtual_helix_order')
     # end def
 
+    def activeIdNum(self):
+        return self._active_id_num
+     # end def
+
     def activeBaseIndex(self):
         return self._active_base_index
     # end def
 
-    def activeVirtualHelix(self):
-        return self._active_virtual_helix
-     # end def
-
-    def activeVirtualHelixIdx(self):
-        return self._active_virtual_helix_idx
-     # end def
-
-    def dimensions(self):
-        """Returns a tuple of the max X and maxY coordinates of the lattice."""
-        return self.latticeCoordToPositionXY(self._max_row, self._max_col)
+    def setActiveBaseIndex(self, idx):
+        self._active_base_index = idx
+        self.partActiveSliceIndexSignal.emit(self, idx)
     # end def
 
-    def getStapleSequences(self):
-        """getStapleSequences"""
-        s = "Start,End,Sequence,Length,Color\n"
-        for oligo in self._oligos:
-            if oligo.strand5p().strandSet().isStaple():
-                s = s + oligo.sequenceExport()
-        return s
-
-    def getVirtualHelices(self):
-        """yield an iterator to the virtual_helix references in the part"""
-        return self._coord_to_virtual_velix.values()
-    # end def
-
-    def indexOfRightmostNonemptyBase(self):
-        """
-        During reduction of the number of bases in a part, the first click
-        removes empty bases from the right hand side of the part (red
-        left-facing arrow). This method returns the new numBases that will
-        effect that reduction.
-        """
-        ret = self._STEP - 1
-        for vh in self.getVirtualHelices():
-            ret = max(ret, vh.indexOfRightmostNonemptyBase())
-        return ret
+    def setActiveVirtualHelix(self, virtual_helix, idx=None):
+        self._active_virtual_helix = virtual_helix
+        self._active_virtual_helix_idx = idx
+        self.partStrandChangedSignal.emit(self, virtual_helix)
     # end def
 
     def insertions(self):
@@ -293,63 +213,11 @@ class Part(CNObject):
         return self._insertions
     # end def
 
-    def isEvenParity(self, row, column):
-        """Should be overridden when subclassing."""
-        raise NotImplementedError
-    # end def
-
-    def getStapleLoopOligos(self):
-        """
-        Returns staple oligos with no 5'/3' ends. Used by
-        actionExportSequencesSlot in documentcontroller to validate before
-        exporting staple sequences.
-        """
-        stap_loop_olgs = []
-        for o in list(self.oligos()):
-            if o.isStaple() and o.isLoop():
-                stap_loop_olgs.append(o)
-        return stap_loop_olgs
-
-    def maxBaseIdx(self):
-        return self._max_base
-    # end def
-
-    def minBaseIdx(self):
-        return self._min_base
-    # end def
-
-    def radius(self):
-        return self._RADIUS
-    # end def
-
-    def helicalPitch(self):
-        return self._HELICAL_PITCH
-    # end def
-
-    def twistPerBase(self):
-        return self._TWIST_PER_BASE
-    # end def
-
-    def selected(self):
+    def isSelected(self):
         return self.is_selected
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addOligo(self, oligo):
-        print("part: adding oligo", oligo)
-        self._oligos.add(oligo)
-        self.partOligoAddedSignal.emit(self, oligo)
-    # end def
-
-    def removeAllOligos(self, use_undostack=True):
-        # clear existing oligos
-        cmds = []
-        for o in list(self.oligos()):
-            cmds.append(RemoveOligoCommand(o))
-        # end for
-        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
-    # end def
-
     def setSelected(self, is_selected):
         self._selected = is_selected
         self.partSelectedChangedSignal.emit(self, is_selected)
@@ -486,8 +354,8 @@ class Part(CNObject):
             self.addModInstance(id_num idx, strandtype, False, mid)
     # end def
 
-    def removeModInstance(self, coord, idx, isstaple, isinternal, mid):
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
+    def removeModInstance(self, id_num, idx, is_rev, isinternal, mid):
+        key =  "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
         locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
         if key in mods_strands:
@@ -500,40 +368,40 @@ class Part(CNObject):
     # end def
 
     def removeModStrandInstance(self, strand, idx, mid):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
+        id_num = strand.idNum()
+        is_rev = strand.isReverse()
         if mid is not None:
-            self.removeModInstance(coord, idx, isstaple, False, mid)
+            self.removeModInstance(id_num, idx, is_rev, False, mid)
     # end def
 
-    def changeModInstance(self, coord, idx, isstaple, isinternal, mid_old, mid_new):
+    def changeModInstance(self, id_num, idx, is_rev, isinternal, mid_old, mid_new):
         if mid_new != mid_old:
             mods = self._mods
             if mid_old in mods and mid_new in mods:
-                self.removeModInstance(coord, idx, istaple, isinternal, mid_old)
-                self.addModInstance(coord, idx, isstaple, isinternal, mid_new)
+                self.removeModInstance(id_num, idx, is_rev, isinternal, mid_old)
+                self.addModInstance(id_num, idx, is_rev, isinternal, mid_new)
     # end def
 
-    def changeModLocation(self, coord, idx_old, idx, isstaple, isinternal, mid):
+    def changeModLocation(self, id_num, idx_old, idx, is_rev, isinternal, mid):
         if idx_old != idx:
-            self.removeModInstance(coord, idx_old, isstaple, isinternal, mid)
-            self.addModInstance(coord, idx, isstaple, isinternal, mid)
+            self.removeModInstance(id_num, idx_old, is_rev, isinternal, mid)
+            self.addModInstance(id_num, idx, is_rev, isinternal, mid)
     # end def
 
     def changeModStrandLocation(self, strand, idxs_old, idxs):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
+        id_num = strand.idNum()
+        is_rev = strand.isReverse()
         mods_strands = self._mods['ext_instances']
         for i in [0,1]:
             idx_old = idxs_old[i]
             idx = idxs[i]
             if idx_old != idx:
-                key_old =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx_old)
+                key_old =  "{},{},{}".format(id_num, is_rev, idx_old)
                 if key_old in mods_strands:
                     mid = mods_strands[key_old]
                     locations = self._mods[mid]['ext_locations']
                     self.removeModInstanceKey(key_old, mods_strands, locations)
-                    key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
+                    key =  "{},{},{}".format(id_num, is_rev, idx)
                     self.addModInstanceKey(key, mods_strands, locations, mid)
         # end for
     # end def

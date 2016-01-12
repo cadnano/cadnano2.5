@@ -101,8 +101,8 @@ class SelectSliceTool(AbstractSliceTool):
         group = self.group
         self.deselectItems()
 
-        for vh in self.selection_set:
-            vhi = part_item.getVirtualHelixItem(vh)
+        for id_num in self.selection_set:
+            vhi = part_item.getVirtualHelixItem(id_num)
             group.addToGroup(vhi)
 
         self.is_selection_active = True
@@ -120,8 +120,8 @@ class SelectSliceTool(AbstractSliceTool):
         self.snap_origin_item = None
         if self.is_selection_active:
             part_item = self.part_item
-            for vh in self.selection_set:
-                vhi = part_item.getVirtualHelixItem(vh)
+            for id_num in self.selection_set:
+                vhi = part_item.getVirtualHelixItem(id_num)
                 if vhi is not None:
                     group.removeFromGroup(vhi)
             self.selection_set.clear()
@@ -136,7 +136,7 @@ class SelectSliceTool(AbstractSliceTool):
     def addToSelection(self, vhi):
         group = self.group
         group.addToGroup(vhi)
-        self.selection_set.add(vhi.virtualHelix())
+        self.selection_set.add(vhi.idNum())
         if len(group.childItems()) > 0:
             self.is_selection_active = True
             group.setSelectionRect()
@@ -276,7 +276,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):
                     if isinstance(item, VirtualHelixItem):
-                        print("origin", item.virtualHelix())
+                        print("origin", item.idNum())
                         tool.snap_origin_item = item
                         break
                 # strategy #2
@@ -285,7 +285,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 # for item in self.childItems():
                 #     pos_local = mapper(item, pos)
                 #     if isinstance(item, VirtualHelixItem) and item.contains(pos_local):
-                #         print("origin", item.virtualHelix())
+                #         print("origin", item.idNum())
                 #         tool.snap_origin_item = item
                 #         break
             self.drag_start_position = sp = self.pos()

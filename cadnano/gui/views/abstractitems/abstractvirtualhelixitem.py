@@ -23,6 +23,14 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.virtualHelixGroup().setProperties(self._id_num, keys, values)
     # end def
 
+    def part(self):
+        return self._model_part
+    # end def
+
+    def partItem(self):
+        return self._part_item
+    # end def
+
     def fwdStrand(self, idx):
         self._model_part.virtualHelixGroup().fwd_strandsets[self._id_num].getStrand(idx)
     # end def

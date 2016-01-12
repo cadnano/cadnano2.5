@@ -44,7 +44,7 @@ class CreateStrandCommand(UndoCommand):
         # Emit a signal to notify on completion
         strandset.strandsetStrandAddedSignal.emit(strandset, strand)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
     # end def
 
     def undo(self):
@@ -61,6 +61,6 @@ class CreateStrandCommand(UndoCommand):
         strand.strandRemovedSignal.emit(strand)
         strand.setOligo(None)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.virtualHelix())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
     # end def
 # end class

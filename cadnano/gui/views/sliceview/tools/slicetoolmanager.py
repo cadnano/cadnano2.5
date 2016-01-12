@@ -39,7 +39,7 @@ class SliceToolManager(AbstractToolManager):
     def activeSliceLastSlot(self):
         part = self.window.selectedInstance()
         if part is not None:
-            part.setActiveBaseIndex(part.maxBaseIdx()-1)
+            part.setActiveBaseIndex(part.maxBaseIdx(0)-1)   # TODO fix this
 
     ### METHODS ###
     def _connectWindowSignalsToSelf(self):

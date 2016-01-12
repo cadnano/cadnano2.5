@@ -72,6 +72,8 @@ class VirtualHelixGroup(CNObject):
         XY position of virtual helices
         """
         self.origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
+        self.origin_limits = (0.,0, 0., 0.)
+
         self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float))
         """
         book keeping for fast lookup of indices for insertions and deletions
@@ -79,6 +81,7 @@ class VirtualHelixGroup(CNObject):
         the length of this is the max id_num used
         """
         self.offset_and_size = []
+        self.reserved_ids = set()
 
         self.properties = defaultDataFrame(DEFAULT_SIZE)
 
@@ -135,6 +138,7 @@ class VirtualHelixGroup(CNObject):
             heapify(self.recycle_bin)
         if self._highest_id_num_used < num:
             self._highest_id_num_used = num
+        self.reserved_ids.add(num)
     # end def
 
     def recycleIdNum(self, id_num):
@@ -144,6 +148,7 @@ class VirtualHelixGroup(CNObject):
         reserveIdNumForHelix returns the id_num again).
         """
         heappush(self.recycle_bin, id_num)
+        self.reserved_ids.remove(num)
     # end def
 
     def isIdNumUsed(self, id_num):
@@ -195,6 +200,33 @@ class VirtualHelixGroup(CNObject):
         return self.origin_pts[id_num]
     # end def
 
+    def getidNums(self):
+        """ return a list of used id_nums
+        """
+        return [i for i, x in filter(lambda i, x: x is not None, enumerate(self.offset_and_size))]
+    # end def
+
+    def setOriginLimits(self):
+        """
+        given a id_num get the coordinate at a given index
+        """
+        valid_pts = np.where(self.origin_pts != np.inf)
+        xs = valid_pts[:,0]
+        ys = valid_pts[:,1]
+        xLL = np.amin(xs)
+        xUR = np.amax(xs)
+        yLL = np.amin(ys)
+        yUR = np.amax(ys)
+        self.origin_limits = (xLL, yLL, xUR, yUR)
+    # end def
+
+    def getOriginLimits(self):
+        """
+        given a id_num get the coordinate at a given index
+        """
+        return self.origin_limits
+    # end def
+
     def getStrandSets(self, id_num):
         """
         given a id_num get the coordinate at a given index
@@ -215,9 +247,26 @@ class VirtualHelixGroup(CNObject):
 
     def getStrand(self, strand_type, id_num, idx):
         if strand_type == StrandType.FWD:
-            return self.fwd_strandsets[self._id_num].getStrand(idx)
+            return self.fwd_strandsets[id_num].getStrand(idx)
         else:
-            return self.rev_strandsets[self._id_num].getStrand(idx)
+            return self.rev_strandsets[id_num].getStrand(idx)
+    # end def
+
+    def indexOfRightmostNonemptyBase(self):
+        """
+        During reduction of the number of bases in a part, the first click
+        removes empty bases from the right hand side of the part (red
+        left-facing arrow). This method returns the new numBases that will
+        effect that reduction.
+        """
+        ret = self._STEP - 1
+        fwd_strandsets = self.fwd_strandsets
+        rev_strandsets = self.rev_strandsets
+        for id_num in self.reserved_ids:
+            ret = max(ret, fwd_strandsets[id_num].indexOfRightmostNonemptyBase(),
+                            rev_strandsets[id_num].indexOfRightmostNonemptyBase())
+        return ret
+    # end def
 
     def translateCoordinates(self, id_nums, delta):
         """ delta is a sequence of floats of length 3
@@ -461,6 +510,17 @@ class VirtualHelixGroup(CNObject):
                                         ignore_index=True)
 
         self.origin_pts[id_num] = origin[:2]
+        new_x, new_y
+        xLL, yLL, xUR, yUR = self.origin_limits
+        if new_x < xLL:
+            xLL = new_x
+        if new_x > xUR
+            xUR = new_x
+        if new_y < yLL:
+            yLL = new_y
+        if new_y > yUR:
+            yUR = new_y
+        self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
         self.properties.loc[id_num, 'name'] = "vh%d" % (id_num)
         self.fwd_strandsets[id_num] = StrandSet(StrandType.FWD, id_num, self, num_points)

@@ -42,7 +42,7 @@ class Oligo(CNObject):
         olg_id = str(id(self))[-4:]
         if self._strand5p is not None:
             strand_type = "Stap" if self.isStaple() else "Scaf"
-            vh_num = self._strand5p.strandSet().virtualHelix().number()
+            vh_num = self._strand5p.idNum()
             idx = self._strand5p.idx5Prime()
         else:
             strand_type = "None"
@@ -116,7 +116,7 @@ class Oligo(CNObject):
     # end def
 
     def locString(self):
-        vh_num = self._strand5p.strandSet().virtualHelix().number()
+        vh_num = self._strand5p.idNum()
         idx = self._strand5p.idx5Prime()
         return "%d[%d]" % (vh_num, idx)
     # end def
@@ -176,7 +176,7 @@ class Oligo(CNObject):
 
     def sequenceExport(self):
         part = self.part()
-        vh_num5p = self.strand5p().virtualHelix().number()
+        vh_num5p = self.strand5p().idNum()
         strand5p = self.strand5p()
         idx5p = strand5p.idx5Prime()
         seq = ''
@@ -186,7 +186,7 @@ class Oligo(CNObject):
         for strand in strand5p.generator3pStrand():
             seq = seq + Strand.sequence(strand, for_export=True)
             if strand.connection3p() is None:  # last strand in the oligo
-                vh_num3p = strand.virtualHelix().number()
+                vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
         modseq5p, modseq5p_name = part.getModSequence(strand5p, idx5p, 0)
         modseq3p, modseq3p_name = part.getModSequence(strand, idx3p, 1)
