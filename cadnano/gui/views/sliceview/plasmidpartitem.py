@@ -266,13 +266,13 @@ class PlasmidPartItem(QGraphicsItem, AbstractPartItem):
         pass
     # end def
 
-    def selectionWillChange(self, newSel):
+    def selectionWillChange(self, new_sel):
         if self.part() == None:
             return
         if self.part().selectAllBehavior():
             return
         for sh in self._empty_helix_hash.values():
-            sh.setSelected(sh.virtualHelix() in newSel)
+            sh.setSelected(sh.virtualHelix() in new_sel)
     # end def
 
     def setModifyState(self, bool):

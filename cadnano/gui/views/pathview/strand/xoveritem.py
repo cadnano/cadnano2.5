@@ -61,10 +61,6 @@ class XoverNode3(QGraphicsRectItem):
         pass
     # end def
 
-    def virtualHelix(self):
-        return self._vhi.virtualHelix()
-    # end def
-
     def strandType(self):
         return self._strand_type
     # end def
@@ -75,7 +71,7 @@ class XoverNode3(QGraphicsRectItem):
 
     def setPartnerVirtualHelix(self,strand):
         if strand.connection5p():
-            self._partner_virtual_helix = strand.connection5p().virtualHelix()
+            self._partner_virtual_helix = strand.connection5p().idNum()
         else:
             self._partner_virtual_helix = None
     # end def
@@ -191,7 +187,7 @@ class XoverNode5(XoverNode3):
 
     def setPartnerVirtualHelix(self, strand):
         if strand.connection3p():
-            self._partner_virtual_helix = strand.connection3p().virtualHelix()
+            self._partner_virtual_helix = strand.connection3p().idNum()
         else:
             self._partner_virtual_helix = None
     # end def
@@ -286,7 +282,7 @@ class XoverItem(QGraphicsPathItem):
         if strand5p:
             strand3p = strand5p.connection3p()
             if strand3p is not None and node3:
-                if node3.virtualHelix():
+                if node3.idNum():   # unclear about this condition now
                     self.update(self._strand5p)
                 else:
                     node3.remove()
@@ -307,7 +303,7 @@ class XoverItem(QGraphicsPathItem):
         self._strand5p = strand5p
         strand3p = strand5p.connection3p()
         vhi5p = self._virtual_helix_item
-        partItem = vhi5p.partItem()
+        part_item = vhi5p.partItem()
 
         # This condition is for floating xovers
         idx_3_prime = idx if idx else strand5p.idx3Prime()
@@ -316,7 +312,7 @@ class XoverItem(QGraphicsPathItem):
             self._node5 = XoverNode5(vhi5p, self, strand5p, idx_3_prime)
         if strand3p is not None:
             if self._node3 is None:
-                vhi3p = partItem.itemForVirtualHelix(strand3p.virtualHelix())
+                vhi3p = part_item.itemForVirtualHelix(strand3p.idNum())
                 self._node3 = XoverNode3(vhi3p, self, strand3p, strand3p.idx5Prime())
             else:
                 self._node5.setIdx(idx_3_prime)

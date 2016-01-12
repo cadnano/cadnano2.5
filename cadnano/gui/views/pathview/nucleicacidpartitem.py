@@ -463,7 +463,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def setActiveVirtualHelixItem(self, new_active_vhi):
         if new_active_vhi != self._active_virtual_helix_item:
             self._active_virtual_helix_item = new_active_vhi
-            # self._model_part.setActiveVirtualHelix(new_active_vhi.virtualHelix())
     # end def
 
     def setPreXoverItemsVisible(self, virtual_helix_item):

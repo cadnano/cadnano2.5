@@ -432,9 +432,9 @@ class Part(CNObject):
     #end def
 
     def getModID(self, strand, idx):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
+        id_num = strand.idNum()
+        strandtype = strand.strandType()
+        key =  "{},{},{}".format(id_num, strandtype, idx)
         mods_strand  = self._mods['ext_instances']
         if key in mods_strand:
             return mods_strand[key]
@@ -453,19 +453,15 @@ class Part(CNObject):
 
     def getModStrandIdx(self, key):
         keylist = key.split(',')
-        coord = int(keylist[0]), int(keylist[1])
-        isstaple = True if keylist[2] == 'True' else False
-        idx = int(keylist[3])
-        vh = self.virtualHelixAtCoord(coord)
-        if vh:
-            strand = vh.stap(idx) if isstaple else vh.scaf(idx)
-            return strand, idx
-        else:
-            raise ValueError("getModStrandIdx: no strand for key: {}", key)
+        id_num = int(keylist[0])
+        strandtype = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        idx = int(keylist[2])
+        strand = self.virtualHelixGroup().getStrand(strandtype, id_num, idx)
+        return strand, idx
     # end def
 
-    def addModInstance(self, coord, idx, isstaple, isinternal, mid):
-        key =  "{},{},{},{}".format(coord[0], coord[1], isstaple, idx)
+    def addModInstance(self, id_num, idx, is_rev, isinternal, mid):
+        key =  "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
         try:
             locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
@@ -473,7 +469,7 @@ class Part(CNObject):
             print(mid, self._mods[mid])
             raise
         if key in mods_strands:
-            self.removeModInstance(coord, idx, isstaple, isinternal, mid)
+            self.removeModInstance(id_num, idx, is_rev, isinternal, mid)
         self.addModInstanceKey(key, mods_strands, locations, mid)
     # end def
 
@@ -484,10 +480,10 @@ class Part(CNObject):
     # end def
 
     def addModStrandInstance(self, strand, idx, mid):
-        coord = strand.virtualHelix().coord()
-        isstaple = strand.isStaple()
+        id_num = strand.idNum()
+        strandtype = strand.strandType()
         if mid is not None:
-            self.addModInstance(coord, idx, isstaple, False, mid)
+            self.addModInstance(id_num idx, strandtype, False, mid)
     # end def
 
     def removeModInstance(self, coord, idx, isstaple, isinternal, mid):

@@ -274,14 +274,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def removeVirtualHelixItem(self, virtual_helix_item):
-        vh = virtual_helix_item.virtualHelix()
-        # self._virtual_helix_item_list.remove(virtual_helix_item)
-        del self._virtual_helix_item_hash[vh]
-        # del self._virtual_helix_hash[vh.coord()]
-        # ztf = not getBatch()
-        # self._setVirtualHelixItemList(self._virtual_helix_item_list,
-        #     zoom_to_fit=ztf)
-        # self._updateBoundingRect()
+        id_num = virtual_helix_item.idNum()
+        del self._virtual_helix_item_hash[id_num]
     # end def
 
 
@@ -321,24 +315,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def getVirtualHelixItemByCoord(self, row, column):
-        if (row, column) in self._empty_helix_hash:
-            return self._virtual_helix_hash[(row, column)]
-        else:
-            return None
-    # end def
-
     # def paint(self, painter, option, widget=None):
     #     pass
     # # end def
 
-    def selectionWillChange(self, newSel):
+    def selectionWillChange(self, new_sel):
         if self.part() is None:
             return
         if self.part().selectAllBehavior():
             return
-        for sh in self._empty_helix_hash.values():
-            sh.setSelected(sh.virtualHelix() in newSel)
     # end def
 
     def setModifyState(self, bool):
@@ -351,10 +336,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """Shows statusString in the MainWindow's status bar."""
         pass  # disabled for now.
         # self.window().statusBar().showMessage(statusString, timeout)
-
-    def vhAtCoordsChanged(self, row, col):
-        self._empty_helix_hash[(row, col)].update()
-    # end def
 
     def zoomToFit(self):
         thescene = self.scene()
@@ -392,8 +373,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return x, y
     # end def
 
-    def getVirtualHelixItem(self, virtual_helix):
-        return self._virtual_helix_item_hash.get(virtual_helix)
+    def getVirtualHelixItem(self, id_num):
+        return self._virtual_helix_item_hash.get(id_num)
+
+    def getVirtualHelixItems(self):
+        return self._virtual_helix_item_hash.values()
 
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:

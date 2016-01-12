@@ -206,6 +206,19 @@ class VirtualHelixGroup(CNObject):
         return (self.fwd_strandsets[id_num], self.rev_strandsets[id_num])
     # end def
 
+    def hasStrandAtIdx(self, id_num, idx):
+        """Return a tuple for (Scaffold, Staple). True if
+           a strand is present at idx, False otherwise."""
+        return (self.fwd_strandsets[id_num].hasStrandAt(idx, idx),\
+                self.rev_strandsets[id_num].hasStrandAt(idx, idx))
+    # end def
+
+    def getStrand(self, strand_type, id_num, idx):
+        if strand_type == StrandType.FWD:
+            return self.fwd_strandsets[self._id_num].getStrand(idx)
+        else:
+            return self.rev_strandsets[self._id_num].getStrand(idx)
+
     def translateCoordinates(self, id_nums, delta):
         """ delta is a sequence of floats of length 3
         for now support XY translation
@@ -521,6 +534,25 @@ class VirtualHelixGroup(CNObject):
                 raise IndexError("IdNum {} does not exists".format(id_num))
         return self.properties.loc[id_num, keys]
     # end
+
+    def setProperties(self, id_num, keys, values, safe=True):
+        """ keys and values can be sequences of equal length or
+        singular values
+        """
+        if safe:
+            offset_and_size = self.getOffsetAndSize(id_num)
+            # 1. Find insert indices
+            if offset_and_size is None:
+                raise IndexError("IdNum {} does not exists".format(id_num))
+        self.properties.loc[id_num, keys] = values
+    # end
+
+    def locationQt(self, id_num, scale_factor=1.0):
+        """ Y-axis is inverted in Qt +y === DOWN
+        """
+        x, y = self.getOrigin(id_num)
+        return scale_factor*x, -scale_factor*y
+    # end def
 
     def resizeHelix(self, id_num, is_right, delta):
         """ id_num (int): the id_num of the virtual helix

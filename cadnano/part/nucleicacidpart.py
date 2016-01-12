@@ -72,6 +72,9 @@ class NucleicAcidPart(Part):
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
         self._oligos = set()
+
+        self._virtual_helix_group = VirtualHelixGroup(self)
+
         self._quadtree = Quadtree(0, 0, 100, min_size=(4.1*self._RADIUS))
         self._number_to_virtual_helix = {}
         # Dimensions
@@ -169,12 +172,6 @@ class NucleicAcidPart(Part):
         return PartType.NUCLEICACIDPART
     # end def
 
-    def virtualHelixToNumber(self, number):
-        """A vhref is the number of a virtual helix, the point of a virtual helix,
-        or the virtual helix itself. For conveniece, CRUD should now work with any of them."""
-        return  self._number_to_virtual_helix.get(vhref, None)
-    # end def
-
     def getVirtualHelicesInArea(self, rect):
         nodes_results = set()
         res = self._quadtree.queryRect(rect, nodes_results)
@@ -203,6 +200,10 @@ class NucleicAcidPart(Part):
                                             existing[1] - point[1]))
             return True
         return False
+    # end def
+
+    def virtualHelixGroup(self):
+        return self._virtual_helix_group
     # end def
 
     def activeBaseIndex(self):

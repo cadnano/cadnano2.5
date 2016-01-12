@@ -18,27 +18,26 @@ class ActiveSliceItem(QGraphicsRectItem):
     # end def
 
     ### SLOTS ###
-    def strandChangedSlot(self, sender, vh):
-        if vh is None:
-            return
+    def strandChangedSlot(self, sender, id_num):
+        part = self.part()
         nucleicacid_part_item = self._nucleicacid_part_item
-        vhi = nucleicacid_part_item.getVirtualHelixItemByCoord(*vh.coord())
-        active_base_idx = nucleicacid_part_item.part().activeBaseIndex()
+        vhi = nucleicacid_part_item.getVirtualHelixItem(id_num)
+        active_base_idx = part.activeBaseIndex()
+
         has_scaf, has_stap = vh.hasStrandAtIdx(active_base_idx)
         vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
     # end def
 
-    def updateIndexSlot(self, sender, newActiveSliceZIndex):
+    def updateIndexSlot(self, sender, new_active_slice_zIndex):
         part = self.part()
         if part.numberOfVirtualHelices() == 0:
             return
         newly_active_vhs = set()
         active_base_idx = part.activeBaseIndex()
-        for vhi in self._nucleicacid_part_item._virtual_helix_hash.values():
-            vh = vhi.virtualHelix()
-            if vh:
-                has_scaf, has_stap = vh.hasStrandAtIdx(active_base_idx)
-                vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
+        for vhi in self._nucleicacid_part_item.getVirtualHelixItems():
+            id_num = vhi.idNum()
+            has_scaf, has_stap = part.virtualHelixGroup().hasStrandAtIdx(label, active_base_idx)
+            vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
     # end def
 
     def updateRectSlot(self, part):

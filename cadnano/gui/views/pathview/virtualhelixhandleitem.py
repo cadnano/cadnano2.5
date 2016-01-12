@@ -77,11 +77,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
 
-    def __init__(self, id_num, nucleicacid_part_item, viewroot):
-        super(VirtualHelixHandleItem, self).__init__(nucleicacid_part_item)
+    def __init__(self, id_num, part_item, viewroot):
+        super(VirtualHelixHandleItem, self).__init__(part_item)
         self._id_num = id_num
-        self._nucleicacid_part_item = nucleicacid_part_item
-        self._model_part = nucleicacid_part_item.part()
+        self._part_item = part_item
+        self._model_part = part_item.part()
         self._viewroot = viewroot
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
@@ -119,7 +119,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def getProperty(self, key):
-        return self._model_part.virtualHelixGroup().getProperties(self._id_num)
+        return self._model_part.virtualHelixGroup().getProperties(self._id_num, key)
+    # end def
+
+    def setProperty(self, key, value):
+        return self._model_part.virtualHelixGroup().setProperties(self._id_num, key, value)
     # end def
 
     def modelColor(self):
@@ -201,7 +205,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def partItem(self):
-        return self._nucleicacid_part_item
+        return self._part_item
     # end def
 
     def hoverEnterEvent(self, event):
@@ -255,7 +259,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def restoreParent(self, pos=None):
         """
-        Required to restore parenting and positioning in the nucleicacid_part_item
+        Required to restore parenting and positioning in the part_item
         """
 
         # map the position
@@ -266,11 +270,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def tempReparent(self, pos=None):
-        nucleicacid_part_item = self._nucleicacid_part_item
+        part_item = self._part_item
         if pos is None:
             pos = self.scenePos()
-        self.setParentItem(nucleicacid_part_item)
-        temp_point = nucleicacid_part_item.mapFromScene(pos)
+        self.setParentItem(part_item)
+        temp_point = part_item.mapFromScene(pos)
         self.setPos(temp_point)
     # end def
 

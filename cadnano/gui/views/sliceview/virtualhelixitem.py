@@ -34,13 +34,14 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
     and paints its corresponding VirtualHelix number.
     """
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num, part_item):
         """
         """
         super(VirtualHelixItem, self).__init__(parent=part_item)
-        self._virtual_helix = model_virtual_helix
+        self._id_num = id_num
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
         self._part_item = part_item
+        self._model_part = part_item.part()
         self.hide()
         x, y = model_virtual_helix.locationQt(part_item.scaleFactor())
         # set position to offset for radius
@@ -80,23 +81,9 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         return self._part_item
     # end def
 
-    def virtualHelix(self):
-        return self._virtual_helix
+    def idNum(self):
+        return self._id_num
     # end def
-
-    def number(self):
-        return self.virtualHelix().number()
-    # end def
-
-    def basesPerRepeat(self):
-        return self._bases_per_repeat
-
-    def turnsPerRepeat(self):
-        return self._turns_per_repeat
-
-    def twistPerBase(self):
-        bases_per_turn = self._bases_per_repeat/self._turns_per_repeat
-        return 360./bases_per_turn
 
     def setCenterPos(self, x, y):
         # invert the y axis
@@ -147,7 +134,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def selectToolMousePress(self, tool, part_item, event):
-        part = part_item.part()
+        part = self._model_part
         part.setSelected(True)
         tool.selectOrSnap(part_item, self, event)
         # return QGraphicsItem.mousePressEvent(self, event)
@@ -169,16 +156,16 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
             # self._prexoveritemgroup.setRotation(new_value)
-            scamZ = self._virtual_helix.getProperty('scamZ')
+            scamZ = self.getProperty('scamZ')
             if scamZ != new_value:
-                self._virtual_helix.setProperty('scamZ', new_value)
+                self.setProperty('scamZ', new_value)
             active_base_idx = self.part().activeBaseIndex()
             has_fwd, has_rev = virtual_helix.hasStrandAtIdx(active_base_idx)
             self.setActiveSliceView(active_base_idx, has_fwd, has_rev)
         elif property_key == 'scamZ':
-            eulerZ = self._virtual_helix.getProperty('eulerZ')
+            eulerZ = self.getProperty('eulerZ')
             if eulerZ != new_value:
-                self._virtual_helix.setProperty('eulerZ', new_value)
+                self.setProperty('eulerZ', new_value)
     # end def
 
 
@@ -225,10 +212,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         coordinates in the model are always in the part
         coordinate frame
         """
-        vh = self._virtual_helix
         part_item = self._part_item
         sf = part_item.scaleFactor()
-        x, y = vh.locationQt(part_item.scaleFactor())
+        vhg = self._model_part.virtualHelixGroup()
+        x, y = vhg.locationQt(self._id_num, part_item.scaleFactor())
         new_pos = QPointF(x - _RADIUS, y - _RADIUS)
         ctr_pos = part_item.mapFromScene(self.scenePos())
         """
@@ -272,7 +259,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.virtualHelix().getName()
+        nvhi_name = nvhi.getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS,_RADIUS)
@@ -320,39 +307,39 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def updateFwdArrow(self, idx):
-        fwd_strand = self._virtual_helix.scaf(idx)
+        fwd_strand = self.fwdStrand(idx)
         if fwd_strand:
             fwd_strand_color = fwd_strand.oligo().getColor()
-            scaf_alpha = 230 if fwd_strand.hasXoverAt(idx) else 128
+            fwd_alpha = 230 if fwd_strand.hasXoverAt(idx) else 128
         else:
             fwd_strand_color = '#a0a0a4' #Qt.gray
-            scaf_alpha = 26
+            fwd_alpha = 26
 
-        fwd_strand_color_obj = getColorObj(fwd_strand_color, alpha=scaf_alpha)
+        fwd_strand_color_obj = getColorObj(fwd_strand_color, alpha=fwd_alpha)
         self._pen1.setBrush(fwd_strand_color_obj)
         self.arrow1.setPen(self._pen1)
         part = self.part()
         tpb = part._TWIST_PER_BASE
         angle = idx*tpb
         # for some reason rotation is CW and not CCW with increasing angle
-        eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
+        eulerZ = self.getProperty('eulerZ')
         self.arrow1.setRotation(angle + part._TWIST_OFFSET + eulerZ)
 
     def updateRevArrow(self, idx):
-        rev_strand = self._virtual_helix.stap(idx)
+        rev_strand = self.revStrand(idx)
         if rev_strand:
             rev_strand_color = rev_strand.oligo().getColor()
-            stap_alpha = 230 if rev_strand.hasXoverAt(idx) else 128
+            rev_alpha = 230 if rev_strand.hasXoverAt(idx) else 128
         else:
             rev_strand_color = '#c0c0c0' # Qt.lightGray
-            stap_alpha = 26
-        rev_strand_color_obj = getColorObj(rev_strand_color, alpha=stap_alpha)
+            rev_alpha = 26
+        rev_strand_color_obj = getColorObj(rev_strand_color, alpha=rev_alpha)
         self._pen2.setBrush(rev_strand_color_obj)
         self.arrow2.setPen(self._pen2)
         part = self.part()
         tpb = part._TWIST_PER_BASE
         angle = idx*tpb
-        eulerZ = float(self._virtual_helix.getProperty('eulerZ'))
+        eulerZ = self.getProperty('eulerZ')
         self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 180)
     # end def
 

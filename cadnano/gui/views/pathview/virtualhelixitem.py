@@ -22,10 +22,10 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     """VirtualHelixItem for PathView"""
     findChild = util.findChild  # for debug
 
-    def __init__(self, part_item, model_virtual_helix, viewroot):
+    def __init__(self, id_num, part_item, viewroot):
         super(VirtualHelixItem, self).__init__(part_item.proxy())
         self._part_item = part_item
-        self._model_virtual_helix = model_virtual_helix
+        self._id_num = id_num
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, model_virtual_helix)
@@ -106,11 +106,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     # end def
 
     ### ACCESSORS ###
-
-    def coord(self):
-        return self._model_virtual_helix.coord()
-    # end def
-
     def viewroot(self):
         return self._viewroot
     # end def
@@ -237,11 +232,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         strand_set, idx = self.baseAtPoint(event.pos())
         self.setActive(idx)
         tool_method_name = self._getActiveTool().methodPrefix() + "MousePress"
-
-        ### uncomment for debugging modifier selection
-        # strand_set, idx = self.baseAtPoint(event.pos())
-        # row, col = strand_set.virtualHelix().coord()
-        # self._part_item.part().selectPreDecorator([(row,col,idx)])
 
         if hasattr(self, tool_method_name):
             self._last_strand_set, self._last_idx = strand_set, idx
