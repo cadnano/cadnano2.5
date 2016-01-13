@@ -15,7 +15,6 @@ from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import NucleicAcidPartItem
-from .plasmidpartitem import PlasmidPartItem
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -92,10 +91,7 @@ class OutlinerTreeWidget(QTreeWidget):
         """
         model_part = model_part_instance.reference()
         part_type = model_part.partType()
-        if part_type == PartType.PLASMIDPART:
-            plasmid_part_item = PlasmidPartItem(model_part, parent=self)
-            self._instance_items[model_part_instance] = plasmid_part_item
-        elif part_type == PartType.NUCLEICACIDPART:
+        if part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = na_part_item
         else:

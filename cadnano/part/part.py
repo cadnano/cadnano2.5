@@ -11,22 +11,8 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
 from cadnano.enum import StrandType
-from cadnano.oligo import Oligo
-from cadnano.oligo import RemoveOligoCommand
-from cadnano.strand import Strand
-from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
-from cadnano.strandset import StrandSet
-from cadnano.strandset import SplitCommand
-from cadnano.virtualhelix import RemoveVirtualHelixCommand
-from cadnano.virtualhelix import VirtualHelix
-from .createvhelixcmd import CreateVirtualHelixCommand
-from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
-from .resizepartcmd import ResizePartCommand
-from .refresholigoscmd import RefreshOligosCommand
-from .removepartcmd import RemovePartCommand
-from .renumbercmd import RenumberVirtualHelicesCommand
-from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
+from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 
 class Part(CNObject):
     """
@@ -366,7 +352,7 @@ class Part(CNObject):
         id_num = strand.idNum()
         strandtype = strand.strandType()
         if mid is not None:
-            self.addModInstance(id_num idx, strandtype, False, mid)
+            self.addModInstance(id_num, idx, strandtype, False, mid)
     # end def
 
     def removeModInstance(self, id_num, idx, is_rev, isinternal, mid):

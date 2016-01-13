@@ -1,6 +1,5 @@
 from cadnano.cnproxy import UndoCommand
-from cadnano.virtualhelix import VirtualHelix
-from cadnano.virtualhelixgroup import VirtualHelixGroup
+from cadnano.virtualhelix import VirtualHelixGroup
 
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(self, part, x, y, length):

@@ -6,7 +6,6 @@ from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
 from PyQt5.QtWidgets import QSizePolicy
 
 from cadnano.enum import ItemType
-from cadnano.gui.controllers.itemcontrollers.plasmidpartitemcontroller import PlasmidPartItemController
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 
 from .cnpropertyitem import CNPropertyItem

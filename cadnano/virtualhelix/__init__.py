@@ -1,2 +1,2 @@
-from .virtualhelix import *
-
+from .virtualhelixgroup import *
+from .removevhelixcmd import RemoveVirtualHelixCommand

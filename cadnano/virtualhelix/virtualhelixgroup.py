@@ -59,9 +59,9 @@ class VirtualHelixGroup(CNObject):
 
         # 1. per virtual base pair allocations
         self.total_points = 0
-        self.axis_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
-        self.fwd_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
-        self.rev_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float))
+        self.axis_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
+        self.fwd_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
+        self.rev_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         self.id_nums = np.full((DEFAULT_FULL_SIZE, 1), -1, dtype=int)
         self.indices = np.zeros((DEFAULT_FULL_SIZE, 1), dtype=int)
 
@@ -74,7 +74,7 @@ class VirtualHelixGroup(CNObject):
         self.origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
         self.origin_limits = (0.,0, 0., 0.)
 
-        self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float))
+        self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float)
         """
         book keeping for fast lookup of indices for insertions and deletions
         and coordinate points
@@ -139,7 +139,7 @@ class VirtualHelixGroup(CNObject):
 
     def getOffsetAndSize(self, id_num):
         offset_and_size = self.offset_and_size
-        offset_and_size[id_num] if id_num < len(offset_and_size) else return None
+        return offset_and_size[id_num] if id_num < len(offset_and_size) else None
     # end def
 
     def getNewIdNum(self):
@@ -544,7 +544,7 @@ class VirtualHelixGroup(CNObject):
         xLL, yLL, xUR, yUR = self.origin_limits
         if new_x < xLL:
             xLL = new_x
-        if new_x > xUR
+        if new_x > xUR:
             xUR = new_x
         if new_y < yLL:
             yLL = new_y

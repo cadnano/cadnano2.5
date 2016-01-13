@@ -19,7 +19,7 @@ from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
-from cadnano.virtualhelixgroup import VirtualHelixGroup
+from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand
@@ -40,7 +40,8 @@ class NucleicAcidPart(Part):
     - sequence output is more abstract ("virtual sequences" are used)
     """
 
-    _SUB_STEP_SIZE = _STEP_SIZE / 3
+    _SUB_STEP_SIZE = Part._STEP_SIZE / 3
+
     _MINOR_GROOVE_ANGLE = 171
 
     __count = 0

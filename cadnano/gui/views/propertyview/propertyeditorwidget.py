@@ -17,7 +17,7 @@ from cadnano.enum import ItemType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
-from .plasmidpartitem import PlasmidPartItem
+
 from .oligoitem import OligoItem
 from .nucleicacidpartitem import NucleicAcidPartItem
 from .virtualhelixitem import VirtualHelixItem

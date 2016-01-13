@@ -10,7 +10,6 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 from cadnano.enum import Parity, PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.virtualhelix import VirtualHelix
 from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
 from . import slicestyles as styles
 from .sliceextras import PreXoverItemGroup, WedgeGizmo, WEDGE_RECT

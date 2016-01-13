@@ -9,10 +9,9 @@ from cadnano import util
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack, UndoCommand
-from cadnano.oligo import Oligo
+
 from cadnano.strand import Strand
-from cadnano.strandset import StrandSet
-from cadnano.virtualhelix import VirtualHelix
+
 from cadnano.part import Part
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance

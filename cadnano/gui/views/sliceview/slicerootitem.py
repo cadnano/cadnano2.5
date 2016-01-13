@@ -5,7 +5,6 @@ from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import NucleicAcidPartItem
-from .plasmidpartitem import PlasmidPartItem
 
 
 class SliceRootItem(QGraphicsRectItem):
