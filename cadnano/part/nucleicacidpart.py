@@ -83,38 +83,6 @@ class NucleicAcidPart(Part):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
-    partActiveSliceResizeSignal = ProxySignal(CNObject,
-                        name='partActiveSliceResizeSignal')     # self
-    partDimensionsChangedSignal = ProxySignal(CNObject,
-                        name='partDimensionsChangedSignal')     # self
-    partInstanceAddedSignal = ProxySignal(CNObject,
-                        name='partInstanceAddedSignal')         # self
-    partParentChangedSignal = ProxySignal(CNObject,
-                        name='partParentChangedSignal')         # self
-    # partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
-    #                     name='partPreDecoratorSelectedSignal')  # self, row, col, idx
-    partRemovedSignal = ProxySignal(CNObject,
-                        name='partRemovedSignal')               # self
-    partVirtualHelixAddedSignal = ProxySignal(object, int,
-                        name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
-    partVirtualHelixRemovedSignal = ProxySignal(object, int,
-                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
-    partVirtualHelixRenumberedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixRenumberedSignal')# self, virtual_helix id_num
-    partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
-    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
-                        name='partVirtualHelicesReorderedSignal') # self, list of coords
-    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,
-                        name='partActiveVirtualHelixChangedSignal')
-    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
-                                        name='partVirtualHelicesTranslatedSignal')  # self, transform
-    partModAddedSignal = ProxySignal(object, object, object,
-                        name='partModAddedSignal')
-    partModRemovedSignal = ProxySignal(object, object,
-                        name='partModRemovedSignal')
-    partModChangedSignal = ProxySignal(object, object, object,
-                        name='partModChangedSignal')
 
     ### SLOTS ###
 
@@ -633,11 +601,10 @@ class NucleicAcidPart(Part):
         """
         # 1) new part
         part = self.newPart()
-        for key, vhelix in self._virtual_helices:
-            # 2) Copy VirtualHelix
-            part._virtual_helices[key] = vhelix.deepCopy(part)
+        # 2) Copy VirtualHelix Group
+        vhg = self._virtual_helix_group.copy(part)
         # end for
-        # 3) Copy oligos
+        # 3) Copy oligos, populating the strandsets
         for oligo, val in self._oligos:
             strandGenerator = oligo.strand5p().generator3pStrand()
             strand_type = oligo.strand5p().strandType()
@@ -645,8 +612,7 @@ class NucleicAcidPart(Part):
             last_strand = None
             for strand in strandGenerator:
                 id_num = strand.idNum()
-                newVHelix = part._virtual_helices[id_num]
-                new_strandset = newVHelix().getStrandSetByType(strand_type)
+                new_strandset = vhg.getStrandSets(id_num)[strand.strandType()]
                 new_strand = strand.deepCopy(new_strandset, new_oligo)
                 if last_strand:
                     last_strand.setConnection3p(new_strand)

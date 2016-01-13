@@ -108,6 +108,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def copy(self, part):
+        """ copy all arrays and counters and create new StrandSets
+
+        TODO: consider renaming this method
+        """
         new_vhg = VirtualHelixGroup(part)
         new_vhg.total_points = self.total_points
         new_vhg.axis_pts = self.axis_pts.copy()
@@ -126,8 +130,8 @@ class VirtualHelixGroup(CNObject):
 
         new_vhg.properties = defaultDataFrame(DEFAULT_SIZE)
 
-        new_vhg.fwd_strandsets = [x.copy(new_vhg) for x in self.fwd_strandsets]
-        new_vhg.rev_strandsets = [x.copy(new_vhg) for x in self.rev_strandsets]
+        new_vhg.fwd_strandsets = [x.simpleCopy(new_vhg) for x in self.fwd_strandsets]
+        new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
 
         new_vhg.recycle_bin = self.recycle_bin
         new_vhg._highest_id_num_used = self._highest_id_num_used

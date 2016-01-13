@@ -90,6 +90,7 @@ class Part(CNObject):
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
     ### SIGNALS ###
+    # A. Part
     partActiveSliceIndexSignal = ProxySignal(CNObject, int,
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(CNObject,
@@ -100,34 +101,46 @@ class Part(CNObject):
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(CNObject,
                         name='partParentChangedSignal')         # self
-    # partPreDecoratorSelectedSignal = ProxySignal(object, int, int, int,
-    #                     name='partPreDecoratorSelectedSignal')  # self, row, col, idx
     partRemovedSignal = ProxySignal(CNObject,
                         name='partRemovedSignal')               # self
-    partStrandChangedSignal = ProxySignal(object, CNObject,
-                        name='partStrandChangedSignal')         # self, virtual_helix
-    partVirtualHelixAddedSignal = ProxySignal(object, object,
-                        name='partVirtualHelixAddedSignal')     # self, virtualhelix
-    partVirtualHelixRenumberedSignal = ProxySignal(object, tuple,
-                        name='partVirtualHelixRenumberedSignal')# self, coord
-    partVirtualHelixResizedSignal = ProxySignal(object, tuple,
-                        name='partVirtualHelixResizedSignal')   # self, coord
+    partPropertyChangedSignal = ProxySignal(CNObject, object, object,
+                        name='partPropertyChangedSignal')       # self, property_name, new_value
+    partSelectedChangedSignal = ProxySignal(CNObject, object,
+                        name='partSelectedChangedSignal')       # self, is_selected
+
+    # B. Virtual Helix
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,
+                        name='partActiveVirtualHelixChangedSignal')
+
+    partVirtualHelixAddedSignal = ProxySignal(object, int,
+                        name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
+    partVirtualHelixRemovedSignal = ProxySignal(object, int,
+                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
+    partVirtualHelixRenumberedSignal = ProxySignal(CNObject, int,
+                        name='partVirtualHelixRenumberedSignal')# self, virtual_helix id_num
+    partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
+                        name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
+    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
+                        name='partVirtualHelicesReorderedSignal') # self, list of id_nums
+
     partVirtualHelixTransformedSignal = ProxySignal(object, tuple,
                         name='partVirtualHelixTransformedSignal')   # self, transform
-    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, CNObject,
-                        name='partActiveVirtualHelixChangedSignal')
+    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
+                        name='partVirtualHelicesTranslatedSignal')  # self, transform
+
+    # C. Oligo
+    partOligoAddedSignal = ProxySignal(CNObject, object,
+                        name='partOligoAddedSignal')            # self, oligo
+    # D. Strand
+    partStrandChangedSignal = ProxySignal(object, CNObject,
+                        name='partStrandChangedSignal')         # self, virtual_helix
+    # E. Mod
     partModAddedSignal = ProxySignal(object, object, object,
                         name='partModAddedSignal')
     partModRemovedSignal = ProxySignal(object, object,
                         name='partModRemovedSignal')
     partModChangedSignal = ProxySignal(object, object, object,
                         name='partModChangedSignal')
-    partSelectedChangedSignal = ProxySignal(CNObject, object,
-                        name='partSelectedChangedSignal')       # self, is_selected
-    partPropertyChangedSignal = ProxySignal(CNObject, object, object,
-                        name='partPropertyChangedSignal')       # self, property_name, new_value
-    partOligoAddedSignal = ProxySignal(CNObject, object,
-                        name='partOligoAddedSignal')            # self, oligo
 
     ### SLOTS ###
 

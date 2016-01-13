@@ -907,6 +907,8 @@ class Strand(CNObject):
         can't use python module 'copy' as the dictionary _decorators
         needs to be shallow copied as well, but wouldn't be if copy.copy()
         is used, and copy.deepcopy is undesired
+
+        TODO: consider renaming this method
         """
         new_s = Strand(strandset, *self.idxs())
         new_s._oligo = oligo

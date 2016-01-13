@@ -44,6 +44,16 @@ class StrandSet(CNObject):
         self._last_strandset_idx = None
     # end def
 
+    def simpleCopy(self, virtual_helix_group):
+        """ Create an empty copy (no strands) of this strandset with the only
+        a new virtual_helix_group parent
+
+        TODO: consider renaming this method
+        """
+        return StrandSet(self._strand_type, self._id_num,
+                        virtual_helix_group, len(self.strand_array))
+    # end def
+
     def __iter__(self):
         """Iterate over each strand in the strands list."""
         return self.strands().__iter__()
