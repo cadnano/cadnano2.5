@@ -509,7 +509,8 @@ class StrandSet(CNObject):
     def getLegacyArray(self):
         """docstring for getLegacyArray"""
         num = self._id_num
-        ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx() + 1)]
+        # TODO fix this or get rid of it
+        ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx(0) + 1)]
         if self.isDrawn5to3():
             for strand in self.strand_heap:
                 lo, hi = strand.idxs()

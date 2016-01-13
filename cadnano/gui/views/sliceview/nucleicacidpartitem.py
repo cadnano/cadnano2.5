@@ -183,13 +183,13 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # 2. now redraw what makes sense to be redrawn
         for vh in vh_set:
             vhi = self._virtual_helix_item_hash[vh]
-            self.refreshVirtualHelixItemGizmos(vh, vhi)
+            self._refreshVirtualHelixItemGizmos(vh, vhi)
         for vh in left_overs:
             vhi = self._virtual_helix_item_hash[vh]
-            self.refreshVirtualHelixItemGizmos(vh, vhi)
+            self._refreshVirtualHelixItemGizmos(vh, vhi)
     # end def
 
-    def refreshVirtualHelixItemGizmos(self, vh, vhi):
+    def _refreshVirtualHelixItemGizmos(self, vh, vhi):
         """Update props and appearance of self & recent neighbors."""
         neighbors = vh.getProperty('neighbors')
 
@@ -199,6 +199,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             vhi.setWedgeGizmo(nvh, nvhi)
         # end for
         vhi.endAddWedgeGizmos()
+    # end def
+
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+        if self._model_part == sender:
+            vh_i = self._virtual_helix_item_hash[id_num]
+            vh_i.virtualHelixPropertyChangedSlot(keys, values)
     # end def
 
     def partVirtualHelixAddedSlot(self, sender, id_num):
@@ -212,20 +218,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.removeVirtualHelixItem(id_num)
     # end def
 
-    def partVirtualHelixRenumberedSlot(self, sender, coord):
-        pass
-    # end def
-
-    def partVirtualHelixResizedSlot(self, sender, coord):
-        pass
-    # end def
-
     def updatePreXoverItemsSlot(self, sender, virtual_helix):
         pass
-    # end def
-
-    def partColorChangedSlot(self):
-        print("sliceview Dnapart partColorChangedSlot")
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -269,8 +263,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-
-
     ### PRIVATE SUPPORT METHODS ###
     def _upperLeftCornerForCoords(self, row, col):
         pass  # subclass
@@ -278,31 +270,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def _updateGeometry(self):
         self._rect = QRectF(*self.part().dimensions(self._scale_factor))
-    # end def
-
-
-    def _setLattice(self, old_coords, new_coords):
-        """A private method used to change the number of rows,
-        cols in response to a change in the dimensions of the
-        part represented by the receiver"""
-        old_set = set(old_coords)
-        old_list = list(old_set)
-        new_set = set(new_coords)
-        new_list = list(new_set)
-        for coord in old_list:
-            if coord not in new_set:
-                self._killHelixItemAt(*coord)
-        # end for
-        for coord in new_list:
-            if coord not in old_set:
-                self._spawnEmptyHelixItemAt(*coord)
-        # end for
-        # self._updateGeometry(newCols, newRows)
-        # self.prepareGeometryChange()
-        # the Deselector copies our rect so it changes too
-        self.deselector.prepareGeometryChange()
-        if not getReopen():
-            self.zoomToFit()
     # end def
 
     ### PUBLIC SUPPORT METHODS ###

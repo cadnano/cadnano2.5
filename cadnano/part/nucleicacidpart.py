@@ -6,8 +6,6 @@ from uuid import uuid4
 izip = zip
 
 from cadnano import util
-from cadnano.pointquadtree import Quadtree
-from cadnano.math.vector import v2DistanceAndAngle
 from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
@@ -21,7 +19,7 @@ from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
 from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
-from cadnano.virtualhelix import VirtualHelix
+from cadnano.virtualhelixgroup import VirtualHelixGroup
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand

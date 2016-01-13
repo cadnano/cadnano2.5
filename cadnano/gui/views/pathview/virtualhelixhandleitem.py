@@ -63,16 +63,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             item.setRotation(rev_angles[i])
             prexo_items[i] = item
     # # end def
-    #     angles = [0, 240, 120, 150, 30, 270]
-    #     colors = ['#cc0000', '#00cc00', '#0000cc', '#80cc0000', '#8000cc00', '#800000cc']
-    #     for i in range(len(angles)):
-    #         item = QGraphicsEllipseItem(x, y, iw, iw, self)
-    #         item.setPen(QPen(Qt.NoPen))
-    #         item.setBrush(getBrushObj(colors[i]))
-    #         item.setTransformOriginPoint(_RECT.center())
-    #         item.setRotation(angles[i])
-    #         prexo_items[i] = item
-    # end def
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"

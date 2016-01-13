@@ -82,10 +82,10 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         """
         pass
 
-    def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        if property_key == 'color':
-            self._handle.refreshColor()
-    # end def
+    # def partPropertyChangedSlot(self, model_part, property_key, new_value):
+    #     if property_key == 'color':
+    #         self._handle.refreshColor()
+    # # end def
 
     def partVirtualHelixRemovedSlot(self, id_num):
         self._controller.disconnectSignals()
@@ -98,6 +98,12 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         self._model_part = None
         self._getActiveTool = None
         self._handle = None
+    # end def
+
+    def virtualHelixPropertyChangedSlot(self, keys, values):
+        # for key, val in zip(keys, values):
+        #     pass
+        self.refreshPath()
     # end def
 
     ### ACCESSORS ###

@@ -49,13 +49,13 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
         model_part = self._model_part
         vhg = model_part.virtualHelixGroup()
-        self._bases_per_repeat = self.getProperty(id_num, 'bases_per_repeat')
-        self._turns_per_repeat = self.getProperty(id_num, 'turns_per_repeat')
-        self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
+        # self._bases_per_repeat = self.getProperty(id_num, 'bases_per_repeat')
+        # self._turns_per_repeat = self.getProperty(id_num, 'turns_per_repeat')
+        # self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
 
         self.wedge_gizmos = {}
         self._added_wedge_gizmos = set()
-        self._prexo_gizmos = []
+        # self._prexo_gizmos = []
 
         self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
@@ -145,18 +145,10 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     #     return QGraphicsItem.hoverMoveEvent(self, event)
     # # end def
 
-    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
-        if property_key == 'eulerZ':
-            scamZ = self.getProperty('scamZ')
-            if scamZ != new_value:
-                self.setProperty('scamZ', new_value)
-            active_base_idx = self.part().activeBaseIndex()
-            has_fwd, has_rev = virtual_helix.hasStrandAtIdx(active_base_idx)
-            self.setActiveSliceView(active_base_idx, has_fwd, has_rev)
-        elif property_key == 'scamZ':
-            eulerZ = self.getProperty('eulerZ')
-            if eulerZ != new_value:
-                self.setProperty('eulerZ', new_value)
+    def virtualHelixPropertyChangedSlot(self, keys, values):
+        # for key, val in zip(keys, values):
+        #     pass
+        self.updateAppearance()
     # end def
 
 
@@ -174,23 +166,16 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def updateAppearance(self):
-        part_color = self.part().getProperty('color')
+        part = self._model_part
+        part_color = part.getProperty('color')
 
         self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
         self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
-        self._OUT_OF_SLICE_BRUSH = getBrushObj(part_color, alpha=64)
+
         self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
-        # if self.part().crossSectionType() == LatticeType.HONEYCOMB:
-        #     self._USE_PEN = getPenObj(styles.BLUE_STROKE, styles.SLICE_HELIX_STROKE_WIDTH)
-        #     self._OUT_OF_SLICE_PEN = getPenObj(styles.BLUE_STROKE,\
-        #                                   styles.SLICE_HELIX_STROKE_WIDTH)
-
-        if self.part().partType() == PartType.NUCLEICACIDPART:
-            self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
-            # self._USE_BRUSH = getBrushObj(part_color, lighter=180)
-            self._USE_BRUSH = getBrushObj(part_color, alpha=150)
+        self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
+        self._USE_BRUSH = getBrushObj(part_color, alpha=150)
 
         self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
