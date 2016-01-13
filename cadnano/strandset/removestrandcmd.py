@@ -8,12 +8,10 @@ class RemoveStrandCommand(UndoCommand):
     RemoveStrandCommand deletes a strand. It should only be called on
     strands with no connections to other strands.
     """
-    # def __init__(self, strandset, strand, strandset_idx, solo=True):
     def __init__(self, strandset, strand, solo=True):
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
         self._strand = strand
-        # self._s_set_idx = strandset_idx
         self._solo = solo
         self._old_strand5p = strand.connection5p()
         self._old_strand3p = strand.connection3p()
@@ -82,7 +80,7 @@ class RemoveStrandCommand(UndoCommand):
                 olg3p.addToPart(strandset.part())
             if self._solo:
                 part = strandset.part()
-                id_num = strandset.idNum(
+                id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 # strand.strandXover5pChangedSignal.emit(strand, strand3p)
             strand3p.strandUpdateSignal.emit(strand3p)

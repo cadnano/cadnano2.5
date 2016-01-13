@@ -107,6 +107,32 @@ class VirtualHelixGroup(CNObject):
         self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
     # end def
 
+    def copy(self, part):
+        new_vhg = VirtualHelixGroup(part)
+        new_vhg.total_points = self.total_points
+        new_vhg.axis_pts = self.axis_pts.copy()
+        new_vhg.fwd_pts = self.fwd_pts.copy()
+        new_vhg.rev_pts = self.rev_pts.copy()
+        new_vhg.id_nums = self.id_nums.copy()
+        new_vhg.indices = self.indices.copy()
+
+        new_vhg.total_id_nums = self.total_id_nums
+        new_vhg.origin_pts = self.origin_pts
+        new_vhg.origin_limits = self.origin_limits
+        new_vhg.directions = self.directions
+
+        new_vhg.offset_and_size = self.offset_and_size.copy()
+        new_vhg.reserved_ids = self.reserved_ids.copy()
+
+        new_vhg.properties = defaultDataFrame(DEFAULT_SIZE)
+
+        new_vhg.fwd_strandsets = [x.copy(new_vhg) for x in self.fwd_strandsets]
+        new_vhg.rev_strandsets = [x.copy(new_vhg) for x in self.rev_strandsets]
+
+        new_vhg.recycle_bin = self.recycle_bin
+        new_vhg._highest_id_num_used = self._highest_id_num_used
+    # end def
+
     def getOffsetAndSize(self, id_num):
         offset_and_size = self.offset_and_size
         offset_and_size[id_num] if id_num < len(offset_and_size) else return None
