@@ -15,8 +15,6 @@ from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem
-from .prexoveraitem import PreXoverAItem
-from .prexoverpitem import PreXoverPItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
 

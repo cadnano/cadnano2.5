@@ -73,7 +73,6 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         self._properties["name"] = "NaPart%d" % self._count()
         self._properties['active_phos'] = None
-        self._properties['active_phos'] = None
         self._properties['crossover_span_angle'] = 45
         self._properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._properties['neighbor_active_angle'] = ''
@@ -497,69 +496,44 @@ class NucleicAcidPart(Part):
         self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
 
-    def getPreXoversHigh(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
-        """
-        Returns all prexover positions for neighbor_type that are below
-        max_idx. Used in emptyhelixitem.py.
-        """
-        pre_xo = self._SCAFH if strand_type == StrandType.SCAFFOLD else self._STAPH
-        if max_idx is None:
-            max_idx = self._max_base
-        steps = (self._max_base // self._STEP_SIZE) + 1
-        ret = [i * self._STEP_SIZE + j for i in range(steps) for j in pre_xo[neighbor_type]]
-        return filter(lambda x: x >= min_idx and x <= max_idx, ret)
+    # def xoverSnapTo(self, strand, idx, delta):
+    #     """
+    #     Returns the nearest xover position to allow snap-to behavior in
+    #     resizing strands via dragging selected xovers.
+    #     """
+    #     strand_type = strand.strandType()
+    #     if delta > 0:
+    #         min_idx, max_idx = idx - delta, idx + delta
+    #     else:
+    #         min_idx, max_idx = idx + delta, idx - delta
 
-    def getPreXoversLow(self, strand_type, neighbor_type, min_idx=0, max_idx=None):
-        """
-        Returns all prexover positions for neighbor_type that are above
-        min_idx. Used in emptyhelixitem.py.
-        """
-        pre_xo = self._SCAFL if strand_type == StrandType.SCAFFOLD \
-                                else self._STAPL
-        if max_idx is None:
-            max_idx = self._max_base
-        steps = (self._max_base // self._STEP_SIZE) + 1
-        ret = [i * self._STEP_SIZE + j for i in range(steps) for j in pre_xo[neighbor_type]]
-        return filter(lambda x: x >= min_idx and x <= max_idx, ret)
+    #     # determine neighbor strand and bind the appropriate prexover method
+    #     lo, hi = strand.idxs()
+    #     if idx == lo:
+    #         connected_strand = strand.connectionLow()
+    #         preXovers = self.getPreXoversHigh
+    #     else:
+    #         connected_strand = strand.connectionHigh()
+    #         preXovers = self.getPreXoversLow
+    #     connected_vh = connected_strand.idNum()
 
-    def xoverSnapTo(self, strand, idx, delta):
-        """
-        Returns the nearest xover position to allow snap-to behavior in
-        resizing strands via dragging selected xovers.
-        """
-        strand_type = strand.strandType()
-        if delta > 0:
-            min_idx, max_idx = idx - delta, idx + delta
-        else:
-            min_idx, max_idx = idx + delta, idx - delta
-
-        # determine neighbor strand and bind the appropriate prexover method
-        lo, hi = strand.idxs()
-        if idx == lo:
-            connected_strand = strand.connectionLow()
-            preXovers = self.getPreXoversHigh
-        else:
-            connected_strand = strand.connectionHigh()
-            preXovers = self.getPreXoversLow
-        connected_vh = connected_strand.idNum()
-
-        # determine neighbor position, if any
-        neighbors = self.getVirtualHelixNeighbors(strand.idNum())
-        if connected_vh in neighbors:
-            neighbor_idx = neighbors.index(connected_vh)
-            try:
-                new_idx = util.nearest(idx + delta,
-                                    preXovers(strand_type,
-                                                neighbor_idx,
-                                                min_idx=min_idx,
-                                                max_idx=max_idx)
-                                    )
-                return new_idx
-            except ValueError:
-                return None  # nearest not found in the expanded list
-        else:  # no neighbor (forced xover?)... don't snap, just return
-            return idx + delta
-    # end def
+    #     # determine neighbor position, if any
+    #     neighbors = self.getVirtualHelixNeighbors(strand.idNum())
+    #     if connected_vh in neighbors:
+    #         neighbor_idx = neighbors.index(connected_vh)
+    #         try:
+    #             new_idx = util.nearest(idx + delta,
+    #                                 preXovers(strand_type,
+    #                                             neighbor_idx,
+    #                                             min_idx=min_idx,
+    #                                             max_idx=max_idx)
+    #                                 )
+    #             return new_idx
+    #         except ValueError:
+    #             return None  # nearest not found in the expanded list
+    #     else:  # no neighbor (forced xover?)... don't snap, just return
+    #         return idx + delta
+    # # end def
 
     def newPart(self):
         return Part(self._document)
@@ -694,25 +668,6 @@ class NucleicAcidPart(Part):
         return part
     # end def
 
-    def isPossibleXoverA(self, from_id_num, to_id_num, strand_type, idx):
-        from_ss = from_id_num.getStrandSetByType(strand_type)
-        to_ss = to_id_num.getStrandSetByType(strand_type)
-        return from_ss.hasStrandAtAndNoXover(idx) and \
-                to_ss.hasStrandAtAndNoXover(idx)
-    # end def
-
-    def isPossibleXoverP(self, from_id_num, to_id_num, strand_type, idx):
-        vhg = self._virtual_helix_group
-        to_strand_type = StrandType.FWD if strand_type is StrandType.REV else StrandType.REV
-        from_ss = vhg.getStrandSets(from_id_num)[strand_type]
-        to_ss = vhg.getStrandSets(to_id_num)[to_strand_type]
-        if from_ss.isDrawn5to3():
-            return from_ss.hasStrandAtAndNoXover(idx) and \
-                    to_ss.hasStrandAtAndNoXover(idx + 1)
-        else:
-            return from_ss.hasStrandAtAndNoXover(idx) and \
-                    to_ss.hasStrandAtAndNoXover(idx - 1)
-    # end def
 
     def setImportedVHelixOrder(self, ordered_coord_list, check_batch=True):
         """Used on file import to store the order of the virtual helices."""
