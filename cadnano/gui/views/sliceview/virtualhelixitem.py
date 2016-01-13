@@ -37,20 +37,20 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     def __init__(self, id_num, part_item):
         """
         """
-        super(VirtualHelixItem, self).__init__(parent=part_item)
-        self._id_num = id_num
-        self._controller = VirtualHelixItemController(self, model_virtual_helix)
-        self._part_item = part_item
-        self._model_part = part_item.part()
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        QGraphicsEllipseItem.__init__(self, parent=part_item)
+        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
+
         self.hide()
-        x, y = model_virtual_helix.locationQt(part_item.scaleFactor())
+        x, y = self._virtual_helix_group.locationQt(id_num, part_item.scaleFactor())
         # set position to offset for radius
         # self.setTransformOriginPoint(_RADIUS, _RADIUS)
         self.setCenterPos(x, y)
-        # self.setPos(x, y)
 
-        self._bases_per_repeat = model_virtual_helix.getProperty('bases_per_repeat')
-        self._turns_per_repeat = model_virtual_helix.getProperty('turns_per_repeat')
+        model_part = self._model_part
+        vhg = model_part.virtualHelixGroup()
+        self._bases_per_repeat = self.getProperty(id_num, 'bases_per_repeat')
+        self._turns_per_repeat = self.getProperty(id_num, 'turns_per_repeat')
         self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
 
         self.wedge_gizmos = {}
@@ -145,17 +145,8 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     #     return QGraphicsItem.hoverMoveEvent(self, event)
     # # end def
 
-    def virtualHelixNumberChangedSlot(self, virtual_helix):
-        """
-        receives a signal containing a virtual_helix and the oldNumber
-        as a safety check
-        """
-        self.setNumber()
-    # end def
-
     def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
         if property_key == 'eulerZ':
-            # self._prexoveritemgroup.setRotation(new_value)
             scamZ = self.getProperty('scamZ')
             if scamZ != new_value:
                 self.setProperty('scamZ', new_value)

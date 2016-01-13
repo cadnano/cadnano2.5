@@ -11,6 +11,7 @@ class CNPropertyItem(QTreeWidgetItem):
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self._cn_model = cn_model
+        self._controller = None
         if key is None:
             self._parent_tree = parent
             root = parent.invisibleRootItem() # add propertyitems as siblings
@@ -53,6 +54,12 @@ class CNPropertyItem(QTreeWidgetItem):
 
     def itemType(self):
         return None
+    # end def
+
+    def disconnectSignals(self):
+        if self._controller is not None:
+            self._controller.disconnectSignals()
+            self._controller = None
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):

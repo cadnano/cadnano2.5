@@ -21,6 +21,7 @@ from .plasmidpartitem import PlasmidPartItem
 from .oligoitem import OligoItem
 from .nucleicacidpartitem import NucleicAcidPartItem
 from .virtualhelixitem import VirtualHelixItem
+from .cnpropertyitem import CNPropertyItem
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
 _FONT = QFont(styles.THE_FONT, 12)
@@ -78,7 +79,12 @@ class PropertyEditorWidget(QTreeWidget):
     ### SLOTS ###
     def outlinerItemSelectionChanged(self):
         o = self._window.outliner_widget
+        for child in self.children():
+            if isinstance(child, CNPropertyItem):
+                child.disconnectSignals()
+
         selected_items = o.selectedItems()
+
         self.clear()    # remove pre-existing items
         if len(selected_items) == 1:
             # get the selected item
@@ -91,7 +97,7 @@ class PropertyEditorWidget(QTreeWidget):
                 pe_item = OligoItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem(item.cnModel(), self)
+                pe_item = VirtualHelixItem(item.idNum(), item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.NUCLEICACID:
                 # print("nucleicacid selected")
@@ -171,54 +177,6 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             return QStyledItemDelegate.createEditor(self, \
                             parent_QWidget, option, model_index)
     # end def
-
-    # def setEditorData(self, editor, model_index):
-    #     column = model_index.column()
-    #     if column == 0: # Property
-    #         # textQString = model_index.model().data(model_index, Qt.EditRole)
-    #         # editor.setText(textQString)
-    #         return
-    #     elif column == 1: # Value
-    #         value = model_index.model().data(model_index, Qt.EditRole)
-    #         data_type = type(value)
-    #         if data_type is str:
-    #             editor.setText(value)
-    #         elif data_type is int:
-    #             editor.setValue(value)
-    #         elif data_type is float:
-    #             editor.setValue(value)
-    #         elif data_type is bool:
-    #             editor.setChecked(value)
-    #         else:
-    #             raise NotImplementedError
-    #     else:
-    #         QStyledItemDelegate.setEditorData(self, editor, model_index)
-    # # end def
-
-    # def setModelData(self, editor, model, model_index):
-    #     column = model_index.column()
-    #     if column == 0: # Property
-    #         # textQString = editor.text()
-    #         # model.setData(model_index, textQString, Qt.EditRole)
-    #         return
-    #     elif column == 1: # Value
-    #         data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
-    #         if data_type is str:
-    #             new_value = editor.text()
-    #         elif data_type is int:
-    #             new_value = editor.value()
-    #         elif data_type is float:
-    #             new_value = editor.value()
-    #         elif data_type is bool:
-    #             new_value = editor.isChecked()
-    #         elif data_type is type(None):
-    #             return
-    #         else:
-    #             raise NotImplementedError
-    #         model.setData(model_index, new_value, Qt.EditRole)
-    #     else:
-    #         QStyledItemDelegate.setModelData(self, editor, model, model_index)
-    # # end def
 
     def updateEditorGeometry(self, editor, option, model_index):
         column = model_index.column()

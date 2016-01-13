@@ -44,7 +44,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
-        self._virtual_helix_hash = {}
+        self._virtual_helix_item_hash = {}
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -88,7 +88,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def vhItemForIdNum(self, id_num):
         """Returns the pathview VirtualHelixItem corresponding to id_num"""
-        return self._virtual_helix_hash.get(id_num)
+        return self._virtual_helix_item_hash.get(id_num)
 
     ### SIGNALS ###
 
@@ -146,7 +146,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         scene = self.scene()
         scene.removeItem(self)
         self._model_part = None
-        self._virtual_helix_hash = None
+        self._virtual_helix_item_hash = None
         self._virtual_helix_item_list = None
         self._controller.disconnectSignals()
         self._controller = None
@@ -168,15 +168,14 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self._mod_rect.show()
     # end def
 
-    def partVirtualHelixAddedSlot(self, sender, model_virtual_helix):
+    def partVirtualHelixAddedSlot(self, model_part, id_num):
         """
         When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vh = model_virtual_helix
-        vhi = VirtualHelixItem(self, model_virtual_helix, self._viewroot)
-        self._virtual_helix_hash[vh] = vhi
+        vhi = VirtualHelixItem(self, id_num, self, self._viewroot)
+        self._virtual_helix_item_hash[id_num] = vhi
 
         # reposition when first VH is added
         if len(self._virtual_helix_item_list) == 0:
@@ -192,7 +191,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     # end def
 
-    def partVirtualHelixRenumberedSlot(self, sender, vh):
+    def partVirtualHelixRenumberedSlot(self, sender, id_old, id_new):
         """Notifies the virtualhelix at coord to change its number"""
         # check for new number
         # notify VirtualHelixHandleItem to update its label
@@ -201,23 +200,25 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass
     # end def
 
-    def partVirtualHelixResizedSlot(self, sender, vh):
+    def partVirtualHelixResizedSlot(self, sender, id_num):
         """Notifies the virtualhelix at coord to resize."""
-        vh = self._virtual_helix_hash[vh]
-        vh.resize()
+        vhi = self._virtual_helix_item_hash[id_num]
+        vhi.resize()
     # end def
 
-    def partVirtualHelicesReorderedSlot(self, sender, ordered_coord_list, check_batch):
+    def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):
         """docstring for partVirtualHelicesReorderedSlot"""
-        new_list = self._virtual_helix_item_list
-        decorated = [(ordered_coord_list.index(vhi.coord()), vhi)\
-                        for vhi in self._virtual_helix_item_list]
-        decorated.sort()
-        new_list = [vhi for idx, vhi in decorated]
+        vhi_dict = self._virtual_helix_item_hash
+        new_list = [vhi_dict[id_num] for id_num in ordered_id_list]
 
         ztf = not getBatch() if check_batch == True else False
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
+
+    def partVirtualHelixRemovedSlot(self, id_num):
+        self.removeVirtualHelixItem(id_num)
+    # end def
+
 
     def updatePreXoverItemsSlot(self, sender, virtual_helix):
         part = self.part()
@@ -245,10 +246,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self._model_part.document()
     # end def
 
-    def removeVirtualHelixItem(self, virtual_helix_item):
-        label = virtual_helix_item.label()
-        self._virtual_helix_item_list.remove(virtual_helix_item)
-        del self._virtual_helix_hash[label]
+    def removeVirtualHelixItem(self, id_num):
+        vhi = self._virtual_helix_item_hash[id_num]
+        vhi.virtualHelixRemovedSlot()
+        self._virtual_helix_item_list.remove(vhi)
+        del self._virtual_helix_item_hash[id_num]
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
@@ -256,8 +258,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     # end def
 
-    def itemForVirtualHelix(self, label):
-        return self._virtual_helix_hash[label]
+    def itemForVirtualHelix(self, id_num):
+        return self._virtual_helix_item_hash[id_num]
     # end def
 
     def virtualHelixBoundingRect(self):

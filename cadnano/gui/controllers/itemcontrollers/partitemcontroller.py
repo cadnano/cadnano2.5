@@ -23,6 +23,7 @@ class PartItemController():
         m_p.partVirtualHelicesReorderedSignal.connect(p_i.partVirtualHelicesReorderedSlot)
         m_p.partVirtualHelixTransformedSignal.connect(p_i.partVirtualHelixTransformedSlot)
         m_p.partVirtualHelicesTranslatedSignal.connect(p_i.partVirtualHelicesTranslatedSlot)
+        m_p.partVirtualHelixPropertyChangedSignal.connect(p_i.partVirtualHelixPropertyChangedSlot)
 
         m_p.partOligoAddedSignal.connect(p_i.partOligoAddedSlot)
         m_p.partStrandChangedSignal.connect(p_i.updatePreXoverItemsSlot)
@@ -47,6 +48,7 @@ class PartItemController():
         m_p.partVirtualHelicesReorderedSignal.disconnect(p_i.partVirtualHelicesReorderedSlot)
         m_p.partVirtualHelixTransformedSignal.disconnect(p_i.partVirtualHelixTransformedSlot)
         m_p.partVirtualHelicesTranslatedSignal.disconnect(p_i.partVirtualHelicesTranslatedSlot)
+        m_p.partVirtualHelixPropertyChangedSignal.disconnect(p_i.partVirtualHelixPropertyChangedSlot)
 
         m_p.partOligoAddedSignal.disconnect(p_i.partOligoAddedSlot)
         m_p.partStrandChangedSignal.disconnect(p_i.updatePreXoverItemsSlot)

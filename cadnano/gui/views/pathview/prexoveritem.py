@@ -7,11 +7,11 @@ from cadnano.enum import StrandType
 from cadnano.gui.palette import getPenObj, getBrushObj, getSolidBrush
 from . import pathstyles as styles
 
-_SCAF_PEN = getPenObj(styles.PXI_SCAF_STROKE,
+_FWD_PEN = getPenObj(styles.PXI_SCAF_STROKE,
                     styles.PATH_STRAND_STROKE_WIDTH,
                     capstyle=Qt.FlatCap,
                     joinstyle=Qt.RoundJoin)
-_STAP_PEN = getPenObj(styles.PXI_STAP_STROKE,
+_REV_PEN = getPenObj(styles.PXI_STAP_STROKE,
                     styles.PATH_STRAND_STROKE_WIDTH,
                     capstyle=Qt.FlatCap,
                     joinstyle=Qt.RoundJoin)
@@ -38,8 +38,8 @@ class PreXoverItem(QGraphicsPathItem):
         # translate from Low to Left for the Path View
         self._is_low_index = is_low_idx
         self._is_active = False
-        self._pen = _SCAF_PEN if strand_type == StrandType.SCAFFOLD else _STAP_PEN
-        is_on_top = from_virtual_helix_item.isStrandTypeOnTop(strand_type)
+        is_on_top = strand_type is StrandType.FWD
+        self._pen = _FWD_PEN if is_on_top else _REV_PEN
 
         bw = _BASE_WIDTH
         x = bw * index

@@ -201,12 +201,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi.endAddWedgeGizmos()
     # end def
 
-    def partVirtualHelixAddedSlot(self, sender, virtual_helix):
-        vh = virtual_helix
+    def partVirtualHelixAddedSlot(self, sender, id_num):
         # TODO test to see if self._virtual_helix_hash is necessary
-        vhi = VirtualHelixItem(vh, self)
+        vhi = VirtualHelixItem(id_num, self)
         # self._virtual_helix_item_list.append(virtual_helix_item)
         self._virtual_helix_item_hash[virtual_helix] = vhi
+    # end def
+
+    def partVirtualHelixRemovedSlot(self, id_num):
+        self.removeVirtualHelixItem(id_num)
     # end def
 
     def partVirtualHelixRenumberedSlot(self, sender, coord):
@@ -259,7 +262,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self.parentItem().window()
     # end def
 
-    def removeVirtualHelixItem(self, virtual_helix_item):
+    def removeVirtualHelixItem(self, id_num):
+        vhi = self._virtual_helix_item_hash[id_num]
+        vhi.virtualHelixRemovedSlot()
         id_num = virtual_helix_item.idNum()
         del self._virtual_helix_item_hash[id_num]
     # end def

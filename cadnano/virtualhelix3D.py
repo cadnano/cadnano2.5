@@ -635,6 +635,7 @@ class VirtualHelixGroup(CNObject):
             if offset_and_size is None:
                 raise IndexError("IdNum {} does not exists".format(id_num))
         self.properties.loc[id_num, keys] = values
+        self.parent().partVirtualHelixPropertyChangedSignal.emit(self, tuple(keys), tuple(values))
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):

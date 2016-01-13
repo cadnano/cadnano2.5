@@ -547,32 +547,26 @@ class NucleicAcidPart(Part):
         undesirable Object parenting to make sure the translations are set
         correctly.  set to True when "undo-ing"
         """
-        qt = self._quadtree
+        vhg = self._virtual_helix_group
         # 1. get old neighbor list
         old_neighbors = set()
-        for vh in vh_set:
-            neighbors = self.getVirtualHelixNeighbors(vh)
+        for id_num in vh_set:
+            neighbors = self.getVirtualHelixNeighbors(id_num)
             old_neighbors.update(neighbors)
-        # 2. move in the quadtree
-        for vh in vh_set:
-            if qt.removeNode(vh):
-                vh.translate(dx, dy)
-                qt.insertNode(vh)
-            else:
-                raise ValueError("{} not in set".format(vh))
+        # 2. move in the virtual_helix_group
+        vhg.translateCoordinates(vh_set, (dx, dy, 0.))
         # 3. update neighbor calculations
         new_neighbors = set()
-        for vh in vh_set:
-            neighbors = self.getVirtualHelixNeighbors(vh)
-            vh.setProperty('neighbors', list(neighbors))
+        for id_num in vh_set:
+            neighbors = self.getVirtualHelixNeighbors(id_num)
+            vhg.setProperties(id_num, 'neighbors', list(neighbors))
             new_neighbors.update(neighbors)
-            # print(vh, neighbors)
 
         # now update the old and new neighbors that were not in the vh set
         left_overs = new_neighbors.union(old_neighbors).difference(vh_set)
-        for vh in left_overs:
-            neighbors = self.getVirtualHelixNeighbors(vh)
-            vh.setProperty('neighbors', list(neighbors))
+        for id_num in left_overs:
+            neighbors = self.getVirtualHelixNeighbors(id_num)
+            vhg.setProperties(id_num, 'neighbors', list(neighbors))
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
     #end def
 
@@ -580,11 +574,7 @@ class NucleicAcidPart(Part):
 
     ### PUBLIC SUPPORT METHODS ###
     def shallowCopy(self):
-        part = self.newPart()
-        part._virtual_helices = dict(self._virtual_helices)
-        part._oligos = set(self._oligos)
-        part._max_base = self._max_base
-        return part
+        raise NotImplementedError
     # end def
 
     def deepCopy(self):

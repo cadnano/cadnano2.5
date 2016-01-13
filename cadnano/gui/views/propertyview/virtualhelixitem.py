@@ -8,27 +8,31 @@ from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
 
 from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 
 from .cnpropertyitem import CNPropertyItem
 
-class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
-    def __init__(self, model_virtual_helix, parent, key=None):
-        super(VirtualHelixItem, self).__init__(model_virtual_helix, parent, key=key)
+class VirtualHelixItem(CNPropertyItem):
+    def __init__(self, id_num, model_part, parent, key=None):
+        self._id_num = id_num
+        self._model_part = model_part
+        CNPropertyItem.__init__(self, model_part, parent=parent)
         if key is None:
-            self._controller = VirtualHelixItemController(self, model_virtual_helix)
+            # different controller required for this
+            self._controller = VirtualHelixItemController(self, model_part, True, False)
     # end def
 
     # SLOTS
-    def virtualHelixPropertyChangedSlot(self, virtual_helix, property_key, new_value):
-        if self._cn_model == virtual_helix:
-            self.setValue(property_key, new_value)
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+        if self._cn_model == sender and id_num == self._id_num:
+            for key, val in zip(keys, values):
+                self.setValue(key, val)
 
-    def virtualHelixRemovedSlot(self, virtual_helix):
-        self._cn_model = None
-        self._controller.disconnectSignals()
-        self._controller = None
-        self.parent().removeChild(self)
+    def partVirtualHelixRemovedSlot(self, sender, id_num):
+        if self._cn_model == sender and id_num == self._id_num:
+            self.setValue(property_key, new_value)
+            self._cn_model = None
+            self._controller = None
+            self.parent().removeChild(self)
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
@@ -36,7 +40,7 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
-        m_vh = self._cn_model
+        m_p = self._cn_model
         key = self.key()
         if key == 'name':
             editor = QLineEdit(parent_QWidget)
@@ -48,7 +52,7 @@ class VirtualHelixItem(CNPropertyItem, AbstractVirtualHelixItem):
             editor.setRange(0,359)
         elif key == 'scamZ':
             editor = QDoubleSpinBox(parent_QWidget)
-            editor.setSingleStep(m_vh.part().twistPerBase())
+            editor.setSingleStep(m_p.twistPerBase())
             editor.setDecimals(1)
             editor.setRange(0,359)
         elif key in ['ehiX', 'ehiY']:

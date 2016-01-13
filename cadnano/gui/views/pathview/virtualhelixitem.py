@@ -15,6 +15,7 @@ from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
@@ -23,14 +24,13 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     findChild = util.findChild  # for debug
 
     def __init__(self, id_num, part_item, viewroot):
-        super(VirtualHelixItem, self).__init__(part_item.proxy())
-        self._part_item = part_item
-        self._model_part
-        self._id_num = id_num
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        QGraphicsPathItem.__init__(self, parent=part_item.proxy())
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
+        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        self._handle = VirtualHelixHandleItem(model_virtual_helix, part_item, viewroot)
+        self._handle = VirtualHelixHandleItem(id_num, part_item, viewroot)
         self._last_strand_set = None
         self._last_idx = None
         self._scaffold_background = None
@@ -82,25 +82,20 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
         """
         pass
 
-    def virtualHelixNumberChangedSlot(self, virtual_helix, number):
-        self._handle.setNumber()
-    # end def
-
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if property_key == 'color':
             self._handle.refreshColor()
     # end def
 
-    def virtualHelixRemovedSlot(self, virtual_helix):
+    def partVirtualHelixRemovedSlot(self, id_num):
         self._controller.disconnectSignals()
         self._controller = None
 
         scene = self.scene()
         self._handle.remove()
         scene.removeItem(self)
-        self._part_item.removeVirtualHelixItem(self)
         self._part_item = None
-        self._model_virtual_helix = None
+        self._model_part = None
         self._getActiveTool = None
         self._handle = None
     # end def
@@ -119,13 +114,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
     # end def
 
     ### DRAWING METHODS ###
-    def isStrandTypeOnTop(self, strand_type):
-        # return strand_type is StrandType.SCAFFOLD
-        is_even_parity = self._model_virtual_helix.isEvenParity()
-        return is_even_parity and strand_type is StrandType.SCAFFOLD or \
-               not is_even_parity and strand_type is StrandType.STAPLE
-    # end def
-
     def upperLeftCornerOfBase(self, idx, strand):
         x = idx * _BASE_WIDTH
         y = 0 if strand.isForward() else _BASE_WIDTH
@@ -182,9 +170,6 @@ class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
 
         self.setPath(path)
 
-        # if self._model_virtual_helix.scaffoldIsOnTop():
-        #     scaffoldY = 0
-        # else:
         scaffoldY = bw
     # end def
 

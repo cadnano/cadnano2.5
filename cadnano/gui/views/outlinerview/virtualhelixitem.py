@@ -4,11 +4,12 @@ from .cnoutlineritem import CNOutlinerItem
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
+
 class VirtualHelixItem(CNOutlinerItem, AbstractVirtualHelixItem):
-    def __init__(self, model_virtual_helix, parent):
-        super(VirtualHelixItem, self).__init__(model_virtual_helix, parent)
-        self._controller = VirtualHelixItemController(self, model_virtual_helix)
-        self._model_virtual_helix = model_virtual_helix
+    def __init__(self, id_num, part_item):
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        CNOutlinerItem.__init__(self, parent=part_item)
+        self._controller = VirtualHelixItemController(self, self._model_part, False, False)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -19,8 +20,4 @@ class VirtualHelixItem(CNOutlinerItem, AbstractVirtualHelixItem):
     # end def
 
     ### SLOTS ###
-    def virtualHelixPropertyChangedSlot(self, model_vh, property_key, new_value):
-        if property_key in CNOutlinerItem.PROPERTIES:
-            self.setValue(property_key, new_value)
-    # end def
 # end class

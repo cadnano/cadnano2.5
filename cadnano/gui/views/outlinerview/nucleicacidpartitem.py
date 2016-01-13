@@ -60,21 +60,17 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         o_i = self._items[m_o]
         o_i.parent().removeChild(o_i)
         del self._items[m_o]
-
     # end def
 
-    def partVirtualHelixAddedSlot(self, model_part, model_virtual_helix):
-        m_vh = model_virtual_helix
-        m_vh.virtualHelixRemovedSignal.connect(self.partVirtualHelixRemovedSlot)
-        vh_i = VirtualHelixItem(m_vh, self)
-        self._items[m_vh] = vh_i
+    def partVirtualHelixAddedSlot(self, model_part, id_num):
+        vh_i = VirtualHelixItem(id_num, self)
+        self._items[id_num] = vh_i
 
-    def partVirtualHelixRemovedSlot(self, model_part, model_virtual_helix):
-        m_vh = model_virtual_helix
-        vh_i = self._items.get(m_vh)
+    def partVirtualHelixRemovedSlot(self, model_part, id_num):
+        vh_i = self._items.get(id_num)
         # in case a VirtualHelixItem Object is cleaned up before this happends
         if vh_i is not None:
-            del self._items[m_vh]
+            del self._items[id_num]
             vh_i.parent().removeChild(vh_i)
     # end def
 
@@ -85,5 +81,13 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
 
     def partSelectedChangedSlot(self, model_part, is_selected):
         self.setSelected(is_selected)
+    # end def
+
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+        if self._model_part == sender:
+            vh_i = self._items[id_num]
+            for key, val in zip(keys, values):
+                if key in CNOutlinerItem.PROPERTIES:
+                    vh_i.setValue(key, val)
     # end def
 # end class

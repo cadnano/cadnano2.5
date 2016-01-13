@@ -40,6 +40,8 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
+        pass
 # end class
 
 

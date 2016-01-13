@@ -127,7 +127,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def modelColor(self):
-        return self.part().getProperty('color')
+        return self._model_part.getProperty('color')
     # end def
 
     def refreshColor(self):

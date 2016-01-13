@@ -6,6 +6,12 @@ class AbstractVirtualHelixItem(object):
 
     Slots that must be overridden should raise an exception.
     """
+    def __init__(self, id_num, part_item):
+        self._id_num = id_num
+        self._part_item = part_item
+        self._model_part = part_item.part()
+        self._virtual_helix_group = self._model_part.virtualHelixGroup()
+
     def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         pass
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
@@ -16,11 +22,11 @@ class AbstractVirtualHelixItem(object):
         pass
 
     def getProperty(self, keys):
-        return self._model_part.virtualHelixGroup().getProperties(self._id_num, keys)
+        return self._virtual_helix_group.getProperties(self._id_num, keys)
     # end def
 
     def setProperty(self, keys, values):
-        return self._model_part.virtualHelixGroup().setProperties(self._id_num, keys, values)
+        return self._virtual_helix_group.setProperties(self._id_num, keys, values)
     # end def
 
     def part(self):
@@ -31,12 +37,16 @@ class AbstractVirtualHelixItem(object):
         return self._part_item
     # end def
 
+    def idNum(self):
+        return self._id_num
+    # end def
+
     def fwdStrand(self, idx):
-        self._model_part.virtualHelixGroup().fwd_strandsets[self._id_num].getStrand(idx)
+        self._virtual_helix_group.fwd_strandsets[self._id_num].getStrand(idx)
     # end def
 
     def revStrand(self, idx):
-        self._model_part.virtualHelixGroup().rev_strandsets[self._id_num].getStrand(idx)
+        self._virtual_helix_group.rev_strandsets[self._id_num].getStrand(idx)
     # end def
 # end class
 
