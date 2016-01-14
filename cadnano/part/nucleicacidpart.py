@@ -105,12 +105,20 @@ class NucleicAcidPart(Part):
         return res
     # end def
 
-    def getVirtualHelixAtPoint(self, point):
+    def getVirtualHelixAtPoint(self, point, id_num=None):
+        """ Fix this to get the closest result
+        """
         radius = self._RADIUS
         res = self._virtual_helix_group.queryOrigin(radius, point)
         res = set(res)
         if len(res) > 0:
-            return res.pop()
+            if id_num is None:
+                return res.pop()
+            else:
+                while len(res) > 0:
+                    check_id_num = res.pop()
+                    if check_id_num != id_num:
+                        return check_id_num
         return None
     # end def
 
@@ -125,7 +133,8 @@ class NucleicAcidPart(Part):
             print(res)
             existing_id_num = res.pop()
             existing_pt = self._virtual_helix_group.getOrigin(existing_id_num)
-            print("vh\n{}\n{}\ndx: {}, dy: {}".format(existing_pt,
+            print("vh{}\n{}\n{}\ndx: {}, dy: {}".format(existing_id_num,
+                                            existing_pt,
                                             point,
                                             existing_pt[0] - point[0],
                                             existing_pt[1] - point[1]))

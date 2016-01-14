@@ -51,6 +51,10 @@ class AbstractSliceTool(QGraphicsObject):
         # li.setLine(0., 0., 0., 0.)
     # end def
 
+    def idNum(self):
+        if self._vhi is not None:
+            return self._vhi.idNum()
+
     def setPartItem(self, part_item):
         self.part_item = part_item
     # end def
@@ -97,6 +101,7 @@ class AbstractSliceTool(QGraphicsObject):
             li.setLine(direction_min)
             return part_item.mapFromItem(li, direction_min.p2())
         else:
+            print("default point")
             line.setP2(pos)
             li.setLine(line)
             return part_item.mapFromItem(li, pos)

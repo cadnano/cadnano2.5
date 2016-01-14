@@ -357,15 +357,16 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         check = part.isVirtualHelixNearPoint(part_pt_tuple)
         tool.setPartItem(self)
         if check:
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple, id_num=tool.idNum())
             if id_num is not None:
+                print("restart", id_num)
                 vhi = self._virtual_helix_item_hash[id_num]
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
             part.createVirtualHelix(*part_pt_tuple)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            neighbors = vhg.getOriginNeighbors(id_num, 2.1*part.radius())
+            #neighbors = vhg.getOriginNeighbors(id_num, 2.1*part.radius())
             # print("neighbors to {}:".format(virtual_helix.number()))
             # for vh in neighbors:
             #     print(vh)
