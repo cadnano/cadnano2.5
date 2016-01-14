@@ -215,7 +215,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._virtual_helix_item_hash[id_num] = vhi
     # end def
 
-    def partVirtualHelixRemovedSlot(self, id_num):
+    def partVirtualHelixRemovedSlot(self, sender, id_num):
         self.removeVirtualHelixItem(id_num)
     # end def
 
@@ -260,7 +260,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def removeVirtualHelixItem(self, id_num):
         vhi = self._virtual_helix_item_hash[id_num]
         vhi.virtualHelixRemovedSlot()
-        id_num = virtual_helix_item.idNum()
         del self._virtual_helix_item_hash[id_num]
     # end def
 
@@ -352,25 +351,25 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if not (event.modifiers() & mod):
             pass
         part = self._model_part
-
+        vhg = part.virtualHelixGroup()
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
         check = part.isVirtualHelixNearPoint(part_pt_tuple)
         tool.setPartItem(self)
         if check:
-            virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
-            if virtual_helix is not None:
-                vhi = self._virtual_helix_item_hash[virtual_helix]
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            if id_num is not None:
+                vhi = self._virtual_helix_item_hash[id_num]
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
             part.createVirtualHelix(*part_pt_tuple)
-            virtual_helix = part.getVirtualHelixAtPoint(part_pt_tuple)
-            neighbors = part.getVirtualHelixNeighbors(virtual_helix)
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            neighbors = vhg.getOriginNeighbors(id_num, 2.1*part.radius())
             # print("neighbors to {}:".format(virtual_helix.number()))
             # for vh in neighbors:
             #     print(vh)
-            vhi = self._virtual_helix_item_hash[virtual_helix]
+            vhi = self._virtual_helix_item_hash[id_num]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
         return QGraphicsItem.mousePressEvent(self, event)

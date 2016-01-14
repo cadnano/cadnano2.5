@@ -10,7 +10,6 @@ class CNOutlinerItem(QTreeWidgetItem):
     PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
 
     def __init__(self, cn_model, parent):
-        # QTreeWidgetItem.__init__(self, parent, QTreeWidgetItem.UserType)
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = cn_model
         self.setFlags(self.flags() | Qt.ItemIsEditable)
@@ -55,7 +54,7 @@ class CNOutlinerItem(QTreeWidgetItem):
     # end def
 
     def setValue(self, key, value):
-        cn_model = self._cn_model
+        # cn_model = self._cn_model
         if key == 'name':
             name = self.data(NAME_COL, Qt.DisplayRole)
             if name != value:

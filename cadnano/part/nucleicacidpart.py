@@ -122,11 +122,13 @@ class NucleicAcidPart(Part):
         res = self._virtual_helix_group.queryOrigin(2*radius, point)
         res = set(res)
         if len(res) > 0:
-            existing = res.pop().location()
-            print("vh\n{}\n{}\ndx: {}, dy: {}".format(existing,
+            print(res)
+            existing_id_num = res.pop()
+            existing_pt = self._virtual_helix_group.getOrigin(existing_id_num)
+            print("vh\n{}\n{}\ndx: {}, dy: {}".format(existing_pt,
                                             point,
-                                            existing[0] - point[0],
-                                            existing[1] - point[1]))
+                                            existing_pt[0] - point[0],
+                                            existing_pt[1] - point[1]))
             return True
         return False
     # end def
@@ -558,24 +560,25 @@ class NucleicAcidPart(Part):
         correctly.  set to True when "undo-ing"
         """
         vhg = self._virtual_helix_group
+        threshold = 2.1*self._RADIUS
         # 1. get old neighbor list
         old_neighbors = set()
         for id_num in vh_set:
-            neighbors = self.getVirtualHelixNeighbors(id_num)
+            neighbors = vhg.getOriginNeighbors(id_num, threshold)
             old_neighbors.update(neighbors)
         # 2. move in the virtual_helix_group
         vhg.translateCoordinates(vh_set, (dx, dy, 0.))
         # 3. update neighbor calculations
         new_neighbors = set()
         for id_num in vh_set:
-            neighbors = self.getVirtualHelixNeighbors(id_num)
+            neighbors = vhg.getOriginNeighbors(id_num, threshold)
             vhg.setProperties(id_num, 'neighbors', list(neighbors))
             new_neighbors.update(neighbors)
 
         # now update the old and new neighbors that were not in the vh set
         left_overs = new_neighbors.union(old_neighbors).difference(vh_set)
         for id_num in left_overs:
-            neighbors = self.getVirtualHelixNeighbors(id_num)
+            neighbors = self.getOriginNeighbors(id_num, threshold)
             vhg.setProperties(id_num, 'neighbors', list(neighbors))
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
     #end def

@@ -16,7 +16,7 @@ class AbstractVirtualHelixItem(object):
         pass
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
         pass
-    def virtualHelixRemovedSlot(self, virtual_helix):
+    def virtualHelixRemovedSlot(self):
         pass
     def strandAddedSlot(self, sender, strand):
         pass

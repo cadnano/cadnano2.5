@@ -89,10 +89,12 @@ class VirtualHelixGroup(CNObject):
         self.rev_strandsets = [None]*DEFAULT_SIZE
 
         # Cache Stuff
-        self._point_cache = {}
-        self._point_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
-        self._origin_cache = {}
-        self._origin_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
+        self._point_cache = None
+        self._point_cache_keys = None
+        self.resetPointCache()
+        self._origin_cache = None
+        self._origin_cache_keys = None
+        self.resetOriginCache()
 
         # scratch allocations for vector calculations
         self.m3_scratch0 = np.zeros((3,3), dtype=float)
@@ -105,6 +107,16 @@ class VirtualHelixGroup(CNObject):
         # ID assignment
         self.recycle_bin = []
         self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
+    # end def
+
+    def resetOriginCache(self):
+        self._origin_cache = {}
+        self._origin_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
+    # end def
+
+    def resetPointCache(self):
+        self._point_cache = {}
+        self._point_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
     # end def
 
     def getSize(self):
@@ -161,6 +173,10 @@ class VirtualHelixGroup(CNObject):
             return self._highest_id_num_used + 1
     # end def
 
+    def getName(self, id_num):
+        return self.getProperties(id_num, 'name')
+    # end def
+
     def reserveIdNum(self, requested_id_num):
         """
         Reserves and returns a unique numerical id_num appropriate for a
@@ -186,7 +202,7 @@ class VirtualHelixGroup(CNObject):
         reserveIdNumForHelix returns the id_num again).
         """
         heappush(self.recycle_bin, id_num)
-        self.reserved_ids.remove(num)
+        self.reserved_ids.remove(id_num)
     # end def
 
     def isIdNumUsed(self, id_num):
@@ -310,8 +326,8 @@ class VirtualHelixGroup(CNObject):
         """ delta is a sequence of floats of length 3
         for now support XY translation
         """
-        self._origin_cache = {} # clear cache
-        self._point_cache = {}
+        self.resetOriginCache()
+        self.resetPointCache()
         origin_pts = self.origin_pts
         delta_origin = delta[:2] # x, y only
         for id_num in id_nums:
@@ -355,7 +371,7 @@ class VirtualHelixGroup(CNObject):
         for now return a set of neighbor id_nums
         """
         origin = self.origin_pts[id_num]
-        neighbors = self.queryOrigin(radius, *origin)
+        neighbors = self.queryOrigin(radius, origin)
         neighbor_candidates = set(neighbors)
         neighbor_candidates.discard(id_num)
         return neighbor_candidates
@@ -378,7 +394,7 @@ class VirtualHelixGroup(CNObject):
 
         # 1. Find insert indices
         if offset_and_size_tuple is None:
-            raise IndexError("IdNum {} does not exists".format(id_num))
+            raise IndexError("id_num {} does not exists".format(id_num))
 
         offset_and_size = self.offset_and_size
         len_axis_pts = len(self.axis_pts)
@@ -386,7 +402,7 @@ class VirtualHelixGroup(CNObject):
         new_axis_pts, new_fwd_pts, new_rev_pts = points
         num_points = len(new_axis_pts) # number of points being added
 
-        self._point_cache = {} # clear cache
+        self.resetPointCache()
 
         # 1. existing id_num
         offset, size = offset_and_size_tuple
@@ -396,7 +412,7 @@ class VirtualHelixGroup(CNObject):
         else: # prepend
             insert_idx = offset
 
-        new_lims = (hi_idx_limit, hi_idx_limit + num_points)
+        # new_lims = (hi_idx_limit, hi_idx_limit + num_points)
         offset_and_size[id_num] = (offset, size + num_points)
 
         # 2. Did exceed allocation???
@@ -510,7 +526,7 @@ class VirtualHelixGroup(CNObject):
     def createHelix(self, id_num, origin, direction, num_points):
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
-            raise IndexError("IdNum {} already exists".format(id_num))
+            raise IndexError("id_num {} already exists".format(id_num))
 
         self.reserveIdNum(id_num)
 
@@ -518,7 +534,7 @@ class VirtualHelixGroup(CNObject):
 
         # 1. New id_num / virtual helix insert after all other points
         # expand offset and size as required
-        self._origin_cache = {} # clear cache
+        self.resetOriginCache()
 
         number_of_new_elements = id_num - len(offset_and_size) + 1
         offset_and_size += [None]*number_of_new_elements
@@ -527,8 +543,8 @@ class VirtualHelixGroup(CNObject):
 
         total_points = self.total_points
         lo_idx_limit = total_points
-        new_lims = (total_points, total_points + num_points)
-        offset_and_size[id_num] = (total_points, num_points)
+        # new_lims = (total_points, total_points + num_points)
+        offset_and_size[id_num] = (total_points, 0) # initialize with size 0
 
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self.origin_pts)
@@ -632,7 +648,7 @@ class VirtualHelixGroup(CNObject):
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
-                raise IndexError("IdNum {} does not exists".format(id_num))
+                raise IndexError("id_num {} does not exists".format(id_num))
         return self.properties.loc[id_num, keys]
     # end
 
@@ -644,7 +660,7 @@ class VirtualHelixGroup(CNObject):
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
-                raise IndexError("IdNum {} does not exists".format(id_num))
+                raise IndexError("id_num {} does not exists".format(id_num))
         self.properties.loc[id_num, keys] = values
         self.parent().partVirtualHelixPropertyChangedSignal.emit(self, tuple(keys), tuple(values))
     # end
@@ -666,7 +682,7 @@ class VirtualHelixGroup(CNObject):
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
-            raise IndexError("IdNum {} does not exist")
+            raise IndexError("id_num {} does not exist")
 
         offset, size = offset_and_size_tuple
         len_axis_pts = len(self.axis_pts)
@@ -709,8 +725,9 @@ class VirtualHelixGroup(CNObject):
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
-            raise IndexError("IdNum {} does not exist")
+            raise IndexError("id_num {} does not exist")
         offset, size = offset_and_size_tuple
+        # print("the offset and size", offset_and_size_tuple)
         did_remove = self.removeCoordinates(id_num, size, is_right=False)
         self.recycleIdNum(id_num)
         assert did_remove
@@ -772,7 +789,7 @@ class VirtualHelixGroup(CNObject):
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
 
         if offset_and_size_tuple is None:
-            raise KeyError("IdNum {} not in VirtualHelixGroup".format(id_num))
+            raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
 
         offset, size = offset_and_size_tuple
 
@@ -784,17 +801,20 @@ class VirtualHelixGroup(CNObject):
         else:
             idx_start, idx_stop = lo, lo + length
 
-        self._point_cache = {} # clear cache
-        offset_and_size = self.offset_and_size[id_num]
+        self.resetPointCache()
+        offset_and_size = self.offset_and_size
         current_offset_and_size_length = len(offset_and_size)
 
         # 1. Move the good data
-
-        relocate_idx_end = idx_start + total_points - length
         total_points = self.total_points
+        relocate_idx_end = total_points - length
 
         axis_pts = self.axis_pts
-        axis_pts[idx_start:relocate_idx_end] = axis_pts[idx_stop:total_points]
+        try:
+            axis_pts[idx_start:relocate_idx_end] = axis_pts[idx_stop:total_points]
+        except:
+            print("idx_start {}, relocate_idx_end {}, idx_stop {}, total_points {}, length {}".format(idx_start, relocate_idx_end, idx_stop, total_points, length))
+            raise
         axis_pts[relocate_idx_end:total_points] = np.inf
 
         fwd_pts = self.fwd_pts
@@ -824,9 +844,9 @@ class VirtualHelixGroup(CNObject):
                 offset_and_size[i + id_num] = (offset - length, size)
 
         # 3. Check if we need to remove Virtual Helix
-        if offset_and_size[id_num][1] == length:
+        if size == length:
             self.total_id_nums -= 1
-            self._origin_cache = {} # clear cache
+            self.resetOriginCache()
             offset_and_size[id_num] = None
             self.origin_pts[id_num, :] = (np.inf, np.inf)  # set off to infinity
             # trim the unused id_nums at the end
@@ -836,7 +856,7 @@ class VirtualHelixGroup(CNObject):
                     remove_count += 1
                 else:
                     break
-            self.offset_and_size = offset_and_size[:old_length - remove_count]
+            self.offset_and_size = offset_and_size[:current_offset_and_size_length - remove_count]
             did_remove = True
         else:
             did_remove = False
@@ -844,16 +864,18 @@ class VirtualHelixGroup(CNObject):
         return did_remove
     # end def
 
-    def queryPoint(self, radius, x, y, z):
+    def queryPoint(self, radius, point):
         """
         cached query
+        point is an array_like of length 3
         """
         qc = self._point_cache
-        query = (radius, x, y, z)
-        if query in self._point_cache:
+        x, y, z = point
+        query = ("%0.2f, (%0.2f, %0.2f, %0.2f)") % (radius, x, y, z)
+        if query in qc:
             return qc.get(query)
         else:
-            res = self._queryPoint(radius, x, y, z)
+            res = self._queryPoint(radius, point)
             self._point_cache_keys.append(query)
             qc[query] =  res
             # limit the size of the cache
@@ -863,11 +885,11 @@ class VirtualHelixGroup(CNObject):
             return res
     # end def
 
-    def _queryPoint(self, radius, x, y, z):
+    def _queryPoint(self, radius, point):
         """ return the indices of all virtual helices closer
         than radius
         """
-        difference = self.axis_pts - (x, y, z)
+        difference = self.axis_pts - point
         ldiff = len(difference)
         delta = self.delta3D_scratch
         if ldiff != len(delta):
@@ -884,19 +906,28 @@ class VirtualHelixGroup(CNObject):
 
     def queryOrigin(self, radius, point):
         """ Hack for now to get 2D behavior
+        point is an array_like of length 2
         """
         qc = self._origin_cache
-        query = (radius, point)
-        if query in self._origin_cache:
+        x, y = point
+        query = ("%0.2f, (%0.2f, %0.2f)") % (radius, x, y)
+        if query in qc:
+            print('hit')
             return qc.get(query)
         else:
+            # print('miss')
             res = self._queryOrigin(radius, point)
             self._origin_cache_keys.append(query)
             qc[query] =  res
+            # print("size", len(qc))
             # limit the size of the cache
             old_key = self._origin_cache_keys.popleft()
             if old_key is not None:
-                del qc[old_key]
+                try:
+                    del qc[old_key]
+                except:
+                    print(old_key, list(qc.keys()))
+                    raise OSError("poop")
             return res
     # end def
 

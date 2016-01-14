@@ -151,16 +151,16 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
 
-    def virtualHelixRemovedSlot(self, virtual_helix):
+    def virtualHelixRemovedSlot(self):
         self._controller.disconnectSignals()
         self._controller = None
         part_item = self._part_item
         tool = part_item._getActiveTool()
         tool.hideLineItem()
-        part_item.removeVirtualHelixItem(self)
-        self._virtual_helix = None
         self.scene().removeItem(self._label)
         self._label = None
+        self._part_item = None
+        self._model_part = None
         self.scene().removeItem(self)
     # end def
 

@@ -87,7 +87,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     #         self._handle.refreshColor()
     # # end def
 
-    def partVirtualHelixRemovedSlot(self, id_num):
+    def virtualHelixRemovedSlot(self):
         self._controller.disconnectSignals()
         self._controller = None
 
@@ -275,7 +275,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         forwarding them to approproate tool method as necessary.
         """
         base_idx = int(floor(event.pos().x() / _BASE_WIDTH))
-        loc = "%d[%d]" % (self.number(), base_idx)
+        loc = "%d[%d]" % (self._id_num, base_idx)
         self._part_item.updateStatusBar(loc)
 
         active_tool = self._getActiveTool()

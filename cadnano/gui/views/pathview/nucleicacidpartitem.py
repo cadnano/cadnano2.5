@@ -215,7 +215,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
-    def partVirtualHelixRemovedSlot(self, id_num):
+    def partVirtualHelixRemovedSlot(self, sender, id_num):
         self.removeVirtualHelixItem(id_num)
     # end def
 
