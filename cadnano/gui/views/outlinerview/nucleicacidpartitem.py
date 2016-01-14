@@ -36,6 +36,10 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         return self._root_items
     # end def
 
+    def part(self):
+        return self._cn_model
+    # end def
+
     def itemType(self):
         return ItemType.NUCLEICACID
     # end def

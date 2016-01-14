@@ -30,7 +30,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         self._getActiveTool = nucleicacid_part_item._getActiveTool
         self._active_slice = 0
         self._low_drag_bound = 0
-        self._high_drag_bound = self.part().maxBaseIdx()    # TODO fix this
+        self._high_drag_bound = self.part().maxBaseIdx(0)    # TODO fix this
         self._controller = ActiveSliceItemController(self, nucleicacid_part_item.part())
 
         self._label = QGraphicsSimpleTextItem("", parent=self)
@@ -84,7 +84,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         the part and changes the receiver to reflect the part"""
         label = self._label
         bw = _BASE_WIDTH
-        bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx())   # TODO fix this
+        bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx(0))   # TODO fix this
         # self.setPos(bi * bw, -styles.PATH_HELIX_PADDING)
         self.setPos(bi * bw, -styles.PATH_HELIX_PADDING/2)
 

@@ -7,7 +7,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.part = part
         vhg = part.virtualHelixGroup()
         self.id_num = vhg.getNewIdNum()
-        self.origin_pt = x, y, 0.
+        self.origin_pt = (x, y, 0.)
         self.length = length
     # end def
 

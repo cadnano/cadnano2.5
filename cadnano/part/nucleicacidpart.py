@@ -107,7 +107,8 @@ class NucleicAcidPart(Part):
 
     def getVirtualHelixAtPoint(self, point):
         radius = self._RADIUS
-        res = self._quadtree.queryPoint(point, radius)
+        res = self._virtual_helix_group.queryOrigin(radius, point)
+        res = set(res)
         if len(res) > 0:
             return res.pop()
         return None
@@ -118,7 +119,8 @@ class NucleicAcidPart(Part):
         multiples of radius
         """
         radius = self._RADIUS
-        res = self._quadtree.queryPoint(point, 2*radius)
+        res = self._virtual_helix_group.queryOrigin(2*radius, point)
+        res = set(res)
         if len(res) > 0:
             existing = res.pop().location()
             print("vh\n{}\n{}\ndx: {}, dy: {}".format(existing,
@@ -136,6 +138,14 @@ class NucleicAcidPart(Part):
     def dimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
         xLL, yLL, xUR, yUR = self._virtual_helix_group.getOriginLimits()
+        if xLL > -100:
+            xLL = -100
+        if yLL > -100:
+            yLL = -100
+        if xUR < 100:
+            xUR = 100
+        if yUR < 100:
+            yUR = 100
         return xLL*scale_factor, yLL*scale_factor, xUR*scale_factor, yUR*scale_factor
     # end def
 
@@ -165,12 +175,13 @@ class NucleicAcidPart(Part):
         return stap_loop_olgs
 
     def maxBaseIdx(self, id_num):
-        _, size = self._virtual_helix_group.getOffsetAndSize(id_num)
+        o_and_s = self._virtual_helix_group.getOffsetAndSize(id_num)
+        size = 42 if o_and_s is None else o_and_s[1]
         return size
     # end def
 
     def numberOfVirtualHelices(self):
-        return self._quadtree.getSize()
+        return self._virtual_helix_group.getSize()
     # end def
 
     def radius(self):
@@ -265,7 +276,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def createVirtualHelix(self, x, y, use_undostack=True):
-        c = CreateVirtualHelixCommand(self, x, y)
+        c = CreateVirtualHelixCommand(self, x, y, 42)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
                                                 use_undostack=use_undostack)
     # end def

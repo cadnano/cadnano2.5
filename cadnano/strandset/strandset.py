@@ -31,7 +31,7 @@ class StrandSet(CNObject):
     which a strand can be created or resized.
     """
     def __init__(self, strand_type, id_num, virtual_helix_group, initial_size):
-        self._document = virtual_helix.document()
+        self._document = virtual_helix_group.document()
         super(StrandSet, self).__init__(virtual_helix_group)
         self._strand_type = strand_type
         self._id_num = id_num

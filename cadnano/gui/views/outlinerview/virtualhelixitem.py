@@ -5,10 +5,12 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
-class VirtualHelixItem(CNOutlinerItem, AbstractVirtualHelixItem):
+class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     def __init__(self, id_num, part_item):
+        # self._model_part = part_item.part()
+        # self._id_num = id_num
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
-        CNOutlinerItem.__init__(self, parent=part_item)
+        CNOutlinerItem.__init__(self,  part_item.part(), parent=part_item)
         self._controller = VirtualHelixItemController(self, self._model_part, False, False)
     # end def
 

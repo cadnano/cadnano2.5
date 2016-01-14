@@ -25,7 +25,7 @@ _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 _HOVER_PEN = getPenObj('#ffffff', 128)
 _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 
-class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
+class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     The VirtualHelixItem is an individual circle that gets drawn in the SliceView
     as a child of the OrigamiPartItem. Taken as a group, many SliceHelix
@@ -205,7 +205,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
     # end def
 
     def createLabel(self):
-        label = QGraphicsSimpleTextItem("%d" % self._virtual_helix.number())
+        label = QGraphicsSimpleTextItem("%d" % self.idNum())
         label.setFont(_FONT)
         label.setZValue(_ZVALUE)
         label.setParentItem(self)
@@ -320,8 +320,7 @@ class VirtualHelixItem(QGraphicsEllipseItem, AbstractVirtualHelixItem):
 
     def setNumber(self):
         """docstring for setNumber"""
-        vh = self._virtual_helix
-        num = vh.number()
+        num = self.idNum()
         label = self._label
 
         if num is not None:

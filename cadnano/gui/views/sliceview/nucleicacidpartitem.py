@@ -80,17 +80,18 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         self._outline.setZValue(styles.ZDESELECTOR)
         self._outline.setPen(getPenObj(self.modelColor(), _DEFAULT_WIDTH))
+
         # self._outline.setPen(QPen(Qt.NoPen))
         # self._drag_handle = DragHandle(QRectF(_orect), self)
         # self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
         # if len(m_p.document().children()) > 1:
         #     self._adjustPosition()
         # select upon creation
-        for _part in m_p.document().children():
-            if _part is m_p:
-                _part.setSelected(True)
+        for part in m_p.document().children():
+            if part is m_p:
+                part.setSelected(True)
             else:
-                _part.setSelected(False)
+                part.setSelected(False)
         self.show()
     # end def
 
@@ -211,7 +212,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # TODO test to see if self._virtual_helix_hash is necessary
         vhi = VirtualHelixItem(id_num, self)
         # self._virtual_helix_item_list.append(virtual_helix_item)
-        self._virtual_helix_item_hash[virtual_helix] = vhi
+        self._virtual_helix_item_hash[id_num] = vhi
     # end def
 
     def partVirtualHelixRemovedSlot(self, id_num):
@@ -339,6 +340,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
+        print("ctmp")
         pt = tool.eventToPosition(self, event)
         if pt is None:
             tool.deactivate()

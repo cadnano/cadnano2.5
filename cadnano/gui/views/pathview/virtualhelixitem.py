@@ -19,7 +19,7 @@ from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import V
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
-class VirtualHelixItem(QGraphicsPathItem, AbstractVirtualHelixItem):
+class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     """VirtualHelixItem for PathView"""
     findChild = util.findChild  # for debug
 

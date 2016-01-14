@@ -174,7 +174,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         the instantiation of a virtualhelix item.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vhi = VirtualHelixItem(self, id_num, self, self._viewroot)
+        vhi = VirtualHelixItem(id_num, self, self._viewroot)
         self._virtual_helix_item_hash[id_num] = vhi
 
         # reposition when first VH is added
