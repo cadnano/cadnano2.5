@@ -111,9 +111,9 @@ class Part(CNObject):
 
     partVirtualHelixTransformedSignal = ProxySignal(object, int, object,
                         name='partVirtualHelixTransformedSignal')   # self, list of id_nums, transform
-    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, int, object, bool,
+    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
                         name='partVirtualHelicesTranslatedSignal')  # self, list of id_nums, transform
-    partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object,
+    partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
                                             name='partVirtualHelixPropertyChangedSignal')  # self, id_num, value
 
     # C. Oligo

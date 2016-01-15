@@ -100,9 +100,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def getVirtualHelicesInArea(self, rect):
-        nodes_results = set()
-        res = self._quadtree.queryRect(rect, nodes_results)
-        return res
+        res = self._virtual_helix_group.queryOriginRect(rect)
+        return set(res)
     # end def
 
     def getVirtualHelixAtPoint(self, point, id_num=None):
@@ -587,14 +586,22 @@ class NucleicAcidPart(Part):
         new_neighbors = set()
         for id_num in vh_set:
             neighbors = vhg.getOriginNeighbors(id_num, threshold)
-            vhg.setProperties(id_num, 'neighbors', list(neighbors))
+            try:
+                vhg.setProperties(id_num, 'neighbors', str(list(neighbors)))
+            except:
+                print("neighbors", list(neighbors))
+                raise
             new_neighbors.update(neighbors)
 
         # now update the old and new neighbors that were not in the vh set
         left_overs = new_neighbors.union(old_neighbors).difference(vh_set)
         for id_num in left_overs:
-            neighbors = self.getOriginNeighbors(id_num, threshold)
-            vhg.setProperties(id_num, 'neighbors', list(neighbors))
+            neighbors = vhg.getOriginNeighbors(id_num, threshold)
+            try:
+                vhg.setProperties(id_num, 'neighbors', str(list(neighbors)))
+            except:
+                print("neighbors", list(neighbors))
+                raise
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
     #end def
 

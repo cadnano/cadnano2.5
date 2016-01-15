@@ -80,7 +80,7 @@ class PropertyEditorWidget(QTreeWidget):
     def outlinerItemSelectionChanged(self):
         o = self._window.outliner_widget
         for child in self.children():
-            if isinstance(child, CNPropertyItem):
+            if isinstance(child, (CNPropertyItem, VirtualHelixItem)):
                 child.disconnectSignals()
 
         selected_items = o.selectedItems()
@@ -90,17 +90,13 @@ class PropertyEditorWidget(QTreeWidget):
             # get the selected item
             item = selected_items[0]
             item_type = item.itemType()
-            if item_type is ItemType.PLASMID:
-                pe_item = PlasmidPartItem(item.cnModel(), self)
-                self.show()
-            elif item_type is ItemType.OLIGO:
+            if item_type is ItemType.OLIGO:
                 pe_item = OligoItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem(item.idNum(), item.cnModel(), self)
+                pe_item = VirtualHelixItem(item.cnModel(), self, item.idNum())
                 self.show()
             elif item_type is ItemType.NUCLEICACID:
-                # print("nucleicacid selected")
                 pe_item = NucleicAcidPartItem(item.cnModel(), self)
                 self.show()
             else:

@@ -1,5 +1,5 @@
 from collections import OrderedDict
-
+from ast import literal_eval
 from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
 from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
@@ -178,22 +178,22 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                     tool.deselectItems()
 
         # 1. move everything that moved
-        for vh in vh_set:
-            vhi = self._virtual_helix_item_hash[vh]
+        for id_num in vh_set:
+            vhi = self._virtual_helix_item_hash[id_num]
             vhi.updatePosition()
         # 2. now redraw what makes sense to be redrawn
-        for vh in vh_set:
-            vhi = self._virtual_helix_item_hash[vh]
-            self._refreshVirtualHelixItemGizmos(vh, vhi)
-        for vh in left_overs:
-            vhi = self._virtual_helix_item_hash[vh]
-            self._refreshVirtualHelixItemGizmos(vh, vhi)
+        for id_num in vh_set:
+            vhi = self._virtual_helix_item_hash[id_num]
+            self._refreshVirtualHelixItemGizmos(id_num, vhi)
+        for id_num in left_overs:
+            vhi = self._virtual_helix_item_hash[id_num]
+            self._refreshVirtualHelixItemGizmos(id_num, vhi)
     # end def
 
-    def _refreshVirtualHelixItemGizmos(self, vh, vhi):
+    def _refreshVirtualHelixItemGizmos(self, id_num, vhi):
         """Update props and appearance of self & recent neighbors."""
-        neighbors = vh.getProperty('neighbors')
-
+        neighbors = vhi.getProperty('neighbors')
+        neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
             nvhi = self._virtual_helix_item_hash[nvh]
@@ -339,7 +339,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def createToolMousePress(self, tool, event):
         # 1. get point in model coordinates:
-        print("ctmp")
+        # print("ctmp")
         pt = tool.eventToPosition(self, event)
         if pt is None:
             tool.deactivate()

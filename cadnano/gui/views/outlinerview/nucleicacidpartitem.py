@@ -88,7 +88,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
-        if self._model_part == sender:
+        if self._cn_model == sender:
             vh_i = self._items[id_num]
             for key, val in zip(keys, values):
                 if key in CNOutlinerItem.PROPERTIES:

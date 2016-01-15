@@ -48,9 +48,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         model_part = self._model_part
         vhg = model_part.virtualHelixGroup()
-        # self._bases_per_repeat = self.getProperty(id_num, 'bases_per_repeat')
-        # self._turns_per_repeat = self.getProperty(id_num, 'turns_per_repeat')
-        # self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
+        self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
 
         self.wedge_gizmos = {}
         self._added_wedge_gizmos = set()

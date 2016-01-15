@@ -25,6 +25,10 @@ class AbstractVirtualHelixItem(object):
         return self._virtual_helix_group.getProperties(self._id_num, keys)
     # end def
 
+    def getAllProperties(self):
+        return self._virtual_helix_group.getAllProperties(self._id_num)
+    # end def
+
     def setProperty(self, keys, values):
         return self._virtual_helix_group.setProperties(self._id_num, keys, values)
     # end def

@@ -3,7 +3,7 @@ from heapq import heapify, heappush, nsmallest
 
 import numpy as np
 import pandas as pd
-from collections import deque
+from collections import deque, Iterable
 from cadnano.strandset import StrandSet
 from cadnano.enum import StrandType
 from cadnano.cnobject import CNObject
@@ -25,7 +25,7 @@ def defaultProperties(id_num):
     ('eulerZ', 10.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
-    ('neighbors', []),
+    ('neighbors', '[]'),
     ('bases_per_repeat', 21),
     ('turns_per_repeat', 2),
     ('repeats', 2),
@@ -371,7 +371,7 @@ class VirtualHelixGroup(CNObject):
         for now return a set of neighbor id_nums
         """
         origin = self.origin_pts[id_num]
-        neighbors = self.queryOrigin(radius, origin)
+        neighbors = self.queryOrigin(radius, tuple(origin))
         neighbor_candidates = set(neighbors)
         neighbor_candidates.discard(id_num)
         return neighbor_candidates
@@ -652,6 +652,15 @@ class VirtualHelixGroup(CNObject):
         return self.properties.loc[id_num, keys]
     # end
 
+    def getAllProperties(self, id_num, safe=True):
+        if safe:
+            offset_and_size_tuple = self.getOffsetAndSize(id_num)
+            # 1. Find insert indices
+            if offset_and_size_tuple is None:
+                raise IndexError("id_num {} does not exists".format(id_num))
+        return self.properties.loc[id_num].to_dict()
+    # end
+
     def setProperties(self, id_num, keys, values, safe=True):
         """ keys and values can be sequences of equal length or
         singular values
@@ -662,7 +671,9 @@ class VirtualHelixGroup(CNObject):
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
         self.properties.loc[id_num, keys] = values
-        self.parent().partVirtualHelixPropertyChangedSignal.emit(self, tuple(keys), tuple(values))
+        if not isinstance(values, Iterable):
+            keys, values = (keys,) , (values,)
+        self.parent().partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):
@@ -870,8 +881,9 @@ class VirtualHelixGroup(CNObject):
         point is an array_like of length 3
         """
         qc = self._point_cache
-        x, y, z = point
-        query = ("%0.2f, (%0.2f, %0.2f, %0.2f)") % (radius, x, y, z)
+        # x, y, z = point
+        # query = ("%0.2f, (%0.2f, %0.2f, %0.2f)") % (radius, x, y, z)
+        query = (radius, point)
         if query in qc:
             return qc.get(query)
         else:
@@ -913,7 +925,7 @@ class VirtualHelixGroup(CNObject):
         # query = ("%0.2f, (%0.2f, %0.2f)") % (radius, x, y)
         query = (radius, point)
         if query in qc:
-            print('hit')
+            # print('hit')
             return qc.get(query)
         else:
             # print('miss')
@@ -924,11 +936,11 @@ class VirtualHelixGroup(CNObject):
             # limit the size of the cache
             old_key = self._origin_cache_keys.popleft()
             if old_key is not None:
-                try:
-                    del qc[old_key]
-                except:
-                    print(old_key, list(qc.keys()))
-                    raise OSError("poop")
+                # try:
+                del qc[old_key]
+                # except:
+                #     print(old_key, list(qc.keys()))
+                #     raise
             return res
     # end def
 
@@ -951,6 +963,20 @@ class VirtualHelixGroup(CNObject):
         return close_points[sorted_idxs]
     # end def
 
+    def queryOriginRect(self, rect):
+        # search children
+        x1, y1, x2, y2 = rect
+        origin_pts = self.origin_pts
+        xs = origin_pts[:, 0]
+        ys = origin_pts[:, 1]
+        x_lo_mask = xs > x1
+        x_hi_mask = xs < x2
+        combo_x = np.logical_and(x_lo_mask, x_hi_mask)
+        np.logical_and(ys > y1, ys < y2, out=x_lo_mask)
+        np.logical_and(x_lo_mask, combo_x, out=x_hi_mask)
+        id_nums, = np.where(x_hi_mask)
+        return id_nums
+    # end def
 # end class
 
 def distanceToPoint(origin, direction, point):

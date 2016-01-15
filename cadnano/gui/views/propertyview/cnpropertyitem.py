@@ -27,7 +27,7 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key = "name"
             self._prop_items[key] = self
             self.setData(KEY_COL, Qt.EditRole, key)
-            self.setData(VAL_COL, Qt.EditRole, name) #Qt.DisplayRole
+            self.setData(VAL_COL, Qt.EditRole, name)
 
             constructor = type(self)
             for key in sorted(model_props):
@@ -37,7 +37,9 @@ class CNPropertyItem(QTreeWidgetItem):
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
                 model_value = cn_model.getProperty(key)
-                if isinstance(model_value, tuple):
+                if isinstance(model_value, float):
+                    model_value = "%0.2f" % model_value
+                elif not isinstance(model_value, str):    # can't get non-strings to work
                     model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:

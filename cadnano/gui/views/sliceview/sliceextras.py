@@ -249,7 +249,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.fwd_prexover_items = {}
         self.rev_prexover_items = {}
         self._colors = self._getColors()
-        self.addItems()
+        # self.addItems()
         self.setPen(getNoPen())
         self.setZValue(styles.ZPXIGROUP)
         self.setTransformOriginPoint(rect.center())
@@ -273,7 +273,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def _getColors(self):
-        step_size = self._parent.basesPerRepeat()
+        step_size = self._parent.getProperty('bases_per_repeat')
         hue_scale = step_size*self.HUE_FACTOR
         return [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() for i in range(step_size)]
     # end def
@@ -284,7 +284,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         step_size, twist, groove = self._parent.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
-
+        print("Stepsize", step_size)
         iw = PXI_PP_ITEM_WIDTH
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
