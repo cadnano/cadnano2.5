@@ -110,35 +110,41 @@ class NucleicAcidPart(Part):
         """
         radius = self._RADIUS
         res = self._virtual_helix_group.queryOrigin(radius, point)
-        res = set(res)
+        # res = set(res)
         if len(res) > 0:
             if id_num is None:
-                return res.pop()
+                return res[0]
             else:
-                while len(res) > 0:
-                    check_id_num = res.pop()
+                for i in range(len(res)):
+                    check_id_num = res[i]
                     if check_id_num != id_num:
                         return check_id_num
         return None
     # end def
 
-    def isVirtualHelixNearPoint(self, point):
+    def isVirtualHelixNearPoint(self, point, id_num=None):
         """ Is a VirtualHelix near a point
         multiples of radius
         """
         radius = self._RADIUS
         res = self._virtual_helix_group.queryOrigin(2*radius, point)
-        res = set(res)
+        res = list(res)
         if len(res) > 0:
             print(res)
-            existing_id_num = res.pop()
-            existing_pt = self._virtual_helix_group.getOrigin(existing_id_num)
-            print("vh{}\n{}\n{}\ndx: {}, dy: {}".format(existing_id_num,
-                                            existing_pt,
-                                            point,
-                                            existing_pt[0] - point[0],
-                                            existing_pt[1] - point[1]))
-            return True
+            if id_num is None:
+                return True
+            else:
+                for i in range(len(res)):
+                    check_id_num = res[i]
+                    if check_id_num != id_num:
+                        existing_id_num = check_id_num
+                        existing_pt = self._virtual_helix_group.getOrigin(existing_id_num)
+                        print("vh{}\n{}\n{}\ndx: {}, dy: {}".format(existing_id_num,
+                                                        existing_pt,
+                                                        point,
+                                                        existing_pt[0] - point[0],
+                                                        existing_pt[1] - point[1]))
+                        return True
         return False
     # end def
 

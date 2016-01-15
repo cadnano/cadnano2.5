@@ -909,8 +909,9 @@ class VirtualHelixGroup(CNObject):
         point is an array_like of length 2
         """
         qc = self._origin_cache
-        x, y = point
-        query = ("%0.2f, (%0.2f, %0.2f)") % (radius, x, y)
+        # x, y = point
+        # query = ("%0.2f, (%0.2f, %0.2f)") % (radius, x, y)
+        query = (radius, point)
         if query in qc:
             print('hit')
             return qc.get(query)
@@ -944,7 +945,10 @@ class VirtualHelixGroup(CNObject):
         # compute square of distance to point
         inner1d(difference, difference, out=delta)
         close_points, = np.where(delta < radius*radius)
-        return close_points
+        # take then sort the indices of the points in range
+        sorted_idxs = np.argsort(np.take(delta, close_points))
+        # close_points[idxs]
+        return close_points[sorted_idxs]
     # end def
 
 # end class

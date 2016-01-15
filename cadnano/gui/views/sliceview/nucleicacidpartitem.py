@@ -354,26 +354,24 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhg = part.virtualHelixGroup()
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
-        check = part.isVirtualHelixNearPoint(part_pt_tuple)
+        current_id_num = tool.idNum()
+        check = part.isVirtualHelixNearPoint(part_pt_tuple, current_id_num)
         tool.setPartItem(self)
         if check:
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple, id_num=tool.idNum())
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            # print("got a check", id_num)
             if id_num is not None:
-                print("restart", id_num)
+                # print("restart", id_num)
                 vhi = self._virtual_helix_item_hash[id_num]
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
             part.createVirtualHelix(*part_pt_tuple)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            #neighbors = vhg.getOriginNeighbors(id_num, 2.1*part.radius())
-            # print("neighbors to {}:".format(virtual_helix.number()))
-            # for vh in neighbors:
-            #     print(vh)
             vhi = self._virtual_helix_item_hash[id_num]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
-        return QGraphicsItem.mousePressEvent(self, event)
+        QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def createToolHoverMove(self, tool, event):
