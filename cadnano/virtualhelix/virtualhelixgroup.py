@@ -658,7 +658,10 @@ class VirtualHelixGroup(CNObject):
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
-        return self.properties.loc[id_num].to_dict()
+        series = self.properties.loc[id_num]
+        # to_dict doesn't promote to python native types needed by QVariant
+        # leaves as numpy integers and floats
+        return dict((k, v.item()) if isinstance(v, (np.float64, np.int64)) else (k, v) for k, v in zip(series.index, series.tolist()))
     # end
 
     def setProperties(self, id_num, keys, values, safe=True):
@@ -946,7 +949,7 @@ class VirtualHelixGroup(CNObject):
 
     def _queryOrigin(self, radius, point):
         """ return the indices of all id_nums closer
-        than radius
+        than radius, sorted by distance
         """
         difference = self.origin_pts - point
         ldiff = len(difference)
@@ -959,7 +962,7 @@ class VirtualHelixGroup(CNObject):
         close_points, = np.where(delta < radius*radius)
         # take then sort the indices of the points in range
         sorted_idxs = np.argsort(np.take(delta, close_points))
-        # close_points[idxs]
+
         return close_points[sorted_idxs]
     # end def
 

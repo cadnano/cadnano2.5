@@ -52,10 +52,11 @@ class VirtualHelixItem(QTreeWidgetItem):
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
                 model_value = model_props[key]
+                # print(key, model_value, type(model_value))
                 if isinstance(model_value, float):
                     model_value = "%0.2f" % model_value
-                elif not isinstance(model_value, str):    # can't get non-strings to work
-                    model_value = str(model_value)
+                # elif not isinstance(model_value, str):    # can't get non-strings to work
+                #     model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
             self._key = key
