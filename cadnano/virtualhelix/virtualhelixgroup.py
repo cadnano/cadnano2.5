@@ -21,7 +21,7 @@ def defaultProperties(id_num):
     props = [
     ('name', "vh%d" % (id_num)),
     ('color', '#ffffffff'),
-    ('active_phos', None),
+    ('active_phos', ''),
     ('eulerZ', 10.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
@@ -31,7 +31,8 @@ def defaultProperties(id_num):
     ('repeats', 2),
     ('helical_pitch', 1.),
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
-    ('twist_per_base', 360 / 10.5) # 360/_bases_per_turn
+    ('twist_per_base', 360 / 10.5), # 360/_bases_per_turn
+    ('minor_groove_angle', 171)
     ]
     return tuple(zip(*props))
 # end def

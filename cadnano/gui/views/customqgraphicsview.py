@@ -69,7 +69,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._x0 = 0
         self._y0 = 0
         self._scale_size = 1.0
-        self._scale_limit_max = 3.0
+        self._scale_limit_max = 24.0 # OLD 3.0
         self._scale_limit_min = 0.21
         self._scale_up_rate = 0.01
         self._scale_down_rate = 0.01

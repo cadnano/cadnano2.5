@@ -249,7 +249,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.fwd_prexover_items = {}
         self.rev_prexover_items = {}
         self._colors = self._getColors()
-        # self.addItems()
+        self.addItems()
         self.setPen(getNoPen())
         self.setZValue(styles.ZPXIGROUP)
         self.setTransformOriginPoint(rect.center())
@@ -284,7 +284,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         step_size, twist, groove = self._parent.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
-        print("Stepsize", step_size)
         iw = PXI_PP_ITEM_WIDTH
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
@@ -358,10 +357,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         vh_name, vh_angle = self._parent.getProperty(['name', 'eulerZ'])
         step_idx = pre_xover_item.stepIdx() # (f|r).step_idx
         facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
+
+        # facing_angle = pre_xover_item.facingAngle()
         is_fwd = 'fwd' if pre_xover_item.is_fwd else 'rev'
         value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
-        self._parent.part().setProperty('active_phos', value)
-        self._virtual_helix.setProperty('active_phos', value)
+        self._parent.setProperty('active_phos', value)
     # end def
 
     def updateViewActivePhos(self, new_active_item=None):

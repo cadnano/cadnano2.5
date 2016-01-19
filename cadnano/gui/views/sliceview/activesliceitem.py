@@ -36,8 +36,8 @@ class ActiveSliceItem(QGraphicsRectItem):
         active_base_idx = part.activeBaseIndex()
         for vhi in self._nucleicacid_part_item.getVirtualHelixItems():
             id_num = vhi.idNum()
-            has_scaf, has_stap = part.virtualHelixGroup().hasStrandAtIdx(label, active_base_idx)
-            vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
+            has_fwd, has_rev = part.virtualHelixGroup().hasStrandAtIdx(id_num, active_base_idx)
+            vhi.setActiveSliceView(active_base_idx, has_fwd, has_rev)
     # end def
 
     def updateRectSlot(self, part):
