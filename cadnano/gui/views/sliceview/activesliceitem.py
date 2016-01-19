@@ -24,11 +24,11 @@ class ActiveSliceItem(QGraphicsRectItem):
         vhi = nucleicacid_part_item.getVirtualHelixItem(id_num)
         active_base_idx = part.activeBaseIndex()
 
-        has_scaf, has_stap = vh.hasStrandAtIdx(active_base_idx)
+        has_scaf, has_stap = part.virtualHelixGroup().hasStrandAtIdx(id_num, active_base_idx)
         vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
     # end def
 
-    def updateIndexSlot(self, sender, new_active_slice_zIndex):
+    def updateIndexSlot(self, sender, new_active_slice_z_index):
         part = self.part()
         if part.numberOfVirtualHelices() == 0:
             return

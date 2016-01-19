@@ -9,7 +9,7 @@ class AddInstanceCommand(UndoCommand):
     """
     def __init__(self, document, obj_instance):
         super(AddInstanceCommand, self).__init__("add instance")
-        self._doc = document
+        self._document = document
         self._obj_instance = obj_instance
     # end def
 
@@ -18,7 +18,7 @@ class AddInstanceCommand(UndoCommand):
     # end def
 
     def redo(self):
-        doc = self._doc
+        doc = self._document
         obji = self._obj_instance
         obji.unwipe(doc)
         if isinstance(obji.reference(), Part):
@@ -35,6 +35,6 @@ class AddInstanceCommand(UndoCommand):
             obji.reference().partRemovedSignal.emit(obji)
         else:
             obji.reference().assemblyRemovedSignal.emit(obji)
-        obji.wipe(self._doc)
+        obji.wipe(self._document)
     # end def
 # end class

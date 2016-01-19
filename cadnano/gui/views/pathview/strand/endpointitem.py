@@ -231,7 +231,7 @@ class EndpointItem(QGraphicsPathItem):
         Parses a mousePressEvent, calling the approproate tool method as
         necessary. Stores _move_idx for future comparison.
         """
-        vhi_num = self._strand_item._virtual_helix_item.number()
+        vhi_num = self._strand_item.idNum()
         oligo_length = self._strand_item._model_strand.oligo().length()
         msg = "%d[%d]\tlength: %d" % (vhi_num, self.idx(), oligo_length)
         self.partItem().updateStatusBar(msg)

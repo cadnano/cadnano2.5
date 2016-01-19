@@ -46,7 +46,7 @@ class Strand(CNObject):
     """
 
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
-        self._doc = strandset.document()
+        self._document = strandset.document()
         super(Strand, self).__init__(strandset)
         self._strandset = strandset
         self._id_num = strandset.idNum()
@@ -64,8 +64,8 @@ class Strand(CNObject):
 
         # dynamic methods for mapping high/low connection /indices
         # to corresponding 3Prime 5Prime
-        is_drawn_5_to_3 = strandset.isDrawn5to3()
-        if is_drawn_5_to_3:
+        is_forward = strandset.isForward()
+        if is_forward:
             self.idx5Prime = self.lowIdx
             self.idx3Prime = self.highIdx
             self.connectionLow = self.connection5p
@@ -79,7 +79,7 @@ class Strand(CNObject):
             self.connectionHigh = self.connection5p
             self.setConnectionLow = self.setConnection3p
             self.setConnectionHigh = self.setConnection5p
-        self._is_drawn_5_to_3 = is_drawn_5_to_3
+        self._is_forward = is_forward
     # end def
 
     def __repr__(self):
@@ -189,7 +189,7 @@ class Strand(CNObject):
     # end def
 
     def document(self):
-        return self._doc
+        return self._document
     # end def
 
     def oligo(self):
@@ -294,7 +294,7 @@ class Strand(CNObject):
         return the used portion of the sequence_string
 
         As it depends which direction this is going, and strings are stored in
-        memory left to right, we need to test for is_drawn_5_to_3 to map the
+        memory left to right, we need to test for is_forward to map the
         reverse compliment appropriately, as we traverse overlapping strands.
 
         We reverse the sequence ahead of time if we are applying it 5' to 3',
@@ -322,14 +322,14 @@ class Strand(CNObject):
             # clear out string for in case of not total overlap
             use_seq = ''.join([' ' for x in range(total_length)])
         else:  # use the string as is
-            use_seq = sequence_string[::-1] if self._is_drawn_5_to_3 \
+            use_seq = sequence_string[::-1] if self._is_forward \
                                             else sequence_string
 
         temp = array(array_type, sixb(use_seq))
         if self._sequence is None:
             temp_self = array(array_type, sixb(''.join([' ' for x in range(total_length)])))
         else:
-            temp_self = array(array_type, sixb(self._sequence) if self._is_drawn_5_to_3 \
+            temp_self = array(array_type, sixb(self._sequence) if self._is_forward \
                                                     else sixb(self._sequence[::-1]))
 
         # generate the index into the compliment string
@@ -344,7 +344,7 @@ class Strand(CNObject):
         self._sequence = tostring(temp_self)
 
         # if we need to reverse it do it now
-        if not self._is_drawn_5_to_3:
+        if not self._is_forward:
             self._sequence = self._sequence[::-1]
 
         # test to see if the string is empty(), annoyingly expensive
@@ -390,8 +390,8 @@ class Strand(CNObject):
         pass
         # return self.idx5Prime
 
-    def isDrawn5to3(self):
-        return self._strandset.isDrawn5to3()
+    def isForward(self):
+        return self._strandset.isForward()
     # end def
 
     def getSequenceList(self):
@@ -405,8 +405,8 @@ class Strand(CNObject):
         out from low index to high index
         """
         seqList = []
-        is_drawn_5_to_3 = self._is_drawn_5_to_3
-        seq = self._sequence if is_drawn_5_to_3 else self._sequence[::-1]
+        is_forward = self._is_forward
+        seq = self._sequence if is_forward else self._sequence[::-1]
         # assumes a sequence has been applied correctly and is up to date
         tL = self.totalLength()
 
@@ -437,7 +437,7 @@ class Strand(CNObject):
         # end for
         # append the last bit of the strand
         seqList.append((lI + tL, (seq[offsetLast:tL], '')))
-        if not is_drawn_5_to_3:
+        if not is_forward:
             # reverse it again so all sub sequences are from 5' to 3'
             for i in range(len(seqList)):
                 index, temp = seqList[i]
@@ -523,16 +523,16 @@ class Strand(CNObject):
         #                                         if from_strand else True
         # if not is_strand_type_match:
         #     return False
-        is_drawn_5_to_3 = ss.isDrawn5to3()
+        is_forward = ss.isForward()
         index_diff_H = self.highIdx() - idx
         index_diff_L = idx - self.lowIdx()
-        index3_lim = self.idx3Prime() - 1 if is_drawn_5_to_3 \
+        index3_lim = self.idx3Prime() - 1 if is_forward \
                                             else self.idx3Prime() + 1
         if is_same_strand:
-            indexDiffStrands = from_idx - idx
+            index_diff_strands = from_idx - idx
             if idx == self.idx5Prime() or idx == index3_lim:
                 return True
-            elif indexDiffStrands > -3 and indexDiffStrands < 3:
+            elif index_diff_strands > -3 and index_diff_strands < 3:
                 return False
         # end if for same Strand
         else:
@@ -748,8 +748,8 @@ class Strand(CNObject):
 
     def resize(self, new_idxs, use_undostack=True):
         cmds = []
-        if self.strandSet().isScaffold():
-            cmds.append(self.oligo().applySequenceCMD(None))
+        # if self.strandSet().isScaffold():
+        #     cmds.append(self.oligo().applySequenceCMD(None))
         cmds += self.getRemoveInsertionCommands(new_idxs)
         cmds.append(ResizeCommand(self, new_idxs))
         util.execCommandList(

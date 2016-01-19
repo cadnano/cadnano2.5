@@ -35,8 +35,8 @@ class ResizeCommand(UndoCommand):
         std.setIdxs(n_i)
         strandset.updateStrandIdxs(std, o_i, n_i)
 
-        if strandset.isStaple():
-            std.reapplySequence()
+        # if strandset.isStaple():
+        #     std.reapplySequence()
         std.strandResizedSignal.emit(std, n_i)
         # for updating the Slice View displayed helices
         part.partStrandChangedSignal.emit(part, strandset.idNum())
@@ -56,8 +56,8 @@ class ResizeCommand(UndoCommand):
         std.setIdxs(o_i)
         strandset.updateStrandIdxs(std, n_i, o_i)
 
-        if strandset.isStaple():
-            std.reapplySequence()
+        # if strandset.isStaple():
+        #     std.reapplySequence()
         std.strandResizedSignal.emit(std, o_i)
         # for updating the Slice View displayed helices
         part.partStrandChangedSignal.emit(part, strandset.idNum())

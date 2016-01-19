@@ -206,7 +206,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
                         lo, hi = strand.getResizeBounds(idx3p)
-                        if strand.isDrawn5to3():
+                        if strand.isForward():
                             strand.resize((idx5p, hi))
                         else:
                             strand.resize((lo, idx5p))
@@ -216,7 +216,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx5p):
                         lo, hi = strand.getResizeBounds(idx5p)
-                        if strand.isDrawn5to3():
+                        if strand.isForward():
                             strand.resize((lo, idx3p))
                         else:
                             strand.resize((idx3p, hi))
@@ -227,7 +227,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
                         lo, hi = strand.getResizeBounds(idx3p)
-                        if strand.isDrawn5to3():
+                        if strand.isForward():
                             strand.resize((idx5p, hi))
                         else:
                             strand.resize((lo, idx5p))
@@ -237,7 +237,7 @@ class ActiveSliceItem(QGraphicsRectItem):
                     idx3p = strand.idx3Prime()
                     if not strand.hasXoverAt(idx3p):
                         lo, hi = strand.getResizeBounds(idx5p)
-                        if strand.isDrawn5to3():
+                        if strand.isForward():
                             strand.resize((lo, idx3p))
                         else:
                             strand.resize((idx3p, hi))

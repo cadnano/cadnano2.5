@@ -226,14 +226,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
 
-    def updatePreXoverItemsSlot(self, sender, virtual_helix):
+    def updatePreXoverItemsSlot(self, sender, id_num):
         part = self.part()
-        if virtual_helix is None:
-            self.setPreXoverItemsVisible(None)
-        elif part.areSameOrNeighbors(part.activeVirtualHelix(), virtual_helix):
-            vhi = self.itemForVirtualHelix(virtual_helix)
+        if id_num is None:
+            pass
+            # self.setPreXoverItemsVisible(None)
+        elif part.activeIdNum() == id_num:
+            vhi = self._virtual_helix_item_hash.get(id_num)
             self.setActiveVirtualHelixItem(vhi)
-            self.setPreXoverItemsVisible(self.activeVirtualHelixItem())
+            # self.setPreXoverItemsVisible(vhi)
     # end def
 
     ### ACCESSORS ###

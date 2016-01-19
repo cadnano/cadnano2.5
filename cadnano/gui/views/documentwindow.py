@@ -87,7 +87,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.insertToolBarBreak(self.right_toolbar)
 
         # set the selection filter default
-        doc.documentSelectionFilterChangedSignal.emit(["endpoint", "scaffold", "staple", "xover"])
+        doc.documentSelectionFilterChangedSignal.emit(["endpoint", "forward", "reverse", "xover"])
         doc.documentPreXoverFilterChangedSignal.emit("prexover_a")
 
         self.path_graphics_view.setupGL()

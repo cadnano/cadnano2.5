@@ -86,8 +86,8 @@ class DocumentController():
         self.win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
         self.win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
         self.win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
-        self.win.action_filter_scaf.triggered.connect(self.actionFilterScafSlot)
-        self.win.action_filter_stap.triggered.connect(self.actionFilterStapSlot)
+        self.win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
+        self.win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
         self.win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
         self.win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
 
@@ -206,20 +206,20 @@ class DocumentController():
         self._strandFilterUpdate()
     # end def
 
-    def actionFilterScafSlot(self):
+    def actionFilterFwdSlot(self):
         """Remains checked if no other strand-type filter is active."""
-        fSc = self.win.action_filter_scaf
-        fSt = self.win.action_filter_stap
-        if not fSc.isChecked() and not fSt.isChecked():
-            fSc.setChecked(True)
+        f_fwd = self.win.action_filter_fwd
+        f_rev = self.win.action_filter_rev
+        if not f_fwd.isChecked() and not f_rev.isChecked():
+            f_fwd.setChecked(True)
         self._strandFilterUpdate()
 
-    def actionFilterStapSlot(self):
+    def actionFilterRevSlot(self):
         """Remains checked if no other strand-type filter is active."""
-        fSc = self.win.action_filter_scaf
-        fSt = self.win.action_filter_stap
-        if not fSc.isChecked() and not fSt.isChecked():
-            fSt.setChecked(True)
+        f_fwd = self.win.action_filter_fwd
+        f_rev = self.win.action_filter_rev
+        if not f_fwd.isChecked() and not f_rev.isChecked():
+            f_rev.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
@@ -232,9 +232,9 @@ class DocumentController():
             filter_list.append("strand")
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
-        if win.action_filter_scaf.isChecked():
+        if win.action_filter_fwd.isChecked():
             filter_list.append("scaffold")
-        if win.action_filter_stap.isChecked():
+        if win.action_filter_rev.isChecked():
             filter_list.append("staple")
         self._document.documentSelectionFilterChangedSignal.emit(filter_list)
     # end def

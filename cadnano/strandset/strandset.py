@@ -103,7 +103,7 @@ class StrandSet(CNObject):
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def isDrawn5to3(self):
-        return self._virtual_helix.isDrawn5to3(self)
+        return self.isForward()
     # end def
 
     def isForward(self):
@@ -169,7 +169,7 @@ class StrandSet(CNObject):
         sequence application.
         """
         vhg = self._virtual_helix_group
-        fwd_ss, rev_ss = vhg.getStrandSet(self.id_num)
+        fwd_ss, rev_ss = vhg.getStrandSets(self._id_num)
         return rev_ss if self._strand_type == StrandType.FWD else fwd_ss
     # end def
 
@@ -511,7 +511,7 @@ class StrandSet(CNObject):
         num = self._id_num
         # TODO fix this or get rid of it
         ret = [[-1, -1, -1, -1] for i in range(self.part().maxBaseIdx(0) + 1)]
-        if self.isDrawn5to3():
+        if self.isForward():
             for strand in self.strand_heap:
                 lo, hi = strand.idxs()
                 assert strand.idx5Prime() == lo and strand.idx3Prime() == hi

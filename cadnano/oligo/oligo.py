@@ -200,8 +200,8 @@ class Oligo(CNObject):
     def shouldHighlight(self):
         if not self._strand5p:
             return False
-        if self._strand5p.isScaffold():
-            return False
+        # if self._strand5p.isScaffold():
+        #     return False
         if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
         if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
@@ -307,7 +307,7 @@ class Oligo(CNObject):
         # end if
 
         # Now get correct 5p end to oligo
-        if old_strand_low.isDrawn5to3():
+        if old_strand_low.isForward():
             if old_strand_low.connection5p() is not None:
                 self._strand5p = old_strand_low.oligo()._strand5p
             else:

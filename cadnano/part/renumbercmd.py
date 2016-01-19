@@ -22,9 +22,9 @@ class RenumberVirtualHelicesCommand(UndoCommand):
                 odd += 2
         # end for
         part = self._part
-        aVH =  part.activeVirtualHelix()
-        if aVH:
-            part.partStrandChangedSignal.emit(part, aVH)
+        active_id_num =  part.activeIdNum()
+        if active_id_num:
+            part.partStrandChangedSignal.emit(part, active_id_num)
         for oligo in part._oligos:
             for strand in oligo.strand5p().generator3pStrand():
                 strand.strandUpdateSignal.emit(strand)
@@ -35,9 +35,9 @@ class RenumberVirtualHelicesCommand(UndoCommand):
             vh.setNumber(num)
         # end for
         part = self._part
-        aVH =  part.activeVirtualHelix()
-        if aVH:
-            part.partStrandChangedSignal.emit(part, aVH)
+        active_id_num =  part.activeIdNum()
+        if active_id_num:
+            part.partStrandChangedSignal.emit(part, active_id_num)
         for oligo in part._oligos:
             for strand in oligo.strand5p().generator3pStrand():
                 strand.strandUpdateSignal.emit(strand)

@@ -872,7 +872,7 @@
     <string>H</string>
    </property>
   </action>
-  <action name="action_filter_scaf">
+  <action name="action_filter_fwd">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -884,13 +884,13 @@
      <normaloff>:/parttools/filter-scaf</normaloff>:/parttools/filter-scaf</iconset>
    </property>
    <property name="toolTip">
-    <string>s(C)affold</string>
+    <string>(C)Forward</string>
    </property>
    <property name="shortcut">
     <string>C</string>
    </property>
   </action>
-  <action name="action_filter_stap">
+  <action name="action_filter_rev">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -902,7 +902,7 @@
      <normaloff>:/parttools/filter-stap</normaloff>:/parttools/filter-stap</iconset>
    </property>
    <property name="toolTip">
-    <string>s(T)aple</string>
+    <string>(T)Reverse</string>
    </property>
    <property name="shortcut">
     <string>T</string>

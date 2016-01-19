@@ -120,7 +120,7 @@ class Part(CNObject):
     partOligoAddedSignal = ProxySignal(CNObject, object,
                         name='partOligoAddedSignal')            # self, oligo
     # D. Strand
-    partStrandChangedSignal = ProxySignal(object, CNObject,
+    partStrandChangedSignal = ProxySignal(object, int,
                         name='partStrandChangedSignal')         # self, virtual_helix
     # E. Mod
     partModAddedSignal = ProxySignal(object, object, object,
@@ -203,10 +203,10 @@ class Part(CNObject):
         self.partActiveSliceIndexSignal.emit(self, idx)
     # end def
 
-    def setActiveVirtualHelix(self, virtual_helix, idx=None):
-        self._active_virtual_helix = virtual_helix
+    def setActiveVirtualHelix(self, id_num, idx=None):
+        self._active_virtual_helix = id_num
         self._active_virtual_helix_idx = idx
-        self.partStrandChangedSignal.emit(self, virtual_helix)
+        self.partStrandChangedSignal.emit(self, id_num)
     # end def
 
     def insertions(self):

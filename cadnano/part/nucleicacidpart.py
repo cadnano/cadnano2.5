@@ -304,7 +304,7 @@ class NucleicAcidPart(Part):
         """
         if use_undostack:
             self.undoStack().beginMacro("Delete VirtualHelix")
-        fwd_ss, rev_ss = self._virtual_helix_group.getStrandSet(id_num)
+        fwd_ss, rev_ss = self._virtual_helix_group.getStrandSets(id_num)
         fwd_ss.remove(use_undostack)
         rev_ss.remove(use_undostack)
         c = RemoveVirtualHelixCommand(self, id_num)
@@ -349,7 +349,7 @@ class NucleicAcidPart(Part):
             2) Split attempted on the 3 prime strand, AKA 5prime endpoint of
             one of the new strands.  We have now created 2 strands, and the
             ss_idx is either the same as the first lookup, or one more than it
-            depending on which way the the strand is drawn (isDrawn5to3).  If a
+            depending on which way the the strand is drawn (isForward).  If a
             split occured the 5prime strand is definitely part of the 3prime
             strand created in this step
             3) Split is attempted on the resulting 2 strands.  There is now 3
@@ -362,18 +362,18 @@ class NucleicAcidPart(Part):
             if strand3p.idx5Prime() == idx3p:  # yes, idx already matches
                 temp5 = xo_strand3 = strand3p
             else:
-                offset3p = -1 if ss3p.isDrawn5to3() else 1
+                offset3p = -1 if ss3p.isForward() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
                     c = SplitCommand(strand3p, idx3p + offset3p)
                     # cmds.append(c)
-                    xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
+                    xo_strand3 = c._strand_high if ss3p.isForward() else c._strand_low
                     # adjust the target 5prime strand, always necessary if a split happens here
-                    if idx5p > idx3p and ss3p.isDrawn5to3():
+                    if idx5p > idx3p and ss3p.isForward():
                         temp5 = xo_strand3
-                    elif idx5p < idx3p and not ss3p.isDrawn5to3():
+                    elif idx5p < idx3p and not ss3p.isForward():
                         temp5 = xo_strand3
                     else:
-                        temp5 = c._strand_low if ss3p.isDrawn5to3() else c._strand_high
+                        temp5 = c._strand_low if ss3p.isForward() else c._strand_high
                     if use_undostack:
                         self.undoStack().push(c)
                     else:
@@ -396,22 +396,22 @@ class NucleicAcidPart(Part):
                 """
                 if c:
                     # the insertion index into the set is increases
-                    if ss3p.isDrawn5to3():
+                    if ss3p.isForward():
                         ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
                     else:
                         ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
                 if ss5p.strandCanBeSplit(temp5, idx5p):
                     d = SplitCommand(temp5, idx5p)
                     # cmds.append(d)
-                    xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
+                    xo_strand5 = d._strand_low if ss5p.isForward() else d._strand_high
                     if use_undostack:
                         self.undoStack().push(d)
                     else:
                         d.redo()
                     # adjust the target 3prime strand, IF necessary
-                    if idx5p > idx3p and ss3p.isDrawn5to3():
+                    if idx5p > idx3p and ss3p.isForward():
                         xo_strand3 = xo_strand5
-                    elif idx5p < idx3p and not ss3p.isDrawn5to3():
+                    elif idx5p < idx3p and not ss3p.isForward():
                         xo_strand3 = xo_strand5
                 else:
                     if use_undostack:
@@ -426,12 +426,12 @@ class NucleicAcidPart(Part):
             if strand3p.idx5Prime() == idx3p:  # yes, idx already matches
                 xo_strand3 = strand3p
             else:  # no, let's try to split
-                offset3p = -1 if ss3p.isDrawn5to3() else 1
+                offset3p = -1 if ss3p.isForward() else 1
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
                     if ss3p.getStrandIndex(strand3p)[0]:
                         c = SplitCommand(strand3p, idx3p + offset3p)
                         # cmds.append(c)
-                        xo_strand3 = c._strand_high if ss3p.isDrawn5to3() else c._strand_low
+                        xo_strand3 = c._strand_high if ss3p.isForward() else c._strand_low
                         if use_undostack:
                             self.undoStack().push(c)
                         else:
@@ -453,7 +453,7 @@ class NucleicAcidPart(Part):
                     if ss5p.getStrandIndex(strand5p)[0]:
                         d = SplitCommand(strand5p, idx5p)
                         # cmds.append(d)
-                        xo_strand5 = d._strand_low if ss5p.isDrawn5to3() else d._strand_high
+                        xo_strand5 = d._strand_low if ss5p.isForward() else d._strand_high
                         if use_undostack:
                             self.undoStack().push(d)
                         else:

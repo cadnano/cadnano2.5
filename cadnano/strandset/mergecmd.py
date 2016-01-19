@@ -54,7 +54,7 @@ class MergeCommand(UndoCommand):
             tH = strand_high.totalLength()
             seqL = strand_low._sequence if strand_low._sequence else "".join([" " for i in range(tL)])
             seqH = strand_high._sequence if strand_high._sequence else "".join([" " for i in range(tH)])
-            if new_strand.isDrawn5to3():
+            if new_strand.isForward():
                 new_strand._sequence = seqL + seqH
             else:
                 new_strand._sequence = seqH + seqL
@@ -62,7 +62,7 @@ class MergeCommand(UndoCommand):
 
     def redo(self):
         ss = self._s_set
-        doc = ss._doc
+        doc = ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
@@ -80,15 +80,15 @@ class MergeCommand(UndoCommand):
         # update connectivity of strands
         nScL = new_strand.connectionLow()
         if nScL:
-            if (new_strand.isDrawn5to3() and nScL.isDrawn5to3()) or \
-                (not new_strand.isDrawn5to3() and not nScL.isDrawn5to3()):
+            if (new_strand.isForward() and nScL.isForward()) or \
+                (not new_strand.isForward() and not nScL.isForward()):
                 nScL.setConnectionHigh(new_strand)
             else:
                 nScL.setConnectionLow(new_strand)
         nScH = new_strand.connectionHigh()
         if nScH:
-            if (new_strand.isDrawn5to3() and nScH.isDrawn5to3()) or \
-                (not new_strand.isDrawn5to3() and not nScH.isDrawn5to3()):
+            if (new_strand.isForward() and nScH.isForward()) or \
+                (not new_strand.isForward() and not nScH.isForward()):
                 nScH.setConnectionLow(new_strand)
             else:
                 nScH.setConnectionHigh(new_strand)
@@ -111,7 +111,7 @@ class MergeCommand(UndoCommand):
 
     def undo(self):
         ss = self._s_set
-        doc = ss._doc
+        doc = ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
@@ -128,15 +128,15 @@ class MergeCommand(UndoCommand):
         # update connectivity of strands
         sLcL = s_low.connectionLow()
         if sLcL:
-            if (s_low.isDrawn5to3() and sLcL.isDrawn5to3()) or \
-                (not s_low.isDrawn5to3() and not sLcL.isDrawn5to3()):
+            if (s_low.isForward() and sLcL.isForward()) or \
+                (not s_low.isForward() and not sLcL.isForward()):
                 sLcL.setConnectionHigh(s_low)
             else:
                 sLcL.setConnectionLow(s_low)
         sHcH = s_high.connectionHigh()
         if sHcH:
-            if (s_high.isDrawn5to3() and sHcH.isDrawn5to3()) or \
-                (not s_high.isDrawn5to3() and not sHcH.isDrawn5to3()):
+            if (s_high.isForward() and sHcH.isForward()) or \
+                (not s_high.isForward() and not sHcH.isForward()):
                 sHcH.setConnectionLow(s_high)
             else:
                 sHcH.setConnectionHigh(s_high)

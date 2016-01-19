@@ -41,7 +41,7 @@ class RemoveStrandCommand(UndoCommand):
         # Remove the strand
         strand = self._strand
         strandset = self._strandset
-        doc = strandset._doc
+        doc = strandset._document
         doc.removeStrandFromSelection(strand)
         strandset._removeFromStrandList(strand)
 
@@ -103,7 +103,7 @@ class RemoveStrandCommand(UndoCommand):
         # Restore the strand
         strand = self._strand
         strandset = self._strandset
-        doc = strandset._doc
+        doc = strandset._document
         # Add the new_strand to the s_set
         strandset._addToStrandList(strand)
         strand5p = self._old_strand5p

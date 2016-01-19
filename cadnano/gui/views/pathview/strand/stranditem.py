@@ -40,19 +40,19 @@ class StrandItem(QGraphicsLineItem):
         self._getActiveTool = virtual_helix_item._getActiveTool
 
         self._controller = StrandItemController(self, model_strand)
-        is_drawn_5to3 = model_strand.strandSet().isDrawn5to3()
+        is_forward = model_strand.strandSet().isForward()
 
         self._strand_filter = model_strand.strandFilter()
 
         self._insertion_items = {}
         # caps
-        self._low_cap = EndpointItem(self, 'low', is_drawn_5to3)
-        self._high_cap = EndpointItem(self, 'high', is_drawn_5to3)
+        self._low_cap = EndpointItem(self, 'low', is_forward)
+        self._high_cap = EndpointItem(self, 'high', is_forward)
         # self._high_cap = None
-        self._dual_cap = EndpointItem(self, 'dual', is_drawn_5to3)
+        self._dual_cap = EndpointItem(self, 'dual', is_forward)
 
         # orientation
-        self._is_drawn_5to3 = is_drawn_5to3
+        self._is_forward = is_forward
         # self._isOnTop = virtual_helix_item.isStrandOnTop(model_strand)
         # label
         self._seq_label = QGraphicsSimpleTextItem(self)
@@ -258,6 +258,9 @@ class StrandItem(QGraphicsLineItem):
         return self._virtual_helix_item.partItem()
     # end def
 
+    def idNum(self):
+        return self._virtual_helix_item.idNum()
+
     def window(self):
         return self._virtual_helix_item.window()
 
@@ -287,17 +290,17 @@ class StrandItem(QGraphicsLineItem):
         # end for
     # end def
 
-    def resetStrandItem(self, virtual_helix_item, is_drawn_5to3):
+    def resetStrandItem(self, virtual_helix_item, is_forward):
         self.setParentItem(virtual_helix_item)
         self._virtual_helix_item = virtual_helix_item
-        self.resetEndPointItems(is_drawn_5to3)
+        self.resetEndPointItems(is_forward)
     # end def
 
-    def resetEndPointItems(self, is_drawn_5to3):
-        self._is_drawn_5to3 = is_drawn_5to3
-        self._low_cap.resetEndPoint(is_drawn_5to3)
-        self._high_cap.resetEndPoint(is_drawn_5to3)
-        self._dual_cap.resetEndPoint(is_drawn_5to3)
+    def resetEndPointItems(self, is_forward):
+        self._is_forward = is_forward
+        self._low_cap.resetEndPoint(is_forward)
+        self._high_cap.resetEndPoint(is_forward)
+        self._dual_cap.resetEndPoint(is_forward)
     # end def
 
     def updateLine(self, moved_cap):
@@ -428,7 +431,7 @@ class StrandItem(QGraphicsLineItem):
         strand = self.strand()
 
         seq_txt = strand.sequence()
-        isDrawn3to5 = not self._is_drawn_5to3
+        isDrawn3to5 = not self._is_forward
         textXCenteringOffset = styles.SEQUENCETEXTXCENTERINGOFFSET
 
         if seq_txt == '':
@@ -516,7 +519,7 @@ class StrandItem(QGraphicsLineItem):
         Parses a mouseMoveEvent to extract strandSet and base index,
         forwarding them to approproate tool method as necessary.
         """
-        vhi_num = self._virtual_helix_item.number()
+        vhi_num = self._virtual_helix_item.idNum()
         idx = int(floor((event.pos().x()) / _BASE_WIDTH))
         oligo_length = self._model_strand.oligo().length()
         self.partItem().updateStatusBar("%d[%d]\tlength: %d" % (vhi_num, idx, oligo_length))
@@ -766,8 +769,8 @@ class StrandItem(QGraphicsLineItem):
             if document.isModelStrandSelected(con3p) and document.isModelStrandSelected(strand5p):
                 val3p = document.getSelectedStrandValue(con3p)
                 # print "xover idx", indices
-                test3p = val3p[0] if con3p.isDrawn5to3() else val3p[1]
-                test5p = idx_h if strand5p.isDrawn5to3() else idx_l
+                test3p = val3p[0] if con3p.isForward() else val3p[1]
+                test5p = idx_h if strand5p.isForward() else idx_l
                 if test3p and test5p:
                     xoi = self._xover3pEnd
                     if not xoi.isSelected() or not xoi.group():

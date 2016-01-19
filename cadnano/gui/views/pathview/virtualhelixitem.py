@@ -245,16 +245,17 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         x, y = pos.x(), pos.y()
         part = self._model_part
+        id_num = self._id_num
         base_idx = int(floor(x / _BASE_WIDTH))
-        min_base, max_base = 0, part.maxBaseIdx(self._id_num)
+        min_base, max_base = 0, part.maxBaseIdx(id_num)
         if base_idx < min_base or base_idx >= max_base:
             base_idx = util.clamp(base_idx, min_base, max_base)
         if y < 0:
             y = 0  # HACK: zero out y due to erroneous click
-        strand_idx = floor(y * 1. / _BASE_WIDTH)
-        if strand_idx < 0 or strand_idx > 1:
-            strand_idx = int(util.clamp(strand_idx, 0, 1))
-        strand_set = m_vh.getStrandSetByIdx(strand_idx)
+        strand_type = floor(y * 1. / _BASE_WIDTH)
+        if strand_type < 0 or strand_type > 1:
+            strand_type = int(util.clamp(strand_type, 0, 1))
+        strand_set = part.virtualHelixGroup().getStrandSets(id_num)[strand_type]
         return (strand_set, base_idx)
     # end def
 

@@ -7,13 +7,13 @@ class RemovePartCommand(UndoCommand):
     def __init__(self, part):
         super(RemovePartCommand, self).__init__("remove part")
         self._part = part
-        self._doc = part.document()
+        self._document = part.document()
     # end def
 
     def redo(self):
         # Remove the strand
         part = self._part
-        doc = self._doc
+        doc = self._document
         doc.removeChild(part)
         part.setDocument(None)
         part.partRemovedSignal.emit(part)
@@ -21,7 +21,7 @@ class RemovePartCommand(UndoCommand):
 
     def undo(self):
         part = self._part
-        doc = self._doc
+        doc = self._document
         doc._addPart(part)
         part.setDocument(doc)
         doc.documentPartAddedSignal.emit(doc, part)

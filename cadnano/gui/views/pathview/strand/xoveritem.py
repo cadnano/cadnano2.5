@@ -30,7 +30,7 @@ class XoverNode3(QGraphicsRectItem):
         self._xover_item = xover_item
         self._idx = idx
         self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
-        self._is_drawn_5to3 = strand3p.strandSet().isDrawn5to3()
+        self._is_forward = strand3p.strandSet().isForward()
         self._strand_type = strand3p.strandSet().strandType()
 
         self.setPartnerVirtualHelix(strand3p)
@@ -101,8 +101,8 @@ class XoverNode3(QGraphicsRectItem):
         return self._is_on_top
     # end def
 
-    def isDrawn5to3(self):
-        return self._is_drawn_5to3
+    def isForward(self):
+        return self._is_forward
     # end def
 
     def updatePositionAndAppearance(self):
@@ -113,12 +113,12 @@ class XoverNode3(QGraphicsRectItem):
         """
         self.setPos(*self.point())
         # We can only expose a 5' end. But on which side?
-        isLeft = True if self._is_drawn_5to3 else False
+        isLeft = True if self._is_forward else False
         self._updateLabel(isLeft)
     # end def
 
     def updateConnectivity(self):
-        isLeft = True if self._is_drawn_5to3 else False
+        isLeft = True if self._is_forward else False
         self._updateLabel(isLeft)
     # end def
 
@@ -196,7 +196,7 @@ class XoverNode5(XoverNode3):
         """Same as XoverItem3, but exposes 3' end"""
         self.setPos(*self.point())
         # # We can only expose a 3' end. But on which side?
-        isLeft = False if self._is_drawn_5to3 else True
+        isLeft = False if self._is_forward else True
         self._updateLabel(isLeft)
     # end def
 # end class
@@ -352,13 +352,13 @@ class XoverItem(QGraphicsPathItem):
         pt5 = vhi5.mapToItem(parent, *node5.point())
 
         five_is_top = node5.isOnTop()
-        five_is_5to3 = node5.isDrawn5to3()
+        five_is_5to3 = node5.isForward()
 
         vhi3 = node3.virtualHelixItem()
         pt3 = vhi3.mapToItem(parent, *node3.point())
 
         three_is_top = node3.isOnTop()
-        three_is_5to3 = node3.isDrawn5to3()
+        three_is_5to3 = node3.isForward()
         same_strand = (node5.strandType() == node3.strandType()) and vhi3 == vhi5
         same_parity = five_is_5to3 == three_is_5to3
 
@@ -577,13 +577,13 @@ class XoverItem(QGraphicsPathItem):
         strand3p = strand5p.connection3p()
         test5p = document.isModelStrandSelected(strand5p)
         lowVal5p, highVal5p = document.getSelectedStrandValue(strand5p) if test5p else (False, False)
-        if strand5p.isDrawn5to3():
+        if strand5p.isForward():
             highVal5p = False
         else:
             lowVal5p = False
         test3p = document.isModelStrandSelected(strand3p)
         lowVal3p, highVal3p = document.getSelectedStrandValue(strand3p) if test3p else (False, False)
-        if strand3p.isDrawn5to3():
+        if strand3p.isForward():
             lowVal3p = False
         else:
             highVal3p = False
@@ -605,13 +605,13 @@ class XoverItem(QGraphicsPathItem):
 
         test5p = document.isModelStrandSelected(strand5p)
         lowVal5p, highVal5p = document.getSelectedStrandValue(strand5p) if test5p else (False, False)
-        if strand5p.isDrawn5to3():
+        if strand5p.isForward():
             highVal5p = True
         else:
             lowVal5p = True
         test3p = document.isModelStrandSelected(strand3p)
         lowVal3p, highVal3p = document.getSelectedStrandValue(strand3p) if test3p else (False, False)
-        if strand3p.isDrawn5to3():
+        if strand3p.isForward():
             lowVal3p = True
         else:
             highVal3p = True

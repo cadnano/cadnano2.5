@@ -22,7 +22,7 @@ class SplitCommand(UndoCommand):
         # Store inputs
         self._old_strand = strand
         old_sequence  = strand._sequence
-        is5to3 = strand.isDrawn5to3()
+        is5to3 = strand.isForward()
 
         # self._s_set_idx = strandset_idx
         self._s_set = s_set = strand.strandSet()
@@ -122,15 +122,15 @@ class SplitCommand(UndoCommand):
         # update connectivity of strands
         sLcL = s_low.connectionLow()
         if sLcL:
-            if (o_strand.isDrawn5to3() and sLcL.isDrawn5to3()) or \
-                (not o_strand.isDrawn5to3() and not sLcL.isDrawn5to3()):
+            if (o_strand.isForward() and sLcL.isForward()) or \
+                (not o_strand.isForward() and not sLcL.isForward()):
                 sLcL.setConnectionHigh(s_low)
             else:
                 sLcL.setConnectionLow(s_low)
         sHcH = s_high.connectionHigh()
         if sHcH:
-            if (o_strand.isDrawn5to3() and sHcH.isDrawn5to3()) or \
-                (not o_strand.isDrawn5to3() and not sHcH.isDrawn5to3()):
+            if (o_strand.isForward() and sHcH.isForward()) or \
+                (not o_strand.isForward() and not sHcH.isForward()):
                 sHcH.setConnectionLow(s_high)
             else:
                 sHcH.setConnectionHigh(s_high)
@@ -176,15 +176,15 @@ class SplitCommand(UndoCommand):
         # update connectivity of strands
         oScL = o_strand.connectionLow()
         if oScL:
-            if (o_strand.isDrawn5to3() and oScL.isDrawn5to3()) or \
-                (not o_strand.isDrawn5to3() and not oScL.isDrawn5to3()):
+            if (o_strand.isForward() and oScL.isForward()) or \
+                (not o_strand.isForward() and not oScL.isForward()):
                 oScL.setConnectionHigh(o_strand)
             else:
                 oScL.setConnectionLow(o_strand)
         oScH = o_strand.connectionHigh()
         if oScH:
-            if (o_strand.isDrawn5to3() and oScH.isDrawn5to3()) or \
-                (not o_strand.isDrawn5to3() and not oScH.isDrawn5to3()):
+            if (o_strand.isForward() and oScH.isForward()) or \
+                (not o_strand.isForward() and not oScH.isForward()):
                 oScH.setConnectionLow(o_strand)
             else:
                 oScH.setConnectionHigh(o_strand)

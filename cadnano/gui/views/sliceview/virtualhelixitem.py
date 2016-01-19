@@ -292,11 +292,10 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._pen1.setBrush(fwd_strand_color_obj)
         self.arrow1.setPen(self._pen1)
         part = self.part()
-        tpb = part._TWIST_PER_BASE
+        eulerZ, tpb = self.getProperty(['eulerZ', 'twist_per_base'])
         angle = idx*tpb
         # for some reason rotation is CW and not CCW with increasing angle
-        eulerZ = self.getProperty('eulerZ')
-        self.arrow1.setRotation(angle + part._TWIST_OFFSET + eulerZ)
+        self.arrow1.setRotation(angle + eulerZ)
 
     def updateRevArrow(self, idx):
         rev_strand = self.revStrand(idx)
@@ -310,10 +309,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._pen2.setBrush(rev_strand_color_obj)
         self.arrow2.setPen(self._pen2)
         part = self.part()
-        tpb = part._TWIST_PER_BASE
+        eulerZ, tpb = self.getProperty(['eulerZ', 'twist_per_base'])
         angle = idx*tpb
-        eulerZ = self.getProperty('eulerZ')
-        self.arrow2.setRotation(angle + part._TWIST_OFFSET + eulerZ + 180)
+        self.arrow2.setRotation(angle + eulerZ + 180)
     # end def
 
     def setNumber(self):

@@ -18,12 +18,12 @@ class CreateStrandCommand(UndoCommand):
         # self._s_set_idx = strandset_idx
         doc = strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
-        if strandset.isStaple():
-            color_list = prefs.STAP_COLORS
-            color = random.choice(color_list)
-        else:
-            #prefs.SCAF_COLORS
-            color = strandset.part().getProperty('color')
+        # if strandset.isStaple():
+        #     color_list = prefs.STAP_COLORS
+        #     color = random.choice(color_list)
+        # else:
+        #     #prefs.SCAF_COLORS
+        color = strandset.part().getProperty('color')
         self._new_oligo = Oligo(None, color)  # redo will set part
         self._new_oligo.setLength(self._strand.totalLength())
     # end def
@@ -39,8 +39,8 @@ class CreateStrandCommand(UndoCommand):
         oligo.addToPart(strandset.part())
         strand.setOligo(oligo)
 
-        if strandset.isStaple():
-            strand.reapplySequence()
+        # if strandset.isStaple():
+        strand.reapplySequence()
         # Emit a signal to notify on completion
         strandset.strandsetStrandAddedSignal.emit(strandset, strand)
         # for updating the Slice View displayed helices
@@ -51,7 +51,7 @@ class CreateStrandCommand(UndoCommand):
         # Remove the strand from StrandSet strand_list and selectionList
         strand = self._strand
         strandset = self._strandset
-        strandset._doc.removeStrandFromSelection(strand)
+        strandset._document.removeStrandFromSelection(strand)
         strandset._removeFromStrandList(strand)
         # Get rid of the new oligo
         oligo = self._new_oligo
