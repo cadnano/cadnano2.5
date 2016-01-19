@@ -17,7 +17,7 @@ class VirtualHelixItemController(object):
             m_p.partVirtualHelixPropertyChangedSignal.connect(vh_item.partVirtualHelixPropertyChangedSlot)
             m_p.partVirtualHelixRemovedSignal.connect(vh_item.partVirtualHelixRemovedSlot)
         if self._do_wire_strands:
-            for strandset in m_p.virtualHelixGroup().getStrandSets(vh_item.idNum()):
+            for strandset in m_p.getStrandSets(vh_item.idNum()):
                 strandset.strandsetStrandAddedSignal.connect(vh_item.strandAddedSlot)
     # end def
 
@@ -28,7 +28,7 @@ class VirtualHelixItemController(object):
             m_p.partVirtualHelixPropertyChangedSignal.disconnect(vh_item.partVirtualHelixPropertyChangedSlot)
             m_p.partVirtualHelixRemovedSignal.disconnect(vh_item.partVirtualHelixRemovedSlot)
         if self._do_wire_strands:
-            for strandset in m_p.virtualHelixGroup().getStrandSets(vh_item.idNum()):
+            for strandset in m_p.getStrandSets(vh_item.idNum()):
                 strandset.strandsetStrandAddedSignal.disconnect(vh_item.strandAddedSlot)
     # end def
 # end class

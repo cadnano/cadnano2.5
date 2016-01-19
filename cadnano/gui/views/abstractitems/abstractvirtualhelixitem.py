@@ -10,7 +10,6 @@ class AbstractVirtualHelixItem(object):
         self._id_num = id_num
         self._part_item = part_item
         self._model_part = part_item.part()
-        self._virtual_helix_group = self._model_part.virtualHelixGroup()
 
     def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         pass
@@ -22,15 +21,15 @@ class AbstractVirtualHelixItem(object):
         pass
 
     def getProperty(self, keys):
-        return self._virtual_helix_group.getProperties(self._id_num, keys)
+        return self._model_part.getVirtualHelixProperties(self._id_num, keys)
     # end def
 
     def getAllProperties(self):
-        return self._virtual_helix_group.getAllProperties(self._id_num)
+        return self._model_part.getAllVirtualHelixProperties(self._id_num)
     # end def
 
     def setProperty(self, keys, values):
-        return self._virtual_helix_group.setProperties(self._id_num, keys, values)
+        return self._model_part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
     def part(self):
@@ -46,11 +45,11 @@ class AbstractVirtualHelixItem(object):
     # end def
 
     def fwdStrand(self, idx):
-        self._virtual_helix_group.fwd_strandsets[self._id_num].getStrand(idx)
+        self._model_part.fwd_strandsets[self._id_num].getStrand(idx)
     # end def
 
     def revStrand(self, idx):
-        self._virtual_helix_group.rev_strandsets[self._id_num].getStrand(idx)
+        self._model_part.rev_strandsets[self._id_num].getStrand(idx)
     # end def
 # end class
 

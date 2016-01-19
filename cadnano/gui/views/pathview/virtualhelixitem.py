@@ -255,7 +255,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         strand_type = floor(y * 1. / _BASE_WIDTH)
         if strand_type < 0 or strand_type > 1:
             strand_type = int(util.clamp(strand_type, 0, 1))
-        strand_set = part.virtualHelixGroup().getStrandSets(id_num)[strand_type]
+        strand_set = part.getStrandSets(id_num)[strand_type]
         return (strand_set, base_idx)
     # end def
 

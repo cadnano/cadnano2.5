@@ -12,8 +12,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         model_part = self._model_part
         CNOutlinerItem.__init__(self, model_part, parent=part_item)
-        vhg = model_part.virtualHelixGroup()
-        name = vhg.getName(id_num)
+        name = model_part.getVirtualHelixName(id_num)
         self.setData(0, Qt.EditRole, name)
         self._controller = VirtualHelixItemController(self, model_part, False, False)
     # end def

@@ -23,8 +23,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
 
         # item groups
         self._root_items = {}
-        self._root_items['VHelixList'] = self.createRootItem('VHelix List', self)
-        self._root_items['OligoList'] = self.createRootItem('Oligo List', self)
+        self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helix', self)
+        self._root_items['OligoList'] = self.createRootPartItem('Oligos', self)
         # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
         self._items = {} # children
     # end def
@@ -67,7 +67,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num):
-        vh_i = VirtualHelixItem(id_num, self)
+        vh_i = VirtualHelixItem(id_num, self._root_items['VHelixList'])
         self._items[id_num] = vh_i
 
     def partVirtualHelixRemovedSlot(self, model_part, id_num):

@@ -24,7 +24,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         vhi = nucleicacid_part_item.getVirtualHelixItem(id_num)
         active_base_idx = part.activeBaseIndex()
 
-        has_scaf, has_stap = part.virtualHelixGroup().hasStrandAtIdx(id_num, active_base_idx)
+        has_scaf, has_stap = part.hasStrandAtIdx(id_num, active_base_idx)
         vhi.setActiveSliceView(active_base_idx, has_scaf, has_stap)
     # end def
 
@@ -36,7 +36,7 @@ class ActiveSliceItem(QGraphicsRectItem):
         active_base_idx = part.activeBaseIndex()
         for vhi in self._nucleicacid_part_item.getVirtualHelixItems():
             id_num = vhi.idNum()
-            has_fwd, has_rev = part.virtualHelixGroup().hasStrandAtIdx(id_num, active_base_idx)
+            has_fwd, has_rev = part.hasStrandAtIdx(id_num, active_base_idx)
             vhi.setActiveSliceView(active_base_idx, has_fwd, has_rev)
     # end def
 

@@ -30,7 +30,7 @@ class RefreshOligosCommand(UndoCommand):
         visited = {}
         part = self._part
         for id_num in part.getIdNums():
-            fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+            fwd_ss, rev_ss = part.getStrandsets(id_num)
             for strand in rev_ss:
                 visited[strand] = False
             for strand in fwd_ss:

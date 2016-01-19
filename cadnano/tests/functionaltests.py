@@ -87,7 +87,7 @@ class FunctionalTests(CadnanoGuiTestCase):
         for sequenceName, start_id_num, start_idx in sequences_to_apply:
             sequence = sequences.get(sequenceName, None)
             for id_num in part.getIdNums():
-                fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+                fwd_ss, rev_ss = part.getStrandsets(id_num)
                 if id_num == start_id_num:
                     strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)

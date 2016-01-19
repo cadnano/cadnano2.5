@@ -41,13 +41,13 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         self.hide()
-        x, y = self._virtual_helix_group.locationQt(id_num, part_item.scaleFactor())
+        model_part = self._model_part
+        x, y = model_part.locationQt(id_num, part_item.scaleFactor())
         # set position to offset for radius
         # self.setTransformOriginPoint(_RADIUS, _RADIUS)
         self.setCenterPos(x, y)
 
-        model_part = self._model_part
-        vhg = model_part.virtualHelixGroup()
+
         self._prexoveritemgroup = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
 
         self.wedge_gizmos = {}
@@ -187,8 +187,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         part_item = self._part_item
         sf = part_item.scaleFactor()
-        vhg = self._model_part.virtualHelixGroup()
-        x, y = vhg.locationQt(self._id_num, part_item.scaleFactor())
+        x, y = self._model_part.locationQt(self._id_num, part_item.scaleFactor())
         new_pos = QPointF(x - _RADIUS, y - _RADIUS)
         ctr_pos = part_item.mapFromScene(self.scenePos())
         """

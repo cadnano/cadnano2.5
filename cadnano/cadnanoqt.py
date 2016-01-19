@@ -105,9 +105,9 @@ class CadnanoQt(QObject):
                 part_instance = self.d.selectedInstance()
                 return w().pathroot.partItemForPart(part_instance)
 
-            print( "\tvh(i)\tshortcut for p().reference().virtualHelixGroup().getStrandSets(i)")
+            print( "\tvh(i)\tshortcut for p().reference().getStrandSets(i)")
             def strandsets(id_num):
-                return p().reference().virtualHelixGroup().getStrandSets(id_num)
+                return p().reference().getStrandSets(id_num)
 
             print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
             def vhi(id_num):

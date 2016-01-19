@@ -15,11 +15,11 @@ from cadnano.oligo import Oligo
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
 from cadnano.strand import Strand
-from cadnano.strandset import CreateStrandCommand, RemoveStrandCommand
+from cadnano.strandset import CreateStrandCommand
 from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
-from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
+# from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand
@@ -57,24 +57,14 @@ class NucleicAcidPart(Part):
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
         """
-        # if self.__class__ == Part:
-        #     e = "This class is abstract. Perhaps you want HoneycombPart."
-        #     raise NotImplementedError(e)
-        self._document = kwargs.get('document', None)
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
-        # Data structure
-        self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
-        self._mods = defaultdict(dict)
-        self._oligos = set()
-
-        self._virtual_helix_group = VirtualHelixGroup(self)
 
         # Properties (NucleicAcidPart-specific)
-        self._properties["name"] = "NaPart%d" % self._count()
-        self._properties['active_phos'] = None
-        self._properties['crossover_span_angle'] = 45
-        self._properties['max_vhelix_length'] = self._STEP_SIZE*2
-        self._properties['neighbor_active_angle'] = ''
+        self._group_properties["name"] = "NaPart%d" % self._count()
+        self._group_properties['active_phos'] = None
+        self._group_properties['crossover_span_angle'] = 45
+        self._group_properties['max_vhelix_length'] = self._STEP_SIZE*2
+        self._group_properties['neighbor_active_angle'] = ''
     # end def
 
     def __repr__(self):
@@ -100,7 +90,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def getVirtualHelicesInArea(self, rect):
-        res = self._virtual_helix_group.queryOriginRect(rect)
+        res = self.queryVirtualHelixOriginRect(rect)
         return set(res)
     # end def
 
@@ -108,7 +98,7 @@ class NucleicAcidPart(Part):
         """ Fix this to get the closest result
         """
         radius = self._RADIUS
-        res = self._virtual_helix_group.queryOrigin(radius, point)
+        res = self.queryVirtualHelixOrigin(radius, point)
         # res = set(res)
         if len(res) > 0:
             if id_num is None:
@@ -126,7 +116,7 @@ class NucleicAcidPart(Part):
         multiples of radius
         """
         radius = self._RADIUS
-        res = self._virtual_helix_group.queryOrigin(2*radius, point)
+        res = self.queryVirtualHelixOrigin(2*radius, point)
         res = list(res)
         if len(res) > 0:
             print(res)
@@ -137,7 +127,7 @@ class NucleicAcidPart(Part):
                     check_id_num = res[i]
                     if check_id_num != id_num:
                         existing_id_num = check_id_num
-                        existing_pt = self._virtual_helix_group.getOrigin(existing_id_num)
+                        existing_pt = self.getVirtualHelixOrigin(existing_id_num)
                         print("vh{}\n{}\n{}\ndx: {}, dy: {}".format(existing_id_num,
                                                         existing_pt,
                                                         point,
@@ -147,13 +137,9 @@ class NucleicAcidPart(Part):
         return False
     # end def
 
-    def virtualHelixGroup(self):
-        return self._virtual_helix_group
-    # end def
-
     def dimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
-        xLL, yLL, xUR, yUR = self._virtual_helix_group.getOriginLimits()
+        xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
         if xLL > -100:
             xLL = -100
         if yLL > -100:
@@ -175,7 +161,7 @@ class NucleicAcidPart(Part):
 
     def getIdNums(self):
         """return the set of all ids used"""
-        return self._virtual_helix_group.reserved_ids
+        return self.reserved_ids
     # end def
 
     def getStapleLoopOligos(self):
@@ -191,13 +177,13 @@ class NucleicAcidPart(Part):
         return stap_loop_olgs
 
     def maxBaseIdx(self, id_num):
-        o_and_s = self._virtual_helix_group.getOffsetAndSize(id_num)
+        o_and_s = self.getOffsetAndSize(id_num)
         size = 42 if o_and_s is None else o_and_s[1]
         return size
     # end def
 
     def numberOfVirtualHelices(self):
-        return self._virtual_helix_group.getSize()
+        return self.getSize()
     # end def
 
     def radius(self):
@@ -219,7 +205,7 @@ class NucleicAcidPart(Part):
         total_stap_oligos = 0
 
         for id_num in self.getIdNums():
-            fwd_ss, rev_ss = part.virtualHelixGroup().getStrandSets(id_num)
+            fwd_ss, rev_ss = part.getStrandSets(id_num)
             total_stap_strands += rev_ss.strandCount()
             for strand in rev_ss:
                 rev_oligos.add(strand.oligo())
@@ -304,7 +290,7 @@ class NucleicAcidPart(Part):
         """
         if use_undostack:
             self.undoStack().beginMacro("Delete VirtualHelix")
-        fwd_ss, rev_ss = self._virtual_helix_group.getStrandSets(id_num)
+        fwd_ss, rev_ss = self.getStrandSets(id_num)
         fwd_ss.remove(use_undostack)
         rev_ss.remove(use_undostack)
         c = RemoveVirtualHelixCommand(self, id_num)
@@ -573,21 +559,20 @@ class NucleicAcidPart(Part):
         undesirable Object parenting to make sure the translations are set
         correctly.  set to True when "undo-ing"
         """
-        vhg = self._virtual_helix_group
         threshold = 2.1*self._RADIUS
         # 1. get old neighbor list
         old_neighbors = set()
         for id_num in vh_set:
-            neighbors = vhg.getOriginNeighbors(id_num, threshold)
+            neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
             old_neighbors.update(neighbors)
         # 2. move in the virtual_helix_group
-        vhg.translateCoordinates(vh_set, (dx, dy, 0.))
+        self.translateCoordinates(vh_set, (dx, dy, 0.))
         # 3. update neighbor calculations
         new_neighbors = set()
         for id_num in vh_set:
-            neighbors = vhg.getOriginNeighbors(id_num, threshold)
+            neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                vhg.setProperties(id_num, 'neighbors', str(list(neighbors)))
+                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)))
             except:
                 print("neighbors", list(neighbors))
                 raise
@@ -596,9 +581,9 @@ class NucleicAcidPart(Part):
         # now update the old and new neighbors that were not in the vh set
         left_overs = new_neighbors.union(old_neighbors).difference(vh_set)
         for id_num in left_overs:
-            neighbors = vhg.getOriginNeighbors(id_num, threshold)
+            neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                vhg.setProperties(id_num, 'neighbors', str(list(neighbors)))
+                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)))
             except:
                 print("neighbors", list(neighbors))
                 raise
@@ -625,19 +610,19 @@ class NucleicAcidPart(Part):
                 StrandType of the original using the hash id_num
         """
         # 1) new part
-        part = self.newPart()
+        new_part = self.newPart()
         # 2) Copy VirtualHelix Group
-        vhg = self._virtual_helix_group.copy(part)
+        new_part = self.copy(self._document, new_object=new_part)
         # end for
         # 3) Copy oligos, populating the strandsets
         for oligo, val in self._oligos:
             strandGenerator = oligo.strand5p().generator3pStrand()
             strand_type = oligo.strand5p().strandType()
-            new_oligo = oligo.deepCopy(part)
+            new_oligo = oligo.deepCopy(new_part)
             last_strand = None
             for strand in strandGenerator:
                 id_num = strand.idNum()
-                new_strandset = vhg.getStrandSets(id_num)[strand.strandType()]
+                new_strandset = self.getStrandSets(id_num)[strand.strandType()]
                 new_strand = strand.deepCopy(new_strandset, new_oligo)
                 if last_strand:
                     last_strand.setConnection3p(new_strand)
@@ -653,8 +638,8 @@ class NucleicAcidPart(Part):
                 s5p = new_oligo.strand5p()
                 last_strand.set3pconnection(s5p)
                 s5p.set5pconnection(last_strand)
-            # add to part
-            oligo.add()
+            # add to new_part
+            oligo.addToPart(new_part)
         # end for
         return part
     # end def

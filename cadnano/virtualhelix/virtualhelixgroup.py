@@ -47,16 +47,19 @@ DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
 
 class VirtualHelixGroup(CNObject):
-    def __init__(self, part):
+    def __init__(self, *args, **kwargs):
         """ this is composed of a group of arrays
         that
         1. contain the coordinates of every virtual base stored
             in their index order per id_num
         2. contains the id_num per coordinate
         """
-        super(VirtualHelixGroup, self).__init__(part)
-
-        self.radius = 2     # probably a property???
+        self._document = document = kwargs.get('document', None)
+        super(VirtualHelixGroup, self).__init__(document)
+        do_copy = kwargs.get('do_copy', False)
+        if do_copy:
+            return
+        self._radius = 1.125     # probably a property???
 
         # 1. per virtual base pair allocations
         self.total_points = 0
@@ -84,7 +87,8 @@ class VirtualHelixGroup(CNObject):
         self.offset_and_size = [None]*DEFAULT_SIZE
         self.reserved_ids = set()
 
-        self.properties = defaultDataFrame(DEFAULT_SIZE)
+        self.vh_properties = defaultDataFrame(DEFAULT_SIZE)
+        self._group_properties = {}
 
         self.fwd_strandsets = [None]*DEFAULT_SIZE
         self.rev_strandsets = [None]*DEFAULT_SIZE
@@ -125,15 +129,20 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def document(self):
-        return self.parent().document()
+        return self._document
     # end def
 
-    def copy(self, part):
+    def copy(self, document, new_object=None):
         """ copy all arrays and counters and create new StrandSets
 
         TODO: consider renaming this method
         """
-        new_vhg = VirtualHelixGroup(part)
+        new_vhg = new_object
+        if new_vhg is None:
+            constructor = type(self)
+            new_vhg = constructor(document=document, do_copy=True)
+        if not isinstance(new_vhg, VirtualHelixGroup):
+            raise ValueError("new_vhg {} is not an instance of a VirtualHelixGroup".format(new_vhg))
         new_vhg.total_points = self.total_points
         new_vhg.axis_pts = self.axis_pts.copy()
         new_vhg.fwd_pts = self.fwd_pts.copy()
@@ -149,13 +158,14 @@ class VirtualHelixGroup(CNObject):
         new_vhg.offset_and_size = self.offset_and_size.copy()
         new_vhg.reserved_ids = self.reserved_ids.copy()
 
-        new_vhg.properties = defaultDataFrame(DEFAULT_SIZE)
+        new_vhg.vh_properties = defaultDataFrame(DEFAULT_SIZE)
 
         new_vhg.fwd_strandsets = [x.simpleCopy(new_vhg) for x in self.fwd_strandsets]
         new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
 
         new_vhg.recycle_bin = self.recycle_bin
         new_vhg._highest_id_num_used = self._highest_id_num_used
+        return new_vhg
     # end def
 
     def getOffsetAndSize(self, id_num):
@@ -174,8 +184,8 @@ class VirtualHelixGroup(CNObject):
             return self._highest_id_num_used + 1
     # end def
 
-    def getName(self, id_num):
-        return self.getProperties(id_num, 'name')
+    def getVirtualHelixName(self, id_num):
+        return self.getVirtualHelixProperties(id_num, 'name')
     # end def
 
     def reserveIdNum(self, requested_id_num):
@@ -225,10 +235,6 @@ class VirtualHelixGroup(CNObject):
                 self.rev_pts[lo:hi] )
     # end def
 
-    def part(self):
-        return self.parent()
-    # end def
-
     def getCoordinate(self, id_num, idx):
         """
         given a id_num get the coordinate at a given index
@@ -244,7 +250,7 @@ class VirtualHelixGroup(CNObject):
             raise IndexError("idx {} greater than size {}".format(idx, size))
     # end def
 
-    def getOrigin(self, id_num):
+    def getVirtualHelixOrigin(self, id_num):
         """
         given a id_num get the coordinate at a given index
         """
@@ -261,7 +267,7 @@ class VirtualHelixGroup(CNObject):
         return [i for i, x in filter(lambda i, x: x is not None, enumerate(self.offset_and_size))]
     # end def
 
-    def setOriginLimits(self):
+    def setVirtualHelixOriginLimits(self):
         """
         given a id_num get the coordinate at a given index
         """
@@ -275,7 +281,7 @@ class VirtualHelixGroup(CNObject):
         self.origin_limits = (xLL, yLL, xUR, yUR)
     # end def
 
-    def getOriginLimits(self):
+    def getVirtualHelixOriginLimits(self):
         """
         given a id_num get the coordinate at a given index
         """
@@ -361,18 +367,18 @@ class VirtualHelixGroup(CNObject):
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
 
         coord = self.getCoordinate(id_num, idx)
-        neighbors, indices = self.queryPoint(radius, *coord)
+        neighbors, indices = self.queryBasePoint(radius, *coord)
         non_id_num_idxs, _ = np.where(neighbors != id_num)
         return list(zip(np.take(neighbors, non_id_num_idxs),
                         np.take(indices, non_id_num_idxs)    ))
     # end def
 
-    def getOriginNeighbors(self, id_num, radius):
+    def getVirtualHelixOriginNeighbors(self, id_num, radius):
         """ might use radius = 2.1*RADIUS
         for now return a set of neighbor id_nums
         """
         origin = self.origin_pts[id_num]
-        neighbors = self.queryOrigin(radius, tuple(origin))
+        neighbors = self.queryVirtualHelixOrigin(radius, tuple(origin))
         neighbor_candidates = set(neighbors)
         neighbor_candidates.discard(id_num)
         return neighbor_candidates
@@ -560,7 +566,7 @@ class VirtualHelixGroup(CNObject):
             self.directions.resize((total_rows, 3))
             self.directions[len_origin_pts:] = 0 # unnecessary as resize fills with zeros
 
-            self.properties = self.properties.append(
+            self.vh_properties = self.vh_properties.append(
                                         defaultDataFrame(number_of_new_elements),
                                         ignore_index=True)
 
@@ -577,7 +583,7 @@ class VirtualHelixGroup(CNObject):
             yUR = new_y
         self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
-        self.properties.loc[id_num, 'name'] = "vh%d" % (id_num)
+        self.vh_properties.loc[id_num, 'name'] = "vh%d" % (id_num)
         self.fwd_strandsets[id_num] = StrandSet(StrandType.FWD,
                                                 id_num, self, num_points)
         self.rev_strandsets[id_num] = StrandSet(StrandType.REV,
@@ -592,7 +598,7 @@ class VirtualHelixGroup(CNObject):
 
     def pointsFromDirection(self, id_num, origin, direction, num_points, index):
         """ Assumes always prepending or appending points.  no insertions.
-        changes eulerZ of the id_num properties as required for prepending points
+        changes eulerZ of the id_num vh_properties as required for prepending points
 
         origin: (1,3) ndarray or length 3 sequence.  The origin should be
                     referenced from an index of 0.
@@ -604,8 +610,8 @@ class VirtualHelixGroup(CNObject):
         returns:
             None
         """
-        rad = self.radius
-        hp, twist_per_base, eulerZ = self.properties.loc[id_num,
+        rad = self._radius
+        hp, twist_per_base, eulerZ = self.vh_properties.loc[id_num,
                                                             ['helical_pitch',
                                                             'twist_per_base',
                                                             'eulerZ']]
@@ -639,33 +645,33 @@ class VirtualHelixGroup(CNObject):
         np.add(np.dot(m, coord_pts.T, out=scratch).T, origin, out=coord_pts)
 
         if index < 0:
-            self.properties.loc[id_num, 'eulerZ'] = eulerZ_new
+            self.vh_properties.loc[id_num, 'eulerZ'] = eulerZ_new
 
         return (coord_pts, fwd_pts, rev_pts)
     # end def
 
-    def getProperties(self, id_num, keys, safe=True):
+    def getVirtualHelixProperties(self, id_num, keys, safe=True):
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
-        return self.properties.loc[id_num, keys]
+        return self.vh_properties.loc[id_num, keys]
     # end
 
-    def getAllProperties(self, id_num, safe=True):
+    def getAllVirtualHelixProperties(self, id_num, safe=True):
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
-        series = self.properties.loc[id_num]
+        series = self.vh_properties.loc[id_num]
         # to_dict doesn't promote to python native types needed by QVariant
         # leaves as numpy integers and floats
         return dict((k, v.item()) if isinstance(v, (np.float64, np.int64)) else (k, v) for k, v in zip(series.index, series.tolist()))
     # end
 
-    def setProperties(self, id_num, keys, values, safe=True):
+    def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
         """ keys and values can be sequences of equal length or
         singular values
         """
@@ -674,16 +680,16 @@ class VirtualHelixGroup(CNObject):
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
-        self.properties.loc[id_num, keys] = values
+        self.vh_properties.loc[id_num, keys] = values
         if not isinstance(values, Iterable):
             keys, values = (keys,) , (values,)
-        self.parent().partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
+        self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):
         """ Y-axis is inverted in Qt +y === DOWN
         """
-        x, y = self.getOrigin(id_num)
+        x, y = self.getVirtualHelixOrigin(id_num)
         return scale_factor*x, -scale_factor*y
     # end def
 
@@ -749,7 +755,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def resetCoordinates(self, id_num):
-        """ call this after changing helix properties
+        """ call this after changing helix vh_properties
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -763,7 +769,7 @@ class VirtualHelixGroup(CNObject):
 
     def setCoordinates(self, id_num, points, idx_start=0):
         """ change the coordinates stored, useful when adjusting
-        helix properties
+        helix vh_properties
 
         id_num: the id_num to apply this to
 
@@ -879,7 +885,7 @@ class VirtualHelixGroup(CNObject):
         return did_remove
     # end def
 
-    def queryPoint(self, radius, point):
+    def queryBasePoint(self, radius, point):
         """
         cached query
         point is an array_like of length 3
@@ -891,7 +897,7 @@ class VirtualHelixGroup(CNObject):
         if query in qc:
             return qc.get(query)
         else:
-            res = self._queryPoint(radius, point)
+            res = self._queryBasePoint(radius, point)
             self._point_cache_keys.append(query)
             qc[query] =  res
             # limit the size of the cache
@@ -901,7 +907,7 @@ class VirtualHelixGroup(CNObject):
             return res
     # end def
 
-    def _queryPoint(self, radius, point):
+    def _queryBasePoint(self, radius, point):
         """ return the indices of all virtual helices closer
         than radius
         """
@@ -920,7 +926,7 @@ class VirtualHelixGroup(CNObject):
                             np.take(self.indices, close_points) )
     # end def
 
-    def queryOrigin(self, radius, point):
+    def queryVirtualHelixOrigin(self, radius, point):
         """ Hack for now to get 2D behavior
         point is an array_like of length 2
         """
@@ -933,7 +939,7 @@ class VirtualHelixGroup(CNObject):
             return qc.get(query)
         else:
             # print('miss')
-            res = self._queryOrigin(radius, point)
+            res = self._queryVirtualHelixOrigin(radius, point)
             self._origin_cache_keys.append(query)
             qc[query] =  res
             # print("size", len(qc))
@@ -948,7 +954,7 @@ class VirtualHelixGroup(CNObject):
             return res
     # end def
 
-    def _queryOrigin(self, radius, point):
+    def _queryVirtualHelixOrigin(self, radius, point):
         """ return the indices of all id_nums closer
         than radius, sorted by distance
         """
@@ -967,7 +973,7 @@ class VirtualHelixGroup(CNObject):
         return close_points[sorted_idxs]
     # end def
 
-    def queryOriginRect(self, rect):
+    def queryVirtualHelixOriginRect(self, rect):
         # search children
         x1, y1, x2, y2 = rect
         origin_pts = self.origin_pts

@@ -30,12 +30,12 @@ class StrandSet(CNObject):
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
     """
-    def __init__(self, strand_type, id_num, virtual_helix_group, initial_size):
-        self._document = virtual_helix_group.document()
-        super(StrandSet, self).__init__(virtual_helix_group)
+    def __init__(self, strand_type, id_num, part, initial_size):
+        self._document = part.document()
+        super(StrandSet, self).__init__(part)
         self._strand_type = strand_type
         self._id_num = id_num
-        self._virtual_helix_group = virtual_helix_group
+        self._part = part
 
         self.strand_array = [None]*(initial_size)
         self.strand_heap = []
@@ -44,14 +44,14 @@ class StrandSet(CNObject):
         self._last_strandset_idx = None
     # end def
 
-    def simpleCopy(self, virtual_helix_group):
+    def simpleCopy(self, part):
         """ Create an empty copy (no strands) of this strandset with the only
         a new virtual_helix_group parent
 
         TODO: consider renaming this method
         """
         return StrandSet(self._strand_type, self._id_num,
-                        virtual_helix_group, len(self.strand_array))
+                        part, len(self.strand_array))
     # end def
 
     def __iter__(self):
@@ -76,7 +76,7 @@ class StrandSet(CNObject):
 
     ### ACCESSORS ###
     def part(self):
-        return self._virtual_helix_group.part()
+        return self._part
     # end def
 
     def document(self):
@@ -168,8 +168,7 @@ class StrandSet(CNObject):
         Returns the complementary strandset. Used for insertions and
         sequence application.
         """
-        vhg = self._virtual_helix_group
-        fwd_ss, rev_ss = vhg.getStrandSets(self._id_num)
+        fwd_ss, rev_ss = self._part.getStrandSets(self._id_num)
         return rev_ss if self._strand_type == StrandType.FWD else fwd_ss
     # end def
 
@@ -270,7 +269,7 @@ class StrandSet(CNObject):
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self, base_idx_low, base_idx_high)
-            x, y = self._virtual_helix_group.getOrigin(self._id_num)
+            x, y = self._part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._strand_type, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
@@ -287,7 +286,7 @@ class StrandSet(CNObject):
         we assume that deserialized strands will not cause collisions.
         """
         c = CreateStrandCommand(self, base_idx_low, base_idx_high)
-        x, y = self._virtual_helix_group.getOrigin(self._id_num)
+        x, y = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._strand_type, base_idx_low)
         # print("strand", d)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)

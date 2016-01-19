@@ -109,11 +109,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def getProperty(self, key):
-        return self._model_part.virtualHelixGroup().getProperties(self._id_num, key)
+        return self._model_part.getVirtualHelixProperties(self._id_num, key)
     # end def
 
     def setProperty(self, key, value):
-        return self._model_part.virtualHelixGroup().setProperties(self._id_num, key, value)
+        return self._model_part.setVirtualHelixProperties(self._id_num, key, value)
     # end def
 
     def modelColor(self):

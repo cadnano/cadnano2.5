@@ -11,10 +11,11 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
 from cadnano.enum import StrandType
+from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
 
 from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 
-class Part(CNObject):
+class Part(VirtualHelixGroup):
     """
     A Part is a group of VirtualHelix items that are on the same lattice.
     Parts are the model component that most directly corresponds to a
@@ -43,8 +44,7 @@ class Part(CNObject):
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
         """
-        self._document = kwargs.get('document', None)
-        super(Part, self).__init__(self._document)
+        super(Part, self).__init__(*args, **kwargs)
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
@@ -52,10 +52,9 @@ class Part(CNObject):
         # Properties
         self.view_properties = {} #self._document.newViewProperties()
 
-        self._properties = {}
-        self._properties["name"] = "Part%d" % len(self._document.children())
-        self._properties["color"] = "#000000" # outlinerview will override from styles
-        self._properties["visible"] = True
+        self._group_properties["name"] = "Part%d" % len(self._document.children())
+        self._group_properties["color"] = "#000000" # outlinerview will override from styles
+        self._group_properties["visible"] = True
 
         # Selections
         self._selections = {}
@@ -142,11 +141,11 @@ class Part(CNObject):
     # end def
 
     def getProperty(self, key):
-        return self._properties[key]
+        return self._group_properties[key]
     # end def
 
     def getColor(self):
-        return self._properties['color']
+        return self._group_properties['color']
 
     def setViewProperty(self, key, value):
         self.view_properties[key] = value
@@ -157,16 +156,16 @@ class Part(CNObject):
     # end def
 
     def getName(self):
-        return self._properties['name']
+        return self._group_properties['name']
     # end def
 
     def getPropertyDict(self):
-        return self._properties
+        return self._group_properties
     # end def
 
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
-        self._properties[key] = value
+        self._group_properties[key] = value
         self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
@@ -325,7 +324,7 @@ class Part(CNObject):
         id_num = int(keylist[0])
         strandtype = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
         idx = int(keylist[2])
-        strand = self.virtualHelixGroup().getStrand(strandtype, id_num, idx)
+        strand = self.getStrand(strandtype, id_num, idx)
         return strand, idx
     # end def
 

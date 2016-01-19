@@ -31,13 +31,16 @@ class CNOutlinerItem(QTreeWidgetItem):
         return self._cn_model
     # end def
 
-    def createRootItem(self, item_name, parent):
+    def createRootPartItem(self, item_name, parent):
+        """ use this for sub-lists for part items
+        """
         twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
         twi.setData(NAME_COL, Qt.EditRole, item_name)
         twi.setData(VISIBLE_COL, Qt.EditRole, True) # is_visible
         twi.setData(COLOR_COL, Qt.EditRole, "#ffffff") # color
         twi.setFlags(twi.flags() & ~Qt.ItemIsSelectable)
         twi.setExpanded(True)
+        twi.part = lambda : self._cn_model
         return twi
     # end def
 

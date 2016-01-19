@@ -22,7 +22,7 @@ class VirtualHelixItem(QTreeWidgetItem):
     def __init__(self, model_part, parent, id_num, key=None):
         self._id_num = id_num
         self._cn_model = model_part
-        self._virtual_helix_group = model_part.virtualHelixGroup()
+        self._model_part = model_part
         self._controller = None
         # QTreeWidgetItem.__init__(self, parent, QTreeWidgetItem.UserType)
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
@@ -54,9 +54,7 @@ class VirtualHelixItem(QTreeWidgetItem):
                 model_value = model_props[key]
                 # print(key, model_value, type(model_value))
                 if isinstance(model_value, float):
-                    model_value = "%0.2f" % model_value
-                # elif not isinstance(model_value, str):    # can't get non-strings to work
-                #     model_value = str(model_value)
+                    model_value = "%0.3f" % model_value
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
             self._key = key

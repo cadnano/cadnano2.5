@@ -200,7 +200,7 @@ class ActiveSliceItem(QGraphicsRectItem):
             for id_num in part.getIdNums():
                 # SCAFFOLD
                 # resize 3' first
-                fwd_ss, rev_ss = part.virtualHelixGroup().getStrandsets(id_num)
+                fwd_ss, rev_ss = part.getStrandsets(id_num)
                 for strand in fwd_ss:
                     idx5p = strand.idx5Prime()
                     idx3p = strand.idx3Prime()

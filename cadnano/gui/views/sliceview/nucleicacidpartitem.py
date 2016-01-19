@@ -351,7 +351,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if not (event.modifiers() & mod):
             pass
         part = self._model_part
-        vhg = part.virtualHelixGroup()
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
         current_id_num = tool.idNum()
