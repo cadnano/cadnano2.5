@@ -11,7 +11,7 @@ from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
 
-from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
+from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem

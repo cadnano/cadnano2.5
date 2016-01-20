@@ -891,8 +891,6 @@ class VirtualHelixGroup(CNObject):
         point is an array_like of length 3
         """
         qc = self._point_cache
-        # x, y, z = point
-        # query = ("%0.2f, (%0.2f, %0.2f, %0.2f)") % (radius, x, y, z)
         query = (radius, point)
         if query in qc:
             return qc.get(query)
@@ -931,11 +929,8 @@ class VirtualHelixGroup(CNObject):
         point is an array_like of length 2
         """
         qc = self._origin_cache
-        # x, y = point
-        # query = ("%0.2f, (%0.2f, %0.2f)") % (radius, x, y)
         query = (radius, point)
         if query in qc:
-            # print('hit')
             return qc.get(query)
         else:
             # print('miss')

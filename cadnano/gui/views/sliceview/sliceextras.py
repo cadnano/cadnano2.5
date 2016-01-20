@@ -351,7 +351,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         if pre_xover_item is None:
-            self._parent.part().setProperty('active_phos', None)
+            # self._parent.part().setProperty('active_phos', None)
             self._parent.setProperty('active_phos', None)
             return
         vh_name, vh_angle = self._parent.getProperty(['name', 'eulerZ'])
