@@ -40,6 +40,11 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.getCoordinate(id_num, idx)
     # end def
 
+    def getSize(self):
+        offset, size = self._model_part.getOffsetAndSize(self._id_num)
+        return size
+    # end def
+
     def part(self):
         return self._model_part
     # end def

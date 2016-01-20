@@ -222,7 +222,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         part = self.part()
         path = QPainterPath()
         sub_step_size = part.subStepSize()
-        canvas_size = part.maxBaseIdx(self._id_num) + 1
+        canvas_size = self.getSize()
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks
