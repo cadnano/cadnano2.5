@@ -298,8 +298,8 @@ class PreXoverItem(QGraphicsRectItem):
             scale = 3
             delta1 = -_BASE_WIDTH*scale if self._is_fwd else _BASE_WIDTH*scale
             delta2 = _BASE_WIDTH*scale if active_item.isFwd() else -_BASE_WIDTH*scale
-            c1 = self.mapFromScene(QPointF(p1.x(), p1.y()+delta1))
-            c2 = self.mapFromScene(QPointF(p2.x(), p2.y()-delta2))
+            c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
+            c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
             pp = QPainterPath()
             pp.moveTo(self._phos_item.pos())
             pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
@@ -422,8 +422,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
     def updateBasesPerRepeat(self):
         """Recreates colors, all vhi"""
         step_size = self._parent.getProperty('bases_per_repeat')
-        _hue_scale = step_size*self.HUE_FACTOR
-        self._colors = [QColor.fromHsvF(i / _hue_scale, 0.75, 0.8).name() \
+        hue_scale = step_size*self.HUE_FACTOR
+        self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() \
                                     for i in range(step_size)]
         self.removeRepeats()
         self.addRepeats()
@@ -467,7 +467,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
             bpr = self._parent.getProperty('bases_per_repeat')
             cutoff = bpr / 2
             active_idx = active_item.baseIdx()
-            step_idxs = range(0, self._parent.maxLength(), self._parent.basesPerRepeat())
+            step_idxs = range(0, self._parent.maxLength(), bpr)
             k = 0
             pre_xovers = {}
             for i, j in product(fwd_idxs, step_idxs):
@@ -503,7 +503,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
         max_length = self._parent.maxLength()
         inactive_fwd = set(range(max_length))
         inactive_rev = set(range(max_length))
-        step_idxs = range(0, max_length, self._parent.basesPerRepeat())
+        bpr = self._parent.getProperty('bases_per_repeat')
+        step_idxs = range(0, max_length, bpr)
 
         for id_num, fwd_idxs, rev_idxs, is_colliding in prox_groups:
             for i, j in product(fwd_idxs, step_idxs):
@@ -532,8 +533,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
         bw = _BASE_WIDTH
         part = self._parent.part()
         canvas_size = self._parent.maxLength()
-        step_size = self._parent.basesPerRepeat()
-        xdelta = angle / 360. * bw*step_size
+        bpr = self._parent.getProperty('bases_per_repeat')
+        xdelta = angle / 360. * bw*bpr
         for i, item in self._fwd_pxo_items.items():
             x = (bw*i + xdelta) % (bw*canvas_size)
             item.setX(x)
@@ -545,18 +546,17 @@ class PreXoverItemGroup(QGraphicsRectItem):
     def updateModelActivePhos(self, pre_xover_item):
         """Notify model of pre_xover_item hover state."""
         vhi = self._parent
+        model_part = vhi.part()
         id_num = self._parent.idNum()
         if pre_xover_item is None:
-            vhi.part().setProperty('active_phos', None)
-            vhi.setProperty('active_phos', None)
+            model_part.setProperty('active_phos', None)
             return
         vh_name, vh_angle  = vhi.getProperty(['name', 'eulerZ'])
         idx = pre_xover_item.baseIdx() # (f|r).step_idx
         facing_angle = pre_xover_item.facingAngle()
         is_fwd = 'fwd' if pre_xover_item.isFwd() else 'rev'
         value = '%s.%s.%d.%d' % (vh_name, is_fwd, idx, facing_angle)
-        self._parent.part().setProperty('active_phos', value)
-        vhi.setProperty('active_phos', value)
+        model_part.setProperty('active_phos', value)
     # end def
 
     def updateViewActivePhos(self, new_active_item=None):

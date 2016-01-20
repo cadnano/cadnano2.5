@@ -186,7 +186,7 @@ class SelectSliceTool(AbstractSliceTool):
         sf = part_item.scaleFactor()
         part = part_item.part()
         part.translateVirtualHelices(self.selection_set,
-                                        dx / sf, -dy / sf,
+                                        dx / sf, -dy / sf, 0,
                                         finalize,
                                         use_undostack=use_undostack)
     # end def
@@ -279,15 +279,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                         print("origin", item.idNum())
                         tool.snap_origin_item = item
                         break
-                # strategy #2
-                # pos = event.pos()
-                # mapper = self.mapToItem
-                # for item in self.childItems():
-                #     pos_local = mapper(item, pos)
-                #     if isinstance(item, VirtualHelixItem) and item.contains(pos_local):
-                #         print("origin", item.idNum())
-                #         tool.snap_origin_item = item
-                #         break
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
             # self.drag_start_scene_position = event.scenePos()
@@ -324,13 +315,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         if not self.tool.individual_pick and event.button() == Qt.LeftButton:
             delta = self.pos() - self.drag_start_position
             dx, dy = delta.x(), delta.y()
-            # self.tool.moveSelection(dx, dy, True)
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
                 self.tool.moveSelection(dx, dy, True)
-            # elif dx != 0.0 and dy != 0.0:
-            #     print("small move", dx, dy)
-            #     # restore starting position
-            #     self.setPos(self.drag_start_position)
         self.tool.individual_pick = False
         return QGraphicsItemGroup.mouseReleaseEvent(self, event)
     # end def

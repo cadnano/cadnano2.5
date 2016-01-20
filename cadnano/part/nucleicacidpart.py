@@ -539,21 +539,21 @@ class NucleicAcidPart(Part):
     # end def
 
     def translateVirtualHelices(self,   vh_set,
-                                        dx, dy,
+                                        dx, dy, dz,
                                         finalize,
                                         use_undostack=False):
         if use_undostack:
-            c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy)
+            c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy, dz)
             if finalize:
                 util.finalizeCommands(self, [c], desc="Translate VHs")
             else:
                 util.execCommandList(self, [c], desc="Translate VHs", \
                                                             use_undostack=True)
         else:
-            self._translateVirtualHelices(vh_set, dx, dy, False)
+            self._translateVirtualHelices(vh_set, dx, dy, dz, False)
     # end def
 
-    def _translateVirtualHelices(self, vh_set, dx, dy, do_deselect):
+    def _translateVirtualHelices(self, vh_set, dx, dy, dz, do_deselect):
         """
         do_deselect tells a view to clear selections that might have
         undesirable Object parenting to make sure the translations are set
@@ -566,7 +566,7 @@ class NucleicAcidPart(Part):
             neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
             old_neighbors.update(neighbors)
         # 2. move in the virtual_helix_group
-        self.translateCoordinates(vh_set, (dx, dy, 0.))
+        self.translateCoordinates(vh_set, (dx, dy, dz))
         # 3. update neighbor calculations
         new_neighbors = set()
         for id_num in vh_set:

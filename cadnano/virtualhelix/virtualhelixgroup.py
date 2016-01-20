@@ -21,7 +21,6 @@ def defaultProperties(id_num):
     props = [
     ('name', "vh%d" % (id_num)),
     ('color', '#ffffffff'),
-    ('active_phos', ''),
     ('eulerZ', 10.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),

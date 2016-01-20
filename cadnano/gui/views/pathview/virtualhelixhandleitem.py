@@ -1,4 +1,4 @@
-from math import sqrt, atan2, degrees, pi
+from math import sqrt, atan2, degrees, pi, floor
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QTransform
@@ -9,19 +9,8 @@ from PyQt5.QtWidgets import QUndoCommand, QStyle
 
 from cadnano import util
 from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj, getNoBrush
+from cadnano.gui.views.sliceview.sliceextras import PreXoverItem, PreXoverItemGroup
 from . import pathstyles as styles
-
-
-HOVER_WIDTH = H_W = 20
-GAP = 0 # gap between inner and outer strands
-
-_ROTARYDIAL_STROKE_WIDTH = 1
-_ROTARYDIAL_PEN = getPenObj(styles.BLUE_STROKE, _ROTARYDIAL_STROKE_WIDTH)
-_ROTARYDIAL_BRUSH = getBrushObj('#8099ccff')
-_ROTARY_DELTA_WIDTH = 10
-
-_HOVER_PEN = getPenObj('#ffffff', 128)
-_HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
 _RECT = QRectF(0, 0, 2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,\
@@ -32,47 +21,21 @@ _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
 _HOV_PEN = getPenObj(styles.BLUE_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 
-
-class PreXoverItemGroup(QGraphicsEllipseItem):
-    def __init__(self, rect, parent=None):
-        super(QGraphicsEllipseItem, self).__init__(rect, parent)
-        self._parent = parent
-        self.setPen(getNoPen())
-        iw = _ITEM_WIDTH = 6
-        x = _RECT.width() - 2*styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH - 1
-        y = _RECT.center().y()
-        prexo_items = {}
-        fwd_angles = [0, 240, 120]
-        fwd_colors = ['#cc0000', '#00cc00', '#0000cc']
-        for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getNoPen())
-            item.setBrush(getBrushObj(fwd_colors[i]))
-            item.setTransformOriginPoint(_RECT.center())
-            item.setRotation(fwd_angles[i])
-            prexo_items[i] = item
-
-        rev_angles = [150, 30, 270]
-        rev_colors = ['#0000cc', '#cc0000', '#00cc00']
-        # rev_colors = ['#ff00ff', '#3399ff', '#ff6600']
-        for i in range(len(fwd_angles)):
-            item = QGraphicsEllipseItem(x, y, iw, iw, self)
-            item.setPen(getPenObj(rev_colors[i],0.5))
-            item.setBrush(getNoBrush())
-            item.setTransformOriginPoint(_RECT.center())
-            item.setRotation(rev_angles[i])
-            prexo_items[i] = item
-    # # end def
+_BASE_WIDTH = styles.PATH_BASE_WIDTH
+_VH_XOFFSET = styles.VH_XOFFSET
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
     _filter_name = "virtual_helix"
 
-    def __init__(self, id_num, part_item, viewroot):
+    def __init__(self, virtual_helix_item, part_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(part_item)
-        self._id_num = id_num
+        self._virtual_helix_item = virtual_helix_item
+        self._id_num = virtual_helix_item.idNum()
         self._part_item = part_item
         self._model_part = part_item.part()
         self._viewroot = viewroot
+
+        self._right_mouse_move = False
         self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
         self.refreshColor()
@@ -91,11 +54,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
         self._hover_rect = QRectF(_RECT)
-        self._outer_line = RotaryDialLine(self._rect, self)
-        self._hover_region = RotaryDialHoverRegion(self._hover_rect, self)
-        self.show()
+        # self.show()
 
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RECT, self)
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self)
         _pxig.setTransformOriginPoint(_RECT.center())
 
     # end def
@@ -106,6 +67,10 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
 
     def part(self):
         return self._model_part
+    # end def
+
+    def idNum(self):
+        return self._id_num
     # end def
 
     def getProperty(self, key):
@@ -141,12 +106,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             self.setBrush(_DEF_BRUSH)
             self.setPen(_DEF_PEN)
         self.update(self.boundingRect())
-    # end def
-
-    def paint(self, painter, option, widget):
-        painter.setPen(self.pen())
-        painter.setBrush(self.brush())
-        painter.drawEllipse(self.rect())
     # end def
 
     def remove(self):
@@ -198,6 +157,16 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._part_item
     # end def
 
+    ### DRAWING ###
+    def paint(self, painter, option, widget):
+        """Need to override paint so selection appearance is correct."""
+        painter.setPen(self.pen())
+        painter.setBrush(self.brush())
+        painter.drawEllipse(self.rect())
+    # end def
+
+
+    ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         """
         hoverEnterEvent changes the PathHelixHandle brush and pen from default
@@ -232,6 +201,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)
+        elif event.button() == Qt.RightButton:
+            self._right_mouse_move = True
+            self.drag_start_position = dsp = event.pos()
+            self.drag_last_position = dsp
+            self.handle_start = self.pos()
         else:
             QGraphicsItem.mousePressEvent(self, event)
     # end def
@@ -243,8 +217,29 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)
+        elif self._right_mouse_move:
+            new_pos = event.pos()
+            delta = new_pos - self.drag_last_position
+            self.drag_last_position = new_pos
+            dx = int(floor(delta.x())/_BASE_WIDTH)*_BASE_WIDTH
+            x = self.handle_start.x() + dx
+            if x != self.x():
+                self.setX(x)
+                self._virtual_helix_item.setX(x + _VH_XOFFSET)
+                self._part_item.updateXoverItems(self._virtual_helix_item)
+                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dx, False, use_undostack=False)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        MOVE_THRESHOLD = 0.01   # ignore small moves
+        if self._right_mouse_move and event.button() == Qt.RightButton:
+            self._right_mouse_move = False
+            delta = self.pos() - self.handle_start
+            dz = delta.x()
+            if abs(dz) > MOVE_THRESHOLD:
+                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, True)
     # end def
 
     def restoreParent(self, pos=None):
@@ -308,174 +303,4 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         pass
         self.setSelected(True)
     # end def
-# end class
-
-
-
-class RotaryDialDeltaItem(QGraphicsPathItem):
-    def __init__(self, startAngle, spanAngle, parent=None):
-        # setup DNA line
-        super(QGraphicsPathItem, self).__init__(parent)
-        self._parent = parent
-        self.updateAngle(startAngle, spanAngle)
-        self.updateColor(parent.modelColor())
-    # end def
-
-    def updateAngle(self, startAngle, spanAngle):
-        self._startAngle = startAngle
-        self._spanAngle = spanAngle
-        path = QPainterPath()
-        path.arcMoveTo(self._parent._rect, startAngle)
-        path.arcTo(self._parent._rect, startAngle, spanAngle)
-        self.setPath(path)
-    # end def
-
-    def updateColor(self, color):
-        self.setPen(getPenObj(color,_ROTARY_DELTA_WIDTH,
-                                alpha=128, capstyle=Qt.FlatCap))
-    # end def
-# end class
-
-class RotaryDialHoverRegion(QGraphicsEllipseItem):
-    def __init__(self, rect, parent=None):
-        # setup DNA line
-        super(QGraphicsEllipseItem, self).__init__(rect, parent)
-        self._parent = parent
-        self.setPen(QPen(Qt.NoPen))
-        self.setBrush(_HOVER_BRUSH)
-        self.setAcceptHoverEvents(True)
-
-        # hover marker
-        self._hoverLine = QGraphicsLineItem(-_ROTARY_DELTA_WIDTH/2, 0,
-                                            _ROTARY_DELTA_WIDTH/2, 0,
-                                            self)
-        self._hoverLine.setPen(getPenObj('#00cc', 0.5))
-        self._hoverLine.hide()
-
-        self._startPos = None
-        self._startAngle = None  # save selection start
-        self._clockwise = None
-        self.dummy = RotaryDialDeltaItem(0, 0, parent)
-        self.dummy.hide()
-
-    def updateRect(self, rect):
-        self.setRect(rect)
-
-    def hoverEnterEvent(self, event):
-        self.updateHoverLine(event)
-        self._hoverLine.show()
-    # end def
-
-    def hoverMoveEvent(self, event):
-        self.updateHoverLine(event)
-    # end def
-
-    def hoverLeaveEvent(self, event):
-        self._hoverLine.hide()
-    # end def
-
-    def mousePressEvent(self, event):
-        r = _RADIUS # self._parent.radius()
-        self.updateHoverLine(event)
-        pos = self._hoverLine.pos()
-        aX, aY, angle = self.snapPosToCircle(pos, r)
-        if angle != None:
-            self._startPos = QPointF(aX, aY)
-            self._startAngle = self.updateHoverLine(event)
-            self.dummy.updateAngle(self._startAngle, 0)
-            self.dummy.show()
-        # mark the start
-        # f = QGraphicsEllipseItem(pX, pY, 2, 2, self)
-        # f.setPen(QPen(Qt.NoPen))
-        # f.setBrush(QBrush(QColor(204, 0, 0)))
-    # end def
-
-    def mouseMoveEvent(self, event):
-        eventAngle = self.updateHoverLine(event)
-        # Record initial direction before calling getSpanAngle
-        if self._clockwise is None:
-            self._clockwise = False if eventAngle > self._startAngle else True
-        spanAngle = self.getSpanAngle(eventAngle)
-        self.dummy.updateAngle(self._startAngle, spanAngle)
-    # end def
-
-    def mouseReleaseEvent(self, event):
-        self.dummy.hide()
-        endAngle = self.updateHoverLine(event)
-        spanAngle = self.getSpanAngle(endAngle)
-        angle = self._parent.getProperty('eulerZ')
-        self._parent.setProperty('eulerZ',
-                                round((angle - spanAngle) % 360., 0))
-
-        # mark the end
-        # x = self._hoverLine.x()
-        # y = self._hoverLine.y()
-        # f = QGraphicsEllipseItem(x, y, 6, 6, self)
-        # f.setPen(QPen(Qt.NoPen))
-        # f.setBrush(QBrush(QColor(204, 0, 0, 128)))
-    # end def
-
-    def updateHoverLine(self, event):
-        """
-        Moves red line to point (aX,aY) on RotaryDialLine closest to event.pos.
-        Returns the angle of aX, aY, using the Qt arc coordinate system
-        (0 = east, 90 = north, 180 = west, 270 = south).
-        """
-        r = _RADIUS # self._parent.radius()
-        aX, aY, angle = self.snapPosToCircle(event.pos(), r)
-        if angle != None:
-            self._hoverLine.setPos(aX, aY)
-            self._hoverLine.setRotation(-angle)
-        return angle
-    # end def
-
-    def snapPosToCircle(self, pos, radius):
-        """Given x, y and radius, return x,y of nearest point on circle, and its angle"""
-        pX = pos.x()
-        pY = pos.y()
-        cX = cY = radius
-        vX = pX - cX
-        vY = pY - cY
-        magV = sqrt(vX*vX + vY*vY)
-        if magV == 0:
-            return (None, None, None)
-        aX = cX + vX / magV * radius
-        aY = cY + vY / magV * radius
-        angle = (atan2(aY - cY, aX - cX))
-        deg = -degrees(angle) if angle < 0 else 180 + (180 - degrees(angle))
-        return (aX, aY, deg)
-    # end def
-
-    def getSpanAngle(self, angle):
-        """
-        Return the spanAngle angle by checking the initial direction of the selection.
-        Selections that cross 0° must be handed as an edge case.
-        """
-        if self._clockwise: # spanAngle is negative
-            if angle < self._startAngle:
-                spanAngle = angle - self._startAngle
-            else:
-                spanAngle = -(self._startAngle + (360 - angle))
-        else: # counterclockwise, spanAngle is positive
-            if angle > self._startAngle:
-                spanAngle = angle - self._startAngle
-            else:
-                spanAngle = (360 - self._startAngle) + angle
-        return spanAngle
-    # end def
-# end class
-
-class RotaryDialLine(QGraphicsEllipseItem):
-    def __init__(self, rect, parent=None):
-        super(QGraphicsEllipseItem, self).__init__(rect, parent)
-        self.updateColor(parent.modelColor())
-        self.setRect(rect)
-        self.setFlag(QGraphicsItem.ItemStacksBehindParent)
-    # end def
-
-    def updateColor(self, color):
-        self.setPen(getPenObj(color, _ROTARYDIAL_STROKE_WIDTH))
-
-    def updateRect(self, rect):
-        self.setRect(rect)
 # end class

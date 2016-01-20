@@ -39,7 +39,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        self._handle = VirtualHelixHandleItem(id_num, part_item, viewroot)
+        self._handle = VirtualHelixHandleItem(self, part_item, viewroot)
         self._last_strand_set = None
         self._last_idx = None
         self._scaffold_background = None
