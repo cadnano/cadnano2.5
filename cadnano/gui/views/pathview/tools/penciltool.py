@@ -329,8 +329,9 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._vhi = virtual_helix_item
         self._xover_item = xover_item
         self._idx = idx
-        self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
+
         self._is_forward = strand3p.strandSet().isForward()
+        self._is_on_top = self._is_forward
         self._strand_type = strand3p.strandSet().strandType()
 
         self._partner_virtual_helix = virtual_helix_item
@@ -340,7 +341,6 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._path_thing = QGraphicsPathItem(self)
         self.configurePath()
 
-        self.setPen(_NO_PEN)
         self._label = None
         self.setPen(_NO_PEN)
         self.setBrush(_NO_BRUSH)

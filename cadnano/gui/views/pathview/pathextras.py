@@ -14,8 +14,8 @@ from . import pathstyles as styles
 
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
-_BASE_RECT = QRectF(0,0,_BASE_WIDTH,_BASE_WIDTH)
-_VH_XOFFSET = styles.VH_XOFFSET
+_BASE_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
+
 
 PHOS_ITEM_WIDTH = 0.25*_BASE_WIDTH
 TRIANGLE = QPolygonF()
@@ -213,11 +213,14 @@ class PreXoverItem(QGraphicsRectItem):
         return self._color
 
     def facingAngle(self):
-        _z, eulerZ, tpb, groove = self._parent.getProperty(['z', 'eulerZ', 'twist_per_base', 'minor_groove_angle'])
+        vhi = self._parent
+        id_num = parent.idNum()
+        x, y, _z = vhi.part().getCoordinate(id_num, 0)
+        eulerZ, tpb, groove = vhi.getProperty(['eulerZ', 'twist_per_base', 'minor_groove_angle'])
         if self._is_fwd:
             angle = round(((self._step_idx + (_z / _BASE_WIDTH))*tpb) % 360, 3)
         else:
-            angle = round(((self._step_idx + (_z / _BASE_WIDTH))*tpb + groove)%360, 3)
+            angle = round(((self._step_idx + (_z / _BASE_WIDTH))*tpb + groove) % 360, 3)
         return (eulerZ + angle) % 360
 
     def isFwd(self):
@@ -231,10 +234,13 @@ class PreXoverItem(QGraphicsRectItem):
         return '%s.%s.%d.%d' % (vh_name, fwd_str, idx, angle)
 
     def absoluteIdx(self):
-        return self.baseIdx() + (self._parent._vh_Z() / _BASE_WIDTH)
+        vhi = self._parent
+        id_num = parent.idNum()
+        x, y, _z = vhi.part().getCoordinate(id_num, 0)
+        return self.baseIdx() + (_z / _BASE_WIDTH)
 
     def baseIdx(self):
-        return self._step+self._step_idx
+        return self._step + self._step_idx
 
     def stepIdx(self):
         return self._step_idx

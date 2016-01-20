@@ -32,6 +32,14 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
+    def getAxisPoint(self, idx):
+        return self._model_part.getCoordinate(self._id_num, idx)
+    # end def
+
+    def getOtherAxisPoint(self, id_num, idx):
+        return self._model_part.getCoordinate(id_num, idx)
+    # end def
+
     def part(self):
         return self._model_part
     # end def

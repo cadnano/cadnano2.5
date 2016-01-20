@@ -18,6 +18,15 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
+_VH_XOFFSET = styles.VH_XOFFSET
+
+def v2DistanceAndAngle(a, b):
+    dx = b[0] - a[0]
+    dy = b[1] - a[1]
+    dist = math.sqrt(dx*dx + dy*dy)
+    angle = math.atan2(dy, dx)
+    return dist, angle
+
 
 class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     """VirtualHelixItem for PathView"""
@@ -102,7 +111,77 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
         # for key, val in zip(keys, values):
-        #     pass
+        #     # if key == 'z':
+        #     #     z = float(value)
+        #     #     self.setX(z)
+        #     #     self._handle.setX(z-_VH_XOFFSET)
+        #     #     self.part().partDimensionsChangedSignal.emit(self.part(), True)
+        #     # elif key == 'eulerZ':
+        #     #     self._handle.rotateWithCenterOrigin(value)
+        #     #     self._prexoveritemgroup.updatePositionsAfterRotation(value)
+        #     ### GEOMETRY PROPERTIES ###
+        #     if key == 'repeats':
+        #         self.updateRepeats(int(value))
+        #     elif key == 'bases_per_repeat':
+        #         self.updateBasesPerRepeat(int(value))
+        #     elif key == 'turns_per_repeat':
+        #         self.updateTurnsPerRepeat(int(value))
+        #     ### RUNTIME PROPERTIES ###
+        #     elif key == 'active_phos':
+        #         hpxig = self._handle._prexoveritemgroup
+        #         pxig = self._prexoveritemgroup
+        #         if value:
+        #             # vh-handle
+        #             vh_name, fwd_str, base_idx, facing_angle = value.split('.')
+        #             is_fwd = 1 if fwd_str == 'fwd' else 0
+        #             step_idx = int(base_idx) % self._bases_per_repeat
+        #             h_item = hpxig.getItem(is_fwd, step_idx)
+        #             hpxig.updateViewActivePhos(h_item)
+        #             # vh
+        #             item = pxig.getItem(is_fwd, step_idx)
+        #             pxig.updateViewActivePhos(item)
+        #         else:
+        #             hpxig.updateViewActivePhos(None) # vh-handle
+        #             pxig.updateViewActivePhos(None) # vh
+        #             # self._activephositem.hide()
+        #     elif key == 'neighbor_active_angle':
+        #         hpxig = self._handle._prexoveritemgroup
+        #         pxig = self._prexoveritemgroup
+        #         if value:
+        #             # handle
+        #             local_angle = (int(value) + 180) % 360
+        #             h_fwd_items, h_rev_items = hpxig.getItemsFacingNearAngle(local_angle)
+        #             for h_item in h_fwd_items + h_rev_items:
+        #                 h_item.updateItemApperance(True, show_3p=False)
+        #             # path
+
+        #             active_value = self.part().getProperty('active_phos')
+        #             if not active_value:
+        #                 return
+        #             id_num, fwd_str, base_idx, facing_angle = active_value.split('.')
+        #             is_fwd = True if fwd_str == 'fwd' else False
+        #             active_idx = int(base_idx)
+        #             vhi = self._part_item.vhItemForIdNum(id_num)
+        #             active_item = vhi._prexoveritemgroup.getItem(is_fwd, active_idx)
+        #             neighbors = self.getProperty('neighbors')
+        #             neighbors = literal_eval(neighbors)
+        #             this_pt = self.getAxisPoint(0)
+        #             for n_id_num in neighbors:
+        #                 n_pt = self.getOtherAxisPoint(n_id_num, 0)
+        #                 n_dist, n_angle = v2DistanceAndAngle(this_pt[:2], n_pt[:2])
+        #                 if n_id_num == id_num:
+        #                     fwd_items, rev_items = hpxig.getItemsFacingNearAngle(int(n_angle))
+        #                     fwd_idxs = [item.step_idx() for item in fwd_items]
+        #                     rev_idxs = [item.step_idx() for item in rev_items]
+        #                     pxig.setActiveNeighbors(active_item, fwd_idxs, rev_idxs)
+        #         else:
+        #             # handle
+        #             hpxig.resetAllItemsAppearance()
+        #             # path
+        #             pxig.setActiveNeighbors(None, None, None)
+        #     elif key == 'neighbors':
+        #         pxig = self._prexoveritemgroup
+        #         self.refreshProximalItems()
         self.refreshPath()
     # end def
 
