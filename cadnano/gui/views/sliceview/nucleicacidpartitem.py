@@ -166,7 +166,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """
         if do_deselect:
             tool = self._getActiveTool()
-            if tool is not None and tool.methodPrefix() == "selectTool":
+            if tool.methodPrefix() == "selectTool":
                 if tool.isSelectionActive():
                     tool.deselectItems()
 
@@ -282,30 +282,22 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def mousePressEvent(self, event):
         self.part().setSelected(True)
         tool = self._getActiveTool()
-        if tool is None:
+        tool_method_name = tool.methodPrefix() + "MousePress"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, event)
+        else:
             event.setAccepted(False)
             QGraphicsItem.mousePressEvent(self, event)
-        else:
-            tool_method_name = tool.methodPrefix() + "MousePress"
-            if hasattr(self, tool_method_name):
-                getattr(self, tool_method_name)(tool, event)
-            else:
-                event.setAccepted(False)
-                QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def hoverMoveEvent(self, event):
         tool = self._getActiveTool()
-        if tool is None:
+        tool_method_name = tool.methodPrefix() + "HoverMove"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, event)
+        else:
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
-        else:
-            tool_method_name = tool.methodPrefix() + "HoverMove"
-            if hasattr(self, tool_method_name):
-                getattr(self, tool_method_name)(tool, event)
-            else:
-                event.setAccepted(False)
-                QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def getModelPos(self, pos):

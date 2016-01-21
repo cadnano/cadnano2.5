@@ -278,9 +278,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         strand_set, idx = self.baseAtPoint(event.pos())
         self.setActive(idx)
         tool = self._getActiveTool()
-        if tool is None:
-            QGraphicsItem.mousePressEvent(self, event)
-            return
         tool_method_name = tool.methodPrefix() + "MousePress"
 
         if hasattr(self, tool_method_name):
@@ -296,9 +293,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         forwarding them to approproate tool method as necessary.
         """
         tool = self._getActiveTool()
-        if tool is None:
-            QGraphicsItem.mousePressEvent(self, event)
-            return
         tool_method_name = tool.methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):
             strand_set, idx = self.baseAtPoint(event.pos())
@@ -315,9 +309,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         forwarding them to approproate tool method as necessary.
         """
         tool = self._getActiveTool()
-        if tool is None:
-            QGraphicsItem.mousePressEvent(self, event)
-            return
         tool_method_name = tool.methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(self._last_strand_set, self._last_idx)
@@ -371,9 +362,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._part_item.updateStatusBar(loc)
 
         active_tool = self._getActiveTool()
-        if active_tool is None:
-            QGraphicsItem.hoverMoveEvent(self, event)
-            return
         tool_method_name = active_tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
             strand_type, idx_x, idx_y = active_tool.baseAtPoint(self, event.pos())
@@ -385,7 +373,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds"""
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
-        if active_tool is not None and not active_tool.isDrawingStrand():
+        if not active_tool.isDrawingStrand():
             active_tool.initStrandItemFromVHI(self, strand_set, idx)
             active_tool.setIsDrawingStrand(True)
     # end def
@@ -394,7 +382,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds"""
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
-        if active_tool is not None and active_tool.isDrawingStrand():
+        if active_tool.isDrawingStrand():
             active_tool.updateStrandItemFromVHI(self, strand_set, idx)
     # end def
 
@@ -402,7 +390,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds"""
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
-        if active_tool is not None and active_tool.isDrawingStrand():
+        if active_tool.isDrawingStrand():
             active_tool.setIsDrawingStrand(False)
             active_tool.attemptToCreateStrand(self, strand_set, idx)
     # end def
@@ -411,7 +399,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Pencil the strand is possible."""
         part_item = self.partItem()
         active_tool = self._getActiveTool()
-        if active_tool is not None and not active_tool.isFloatingXoverBegin():
+        if not active_tool.isFloatingXoverBegin():
             temp_xover = active_tool.floatingXover()
             temp_xover.updateFloatingFromVHI(self, strand_type, idx_x, idx_y)
     # end def

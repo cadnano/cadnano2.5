@@ -550,8 +550,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         forwarding them to approproate tool method as necessary.
         """
         active_tool = self._getActiveTool()
-        if active_tool is None:
-            return QGraphicsItem.hoverMoveEvent(self, event)
         tool_method_name = active_tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(event.pos())
@@ -559,10 +557,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def pencilToolHoverMove(self, pt):
         """Pencil the strand is possible."""
-        Dna_part_item = self
         active_tool = self._getActiveTool()
-        if active_tool is None:
-            return QGraphicsItem.hoverMoveEvent(self, event)
         if not active_tool.isFloatingXoverBegin():
             temp_xover = active_tool.floatingXover()
             temp_xover.updateFloatingFromPartItem(self, pt)

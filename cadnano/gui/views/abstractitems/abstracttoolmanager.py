@@ -3,6 +3,17 @@ from PyQt5.QtWidgets import QActionGroup
 
 from cadnano import app
 
+class DummyTool(object):
+    action_name = 'action_dummy_tool'
+    def methodPrefix(self):
+        return "dummyTool"  # first letter should be lowercase
+    def setActive(self, bool):
+        pass
+    def lastLocation(self):
+        return None
+
+dummy_tool = DummyTool()
+
 class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""
     def __init__(self, tool_group_name, window):
@@ -74,7 +85,7 @@ class AbstractToolManager(QObject):
             action_name = 'action_%s_%s' % (tgn, l_tool_name)
             tool_widget = getattr(window, action_name)
             tool_widget.setChecked(False)
-        self._active_tool = None
+        self._active_tool = dummy_tool
     # end def
 
     def activeToolGetter(self):
@@ -84,7 +95,8 @@ class AbstractToolManager(QObject):
     def setActiveTool(self, new_active_tool):
         if new_active_tool == self._active_tool:
             return
-
+        if new_active_tool is None:
+            new_active_tool = dummy_tool
         # if self.lastLocation():
         #     new_active_tool.updateLocation(*self.lastLocation())
 
