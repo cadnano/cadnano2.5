@@ -4,6 +4,9 @@ from PyQt5.QtWidgets import QActionGroup
 from cadnano import app
 
 class DummyTool(object):
+    """ For use in place of None checks in the code
+    reduces boilerplate
+    """
     action_name = 'action_dummy_tool'
     def methodPrefix(self):
         return "dummyTool"  # first letter should be lowercase
@@ -24,7 +27,7 @@ class AbstractToolManager(QObject):
         super(AbstractToolManager, self).__init__()
         self.window = window
         self.tool_group_name = tool_group_name
-        self._active_tool = None
+        self._active_tool = dummy_tool
         self._active_part = None
         self.tool_names = None
         self.ag = QActionGroup(window)
