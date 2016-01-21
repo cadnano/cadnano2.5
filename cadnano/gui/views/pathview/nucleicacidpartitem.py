@@ -23,6 +23,7 @@ _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 _BOUNDING_RECT_PADDING = 20
+_VH_XOFFSET = styles.VH_XOFFSET
 
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering"""
@@ -183,6 +184,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             p = view.scene_root_item.childrenBoundingRect().bottomLeft()
             _p = _BOUNDING_RECT_PADDING
             self.setPos(p.x() + _p*6 + styles.VIRTUALHELIXHANDLEITEM_RADIUS, p.y() + _p*3)
+            # self.setPos(p.x() + _VH_XOFFSET, p.y() + _p*3)
 
         self._virtual_helix_item_list.append(vhi)
         ztf = not getBatch()
@@ -342,7 +344,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot._vhi_h_selection_group
         for vhi in new_list:
-            vhi.setPos(0, y)
+            _z = 0
+            vhi.setPos(_z, y)
             if vhi_rect is None:
                 vhi_rect = vhi.boundingRect()
                 step = vhi_rect.height() + styles.PATH_HELIX_PADDING
@@ -359,9 +362,13 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             if vhi_h_rect is None:
                 vhi_h_rect = vhi_h.boundingRect()
 
-            vhi_h.setPos(-2 * vhi_h_rect.width(), y + (vhi_rect.height() - vhi_h_rect.height()) / 2)
+            # vhi_h.setPos(-2 * vhi_h_rect.width(), y + (vhi_rect.height() - vhi_h_rect.height()) / 2)
+            vhi_h_x = _z - _VH_XOFFSET
+            vhi_h_y = y + (vhi_rect.height() - vhi_h_rect.height()) / 2
+            vhi_h.setPos(vhi_h_x, vhi_h_y)
 
-            leftmost_extent = min(leftmost_extent, -2 * vhi_h_rect.width())
+            # leftmost_extent = min(leftmost_extent, vhi_h_x)
+            leftmost_extent = min(leftmost_extent, -1.5*vhi_h_rect.width())
             rightmost_extent = max(rightmost_extent, vhi_rect.width())
             y += step
             self.updateXoverItems(vhi)

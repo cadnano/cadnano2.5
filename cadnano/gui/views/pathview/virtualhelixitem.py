@@ -2,6 +2,12 @@
 # encoding: utf-8
 
 from math import floor
+
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
+
 from cadnano import util
 from cadnano.enum import StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
@@ -10,12 +16,6 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
-
-from PyQt5.QtCore import QRectF, Qt
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET

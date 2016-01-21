@@ -203,8 +203,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             selection_group.mousePressEvent(event)
         elif event.button() == Qt.RightButton:
             self._right_mouse_move = True
-            self.drag_start_position = dsp = event.pos()
-            self.drag_last_position = dsp
+            self.drag_last_position = event.scenePos()
             self.handle_start = self.pos()
         else:
             QGraphicsItem.mousePressEvent(self, event)
@@ -214,20 +213,22 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """
         All mouseMoveEvents are passed to the group if it's in a group
         """
+        MOVE_THRESHOLD = 0.01   # ignore small moves
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)
         elif self._right_mouse_move:
-            new_pos = event.pos()
+            new_pos = event.scenePos()
             delta = new_pos - self.drag_last_position
-            self.drag_last_position = new_pos
-            dx = int(floor(delta.x())/_BASE_WIDTH)*_BASE_WIDTH
+            dx = int(floor(delta.x() / _BASE_WIDTH ))*_BASE_WIDTH
             x = self.handle_start.x() + dx
-            if x != self.x():
+            if abs(dx) > MOVE_THRESHOLD:
+                old_x = self.x()
                 self.setX(x)
                 self._virtual_helix_item.setX(x + _VH_XOFFSET)
                 self._part_item.updateXoverItems(self._virtual_helix_item)
-                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dx, False, use_undostack=False)
+                dz = x - old_x
+                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, False, use_undostack=False)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
