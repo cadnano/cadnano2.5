@@ -45,7 +45,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._pre_xover_items = []  # crossover-related
-        self._virtual_helix_item_hash = {}
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -62,7 +61,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def modelColor(self):
-        return self._model_props['color']
+        # return self._model_props['color']
+        return self._model_part.getProperty('color')
     # end def
 
     def getModelAxisPoint(self, z):
@@ -127,12 +127,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if is_selected:
             self.resetPen(styles.SELECTED_COLOR, styles.SELECTED_PEN_WIDTH)
             self.resetBrush(styles.SELECTED_BRUSH_COLOR, styles.SELECTED_ALPHA)
-            # self.setZValue(styles.ZPARTITEM+1)
         else:
             self.resetPen(self.modelColor())
             self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
-            # self.setZValue(styles.ZPARTITEM)
-
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
@@ -160,7 +157,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """docstring for partPreDecoratorSelectedSlot"""
         part = self._model_part
         vh = part.virtualHelixAtCoord((row,col))
-        vhi = self.itemForVirtualHelix(vh)
+        vhi = self.idToVirtualHelixItem(vh)
         y_offset = _BW if vh.isEvenParity() else 0
         p = QPointF(base_idx*_BW, vhi.y() + y_offset)
         view = self.window().path_graphics_view
@@ -258,10 +255,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             zoom_to_fit=ztf)
         self._updateBoundingRect()
 
-    # end def
-
-    def itemForVirtualHelix(self, id_num):
-        return self._virtual_helix_item_hash[id_num]
     # end def
 
     def virtualHelixBoundingRect(self):
@@ -506,7 +499,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #     potential_xovers = part.potentialCrossoverList(id_num, idx, xover_p)
     #     for neighbor, index, strand_type, is_low_idx in potential_xovers:
     #         # create one half
-    #         neighbor_vhi = self.itemForVirtualHelix(neighbor)
+    #         neighbor_vhi = self.idToVirtualHelixItem(neighbor)
     #         pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
     #         # add to list
     #         self._pre_xover_items.append(pxi)
@@ -556,7 +549,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         Parses a mouseMoveEvent to extract strandSet and base index,
         forwarding them to approproate tool method as necessary.
         """
-        tool_method_name = self._getActiveTool().methodPrefix() + "HoverMove"
+        active_tool = self._getActiveTool()
+        if active_tool is None:
+            return QGraphicsItem.hoverMoveEvent(self, event)
+        tool_method_name = active_tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(event.pos())
     # end def
@@ -565,6 +561,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """Pencil the strand is possible."""
         Dna_part_item = self
         active_tool = self._getActiveTool()
+        if active_tool is None:
+            return QGraphicsItem.hoverMoveEvent(self, event)
         if not active_tool.isFloatingXoverBegin():
             temp_xover = active_tool.floatingXover()
             temp_xover.updateFloatingFromPartItem(self, pt)

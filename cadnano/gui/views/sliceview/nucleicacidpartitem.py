@@ -55,8 +55,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._scale_factor = self._RADIUS / m_p.radius()
 
-        self._virtual_helix_item_hash = {}
-
         self.hide() # hide while until after attemptResize() to avoid flicker
 
         self._rect = QRectF(0, 0, 1000, 1000)
@@ -168,7 +166,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """
         if do_deselect:
             tool = self._getActiveTool()
-            if tool.methodPrefix() == "selectTool":
+            if tool is not None and tool.methodPrefix() == "selectTool":
                 if tool.isSelectionActive():
                     tool.deselectItems()
 
@@ -284,22 +282,30 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def mousePressEvent(self, event):
         self.part().setSelected(True)
         tool = self._getActiveTool()
-        tool_method_name = tool.methodPrefix() + "MousePress"
-        if hasattr(self, tool_method_name):
-            getattr(self, tool_method_name)(tool, event)
-        else:
+        if tool is None:
             event.setAccepted(False)
             QGraphicsItem.mousePressEvent(self, event)
+        else:
+            tool_method_name = tool.methodPrefix() + "MousePress"
+            if hasattr(self, tool_method_name):
+                getattr(self, tool_method_name)(tool, event)
+            else:
+                event.setAccepted(False)
+                QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def hoverMoveEvent(self, event):
         tool = self._getActiveTool()
-        tool_method_name = tool.methodPrefix() + "HoverMove"
-        if hasattr(self, tool_method_name):
-            getattr(self, tool_method_name)(tool, event)
-        else:
+        if tool is None:
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
+        else:
+            tool_method_name = tool.methodPrefix() + "HoverMove"
+            if hasattr(self, tool_method_name):
+                getattr(self, tool_method_name)(tool, event)
+            else:
+                event.setAccepted(False)
+                QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def getModelPos(self, pos):

@@ -109,10 +109,10 @@ class Part(VirtualHelixGroup):
     partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
                         name='partVirtualHelicesReorderedSignal') # self, list of id_nums
 
-    partVirtualHelixTransformedSignal = ProxySignal(object, int, object,
-                        name='partVirtualHelixTransformedSignal')   # self, list of id_nums, transform
     partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
                         name='partVirtualHelicesTranslatedSignal')  # self, list of id_nums, transform
+    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object,
+                        name='partVirtualHelicesSelectedSignal')  # self, list of id_nums to select, transform
     partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
                                             name='partVirtualHelixPropertyChangedSignal')  # self, id_num, value
 

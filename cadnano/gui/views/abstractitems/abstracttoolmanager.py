@@ -36,6 +36,7 @@ class AbstractToolManager(QObject):
     # end def
 
     def installTool(self, tool_name):
+        this = self
         window = self.window
         tgn = self.tool_group_name
 
@@ -48,6 +49,7 @@ class AbstractToolManager(QObject):
         set_active_tool_method_name = 'choose%sTool' % (tool_name)
 
         def clickHandler(self):
+            window.deactiveToolManagers(this)
             tool_widget.setChecked(True)
             self.setActiveTool(tool)
             if hasattr(tool, 'widgetClicked'):
@@ -58,6 +60,21 @@ class AbstractToolManager(QObject):
         handler = getattr(self, set_active_tool_method_name)
         tool_widget.triggered.connect(handler)
         return tool_widget
+    # end def
+
+    def deactivateAllTools(self):
+        """ uncheck all tools in this group and set the active tool to None
+        """
+        window = self.window
+        tgn = self.tool_group_name
+        if self._active_tool is not None:
+            self._active_tool.setActive(False)
+        for tool_name in self.tool_names:
+            l_tool_name = tool_name.lower()
+            action_name = 'action_%s_%s' % (tgn, l_tool_name)
+            tool_widget = getattr(window, action_name)
+            tool_widget.setChecked(False)
+        self._active_tool = None
     # end def
 
     def activeToolGetter(self):

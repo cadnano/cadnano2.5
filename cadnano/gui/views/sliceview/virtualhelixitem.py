@@ -122,11 +122,13 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     def mousePressEvent(self, event):
         part_item = self._part_item
         tool = part_item._getActiveTool()
+        if tool is None:
+            QGraphicsItem.mousePressEvent(self, event)
+            return
         tool_method_name = tool.methodPrefix() + "MousePress"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, part_item, event)
         else:
-            # event.setAccepted(False)
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
@@ -154,7 +156,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._controller = None
         part_item = self._part_item
         tool = part_item._getActiveTool()
-        tool.hideLineItem()
+        if tool is not None:
+            tool.hideLineItem()
         self.scene().removeItem(self._label)
         self._label = None
         self._part_item = None

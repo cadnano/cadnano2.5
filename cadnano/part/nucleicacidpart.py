@@ -19,7 +19,6 @@ from cadnano.strandset import CreateStrandCommand
 from cadnano.strandset import SplitCommand
 from cadnano.strandset import StrandSet
 from cadnano.virtualhelix import RemoveVirtualHelixCommand
-# from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand

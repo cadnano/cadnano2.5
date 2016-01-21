@@ -8,6 +8,12 @@ class AbstractPartItem(object):
     means it's not necessary to add the same slot to every item across
     all views.
     """
+
+    def __init__(self):
+        self._oligo_item_hash = {}
+        self._virtual_helix_item_hash = {}
+    # end def
+
     def part(self):
         return self._model_part
 
@@ -22,6 +28,10 @@ class AbstractPartItem(object):
 
     def scaleFactor(self):
         return self._scale_factor
+    # end def
+
+    def idToVirtualHelixItem(self, id_num):
+        return self._virtual_helix_item_hash[id_num]
     # end def
 
     def partDimensionsChangedSlot(self, part):
@@ -50,11 +60,11 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelixResizedSlot(self, sender, id_num):
         pass
-    def partVirtualHelixTransformedSlot(self, sender):
-        pass
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
+        pass
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set):
         pass
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass

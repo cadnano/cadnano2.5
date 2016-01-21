@@ -70,13 +70,13 @@ class PathRootItem(QGraphicsRectItem):
             raise NotImplementedError
     # end def
 
-    def selectedChangedSlot(self, item_dict):
-        """Given a newly selected model_part, update the scene to indicate
-        that model_part is selected and the previously selected part is
-        deselected."""
-        for item, value in item_dict:
-            item.selectionProcess(value)
-    # end def
+    # def selectedChangedSlot(self, item_dict):
+    #     """Given a newly selected model_part, update the scene to indicate
+    #     that model_part is selected and the previously selected part is
+    #     deselected."""
+    #     for item, value in item_dict:
+    #         item.selectionProcess(value)
+    # # end def
 
     def clearSelectionsSlot(self, doc):
         self._vhi_h_selection_group.resetSelection()

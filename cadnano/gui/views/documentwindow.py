@@ -46,6 +46,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.property_widget.configure(window=self, document=doc)
         self.property_buttonbox.setVisible(False)
 
+        self.tool_managers = None # initialize
+
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
         self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),\
@@ -83,6 +85,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_tool_manager = PathToolManager(self)
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
+        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
 
         self.insertToolBarBreak(self.right_toolbar)
 
@@ -189,3 +192,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.resize(self.settings.value("size", QSize(1100, 800)))
         self.move(self.settings.value("pos", QPoint(200, 200)))
         self.settings.endGroup()
+
+    def deactiveToolManagers(self, active_tool_manager):
+        tms = self.tool_managers
+        if tms is not None:
+            for manager in tms:
+                if manager is not active_tool_manager:
+                    manager.deactivateAllTools()

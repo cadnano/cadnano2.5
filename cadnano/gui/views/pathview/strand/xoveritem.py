@@ -312,7 +312,7 @@ class XoverItem(QGraphicsPathItem):
             self._node5 = XoverNode5(vhi5p, self, strand5p, idx_3_prime)
         if strand3p is not None:
             if self._node3 is None:
-                vhi3p = part_item.itemForVirtualHelix(strand3p.idNum())
+                vhi3p = part_item.idToVirtualHelixItem(strand3p.idNum())
                 self._node3 = XoverNode3(vhi3p, self, strand3p, strand3p.idx5Prime())
             else:
                 self._node5.setIdx(idx_3_prime)
