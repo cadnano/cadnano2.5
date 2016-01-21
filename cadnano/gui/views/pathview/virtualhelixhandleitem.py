@@ -227,7 +227,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
                 self.setX(x)
                 self._virtual_helix_item.setX(x + _VH_XOFFSET)
                 self._part_item.updateXoverItems(self._virtual_helix_item)
-                dz = x - old_x
+                dz = self._part_item.getModelAxisPoint(x - old_x)
                 self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, False, use_undostack=False)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
@@ -240,6 +240,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             delta = self.pos() - self.handle_start
             dz = delta.x()
             if abs(dz) > MOVE_THRESHOLD:
+                dz = self._part_item.getModelAxisPoint(dz)
                 self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, True)
     # end def
 

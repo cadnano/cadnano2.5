@@ -81,11 +81,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._outline.setZValue(styles.ZDESELECTOR)
         self._outline.setPen(getPenObj(self.modelColor(), _DEFAULT_WIDTH))
 
-        # self._outline.setPen(QPen(Qt.NoPen))
-        # self._drag_handle = DragHandle(QRectF(_orect), self)
-        # self._drag_handle.attemptResize(QRectF(441.6, 360, 160, 135.5)) # show 3rows x 6cols
-        # if len(m_p.document().children()) > 1:
-        #     self._adjustPosition()
         # select upon creation
         for part in m_p.document().children():
             if part is m_p:
@@ -237,20 +232,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self._rect
     # end def
 
-    def part(self):
-        return self._model_part
-    # end def
-
     def modelColor(self):
         return self._model_props['color']
-    # end def
-
-    def scaleFactor(self):
-        return self._scale_factor
-    # end def
-
-    def setPart(self, new_part):
-        self._model_part = new_part
     # end def
 
     def window(self):
@@ -273,10 +256,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    # def paint(self, painter, option, widget=None):
-    #     pass
-    # # end def
-
     def selectionWillChange(self, new_sel):
         if self.part() is None:
             return

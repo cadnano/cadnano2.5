@@ -53,6 +53,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
+        self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
         # self.setBrush(QBrush(Qt.NoBrush))
     # end def
 
@@ -60,13 +61,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self._proxy_parent
     # end def
 
-    # def paint(self, painter, option, widget):
-    #     print("paint NucleicAcidPartItem")
-    #     QGraphicsRectItem.paint(self, painter, option, widget)
-    # # end def
-
     def modelColor(self):
         return self._model_props['color']
+    # end def
+
+    def getModelAxisPoint(self, z):
+        """ Z-axis
+        """
+        sf = self._scale_factor
+        return z / sf
     # end def
 
     def _initModifierRect(self):
@@ -245,16 +248,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self._active_virtual_helix_item
     # end def
 
-    def part(self):
-        """Return a reference to the model's part object"""
-        return self._model_part
-    # end def
-
-    def document(self):
-        """Return a reference to the model's document object"""
-        return self._model_part.document()
-    # end def
-
     def removeVirtualHelixItem(self, id_num):
         vhi = self._virtual_helix_item_hash[id_num]
         vhi.virtualHelixRemovedSlot()
@@ -344,7 +337,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot._vhi_h_selection_group
         for vhi in new_list:
-            _z = 0
+            _, _, _z = vhi.getAxisPoint(0)
+            _z *= self._scale_factor
             vhi.setPos(_z, y)
             if vhi_rect is None:
                 vhi_rect = vhi.boundingRect()

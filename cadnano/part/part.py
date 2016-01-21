@@ -37,6 +37,7 @@ class Part(VirtualHelixGroup):
     _TURNS_PER_STEP = 2
     _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
+    _BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
 
     def __init__(self, *args, **kwargs):
         """
@@ -179,6 +180,27 @@ class Part(VirtualHelixGroup):
 
     def stepSize(self):
         return self._STEP_SIZE
+    # end def
+
+    def baseWidth(self):
+        return self._BASE_WIDTH
+    # end def
+
+    def radius(self):
+        return self._RADIUS
+    # end def
+
+    def helicalPitch(self):
+        return self._HELICAL_PITCH
+    # end def
+
+    def twistPerBase(self):
+        return self._TWIST_PER_BASE
+    # end def
+
+    def destroy(self):
+        self.setParent(None)
+        self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###

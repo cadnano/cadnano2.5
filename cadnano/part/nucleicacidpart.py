@@ -186,18 +186,6 @@ class NucleicAcidPart(Part):
         return self.getSize()
     # end def
 
-    def radius(self):
-        return self._RADIUS
-    # end def
-
-    def helicalPitch(self):
-        return self._HELICAL_PITCH
-    # end def
-
-    def twistPerBase(self):
-        return self._TWIST_PER_BASE
-    # end def
-
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def verifyOligoStrandCounts(self):
         total_stap_strands = 0
@@ -469,11 +457,6 @@ class NucleicAcidPart(Part):
             cmds.append(c)
             util.execCommandList(self, cmds, desc="Remove Xover", \
                                                     use_undostack=use_undostack)
-    # end def
-
-    def destroy(self):
-        self.setParent(None)
-        self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
 
     # def xoverSnapTo(self, strand, idx, delta):

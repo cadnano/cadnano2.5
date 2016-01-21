@@ -11,6 +11,19 @@ class AbstractPartItem(object):
     def part(self):
         return self._model_part
 
+    def setPart(self, new_part):
+        self._model_part = new_part
+    # end def
+
+    def document(self):
+        """Return a reference to the model's document object"""
+        return self._model_part.document()
+    # end def
+
+    def scaleFactor(self):
+        return self._scale_factor
+    # end def
+
     def partDimensionsChangedSlot(self, part):
         pass
     def partOligoAddedSlot(self, part, oligo):
