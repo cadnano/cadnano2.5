@@ -443,7 +443,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         PathHelixHandle of its new location.
         """
         vhi_list = self._virtual_helix_item_list
-        helix_numbers = [vhi.label() for vhi in vhi_list]
+        helix_numbers = [vhi.idNum() for vhi in vhi_list]
         first_index = helix_numbers.index(first)
         last_index = helix_numbers.index(last) + 1
 
@@ -463,7 +463,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # end else
 
         # call the method to move the items and store the list
-        self.part().setImportedVHelixOrder([vhi.label() for vhi in new_list], check_batch=False)
+        self.part().setImportedVHelixOrder([vhi.idNum() for vhi in new_list], check_batch=False)
         # self._setVirtualHelixItemList(new_list, zoom_to_fit=False)
     # end def
 
@@ -487,7 +487,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #             self._pre_xover_items = []
     #         return
 
-    #     label = vhi.label()
+    #     id_num = vhi.idNum()
     #     Dna_part_item = self
     #     part = self.part()
     #     idx = part.activeVirtualHelixIdx()
@@ -503,7 +503,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #     xover_p = False
     #     _PXI = PreXoverAItem
 
-    #     potential_xovers = part.potentialCrossoverList(label, idx, xover_p)
+    #     potential_xovers = part.potentialCrossoverList(id_num, idx, xover_p)
     #     for neighbor, index, strand_type, is_low_idx in potential_xovers:
     #         # create one half
     #         neighbor_vhi = self.itemForVirtualHelix(neighbor)

@@ -349,16 +349,16 @@ class EndpointItem(QGraphicsPathItem):
         """Break the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
-        nucleicacid_part_item = vhi.partItem()
+        part_item = vhi.partItem()
         active_tool = self._getActiveTool()
 
         if active_tool.isFloatingXoverBegin():
             if m_strand.idx5Prime() == idx:
                 return
-            temp_xover = active_tool.floatingXover()
-            temp_xover.updateBase(vhi, m_strand, idx)
-            active_tool.setFloatingXoverBegin(False)
-            # tempXover.hide5prime()
+            else:
+                temp_xover = active_tool.floatingXover()
+                temp_xover.updateBase(vhi, m_strand, idx)
+                active_tool.setFloatingXoverBegin(False)
         else:
             active_tool.setFloatingXoverBegin(True)
             # install Xover
