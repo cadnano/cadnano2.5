@@ -106,29 +106,29 @@ class Document(CNObject):
     #     return self._assemblies
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def selectedInstance(self):
-        return self._selected_instance
+    # def selectedInstance(self):
+    #     return self._selected_instance
 
-    def addToSelection(self, obj, value):
-        self._selection_dict[obj] = value
-        self._selected_changed_dict[obj] = value
-    # end def
+    # def addToSelection(self, obj, value):
+    #     self._selection_dict[obj] = value
+    #     self._selected_changed_dict[obj] = value
+    # # end def
 
-    def removeFromSelection(self, obj):
-        if obj in self._selection_dict:
-            del self._selection_dict[obj]
-            self._selected_changed_dict[obj] = (False, False)
-            return True
-        else:
-            return False
-    # end def
+    # def removeFromSelection(self, obj):
+    #     if obj in self._selection_dict:
+    #         del self._selection_dict[obj]
+    #         self._selected_changed_dict[obj] = (False, False)
+    #         return True
+    #     else:
+    #         return False
+    # # end def
 
-    def clearSelections(self):
-        """
-        Only clear the dictionary
-        """
-        self._selection_dict = {}
-    # end def
+    # def clearSelections(self):
+    #     """
+    #     Only clear the dictionary
+    #     """
+    #     self._selection_dict = {}
+    # # end def
 
     def addStrandToSelection(self, strand, value):
         ss = strand.strandSet()
@@ -181,9 +181,9 @@ class Document(CNObject):
         self.documentClearSelectionsSignal.emit(self)
     # end def
 
-    def isModelSelected(self, obj):
-        return obj in self._selection_dict
-    # end def
+    # def isModelSelected(self, obj):
+    #     return obj in self._selection_dict
+    # # end def
 
     def isModelStrandSelected(self, strand):
         ss = strand.strandSet()
