@@ -6,10 +6,6 @@ from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 
 from .nucleicacidpartitem import NucleicAcidPartItem
-from .pathselection import EndpointHandleSelectionBox
-from .pathselection import SelectionItemGroup
-from .pathselection import VirtualHelixHandleSelectionBox
-
 
 class PathRootItem(QGraphicsRectItem):
     """
@@ -32,7 +28,8 @@ class PathRootItem(QGraphicsRectItem):
         self._part_item_for_part_instance = {}  # Maps Part -> PartItem
         self._selection_filter_dict = {}
         self._prexover_filter = None
-        self._initSelections()
+        self.manager = None
+        self.select_tool = None
     # end def
 
     ### SIGNALS ###
@@ -61,7 +58,7 @@ class PathRootItem(QGraphicsRectItem):
         elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,\
                                 viewroot=self, \
-                                active_tool_getter=win.path_tool_manager.activeToolGetter,\
+                                active_tool_getter=self.manager.activeToolGetter,\
                                 parent=self)
             self._part_item_for_part_instance[model_part_instance] = na_part_item
             win.path_tool_manager.setActivePart(na_part_item)
@@ -79,14 +76,12 @@ class PathRootItem(QGraphicsRectItem):
     # # end def
 
     def clearSelectionsSlot(self, doc):
-        self._vhi_h_selection_group.resetSelection()
-        self._strand_item_selection_group.resetSelection()
+        self.select_tool.resetSelections()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
-        self._vhi_h_selection_group.clearSelection(False)
-        self._strand_item_selection_group.clearSelection(False)
+        self.select_tool.clearSelections(False)
         self.clearSelectionFilterDict()
         for filter_name in filter_name_list:
             self.addToSelectionFilterDict(filter_name)
@@ -98,8 +93,7 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def resetRootItemSlot(self, doc):
-        self._vhi_h_selection_group.resetSelection()
-        self._strand_item_selection_group.resetSelection()
+        self.select_tool.resetSelections()
         self.scene().views()[0].clearGraphicsView()
     # end def
 
@@ -118,18 +112,6 @@ class PathRootItem(QGraphicsRectItem):
 
     def document(self):
         return self._document
-    # end def
-
-    def _initSelections(self):
-        """Initialize anything related to multiple selection."""
-        b_type = VirtualHelixHandleSelectionBox
-        self._vhi_h_selection_group = SelectionItemGroup(boxtype=b_type,\
-                                                      constraint='y',\
-                                                      parent=self)
-        b_type = EndpointHandleSelectionBox
-        self._strand_item_selection_group = SelectionItemGroup(boxtype=b_type,\
-                                                      constraint='x',\
-                                                      parent=self)
     # end def
 
     ### PUBLIC METHODS ###
@@ -178,11 +160,11 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def vhiHandleSelectionGroup(self):
-        return self._vhi_h_selection_group
+        return self.select_tool.vhi_h_selection_group
     # end def
 
     def strandItemSelectionGroup(self):
-        return self._strand_item_selection_group
+        return self.select_tool.strand_item_selection_group
     # end def
 
     def selectionLock(self):
@@ -193,7 +175,12 @@ class PathRootItem(QGraphicsRectItem):
         self.scene().views()[0].setSelectionLock(locker)
     # end def
 
-    def clearStrandSelections(self):
-        self._strand_item_selection_group.clearSelection(False)
+    # def clearStrandSelections(self):
+    #     self._strand_item_selection_group.clearSelection(False)
+    # # end def
+
+    def setManager(self, manager):
+        self.manager = manager
+        self.select_tool = manager.select_tool
     # end def
 # end class

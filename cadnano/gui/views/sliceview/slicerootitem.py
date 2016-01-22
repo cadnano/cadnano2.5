@@ -22,7 +22,8 @@ class SliceRootItem(QGraphicsRectItem):
         self._document = document
         self._controller = ViewRootController(self, document)
         self._instance_items = {}
-
+        self.manager = None
+        self.select_tool = None
     ### SIGNALS ###
 
     ### SLOTS ###
@@ -32,14 +33,12 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
         """
         part_type = model_part_instance.reference().partType()
-        window = self._window
         if part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
-                active_tool_getter=window.slice_tool_manager.activeToolGetter,
+                active_tool_getter=self.manager.activeToolGetter,
                 parent=self)
             self._instance_items[na_part_item] = na_part_item
             na_part_item.zoomToFit()
-            # window.slice_graphics_view.zoomToFit()
         else:
             raise NotImplementedError
     # end def
@@ -96,4 +95,9 @@ class SliceRootItem(QGraphicsRectItem):
         """docstring for setModifyState"""
         for nucleicacid_part_item in self._instance_items:
             nucleicacid_part_item.setModifyState(bool)
+    # end def
+
+    def setManager(self, manager):
+        self.manager = manager
+        self.select_tool = manager.select_tool
     # end def

@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
 from cadnano import util
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
-import cadnano.gui.views.pathview.pathselection as pathselection
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
@@ -542,6 +541,9 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     def modelDeselect(self, document):
+        """ A strand is selected based on whether its low or high endpoints
+        are selected.  this value is a tuple (is_low, is_high) of booleans
+        """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
         low_val, high_val = document.getSelectedStrandValue(strand) if test \
@@ -558,6 +560,9 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     def modelSelect(self, document):
+        """ A strand is selected based on whether its low or high endpoints
+        are selected.  this value is a tuple (is_low, is_high) of booleans
+        """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
         low_val, high_val = document.getSelectedStrandValue(strand) if test \

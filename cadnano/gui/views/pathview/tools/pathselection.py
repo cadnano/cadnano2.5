@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsItemGroup, QGraphicsPa
 
 from cadnano import util
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
-from . import pathstyles as styles
+from cadnano.gui.views.pathview import pathstyles as styles
 
 
 class SelectionItemGroup(QGraphicsItemGroup):
@@ -15,7 +15,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
     """
     def __init__(self, boxtype, constraint='y', parent=None):
         super(SelectionItemGroup, self).__init__(parent)
-        self._viewroot = parent
+        self.viewroot = parent
         self.setFiltersChildEvents(True)
 
         # LOOK at Qt Source for deprecated code to replace this behavior
@@ -72,7 +72,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def document(self):
-        return self._viewroot.document()
+        return self.viewroot.document()
     # end def
 
     def pendToRemove(self, item):
@@ -102,7 +102,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
                 item.modelSelect(doc)
             # end for
             self._pending_to_add_dict = {}
-            doc.updateSelection()
+            doc.updatePathSelection()
     # end def
 
     def resetSelection(self):
@@ -110,16 +110,16 @@ class SelectionItemGroup(QGraphicsItemGroup):
         self._added_to_press_list = False
         self.clearSelection(False)
         self.setSelectionLock(None)
-        self.selectionbox.setParentItem(self._viewroot)
-        self.setParentItem(self._viewroot)
+        self.selectionbox.setParentItem(self.viewroot)
+        self.setParentItem(self.viewroot)
     # end def
 
     def selectionLock(self):
-        return self._viewroot.selectionLock()
+        return self.viewroot.selectionLock()
     # end def
 
     def setSelectionLock(self, selection_group):
-        self._viewroot.setSelectionLock(selection_group)
+        self.viewroot.setSelectionLock(selection_group)
     # end def
 
     def keyPressEvent(self, event):
@@ -129,7 +129,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
         key = event.key()
         if key in [Qt.Key_Backspace, Qt.Key_Delete]:
             self.selectionbox.deleteSelection()
-            # self.document().deleteSelection()
             self.clearSelection(False)
             return QGraphicsItemGroup.keyPressEvent(self, event)
         else:
@@ -208,7 +207,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             self.selectionbox.hide()
             self.selectionbox.resetPosition()
             self.removeSelectedItems()
-            self._viewroot.setSelectionLock(None)
+            self.viewroot.setSelectionLock(None)
             self.clearFocus()  # this is to disable delete keyPressEvents
             self.prepareGeometryChange()
             self._rect.setWidth(0)
@@ -257,7 +256,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             self.removeFromGroup(item)
             item.modelDeselect(doc)
         # end for
-        doc.updateSelection()
+        doc.updatePathSelection()
     # end def
 
     def setBoundingRect(self, rect):
@@ -429,7 +428,7 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
 
     def refreshPath(self):
         temp_low, temp_high = \
-                    self._item_group._viewroot.document().getSelectionBounds()
+                    self._item_group.viewroot.document().getSelectionBounds()
 
         self._bounds = (temp_low, temp_high)
 
@@ -468,12 +467,12 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         else:
             do_maximize = False
 
-        self._item_group._viewroot.document().resizeSelection(delta,
+        self._item_group.viewroot.document().resizeSelection(delta,
                                                 do_maximize=do_maximize)
     # end def
 
     def deleteSelection(self):
-        self._item_group.document().deleteSelection()
+        self._item_group.document().deleteStrandSelection()
 
     def boxParent(self):
         temp = self._item_group.childItems()[0].partItem().proxy()

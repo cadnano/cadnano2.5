@@ -6,8 +6,8 @@ class EraseTool(AbstractPathTool):
     """
     docstring for EraseTool
     """
-    def __init__(self, controller):
-        super(EraseTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(EraseTool, self).__init__(manager)
 
     def __repr__(self):
         return "erase_tool"  # first letter should be lowercase

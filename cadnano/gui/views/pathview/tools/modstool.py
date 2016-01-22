@@ -16,8 +16,8 @@ class ModsTool(AbstractPathTool):
     """
     docstring for ModsTool
     """
-    def __init__(self, controller):
-        super(ModsTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(ModsTool, self).__init__(manager)
         self.dialog = QDialog()
         self.initDialog()
         self.current_strand = None

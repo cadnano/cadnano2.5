@@ -16,17 +16,12 @@ _RECT = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,\
 _PEN = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
 _BRUSH = getNoBrush()
 
-# There's a bug where C++ will free orphaned graphics items out from
-# under pyqt. To avoid this, "_mother" adopts orphaned graphics items.
-# _mother = QGraphicsItemGroup()
-
-
 class AbstractPathTool(QGraphicsObject):
     """Abstract base class to be subclassed by all other pathview tools."""
-    def __init__(self, controller, parent=None):
-        super(AbstractPathTool, self).__init__(parent)
-        self._controller = controller
-        self._window = controller.window
+    def __init__(self, manager):
+        super(AbstractPathTool, self).__init__(None)
+        self._manager = manager
+        self._window = manager.window
         self._active = False
         self._last_location = None
         self._rect = _RECT
@@ -44,13 +39,13 @@ class AbstractPathTool(QGraphicsObject):
 
     ######################### Positioning and Parenting ####################
     def hoverEnterVirtualHelixItem(self, virtual_helix_item, event):
-        self.updateLocation(virtual_helix_item, virtual_helix_item.mapToScene(QPointF(event.pos())))
+        self.updateLocation(virtual_helix_item, event.scenePos())
 
     def hoverLeaveVirtualHelixItem(self, virtual_helix_item, event):
-        self.updateLocation(None, virtual_helix_item.mapToScene(QPointF(event.pos())))
+        self.updateLocation(None, event.scenePos())
 
     def hoverMoveVirtualHelixItem(self, virtual_helix_item, event, flag=None):
-        self.updateLocation(virtual_helix_item, virtual_helix_item.mapToScene(QPointF(event.pos())))
+        self.updateLocation(virtual_helix_item, event.scenePos())
 
     def updateLocation(self, virtual_helix_item, scene_pos, *varargs):
         """Takes care of caching the location so that a tool switch
@@ -90,13 +85,9 @@ class AbstractPathTool(QGraphicsObject):
         Called by PathToolManager.setActiveTool when the tool becomes
         active. Used, for example, to show/hide tool-specific ui elements.
         """
-        # if self.isActive() and not will_be_active:
-        #     self.setParentItem(_mother)
-        #     self.hide()
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        # self._pen = _PEN
 
     def deactivate(self):
         self.hide()
@@ -104,7 +95,6 @@ class AbstractPathTool(QGraphicsObject):
     def isActive(self):
         """Returns isActive"""
         return self._active
-        # return self._active != _mother
 
     def widgetClicked(self):
         """Called every time a widget representing self gets clicked,

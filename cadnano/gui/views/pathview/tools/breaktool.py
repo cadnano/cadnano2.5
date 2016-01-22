@@ -29,8 +29,8 @@ class BreakTool(AbstractPathTool):
     """
     docstring for BreakTool
     """
-    def __init__(self, controller):
-        super(BreakTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(BreakTool, self).__init__(manager)
         self._is_top_strand = True
 
     def __repr__(self):

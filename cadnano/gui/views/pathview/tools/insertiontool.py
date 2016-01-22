@@ -7,8 +7,8 @@ class InsertionTool(AbstractPathTool):
     """
     docstring for InsertionTool
     """
-    def __init__(self, controller):
-        super(InsertionTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(InsertionTool, self).__init__(manager)
 
     def __repr__(self):
         return "insertion_tool"  # first letter should be lowercase

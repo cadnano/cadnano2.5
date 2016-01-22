@@ -6,8 +6,8 @@ class PaintTool(AbstractPathTool):
     """
     Handles visibility and color cycling for the paint tool.
     """
-    def __init__(self, controller):
-        super(PaintTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(PaintTool, self).__init__(manager)
         self._is_macrod = False
 
     def __repr__(self):

@@ -61,7 +61,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setScene(self.slicescene)
         self.slice_graphics_view.scene_root_item = self.sliceroot
         self.slice_graphics_view.setName("SliceView")
-        self.slice_tool_manager = SliceToolManager(self)
+        self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -82,7 +82,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
-        self.path_tool_manager = PathToolManager(self)
+        self.path_tool_manager = PathToolManager(self, self.pathroot)
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
         self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
@@ -124,6 +124,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])
+    # end def
+
+    def document(self):
+        return self.controller.document()
     # end def
 
     ### ACCESSORS ###

@@ -23,8 +23,8 @@ class PencilTool(AbstractPathTool):
     """
     docstring for PencilTool
     """
-    def __init__(self, controller):
-        super(PencilTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(PencilTool, self).__init__(manager)
         self._temp_xover = ForcedXoverItem(self, None, None)
         self._temp_strand_item = ForcedStrandItem(self, None)
         self._temp_strand_item.hide()

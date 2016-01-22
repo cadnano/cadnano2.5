@@ -37,6 +37,7 @@ class Document(CNObject):
         # the added list is what was recently selected or deselected
         self._selected_changed_dict = {}
         self.view_names = []
+        self.filter_list = []
         app().documentWasCreatedSignal.emit(self)
     # end def
 
@@ -94,6 +95,11 @@ class Document(CNObject):
         self.documentClearSelectionsSignal.emit(self)
         for child in self._children:
             child.remove(use_undostack=False)
+    # end def
+
+    def setFilterList(self, filter_list):
+        self.filter_list = filter_list
+        self.documentSelectionFilterChangedSignal.emit(filter_list)
     # end def
 
     def removeChild(self, child):
@@ -300,7 +306,7 @@ class Document(CNObject):
     #     pass
     # # end def
 
-    def deleteSelection(self, use_undostack=True):
+    def deleteStrandSelection(self, use_undostack=True):
         """
         Delete selected strands. First iterates through all selected strands
         and extracts refs to xovers and strands. Next, calls removeXover
@@ -426,7 +432,7 @@ class Document(CNObject):
             self.undoStack().endMacro()
     # end def
 
-    def updateSelection(self):
+    def updatePathSelection(self):
         """
         do it this way in the future when we have
         a better signaling architecture between views
@@ -439,8 +445,6 @@ class Document(CNObject):
             obj.selectedChangedSignal.emit(obj, value)
         # end for
         self._selected_changed_dict = {}
-        # for ss in self._selection_dict:
-        #     print(self.sortedSelectedStrands(ss))
     # end def
 
     def resetViews(self):

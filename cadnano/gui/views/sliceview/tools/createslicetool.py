@@ -3,8 +3,8 @@ import math
 
 class CreateSliceTool(AbstractSliceTool):
     """"""
-    def __init__(self, controller, parent=None):
-        super(CreateSliceTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(CreateSliceTool, self).__init__(manager)
 
     def __repr__(self):
         return "create_tool"  # first letter should be lowercase

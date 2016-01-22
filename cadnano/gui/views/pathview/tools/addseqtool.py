@@ -32,8 +32,8 @@ class DNAHighlighter(QSyntaxHighlighter):
         self.setCurrentBlockState(0)
 
 class AddSeqTool(AbstractPathTool):
-    def __init__(self, controller, parent=None):
-        AbstractPathTool.__init__(self, controller, parent)
+    def __init__(self, manager):
+        AbstractPathTool.__init__(self, manager)
         self.dialog = QDialog()
         self.buttons = []
         self.seq_box = None

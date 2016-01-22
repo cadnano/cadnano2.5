@@ -12,10 +12,9 @@ class AbstractSliceTool(QGraphicsObject):
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
-    def __init__(self, controller, parent=None):
-        super(AbstractSliceTool, self).__init__(parent)
-        self._controller = controller
-        self._window = controller.window
+    def __init__(self, manager):
+        super(AbstractSliceTool, self).__init__(None)
+        self._manager = manager
         self._active = False
         self._last_location = None
         self._line_item = QGraphicsLineItem(None)
@@ -41,6 +40,10 @@ class AbstractSliceTool(QGraphicsObject):
         #                 rad*(0 + 2*math.cos(x)), rad*(0 + 2*math.sin(x))
         #                 ) for x in self.angles]
     # end def
+
+    def manager(self):
+        return self._manager
+    # end
 
     def setVirtualHelixItem(self, virtual_helix_item):
         rad = self._RADIUS

@@ -233,10 +233,10 @@ class DocumentController():
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
         if win.action_filter_fwd.isChecked():
-            filter_list.append("scaffold")
+            filter_list.append("forward")
         if win.action_filter_rev.isChecked():
-            filter_list.append("staple")
-        self._document.documentSelectionFilterChangedSignal.emit(filter_list)
+            filter_list.append("reverse")
+        self.document.setFilterList(filter_list)
     # end def
 
     def actionNewSlot(self):

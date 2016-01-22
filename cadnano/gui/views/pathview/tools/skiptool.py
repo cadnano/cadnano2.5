@@ -6,8 +6,8 @@ class SkipTool(AbstractPathTool):
     """
     docstring for SkipTool
     """
-    def __init__(self, controller):
-        super(SkipTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(SkipTool, self).__init__(manager)
 
     def __repr__(self):
         return "skip_tool"  # first letter should be lowercase

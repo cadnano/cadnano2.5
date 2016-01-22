@@ -22,8 +22,8 @@ _TEST_COLOR = "#00ff00"
 
 class SelectSliceTool(AbstractSliceTool):
     """"""
-    def __init__(self, controller, parent=None):
-        super(SelectSliceTool, self).__init__(controller)
+    def __init__(self, manager):
+        super(SelectSliceTool, self).__init__(manager)
         self.sgv = None
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
@@ -52,7 +52,7 @@ class SelectSliceTool(AbstractSliceTool):
             self.deselectItems()
             self.part_item = part_item
             self.group.setParentItem(part_item)
-            self.sgv = part_item.window().slice_graphics_view
+            self.sgv = self._manager.window.slice_graphics_view
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
             self.sgv.activateSelection(True)

@@ -328,7 +328,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         scene = self.scene()
         vhi_rect = None
         vhi_h_rect = None
-        vhi_h_selection_group = self._viewroot._vhi_h_selection_group
+        vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
         for vhi in new_list:
             _, _, _z = vhi.getAxisPoint(0)
             _z *= self._scale_factor

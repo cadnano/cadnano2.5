@@ -11,7 +11,6 @@ from cadnano.gui.views.pathview import pathstyles as styles
 from .xoveritem import XoverItem
 from .decorators.insertionitem import InsertionItem
 
-import cadnano.gui.views.pathview.pathselection as pathselection
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
 
 import cadnano.util as util

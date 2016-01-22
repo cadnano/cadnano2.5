@@ -20,6 +20,10 @@ class AbstractVirtualHelixItem(object):
     def strandAddedSlot(self, sender, strand):
         pass
 
+    def setSelected(self, is_selected):
+        pass
+    # end def
+
     def getProperty(self, keys):
         return self._model_part.getVirtualHelixProperties(self._id_num, keys)
     # end def

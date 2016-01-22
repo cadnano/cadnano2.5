@@ -19,13 +19,15 @@ dummy_tool = DummyTool()
 
 class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""
-    def __init__(self, tool_group_name, window):
+    def __init__(self, tool_group_name, window, viewroot):
         """
         We store mainWindow because a controller's got to have
         references to both the layer above (UI) and the layer below (model)
         """
         super(AbstractToolManager, self).__init__()
         self.window = window
+        self.viewroot = viewroot
+        self.document = window.document()
         self.tool_group_name = tool_group_name
         self._active_tool = dummy_tool
         self._active_part = None
@@ -37,6 +39,8 @@ class AbstractToolManager(QObject):
     activeToolChangedSignal = pyqtSignal(str)
 
     def installTools(self):
+        if self.viewroot.manager is None:
+            raise ValueError("Please call viewroot.setManager before calling installTools")
         # Call installTool on every tool
         tnames = self.tool_names
         if tnames is None:
@@ -110,4 +114,7 @@ class AbstractToolManager(QObject):
         self._active_tool.setActive(True)
         self.activeToolChangedSignal.emit(self._active_tool.action_name)
     # end def
+
+    def getFilterList(self):
+        return self.document.filter_list
 # end class
