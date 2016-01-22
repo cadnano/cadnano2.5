@@ -53,6 +53,10 @@ class SelectSliceTool(AbstractSliceTool):
             self.part_item = part_item
             self.group.setParentItem(part_item)
             self.sgv = part_item.window().slice_graphics_view
+
+            # required for whatever reason to renable QGraphicsView.RubberBandDrag
+            self.sgv.activateSelection(True)
+
             self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
@@ -271,7 +275,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         else:
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
-                print("clicking the box")
+                # print("clicking the box")
                 # strategy #1
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):

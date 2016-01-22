@@ -149,6 +149,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.part_item = None
         self.hideLineItem()
         self.hide()
+        self._active = False
     # end def
 
     def isActive(self):

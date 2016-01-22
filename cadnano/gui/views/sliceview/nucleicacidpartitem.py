@@ -358,16 +358,16 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def selectToolMousePress(self, tool, event):
         """
         """
-        print("select tool part item")
+        # print("select tool part item")
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
         part = self._model_part
         if part.isVirtualHelixNearPoint(part_pt_tuple):
-            vh = part.getVirtualHelixAtPoint(part_pt_tuple)
-            if vh is not None:
-                print(vh)
-                loc = vh.location()
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            if id_num is not None:
+                print(id_num)
+                loc = part.getCoordinate(id_num, 0)
                 print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
                     loc[0], loc[1] ))
             else:
