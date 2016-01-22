@@ -274,9 +274,9 @@ class EndpointItem(QGraphicsPathItem):
         m_strand = self._strand_item._model_strand
         s_i = self._strand_item
         viewroot = s_i.viewroot()
-        current_filter_dict = viewroot.selectionFilterDict()
-        if s_i.strandFilter() in current_filter_dict \
-                                    and self._filter_name in current_filter_dict:
+        current_filter_set = viewroot.selectionFilterSet()
+        if (s_i.strandFilter() in current_filter_set
+                                    and self._filter_name in current_filter_set):
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -289,7 +289,7 @@ class EndpointItem(QGraphicsPathItem):
                 self.partItem().updateStatusBar(msg)
         else:
             logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_dict,
+                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_set,
                         s_i.strandFilter(), self._filter_name)
     # end def
 
@@ -388,9 +388,9 @@ class EndpointItem(QGraphicsPathItem):
                     self._strand_item._model_strand.getResizeBounds(self.idx())
         s_i = self._strand_item
         viewroot = s_i.viewroot()
-        current_filter_dict = viewroot.selectionFilterDict()
-        if s_i.strandFilter() in current_filter_dict \
-                                    and self._filter_name in current_filter_dict:
+        current_filter_set = viewroot.selectionFilterSet()
+        if (s_i.strandFilter() in current_filter_set
+                                    and self._filter_name in current_filter_set):
             selection_group = viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (modifiers & mod):
@@ -495,14 +495,14 @@ class EndpointItem(QGraphicsPathItem):
             if str(active_tool) == "select_tool":
                 s_i = self._strand_item
                 viewroot = s_i.viewroot()
-                current_filter_dict = viewroot.selectionFilterDict()
+                current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
 
                 # only add if the selection_group is not locked out
-                if value == True and self._filter_name in current_filter_dict:
+                if value == True and self._filter_name in current_filter_set:
                     # if self.group() != selection_group \
-                    #                   and s_i.strandFilter() in current_filter_dict:
-                    if s_i.strandFilter() in current_filter_dict:
+                    #                   and s_i.strandFilter() in current_filter_set
+                    if s_i.strandFilter() in current_filter_set:
                         if self.group() != selection_group or not self.isSelected():
                             selection_group.pendToAdd(self)
                             selection_group.setSelectionLock(selection_group)
@@ -529,8 +529,8 @@ class EndpointItem(QGraphicsPathItem):
             elif str(active_tool) == "paint_tool":
                 s_i = self._strand_item
                 viewroot = s_i.viewroot()
-                current_filter_dict = viewroot.selectionFilterDict()
-                if s_i.strandFilter() in current_filter_dict:
+                current_filter_set = viewroot.selectionFilterSet()
+                if s_i.strandFilter() in current_filter_set:
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress(None, None, None)

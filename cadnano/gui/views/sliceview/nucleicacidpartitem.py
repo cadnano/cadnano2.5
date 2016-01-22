@@ -35,7 +35,7 @@ _BOUNDING_RECT_PADDING = 10
 class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
-    def __init__(self, model_part_instance, active_tool_getter, parent=None):
+    def __init__(self, model_part_instance, viewroot, parent=None):
         """
         Parent should be either a SliceRootItem, or an AssemblyItem.
 
@@ -49,7 +49,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
 
-        self._getActiveTool = active_tool_getter
+        self._getActiveTool = viewroot.manager.activeToolGetter
 
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())

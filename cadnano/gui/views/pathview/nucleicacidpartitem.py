@@ -33,14 +33,14 @@ class ProxyParentItem(QGraphicsRectItem):
 class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     findChild = util.findChild  # for debug
 
-    def __init__(self, model_part_instance, viewroot, active_tool_getter, parent):
+    def __init__(self, model_part_instance, viewroot, parent):
         """parent should always be pathrootitem"""
         super(NucleicAcidPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
         self._viewroot = viewroot
-        self._getActiveTool = active_tool_getter
+        self._getActiveTool = viewroot.manager.activeToolGetter
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)

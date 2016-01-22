@@ -36,7 +36,7 @@ class StrandItem(QGraphicsLineItem):
         self._model_strand = model_strand
         self._virtual_helix_item = virtual_helix_item
         self._viewroot = viewroot
-        self._getActiveTool = virtual_helix_item._getActiveTool
+        self._getActiveTool = viewroot.manager.activeToolGetter
 
         self._controller = StrandItemController(self, model_strand)
         is_forward = model_strand.strandSet().isForward()
@@ -560,8 +560,8 @@ class StrandItem(QGraphicsLineItem):
 
     def selectToolMousePress(self, event, idx):
         event.setAccepted(False)
-        current_filter_dict = self._viewroot.selectionFilterDict()
-        if self.strandFilter() in current_filter_dict and self._filter_name in current_filter_dict:
+        current_filter_set = self._viewroot.selectionFilterSet()
+        if self.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
             selection_group = self._viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (event.modifiers() & mod):
@@ -644,21 +644,21 @@ class StrandItem(QGraphicsLineItem):
         to the clicked strand via its oligo.
         """
         m_strand = self._model_strand
-        current_filter_dict = self._viewroot.selectionFilterDict()
-        if self.strandFilter() in current_filter_dict and self._filter_name in current_filter_dict:
-            olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
-            if olgLen:
-                msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
-                if olgLen > seqLen:
-                    d = olgLen - seqLen
+        current_filter_set = self._viewroot.selectionFilterSet()
+        if self.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
+            olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
+            if olg_len:
+                msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)
+                if olg_len > seq_len:
+                    d = olg_len - seq_len
                     msg = msg + " Warning: %d bases have no sequence." % d
-                elif olgLen < seqLen:
-                    d = seqLen - olgLen
+                elif olg_len < seq_len:
+                    d = seq_len - olg_len
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
         else:
             logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_dict,
+                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_set,
                         self.strandFilter(), self._filter_name)
     # end def
 
@@ -702,13 +702,13 @@ class StrandItem(QGraphicsLineItem):
             active_tool = self._getActiveTool()
             if active_tool.methodPrefix() == "selectTool":
                 viewroot = self._viewroot
-                current_filter_dict = viewroot.selectionFilterDict()
+                current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
 
                 # only add if the selection_group is not locked out
                 is_normal_select = selection_group.isNormalSelect()
-                if value == True and (self._filter_name in current_filter_dict or not is_normal_select):
-                    if self._strand_filter in current_filter_dict:
+                if value == True and (self._filter_name in current_filter_set or not is_normal_select):
+                    if self._strand_filter in current_filter_set:
                         if self.group() != selection_group:
                             self.setSelectedColor(True)
                             # This should always be the case, but...
@@ -742,8 +742,8 @@ class StrandItem(QGraphicsLineItem):
             # end if
             elif active_tool.methodPrefix() == "paintTool":
                 viewroot = self._viewroot
-                current_filter_dict = viewroot.selectionFilterDict()
-                if self._strand_filter in current_filter_dict:
+                current_filter_set = viewroot.selectionFilterSet()
+                if self._strand_filter in current_filter_set:
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress(None, None)

@@ -37,7 +37,7 @@ class Document(CNObject):
         # the added list is what was recently selected or deselected
         self._selected_changed_dict = {}
         self.view_names = []
-        self.filter_list = []
+        self.filter_set = set()
         app().documentWasCreatedSignal.emit(self)
     # end def
 
@@ -55,7 +55,7 @@ class Document(CNObject):
     # e.g. { objectRef: (value0, value1),  ...}
     documentSelectedChangedSignal = ProxySignal(dict,
                                          name='documentSelectedChangedSignal') # tuples of items + data
-    documentSelectionFilterChangedSignal = ProxySignal(list,
+    documentSelectionFilterChangedSignal = ProxySignal(object,
                                   name='documentSelectionFilterChangedSignal')
     documentPreXoverFilterChangedSignal = ProxySignal(str,
                                    name='documentPreXoverFilterChangedSignal')
@@ -97,9 +97,9 @@ class Document(CNObject):
             child.remove(use_undostack=False)
     # end def
 
-    def setFilterList(self, filter_list):
-        self.filter_list = filter_list
-        self.documentSelectionFilterChangedSignal.emit(filter_list)
+    def setFilterSet(self, filter_list):
+        self.filter_set = fs = set(filter_list)
+        self.documentSelectionFilterChangedSignal.emit(fs)
     # end def
 
     def removeChild(self, child):

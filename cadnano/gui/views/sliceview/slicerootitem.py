@@ -35,7 +35,7 @@ class SliceRootItem(QGraphicsRectItem):
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
-                active_tool_getter=self.manager.activeToolGetter,
+                viewroot=self,
                 parent=self)
             self._instance_items[na_part_item] = na_part_item
             na_part_item.zoomToFit()

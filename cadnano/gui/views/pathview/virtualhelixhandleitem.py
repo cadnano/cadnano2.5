@@ -270,11 +270,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         # intercept the change instead of the has changed to enable features.
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
             viewroot = self._viewroot
-            current_filter_dict = viewroot.selectionFilterDict()
+            current_filter_set = viewroot.selectionFilterSet()
             selection_group = viewroot.vhiHandleSelectionGroup()
 
             # only add if the selection_group is not locked out
-            if value == True and self._filter_name in current_filter_dict:
+            if value == True and self._filter_name in current_filter_set:
                 if self.group() != selection_group:
                     selection_group.pendToAdd(self)
                     selection_group.setSelectionLock(selection_group)

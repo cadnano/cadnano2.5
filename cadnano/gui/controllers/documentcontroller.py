@@ -236,7 +236,7 @@ class DocumentController():
             filter_list.append("forward")
         if win.action_filter_rev.isChecked():
             filter_list.append("reverse")
-        self.document.setFilterList(filter_list)
+        self._document.setFilterSet(filter_list)
     # end def
 
     def actionNewSlot(self):

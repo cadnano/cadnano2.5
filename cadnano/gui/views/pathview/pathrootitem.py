@@ -26,7 +26,6 @@ class PathRootItem(QGraphicsRectItem):
         self._controller = ViewRootController(self, document)
         self._model_part = None
         self._part_item_for_part_instance = {}  # Maps Part -> PartItem
-        self._selection_filter_dict = {}
         self._prexover_filter = None
         self.manager = None
         self.select_tool = None
@@ -56,10 +55,9 @@ class PathRootItem(QGraphicsRectItem):
             # plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
             # self._instance_items[plasmid_part_item] = plasmid_part_item
         elif part_type == PartType.NUCLEICACIDPART:
-            na_part_item = NucleicAcidPartItem(model_part_instance,\
-                                viewroot=self, \
-                                active_tool_getter=self.manager.activeToolGetter,\
-                                parent=self)
+            na_part_item = NucleicAcidPartItem(model_part_instance,
+                                                viewroot=self,
+                                                parent=self)
             self._part_item_for_part_instance[model_part_instance] = na_part_item
             win.path_tool_manager.setActivePart(na_part_item)
             self.setModifyState(win.action_modify.isChecked())
@@ -67,24 +65,14 @@ class PathRootItem(QGraphicsRectItem):
             raise NotImplementedError
     # end def
 
-    # def selectedChangedSlot(self, item_dict):
-    #     """Given a newly selected model_part, update the scene to indicate
-    #     that model_part is selected and the previously selected part is
-    #     deselected."""
-    #     for item, value in item_dict:
-    #         item.selectionProcess(value)
-    # # end def
-
     def clearSelectionsSlot(self, doc):
         self.select_tool.resetSelections()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
+    def selectionFilterChangedSlot(self, filter_name_set):
         self.select_tool.clearSelections(False)
-        self.clearSelectionFilterDict()
-        for filter_name in filter_name_list:
-            self.addToSelectionFilterDict(filter_name)
+        pass
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -140,24 +128,12 @@ class PathRootItem(QGraphicsRectItem):
             part_item.setModifyState(bool)
     # end def
 
-    def selectionFilterDict(self):
-        return self._selection_filter_dict
+    def selectionFilterSet(self):
+        return self._document.select_filter_set
     # end def
 
     def preXoverFilter(self):
         return self._prexover_filter
-
-    def addToSelectionFilterDict(self, filter_name):
-        self._selection_filter_dict[filter_name] = True
-    # end def
-
-    def removeFromSelectionFilterDict(self, filter_name):
-        del self._selection_filter_dict[filter_name]
-    # end def
-
-    def clearSelectionFilterDict(self):
-        self._selection_filter_dict = {}
-    # end def
 
     def vhiHandleSelectionGroup(self):
         return self.select_tool.vhi_h_selection_group

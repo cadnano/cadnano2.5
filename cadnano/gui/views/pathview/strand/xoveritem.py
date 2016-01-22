@@ -209,7 +209,7 @@ class XoverItem(QGraphicsPathItem):
 
     XoverItem should be a child of a PartItem.
     """
-    _filterName = "xover"
+    _filter_name = "xover"
 
     def __init__(self, strand_item, virtual_helix_item):
         """
@@ -448,8 +448,8 @@ class XoverItem(QGraphicsPathItem):
             event.setAccepted(False)
             sI = self._strand_item
             viewroot = sI.viewroot()
-            current_filter_dict = viewroot.selectionFilterDict()
-            if sI.strandFilter() in current_filter_dict and self._filterName in current_filter_dict:
+            current_filter_set = viewroot.selectionFilterSet()
+            if sI.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
                 event.setAccepted(True)
                 selection_group = viewroot.strandItemSelectionGroup()
                 mod = Qt.MetaModifier
@@ -528,11 +528,11 @@ class XoverItem(QGraphicsPathItem):
             if active_tool.methodPrefix() == "selectTool":
                 sI = self._strand_item
                 viewroot = sI.viewroot()
-                current_filter_dict = viewroot.selectionFilterDict()
+                current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
                 # only add if the selection_group is not locked out
-                if value == True and (self._filterName in current_filter_dict or not selection_group.isNormalSelect()):
-                    if sI.strandFilter() in current_filter_dict:
+                if value == True and (self._filter_name in current_filter_set or not selection_group.isNormalSelect()):
+                    if sI.strandFilter() in current_filter_set:
                         # print "might add a xoi"
                         if self.group() != selection_group and selection_group.isNormalSelect():
                             # print "adding an xoi"
@@ -562,8 +562,8 @@ class XoverItem(QGraphicsPathItem):
             elif str(active_tool) == "paint_tool":
                 sI = self._strand_item
                 viewroot = sI.viewroot()
-                current_filter_dict = viewroot.selectionFilterDict()
-                if sI.strandFilter() in current_filter_dict:
+                current_filter_set = viewroot.selectionFilterSet()
+                if sI.strandFilter() in current_filter_set:
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress()
