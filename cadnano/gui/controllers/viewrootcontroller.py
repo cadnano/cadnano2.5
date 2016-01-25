@@ -24,4 +24,3 @@ class ViewRootController():
         m_d.documentPreXoverFilterChangedSignal.disconnect(v_r.preXoverFilterChangedSlot)
         m_d.documentViewResetSignal.disconnect(v_r.resetRootItemSlot)
     # end def
-    

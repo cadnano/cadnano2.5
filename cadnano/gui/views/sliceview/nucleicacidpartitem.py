@@ -48,7 +48,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_props = m_p.getPropertyDict()
-
+        self._viewroot = viewroot
         self._getActiveTool = viewroot.manager.activeToolGetter
 
         self._controller = NucleicAcidPartItemController(self, m_p)
@@ -168,7 +168,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             tool = self._getActiveTool()
             if tool.methodPrefix() == "selectTool":
                 if tool.isSelectionActive():
-                    tool.deselectItems()
+                    # tool.deselectItems()
+                    tool.modelClear()
 
         # 1. move everything that moved
         for id_num in vh_set:
@@ -220,10 +221,25 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """Set this Z to front, and return other Zs to default."""
         if is_selected:
             # self._drag_handle.resetAppearance(_SELECTED_COLOR, _SELECTED_WIDTH, _SELECTED_ALPHA)
-            self.setZValue(styles.ZPARTITEM+1)
+            self.setZValue(styles.ZPARTITEM + 1)
         else:
             # self._drag_handle.resetAppearance(self.modelColor(), _DEFAULT_WIDTH, _DEFAULT_ALPHA)
             self.setZValue(styles.ZPARTITEM)
+    # end def
+
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+        """ is_adding (bool): adding (True) virtual helices to a selection
+        or removing (False)
+        """
+        select_tool = self._viewroot.select_tool
+        if is_adding:
+            print("got the adding slot in path")
+            select_tool.selection_set.update(vh_set)
+            select_tool.setPartItem(self)
+            select_tool.getSelectionBoundingRect()
+        else:
+            select_tool.deselectSet(vh_set)
+    # end def
 
     ### ACCESSORS ###
     def boundingRect(self):
@@ -371,9 +387,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
                     loc[0], loc[1] ))
             else:
-                tool.deselectItems()
+                # tool.deselectItems()
+                tool.modelClear()
         else:
-            tool.deselectItems()
+            # tool.deselectItems()
+            tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 

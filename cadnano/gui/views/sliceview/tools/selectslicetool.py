@@ -44,12 +44,17 @@ class SelectSliceTool(AbstractSliceTool):
         return self.is_selection_active
     # end def
 
+    def modelClear(self):
+        doc = self._manager.document
+        doc.clearAllSelected()
+
     def setPartItem(self, part_item):
         if part_item != self.part_item:
             if self.sgv is not None:
                 self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
                 self.sgv = None
-            self.deselectItems()
+            # self.deselectItems()
+            self.modelClear()
             self.part_item = part_item
             self.group.setParentItem(part_item)
             self.sgv = self._manager.window.slice_graphics_view
@@ -94,8 +99,12 @@ class SelectSliceTool(AbstractSliceTool):
             #     query_rect[0] < query_rect[2], query_rect[1] < query_rect[3])
             res = part.getVirtualHelicesInArea(query_rect)
             # print(res)
-            self.selection_set = res
-            self.getSelectionBoundingRect()
+
+            doc = self._manager.document
+            doc.clearAllSelected()
+            doc.addVirtualHelicesToSelection(part, res)
+            # self.selection_set = res
+            # self.getSelectionBoundingRect()
         else:
             self.last_rubberband_vals = (rect, from_pt, to_point)
     # end def
@@ -103,8 +112,7 @@ class SelectSliceTool(AbstractSliceTool):
     def getSelectionBoundingRect(self):
         part_item = self.part_item
         group = self.group
-        self.deselectItems()
-
+        # self.deselectItems()
         for id_num in self.selection_set:
             vhi = part_item.getVirtualHelixItem(id_num)
             group.addToGroup(vhi)
@@ -137,10 +145,48 @@ class SelectSliceTool(AbstractSliceTool):
         return False
     # end def
 
+    def deselectSet(self, vh_set):
+        group = self.group
+        self.snap_origin_item = None
+        selection_set = self.selection_set
+        if self.is_selection_active:
+            part_item = self.part_item
+            for id_num in vh_set:
+                vhi = part_item.getVirtualHelixItem(id_num)
+                if vhi is not None:
+                    group.removeFromGroup(vhi)
+                    selection_set.remove(id_num)
+            group.clearSelectionRect()
+            group.hide()
+            if len(selection_set) > 0 and len(group.childItems()) > 0:
+                group.setSelectionRect()
+                group.show()
+            return
+        group.clearSelectionRect()
+        return False
+    # end def
+
     def addToSelection(self, vhi):
         group = self.group
         group.addToGroup(vhi)
         self.selection_set.add(vhi.idNum())
+        if len(group.childItems()) > 0:
+            self.is_selection_active = True
+            group.setSelectionRect()
+            group.show()
+            self.individual_pick = True
+            self.snap_origin_item = None
+    # end def
+
+    def addSetToSelection(self, vh_set):
+        group = self.group
+        part_item = self.part_item
+        selection_set = self.selection_set
+        for id_num in vh_set:
+            vhi = part_item.getVirtualHelixItem(id_num)
+            group.addToGroup(vhi)
+            selection_set.add(id_num)
+        # end
         if len(group.childItems()) > 0:
             self.is_selection_active = True
             group.setSelectionRect()
@@ -156,7 +202,8 @@ class SelectSliceTool(AbstractSliceTool):
             self.individual_pick = False
         else: # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
-                self.deselectItems()
+                # self.deselectItems()
+                self.modelClear()
             self.addToSelection(virtual_helix_item)
     # end def
 
@@ -199,7 +246,8 @@ class SelectSliceTool(AbstractSliceTool):
         if self.sgv is not None:
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
-        self.deselectItems()
+        # self.deselectItems()
+        self.modelClear()
         self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def

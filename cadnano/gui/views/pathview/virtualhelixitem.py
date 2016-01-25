@@ -63,7 +63,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     ### SIGNALS ###
 
-    ### SLOTS indericectly called from the part ###
+    ### SLOTS indirectly called from the part ###
 
     def levelOfDetailChangedSlot(self, boolval):
         """Not connected to the model, only the QGraphicsView"""

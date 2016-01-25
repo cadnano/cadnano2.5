@@ -40,7 +40,7 @@ class AbstractStrandItemController(object):
         m_s.strandModifierChangedSignal.connect(s_i.strandModifierChangedSlot)
         m_s.strandModifierRemovedSignal.connect(s_i.strandModifierRemovedSlot)
 
-        m_s.selectedChangedSignal.connect(s_i.selectedChangedSlot)
+        m_s.strandSelectedChangedSignal.connect(s_i.strandSelectedChangedSlot)
     # end def
 
     def connectOligoSignals(self):
@@ -68,7 +68,7 @@ class AbstractStrandItemController(object):
         m_s.strandModifierChangedSignal.disconnect(s_i.strandModifierChangedSlot)
         m_s.strandModifierRemovedSignal.disconnect(s_i.strandModifierRemovedSlot)
 
-        m_s.selectedChangedSignal.disconnect(s_i.selectedChangedSlot)
+        m_s.strandSelectedChangedSignal.disconnect(s_i.strandSelectedChangedSlot)
     # end def
 
     def disconnectOligoSignals(self):

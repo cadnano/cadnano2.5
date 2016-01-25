@@ -272,7 +272,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             viewroot = self._viewroot
             current_filter_set = viewroot.selectionFilterSet()
             selection_group = viewroot.vhiHandleSelectionGroup()
-
+            print("filter set", current_filter_set, self._filter_name)
             # only add if the selection_group is not locked out
             if value == True and self._filter_name in current_filter_set:
                 if self.group() != selection_group:
@@ -297,12 +297,23 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def modelDeselect(self, document):
-        pass
-        self.restoreParent()
+        id_num = self._id_num
+        part = self._model_part
+        is_selected = document.isVirtualHelixSelected(part, id_num)
+        if is_selected:
+            document.removeVirtualHelicesFromSelection(part, [id_num])
+        else:
+            self.restoreParent()
     # end def
 
     def modelSelect(self, document):
-        pass
-        self.setSelected(True)
+        id_num = self._id_num
+        part = self._model_part
+        is_selected = document.isVirtualHelixSelected(part, id_num)
+        if not is_selected:
+            # print("VHHHI pop")
+            document.addVirtualHelicesToSelection(part, [id_num])
+        else:
+            self.setSelected(True)
     # end def
 # end class

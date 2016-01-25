@@ -64,7 +64,10 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
-    def partVirtualHelicesSelectedSlot(self, sender, vh_set):
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+        """ is_adding (bool): adding (True) virtual helices to a selection
+        or removing (False)
+        """
         pass
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass

@@ -102,16 +102,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
                 item.modelSelect(doc)
             # end for
             self._pending_to_add_dict = {}
-            doc.updatePathSelection()
-    # end def
-
-    def resetSelection(self):
-        self._pending_to_add_dict = {}
-        self._added_to_press_list = False
-        self.clearSelection(False)
-        self.setSelectionLock(None)
-        self.selectionbox.setParentItem(self.viewroot)
-        self.setParentItem(self.viewroot)
+            doc.updateStrandSelection()
     # end def
 
     def selectionLock(self):
@@ -202,7 +193,18 @@ class SelectionItemGroup(QGraphicsItemGroup):
         self._added_to_press_list = False
     # end def
 
+    def resetSelection(self):
+        self._pending_to_add_dict = {}
+        self._added_to_press_list = False
+        self.clearSelection(False)
+        self.setSelectionLock(None)
+        self.selectionbox.setParentItem(self.viewroot)
+        self.setParentItem(self.viewroot)
+    # end def
+
     def clearSelection(self, value):
+        """ value is for keyPressEvents
+        """
         if value == False:
             self.selectionbox.hide()
             self.selectionbox.resetPosition()
@@ -228,7 +230,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
                 return True
         elif change == QGraphicsItem.ItemChildAddedChange:
             if self._added_to_press_list == False:
-                # print "kid added"
+                # print("kid added")
                 self.setFocus()  # this is to get delete keyPressEvents
                 self.selectionbox.boxParent()
                 # self.setParentItem(self.selectionbox.boxParent())
@@ -256,7 +258,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             self.removeFromGroup(item)
             item.modelDeselect(doc)
         # end for
-        doc.updatePathSelection()
+        doc.updateStrandSelection()
     # end def
 
     def setBoundingRect(self, rect):
@@ -442,13 +444,13 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         bw = self._BASE_WIDTH
         i_g = self._item_group
         # the childrenBoundingRect is necessary to get this to work
-        rectIG = i_g.childrenBoundingRect()
-        rect = self.mapRectFromItem(i_g, rectIG)
+        rect_IG = i_g.childrenBoundingRect()
+        rect = self.mapRectFromItem(i_g, rect_IG)
         if rect.width() < bw:
             rect.adjust(-bw / 4, 0, bw / 2, 0)
         path = QPainterPath()
         path.addRect(rect)
-        self._item_group.setBoundingRect(rectIG)
+        self._item_group.setBoundingRect(rect_IG)
 
         # path.addRoundedRect(rect, radius, radius)
         # path.moveTo(rect.right(),\

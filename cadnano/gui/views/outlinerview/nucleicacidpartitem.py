@@ -93,4 +93,11 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
                 if key in CNOutlinerItem.PROPERTIES:
                     vh_i.setValue(key, val)
     # end def
+
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+        """ is_adding (bool): adding (True) virtual helices to a selection
+        or removing (False)
+        """
+        pass
+    # end def
 # end class

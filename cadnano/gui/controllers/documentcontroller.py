@@ -128,7 +128,8 @@ class DocumentController():
             types.append("even")
         if f1.isChecked():
             types.append("odd")
-        self._document.documentSelectionFilterChangedSignal.emit(types)
+        self._document.setFilterSet(types)
+        # self._document.documentSelectionFilterChangedSignal.emit(types)
 
     def actionFilterEvenSlot(self):
         fH = self.win.action_filter_handle
@@ -141,7 +142,8 @@ class DocumentController():
             types.append("even")
         if f1.isChecked():
             types.append("odd")
-        self._document.documentSelectionFilterChangedSignal.emit(types)
+        self._document.setFilterSet(types)
+        # self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
     def actionFilterOddSlot(self):
@@ -155,7 +157,8 @@ class DocumentController():
             types.append("even")
         if f1.isChecked():
             types.append("odd")
-        self._document.documentSelectionFilterChangedSignal.emit(types)
+        self._document.setFilterSet(types)
+        # self._document.documentSelectionFilterChangedSignal.emit(types)
     # end def
 
     def actionFilterEndpointSlot(self):

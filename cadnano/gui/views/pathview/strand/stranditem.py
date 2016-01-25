@@ -224,8 +224,8 @@ class StrandItem(QGraphicsLineItem):
         pass
     # end def
 
-    def selectedChangedSlot(self, strand, indices):
-        self.selectIfRequired(self.partItem().document(), indices)
+    def strandSelectedChangedSlot(self, strand, indices):
+        self.selectIfRequired(self._viewroot.document(), indices)
     # end def
 
     ### ACCESSORS ###
@@ -261,7 +261,7 @@ class StrandItem(QGraphicsLineItem):
         return self._virtual_helix_item.idNum()
 
     def window(self):
-        return self._virtual_helix_item.window()
+        return self._viewroot.window()
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
     def refreshInsertionItems(self, strand):
@@ -732,7 +732,7 @@ class StrandItem(QGraphicsLineItem):
                 # end elif
                 else:
                     # Deselect
-                    # print "Deselecting strand"
+                    # print("Deselecting strand")
                     selection_group.pendToRemove(self)
                     self.setSelectedColor(False)
                     selection_group.pendToRemove(self._low_cap)
@@ -767,7 +767,7 @@ class StrandItem(QGraphicsLineItem):
             # indirect way of doing selection checks
             if document.isModelStrandSelected(con3p) and document.isModelStrandSelected(strand5p):
                 val3p = document.getSelectedStrandValue(con3p)
-                # print "xover idx", indices
+                # print("xover idx", indices)
                 test3p = val3p[0] if con3p.isForward() else val3p[1]
                 test5p = idx_h if strand5p.isForward() else idx_l
                 if test3p and test5p:

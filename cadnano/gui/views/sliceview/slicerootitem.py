@@ -57,6 +57,7 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def clearSelectionsSlot(self, doc):
+        self.select_tool.deselectItems()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
 

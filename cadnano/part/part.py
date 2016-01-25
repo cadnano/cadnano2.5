@@ -46,6 +46,7 @@ class Part(VirtualHelixGroup):
         number assignment.
         """
         super(Part, self).__init__(*args, **kwargs)
+        self._instance_count = 0
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
         self._mods = defaultdict(dict)
@@ -111,8 +112,8 @@ class Part(VirtualHelixGroup):
 
     partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
                         name='partVirtualHelicesTranslatedSignal')  # self, list of id_nums, transform
-    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object,
-                        name='partVirtualHelicesSelectedSignal')  # self, list of id_nums to select, transform
+    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object, bool,
+                        name='partVirtualHelicesSelectedSignal')  # self, iterable of id_nums to select, transform
     partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
                                             name='partVirtualHelixPropertyChangedSignal')  # self, id_num, value
 
@@ -139,6 +140,24 @@ class Part(VirtualHelixGroup):
 
     def setDocument(self, document):
         self._document = document
+    # end def
+
+    def incrementInstance(self, document):
+        self._instance_count += 1
+        if self._instance_count == 1:
+            self._document = document
+            document.addChild(self)
+    # end def
+
+    def decrementInstance(self):
+        ic = self._instance_count
+        if ic == 0:
+            raise IndexError("Can't have less than zero instance of a Part")
+        ic -= 1
+        if ic == 0:
+            self._document = None
+            self._document.removeChild(self)
+        self._instance_count = ic
     # end def
 
     def getProperty(self, key):

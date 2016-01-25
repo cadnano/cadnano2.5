@@ -32,15 +32,18 @@ class ObjectInstance(CNObject):
     # end def
 
     def wipe(self, doc):
-       self._object.setDocument(None)
-       doc.setSelectedInstance(None)
-       doc.removeChild(self._object)
+        """For adding ObjectInstances to a Document"""
+        self._object.decrementInstance()
+        obj.decrementInstance()
+        doc.removeInstance(self)
+        doc.setSelectedInstance(None)
     # end def
 
     def unwipe(self, doc):
+        """For Removing ObjectInstances from a Document"""
         obj = self._object
-        obj.setDocument(doc)
-        doc.addChild(obj)
+        obj.incrementInstance(doc)
+        doc.addInstance(self)
         doc.setSelectedInstance(self)
     # end def
 

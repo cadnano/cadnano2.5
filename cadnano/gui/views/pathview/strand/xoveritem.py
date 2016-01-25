@@ -533,19 +533,19 @@ class XoverItem(QGraphicsPathItem):
                 # only add if the selection_group is not locked out
                 if value == True and (self._filter_name in current_filter_set or not selection_group.isNormalSelect()):
                     if sI.strandFilter() in current_filter_set:
-                        # print "might add a xoi"
+                        # print("might add a xoi")
                         if self.group() != selection_group and selection_group.isNormalSelect():
-                            # print "adding an xoi"
+                            # print("adding an xoi")
                             selection_group.pendToAdd(self)
                             selection_group.setSelectionLock(selection_group)
                         self.setSelectedColor(True)
                         return True
                     else:
-                        # print "Doh"
+                        # print("Doh")
                         return False
                 # end if
                 elif value == True:
-                    # print "DOink"
+                    # print("DOink")
                     return False
                 else:
                     # Deselect

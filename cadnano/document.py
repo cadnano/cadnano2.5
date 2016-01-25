@@ -29,13 +29,14 @@ class Document(CNObject):
         super(Document, self).__init__(parent)
 
         self._undostack = UndoStack()
-        self._children = []
+        self._children = []     # for storing a reference to Parts (and Assemblies)
+        self._instances = []    # for storing instances of Parts (and Assemblies)
         self._controller = None
         self._selected_instance = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
-        self._selected_changed_dict = {}
+        self._strand_selected_changed_dict = {}
         self.view_names = []
         self.filter_set = set()
         app().documentWasCreatedSignal.emit(self)
@@ -64,7 +65,6 @@ class Document(CNObject):
                                                name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(CNObject,
                                          name='documentClearSelectionsSignal')
-
     ### SLOTS ###
 
     ### ACCESSORS ###
@@ -80,15 +80,15 @@ class Document(CNObject):
         """Returns a list of parts associated with the document."""
         return self._children
 
-    def getPartsDict(self):
-        out = {}
-        for item in self._children:
-            if isinstance(item, Part):
-                out[item.getName()] = item
-        return out
-
     def addChild(self, child):
         self._children.append(child)
+
+    def addInstance(self, instance):
+        self._instances.append(instance)
+
+    def removeInstance(self, instance):
+        self._instances.remove(instance)
+        self.documentClearSelectionsSignal.emit(self)
 
     def removeAllChildren(self):
         """Used to reset the document. Not undoable."""
@@ -103,7 +103,6 @@ class Document(CNObject):
     # end def
 
     def removeChild(self, child):
-        self.documentClearSelectionsSignal.emit(self)
         self._children.remove(child)
     # end def
 
@@ -115,34 +114,13 @@ class Document(CNObject):
     # def selectedInstance(self):
     #     return self._selected_instance
 
-    # def addToSelection(self, obj, value):
-    #     self._selection_dict[obj] = value
-    #     self._selected_changed_dict[obj] = value
-    # # end def
-
-    # def removeFromSelection(self, obj):
-    #     if obj in self._selection_dict:
-    #         del self._selection_dict[obj]
-    #         self._selected_changed_dict[obj] = (False, False)
-    #         return True
-    #     else:
-    #         return False
-    # # end def
-
-    # def clearSelections(self):
-    #     """
-    #     Only clear the dictionary
-    #     """
-    #     self._selection_dict = {}
-    # # end def
-
     def addStrandToSelection(self, strand, value):
         ss = strand.strandSet()
         if ss in self._selection_dict:
             self._selection_dict[ss][strand] = value
         else:
             self._selection_dict[ss] = {strand: value}
-        self._selected_changed_dict[strand] = value
+        self._strand_selected_changed_dict[strand] = value
     # end def
 
     def removeStrandFromSelection(self, strand):
@@ -153,12 +131,46 @@ class Document(CNObject):
                 del temp[strand]
                 if len(temp) == 0:
                     del self._selection_dict[ss]
-                self._selected_changed_dict[strand] = (False, False)
+                self._strand_selected_changed_dict[strand] = (False, False)
                 return True
             else:
                 return False
         else:
             return False
+    # end def
+
+    def addVirtualHelicesToSelection(self, part, id_nums):
+        """ If the Part isn't in the _selection_dict its not
+        going to be in the changed_dict either, so go ahead and add
+
+        """
+        selection_dict = self._selection_dict
+        if part not in selection_dict:
+            selection_dict[part] = s_set = set()
+        else:
+            s_set = selection_dict[part]
+        changed_set = set()
+        for id_num in id_nums:
+            if id_num not in s_set:
+                s_set.add(id_num)
+                changed_set.add(id_num)
+        if len(changed_set) > 0:
+            part.partVirtualHelicesSelectedSignal.emit(part, changed_set, True)
+    # end def
+
+    def removeVirtualHelicesFromSelection(self, part, id_nums):
+        selection_dict = self._selection_dict
+        if part in selection_dict:
+            s_set = selection_dict[part]
+            changed_set = set()
+            for id_num in id_nums:
+                if id_num in s_set:
+                    s_set.remove(id_num)
+                    if len(s_set) == 0:
+                        del selection_dict[part]
+                    changed_set.add(id_num)
+            if len(changed_set) > 0:
+                part.partVirtualHelicesSelectedSignal.emit(part, changed_set, False)
     # end def
 
     def selectionDict(self):
@@ -183,7 +195,7 @@ class Document(CNObject):
     def clearAllSelected(self):
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
-        self._selected_changed_dict = {}
+        self._strand_selected_changed_dict = {}
         self.documentClearSelectionsSignal.emit(self)
     # end def
 
@@ -198,6 +210,13 @@ class Document(CNObject):
                 return True
             else:
                 return False
+        else:
+            return False
+    # end def
+
+    def isVirtualHelixSelected(self, part, id_num):
+        if part in self._selection_dict:
+            return id_num in self._selection_dict[part]
         else:
             return False
     # end def
@@ -218,8 +237,6 @@ class Document(CNObject):
     # end def
 
     def sortedSelectedStrands(self, strandset):
-        # outList = self._selection_dict[strandset].keys()
-        # outList.sort(key=Strand.lowIdx)
         out_list = [x for x in self._selection_dict[strandset].items()]
         getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))
         out_list.sort(key=getLowIdx)
@@ -302,10 +319,6 @@ class Document(CNObject):
         return (min_low_delta, min_high_delta)
     # end def
 
-    # def operateOnStrandSelection(self, method, arg, both=False):
-    #     pass
-    # # end def
-
     def deleteStrandSelection(self, use_undostack=True):
         """
         Delete selected strands. First iterates through all selected strands
@@ -359,25 +372,25 @@ class Document(CNObject):
         if use_undostack:
             self.undoStack().endMacro()
 
-    def paintSelection(self, scafColor, stapColor, use_undostack=True):
-        """Delete xovers if present. Otherwise delete everything."""
-        scaf_oligos = {}
-        stap_oligos = {}
-        for strandset_dict in self._selection_dict.values():
-            for strand, value in strandset_dict.items():
-                if strand.isScaffold():
-                    scaf_oligos[strand.oligo()] = True
-                else:
-                    stap_oligos[strand.oligo()] = True
+    # def paintSelection(self, scafColor, stapColor, use_undostack=True):
+    #     """Delete xovers if present. Otherwise delete everything."""
+    #     scaf_oligos = {}
+    #     stap_oligos = {}
+    #     for strandset_dict in self._selection_dict.values():
+    #         for strand, value in strandset_dict.items():
+    #             if strand.isScaffold():
+    #                 scaf_oligos[strand.oligo()] = True
+    #             else:
+    #                 stap_oligos[strand.oligo()] = True
 
-        if use_undostack:
-            self.undoStack().beginMacro("Paint strands")
-        for olg in scaf_oligos.keys():
-            olg.applyColor(scafColor)
-        for olg in stap_oligos.keys():
-            olg.applyColor(stapColor)
-        if use_undostack:
-            self.undoStack().endMacro()
+    #     if use_undostack:
+    #         self.undoStack().beginMacro("Paint strands")
+    #     for olg in scaf_oligos.keys():
+    #         olg.applyColor(scafColor)
+    #     for olg in stap_oligos.keys():
+    #         olg.applyColor(stapColor)
+    #     if use_undostack:
+    #         self.undoStack().endMacro()
 
     def resizeSelection(self, delta, do_maximize=False, use_undostack=True):
         """
@@ -432,19 +445,19 @@ class Document(CNObject):
             self.undoStack().endMacro()
     # end def
 
-    def updatePathSelection(self):
+    def updateStrandSelection(self):
         """
         do it this way in the future when we have
         a better signaling architecture between views
         """
-        # self.documentSelectedChangedSignal.emit(self._selected_changed_dict)
+        # self.documentSelectedChangedSignal.emit(self._strand_selected_changed_dict)
         """
         For now, individual objects need to emit signals
         """
-        for obj, value in self._selected_changed_dict.items():
-            obj.selectedChangedSignal.emit(obj, value)
+        for obj, value in self._strand_selected_changed_dict.items():
+            obj.strandSelectedChangedSignal.emit(obj, value)
         # end for
-        self._selected_changed_dict = {}
+        self._strand_selected_changed_dict = {}
     # end def
 
     def resetViews(self):
@@ -456,7 +469,7 @@ class Document(CNObject):
         """
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
-        self._selected_changed_dict = {}
+        self._strand_selected_changed_dict = {}
         self.documentViewResetSignal.emit(self)
     # end def
 

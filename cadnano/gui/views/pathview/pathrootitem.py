@@ -66,6 +66,7 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def clearSelectionsSlot(self, doc):
+        print("yargh!!!!")
         self.select_tool.resetSelections()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
@@ -129,7 +130,7 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def selectionFilterSet(self):
-        return self._document.select_filter_set
+        return self._document.filter_set
     # end def
 
     def preXoverFilter(self):

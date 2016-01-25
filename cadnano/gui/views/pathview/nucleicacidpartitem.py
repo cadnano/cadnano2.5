@@ -190,7 +190,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
         self._updateBoundingRect()
-
     # end def
 
     def partVirtualHelixRenumberedSlot(self, sender, id_old, id_new):
@@ -227,6 +226,32 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             vh_i.virtualHelixPropertyChangedSlot(keys, values)
     # end def
 
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+        """ is_adding (bool): adding (True) virtual helices to a selection
+        or removing (False)
+        """
+        vhhi_group = self._viewroot.vhiHandleSelectionGroup()
+        vh_hash = self._virtual_helix_item_hash
+        doc = self._viewroot.document()
+        if is_adding:
+            print("got the adding slot in path")
+            for id_num in vh_set:
+                vhi = vh_hash[id_num]
+                vhhi = vhi.handle()
+                # vhhi_group.addToGroup(vhhi)
+                vhhi.modelSelect(doc)
+            # end for
+            vhhi_group.processPendingToAddList()
+        else:
+            print("got the adding slot in path")
+            for id_num in vh_set:
+                vhi = vh_hash[id_num]
+                vhhi = vhi.handle()
+                vhhi.modelDeselect(doc)
+                # vhhi_group.removeChild(vhhi)
+            # end for
+            vhhi_group.processPendingToAddList()
+    # end def
 
     def updatePreXoverItemsSlot(self, sender, id_num):
         part = self.part()

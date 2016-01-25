@@ -27,8 +27,8 @@ class SelectTool(AbstractPathTool):
         self.strand_item_selection_group.resetSelection()
 
     def clearSelections(self, value):
-        self.vhi_h_selection_group.clearSelection(False)
-        self.strand_item_selection_group.clearSelection(False)
+        self.vhi_h_selection_group.clearSelection(value)
+        self.strand_item_selection_group.clearSelection(value)
 
     def __repr__(self):
         return "select_tool"  # first letter should be lowercase
