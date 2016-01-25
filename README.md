@@ -79,11 +79,11 @@ OS X and Linux installs of `PyQt5` can be painful for some people.
 
 First create a new conda environment. The default anaconda install typically
 have PyQt4 installed, and that doesn't always play well with PyQt5, so we need
-to create an empty one.
+to create an empty one.  For now this supports Python 3.4
 
 (If you know what you are doing, you can omit the `--no-default-packages` flag.)
 
-    conda create --no-default-packages -n pyqt5 python=3
+    conda create --no-default-packages -n pyqt5 python=3.4
 
 followed by:
 
@@ -101,6 +101,11 @@ Anaconda pyqt5 build is available. You can check this simply using `conda search
 pyqt5` or `conda install pyqt5`.
 
 There is an open issue on Anaconda to support PyQt5: [ContinuumIO/anaconda-issues#138](https://github.com/ContinuumIO/anaconda-issues/issues/138).
+
+Additionally you can use Python 3.5 on Windows and Linux with the commands:
+
+    conda create --no-default-packages -n pyqt5 python=3
+    conda install -c https://conda.anaconda.org/inso pyqt5
 
 # *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 
