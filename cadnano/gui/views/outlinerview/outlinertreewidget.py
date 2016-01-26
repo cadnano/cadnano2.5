@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 from PyQt5.QtWidgets import QColorDialog
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QItemSelection
 
 from cadnano.enum import PartType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
@@ -19,6 +20,30 @@ from .nucleicacidpartitem import NucleicAcidPartItem
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
+def CustomSelectionModel(QItemSelectionModel):
+    def __init__(self, tree_widget):
+        super(CustomSelectionModel, self).__init__(tree_widget)
+        self._tree_widget = tree_widget
+
+    # def select(obj, index_or_selection, flags):
+    #     print("custom_select")
+    #     tw = self._tree_widget
+    #     doc = tw._document
+    #     doc.filter_set
+    #     if isinstance(index_or_selection, QModelIndex):
+    #         item = self.itemFromIndex(index_or_selection)
+    #         if item._filter_name in filter_set:
+    #             return QItemSelectionModel.select(obj, index, flags)
+    #     else:   #QItemSelection
+    #         out_selection = []
+    #         for index in index_or_selection.indexes():
+    #             item = self.itemFromIndex(index_or_selection)
+    #             if item._filter_name in filter_set:
+    #                 out_selection.append(index)
+    #         selection = QItemSelection(out_selection[0], out_selection[-1])
+    #         return QItemSelectionModel.select(obj, selection, flags)
+    # # end def
+# end class
 
 class OutlinerTreeWidget(QTreeWidget):
     """
@@ -50,12 +75,17 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setColumnWidth(0, 140)
         self.setColumnWidth(1, 18)
         self.setColumnWidth(2, 18)
+
         # Dragging
         self.setDragEnabled(True)
         self.setDragDropMode(QAbstractItemView.InternalMove)
+        self.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
+
+        self.selectionModel().selectionChanged.connect(self.selectionFilter)
 
         self.model().dataChanged.connect(self.dataChangedSlot)
         self.itemSelectionChanged.connect(self.selectedChangedSlot)
@@ -65,6 +95,23 @@ class OutlinerTreeWidget(QTreeWidget):
         # self.expandItem(a1)
         # p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
         # p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
+    # end def
+
+    def selectionFilter(self, selected_items, deselected_items):
+        """ Disables selections of items not in the active filter set.
+        I had issues with segfaults subclassing QItemSelectionModel so
+        this is the next best thing I think
+        """
+        filter_set = self._document.filter_set
+        out_selection = []
+        flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
+        for index in selected_items.indexes():
+              item = self.itemFromIndex(index)
+              if item._filter_name not in filter_set:
+                  out_selection.append(index)
+        if len(out_selection) > 0:
+            selection = QItemSelection(out_selection[0], out_selection[-1])
+            self.selectionModel().select(selection, flags)
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
@@ -285,5 +332,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         #     _QCOMMONSTYLE.drawControl(_QCOMMONSTYLE.CE_PushButton, buttonQStyleOptionButton, painter)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)
+    # end def
+
+    def itemSelectionChanged(self):
+        print("pppppp", self.selectedItems())
     # end def
 # end class CustomStyleItemDelegate

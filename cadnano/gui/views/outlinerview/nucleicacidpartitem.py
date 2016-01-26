@@ -11,6 +11,7 @@ from .oligoitem import OligoItem
 from .virtualhelixitem import VirtualHelixItem
 
 class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
+    _filter_name = "part"
     def __init__(self, model_part, parent):
         super(NucleicAcidPartItem, self).__init__(model_part, parent)
         self._controller = NucleicAcidPartItemController(self, model_part)
@@ -110,20 +111,17 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         vh_list = self._root_items['VHelixList']
         root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
         if is_adding:
-            flag = QItemSelectionModel.SelectCurrent | QItemSelectionModel.Rows
+            flag = QItemSelectionModel.SelectCurrent #| QItemSelectionModel.Rows
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
                 idx = vh_list.indexOfChild(vhi)
-                iselection = QItemSelection(model.index(idx, 0, root_midx),
-                                            model.index(idx, vhi.columnCount() - 1, root_midx))
-                selection_model.select(iselection, flag)
+                selection_model.select(model.index(idx, 0, root_midx), flag)
         else:
-            flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect | QItemSelectionModel.Rows
+            flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect #| QItemSelectionModel.Rows
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
                 idx = vh_list.indexOfChild(vhi)
-                iselection = QItemSelection(model.index(idx, 0, root_midx),
-                                            model.index(idx, vhi.columnCount() - 1, root_midx))
-                selection_model.select(iselection, flag)
+                selection_model.select(model.index(idx, 0, root_midx), flag)
+        # print("hhihh", tw.selectedItems())
     # end def
 # end class

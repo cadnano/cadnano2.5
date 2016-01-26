@@ -8,6 +8,7 @@ from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import V
 
 
 class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
+    _filter_name = "virtual_helix"
     def __init__(self, id_num, part_item):
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         model_part = self._model_part

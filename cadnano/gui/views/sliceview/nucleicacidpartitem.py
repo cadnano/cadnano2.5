@@ -233,7 +233,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """
         select_tool = self._viewroot.select_tool
         if is_adding:
-            print("got the adding slot in path")
+            # print("got the adding slot in path")
             select_tool.selection_set.update(vh_set)
             select_tool.setPartItem(self)
             select_tool.getSelectionBoundingRect()

@@ -138,15 +138,16 @@ class NucleicAcidPart(Part):
 
     def dimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
+        DMIN = 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
-        if xLL > -100:
-            xLL = -100
-        if yLL > -100:
-            yLL = -100
-        if xUR < 100:
-            xUR = 100
-        if yUR < 100:
-            yUR = 100
+        if xLL > -DMIN:
+            xLL = -DMIN
+        if yLL > -DMIN:
+            yLL = -DMIN
+        if xUR < DMIN:
+            xUR = DMIN
+        if yUR < DMIN:
+            yUR = DMIN
         return xLL*scale_factor, yLL*scale_factor, xUR*scale_factor, yUR*scale_factor
     # end def
 
