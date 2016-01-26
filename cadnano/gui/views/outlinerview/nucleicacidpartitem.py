@@ -1,3 +1,6 @@
+from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QItemSelectionModel
+
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
 
@@ -98,6 +101,16 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         """ is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
-        pass
+        vhi_hash = self._virtual_helix_item_hash
+        tw = self.treeWidget()
+        select_model = tw.selectionModel()
+        for id_num in vh_set:
+            print("I am aslee", id_num, is_adding)
+            vhi = vhi_hash.get(id_num)
+            # idx = self._root_items['VHelixList'].indexOfChild(vhi)
+            # print(idx, QItemSelectionModel.Select)
+            # select_model.select(idx, QItemSelectionModel.Select)
+            vhi.setSelected(is_adding)
+            # print(int(vhi.flags()), int(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled), int(Qt.ItemIsSelectable))
     # end def
 # end class

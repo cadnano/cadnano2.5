@@ -272,7 +272,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             viewroot = self._viewroot
             current_filter_set = viewroot.selectionFilterSet()
             selection_group = viewroot.vhiHandleSelectionGroup()
-            print("filter set", current_filter_set, self._filter_name)
+            # print("filter set", current_filter_set, self._filter_name)
             # only add if the selection_group is not locked out
             if value == True and self._filter_name in current_filter_set:
                 if self.group() != selection_group:

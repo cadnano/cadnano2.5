@@ -234,21 +234,19 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vh_hash = self._virtual_helix_item_hash
         doc = self._viewroot.document()
         if is_adding:
-            print("got the adding slot in path")
+            # print("got the adding slot in path")
             for id_num in vh_set:
                 vhi = vh_hash[id_num]
                 vhhi = vhi.handle()
-                # vhhi_group.addToGroup(vhhi)
                 vhhi.modelSelect(doc)
             # end for
             vhhi_group.processPendingToAddList()
         else:
-            print("got the adding slot in path")
+            # print("got the adding slot in path")
             for id_num in vh_set:
                 vhi = vh_hash[id_num]
                 vhhi = vhi.handle()
                 vhhi.modelDeselect(doc)
-                # vhhi_group.removeChild(vhhi)
             # end for
             vhhi_group.processPendingToAddList()
     # end def

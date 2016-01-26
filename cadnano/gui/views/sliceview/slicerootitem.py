@@ -49,7 +49,8 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
-        pass
+        if 'virtual_helix' not in filter_name_list:
+            self.manager.chooseCreateTool()
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):

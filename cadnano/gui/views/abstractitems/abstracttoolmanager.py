@@ -67,7 +67,7 @@ class AbstractToolManager(QObject):
         set_active_tool_method_name = 'choose%sTool' % (tool_name)
 
         def clickHandler(self):
-            window.deactiveToolManagers(this)
+            # window.deactiveToolManagers(this)
             tool_widget.setChecked(True)
             self.setActiveTool(tool)
             if hasattr(tool, 'widgetClicked'):

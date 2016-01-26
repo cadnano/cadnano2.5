@@ -64,33 +64,42 @@ class DocumentController():
     def _connectWindowSignalsToSelf(self):
         """This method serves to group all the signal & slot connections
         made by DocumentController"""
-        self.win.action_new.triggered.connect(self.actionNewSlot)
-        self.win.action_open.triggered.connect(self.actionOpenSlot)
-        self.win.action_close.triggered.connect(self.actionCloseSlot)
-        self.win.action_save.triggered.connect(self.actionSaveSlot)
-        self.win.action_save_as.triggered.connect(self.actionSaveAsSlot)
-        self.win.action_SVG.triggered.connect(self.actionSVGSlot)
-        self.win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
-        self.win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
-        self.win.action_preferences.triggered.connect(self.actionPrefsSlot)
-        self.win.action_modify.triggered.connect(self.actionModifySlot)
-        self.win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
+        win = self.win
+        win.action_new.triggered.connect(self.actionNewSlot)
+        win.action_open.triggered.connect(self.actionOpenSlot)
+        win.action_close.triggered.connect(self.actionCloseSlot)
+        win.action_save.triggered.connect(self.actionSaveSlot)
+        win.action_save_as.triggered.connect(self.actionSaveAsSlot)
+        win.action_SVG.triggered.connect(self.actionSVGSlot)
+        win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
+        win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
+        win.action_preferences.triggered.connect(self.actionPrefsSlot)
+        win.action_modify.triggered.connect(self.actionModifySlot)
+        win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
 
-        self.win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
+        win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
 
-        self.win.closeEvent = self.windowCloseEventHandler
-        self.win.action_about.triggered.connect(self.actionAboutSlot)
-        self.win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
-        self.win.action_feedback.triggered.connect(self.actionFeedbackSlot)
-        self.win.action_filter_handle.triggered.connect(self.actionFilterHandleSlot)
-        self.win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
-        self.win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
-        self.win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
-        self.win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
-        self.win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
-        self.win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
-        self.win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
+        win.closeEvent = self.windowCloseEventHandler
+        win.action_about.triggered.connect(self.actionAboutSlot)
+        win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
+        win.action_feedback.triggered.connect(self.actionFeedbackSlot)
 
+        # make it so select tool in slice view activation turns on vh filter
+        win.action_filter_handle.triggered.connect(self.actionFilterHandleSlot)
+        self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
+        win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
+        win.action_vhelix_select.triggered.connect(self.actionFilterHandleSlot)
+        self.trigger_path_select = lambda x: win.action_path_select.trigger()
+        win.action_vhelix_select.triggered.connect(self.trigger_path_select)
+
+        win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
+        win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
+        win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
+        win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
+        win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
+        win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
+        win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
+    # end def
 
 
     ### SLOTS ###

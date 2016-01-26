@@ -66,7 +66,7 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     def clearSelectionsSlot(self, doc):
-        print("yargh!!!!")
+        # print("yargh!!!!")
         self.select_tool.resetSelections()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
