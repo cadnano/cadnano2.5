@@ -1,5 +1,5 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QItemSelectionModel
+from PyQt5.QtCore import QItemSelectionModel, QItemSelection
 
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
@@ -103,14 +103,27 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         """
         vhi_hash = self._virtual_helix_item_hash
         tw = self.treeWidget()
-        select_model = tw.selectionModel()
-        for id_num in vh_set:
-            print("I am aslee", id_num, is_adding)
-            vhi = vhi_hash.get(id_num)
-            # idx = self._root_items['VHelixList'].indexOfChild(vhi)
-            # print(idx, QItemSelectionModel.Select)
-            # select_model.select(idx, QItemSelectionModel.Select)
-            vhi.setSelected(is_adding)
-            # print(int(vhi.flags()), int(Qt.ItemIsSelectable | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled), int(Qt.ItemIsSelectable))
+        model = tw.model()
+        selection_model = tw.selectionModel()
+        top_idx = tw.indexOfTopLevelItem(self)
+        top_midx = model.index(top_idx, 0)
+        vh_list = self._root_items['VHelixList']
+        root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
+        if is_adding:
+            flag = QItemSelectionModel.SelectCurrent | QItemSelectionModel.Rows
+            for id_num in vh_set:
+                vhi = vhi_hash.get(id_num)
+                idx = vh_list.indexOfChild(vhi)
+                iselection = QItemSelection(model.index(idx, 0, root_midx),
+                                            model.index(idx, vhi.columnCount() - 1, root_midx))
+                selection_model.select(iselection, flag)
+        else:
+            flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect | QItemSelectionModel.Rows
+            for id_num in vh_set:
+                vhi = vhi_hash.get(id_num)
+                idx = vh_list.indexOfChild(vhi)
+                iselection = QItemSelection(model.index(idx, 0, root_midx),
+                                            model.index(idx, vhi.columnCount() - 1, root_midx))
+                selection_model.select(iselection, flag)
     # end def
 # end class

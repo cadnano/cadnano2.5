@@ -100,10 +100,6 @@ class OutlinerTreeWidget(QTreeWidget):
             raise NotImplementedError
     # end def
 
-    def clearSelectionsSlot(self, doc):
-        pass
-    # end def
-
     def selectedChangedSlot(self):
         for mpi in self._instance_items:
             if self._instance_items[mpi] in self.selectedItems():
@@ -122,6 +118,10 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def resetRootItemSlot(self, doc):
         pass
+    # end def
+
+    def clearSelectionsSlot(self, doc):
+        self.selectionModel().clearSelection()
     # end def
 
     def dataChangedSlot(self, top_left, bot_right):
