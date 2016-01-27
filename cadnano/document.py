@@ -146,6 +146,7 @@ class Document(CNObject):
         """
         selection_dict = self._selection_dict
         if part not in selection_dict:
+            # print("creating new set", id(part))
             selection_dict[part] = s_set = set()
         else:
             s_set = selection_dict[part]
@@ -159,6 +160,7 @@ class Document(CNObject):
     # end def
 
     def removeVirtualHelicesFromSelection(self, part, id_nums):
+        # print("remove called", id(part), id_nums,  self._selection_dict.get(part))
         selection_dict = self._selection_dict
         if part in selection_dict:
             s_set = selection_dict[part]
@@ -467,6 +469,7 @@ class Document(CNObject):
         let them be garbage collect
         the dictionary maintains what is selected
         """
+        print("reset views")
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}

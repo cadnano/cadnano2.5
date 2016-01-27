@@ -38,6 +38,7 @@ class SliceRootItem(QGraphicsRectItem):
                 viewroot=self,
                 parent=self)
             self._instance_items[na_part_item] = na_part_item
+            self.select_tool.setPartItem(na_part_item)
             na_part_item.zoomToFit()
         else:
             raise NotImplementedError

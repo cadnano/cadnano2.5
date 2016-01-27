@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidgetItem
 
 NAME_COL = 0
@@ -13,14 +13,21 @@ class CNOutlinerItem(QTreeWidgetItem):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = cn_model
         self.setFlags(self.flags() | Qt.ItemIsEditable)
+        # self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled |
+        #                 Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
         name = cn_model.getName()
         color = cn_model.getColor()
-        self.setData(0, Qt.EditRole, name)
-        self.setData(1, Qt.EditRole, True) # is_visible
-        self.setData(2, Qt.EditRole, color)
+        self.setData(NAME_COL, Qt.EditRole, name)
+        self.setData(VISIBLE_COL, Qt.EditRole, True) # is_visible
+        self.setData(COLOR_COL, Qt.EditRole, color)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
+    def __hash__(self):
+        """ necessary as CNOutlinerItem as a base class is unhashable
+        but necessary due to __init__ arg differences for whatever reason
+        """
+        return hash(self._cn_model)
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):

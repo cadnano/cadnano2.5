@@ -8,6 +8,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.id_num = part.getNewIdNum()
         self.origin_pt = (x, y, 0.)
         self.length = length
+        self.color = part.getColor()
     # end def
 
     def redo(self):
@@ -15,7 +16,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         origin_pt = self.origin_pt
         # need to always reserve an id
-        part.createHelix(id_num, origin_pt, (1, 0, 0), self.length)
+        part.createHelix(id_num, origin_pt, (1, 0, 0), self.length, self.color)
         part.partVirtualHelixAddedSignal.emit(part, id_num)
         part.partActiveSliceResizeSignal.emit(part)
     # end def

@@ -162,16 +162,20 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def updateAppearance(self):
-        part = self._model_part
-        part_color = part.getProperty('color')
+        is_visible, color = self.getProperty(['is_visible', 'color'])
+        if is_visible:
+            self.show()
+        else:
+            self.hide()
+            return
 
-        self._USE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._OUT_OF_SLICE_PEN = getPenObj(part_color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._USE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
+        self._OUT_OF_SLICE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
 
         self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 
         self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
-        self._USE_BRUSH = getBrushObj(part_color, alpha=150)
+        self._USE_BRUSH = getBrushObj(color, alpha=150)
 
         self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
         self.setBrush(self._OUT_OF_SLICE_BRUSH)

@@ -54,6 +54,7 @@ class SelectSliceTool(AbstractSliceTool):
                 self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
                 self.sgv = None
             # self.deselectItems()
+            # if self.part_item != None:
             self.modelClear()
             self.part_item = part_item
             self.group.setParentItem(part_item)
@@ -64,19 +65,6 @@ class SelectSliceTool(AbstractSliceTool):
 
             self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
-
-    # def mousePressEvent(self, event):
-    #     if event.button() == Qt.RightButton:
-    #         self._right_mouse_move = True
-    #         self._button_down_pos = event.pos()
-    # # end def
-
-    # def mouseMoveEvent(self, event):
-    #     if self._right_mouse_move:
-    #         # p = event.pos() - self._button_down_pos
-    #         # self.setPos(p)
-    #         self.setCenterPos(p)
-    # # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
         rbr_last, fp_last, tp_last = self.last_rubberband_vals

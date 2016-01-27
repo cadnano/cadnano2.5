@@ -15,6 +15,8 @@ from cadnano.enum import PartType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+
+from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
 from .nucleicacidpartitem import NucleicAcidPartItem
 from .virtualhelixitem import VirtualHelixItem
 from .oligoitem import OligoItem
@@ -22,33 +24,9 @@ from .oligoitem import OligoItem
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
 
-def CustomSelectionModel(QItemSelectionModel):
-    def __init__(self, tree_widget):
-        super(CustomSelectionModel, self).__init__(tree_widget)
-        self._tree_widget = tree_widget
-
-    # def select(obj, index_or_selection, flags):
-    #     print("custom_select")
-    #     tw = self._tree_widget
-    #     doc = tw._document
-    #     doc.filter_set
-    #     if isinstance(index_or_selection, QModelIndex):
-    #         item = self.itemFromIndex(index_or_selection)
-    #         if item._filter_name in filter_set:
-    #             return QItemSelectionModel.select(obj, index, flags)
-    #     else:   #QItemSelection
-    #         out_selection = []
-    #         for index in index_or_selection.indexes():
-    #             item = self.itemFromIndex(index_or_selection)
-    #             if item._filter_name in filter_set:
-    #                 out_selection.append(index)
-    #         selection = QItemSelection(out_selection[0], out_selection[-1])
-    #         return QItemSelectionModel.select(obj, selection, flags)
-    # # end def
-# end class
-
 class OutlinerTreeWidget(QTreeWidget):
-    """
+    """ The there needs to always be a currentItem which defaults
+    to row 0, column 0 at the root
     """
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
@@ -77,6 +55,7 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setColumnWidth(0, 140)
         self.setColumnWidth(1, 18)
         self.setColumnWidth(2, 18)
+        # self.setUniformRowHeights(True)
 
         # Dragging
         self.setDragEnabled(True)
@@ -85,22 +64,16 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.model_selection_changes = (set(), set())
-        self.do_filter = True   # make sure filter is called onl
+        # self.do_filter = True   # make sure filter is called only when necessary
+        self.is_child_adding = 0
 
         custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
 
         self.selectionModel().selectionChanged.connect(self.selectionFilter)
-
         self.model().dataChanged.connect(self.dataChangedSlot)
-        self.itemSelectionChanged.connect(self.selectedChangedSlot)
+        # self.itemSelectionChanged.connect(self.selectedChangedSlot)
         self.itemClicked.connect(self.itemClickedHandler)
-        # Add some dummy items
-        # p1 = self.addDummyRow("Part0", True, "#cc0000")
-        # a1 = self.addDummyRow("Asm0",  True, "#00cc00")
-        # self.expandItem(a1)
-        # p2 = self.addDummyRow("Part1", True, "#0000cc", a1)
-        # p3 = self.addDummyRow("Part2", True, "#cc6600", a1)
     # end def
 
     def selectionFilter(self, selected_items, deselected_items):
@@ -108,39 +81,61 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
-        if self.do_filter:
-            # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
-            filter_set = self._document.filter_set
-            out_deselection = []
-            out_selection = []
-            flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
-            for index in selected_items.indexes():
-                item = self.itemFromIndex(index)
-                if item._filter_name not in filter_set:
+        # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
+        filter_set = self._document.filter_set
+        out_deselection = []
+        out_selection = []
+        flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
+        for index in selected_items.indexes():
+            item = self.itemFromIndex(index)
+            if item._filter_name not in filter_set:
+                if index.column() == 0:
+                    # print("deselect", item._filter_name,
+                    #                     index.row(), index.column())
                     out_deselection.append(index)
-                else:
-                    out_selection.append(index)
-            if len(out_deselection) > 0:
-                deselection = QItemSelection(out_deselection[0], out_deselection[-1])
-                self.do_filter = False
-                self.selectionModel().select(deselection, flags)
-                self.do_filter = True
+            else:
+                out_selection.append(index)
+        if len(out_deselection) > 0:
+            self.indexFromItem(item)
+            sm = self.selectionModel()
+            deselection = QItemSelection(out_deselection[0], out_deselection[-1])
+            sm.blockSignals(True)
+            sm.select(deselection, flags)
+            sm.blockSignals(False)
 
-            # now group the indices into items in sets
-            tbs, tbd = self.model_selection_changes
-            for idx in out_selection:
-                item = self.itemFromIndex(idx)
-                tbs.add(item)
-            for idx in deselected_items.indexes():
-                item = self.itemFromIndex(idx)
-                tbd.add(item)
+        # now group the indices into items in sets
+        tbs, tbd = self.model_selection_changes
+        for idx in out_selection:
+            item = self.itemFromIndex(idx)
+            tbs.add(item)
+        for idx in deselected_items.indexes():
+            item = self.itemFromIndex(idx)
+            tbd.add(item)
     # end def
 
     def itemClickedHandler(self, tree_widget_item, column):
-        # print("I'm click", tree_widget_item.__class__.__name__, tree_widget_item.isSelected())
+        # print("I'm click", tree_widget_item.__class__.__name__,
+        #    tree_widget_item.isSelected())
         document = self._document
         model_to_be_selected, model_to_be_deselected = self.model_selection_changes
-        self.do_filter = True
+        print("click column", column)
+        #1. handle clicks on check marks
+        if column == VISIBLE_COL:
+            self.blockSignals(True)
+            if tree_widget_item.data(column, Qt.DisplayRole):
+                print("unchecking", tree_widget_item.__class__.__name__)
+                tree_widget_item.setData(column, Qt.EditRole, False)
+                # self.closePersistentEditor(tree_widget_item, column)
+            else:
+                print("checking", tree_widget_item.__class__.__name__)
+                tree_widget_item.setData(column, Qt.EditRole, True)
+                # self.closePersistentEditor(tree_widget_item, column)
+            self.blockSignals(False)
+        # else:
+        #     self.openPersistentEditor(tree_widget_item, column)
+
+
+        # 2. handle document selection
         if isinstance(tree_widget_item, NucleicAcidPartItem):
             pass
         elif isinstance(tree_widget_item, VirtualHelixItem):
@@ -152,15 +147,32 @@ class OutlinerTreeWidget(QTreeWidget):
                     document.addVirtualHelicesToSelection(part, [id_num])
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
-                id_num, part = item.idNum(), item.part()
-                is_selected = document.isVirtualHelixSelected(part, id_num)
-                # print("de id_num", id_num, is_selected)
-                if is_selected:
-                    document.removeVirtualHelicesFromSelection(part, [id_num])
+                if isinstance(item, VirtualHelixItem):
+                    id_num, part = item.idNum(), item.part()
+                    is_selected = document.isVirtualHelixSelected(part, id_num)
+                    # print("de id_num", id_num, is_selected)
+                    if is_selected:
+                        document.removeVirtualHelicesFromSelection(part, [id_num])
             model_to_be_deselected.clear()
         elif isinstance(tree_widget_item, OligoItem):
             pass
         # end def
+    # end def
+
+    def dataChangedSlot(self, top_left, bottom_right):
+        if self.is_child_adding == 0:
+            if top_left == bottom_right:
+                item = self.itemFromIndex(top_left)
+                if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
+                    # print("dataChanged", item.__class__.__name__)
+                    item.updateCNModel()
+            else:
+                selection = QItemSelection(top_left, bottom_right)
+                for index in selection.indexes():
+                    if index.column() == 0:
+                        item = self.itemFromIndex(index)
+                        if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
+                            item.updateCNModel()
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
@@ -188,21 +200,23 @@ class OutlinerTreeWidget(QTreeWidget):
         model_part = model_part_instance.reference()
         part_type = model_part.partType()
         if part_type == PartType.NUCLEICACIDPART:
-            # print("part added")
+            self.is_child_adding += 1
             na_part_item = NucleicAcidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = na_part_item
+            self.setCurrentItem(na_part_item)
+            self.is_child_adding -= 1
         else:
             print(part_type)
             raise NotImplementedError
     # end def
 
-    def selectedChangedSlot(self):
-        for mpi in self._instance_items:
-            if self._instance_items[mpi] in self.selectedItems():
-                mpi.reference().setSelected(True)
-            else:
-                mpi.reference().setSelected(False)
-    # end def
+    # def selectedChangedSlot(self):
+    #     for mpi in self._instance_items:
+    #         if self._instance_items[mpi] in self.selectedItems():
+    #             mpi.reference().setSelected(True)
+    #         else:
+    #             mpi.reference().setSelected(False)
+    # # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
         pass
@@ -218,14 +232,6 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def clearSelectionsSlot(self, doc):
         self.selectionModel().clearSelection()
-    # end def
-
-    def dataChangedSlot(self, top_left, bot_right):
-        c_i = self.currentItem()
-        if c_i is None:
-            return
-        if c_i == self.itemFromIndex(top_left):
-            c_i.updateCNModel()
     # end def
 
     ### ACCESSORS ###
@@ -258,15 +264,16 @@ class OutlinerTreeWidget(QTreeWidget):
 class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
-        if column == 0: # Model name
+        if column == NAME_COL: # Model name
             editor = QLineEdit(parent_QWidget)
             editor.setAlignment(Qt.AlignVCenter)
             return editor
-        elif column == 1: # Visibility checkbox
-            editor = QCheckBox(parent_QWidget)
-            # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
-            return editor
-        elif column == 2: # Color Picker
+        # elif column == 1: # Visibility checkbox
+        #     editor = QCheckBox(parent_QWidget)
+        #     # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
+        #     return editor
+        elif column == COLOR_COL: # Color Picker
+            print("##############dsfsdfdsdfgsdfg")
             editor = QColorDialog(parent_QWidget)
             return editor
         # elif column == 3: # SpinBox Example
@@ -282,13 +289,13 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def setEditorData(self, editor, model_index):
         column = model_index.column()
-        if column == 0: # Part Name
+        if column == NAME_COL: # Part Name
             text_QString = model_index.model().data(model_index, Qt.EditRole)
             editor.setText(text_QString)
-        elif column == 1: # Visibility
-            value = model_index.model().data(model_index, Qt.EditRole)
-            editor.setChecked(value)
-        elif column == 2: # Color
+        # elif column == VISIBLE_COL: # Visibility
+        #     value = model_index.model().data(model_index, Qt.EditRole)
+        #     editor.setChecked(value)
+        elif column == COLOR_COL: # Color
             value = model_index.model().data(model_index, Qt.EditRole)
             # editor.setText(value)
             editor.setCurrentColor(QColor(value))
@@ -301,13 +308,13 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, model_index):
         column = model_index.column()
-        if column == 0: # Part Name
+        if column == NAME_COL: # Part Name
             text_QString = editor.text()
             model.setData(model_index, text_QString, Qt.EditRole)
-        elif column == 1: # Visibility
-            value = editor.isChecked()
-            model.setData(model_index, value, Qt.EditRole)
-        elif column == 2: # Color
+        # elif column == VISIBLE_COL: # Visibility
+        #     value = editor.isChecked()
+        #     model.setData(model_index, value, Qt.EditRole)
+        elif column == COLOR_COL: # Color
             # color = editor.text()
             # model.setData(model_index, color, Qt.EditRole)
             color = editor.currentColor()
@@ -322,14 +329,14 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def updateEditorGeometry(self, editor, option, model_index):
         column = model_index.column()
-        if column == 0:
+        if column == NAME_COL:
             editor.setGeometry(option.rect)
-        elif column == 1:
-            rect = QRect(option.rect)
-            delta = option.rect.width() / 2 - 9
-            rect.setX(option.rect.x() + delta) # Hack to center the checkbox
-            editor.setGeometry(rect)
-        elif column == 2:
+        # elif column == VISIBLE_COL:
+        #     rect = QRect(option.rect)
+        #     delta = option.rect.width() / 2 - 9
+        #     rect.setX(option.rect.x() + delta) # Hack to center the checkbox
+        #     editor.setGeometry(rect)
+        elif column == COLOR_COL:
             pass
             # editor.setGeometry(option.rect)
         else:
@@ -338,26 +345,37 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, model_index):
         column = model_index.column()
-        if column == 0: # Part Name
+        if option.rect.height() != 20:
+            top_left = option.rect.topLeft()
+            new_rect = QRect(top_left, QSize(option.rect.width(),20))
+        else:
+            new_rect = QRect(option.rect)
+        option.rect = new_rect
+        if column == NAME_COL: # Part Name
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
-        if column == 1: # Visibility
+        if column == VISIBLE_COL: # Visibility
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionButton()
-            styleoption.rect = QRect(option.rect)
+            styleoption.rect = new_rect
             checked = model_index.model().data(model_index, Qt.EditRole)
             styleoption.state |= QStyle.State_On if checked else QStyle.State_Off
+            # make the check box look a little more active by changing the pallete
+            styleoption.palette.setBrush(QPalette.Button, Qt.white)
+            styleoption.palette.setBrush(QPalette.HighlightedText, Qt.black)
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
             if checked:
-                element =  _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
+                element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
-
-        elif column == 2: # Color
+        elif column == COLOR_COL: # Color
             color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionViewItem()
             styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
-            styleoption.rect = QRect(option.rect)
+            top_left = option.rect.topLeft()
+            # styleoption.rect = QRect(option.rect)
+            styleoption.rect = new_rect
+            # print("color rect", option.rect.height())
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
 
         # elif column == 3: # SpinBox Example

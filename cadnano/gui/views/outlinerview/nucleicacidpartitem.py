@@ -4,7 +4,7 @@ from PyQt5.QtCore import QItemSelectionModel, QItemSelection
 from cadnano.enum import ItemType, PartType
 from cadnano.gui.views import styles
 
-from .cnoutlineritem import CNOutlinerItem
+from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
@@ -27,7 +27,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
 
         # item groups
         self._root_items = {}
-        self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helix', self)
+        self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helices', self)
         self._root_items['OligoList'] = self.createRootPartItem('Oligos', self)
         # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
     # end def
@@ -70,8 +70,11 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num):
+        tw = self.treeWidget()
+        tw.is_child_adding += 1
         vh_i = VirtualHelixItem(id_num, self._root_items['VHelixList'])
         self._virtual_helix_item_hash[id_num] = vh_i
+        tw.is_child_adding -= 1
 
     def partVirtualHelixRemovedSlot(self, model_part, id_num):
         vh_i = self._virtual_helix_item_hash.get(id_num)
@@ -104,7 +107,6 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         """
         vhi_hash = self._virtual_helix_item_hash
         tw = self.treeWidget()
-        # tw.do_filter = True
         model = tw.model()
         selection_model = tw.selectionModel()
         top_idx = tw.indexOfTopLevelItem(self)
@@ -115,14 +117,18 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             flag = QItemSelectionModel.SelectCurrent #| QItemSelectionModel.Rows
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
-                idx = vh_list.indexOfChild(vhi)
-                selection_model.select(model.index(idx, 0, root_midx), flag)
+                # selecting a selected item will deselect it, so check
+                if not vhi.isSelected():
+                    idx = vh_list.indexOfChild(vhi)
+                    selection_model.select(model.index(idx, 0, root_midx), flag)
         else:
             flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect #| QItemSelectionModel.Rows
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
-                idx = vh_list.indexOfChild(vhi)
-                selection_model.select(model.index(idx, 0, root_midx), flag)
+                # deselecting a deselected item will select it, so check
+                if vhi.isSelected():
+                    idx = vh_list.indexOfChild(vhi)
+                    selection_model.select(model.index(idx, 0, root_midx), flag)
         # print("hhihh", tw.selectedItems())
     # end def
 # end class

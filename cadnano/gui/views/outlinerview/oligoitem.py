@@ -1,6 +1,6 @@
 from cadnano.enum import ItemType
 
-from .cnoutlineritem import CNOutlinerItem
+from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL
 from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 

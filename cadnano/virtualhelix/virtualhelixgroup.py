@@ -20,7 +20,8 @@ DEFAULT_CACHE_SIZE = 20
 def defaultProperties(id_num):
     props = [
     ('name', "vh%d" % (id_num)),
-    ('color', '#ffffffff'),
+    ('is_visible', True),
+    ('color', '#00000000'),
     ('eulerZ', 10.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
@@ -529,7 +530,7 @@ class VirtualHelixGroup(CNObject):
         return m0
     # end def
 
-    def createHelix(self, id_num, origin, direction, num_points):
+    def createHelix(self, id_num, origin, direction, num_points, color):
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))
@@ -582,7 +583,7 @@ class VirtualHelixGroup(CNObject):
             yUR = new_y
         self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
-        self.vh_properties.loc[id_num, 'name'] = "vh%d" % (id_num)
+        self.vh_properties.loc[id_num, ['name', 'color']] = "vh%d" % (id_num), color
         self.fwd_strandsets[id_num] = StrandSet(StrandType.FWD,
                                                 id_num, self, num_points)
         self.rev_strandsets[id_num] = StrandSet(StrandType.REV,
@@ -680,7 +681,7 @@ class VirtualHelixGroup(CNObject):
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
         self.vh_properties.loc[id_num, keys] = values
-        if not isinstance(values, Iterable):
+        if not isinstance(values, (tuple, list)):
             keys, values = (keys,) , (values,)
         self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
     # end
