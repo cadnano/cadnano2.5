@@ -16,6 +16,8 @@ from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import NucleicAcidPartItem
+from .virtualhelixitem import VirtualHelixItem
+from .oligoitem import OligoItem
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -82,6 +84,9 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
+        self.model_to_be_selected = []
+        self.model_to_be_deselected = []
+
         custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
 
@@ -89,6 +94,7 @@ class OutlinerTreeWidget(QTreeWidget):
 
         self.model().dataChanged.connect(self.dataChangedSlot)
         self.itemSelectionChanged.connect(self.selectedChangedSlot)
+        self.itemClicked.connect(self.itemClickedHandler)
         # Add some dummy items
         # p1 = self.addDummyRow("Part0", True, "#cc0000")
         # a1 = self.addDummyRow("Asm0",  True, "#00cc00")
@@ -102,16 +108,48 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
+        # print("!!!!!!!!filter")
         filter_set = self._document.filter_set
+        out_deselection = []
         out_selection = []
         flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
         for index in selected_items.indexes():
-              item = self.itemFromIndex(index)
-              if item._filter_name not in filter_set:
-                  out_selection.append(index)
-        if len(out_selection) > 0:
-            selection = QItemSelection(out_selection[0], out_selection[-1])
-            self.selectionModel().select(selection, flags)
+            item = self.itemFromIndex(index)
+            if item._filter_name not in filter_set:
+                out_deselection.append(index)
+            else:
+                out_selection.append(index)
+        if len(out_deselection) > 0:
+            deselection = QItemSelection(out_deselection[0], out_deselection[-1])
+            self.selectionModel().select(deselection, flags)
+
+        self.model_to_be_selected = out_selection
+        self.model_to_be_deselected = deselected_items
+    # end def
+
+    def itemClickedHandler(self, tree_widget_item, column):
+        # print("I'm click", tree_widget_item, tree_widget_item.isSelected())
+        document = self._document
+        if isinstance(tree_widget_item, NucleicAcidPartItem):
+            pass
+        elif isinstance(tree_widget_item, VirtualHelixItem):
+            for index in self.model_to_be_selected:
+                item = self.itemFromIndex(index)
+                id_num, part = item.idNum(), item.part()
+                is_selected = document.isVirtualHelixSelected(part, id_num)
+                if not is_selected:
+                    document.addVirtualHelicesToSelection(part, [id_num])
+            self.model_to_be_selected = []
+            for index in self.model_to_be_deselected:
+                item = self.itemFromIndex(index)
+                id_num, part = item.idNum(), item.part()
+                is_selected = document.isVirtualHelixSelected(part, id_num)
+                if is_selected:
+                    document.removeVirtualHelicesFromSelection(part, [id_num])
+            self.model_to_be_deselected = []
+        elif isinstance(tree_widget_item, OligoItem):
+            pass
+        # end def
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
