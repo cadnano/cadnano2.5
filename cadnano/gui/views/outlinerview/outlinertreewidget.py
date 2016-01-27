@@ -84,8 +84,8 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
-        self.model_to_be_selected = []
-        self.model_to_be_deselected = []
+        self.model_selection_changes = (set(), set())
+        self.do_filter = True   # make sure filter is called onl
 
         custom_delegate = CustomStyleItemDelegate()
         self.setItemDelegate(custom_delegate)
@@ -108,45 +108,56 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
-        # print("!!!!!!!!filter")
-        filter_set = self._document.filter_set
-        out_deselection = []
-        out_selection = []
-        flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
-        for index in selected_items.indexes():
-            item = self.itemFromIndex(index)
-            if item._filter_name not in filter_set:
-                out_deselection.append(index)
-            else:
-                out_selection.append(index)
-        if len(out_deselection) > 0:
-            deselection = QItemSelection(out_deselection[0], out_deselection[-1])
-            self.selectionModel().select(deselection, flags)
+        if self.do_filter:
+            # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
+            filter_set = self._document.filter_set
+            out_deselection = []
+            out_selection = []
+            flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
+            for index in selected_items.indexes():
+                item = self.itemFromIndex(index)
+                if item._filter_name not in filter_set:
+                    out_deselection.append(index)
+                else:
+                    out_selection.append(index)
+            if len(out_deselection) > 0:
+                deselection = QItemSelection(out_deselection[0], out_deselection[-1])
+                self.do_filter = False
+                self.selectionModel().select(deselection, flags)
+                self.do_filter = True
 
-        self.model_to_be_selected = out_selection
-        self.model_to_be_deselected = deselected_items
+            # now group the indices into items in sets
+            tbs, tbd = self.model_selection_changes
+            for idx in out_selection:
+                item = self.itemFromIndex(idx)
+                tbs.add(item)
+            for idx in deselected_items.indexes():
+                item = self.itemFromIndex(idx)
+                tbd.add(item)
     # end def
 
     def itemClickedHandler(self, tree_widget_item, column):
-        # print("I'm click", tree_widget_item, tree_widget_item.isSelected())
+        # print("I'm click", tree_widget_item.__class__.__name__, tree_widget_item.isSelected())
         document = self._document
+        model_to_be_selected, model_to_be_deselected = self.model_selection_changes
+        self.do_filter = True
         if isinstance(tree_widget_item, NucleicAcidPartItem):
             pass
         elif isinstance(tree_widget_item, VirtualHelixItem):
-            for index in self.model_to_be_selected:
-                item = self.itemFromIndex(index)
+            for item in model_to_be_selected:
                 id_num, part = item.idNum(), item.part()
                 is_selected = document.isVirtualHelixSelected(part, id_num)
+                # print("select id_num", id_num, is_selected)
                 if not is_selected:
                     document.addVirtualHelicesToSelection(part, [id_num])
-            self.model_to_be_selected = []
-            for index in self.model_to_be_deselected:
-                item = self.itemFromIndex(index)
+            model_to_be_selected.clear()
+            for item in model_to_be_deselected:
                 id_num, part = item.idNum(), item.part()
                 is_selected = document.isVirtualHelixSelected(part, id_num)
+                # print("de id_num", id_num, is_selected)
                 if is_selected:
                     document.removeVirtualHelicesFromSelection(part, [id_num])
-            self.model_to_be_deselected = []
+            model_to_be_deselected.clear()
         elif isinstance(tree_widget_item, OligoItem):
             pass
         # end def

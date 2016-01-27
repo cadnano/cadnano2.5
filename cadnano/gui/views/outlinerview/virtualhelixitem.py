@@ -18,6 +18,12 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
         self._controller = VirtualHelixItemController(self, model_part, False, False)
     # end def
 
+    def __hash__(self):
+        """ necessary as CNOutlinerItem as a base class is unhashable
+        but necessary due to __init__ arg differences for whatever reason
+        """
+        return hash((self._id_num, self._model_part))
+
     ### PRIVATE SUPPORT METHODS ###
 
     ### PUBLIC SUPPORT METHODS ###

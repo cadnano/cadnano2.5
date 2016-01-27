@@ -104,6 +104,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         """
         vhi_hash = self._virtual_helix_item_hash
         tw = self.treeWidget()
+        # tw.do_filter = True
         model = tw.model()
         selection_model = tw.selectionModel()
         top_idx = tw.indexOfTopLevelItem(self)
