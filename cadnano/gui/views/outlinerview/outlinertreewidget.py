@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtCore import Qt, QRect, QSize
 from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
-from PyQt5.QtWidgets import QTreeWidget, QHeaderView
+from PyQt5.QtWidgets import QTreeWidget, QHeaderView, QMenu, QAction
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
@@ -55,7 +55,9 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setColumnWidth(0, 140)
         self.setColumnWidth(1, 18)
         self.setColumnWidth(2, 18)
-        # self.setUniformRowHeights(True)
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.getCustomContextMenu)
 
         # Dragging
         self.setDragEnabled(True)
@@ -64,7 +66,6 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setSelectionBehavior(QAbstractItemView.SelectRows)
 
         self.model_selection_changes = (set(), set())
-        # self.do_filter = True   # make sure filter is called only when necessary
         self.is_child_adding = 0
 
         custom_delegate = CustomStyleItemDelegate()
@@ -118,21 +119,18 @@ class OutlinerTreeWidget(QTreeWidget):
         #    tree_widget_item.isSelected())
         document = self._document
         model_to_be_selected, model_to_be_deselected = self.model_selection_changes
-        print("click column", column)
-        #1. handle clicks on check marks
+        # print("click column", column)
+        # 1. handle clicks on check marks to speed things up over using an editor
         if column == VISIBLE_COL:
             self.blockSignals(True)
             if tree_widget_item.data(column, Qt.DisplayRole):
-                print("unchecking", tree_widget_item.__class__.__name__)
+                # print("unchecking", tree_widget_item.__class__.__name__)
                 tree_widget_item.setData(column, Qt.EditRole, False)
-                # self.closePersistentEditor(tree_widget_item, column)
             else:
-                print("checking", tree_widget_item.__class__.__name__)
+                # print("checking", tree_widget_item.__class__.__name__)
                 tree_widget_item.setData(column, Qt.EditRole, True)
-                # self.closePersistentEditor(tree_widget_item, column)
             self.blockSignals(False)
-        # else:
-        #     self.openPersistentEditor(tree_widget_item, column)
+        # end if
 
 
         # 2. handle document selection
@@ -173,6 +171,66 @@ class OutlinerTreeWidget(QTreeWidget):
                         item = self.itemFromIndex(index)
                         if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
                             item.updateCNModel()
+    # end def
+
+    def getCustomContextMenu(self, point):
+        """ point (QPoint)
+        """
+        menu = QMenu(self)
+
+        hide_act = QAction("Hide selection", self)
+        hide_act.setStatusTip("Hide selection")
+        hide_act.triggered.connect(self.hideSelection)
+        menu.addAction(hide_act)
+
+        show_act = QAction("Show selection", self)
+        show_act.setStatusTip("Show selection")
+        show_act.triggered.connect(self.showSelection)
+        menu.addAction(show_act)
+
+        color_act = QAction("Change colors", self)
+        color_act.setStatusTip("Change selection colors")
+        color_act.triggered.connect(self.colorSelection)
+        menu.addAction(color_act)
+
+        menu.exec_(self.mapToGlobal(point))
+    # end def
+
+    def hideSelection(self):
+        column = VISIBLE_COL
+        for item in self.selectedItems():
+            if isinstance(item, (VirtualHelixItem)):
+                item.setData(column, Qt.EditRole, False)
+                # print("hiding", item.__class__.__name__, item.idNum())
+            else:
+                print("item unhidable", item.__class__.__name__)
+    # end def
+
+    def showSelection(self):
+        column = VISIBLE_COL
+        for item in self.selectedItems():
+            if isinstance(item, (VirtualHelixItem)):
+                item.setData(column, Qt.EditRole, True)
+                # print("showing", item.__class__.__name__, item.idNum())
+            else:
+                print("item unshowable", item.__class__.__name__)
+    # end def
+
+    def colorSelection(self):
+        dialog = QColorDialog(self)
+        dialog.colorSelected.connect(self.colorSelectionSlot)
+        dialog.open()
+    # end def
+
+    def colorSelectionSlot(self, color):
+        column = COLOR_COL
+        color_name = color.name()
+        for item in self.selectedItems():
+            if isinstance(item, (VirtualHelixItem)):
+                item.setData(column, Qt.EditRole, color_name)
+                # print("coloring", item.__class__.__name__, item.idNum())
+            else:
+                print("item uncolorable", item.__class__.__name__)
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
@@ -268,20 +326,14 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             editor = QLineEdit(parent_QWidget)
             editor.setAlignment(Qt.AlignVCenter)
             return editor
-        # elif column == 1: # Visibility checkbox
-        #     editor = QCheckBox(parent_QWidget)
-        #     # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
-        #     return editor
+        elif column == 1: # Visibility checkbox
+            # editor = QCheckBox(parent_QWidget)
+            # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
+            # return editor
+            return None
         elif column == COLOR_COL: # Color Picker
-            print("##############dsfsdfdsdfgsdfg")
             editor = QColorDialog(parent_QWidget)
             return editor
-        # elif column == 3: # SpinBox Example
-        #     editor = QSpinBox(parent_QWidget)
-        #     editor.setAlignment(Qt.AlignHCenter|Qt.AlignVCenter)
-        #     editor.setMinimum(0)
-        #     editor.setMaximum(100)
-        #     return editor
         else:
             return QStyledItemDelegate.createEditor(self, \
                             parent_QWidget, option, model_index)
@@ -297,11 +349,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         #     editor.setChecked(value)
         elif column == COLOR_COL: # Color
             value = model_index.model().data(model_index, Qt.EditRole)
-            # editor.setText(value)
             editor.setCurrentColor(QColor(value))
-        # elif column == 3: # SpinBox Example
-        #     value = model_index.model().data(model_index, Qt.EditRole)
-        #     editor.setValue(value)
         else:
             QStyledItemDelegate.setEditorData(self, editor, model_index)
     # end def
@@ -315,14 +363,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         #     value = editor.isChecked()
         #     model.setData(model_index, value, Qt.EditRole)
         elif column == COLOR_COL: # Color
-            # color = editor.text()
-            # model.setData(model_index, color, Qt.EditRole)
             color = editor.currentColor()
             model.setData(model_index, color.name(), Qt.EditRole)
-
-        # elif column == 3: # SpinBox Example
-        #     value = editor.value()
-        #     model.setData(model_index, value, Qt.EditRole)
         else:
             QStyledItemDelegate.setModelData(self, editor, model, model_index)
     # end def
@@ -336,9 +378,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         #     delta = option.rect.width() / 2 - 9
         #     rect.setX(option.rect.x() + delta) # Hack to center the checkbox
         #     editor.setGeometry(rect)
-        elif column == COLOR_COL:
-            pass
-            # editor.setGeometry(option.rect)
+        # elif column == COLOR_COL:
+        #     editor.setGeometry(option.rect)
         else:
             QStyledItemDelegate.updateEditorGeometry(self, editor, option, model_index)
     # end def
@@ -346,7 +387,6 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     def paint(self, painter, option, model_index):
         column = model_index.column()
         new_rect = QRect(option.rect)
-        option.rect = new_rect
         if column == NAME_COL: # Part Name
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
