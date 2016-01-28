@@ -110,6 +110,19 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
+        for key, val in zip(keys, values):
+            if key == 'is_visible':
+                if val:
+                    self.show()
+                    self._handle.show()
+                else:
+                    self.hide()
+                    self._handle.hide()
+                    return
+            else:
+                pass
+        # end for
+
         # for key, val in zip(keys, values):
         #     # if key == 'z':
         #     #     z = float(value)

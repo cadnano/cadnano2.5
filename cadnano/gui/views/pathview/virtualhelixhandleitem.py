@@ -301,7 +301,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         part = self._model_part
         is_selected = document.isVirtualHelixSelected(part, id_num)
         if is_selected:
-            print("VHHI remove")
+            # print("VHHI remove")
             document.removeVirtualHelicesFromSelection(part, [id_num])
         else:
             self.restoreParent()
@@ -312,7 +312,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         part = self._model_part
         is_selected = document.isVirtualHelixSelected(part, id_num)
         if not is_selected:
-            print("VHHHI add")
+            # print("VHHHI add")
             document.addVirtualHelicesToSelection(part, [id_num])
         else:
             self.setSelected(True)
