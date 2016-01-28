@@ -345,11 +345,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def paint(self, painter, option, model_index):
         column = model_index.column()
-        if option.rect.height() != 20:
-            top_left = option.rect.topLeft()
-            new_rect = QRect(top_left, QSize(option.rect.width(),20))
-        else:
-            new_rect = QRect(option.rect)
+        new_rect = QRect(option.rect)
         option.rect = new_rect
         if column == NAME_COL: # Part Name
             option.displayAlignment = Qt.AlignVCenter
@@ -373,30 +369,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             styleoption = QStyleOptionViewItem()
             styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
             top_left = option.rect.topLeft()
-            # styleoption.rect = QRect(option.rect)
             styleoption.rect = new_rect
             # print("color rect", option.rect.height())
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
-
-        # elif column == 3: # SpinBox Example
-        #     value = model_index.model().data(model_index, Qt.EditRole)
-        #     option.displayAlignment = Qt.AlignHCenter | Qt.AlignVCenter
-        #     currentQRect = QRect(option.rect)
-        #     # currentQRect.setWidth(currentQRect.width() - 22)
-        #     currentQRect.setWidth(20)
-        #     # self.drawDisplay(painter, option, currentQRect, value)
-        #     spinBoxQStyleOptionSpinBox = QStyleOptionSpinBox()
-        #     spinBoxQStyleOptionSpinBox.rect = QRect(option.rect)
-        #     _QCOMMONSTYLE.drawComplexControl(_QCOMMONSTYLE.CC_SpinBox, \
-        #                                             spinBoxQStyleOptionSpinBox, \
-        #                                             painter)
-        # elif column == 4: # PushButton example
-        #     text_QString = model_index.model().data(model_index, Qt.EditRole)
-        #     buttonQStyleOptionButton = QStyleOptionButton()
-        #     buttonQStyleOptionButton.rect = QRect(option.rect)
-        #     buttonQStyleOptionButton.text = text_QString
-        #     buttonQStyleOptionButton.state = QStyle.State_Active
-        #     _QCOMMONSTYLE.drawControl(_QCOMMONSTYLE.CE_PushButton, buttonQStyleOptionButton, painter)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)
     # end def
