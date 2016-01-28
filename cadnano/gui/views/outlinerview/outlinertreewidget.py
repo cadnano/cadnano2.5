@@ -1,5 +1,5 @@
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtCore import Qt, QRect, QSize
+from PyQt5.QtCore import pyqtSignal, QObject, QDataStream
+from PyQt5.QtCore import Qt, QRect, QSize, QVariant
 from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView, QMenu, QAction
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
@@ -20,6 +20,7 @@ from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
 from .nucleicacidpartitem import NucleicAcidPartItem
 from .virtualhelixitem import VirtualHelixItem
 from .oligoitem import OligoItem
+import struct
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -231,6 +232,53 @@ class OutlinerTreeWidget(QTreeWidget):
                 # print("coloring", item.__class__.__name__, item.idNum())
             else:
                 print("item uncolorable", item.__class__.__name__)
+    # end def
+
+    def dropEvent(self, event):
+        data = event.mimeData()
+        if data.hasFormat('application/x-qabstractitemmodeldatalist'):
+            bytearray = data.data('application/x-qabstractitemmodeldatalist')
+            data_item1 = self.decodeMimeData(bytearray)
+            # data_item2 = self.decodeMimeData(bytearray)
+            print("got a drop event", data_item1)
+
+        # item Drop above
+        pos = event.pos()
+        dest_item = self.itemAt(pos)
+        if dest_item is None:
+            return
+        dest_parent = dest_item.parent()
+        print("VH:", dest_item.idNum()) # dropped above this item
+        selected_items = self.selectedItems()
+        print("selected", [x.idNum() for x in selected_items])
+        for x in selected_items:
+            if x.parent() != dest_parent:
+                return
+        # print("event source", event.source())
+        return QTreeWidget.dropEvent(self, event)
+    # end def
+
+    def decodeMimeData(self, bytearray):
+        """
+        see:
+        https://wiki.python.org/moin/PyQt/Handling%20Qt's%20internal%20item%20MIME%20type
+        http://doc.qt.io/qt-5.5/datastreamformat.html
+        """
+        data = {}
+        ds = QDataStream(bytearray)
+        while not ds.atEnd():
+            item = []
+            row = ds.readInt32()
+            column = ds.readInt32()
+            number_of_items = ds.readInt32()
+            # print("rc:", row, column, number_of_items)
+            for i in range(number_of_items):
+                key = ds.readInt32()
+                value = QVariant()
+                ds >> value
+                item.append((value.value(), Qt.ItemDataRole(key)))
+            data[(row, column)] = item
+        return data
     # end def
 
     def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
