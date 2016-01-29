@@ -25,7 +25,7 @@ _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
 
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
-    _filter_name = "virtual_helix"
+    FILTER_NAME = "virtual_helix"
 
     def __init__(self, virtual_helix_item, part_item, viewroot):
         super(VirtualHelixHandleItem, self).__init__(part_item)
@@ -272,9 +272,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             viewroot = self._viewroot
             current_filter_set = viewroot.selectionFilterSet()
             selection_group = viewroot.vhiHandleSelectionGroup()
-            # print("filter set", current_filter_set, self._filter_name)
+            # print("filter set", current_filter_set, self.FILTER_NAME)
             # only add if the selection_group is not locked out
-            if value == True and self._filter_name in current_filter_set:
+            if value == True and self.FILTER_NAME in current_filter_set:
                 if self.group() != selection_group:
                     selection_group.pendToAdd(self)
                     selection_group.setSelectionLock(selection_group)

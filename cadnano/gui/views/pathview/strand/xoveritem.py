@@ -209,7 +209,7 @@ class XoverItem(QGraphicsPathItem):
 
     XoverItem should be a child of a PartItem.
     """
-    _filter_name = "xover"
+    FILTER_NAME = "xover"
 
     def __init__(self, strand_item, virtual_helix_item):
         """
@@ -449,7 +449,7 @@ class XoverItem(QGraphicsPathItem):
             sI = self._strand_item
             viewroot = sI.viewroot()
             current_filter_set = viewroot.selectionFilterSet()
-            if sI.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
+            if sI.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
                 event.setAccepted(True)
                 selection_group = viewroot.strandItemSelectionGroup()
                 mod = Qt.MetaModifier
@@ -531,7 +531,7 @@ class XoverItem(QGraphicsPathItem):
                 current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
                 # only add if the selection_group is not locked out
-                if value == True and (self._filter_name in current_filter_set or not selection_group.isNormalSelect()):
+                if value == True and (self.FILTER_NAME in current_filter_set or not selection_group.isNormalSelect()):
                     if sI.strandFilter() in current_filter_set:
                         # print("might add a xoi")
                         if self.group() != selection_group and selection_group.isNormalSelect():

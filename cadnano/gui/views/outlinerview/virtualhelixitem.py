@@ -2,18 +2,21 @@ from PyQt5.QtCore import Qt
 
 from cadnano.enum import ItemType
 
-from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LEAF_FLAGS
 
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
 class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
-    _filter_name = "virtual_helix"
+    FILTER_NAME = "virtual_helix"
+    CAN_NAME_EDIT = False
+
     def __init__(self, id_num, part_item):
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         model_part = self._model_part
         CNOutlinerItem.__init__(self, model_part, parent=part_item)
+        self.setFlags(LEAF_FLAGS)
         name, color = self.getProperty(['name', 'color'])
         self.setData(NAME_COL, Qt.DisplayRole, name)
         self.setData(COLOR_COL, Qt.DisplayRole, color)

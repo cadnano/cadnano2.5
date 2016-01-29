@@ -5,16 +5,19 @@ NAME_COL = 0
 VISIBLE_COL = 1
 COLOR_COL = 2
 
+
+LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEnabled |
+                Qt.ItemIsDragEnabled | Qt.ItemIsEditable |
+                Qt.ItemIsUserCheckable)
+
 class CNOutlinerItem(QTreeWidgetItem):
 
     PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
+    CAN_NAME_EDIT = True
 
     def __init__(self, cn_model, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = cn_model
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
-        # self.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled |
-        #                 Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled)
         name = cn_model.getName()
         color = cn_model.getColor()
         self.setData(NAME_COL, Qt.EditRole, name)

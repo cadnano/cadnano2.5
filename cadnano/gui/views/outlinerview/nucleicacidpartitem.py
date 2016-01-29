@@ -11,7 +11,7 @@ from .oligoitem import OligoItem
 from .virtualhelixitem import VirtualHelixItem
 
 class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
-    _filter_name = "part"
+    FILTER_NAME = "part"
     def __init__(self, model_part, parent):
         super(NucleicAcidPartItem, self).__init__(model_part, parent)
         self._controller = NucleicAcidPartItemController(self, model_part)

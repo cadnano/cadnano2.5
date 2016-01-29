@@ -69,7 +69,7 @@ class OutlinerTreeWidget(QTreeWidget):
         self.model_selection_changes = (set(), set())
         self.is_child_adding = 0
 
-        custom_delegate = CustomStyleItemDelegate()
+        custom_delegate = CustomStyleItemDelegate(self)
         self.setItemDelegate(custom_delegate)
 
         self.selectionModel().selectionChanged.connect(self.selectionFilter)
@@ -90,9 +90,9 @@ class OutlinerTreeWidget(QTreeWidget):
         flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
         for index in selected_items.indexes():
             item = self.itemFromIndex(index)
-            if item._filter_name not in filter_set:
+            if item.FILTER_NAME not in filter_set:
                 if index.column() == 0:
-                    # print("deselect", item._filter_name,
+                    # print("deselect", item.FILTER_NAME,
                     #                     index.row(), index.column())
                     out_deselection.append(index)
             else:
@@ -235,12 +235,11 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def dropEvent(self, event):
-        data = event.mimeData()
-        if data.hasFormat('application/x-qabstractitemmodeldatalist'):
-            bytearray = data.data('application/x-qabstractitemmodeldatalist')
-            data_item1 = self.decodeMimeData(bytearray)
-            # data_item2 = self.decodeMimeData(bytearray)
-            print("got a drop event", data_item1)
+        # data = event.mimeData()
+        # if data.hasFormat('application/x-qabstractitemmodeldatalist'):
+        #     bytearray = data.data('application/x-qabstractitemmodeldatalist')
+        #     data_item1 = self.decodeMimeData(bytearray)
+        #     print("got a drop event", data_item1)
 
         # item Drop above
         pos = event.pos()
@@ -248,13 +247,12 @@ class OutlinerTreeWidget(QTreeWidget):
         if dest_item is None:
             return
         dest_parent = dest_item.parent()
-        print("VH:", dest_item.idNum()) # dropped above this item
         selected_items = self.selectedItems()
-        print("selected", [x.idNum() for x in selected_items])
         for x in selected_items:
             if x.parent() != dest_parent:
                 return
-        # print("event source", event.source())
+        print("VH:", dest_item.idNum()) # dropped above this item
+        print("selected", [x.idNum() for x in selected_items])
         return QTreeWidget.dropEvent(self, event)
     # end def
 
@@ -371,9 +369,11 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
         if column == NAME_COL: # Model name
-            editor = QLineEdit(parent_QWidget)
-            editor.setAlignment(Qt.AlignVCenter)
-            return editor
+            item = self.parent().itemFromIndex(model_index)
+            if item.CAN_NAME_EDIT:
+                editor = QLineEdit(parent_QWidget)
+                editor.setAlignment(Qt.AlignVCenter)
+                return editor
         elif column == 1: # Visibility checkbox
             # editor = QCheckBox(parent_QWidget)
             # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368

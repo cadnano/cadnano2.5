@@ -28,7 +28,7 @@ _NO_PEN = QPen(Qt.NoPen)
 
 
 class StrandItem(QGraphicsLineItem):
-    _filter_name = "strand"
+    FILTER_NAME = "strand"
 
     def __init__(self, model_strand, virtual_helix_item, viewroot):
         """The parent should be a VirtualHelixItem."""
@@ -561,7 +561,7 @@ class StrandItem(QGraphicsLineItem):
     def selectToolMousePress(self, event, idx):
         event.setAccepted(False)
         current_filter_set = self._viewroot.selectionFilterSet()
-        if self.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
+        if self.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
             selection_group = self._viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (event.modifiers() & mod):
@@ -645,7 +645,7 @@ class StrandItem(QGraphicsLineItem):
         """
         m_strand = self._model_strand
         current_filter_set = self._viewroot.selectionFilterSet()
-        if self.strandFilter() in current_filter_set and self._filter_name in current_filter_set:
+        if self.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
             olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
             if olg_len:
                 msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)
@@ -658,8 +658,8 @@ class StrandItem(QGraphicsLineItem):
                 self.partItem().updateStatusBar(msg)
         else:
             logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_set,
-                        self.strandFilter(), self._filter_name)
+                        "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+                        self.strandFilter(), self.FILTER_NAME)
     # end def
 
     def restoreParent(self, pos=None):
@@ -707,7 +707,7 @@ class StrandItem(QGraphicsLineItem):
 
                 # only add if the selection_group is not locked out
                 is_normal_select = selection_group.isNormalSelect()
-                if value == True and (self._filter_name in current_filter_set or not is_normal_select):
+                if value == True and (self.FILTER_NAME in current_filter_set or not is_normal_select):
                     if self._strand_filter in current_filter_set:
                         if self.group() != selection_group:
                             self.setSelectedColor(True)

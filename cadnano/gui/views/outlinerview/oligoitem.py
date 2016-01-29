@@ -1,13 +1,15 @@
 from cadnano.enum import ItemType
 
-from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import (CNOutlinerItem, NAME_COL,
+                            VISIBLE_COL, COLOR_COL, LEAF_FLAGS)
 from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 
 class OligoItem(CNOutlinerItem, AbstractOligoItem):
-    _filter_name = "strand"
+    FILTER_NAME = "strand"
     def __init__(self, model_oligo, parent):
         super(OligoItem, self).__init__(model_oligo, parent)
+        self.setFlags(LEAF_FLAGS)
         self._controller = OligoItemController(self, model_oligo)
     # end def
 

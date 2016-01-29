@@ -70,7 +70,7 @@ MOD_RECT = QRectF(.25*_BASE_WIDTH, -.25*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.5*_BASE_
 
 class EndpointItem(QGraphicsPathItem):
 
-    _filter_name = "endpoint"
+    FILTER_NAME = "endpoint"
 
     def __init__(self, strand_item, cap_type, is_drawn5to3):
         """The parent should be a StrandItem."""
@@ -276,7 +276,7 @@ class EndpointItem(QGraphicsPathItem):
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
         if (s_i.strandFilter() in current_filter_set
-                                    and self._filter_name in current_filter_set):
+                                    and self.FILTER_NAME in current_filter_set):
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -289,8 +289,8 @@ class EndpointItem(QGraphicsPathItem):
                 self.partItem().updateStatusBar(msg)
         else:
             logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, _filter_name=%s", m_strand, current_filter_set,
-                        s_i.strandFilter(), self._filter_name)
+                        "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+                        s_i.strandFilter(), self.FILTER_NAME)
     # end def
 
     def modsToolMousePress(self, modifiers, event, idx):
@@ -390,7 +390,7 @@ class EndpointItem(QGraphicsPathItem):
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
         if (s_i.strandFilter() in current_filter_set
-                                    and self._filter_name in current_filter_set):
+                                    and self.FILTER_NAME in current_filter_set):
             selection_group = viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (modifiers & mod):
@@ -499,7 +499,7 @@ class EndpointItem(QGraphicsPathItem):
                 selection_group = viewroot.strandItemSelectionGroup()
 
                 # only add if the selection_group is not locked out
-                if value == True and self._filter_name in current_filter_set:
+                if value == True and self.FILTER_NAME in current_filter_set:
                     # if self.group() != selection_group \
                     #                   and s_i.strandFilter() in current_filter_set
                     if s_i.strandFilter() in current_filter_set:
