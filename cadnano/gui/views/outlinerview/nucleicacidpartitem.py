@@ -90,7 +90,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
-        print("part", is_selected)
+        # print("part", is_selected)
         self.setSelected(is_selected)
     # end def
 
@@ -115,12 +115,14 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         vh_list = self._root_items['VHelixList']
         root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
         if is_adding:
-            flag = QItemSelectionModel.Current | QItemSelectionModel.Select  #QItemSelectionModel.SelectCurrent #| QItemSelectionModel.Rows
+            flag = QItemSelectionModel.Select#Current #| QItemSelectionModel.Rows
             for id_num in vh_set:
-                print("should be selecting", id_num)
                 vhi = vhi_hash.get(id_num)
                 # selecting a selected item will deselect it, so check
                 if not vhi.isSelected():
+                    # print("should be selecting", id_num)
+                    # sitems = [tw.itemFromIndex(i) for i in selection_model.selection().indexes()]
+                    # print("isSelected", sitems)
                     idx = vh_list.indexOfChild(vhi)
                     selection_model.select(model.index(idx, 0, root_midx), flag)
         else:
