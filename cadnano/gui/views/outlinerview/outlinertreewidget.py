@@ -109,9 +109,11 @@ class OutlinerTreeWidget(QTreeWidget):
         tbs, tbd = self.model_selection_changes
         for idx in out_selection:
             item = self.itemFromIndex(idx)
+            print("did deselect", item)
             tbs.add(item)
         for idx in deselected_items.indexes():
             item = self.itemFromIndex(idx)
+            print("did deselect", item)
             tbd.add(item)
     # end def
 
@@ -475,6 +477,7 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def clearSelectionsSlot(self, doc):
+        print("clearSelection")
         self.selectionModel().clearSelection()
     # end def
 

@@ -90,6 +90,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
+        print("part", is_selected)
         self.setSelected(is_selected)
     # end def
 
@@ -114,8 +115,9 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         vh_list = self._root_items['VHelixList']
         root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
         if is_adding:
-            flag = QItemSelectionModel.SelectCurrent #| QItemSelectionModel.Rows
+            flag = QItemSelectionModel.Current | QItemSelectionModel.Select  #QItemSelectionModel.SelectCurrent #| QItemSelectionModel.Rows
             for id_num in vh_set:
+                print("should be selecting", id_num)
                 vhi = vhi_hash.get(id_num)
                 # selecting a selected item will deselect it, so check
                 if not vhi.isSelected():
@@ -125,10 +127,21 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect #| QItemSelectionModel.Rows
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
+                # print("should be deselecting?", id_num)
                 # deselecting a deselected item will select it, so check
                 if vhi.isSelected():
                     idx = vh_list.indexOfChild(vhi)
                     selection_model.select(model.index(idx, 0, root_midx), flag)
         # print("hhihh", tw.selectedItems())
+    # end def
+
+    def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):
+        """docstring for partVirtualHelicesReorderedSlot"""
+        vhi_dict = self._virtual_helix_item_hash
+        new_list = [vhi_dict[id_num] for id_num in ordered_id_list]
+        root_vhi = self._root_items['VHelixList']
+        root_vhi.takeChildren()
+        for vhi in new_list:
+            root_vhi.addChild(vhi)
     # end def
 # end class
