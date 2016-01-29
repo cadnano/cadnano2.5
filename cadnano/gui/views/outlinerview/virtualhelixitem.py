@@ -31,6 +31,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
         """
         return hash((self._id_num, self._model_part))
 
+    def __repr__(self):
+        return "VHI Outline %d" % self._id_num
+
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
         return ItemType.VIRTUALHELIX

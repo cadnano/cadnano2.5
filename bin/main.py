@@ -21,7 +21,7 @@ if "-t" in sys.argv:
     os.environ['CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME'] = 'YES'
 
 def main(argv=None):
-    print(argv)
+    # print(argv)
     from cadnano import initAppWithGui
     # Things are a lot easier if we can pass None instead of sys.argv and only fall back to sys.argv when we need to.
     app = initAppWithGui(argv)

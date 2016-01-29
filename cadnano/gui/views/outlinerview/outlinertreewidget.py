@@ -1,7 +1,7 @@
 from PyQt5.QtCore import pyqtSignal, QObject, QDataStream
 from PyQt5.QtCore import Qt, QRect, QSize, QVariant
 from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
-from PyQt5.QtWidgets import QTreeWidget, QHeaderView, QMenu, QAction
+from PyQt5.QtWidgets import QTreeWidget, QHeaderView, QMenu, QAction, QTreeView
 from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
 from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 from PyQt5.QtWidgets import QColorDialog
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QItemSelection
+from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QItemSelection, QPersistentModelIndex
 
 from cadnano.enum import PartType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
@@ -160,7 +160,7 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def dataChangedSlot(self, top_left, bottom_right):
         if self.is_child_adding == 0:
-            if top_left == bottom_right:
+            if top_left == bottom_right:    # single item
                 item = self.itemFromIndex(top_left)
                 if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
                     # print("dataChanged", item.__class__.__name__)
@@ -170,6 +170,8 @@ class OutlinerTreeWidget(QTreeWidget):
                 for index in selection.indexes():
                     if index.column() == 0:
                         item = self.itemFromIndex(index)
+                        # if isinstance(item, VirtualHelixItem):
+                        #     print("slap", item.idNum())
                         if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
                             item.updateCNModel()
     # end def
@@ -235,11 +237,13 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def dropEvent(self, event):
+        """ custom drop event to prevent reparenting
+        """
         # data = event.mimeData()
         # if data.hasFormat('application/x-qabstractitemmodeldatalist'):
         #     bytearray = data.data('application/x-qabstractitemmodeldatalist')
-        #     data_item1 = self.decodeMimeData(bytearray)
-        #     print("got a drop event", data_item1)
+        #     data_item = self.decodeMimeData(bytearray)
+        #     print("got a drop event", data_item)
 
         # item Drop above
         pos = event.pos()
@@ -251,9 +255,143 @@ class OutlinerTreeWidget(QTreeWidget):
         for x in selected_items:
             if x.parent() != dest_parent:
                 return
-        print("VH:", dest_item.idNum()) # dropped above this item
-        print("selected", [x.idNum() for x in selected_items])
-        return QTreeWidget.dropEvent(self, event)
+        # print("VH:", dest_item.idNum()) # dropped above this item
+        # print("selected", [x.idNum() for x in selected_items])
+        res = self.myDropEvent(event, dest_item)
+        if isinstance(dest_item, VirtualHelixItem):
+            part = dest_item.part()
+            vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
+            part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
+        # return QTreeWidget.dropEvent(self, event)
+    # end def
+
+    def myDropEvent(self, event, drop_item):
+        """ workaround for broken QTreeWidget::dropEvent
+        per https://bugreports.qt.io/browse/QTBUG-45320
+        doing reverse ordering of items on dropping.  reimplementation in python
+        from C++
+        """
+        if event.source() == self and (event.dropAction() == Qt.MoveAction or
+                                        self.dragDropMode() == QAbstractItemView.InternalMove):
+            droptuple = self.dropOn(event, drop_item)
+            if droptuple is not None:
+                (row, col, drop_index) = droptuple
+                # print("droptuple", droptuple[2].row())
+                idxs = self.selectedIndexes()
+                indexes = []
+                for idx in idxs:
+                    if idx.column() == 0:
+                        indexes.append(idx)
+                if drop_index in indexes:
+                    return
+                # When removing items the drop location could shift
+                new_drop_index = QPersistentModelIndex(self.model().index(row, col, drop_index))
+                # print("updatated drop_row", new_drop_index.row())
+                # Remove the items
+                taken = []
+                for i in range(len(indexes) - 1, -1, -1):
+                    # print("idx", indexes[i].row(), indexes[i].column())
+                    parent = self.itemFromIndex(indexes[i]);
+                    if parent is None or parent.parent() is None:
+                        t_item = self.takeTopLevelItem(indexes[i].row())
+                        taken.append(t_item)
+                    else:
+                        t_item = parent.parent().takeChild(indexes[i].row())
+                        taken.append(t_item)
+                # end for
+                # insert them back in at their new positions
+                for i in range(len(indexes)):
+                    # Either at a specific point or appended
+                    if row == -1:
+                        if drop_index.isValid():
+                            parent = self.itemFromIndex(drop_index)
+                            parent.insertChild(parent.childCount(), taken.pop())
+                        else:
+                            self.insertTopLevelItem(self.topLevelItemCount(), taken.pop())
+                    else:
+                        r = new_drop_index.row() if new_drop_index.row() >= 0 else row
+                        if drop_index.isValid():
+                            parent = self.itemFromIndex(drop_index)
+                            parent.insertChild(min(r, parent.childCount()), taken.pop())
+                        else:
+                            self.insertTopLevelItem(min(r, self.topLevelItemCount()), taken.pop())
+                # end for
+
+                event.accept()
+                # Don't want QAbstractItemView to delete it because it was "moved" we already did it
+                event.setDropAction(Qt.CopyAction)
+        QTreeView.dropEvent(self, event)
+    # end def
+
+    def dropOn(self, event, drop_item):
+        """ reimplementation of QAbstractItemViewPrivate::dropOn
+        """
+        if event.isAccepted():
+            return False
+
+        index = self.indexFromItem(drop_item)
+        root = self.rootIndex()
+        # If we are allowed to do the drop
+        if self.model().supportedDropActions() and event.dropAction():
+            row = -1
+            col = -1
+            if index != root:
+                dip = self.dropPosition(event.pos(),
+                            QTreeView.visualRect(self, index), index)
+                if dip is QAbstractItemView.AboveItem:
+                    row = index.row()
+                    col = index.column()
+                    index = index.parent()
+                elif dip is QAbstractItemView.BelowItem:
+                    row = index.row() + 1
+                    col = index.column()
+                    index = index.parent()
+            else:
+                dip = QAbstractItemView.OnViewport
+
+            drop_index = index
+            drop_row = row
+            drop_col = col
+            self.drop_indicator_position = dip
+            if not self.isDroppingOnItself(event, index, root):
+                return (drop_row, drop_col, drop_index)
+        return None
+    # end def
+
+    def dropPosition(self, pos, rect, index):
+        """ reimplementation of QAbstractItemViewPrivate::position
+        """
+        r = QAbstractItemView.OnViewport
+        margin = 2
+        if pos.y() - rect.top() < margin:
+            r = QAbstractItemView.AboveItem
+        elif rect.bottom() - pos.y() < margin:
+            r = QAbstractItemView.BelowItem
+        elif rect.contains(pos, True):
+            r = QAbstractItemView.OnItem
+
+        if r == QAbstractItemView.OnItem and (not (self.model().flags(index) & Qt.ItemIsDropEnabled)):
+            r = QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QAbstractItemView.BelowItem
+        return r
+    # end def
+
+    def isDroppingOnItself(self, event, index, root_index):
+        """ reimplementation of QAbstractItemViewPrivate::droppingOnItself
+        """
+        drop_action = event.dropAction()
+        if self.dragDropMode() == QAbstractItemView.InternalMove:
+            drop_action = Qt.MoveAction
+        if (event.source() == self
+            and event.possibleActions() & Qt.MoveAction
+            and drop_action == Qt.MoveAction):
+            selected_indexes = self.selectedIndexes()
+            child = index
+            while child.isValid() and child != root_index:
+                if child in selected_indexes:
+                    return True
+                child = child.parent()
+        # end if
+        return False
     # end def
 
     def decodeMimeData(self, bytearray):
@@ -263,19 +401,21 @@ class OutlinerTreeWidget(QTreeWidget):
         http://doc.qt.io/qt-5.5/datastreamformat.html
         """
         data = {}
+        data_list = []
         ds = QDataStream(bytearray)
         while not ds.atEnd():
             item = []
             row = ds.readInt32()
             column = ds.readInt32()
             number_of_items = ds.readInt32()
-            # print("rc:", row, column, number_of_items)
+            print("rc:", row, column, number_of_items)
             for i in range(number_of_items):
                 key = ds.readInt32()
                 value = QVariant()
                 ds >> value
                 item.append((value.value(), Qt.ItemDataRole(key)))
             data[(row, column)] = item
+            # data_list.append(((row, column), item))
         return data
     # end def
 
