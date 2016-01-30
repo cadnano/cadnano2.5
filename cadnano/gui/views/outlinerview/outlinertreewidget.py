@@ -453,7 +453,7 @@ class OutlinerTreeWidget(QTreeWidget):
             self.setCurrentItem(na_part_item)
             self.is_child_adding -= 1
         else:
-            print(part_type)
+            print("part type", part_type)
             raise NotImplementedError
     # end def
 

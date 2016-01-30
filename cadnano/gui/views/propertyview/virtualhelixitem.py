@@ -27,6 +27,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         # QTreeWidgetItem.__init__(self, parent, QTreeWidgetItem.UserType)
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
+        # self.setCheckState(VAL_COL, Qt.Checked)
         if key is None:
             self._controller = VirtualHelixItemController(self, model_part, True, False)
             self._parent_tree = parent
@@ -35,7 +36,7 @@ class VirtualHelixItem(QTreeWidgetItem):
             # Properties
             self._prop_items = {}
             model_props = AbstractVirtualHelixItem.getAllProperties(self)
-            # print("^^^^^^^", model_props)
+
             # add properties alphabetically, but with 'name' on top
             name = model_props['name']
             if name is None:
@@ -55,6 +56,8 @@ class VirtualHelixItem(QTreeWidgetItem):
                 # print(key, model_value, type(model_value))
                 if isinstance(model_value, float):
                     model_value = "%0.3f" % model_value
+                # elif not isinstance(model_value, str):
+                #     model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
             self._key = key

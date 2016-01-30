@@ -668,7 +668,7 @@ class VirtualHelixGroup(CNObject):
         series = self.vh_properties.loc[id_num]
         # to_dict doesn't promote to python native types needed by QVariant
         # leaves as numpy integers and floats
-        return dict((k, v.item()) if isinstance(v, (np.float64, np.int64)) else (k, v) for k, v in zip(series.index, series.tolist()))
+        return dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_)) else (k, v) for k, v in zip(series.index, series.tolist()))
     # end
 
     def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
