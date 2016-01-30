@@ -154,17 +154,18 @@ class SelectSliceTool(AbstractSliceTool):
         return False
     # end def
 
-    def addToSelection(self, vhi):
-        group = self.group
-        group.addToGroup(vhi)
-        self.selection_set.add(vhi.idNum())
-        if len(group.childItems()) > 0:
-            self.is_selection_active = True
-            group.setSelectionRect()
-            group.show()
-            self.individual_pick = True
-            self.snap_origin_item = None
-    # end def
+    # Deprecated by moving selection to the model
+    # def addToSelection(self, vhi):
+    #     group = self.group
+    #     group.addToGroup(vhi)
+    #     self.selection_set.add(vhi.idNum())
+    #     if len(group.childItems()) > 0:
+    #         self.is_selection_active = True
+    #         group.setSelectionRect()
+    #         group.show()
+    #         self.individual_pick = True
+    #         self.snap_origin_item = None
+    # # end def
 
     def addSetToSelection(self, vh_set):
         group = self.group
@@ -190,9 +191,15 @@ class SelectSliceTool(AbstractSliceTool):
             self.individual_pick = False
         else: # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
-                # self.deselectItems()
-                self.modelClear()
-            self.addToSelection(virtual_helix_item)
+                self.modelClear()   # deselect if shift isn't held
+
+            # self.is_selection_active = True
+            self.individual_pick = True
+            self.snap_origin_item = None
+
+            doc = self._manager.document
+            part = part_item.part()
+            doc.addVirtualHelicesToSelection(part, [virtual_helix_item.idNum()])
     # end def
 
     def doSnap(self, part_item, virtual_helix_item):
@@ -305,20 +312,27 @@ class SliceSelectionGroup(QGraphicsItemGroup):
 
     def mousePressEvent(self, event):
         tool = self.tool
-        tool.individual_pick = False
         if event.button() != Qt.LeftButton:
+            tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
+            is_shift = event.modifiers() == Qt.ShiftModifier
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
                 # print("clicking the box")
-                # strategy #1
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):
                     if isinstance(item, VirtualHelixItem):
-                        print("origin", item.idNum())
-                        tool.snap_origin_item = item
-                        break
+                        if is_shift:
+                            doc = tool._manager.document
+                            part = item.part()
+                            id_num = item.idNum()
+                            if doc.isVirtualHelixSelected(part, id_num):    # maybe should ask the model?
+                                doc.removeVirtualHelicesFromSelection(part, [id_num])
+                        else:
+                            print("origin", item.idNum())
+                            tool.snap_origin_item = item
+                            break
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
             # self.drag_start_scene_position = event.scenePos()

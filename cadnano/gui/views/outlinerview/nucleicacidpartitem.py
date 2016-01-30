@@ -115,26 +115,21 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         vh_list = self._root_items['VHelixList']
         root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
         if is_adding:
-            flag = QItemSelectionModel.Select#Current #| QItemSelectionModel.Rows
+            flag = QItemSelectionModel.Select
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
                 # selecting a selected item will deselect it, so check
                 if not vhi.isSelected():
-                    # print("should be selecting", id_num)
-                    # sitems = [tw.itemFromIndex(i) for i in selection_model.selection().indexes()]
-                    # print("isSelected", sitems)
                     idx = vh_list.indexOfChild(vhi)
                     selection_model.select(model.index(idx, 0, root_midx), flag)
         else:
-            flag = QItemSelectionModel.Current | QItemSelectionModel.Deselect #| QItemSelectionModel.Rows
+            flag = QItemSelectionModel.Deselect
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
-                # print("should be deselecting?", id_num)
                 # deselecting a deselected item will select it, so check
                 if vhi.isSelected():
                     idx = vh_list.indexOfChild(vhi)
                     selection_model.select(model.index(idx, 0, root_midx), flag)
-        # print("hhihh", tw.selectedItems())
     # end def
 
     def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):
