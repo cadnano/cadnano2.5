@@ -46,7 +46,7 @@ class PreXoverItem(QGraphicsPathItem):
         y = (-1.25 if is_on_top else 2.25) * bw
         self.setPos(x, y)
 
-        num = to_virtual_helix_item.number()
+        num = to_virtual_helix_item.idNum()
         tBR = _FM.tightBoundingRect(str(num))
         half_label_H = tBR.height()/2.0
         half_label_W = tBR.width()/2.0
@@ -93,7 +93,7 @@ class PreXoverItem(QGraphicsPathItem):
         lbl = self._label
         lbl.setBrush(self._label_brush)
         lbl.setFont(_TO_HELIX_NUM_FONT)
-        lbl.setText( str(self._to_vh_item.number() ) )
+        lbl.setText( str(self._to_vh_item.idNum() ) )
     # end def
 
     ### TOOL METHODS ###

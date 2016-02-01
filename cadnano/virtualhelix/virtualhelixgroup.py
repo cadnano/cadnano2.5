@@ -982,6 +982,30 @@ class VirtualHelixGroup(CNObject):
         id_nums, = np.where(x_hi_mask)
         return id_nums
     # end def
+
+    def queryIdNumRange(self, id_num, neighbors, start, length, radius):
+        """ return the indices of all virtual helices closer
+        than radius
+        """
+        offset, size = self.getOffsetAndSize(id_num)
+        this_fwd_pts = self.fwd_pts[offset + start:offset + start + length]
+        this_rev_pts = self.rev_pts[offset + start:offset + start + length]
+
+        for i, point in enumerate(this_fwd_pts):
+            difference = self.fwd_pts - point
+            ldiff = len(difference)
+            delta = self.delta3D_scratch
+            if ldiff != len(delta):
+                self.delta3D_scratch = delta = np.empty((ldiff,), dtype=float)
+
+            # compute square of distance to point
+            delta = inner1d(difference, difference, out=delta)
+            close_points, = np.where(delta < radius*radius)
+            # return list(zip(    np.take(self.id_nums, close_points),
+            #                     np.take(self.indices, close_points) ))
+            return (np.take(self.id_nums, close_points),
+                                np.take(self.indices, close_points) )
+    # end def
 # end class
 
 def distanceToPoint(origin, direction, point):

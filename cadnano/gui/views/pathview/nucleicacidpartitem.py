@@ -488,50 +488,49 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self._active_virtual_helix_item = new_active_vhi
     # end def
 
-    # def setPreXoverItemsVisible(self, virtual_helix_item):
-    #     """
-    #     self._pre_xover_items list references prexovers parented to other
-    #     PathHelices such that only the activeHelix maintains the list of
-    #     visible prexovers
-    #     """
-    #     vhi = virtual_helix_item
+    def setPreXoverItemsVisible(self, virtual_helix_item):
+        """
+        self._pre_xover_items list references prexovers parented to other
+        PathHelices such that only the activeHelix maintains the list of
+        visible prexovers
+        """
+        vhi = virtual_helix_item
 
-    #     if vhi is None:
-    #         if self._pre_xover_items:
-    #             # clear all PreXoverItems
-    #             list(map(PreXoverItem.remove, self._pre_xover_items))
-    #             self._pre_xover_items = []
-    #         return
+        if vhi is None:
+            if self._pre_xover_items:
+                # clear all PreXoverItems
+                list(map(PreXoverItem.remove, self._pre_xover_items))
+                self._pre_xover_items = []
+            return
 
-    #     id_num = vhi.idNum()
-    #     Dna_part_item = self
-    #     part = self.part()
-    #     idx = part.activeVirtualHelixIdx()
+        id_num = vhi.idNum()
+        part = self.part()
+        idx = part.activeVirtualHelixIdx()
 
-    #     # clear all PreXoverItems
-    #     list(map(PreXoverItem.remove, self._pre_xover_items))
-    #     self._pre_xover_items = []
+        # clear all PreXoverItems
+        list(map(PreXoverItem.remove, self._pre_xover_items))
+        self._pre_xover_items = []
 
-    #     # if self._viewroot.preXoverFilter() == "prexover_p":
-    #     #     xover_p = True
-    #     #     _PXI = PreXoverPItem
-    #     # else:
-    #     xover_p = False
-    #     _PXI = PreXoverAItem
+        # if self._viewroot.preXoverFilter() == "prexover_p":
+        #     xover_p = True
+        #     _PXI = PreXoverPItem
+        # else:
+        xover_p = False
+        _PXI = PreXoverItem
 
-    #     potential_xovers = part.potentialCrossoverList(id_num, idx, xover_p)
-    #     for neighbor, index, strand_type, is_low_idx in potential_xovers:
-    #         # create one half
-    #         neighbor_vhi = self.idToVirtualHelixItem(neighbor)
-    #         pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
-    #         # add to list
-    #         self._pre_xover_items.append(pxi)
-    #         # create the complement
-    #         pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
-    #         # add to list
-    #         self._pre_xover_items.append(pxi)
-    #     # end for
-    # # end def
+        potential_xovers = part.potentialCrossoverList(id_num, idx, xover_p)
+        for neighbor, index, strand_type, is_low_idx in potential_xovers:
+            # create one half
+            neighbor_vhi = self.idToVirtualHelixItem(neighbor)
+            pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
+            # add to list
+            self._pre_xover_items.append(pxi)
+            # create the complement
+            pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
+            # add to list
+            self._pre_xover_items.append(pxi)
+        # end for
+    # end def
 
     def updatePreXoverItems(self):
         self.setPreXoverItemsVisible(self.activeVirtualHelixItem())
