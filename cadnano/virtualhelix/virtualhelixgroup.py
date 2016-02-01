@@ -983,16 +983,24 @@ class VirtualHelixGroup(CNObject):
         return id_nums
     # end def
 
-    def queryIdNumRange(self, id_num, neighbors, start, length, radius):
-        """ return the indices of all virtual helices closer
-        than radius
+    def queryIdNumRange(self, id_num, radius, index_slice=None):
+        """ return the indices of all virtual helices phosphates closer
+        than radius to id_num's helical axis
+        index_slice: a tuple of the start index and length into a virtual helix
         """
         offset, size = self.getOffsetAndSize(id_num)
-        this_fwd_pts = self.fwd_pts[offset + start:offset + start + length]
-        this_rev_pts = self.rev_pts[offset + start:offset + start + length]
+        start, length = 0, size if index_slice is None else index_slice
 
-        for i, point in enumerate(this_fwd_pts):
-            difference = self.fwd_pts - point
+        # convert to a list since we can't speed this loop up without cython or something
+        this_axis_pts = self.axis_pts[offset + start:offset + start + length].tolist()
+        fwd_pts = self.fwd_pts
+        rev_pts = self.rev_pts
+        # for now just looks against everything
+        fwd_hit_list = []
+        rev_hit_list = []
+        rsquared = radius*radius
+        for i, point in enumerate(this_axis_pts):
+            difference = fwd_pts - point
             ldiff = len(difference)
             delta = self.delta3D_scratch
             if ldiff != len(delta):
@@ -1000,13 +1008,85 @@ class VirtualHelixGroup(CNObject):
 
             # compute square of distance to point
             delta = inner1d(difference, difference, out=delta)
-            close_points, = np.where(delta < radius*radius)
-            # return list(zip(    np.take(self.id_nums, close_points),
-            #                     np.take(self.indices, close_points) ))
-            return (np.take(self.id_nums, close_points),
-                                np.take(self.indices, close_points) )
+            close_points, = np.where(delta < rsquared)
+            close_points, = np.where((close_points < offset) | (close_points > (offset + size)))
+            if len(close_points) > 0:
+                fwd_hits = (np.take(self.id_nums, close_points).tolist(),
+                                    np.take(self.indices, close_points).tolist() )
+                fwd_hit_list.append((start + i, fwd_hits))
+
+            difference = rev_pts - point
+            delta = inner1d(difference, difference, out=delta)
+            close_points, = np.where(delta < rsquared)
+            close_points, = np.where((close_points < offset) | (close_points > (offset + size)))
+            if len(close_points) > 0:
+                rev_hits = (np.take(self.id_nums, close_points).tolist(),
+                                    np.take(self.indices, close_points).tolist() )
+                rev_hit_list.append((start + i, rev_hits))
+        return fwd_hit_list, rev_hit_list
+    # end def
+
+    def queryIdNumRangeNeighbor(self, id_num, neighbors, radius, index_slice=None):
+        """ return the indices of all virtual helices phosphates closer
+        than radius to id_num's helical axis
+        index_slice: a tuple of the start index and length into a virtual helix
+
+        returns a (fwd_hit_list, rev_hit_list) of the form
+        (id_num_index, [neighbor_id_index,...])
+        """
+        offset, size = self.getOffsetAndSize(id_num)
+        start, length = 0, size if index_slice is None else index_slice
+
+        # convert to a list since we can't speed this loop up without cython or something
+        this_axis_pts = self.axis_pts[offset + start:offset + start + length].tolist()
+        fwd_pts = self.fwd_pts
+        rev_pts = self.rev_pts
+        # for now just looks against everything
+        fwd_hit_list = []
+        rev_hit_list = []
+        rsquared = radius*radius
+        for neighbor_id in neighbors:
+            # 1. get relevant points
+            offset, size = self.getOffsetAndSize(neighbor_id)
+            nfwd_pts = fwd_pts[offset:offset+size]
+            nrev_pts = rev_pts[offset:offset+size]
+            for i, point in enumerate(this_axis_pts):
+                # 2. forward points
+                difference = nfwd_pts - point
+                ldiff = len(difference)
+                delta = self.delta3D_scratch
+                if ldiff != len(delta):
+                    self.delta3D_scratch = delta = np.empty((ldiff,), dtype=float)
+
+                # compute square of distance to point
+                delta = inner1d(difference, difference, out=delta)
+                fwd_hits, = np.where(delta < rsquared)
+                if len(fwd_hits) > 0:
+                    fwd_hit_list.append((start + i, fwd_hits.tolist()))
+
+                # 3 .now reverse points
+                difference = nrev_pts - point
+                delta = inner1d(difference, difference, out=delta)
+                rev_hits, = np.where(delta < rsquared)
+                if len(rev_hits) > 0
+                    rev_hit_list.append((start+i, rev_hits.tolist())
+            # end for
+        # end for
+        return fwd_hit_list, rev_hit_list
     # end def
 # end class
+
+def radiusForAngle(angle, radius_in):
+    """ calculate the distance from the center axis of
+    a virtual helix with radius_in radius to a bounds of
+    an arc on tangent virtual helix with the same radius
+    the arc center is on the line connecting the two
+    virtual helices.  Using trig identities and Pythagorean theorem
+    """
+    theta = math.radian(angle) / 2
+    R = radius_in*math.sqrt(5 - 4*math.cos(theta))
+    return R
+# end def
 
 def distanceToPoint(origin, direction, point):
     """
