@@ -1009,6 +1009,9 @@ class VirtualHelixGroup(CNObject):
 # end class
 
 def distanceToPoint(origin, direction, point):
+    """
+    http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+    """
     direction_distance = np.dot(point - origin,  direction)
     # point behind the ray
     if direction_distance < 0:
