@@ -159,13 +159,16 @@ ACTIVE_ALPHA = 128
 PROX_ALPHA = 64
 
 class PreXoverItem(QGraphicsRectItem):
-    def __init__(self, step, step_idx, color, is_fwd=True, parent=None):
-        super(QGraphicsRectItem, self).__init__(_BASE_RECT, parent)
-        self._step = step
-        self._step_idx = step_idx
+    def __init__(self,  from_virtual_helix_item, from_index,
+                        to_virtual_helix_item, to_index,
+                        color, is_fwd=True):
+        super(QGraphicsRectItem, self).__init__(_BASE_RECT, from_virtual_helix_item)
+        self._from_vh_item = from_virtual_helix_item
+        self._from_idx = from_index
+        self._to_vh_item = to_virtual_helix_item
+        self._to_idx = to_index
         self._color = color
         self._is_fwd = is_fwd
-        self._parent = parent
         self._animations = []
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
@@ -199,43 +202,16 @@ class PreXoverItem(QGraphicsRectItem):
         self._phos_item = phos
     # end def
 
-    def __repr__(self):
-        cls_name = self.__class__.__name__
-        vh_name = self._parent._vh_name()
-        fwd_str = 'fwd' if self._is_fwd else 'rev'
-        idx = self._step_idx
-        angle = self.facingAngle()
-        return "<%s>(%s.%s[%d].%d)" % (cls_name, vh_name, fwd_str, idx, angle)
-    # end def
-
     ### ACCESSORS ###
     def color(self):
         return self._color
 
-    def facingAngle(self):
-        vhi = self._parent
-        id_num = parent.idNum()
-        x, y, _z = vhi.part().getCoordinate(id_num, 0)
-        eulerZ, tpb, groove = vhi.getProperty(['eulerZ', 'twist_per_base', 'minor_groove_angle'])
-        if self._is_fwd:
-            angle = round(((self._step_idx + (_z / _BASE_WIDTH))*tpb) % 360, 3)
-        else:
-            angle = round(((self._step_idx + (_z / _BASE_WIDTH))*tpb + groove) % 360, 3)
-        return (eulerZ + angle) % 360
-
     def isFwd(self):
         return self._is_fwd
 
-    def name(self):
-        vh_name = self._parent.getProperty('name')
-        fwd_str = 'fwd' if self._is_fwd else 'rev'
-        idx = self.baseIdx()
-        angle = self.facingAngle()
-        return '%s.%s.%d.%d' % (vh_name, fwd_str, idx, angle)
-
     def absoluteIdx(self):
-        vhi = self._parent
-        id_num = parent.idNum()
+        vhi = self._from_vh_item
+        id_num = vhi.idNum()
         x, y, _z = vhi.part().getCoordinate(id_num, 0)
         return self.baseIdx() + (_z / _BASE_WIDTH)
 
@@ -291,8 +267,15 @@ class PreXoverItem(QGraphicsRectItem):
             # self.animate(self, 'brush_alpha', 1000, PROX_ALPHA, 0)
     # end def
 
-    def setActiveNeighbor(self, is_active, shortcut=None, active_item=None):
-        if is_active:
+    def setActiveNeighbor(self, active_item, shortcut=None):
+        if active_item is None:
+            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            self.setBrush(getBrushObj(self._color, alpha=128))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+            self._bond_item.hide()
+            self.setLabel(text=self._label_txt)
+        else:
             p1 = self._phos_item.scenePos()
             p2 = active_pos = active_item._phos_item.scenePos()
             scale = 3
@@ -321,14 +304,6 @@ class PreXoverItem(QGraphicsRectItem):
             self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
             self.setLabel(text=shortcut, outline=True)
-
-        else:
-            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
-            self._bond_item.hide()
-            self.setLabel(text=self._label_txt)
     # end def
 
     def setLabel(self, text=None, outline=False):
@@ -353,21 +328,24 @@ class PreXoverItem(QGraphicsRectItem):
 class PreXoverItemGroup(QGraphicsRectItem):
     HUE_FACTOR = 1.6
 
-    def __init__(self, parent=None):
-        super(QGraphicsRectItem, self).__init__(parent)
-        self._parent = parent
+    def __init__(self, virtualhelixitem):
+        super(QGraphicsRectItem, self).__init__(virtual_helix_item)
+        self._parent = virtual_helix_item
         self.setPen(getNoPen())
         self._colors = []
         self._fwd_pxo_items = {}
         self._rev_pxo_items = {}
         self._active_items = []
-        self._prox_items = []
         self.updateBasesPerRepeat()
     # end def
 
     ### ACCESSORS ###
     def window(self):
         return self._parent.window()
+
+    def virtualHelixItem(self):
+        return self.parentItem():
+    # end def
 
     ### EVENT HANDLERS ###
 
@@ -401,22 +379,13 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self.setRect(0, 0, bw*canvas_size, bw2)
     # end def
 
-    def removeRepeats(self, n=None):
+    def removeRepeats(self):
         """
-        Adds n*bases_per_repeat PreXoverItems to fwd and rev groups.
-        If n is None, remove all PreXoverItems from fwd and rev groups.
+        remove all PreXoverItems from fwd and rev groups.
         """
-        if n:
-            step_size = self._parent.getProperty('bases_per_repeat')
-            end_idx = len(self._fwd_pxo_items)
-            start_idx = end_idx - n*step_size
-            for i in range(start_idx, end_idx):
-                self.scene().removeItem(self._fwd_pxo_items.pop(i))
-                self.scene().removeItem(self._rev_pxo_items.pop(i))
-        else:
-            for i in range(len(self._fwd_pxo_items)):
-                self.scene().removeItem(self._fwd_pxo_items.pop(i))
-                self.scene().removeItem(self._rev_pxo_items.pop(i))
+        for i in range(len(self._fwd_pxo_items)):
+            self.scene().removeItem(self._fwd_pxo_items.pop())
+            self.scene().removeItem(self._rev_pxo_items.pop())
     # end def
 
     def updateBasesPerRepeat(self):
@@ -477,7 +446,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 item = self._fwd_pxo_items[i+j]
                 delta = item.absoluteIdx() - active_absolute_idx
                 if abs(delta) < cutoff and k < 10:
-                    item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
+                    item.setActiveNeighbor(active_item, shortcut=str(k))
                     pre_xovers[k] = item.name()
                     k += 1
                     self._active_items.append(item)
@@ -488,7 +457,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 item = self._rev_pxo_items[i+j]
                 delta = item.absoluteIdx() - active_absolute_idx
                 if abs(delta) < cutoff and k < 10:
-                    item.setActiveNeighbor(True, shortcut=str(k), active_item=active_item)
+                    item.setActiveNeighbor(active_item, shortcut=str(k))
                     pre_xovers[k] = item.name()
                     k += 1
                     self._active_items.append(item)
@@ -496,7 +465,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         else:
             self._parent.partItem().setKeyPressDict({})
             while self._active_items:
-                self._active_items.pop().setActiveNeighbor(False)
+                self._active_items.pop().setActiveNeighbor(None)
     # end def
 
     def setProximalItems(self, prox_groups):
@@ -559,9 +528,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
             return
         vh_name, vh_angle  = vhi.getProperty(['name', 'eulerZ'])
         idx = pre_xover_item.baseIdx() # (f|r).step_idx
-        facing_angle = pre_xover_item.facingAngle()
         is_fwd = 'fwd' if pre_xover_item.isFwd() else 'rev'
-        value = '%s.%s.%d.%d' % (vh_name, is_fwd, idx, facing_angle)
+        value = '%s.%s.%d' % (vh_name, is_fwd, idx)
         model_part.setProperty('active_phos', value)
     # end def
 

@@ -516,17 +516,17 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         #     _PXI = PreXoverPItem
         # else:
         xover_p = False
-        _PXI = PreXoverItem
+        PXI = PreXoverItem
 
-        potential_xovers = part.potentialCrossoverList(id_num, idx, xover_p)
+        potential_xovers = part.potentialCrossoverList(id_num, idx)
         for neighbor, index, strand_type, is_low_idx in potential_xovers:
             # create one half
             neighbor_vhi = self.idToVirtualHelixItem(neighbor)
-            pxi = _PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
+            pxi = PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
             # add to list
             self._pre_xover_items.append(pxi)
             # create the complement
-            pxi = _PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
+            pxi = PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
             # add to list
             self._pre_xover_items.append(pxi)
         # end for
