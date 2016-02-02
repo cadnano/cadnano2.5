@@ -1069,7 +1069,7 @@ class VirtualHelixGroup(CNObject):
                 delta = inner1d(difference, difference, out=delta)
                 rev_hits, = np.where(delta < rsquared)
                 if len(rev_hits) > 0
-                    rev_hit_list.append((start+i, neighbor_id, rev_hits.tolist())
+                    rev_hit_list.append((start+i, neighbor_id, rev_hits.tolist()))
             # end for
         # end for
         return fwd_hit_list, rev_hit_list
@@ -1087,8 +1087,14 @@ class VirtualHelixGroup(CNObject):
         """
         theta = math.radian(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-        x = BASE_WIDTH*(angle/2/360*bases_per_turn),
+        x = BASE_WIDTH*(angle/2/360*bases_per_turn)
         return math.sqrt(R*R + x*x)
+    # end def
+
+    def indexToAngle(self, id_num, idx):
+        tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
+        twist_per_base = math.radians(twist_per_base)
+        return eulerZ + twist_per_base*idx
     # end def
 # end class
 

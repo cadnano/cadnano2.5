@@ -519,6 +519,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         PXI = PreXoverItem
 
         potential_xovers = part.potentialCrossoverList(id_num, idx)
+        setUpPrexovers()
         for neighbor, index, strand_type, is_low_idx in potential_xovers:
             # create one half
             neighbor_vhi = self.idToVirtualHelixItem(neighbor)

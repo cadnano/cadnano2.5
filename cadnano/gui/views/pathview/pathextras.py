@@ -267,6 +267,8 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def setActiveNeighbor(self, active_item, shortcut=None):
+        """
+        """
         if active_item is None:
             inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
             self.setBrush(getBrushObj(self._color, alpha=128))
