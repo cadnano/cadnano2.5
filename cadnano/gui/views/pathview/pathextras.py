@@ -106,13 +106,12 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
     _FM = QFontMetrics(_XO_FONT)
 
-    def __init__(self, idx, is_fwd, color, parent=None):
-        super(QGraphicsSimpleTextItem, self).__init__(parent)
+    def __init__(self, is_fwd, color, pre_xover_item):
+        super(QGraphicsSimpleTextItem, self).__init__(pre_xover_item)
         self._txt = ''
-        self._idx = idx
         self._is_fwd = is_fwd
         self._color = color
-        self._parent = parent
+        self._pre_xover_item = pre_xover_item
         self._tbr = None
         self._outline = QGraphicsRectItem(self)
         self.setFont(self._XO_FONT)
@@ -159,14 +158,16 @@ ACTIVE_ALPHA = 128
 PROX_ALPHA = 64
 
 class PreXoverItem(QGraphicsRectItem):
+    """ A PreXoverItem exists between a single 'from' VirtualHelixItem index
+    and zero or more 'to' VirtualHelixItem Indices
+    """
     def __init__(self,  from_virtual_helix_item, from_index,
-                        to_virtual_helix_item, to_index,
                         color, is_fwd=True):
         super(QGraphicsRectItem, self).__init__(_BASE_RECT, from_virtual_helix_item)
         self._from_vh_item = from_virtual_helix_item
         self._from_idx = from_index
-        self._to_vh_item = to_virtual_helix_item
-        self._to_idx = to_index
+        self._to_vh_item = None
+        self._to_idxs = None
         self._color = color
         self._is_fwd = is_fwd
         self._animations = []
@@ -174,9 +175,8 @@ class PreXoverItem(QGraphicsRectItem):
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
         self._label_txt = None
-        self._label = PreXoverLabel(step_idx, is_fwd, color, self)
+        self._label = PreXoverLabel(is_fwd, color, self)
         self._label.hide()
-        self._has_neighbor = False
 
         self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
@@ -236,31 +236,30 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def hasNeighbor(self):
-        pass
-
     def setActive(self, is_active):
         if is_active:
             self.setBrush(getBrushObj(self._color, alpha=128))
             self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
         else:
-            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
             self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
             self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
 
-    def setProximal(self, has_neighbor, id_num=None, colliding=False):
-        if has_neighbor:
-            self._has_neighbor = True
+    def setProximal(self, to_virtual_helix_item, to_index, colliding=False):
+        if to_virtual_helix_item is not None:
+            self._to_vh_item = to_virtual_helix_item
+            self._to_idx = to_index
             color = '#cc0000' if colliding else self._color
             self.setBrush(getBrushObj(color, alpha=PROX_ALPHA))
             self._label_txt = id_num
             self.setLabel(id_num)
             # self.animate(self, 'brush_alpha', 1, 0, PROX_ALPHA) # overwrite running anim
         else:
-            self._has_neighbor = False
+            self._to_vh_item = None
+            self._to_idx = None
             self.setBrush(getBrushObj(self._color, alpha=0))
             self._label_txt = None
             self.setLabel()
@@ -269,7 +268,7 @@ class PreXoverItem(QGraphicsRectItem):
 
     def setActiveNeighbor(self, active_item, shortcut=None):
         if active_item is None:
-            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
             self.setBrush(getBrushObj(self._color, alpha=128))
             self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
@@ -299,7 +298,7 @@ class PreXoverItem(QGraphicsRectItem):
             elif abs_idx == active_item_abs_idx - 1:
                 alpha = 255
 
-            inactive_alpha = PROX_ALPHA if self._has_neighbor else 0
+            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
             self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
             self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
