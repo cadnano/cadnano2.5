@@ -1062,31 +1062,35 @@ class VirtualHelixGroup(CNObject):
                 delta = inner1d(difference, difference, out=delta)
                 fwd_hits, = np.where(delta < rsquared)
                 if len(fwd_hits) > 0:
-                    fwd_hit_list.append((start + i, fwd_hits.tolist()))
+                    fwd_hit_list.append((start + i, neighbor_id, fwd_hits.tolist()))
 
-                # 3 .now reverse points
+                # 3. now reverse points
                 difference = nrev_pts - point
                 delta = inner1d(difference, difference, out=delta)
                 rev_hits, = np.where(delta < rsquared)
                 if len(rev_hits) > 0
-                    rev_hit_list.append((start+i, rev_hits.tolist())
+                    rev_hit_list.append((start+i, neighbor_id, rev_hits.tolist())
             # end for
         # end for
         return fwd_hit_list, rev_hit_list
     # end def
-# end class
 
-def radiusForAngle(angle, radius_in):
-    """ calculate the distance from the center axis of
-    a virtual helix with radius_in radius to a bounds of
-    an arc on tangent virtual helix with the same radius
-    the arc center is on the line connecting the two
-    virtual helices.  Using trig identities and Pythagorean theorem
-    """
-    theta = math.radian(angle) / 2
-    R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-    return R
-# end def
+    @staticmethod
+    def radiusForAngle(angle, radius_in, bases_per_turn, base_width):
+        """ calculate the distance from the center axis of
+        a virtual helix with radius_in radius to a bounds of
+        an arc on tangent virtual helix with the same radius
+        the arc center is on the line connecting the two
+        virtual helices.  Using trig identities and Pythagorean theorem
+        additionally we need to account the axial distance between bases
+        (the BASE_WIDTH)
+        """
+        theta = math.radian(angle) / 2
+        R = radius_in*math.sqrt(5 - 4*math.cos(theta))
+        x = BASE_WIDTH*(angle/2/360*bases_per_turn),
+        return math.sqrt(R*R + x*x)
+    # end def
+# end class
 
 def distanceToPoint(origin, direction, point):
     """

@@ -138,36 +138,13 @@ class NucleicAcidPart(Part):
 
     def potentialCrossoverList(self, id_num, idx=None):
         neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
-        to_strandsets = [self.getStrandSets(x) for x in neighbors]
+        # neighbors = list(neighbors)
+        hit_radius = self.radiusForAngle(60, self._RADIUS, self._BASE_WIDTH)
+        fwd_hits, rev_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
+                                            hit_radius, index_slice=None)
+        return fwd_hits, rev_hits
 
-        base_range_unit = list(range(0, num_bases, part._STEP))
-
-        if idx is not None:
-            base_range_full = list(filter(lambda x: x >= idx - 3 * part._STEP and \
-                                        x <= idx + 2 * part._STEP, base_range_unit))
-        else:
-            base_range_full = base_range_unit
-        points
-
-
-        for from_ss, to_ss, pts, st in izip(from_strandsets,
-                                            to_strandsets, lut, stand_types):
-            # test each period of each lattice for each StrandType
-            for pt, is_low_idx in izip(pts, (True, False)):
-                for i, j in product(base_range_full, pt):
-                    index = i + j
-                    if index < num_bases:
-                        if from_ss.hasNoStrandAtOrNoXover(index) and \
-                                to_ss.hasNoStrandAtOrNoXover(index):
-                            ret.append((neighbor, index, st, is_low_idx))
-                        # end if
-                    # end if
-                # end for
-            # end for
-        # end for
-        return ret
     # end def
-
     def dimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
         DMIN = 30

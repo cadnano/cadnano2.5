@@ -29,7 +29,7 @@ _TO_HELIX_NUM_FONT = styles.XOVER_LABEL_FONT
 _FM = QFontMetrics(_TO_HELIX_NUM_FONT)
 
 class PreXoverItem(QGraphicsPathItem):
-    def __init__(self,  from_virtual_helix_item, to_virtual_helix_item, index, strand_type, is_low_idx):
+    def __init__(self,  from_virtual_helix_item, to_virtual_helix_item, index, strand_type):
         super(PreXoverItem, self).__init__(from_virtual_helix_item)
         self._from_vh_item = from_virtual_helix_item
         self._to_vh_item = to_virtual_helix_item

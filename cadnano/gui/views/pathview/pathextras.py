@@ -505,8 +505,14 @@ class PreXoverItemGroup(QGraphicsRectItem):
         inactive_rev = set(range(max_length))
         bpr = self._parent.getProperty('bases_per_repeat')
         step_idxs = range(0, max_length, bpr)
+        id_
+        for this_idx, neighbor_id, idxs in fwd_hits:
+            item = self._fwd_pxo_items[this_idx]
+            item.setProximal(True, id_num=neighbor_id)
 
-        for id_num, fwd_idxs, rev_idxs, is_colliding in prox_groups:
+
+        for id_num, fwd_idxs, rev_idxs in prox_groups:
+
             for i, j in product(fwd_idxs, step_idxs):
                 idx = i + j
                 if not idx in self._fwd_pxo_items:
