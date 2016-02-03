@@ -1038,21 +1038,44 @@ class VirtualHelixGroup(CNObject):
         start, length = 0, size if index_slice is None else index_slice
 
         # convert to a list since we can't speed this loop up without cython or something
-        this_axis_pts = self.axis_pts[offset + start:offset + start + length].tolist()
+        axis_pts = self.axis_pts
         fwd_pts = self.fwd_pts
         rev_pts = self.rev_pts
+        this_axis_pts = axis_pts[offset + start:offset + start + length].tolist()
+        this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
+        this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
         # for now just looks against everything
         rsquared = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
-            # 1. get relevant points
             offset, size = self.getOffsetAndSize(neighbor_id)
+
+            # 1. Finds points that point at neighbors
+            naxis_pts = axis_pts[offset:offset+size]
+            for i, point in enumerate(this_fwd_pts):
+                difference = naxis_pts - point
+                if ldiff != len(delta):
+                    self.delta3D_scratch = delta = np.empty((ldiff,), dtype=float)
+                inner1d(difference, difference, out=delta)
+                axis_hits, = np.where(delta < rsquared)
+                if len(fwd_hits) > 0:
+                    fwd_hit_list.append((start + i, neighbor_id, axis_hits.tolist()))
+            for i, point in enumerate(this_rev_pts):
+                difference = naxis_pts - point
+                if ldiff != len(delta):
+                    self.delta3D_scratch = delta = np.empty((ldiff,), dtype=float)
+                inner1d(difference, difference, out=delta)
+                axis_hits, = np.where(delta < rsquared)
+                if len(fwd_hits) > 0:
+                    fwd_hit_list.append((start + i, neighbor_id, axis_hits.tolist()))
+
+            # 2. get relevant points
             nfwd_pts = fwd_pts[offset:offset+size]
             nrev_pts = rev_pts[offset:offset+size]
             fwd_hit_list = []
             rev_hit_list = []
             for i, point in enumerate(this_axis_pts):
-                # 2. forward points
+                # 3. forward points
                 difference = nfwd_pts - point
                 ldiff = len(difference)
                 delta = self.delta3D_scratch
@@ -1060,14 +1083,14 @@ class VirtualHelixGroup(CNObject):
                     self.delta3D_scratch = delta = np.empty((ldiff,), dtype=float)
 
                 # compute square of distance to point
-                delta = inner1d(difference, difference, out=delta)
+                inner1d(difference, difference, out=delta)
                 fwd_hits, = np.where(delta < rsquared)
                 if len(fwd_hits) > 0:
                     fwd_hit_list.append((start + i, neighbor_id, fwd_hits.tolist()))
 
-                # 3. now reverse points
+                # 4. now reverse points
                 difference = nrev_pts - point
-                delta = inner1d(difference, difference, out=delta)
+                inner1d(difference, difference, out=delta)
                 rev_hits, = np.where(delta < rsquared)
                 if len(rev_hits) > 0
                     rev_hit_list.append((start+i rev_hits.tolist()))
