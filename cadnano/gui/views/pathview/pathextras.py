@@ -430,6 +430,32 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self._max_base = new_max
     # end def
 
+    def setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits):
+        # 1. clear all PreXoverItems
+        list(map(PreXoverItem.remove, self._pre_xover_items))
+        self._pre_xover_items = {}
+        self._active_virtual_helix_item = virtual_helix_item
+        # the list of neighbots per strand
+        id_num = virtual_helix_item.idNum()
+        # 1. Construct PXIs for the active virtual_helix_item
+        for i in range(virtual_helix_item.length()):
+            self._pre_xover_items[(id_num, idx, True)] = PreXoverItem(virtual_helix_item, idx, self)
+
+        for neighbor_id, hits in per_neighbor_hits:
+            # 2. construct neighbors PXIs
+            nvhi = self._virtual_helix_item_hash[neighbor_id]
+            for i in range(nvhi.length()):
+                self._pre_xover_items[(id_num, idx, True)] = PreXoverItem(nvhi, idx, self)
+
+            # 3. set the hits per item and neighboring hits
+            fwd_hits, rev_hits = hits
+            for idx, n_idxs in fwd_hits:
+                self.setProximalItems(nvhi, idx, )
+            for idx, n_idxs in rev_hits:
+                self.setProximalItems(nvhi, idx, )
+        # end for
+    # end def
+
     def setActiveNeighbors(self, active_item, fwd_idxs, rev_idxs):
         # active_item is a PreXoverItem
         if active_item:

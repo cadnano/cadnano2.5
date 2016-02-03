@@ -1042,14 +1042,15 @@ class VirtualHelixGroup(CNObject):
         fwd_pts = self.fwd_pts
         rev_pts = self.rev_pts
         # for now just looks against everything
-        fwd_hit_list = []
-        rev_hit_list = []
         rsquared = radius*radius
+        per_neighbor_hits = {}
         for neighbor_id in neighbors:
             # 1. get relevant points
             offset, size = self.getOffsetAndSize(neighbor_id)
             nfwd_pts = fwd_pts[offset:offset+size]
             nrev_pts = rev_pts[offset:offset+size]
+            fwd_hit_list = []
+            rev_hit_list = []
             for i, point in enumerate(this_axis_pts):
                 # 2. forward points
                 difference = nfwd_pts - point
@@ -1069,10 +1070,11 @@ class VirtualHelixGroup(CNObject):
                 delta = inner1d(difference, difference, out=delta)
                 rev_hits, = np.where(delta < rsquared)
                 if len(rev_hits) > 0
-                    rev_hit_list.append((start+i, neighbor_id, rev_hits.tolist()))
+                    rev_hit_list.append((start+i rev_hits.tolist()))
+            per_neighbor_hits[neighbor_id] = (fwd_hit_list, rev_hit_list)
             # end for
         # end for
-        return fwd_hit_list, rev_hit_list
+        return per_neighbor_hits
     # end def
 
     @staticmethod
