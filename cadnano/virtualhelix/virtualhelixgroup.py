@@ -1026,11 +1026,12 @@ class VirtualHelixGroup(CNObject):
         return fwd_hit_list, rev_hit_list
     # end def
 
-    def queryIdNumRangeNeighbor(self, id_num, neighbors, radius, index_slice=None):
+    def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index_slice=None):
         """ return the indices of all virtual helices phosphates closer
         than radius to id_num's helical axis
         index_slice: a tuple of the start index and length into a virtual helix
 
+        theta: angle (radians) commensurate with radius
         returns a (fwd_hit_list, rev_hit_list) of the form
         (id_num_index, [neighbor_id_index,...])
         """
@@ -1039,6 +1040,13 @@ class VirtualHelixGroup(CNObject):
         norm = np.linalg.norm
         cross = np.cross
         dot = np.dot
+        normalize = self.normalize
+        PI = math.pi
+        TWOPI = 2*PI
+        RADIUS = self._RADIUS
+        BW = self._BASE_WIDTH
+        bases_per_turn = self.vh_properties.loc[id_num, ['bases_per_turn']]
+        theta, radius = self.radiusForAngle(alpha, RADIUS, bases_per_turn, BW)
         # convert to a list since we can't speed this loop up without cython or something
         axis_pts = self.axis_pts
         fwd_pts = self.fwd_pts
@@ -1047,7 +1055,7 @@ class VirtualHelixGroup(CNObject):
         this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
         # for now just looks against everything
-        rsquared1 = RADIUS*RADIUS + BASE_WIDTH*BASE_WIDTH/4
+        # rsquared1 = RADIUS*RADIUS + BASE_WIDTH*BASE_WIDTH/4
         rsquared2 = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
@@ -1070,32 +1078,19 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
                 neighbor_min_delta_idx = np.argmin(delta)
-                if delta[neighbor_min_delta_idx] < rsquared1:
-                    neighbor_axis_pt = axis_pts[offset + neighbor_min_delta_idx]
-                    angle = self.angleToNeighbor(this_axis_pts[i], naxis_pts[neighbor_min_delta_idx])
-
-                    fwd_axis_hits.append(start + i, this_axis_pts[i], neighbor_min_delta_idx)
-
-            rev_axis_hits = []
-            for i, point in enumerate(this_rev_pts):
-                difference = naxis_pts - point
-                inner1d(difference, difference, out=delta)
-                neighbor_min_delta_idx = np.argmin(delta)
-                if delta[neighbor_min_delta_idx] < rsquared1:
+                if delta[neighbor_min_delta_idx] < rsquared2:
                     neighbor_axis_pt = naxis_pts[neighbor_min_delta_idx]
                     # a. angle from fwd_pt to neighbor
-                    v1 = self.normalize(this_axis_pts[i] - neighbor_axis_pt)
+                    v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
                     v1 = v1 - dot(v1, direction)*direction
 
-                    v2 = self.normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
+                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
                     # real_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    PI = math.pi
-                    TWOPI = 2*PI
                     native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx) % TWOPI + real_angle
                     max_angle = native_angle + theta
                     min_angle = native_angle - theta
@@ -1104,9 +1099,37 @@ class VirtualHelixGroup(CNObject):
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle < x < max_angle ]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle < x < max_angle ]
-                    rev_axis_hits.append(start + i, passing_angles_idxs)
-            per_neighbor_hits[neighbor_id] = (fwd_hit_range_list, rev_hit_range_list)
+                    fwd_axis_hits.append(start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs)
             # end for
+            rev_axis_hits = []
+            for i, point in enumerate(this_rev_pts):
+                difference = naxis_pts - point
+                inner1d(difference, difference, out=delta)
+                neighbor_min_delta_idx = np.argmin(delta)
+                if delta[neighbor_min_delta_idx] < rsquared2:
+                    neighbor_axis_pt = naxis_pts[neighbor_min_delta_idx]
+                    # a. angle from fwd_pt to neighbor
+                    v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
+                    # project point onto plane normal to axis
+                    v1 = v1 - dot(v1, direction)*direction
+
+                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
+                    # real_angle = math.acos(np.dot(v1, v2))  # angle
+                    # get signed angle between
+                    real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
+
+                    # b. fwd pt angle relative to first base in virtual helix
+                    native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx) % TWOPI + real_angle
+                    max_angle = native_angle + theta
+                    min_angle = native_angle - theta
+                    all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(neighbor_min_delta_idx - half_period,
+                                                                                neighbor_min_delta_idx + half_period) ]
+                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle < x < max_angle ]
+                    all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle < x < max_angle ]
+                    rev_axis_hits.append(start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs)
+            # end for
+            per_neighbor_hits[neighbor_id] = (fwd_hit_range_list, rev_axis_hits)
         # end for
         return per_neighbor_hits
     # end def
@@ -1124,7 +1147,7 @@ class VirtualHelixGroup(CNObject):
         theta = math.radian(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
         x = BASE_WIDTH*(angle/2/360*bases_per_turn)
-        return math.sqrt(R*R + x*x)
+        return theta, math.sqrt(R*R + x*x)
     # end def
 
     def indexToAngle(self, id_num, idx):
