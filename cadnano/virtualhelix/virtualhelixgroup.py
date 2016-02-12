@@ -169,6 +169,14 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getOffsetAndSize(self, id_num):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+
+        Returns:
+            tuple[int, int] or None: offset, size into the coordinate arrays
+                for a given id_num
+        """
         offset_and_size = self.offset_and_size
         return offset_and_size[id_num] if id_num < len(offset_and_size) else None
     # end def
@@ -193,6 +201,9 @@ class VirtualHelixGroup(CNObject):
         Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
+
+        Args:
+            requested_id_num (int): virtual helix ID number
         """
         num = requested_id_num
         assert num >= 0, int(num) == num
@@ -211,18 +222,30 @@ class VirtualHelixGroup(CNObject):
         The caller's contract is to ensure that id_num is not used in *any* helix
         at the time of the calling of this function (or afterwards, unless
         reserveIdNumForHelix returns the id_num again).
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         heappush(self.recycle_bin, id_num)
         self.reserved_ids.remove(id_num)
     # end def
 
     def isIdNumUsed(self, id_num):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+
+        Returns:
+            bool:   True if used False otherwise
+        """
         return True if self.getOffsetAndSize(id_num) is not None else False
     # end def
 
     def getCoordinates(self, id_num):
-        """ return a view onto the numpy array for a
-        given id_num
+        """ return a view onto the numpy array for a given id_num
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -236,8 +259,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getCoordinate(self, id_num, idx):
-        """
-        given a id_num get the coordinate at a given index
+        """ given a id_num get the coordinate at a given index
+        Args:
+            id_num (int): virtual helix ID number
+            idx (int): index
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -251,8 +276,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getVirtualHelixOrigin(self, id_num):
-        """
-        given a id_num get the coordinate at a given index
+        """given a id_num get the origin coordinate
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -289,8 +316,9 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getStrandSets(self, id_num):
-        """
-        given a id_num get the coordinate at a given index
+        """given a id_num get the coordinate at a given index
+        Args:
+            id_num (int): virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -300,13 +328,28 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def hasStrandAtIdx(self, id_num, idx):
-        """Return a tuple for (Scaffold, Staple). True if
-           a strand is present at idx, False otherwise."""
+        """
+        Args:
+            strand_type (StrandType.(FWD/REV)):
+            id_num (int): virtual helix ID number
+            idx (int): index that the strand is at
+
+        Returns:
+            tuple[Scaffold, Staple]: True if a strand is present at idx,
+                False otherwise.
+        """
         return (self.fwd_strandsets[id_num].hasStrandAt(idx, idx),\
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
     def getStrand(self, strand_type, id_num, idx):
+        """
+        Args:
+            strand_type (StrandType.(FWD/REV)):
+            id_num (int): virtual helix ID number
+            idx (int): index that the strand is at
+        """
+
         if strand_type == StrandType.FWD:
             return self.fwd_strandsets[id_num].getStrand(idx)
         else:
@@ -332,6 +375,10 @@ class VirtualHelixGroup(CNObject):
     def translateCoordinates(self, id_nums, delta):
         """ delta is a sequence of floats of length 3
         for now support XY translation
+
+        Args:
+            id_nums (Sequence[int]): virtual helix ID numbers
+            delta (Sequence[float]): 1x3 vector
         """
         self.resetOriginCache()
         self.resetPointCache()
@@ -348,6 +395,12 @@ class VirtualHelixGroup(CNObject):
     def getIndices(self, id_num):
         """ return a view onto the numpy array for a
         given id_num
+
+        Args:
+            id_num (int): virtual helix ID number
+
+        Returns:
+            ndarray[int]: array of indices corresponding to points
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -361,6 +414,11 @@ class VirtualHelixGroup(CNObject):
     def getNeighbors(self, id_num, radius, idx=0):
         """ might use radius = 2.1*RADIUS
         return list of neighbor id_nums and the indices nearby
+
+        Args:
+            id_num (int): virtual helix ID number
+            radius (float): radial distance within which a neighbors origin exists
+            idx (Optional[int]): index to center the neighbor search at
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -376,6 +434,10 @@ class VirtualHelixGroup(CNObject):
     def getVirtualHelixOriginNeighbors(self, id_num, radius):
         """ might use radius = 2.1*RADIUS
         for now return a set of neighbor id_nums
+
+        Args:
+            id_num (int): virtual helix ID number
+            radius (float): radial distance within which a neighbors origin exists
         """
         origin = self.origin_pts[id_num]
         neighbors = self.queryVirtualHelixOrigin(radius, tuple(origin))
@@ -389,13 +451,12 @@ class VirtualHelixGroup(CNObject):
         not internally.  NO GAPS!
         handles reindex the points in self.indices
 
-        id_num (int): integer index id_num of the virtual helix
-        points (ndarray): n x 3 shaped numpy ndarray of floats or
-                        2D Python list
-
-                        points are stored in order and by index
-        is_right (bool): whether we are extending in the positive index direction
-                        or prepending
+        Args:
+            id_num (int): virtual helix ID number
+            points (ndarray): n x 3 shaped numpy ndarray of floats or
+                2D Python list. points are stored in order and by index
+            is_right (bool): whether we are extending in the positive index
+                direction or prepending
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
 
@@ -470,12 +531,17 @@ class VirtualHelixGroup(CNObject):
 
     def getDirections(self, id_nums):
         """
-        id_nums: array_like list of indices or scalar index
+        Args:
+            id_nums (Sequence[int]): array_like list of indices or scalar index
         """
         return np.take(self.directions, id_nums, axis=0)
     # end def
 
     def normalize(self, v):
+        """
+        Args:
+            v (Sequence[float]): (1,3) ndarray or length 3 sequence
+        """
         norm = np.linalg.norm(v)
         if norm == 0:
            return v
@@ -483,9 +549,18 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def lengthSq(self, v):
+        """
+        Args:
+            v (Sequence[float]): (1,3) ndarray or length 3 sequence
+        """
         return inner1d(v, v)
 
     def cross(self, a, b):
+        """
+        Args:
+            a (Sequence[float]): (1,3) ndarray or length 3 sequence
+            b (Sequence[float]): (1,3) ndarray or length 3 sequence
+        """
         ax, ay, az = a
         bx, by, bz = b
         c = [ay*bz - az*by,
@@ -499,6 +574,10 @@ class VirtualHelixGroup(CNObject):
         in the v1 direction to the v2 direction
 
         see http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/180436#180436
+
+        Args:
+            v1 (Sequence[float]): (1,3) ndarray or length 3 sequence
+            v2 (Sequence[float]): (1,3) ndarray or length 3 sequence
         """
         if v1 == v2:
             return self.eye3_scratch.copy()
@@ -531,6 +610,16 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def createHelix(self, id_num, origin, direction, num_points, color):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+            origin (Sequence[float]): (1,3) ndarray or length 3 sequence.  The origin should be
+                        referenced from an index of 0.
+            direction (Sequence[float]): (1,3) ndarray or length 3 sequence
+
+            color (str): the offset index into a helix to start the helix at.
+                Useful for appending points. if index less than zero
+        """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))
@@ -598,16 +687,18 @@ class VirtualHelixGroup(CNObject):
 
     def pointsFromDirection(self, id_num, origin, direction, num_points, index):
         """ Assumes always prepending or appending points.  no insertions.
-        changes eulerZ of the id_num vh_properties as required for prepending points
+        changes eulerZ of the id_num vh_properties as required for prepending
+        points
 
-        origin: (1,3) ndarray or length 3 sequence.  The origin should be
-                    referenced from an index of 0.
-        direction: (1,3) ndarray or length 3 sequence
+        Args:
+            id_num (int): virtual helix ID number
+            origin (Sequence[float]): (1,3) ndarray or length 3 sequence.  The origin should be
+                        referenced from an index of 0.
+            direction (Sequence[float]): (1,3) ndarray or length 3 sequence
+            index (int): the offset index into a helix to start the helix at.
+                Useful for appending points. if index less than zero
 
-        index: the offset index into a helix to start the helix at.  Useful for
-            appending points. if index less than zero
-
-        returns:
+        Returns:
             None
         """
         rad = self._radius
@@ -651,6 +742,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getVirtualHelixProperties(self, id_num, keys, safe=True):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+        """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
@@ -660,6 +755,10 @@ class VirtualHelixGroup(CNObject):
     # end
 
     def getAllVirtualHelixProperties(self, id_num, safe=True):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+        """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
@@ -674,6 +773,9 @@ class VirtualHelixGroup(CNObject):
     def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
         """ keys and values can be sequences of equal length or
         singular values
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -688,18 +790,26 @@ class VirtualHelixGroup(CNObject):
 
     def locationQt(self, id_num, scale_factor=1.0):
         """ Y-axis is inverted in Qt +y === DOWN
+
+        Returns:
+            tuple: x, y coordinates
         """
         x, y = self.getVirtualHelixOrigin(id_num)
         return scale_factor*x, -scale_factor*y
     # end def
 
     def resizeHelix(self, id_num, is_right, delta):
-        """ id_num (int): the id_num of the virtual helix
+        """
+
+        Args:
+            id_num (int): virtual helix ID number
             is_right (bool): whether this is a left side (False) or
-                    right side (True) operation
+                right side (True) operation
             delta (int): number of virtual base pairs to add to (+) or trim (-)
-            from the virtual helix
-            returns: None
+                from the virtual helix
+
+        Returns:
+            None
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -741,8 +851,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def removeHelix(self, id_num):
-        """
-        id_num (int):
+        """ Remove a helix and recycle it's `id_num`
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -755,7 +867,11 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def resetCoordinates(self, id_num):
-        """ call this after changing helix vh_properties
+        """ call this after changing helix vh_properties to update the points
+        controlled by the properties
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -771,12 +887,12 @@ class VirtualHelixGroup(CNObject):
         """ change the coordinates stored, useful when adjusting
         helix vh_properties
 
-        id_num: the id_num to apply this to
-
-        points: tuple containing axis, and forward and reverse phosphates
-        points
-
-        idx_start: index offset into the virtual helix to assign points to.
+        Args:
+            id_num (int): virtual helix ID number
+            points (tuple): tuple containing axis, and forward and reverse
+                phosphates points
+            idx_start (Optional(int)): index offset into the virtual helix to
+                assign points to.
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -798,13 +914,16 @@ class VirtualHelixGroup(CNObject):
 
     def removeCoordinates(self, id_num, length, is_right):
         """ remove coordinates given a length, reindex as necessary
-        id_num (int):
-        length (int):
-        is_right (bool): whether the removal occurs at the right or left
-        end of a virtual helix since virtual helix arrays are always
-        contiguous
 
-        returns (bool): True if id_num is removed, False otherwise
+        Args:
+            id_num (int): virtual helix ID number
+            length (int):
+            is_right (bool): whether the removal occurs at the right or left
+                end of a virtual helix since virtual helix arrays are always
+                contiguous
+
+        Returns:
+            bool: True if id_num is removed, False otherwise
         """
 
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -886,9 +1005,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryBasePoint(self, radius, point):
-        """
-        cached query
-        point is an array_like of length 3
+        """ cached query
+        Args:
+            radius (float): distance to consider
+            point (Sequence[float]): is an array_like of length 3
         """
         qc = self._point_cache
         query = (radius, point)
@@ -906,8 +1026,11 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def _queryBasePoint(self, radius, point):
-        """ return the indices of all virtual helices closer
-        than radius
+        """ return the indices of all virtual helices closer than radius
+
+        Args:
+            radius (float): distance to consider
+            point (Sequence[float]): is an array_like of length 3
         """
         difference = self.axis_pts - point
         ldiff = len(difference)
@@ -927,6 +1050,10 @@ class VirtualHelixGroup(CNObject):
     def queryVirtualHelixOrigin(self, radius, point):
         """ Hack for now to get 2D behavior
         point is an array_like of length 2
+
+        Args:
+            radius (float): distance to consider
+            point (Sequence[float]): is an array_like of length 3
         """
         qc = self._origin_cache
         query = (radius, point)
@@ -952,6 +1079,10 @@ class VirtualHelixGroup(CNObject):
     def _queryVirtualHelixOrigin(self, radius, point):
         """ return the indices of all id_nums closer
         than radius, sorted by distance
+
+        Args:
+            radius (float): distance to consider
+            point (Sequence[float]): is an array_like of length 3
         """
         difference = self.origin_pts - point
         ldiff = len(difference)
@@ -969,6 +1100,12 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryVirtualHelixOriginRect(self, rect):
+        """
+        Args:
+            rect (Sequence[float]): rectangle defined by x1, y1, x2, y2
+                definining the lower left and upper right corner of the
+                rectangle respetively
+        """
         # search children
         x1, y1, x2, y2 = rect
         origin_pts = self.origin_pts
@@ -986,7 +1123,12 @@ class VirtualHelixGroup(CNObject):
     def queryIdNumRange(self, id_num, radius, index_slice=None):
         """ return the indices of all virtual helices phosphates closer
         than radius to id_num's helical axis
-        index_slice: a tuple of the start index and length into a virtual helix
+
+        Args:
+            id_num (int): virtual helix ID number
+            radius (float): distance to consider
+            index_slice (Tuple): a tuple of the start index and length into
+                a virtual helix
         """
         offset, size = self.getOffsetAndSize(id_num)
         start, length = 0, size if index_slice is None else index_slice
@@ -1009,7 +1151,8 @@ class VirtualHelixGroup(CNObject):
             # compute square of distance to point
             delta = inner1d(difference, difference, out=delta)
             close_points, = np.where(delta < rsquared)
-            close_points, = np.where((close_points < offset) | (close_points > (offset + size)))
+            close_points, = np.where(   (close_points < offset) |
+                                        (close_points > (offset + size)))
             if len(close_points) > 0:
                 fwd_hits = (np.take(self.id_nums, close_points).tolist(),
                                     np.take(self.indices, close_points).tolist() )
@@ -1018,7 +1161,8 @@ class VirtualHelixGroup(CNObject):
             difference = rev_pts - point
             delta = inner1d(difference, difference, out=delta)
             close_points, = np.where(delta < rsquared)
-            close_points, = np.where((close_points < offset) | (close_points > (offset + size)))
+            close_points, = np.where(   (close_points < offset) |
+                                        (close_points > (offset + size)))
             if len(close_points) > 0:
                 rev_hits = (np.take(self.id_nums, close_points).tolist(),
                                     np.take(self.indices, close_points).tolist() )
@@ -1027,13 +1171,27 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index_slice=None):
-        """ return the indices of all virtual helices phosphates closer
-        than radius to id_num's helical axis
-        index_slice: a tuple of the start index and length into a virtual helix
+        """ Get indices of all virtual helices phosphates closer within an
+        `alpha` angle's radius to `id_num`'s helical axis
 
-        theta: angle (radians) commensurate with radius
-        returns a (fwd_hit_list, rev_hit_list) of the form
-        (id_num_index, [neighbor_id_index,...])
+        Args:
+            id_num (int): virtual helix ID number
+            neighbors (sequence): neighbors of id_num
+            alpha (float): angle (radians) commensurate with radius
+            index_slice (Optional[tuple]): (start_index, length) into a virtual
+                helix
+
+        Returns:
+            tuple::
+
+                (fwd_hit_list, rev_hit_list)
+
+            where each list has the form::
+
+                [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
+
+        Raises:
+            None
         """
         offset, size = self.getOffsetAndSize(id_num)
         start, length = 0, size if index_slice is None else index_slice
@@ -1151,12 +1309,20 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def indexToAngle(self, id_num, idx):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+        """
         tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
         twist_per_base = math.radians(twist_per_base)
         return eulerZ + twist_per_base*idx
     # end def
 
     def angleBetweemPoints(self, id_num, idx):
+        """
+        Args:
+            id_num (int): virtual helix ID number
+        """
         tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
         twist_per_base = math.radians(twist_per_base)
         return eulerZ + twist_per_base*idx
@@ -1166,33 +1332,13 @@ class VirtualHelixGroup(CNObject):
         """ VirtualHelices are straight for now so only one direction for the axis
         assume directions are alway normalized, so no need to divide by the
         magnitude of the direction vector squared
+
+        Args:
+            id_num (int): virtual helix ID number
         """
         direction = self.directions[id_num]
         return point - np.dot(point, direction)*direction
     # end
-
-    def getAngleIndices(self, target_axis_pt,
-                            neighbor_axis_pt,
-                            neighbor_direction, neighbor_id, theta):
-        # a. angle from fwd_pt to neighbor
-        v1 = self.normalize(target_axis_pt - neighbor_axis_pt)
-        # project point onto plane normal to axis
-        v1 = v1 - dot(v1, direction)*direction
-
-        v2 = self.normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
-        # real_angle = math.acos(np.dot(v1, v2))  # angle
-        # get signed angle between
-        real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
-
-        # b. fwd pt angle relative to first base in virtual helix
-
-        native_angle = self.indexToAngle(neighbor_id, neighbor_min_delta_idx) + real_angle
-        max_angle = native_angle + theta
-        min_angle = native_angle - theta
-        all_angles = [(i, eulerZ + twist_per_base*i) for i in range(neighbor_min_delta_idx - half_period,
-                                                                    neighbor_min_delta_idx + half_period) ]
-        passing_angles_indices = [i for i, x in all_angles if min_angle < x < max_angle ]
-        return passing_angles_indices
 # end class
 
 def distanceToPoint(origin, direction, point):
