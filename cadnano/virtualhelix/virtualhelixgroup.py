@@ -1287,7 +1287,7 @@ class VirtualHelixGroup(CNObject):
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle < x < max_angle ]
                     rev_axis_hits.append(start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs)
             # end for
-            per_neighbor_hits[neighbor_id] = (fwd_hit_range_list, rev_axis_hits)
+            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
         # end for
         return per_neighbor_hits
     # end def

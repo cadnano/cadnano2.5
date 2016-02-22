@@ -13,11 +13,11 @@ from cadnano.gui.palette import getBrushObj, getNoBrush
 from . import pathstyles as styles
 
 
-_BASE_WIDTH = styles.PATH_BASE_WIDTH
-_BASE_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
+BASE_WIDTH = styles.PATHBASE_WIDTH
+BASE_RECT = QRectF(0, 0, BASE_WIDTH, BASE_WIDTH)
 
 
-PHOS_ITEM_WIDTH = 0.25*_BASE_WIDTH
+PHOS_ITEM_WIDTH = 0.25*BASE_WIDTH
 TRIANGLE = QPolygonF()
 TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75 * PHOS_ITEM_WIDTH, 0.5 * PHOS_ITEM_WIDTH))
@@ -81,7 +81,7 @@ class ActivePhosItem(QGraphicsPathItem):
     def getPath(self):
         path = QPainterPath()
         # _step = self._parent.getProperty('bases_per_repeat')
-        rect = QRectF(_BASE_RECT)
+        rect = QRectF(BASE_RECT)
         path.addRect(rect)
         return path
     # end def
@@ -93,8 +93,8 @@ class ActivePhosItem(QGraphicsPathItem):
         if self.path().isEmpty():
             self.setPath(self.getPath())
         self.setBrush(getBrushObj(color, alpha=128))
-        x = _BASE_WIDTH*step_idx
-        y = -_BASE_WIDTH if is_fwd else _BASE_WIDTH*2
+        x = BASE_WIDTH*step_idx
+        y = -BASE_WIDTH if is_fwd else BASE_WIDTH*2
         self.setPos(x,y)
         self.show()
     # end def
@@ -125,11 +125,11 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         half_label_H = tBR.height() / 2.0
         half_label_W = tBR.width() / 2.0
 
-        labelX = _BASE_WIDTH/2.0 - half_label_W #
+        labelX = BASE_WIDTH/2.0 - half_label_W #
         if str_txt == '1':  # adjust for the number one
             labelX -= tBR.width()
 
-        labelY = half_label_H if self._is_fwd else (_BASE_WIDTH - tBR.height())/2
+        labelY = half_label_H if self._is_fwd else (BASE_WIDTH - tBR.height())/2
 
         self.setPos(labelX, labelY)
         self.setText(str_txt)
@@ -161,13 +161,13 @@ class PreXoverItem(QGraphicsRectItem):
     """ A PreXoverItem exists between a single 'from' VirtualHelixItem index
     and zero or more 'to' VirtualHelixItem Indices
     """
-    def __init__(self,  from_virtual_helix_item, from_index,
-                        color, is_fwd=True):
-        super(QGraphicsRectItem, self).__init__(_BASE_RECT, from_virtual_helix_item)
+    def __init__(self, from_virtual_helix_item, from_index, is_fwd,
+                to_vh_id_num, prexoveritemgroup, color):
+        super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self._from_vh_item = from_virtual_helix_item
         self._from_idx = from_index
-        self._to_vh_item = None
-        self._to_idxs = None
+        self.prexoveritemgroup = prexoveritemgroup
+        self._to_vh_id_num = to_vh_id_num
         self._color = color
         self._is_fwd = is_fwd
         self._animations = []
@@ -181,7 +181,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
 
-        _half_bw, _bw = 0.5*_BASE_WIDTH, _BASE_WIDTH
+        _half_bw, _bw = 0.5*BASE_WIDTH, BASE_WIDTH
         _half_iw, _iw = 0.5*PHOS_ITEM_WIDTH, PHOS_ITEM_WIDTH
 
         if is_fwd:
@@ -213,7 +213,7 @@ class PreXoverItem(QGraphicsRectItem):
         vhi = self._from_vh_item
         id_num = vhi.idNum()
         x, y, _z = vhi.part().getCoordinate(id_num, 0)
-        return self.baseIdx() + (_z / _BASE_WIDTH)
+        return self.baseIdx() + (_z / BASE_WIDTH)
 
     def baseIdx(self):
         return self._step + self._step_idx
@@ -280,8 +280,8 @@ class PreXoverItem(QGraphicsRectItem):
             p1 = self._phos_item.scenePos()
             p2 = active_pos = active_item._phos_item.scenePos()
             scale = 3
-            delta1 = -_BASE_WIDTH*scale if self._is_fwd else _BASE_WIDTH*scale
-            delta2 = _BASE_WIDTH*scale if active_item.isFwd() else -_BASE_WIDTH*scale
+            delta1 = -BASE_WIDTH*scale if self._is_fwd else BASE_WIDTH*scale
+            delta2 = BASE_WIDTH*scale if active_item.isFwd() else -BASE_WIDTH*scale
             c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
             c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
             pp = QPainterPath()
@@ -324,247 +324,4 @@ class PreXoverItem(QGraphicsRectItem):
         item.adapter.saveRef(property_name, anim)
     # end def
 # end class
-
-
-class PreXoverItemGroup(QGraphicsRectItem):
-    HUE_FACTOR = 1.6
-
-    def __init__(self, virtualhelixitem):
-        super(QGraphicsRectItem, self).__init__(virtual_helix_item)
-        self._parent = virtual_helix_item
-        self.setPen(getNoPen())
-        self._colors = []
-        self._fwd_pxo_items = {}
-        self._rev_pxo_items = {}
-        self._active_items = []
-        self.updateBasesPerRepeat()
-    # end def
-
-    ### ACCESSORS ###
-    def window(self):
-        return self._parent.window()
-
-    def virtualHelixItem(self):
-        return self.parentItem():
-    # end def
-
-    ### EVENT HANDLERS ###
-
-    ### PRIVATE SUPPORT METHODS ###
-    def addRepeats(self, n=None):
-        """
-        Adds n*bases_per_repeat PreXoverItems to fwd and rev groups.
-        If n is None, get the value from the parent VHI.
-        """
-        step_size, num_repeats = self._parent.getProperty(['bases_per_repeat', 'repeats'])
-        if n is None:
-            n = num_repeats
-            start_idx = 0
-        else:
-            start_idx = len(self._fwd_pxo_items)
-        end_idx = start_idx + n*step_size
-
-        iw, half_iw = PHOS_ITEM_WIDTH, 0.5*PHOS_ITEM_WIDTH
-        bw, half_bw, bw2 = _BASE_WIDTH, 0.5*_BASE_WIDTH, 2*_BASE_WIDTH
-        for i in range(start_idx, end_idx, step_size):
-            for j in range(step_size):
-                fwd = PreXoverItem(i, j, self._colors[j], is_fwd=True, parent=self)
-                rev = PreXoverItem(i, j, self._colors[-1 - j], is_fwd=False, parent=self)
-                fwd.setPos((i + j)*bw, -bw)
-                rev.setPos((i + j)*bw, bw2)
-                self._fwd_pxo_items[i + j] = fwd
-                self._rev_pxo_items[i + j] = rev
-            # end for
-        # end for
-        canvas_size = self._parent.maxLength()
-        self.setRect(0, 0, bw*canvas_size, bw2)
-    # end def
-
-    def removeRepeats(self):
-        """
-        remove all PreXoverItems from fwd and rev groups.
-        """
-        for i in range(len(self._fwd_pxo_items)):
-            self.scene().removeItem(self._fwd_pxo_items.pop())
-            self.scene().removeItem(self._rev_pxo_items.pop())
-    # end def
-
-    def updateBasesPerRepeat(self):
-        """Recreates colors, all vhi"""
-        step_size = self._parent.getProperty('bases_per_repeat')
-        hue_scale = step_size*self.HUE_FACTOR
-        self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() \
-                                    for i in range(step_size)]
-        self.removeRepeats()
-        self.addRepeats()
-    # end def
-
-    def updateTurnsPerRepeat(self):
-        pass
-    # end def
-
-    def part(self):
-        return self._parent.part()
-
-    ### PUBLIC SUPPORT METHODS ###
-    def getItem(self, is_fwd, idx):
-        if is_fwd:
-            if idx in self._fwd_pxo_items:
-                return self._fwd_pxo_items[idx]
-        else:
-            if idx in self._rev_pxo_items:
-                return self._rev_pxo_items[idx]
-        return None
-    # end def
-
-    def resize(self):
-        old_max = len(self._fwd_pxo_items)
-        new_max = self._parent.maxLength()
-        if new_max == old_max:
-            return
-        elif new_max > old_max:
-            bpr = self._parent.getProperty('bases_per_repeat')
-            self._add_pxitems(old_max + 1, new_max, bpr)
-        else:
-            self._rm_pxitems_after(new_max)
-        self._max_base = new_max
-    # end def
-
-    def setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits):
-        # 1. clear all PreXoverItems
-        list(map(PreXoverItem.remove, self._pre_xover_items))
-        self._pre_xover_items = {}
-        self._active_virtual_helix_item = virtual_helix_item
-        # the list of neighbots per strand
-        id_num = virtual_helix_item.idNum()
-        # 1. Construct PXIs for the active virtual_helix_item
-        for i in range(virtual_helix_item.length()):
-            self._pre_xover_items[(id_num, idx, True)] = PreXoverItem(virtual_helix_item, idx, self)
-
-        for neighbor_id, hits in per_neighbor_hits:
-            # 2. construct neighbors PXIs
-            nvhi = self._virtual_helix_item_hash[neighbor_id]
-            for i in range(nvhi.length()):
-                self._pre_xover_items[(id_num, idx, True)] = PreXoverItem(nvhi, idx, self)
-
-            # 3. set the hits per item and neighboring hits
-            fwd_hits, rev_hits = hits
-            for idx, n_idxs in fwd_hits:
-                self.setProximalItems(nvhi, idx, )
-            for idx, n_idxs in rev_hits:
-                self.setProximalItems(nvhi, idx, )
-        # end for
-    # end def
-
-    def setActiveNeighbors(self, active_item, fwd_idxs, rev_idxs):
-        # active_item is a PreXoverItem
-        if active_item:
-            active_absolute_idx = active_item.absoluteIdx()
-            bpr = self._parent.getProperty('bases_per_repeat')
-            cutoff = bpr / 2
-            active_idx = active_item.baseIdx()
-            step_idxs = range(0, self._parent.maxLength(), bpr)
-            k = 0
-            pre_xovers = {}
-            for i, j in product(fwd_idxs, step_idxs):
-                idx = i + j
-                if not idx in self._fwd_pxo_items:
-                    continue
-                item = self._fwd_pxo_items[i+j]
-                delta = item.absoluteIdx() - active_absolute_idx
-                if abs(delta) < cutoff and k < 10:
-                    item.setActiveNeighbor(active_item, shortcut=str(k))
-                    pre_xovers[k] = item.name()
-                    k += 1
-                    self._active_items.append(item)
-            for i, j in product(rev_idxs, step_idxs):
-                idx = i + j
-                if not idx in self._fwd_pxo_items:
-                    continue
-                item = self._rev_pxo_items[i+j]
-                delta = item.absoluteIdx() - active_absolute_idx
-                if abs(delta) < cutoff and k < 10:
-                    item.setActiveNeighbor(active_item, shortcut=str(k))
-                    pre_xovers[k] = item.name()
-                    k += 1
-                    self._active_items.append(item)
-            self._parent.partItem().setKeyPressDict(pre_xovers)
-        else:
-            self._parent.partItem().setKeyPressDict({})
-            while self._active_items:
-                self._active_items.pop().setActiveNeighbor(None)
-    # end def
-
-    def setProximalItems(self, prox_groups):
-        max_length = self._parent.maxLength()
-        inactive_fwd = set(range(max_length))
-        inactive_rev = set(range(max_length))
-        bpr = self._parent.getProperty('bases_per_repeat')
-        step_idxs = range(0, max_length, bpr)
-        id_
-        for this_idx, neighbor_id, idxs in fwd_hits:
-            item = self._fwd_pxo_items[this_idx]
-            item.setProximal(True, id_num=neighbor_id)
-
-
-        for id_num, fwd_idxs, rev_idxs in prox_groups:
-
-            for i, j in product(fwd_idxs, step_idxs):
-                idx = i + j
-                if not idx in self._fwd_pxo_items:
-                    continue
-                item = self._fwd_pxo_items[i+j]
-                item.setProximal(True, id_num=id_num, colliding=is_colliding)
-                if idx in inactive_fwd:
-                    inactive_fwd.remove(idx)
-            for i, j in product(rev_idxs, step_idxs):
-                idx = i + j
-                if not idx in self._rev_pxo_items:
-                    continue
-                item = self._rev_pxo_items[i + j]
-                item.setProximal(True, id_num=id_num, colliding=is_colliding)
-                if idx in inactive_rev:
-                    inactive_rev.remove(idx)
-        for idx in list(inactive_fwd):
-            self._fwd_pxo_items[idx].setProximal(False)
-        for idx in list(inactive_rev):
-            self._rev_pxo_items[idx].setProximal(False)
-
-
-    def updatePositionsAfterRotation(self, angle):
-        bw = _BASE_WIDTH
-        part = self._parent.part()
-        canvas_size = self._parent.maxLength()
-        bpr = self._parent.getProperty('bases_per_repeat')
-        xdelta = angle / 360. * bw*bpr
-        for i, item in self._fwd_pxo_items.items():
-            x = (bw*i + xdelta) % (bw*canvas_size)
-            item.setX(x)
-        for i, item in self._rev_pxo_items.items():
-            x = (bw*i + xdelta) % (bw*canvas_size)
-            item.setX(x)
-    # end def
-
-    def updateModelActivePhos(self, pre_xover_item):
-        """Notify model of pre_xover_item hover state."""
-        vhi = self._parent
-        model_part = vhi.part()
-        id_num = self._parent.idNum()
-        if pre_xover_item is None:
-            model_part.setProperty('active_phos', None)
-            return
-        vh_name, vh_angle  = vhi.getProperty(['name', 'eulerZ'])
-        idx = pre_xover_item.baseIdx() # (f|r).step_idx
-        is_fwd = 'fwd' if pre_xover_item.isFwd() else 'rev'
-        value = '%s.%s.%d' % (vh_name, is_fwd, idx)
-        model_part.setProperty('active_phos', value)
-    # end def
-
-    def updateViewActivePhos(self, new_active_item=None):
-        while self._active_items:
-            self._active_items.pop().setActive(False)
-        if new_active_item:
-            new_active_item.setActive(True)
-            self._active_items.append(new_active_item)
-    # end def
 

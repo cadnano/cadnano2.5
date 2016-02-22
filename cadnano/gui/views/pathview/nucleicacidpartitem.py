@@ -44,7 +44,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
-        self._pre_xover_items = []  # crossover-related
+        self.prexovergroup = PreXoverItemGroup(self)
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -497,6 +497,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi = virtual_helix_item
 
         if vhi is None:
+            self.prexovergroup.clear()
             if self._pre_xover_items:
                 # clear all PreXoverItems
                 list(map(PreXoverItem.remove, self._pre_xover_items))
@@ -508,18 +509,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         idx = part.activeVirtualHelixIdx()
 
         per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
-        self.prexovergroup.setUpPrexovers(virtual_helix_item, per_neighbor_hits)
-        # for neighbor, index, strand_type, is_low_idx in potential_xovers:
-        #     # create one half
-        #     neighbor_vhi = self.idToVirtualHelixItem(neighbor)
-        #     pxi = PXI(vhi, neighbor_vhi, index, strand_type, is_low_idx)
-        #     # add to list
-        #     self._pre_xover_items.append(pxi)
-        #     # create the complement
-        #     pxi = PXI(neighbor_vhi, vhi, index, strand_type, is_low_idx)
-        #     # add to list
-        #     self._pre_xover_items.append(pxi)
-        # # end for
+        self.prexovergroup.setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 
     def updatePreXoverItems(self):
