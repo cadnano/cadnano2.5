@@ -330,7 +330,6 @@ class VirtualHelixGroup(CNObject):
     def hasStrandAtIdx(self, id_num, idx):
         """
         Args:
-            strand_type (StrandType.(FWD/REV)):
             id_num (int): virtual helix ID number
             idx (int): index that the strand is at
 
@@ -342,15 +341,15 @@ class VirtualHelixGroup(CNObject):
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
-    def getStrand(self, strand_type, id_num, idx):
+    def getStrand(self, is_fwd, id_num, idx):
         """
         Args:
-            strand_type (StrandType.(FWD/REV)):
+            is_fwd (bool): is the StrandType Forward
             id_num (int): virtual helix ID number
             idx (int): index that the strand is at
         """
 
-        if strand_type == StrandType.FWD:
+        if is_fwd:
             return self.fwd_strandsets[id_num].getStrand(idx)
         else:
             return self.rev_strandsets[id_num].getStrand(idx)
@@ -673,10 +672,8 @@ class VirtualHelixGroup(CNObject):
         self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
         self.vh_properties.loc[id_num, ['name', 'color']] = "vh%d" % (id_num), color
-        self.fwd_strandsets[id_num] = StrandSet(StrandType.FWD,
-                                                id_num, self, num_points)
-        self.rev_strandsets[id_num] = StrandSet(StrandType.REV,
-                                                id_num, self, num_points)
+        self.fwd_strandsets[id_num] = StrandSet(True, id_num, self, num_points)
+        self.rev_strandsets[id_num] = StrandSet(False, id_num, self, num_points)
 
         self.total_id_nums += 1
 

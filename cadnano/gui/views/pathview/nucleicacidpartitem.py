@@ -17,6 +17,7 @@ from .activesliceitem import ActiveSliceItem
 from .prexoveritem import PreXoverItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
+from cadnano.enum import StrandType
 
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
@@ -44,7 +45,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
-        self.prexovergroup = PreXoverItemGroup(self)
+        self.prexoveritemgroup = PreXoverItemGroup(self)
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -53,6 +54,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
+        self._key_press_dict = {}
         # self.setBrush(QBrush(Qt.NoBrush))
     # end def
 
@@ -433,7 +435,44 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             rm_button.hide()
     # end def
 
+    def _handleKeyPress(self, key):
+        if key not in self._key_press_dict:
+            return
+
+        # active item
+        part = self._model_part
+        active_base = part.getProperty('active_base')
+        active_id_num, a_is_fwd, a_idx, a_to_id = active_base
+        a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
+        neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
+        n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV
+
+        if not part.hasStrandAtIdx(active_id_num, a_idx)[a_strand_type]: return
+        if not part.hasStrandAtIdx(neighbor_id_num, n_idx)[n_strand_type]: return
+
+        a_strandset = part.getStrandSets(active_id_num)[a_strand_type]
+        n_strandset = part.getStrandSets(neighbor_id_num)[n_strand_type]
+        a_strand = a_strandset.getStrand(a_idx)
+        n_strand = n_strandset.getStrand(n_idx)
+
+        if a_strand.hasXoverAt(a_idx): return
+        if n_strand.hasXoverAt(n_idx): return
+
+        # SPECIAL CASE: neighbor already has a 3' end, and active has
+        # a 5' end, so assume the user wants to install a returning xover
+        if a_strand.idx5Prime() == a_idx and n_strand.idx3Prime() == n_idx:
+            part.createXover(n_strand, n_idx, a_strand, a_idx)
+            return
+
+        # DEFAULT CASE: the active strand acts as strand5p,
+        # install a crossover to the neighbor acting as strand3p
+        part.createXover(a_strand, a_idx, n_strand, n_idx)
+    # end def
+
     ### PUBLIC METHODS ###
+    def setKeyPressDict(self, shortcut_item_dict):
+        self._key_press_dict = shortcut_item_dict
+
     def setModifyState(self, bool):
         """Hides the modRect when modify state disabled."""
         self._can_show_mod_rect = bool
@@ -497,7 +536,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi = virtual_helix_item
 
         if vhi is None:
-            self.prexovergroup.clear()
+            self.prexoveritemgroup.clear()
             if self._pre_xover_items:
                 # clear all PreXoverItems
                 list(map(PreXoverItem.remove, self._pre_xover_items))
@@ -509,7 +548,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         idx = part.activeVirtualHelixIdx()
 
         per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
-        self.prexovergroup.setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits)
+        self.prexoveritemgroup.setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 
     def updatePreXoverItems(self):

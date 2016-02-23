@@ -363,9 +363,9 @@ class Part(VirtualHelixGroup):
     def getModStrandIdx(self, key):
         keylist = key.split(',')
         id_num = int(keylist[0])
-        strandtype = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
         idx = int(keylist[2])
-        strand = self.getStrand(strandtype, id_num, idx)
+        strand = self.getStrand(is_fwd, id_num, idx)
         return strand, idx
     # end def
 

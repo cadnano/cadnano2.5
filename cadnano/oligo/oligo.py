@@ -41,14 +41,12 @@ class Oligo(CNObject):
         cls_name = self.__class__.__name__
         olg_id = str(id(self))[-4:]
         if self._strand5p is not None:
-            strand_type = "Stap" if self.isStaple() else "Scaf"
             vh_num = self._strand5p.idNum()
             idx = self._strand5p.idx5Prime()
         else:
-            strand_type = "None"
             vh_num = -1
             idx = -1
-        return "<%s %s>(%s %d[%d])" % (cls_name, olg_id, strand_type, vh_num, idx)
+        return "<%s %s>(%d[%d])" % (cls_name, olg_id, vh_num, idx)
 
     def shallowCopy(self):
         olg = Oligo(self._part)

@@ -8,7 +8,6 @@ import cadnano.util as util
 
 from cadnano import preferences as prefs
 from cadnano.enum import StrandType
-from cadnano.enum import StrandType
 from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
@@ -30,10 +29,11 @@ class StrandSet(CNObject):
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
     """
-    def __init__(self, strand_type, id_num, part, initial_size):
+    def __init__(self, is_fwd, id_num, part, initial_size):
         self._document = part.document()
         super(StrandSet, self).__init__(part)
-        self._strand_type = strand_type
+        self._is_fwd = is_fwd
+        self._strand_type = StrandType.FWD if self._is_fwd else StrandType.REV
         self._id_num = id_num
         self._part = part
 
@@ -50,7 +50,7 @@ class StrandSet(CNObject):
 
         TODO: consider renaming this method
         """
-        return StrandSet(self._strand_type, self._id_num,
+        return StrandSet(self._is_fwd, self._id_num,
                         part, len(self.strand_array))
     # end def
 
@@ -60,7 +60,7 @@ class StrandSet(CNObject):
     # end def
 
     def __repr__(self):
-        if self._strand_type == 0:
+        if self._is_fwd == 0:
             st = 'scaf'
         else:
             st = 'stap'
@@ -107,11 +107,14 @@ class StrandSet(CNObject):
     # end def
 
     def isForward(self):
-        return self._strand_type is StrandType.FWD
+        return self._is_fwd
     # end def
 
+    def strandType(self):
+        return self._strand_type
+
     def isReverse(self):
-        return self._strand_type is StrandType.REV
+        return not self._is_fwd
     # end def
 
     def length(self):
@@ -169,7 +172,7 @@ class StrandSet(CNObject):
         sequence application.
         """
         fwd_ss, rev_ss = self._part.getStrandSets(self._id_num)
-        return rev_ss if self._strand_type == StrandType.FWD else fwd_ss
+        return rev_ss if self._is_fwd else fwd_ss
     # end def
 
     # def getBoundsOfEmptyRegionContaining(self, base_idx):
@@ -254,7 +257,7 @@ class StrandSet(CNObject):
 
 
     def strandType(self):
-        return self._strand_type
+        return self._is_fwd
 
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
@@ -270,7 +273,7 @@ class StrandSet(CNObject):
             bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self, base_idx_low, base_idx_high)
             x, y = self._part.getVirtualHelixOrigin(self._id_num)
-            d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._strand_type, base_idx_low)
+            d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return 0
@@ -287,7 +290,7 @@ class StrandSet(CNObject):
         """
         c = CreateStrandCommand(self, base_idx_low, base_idx_high)
         x, y = self._part.getVirtualHelixOrigin(self._id_num)
-        d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._strand_type, base_idx_low)
+        d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
         # print("strand", d)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
         return 0
@@ -414,7 +417,7 @@ class StrandSet(CNObject):
 
     ### PUBLIC SUPPORT METHODS ###
     def strandFilter(self):
-        return "forward" if self._strand_type is StrandType.FWD else "reverse"
+        return "forward" if self._is_fwd else "reverse"
 
 
     def hasStrandAt(self, idx_low, idx_high):

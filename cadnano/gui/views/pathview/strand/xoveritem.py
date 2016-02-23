@@ -31,7 +31,6 @@ class XoverNode3(QGraphicsRectItem):
         self._idx = idx
         self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
         self._is_forward = strand3p.strandSet().isForward()
-        self._strand_type = strand3p.strandSet().strandType()
 
         self.setPartnerVirtualHelix(strand3p)
 
@@ -61,10 +60,6 @@ class XoverNode3(QGraphicsRectItem):
         pass
     # end def
 
-    def strandType(self):
-        return self._strand_type
-    # end def
-
     def refreshXover(self):
         self._xover_item.refreshXover()
     # end def
@@ -89,7 +84,7 @@ class XoverNode3(QGraphicsRectItem):
     # end def
 
     def point(self):
-        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._strand_type)
+        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._is_forward)
     # end def
 
     def floatPoint(self):

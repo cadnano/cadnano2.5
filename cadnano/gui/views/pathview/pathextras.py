@@ -161,11 +161,12 @@ class PreXoverItem(QGraphicsRectItem):
     """ A PreXoverItem exists between a single 'from' VirtualHelixItem index
     and zero or more 'to' VirtualHelixItem Indices
     """
-    def __init__(self, from_virtual_helix_item, from_index, is_fwd,
+    def __init__(self, from_virtual_helix_item, is_fwd, from_index,
                 to_vh_id_num, prexoveritemgroup, color):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self._from_vh_item = from_virtual_helix_item
-        self._from_idx = from_index
+        self._id_num = from_virtual_helix_item.idNum()
+        self.idx = from_index
         self.prexoveritemgroup = prexoveritemgroup
         self._to_vh_id_num = to_vh_id_num
         self._color = color
@@ -202,6 +203,13 @@ class PreXoverItem(QGraphicsRectItem):
         self._phos_item = phos
     # end def
 
+    def getInfo(self):
+        """
+        Returns:
+            Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
+        """
+        return (self._id_num, self._is_fwd, self.idx, self._to_vh_id_num)
+
     ### ACCESSORS ###
     def color(self):
         return self._color
@@ -226,12 +234,12 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self._parent.updateModelActivePhos(self)
+        self._parent.updateModelActiveBase(self.getInfo())
         self.setActive(True)
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.updateModelActivePhos(None)
+        self._parent.updateModelActiveBase(None)
         self.setActive(False)
     # end def
 
@@ -266,45 +274,47 @@ class PreXoverItem(QGraphicsRectItem):
             # self.animate(self, 'brush_alpha', 1000, PROX_ALPHA, 0)
     # end def
 
-    def setActiveNeighbor(self, active_item, shortcut=None):
+    def setActiveNeighbor(self, active_prexoveritem, shortcut=None):
+        """ To be called with whatever the active_prexoveritem
+        is for the parts `active_base`
         """
-        """
-        if active_item is None:
-            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
-            self._bond_item.hide()
-            self.setLabel(text=self._label_txt)
-        else:
-            p1 = self._phos_item.scenePos()
-            p2 = active_pos = active_item._phos_item.scenePos()
-            scale = 3
-            delta1 = -BASE_WIDTH*scale if self._is_fwd else BASE_WIDTH*scale
-            delta2 = BASE_WIDTH*scale if active_item.isFwd() else -BASE_WIDTH*scale
-            c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
-            c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
-            pp = QPainterPath()
-            pp.moveTo(self._phos_item.pos())
-            pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
-            self._bond_item.setPath(pp)
-            self._bond_item.show()
+        p1 = self._phos_item.scenePos()
+        p2 = active_pos = active_prexoveritem._phos_item.scenePos()
+        scale = 3
+        delta1 = -BASE_WIDTH*scale if self._is_fwd else BASE_WIDTH*scale
+        delta2 = BASE_WIDTH*scale if active_prexoveritem.isFwd() else -BASE_WIDTH*scale
+        c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
+        c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
+        pp = QPainterPath()
+        pp.moveTo(self._phos_item.pos())
+        pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
+        self._bond_item.setPath(pp)
+        self._bond_item.show()
 
-            alpha = 32
-            abs_idx, active_item_abs_idx = self.absoluteIdx(), active_item.absoluteIdx()
-            if self._is_fwd != active_item.isFwd():
-                if abs_idx == active_item_abs_idx:
-                    alpha = 255
-            elif abs_idx == active_item_abs_idx + 1:
+        alpha = 32
+        idx, active_idx = self.idx, active_prexoveritem.idx
+        if self._is_fwd != active_prexoveritem.isFwd():
+            if idx == active_idx:
                 alpha = 255
-            elif abs_idx == active_item_abs_idx - 1:
-                alpha = 255
+        elif idx == active_idx + 1:
+            alpha = 255
+        elif idx == active_idx - 1:
+            alpha = 255
 
-            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
-            self.setLabel(text=shortcut, outline=True)
+        inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
+        self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+        self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
+        self.animate(self._phos_item, 'rotation', 500, 0, -90)
+        self.setLabel(text=shortcut, outline=True)
+    # end def
+
+    def deactivateNeighbor(self):
+        inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
+        self.setBrush(getBrushObj(self._color, alpha=128))
+        self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+        self.animate(self._phos_item, 'rotation', 500, -90, 0)
+        self._bond_item.hide()
+        self.setLabel(text=self._label_txt)
     # end def
 
     def setLabel(self, text=None, outline=False):

@@ -174,12 +174,6 @@ class Strand(CNObject):
         return self._decorators
     # end def
 
-    def isStaple(self):
-        return self._strandset.isStaple()
-
-    def isScaffold(self):
-        return self._strandset.isScaffold()
-
     def part(self):
         return self._strandset.part()
     # end def

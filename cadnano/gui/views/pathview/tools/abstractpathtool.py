@@ -103,12 +103,12 @@ class AbstractPathTool(QGraphicsObject):
 
     ####################### Coordinate Utilities ###########################
     def baseAtPoint(self, virtual_helix_item, pt):
-        """Returns the (strand_type, base_idx) corresponding
+        """Returns the (is_fwd, base_idx, strand_idx) corresponding
         to pt in virtual_helix_item."""
         x, strand_idx = self.helixIndex(pt)
 
-        strand_type = (StrandType.SCAFFOLD, StrandType.STAPLE)[util.clamp(strand_idx, 0, 1)]
-        return (strand_type, x, strand_idx)
+        is_fwd = False if util.clamp(strand_idx, 0, 1) else True
+        return (is_fwd, x, strand_idx)
 
     def helixIndex(self, point):
         """

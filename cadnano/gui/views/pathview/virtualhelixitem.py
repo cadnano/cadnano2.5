@@ -119,82 +119,55 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                     self.hide()
                     self._handle.hide()
                     return
-            else:
-                pass
-        # end for
-
-        # for key, val in zip(keys, values):
-        #     # if key == 'z':
-        #     #     z = float(value)
-        #     #     self.setX(z)
-        #     #     self._handle.setX(z-_VH_XOFFSET)
-        #     #     self.part().partDimensionsChangedSignal.emit(self.part(), True)
-        #     # elif key == 'eulerZ':
-        #     #     self._handle.rotateWithCenterOrigin(value)
-        #     #     self._prexoveritemgroup.updatePositionsAfterRotation(value)
-        #     ### GEOMETRY PROPERTIES ###
-        #     if key == 'repeats':
-        #         self.updateRepeats(int(value))
-        #     elif key == 'bases_per_repeat':
-        #         self.updateBasesPerRepeat(int(value))
-        #     elif key == 'turns_per_repeat':
-        #         self.updateTurnsPerRepeat(int(value))
-        #     ### RUNTIME PROPERTIES ###
-        #     elif key == 'active_phos':
-        #         hpxig = self._handle._prexoveritemgroup
-        #         pxig = self._prexoveritemgroup
-        #         if value:
-        #             # vh-handle
-        #             vh_name, fwd_str, base_idx, facing_angle = value.split('.')
-        #             is_fwd = 1 if fwd_str == 'fwd' else 0
-        #             step_idx = int(base_idx) % self._bases_per_repeat
-        #             h_item = hpxig.getItem(is_fwd, step_idx)
-        #             hpxig.updateViewActivePhos(h_item)
-        #             # vh
-        #             item = pxig.getItem(is_fwd, step_idx)
-        #             pxig.updateViewActivePhos(item)
-        #         else:
-        #             hpxig.updateViewActivePhos(None) # vh-handle
-        #             pxig.updateViewActivePhos(None) # vh
-        #             # self._activephositem.hide()
-        #     elif key == 'neighbor_active_angle':
-        #         hpxig = self._handle._prexoveritemgroup
-        #         pxig = self._prexoveritemgroup
-        #         if value:
-        #             # handle
-        #             local_angle = (int(value) + 180) % 360
-        #             h_fwd_items, h_rev_items = hpxig.getItemsFacingNearAngle(local_angle)
-        #             for h_item in h_fwd_items + h_rev_items:
-        #                 h_item.updateItemApperance(True, show_3p=False)
-        #             # path
-
-        #             active_value = self.part().getProperty('active_phos')
-        #             if not active_value:
-        #                 return
-        #             id_num, fwd_str, base_idx, facing_angle = active_value.split('.')
-        #             is_fwd = True if fwd_str == 'fwd' else False
-        #             active_idx = int(base_idx)
-        #             vhi = self._part_item.vhItemForIdNum(id_num)
-        #             active_item = vhi._prexoveritemgroup.getItem(is_fwd, active_idx)
-        #             neighbors = self.getProperty('neighbors')
-        #             neighbors = literal_eval(neighbors)
-        #             this_pt = self.getAxisPoint(0)
-        #             for n_id_num in neighbors:
-        #                 n_pt = self.getOtherAxisPoint(n_id_num, 0)
-        #                 n_dist, n_angle = v2DistanceAndAngle(this_pt[:2], n_pt[:2])
-        #                 if n_id_num == id_num:
-        #                     fwd_items, rev_items = hpxig.getItemsFacingNearAngle(int(n_angle))
-        #                     fwd_idxs = [item.step_idx() for item in fwd_items]
-        #                     rev_idxs = [item.step_idx() for item in rev_items]
-        #                     pxig.setActiveNeighbors(active_item, fwd_idxs, rev_idxs)
-        #         else:
-        #             # handle
-        #             hpxig.resetAllItemsAppearance()
-        #             # path
-        #             pxig.setActiveNeighbors(None, None, None)
-        #     elif key == 'neighbors':
-        #         pxig = self._prexoveritemgroup
-        #         self.refreshProximalItems()
+            # if key == 'z':
+            #     z = float(value)
+            #     self.setX(z)
+            #     self._handle.setX(z-_VH_XOFFSET)
+            #     self.part().partDimensionsChangedSignal.emit(self.part(), True)
+            # elif key == 'eulerZ':
+            #     self._handle.rotateWithCenterOrigin(value)
+            #     self._prexoveritemgroup.updatePositionsAfterRotation(value)
+            ### GEOMETRY PROPERTIES ###
+            elif key == 'repeats':
+                self.updateRepeats(int(value))
+            elif key == 'bases_per_repeat':
+                self.updateBasesPerRepeat(int(value))
+            elif key == 'turns_per_repeat':
+                self.updateTurnsPerRepeat(int(value))
+            ### RUNTIME PROPERTIES ###
+            elif key == 'active_phos':  # this draws the curves
+                # hpxig = self._handle._prexoveritemgroup
+                pxoig = self._part_item.prexoveritemgroup
+                if val is not None:
+                    # vh-handle
+                    id_num, is_fwd, idx, to_vh_id_num = val
+                    # h_item = hpxoig.getItem(id_num, is_fwd, idx)
+                    # hpxoig.updateViewActivePhos(h_item)
+                    pxo_item = pxoig.getItem(id_num, is_fwd, idx)
+                    pxoig.updateViewActivePhos(pxo_item)
+                else:
+                    # hpxoig.updateViewActivePhos(None) # vh-handle
+                    pxoig.updateViewActivePhos(None) # vh
+            elif key == 'neighbor_active_angle':
+                # hpxoig = self._handle._prexoveritemgroup
+                pxoig = self._part_item.prexoveritemgroup
+                if val is not None:
+                    id_num, is_fwd, idx, to_vh_id_num = val
+                    # # handle
+                    # local_angle = (int(value) + 180) % 360
+                    # h_fwd_items, h_rev_items = hpxoig.getItemsFacingNearAngle(local_angle)
+                    # for h_item in h_fwd_items + h_rev_items:
+                    #     h_item.updateItemApperance(True, show_3p=False)
+                    # # path
+                    pxoig.setActiveNeighbors(id_num, is_fwd, idx)
+                else:
+                    # handle
+                    # hpxoig.resetAllItemsAppearance()
+                    # path
+                    pxoig.setActiveNeighbors(None, None, None)
+            elif key == 'neighbors':
+                pxoig = self._prexoveritemgroup
+                self.refreshProximalItems()
         self.refreshPath()
     # end def
 
@@ -218,9 +191,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         return x, y
     # end def
 
-    def upperLeftCornerOfBaseType(self, idx, strand_type):
+    def upperLeftCornerOfBaseType(self, idx, is_fwd):
         x = idx * _BASE_WIDTH
-        y = 0 if strand_type is StrandType.FWD else _BASE_WIDTH
+        y = 0 if is_fwd else _BASE_WIDTH
         return x, y
     # end def
 
@@ -332,7 +305,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     ### COORDINATE UTILITIES ###
     def baseAtPoint(self, pos):
         """
-        Returns the (strand_type, index) under the location x,y or None.
+        Returns the (Strandset, index) under the location x, y or None.
 
         It shouldn't be possible to click outside a pathhelix and still call
         this function. However, this sometimes happens if you click exactly
@@ -347,9 +320,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             base_idx = util.clamp(base_idx, min_base, max_base)
         if y < 0:
             y = 0  # HACK: zero out y due to erroneous click
-        strand_type = floor(y * 1. / _BASE_WIDTH)
-        if strand_type < 0 or strand_type > 1:
-            strand_type = int(util.clamp(strand_type, 0, 1))
+        strand_type = floor(y * 1. / _BASE_WIDTH)   # 0 for fwd, 1 for rev
+        strand_type = int(util.clamp(strand_type, 0, 1))
         strand_set = part.getStrandSets(id_num)[strand_type]
         return (strand_set, base_idx)
     # end def
@@ -377,8 +349,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         active_tool = self._getActiveTool()
         tool_method_name = active_tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
-            strand_type, idx_x, idx_y = active_tool.baseAtPoint(self, event.pos())
-            getattr(self, tool_method_name)(strand_type, idx_x, idx_y)
+            is_fwd, idx_x, idx_y = active_tool.baseAtPoint(self, event.pos())
+            getattr(self, tool_method_name)(is_fwd, idx_x, idx_y)
     # end def
 
     ### TOOL METHODS ###
@@ -408,11 +380,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.attemptToCreateStrand(self, strand_set, idx)
     # end def
 
-    def pencilToolHoverMove(self, strand_type, idx_x, idx_y):
+    def pencilToolHoverMove(self, is_fwd, idx_x, idx_y):
         """Pencil the strand is possible."""
         part_item = self.partItem()
         active_tool = self._getActiveTool()
         if not active_tool.isFloatingXoverBegin():
             temp_xover = active_tool.floatingXover()
-            temp_xover.updateFloatingFromVHI(self, strand_type, idx_x, idx_y)
+            temp_xover.updateFloatingFromVHI(self, is_fwd, idx_x, idx_y)
     # end def

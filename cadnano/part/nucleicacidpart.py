@@ -608,7 +608,6 @@ class NucleicAcidPart(Part):
         # 3) Copy oligos, populating the strandsets
         for oligo, val in self._oligos:
             strandGenerator = oligo.strand5p().generator3pStrand()
-            strand_type = oligo.strand5p().strandType()
             new_oligo = oligo.deepCopy(new_part)
             last_strand = None
             for strand in strandGenerator:

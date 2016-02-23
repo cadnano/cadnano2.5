@@ -332,7 +332,6 @@ class ForcedXoverNode3(QGraphicsRectItem):
 
         self._is_forward = strand3p.strandSet().isForward()
         self._is_on_top = self._is_forward
-        self._strand_type = strand3p.strandSet().strandType()
 
         self._partner_virtual_helix = virtual_helix_item
 
@@ -349,15 +348,14 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self.setZValue(styles.ZENDPOINTITEM + 1)
     # end def
 
-    def updateForFloatFromVHI(self, virtual_helix_item, strand_type, idx_x, idx_y):
+    def updateForFloatFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
         """
 
         """
         self._vhi = virtual_helix_item
         self.setParentItem(virtual_helix_item)
-        self._strand_type = strand_type
         self._idx = idx_x
-        self._is_on_top = self._is_forward = True if idx_y == 0 else False
+        self._is_on_top = self._is_forward = True if is_forward else False
         self.updatePositionAndAppearance(is_from_strand=False)
     # end def
 
@@ -371,12 +369,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._idx = idx
         self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
         self._is_forward = strand3p.strandSet().isForward()
-        self._strand_type = strand3p.strandSet().strandType()
         self.updatePositionAndAppearance()
-    # end def
-
-    def strandType(self):
-        return self._strand_type
     # end def
 
     def configurePath(self):
@@ -410,7 +403,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def point(self):
-        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._strand_type)
+        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._is_forward)
     # end def
 
     def floatPoint(self):
@@ -568,7 +561,6 @@ class ForcedXoverItem(QGraphicsPathItem):
         super(ForcedXoverItem, self).__init__(nucleicacid_part_item)
         self._tool = tool
         self._virtual_helix_item = virtual_helix_item
-        self._strand_type = None
         self._node5 = None
         self._node3 = None
         self.setFlag(QGraphicsItem.ItemIsFocusable) # for keyPressEvents
@@ -589,10 +581,6 @@ class ForcedXoverItem(QGraphicsPathItem):
 
     def deactivate(self):
         self._tool.setFloatingXoverBegin(True)
-
-    def strandType(self):
-        return self._strand_type
-    # end def
 
     def hide5prime(self):
         self._node5._path_thing.hide()
@@ -636,7 +624,6 @@ class ForcedXoverItem(QGraphicsPathItem):
         # floating Xover!
         self._virtual_helix_item = virtual_helix_item
         self.setParentItem(virtual_helix_item.partItem())
-        self._strand_type = strand5p.strandSet().strandType()
         if self._node5 is None:
             self._node5 = ForcedXoverNode5(virtual_helix_item, self, strand5p, idx)
             self._node3 = ForcedXoverNode3(virtual_helix_item, self, strand5p, idx)
@@ -645,12 +632,12 @@ class ForcedXoverItem(QGraphicsPathItem):
         self.updateFloatPath()
     # end def
 
-    def updateFloatingFromVHI(self, virtual_helix_item, strandType, idx_x, idx_y):
+    def updateFloatingFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
         # floating Xover!
         self._node5.setPartnerVirtualHelix(virtual_helix_item)
         self._node5.updatePositionAndAppearance()
         self._node3.setPartnerVirtualHelix(self._virtual_helix_item)
-        self._node3.updateForFloatFromVHI(virtual_helix_item, strandType, idx_x, idx_y)
+        self._node3.updateForFloatFromVHI(virtual_helix_item, is_forward, idx_x, idx_y)
         self.updateFloatPath()
     # end def
 

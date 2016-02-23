@@ -7,7 +7,6 @@ class ApplySequenceCommand(UndoCommand):
         self._oligo = oligo
         self._new_sequence = sequence
         self._old_sequence = oligo.sequence()
-        self._strand_type = oligo._strand5p.strandSet().strandType()
     # end def
 
     def redo(self):
