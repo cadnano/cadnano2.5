@@ -46,7 +46,7 @@ class AbstractPartItem(object):
         pass
     def partSelectedChangedSlot(self, model_part, is_selected):
         pass
-    def partActiveVirtualHelixChangedSlot(self, sender):
+    def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
     def partPreDecoratorSelectedSlot(self, sender):
         pass

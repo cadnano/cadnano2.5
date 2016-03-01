@@ -99,18 +99,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partOligoAddedSlot(self, part, oligo):
-        pass
-    # end def
-
-    def partParentChangedSlot(self, sender):
-        """docstring for partParentChangedSlot"""
-        # print "NucleicAcidPartItem.partParentChangedSlot"
-        pass
-    # end def
-
-    def partActiveVirtualHelixChangedSlot(self, part, virtual_helix):
-        self.updatePreXoverItems()
+    def partActiveVirtualHelixChangedSlot(self, part, id_num):
+        vhi = self._virtual_helix_item_hash.get(id_num, None)
+        self.setActiveVirtualHelixItem(vhi)
+        self.setPreXoverItemsVisible(vhi)
     #end def
 
     def partDimensionsChangedSlot(self, model_part):
@@ -251,17 +243,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 vhhi.modelDeselect(doc)
             # end for
             vhhi_group.processPendingToAddList()
-    # end def
-
-    def updatePreXoverItemsSlot(self, sender, id_num):
-        part = self.part()
-        if id_num is None:
-            pass
-            # self.setPreXoverItemsVisible(None)
-        elif part.activeIdNum() == id_num:
-            vhi = self._virtual_helix_item_hash.get(id_num)
-            self.setActiveVirtualHelixItem(vhi)
-            # self.setPreXoverItemsVisible(vhi)
     # end def
 
     ### ACCESSORS ###
@@ -549,10 +530,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
         self.prexoveritemgroup.setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits)
-    # end def
-
-    def updatePreXoverItems(self):
-        self.setPreXoverItemsVisible(self.activeVirtualHelixItem())
     # end def
 
     def updateXoverItems(self, virtual_helix_item):

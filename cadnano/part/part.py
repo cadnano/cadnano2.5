@@ -246,7 +246,7 @@ class Part(VirtualHelixGroup):
     def setActiveVirtualHelix(self, id_num, idx=None):
         self._active_virtual_helix = id_num
         self._active_virtual_helix_idx = idx
-        self.partStrandChangedSignal.emit(self, id_num)
+        self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
     # end def
 
     def insertions(self):
