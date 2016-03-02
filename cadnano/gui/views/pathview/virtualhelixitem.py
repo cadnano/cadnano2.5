@@ -135,39 +135,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             elif key == 'turns_per_repeat':
                 self.updateTurnsPerRepeat(int(value))
             ### RUNTIME PROPERTIES ###
-            elif key == 'active_phos':  # this draws the curves
-                # hpxig = self._handle._prexoveritemgroup
-                pxoig = self._part_item.prexoveritemgroup
-                if val is not None:
-                    # vh-handle
-                    id_num, is_fwd, idx, to_vh_id_num = val
-                    # h_item = hpxoig.getItem(id_num, is_fwd, idx)
-                    # hpxoig.updateViewActivePhos(h_item)
-                    pxo_item = pxoig.getItem(id_num, is_fwd, idx)
-                    pxoig.updateViewActivePhos(pxo_item)
-                else:
-                    # hpxoig.updateViewActivePhos(None) # vh-handle
-                    pxoig.updateViewActivePhos(None) # vh
-            elif key == 'neighbor_active_angle':
-                # hpxoig = self._handle._prexoveritemgroup
-                pxoig = self._part_item.prexoveritemgroup
-                if val is not None:
-                    id_num, is_fwd, idx, to_vh_id_num = val
-                    # # handle
-                    # local_angle = (int(value) + 180) % 360
-                    # h_fwd_items, h_rev_items = hpxoig.getItemsFacingNearAngle(local_angle)
-                    # for h_item in h_fwd_items + h_rev_items:
-                    #     h_item.updateItemApperance(True, show_3p=False)
-                    # # path
-                    pxoig.setActiveNeighbors(id_num, is_fwd, idx)
-                else:
-                    # handle
-                    # hpxoig.resetAllItemsAppearance()
-                    # path
-                    pxoig.setActiveNeighbors(None, None, None)
             elif key == 'neighbors':
-                pxoig = self._prexoveritemgroup
-                self.refreshProximalItems()
+                # this means a virtual helix in the slice view has moved
+                # so we need to clear and redraw the PreXoverItems just in case
+                if self.isActive():
+                    self._part_item.setPreXoverItemsVisible(self)
         self.refreshPath()
     # end def
 
@@ -249,9 +221,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self.refreshPath()
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActive(self, idx):
+    def setActive(self, is_fwd, idx):
         """Makes active the virtual helix associated with this item."""
-        self.part().setActiveVirtualHelix(self._id_num, idx)
+        self.part().setActiveVirtualHelix(self._id_num, is_fwd, idx)
     # end def
 
     ### EVENT HANDLERS ###
@@ -262,7 +234,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         self.scene().views()[0].addToPressList(self)
         strand_set, idx = self.baseAtPoint(event.pos())
-        self.setActive(idx)
+        self.setActive(strand_set.isForward(), idx)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
 

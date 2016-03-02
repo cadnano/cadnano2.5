@@ -48,6 +48,8 @@ class AbstractPartItem(object):
         pass
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
+    def partActiveBaseInfoSlot(self, sender, info):
+        pass
     def partPreDecoratorSelectedSlot(self, sender):
         pass
     def updatePreXoverItemsSlot(self, sender):

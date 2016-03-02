@@ -9,6 +9,13 @@ class RemoveStrandCommand(UndoCommand):
     strands with no connections to other strands.
     """
     def __init__(self, strandset, strand, solo=True):
+        """
+        Args:
+            strandset (StrandSet):
+            strand (Strand):
+            solo (Optional[bool]): set to True if only one strand is being
+                removed to minimize signaling
+        """
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
         self._strand = strand
@@ -19,7 +26,8 @@ class RemoveStrandCommand(UndoCommand):
 
         part = strand.part()
         idxs = strand.idxs()
-        self.mids = part.getModID(strand, strand.lowIdx()), part.getModID(strand, strand.highIdx())
+        self.mids = (   part.getModID(  strand, strand.lowIdx()),
+                        part.getModID(strand, strand.highIdx()) )
 
         # only create a new 5p oligo if there is a 3' connection
         self._new_oligo5p = olg.shallowCopy() if self._old_strand5p else None
@@ -68,6 +76,7 @@ class RemoveStrandCommand(UndoCommand):
             if self._solo:
                 part = strandset.part()
                 id_num = strandset.idNum()
+                # Why is this signal emitted here?
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
                 #strand5p.strandXover5pChangedSignal.emit(strand5p, strand)
             strand5p.strandUpdateSignal.emit(strand5p)
@@ -89,14 +98,15 @@ class RemoveStrandCommand(UndoCommand):
         strand.strandRemovedSignal.emit(strand)
 
         if self.mids[0] is not None:
-            strand.part().removeModStrandInstance(strand, strand.lowIdx(), self.mids[0])
-            # strand.strandModsRemovedSignal.emit(strand, self.mids[0], strand.lowIdx())
+            strand.part().removeModStrandInstance(strand, strand.lowIdx(),
+                                                    self.mids[0] )
         if self.mids[1] is not None:
-            strand.part().removeModStrandInstance(strand, strand.highIdx(), self.mids[1])
-            # strand.strandModsRemovedSignal.emit(strand, self.mids[1], strand.highIdx())
+            strand.part().removeModStrandInstance(strand, strand.highIdx(),
+                                                            self.mids[1])
 
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(),
+                                                        strandset.idNum())
     # end def
 
     def undo(self):
@@ -135,14 +145,19 @@ class RemoveStrandCommand(UndoCommand):
         strandset.strandsetStrandAddedSignal.emit(strandset, strand)
 
         if self.mids[0] is not None:
-            strand.part().addModStrandInstance(strand, strand.lowIdx(), self.mids[0])
-            strand.strandModsAddedSignal.emit(strand, self.mids[0], strand.lowIdx())
+            strand.part().addModStrandInstance(strand, strand.lowIdx(),
+                                                self.mids[0])
+            strand.strandModsAddedSignal.emit(strand, self.mids[0],
+                                                strand.lowIdx())
         if self.mids[1] is not None:
-            strand.part().addModStrandInstance(strand, strand.highIdx(), self.mids[1])
-            strand.strandModsAddedSignal.emit(strand, self.mids[1], strand.highIdx())
+            strand.part().addModStrandInstance(strand, strand.highIdx(),
+                                                self.mids[1])
+            strand.strandModsAddedSignal.emit(strand, self.mids[1],
+                                                strand.highIdx())
 
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(),
+                                                        strandset.idNum())
 
         # Restore connections to this strand
         if strand5p is not None:

@@ -57,6 +57,10 @@ class AbstractVirtualHelixItem(object):
         return self._part_item
     # end def
 
+    def isActive(self):
+        return self._model_part.isVirtualHelixActive(self._id_num)
+    # end def
+
     def idNum(self):
         return self._id_num
     # end def

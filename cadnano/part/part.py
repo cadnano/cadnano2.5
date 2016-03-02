@@ -64,7 +64,7 @@ class Part(VirtualHelixGroup):
         # Runtime state
         self._active_base_index = self._STEP_SIZE
         self._active_id_num = None
-        self._active_id_num_idx = None
+        self.active_base_info = None
         self._selected = False
 
         if self.__class__ == Part:
@@ -96,9 +96,10 @@ class Part(VirtualHelixGroup):
                         name='partSelectedChangedSignal')       # self, is_selected
 
     # B. Virtual Helix
-    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num
                         name='partActiveVirtualHelixChangedSignal')
-
+    partActiveBaseInfoSignal = ProxySignal(CNObject, tuple,   # self.active_base_info
+                        name='partActiveBaseInfoSignal')
     partVirtualHelixAddedSignal = ProxySignal(object, int,
                         name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
     partVirtualHelixRemovedSignal = ProxySignal(object, int,
@@ -243,10 +244,15 @@ class Part(VirtualHelixGroup):
         self.partActiveSliceIndexSignal.emit(self, idx)
     # end def
 
-    def setActiveVirtualHelix(self, id_num, idx=None):
+    def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
         self._active_virtual_helix = id_num
-        self._active_virtual_helix_idx = idx
+        self.active_base_info = abi = (id_num, is_fwd, idx, -1)
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
+        self.partActiveBaseInfoSignal.emit(self, abi)
+    # end def
+
+    def isVirtualHelixActive(self, id_num):
+        return id_num == self._active_virtual_helix
     # end def
 
     def insertions(self):

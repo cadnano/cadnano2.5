@@ -13,7 +13,7 @@ from cadnano.gui.palette import getBrushObj, getNoBrush
 from . import pathstyles as styles
 
 
-BASE_WIDTH = styles.PATHBASE_WIDTH
+BASE_WIDTH = styles.PATH_BASE_WIDTH
 BASE_RECT = QRectF(0, 0, BASE_WIDTH, BASE_WIDTH)
 
 
@@ -234,47 +234,17 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self._parent.updateModelActiveBase(self.getInfo())
-        self.setActive(True)
+        self._parent.updateModelActiveBaseInfo(self.getInfo())
+        self.setInstantActive(True)
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.updateModelActiveBase(None)
-        self.setActive(False)
+        self._parent.updateModelActiveBaseInfi(None)
+        self.setInstantActive(False)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActive(self, is_active):
-        if is_active:
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
-        else:
-            inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
-    # end def
-
-    def setProximal(self, to_virtual_helix_item, to_index, colliding=False):
-        if to_virtual_helix_item is not None:
-            self._to_vh_item = to_virtual_helix_item
-            self._to_idx = to_index
-            color = '#cc0000' if colliding else self._color
-            self.setBrush(getBrushObj(color, alpha=PROX_ALPHA))
-            self._label_txt = id_num
-            self.setLabel(id_num)
-            # self.animate(self, 'brush_alpha', 1, 0, PROX_ALPHA) # overwrite running anim
-        else:
-            self._to_vh_item = None
-            self._to_idx = None
-            self.setBrush(getBrushObj(self._color, alpha=0))
-            self._label_txt = None
-            self.setLabel()
-            # self.animate(self, 'brush_alpha', 1000, PROX_ALPHA, 0)
-    # end def
-
-    def setActiveNeighbor(self, active_prexoveritem, shortcut=None):
+    def activateNeighbor(self, active_prexoveritem, shortcut=None):
         """ To be called with whatever the active_prexoveritem
         is for the parts `active_base`
         """
@@ -301,20 +271,31 @@ class PreXoverItem(QGraphicsRectItem):
         elif idx == active_idx - 1:
             alpha = 255
 
-        inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
-        self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+        self.setBrush(getBrushObj(self._color, alpha=128))
         self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
         self.animate(self._phos_item, 'rotation', 500, 0, -90)
         self.setLabel(text=shortcut, outline=True)
     # end def
 
     def deactivateNeighbor(self):
-        inactive_alpha = PROX_ALPHA if self._to_vh_item is not None else 0
+        inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
         self.setBrush(getBrushObj(self._color, alpha=128))
         self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
         self.animate(self._phos_item, 'rotation', 500, -90, 0)
         self._bond_item.hide()
         self.setLabel(text=self._label_txt)
+    # end def
+
+    def setInstantActive(self, is_active):
+        if is_active:
+            self.setBrush(getBrushObj(self._color, alpha=128))
+            self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
+            self.animate(self._phos_item, 'rotation', 500, 0, -90)
+        else:
+            inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
 
     def setLabel(self, text=None, outline=False):

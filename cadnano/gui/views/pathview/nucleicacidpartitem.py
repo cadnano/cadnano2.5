@@ -14,7 +14,8 @@ from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
-from .prexoveritem import PreXoverItem
+# from .prexoveritem import PreXoverItem
+from .prexoveritemgroup import PreXoverItemGroup
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
 from cadnano.enum import StrandType
@@ -104,6 +105,24 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
     #end def
+
+    def partActiveBaseInfoSlot(self, part, info):
+        pxoig = self.prexoveritemgroup
+        if info is not None:
+            id_num, is_fwd, idx, to_vh_id_num = info
+            # # handle
+            # local_angle = (int(value) + 180) % 360
+            # h_fwd_items, h_rev_items = hpxoig.getItemsFacingNearAngle(local_angle)
+            # for h_item in h_fwd_items + h_rev_items:
+            #     h_item.updateItemApperance(True, show_3p=False)
+            # # path
+            pxoig.activateNeighbors(id_num, is_fwd, idx)
+        else:
+            # handle
+            # hpxoig.resetAllItemsAppearance()
+            # path
+            pxoig.deactivateNeighbors()
+    # end def
 
     def partDimensionsChangedSlot(self, model_part):
         if len(self._virtual_helix_item_list) > 0:
@@ -397,7 +416,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
-        self.setRect(self._vh_rect.adjusted(-_p/2,-_p,_p,-_p/2))
+        self.setRect(self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2))
         # move and show or hide the buttons if necessary
         add_button = self._add_bases_button
         rm_button = self._remove_bases_button
@@ -529,7 +548,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         idx = part.activeVirtualHelixIdx()
 
         per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
-        self.prexoveritemgroup.setActiveVirtualHelix(virtual_helix_item, per_neighbor_hits)
+        self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 
     def updateXoverItems(self, virtual_helix_item):

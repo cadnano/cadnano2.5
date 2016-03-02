@@ -15,6 +15,7 @@ class PartItemController():
         m_p.partSelectedChangedSignal.connect(p_i.partSelectedChangedSlot)
 
         m_p.partActiveVirtualHelixChangedSignal.connect(p_i.partActiveVirtualHelixChangedSlot)
+        m_p.partActiveBaseInfoSignal.connect(p_i.partActiveBaseInfoSlot)
 
         m_p.partVirtualHelixAddedSignal.connect(p_i.partVirtualHelixAddedSlot)
         m_p.partVirtualHelixRemovedSignal.connect(p_i.partVirtualHelixRemovedSlot)
@@ -26,6 +27,7 @@ class PartItemController():
         m_p.partVirtualHelixPropertyChangedSignal.connect(p_i.partVirtualHelixPropertyChangedSlot)
 
         m_p.partOligoAddedSignal.connect(p_i.partOligoAddedSlot)
+        # m_p.partStrandChangedSignal.connect(p_i.updatePreXoverItemsSlot)
     # end def
 
     def disconnectSignals(self):
@@ -39,6 +41,7 @@ class PartItemController():
         m_p.partSelectedChangedSignal.disconnect(p_i.partSelectedChangedSlot)
 
         m_p.partActiveVirtualHelixChangedSignal.disconnect(p_i.partActiveVirtualHelixChangedSlot)
+        m_p.partActiveBaseInfoSignal.disconnect(p_i.partActiveBaseInfoSlot)
 
         m_p.partVirtualHelixAddedSignal.disconnect(p_i.partVirtualHelixAddedSlot)
         m_p.partVirtualHelixRemovedSignal.disconnect(p_i.partVirtualHelixRemovedSlot)
@@ -50,4 +53,5 @@ class PartItemController():
         m_p.partVirtualHelixPropertyChangedSignal.disconnect(p_i.partVirtualHelixPropertyChangedSlot)
 
         m_p.partOligoAddedSignal.disconnect(p_i.partOligoAddedSlot)
+        # m_p.partStrandChangedSignal.disconnect(p_i.updatePreXoverItemsSlot)
     # end def
