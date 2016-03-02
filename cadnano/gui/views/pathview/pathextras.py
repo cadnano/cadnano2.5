@@ -182,24 +182,23 @@ class PreXoverItem(QGraphicsRectItem):
         self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
 
-        _half_bw, _bw = 0.5*BASE_WIDTH, BASE_WIDTH
-        _half_iw, _iw = 0.5*PHOS_ITEM_WIDTH, PHOS_ITEM_WIDTH
-
         if is_fwd:
             phos = Triangle(FWDPHOS_PP, self)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(_half_bw, _bw)
+            phos.setPos(0.5*BASE_WIDTH, BASE_WIDTH)
             phos.setPen(getNoPen())
             phos.setBrush(getBrushObj(color))
             self._bond_item.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
+            self.setPos(from_index*BASE_WIDTH,-BASE_WIDTH)
         else:
             phos = Triangle(REVPHOS_PP, self)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(_half_bw, 0)
+            phos.setPos(0.5*BASE_WIDTH, 0)
             phos.setPen(getPenObj(color, 0.25))
             phos.setBrush(getNoBrush())
             self._bond_item.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
                                     penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
+            self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
         self._phos_item = phos
     # end def
 
@@ -213,6 +212,12 @@ class PreXoverItem(QGraphicsRectItem):
     ### ACCESSORS ###
     def color(self):
         return self._color
+
+    def remove(self):
+        scene = self.scene()
+        if scene:
+            # scene.removeItem(self._label)
+            scene.removeItem(self)
 
     def isFwd(self):
         return self._is_fwd
@@ -234,12 +239,12 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self._parent.updateModelActiveBaseInfo(self.getInfo())
+        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
         self.setInstantActive(True)
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.updateModelActiveBaseInfi(None)
+        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
         self.setInstantActive(False)
     # end def
 

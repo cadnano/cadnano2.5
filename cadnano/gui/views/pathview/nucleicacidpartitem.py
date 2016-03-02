@@ -543,9 +543,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 self._pre_xover_items = []
             return
 
-        id_num = vhi.idNum()
         part = self.part()
-        idx = part.activeVirtualHelixIdx()
+        id_num, is_fwd, idx, to_vh_id_num = part.active_base_info
 
         per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
         self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)

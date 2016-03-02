@@ -742,13 +742,21 @@ class VirtualHelixGroup(CNObject):
         """
         Args:
             id_num (int): virtual helix ID number
+            keys (str or List/Tuple):
+            safe (Optional[boo]):
+        Returns:
+            Type of single key property or List: depending on type of arg `keys`
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
-        return self.vh_properties.loc[id_num, keys]
+        props = self.vh_properties.loc[id_num, keys]
+        if isinstance(props, pd.Series):
+            return [v.item() if isinstance(v, (np.float64, np.int64, np.bool_)) else v for v in props]
+        else:
+            return props.item() if isinstance(props, (np.float64, np.int64, np.bool_)) else props
     # end
 
     def getAllVirtualHelixProperties(self, id_num, safe=True):
@@ -1051,6 +1059,9 @@ class VirtualHelixGroup(CNObject):
         Args:
             radius (float): distance to consider
             point (Sequence[float]): is an array_like of length 3
+
+        Returns:
+            List
         """
         qc = self._origin_cache
         query = (radius, point)
@@ -1059,6 +1070,7 @@ class VirtualHelixGroup(CNObject):
         else:
             # print('miss')
             res = self._queryVirtualHelixOrigin(radius, point)
+            res = res.tolist()
             self._origin_cache_keys.append(query)
             qc[query] =  res
             # print("size", len(qc))
@@ -1080,6 +1092,9 @@ class VirtualHelixGroup(CNObject):
         Args:
             radius (float): distance to consider
             point (Sequence[float]): is an array_like of length 3
+
+        Returns:
+            ndarray
         """
         difference = self.origin_pts - point
         ldiff = len(difference)
@@ -1214,17 +1229,20 @@ class VirtualHelixGroup(CNObject):
         rsquared2 = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
-            tpb, eulerZ = self.vh_properties.loc[neighbor_id, ['twist_per_base', 'eulerZ']]
-            twist_per_base = math.radians(twist_per_base)
+            tpb, eulerZ, bpr = self.vh_properties.loc[neighbor_id, ['twist_per_base', 'eulerZ', 'bases_per_repeat']]
+            half_period = math.ceil(bpr / 2)
+            twist_per_base = math.radians(tpb)
 
             offset, size = self.getOffsetAndSize(neighbor_id)
 
             # 1. Finds points that point at neighbors axis point
             naxis_pts = axis_pts[offset:offset + size]
+            nfwd_pts = fwd_pts[offset:offset + size]
+
             direction = self.directions[neighbor_id]
             len_neighbor_pts = len(naxis_pts)
             delta = self.delta3D_scratch
-            if len(len_neighbor_pts) != len(delta):
+            if len_neighbor_pts != len(delta):
                 self.delta3D_scratch = delta = np.empty((len_neighbor_pts,), dtype=float)
 
             fwd_axis_hits = []
@@ -1249,13 +1267,14 @@ class VirtualHelixGroup(CNObject):
                     native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx) % TWOPI + real_angle
                     max_angle = native_angle + theta
                     min_angle = native_angle - theta
-                    all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(neighbor_min_delta_idx - half_period,
-                                                                                neighbor_min_delta_idx + half_period) ]
+                    all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle < x < max_angle ]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle < x < max_angle ]
-                    fwd_axis_hits.append(start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs)
+                    fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
+
             rev_axis_hits = []
             for i, point in enumerate(this_rev_pts):
                 difference = naxis_pts - point
@@ -1277,12 +1296,12 @@ class VirtualHelixGroup(CNObject):
                     native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx) % TWOPI + real_angle
                     max_angle = native_angle + theta
                     min_angle = native_angle - theta
-                    all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(neighbor_min_delta_idx - half_period,
-                                                                                neighbor_min_delta_idx + half_period) ]
+                    all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle < x < max_angle ]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle < x < max_angle ]
-                    rev_axis_hits.append(start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs)
+                    rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
             per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
         # end for
@@ -1299,9 +1318,9 @@ class VirtualHelixGroup(CNObject):
         additionally we need to account the axial distance between bases
         (the BASE_WIDTH)
         """
-        theta = math.radian(angle) / 2
+        theta = math.radians(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-        x = BASE_WIDTH*(angle/2/360*bases_per_turn)
+        x = base_width*(angle/2/360*bases_per_turn)
         return theta, math.sqrt(R*R + x*x)
     # end def
 

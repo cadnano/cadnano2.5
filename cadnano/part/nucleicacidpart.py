@@ -137,7 +137,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def potentialCrossoverList(self, id_num, idx=None):
-        neighbors = self.getVirtualHelixOriginNeighbors(id_num, threshold)
+        neighbors = self.getVirtualHelixOriginNeighbors(id_num, 2.1*self._RADIUS)
         # hit_radius = self.radiusForAngle(60, self._RADIUS, self._BASE_WIDTH)
         alpha = 60
         per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors, alpha, index_slice=None)

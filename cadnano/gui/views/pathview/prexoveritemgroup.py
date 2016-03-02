@@ -1,4 +1,5 @@
 from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtGui import QColor
 from .pathextras import PreXoverItem, PHOS_ITEM_WIDTH, BASE_WIDTH
 from cadnano.gui.palette import newPenObj, getNoPen, getPenObj
 from cadnano.enum import StrandType
@@ -8,6 +9,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
     def __init__(self, part_item):
         super(QGraphicsRectItem, self).__init__(part_item)
+        self.part_item = part_item
         self.virtual_helix_item = None
         self.setPen(getNoPen())
         self._colors = []
@@ -66,25 +68,27 @@ class PreXoverItemGroup(QGraphicsRectItem):
             virtual_helix_item (VirtualHelixItem):
             per_neighbor_hits (Tuple()):
         """
+        # print("ACTIVATING VH", virtual_helix_item.idNum())
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()
         pxis = self.prexover_items
-
-        colors = self._colors
-        this_step_size = virtual_helix_item.getProperty(['bases_per_repeat'])
+        partitem = self.parentItem()
+        this_step_size = virtual_helix_item.getProperty('bases_per_repeat')
         self.virtual_helix_item = virtual_helix_item
         self.updateBasesPerRepeat(this_step_size)
-        # the list of neighbots per strand
+        colors = self._colors
+        # the list of neighbors per strand
         id_num = virtual_helix_item.idNum()
         fwd_st, rev_st = True, False
         # 1. Construct PXIs for the active virtual_helix_item
-        for neighbor_id, hits in per_neighbor_hits:
+        for neighbor_id, hits in per_neighbor_hits.items():
             fwd_axis_hits, rev_axis_hits = hits
-            nvhi = self._virtual_helix_item_hash[neighbor_id]
-            n_step_size = nvhi.getProperty(['bases_per_repeat'])
+            nvhi = partitem.idToVirtualHelixItem(neighbor_id)
+            n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 # from_virtual_helix_item, from_index, fwd_st, prexoveritemgroup, color):
                 neighbor_pxis = []
+                print((id_num, fwd_st, idx))
                 pxis[(id_num, fwd_st, idx)] = (PreXoverItem(virtual_helix_item, fwd_st, idx,
                                                         neighbor_id, self, colors[idx % this_step_size]),
                                                 neighbor_pxis)
@@ -96,7 +100,8 @@ class PreXoverItemGroup(QGraphicsRectItem):
                                                         id_num, self, colors[-1 - (j % n_step_size)] ))
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
-                pxis[(id_num, idx, rev_st)] = ( PreXoverItem(virtual_helix_item, rev_st, idx,
+                print((id_num, rev_st, idx))
+                pxis[(id_num, rev_st, idx)] = ( PreXoverItem(virtual_helix_item, rev_st, idx,
                                                         neighbor_id, self, colors[-1 - (idx % this_step_size)]),
                                                 neighbor_pxis)
                 for j in fwd_idxs:
@@ -109,17 +114,20 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
-        pxi, neighbor_list = self.prexover_items[(id_num, is_fwd, idx)]
-        neighbor_keys = {}
-        for i, npxi in enumerate(neighbor_list):
-            npxi.activateNeighbor(pxi, shortcut=str(k))
-            neighbor_keys[k] = npxi.getInfo()
-            self._active_items.append(npxi)
-        self._parent.partItem().setKeyPressDict(neighbor_keys)
+        # print("ACTIVATING neighbors", id_num)
+        item = self.prexover_items.get((id_num, is_fwd, idx))
+        if item is not None:
+            pxi, neighbor_list = item
+            neighbor_keys = {}
+            for k, npxi in enumerate(neighbor_list):
+                npxi.activateNeighbor(pxi, shortcut=str(k))
+                neighbor_keys[k] = npxi.getInfo()
+                self._active_items.append(npxi)
+            self.part_item.setKeyPressDict(neighbor_keys)
     # end def
 
     def deactivateNeighbors(self):
-        self._parent.partItem().setKeyPressDict({})
+        self.part_item.setKeyPressDict({})
         while self._active_items:
             self._active_items.pop().deactivateNeighbor()
 
@@ -128,6 +136,6 @@ class PreXoverItemGroup(QGraphicsRectItem):
         Args:
             pre_xover_info (Tuple): from call to getInfo()
         """
-        self._part.active_base_info = pre_xover_info
+        self.part_item.part().active_base_info = pre_xover_info
     # end def
 # end class
