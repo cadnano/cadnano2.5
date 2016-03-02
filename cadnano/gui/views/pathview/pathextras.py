@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtGui import QPolygonF, QTransform
 from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano.gui.palette import getNoPen, getPenObj
@@ -181,6 +181,7 @@ class PreXoverItem(QGraphicsRectItem):
 
         self.setPen(getNoPen())
         self.setAcceptHoverEvents(True)
+        self.setFlags(QGraphicsItem.ItemIsFocusable)
 
         if is_fwd:
             phos = Triangle(FWDPHOS_PP, self)
@@ -228,12 +229,6 @@ class PreXoverItem(QGraphicsRectItem):
         x, y, _z = vhi.part().getCoordinate(id_num, 0)
         return self.baseIdx() + (_z / BASE_WIDTH)
 
-    def baseIdx(self):
-        return self._step + self._step_idx
-
-    def stepIdx(self):
-        return self._step_idx
-
     def window(self):
         return self._parent.window()
 
@@ -246,6 +241,11 @@ class PreXoverItem(QGraphicsRectItem):
     def hoverLeaveEvent(self, event):
         self.prexoveritemgroup.updateModelActiveBaseInfo(None)
         self.setInstantActive(False)
+    # end def
+
+    def keyPressEvent(self, event):
+        print("got a kpe")
+        self.prexoveritemgroup.part_item.handlePreXoverKeyPress(int(event.key()- 48))
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -276,7 +276,8 @@ class PreXoverItem(QGraphicsRectItem):
         elif idx == active_idx - 1:
             alpha = 255
 
-        self.setBrush(getBrushObj(self._color, alpha=128))
+        inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
+        self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
         self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
         self.animate(self._phos_item, 'rotation', 500, 0, -90)
         self.setLabel(text=shortcut, outline=True)

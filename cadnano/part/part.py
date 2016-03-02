@@ -98,7 +98,7 @@ class Part(VirtualHelixGroup):
     # B. Virtual Helix
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num
                         name='partActiveVirtualHelixChangedSignal')
-    partActiveBaseInfoSignal = ProxySignal(CNObject, tuple,   # self.active_base_info
+    partActiveBaseInfoSignal = ProxySignal(CNObject, object,   # self.active_base_info (tuple or None)
                         name='partActiveBaseInfoSignal')
     partVirtualHelixAddedSignal = ProxySignal(object, int,
                         name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num
@@ -249,6 +249,11 @@ class Part(VirtualHelixGroup):
         self.active_base_info = abi = (id_num, is_fwd, idx, -1)
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
+    # end def
+
+    def setActiveBaseInfo(self, info):
+        self.active_base_info = info
+        self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
     def isVirtualHelixActive(self, id_num):

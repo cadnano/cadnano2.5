@@ -3,7 +3,7 @@ from __future__ import division
 from collections import defaultdict
 from math import ceil
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot
+from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot, QSignalMapper
 from PyQt5.QtGui import QBrush, QColor, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
 
@@ -57,6 +57,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
         self._key_press_dict = {}
         # self.setBrush(QBrush(Qt.NoBrush))
+
+        self._sm = sm = QSignalMapper()
+        for shortcut, action in self.window().keyActions.items():
+            action.triggered.connect(sm.map)
+            sm.setMapping(action, shortcut)
+        sm.mapped.connect(self.handlePreXoverKeyPress)
     # end def
 
     def proxy(self):
@@ -435,14 +441,14 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             rm_button.hide()
     # end def
 
-    def _handleKeyPress(self, key):
+    def handlePreXoverKeyPress(self, key):
+        print("handling key", key)
         if key not in self._key_press_dict:
             return
 
         # active item
         part = self._model_part
-        active_base = part.getProperty('active_base')
-        active_id_num, a_is_fwd, a_idx, a_to_id = active_base
+        active_id_num, a_is_fwd, a_idx, a_to_id = part.active_base_info
         a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
         neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
         n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV

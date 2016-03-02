@@ -88,7 +88,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 # from_virtual_helix_item, from_index, fwd_st, prexoveritemgroup, color):
                 neighbor_pxis = []
-                print((id_num, fwd_st, idx))
+                # print((id_num, fwd_st, idx))
                 pxis[(id_num, fwd_st, idx)] = (PreXoverItem(virtual_helix_item, fwd_st, idx,
                                                         neighbor_id, self, colors[idx % this_step_size]),
                                                 neighbor_pxis)
@@ -100,7 +100,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                                                         id_num, self, colors[-1 - (j % n_step_size)] ))
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
-                print((id_num, rev_st, idx))
+                # print((id_num, rev_st, idx))
                 pxis[(id_num, rev_st, idx)] = ( PreXoverItem(virtual_helix_item, rev_st, idx,
                                                         neighbor_id, self, colors[-1 - (idx % this_step_size)]),
                                                 neighbor_pxis)
@@ -114,7 +114,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
-        # print("ACTIVATING neighbors", id_num)
+        print("ACTIVATING neighbors", id_num)
         item = self.prexover_items.get((id_num, is_fwd, idx))
         if item is not None:
             pxi, neighbor_list = item
@@ -136,6 +136,6 @@ class PreXoverItemGroup(QGraphicsRectItem):
         Args:
             pre_xover_info (Tuple): from call to getInfo()
         """
-        self.part_item.part().active_base_info = pre_xover_info
+        self.part_item.part().setActiveBaseInfo(pre_xover_info)
     # end def
 # end class
