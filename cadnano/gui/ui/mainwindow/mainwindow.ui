@@ -339,8 +339,6 @@
    <addaction name="action_filter_xover"/>
    <addaction name="separator"/>
    <addaction name="action_filter_handle"/>
-   <addaction name="action_filter_even"/>
-   <addaction name="action_filter_odd"/>
   </widget>
   <widget class="QToolBar" name="left_toolbar">
    <property name="sizePolicy">

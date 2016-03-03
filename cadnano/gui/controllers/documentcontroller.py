@@ -97,8 +97,6 @@ class DocumentController():
         win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
         win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
         win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
-        win.action_filter_even.triggered.connect(self.actionFilterEvenSlot)
-        win.action_filter_odd.triggered.connect(self.actionFilterOddSlot)
     # end def
 
 
@@ -131,44 +129,8 @@ class DocumentController():
         if fX.isChecked():
             fX.setChecked(False)
         types = ["virtual_helix"]
-        f0 = self.win.action_filter_even
-        f1 = self.win.action_filter_odd
-        if f0.isChecked():
-            types.append("even")
-        if f1.isChecked():
-            types.append("odd")
         self._document.setFilterSet(types)
         # self._document.documentSelectionFilterChangedSignal.emit(types)
-
-    def actionFilterEvenSlot(self):
-        fH = self.win.action_filter_handle
-        if not fH.isChecked():
-            return
-        f0 = self.win.action_filter_even
-        f1 = self.win.action_filter_odd
-        types = ["virtual_helix"]
-        if f0.isChecked():
-            types.append("even")
-        if f1.isChecked():
-            types.append("odd")
-        self._document.setFilterSet(types)
-        # self._document.documentSelectionFilterChangedSignal.emit(types)
-    # end def
-
-    def actionFilterOddSlot(self):
-        fH = self.win.action_filter_handle
-        if not fH.isChecked():
-            return
-        f0 = self.win.action_filter_even
-        f1 = self.win.action_filter_odd
-        types = ["virtual_helix"]
-        if f0.isChecked():
-            types.append("even")
-        if f1.isChecked():
-            types.append("odd")
-        self._document.setFilterSet(types)
-        # self._document.documentSelectionFilterChangedSignal.emit(types)
-    # end def
 
     def actionFilterEndpointSlot(self):
         """
