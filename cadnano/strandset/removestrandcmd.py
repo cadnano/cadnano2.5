@@ -39,7 +39,7 @@ class RemoveStrandCommand(UndoCommand):
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
             # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-            color_list = prefs.STAP_COLORS if strandset.isReverse() else [part.getColor()]
+            color_list = prefs.STAP_COLORS
             color = random.choice(color_list)
             olg3p.setColor(color)
             olg3p.refreshLength()

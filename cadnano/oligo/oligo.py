@@ -149,12 +149,12 @@ class Oligo(CNObject):
         return self._is_loop
     # end def
 
-    def isStaple(self):
-        if self._strand5p is not None:
-            return self._strand5p.isStaple()
-        else:
-            return False
-    # end def
+    # def isStaple(self):
+    #     if self._strand5p is not None:
+    #         return self._strand5p.isStaple()
+    #     else:
+    #         return False
+    # # end def
 
     def length(self):
         # return self._length

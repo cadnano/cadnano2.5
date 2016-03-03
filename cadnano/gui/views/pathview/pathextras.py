@@ -234,6 +234,7 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
+        self.setFocus(Qt.MouseFocusReason)
         self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
         self.setInstantActive(True)
     # end def
@@ -241,11 +242,11 @@ class PreXoverItem(QGraphicsRectItem):
     def hoverLeaveEvent(self, event):
         self.prexoveritemgroup.updateModelActiveBaseInfo(None)
         self.setInstantActive(False)
+        self.clearFocus()
     # end def
 
     def keyPressEvent(self, event):
-        print("got a kpe")
-        self.prexoveritemgroup.part_item.handlePreXoverKeyPress(int(event.key()- 48))
+        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
     # end def
 
     ### PUBLIC SUPPORT METHODS ###

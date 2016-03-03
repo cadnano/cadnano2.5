@@ -51,7 +51,7 @@ class StrandItem(QGraphicsLineItem):
         self._dual_cap = EndpointItem(self, 'dual', is_forward)
 
         # orientation
-        self._is_forward = is_forward
+        self.is_forward = is_forward
         # self._isOnTop = virtual_helix_item.isStrandOnTop(model_strand)
         # label
         self._seq_label = QGraphicsSimpleTextItem(self)
@@ -296,7 +296,7 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def resetEndPointItems(self, is_forward):
-        self._is_forward = is_forward
+        self.is_forward = is_forward
         self._low_cap.resetEndPoint(is_forward)
         self._high_cap.resetEndPoint(is_forward)
         self._dual_cap.resetEndPoint(is_forward)
@@ -430,7 +430,7 @@ class StrandItem(QGraphicsLineItem):
         strand = self.strand()
 
         seq_txt = strand.sequence()
-        isDrawn3to5 = not self._is_forward
+        isDrawn3to5 = not self.is_forward
         textXCenteringOffset = styles.SEQUENCETEXTXCENTERINGOFFSET
 
         if seq_txt == '':
@@ -487,7 +487,7 @@ class StrandItem(QGraphicsLineItem):
         active_tool_str = self._getActiveTool().methodPrefix()
         self.scene().views()[0].addToPressList(self)
         idx = int(floor((event.pos().x()) / _BASE_WIDTH))
-        self._virtual_helix_item.setActive(idx)
+        self._virtual_helix_item.setActive(self.is_forward, idx)
         tool_method_name =  active_tool_str + "MousePress"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(event, idx)
@@ -589,10 +589,10 @@ class StrandItem(QGraphicsLineItem):
     def paintToolMousePress(self, event, idx):
         """Add an insert to the strand if possible."""
         m_strand = self._model_strand
-        if m_strand.isStaple():
-            color = self.window().path_color_panel.stapColorName()
-        else:
-            color = self.window().path_color_panel.scafColorName()
+        # if m_strand.isStaple():
+        color = self.window().path_color_panel.stapColorName()
+        # else:
+        #     color = self.window().path_color_panel.scafColorName()
         m_strand.oligo().applyColor(color)
     # end def
 
@@ -825,3 +825,17 @@ class StrandItem(QGraphicsLineItem):
         painter.setPen(self.pen())
         painter.drawLine(self.line())
     # end def
+
+    def setActiveEndpoint(self, cap_type):
+        """ Set the active index in the VirtualHelix
+        Args:
+            cap_type (str): 'low', 'hi'
+
+        Returns:
+            index of cap as a convenience
+        """
+        idx_l, idx_h = self._model_strand.idxs()
+        idx = idx_l if cap_type == 'low' else idx_h
+        self._virtual_helix_item.setActive(self.is_forward, idx)
+        return idx
+# end class

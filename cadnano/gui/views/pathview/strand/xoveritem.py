@@ -29,8 +29,7 @@ class XoverNode3(QGraphicsRectItem):
         self._vhi = virtual_helix_item
         self._xover_item = xover_item
         self._idx = idx
-        self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
-        self._is_forward = strand3p.strandSet().isForward()
+        self.is_forward = strand3p.strandSet().isForward()
 
         self.setPartnerVirtualHelix(strand3p)
 
@@ -49,7 +48,7 @@ class XoverNode3(QGraphicsRectItem):
         forwarding them to approproate tool method as necessary.
         """
         self.scene().views()[0].addToPressList(self)
-        self._vhi.setActive(self._idx)
+        self._vhi.setActive(self.is_forward, self._idx)
         xoi = self._xover_item
         tool_method_name = xoi._getActiveTool().methodPrefix() + "MousePress"
         if hasattr(xoi, tool_method_name):
@@ -64,11 +63,11 @@ class XoverNode3(QGraphicsRectItem):
         self._xover_item.refreshXover()
     # end def
 
-    def setPartnerVirtualHelix(self,strand):
+    def setPartnerVirtualHelix(self, strand):
         if strand.connection5p():
-            self._partner_virtual_helix = strand.connection5p().idNum()
+            self._partner_virtual_helix_id_num = strand.connection5p().idNum()
         else:
-            self._partner_virtual_helix = None
+            self._partner_virtual_helix_id_num = None
     # end def
 
     def idx(self):
@@ -84,7 +83,7 @@ class XoverNode3(QGraphicsRectItem):
     # end def
 
     def point(self):
-        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._is_forward)
+        return self._vhi.upperLeftCornerOfBaseType(self._idx, self.is_forward)
     # end def
 
     def floatPoint(self):
@@ -92,12 +91,8 @@ class XoverNode3(QGraphicsRectItem):
         return pt.x(), pt.y()
     # end def
 
-    def isOnTop(self):
-        return self._is_on_top
-    # end def
-
     def isForward(self):
-        return self._is_forward
+        return self.is_forward
     # end def
 
     def updatePositionAndAppearance(self):
@@ -108,12 +103,12 @@ class XoverNode3(QGraphicsRectItem):
         """
         self.setPos(*self.point())
         # We can only expose a 5' end. But on which side?
-        isLeft = True if self._is_forward else False
+        isLeft = True if self.is_forward else False
         self._updateLabel(isLeft)
     # end def
 
     def updateConnectivity(self):
-        isLeft = True if self._is_forward else False
+        isLeft = True if self.is_forward else False
         self._updateLabel(isLeft)
     # end def
 
@@ -137,13 +132,13 @@ class XoverNode3(QGraphicsRectItem):
         if self._idx is not None:
             if lbl is None:
                 bw = _BASE_WIDTH
-                num = self._partner_virtual_helix.number()
+                num = self._partner_virtual_helix_id_num
                 tbr = _FM.tightBoundingRect(str(num))
                 half_label_h = tbr.height()/2.0
                 half_label_w = tbr.width()/2.0
                 # determine x and y positions
                 labelX = bw/2.0 - half_label_w
-                if self._is_on_top:
+                if self.is_forward:
                     labelY = -0.25*half_label_h - 0.5 - 0.5*bw
                 else:
                     labelY = 2*half_label_h + 0.5 + 0.5*bw
@@ -159,7 +154,7 @@ class XoverNode3(QGraphicsRectItem):
                 lbl.setFont(_toHelixNumFont)
                 self._label = lbl
             # end if
-            lbl.setText( str(self._partner_virtual_helix.number()) )
+            lbl.setText( str(self._partner_virtual_helix_id_num) )
         # end if
     # end def
 
@@ -182,16 +177,16 @@ class XoverNode5(XoverNode3):
 
     def setPartnerVirtualHelix(self, strand):
         if strand.connection3p():
-            self._partner_virtual_helix = strand.connection3p().idNum()
+            self._partner_virtual_helix_id_num = strand.connection3p().idNum()
         else:
-            self._partner_virtual_helix = None
+            self._partner_virtual_helix_id_num = None
     # end def
 
     def updatePositionAndAppearance(self):
         """Same as XoverItem3, but exposes 3' end"""
         self.setPos(*self.point())
         # # We can only expose a 3' end. But on which side?
-        isLeft = False if self._is_forward else True
+        isLeft = False if self.is_forward else True
         self._updateLabel(isLeft)
     # end def
 # end class
@@ -277,7 +272,7 @@ class XoverItem(QGraphicsPathItem):
         if strand5p:
             strand3p = strand5p.connection3p()
             if strand3p is not None and node3:
-                if node3.idNum():   # unclear about this condition now
+                if node3.virtualHelix():   # unclear about this condition now
                     self.update(self._strand5p)
                 else:
                     node3.remove()
@@ -346,33 +341,31 @@ class XoverItem(QGraphicsPathItem):
         vhi5 = self._virtual_helix_item
         pt5 = vhi5.mapToItem(parent, *node5.point())
 
-        five_is_top = node5.isOnTop()
-        five_is_5to3 = node5.isForward()
+        n5_is_forward = node5.is_forward
 
         vhi3 = node3.virtualHelixItem()
         pt3 = vhi3.mapToItem(parent, *node3.point())
 
-        three_is_top = node3.isOnTop()
-        three_is_5to3 = node3.isForward()
-        same_strand = (node5.strandType() == node3.strandType()) and vhi3 == vhi5
-        same_parity = five_is_5to3 == three_is_5to3
+        n3_is_forward = node3.is_forward
+        same_strand = (n5_is_forward == n3_is_forward) and (vhi3 == vhi5)
+        same_parity = n5_is_forward == n3_is_forward
 
         # Enter/exit are relative to the direction that the path travels
         # overall.
-        five_enter_pt = pt5 + QPointF(0 if five_is_5to3 else 1, .5)*bw
+        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5)*bw
         five_center_pt = pt5 + QPointF(.5, .5)*bw
-        five_exit_pt = pt5 + QPointF(.5, 0 if five_is_top else 1)*bw
+        five_exit_pt = pt5 + QPointF(.5, 0 if n5_is_forward else 1)*bw
 
-        three_enter_pt = pt3 + QPointF(.5, 0 if three_is_top else 1)*bw
+        three_enter_pt = pt3 + QPointF(.5, 0 if n3_is_forward else 1)*bw
         three_center_pt = pt3 + QPointF(.5, .5)*bw
-        three_exit_pt = pt3 + QPointF(1 if three_is_5to3 else 0, .5)*bw
+        three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5)*bw
 
         c1 = QPointF()
         # case 1: same strand
         if same_strand:
             dx = abs(three_enter_pt.x() - five_exit_pt.x())
             c1.setX(0.5 * (five_exit_pt.x() + three_enter_pt.x()))
-            if five_is_top:
+            if n5_is_forward:
                 c1.setY(five_exit_pt.y() - _Y_SCALE * dx)
             else:
                 c1.setY(five_exit_pt.y() + _Y_SCALE * dx)
@@ -383,7 +376,7 @@ class XoverItem(QGraphicsPathItem):
             c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
         # case 3: different parity
         else:
-            if five_is_top and five_is_5to3:
+            if n5_is_forward:
                 c1.setX(five_exit_pt.x() - _X_SCALE *\
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             else:

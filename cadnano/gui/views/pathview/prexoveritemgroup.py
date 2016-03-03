@@ -1,3 +1,4 @@
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
 from .pathextras import PreXoverItem, PHOS_ITEM_WIDTH, BASE_WIDTH
@@ -6,7 +7,7 @@ from cadnano.enum import StrandType
 
 class PreXoverItemGroup(QGraphicsRectItem):
     HUE_FACTOR = 1.6
-
+    KEYMAP = { i: getattr(Qt, 'Key_%d' % i) for i in range(10) }
     def __init__(self, part_item):
         super(QGraphicsRectItem, self).__init__(part_item)
         self.part_item = part_item
@@ -16,6 +17,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # dictionary of tuple of a (PreXoverItem, List[PreXoverItem])
         self.prexover_items = {}
         self._active_items = []
+        self._key_press_dict = {}
         # self.updateBasesPerRepeat()
     # end def
 
@@ -27,6 +29,9 @@ class PreXoverItemGroup(QGraphicsRectItem):
         return self.virtual_helix_item
     # end def
 
+    def addKeyPress(self, key_int, info):
+        qtkey = self.KEYMAP[key_int]
+        self._key_press_dict[qtkey] = info
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
@@ -37,6 +42,44 @@ class PreXoverItemGroup(QGraphicsRectItem):
                                     for i in range(step_size)]
         # self.removeRepeats()
         # self.addRepeats()
+    # end def
+
+    def handlePreXoverKeyPress(self, key):
+        print("handling key", key, self.KEYMAP.get(key, None))
+        if key not in self._key_press_dict:
+            return
+
+        # active item
+        part = self.part_item.part()
+        active_id_num, a_is_fwd, a_idx, a_to_id = part.active_base_info
+        a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
+        neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
+        n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV
+
+        if not part.hasStrandAtIdx(active_id_num, a_idx)[a_strand_type]:
+            print("no active strand", key)
+            return
+        if not part.hasStrandAtIdx(neighbor_id_num, n_idx)[n_strand_type]:
+            print("no neighbor strand", key)
+            return
+
+        a_strandset = part.getStrandSets(active_id_num)[a_strand_type]
+        n_strandset = part.getStrandSets(neighbor_id_num)[n_strand_type]
+        a_strand = a_strandset.getStrand(a_idx)
+        n_strand = n_strandset.getStrand(n_idx)
+
+        if a_strand.hasXoverAt(a_idx): return
+        if n_strand.hasXoverAt(n_idx): return
+
+        # SPECIAL CASE: neighbor already has a 3' end, and active has
+        # a 5' end, so assume the user wants to install a returning xover
+        if a_strand.idx5Prime() == a_idx and n_strand.idx3Prime() == n_idx:
+            part.createXover(n_strand, n_idx, a_strand, a_idx)
+            return
+
+        # DEFAULT CASE: the active strand acts as strand5p,
+        # install a crossover to the neighbor acting as strand3p
+        part.createXover(a_strand, a_idx, n_strand, n_idx)
     # end def
 
     def updateTurnsPerRepeat(self):
@@ -114,20 +157,18 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
-        print("ACTIVATING neighbors", id_num)
+        # print("ACTIVATING neighbors", id_num)
         item = self.prexover_items.get((id_num, is_fwd, idx))
         if item is not None:
             pxi, neighbor_list = item
-            neighbor_keys = {}
             for k, npxi in enumerate(neighbor_list):
                 npxi.activateNeighbor(pxi, shortcut=str(k))
-                neighbor_keys[k] = npxi.getInfo()
+                self.addKeyPress(k, npxi.getInfo())
                 self._active_items.append(npxi)
-            self.part_item.setKeyPressDict(neighbor_keys)
     # end def
 
     def deactivateNeighbors(self):
-        self.part_item.setKeyPressDict({})
+        self._key_press_dict = {}
         while self._active_items:
             self._active_items.pop().deactivateNeighbor()
 

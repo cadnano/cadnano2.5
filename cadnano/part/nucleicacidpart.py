@@ -163,8 +163,8 @@ class NucleicAcidPart(Part):
         """getStapleSequences"""
         s = "Start,End,Sequence,Length,Color\n"
         for oligo in self._oligos:
-            if oligo.strand5p().strandSet().isStaple():
-                s = s + oligo.sequenceExport()
+            # if oligo.strand5p().strandSet().isStaple():
+            s = s + oligo.sequenceExport()
         return s
 
     def getIdNums(self):
@@ -180,7 +180,8 @@ class NucleicAcidPart(Part):
         """
         stap_loop_olgs = []
         for o in list(self.oligos()):
-            if o.isStaple() and o.isLoop():
+            # if o.isStaple() and o.isLoop():
+            if o.isLoop():
                 stap_loop_olgs.append(o)
         return stap_loop_olgs
 
@@ -314,9 +315,9 @@ class NucleicAcidPart(Part):
 
         if use_undostack:
             self.undoStack().beginMacro("Create Xover")
-        if ss5p.isScaffold() and use_undostack:  # ignore on import
-            strand5p.oligo().applySequence(None)
-            strand3p.oligo().applySequence(None)
+        # if ss5p.isScaffold() and use_undostack:  # ignore on import
+        #     strand5p.oligo().applySequence(None)
+        #     strand3p.oligo().applySequence(None)
         if strand5p == strand3p:
             """
             This is a complicated case basically we need a truth table.

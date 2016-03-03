@@ -152,7 +152,7 @@ class ForcedStrandItem(QGraphicsLineItem):
         self._high_cap.disableEvents()
 
         # orientation
-        self._is_forward = is_forward
+        self.is_forward = is_forward
 
         # create a larger click area rect to capture mouse events
         self._click_area = c_a = QGraphicsRectItem(_DEFAULT_RECT, self)
@@ -227,7 +227,7 @@ class ForcedStrandItem(QGraphicsLineItem):
 
     def resetEndPointItems(self, is_forward):
         bw = _BASE_WIDTH
-        self._is_forward = is_forward
+        self.is_forward = is_forward
         self._low_cap.resetEndPoint(is_forward)
         self._high_cap.resetEndPoint(is_forward)
         line = self.line()
@@ -330,8 +330,8 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._xover_item = xover_item
         self._idx = idx
 
-        self._is_forward = strand3p.strandSet().isForward()
-        self._is_on_top = self._is_forward
+        self.is_forward = strand3p.strandSet().isForward()
+        self._is_on_top = self.is_forward
 
         self._partner_virtual_helix = virtual_helix_item
 
@@ -355,7 +355,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._vhi = virtual_helix_item
         self.setParentItem(virtual_helix_item)
         self._idx = idx_x
-        self._is_on_top = self._is_forward = True if is_forward else False
+        self._is_on_top = self.is_forward = True if is_forward else False
         self.updatePositionAndAppearance(is_from_strand=False)
     # end def
 
@@ -367,19 +367,19 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._strand = strand3p
         self.setParentItem(virtual_helix_item)
         self._idx = idx
-        self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
-        self._is_forward = strand3p.strandSet().isForward()
+        # self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
+        self._is_on_top = self.is_forward = strand3p.strandSet().isForward()
         self.updatePositionAndAppearance()
     # end def
 
     def configurePath(self):
         self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
-        path = PPR3 if self._is_forward else PPL3
-        offset = -_BASE_WIDTH if self._is_forward else _BASE_WIDTH
+        path = PPR3 if self.is_forward else PPL3
+        offset = -_BASE_WIDTH if self.is_forward else _BASE_WIDTH
         self._path_thing.setPath(path)
         self._path_thing.setPos(offset, 0)
 
-        offset = -_BASE_WIDTH if self._is_forward else 0
+        offset = -_BASE_WIDTH if self.is_forward else 0
         self._blank_thing.setPos(offset, 0)
 
         self._blank_thing.show()
@@ -403,7 +403,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def point(self):
-        return self._vhi.upperLeftCornerOfBaseType(self._idx, self._is_forward)
+        return self._vhi.upperLeftCornerOfBaseType(self._idx, self.is_forward)
     # end def
 
     def floatPoint(self):
@@ -416,7 +416,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def isForward(self):
-        return self._is_forward
+        return self.is_forward
     # end def
 
     def updatePositionAndAppearance(self, is_from_strand=True):
@@ -432,7 +432,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
             if self._strand.canInstallXoverAt(self._idx, from_strand, from_idx):
                 self.configurePath()
                 # We can only expose a 5' end. But on which side?
-                is_left = True if self._is_forward else False
+                is_left = True if self.is_forward else False
                 self._updateLabel(is_left)
             else:
                 self.hideItems()
@@ -441,7 +441,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def updateConnectivity(self):
-        is_left = True if self._is_forward else False
+        is_left = True if self.is_forward else False
         self._updateLabel(is_left)
     # end def
 
@@ -522,12 +522,12 @@ class ForcedXoverNode5(ForcedXoverNode3):
 
     def configurePath(self):
         self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
-        path = PPL5 if self._is_forward else PPR5
-        offset = _BASE_WIDTH if self._is_forward else -_BASE_WIDTH
+        path = PPL5 if self.is_forward else PPR5
+        offset = _BASE_WIDTH if self.is_forward else -_BASE_WIDTH
         self._path_thing.setPath(path)
         self._path_thing.setPos(offset, 0)
 
-        offset = 0 if self._is_forward else -_BASE_WIDTH
+        offset = 0 if self.is_forward else -_BASE_WIDTH
         self._blank_thing.setPos(offset, 0)
 
         self._blank_thing.show()
@@ -539,7 +539,7 @@ class ForcedXoverNode5(ForcedXoverNode3):
         self.setPos(*self.point())
         self.configurePath()
         # # We can only expose a 3' end. But on which side?
-        is_left = False if self._is_forward else True
+        is_left = False if self.is_forward else True
         self._updateLabel(is_left)
     # end def
 # end class
@@ -672,41 +672,38 @@ class ForcedXoverItem(QGraphicsPathItem):
         nucleicacid_part_item = vhi5.partItem()
         pt5 = vhi5.mapToItem(nucleicacid_part_item, *node5.floatPoint())
 
-        five_is_top = node5.isOnTop()
-        five_is_5_to_3 = node5.isForward()
+        n5_is_forward = node5.is_forward
 
         # Enter/exit are relative to the direction that the path travels
         # overall.
-        five_enter_pt = pt5 + QPointF(0 if five_is_5_to_3 else 1, .5)*bw
+        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5)*bw
         five_center_pt = pt5 + QPointF(.5, .5)*bw
-        five_exit_pt = pt5 + QPointF(.5, 0 if five_is_top else 1)*bw
+        five_exit_pt = pt5 + QPointF(.5, 0 if n5_is_forward else 1)*bw
 
         vhi3 = node3.virtualHelixItem()
 
         if point:
             pt3 = point
-            three_is_top = True
-            three_is_5_to_3 = True
+            n3_is_forward = True
             same_strand = False
             same_parity = False
             three_enter_pt = three_center_pt = three_exit_pt = pt3
         else:
             pt3 = vhi3.mapToItem(nucleicacid_part_item, *node3.point())
-            three_is_top = node3.isOnTop()
-            three_is_5_to_3 = node3.isForward()
-            same_strand = (node5.strandType() == node3.strandType()) and vhi3 == vhi5
-            same_parity = five_is_5_to_3 == three_is_5_to_3
+            n3_is_forward = node3.is_forward
+            same_strand = (n5_is_forward == n3_is_forward) and vhi3 == vhi5
+            same_parity = n5_is_forward == n3_is_forward
 
-            three_enter_pt = pt3 + QPointF(.5, 0 if three_is_top else 1)*bw
+            three_enter_pt = pt3 + QPointF(.5, 0 if n3_is_forward else 1)*bw
             three_center_pt = pt3 + QPointF(.5, .5)*bw
-            three_exit_pt = pt3 + QPointF(1 if three_is_5_to_3 else 0, .5)*bw
+            three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5)*bw
 
         c1 = QPointF()
         # case 1: same strand
         if same_strand:
             dx = abs(three_enter_pt.x() - five_exit_pt.x())
             c1.setX(0.5 * (five_exit_pt.x() + three_enter_pt.x()))
-            if five_is_top:
+            if n5_is_forward:
                 c1.setY(five_exit_pt.y() - _yScale * dx)
             else:
                 c1.setY(five_exit_pt.y() + _yScale * dx)
@@ -717,7 +714,7 @@ class ForcedXoverItem(QGraphicsPathItem):
              c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
         # case 3: different parity
         else:
-            if five_is_top and five_is_5_to_3:
+            if n5_is_forward:
                 c1.setX(five_exit_pt.x() - _xScale *\
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             else:
@@ -803,7 +800,7 @@ class EndpointItem(QGraphicsPathItem):
 
         self._strand_item = strand_item
         self._getActiveTool = strand_item.activeTool()
-        self._cap_type = cap_type
+        self.cap_type = cap_type
         self._low_drag_bound = None
         self._high_drag_bound = None
         self._initCapSpecificState(is_forward)
@@ -828,7 +825,7 @@ class EndpointItem(QGraphicsPathItem):
     ### ACCESSORS ###
     def idx(self):
         """Look up baseIdx, as determined by strand_item idxs and cap type."""
-        if self._cap_type == 'low':
+        if self.cap_type == 'low':
             return self._strand_item.idxs()[0]
         else:  # high or dual, doesn't matter
             return self._strand_item.idxs()[1]
@@ -865,7 +862,7 @@ class EndpointItem(QGraphicsPathItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def _initCapSpecificState(self, is_forward):
-        c_t = self._cap_type
+        c_t = self.cap_type
         if c_t == 'low':
             path = PPL5 if is_forward else PPL3
         elif c_t == 'high':
@@ -877,7 +874,7 @@ class EndpointItem(QGraphicsPathItem):
 
     def _getNewIdxsForResize(self, baseIdx):
         """Returns a tuple containing idxs to be passed to the """
-        c_t = self._cap_type
+        c_t = self.cap_type
         if c_t == 'low':
             return (baseIdx, self._strand_item.idxs()[1])
         elif c_t == 'high':
@@ -892,7 +889,7 @@ class EndpointItem(QGraphicsPathItem):
         necessary. Stores _move_idx for future comparison.
         """
         self.scene().views()[0].addToPressList(self)
-        self._strand_item.virtualHelixItem().setActive(self.idx())
+        self._strand_item.setActiveEndpoint(self.cap_type)
         self._move_idx = self.idx()
         active_tool_str = self._getActiveTool().methodPrefix()
         if active_tool_str == 'pencilTool':

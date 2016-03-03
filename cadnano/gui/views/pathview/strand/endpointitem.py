@@ -78,7 +78,7 @@ class EndpointItem(QGraphicsPathItem):
 
         self._strand_item = strand_item
         self._getActiveTool = strand_item._getActiveTool
-        self._cap_type = cap_type
+        self.cap_type = cap_type
         self._low_drag_bound = None
         self._high_drag_bound = None
         self._mod_item = None
@@ -104,7 +104,7 @@ class EndpointItem(QGraphicsPathItem):
     ### ACCESSORS ###
     def idx(self):
         """Look up base_idx, as determined by strandItem idxs and cap type."""
-        if self._cap_type == 'low':
+        if self.cap_type == 'low':
             return self._strand_item.idxs()[0]
         else:  # high or dual, doesn't matter
             return self._strand_item.idxs()[1]
@@ -186,7 +186,7 @@ class EndpointItem(QGraphicsPathItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def _initCapSpecificState(self, is_drawn5to3):
-        c_t = self._cap_type
+        c_t = self.cap_type
         if c_t == 'low':
             path = PP_L5 if is_drawn5to3 else PP_L3
         elif c_t == 'high':
@@ -198,7 +198,7 @@ class EndpointItem(QGraphicsPathItem):
 
     def _getNewIdxsForResize(self, base_idx):
         """Returns a tuple containing idxs to be passed to the """
-        c_t = self._cap_type
+        c_t = self.cap_type
         if c_t == 'low':
             return (base_idx, self._strand_item.idxs()[1])
         elif c_t == 'high':
@@ -213,8 +213,8 @@ class EndpointItem(QGraphicsPathItem):
         necessary. Stores _move_idx for future comparison.
         """
         self.scene().views()[0].addToPressList(self)
-        self._strand_item.virtualHelixItem().setActive(self.idx())
-        self._move_idx = self.idx()
+        idx = self._strand_item.setActiveEndpoint(self.cap_type)
+        self._move_idx = idx
         active_tool_str = self._getActiveTool().methodPrefix()
         tool_method_name = active_tool_str + "MousePress"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -324,10 +324,10 @@ class EndpointItem(QGraphicsPathItem):
     def paintToolMousePress(self, modifiers, event, idx):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
-        if m_strand.isStaple():
-            color = self.window().path_color_panel.stapColorName()
-        else:
-            color = self.window().path_color_panel.scafColorName()
+        # if m_strand.isStaple():
+        color = self.window().path_color_panel.stapColorName()
+        # else:
+            # color = self.window().path_color_panel.scafColorName()
         m_strand.oligo().applyColor(color)
     # end def
 
@@ -399,6 +399,8 @@ class EndpointItem(QGraphicsPathItem):
             selection_group.pendToAdd(self)
             selection_group.processPendingToAddList()
             return selection_group.mousePressEvent(event)
+        # else:
+        #     print("mpselect from endpoint", self.FILTER_NAME, s_i.strandFilter(), current_filter_set)
     # end def
 
     def selectToolMouseMove(self, modifiers, idx):
@@ -430,7 +432,7 @@ class EndpointItem(QGraphicsPathItem):
         #     m_strand.resize(new_idxs)
 
         # if modifiers & Qt.AltModifier:
-        #     if self._cap_type == 'low':
+        #     if self.cap_type == 'low':
         #         new_idxs = self._getNewIdxsForResize(self._low_drag_bound)
         #     else:
         #         new_idxs = self._getNewIdxsForResize(self._high_drag_bound)
@@ -548,7 +550,7 @@ class EndpointItem(QGraphicsPathItem):
         test = document.isModelStrandSelected(strand)
         low_val, high_val = document.getSelectedStrandValue(strand) if test \
                                                             else (False, False)
-        if self._cap_type == 'low':
+        if self.cap_type == 'low':
             out_value = (False, high_val)
         else:
             out_value = (low_val, False)
@@ -567,7 +569,7 @@ class EndpointItem(QGraphicsPathItem):
         test = document.isModelStrandSelected(strand)
         low_val, high_val = document.getSelectedStrandValue(strand) if test \
                                                             else (False, False)
-        if self._cap_type == 'low':
+        if self.cap_type == 'low':
             out_value = (True, high_val)
         else:
             out_value = (low_val, True)

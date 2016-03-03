@@ -99,6 +99,7 @@ class Document(CNObject):
 
     def setFilterSet(self, filter_list):
         self.filter_set = fs = set(filter_list)
+        print("setting fs", fs)
         self.documentSelectionFilterChangedSignal.emit(fs)
     # end def
 

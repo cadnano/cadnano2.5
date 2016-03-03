@@ -585,7 +585,7 @@ class Strand(CNObject):
         mods = []
         modsDict = self.part().mods()['ext_instances']
         id_num = self._id_num
-        isstaple = self.isStaple()
+        isstaple = True#self.isStaple()
         idxL, idxH = self.idxs()
         keyL =  "{},{},{}".format(id_num, isstaple, idxL)
         keyH =  "{},{},{}".format(id_num, isstaple, idxH)

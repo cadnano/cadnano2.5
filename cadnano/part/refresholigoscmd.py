@@ -44,10 +44,10 @@ class RefreshOligosCommand(UndoCommand):
             start_oligo = strand.oligo()
 
             if colors is not None:
-                if strand.isStaple():
-                    start_oligo.setColor(colors[1])
-                else:
-                    start_oligo.setColor(colors[0])
+                # if strand.isStaple():
+                start_oligo.setColor(colors[1])
+                # else:
+                    # start_oligo.setColor(colors[0])
 
             strand5gen = strand.generator5pStrand()
             # this gets the oligo and burns a strand in the generator

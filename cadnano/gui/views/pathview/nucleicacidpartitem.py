@@ -55,14 +55,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
-        self._key_press_dict = {}
-        # self.setBrush(QBrush(Qt.NoBrush))
-
-        self._sm = sm = QSignalMapper()
-        for shortcut, action in self.window().keyActions.items():
-            action.triggered.connect(sm.map)
-            sm.setMapping(action, shortcut)
-        sm.mapped.connect(self.handlePreXoverKeyPress)
+        # self.setBrush(QBrush(Qt.NoBrush)))
     # end def
 
     def proxy(self):
@@ -428,12 +421,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         rm_button = self._remove_bases_button
 
         if len(self._virtual_helix_item_list) > 0:
-            addRect = add_button.boundingRect()
-            rmRect = rm_button.boundingRect()
+            add_rect = add_button.boundingRect()
+            rm_rect = rm_button.boundingRect()
             x = self._vh_rect.right()
             y = -styles.PATH_HELIX_PADDING
             add_button.setPos(x, y)
-            rm_button.setPos(x-rmRect.width(), y)
+            rm_button.setPos(x - rm_rect.width(), y)
             add_button.show()
             rm_button.show()
         else:
@@ -441,44 +434,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             rm_button.hide()
     # end def
 
-    def handlePreXoverKeyPress(self, key):
-        print("handling key", key)
-        if key not in self._key_press_dict:
-            return
-
-        # active item
-        part = self._model_part
-        active_id_num, a_is_fwd, a_idx, a_to_id = part.active_base_info
-        a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
-        neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
-        n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV
-
-        if not part.hasStrandAtIdx(active_id_num, a_idx)[a_strand_type]: return
-        if not part.hasStrandAtIdx(neighbor_id_num, n_idx)[n_strand_type]: return
-
-        a_strandset = part.getStrandSets(active_id_num)[a_strand_type]
-        n_strandset = part.getStrandSets(neighbor_id_num)[n_strand_type]
-        a_strand = a_strandset.getStrand(a_idx)
-        n_strand = n_strandset.getStrand(n_idx)
-
-        if a_strand.hasXoverAt(a_idx): return
-        if n_strand.hasXoverAt(n_idx): return
-
-        # SPECIAL CASE: neighbor already has a 3' end, and active has
-        # a 5' end, so assume the user wants to install a returning xover
-        if a_strand.idx5Prime() == a_idx and n_strand.idx3Prime() == n_idx:
-            part.createXover(n_strand, n_idx, a_strand, a_idx)
-            return
-
-        # DEFAULT CASE: the active strand acts as strand5p,
-        # install a crossover to the neighbor acting as strand3p
-        part.createXover(a_strand, a_idx, n_strand, n_idx)
-    # end def
-
     ### PUBLIC METHODS ###
-    def setKeyPressDict(self, shortcut_item_dict):
-        self._key_press_dict = shortcut_item_dict
-
     def setModifyState(self, bool):
         """Hides the modRect when modify state disabled."""
         self._can_show_mod_rect = bool
@@ -550,10 +506,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             return
 
         part = self.part()
-        id_num, is_fwd, idx, to_vh_id_num = part.active_base_info
-
-        per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
-        self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
+        info = part.active_base_info
+        if info is not None:
+            id_num, is_fwd, idx, to_vh_id_num = info
+            per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
+            self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 
     def updateXoverItems(self, virtual_helix_item):
