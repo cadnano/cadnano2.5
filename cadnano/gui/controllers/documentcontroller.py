@@ -59,6 +59,7 @@ class DocumentController():
         o = self.win.outliner_widget
         p_e = self.win.property_widget
         o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
+        self.actionFilterHandleSlot()
     # end def
 
     def _connectWindowSignalsToSelf(self):
@@ -91,6 +92,9 @@ class DocumentController():
         win.action_vhelix_select.triggered.connect(self.actionFilterHandleSlot)
         self.trigger_path_select = lambda x: win.action_path_select.trigger()
         win.action_vhelix_select.triggered.connect(self.trigger_path_select)
+
+        win.action_vhelix_create.triggered.connect(self.actionFilterHandleSlot)
+        win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)
 
         win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
         win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
@@ -130,7 +134,7 @@ class DocumentController():
             fX.setChecked(False)
         types = ["virtual_helix"]
         self._document.setFilterSet(types)
-        # self._document.documentSelectionFilterChangedSignal.emit(types)
+    # end def
 
     def actionFilterEndpointSlot(self):
         """

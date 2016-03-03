@@ -98,6 +98,13 @@ class Document(CNObject):
     # end def
 
     def setFilterSet(self, filter_list):
+        vhkey = 'virtual_helix'
+        fs = self.filter_set
+        if vhkey in filter_list and vhkey not in fs:
+            self.clearAllSelected()
+        if vhkey in fs and vhkey not in filter_list:
+            self.clearAllSelected()
+
         self.filter_set = fs = set(filter_list)
         print("setting fs", fs)
         self.documentSelectionFilterChangedSignal.emit(fs)
