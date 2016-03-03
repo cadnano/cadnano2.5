@@ -1265,9 +1265,11 @@ class VirtualHelixGroup(CNObject):
                     real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle) % TWOPI
-                    max_angle = native_angle + theta
-                    min_angle = native_angle - theta
+                    native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle)
+                    max_angle = (native_angle + theta) % TWOPI
+                    min_angle = (native_angle - theta + TWOPI) % TWOPI
+                    if min_angle > max_angle:
+                        max_angle, min_angle =  min_angle, max_angle
                     all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                 min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle <= x <= max_angle ]
@@ -1298,9 +1300,11 @@ class VirtualHelixGroup(CNObject):
                     real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle) % TWOPI
-                    max_angle = native_angle + theta
-                    min_angle = native_angle - theta
+                    native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle)
+                    max_angle = (native_angle + theta) % TWOPI
+                    min_angle = (native_angle - theta + TWOPI) % TWOPI
+                    if min_angle > max_angle:
+                        max_angle, min_angle =  min_angle, max_angle
                     all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                 min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle <= x <= max_angle ]
