@@ -14,9 +14,11 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self.virtual_helix_item = None
         self.setPen(getNoPen())
         self._colors = []
+
         # dictionary of tuple of a (PreXoverItem, List[PreXoverItem])
-        self.prexover_items = {}
-        self.neighbor_prexover_items = {}
+        self.prexover_item_map = {}
+
+        self.neighbor_prexover_items = {}   # jsut a dictionary of neighbors
         self._active_items = []
         self._key_press_dict = {}
         # self.updateBasesPerRepeat()
@@ -92,20 +94,20 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def getItem(self, id_num, is_fwd, idx):
-        return self.prexover_items[(id_num, is_fwd, idx)]
+        return self.prexover_item_map[(id_num, is_fwd, idx)]
     # end def
 
     def clearPreXoverItems(self):
-        for x, y in self.prexover_items.values():
+        for x, y in self.prexover_item_map.values():
             PreXoverItem.remove(x)
-        self.prexover_items = {}
+        self.prexover_item_map = {}
         for x in self.neighbor_prexover_items.values():
             PreXoverItem.remove(x)
         self.neighbor_prexover_items = {}
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, per_neighbor_hits):
-        """ Populate self.prexover_items dictionary which maps a tuple
+        """ Populate self.prexover_item_map dictionary which maps a tuple
         of (id_num, is_fwd, idx) to a given PreXoverItem and a List of neighbor PreXoverItems
         This also effectively deactivates the existing VirtualHelix
 
@@ -116,7 +118,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # print("ACTIVATING VH", virtual_helix_item.idNum())
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()
-        pxis = self.prexover_items
+        pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
         partitem = self.parentItem()
         this_step_size = virtual_helix_item.getProperty('bases_per_repeat')
@@ -182,7 +184,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
 
     def activateNeighbors(self, id_num, is_fwd, idx):
         # print("ACTIVATING neighbors", id_num, idx)
-        item = self.prexover_items.get((id_num, is_fwd, idx))
+        item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is not None:
             pxi, neighbor_list = item
             # print("Should have {} neighbors".format(len(neighbor_list)))
@@ -203,5 +205,9 @@ class PreXoverItemGroup(QGraphicsRectItem):
             pre_xover_info (Tuple): from call to getInfo()
         """
         self.part_item.part().setActiveBaseInfo(pre_xover_info)
+    # end def
+
+    def isVirtualHelixActive(self, id_num):
+        return self.part_item.part().isVirtualHelixActive(id_num)
     # end def
 # end class

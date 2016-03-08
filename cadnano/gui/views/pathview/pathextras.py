@@ -225,8 +225,8 @@ class PreXoverItem(QGraphicsRectItem):
 
     def absoluteIdx(self):
         vhi = self._from_vh_item
-        id_num = vhi.idNum()
-        x, y, _z = vhi.part().getCoordinate(id_num, 0)
+        # id_num = vhi.idNum()
+        x, y, _z = vhi.part().getCoordinate(self._id_num, 0)
         return self.baseIdx() + (_z / BASE_WIDTH)
 
     def window(self):
@@ -234,15 +234,17 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self.setFocus(Qt.MouseFocusReason)
-        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
-        self.setInstantActive(True)
+        if self.prexoveritemgroup.isVirtualHelixActive(self._id_num):
+            self.setFocus(Qt.MouseFocusReason)
+            self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
+            self.setInstantActive(True)
     # end def
 
     def hoverLeaveEvent(self, event):
-        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
-        self.setInstantActive(False)
-        self.clearFocus()
+        if self.prexoveritemgroup.isVirtualHelixActive(self._id_num):
+            self.prexoveritemgroup.updateModelActiveBaseInfo(None)
+            self.setInstantActive(False)
+            self.clearFocus()
     # end def
 
     def keyPressEvent(self, event):
@@ -285,10 +287,9 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbor(self):
+        self.setInstantActive(False)
         inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
-        self.setBrush(getBrushObj(self._color, alpha=128))
-        self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-        self.animate(self._phos_item, 'rotation', 500, -90, 0)
+        # self.setBrush(getBrushObj(self._color, alpha=128))
         self._bond_item.hide()
         self.setLabel(text=self._label_txt)
     # end def
