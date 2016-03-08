@@ -157,11 +157,11 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
-        print("ACTIVATING neighbors", id_num, idx)
+        # print("ACTIVATING neighbors", id_num, idx)
         item = self.prexover_items.get((id_num, is_fwd, idx))
         if item is not None:
             pxi, neighbor_list = item
-            print("Should have {} neighbors".format(len(neighbor_list)))
+            # print("Should have {} neighbors".format(len(neighbor_list)))
             for k, npxi in enumerate(neighbor_list):
                 npxi.activateNeighbor(pxi, shortcut=str(k))
                 self.addKeyPress(k, npxi.getInfo())

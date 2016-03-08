@@ -1266,19 +1266,13 @@ class VirtualHelixGroup(CNObject):
 
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle)
-                    max_angle = (native_angle + theta) % TWOPI
-                    min_angle = (native_angle - theta + TWOPI) % TWOPI
-                    if min_angle > max_angle:
-                        max_angle, min_angle =  min_angle, max_angle
+                    angleRangeCheck = self.angleRangeCheck
+
                     all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                 min(neighbor_min_delta_idx + half_period, size)) ]
-                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle <= x <= max_angle ]
+                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, real_angle, theta)]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle <= x <= max_angle ]
-                    if start + i == 23:
-                        print("$$$$$ Fwd yikes", id_num)
-                        print(passing_fwd_angles_idxs)
-                        print(passing_rev_angles_idxs)
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, real_angle, theta) ]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
 
@@ -1301,25 +1295,35 @@ class VirtualHelixGroup(CNObject):
 
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = (eulerZ + twist_per_base*neighbor_min_delta_idx + real_angle)
-                    max_angle = (native_angle + theta) % TWOPI
-                    min_angle = (native_angle - theta + TWOPI) % TWOPI
-                    if min_angle > max_angle:
-                        max_angle, min_angle =  min_angle, max_angle
+                    angleRangeCheck = self.angleRangeCheck
                     all_fwd_angles = [(j, (eulerZ + twist_per_base*j) % TWOPI) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                 min(neighbor_min_delta_idx + half_period, size)) ]
-                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if min_angle <= x <= max_angle ]
+                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, real_angle, theta)]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if min_angle <= x <= max_angle ]
-                    if start + i == 23:
-                        print("$$$$$ Rev yikes", id_num)
-                        print(passing_fwd_angles_idxs)
-                        print(passing_rev_angles_idxs)
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, real_angle, theta) ]
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
             per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
         # end for
         return per_neighbor_hits
     # end def
+
+    @staticmethod
+    def angleRangeCheck(angle, target_angle, theta):
+        """ see if `angle` falls in range
+            `[target_angle - theta`, target_angle + theta]`
+            Accounting for wrap around
+        Args:
+            angle (float): radians
+            target_angle (float): radians
+            theta (float): radians
+        Returns:
+            bool: True if in range, False otherwise
+        """
+        PI = 3.141592653589793
+        TWOPI = 2*PI
+        diff = (angle - target_angle + PI) % TWOPI - PI
+        return -theta <= diff and diff <= theta
 
     @staticmethod
     def radiusForAngle(angle, radius_in, bases_per_turn, base_width):
