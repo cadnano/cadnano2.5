@@ -175,10 +175,9 @@ class PreXoverItem(QGraphicsRectItem):
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
-        self._label_txt = None
+        self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self._label = PreXoverLabel(is_fwd, color, self)
-        self._label.hide()
-
+        self.setLabel(text=lbt)
         self.setPen(getNoPen())
 
         if is_fwd:
@@ -199,6 +198,8 @@ class PreXoverItem(QGraphicsRectItem):
                                     penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
         self._phos_item = phos
+
+        self.setInstantActive(False)
     # end def
 
     def getInfo(self):
@@ -233,6 +234,14 @@ class PreXoverItem(QGraphicsRectItem):
     ### EVENT HANDLERS ###
 
     ### PUBLIC SUPPORT METHODS ###
+    def setLabel(self, text=None, outline=False):
+        if text:
+            self._label.setTextAndStyle(text=text, outline=outline)
+            self._label.show()
+        else:
+            self._label.hide()
+    #end def
+
     def animate(self, item, property_name, duration, start_value, end_value):
         b_name = property_name.encode('ascii')
         anim = QPropertyAnimation(item.adapter, b_name)
@@ -241,29 +250,6 @@ class PreXoverItem(QGraphicsRectItem):
         anim.setEndValue(end_value)
         anim.start()
         item.adapter.saveRef(property_name, anim)
-    # end def
-# end class
-
-class ActivePreXoverItem(PreXoverItem):
-    def __init__(self, *args):
-        super(ActivePreXoverItem, self).__init__(*args)
-        self.setAcceptHoverEvents(True)
-        self.setFlags(QGraphicsItem.ItemIsFocusable)
-    # end def
-    def hoverEnterEvent(self, event):
-        self.setFocus(Qt.MouseFocusReason)
-        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
-        self.setInstantActive(True)
-    # end def
-
-    def hoverLeaveEvent(self, event):
-        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
-        self.setInstantActive(False)
-        self.clearFocus()
-    # end def
-
-    def keyPressEvent(self, event):
-        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
     # end def
 
     def setInstantActive(self, is_active):
@@ -279,14 +265,31 @@ class ActivePreXoverItem(PreXoverItem):
     # end def
 # end class
 
-class NeighborPreXoverItem(PreXoverItem):
-    def setLabel(self, text=None, outline=False):
-        if text:
-            self._label.setTextAndStyle(text=text, outline=outline)
-            self._label.show()
-        else:
-            self._label.hide()
+class ActivePreXoverItem(PreXoverItem):
+    def __init__(self, *args):
+        super(ActivePreXoverItem, self).__init__(*args)
+        self.setAcceptHoverEvents(True)
+        self.setFlags(QGraphicsItem.ItemIsFocusable)
+    # end def
 
+    def hoverEnterEvent(self, event):
+        self.setFocus(Qt.MouseFocusReason)
+        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
+        self.setInstantActive(True)
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
+        self.setInstantActive(False)
+        self.clearFocus()
+    # end def
+
+    def keyPressEvent(self, event):
+        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
+    # end def
+# end class
+
+class NeighborPreXoverItem(PreXoverItem):
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
         """ To be called with whatever the active_prexoveritem
         is for the parts `active_base`
