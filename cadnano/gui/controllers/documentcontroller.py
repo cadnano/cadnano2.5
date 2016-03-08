@@ -90,8 +90,13 @@ class DocumentController():
         self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
         win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
         win.action_vhelix_select.triggered.connect(self.actionFilterHandleSlot)
-        self.trigger_path_select = lambda x: win.action_path_select.trigger()
-        win.action_vhelix_select.triggered.connect(self.trigger_path_select)
+
+        # Commented out for now as this call to connect somehow disconnects the
+        # the Select tool due to call resolution.  Forced filter toggling should be
+        # handled differently
+        # self.trigger_path_select = lambda x: win.action_path_select.trigger()
+        # self.trigger_path_select = lambda x: win.action_path_select.setChecked(True)
+        # win.action_vhelix_select.triggered.connect(self.trigger_path_select) # for now connects to path tool
 
         win.action_vhelix_create.triggered.connect(self.actionFilterHandleSlot)
         win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)

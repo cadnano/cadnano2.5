@@ -245,7 +245,7 @@ class Part(VirtualHelixGroup):
     # end def
 
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
-        self._active_virtual_helix = id_num
+        self._active_id_num = id_num
         self.active_base_info = abi = (id_num, is_fwd, idx, -1)
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
@@ -257,7 +257,7 @@ class Part(VirtualHelixGroup):
     # end def
 
     def isVirtualHelixActive(self, id_num):
-        return id_num == self._active_virtual_helix
+        return id_num == self._active_id_num
     # end def
 
     def insertions(self):

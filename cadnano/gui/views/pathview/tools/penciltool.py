@@ -467,7 +467,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         lbl = self._label
         if self._idx is not None:
             bw = _BASE_WIDTH
-            num = self._partner_virtual_helix.number()
+            num = self._partner_virtual_helix.idNum()
             tBR = _FM.tightBoundingRect(str(num))
             half_label_h = tBR.height()/2.0
             half_label_w = tBR.width()/2.0
@@ -490,7 +490,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
             lbl.setFont(_TO_HELIX_NUM_FONT)
             self._label = lbl
 
-            lbl.setText( str(self._partner_virtual_helix.number()) )
+            lbl.setText( str(self._partner_virtual_helix.idNum()) )
             lbl.show()
         # end if
     # end def
