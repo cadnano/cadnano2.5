@@ -180,8 +180,6 @@ class PreXoverItem(QGraphicsRectItem):
         self._label.hide()
 
         self.setPen(getNoPen())
-        self.setAcceptHoverEvents(True)
-        self.setFlags(QGraphicsItem.ItemIsFocusable)
 
         if is_fwd:
             phos = Triangle(FWDPHOS_PP, self)
@@ -233,25 +231,62 @@ class PreXoverItem(QGraphicsRectItem):
         return self._parent.window()
 
     ### EVENT HANDLERS ###
+
+    ### PUBLIC SUPPORT METHODS ###
+    def animate(self, item, property_name, duration, start_value, end_value):
+        b_name = property_name.encode('ascii')
+        anim = QPropertyAnimation(item.adapter, b_name)
+        anim.setDuration(duration)
+        anim.setStartValue(start_value)
+        anim.setEndValue(end_value)
+        anim.start()
+        item.adapter.saveRef(property_name, anim)
+    # end def
+# end class
+
+class ActivePreXoverItem(PreXoverItem):
+    def __init__(self, *args):
+        super(ActivePreXoverItem, self).__init__(*args)
+        self.setAcceptHoverEvents(True)
+        self.setFlags(QGraphicsItem.ItemIsFocusable)
+    # end def
     def hoverEnterEvent(self, event):
-        if self.prexoveritemgroup.isVirtualHelixActive(self._id_num):
-            self.setFocus(Qt.MouseFocusReason)
-            self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
-            self.setInstantActive(True)
+        self.setFocus(Qt.MouseFocusReason)
+        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
+        self.setInstantActive(True)
     # end def
 
     def hoverLeaveEvent(self, event):
-        if self.prexoveritemgroup.isVirtualHelixActive(self._id_num):
-            self.prexoveritemgroup.updateModelActiveBaseInfo(None)
-            self.setInstantActive(False)
-            self.clearFocus()
+        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
+        self.setInstantActive(False)
+        self.clearFocus()
     # end def
 
     def keyPressEvent(self, event):
         self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
     # end def
 
-    ### PUBLIC SUPPORT METHODS ###
+    def setInstantActive(self, is_active):
+        if is_active:
+            self.setBrush(getBrushObj(self._color, alpha=128))
+            self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
+            self.animate(self._phos_item, 'rotation', 500, 0, -90)
+        else:
+            inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+    # end def
+# end class
+
+class NeighborPreXoverItem(PreXoverItem):
+    def setLabel(self, text=None, outline=False):
+        if text:
+            self._label.setTextAndStyle(text=text, outline=outline)
+            self._label.show()
+        else:
+            self._label.hide()
+
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
         """ To be called with whatever the active_prexoveritem
         is for the parts `active_base`
@@ -287,40 +322,13 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbor(self):
-        self.setInstantActive(False)
         inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
-        # self.setBrush(getBrushObj(self._color, alpha=128))
+        self.setBrush(getBrushObj(self._color, alpha=128))
+        self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+        self.animate(self._phos_item, 'rotation', 500, -90, 0)
         self._bond_item.hide()
         self.setLabel(text=self._label_txt)
     # end def
-
-    def setInstantActive(self, is_active):
-        if is_active:
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
-        else:
-            inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
-    # end def
-
-    def setLabel(self, text=None, outline=False):
-        if text:
-            self._label.setTextAndStyle(text=text, outline=outline)
-            self._label.show()
-        else:
-            self._label.hide()
-
-    def animate(self, item, property_name, duration, start_value, end_value):
-        b_name = property_name.encode('ascii')
-        anim = QPropertyAnimation(item.adapter, b_name)
-        anim.setDuration(duration)
-        anim.setStartValue(start_value)
-        anim.setEndValue(end_value)
-        anim.start()
-        item.adapter.saveRef(property_name, anim)
-    # end def
 # end class
+
 

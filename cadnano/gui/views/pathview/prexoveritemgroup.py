@@ -1,7 +1,8 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
-from .pathextras import PreXoverItem, PHOS_ITEM_WIDTH, BASE_WIDTH
+from .pathextras import (PreXoverItem, NeighborPreXoverItem, ActivePreXoverItem,
+                        PHOS_ITEM_WIDTH, BASE_WIDTH)
 from cadnano.gui.palette import newPenObj, getNoPen, getPenObj
 from cadnano.enum import StrandType
 
@@ -137,14 +138,14 @@ class PreXoverItemGroup(QGraphicsRectItem):
                 # from_virtual_helix_item, from_index, fwd_st_type, prexoveritemgroup, color):
                 neighbor_pxis = []
                 # print((id_num, fwd_st_type, idx))
-                pxis[(id_num, fwd_st_type, idx)] = (PreXoverItem(virtual_helix_item, fwd_st_type, idx,
+                pxis[(id_num, fwd_st_type, idx)] = (ActivePreXoverItem(virtual_helix_item, fwd_st_type, idx,
                                                         neighbor_id, self, colors[idx % this_step_size]),
                                                 neighbor_pxis)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = PreXoverItem(nvhi, fwd_st_type, j,
+                        npxi = NeighborPreXoverItem(nvhi, fwd_st_type, j,
                                             id_num, self, colors[j % n_step_size])
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(  npxi  )
@@ -152,7 +153,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = PreXoverItem(nvhi, rev_st_type, j,
+                        npxi = NeighborPreXoverItem(nvhi, rev_st_type, j,
                                             id_num, self, colors[-1 - (j % n_step_size)] )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
@@ -160,14 +161,14 @@ class PreXoverItemGroup(QGraphicsRectItem):
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, rev_st_type, idx))
-                pxis[(id_num, rev_st_type, idx)] = ( PreXoverItem(virtual_helix_item, rev_st_type, idx,
+                pxis[(id_num, rev_st_type, idx)] = ( ActivePreXoverItem(virtual_helix_item, rev_st_type, idx,
                                                         neighbor_id, self, colors[-1 - (idx % this_step_size)]),
                                                 neighbor_pxis)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = PreXoverItem(nvhi, fwd_st_type, j,
+                        npxi = NeighborPreXoverItem(nvhi, fwd_st_type, j,
                                             id_num, self, colors[j % n_step_size])
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
@@ -175,7 +176,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = PreXoverItem(nvhi, rev_st_type, j,
+                        npxi = NeighborPreXoverItem(nvhi, rev_st_type, j,
                                             id_num, self, colors[-1 - (j % n_step_size)])
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
