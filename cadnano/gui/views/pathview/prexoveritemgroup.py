@@ -16,6 +16,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self._colors = []
         # dictionary of tuple of a (PreXoverItem, List[PreXoverItem])
         self.prexover_items = {}
+        self.neighbor_prexover_items = {}
         self._active_items = []
         self._key_press_dict = {}
         # self.updateBasesPerRepeat()
@@ -97,9 +98,10 @@ class PreXoverItemGroup(QGraphicsRectItem):
     def clearPreXoverItems(self):
         for x, y in self.prexover_items.values():
             PreXoverItem.remove(x)
-            for z in y:
-                PreXoverItem.remove(z)
         self.prexover_items = {}
+        for x in self.neighbor_prexover_items.values():
+            PreXoverItem.remove(x)
+        self.neighbor_prexover_items = {}
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, per_neighbor_hits):
@@ -115,6 +117,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()
         pxis = self.prexover_items
+        neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
         partitem = self.parentItem()
         this_step_size = virtual_helix_item.getProperty('bases_per_repeat')
         self.virtual_helix_item = virtual_helix_item
@@ -122,37 +125,58 @@ class PreXoverItemGroup(QGraphicsRectItem):
         colors = self._colors
         # the list of neighbors per strand
         id_num = virtual_helix_item.idNum()
-        fwd_st, rev_st = True, False
+        fwd_st_type, rev_st_type = True, False  # for clarity in the call to constructors
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
             fwd_axis_hits, rev_axis_hits = hits
             nvhi = partitem.idToVirtualHelixItem(neighbor_id)
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
-                # from_virtual_helix_item, from_index, fwd_st, prexoveritemgroup, color):
+                # from_virtual_helix_item, from_index, fwd_st_type, prexoveritemgroup, color):
                 neighbor_pxis = []
-                # print((id_num, fwd_st, idx))
-                pxis[(id_num, fwd_st, idx)] = (PreXoverItem(virtual_helix_item, fwd_st, idx,
+                # print((id_num, fwd_st_type, idx))
+                pxis[(id_num, fwd_st_type, idx)] = (PreXoverItem(virtual_helix_item, fwd_st_type, idx,
                                                         neighbor_id, self, colors[idx % this_step_size]),
                                                 neighbor_pxis)
                 for j in fwd_idxs:
-                    neighbor_pxis.append(   PreXoverItem(nvhi, fwd_st, j,
-                                            id_num, self, colors[j % n_step_size]) )
+                    nkey = (neighbor_id, fwd_st_type, j)
+                    npxi = neighbor_pxis_dict.get(nkey)
+                    if npxi is None:
+                        npxi = PreXoverItem(nvhi, fwd_st_type, j,
+                                            id_num, self, colors[j % n_step_size])
+                        neighbor_pxis_dict[nkey] = npxi
+                    neighbor_pxis.append(  npxi  )
                 for j in rev_idxs:
-                    neighbor_pxis.append( PreXoverItem(nvhi, rev_st, j,
-                                                        id_num, self, colors[-1 - (j % n_step_size)] ))
+                    nkey = (neighbor_id, rev_st_type, j)
+                    npxi = neighbor_pxis_dict.get(nkey)
+                    if npxi is None:
+                        npxi = PreXoverItem(nvhi, rev_st_type, j,
+                                            id_num, self, colors[-1 - (j % n_step_size)] )
+                        neighbor_pxis_dict[nkey] = npxi
+                    neighbor_pxis.append( npxi )
+
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
-                # print((id_num, rev_st, idx))
-                pxis[(id_num, rev_st, idx)] = ( PreXoverItem(virtual_helix_item, rev_st, idx,
+                # print((id_num, rev_st_type, idx))
+                pxis[(id_num, rev_st_type, idx)] = ( PreXoverItem(virtual_helix_item, rev_st_type, idx,
                                                         neighbor_id, self, colors[-1 - (idx % this_step_size)]),
                                                 neighbor_pxis)
                 for j in fwd_idxs:
-                    neighbor_pxis.append(  PreXoverItem(nvhi, fwd_st, j,
-                                                        id_num, self, colors[j % n_step_size]))
+                    nkey = (neighbor_id, fwd_st_type, j)
+                    npxi = neighbor_pxis_dict.get(nkey)
+                    if npxi is None:
+                        npxi = PreXoverItem(nvhi, fwd_st_type, j,
+                                            id_num, self, colors[j % n_step_size])
+                        neighbor_pxis_dict[nkey] = npxi
+                    neighbor_pxis.append( npxi )
                 for j in rev_idxs:
-                    neighbor_pxis.append( PreXoverItem(nvhi, rev_st, j,
-                                                        id_num, self, colors[-1 - (j % n_step_size)]))
+                    nkey = (neighbor_id, rev_st_type, j)
+                    npxi = neighbor_pxis_dict.get(nkey)
+                    if npxi is None:
+                        npxi = PreXoverItem(nvhi, rev_st_type, j,
+                                            id_num, self, colors[-1 - (j % n_step_size)])
+                        neighbor_pxis_dict[nkey] = npxi
+                    neighbor_pxis.append( npxi )
         # end for per_neighbor_hits
     # end def
 
