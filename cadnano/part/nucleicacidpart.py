@@ -136,7 +136,22 @@ class NucleicAcidPart(Part):
         return False
     # end def
 
-    def potentialCrossoverList(self, id_num, idx=None):
+    def potentialCrossoverMap(self, id_num, idx=None):
+        """
+        Args:
+            id_num (int):
+
+        Returns:
+            dictionary of tuples:
+
+                neighbor_id_num: (fwd_hit_list, rev_hit_list)
+
+                where each list has the form:
+
+                    [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
+
+
+        """
         neighbors = self.getVirtualHelixOriginNeighbors(id_num, 2.1*self._RADIUS)
         # hit_radius = self.radiusForAngle(60, self._RADIUS, self._BASE_WIDTH)
         alpha = 60

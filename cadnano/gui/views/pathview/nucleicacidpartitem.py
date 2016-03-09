@@ -509,7 +509,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         info = part.active_base_info
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
-            per_neighbor_hits = part.potentialCrossoverList(id_num, idx)
+            per_neighbor_hits = part.potentialCrossoverMap(id_num, idx)
             self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 

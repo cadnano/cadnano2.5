@@ -1194,11 +1194,11 @@ class VirtualHelixGroup(CNObject):
                 helix
 
         Returns:
-            tuple::
+            dictionary of tuples:
 
-                (fwd_hit_list, rev_hit_list)
+                neighbor_id_num: (fwd_hit_list, rev_hit_list)
 
-            where each list has the form::
+            where each list has the form:
 
                 [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
 
@@ -1255,7 +1255,8 @@ class VirtualHelixGroup(CNObject):
                 neighbor_min_delta_idx = np.argmin(delta)
                 if delta[neighbor_min_delta_idx] < rsquared2:
                     neighbor_axis_pt = naxis_pts[neighbor_min_delta_idx]
-                    # a. angle from fwd_pt to neighbor
+                    # a. angle between vector from neighbor axis at minimum delta to this axis_pt
+                    #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
                     v1 = v1 - dot(v1, direction)*direction
@@ -1284,7 +1285,8 @@ class VirtualHelixGroup(CNObject):
                 neighbor_min_delta_idx = np.argmin(delta)
                 if delta[neighbor_min_delta_idx] < rsquared2:
                     neighbor_axis_pt = naxis_pts[neighbor_min_delta_idx]
-                    # a. angle from fwd_pt to neighbor
+                    # a. angle between vector from neighbor axis at minimum delta to this axis_pt
+                    #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
                     v1 = v1 - dot(v1, direction)*direction
