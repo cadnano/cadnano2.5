@@ -34,35 +34,39 @@ _WEDGE_RECT_CENTERPT = WEDGE_RECT.center()
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
         super(PropertyWrapperObject, self).__init__()
-        self._item = item
-        self._animations = {}
+        self.item = item
+        self.animations = {}
 
     def __get_bondP2(self):
-        return self._item.line().p2()
+        return self.item.line().p2()
 
     def __set_bondP2(self, p2):
-        p1 = self._item.line().p1()
+        p1 = self.item.line().p1()
         line = QLineF(p1.x(),p1.y(),p2.x(),p2.y())
-        self._item.setLine(line)
+        self.item.setLine(line)
 
     def __get_rotation(self):
-        return self._item.rotation()
+        return self.item.rotation()
 
     def __set_rotation(self, angle):
-        self._item.setRotation(angle)
+        self.item.setRotation(angle)
 
     def __get_penAlpha(self):
-        return self._item.pen().color().alpha()
+        return self.item.pen().color().alpha()
 
     def __set_penAlpha(self, alpha):
-        pen = QPen(self._item.pen())
-        color = QColor(self._item.pen().color())
+        pen = QPen(self.item.pen())
+        color = QColor(self.item.pen().color())
         color.setAlpha(alpha)
         pen.setColor(color)
         self._item.setPen(pen)
 
     def saveRef(self, property_name, animation):
-        self._animations[property_name] = animation
+        self.animations[property_name] = animation
+
+    def getRef(self, property_name):
+        return self.animations.get(property_name)
+
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
     pen_alpha = pyqtProperty(int, __get_penAlpha, __set_penAlpha)
@@ -109,10 +113,10 @@ class PhosBond(QGraphicsLineItem):
 class PreXoverItem(QGraphicsPathItem):
     def __init__(self, step_idx, color, pre_xover_item_group, is_fwd=True):
         super(PreXoverItem, self).__init__(pre_xover_item_group)
-        self._step_idx = step_idx
+        self.step_idx = step_idx
         self.color = color
         self.is_fwd = is_fwd
-        self._parent = pre_xover_item_group
+        self.pre_xover_item_group = pre_xover_item_group
         self.phos_item = Triangle(is_fwd, self)
         self.item_5p = None
         self.item_3p = None
@@ -130,17 +134,24 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### ACCESSORS ###
     def facingAngle(self):
-        facing_angle = self._parent.virtualHelixAngle() + self.rotation()
+        facing_angle = self.pre_xover_item_group.eulerZAngle() + self.rotation()
         return facing_angle % 360
 
     def color(self):
         return self._color
 
+    def getInfo(self):
+        """
+        Returns:
+            Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
+        """
+        return (self.pre_xover_item_group.id_num, self.is_fwd, self.step_idx, None)
+
     def name(self):
-        return "%s.%d" % ("r" if self.is_fwd else "f", self._step_idx)
+        return "%s.%d" % ("r" if self.is_fwd else "f", self.step_idx)
 
     def stepIdx(self):
-        return self._step_idx
+        return self.step_idx
 
     def setBondLineLength(self, value):
         self._active_p2_3p = QPointF(value, 0)
@@ -148,12 +159,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self._parent.updateModelActivePhos(self)
+        self.pre_xover_item_group.updateModelActiveBaseInfo(self.getInfo())
     # end def
 
     def hoverLeaveEvent(self, event):
-        self._parent.updateModelActivePhos(None)
-        self._parent.resetAllItemsAppearance()
+        self.pre_xover_item_group.updateModelActiveBaseInfo(None)
+        self.pre_xover_item_group.resetAllItemsAppearance()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -242,10 +253,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         super(PreXoverItemGroup, self).__init__(rect, virtual_helix_item)
         self._radius = radius
         self._rect = rect
-        self._parent = virtual_helix_item
-        self._id_num = id_num = virtual_helix_item.idNum()
-        self._active_item = None
-        self._active_wedge_gizmo = WedgeGizmo(radius, rect, self)
+        self.virtual_helix_item = virtual_helix_item
+        self.model_part = virtual_helix_item.part()
+        self.id_num = virtual_helix_item.idNum()
+        self.active_item = None
+        self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
         self.fwd_prexover_items = {}
         self.rev_prexover_items = {}
         self._colors = self._getColors()
@@ -257,8 +269,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     ### ACCESSORS ###
-    def virtualHelixAngle(self):
-        return self._parent.getProperty('eulerZ')
+    def eulerZAngle(self):
+        return self.virtual_helix_item.getProperty('eulerZ')
     # end def
 
     def getItem(self, is_fwd, step_idx):
@@ -273,7 +285,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def _getColors(self):
-        step_size = self._parent.getProperty('bases_per_repeat')
+        step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
         hue_scale = step_size*self.HUE_FACTOR
         return [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() for i in range(step_size)]
     # end def
@@ -281,7 +293,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
         radius = self._radius
-        step_size, twist, groove = self._parent.getProperty(['bases_per_repeat',
+        step_size, twist, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
         iw = PXI_PP_ITEM_WIDTH
@@ -298,7 +310,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             fwd.setTransformOriginPoint((-radius + iw + inset), 0)
             rev.setTransformOriginPoint((-radius + iw + inset), 0)
             fwd.setRotation(round((i*twist) % 360, 3))
-            rev.setRotation(round((i*twist + groove) % 360, 3))
+            rev.setRotation(round((i*twist + mgroove) % 360, 3))
             fwd.setBondLineLength(inset + iw)
             rev.setBondLineLength(inset + iw)
             self.fwd_prexover_items[i] = fwd
@@ -327,18 +339,20 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def updateTurnsPerRepeat(self):
-        step_size, twist, groove = self._parent.getProperty(['bases_per_repeat',
+        step_size, twist, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
+        fpxis = self.fwd_prexover_items
+        rpxis = self.rev_prexover_items
         for i in range(step_size):
             fwd = self.fwd_prexover_items[i]
             rev = self.rev_prexover_items[i]
-            fwd.setRotation(round((i*twist_per_base)%360, 3))
-            rev.setRotation(round((i*twist_per_base + groove) % 360, 3))
+            fwd.setRotation(round((i*twist_per_base) % 360, 3))
+            rev.setRotation(round((i*twist_per_base + mgroove) % 360, 3))
         for i in range(step_size - 1):
-            fwd, next_fwd = self.fwd_prexover_items[i], self.fwd_prexover_items[i + 1]
+            fwd, next_fwd = fpxis[i], fpxis[i + 1]
             j = (step_size - 1) - i
-            rev, next_rev = self.rev_prexover_items[j], self.rev_prexover_items[j - 1]
+            rev, next_rev = rpxis[j], rpxis[j - 1]
             fwd.set3pItem(next_fwd)
             rev.set3pItem(next_rev)
             next_fwd.set5pItem(fwd)
@@ -346,32 +360,22 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def partCrossoverSpanAngle(self):
-        return self._parent.partCrossoverSpanAngle()
+        return self.virtual_helix_item.partCrossoverSpanAngle()
 
-    def updateModelActivePhos(self, pre_xover_item):
+    def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state."""
-        if pre_xover_item is None:
-            self._parent.part().setProperty('active_phos', None)
-            return
-        vh_name, vh_angle = self._parent.getProperty(['name', 'eulerZ'])
-        step_idx = pre_xover_item.stepIdx() # (f|r).step_idx
-        facing_angle = (vh_angle + pre_xover_item.rotation()) % 360
-
-        # facing_angle = pre_xover_item.facingAngle()
-        is_fwd = 'fwd' if pre_xover_item.is_fwd else 'rev'
-        value = "%s.%s.%d.%0d" % (vh_name, is_fwd, step_idx, facing_angle)
-        self._parent.part().setProperty('active_phos', value)
+        self.model_part.setActiveBaseInfo(pre_xover_info)
     # end def
 
-    def updateViewActivePhos(self, new_active_item=None):
+    def updateViewActiveBase(self, new_active_item=None):
         """Refresh appearance of items whose active state changed."""
-        if self._active_item:
-            self._active_item.updateItemApperance(False, show_3p=True)
-            self._active_wedge_gizmo.hide()
+        if self.active_item:
+            self.active_item.updateItemApperance(False, show_3p=True)
+            self.active_wedge_gizmo.hide()
         if new_active_item:
             new_active_item.updateItemApperance(True, show_3p=True)
-            self._active_wedge_gizmo.showActive(new_active_item)
-            self._active_item = new_active_item
+            self.active_wedge_gizmo.showActive(new_active_item)
+            self.active_item = new_active_item
     # end def
 
     def resetAllItemsAppearance(self):
@@ -382,7 +386,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def getItemsFacingNearAngle(self, angle):
-        span = self._parent.partCrossoverSpanAngle() / 2
+        span = self.virtual_helix_item.partCrossoverSpanAngle() / 2
         fwd = list(filter(lambda p: \
                             180 - abs(abs(p.facingAngle() - angle) - 180) < span,\
                             self.fwd_prexover_items.values()))
@@ -394,13 +398,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 # end class
 
 class WedgeGizmo(QGraphicsPathItem):
-    def __init__(self, radius, rect, parent):
+    def __init__(self, radius, rect, pre_xover_item_group):
         """ parent could be a PreXoverItemGroup or a VirtualHelixItem
         """
-        super(WedgeGizmo, self).__init__(parent)
+        super(WedgeGizmo, self).__init__(pre_xover_item_group)
         self._radius = radius
         self._rect = rect
-        self._parent = parent
+        self.pre_xover_item_group = pre_xover_item_group
         self.setPen(getNoPen())
         self.setZValue(styles.ZWEDGEGIZMO)
         self._last_params = None
@@ -409,7 +413,7 @@ class WedgeGizmo(QGraphicsPathItem):
                     extended=False, rev_gradient=False, outline_only=False):
         self._last_params = (angle, color, extended, rev_gradient, outline_only)
         radius = self._radius
-        span = self._parent.partCrossoverSpanAngle() / 2
+        span = self.pre_xover_item_group.partCrossoverSpanAngle() / 2
         radius_adjusted = radius + (_WEDGE_RECT_GAIN / 2)
 
         tip = QPointF(radius_adjusted, radius_adjusted)

@@ -55,6 +55,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._scale_factor = self._RADIUS / m_p.radius()
 
+        self.prexoveritemgroup = None
+
         self.hide() # hide while until after attemptResize() to avoid flicker
 
         self._rect = QRectF(0, 0, 1000, 1000)

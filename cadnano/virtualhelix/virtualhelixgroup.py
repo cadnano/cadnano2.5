@@ -1229,11 +1229,13 @@ class VirtualHelixGroup(CNObject):
         rsquared2 = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
-            twist_per_base, eulerZ, bpr = self.vh_properties.loc[neighbor_id,
-                                ['twist_per_base', 'eulerZ', 'bases_per_repeat']]
+            twist_per_base, eulerZ, bpr, mgroove = self.vh_properties.loc[neighbor_id,
+                                                        ['twist_per_base', 'eulerZ',
+                                                        'bases_per_repeat', 'minor_groove_angle']]
             half_period = math.ceil(bpr / 2)
             tpb = math.radians(twist_per_base)
             eulerZ = math.radians(eulerZ)
+            mgroove = math.radians(mgroove)
 
             offset, size = self.getOffsetAndSize(neighbor_id)
 
@@ -1277,7 +1279,7 @@ class VirtualHelixGroup(CNObject):
                     all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, (x + mgroove) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
@@ -1306,7 +1308,7 @@ class VirtualHelixGroup(CNObject):
                     all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, (x + mgroove) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for

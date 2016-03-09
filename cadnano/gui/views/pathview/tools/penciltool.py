@@ -126,7 +126,7 @@ class PencilTool(AbstractPathTool):
         Must intercept invalid input events.  Make changes here
         """
         a = event.key()
-        # print("forced xover keypress", a)
+        # print("PencilTool keypress", a)
         if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             QGraphicsObject.keyPressEvent(self, event)
         else:
@@ -611,12 +611,17 @@ class ForcedXoverItem(QGraphicsPathItem):
     def keyPressEvent(self, event):
         """
         Must intercept invalid input events.  Make changes here
+        Use QWidget.changeEvent Slot for intercepting window changes in order to
+        regain focus if necessary in DocumentWindow or CustomGraphicsView classes
+        looking for event.type() QEvent.ActivationChange and using isActiveWindow()
+        or focus to get focus
         """
         a = event.key()
-        # print("forced xover keypress", a)
+        # print("ForcedXoverItem keypress", a)
         if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             QGraphicsPathItem.keyPressEvent(self, event)
         else:
+            # reset the tool
             self._tool.setFloatingXoverBegin(True)
     # end def
 
