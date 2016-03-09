@@ -99,6 +99,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
     # end def
 
     def clearPreXoverItems(self):
+        self._active_items = []
         for x, y in self.prexover_item_map.values():
             PreXoverItem.remove(x)
         self.prexover_item_map = {}

@@ -34,26 +34,34 @@ REVPHOS_PP.addPolygon(T180.map(TRIANGLE))
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
         super(PropertyWrapperObject, self).__init__()
-        self._item = item
-        self._animations = {}
+        self.item = item
+        self.animations = {}
 
     def __get_brushAlpha(self):
-        return self._item.brush().color().alpha()
+        return self.item.brush().color().alpha()
 
     def __set_brushAlpha(self, alpha):
-        brush = QBrush(self._item.brush())
+        brush = QBrush(self.item.brush())
         color = QColor(brush.color())
         color.setAlpha(alpha)
-        self._item.setBrush(QBrush(color))
+        self.item.setBrush(QBrush(color))
 
     def __get_rotation(self):
-        return self._item.rotation()
+        return self.item.rotation()
 
     def __set_rotation(self, angle):
-        self._item.setRotation(angle)
+        self.item.setRotation(angle)
 
     def saveRef(self, property_name, animation):
-        self._animations[property_name] = animation
+        self.animations[property_name] = animation
+
+    def getRef(self, property_name):
+        return self.animations.get(property_name)
+
+    def destroy(self):
+        self.item = None
+        self.animations = None
+        self.deleteLater()
 
     brush_alpha = pyqtProperty(int, __get_brushAlpha, __set_brushAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
@@ -171,7 +179,7 @@ class PreXoverItem(QGraphicsRectItem):
         self._to_vh_id_num = to_vh_id_num
         self._color = color
         self._is_fwd = is_fwd
-        self._animations = []
+        # self._animations = []
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
@@ -215,9 +223,16 @@ class PreXoverItem(QGraphicsRectItem):
 
     def remove(self):
         scene = self.scene()
+        self.adapter.destroy()
         if scene:
-            # scene.removeItem(self._label)
+            scene.removeItem(self._label)
+            self._label = None
+            scene.removeItem(self._phos_item)
+            self._phos_item = None
+            scene.removeItem(self._bond_item)
+            self._bond_item = None
             scene.removeItem(self)
+    # end def
 
     def isFwd(self):
         return self._is_fwd
@@ -244,12 +259,14 @@ class PreXoverItem(QGraphicsRectItem):
 
     def animate(self, item, property_name, duration, start_value, end_value):
         b_name = property_name.encode('ascii')
-        anim = QPropertyAnimation(item.adapter, b_name)
+        anim = item.adapter.getRef(property_name)
+        if anim is None:
+            anim = QPropertyAnimation(item.adapter, b_name)
+            item.adapter.saveRef(property_name, anim)
         anim.setDuration(duration)
         anim.setStartValue(start_value)
         anim.setEndValue(end_value)
         anim.start()
-        item.adapter.saveRef(property_name, anim)
     # end def
 
     def setInstantActive(self, is_active):
