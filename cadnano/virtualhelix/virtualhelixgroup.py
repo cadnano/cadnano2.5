@@ -1262,19 +1262,23 @@ class VirtualHelixGroup(CNObject):
                     v1 = v1 - dot(v1, direction)*direction
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
-                    # real_angle = math.acos(np.dot(v1, v2))  # angle
+                    # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
-                    real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
+                    relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
+                    # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + real_angle)
+                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle) % TWOPI
+                    # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
+                    #         (math.degrees(relative_angle), math.degrees(eulerZ), math.degrees(native_angle)))
+
                     angleRangeCheck = self.angleRangeCheck
 
                     all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
-                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, real_angle, theta)]
+                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, real_angle, theta) ]
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
 
@@ -1292,18 +1296,18 @@ class VirtualHelixGroup(CNObject):
                     v1 = v1 - dot(v1, direction)*direction
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
-                    # real_angle = math.acos(np.dot(v1, v2))  # angle
+                    # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
-                    real_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
+                    relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + real_angle)
+                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle) % TWOPI
                     angleRangeCheck = self.angleRangeCheck
                     all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
-                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, real_angle, theta)]
+                    passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, (x + PI) % TWOPI) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, real_angle, theta) ]
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
             per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
