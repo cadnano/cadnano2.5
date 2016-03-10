@@ -27,7 +27,7 @@ class AbstractPartItem(object):
     # end def
 
     def scaleFactor(self):
-        return self._scale_factor
+        return self.scale_factor
     # end def
 
     def idToVirtualHelixItem(self, id_num):

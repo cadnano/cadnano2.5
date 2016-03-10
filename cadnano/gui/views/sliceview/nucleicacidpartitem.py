@@ -14,7 +14,7 @@ from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
 from .activesliceitem import ActiveSliceItem
 from .virtualhelixitem import VirtualHelixItem
-from .sliceextras import PreXoverItemGroup
+from .prexovermanager import PreXoverManager
 
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -53,9 +53,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
-        self._scale_factor = self._RADIUS / m_p.radius()
+        self.scale_factor = self._RADIUS / m_p.radius()
 
-        self.prexoveritemgroup = None
+        self.active_virtual_helix_item = None
+
+        self.prexover_manager = PreXoverManager(self)
 
         self.hide() # hide while until after attemptResize() to avoid flicker
 
@@ -119,8 +121,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partActiveVirtualHelixChangedSlot(self, part, virtualHelix):
-        pass
+    def partActiveVirtualHelixChangedSlot(self, part, id_num):
+        vhi = self._virtual_helix_item_hash.get(id_num, None)
+        self.setActiveVirtualHelixItem(vhi)
+        self.setPreXoverItemsVisible(vhi)
+    #end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
@@ -256,6 +261,35 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self.parentItem().window()
     # end def
 
+    def setActiveVirtualHelixItem(self, new_active_vhi):
+        if new_active_vhi != self.active_virtual_helix_item:
+            self.active_virtual_helix_item = new_active_vhi
+    # end def
+
+    def setPreXoverItemsVisible(self, virtual_helix_item):
+        """
+        self._pre_xover_items list references prexovers parented to other
+        PathHelices such that only the activeHelix maintains the list of
+        visible prexovers
+        """
+        vhi = virtual_helix_item
+
+        if vhi is None:
+            # self.prexover_manager.clear()
+            # if self._pre_xover_items:
+            #     # clear all PreXoverItems
+            #     list(map(PreXoverItem.remove, self._pre_xover_items))
+            #     self._pre_xover_items = []
+            return
+
+        part = self.part()
+        info = part.active_base_info
+        if info is not None:
+            id_num, is_fwd, idx, to_vh_id_num = info
+            per_neighbor_hits = part.potentialCrossoverMap(id_num, idx)
+            self.prexover_manager.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
+    # end def
+
     def removeVirtualHelixItem(self, id_num):
         vhi = self._virtual_helix_item_hash[id_num]
         vhi.virtualHelixRemovedSlot()
@@ -268,7 +302,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def _updateGeometry(self):
-        self._rect = QRectF(*self.part().dimensions(self._scale_factor))
+        self._rect = QRectF(*self.part().dimensions(self.scale_factor))
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -321,7 +355,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def getModelPos(self, pos):
         """ Y-axis is inverted in Qt +y === DOWN
         """
-        sf = self._scale_factor
+        sf = self.scale_factor
         x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def

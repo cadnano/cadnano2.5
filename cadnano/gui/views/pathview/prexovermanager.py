@@ -6,7 +6,7 @@ from .pathextras import (PreXoverItem, NeighborPreXoverItem, ActivePreXoverItem,
 from cadnano.gui.palette import newPenObj, getNoPen, getPenObj
 from cadnano.enum import StrandType
 
-class PreXoverItemGroup(QGraphicsRectItem):
+class PreXoverManager(QGraphicsRectItem):
     HUE_FACTOR = 1.6
     KEYMAP = { i: getattr(Qt, 'Key_%d' % i) for i in range(10) }
     def __init__(self, part_item):
@@ -19,7 +19,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # dictionary of tuple of a (PreXoverItem, List[PreXoverItem])
         self.prexover_item_map = {}
 
-        self.neighbor_prexover_items = {}   # jsut a dictionary of neighbors
+        self.neighbor_prexover_items = {}   # just a dictionary of neighbors
         self._active_items = []
         self._key_press_dict = {}
         # self.updateBasesPerRepeat()
@@ -122,7 +122,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
-        partitem = self.parentItem()
+        part_item = self.part_item
         this_step_size = virtual_helix_item.getProperty('bases_per_repeat')
         self.virtual_helix_item = virtual_helix_item
         self.updateBasesPerRepeat(this_step_size)
@@ -133,7 +133,7 @@ class PreXoverItemGroup(QGraphicsRectItem):
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
             fwd_axis_hits, rev_axis_hits = hits
-            nvhi = partitem.idToVirtualHelixItem(neighbor_id)
+            nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 # from_virtual_helix_item, from_index, fwd_st_type, prexoveritemgroup, color):

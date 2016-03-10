@@ -15,7 +15,7 @@ from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
 from .activesliceitem import ActiveSliceItem
 # from .prexoveritem import PreXoverItem
-from .prexoveritemgroup import PreXoverItemGroup
+from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
 from cadnano.enum import StrandType
@@ -46,7 +46,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self._active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
-        self.prexoveritemgroup = PreXoverItemGroup(self)
+        self.prexover_manager = PreXoverManager(self)
         self._virtual_helix_item_list = []
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
@@ -106,7 +106,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     #end def
 
     def partActiveBaseInfoSlot(self, part, info):
-        pxoig = self.prexoveritemgroup
+        pxoig = self.prexover_manager
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
             # # handle
@@ -498,11 +498,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi = virtual_helix_item
 
         if vhi is None:
-            self.prexoveritemgroup.clear()
-            if self._pre_xover_items:
-                # clear all PreXoverItems
-                list(map(PreXoverItem.remove, self._pre_xover_items))
-                self._pre_xover_items = []
+            # self.prexover_manager.clear()
+            # if self._pre_xover_items:
+            #     # clear all PreXoverItems
+            #     list(map(PreXoverItem.remove, self._pre_xover_items))
+            #     self._pre_xover_items = []
             return
 
         part = self.part()
@@ -510,7 +510,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
             per_neighbor_hits = part.potentialCrossoverMap(id_num, idx)
-            self.prexoveritemgroup.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
+            self.prexover_manager.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
     # end def
 
     def updateXoverItems(self, virtual_helix_item):
