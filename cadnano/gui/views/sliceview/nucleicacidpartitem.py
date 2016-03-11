@@ -127,6 +127,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setPreXoverItemsVisible(vhi)
     #end def
 
+    def partActiveBaseInfoSlot(self, part, info):
+        pxom = self.prexover_manager
+        if info is not None:
+            id_num, is_fwd, idx, _ = info
+            # pxom.activateNeighbors(id_num, is_fwd, idx)
+        else:
+            # pxom.deactivateNeighbors()
+    # end def
+
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
             if property_key == 'color':
@@ -212,7 +221,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def partVirtualHelixAddedSlot(self, sender, id_num):
         # TODO test to see if self._virtual_helix_hash is necessary
         vhi = VirtualHelixItem(id_num, self)
-        # self._virtual_helix_item_list.append(virtual_helix_item)
         self._virtual_helix_item_hash[id_num] = vhi
     # end def
 
@@ -275,11 +283,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi = virtual_helix_item
 
         if vhi is None:
-            # self.prexover_manager.clear()
-            # if self._pre_xover_items:
-            #     # clear all PreXoverItems
-            #     list(map(PreXoverItem.remove, self._pre_xover_items))
-            #     self._pre_xover_items = []
             return
 
         part = self.part()

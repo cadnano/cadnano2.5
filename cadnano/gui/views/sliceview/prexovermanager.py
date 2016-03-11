@@ -39,4 +39,6 @@ class PreXoverManager(QGraphicsRectItem):
             ngroup = PreXoverItemGroup(_RADIUS, WEDGE_RECT, nvhi)
             groups.append(ngroup)
     # end def
+
+
 # end class

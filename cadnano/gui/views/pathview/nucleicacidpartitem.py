@@ -498,11 +498,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi = virtual_helix_item
 
         if vhi is None:
-            # self.prexover_manager.clear()
-            # if self._pre_xover_items:
-            #     # clear all PreXoverItems
-            #     list(map(PreXoverItem.remove, self._pre_xover_items))
-            #     self._pre_xover_items = []
             return
 
         part = self.part()
