@@ -332,6 +332,16 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             self.scene().removeItem(self.rev_prexover_items.pop(i))
     # end def
 
+    def remove(self):
+        self.removeItems()
+        self.virtual_helix_item = None
+        self.model_part = None
+        scene = self.scene()
+        scene.removeItem(self.active_wedge_gizmo)
+        self.active_wedge_gizmo = None
+        scene.removeItem(self)
+    # end def
+
     def updateBasesPerRepeat(self):
         self._colors = self._getColors()
         self.removeItems()
