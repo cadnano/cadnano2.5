@@ -1,4 +1,4 @@
-# cadnano 2.5  *radnano*
+# cadnano 2.5 
 This is a development version of cadnano ported to `Qt5/PyQt5`,
 the dev branch is most up to date.  `cadnano` looks better in lower case
 
@@ -33,20 +33,164 @@ when in python interpreter you can just:
 
 And script your designs without a GUI
 
-## PyQt5 Installation
 
-the requirements PyQt5 and sip are available from Riverbank Computing Limited at:
+# INSTALLATION
+
+## Step 1: Make sure you have git (and know how to open a Terminal)
+
+Cadnano 2.5 is currently under heavy development. The recommended way to install
+cadnano is to use Git. This is what all modern software developers use to manage
+and distribute code and makes it very easy to get the latest version or revert 
+to an older version (in case the newest version breaks some feature you rely on).
+
+While there are graphical user interfaces available for git, the instructions below
+will use terminal/command-line/shell commands. If you haven't used a terminal 
+before, don't fret: Just copy/paste the commands into the terminal. You open a 
+terminal by:
+* Windows: Start -> Command Prompt, or WindowsKey+R and type ```cmd.exe``` plus enter.
+* OS X: Apps -> Terminal, or Command+Spacebar and type ```terminal``` plus enter.
+* Linux: If you are using Linux, you know this already.
+
+As of March 2016, the easiest ways to install git, depending on your platform, are:
+* Windows: Download Git from the official [website](https://git-scm.com/downloads)
+* OS X: Open a terminal and type ```git```. If git is already installed, you should
+see a "usage" description and a list of available commands. If git is not installed,
+you should see a popup window asking you to install OS X developer tools. Follow 
+the "Developer tools" guide, installing either the full package or "just the tools".
+After installation, type ```git``` again and make sure it works.
+* Linux: Use your package manager to install git; use google if you don't know 
+how to use your package manager.
+
+
+## Step 2: Download Cadnano 2.5 using Git
+
+1. First, select a suitable folder on your computer where you would like the 
+Cadnano2.5 source code be be located. The following will assume this location to be
+`<your user directory>/Dev/cadnano2.5`.
+2. Open a terminal and type `mkdir ~/Dev` and then `cd ~/Dev` to navigate to 'Dev' 
+folder. On Windows, type `makedir ~\Dev` and `cd ~\Dev`.
+3. Use git to download cadnano2.5. In your terminal, type: 
+`git clone https://github.com/cadnano/cadnano2.5.git`.
+You should see git downloading cadnano2.5 into a subdirectory of the same name.
+4. Navigate to the cadnano2.5 root directory by typing: `cd cadnano2.5` 
+(or ~/Dev/cadnano2.5).
+
+You now have cadnano2.5 on your computer and you can run it by typing:
+    python ~/Dev/cadnano2.5/bin/main.py
+
+However, this will only work if you have both python and the PyQt5 library installed. 
+Installation of these are described in the following two steps below...
+
+Note: It is possible to use cadnano2.5 as a python library to create and manipulate
+cadnano designs (.json files). This can be a *very* convenient way to create new 
+designs or perform repetitive tasks or analyses, e.g. if you want to color-code
+all oligos by length or helix or similar. We are currently working on some examples
+showcasing the use of "cadnano-as-a-library" which will be placed in the "examples"
+folder inside the root cadnano2.5 directory.
+
+### Step 2.1: Staying up-to-date with git and exploring git branches
+
+Above we used the `git clone` command to download the cadnano repository to our
+computer. If you want to see if there is a new version available, go to your
+cadnano2.5 root folder and pull the latest version using: (As always, replace 
+forward slashes with backslashes on Windows...)
+    cd ~/Dev/cadnano2.5
+    git pull
+
+When developing software, it is often convenient to work on different aspects of 
+the software separately, in separate "versions". In git, these separately-developed
+versions are called "branches". By default git will use the "master" branch,
+but some features may only be available in another branch.
+You can see the different branches on the [cadnano github page](https://github.com/cadnano/cadnano2.5),
+(in the "Branch:" pull-down menu at near the top of the page)
+or by typing `git branch -r` in your terminal.
+If you want to check out another branch to see how it works, simply type
+`git checkout <branch name>` in your terminal.
+You can always go back to the default master branch by typing `git checkout master`.
+
+
+## Step 3: Make sure you have Python
+
+Unless you have good reason not to, we highly recommend using the [Anaconda Python 
+distribution](https://www.continuum.io/downloads). Even if your system already 
+have python installed, using Anaconda makes everything a lot easier. 
+
+1. Download and install [Anaconda](https://www.continuum.io/downloads)
+2. Verify Anaconda is properly installed: In your terminal type ```which python``` 
+(on OS X) or ```where python``` (on Windows). You should see a line ending in 
+```anaconda3/bin/python``` (or similar).
+
+
+## Step 4a. PyQt5 Installation (using Anaconda)
+
+Cadnano 2.5 uses PyQt5 to display the graphical user interface.
+
+If you have Anaconda, the easiest way to get PyQt5 is as follows:
+
+First create a new conda environment. The default anaconda install typically
+have PyQt4 installed, and that doesn't always play well with PyQt5, so we need
+to create an empty one. In your terminal, type:
+
+    conda create --no-default-packages -n pyqt5 python=3
+
+followed by:
+
+    activate pyqt5           (on Windows, or)
+    source activate pyqt5    (on OS X)
+
+Second, install PyQt5 in the new environment. (Make sure you have activated
+the `pyqt5` environment using the `activate pyqt5` command noted above). 
+Unfortunately, Anaconda doesn't have an official PyQt5 build at the moment, but 
+unofficial builds are available from the Anaconda Cloud. 
+You can see a list of unofficial builds here: https://anaconda.org/search?q=pyqt5
+
+You need to select a version that fits both your operating system (OSX/Windows),
+and your Python version. You can see the supported OS for each package in the
+right-most column. To see the supported Python version you have to click the 
+package, select the "Files" tab, and look at the file names.
+
+Here are some commands that have been shown to work, depending on your platform:
+
+OS X or Linux:
+    conda install -c https://conda.anaconda.org/spyder-ide pyqt5 python=3.5
+    conda install -c https://conda.anaconda.org/mmcauliffe pyqt5 python=3.4
+    conda install -c https://conda.anaconda.org/mmcauliffe pyqt5 python=2.7
+    conda install -c https://conda.anaconda.org/dsdale24 pyqt5 python=2.7
+
+Windows:
+    conda install -c https://conda.anaconda.org/inso pyqt5 python=3.5
+    conda install -c https://conda.anaconda.org/mmcauliffe pyqt5 python=3.5
+    conda install -c https://conda.anaconda.org/dsdale24 pyqt5 python=3.4
+
+Notes: 
+* If you get a "SegFault Error" when running cadnano 2.5, try removing pyqt5 
+(using ```conda uninstall pyqt5``` and then install a different pyqt5 version/build.
+* Before doing the step above, you may want to check if an official
+Anaconda pyqt5 build is available. You can check this simply using `conda search
+pyqt5` or `conda install pyqt5` (without the "-c" channel argument).
+
+
+There is an open issue on Anaconda to support PyQt5: 
+[ContinuumIO/anaconda-issues#138](https://github.com/ContinuumIO/anaconda-issues/issues/138).
+
+
+## Step 4b. PyQt5 Installation (manually, without Anaconda)
+
+If you do not have Anaconda, you have to install PyQt5 manually. This may be a bit
+tricky. Only do this if you know what you are doing.
+
+The requirements PyQt5 and sip are available from Riverbank Computing Limited at:
 
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
 
-### Windows
+### Windows:
 
 On Windows just download the installer from Riverbank computing for your python
 version.  We have no experience with other installation methods other than
 Anaconda for Windows. See below.
 
-### Mac and Linux
+### Mac and Linux:
 
 These instructions can work 10.10 Yosemite and  10.11 El Capitan
 under Xcode 7.0.1 and 6.5.  It has also been tested on Debian 7.9 Wheezy
@@ -75,32 +219,8 @@ your own
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful for some people.
 
-### Anaconda Installation
 
-First create a new conda environment. The default anaconda install typically
-have PyQt4 installed, and that doesn't always play well with PyQt5, so we need
-to create an empty one.
 
-(If you know what you are doing, you can omit the `--no-default-packages` flag.)
-
-    conda create --no-default-packages -n pyqt5 python=3
-
-followed by:
-
-    activate pyqt5
-
-Second, install PyQt5 in the new environment. (Make sure you have activated
-the `pyqt5` environment using the `activate` command). Unfortunately, Anaconda
-doesn't have an official PyQt5 build at the moment, but [`dsdale24` has 64-bit Win/OSX/Linux builds on his channel](https://anaconda.org/dsdale24/pyqt5).
-Install this using:
-
-    conda install -c https://conda.anaconda.org/dsdale24 pyqt5
-
-Note: Before doing the step above, you may want to check if an official
-Anaconda pyqt5 build is available. You can check this simply using `conda search
-pyqt5` or `conda install pyqt5`.
-
-There is an open issue on Anaconda to support PyQt5: [ContinuumIO/anaconda-issues#138](https://github.com/ContinuumIO/anaconda-issues/issues/138).
 
 # *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 
