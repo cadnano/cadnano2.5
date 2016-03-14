@@ -165,7 +165,6 @@ class PreXoverItem(QGraphicsPathItem):
         pxig = self.pre_xover_item_group
         if pxig.is_active:
             pxig.updateModelActiveBaseInfo(None)
-            pxig.resetAllItemsAppearance()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -268,7 +267,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.setPen(getNoPen())
         self.setZValue(styles.ZPXIGROUP)
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(virtual_helix_item.getProperty('eulerZ'))
+        self.setRotation(virtual_helix_item.getProperty('eulerZ') + 180) # add 180
     # end def
 
     ### ACCESSORS ###
@@ -383,24 +382,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state."""
         self.model_part.setActiveBaseInfo(pre_xover_info)
-    # end def
-
-    def updateViewActiveBase(self, new_active_item=None):
-        """Refresh appearance of items whose active state changed."""
-        if self.active_item:
-            self.active_item.updateItemApperance(False, show_3p=True)
-            self.active_wedge_gizmo.hide()
-        if new_active_item:
-            new_active_item.updateItemApperance(True, show_3p=True)
-            self.active_wedge_gizmo.showActive(new_active_item)
-            self.active_item = new_active_item
-    # end def
-
-    def resetAllItemsAppearance(self):
-        for item in self.fwd_prexover_items.values():
-            item.updateItemApperance(False, show_3p=False)
-        for item in self.rev_prexover_items.values():
-            item.updateItemApperance(False, show_3p=False)
     # end def
 
     def getItemsFacingNearAngle(self, angle):

@@ -22,7 +22,8 @@ def defaultProperties(id_num):
     ('name', "vh%d" % (id_num)),
     ('is_visible', True),
     ('color', '#00000000'),
-    ('eulerZ', 10.),
+    # ('eulerZ', 10.),
+    ('eulerZ', 0.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
     ('neighbors', '[]'),
@@ -699,23 +700,26 @@ class VirtualHelixGroup(CNObject):
             None
         """
         rad = self._radius
-        hp, twist_per_base, eulerZ = self.vh_properties.loc[id_num,
+        hp, twist_per_base, eulerZ, mgroove = self.vh_properties.loc[id_num,
                                                             ['helical_pitch',
                                                             'twist_per_base',
-                                                            'eulerZ']]
+                                                            'eulerZ', 'minor_groove_angle']]
         twist_per_base = math.radians(twist_per_base)
         eulerZ_new = math.radians(eulerZ) + twist_per_base*index
+        mgroove = math.radians(mgroove)
 
         fwd_angles = [i*twist_per_base + eulerZ_new for i in range(num_points)]
-        rev_angles = [a + math.pi for a in fwd_angles]
+        rev_angles = [a + mgroove for a in fwd_angles]
         z_pts = np.arange(index, num_points + index)
 
-        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
+        # invert the X coordinate for Right handed DNA
+        fwd_pts = rad*np.column_stack(( -np.cos(fwd_angles),
                                         np.sin(fwd_angles),
                                         np.zeros(num_points)))
         fwd_pts[:,2] = z_pts
 
-        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
+        # invert the X coordinate for Right handed DNA
+        rev_pts = rad*np.column_stack(( -np.cos(rev_angles),
                                         np.sin(rev_angles),
                                         np.zeros(num_points)))
         rev_pts[:,2] = z_pts

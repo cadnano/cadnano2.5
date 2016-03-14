@@ -112,61 +112,33 @@ class PreXoverManager(QGraphicsRectItem):
         # print("ACTIVATING neighbors", id_num, idx)
         if self.active_group is None:
             return
-        if id_num != self.active_group.id_num:
+        agroup = self.active_group
+        if id_num != agroup.id_num:
             raise ValueError("not active id_num {} != {}".format(id_num,
-                                                self.active_group.id_num))
-
+                                                agroup.id_num))
+        active_items = self._active_items
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is not None:
             apxi, npxig, neighbor_list = item
+            apxi.setActive3p(True)
+            agroup.active_wedge_gizmo.showActive(apxi)
+            active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))
             for k, npxi in enumerate(neighbor_list):
-                # npxi.activateNeighbor(pxi, shortcut=str(k))
-                # self.addKeyPress(k, npxi.getInfo())
-                # npxi.updateViewActiveBase(apxi)
                 npxi.setActive3p(True)
                 npxig.active_wedge_gizmo.showActive(npxi)
-                self._active_items.append(npxi)
-
+                active_items.append(npxi)
     # end def
 
     def deactivateNeighbors(self):
-        # self._key_press_dict = {}
         if self.active_neighbor_group is None:
             return
         self.active_neighbor_group.active_wedge_gizmo.hide()
+        self.active_neighbor_group = None
         while self._active_items:
             npxi = self._active_items.pop()
             npxi.setActive3p(False)
             npxi.setActive5p(False)
-
-    # def updateNeighborsNearActiveBase(self, item, is_active):
-    #     """Update part prop to reflect VHs near the active (hovered) phos."""
-    #     _vh = self._virtual_helix
-    #     if not is_active:
-    #         _vh.part().setProperty('neighbor_active_angle', '')
-    #         return
-
-    #     facing_angle = item.facing_angle()
-    #     ret = []
-    #     span = self.partCrossoverSpanAngle()/2
-    #     neighbors = _vh.getProperty('neighbors').split()
-    #     for n in neighbors:
-    #         n_name, n_angle = n.split(':')
-    #         n_angle = int(n_angle)
-    #         d = n_angle-facing_angle
-    #         if 180-abs(abs(d)-180)<span:
-    #             ret.append('%s:%d' % (n_name, n_angle+d))
-    #     _vh.part().setProperty('neighbor_active_angle', ' '.join(ret))
-
-    # def foo():
-    #     if new_value:
-    #         local_angle = (int(new_value)+180) % 360
-    #         fwd_items, rev_items = pxig.getItemsFacingNearAngle(local_angle)
-    #         for item in fwd_items + rev_items:
-    #             item.updateItemApperance(True, show_3p=False)
-    #     else:
-    #         pxig.resetAllItemsAppearance()
-
+    # end def
 # end class
