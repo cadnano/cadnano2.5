@@ -1232,7 +1232,7 @@ class VirtualHelixGroup(CNObject):
             twist_per_base, eulerZ, bpr, mgroove = self.vh_properties.loc[neighbor_id,
                                                         ['twist_per_base', 'eulerZ',
                                                         'bases_per_repeat', 'minor_groove_angle']]
-            half_period = math.ceil(bpr / 2)
+            half_period = math.floor(bpr / 2)
             tpb = math.radians(twist_per_base)
             eulerZ = math.radians(eulerZ)
             mgroove = math.radians(mgroove)

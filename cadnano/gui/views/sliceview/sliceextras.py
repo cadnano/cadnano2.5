@@ -59,7 +59,7 @@ class PropertyWrapperObject(QObject):
         color = QColor(self.item.pen().color())
         color.setAlpha(alpha)
         pen.setColor(color)
-        self._item.setPen(pen)
+        self.item.setPen(pen)
 
     def saveRef(self, property_name, animation):
         self.animations[property_name] = animation
@@ -137,9 +137,6 @@ class PreXoverItem(QGraphicsPathItem):
         facing_angle = self.pre_xover_item_group.eulerZAngle() + self.rotation()
         return facing_angle % 360
 
-    def color(self):
-        return self._color
-
     def getInfo(self):
         """
         Returns:
@@ -159,12 +156,16 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self.pre_xover_item_group.updateModelActiveBaseInfo(self.getInfo())
+        pxig = self.pre_xover_item_group
+        if pxig.is_active:
+            pxig.updateModelActiveBaseInfo(self.getInfo())
     # end def
 
     def hoverLeaveEvent(self, event):
-        self.pre_xover_item_group.updateModelActiveBaseInfo(None)
-        self.pre_xover_item_group.resetAllItemsAppearance()
+        pxig = self.pre_xover_item_group
+        if pxig.is_active:
+            pxig.updateModelActiveBaseInfo(None)
+            pxig.resetAllItemsAppearance()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -249,13 +250,15 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     HUE_FACTOR = 1.6
     SPIRAL_FACTOR = 0.4
 
-    def __init__(self, radius, rect, virtual_helix_item):
+    def __init__(self, radius, rect, virtual_helix_item, is_active):
         super(PreXoverItemGroup, self).__init__(rect, virtual_helix_item)
         self._radius = radius
         self._rect = rect
         self.virtual_helix_item = virtual_helix_item
         self.model_part = virtual_helix_item.part()
         self.id_num = virtual_helix_item.idNum()
+        self.is_active = is_active
+
         self.active_item = None
         self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
         self.fwd_prexover_items = {}
@@ -279,6 +282,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             return items[step_idx]
         else:
             return None
+    # end def
+
+    def getItemIdx(self, is_fwd, idx):
+        step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
+        return self.getItem(is_fwd, idx % step_size)
     # end def
 
     ### EVENT HANDLERS ###
@@ -407,6 +415,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 # end class
 
+
+
 class WedgeGizmo(QGraphicsPathItem):
     def __init__(self, radius, rect, pre_xover_item_group):
         """ parent could be a PreXoverItemGroup or a VirtualHelixItem
@@ -485,7 +495,7 @@ class WedgeGizmo(QGraphicsPathItem):
         pxi = pre_xover_item
         pos = pxi.pos()
         angle = -pxi.rotation()
-        color = pxi.color()
+        color = pxi.color
         # self.showWedge(angle, color, span=5.0)
         if pxi.is_fwd:
             self.showWedge(angle, color, extended=True, rev_gradient=True)

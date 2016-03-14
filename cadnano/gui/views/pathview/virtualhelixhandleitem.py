@@ -56,7 +56,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._hover_rect = QRectF(_RECT)
         # self.show()
 
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self)
+        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self, False)
         _pxig.setTransformOriginPoint(_RECT.center())
 
     # end def

@@ -131,9 +131,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pxom = self.prexover_manager
         if info is not None:
             id_num, is_fwd, idx, _ = info
-            # pxom.activateNeighbors(id_num, is_fwd, idx)
+            pxom.activateNeighbors(id_num, is_fwd, idx)
         else:
-            # pxom.deactivateNeighbors()
+            # pass
+            pxom.deactivateNeighbors()
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
