@@ -265,7 +265,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._colors = self._getColors()
         self.addItems()
         self.setPen(getNoPen())
-        self.setZValue(styles.ZPXIGROUP)
+        z = styles.ZPXIGROUP + 10 if is_active else styles.ZPXIGROUP
+        self.setZValue(z)
         self.setTransformOriginPoint(rect.center())
         self.setRotation(-virtual_helix_item.getProperty('eulerZ')) # add 180
     # end def
@@ -399,7 +400,7 @@ class WedgeGizmo(QGraphicsPathItem):
         self._rect = rect
         self.pre_xover_item_group = pre_xover_item_group
         self.setPen(getNoPen())
-        self.setZValue(styles.ZWEDGEGIZMO)
+        self.setZValue(styles.ZWEDGEGIZMO-10)
         self._last_params = None
 
     def showWedge(self, angle, color,
@@ -464,11 +465,17 @@ class WedgeGizmo(QGraphicsPathItem):
         self.showWedge(*self._last_params)
     # end def
 
+    def deactivate(self):
+        self.hide()
+        self.setZValue(styles.ZWEDGEGIZMO - 10)
+    # end def
+
     def showActive(self, pre_xover_item):
         pxi = pre_xover_item
         pos = pxi.pos()
         angle = -pxi.rotation()
         color = pxi.color
+        self.setZValue(styles.ZWEDGEGIZMO)
         # self.showWedge(angle, color, span=5.0)
         if pxi.is_fwd:
             self.showWedge(angle, color, extended=True, rev_gradient=True)

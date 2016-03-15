@@ -38,6 +38,8 @@ class PreXoverManager(QGraphicsRectItem):
         self._active_items = []
         self.prexover_item_map = {}
         self.neighbor_prexover_items = {}
+        if self.virtual_helix_item is not None:
+            self.virtual_helix_item.setZValue(styles.ZSLICEHELIX)
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, per_neighbor_hits):
@@ -53,6 +55,8 @@ class PreXoverManager(QGraphicsRectItem):
         self.active_group = agroup = PreXoverItemGroup(_RADIUS, WEDGE_RECT,
                                                     virtual_helix_item, True)
         id_num = virtual_helix_item.idNum()
+        virtual_helix_item.setZValue(styles.ZSLICEHELIX + 10)
+
         fwd_st_type, rev_st_type = True, False  # for clarity in the call to constructors
         for neighbor_id, hits in per_neighbor_hits.items():
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
@@ -131,14 +135,14 @@ class PreXoverManager(QGraphicsRectItem):
                 angle -= npxi.rotation()
                 npxi.setActive5p(True)
                 active_items.append(npxi)
-            npxig.active_wedge_gizmo.showWedge(angle/(1+k), color,
-                                        extended=True, rev_gradient=True)
+            # npxig.active_wedge_gizmo.showWedge(angle/(1+k), color,
+            #                             extended=True, rev_gradient=True)
     # end def
 
     def deactivateNeighbors(self):
         if self.active_neighbor_group is None:
             return
-        self.active_neighbor_group.active_wedge_gizmo.hide()
+        self.active_neighbor_group.active_wedge_gizmo.deactivate()
         self.active_neighbor_group = None
         while self._active_items:
             npxi = self._active_items.pop()

@@ -18,7 +18,7 @@ from .sliceextras import PreXoverItemGroup, WedgeGizmo, WEDGE_RECT
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 _FONT = styles.SLICE_NUM_FONT
-_ZVALUE = styles.ZSLICEHELIX + 3
+_ZVALUE = styles.ZSLICEHELIX
 _OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 

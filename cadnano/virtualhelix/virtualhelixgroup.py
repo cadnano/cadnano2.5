@@ -1246,8 +1246,8 @@ class VirtualHelixGroup(CNObject):
                                                         'bases_per_repeat', 'minor_groove_angle']]
             half_period = math.floor(bpr / 2)
             tpb = math.radians(twist_per_base)
-            eulerZ = math.radians(eulerZ)
-            mgroove = math.radians(mgroove)
+            eulerZ = math.radians(eulerZ) + TWOPI
+            mgroove = math.radians(mgroove) + TWOPI
 
             offset, size = self.getOffsetAndSize(neighbor_id)
 
@@ -1262,6 +1262,8 @@ class VirtualHelixGroup(CNObject):
                 self.delta3D_scratch = delta = np.empty((len_neighbor_pts,), dtype=float)
 
             fwd_axis_hits = []
+            angleRangeCheck = self.angleRangeCheck
+            angleNormalize = self.angleNormalize
             for i, point in enumerate(this_fwd_pts):
                 difference = naxis_pts - point
                 inner1d(difference, difference, out=delta)
@@ -1282,16 +1284,14 @@ class VirtualHelixGroup(CNObject):
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle + TWOPI) % TWOPI
+                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
                     # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
                     #         (math.degrees(relative_angle), math.degrees(eulerZ), math.degrees(native_angle)))
 
-                    angleRangeCheck = self.angleRangeCheck
-
-                    all_fwd_angles = [(j, (eulerZ + tpb*j + TWOPI) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + mgroove + TWOPI) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
@@ -1315,13 +1315,12 @@ class VirtualHelixGroup(CNObject):
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle + TWOPI) % TWOPI
+                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
 
-                    angleRangeCheck = self.angleRangeCheck
-                    all_fwd_angles = [(j, (eulerZ + tpb*j + TWOPI) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + mgroove + TWOPI) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
@@ -1329,6 +1328,14 @@ class VirtualHelixGroup(CNObject):
         # end for
         return per_neighbor_hits
     # end def
+
+    @staticmethod
+    def angleNormalize(angle):
+        """ ensure angle is normalized to [0, 2*PI]
+        angle (float): radians
+        """
+        TWOPI = 2*3.141592653589793
+        return ((angle % TWOPI) + TWOPI) % TWOPI
 
     @staticmethod
     def angleRangeCheck(angle, target_angle, theta):
@@ -1363,25 +1370,25 @@ class VirtualHelixGroup(CNObject):
         return theta, math.sqrt(R*R + x*x)
     # end def
 
-    def indexToAngle(self, id_num, idx):
-        """
-        Args:
-            id_num (int): virtual helix ID number
-        """
-        tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
-        twist_per_base = math.radians(twist_per_base)
-        return eulerZ + twist_per_base*idx
-    # end def
+    # def indexToAngle(self, id_num, idx):
+    #     """
+    #     Args:
+    #         id_num (int): virtual helix ID number
+    #     """
+    #     tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
+    #     twist_per_base = math.radians(twist_per_base)
+    #     return eulerZ + twist_per_base*idx
+    # # end def
 
-    def angleBetweemPoints(self, id_num, idx):
-        """
-        Args:
-            id_num (int): virtual helix ID number
-        """
-        tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
-        twist_per_base = math.radians(twist_per_base)
-        return eulerZ + twist_per_base*idx
-    # end def
+    # def angleBetweemPoints(self, id_num, idx):
+    #     """
+    #     Args:
+    #         id_num (int): virtual helix ID number
+    #     """
+    #     tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
+    #     twist_per_base = math.radians(twist_per_base)
+    #     return eulerZ + twist_per_base*idx
+    # # end def
 
     def projectionPointOnPlane(self, id_num, point):
         """ VirtualHelices are straight for now so only one direction for the axis
