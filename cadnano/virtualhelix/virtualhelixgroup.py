@@ -1226,7 +1226,7 @@ class VirtualHelixGroup(CNObject):
         normalize = self.normalize
         PI = math.pi
         TWOPI = 2*PI
-        RADIUS = self._RADIUS
+        RADIUS = self._radius
         BW = self._BASE_WIDTH
         bases_per_turn = self.vh_properties.loc[id_num, ['bases_per_turn']]
         theta, radius = self.radiusForAngle(alpha, RADIUS, bases_per_turn, BW)
@@ -1239,6 +1239,7 @@ class VirtualHelixGroup(CNObject):
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
         # for now just looks against everything
         # rsquared1 = RADIUS*RADIUS + BASE_WIDTH*BASE_WIDTH/4
+        print("THE search radius", radius, RADIUS)
         rsquared2 = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
@@ -1278,12 +1279,12 @@ class VirtualHelixGroup(CNObject):
                     # project point onto plane normal to axis
                     v1 = v1 - dot(v1, direction)*direction
 
-                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
+                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] + neighbor_axis_pt)
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
-                    print(id_num, 'f', relative_angle)
+                    # print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
                     # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
@@ -1314,7 +1315,7 @@ class VirtualHelixGroup(CNObject):
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
-                    print(id_num, 'r', relative_angle, v1, v2)
+                    # print(id_num, 'r', relative_angle, v1, v2)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
 
@@ -1368,8 +1369,10 @@ class VirtualHelixGroup(CNObject):
         """
         theta = math.radians(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-        x = base_width*(angle/2/360*bases_per_turn)
-        return theta, math.sqrt(R*R + x*x)
+        # x = base_width*(angle/2/360*bases_per_turn)
+        x = 0
+        # return theta, math.sqrt(R*R + x*x)
+        return theta, 1.125
     # end def
 
     # def indexToAngle(self, id_num, idx):
