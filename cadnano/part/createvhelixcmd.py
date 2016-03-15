@@ -20,7 +20,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         origin_pt = self.origin_pt
         # need to always reserve an id
-        part.createHelix(id_num, origin_pt, (1, 0, 0), self.length, self.color)
+        part.createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
         if not self.neighbors:
             self.neighbors = part.getVirtualHelixOriginNeighbors(id_num, self.threshold)

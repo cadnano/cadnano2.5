@@ -42,7 +42,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
 
-        part.createHelix(id_num, self.origin_pt, (1, 0, 0), self.length)
+        part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length)
         part.partVirtualHelixAddedSignal.emit(part, id_num, self.neighbors)
         part.partActiveSliceResizeSignal.emit(part)
     # end def

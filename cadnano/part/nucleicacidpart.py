@@ -62,7 +62,7 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         self._group_properties["name"] = "NaPart%d" % self._count()
         self._group_properties['active_phos'] = None
-        self._group_properties['crossover_span_angle'] = 20#45
+        self._group_properties['crossover_span_angle'] = 45
         self._group_properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._group_properties['neighbor_active_angle'] = ''
     # end def

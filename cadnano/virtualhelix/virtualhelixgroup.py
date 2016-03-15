@@ -1283,7 +1283,7 @@ class VirtualHelixGroup(CNObject):
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
-
+                    print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
                     # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
@@ -1314,7 +1314,7 @@ class VirtualHelixGroup(CNObject):
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
-
+                    print(id_num, 'r', relative_angle, v1, v2)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
 
@@ -1323,6 +1323,7 @@ class VirtualHelixGroup(CNObject):
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
+                    # print(math.degrees(native_angle), 'r', [math.degrees(x) for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ])
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
             per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
