@@ -125,10 +125,14 @@ class PreXoverManager(QGraphicsRectItem):
             active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))
+            color = neighbor_list[0].color
+            angle = 0
             for k, npxi in enumerate(neighbor_list):
-                npxi.setActive3p(True)
-                npxig.active_wedge_gizmo.showActive(npxi)
+                angle -= npxi.rotation()
+                npxi.setActive5p(True)
                 active_items.append(npxi)
+            npxig.active_wedge_gizmo.showWedge(angle/(1+k), color,
+                                        extended=True, rev_gradient=True)
     # end def
 
     def deactivateNeighbors(self):

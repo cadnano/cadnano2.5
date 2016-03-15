@@ -267,12 +267,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.setPen(getNoPen())
         self.setZValue(styles.ZPXIGROUP)
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(virtual_helix_item.getProperty('eulerZ') + 180) # add 180
+        self.setRotation(-virtual_helix_item.getProperty('eulerZ')) # add 180
     # end def
 
     ### ACCESSORS ###
     def eulerZAngle(self):
-        return self.virtual_helix_item.getProperty('eulerZ')
+        return -self.virtual_helix_item.getProperty('eulerZ')
     # end def
 
     def getItem(self, is_fwd, step_idx):
@@ -300,14 +300,15 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
         radius = self._radius
-        step_size, twist, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
+        step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
         iw = PXI_PP_ITEM_WIDTH
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
         y = ctr.y()
-
+        tpb = -tpb # Qt +angle is Clockwise
+        mgroove = -mgroove
         for i in range(step_size):
             inset = i*self.SPIRAL_FACTOR # spiral layout
             fwd = PreXoverItem(i, self._colors[i], self, is_fwd=True)
@@ -316,8 +317,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             rev.setPos(x - inset, y)
             fwd.setTransformOriginPoint((-radius + iw + inset), 0)
             rev.setTransformOriginPoint((-radius + iw + inset), 0)
-            fwd.setRotation(round((i*twist) % 360, 3))
-            rev.setRotation(round((i*twist + mgroove) % 360, 3))
+            fwd.setRotation(round((i*tpb) % 360, 3))
+            rev.setRotation(round((i*tpb + mgroove) % 360, 3))
             fwd.setBondLineLength(inset + iw)
             rev.setBondLineLength(inset + iw)
             self.fwd_prexover_items[i] = fwd
@@ -356,16 +357,18 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def updateTurnsPerRepeat(self):
-        step_size, twist, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
+        step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
+        mgroove = -mgroove
+        tpb = -tpb
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
         for i in range(step_size):
             fwd = self.fwd_prexover_items[i]
             rev = self.rev_prexover_items[i]
-            fwd.setRotation(round((i*twist_per_base) % 360, 3))
-            rev.setRotation(round((i*twist_per_base + mgroove) % 360, 3))
+            fwd.setRotation(round((i*tpb) % 360, 3))
+            rev.setRotation(round((i*tpb + mgroove) % 360, 3))
         for i in range(step_size - 1):
             fwd, next_fwd = fpxis[i], fpxis[i + 1]
             j = (step_size - 1) - i
@@ -382,17 +385,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state."""
         self.model_part.setActiveBaseInfo(pre_xover_info)
-    # end def
-
-    def getItemsFacingNearAngle(self, angle):
-        span = self.virtual_helix_item.partCrossoverSpanAngle() / 2
-        fwd = list(filter(lambda p: \
-                            180 - abs(abs(p.facingAngle() - angle) - 180) < span,\
-                            self.fwd_prexover_items.values()))
-        rev = list(filter(lambda p: \
-                            180 - abs(abs(p.facingAngle() - angle) - 180)< span,\
-                            self.rev_prexover_items.values()))
-        return (fwd, rev)
     # end def
 # end class
 

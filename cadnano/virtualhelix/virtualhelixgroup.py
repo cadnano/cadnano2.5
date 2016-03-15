@@ -22,7 +22,7 @@ def defaultProperties(id_num):
     ('name', "vh%d" % (id_num)),
     ('is_visible', True),
     ('color', '#00000000'),
-    # ('eulerZ', 10.),
+    # ('eulerZ', -10.),
     ('eulerZ', 0.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
@@ -32,8 +32,8 @@ def defaultProperties(id_num):
     ('repeats', 2),
     ('helical_pitch', 1.),
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
-    ('twist_per_base', 360 / 10.5), # 360/_bases_per_turn
-    ('minor_groove_angle', 171)
+    ('twist_per_base', -360. / 10.5), # 360/_bases_per_turn
+    ('minor_groove_angle', -171.)
     ]
     return tuple(zip(*props))
 # end def
@@ -704,6 +704,14 @@ class VirtualHelixGroup(CNObject):
                                                             ['helical_pitch',
                                                             'twist_per_base',
                                                             'eulerZ', 'minor_groove_angle']]
+        """
+        + angle is CCW
+        - angle is CW
+        Right handed DNA rotates clockwise from 5' to 3'
+        we use the convention the 5' end starts at 0 degrees
+        and it's pair is minor_groove_angle degrees away
+        direction, hence the minus signs.  eulerZ
+        """
         twist_per_base = math.radians(twist_per_base)
         eulerZ_new = math.radians(eulerZ) + twist_per_base*index
         mgroove = math.radians(mgroove)
@@ -713,13 +721,13 @@ class VirtualHelixGroup(CNObject):
         z_pts = np.arange(index, num_points + index)
 
         # invert the X coordinate for Right handed DNA
-        fwd_pts = rad*np.column_stack(( -np.cos(fwd_angles),
+        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
                                         np.sin(fwd_angles),
                                         np.zeros(num_points)))
         fwd_pts[:,2] = z_pts
 
         # invert the X coordinate for Right handed DNA
-        rev_pts = rad*np.column_stack(( -np.cos(rev_angles),
+        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
                                         np.sin(rev_angles),
                                         np.zeros(num_points)))
         rev_pts[:,2] = z_pts
@@ -1274,16 +1282,16 @@ class VirtualHelixGroup(CNObject):
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle) % TWOPI
+                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle + TWOPI) % TWOPI
                     # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
                     #         (math.degrees(relative_angle), math.degrees(eulerZ), math.degrees(native_angle)))
 
                     angleRangeCheck = self.angleRangeCheck
 
-                    all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, (eulerZ + tpb*j + TWOPI) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + mgroove) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, (x + mgroove + TWOPI) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
@@ -1307,12 +1315,13 @@ class VirtualHelixGroup(CNObject):
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
 
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle) % TWOPI
+                    native_angle = (eulerZ + tpb*neighbor_min_delta_idx + relative_angle + TWOPI) % TWOPI
+
                     angleRangeCheck = self.angleRangeCheck
-                    all_fwd_angles = [(j, (eulerZ + tpb*j) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, (eulerZ + tpb*j + TWOPI) % TWOPI) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
-                    all_rev_angles = [(j, (x + mgroove) % TWOPI) for j, x in all_fwd_angles]
+                    all_rev_angles = [(j, (x + mgroove + TWOPI) % TWOPI) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
