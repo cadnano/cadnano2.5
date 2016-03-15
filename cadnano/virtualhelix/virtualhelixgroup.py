@@ -737,6 +737,7 @@ class VirtualHelixGroup(CNObject):
 
         # create scratch array for stashing intermediate results
         scratch = np.zeros((3, num_points), dtype=float)
+
         # rotate about 0 index and then translate
         m = self.makeRotation((1, 0, 0), direction)
 
@@ -1201,7 +1202,7 @@ class VirtualHelixGroup(CNObject):
         Args:
             id_num (int): virtual helix ID number
             neighbors (sequence): neighbors of id_num
-            alpha (float): angle (radians) commensurate with radius
+            alpha (float): angle (degrees) commensurate with radius
             index_slice (Optional[tuple]): (start_index, length) into a virtual
                 helix
 
@@ -1246,8 +1247,8 @@ class VirtualHelixGroup(CNObject):
                                                         'bases_per_repeat', 'minor_groove_angle']]
             half_period = math.floor(bpr / 2)
             tpb = math.radians(twist_per_base)
-            eulerZ = math.radians(eulerZ) + TWOPI
-            mgroove = math.radians(mgroove) + TWOPI
+            eulerZ = math.radians(eulerZ)
+            mgroove = math.radians(mgroove)
 
             offset, size = self.getOffsetAndSize(neighbor_id)
 

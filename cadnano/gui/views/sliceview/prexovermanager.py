@@ -129,7 +129,7 @@ class PreXoverManager(QGraphicsRectItem):
             active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))
-            color = neighbor_list[0].color
+            color = neighbor_list[0].color if neighbor_list else '#aaaaa'
             angle = 0
             for k, npxi in enumerate(neighbor_list):
                 angle -= npxi.rotation()

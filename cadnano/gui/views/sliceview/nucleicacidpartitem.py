@@ -219,14 +219,22 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             vh_i.virtualHelixPropertyChangedSlot(keys, values)
     # end def
 
-    def partVirtualHelixAddedSlot(self, sender, id_num):
+    def partVirtualHelixAddedSlot(self, sender, id_num, neighbors):
         # TODO test to see if self._virtual_helix_hash is necessary
         vhi = VirtualHelixItem(id_num, self)
         self._virtual_helix_item_hash[id_num] = vhi
+        self._refreshVirtualHelixItemGizmos(id_num, vhi)
+        for neighbor_id in neighbors:
+            nvhi = self._virtual_helix_item_hash[neighbor_id]
+            self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+        # print(neighbors)
     # end def
 
-    def partVirtualHelixRemovedSlot(self, sender, id_num):
+    def partVirtualHelixRemovedSlot(self, sender, id_num, neighbors):
         self.removeVirtualHelixItem(id_num)
+        for neighbor_id in neighbors:
+            nvhi = self._virtual_helix_item_hash[neighbor_id]
+            self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
     # end def
 
     def updatePreXoverItemsSlot(self, sender, virtual_helix):

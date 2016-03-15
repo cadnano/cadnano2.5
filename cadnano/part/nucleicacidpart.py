@@ -3,6 +3,7 @@ from collections import defaultdict
 from heapq import heapify, heappush, heappop
 from itertools import product, islice
 from uuid import uuid4
+from ast import literal_eval
 izip = zip
 
 from cadnano import util
@@ -61,7 +62,7 @@ class NucleicAcidPart(Part):
         # Properties (NucleicAcidPart-specific)
         self._group_properties["name"] = "NaPart%d" % self._count()
         self._group_properties['active_phos'] = None
-        self._group_properties['crossover_span_angle'] = 45
+        self._group_properties['crossover_span_angle'] = 20#45
         self._group_properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._group_properties['neighbor_active_angle'] = ''
     # end def
@@ -152,7 +153,8 @@ class NucleicAcidPart(Part):
 
 
         """
-        neighbors = self.getVirtualHelixOriginNeighbors(id_num, 2.1*self._RADIUS)
+        # neighbors = self.getVirtualHelixOriginNeighbors(id_num, 2.1*self._RADIUS)
+        neighbors = literal_eval(self.vh_properties.loc[id_num, 'neighbors'])
         # hit_radius = self.radiusForAngle(60, self._RADIUS, self._BASE_WIDTH)
         alpha = self.getProperty('crossover_span_angle')
         per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors, alpha, index_slice=None)

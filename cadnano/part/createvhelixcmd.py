@@ -1,3 +1,5 @@
+from ast import literal_eval
+import bisect
 from cadnano.cnproxy import UndoCommand
 from cadnano.virtualhelix import VirtualHelixGroup
 
@@ -9,6 +11,8 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.origin_pt = (x, y, 0.)
         self.length = length
         self.color = part.getColor()
+        self.neighbors = []
+        self.threshold = 2.1*part.radius()
     # end def
 
     def redo(self):
@@ -17,7 +21,20 @@ class CreateVirtualHelixCommand(UndoCommand):
         origin_pt = self.origin_pt
         # need to always reserve an id
         part.createHelix(id_num, origin_pt, (1, 0, 0), self.length, self.color)
-        part.partVirtualHelixAddedSignal.emit(part, id_num)
+
+        if not self.neighbors:
+            self.neighbors = part.getVirtualHelixOriginNeighbors(id_num, self.threshold)
+
+        neighbors = self.neighbors
+        part.vh_properties.loc[id_num, 'neighbors'] = str(list(neighbors))
+        for neighbor_id in neighbors:
+            nneighbors = literal_eval(
+                part.getVirtualHelixProperties(neighbor_id, 'neighbors')
+            )
+            bisect.insort_left(nneighbors, id_num)
+            part.vh_properties.loc[neighbor_id, 'neighbors'] =str(list(nneighbors))
+
+        part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
         part.partActiveSliceResizeSignal.emit(part)
     # end def
 
@@ -25,7 +42,14 @@ class CreateVirtualHelixCommand(UndoCommand):
         part = self.part
         id_num = self.id_num
         # since we're hashing on the object in the views do this first
-        part.partVirtualHelixRemovedSignal.emit(part, id_num)
+        for neighbor_id in self.neighbors:
+            nneighbors = literal_eval(
+                            part.getVirtualHelixProperties(neighbor_id, 'neighbors')
+                        )
+            nneighbors.remove(id_num)
+            part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
+
+        part.partVirtualHelixRemovedSignal.emit(part, id_num, self.neighbors)
         part.removeHelix(id_num)
         # clear out part references
         part.partActiveSliceResizeSignal.emit(part)
