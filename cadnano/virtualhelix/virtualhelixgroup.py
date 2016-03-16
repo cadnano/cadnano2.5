@@ -721,13 +721,13 @@ class VirtualHelixGroup(CNObject):
         z_pts = np.arange(index, num_points + index)
 
         # invert the X coordinate for Right handed DNA
-        fwd_pts = rad*np.column_stack(( -np.cos(fwd_angles),
+        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
                                         np.sin(fwd_angles),
                                         np.zeros(num_points)))
         fwd_pts[:,2] = z_pts
 
         # invert the X coordinate for Right handed DNA
-        rev_pts = rad*np.column_stack(( -np.cos(rev_angles),
+        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
                                         np.sin(rev_angles),
                                         np.zeros(num_points)))
         rev_pts[:,2] = z_pts
@@ -1278,18 +1278,23 @@ class VirtualHelixGroup(CNObject):
                     #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
-                    v1 = v1 - dot(v1, direction)*direction
+                    v1 = normalize(v1 - dot(v1, direction)*direction)
 
-                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] + neighbor_axis_pt)
+                    v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
                     # print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
-                    # print("relative_angle %0.2f, eulerZ: %02.f, native_angle: %0.2f" %
-                    #         (math.degrees(relative_angle), math.degrees(eulerZ), math.degrees(native_angle)))
+                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
+
+                    # print("FWD %d around %d relative_angle %0.2f, base_angle: %0.2f" %
+                    #     (   id_num, neighbor_id,
+                    #         math.degrees(relative_angle),
+                    #         math.degrees(angleNormalize(tpb*neighbor_min_delta_idx))
+                    #         ))
+                    # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
                     all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]
@@ -1310,7 +1315,7 @@ class VirtualHelixGroup(CNObject):
                     #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
-                    v1 = v1 - dot(v1, direction)*direction
+                    v1 = normalize(v1 - dot(v1, direction)*direction)
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
@@ -1318,7 +1323,14 @@ class VirtualHelixGroup(CNObject):
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
                     # print(id_num, 'r', relative_angle, v1, v2)
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx + relative_angle)
+                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
+
+                    # print("REV %d around %d relative_angle %0.2f, base_angle: %0.2f" %
+                    #     (   id_num, neighbor_id,
+                    #         math.degrees(relative_angle),
+                    #         math.degrees(angleNormalize(tpb*neighbor_min_delta_idx))
+                    #         ))
+                    # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
                     all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
                                                                                     min(neighbor_min_delta_idx + half_period, size)) ]

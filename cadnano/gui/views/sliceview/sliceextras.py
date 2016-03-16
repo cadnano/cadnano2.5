@@ -22,8 +22,8 @@ T90, T270 = QTransform(), QTransform()
 T90.rotate(90)
 T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
-FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
-REVPXI_PP.addPolygon(T270.map(TRIANGLE))
+FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
+REVPXI_PP.addPolygon(T90.map(TRIANGLE))
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _WEDGE_RECT_GAIN = 0.25
@@ -185,14 +185,17 @@ class PreXoverItem(QGraphicsPathItem):
         if bond is None: return
 
         if is_active:
-            angle = 90 if self.is_fwd else -90
+            # print("ENTERING", self.step_idx)
+            # angle = 90 if self.is_fwd else -90
+            angle = -90 if self.is_fwd else 90
             self.animate(phos, 'rotation', 300, 0, angle)
             bond.show()
-            if self.item_5p:
-                self.item_5p.line_3p.hide()
+            # if self.item_5p:
+            #     self.item_5p.line_3p.hide()
             self.animate(bond, 'bondp2', 300, self._default_p2_5p, self._active_p2_5p)
         else:
-            QTimer.singleShot(300, bond.hide)
+            # print("LEAVING", self.step_idx)
+            # QTimer.singleShot(300, bond.hide)
             self.animate(phos, 'rotation', 300, phos.rotation(), 0)
             if self.item_5p: QTimer.singleShot(300, self.item_5p.line_3p.show)
             self.animate(bond, 'bondp2', 300, self._active_p2_5p, self._default_p2_5p)
@@ -204,7 +207,8 @@ class PreXoverItem(QGraphicsPathItem):
         if self.line_5p:
             self.line_5p.hide()
         if is_active:
-            angle = -90 if self.is_fwd else 90
+            # angle = -90 if self.is_fwd else 90
+            angle = 90 if self.is_fwd else -90
             self.animate(phos, 'rotation', 300, 0, angle)
             self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
             alpha = 42 if self.is_fwd else 64
@@ -268,7 +272,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         z = styles.ZPXIGROUP + 10 if is_active else styles.ZPXIGROUP
         self.setZValue(z)
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(-virtual_helix_item.getProperty('eulerZ')+180) # add 180
+        self.setRotation(-virtual_helix_item.getProperty('eulerZ')) # add 180
     # end def
 
     ### ACCESSORS ###
@@ -308,8 +312,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
         y = ctr.y()
-        # tpb = -tpb # Qt +angle is Clockwise
-        # mgroove = -mgroove
+        tpb = -tpb # Qt +angle is Clockwise
+        mgroove = -mgroove
         for i in range(step_size):
             inset = i*self.SPIRAL_FACTOR # spiral layout
             fwd = PreXoverItem(i, self._colors[i], self, is_fwd=True)
@@ -361,8 +365,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
-        # mgroove = -mgroove
-        # tpb = -tpb
+        mgroove = -mgroove
+        tpb = -tpb
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
         for i in range(step_size):
@@ -400,7 +404,7 @@ class WedgeGizmo(QGraphicsPathItem):
         self._rect = rect
         self.pre_xover_item_group = pre_xover_item_group
         self.setPen(getNoPen())
-        self.setZValue(styles.ZWEDGEGIZMO-10)
+        self.setZValue(styles.ZWEDGEGIZMO - 10)
         self._last_params = None
 
     def showWedge(self, angle, color,
