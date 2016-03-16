@@ -268,7 +268,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         z = styles.ZPXIGROUP + 10 if is_active else styles.ZPXIGROUP
         self.setZValue(z)
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(-virtual_helix_item.getProperty('eulerZ')) # add 180
+        self.setRotation(-virtual_helix_item.getProperty('eulerZ')+180) # add 180
     # end def
 
     ### ACCESSORS ###
@@ -308,8 +308,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
         y = ctr.y()
-        tpb = -tpb # Qt +angle is Clockwise
-        mgroove = -mgroove
+        # tpb = -tpb # Qt +angle is Clockwise
+        # mgroove = -mgroove
         for i in range(step_size):
             inset = i*self.SPIRAL_FACTOR # spiral layout
             fwd = PreXoverItem(i, self._colors[i], self, is_fwd=True)
@@ -361,8 +361,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
                                                         'twist_per_base',
                                                         'minor_groove_angle'])
-        mgroove = -mgroove
-        tpb = -tpb
+        # mgroove = -mgroove
+        # tpb = -tpb
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
         for i in range(step_size):

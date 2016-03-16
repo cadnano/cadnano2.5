@@ -32,8 +32,8 @@ def defaultProperties(id_num):
     ('repeats', 2),
     ('helical_pitch', 1.),
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
-    ('twist_per_base', -360. / 10.5), # 360/_bases_per_turn
-    ('minor_groove_angle', -171.)
+    ('twist_per_base', 360. / 10.5), # 360/_bases_per_turn
+    ('minor_groove_angle', 171.)
     ]
     return tuple(zip(*props))
 # end def
@@ -721,13 +721,13 @@ class VirtualHelixGroup(CNObject):
         z_pts = np.arange(index, num_points + index)
 
         # invert the X coordinate for Right handed DNA
-        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
+        fwd_pts = rad*np.column_stack(( -np.cos(fwd_angles),
                                         np.sin(fwd_angles),
                                         np.zeros(num_points)))
         fwd_pts[:,2] = z_pts
 
         # invert the X coordinate for Right handed DNA
-        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
+        rev_pts = rad*np.column_stack(( -np.cos(rev_angles),
                                         np.sin(rev_angles),
                                         np.zeros(num_points)))
         rev_pts[:,2] = z_pts
@@ -739,7 +739,8 @@ class VirtualHelixGroup(CNObject):
         scratch = np.zeros((3, num_points), dtype=float)
 
         # rotate about 0 index and then translate
-        m = self.makeRotation((1, 0, 0), direction)
+        m = self.makeRotation( (0, 0, 1), direction)
+        # print(m)
 
         np.add(np.dot(m, fwd_pts.T, out=scratch).T, origin, out=fwd_pts)
         np.add(np.dot(m, rev_pts.T, out=scratch).T, origin, out=rev_pts)
@@ -1239,7 +1240,7 @@ class VirtualHelixGroup(CNObject):
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
         # for now just looks against everything
         # rsquared1 = RADIUS*RADIUS + BASE_WIDTH*BASE_WIDTH/4
-        print("THE search radius", radius, RADIUS)
+        # print("THE search radius", radius, RADIUS)
         rsquared2 = radius*radius
         per_neighbor_hits = {}
         for neighbor_id in neighbors:
@@ -1369,10 +1370,10 @@ class VirtualHelixGroup(CNObject):
         """
         theta = math.radians(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-        # x = base_width*(angle/2/360*bases_per_turn)
+        x = base_width*(angle/2/360*bases_per_turn)
         x = 0
-        # return theta, math.sqrt(R*R + x*x)
-        return theta, 1.125
+        return theta, math.sqrt(R*R + x*x)
+        # return theta, 1.125
     # end def
 
     # def indexToAngle(self, id_num, idx):
