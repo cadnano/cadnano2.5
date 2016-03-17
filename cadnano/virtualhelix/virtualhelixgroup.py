@@ -1196,7 +1196,7 @@ class VirtualHelixGroup(CNObject):
         return fwd_hit_list, rev_hit_list
     # end def
 
-    def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index_slice=None):
+    def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
         """ Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
 
@@ -1220,7 +1220,16 @@ class VirtualHelixGroup(CNObject):
             None
         """
         offset, size = self.getOffsetAndSize(id_num)
-        start, length = 0, size if index_slice is None else index_slice
+        bases_per_turn, bpr = self.vh_properties.loc[id_num,
+                                    ['bases_per_turn', 'bases_per_repeat']]
+        if index is None:
+            start, length = 0, size
+        else:
+            half_period = bpr // 2
+            if size - index < bpr:
+                start, length = size - bpr, bpr
+            else:
+                start, length = max(index - half_period, 0), bases_per_turn
         norm = np.linalg.norm
         cross = np.cross
         dot = np.dot
@@ -1229,7 +1238,7 @@ class VirtualHelixGroup(CNObject):
         TWOPI = 2*PI
         RADIUS = self._radius
         BW = self._BASE_WIDTH
-        bases_per_turn = self.vh_properties.loc[id_num, ['bases_per_turn']]
+
         theta, radius = self.radiusForAngle(alpha, RADIUS, bases_per_turn, BW)
         # convert to a list since we can't speed this loop up without cython or something
         axis_pts = self.axis_pts

@@ -505,7 +505,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
             per_neighbor_hits = part.potentialCrossoverMap(id_num, idx)
-            self.prexover_manager.activateVirtualHelix(virtual_helix_item, per_neighbor_hits)
+            self.prexover_manager.activateVirtualHelix(virtual_helix_item, idx, per_neighbor_hits)
     # end def
 
     def updateXoverItems(self, virtual_helix_item):

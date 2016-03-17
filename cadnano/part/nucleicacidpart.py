@@ -153,11 +153,13 @@ class NucleicAcidPart(Part):
 
 
         """
-        # neighbors = self.getVirtualHelixOriginNeighbors(id_num, 2.1*self._RADIUS)
         neighbors = literal_eval(self.vh_properties.loc[id_num, 'neighbors'])
-        # hit_radius = self.radiusForAngle(60, self._RADIUS, self._BASE_WIDTH)
         alpha = self.getProperty('crossover_span_angle')
-        per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors, alpha, index_slice=None)
+
+        idx = None # FORCE this for now to prevent animation GC crashes
+
+        per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
+                                                        alpha, index=idx)
         return per_neighbor_hits
 
     # end def
