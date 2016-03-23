@@ -6,6 +6,9 @@ the dev branch is most up to date.
 and while master is stable, we will be updating master soon 
 with many new features.
 
+3/23/2016 Rasmus Scholer has written an installation guide in
+[his fork](https://github.com/scholer/cadnano2.5/tree/dnapart) of this repo. 
+
 ## Changes
 A number of organizational and style changes have occured from cadnano 2
 
