@@ -1,4 +1,6 @@
 # cadnano 2.5  (*radnano*)
+
+[![Join the chat at https://gitter.im/cadnano/cadnano2.5](https://badges.gitter.im/cadnano/cadnano2.5.svg)](https://gitter.im/cadnano/cadnano2.5?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 This is a development version of cadnano ported to `Qt5/PyQt5`, 
 the dev branch is most up to date.
 
