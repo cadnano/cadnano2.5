@@ -61,6 +61,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.setNumber()
         self._pen1, self._pen2 = (QPen(), QPen())
         self.createArrows()
+        self.is_active = False
         self.updateAppearance()
 
         self.show()
@@ -80,6 +81,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     def idNum(self):
         return self._id_num
     # end def
+
+    def activate(self):
+        self.is_active = True
+        self.updateAppearance()
+
+    def deactivate(self):
+        self.is_active = False
+        self.updateAppearance()
 
     def setCenterPos(self, x, y):
         # invert the y axis
@@ -169,8 +178,12 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.hide()
             return
 
-        self._USE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
-        self._OUT_OF_SLICE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
+        if self.is_active:
+            self._OUT_OF_SLICE_PEN = self._USE_PEN = getPenObj(styles.ACTIVE_STROKE,
+                                                                styles.SLICE_HELIX_STROKE_WIDTH)
+        else:
+            self._USE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._OUT_OF_SLICE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
 
         self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
 

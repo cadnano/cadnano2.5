@@ -279,7 +279,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):
-        if new_active_vhi != self.active_virtual_helix_item:
+        current_vhi = self.active_virtual_helix_item
+        if new_active_vhi != current_vhi:
+            if current_vhi is not None:
+                current_vhi.deactivate()
+            new_active_vhi.activate()
             self.active_virtual_helix_item = new_active_vhi
     # end def
 

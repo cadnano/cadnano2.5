@@ -241,7 +241,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self.setPen(pen)
         self.is_active = False
 
-
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         """
