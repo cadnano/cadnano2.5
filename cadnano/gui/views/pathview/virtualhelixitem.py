@@ -11,7 +11,8 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano import util
 from cadnano.enum import StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getNoPen, getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import ( newPenObj, getNoPen, getPenObj,
+                                getBrushObj, getNoBrush, getColorObj )
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .virtualhelixhandleitem import VirtualHelixHandleItem
@@ -54,6 +55,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         pen = newPenObj(styles.MINOR_GRID_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
         pen.setCosmetic(should_show_details)
         self.setPen(pen)
+
+        self.is_active = False
 
         self.refreshPath()
         self.setAcceptHoverEvents(True)  # for pathtools
@@ -225,6 +228,19 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Makes active the virtual helix associated with this item."""
         self.part().setActiveVirtualHelix(self._id_num, is_fwd, idx)
     # end def
+
+    def activate(self):
+        pen = self.pen()
+        pen.setColor(getColorObj(styles.MINOR_GRID_STROKE_ACTIVE))
+        self.setPen(pen)
+        self.is_active = True
+
+    def deactivate(self):
+        pen = self.pen()
+        pen.setColor(getColorObj(styles.MINOR_GRID_STROKE))
+        self.setPen(pen)
+        self.is_active = False
+
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
