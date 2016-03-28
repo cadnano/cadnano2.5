@@ -42,7 +42,7 @@ class PreXoverManager(QGraphicsRectItem):
             self.virtual_helix_item.setZValue(styles.ZSLICEHELIX)
     # end def
 
-    def activateVirtualHelix(self, virtual_helix_item, per_neighbor_hits):
+    def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits):
         """ Create PreXoverItemGroups for the active virtual_helix_item and it's
         neighbors and connect the neighboring bases
         """

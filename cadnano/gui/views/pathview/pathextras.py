@@ -30,6 +30,7 @@ FWDPHOS_PP, REVPHOS_PP = QPainterPath(), QPainterPath()
 FWDPHOS_PP.addPolygon(TRIANGLE)
 REVPHOS_PP.addPolygon(T180.map(TRIANGLE))
 
+KEYINPUT_ACTIVE_FLAG = QGraphicsItem.ItemIsFocusable
 
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
@@ -64,6 +65,8 @@ class PropertyWrapperObject(QObject):
         self.deleteLater()
 
     def resetAnimations(self):
+        for item in self.animations.values():
+            item.deleteLater()
         self.animations = {}
 
     brush_alpha = pyqtProperty(int, __get_brushAlpha, __set_brushAlpha)
@@ -77,40 +80,6 @@ class Triangle(QGraphicsPathItem):
         self.adapter = PropertyWrapperObject(self)
     # end def
 # end class
-
-
-class ActivePhosItem(QGraphicsPathItem):
-    def __init__(self, parent=None):
-        super(QGraphicsPathItem, self).__init__(parent)
-        self._parent = parent
-        self._part = parent.part()
-        self.adapter = PropertyWrapperObject(self)
-        self.setPen(getNoPen())
-        self.hide()
-    # end def
-
-    def getPath(self):
-        path = QPainterPath()
-        # _step = self._parent.getProperty('bases_per_repeat')
-        rect = QRectF(BASE_RECT)
-        path.addRect(rect)
-        return path
-    # end def
-
-    def resize(self):
-        self.setPath(self.getPath())
-
-    def update(self, is_fwd, step_idx, color):
-        if self.path().isEmpty():
-            self.setPath(self.getPath())
-        self.setBrush(getBrushObj(color, alpha=128))
-        x = BASE_WIDTH*step_idx
-        y = -BASE_WIDTH if is_fwd else BASE_WIDTH*2
-        self.setPos(x,y)
-        self.show()
-    # end def
-# end class
-
 
 class PreXoverLabel(QGraphicsSimpleTextItem):
     _XO_FONT = styles.XOVER_LABEL_FONT
@@ -185,7 +154,7 @@ class PreXoverItem(QGraphicsRectItem):
         self._bond_item.hide()
         self._label = PreXoverLabel(is_fwd, color, self)
         self._phos_item = Triangle(FWDPHOS_PP, self)
-
+        self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index,
                 to_vh_id_num, prexoveritemgroup, color)
     # end def
@@ -193,6 +162,7 @@ class PreXoverItem(QGraphicsRectItem):
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
                 to_vh_id_num, prexoveritemgroup, color):
         self.setParentItem(from_virtual_helix_item)
+        self.enableActive(False)
         self.resetTransform()
         self._from_vh_item = from_virtual_helix_item
         self._id_num = from_virtual_helix_item.idNum()
@@ -205,14 +175,13 @@ class PreXoverItem(QGraphicsRectItem):
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self.setLabel(text=lbt)
         self._label.resetItem(is_fwd, color)
-        self.setPen(getNoPen())
 
         self.adapter.resetAnimations()
 
         phos = self._phos_item
+        phos.adapter.resetAnimations()
         phos.resetTransform()
         phos.setPos(0, 0)
-        phos.adapter.resetAnimations()
 
         bonditem = self._bond_item
 
@@ -235,7 +204,12 @@ class PreXoverItem(QGraphicsRectItem):
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
         self.show()
 
-        self.setInstantActive(False)
+        if to_vh_id_num is not None:
+            inactive_alpha = PROX_ALPHA
+            self.setBrush(getBrushObj(color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+        else:
+            self.setBrush(getBrushObj(color, alpha=0))
     #end def
 
     def getInfo(self):
@@ -255,26 +229,30 @@ class PreXoverItem(QGraphicsRectItem):
         if scene:
             scene.removeItem(self._label)
             self._label = None
+            self._phos_item.adapter.resetAnimations()
             scene.removeItem(self._phos_item)
             self._phos_item = None
             scene.removeItem(self._bond_item)
             self._bond_item = None
+            self.adapter.resetAnimations()
             scene.removeItem(self)
-    # end def
-
-    def isFwd(self):
-        return self.is_fwd
-
-    def absoluteIdx(self):
-        vhi = self._from_vh_item
-        # id_num = vhi.idNum()
-        x, y, _z = vhi.part().getCoordinate(self._id_num, 0)
-        return self.baseIdx() + (_z / BASE_WIDTH)
-
-    def window(self):
-        return self._parent.window()
+    # end defS
 
     ### EVENT HANDLERS ###
+    def hoverEnterEvent(self, event):
+        """ Only if enableActive(True) is called
+        hover and key events disabled by default
+        """
+        self.setFocus(Qt.MouseFocusReason)
+        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
+        self.setActiveHovered(True)
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
+        self.setActiveHovered(False)
+        self.clearFocus()
+    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def setLabel(self, text=None, outline=False):
@@ -297,7 +275,7 @@ class PreXoverItem(QGraphicsRectItem):
         anim.start()
     # end def
 
-    def setInstantActive(self, is_active):
+    def setActiveHovered(self, is_active):
         if is_active:
             self.setBrush(getBrushObj(self._color, alpha=128))
             self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
@@ -308,33 +286,24 @@ class PreXoverItem(QGraphicsRectItem):
             self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
             self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
-# end class
 
-class ActivePreXoverItem(PreXoverItem):
-    def __init__(self, *args):
-        super(ActivePreXoverItem, self).__init__(*args)
-        self.setAcceptHoverEvents(True)
-        self.setFlags(QGraphicsItem.ItemIsFocusable)
-    # end def
+    def enableActive(self, is_active, to_vh_id_num=None):
+        """ Call on PreXoverItems created on the active VirtualHelixItem
+        """
+        if is_active:
+            self._to_vh_id_num = to_vh_id_num
+            self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
+            self.setLabel(text=lbt)
+            inactive_alpha = PROX_ALPHA
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
 
-    def hoverEnterEvent(self, event):
-        self.setFocus(Qt.MouseFocusReason)
-        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
-        self.setInstantActive(True)
-    # end def
+            self.setAcceptHoverEvents(True)
+            self.setFlag(KEYINPUT_ACTIVE_FLAG, True)
+        else:
+            self.setAcceptHoverEvents(False)
+            self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
 
-    def hoverLeaveEvent(self, event):
-        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
-        self.setInstantActive(False)
-        self.clearFocus()
-    # end def
-
-    def keyPressEvent(self, event):
-        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
-    # end def
-# end class
-
-class NeighborPreXoverItem(PreXoverItem):
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
         """ To be called with whatever the active_prexoveritem
         is for the parts `active_base`
@@ -343,7 +312,7 @@ class NeighborPreXoverItem(PreXoverItem):
         p2 = active_pos = active_prexoveritem._phos_item.scenePos()
         scale = 3
         delta1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
-        delta2 = BASE_WIDTH*scale if active_prexoveritem.isFwd() else -BASE_WIDTH*scale
+        delta2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
         c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
         c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
         pp = QPainterPath()
@@ -354,7 +323,7 @@ class NeighborPreXoverItem(PreXoverItem):
 
         alpha = 32
         idx, active_idx = self.idx, active_prexoveritem.idx
-        if self.is_fwd != active_prexoveritem.isFwd():
+        if self.is_fwd != active_prexoveritem.is_fwd:
             if idx == active_idx:
                 alpha = 255
         elif idx == active_idx + 1:

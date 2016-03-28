@@ -1196,6 +1196,20 @@ class VirtualHelixGroup(CNObject):
         return fwd_hit_list, rev_hit_list
     # end def
 
+    def normalizedRange(self, id_num, index):
+        """ given an `index` within the bounds `[0, size]`
+        return an range of length `bases_per_repeat` if pro
+        """
+        offset, size = self.getOffsetAndSize(id_num)
+        bpr = self.vh_properties.loc[id_num, 'bases_per_repeat']
+        half_period = bpr // 2
+        if size - index < bpr:
+            start = size - bpr
+        else:
+            start = max(index - half_period, 0)
+        return start, bpr
+    # end def
+
     def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
         """ Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
@@ -1229,7 +1243,7 @@ class VirtualHelixGroup(CNObject):
             if size - index < bpr:
                 start, length = size - bpr, bpr
             else:
-                start, length = max(index - half_period, 0), bases_per_turn
+                start, length = max(index - half_period, 0), bpr
         norm = np.linalg.norm
         cross = np.cross
         dot = np.dot

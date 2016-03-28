@@ -42,7 +42,7 @@ class PropertyWrapperObject(QObject):
 
     def __set_bondP2(self, p2):
         p1 = self.item.line().p1()
-        line = QLineF(p1.x(),p1.y(),p2.x(),p2.y())
+        line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
         self.item.setLine(line)
 
     def __get_rotation(self):
@@ -66,6 +66,11 @@ class PropertyWrapperObject(QObject):
 
     def getRef(self, property_name):
         return self.animations.get(property_name)
+
+    def resetAnimations(self):
+        for item in self.animations.values():
+            item.deleteLater()
+        self.animations = {}
 
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
@@ -339,26 +344,25 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             next_rev.set5pItem(rev)
     # end def
 
-    def removeItems(self):
-        for i in range(len(self.fwd_prexover_items)):
-            self.scene().removeItem(self.fwd_prexover_items.pop(i))
-            self.scene().removeItem(self.rev_prexover_items.pop(i))
-    # end def
-
     def remove(self):
-        self.removeItems()
+        fpxis = self.fwd_prexover_items
+        rpxis = self.rev_prexover_items
+        scene = self.scene()
+        for i in range(len(fpxis)):
+            x = fpxis.pop(i)
+            x.phos_item.adapter.resetAnimations()
+            x.line_3p.adapter.resetAnimations()
+            scene.removeItem(x)
+            x = rpxis.pop(i)
+            x.phos_item.adapter.resetAnimations()
+            x.line_3p.adapter.resetAnimations()
+            scene.removeItem(x)
         self.virtual_helix_item = None
         self.model_part = None
         scene = self.scene()
         scene.removeItem(self.active_wedge_gizmo)
         self.active_wedge_gizmo = None
         scene.removeItem(self)
-    # end def
-
-    def updateBasesPerRepeat(self):
-        self._colors = self._getColors()
-        self.removeItems()
-        self.addItems()
     # end def
 
     def updateTurnsPerRepeat(self):

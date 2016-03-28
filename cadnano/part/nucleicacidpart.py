@@ -156,7 +156,7 @@ class NucleicAcidPart(Part):
         neighbors = literal_eval(self.vh_properties.loc[id_num, 'neighbors'])
         alpha = self.getProperty('crossover_span_angle')
 
-        idx = None # FORCE this for now to prevent animation GC crashes
+        # idx = None # FORCE this for now to prevent animation GC crashes
 
         per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
                                                         alpha, index=idx)
