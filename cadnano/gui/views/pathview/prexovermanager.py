@@ -1,3 +1,4 @@
+from collections import deque
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
@@ -22,6 +23,8 @@ class PreXoverManager(QGraphicsRectItem):
         self.neighbor_prexover_items = {}   # just a dictionary of neighbors
         self._active_items = []
         self._key_press_dict = {}
+        self.active_pxi_pool = deque()
+        self.neighbor_pxi_pool = deque()
         # self.updateBasesPerRepeat()
     # end def
 
@@ -100,12 +103,26 @@ class PreXoverManager(QGraphicsRectItem):
 
     def clearPreXoverItems(self):
         self._active_items = []
+        ap_pool = self.active_pxi_pool
+        np_pool = self.neighbor_pxi_pool
         for x, y in self.prexover_item_map.values():
-            PreXoverItem.remove(x)
+            x.hide()
+            ap_pool.append(x)
         self.prexover_item_map = {}
         for x in self.neighbor_prexover_items.values():
-            PreXoverItem.remove(x)
+            x.hide()
+            np_pool.append(x)
         self.neighbor_prexover_items = {}
+    # end def
+
+    @staticmethod
+    def getPoolItem(pool, cls, *args):
+        if len(pool) > 0:
+            item = pool.pop()
+            item.resetItem(*args)
+            return item
+        else:
+            return cls(*args)
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits):
@@ -123,6 +140,9 @@ class PreXoverManager(QGraphicsRectItem):
         pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
         part_item = self.part_item
+        ap_pool = self.active_pxi_pool
+        np_pool = self.neighbor_pxi_pool
+
         this_step_size = virtual_helix_item.getProperty('bases_per_repeat')
         self.virtual_helix_item = virtual_helix_item
         self.updateBasesPerRepeat(this_step_size)
@@ -139,46 +159,66 @@ class PreXoverManager(QGraphicsRectItem):
                 # from_virtual_helix_item, from_index, fwd_st_type, prexoveritemgroup, color):
                 neighbor_pxis = []
                 # print((id_num, fwd_st_type, idx))
-                pxis[(id_num, fwd_st_type, idx)] = (ActivePreXoverItem(virtual_helix_item, fwd_st_type, idx,
-                                                        neighbor_id, self, colors[idx % this_step_size]),
-                                                neighbor_pxis)
+                pxis[(id_num, fwd_st_type, idx)] = (self.getPoolItem(ap_pool,
+                                        ActivePreXoverItem,
+                                        virtual_helix_item, fwd_st_type, idx,
+                                        neighbor_id, self, colors[idx % this_step_size]
+                                        ),
+                                        neighbor_pxis
+                                        )
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = NeighborPreXoverItem(nvhi, fwd_st_type, j,
-                                            id_num, self, colors[j % n_step_size])
+                        npxi = self.getPoolItem(np_pool,
+                                            NeighborPreXoverItem,
+                                            nvhi, fwd_st_type, j,
+                                            id_num, self, colors[j % n_step_size]
+                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(  npxi  )
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = NeighborPreXoverItem(nvhi, rev_st_type, j,
-                                            id_num, self, colors[-1 - (j % n_step_size)] )
+                        npxi = self.getPoolItem(np_pool,
+                                                NeighborPreXoverItem,
+                                                nvhi, rev_st_type, j,
+                                                id_num, self, colors[-1 - (j % n_step_size)]
+                                                )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
 
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, rev_st_type, idx))
-                pxis[(id_num, rev_st_type, idx)] = ( ActivePreXoverItem(virtual_helix_item, rev_st_type, idx,
-                                                        neighbor_id, self, colors[-1 - (idx % this_step_size)]),
-                                                neighbor_pxis)
+                pxis[(id_num, rev_st_type, idx)] = ( self.getPoolItem( ap_pool,
+                                        ActivePreXoverItem,
+                                        virtual_helix_item, rev_st_type, idx,
+                                        neighbor_id, self, colors[-1 - (idx % this_step_size)]
+                                        ),
+                                        neighbor_pxis
+                                        )
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = NeighborPreXoverItem(nvhi, fwd_st_type, j,
-                                            id_num, self, colors[j % n_step_size])
+                        npxi = self.getPoolItem(np_pool,
+                                            NeighborPreXoverItem,
+                                            nvhi, fwd_st_type, j,
+                                            id_num, self, colors[j % n_step_size]
+                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = NeighborPreXoverItem(nvhi, rev_st_type, j,
-                                            id_num, self, colors[-1 - (j % n_step_size)])
+                        npxi = self.getPoolItem(np_pool,
+                                            NeighborPreXoverItem,
+                                            nvhi, rev_st_type, j,
+                                            id_num, self, colors[-1 - (j % n_step_size)]
+                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append( npxi )
         # end for per_neighbor_hits

@@ -63,6 +63,9 @@ class PropertyWrapperObject(QObject):
         self.animations = None
         self.deleteLater()
 
+    def resetAnimations(self):
+        self.animations = {}
+
     brush_alpha = pyqtProperty(int, __get_brushAlpha, __set_brushAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
 # end class
@@ -117,13 +120,18 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     def __init__(self, is_fwd, color, pre_xover_item):
         super(QGraphicsSimpleTextItem, self).__init__(pre_xover_item)
         self._txt = ''
-        self._is_fwd = is_fwd
+        self.is_fwd = is_fwd
         self._color = color
         self._pre_xover_item = pre_xover_item
         self._tbr = None
         self._outline = QGraphicsRectItem(self)
         self.setFont(self._XO_FONT)
         self.setBrush(getBrushObj('#666666'))
+    # end def
+
+    def resetItem(self, is_fwd, color):
+        self.is_fwd = is_fwd
+        self._color = color
     # end def
 
     def setTextAndStyle(self, text, outline=False):
@@ -137,7 +145,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         if str_txt == '1':  # adjust for the number one
             labelX -= tBR.width()
 
-        labelY = half_label_H if self._is_fwd else (BASE_WIDTH - tBR.height())/2
+        labelY = half_label_H if self.is_fwd else (BASE_WIDTH - tBR.height())/2
 
         self.setPos(labelX, labelY)
         self.setText(str_txt)
@@ -172,50 +180,70 @@ class PreXoverItem(QGraphicsRectItem):
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
                 to_vh_id_num, prexoveritemgroup, color):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
+        self.adapter = PropertyWrapperObject(self)
+        self._bond_item = QGraphicsPathItem(self)
+        self._bond_item.hide()
+        self._label = PreXoverLabel(is_fwd, color, self)
+        self._phos_item = Triangle(FWDPHOS_PP, self)
+
+        self.resetItem(from_virtual_helix_item, is_fwd, from_index,
+                to_vh_id_num, prexoveritemgroup, color)
+    # end def
+
+    def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
+                to_vh_id_num, prexoveritemgroup, color):
+        self.setParentItem(from_virtual_helix_item)
+        self.resetTransform()
         self._from_vh_item = from_virtual_helix_item
         self._id_num = from_virtual_helix_item.idNum()
         self.idx = from_index
         self.prexoveritemgroup = prexoveritemgroup
         self._to_vh_id_num = to_vh_id_num
         self._color = color
-        self._is_fwd = is_fwd
-        # self._animations = []
-        self.adapter = PropertyWrapperObject(self)
-        self._bond_item = QGraphicsPathItem(self)
+        self.is_fwd = is_fwd
         self._bond_item.hide()
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
-        self._label = PreXoverLabel(is_fwd, color, self)
         self.setLabel(text=lbt)
+        self._label.resetItem(is_fwd, color)
         self.setPen(getNoPen())
 
+        self.adapter.resetAnimations()
+
+        phos = self._phos_item
+        phos.resetTransform()
+        phos.setPos(0, 0)
+        phos.adapter.resetAnimations()
+
+        bonditem = self._bond_item
+
         if is_fwd:
-            phos = Triangle(FWDPHOS_PP, self)
+            phos.setPath(FWDPHOS_PP)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
             phos.setPos(0.5*BASE_WIDTH, BASE_WIDTH)
             phos.setPen(getNoPen())
             phos.setBrush(getBrushObj(color))
-            self._bond_item.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
+            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
             self.setPos(from_index*BASE_WIDTH,-BASE_WIDTH)
         else:
-            phos = Triangle(REVPHOS_PP, self)
+            phos.setPath(REVPHOS_PP)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
             phos.setPos(0.5*BASE_WIDTH, 0)
             phos.setPen(getPenObj(color, 0.25))
             phos.setBrush(getNoBrush())
-            self._bond_item.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
+            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
                                     penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
-        self._phos_item = phos
+        self.show()
 
         self.setInstantActive(False)
-    # end def
+    #end def
 
     def getInfo(self):
         """
         Returns:
             Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
         """
-        return (self._id_num, self._is_fwd, self.idx, self._to_vh_id_num)
+        return (self._id_num, self.is_fwd, self.idx, self._to_vh_id_num)
 
     ### ACCESSORS ###
     def color(self):
@@ -235,7 +263,7 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def isFwd(self):
-        return self._is_fwd
+        return self.is_fwd
 
     def absoluteIdx(self):
         vhi = self._from_vh_item
@@ -314,7 +342,7 @@ class NeighborPreXoverItem(PreXoverItem):
         p1 = self._phos_item.scenePos()
         p2 = active_pos = active_prexoveritem._phos_item.scenePos()
         scale = 3
-        delta1 = -BASE_WIDTH*scale if self._is_fwd else BASE_WIDTH*scale
+        delta1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
         delta2 = BASE_WIDTH*scale if active_prexoveritem.isFwd() else -BASE_WIDTH*scale
         c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
         c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
@@ -326,7 +354,7 @@ class NeighborPreXoverItem(PreXoverItem):
 
         alpha = 32
         idx, active_idx = self.idx, active_prexoveritem.idx
-        if self._is_fwd != active_prexoveritem.isFwd():
+        if self.is_fwd != active_prexoveritem.isFwd():
             if idx == active_idx:
                 alpha = 255
         elif idx == active_idx + 1:

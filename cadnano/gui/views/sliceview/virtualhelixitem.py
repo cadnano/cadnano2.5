@@ -47,8 +47,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # self.setTransformOriginPoint(_RADIUS, _RADIUS)
         self.setCenterPos(x, y)
 
-        # self.prexover_item_group = pxig = PreXoverItemGroup(_RADIUS, WEDGE_RECT, self)
-
         self.wedge_gizmos = {}
         self._added_wedge_gizmos = set()
         # self._prexo_gizmos = []
