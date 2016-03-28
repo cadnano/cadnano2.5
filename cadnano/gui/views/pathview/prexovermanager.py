@@ -174,12 +174,14 @@ class PreXoverManager(QGraphicsRectItem):
                                     virtual_helix_item, fwd_st_type, idx,
                                     None, self, colors[idx % bpr]
                                 )
+            apxi.enableActive(True, None)
             fpxis.append(apxi)
             apxi = getPoolItem(     pxi_pool,
                                     PreXoverItem,
                                     virtual_helix_item, rev_st_type, idx,
                                     None, self, colors[-1 - (idx % bpr)]
                         )
+            apxi.enableActive(True, None)
             rpxis.append(apxi)
 
         # 1. Construct PXIs for the active virtual_helix_item

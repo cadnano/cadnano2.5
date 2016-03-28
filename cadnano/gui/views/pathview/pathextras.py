@@ -292,14 +292,15 @@ class PreXoverItem(QGraphicsRectItem):
         """
         if is_active:
             self._to_vh_id_num = to_vh_id_num
-            self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
-            self.setLabel(text=lbt)
-            inactive_alpha = PROX_ALPHA
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-
             self.setAcceptHoverEvents(True)
-            self.setFlag(KEYINPUT_ACTIVE_FLAG, True)
+            if to_vh_id_num is None:
+                self.setLabel(text=None)
+            else:
+                self.setLabel(text= str(to_vh_id_num))
+                inactive_alpha = PROX_ALPHA
+                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+                self.setFlag(KEYINPUT_ACTIVE_FLAG, True)
         else:
             self.setAcceptHoverEvents(False)
             self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
