@@ -194,11 +194,6 @@ class PreXoverManager(QGraphicsRectItem):
                 neighbor_pxis = []
                 # print((id_num, fwd_st_type, idx))
                 apxi = fpxis[idx - start]
-                # apxi = getPoolItem(     pxi_pool,
-                #                         PreXoverItem,
-                #                         virtual_helix_item, fwd_st_type, idx,
-                #                         neighbor_id, self, colors[idx % bpr]
-                #                         )
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
                 pxis[(id_num, fwd_st_type, idx)] = (apxi, neighbor_pxis)
                 for j in fwd_idxs:
@@ -227,11 +222,6 @@ class PreXoverManager(QGraphicsRectItem):
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, rev_st_type, idx))
-                # apxi = getPoolItem(     pxi_pool,
-                #                         PreXoverItem,
-                #                         virtual_helix_item, rev_st_type, idx,
-                #                         neighbor_id, self, colors[-1 - (idx % bpr)]
-                #                         )
                 apxi = rpxis[idx - start]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
                 pxis[(id_num, rev_st_type, idx)] = ( apxi, neighbor_pxis )

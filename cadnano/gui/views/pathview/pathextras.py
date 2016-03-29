@@ -168,7 +168,7 @@ class PreXoverItem(QGraphicsRectItem):
         self._id_num = from_virtual_helix_item.idNum()
         self.idx = from_index
         self.prexoveritemgroup = prexoveritemgroup
-        self._to_vh_id_num = to_vh_id_num
+        self.to_vh_id_num = to_vh_id_num
         self._color = color
         self.is_fwd = is_fwd
         self._bond_item.hide()
@@ -217,7 +217,7 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
         """
-        return (self._id_num, self.is_fwd, self.idx, self._to_vh_id_num)
+        return (self._id_num, self.is_fwd, self.idx, self.to_vh_id_num)
 
     ### ACCESSORS ###
     def color(self):
@@ -276,22 +276,34 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def setActiveHovered(self, is_active):
+        """
+        only rotate phosphate Triangle if `self.to_vh_id_num` is not `None`
+        Args:
+            is_active (bool): whether or not the PreXoverItem is parented to the
+                active VirtualHelixItem
+        """
         if is_active:
             self.setBrush(getBrushObj(self._color, alpha=128))
             self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
+            if self.to_vh_id_num is not None:
+                self.animate(self._phos_item, 'rotation', 500, 0, -90)
         else:
-            inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+            if self.to_vh_id_num is None:
+                inactive_alpha = 0
+                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            else:
+                inactive_alpha = PROX_ALPHA
+                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+                self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
 
     def enableActive(self, is_active, to_vh_id_num=None):
         """ Call on PreXoverItems created on the active VirtualHelixItem
         """
         if is_active:
-            self._to_vh_id_num = to_vh_id_num
+            self.to_vh_id_num = to_vh_id_num
             self.setAcceptHoverEvents(True)
             if to_vh_id_num is None:
                 self.setLabel(text=None)
@@ -332,7 +344,7 @@ class PreXoverItem(QGraphicsRectItem):
         elif idx == active_idx - 1:
             alpha = 255
 
-        inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
+        inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
         self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
         self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
         self.animate(self._phos_item, 'rotation', 500, 0, -90)
@@ -340,7 +352,7 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbor(self):
-        inactive_alpha = PROX_ALPHA if self._to_vh_id_num is not None else 0
+        inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
         self.setBrush(getBrushObj(self._color, alpha=128))
         self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
         self.animate(self._phos_item, 'rotation', 500, -90, 0)
