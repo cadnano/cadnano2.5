@@ -161,7 +161,7 @@ class PreXoverManager(QGraphicsRectItem):
         fwd_st_type, rev_st_type = True, False  # for clarity in the call to constructors
 
         start, length = part_item.part().normalizedRange(id_num, this_idx)
-        self.active_pxis = active_pxis = {}
+        active_pxis = self.active_pxis
         for idx in range(start, start + length):
             apxi = getPoolItem(     pxi_pool,
                                     PreXoverItem,
@@ -248,9 +248,10 @@ class PreXoverManager(QGraphicsRectItem):
         # print("ACTIVATING neighbors", id_num, idx)
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is None:
-            apxi = self.active_pxis[(is_fwd, idx)]
-            apxi.setActiveHovered(True)
-            self.hovered_items.append(apxi)
+            apxi = self.active_pxis.get((is_fwd, idx))
+            if apxi is not None:
+                apxi.setActiveHovered(True)
+                self.hovered_items.append(apxi)
         else:
             pxi, neighbor_list = item
             # print("Should have {} neighbors".format(len(neighbor_list)))
