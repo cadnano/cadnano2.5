@@ -107,20 +107,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partActiveBaseInfoSlot(self, part, info):
         pxoig = self.prexover_manager
+        pxoig.deactivateNeighbors()
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
-            # # handle
-            # local_angle = (int(value) + 180) % 360
-            # h_fwd_items, h_rev_items = hpxoig.getItemsFacingNearAngle(local_angle)
-            # for h_item in h_fwd_items + h_rev_items:
-            #     h_item.updateItemApperance(True, show_3p=False)
-            # # path
             pxoig.activateNeighbors(id_num, is_fwd, idx)
-        else:
-            # handle
-            # hpxoig.resetAllItemsAppearance()
-            # path
-            pxoig.deactivateNeighbors()
     # end def
 
     def partDimensionsChangedSlot(self, model_part):

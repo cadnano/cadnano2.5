@@ -285,18 +285,13 @@ class PreXoverItem(QGraphicsRectItem):
         if is_active:
             self.setBrush(getBrushObj(self._color, alpha=128))
             self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
-            if self.to_vh_id_num is not None:
-                self.animate(self._phos_item, 'rotation', 500, 0, -90)
+            # if self.to_vh_id_num is not None:
+            self.animate(self._phos_item, 'rotation', 500, 0, -90)
         else:
-            if self.to_vh_id_num is None:
-                inactive_alpha = 0
-                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            else:
-                inactive_alpha = PROX_ALPHA
-                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-                self.animate(self._phos_item, 'rotation', 500, -90, 0)
+            inactive_alpha = 0 if self.to_vh_id_num is None else PROX_ALPHA
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            self.animate(self._phos_item, 'rotation', 500, -90, 0)
     # end def
 
     def enableActive(self, is_active, to_vh_id_num=None):
