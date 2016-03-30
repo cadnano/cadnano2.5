@@ -389,7 +389,9 @@ class VirtualHelixGroup(CNObject):
             coord_pts += delta # use += to modify the view
             fwd_pts += delta # use += to modify the view
             rev_pts += delta # use += to modify the view
+            # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
+            # print("new origin", self.locationQt(id_num, 15./self.radius()))
     # end def
 
     def getIndices(self, id_num):

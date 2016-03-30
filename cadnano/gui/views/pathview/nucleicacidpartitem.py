@@ -44,7 +44,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._viewroot = viewroot
         self._getActiveTool = viewroot.manager.activeToolGetter
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
-        self._active_virtual_helix_item = None
+        self.active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.prexover_manager = PreXoverManager(self)
         self._virtual_helix_item_list = []
@@ -140,6 +140,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 self._updateBoundingRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
+    # end def
+
+    def partVirtualHelicesTranslatedSlot(self, sender,
+                                            vh_set, left_overs,
+                                            do_deselect):
+        self.prexover_manager.clearPreXoverItems()
+        if self.active_virtual_helix_item is not None:
+            self.active_virtual_helix_item.deactivate()
+            self.active_virtual_helix_item = None
     # end def
 
     def partRemovedSlot(self, sender):
@@ -256,7 +265,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     ### ACCESSORS ###
 
     def activeVirtualHelixItem(self):
-        return self._active_virtual_helix_item
+        return self.active_virtual_helix_item
     # end def
 
     def removeVirtualHelixItem(self, id_num):
@@ -475,12 +484,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):
-        current_vhi = self._active_virtual_helix_item
+        current_vhi = self.active_virtual_helix_item
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
                 current_vhi.deactivate()
             new_active_vhi.activate()
-            self._active_virtual_helix_item = new_active_vhi
+            self.active_virtual_helix_item = new_active_vhi
     # end def
 
     def setPreXoverItemsVisible(self, virtual_helix_item):

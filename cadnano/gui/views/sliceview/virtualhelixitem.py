@@ -142,11 +142,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    # def selectToolMouseMove(self, tool, event):
-    #     tool.mouseMoveEvent(self, event)
-    #     return QGraphicsItem.hoverMoveEvent(self, event)
-    # # end def
-
     def virtualHelixPropertyChangedSlot(self, keys, values):
         # for key, val in zip(keys, values):
         #     pass
@@ -202,16 +197,23 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         part_item = self._part_item
         sf = part_item.scaleFactor()
         x, y = self._model_part.locationQt(self._id_num, part_item.scaleFactor())
-        new_pos = QPointF(x - _RADIUS, y - _RADIUS)
-        ctr_pos = part_item.mapFromScene(self.scenePos())
+        new_pos = QPointF(x - _RADIUS, y - _RADIUS)         # top left
+        tl_pos = part_item.mapFromScene(self.scenePos())    # top left
+
         """
         better to compare QPointF's since it handles difference
         tolerances for you with !=
         """
-        if new_pos != ctr_pos:
+        if new_pos != tl_pos:
             parent_item = self.parentItem()
+            br = self.boundingRect()
+            # print("Rect", br.width(), br.height(), _RADIUS)
+            # print("xy", tl_pos.x(), tl_pos.y())
+            # print("xy1", new_pos.x(), new_pos.y())
             if parent_item != part_item:
+                # print("different parent", parent_item)
                 new_pos = parent_item.mapFromItem(part_item, new_pos)
+            # print("xy2", new_pos.x(), new_pos.y())
             self.setPos(new_pos)
     # end def
 

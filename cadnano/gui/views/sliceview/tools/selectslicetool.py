@@ -167,22 +167,22 @@ class SelectSliceTool(AbstractSliceTool):
     #         self.snap_origin_item = None
     # # end def
 
-    def addSetToSelection(self, vh_set):
-        group = self.group
-        part_item = self.part_item
-        selection_set = self.selection_set
-        for id_num in vh_set:
-            vhi = part_item.getVirtualHelixItem(id_num)
-            group.addToGroup(vhi)
-            selection_set.add(id_num)
-        # end
-        if len(group.childItems()) > 0:
-            self.is_selection_active = True
-            group.setSelectionRect()
-            group.show()
-            self.individual_pick = True
-            self.snap_origin_item = None
-    # end def
+    # def addSetToSelection(self, vh_set):
+    #     group = self.group
+    #     part_item = self.part_item
+    #     selection_set = self.selection_set
+    #     for id_num in vh_set:
+    #         vhi = part_item.getVirtualHelixItem(id_num)
+    #         group.addToGroup(vhi)
+    #         selection_set.add(id_num)
+    #     # end
+    #     if len(group.childItems()) > 0:
+    #         self.is_selection_active = True
+    #         group.setSelectionRect()
+    #         group.show()
+    #         self.individual_pick = True
+    #         self.snap_origin_item = None
+    # # end def
 
     def selectOrSnap(self, part_item, virtual_helix_item, event):
         self.setPartItem(part_item)
@@ -194,7 +194,11 @@ class SelectSliceTool(AbstractSliceTool):
                 self.modelClear()   # deselect if shift isn't held
 
             # self.is_selection_active = True
-            self.individual_pick = True
+
+            # NOTE: individual_pick seems not needed.
+            # it's supposed to allow for single item picking
+            # self.individual_pick = True
+
             self.snap_origin_item = None
 
             doc = self._manager.document
@@ -205,6 +209,12 @@ class SelectSliceTool(AbstractSliceTool):
     def doSnap(self, part_item, virtual_helix_item):
         # print("snapping")
         origin = self.snap_origin_item.getCenterScenePos()
+
+        # xy = part_item.mapFromScene(virtual_helix_item.scenePos())
+        # xy2 = part_item.mapFromScene(self.snap_origin_item.scenePos())
+        # print("snapping from:", xy2.x(), xy2.y())
+        # print("snapped to:", xy.x(), xy.y())
+
         self.setVirtualHelixItem(virtual_helix_item)
         destination = self.findNearestPoint(part_item, origin)
         origin = part_item.mapFromScene(origin)
@@ -227,7 +237,7 @@ class SelectSliceTool(AbstractSliceTool):
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
         """ Y-axis is inverted in Qt +y === DOWN
         """
-        # print("moveSelection: {}, {}", dx, dy)
+        # print("moveSelection: {}, {}".format(dx, dy))
         part_item = self.part_item
         sf = part_item.scaleFactor()
         part = part_item.part()
@@ -241,7 +251,6 @@ class SelectSliceTool(AbstractSliceTool):
         if self.sgv is not None:
             self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             self.sgv = None
-        # self.deselectItems()
         self.modelClear()
         self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
@@ -366,10 +375,13 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         out what to submit to the model
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
+        # print("mouse mouseReleaseEvent", self.tool.individual_pick)
         if not self.tool.individual_pick and event.button() == Qt.LeftButton:
             delta = self.pos() - self.drag_start_position
             dx, dy = delta.x(), delta.y()
+            # print(abs(dx), abs(dy))
             if abs(dx) > MOVE_THRESHOLD or abs(dy) > MOVE_THRESHOLD:
+                # print("finalizling", dx, dy)
                 self.tool.moveSelection(dx, dy, True)
         self.tool.individual_pick = False
         return QGraphicsItemGroup.mouseReleaseEvent(self, event)
