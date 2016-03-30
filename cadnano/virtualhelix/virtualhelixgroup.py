@@ -33,7 +33,8 @@ def defaultProperties(id_num):
     ('helical_pitch', 1.),
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
     ('twist_per_base', 360. / 10.5), # 360/_bases_per_turn
-    ('minor_groove_angle', 171.)
+    ('minor_groove_angle', 171.),
+    ('length', -1)
     ]
     return tuple(zip(*props))
 # end def
@@ -674,7 +675,7 @@ class VirtualHelixGroup(CNObject):
             yUR = new_y
         self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
-        self.vh_properties.loc[id_num, ['name', 'color']] = "vh%d" % (id_num), color
+        self.vh_properties.loc[id_num, ['name', 'color', 'length']] = "vh%d" % (id_num), color, num_points
         self.fwd_strandsets[id_num] = StrandSet(True, id_num, self, num_points)
         self.rev_strandsets[id_num] = StrandSet(False, id_num, self, num_points)
 
@@ -869,6 +870,8 @@ class VirtualHelixGroup(CNObject):
                 self.rev_strandsets[id_num].resize(delta, 0)
         else: # delta == 0
             return
+        _, final_size = self.getOffsetAndSize(id_num)
+        self.vh_properties.loc[id_num, 'length'] =  final_size
     # end def
 
     def removeHelix(self, id_num):
