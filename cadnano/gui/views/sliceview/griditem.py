@@ -1,6 +1,6 @@
 
 from PyQt5.QtCore import QRectF, Qt, QPointF
-from PyQt5.QtGui import QBrush, QPen, QPainterPath
+from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsPathItem,
                             QGraphicsEllipseItem, QGraphicsRectItem,
                             QGraphicsLineItem)
@@ -16,7 +16,9 @@ class GridItem(QGraphicsPathItem):
         self.is_honeycomb = True
         self.draw_lines = True
         self.points = []
-        self.setPen(QPen(Qt.blue))
+        color = QColor(Qt.blue)
+        color.setAlphaF(0.1)
+        self.setPen(color)
         self.updateGrid()
     # end def
 
@@ -34,6 +36,7 @@ class GridItem(QGraphicsPathItem):
 
     def setHoneycomb(self, is_honeycomb):
         self.is_honeycomb = is_honeycomb
+        self.updateGrid()
     # end def
 
     def doHoneycomb(self, part_item, radius, bounds):
