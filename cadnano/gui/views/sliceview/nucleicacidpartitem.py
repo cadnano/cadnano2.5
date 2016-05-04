@@ -15,7 +15,7 @@ from . import slicestyles as styles
 from .activesliceitem import ActiveSliceItem
 from .virtualhelixitem import VirtualHelixItem
 from .prexovermanager import PreXoverManager
-
+from .griditem import GridItem
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -54,6 +54,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._controller = NucleicAcidPartItemController(self, m_p)
         self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self.scale_factor = self._RADIUS / m_p.radius()
+        self.scale_tuple = (self._RADIUS, m_p.radius())
 
         self.active_virtual_helix_item = None
 
@@ -61,8 +62,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         self.hide() # hide while until after attemptResize() to avoid flicker
 
-        self._rect = QRectF(0, 0, 1000, 1000)
+        self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
         self._updateGeometry()
+
         self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setRect(self._rect)
@@ -77,11 +79,13 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.setZValue(styles.ZPARTITEM)
 
         _p = _BOUNDING_RECT_PADDING
-        self._outlinerect = _orect = self.boundingRect().adjusted(-_p, -_p, _p, _p)
+        self._outlinerect = _orect = self.rect().adjusted(-_p, -_p, _p, _p)
         self._outline = QGraphicsRectItem(_orect, self)
         self._outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         self._outline.setZValue(styles.ZDESELECTOR)
         self._outline.setPen(getPenObj(self.modelColor(), _DEFAULT_WIDTH))
+
+        self.griditem = GridItem(self)
 
         # select upon creation
         for part in m_p.document().children():
@@ -95,20 +99,20 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def getVHItemList(self):
         return sorted(self._virtual_helix_hash.values(), key=lambda t:t.number())
 
-    def _adjustPosition(self):
-        """Find the left-most bottom-most sibling, and reposition below."""
-        _p = _BOUNDING_RECT_PADDING
-        _visible_topleft_pos = self.visibleTopLeftScenePos()
-        _bot_left_sib = self.mapToScene(QPointF(-_p*2,-_p*2)) # choose a starting point
-        for sibling in self.parentItem().childItems():
-            if sibling is self:
-                continue
-            _sib = sibling.visibleBottomLeftScenePos()
-            if (_sib.x() >= _bot_left_sib.x() and _sib.y() >= _bot_left_sib.y()):
-                _bot_left_sib = _sib
-        # reposition visible-topleft curner under sibling, plus padding
-        self.setPos(-_visible_topleft_pos + _bot_left_sib + QPointF(0, 2*_p) )
-    # end def
+    # def _adjustPosition(self):
+    #     """Find the left-most bottom-most sibling, and reposition below."""
+    #     _p = _BOUNDING_RECT_PADDING
+    #     _visible_topleft_pos = self.visibleTopLeftScenePos()
+    #     _bot_left_sib = self.mapToScene(QPointF(-_p*2,-_p*2)) # choose a starting point
+    #     for sibling in self.parentItem().childItems():
+    #         if sibling is self:
+    #             continue
+    #         _sib = sibling.visibleBottomLeftScenePos()
+    #         if (_sib.x() >= _bot_left_sib.x() and _sib.y() >= _bot_left_sib.y()):
+    #             _bot_left_sib = _sib
+    #     # reposition visible-topleft curner under sibling, plus padding
+    #     self.setPos(-_visible_topleft_pos + _bot_left_sib + QPointF(0, 2*_p) )
+    # # end def
 
     def visibleTopLeftScenePos(self):
         return self.mapToScene(self._outlinerect.topLeft())
@@ -322,8 +326,17 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def _updateGeometry(self):
+        """ update the boundaries to what's in the model with a minimum
+        size
+        """
         self._rect = QRectF(*self.part().dimensions(self.scale_factor))
     # end def
+
+    def bounds(self):
+        """ x_low, x_high, y_low, y_high
+        """
+        rect = self._rect
+        return (rect.left(), rect.right(), rect.bottom(), rect.top())
 
     ### PUBLIC SUPPORT METHODS ###
     def selectionWillChange(self, new_sel):
@@ -376,6 +389,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """ Y-axis is inverted in Qt +y === DOWN
         """
         sf = self.scale_factor
+        # numerator, denominator = self.scale_tuple
+        # x, y = denominator*pos.x()/numerator, -denominator*pos.y()/numerator
         x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def

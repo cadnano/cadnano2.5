@@ -24,7 +24,7 @@ class AbstractSliceTool(QGraphicsObject):
         # self._pen = _PEN
         self.hide()
         self.is_started = False
-        self.angles = [x*math.pi/180 for x in range(0, 360, 30)]
+        self.angles = [math.radians(x) for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
         self._direction = None
         self.part_item = None
@@ -34,7 +34,7 @@ class AbstractSliceTool(QGraphicsObject):
     def setVectors(self):
         rad = self._RADIUS
         return [QLineF( rad, rad,
-                        rad*(1 + 2*math.cos(x)), rad*(1 + 2*math.sin(x))
+                        rad*(1. + 2.*math.cos(x)), rad*(1. + 2.*math.sin(x))
                         ) for x in self.angles]
         # return [QLineF( 0, 0,
         #                 rad*(0 + 2*math.cos(x)), rad*(0 + 2*math.sin(x))

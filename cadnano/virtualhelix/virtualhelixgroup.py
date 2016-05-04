@@ -1475,3 +1475,76 @@ def remapSlice(start, stop, length):
         raise IndexError("Stop {} must be greater than or equal to start {}".format(stop, start))
     return start, stop
 # end def
+
+# def generateGrid(part, ids, rect, radius, angles):
+#     """ Given an origin, generate a grid of all possible locations given
+#     bounding box
+#     Args:
+#         origin (Tuple[float]): Vector of length 2
+#         rect (Tuple[float]): x1, y1, x2, y2
+#         radius (float):
+#         angles (List): list of relative angles in radians
+#     """
+#     cos = math.cos
+#     sin = math.sin
+#     visited_ids_set = set()
+#     to_visit_set = set()
+#     getVirtualHelixProperties
+#     neighbor_str = part.getVirtualHelixProperties(origin_id, 'neighbors')
+#     neighbors = literal_eval(neighbor_str)
+#     origin = part.getVirtualHelixOrigin(origin_id)
+#     x_low, y_low, x_high, y_high = rect
+#     """
+#     offset to include bounds assuming the rect is bound by the center
+#     of the VirtualHelices
+#     """
+#     x_low -= 0.1
+#     y_low -= 0.1
+#     x_high += 0.1
+#     y_high += 0.1
+#     # calculate a radially symmetric delta about the origin
+#     x_max = max(origin_x - x_low, x_high - origin_x)
+#     y_max = max(origin_y - y_low, y_high - origin_y)
+#     delta_max = max(x_max, y_max)
+#     # add 0.5 for rounding up and 1 for range
+#     grid_range = int(delta_max/radius + 1.5)
+
+#     num_points = len(angles)*(grid_range - 1)
+#     stamp = np.zeros((num_points, 2), dtype=float)
+#     point_list = []
+#     for angle in angles:
+#         rcosa = radius*cos(angle)
+#         rsina = radius*sin(angle)
+#         for i in range(1, grid_range):
+#             xs = i*rcosa
+#             x = xs + origin_x
+#             ys = i*rsina
+#             y = ys + origin_y
+#             if x_low < x and x < x_high and y_low < y and y < y_high:
+#                 point_list.append((xs, ys))
+#     # end for
+#     walkConnectedNeighbors(to_visit_set, part, origin_id)
+#     to_visit_set.remove(origin_id)
+
+
+#     stamp_points = np.array(point_list, dtype=float)
+#     base_points = np.zero_like(stamp_points, dtype=float)
+
+
+
+
+#         visited_ids_set.add(neighbor_id)
+#         base_points[:, :] = stamp_points + origin
+
+
+# def walkConnectedNeighbors(to_visit_set, part, vh_id):
+#     """ recursively visit all connected neighbors
+#     """
+#     to_visit_set.add(vh_id)
+#     neighbor_str = part.getVirtualHelixProperties(origin_id, 'neighbors')
+#     neighbors = literal_eval(neighbor_str)
+#     for neighbor_id in neighbors:
+#         if neighbor not in to_visit_set:
+
+#             walkConnectedNeighbors(to_visit_set, part, neighbor_id)
+# # end def
