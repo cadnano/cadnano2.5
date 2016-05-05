@@ -44,6 +44,9 @@
         <file alias="select-snap-angles">images/slice-snap-angles.png</file>
         <file alias="new-dna-part">images/slice-new-part.png</file>
         <file alias="select-helix">images/slice-select-helix.png</file>
+        <file alias="grid-circles">images/grid-circles.png</file>
+        <file alias="grid-lines">images/grid-lines.png</file>
+        <file alias="grid-points">images/grid-points.png</file>
     </qresource>
     <qresource prefix="/pathtools">
         <file alias="autobreak">images/path-autobreak.png</file>

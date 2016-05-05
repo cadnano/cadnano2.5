@@ -386,6 +386,10 @@
    <addaction name="action_vhelix_create"/>
    <addaction name="action_vhelix_snap"/>
    <addaction name="action_vhelix_set_angles"/>
+   <addaction name="separator"/>
+   <addaction name="actionGridLines"/>
+   <addaction name="actionGridCircles"/>
+   <addaction name="actionGridPoints"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -1197,6 +1201,42 @@
    </property>
    <property name="toolTip">
     <string>Helix angle</string>
+   </property>
+  </action>
+  <action name="actionGridLines">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/grid-lines</normaloff>:/slicetools/grid-lines</iconset>
+   </property>
+   <property name="text">
+    <string>gridLines</string>
+   </property>
+  </action>
+  <action name="actionGridCircles">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/grid-circles</normaloff>:/slicetools/grid-circles</iconset>
+   </property>
+   <property name="text">
+    <string>gridCircles</string>
+   </property>
+  </action>
+  <action name="actionGridPoints">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/grid-points</normaloff>:/slicetools/grid-points</iconset>
+   </property>
+   <property name="text">
+    <string>gridPoints</string>
    </property>
   </action>
  </widget>
