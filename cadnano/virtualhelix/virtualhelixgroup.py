@@ -47,6 +47,7 @@ def defaultDataFrame(size):
 # end def
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
+DEFAULT_RADIUS = 1.125
 
 class VirtualHelixGroup(CNObject):
     def __init__(self, *args, **kwargs):
@@ -61,7 +62,7 @@ class VirtualHelixGroup(CNObject):
         do_copy = kwargs.get('do_copy', False)
         if do_copy:
             return
-        self._radius = 1.125     # probably a property???
+        self._radius = DEFAULT_RADIUS     # probably a property???
 
         # 1. per virtual base pair allocations
         self.total_points = 0
