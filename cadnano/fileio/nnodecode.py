@@ -4,14 +4,14 @@ import io
 
 from cadnano.document import Document
 
-import .v2decode
+import cadnano.fileio.v2decode as v2decode
 
 def decodeFile(filename, document=None):
     with io.open(filename, 'r', encoding='utf-8') as fd:
         nno_dict = json.load(fd)
     if document is None:
         document = Document()
-    if 'format' not in obj:
+    if 'format' not in nno_dict:
         v2decode.decode(document, nno_dict)
     else:
         pass

@@ -71,7 +71,7 @@ class CadnanoQt(QObject):
         global Document
         global DocumentController
         from cadnano.document import Document
-        from cadnano.fileio.nnodecode import decode, decodeFile
+        from cadnano.fileio.nnodecode import decodeFile
         from cadnano.gui.controllers.documentcontroller import DocumentController
         from cadnano.gui.views.pathview import pathstyles as styles
         doc = Document()

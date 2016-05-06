@@ -65,6 +65,10 @@ class StrandType:
     FWD = 0
     REV = 1
 
+class LatticeType:
+    SQUARE = 0
+    HONEYCOMB = 1
+
 
 class Parity:
     EVEN = 0

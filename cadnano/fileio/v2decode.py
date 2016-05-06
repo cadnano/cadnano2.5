@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.enum import StrandType
+from cadnano.enum import StrandType, LatticeType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import preferences as prefs
@@ -23,7 +23,7 @@ def decode(document, obj):
     else:
         raise IOError("error decoding number of bases")
 
-
+    part = None
     # DETERMINE MAX ROW,COL
     max_row_json = max_col_json = 0
     for helix in obj['vstrands']:
@@ -82,7 +82,7 @@ def decode(document, obj):
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        part.createVirtualHelix(row, col, use_undostack=False)
+        part.createVirtualHelix(x, y, use_undostack=False)
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_coord_list)

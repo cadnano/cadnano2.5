@@ -2,7 +2,7 @@ import os
 import sys
 
 from cadnano import app, setReopen, setBatch
-from cadnano.fileio.nnodecode import decode, decodeFile
+from cadnano.fileio.nnodecode import decodeFile
 from cadnano.fileio.encoder import encode
 
 from cadnano.gui.views.documentwindow import DocumentWindow
@@ -425,6 +425,7 @@ class DocumentController():
     def actionAddDnaPart(self):
         part = self._document.addDnaPart()
         self.setActivePart(part)
+        return part
     # end def
 
     def actionToggleOutlinerSlot(self):
