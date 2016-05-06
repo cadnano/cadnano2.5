@@ -655,10 +655,10 @@ class NucleicAcidPart(Part):
     # end def
 
 
-    def setImportedVHelixOrder(self, ordered_coord_list, check_batch=True):
+    def setImportedVHelixOrder(self, ordered_id_list, check_batch=True):
         """Used on file import to store the order of the virtual helices."""
-        self.setViewProperty('path:virtual_helix_order', ordered_coord_list)
-        self.partVirtualHelicesReorderedSignal.emit(self, ordered_coord_list, check_batch)
+        self.setViewProperty('path:virtual_helix_order', ordered_id_list)
+        self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
 # end class

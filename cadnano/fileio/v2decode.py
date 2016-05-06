@@ -67,7 +67,7 @@ def decode(document, obj):
     # document._addPart(part, use_undostack=False)
     setBatch(True)
     # POPULATE VIRTUAL HELICES
-    ordered_coord_list = []
+    ordered_id_list = []
     vh_num_to_coord = {}
     for helix in obj['vstrands']:
         vh_num = helix['num']
@@ -76,16 +76,19 @@ def decode(document, obj):
         scaf= helix['scaf']
         coord = (row, col)
         vh_num_to_coord[vh_num] = coord
-        ordered_coord_list.append(coord)
+        ordered_id_list.append(vh_num)
     # make sure we retain the original order
     radius = DEFAULT_RADIUS
+    delta = num_bases - 256
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
         part.createVirtualHelix(x, y, use_undostack=False)
+        if delta > 0:
+            part.resizeHelix(vh_num, True, delta)
     if not getReopen():
         setBatch(False)
-    part.setImportedVHelixOrder(ordered_coord_list)
+    part.setImportedVHelixOrder(ordered_id_list)
     setReopen(False)
     setBatch(False)
 
@@ -108,13 +111,14 @@ def decode(document, obj):
             # vh = part.virtualHelixAtCoord((row, col))
             x, y = doLattice(radius, row, col)
             is_even = isEven(row, col)
-            vh_num = getVirtualHelixAtPoint((x, y))
+            vh_num = part.getVirtualHelixAtPoint((x, y))
             if isEven:
                 scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
             else:
                 stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
 
-            assert(len(scaf) == len(stap) and len(stap) == part.maxBaseIdx() + 1 and\
+                #len(stap) == part.maxBaseIdx() + 1
+            assert(len(scaf) == len(stap) and
                    len(scaf) == len(insertions) and len(insertions) == len(skips))
             # read scaffold segments and xovers
             for i in range(len(scaf)):
@@ -170,7 +174,7 @@ def decode(document, obj):
         # stap_strand_set = from_vh.stapleStrandSet()
         x, y = doLattice(radius, row, col)
         is_even = isEven(row, col)
-        vh_num = getVirtualHelixAtPoint((x, y))
+        vh_num = part.getVirtualHelixAtPoint((x, y))
         if isEven:
             scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
         else:
@@ -229,7 +233,7 @@ def decode(document, obj):
         # stap_strand_set = vh.stapleStrandSet()
         x, y = doLattice(radius, row, col)
         is_even = isEven(row, col)
-        vh_num = getVirtualHelixAtPoint((x, y))
+        vh_num = part.getVirtualHelixAtPoint((x, y))
         if isEven:
             scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
         else:
