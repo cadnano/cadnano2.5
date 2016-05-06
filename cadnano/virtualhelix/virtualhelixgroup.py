@@ -583,7 +583,7 @@ class VirtualHelixGroup(CNObject):
             v1 (Sequence[float]): (1,3) ndarray or length 3 sequence
             v2 (Sequence[float]): (1,3) ndarray or length 3 sequence
         """
-        if v1 == v2:
+        if np.all(v1 == v2):
             return self.eye3_scratch.copy()
 
         v1 = self.normalize(v1)
@@ -694,7 +694,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            origin (Sequence[float]): (1,3) ndarray or length 3 sequence.  The origin should be
+            origin (Sequence[float]): (1, 3) ndarray or length 3 sequence.  The origin should be
                         referenced from an index of 0.
             direction (Sequence[float]): (1,3) ndarray or length 3 sequence
             index (int): the offset index into a helix to start the helix at.
@@ -841,7 +841,11 @@ class VirtualHelixGroup(CNObject):
         offset, size = offset_and_size_tuple
         len_axis_pts = len(self.axis_pts)
         direction = self.directions[id_num]
+
+        # make origin 3D
         origin = self.origin_pts[id_num]
+        origin = (origin[0], origin[1], 0.)
+
         if delta > 0:   # adding points
             if is_right:
                 index = size

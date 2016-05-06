@@ -60,11 +60,11 @@ class StrandSet(CNObject):
     # end def
 
     def __repr__(self):
-        if self._is_fwd == 0:
-            st = 'scaf'
+        if self._is_fwd:
+            st = 'fwd'
         else:
-            st = 'stap'
-        num = self._virtual_helix.number()
+            st = 'rev'
+        num = self._id_num
         return "<%s_StrandSet(%d)>" % (st, num)
     # end def
 
@@ -505,7 +505,11 @@ class StrandSet(CNObject):
 
     def getStrand(self, base_idx):
         """Returns the strand that overlaps with base_idx."""
-        return self.strand_array[base_idx]
+        try:
+            return self.strand_array[base_idx]
+        except:
+            print(self.strand_array)
+            raise
     # end def
 
     def getLegacyArray(self):

@@ -66,6 +66,7 @@ def decode(document, obj):
         raise TypeError("Lattice type not recognized")
     # document._addPart(part, use_undostack=False)
     setBatch(True)
+    delta = num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     vh_num_to_coord = {}
@@ -79,13 +80,11 @@ def decode(document, obj):
         ordered_id_list.append(vh_num)
     # make sure we retain the original order
     radius = DEFAULT_RADIUS
-    delta = num_bases - 256
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        part.createVirtualHelix(x, y, use_undostack=False)
-        if delta > 0:
-            part.resizeHelix(vh_num, True, delta)
+        part.createVirtualHelix(-40+x, -10+y, num_bases,
+                                id_num=vh_num, use_undostack=False)
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)
@@ -108,11 +107,7 @@ def decode(document, obj):
             insertions = helix['loop']
             skips = helix['skip']
 
-            # vh = part.virtualHelixAtCoord((row, col))
-            x, y = doLattice(radius, row, col)
-            is_even = isEven(row, col)
-            vh_num = part.getVirtualHelixAtPoint((x, y))
-            if isEven:
+            if isEven(row, col):
                 scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
             else:
                 stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
@@ -156,6 +151,7 @@ def decode(document, obj):
                 low_idx = stap_seg[vh_num][i]
                 high_idx = stap_seg[vh_num][i + 1]
                 stap_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+        # end for
     except AssertionError:
         print("Unrecognized file format.")
         raise
@@ -169,13 +165,8 @@ def decode(document, obj):
         stap = helix['stap']
         insertions = helix['loop']
         skips = helix['skip']
-        # from_vh = part.virtualHelixAtCoord((row, col))
-        # scaf_strand_set = from_vh.scaffoldStrandSet()
-        # stap_strand_set = from_vh.stapleStrandSet()
-        x, y = doLattice(radius, row, col)
-        is_even = isEven(row, col)
-        vh_num = part.getVirtualHelixAtPoint((x, y))
-        if isEven:
+
+        if isEven(row, col):
             scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
         else:
             stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
@@ -183,14 +174,19 @@ def decode(document, obj):
         # install scaffold xovers
         for (idx5p, to_vh_num, idx3p) in scaf_xo[vh_num]:
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
-            strand5p = scaf_strand_set.getStrand(idx5p)
-            # to_vh = part.virtualHelixAtCoord(vh_num_to_coord[to_vh_num])
+            try:
+                strand5p = scaf_strand_set.getStrand(idx5p)
+            except:
+                print(vh_num, idx5p)
+                print(scaf_strand_set.strand_heap)
+                print(stap_strand_set.strand_heap)
+                raise
             coord = vh_num_to_coord[to_vh_num]
             if isEven(*coord):
-                scaf_strand_set, stap_strand_set = part.getStrandSets(to_vh_num)
+                to_scaf_strand_set, to_stap_strand_set = part.getStrandSets(to_vh_num)
             else:
-                stap_strand_set, scaf_strand_set = part.getStrandSets(to_vh_num)
-            strand3p = scaf_strand_set.getStrand(idx3p)
+                to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
+            strand3p = to_scaf_strand_set.getStrand(idx3p)
             part.createXover(strand5p, idx5p, strand3p, idx3p,
                 update_oligo=False, use_undostack=False)
         # install staple xovers
@@ -199,18 +195,20 @@ def decode(document, obj):
             strand5p = stap_strand_set.getStrand(idx5p)
             coord = vh_num_to_coord[to_vh_num]
             if isEven(*coord):
-                scaf_strand_set, stap_strand_set = part.getStrandSets(to_vh_num)
+                to_scaf_strand_set, to_stap_strand_set = part.getStrandSets(to_vh_num)
             else:
-                stap_strand_set, scaf_strand_set = part.getStrandSets(to_vh_num)
-            strand3p = scaf_strand_set.getStrand(idx3p)
+                to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
+            strand3p = to_stap_strand_set.getStrand(idx3p)
             part.createXover(strand5p, idx5p, strand3p, idx3p,
                 update_oligo=False, use_undostack=False)
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
-    RefreshOligosCommand(part, include_scaffold=True,
-        colors=(prefs.DEFAULT_SCAF_COLOR, prefs.DEFAULT_STAP_COLOR)).redo()
+    RefreshOligosCommand(part,
+        colors=(prefs.DEFAULT_SCAF_COLOR,
+                prefs.DEFAULT_STAP_COLOR)).redo()
 
+    # KEEP COMMENTED OUT
     # SET DEFAULT COLOR
     # for oligo in part.oligos():
     #     if oligo.isStaple():
@@ -228,13 +226,8 @@ def decode(document, obj):
         stap = helix['stap']
         insertions = helix['loop']
         skips = helix['skip']
-        # vh = part.virtualHelixAtCoord((row, col))
-        # scaf_strand_set = vh.scaffoldStrandSet()
-        # stap_strand_set = vh.stapleStrandSet()
-        x, y = doLattice(radius, row, col)
-        is_even = isEven(row, col)
-        vh_num = part.getVirtualHelixAtPoint((x, y))
-        if isEven:
+
+        if isEven(row, col):
             scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
         else:
             stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
@@ -247,6 +240,8 @@ def decode(document, obj):
                 strand.addInsertion(base_idx, sum_of_insert_skip, use_undostack=False)
         # end for
         # populate colors
+        # print(vh_num)
+        # print([(uu, intToColorHex(yy)) for uu,yy in helix['stap_colors']])
         for base_idx, color_number in helix['stap_colors']:
             color = intToColorHex(color_number)
             strand = stap_strand_set.getStrand(base_idx)

@@ -157,7 +157,9 @@ class PreXoverManager(QGraphicsRectItem):
             npxi.setActive5p(False)
         if self.active_neighbor_group is None:
             return
-        self.active_neighbor_group.active_wedge_gizmo.deactivate()
+        wg = self.active_neighbor_group.active_wedge_gizmo
+        if wg is not None:
+            wg.deactivate()
         self.active_neighbor_group = None
     # end def
 # end class

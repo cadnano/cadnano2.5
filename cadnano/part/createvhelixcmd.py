@@ -4,10 +4,14 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.virtualhelix import VirtualHelixGroup
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(self, part, x, y, length):
+    def __init__(self, part, x, y, length, id_num=None):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
-        self.id_num = part.getNewIdNum()
+        if id_num is None:
+            self.id_num = part.getNewIdNum()
+        else:
+            part.reserveIdNum(id_num)
+            self.id_num = id_num
         self.origin_pt = (x, y, 0.)
         self.length = length
         self.color = part.getColor()

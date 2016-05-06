@@ -293,8 +293,8 @@ class NucleicAcidPart(Part):
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def createVirtualHelix(self, x, y, use_undostack=True):
-        c = CreateVirtualHelixCommand(self, x, y, 42)
+    def createVirtualHelix(self, x, y, length=42, id_num=None, use_undostack=True):
+        c = CreateVirtualHelixCommand(self, x, y, length, id_num=id_num)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
                                                 use_undostack=use_undostack)
     # end def
@@ -323,6 +323,9 @@ class NucleicAcidPart(Part):
         # pass that info in here in and then do the breaks
         if not strand3p.canInstallXoverAt(idx3p, strand5p, idx5p):
             print("createXover: no xover can be installed here")
+            print(strand5p, idx5p)
+            print(strand3p, idx3p)
+            raise ValueError("$$$$$$$$$$$$$$$")
             return
 
         ss5p = strand5p.strandSet()
@@ -543,7 +546,9 @@ class NucleicAcidPart(Part):
     # end def
 
     def resizeVirtualHelices(self, min_delta, max_delta, use_undostack=True):
-        """docstring for resizeVirtualHelices"""
+        """docstring for resizeVirtualHelices
+        TODO Update this to allow differing lengths of VirtualHelices
+        """
         c = ResizePartCommand(self, min_delta, max_delta)
         util.execCommandList(self, [c], desc="Resize part", \
                                                     use_undostack=use_undostack)

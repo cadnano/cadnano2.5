@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # encoding: utf-8
+import sys, traceback
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
 OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
 
@@ -31,10 +32,10 @@ class Oligo(CNObject):
         self._strand5p = None
         # self._length = 0
         self._is_loop = False
-        self._properties = {}
-        self._properties['name'] = "oligo%s" % str(id(self))[-4:]
-        self._properties['color'] = color if color else "#cc0000"
-        self._properties['length'] = 0
+        self._props = {}
+        self._props['name'] = "oligo%s" % str(id(self))[-4:]
+        self._props['color'] =  "#cc0000" if color is None else color
+        self._props['length'] = 0
     # end def
 
     def __repr__(self):
@@ -52,13 +53,16 @@ class Oligo(CNObject):
         olg = Oligo(self._part)
         olg._strand5p = self._strand5p
         olg._is_loop = self._is_loop
-        olg._properties = self._properties.copy()
+        olg._props = self._props.copy()
+        # print(">>>>checking color")
+        # self.getColor()
+        # olg.getColor()
         return olg
     # end def
 
-    def copyProperties(self):
-        return self._properties()
-    # end
+    # def copyProperties(self):
+    #     return self._props()
+    # # end
 
     # def deepCopy(self, part):
     #     """ not sure this actually gets called anywhere
@@ -67,7 +71,7 @@ class Oligo(CNObject):
     #     olg._strand5p = None
     #     olg._is_loop = self._is_loop
     #     # do we copy length?
-    #     olg._properties = self._properties.copy()
+    #     olg._props = self._props.copy()
     #     return olg
     # # end def
 
@@ -89,28 +93,52 @@ class Oligo(CNObject):
 
     ### ACCESSORS ###
     def getProperty(self, key):
-        return self._properties[key]
+        return self._props[key]
     # end def
 
     def getPropertyDict(self):
-        return self._properties
+        return self._props
     # end def
 
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
-        self._properties[key] = value
+        self._props[key] = value
         if key == 'color':
             self.oligoAppearanceChangedSignal.emit(self)
         self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 
     def getName(self):
-        return self._properties['name']
+        return self._props['name']
     # end def
 
     def getColor(self):
-        # return self._color
-        return self._properties['color']
+        color = self._props['color']
+        try:
+            if color is None:
+                print(self._props)
+                raise ValueError("Whhat Got None???")
+        except:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback, limit=5, file=sys.stdout)
+            traceback.print_stack()
+            sys.exit(0)
+        return color
+    # end def
+
+    def setColor(self, color):
+        if color is None:
+            raise ValueError("Whhat None???")
+        self._props['color'] = color
+    # end def
+
+    def setLength(self, length):
+        before = self.shouldHighlight()
+        # self._length = length
+        self.setProperty('length', length)
+        if before != self.shouldHighlight():
+            self.oligoSequenceClearedSignal.emit(self)
+            self.oligoAppearanceChangedSignal.emit(self)
     # end def
 
     def locString(self):
@@ -158,7 +186,7 @@ class Oligo(CNObject):
 
     def length(self):
         # return self._length
-        return self._properties['length']
+        return self._props['length']
     # end def
 
     def sequence(self):
@@ -216,7 +244,7 @@ class Oligo(CNObject):
 
     def applyColor(self, color, use_undostack=True):
         if color == self.getColor():
-            return  # oligo already has color
+            return  # oligo already has this color
         c = ApplyColorCommand(self, color)
         util.execCommandList(self, [c], desc="Color Oligo", use_undostack=use_undostack)
     # end def
@@ -275,20 +303,6 @@ class Oligo(CNObject):
         """
         self._part.removeOligo(self)
         self.setParent(None)
-    # end def
-
-    def setColor(self, color):
-        self._properties['color'] = color
-        # self._color = color
-    # end def
-
-    def setLength(self, length):
-        before = self.shouldHighlight()
-        # self._length = length
-        self.setProperty('length', length)
-        if before != self.shouldHighlight():
-            self.oligoSequenceClearedSignal.emit(self)
-            self.oligoAppearanceChangedSignal.emit(self)
     # end def
 
     def strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):

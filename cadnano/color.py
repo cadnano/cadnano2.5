@@ -48,7 +48,7 @@ except:
 def intToColor(color_number):
     """ legacy color support
     """
-    return Color('#' + hex(color_number)[2:])
+    return Color('#%0.6x' % (color_number))
 
 def intToColorHex(color_number):
-    return '#' + hex(color_number)[2:]
+    return '#%0.6x' % (color_number)

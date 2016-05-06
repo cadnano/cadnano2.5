@@ -254,6 +254,10 @@ class PreXoverItem(QGraphicsRectItem):
         self.clearFocus()
     # end def
 
+    def keyPressEvent(self, event):
+        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
+      # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def setLabel(self, text=None, outline=False):
         if text:

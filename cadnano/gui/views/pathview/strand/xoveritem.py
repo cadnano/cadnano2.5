@@ -417,6 +417,9 @@ class XoverItem(QGraphicsPathItem):
     def _updateColor(self, strand):
         oligo = strand.oligo()
         color = self.pen().color().name() if self.isSelected() else oligo.getColor()
+        if color is None:
+            print("None color:", color, self.isSelected())
+            color = '#cc0000'
         if oligo.shouldHighlight():
             pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
             alpha = 128

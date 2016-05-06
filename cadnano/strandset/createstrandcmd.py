@@ -36,8 +36,9 @@ class CreateStrandCommand(UndoCommand):
         # Set up the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(strand)
-        oligo.addToPart(strandset.part())
         strand.setOligo(oligo)
+
+        oligo.addToPart(strandset.part())
 
         # if strandset.isStaple():
         strand.reapplySequence()

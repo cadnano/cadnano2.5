@@ -171,6 +171,8 @@ class StrandItem(QGraphicsLineItem):
         self._updateColor(strand)
         if strand.connection3p():
             self._xover3pEnd._updateColor(strand)
+        for insertion in self.insertionItems().values():
+            insertion.updateItem()
     # end def
 
     def strandInsertionAddedSlot(self, strand, insertion):

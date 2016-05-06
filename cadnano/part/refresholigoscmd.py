@@ -13,12 +13,10 @@ class RefreshOligosCommand(UndoCommand):
     Hence, we disable oligo assignment during the xover creation step,
     and then do it all in one pass at the end with this command.
 
-    if include_scaffold is specified, the scaffold is refreshed as well
-
     if colors are specified as a tuple of (scaffold_color, staple_color)
     default colors are also applied to the oligos.
 
-    This command is meant for undoable steps, like file-io and autostaple
+    This command is meant for non-undoable steps, like file-io and autostaple
     """
     def __init__(self, part, colors=None):
         super(RefreshOligosCommand, self).__init__("refresh oligos")
@@ -30,7 +28,7 @@ class RefreshOligosCommand(UndoCommand):
         visited = {}
         part = self._part
         for id_num in part.getIdNums():
-            fwd_ss, rev_ss = part.getStrandsets(id_num)
+            fwd_ss, rev_ss = part.getStrandSets(id_num)
             for strand in rev_ss:
                 visited[strand] = False
             for strand in fwd_ss:
@@ -43,11 +41,9 @@ class RefreshOligosCommand(UndoCommand):
             visited[strand] = True
             start_oligo = strand.oligo()
 
-            if colors is not None:
-                # if strand.isStaple():
-                start_oligo.setColor(colors[1])
-                # else:
-                    # start_oligo.setColor(colors[0])
+            # if colors is not None:
+            #     # print("refresh color", colors[1])
+            #     start_oligo.setColor(colors[1])
 
             strand5gen = strand.generator5pStrand()
             # this gets the oligo and burns a strand in the generator

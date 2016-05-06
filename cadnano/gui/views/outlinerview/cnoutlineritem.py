@@ -60,9 +60,9 @@ class CNOutlinerItem(QTreeWidgetItem):
         cn_model = self._cn_model
         name = self.data(NAME_COL, Qt.DisplayRole)
         color = self.data(COLOR_COL, Qt.DisplayRole)
-        if name != cn_model.getName():
+        if name is not None and name != cn_model.getName():
             cn_model.setProperty('name', name)
-        if color != cn_model.getColor():
+        if color is not None and color != cn_model.getColor():
             cn_model.setProperty('color', color)
     # end def
 
