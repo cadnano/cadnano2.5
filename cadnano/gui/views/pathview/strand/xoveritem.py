@@ -272,7 +272,8 @@ class XoverItem(QGraphicsPathItem):
         if strand5p:
             strand3p = strand5p.connection3p()
             if strand3p is not None and node3:
-                if node3.virtualHelix():   # unclear about this condition now
+                # if node3.virtualHelix():   # unclear about this condition now
+                if node3.virtualHelixItem() is not None:
                     self.update(self._strand5p)
                 else:
                     node3.remove()

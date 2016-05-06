@@ -602,7 +602,10 @@ class DocumentController():
         self.win.path_graphics_view.setViewportUpdateOn(False)
         self.win.slice_graphics_view.setViewportUpdateOn(False)
 
-        self.newDocument(fname=fname)
+
+        # NC commented out single document stuff
+        # self.newDocument(fname=fname)
+
         decodeFile(fname, document=self._document)
 
         self.win.path_graphics_view.setViewportUpdateOn(True)

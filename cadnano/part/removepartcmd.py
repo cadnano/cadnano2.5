@@ -1,4 +1,6 @@
 from cadnano.cnproxy import UndoCommand
+# import sys
+# import traceback
 
 class RemovePartCommand(UndoCommand):
     """
@@ -16,6 +18,11 @@ class RemovePartCommand(UndoCommand):
         doc = self._document
         doc.removeChild(part)
         part.setDocument(None)
+        # try:
+        #     raise
+        # except:
+        #     traceback.print_stack()
+        #     sys.exit(0)
         part.partRemovedSignal.emit(part)
     # end def
 

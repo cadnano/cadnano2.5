@@ -140,6 +140,8 @@ class OutlinerTreeWidget(QTreeWidget):
         # 2. handle document selection
         if isinstance(tree_widget_item, NucleicAcidPartItem):
             pass
+            # print("&&&&&&&&&&&&&&&&&&&")
+            # print(tree_widget_item)
         elif isinstance(tree_widget_item, VirtualHelixItem):
             for item in model_to_be_selected:
                 id_num, part = item.idNum(), item.part()
