@@ -125,7 +125,7 @@ class InsertionItem(QGraphicsPathItem):
         self._strand = strand
         self._insertion = insertion
         self._seq_item = QGraphicsPathItem(parent=self)
-        self._is_on_top = is_on_top = virtual_helix_item.isStrandOnTop(strand)
+        self._is_on_top = is_on_top = strand.isForward()
         y = 0 if is_on_top else _BW
         self.setPos(_BW*insertion.idx(), y)
         self.setZValue(styles.ZINSERTHANDLE)

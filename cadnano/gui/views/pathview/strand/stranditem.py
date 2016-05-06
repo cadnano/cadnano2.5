@@ -52,8 +52,6 @@ class StrandItem(QGraphicsLineItem):
 
         # orientation
         self.is_forward = is_forward
-        # self._isOnTop = virtual_helix_item.isStrandOnTop(model_strand)
-        # label
         self._seq_label = QGraphicsSimpleTextItem(self)
 
         self.refreshInsertionItems(model_strand)

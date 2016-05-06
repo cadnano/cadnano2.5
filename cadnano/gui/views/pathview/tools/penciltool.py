@@ -367,7 +367,6 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self._strand = strand3p
         self.setParentItem(virtual_helix_item)
         self._idx = idx
-        # self._is_on_top = virtual_helix_item.isStrandOnTop(strand3p)
         self._is_on_top = self.is_forward = strand3p.strandSet().isForward()
         self.updatePositionAndAppearance()
     # end def
