@@ -329,7 +329,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         """ update the boundaries to what's in the model with a minimum
         size
         """
-        self._rect = QRectF(*self.part().dimensions(self.scale_factor))
+        xLL, yLL, xUR, yUR = self.part().dimensions(self.scale_factor)
+        self._rect = QRectF(QPointF(xLL, yLL), QPointF(xUR, yUR))
     # end def
 
     def bounds(self):

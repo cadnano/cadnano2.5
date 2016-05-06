@@ -57,8 +57,7 @@ def decode(document, obj):
         # num_cols = max(32, max_col_json, cadnano.app().prefs.squareCols)
         num_rows = max(30, max_row_json, prefs.SQUARE_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.SQUARE_PART_MAXCOLS)
-        # part = document.addSquareDnaPart(max_row=num_rows, max_col=num_cols, max_steps=steps)
-        # part = SquarePart(document=document, max_row=num_rows, max_col=num_cols, max_steps=steps)
+
         part = document._controller.actionAddDnaPart()
         doLattice = SquareDnaPart.latticeCoordToPositionXY
         isEven = SquareDnaPart.isEvenParity
@@ -70,20 +69,48 @@ def decode(document, obj):
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     vh_num_to_coord = {}
+    min_row, max_row = 10000, -10000
+    min_col, max_col = 10000, -10000
+
+    # find row, column limits
+    for helix in obj['vstrands']:
+        row = helix['row']
+        if row < min_row:
+            min_row = row
+        if row > max_row:
+            max_row = row
+        col = helix['col']
+        if col < min_col:
+            min_col = col
+        if col > max_col:
+            max_col = col
+    # end for
+
+    delta_row = (max_row + min_row) // 2
+    delta_column = (max_col + min_col) // 2
+
+    print("Found cadnano version 2 file")
+    print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
+    print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
+
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row = helix['row']
         col = helix['col']
         scaf= helix['scaf']
-        coord = (row, col)
+        # align row and columns to the center 0, 0
+        coord = (row -  delta_row, col - delta_column)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
+    # end for
+
     # make sure we retain the original order
     radius = DEFAULT_RADIUS
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        part.createVirtualHelix(-40+x, -10+y, num_bases,
+        # print("%d:" % vh_num, x, y)
+        part.createVirtualHelix(x, y, num_bases,
                                 id_num=vh_num, use_undostack=False)
     if not getReopen():
         setBatch(False)
@@ -100,8 +127,9 @@ def decode(document, obj):
     try:
         for helix in obj['vstrands']:
             vh_num = helix['num']
-            row = helix['row']
-            col = helix['col']
+            row, col = vh_num_to_coord[vh_num]
+            # row = helix['row']
+            # col = helix['col']
             scaf = helix['scaf']
             stap = helix['stap']
             insertions = helix['loop']
@@ -159,8 +187,9 @@ def decode(document, obj):
     # INSTALL XOVERS
     for helix in obj['vstrands']:
         vh_num = helix['num']
-        row = helix['row']
-        col = helix['col']
+        row, col = vh_num_to_coord[vh_num]
+        # row = helix['row']
+        # col = helix['col']
         scaf = helix['scaf']
         stap = helix['stap']
         insertions = helix['loop']
@@ -220,8 +249,9 @@ def decode(document, obj):
     # COLORS, INSERTIONS, SKIPS
     for helix in obj['vstrands']:
         vh_num = helix['num']
-        row = helix['row']
-        col = helix['col']
+        # row = helix['row']
+        # col = helix['col']
+        row, col = vh_num_to_coord[vh_num]
         scaf = helix['scaf']
         stap = helix['stap']
         insertions = helix['loop']
@@ -240,8 +270,6 @@ def decode(document, obj):
                 strand.addInsertion(base_idx, sum_of_insert_skip, use_undostack=False)
         # end for
         # populate colors
-        # print(vh_num)
-        # print([(uu, intToColorHex(yy)) for uu,yy in helix['stap_colors']])
         for base_idx, color_number in helix['stap_colors']:
             color = intToColorHex(color_number)
             strand = stap_strand_set.getStrand(base_idx)
@@ -258,9 +286,6 @@ def decode(document, obj):
                     scaf_ss, stap_ss = part.getStrandSets(vh_num)
                 else:
                     stap_ss, scaf_ss = part.getStrandSets(vh_num)
-                # vh = part.virtualHelixAtCoord(coord)
-                # scaf_ss = vh.scaffoldStrandSet()
-                # stapStrandSet = vh.stapleStrandSet()
                 strand = scaf_ss.getStrand(idx)
                 # print "sequence", seq, vh, idx,  strand.oligo()._strand5p
                 strand.oligo().applySequence(seq, use_undostack=False)
