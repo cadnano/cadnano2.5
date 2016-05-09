@@ -64,7 +64,8 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def resetRootItemSlot(self, doc):
-        pass
+        self.select_tool.deselectItems()
+        self.scene().views()[0].clearGraphicsView()
     # end def
 
     ### ACCESSORS ###
@@ -81,10 +82,6 @@ class SliceRootItem(QGraphicsRectItem):
     def removePartItem(self, part_item):
         del self._instance_items[part_item]
     # end def
-
-    # def removeOrigamiPartItem(self, nucleicacid_part_item):
-    #     del self._instance_items[nucleicacid_part_item]
-    # # end def
 
     def resetDocumentAndController(self, document):
         """docstring for resetDocumentAndController"""

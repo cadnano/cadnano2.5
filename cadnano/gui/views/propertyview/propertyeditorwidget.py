@@ -142,7 +142,7 @@ class PropertyEditorWidget(QTreeWidget):
     # end def
 
     def resetRootItemSlot(self, doc):
-        pass
+        self.clear()
     # end def
 
     ### ACCESSORS ###

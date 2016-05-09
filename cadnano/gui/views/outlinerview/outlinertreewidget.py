@@ -476,7 +476,7 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def resetRootItemSlot(self, doc):
-        pass
+        self.clear()
     # end def
 
     def clearSelectionsSlot(self, doc):

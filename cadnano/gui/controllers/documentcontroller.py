@@ -19,6 +19,11 @@ from PyQt5.QtWidgets import QApplication, QDialog, QDockWidget, QFileDialog
 from PyQt5.QtWidgets import QGraphicsItem, QMainWindow, QMessageBox, QStyleOptionGraphicsItem
 from PyQt5.QtSvg import QSvgGenerator
 
+""" Allow only one part per document for now until part moving
+is properly supported
+"""
+ONLY_ONE = True
+
 class DocumentController():
     """
     Connects UI buttons to their corresponding actions in the model.
@@ -423,6 +428,8 @@ class DocumentController():
 
 
     def actionAddDnaPart(self):
+        if ONLY_ONE:
+            self.newDocument() # only allow one part for now
         part = self._document.addDnaPart()
         self.setActivePart(part)
         return part
@@ -477,7 +484,10 @@ class DocumentController():
 
     ### PRIVATE SUPPORT METHODS ###
     def newDocument(self, doc=None, fname=None):
-        """Creates a new Document, reusing the DocumentController."""
+        """Creates a new Document, reusing the DocumentController.
+        Tells all of the views to reset and removes all items from
+        them
+        """
         if fname is not None and self._filename == fname:
             setReopen(True)
         self._document.resetViews()
@@ -604,7 +614,8 @@ class DocumentController():
 
 
         # NC commented out single document stuff
-        # self.newDocument(fname=fname)
+        if ONLY_ONE:
+            self.newDocument(fname=fname)
 
         decodeFile(fname, document=self._document)
 
