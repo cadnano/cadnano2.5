@@ -84,7 +84,8 @@ class ActiveSliceItem(QGraphicsRectItem):
         the part and changes the receiver to reflect the part"""
         label = self._label
         bw = _BASE_WIDTH
-        bi = util.clamp(int(base_index), 0, self.part().maxBaseIdx(0))   # TODO fix this
+        self._high_drag_bound = mbi = self.part().maxBaseIdx(0) - 1
+        bi = util.clamp(int(base_index), 0, mbi)   # TODO fix this
         # self.setPos(bi * bw, -styles.PATH_HELIX_PADDING)
         self.setPos(bi * bw, -styles.PATH_HELIX_PADDING/2)
 

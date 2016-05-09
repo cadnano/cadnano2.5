@@ -425,7 +425,6 @@ class StrandSet(CNObject):
         sa = self.strand_array
         sh = self.strand_heap
         lsh = len(sh)
-
         strand = sa[idx_low]
 
         if strand is None:
