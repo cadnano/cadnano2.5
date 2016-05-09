@@ -524,6 +524,12 @@ class Document(CNObject):
                 part.remove(use_undostack=False)
     # end def
 
+    def getParts(self):
+        for item in self._children:
+            if isinstance(item, Part):
+                yield item
+    # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def controller(self):
         return self._controller

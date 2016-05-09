@@ -1,60 +1,49 @@
 from os.path import basename
+import numpy as np
 
 from cadnano.enum import StrandType
 import json
 import io
 
+from cadnano.document import Document
+
+import cadnano.fileio.v3encode as v3encode
+
 def encodeToFile(filename, document):
-    json_string = encode(document, nno_dict)
+    json_string = encode(document)
     with io.open(filename, 'w', encoding='utf-8') as fd:
         fd.write(json_string)
 # end def
 
 def encode(document):
-    obj = legacy_dict_from_doc(document)
-    json_string = json.dumps(obj, separators=(',', ':'))  # compact encoding
+    # obj = legacy_dict_from_doc(document)
+    obj = v3encode.encodeDocument(document)
+    json_string = json.dumps(obj, separators=(',', ':'), cls=EncoderforPandas)  # compact encoding
     return json_string
 
 def legacy_dict_from_doc(document):
     part = document.selectedInstance().reference()
     num_bases = part.maxBaseIdx()+1
-    return encodePart(part, name=fname)
+    return v2encode.encodePart(part, name=fname)
+# end def
 
-def encodePart(part, name=None):
-    helix_order_list = part.getImportVirtualHelixOrder()
-    num_bases = part.maxBaseIdx()+1
-    part_name = name if name is not None else part.name()
-    vh_list = []
-    # iterate through virtualhelix list
-    for row, col in helix_order_list:
-        vh = part.virtualHelixAtCoord((row, col))
-        # insertions and skips
-        insertion_dict = part.insertions()[(row, col)]
-        insts = [0 for i in range(num_bases)]
-        skips = [0 for i in range(num_bases)]
-        for idx, insertion in insertion_dict.items():
-            if insertion.isSkip():
-                skips[idx] = insertion.length()
-            else:
-                insts[idx] = insertion.length()
-        # colors
-        stap_colors = []
-        stap_strandset = vh.stapleStrandSet()
-        for strand in stap_strandset:
-            if strand.connection5p() is None:
-                c = str(strand.oligo().getColor())[1:]  # drop the hash
-                stap_colors.append([strand.idx5Prime(), int(c, 16)])
-
-        vh_dict = {"row": row,
-                  "col": col,
-                  "num": vh.number(),
-                  "scaf": vh.getLegacyStrandSetArray(StrandType.SCAFFOLD),
-                  "stap": vh.getLegacyStrandSetArray(StrandType.STAPLE),
-                  "loop": insts,
-                  "skip": skips,
-                  "scafLoop": [],
-                  "stapLoop": [],
-                  "stap_colors": stap_colors}
-        vh_list.append(vh_dict)
-    obj = {"name": part_name , "vstrands": vh_list}
-    return obj
+class EncoderforPandas(json.JSONEncoder):
+    """ Special encoder to coerce numpy number types
+    python types
+    """
+    def default(self, obj):
+        if isinstance(obj, (np.integer, np.floating, np.bool_)):
+            return obj.item()
+        # if isinstance(obj, (np.integer):
+        #     return int(obj)
+        # elif isinstance(obj, np.floating):
+        #     return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            try:
+                return super(EncoderforPandas, self).default(obj)
+            except:
+                print(type(obj))
+                raise
+# end class

@@ -341,13 +341,13 @@ class Part(VirtualHelixGroup):
         """
         mods = self._mods
         res = {}
-        for mid in mods.keys():
+        for mid in list(mods.keys()):
             if mid != 'int_instances' and mid != 'ext_instances':
                 res[mid] = mods[mid].copy()
                 del res[mid]['int_locations']
                 del res[mid]['ext_locations']
-        res['int_instances'] = self._mods['int_instances']
-        res['ext_instances'] = self._mods['ext_instances']
+        res['int_instances'] = mods['int_instances']
+        res['ext_instances'] = mods['ext_instances']
         return res
     #end def
 

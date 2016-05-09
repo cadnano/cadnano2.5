@@ -73,7 +73,7 @@ class VirtualHelixGroup(CNObject):
         self.indices = np.zeros((DEFAULT_FULL_SIZE,), dtype=int)
 
         # 2. per virtual helix allocations
-        self.total_id_nums = 0
+        self.total_id_nums = 0 # should be equal to len(self.reserved_ids)
         """
         for doing 2D X,Y manipulation for now.  keep track of
         XY position of virtual helices
@@ -194,6 +194,9 @@ class VirtualHelixGroup(CNObject):
             # and _highest_id_num_used + 1 is not in the reserve bin
             return self._highest_id_num_used + 1
     # end def
+
+    def getIdNumMax(self):
+        return self._highest_id_num_used
 
     def getVirtualHelixName(self, id_num):
         return self.getVirtualHelixProperties(id_num, 'name')
@@ -776,6 +779,14 @@ class VirtualHelixGroup(CNObject):
         else:
             return props.item() if isinstance(props, (np.float64, np.int64, np.bool_)) else props
     # end
+
+    def helixPropertiesAndOrigins(self):
+        lim = self._highest_id_num_used + 1
+        props = self.vh_properties[:lim]
+        props = props.to_dict(orient='list')
+        origins = self.origin_pts[:lim]
+        return props, origins
+    # end def
 
     def getAllVirtualHelixProperties(self, id_num, safe=True):
         """

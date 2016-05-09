@@ -86,13 +86,13 @@ class ChangeInsertionCommand(UndoCommand):
     the caller of this needs to handle the case where a zero length
     is required and call RemoveInsertionCommand
     """
-    def __init__(self, strand, idx, newLength):
+    def __init__(self, strand, idx, new_length):
         super(ChangeInsertionCommand, self).__init__("change insertion")
         self._strand = strand
         id_num = strand.idNum()
         self._insertions = strand.part().insertions()[id_num]
         self._idx = idx
-        self._new_length = newLength
+        self._new_length = new_length
         self._old_length = self._insertions[idx].length()
         self._comp_strand = \
                     strand.strandSet().complementStrandSet().getStrand(idx)

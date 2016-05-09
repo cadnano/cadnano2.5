@@ -14,6 +14,9 @@ from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 
+PROPERTY_KEYS = ['name', 'color', 'length']
+ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
+
 class Oligo(CNObject):
     """
     Oligo is a group of Strands that are connected via 5' and/or 3'
@@ -58,6 +61,22 @@ class Oligo(CNObject):
         # self.getColor()
         # olg.getColor()
         return olg
+    # end def
+
+    def dump(self):
+        """ Return tuple of this oligo and its properties.
+        It's expected that caller will copy the properties
+        if mutating
+        """
+        s5p = self._strand5p
+        # key = [s5p.idNum(), s5p.idx5Prime(), self._is_loop]
+        # props = self._props
+        # return key + [props[k] for k in PROPERTY_KEYS]
+        key = { 'id_num': s5p.idNum(),
+                'idx5p':s5p.idx5Prime(),
+                'is_loop': self._is_loop}
+        key.update(self._props)
+        return key
     # end def
 
     # def copyProperties(self):

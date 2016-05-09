@@ -511,6 +511,26 @@ class StrandSet(CNObject):
             raise
     # end def
 
+    def dump(self, xover_list):
+        """ Serialize a StrandSet, and append to a xover_list of xovers
+        adding a xover if the 3 prime end of it is founds
+        TODO update this to support strand properties
+        Args:
+            xover_list (List): A list to append xovers to
+        Returns:
+            List[Tuple]: indices low and high of each strand in the Strandset
+        """
+        sh = self.strand_heap
+        idxs = [strand.idxs() for strand in sh]
+        is_fwd = self._is_fwd
+        for strand in sh:
+            s3p = strand.connection3p()
+            if s3p is not None:
+                xover = (strand.idNum(), is_fwd, strand.idx3Prime()) + s3p.dump5p()
+                xover_list.append(xover)
+        return idxs
+    #end def
+
     def getLegacyArray(self):
         """docstring for getLegacyArray"""
         num = self._id_num

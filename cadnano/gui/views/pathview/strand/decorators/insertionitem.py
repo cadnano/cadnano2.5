@@ -241,7 +241,7 @@ class InsertionItem(QGraphicsPathItem):
 
                 temp_path = QPainterPath()
                 # 1. draw the text
-                temp_path.addText(0,0, font, base_text[i if is_on_top else -i-1])
+                temp_path.addText(0, 0, font, base_text[i if is_on_top else -i-1])
                 # 2. center it at the zero point different for top and bottom
                 # strands
                 if not is_on_top:

@@ -3,7 +3,7 @@ import sys
 
 from cadnano import app, setReopen, setBatch
 from cadnano.fileio.nnodecode import decodeFile
-from cadnano.fileio.encoder import encode
+from cadnano.fileio.nnoencode import encodeToFile
 
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
@@ -632,6 +632,7 @@ class DocumentController():
             # manual garbage collection to prevent hang (in osx)
             del self.fileopendialog
             self.fileopendialog = None
+        self.setFilename(fname)
 
     def saveFileDialogCallback(self, selected):
         """If the user chose to save, write to that file."""
@@ -741,10 +742,8 @@ class DocumentController():
                 return False
             filename = self.filename()
         try:
-            with open(filename, 'w') as f:
-                helix_order_list = self.win.pathroot.getSelectedInstanceOrderedVHList()
-                encode(self._document, helix_order_list, f)
-        except IOError:
+            encodeToFile(filename, self._document)
+        except:
             flags = Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet
             errorbox = QMessageBox(QMessageBox.Critical,
                                    "cadnano",
@@ -754,6 +753,7 @@ class DocumentController():
                                    flags)
             errorbox.setWindowModality(Qt.WindowModal)
             errorbox.open()
+            raise
             return False
         self.undoStack().setClean()
         self.setFilename(filename)

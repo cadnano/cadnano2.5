@@ -381,6 +381,10 @@ class Strand(CNObject):
         return self._strandset.isForward()
     # end def
 
+    def dump5p(self):
+        return self._id_num, self._is_forward, self.idx5Prime()
+    # def
+
     def getSequenceList(self):
         """
         return the list of sequences strings comprising the sequence and the

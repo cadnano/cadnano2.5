@@ -2,22 +2,22 @@
     "name": "<date>",
     "vstrands": [
                 {
-                    "num": "<int>",
-                    "row":,
-                    "col":,
+                    "num": 1,
+                    "row":1,
+                    "col":1,
                     "scaf":[["<vh5p>", "<idx5p>", "<vh3p>", "<idx3p>"],],
                     "stap":[["<vh5p>", "<idx5p>", "<vh3p>", "<idx3p>"]],
-                    "skip":[] "(length of vh)",
-                    "loop":[] "(length of vh)",
+                    "skip":[-1,...], // length of vh
+                    "loop":[30, ...], // insertions length of vh
                     "scafLoop":[],
                     "stapLoop":[],
                 },
                 ],
     "oligos":[
             {
-                "vh_num":,
-                "idx":,
-                "seq":,
+                "vh_num": 1,
+                "idx": 1,
+                "seq": "ACGT",
             },
         ],
     "modifications":{
@@ -42,11 +42,14 @@
 
 {
     "format": "Version 3.0",
+    "date":,
     "name": ,
-    "parts": {
+    "parts": [
+        {
         "name":,
         "total_points": 1,
         "total_id_nums": 1,
+        "position": [],
         "virtual_helices": [
             {  "name":,
                 "is_visible": true,
@@ -76,12 +79,13 @@
                     "properties":[
                                     [
                                         [{"color":"#ff0000"}, null, ...]
-                                        [{"color":"<rstop>"}, null, ...],
-                                    ],
-                                    ...]
+                                        [{"color":"#cc0000"}, null, ...],
+                                    ], // list of properties per vh, per strandset
+                                    ...],
                     },
+        "insertions": [{"1": 30, ...}, {"0": -1,...}, ...], // insertions
         "xovers": [["<id_5p>","<isfwd>", "<idx5p>", "<id_3p>", "<isfwd>", "<idx3p>"], ...],
-        "oligos": [{
+        "oligos": [{ // 5 prime end of the oligo
                 "vh_num":,
                 "5pidx":,
                 "fwd":,
@@ -96,14 +100,22 @@
                         "color":"#00FF00",
                         "seq5p":"",
                         "seq3p":"",
-                        "seqInt":"",
+                        "seqint":"",
                         "note": ""
                     }
                 },
                 // now internal and external instances
                 // "{},{},{}"
-                "internal_instances": {"<id>,<idx>,<isfwd>": "<id>"},
+                "internal_instances": {"<id>, <idx>, <isfwd>": "<id>"},
                 "external_instances": {},
+        },
+        "view_properties": {
+            "slice": {"position": [100.0, 100.0]},
+            "path": {
+                "order": [1, 2, 3],
+                "position": [100.0, 100.0]
             }
-    }
+        }
+    } // end part
+    ]
 }
