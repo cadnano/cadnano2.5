@@ -1139,7 +1139,7 @@ class VirtualHelixGroup(CNObject):
 
         # compute square of distance to point
         inner1d(difference, difference, out=delta)
-        close_points, = np.where(delta < radius*radius)
+        close_points, = np.where(delta <= radius*radius)
         # take then sort the indices of the points in range
         sorted_idxs = np.argsort(np.take(delta, close_points))
 

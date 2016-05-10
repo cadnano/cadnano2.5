@@ -116,7 +116,8 @@ class NucleicAcidPart(Part):
         multiples of radius
         """
         radius = self._RADIUS
-        res = self.queryVirtualHelixOrigin(2*radius, point)
+        # add a margin of 0.001 to account for floating point errors
+        res = self.queryVirtualHelixOrigin(2*radius - 0.001, point)
         res = list(res)
         if len(res) > 0:
             # print(res)

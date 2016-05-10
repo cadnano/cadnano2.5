@@ -93,8 +93,8 @@ class OutlinerTreeWidget(QTreeWidget):
             item = self.itemFromIndex(index)
             if item.FILTER_NAME not in filter_set:
                 if index.column() == 0:
-                    print("deselect", item.FILTER_NAME, filter_set,
-                                        index.row(), index.column())
+                    # print("deselect", item.FILTER_NAME, filter_set,
+                    #                     index.row(), index.column())
                     out_deselection.append(index)
             else:
                 out_selection.append(index)
