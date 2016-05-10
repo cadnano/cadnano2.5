@@ -231,6 +231,26 @@ class Document(CNObject):
             return False
     # end def
 
+    def isOligoSelected(self, oligo):
+        strand5p = oligo.strand5p()
+        return self.isModelStrandSelected(strand5p)
+    # end def
+
+    def selectOligo(self, oligo):
+        strand5p = oligo.strand5p()
+        both_ends = (True, True)
+        for strand in strand5p.generator3pStrand():
+            self.addStrandToSelection(strand, both_ends)
+        self.updateStrandSelection()
+    # end def
+
+    def deselectOligo(self, oligo):
+        strand5p = oligo.strand5p()
+        for strand in strand5p.generator3pStrand():
+            self.removeStrandFromSelection(strand)
+        self.updateStrandSelection()
+    # end def
+
     def getSelectedValue(self, obj):
         """
         obj is an objects to look up

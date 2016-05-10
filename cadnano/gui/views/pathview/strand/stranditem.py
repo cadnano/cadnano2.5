@@ -26,6 +26,7 @@ _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0,0, _BASE_WIDTH, _BASE_WIDTH)
 _NO_PEN = QPen(Qt.NoPen)
 
+SELECT_COLOR = "#ff3333"
 
 class StrandItem(QGraphicsLineItem):
     FILTER_NAME = "strand"
@@ -150,9 +151,13 @@ class StrandItem(QGraphicsLineItem):
         xover_3p_end = self.xover_3p_end
         strand = self._model_strand
         if key == 'is_visible':
+            document = self._viewroot.document()
+            # print("isselect", self.isSelected(), new_value)
             if new_value:
                 self.show()
                 xover_3p_end.show()
+                xover_3p_end.modelSelect(document)
+                self.selectIfRequired(document, (True, True))
             else:
                 self._low_cap.hide()
                 self._high_cap.hide()
@@ -161,9 +166,6 @@ class StrandItem(QGraphicsLineItem):
                 xover_3p_end.hide()
                 return
         self._updateAppearance(strand)
-        # self._updateColor(strand)
-        # if strand.connection3p():
-        #     xover_3p_end._updateColor(strand)
         for insertion in self.insertionItems().values():
             insertion.updateItem()
     # end def
@@ -418,7 +420,7 @@ class StrandItem(QGraphicsLineItem):
 
     def _updateColor(self, strand):
         oligo = strand.oligo()
-        color = oligo.getColor()
+        color = SELECT_COLOR if self.isSelected() else oligo.getColor()
         if oligo.shouldHighlight():
             alpha = 128
             pen_width = styles.PATH_STRAND_HIGHLIGHT_STROKE_WIDTH
@@ -697,10 +699,10 @@ class StrandItem(QGraphicsLineItem):
 
     def setSelectedColor(self, value):
         if value == True:
-            color = QColor("#ff3333")
+            color = getColorObj(SELECT_COLOR)
         else:
             oligo = self._model_strand.oligo()
-            color = QColor(oligo.getColor())
+            color = getColorObj(oligo.getColor())
             if oligo.shouldHighlight():
                 color.setAlpha(128)
         pen = self.pen()
@@ -778,19 +780,29 @@ class StrandItem(QGraphicsLineItem):
         if con3p:
             # perhaps change this to a direct call, but here are seeds of an
             # indirect way of doing selection checks
-            if document.isModelStrandSelected(con3p) and document.isModelStrandSelected(strand5p):
+            if (    document.isModelStrandSelected(con3p) and
+                    document.isModelStrandSelected(strand5p) ):
                 val3p = document.getSelectedStrandValue(con3p)
                 # print("xover idx", indices)
                 test3p = val3p[0] if con3p.isForward() else val3p[1]
                 test5p = idx_h if strand5p.isForward() else idx_l
                 if test3p and test5p:
                     xoi = self.xover_3p_end
-                    if not xoi.isSelected() or not xoi.group():
+                    # if not xoi.isSelected() or not xoi.group():
+                    if not xoi.isSelected() or xoi.group() is None:
                         selection_group.setNormalSelect(False)
                         selection_group.addToGroup(xoi)
                         xoi.modelSelect(document)
                         selection_group.setNormalSelect(True)
-                # end if
+            else:
+                xoi = self.xover_3p_end
+                xoi.restoreParent()
+                # # print("should deselect xover")
+                # if xoi.isSelected() or xoi.group() is not None:
+                #     selection_group.setNormalSelect(False)
+                #     selection_group.addToGroup(xoi)
+                #     xoi.modelDeselect(document)
+                #     selection_group.setNormalSelect(True)
             # end if
         # end if
         # Now check the endpoints

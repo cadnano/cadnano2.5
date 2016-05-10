@@ -6,7 +6,7 @@ from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 
 class OligoItem(CNOutlinerItem, AbstractOligoItem):
-    FILTER_NAME = "strand"
+    FILTER_NAME = "oligo"
     def __init__(self, model_oligo, parent):
         super(OligoItem, self).__init__(model_oligo, parent)
         self.setFlags(LEAF_FLAGS)

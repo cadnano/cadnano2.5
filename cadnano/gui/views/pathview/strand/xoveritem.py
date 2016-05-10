@@ -593,6 +593,8 @@ class XoverItem(QGraphicsPathItem):
 
     def modelSelect(self, document):
         strand5p = self._strand5p
+        if strand5p is None:
+            return
         strand3p = strand5p.connection3p()
 
         test5p = document.isModelStrandSelected(strand5p)

@@ -214,16 +214,24 @@ class DocumentController():
     def _strandFilterUpdate(self):
         win = self.win
         filter_list = []
+        add_oligo = False
         if win.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
+            add_oligo = True
         if win.action_filter_strand.isChecked():
             filter_list.append("strand")
+            add_oligo = True
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
+            add_oligo = True
         if win.action_filter_fwd.isChecked():
             filter_list.append("forward")
+            add_oligo = True
         if win.action_filter_rev.isChecked():
             filter_list.append("reverse")
+            add_oligo = True
+        if add_oligo:
+            filter_list.append("oligo")
         self._document.setFilterSet(filter_list)
     # end def
 

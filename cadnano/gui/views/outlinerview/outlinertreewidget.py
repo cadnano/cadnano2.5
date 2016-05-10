@@ -93,8 +93,8 @@ class OutlinerTreeWidget(QTreeWidget):
             item = self.itemFromIndex(index)
             if item.FILTER_NAME not in filter_set:
                 if index.column() == 0:
-                    # print("deselect", item.FILTER_NAME,
-                    #                     index.row(), index.column())
+                    print("deselect", item.FILTER_NAME, filter_set,
+                                        index.row(), index.column())
                     out_deselection.append(index)
             else:
                 out_selection.append(index)
@@ -140,15 +140,14 @@ class OutlinerTreeWidget(QTreeWidget):
         # 2. handle document selection
         if isinstance(tree_widget_item, NucleicAcidPartItem):
             pass
-            # print("&&&&&&&&&&&&&&&&&&&")
-            # print(tree_widget_item)
         elif isinstance(tree_widget_item, VirtualHelixItem):
             for item in model_to_be_selected:
-                id_num, part = item.idNum(), item.part()
-                is_selected = document.isVirtualHelixSelected(part, id_num)
-                # print("select id_num", id_num, is_selected)
-                if not is_selected:
-                    document.addVirtualHelicesToSelection(part, [id_num])
+                if isinstance(item, VirtualHelixItem):
+                    id_num, part = item.idNum(), item.part()
+                    is_selected = document.isVirtualHelixSelected(part, id_num)
+                    # print("select id_num", id_num, is_selected)
+                    if not is_selected:
+                        document.addVirtualHelicesToSelection(part, [id_num])
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
                 if isinstance(item, VirtualHelixItem):
@@ -159,22 +158,21 @@ class OutlinerTreeWidget(QTreeWidget):
                         document.removeVirtualHelicesFromSelection(part, [id_num])
             model_to_be_deselected.clear()
         elif isinstance(tree_widget_item, OligoItem):
-            print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
-            # for item in model_to_be_selected:
-            #     id_num, part = item.idNum(), item.part()
-            #     is_selected = document.isVirtualHelixSelected(part, id_num)
-            #     # print("select id_num", id_num, is_selected)
-            #     if not is_selected:
-            #         document.addVirtualHelicesToSelection(part, [id_num])
+            for item in model_to_be_selected:
+                if isinstance(item, OligoItem):
+                    m_oligo = item.cnModel()
+                    is_selected = document.isOligoSelected(m_oligo)
+                    if not is_selected:
+                        print("selecting", m_oligo)
+                        document.selectOligo(m_oligo)
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
                 if isinstance(item, OligoItem):
-                    # id_num, part = item.idNum(), item.part()
-                    # is_selected = document.isVirtualHelixSelected(part, id_num)
-                    # # print("de id_num", id_num, is_selected)
-                    # if is_selected:
-                    #     document.removeVirtualHelicesFromSelection(part, [id_num])
-                    pass
+                    m_oligo = item.cnModel()
+                    is_selected = document.isOligoSelected(m_oligo)
+                    if is_selected:
+                        print("deselecting", m_oligo)
+                        document.deselectOligo(m_oligo)
             model_to_be_deselected.clear()
         # end def
     # end def
@@ -223,9 +221,9 @@ class OutlinerTreeWidget(QTreeWidget):
     def hideSelection(self):
         column = VISIBLE_COL
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem)):
+            if isinstance(item, (VirtualHelixItem, OligoItem)):
                 item.setData(column, Qt.EditRole, False)
-                # print("hiding", item.__class__.__name__, item.idNum())
+                # print("hiding", item.__class__.__name__)
             else:
                 print("item unhidable", item.__class__.__name__)
     # end def
@@ -233,9 +231,9 @@ class OutlinerTreeWidget(QTreeWidget):
     def showSelection(self):
         column = VISIBLE_COL
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem)):
+            if isinstance(item, (VirtualHelixItem, OligoItem)):
                 item.setData(column, Qt.EditRole, True)
-                # print("showing", item.__class__.__name__, item.idNum())
+                # print("showing", item.__class__.__name__)
             else:
                 print("item unshowable", item.__class__.__name__)
     # end def
