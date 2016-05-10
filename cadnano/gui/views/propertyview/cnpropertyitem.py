@@ -39,6 +39,8 @@ class CNPropertyItem(QTreeWidgetItem):
                 model_value = cn_model.getProperty(key)
                 if isinstance(model_value, float):
                     model_value = "%0.2f" % model_value
+                elif isinstance(model_value, bool):
+                    model_value = model_value
                 elif not isinstance(model_value, str):    # can't get non-strings to work
                     model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)

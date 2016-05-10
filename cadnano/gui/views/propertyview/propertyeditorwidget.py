@@ -224,6 +224,8 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 styleoption.rect = QRect(option.rect)
                 checked = value
                 styleoption.state |= QStyle.State_On if checked else QStyle.State_Off
+                styleoption.palette.setBrush(QPalette.Button, Qt.white)
+                styleoption.palette.setBrush(QPalette.HighlightedText, Qt.black)
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
                 if checked:
                     element =  _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
