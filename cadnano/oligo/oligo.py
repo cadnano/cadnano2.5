@@ -14,7 +14,7 @@ from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 
-PROPERTY_KEYS = ['name', 'color', 'length']
+PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
 
 class Oligo(CNObject):
@@ -33,12 +33,13 @@ class Oligo(CNObject):
         super(Oligo, self).__init__(part)
         self._part = part
         self._strand5p = None
-        # self._length = 0
         self._is_loop = False
-        self._props = {}
-        self._props['name'] = "oligo%s" % str(id(self))[-4:]
-        self._props['color'] =  "#cc0000" if color is None else color
-        self._props['length'] = 0
+        self._props = {
+                'name': "oligo%s" % str(id(self))[-4:],
+                'color': "#cc0000" if color is None else color,
+                'length': 0,
+                'is_visible': True
+        }
     # end def
 
     def __repr__(self):
@@ -97,8 +98,6 @@ class Oligo(CNObject):
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(CNObject,
                                         name='oligoIdentityChangedSignal')  # new oligo
-    oligoAppearanceChangedSignal = ProxySignal(CNObject,
-                                        name='oligoAppearanceChangedSignalpyqtSignal')  # self
     oligoRemovedSignal = ProxySignal(CNObject, CNObject,
                                         name='oligoRemovedSignal')  # part, self
     oligoSequenceAddedSignal = ProxySignal(CNObject,
@@ -115,6 +114,11 @@ class Oligo(CNObject):
         return self._props[key]
     # end def
 
+    def getOutlineProperties(self):
+        props = self._props
+        return props['name'], props['color'], props['is_visible']
+    # end def
+
     def getPropertyDict(self):
         return self._props
     # end def
@@ -122,8 +126,8 @@ class Oligo(CNObject):
     def setProperty(self, key, value):
         # use ModifyPropertyCommand here
         self._props[key] = value
-        if key == 'color':
-            self.oligoAppearanceChangedSignal.emit(self)
+        # if key in ('color', 'is_visible'):
+        #     self.oligoAppearanceChangedSignal.emit(self)
         self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 
@@ -154,10 +158,11 @@ class Oligo(CNObject):
     def setLength(self, length):
         before = self.shouldHighlight()
         # self._length = length
-        self.setProperty('length', length)
+        key = 'length'
+        self.setProperty(key, length)
         if before != self.shouldHighlight():
             self.oligoSequenceClearedSignal.emit(self)
-            self.oligoAppearanceChangedSignal.emit(self)
+            self.oligoPropertyChangedSignal.emit(self, key, length)
     # end def
 
     def locString(self):

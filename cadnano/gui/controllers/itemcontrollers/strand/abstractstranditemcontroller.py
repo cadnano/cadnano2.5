@@ -47,7 +47,7 @@ class AbstractStrandItemController(object):
         s_i = self._strand_item
         m_o = self._model_strand.oligo()
         self._model_oligo = m_o
-        m_o.oligoAppearanceChangedSignal.connect(s_i.oligoAppearanceChangedSlot)
+        m_o.oligoPropertyChangedSignal.connect(s_i.oligoPropertyChangedSlot)
     # end def
 
     def disconnectSignals(self):
@@ -74,5 +74,5 @@ class AbstractStrandItemController(object):
     def disconnectOligoSignals(self):
         s_i = self._strand_item
         m_o = self._model_oligo
-        m_o.oligoAppearanceChangedSignal.disconnect(s_i.oligoAppearanceChangedSlot)
+        m_o.oligoPropertyChangedSignal.disconnect(s_i.oligoPropertyChangedSlot)
     # end def

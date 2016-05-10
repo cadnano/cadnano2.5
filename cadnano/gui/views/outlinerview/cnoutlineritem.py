@@ -60,10 +60,14 @@ class CNOutlinerItem(QTreeWidgetItem):
         cn_model = self._cn_model
         name = self.data(NAME_COL, Qt.DisplayRole)
         color = self.data(COLOR_COL, Qt.DisplayRole)
-        if name is not None and name != cn_model.getName():
+        is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
+        mname, mcolor, mvisible = cn_model.getOutlineProperties()
+        if name is not None and name != mname:
             cn_model.setProperty('name', name)
-        if color is not None and color != cn_model.getColor():
+        if color is not None and color != mcolor:
             cn_model.setProperty('color', color)
+        if is_visible is not None and is_visible != mvisible:
+            cn_model.setProperty('is_visible', is_visible)
     # end def
 
     def setValue(self, key, value):
@@ -76,6 +80,10 @@ class CNOutlinerItem(QTreeWidgetItem):
             color = self.data(COLOR_COL, Qt.DisplayRole)
             if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
+        elif key == 'is_visible':
+            is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
+            if is_visible != value:
+                self.setData(VISIBLE_COL, Qt.EditRole, value)
         else:
             "property not supported"
             # pass

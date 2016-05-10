@@ -159,7 +159,23 @@ class OutlinerTreeWidget(QTreeWidget):
                         document.removeVirtualHelicesFromSelection(part, [id_num])
             model_to_be_deselected.clear()
         elif isinstance(tree_widget_item, OligoItem):
-            pass
+            print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+            # for item in model_to_be_selected:
+            #     id_num, part = item.idNum(), item.part()
+            #     is_selected = document.isVirtualHelixSelected(part, id_num)
+            #     # print("select id_num", id_num, is_selected)
+            #     if not is_selected:
+            #         document.addVirtualHelicesToSelection(part, [id_num])
+            model_to_be_selected.clear()
+            for item in model_to_be_deselected:
+                if isinstance(item, OligoItem):
+                    # id_num, part = item.idNum(), item.part()
+                    # is_selected = document.isVirtualHelixSelected(part, id_num)
+                    # # print("de id_num", id_num, is_selected)
+                    # if is_selected:
+                    #     document.removeVirtualHelicesFromSelection(part, [id_num])
+                    pass
+            model_to_be_deselected.clear()
         # end def
     # end def
 

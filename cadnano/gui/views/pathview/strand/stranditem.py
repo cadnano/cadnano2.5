@@ -69,7 +69,7 @@ class StrandItem(QGraphicsLineItem):
         self.setZValue(styles.ZSTRANDITEM)
 
         # xover comming from the 3p end
-        self._xover3pEnd = XoverItem(self, virtual_helix_item)
+        self.xover_3p_end = XoverItem(self, virtual_helix_item)
         if not getBatch():
             # initial refresh
             self._updateColor(model_strand)
@@ -93,7 +93,7 @@ class StrandItem(QGraphicsLineItem):
         if high_moved:
             self.updateLine(self._high_cap)
         if strand.connection3p():
-            self._xover3pEnd.update(strand)
+            self.xover_3p_end.update(strand)
         self.refreshInsertionItems(strand)
         self._updateSequenceText()
         if group:
@@ -125,8 +125,8 @@ class StrandItem(QGraphicsLineItem):
         # scene.removeItem(self._high_cap)
         # scene.removeItem(self._low_cap)
         scene.removeItem(self._seq_label)
-        self._xover3pEnd.remove()
-        self._xover3pEnd = None
+        self.xover_3p_end.remove()
+        self.xover_3p_end = None
         for insertionItem in self._insertion_items.values():
             insertionItem.remove()
         self._insertion_items = None
@@ -146,11 +146,24 @@ class StrandItem(QGraphicsLineItem):
         self._updateAppearance(strand)
     # end def
 
-    def oligoAppearanceChangedSlot(self, oligo):
+    def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
+        xover_3p_end = self.xover_3p_end
         strand = self._model_strand
-        self._updateColor(strand)
-        if strand.connection3p():
-            self._xover3pEnd._updateColor(strand)
+        if key == 'is_visible':
+            if new_value:
+                self.show()
+                xover_3p_end.show()
+            else:
+                self._low_cap.hide()
+                self._high_cap.hide()
+                self._dual_cap.hide()
+                self.hide()
+                xover_3p_end.hide()
+                return
+        self._updateAppearance(strand)
+        # self._updateColor(strand)
+        # if strand.connection3p():
+        #     xover_3p_end._updateColor(strand)
         for insertion in self.insertionItems().values():
             insertion.updateItem()
     # end def
@@ -168,7 +181,7 @@ class StrandItem(QGraphicsLineItem):
         self._controller.reconnectOligoSignals()
         self._updateColor(strand)
         if strand.connection3p():
-            self._xover3pEnd._updateColor(strand)
+            self.xover_3p_end._updateColor(strand)
         for insertion in self.insertionItems().values():
             insertion.updateItem()
     # end def
@@ -384,7 +397,7 @@ class StrandItem(QGraphicsLineItem):
             dual_cap.hide()
 
         # 2. Xover drawing
-        xo = self._xover3pEnd
+        xo = self.xover_3p_end
         if strand.connection3p():
             xo.update(strand)
             xo.showIt()
@@ -412,7 +425,7 @@ class StrandItem(QGraphicsLineItem):
         else:
             pen_width = styles.PATH_STRAND_STROKE_WIDTH
             alpha = None
-        self._xover3pEnd._updateColor(strand)
+        self.xover_3p_end._updateColor(strand)
         pen = getPenObj(color, pen_width, alpha=alpha, capstyle=Qt.FlatCap)
         brush = getBrushObj(color, alpha=alpha)
         self.setPen(pen)
@@ -771,7 +784,7 @@ class StrandItem(QGraphicsLineItem):
                 test3p = val3p[0] if con3p.isForward() else val3p[1]
                 test5p = idx_h if strand5p.isForward() else idx_l
                 if test3p and test5p:
-                    xoi = self._xover3pEnd
+                    xoi = self.xover_3p_end
                     if not xoi.isSelected() or not xoi.group():
                         selection_group.setNormalSelect(False)
                         selection_group.addToGroup(xoi)

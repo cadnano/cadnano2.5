@@ -26,10 +26,10 @@ class OligoItem(CNOutlinerItem, AbstractOligoItem):
             self.setValue(key, new_value)
     # end def
 
-    def oligoAppearanceChangedSlot(self, model_oligo):
-        color = model_oligo.getColor()
-        self.setValue('color', color)
-    # end def
+    # def oligoAppearanceChangedSlot(self, model_oligo):
+    #     color = model_oligo.getColor()
+    #     self.setValue('color', color)
+    # # end def
 
 
 # end class

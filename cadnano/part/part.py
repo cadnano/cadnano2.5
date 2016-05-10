@@ -165,6 +165,11 @@ class Part(VirtualHelixGroup):
         return self._group_properties[key]
     # end def
 
+    def getOutlineProperties(self):
+        props = self._group_properties
+        return props['name'], props['color'], props['is_visible']
+    # end def
+
     def getColor(self):
         return self._group_properties['color']
 
