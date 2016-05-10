@@ -314,11 +314,18 @@ class StrandSet(CNObject):
 
         if not self.isStrandInSet(strand):
             raise IndexError("Strandset.removeStrand: strand not in set")
-        if self.isScaffold() and strand.sequence() is not None:
+        if strand.sequence() is not None:
             cmds.append(strand.oligo().applySequenceCMD(None))
         cmds += strand.clearDecoratorCommands()
         cmds.append(RemoveStrandCommand(self, strand, solo=solo))
         util.execCommandList(self, cmds, desc="Remove strand", use_undostack=use_undostack)
+    # end def
+
+    def oligoStrandRemover(self, strand, cmds, solo=True):
+        if not self.isStrandInSet(strand):
+            raise IndexError("Strandset.oligoStrandRemover: strand not in set")
+        cmds += strand.clearDecoratorCommands()
+        cmds.append(RemoveStrandCommand(self, strand, solo=solo))
     # end def
 
     def removeAllStrands(self, use_undostack=True):
@@ -593,7 +600,7 @@ class StrandSet(CNObject):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _addToStrandList(self, strand):
+    def addToStrandList(self, strand):
         """Inserts strand into the strand_array at idx."""
         # print("Adding to strandlist")
         idx_low, idx_high = strand.idxs()
@@ -608,7 +615,7 @@ class StrandSet(CNObject):
         for i in range(new_idxs[0], new_idxs[1]+1):
             self.strand_array[i] = strand
 
-    def _removeFromStrandList(self, strand):
+    def removeFromStrandList(self, strand):
         """Remove strand from strand_array."""
         self._document.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
         idx_low, idx_high = strand.idxs()

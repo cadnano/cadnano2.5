@@ -289,7 +289,16 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
-    def addOligo(self, oligo):
+    def removeOligo(self, oligo, use_undostack=True):
+        # clear existing oligos
+        cmds = []
+        for o in list(self.oligos()):
+            cmds.append(RemoveOligoCommand(o))
+        # end for
+        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
+    # end def
+
+    def addOligoToSet(self, oligo):
         self._oligos.add(oligo)
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
@@ -534,10 +543,11 @@ class NucleicAcidPart(Part):
         return Part(self._document)
     # end def
 
-    def removeOligo(self, oligo):
-        # Not a designated method
-        # (there exist methods that also directly
-        # remove parts from self._oligos)
+    def removeOligoFromSet(self, oligo):
+        """ Not a designated method
+        (there exist methods that also directly
+        remove parts from self._oligos)
+        """
         try:
             self._oligos.remove(oligo)
             oligo.oligoRemovedSignal.emit(self, oligo)

@@ -14,6 +14,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         self.origin_pt = (x, y, 0.)
         neighbors = part.getVirtualHelixProperties(id_num, 'neighbors')
         self.neighbors = literal_eval(neighbors)
+        self.color = part.getVirtualHelixProperties(id_num, 'color')
     # end def
 
     def redo(self):
@@ -33,8 +34,8 @@ class RemoveVirtualHelixCommand(UndoCommand):
     # end def
 
     def undo(self):
-        part = self._part
-        id_num = self._id_num
+        part = self.part
+        id_num = self.id_num
         for neighbor_id in self.neighbors:
             nneighbors = literal_eval(
                             part.getVirtualHelixProperties(neighbor_id, 'neighbors')
@@ -42,7 +43,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
 
-        part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length)
+        part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
         part.partVirtualHelixAddedSignal.emit(part, id_num, self.neighbors)
         part.partActiveSliceResizeSignal.emit(part)
     # end def

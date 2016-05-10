@@ -114,11 +114,11 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove old Strand from the s_set
-        ss._removeFromStrandList(o_strand)
+        ss.removeFromStrandList(o_strand)
 
         # Add new strands to the s_set (reusing idx, so order matters)
-        ss._addToStrandList(s_high)
-        ss._addToStrandList(s_low)
+        ss.addToStrandList(s_high)
+        ss.addToStrandList(s_low)
 
         # update connectivity of strands
         sLcL = s_low.connectionLow()
@@ -169,10 +169,10 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove new strands from the s_set (reusing idx, so order matters)
-        ss._removeFromStrandList(s_low)
-        ss._removeFromStrandList(s_high)
+        ss.removeFromStrandList(s_low)
+        ss.removeFromStrandList(s_high)
         # Add the old strand to the s_set
-        ss._addToStrandList(o_strand)
+        ss.addToStrandList(o_strand)
 
         # update connectivity of strands
         oScL = o_strand.connectionLow()

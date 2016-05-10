@@ -22,8 +22,8 @@ ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
 ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
 
-# CADNANO_DEFAULT_DOCUMENT = 'C:\\Users\\nick\\Documents\\GitHub\\cadnano2.5\\tests\super_barcode_hex.json'
-# os.environ['CADNANO_DEFAULT_DOCUMENT'] = CADNANO_DEFAULT_DOCUMENT
+CADNANO_DEFAULT_DOCUMENT = 'C:\\Users\\nick\\Documents\\GitHub\\cadnano2.5\\tests\super_barcode_hex.json'
+os.environ['CADNANO_DEFAULT_DOCUMENT'] = CADNANO_DEFAULT_DOCUMENT
 
 import platform
 
@@ -38,7 +38,7 @@ class CadnanoQt(QObject):
     documentWasCreatedSignal = pyqtSignal(object)  # doc
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
-    def __init__(self, argv=None):
+    def __init__(self, argv):
         """ Create the application object
         """
         self.argns, unused = util.parse_args(argv, gui=True)
@@ -57,8 +57,8 @@ class CadnanoQt(QObject):
         from cadnano.gui.views.preferences import Preferences
         self.prefs = Preferences()
         icon = QIcon(ICON_PATH1)
-        icon.addFile(ICON_PATH2, QSize(256,256))
-        icon.addFile(ICON_PATH3, QSize(48,48))
+        icon.addFile(ICON_PATH2, QSize(256, 256))
+        icon.addFile(ICON_PATH3, QSize(48, 48))
         self.qApp.setWindowIcon(icon)
 
         self.document_controllers = set()  # Open documents

@@ -1,7 +1,7 @@
 from cadnano.cnproxy import UndoCommand
 
 class RemoveOligoCommand(UndoCommand):
-    def __init__(self,oligo):
+    def __init__(self, oligo):
         super(RemoveOligoCommand, self).__init__("remove oligo")
         self._oligo = oligo
         self._part = oligo.part()
@@ -10,16 +10,17 @@ class RemoveOligoCommand(UndoCommand):
     # end def
 
     def redo(self):
-        # s_i_list = self._strand_idx_list
         o = self._oligo
         s5p = o.strand5p()
         part = self._part
+        doc = part.document()
 
         for strand in list(s5p.generator3pStrand()):
             strandset = strand.strandSet()
-            strandset._doc.removeStrandFromSelection(strand)
+            doc.removeStrandFromSelection(strand)
 
-            strandset._removeFromStrandList(strand)
+            strandset.removeFromStrandList(strand)
+            # strandset.removeStrand(strand)
 
             # emit a signal to notify on completion
             strand.strandRemovedSignal.emit(strand)
@@ -28,14 +29,12 @@ class RemoveOligoCommand(UndoCommand):
         # end def
         # set the 3p strand for the undo
         self._strand3p = strand
-
+        # o.setPart(None)
         # remove Oligo from part but don't set parent to None?
-        # o.removeFromPart()
-        part.removeOligo(o)
+        part.removeOligoFromSet(o)
     # end def
 
     def undo(self):
-        # s_i_list = self._strand_idx_list
         o = self._oligo
         s3p = self._strand3p
         part = self._part
@@ -43,7 +42,7 @@ class RemoveOligoCommand(UndoCommand):
         for strand in list(s3p.generator5pStrand()):
             strandset = strand.strandSet()
 
-            strandset._addToStrandList(strand)
+            strandset.addToStrandList(strand)
 
             # Emit a signal to notify on completion
             strandset.strandsetStrandAddedSignal.emit(strandset, strand)
@@ -52,7 +51,7 @@ class RemoveOligoCommand(UndoCommand):
         # end def
 
         # add Oligo to part but don't set parent to None?
-        # o.addToPart(part)
-        part.addOligo(o)
+        # o.setPart(part)
+        part.addOligoToSet(o)
     # end def
 # end class

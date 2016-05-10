@@ -290,13 +290,29 @@ class Oligo(CNObject):
     def addToPart(self, part):
         self._part = part
         self.setParent(part)
-        part.addOligo(self)
+        part.addOligoToSet(self)
+    # end def
+
+    def setPart(self, part):
+        self._part = part
+        self.setParent(part)
     # end def
 
     def destroy(self):
         # QObject also emits a destroyed() Signal
-        self.setParent(None)
-        self.deleteLater()
+        # self.setParent(None)
+        # self.deleteLater()
+        cmds = []
+        s5p = self._strand5p
+        strandset = s5p.strandSet()
+        for strand in s5p.generator3pStrand():
+            # strandset = strand.strandSet()
+            # strandset.oligoStrandRemover(strand, cmds,
+            #                             solo=False)
+            cmds += strand.clearDecoratorCommands()
+        # end for
+        cmds.append(RemoveOligoCommand(self))
+        return cmds
     # end def
 
     def decrementLength(self, delta):
@@ -325,7 +341,7 @@ class Oligo(CNObject):
         Note: don't set self._part = None because we need to continue passing
         the same reference around.
         """
-        self._part.removeOligo(self)
+        self._part.removeOligoFromSet(self)
         self.setParent(None)
     # end def
 

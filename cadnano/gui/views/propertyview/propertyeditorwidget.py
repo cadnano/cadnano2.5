@@ -230,8 +230,6 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 if checked:
                     element =  _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                     _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
-                # option.displayAlignment = Qt.AlignVCenter
-                # QStyledItemDelegate.paint(self, painter, option, model_index)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)
     # end def

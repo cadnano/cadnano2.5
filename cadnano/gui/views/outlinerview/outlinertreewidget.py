@@ -15,6 +15,7 @@ from cadnano.enum import PartType
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano import util
 
 from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
 from .nucleicacidpartitem import NucleicAcidPartItem
@@ -215,6 +216,11 @@ class OutlinerTreeWidget(QTreeWidget):
         color_act.triggered.connect(self.colorSelection)
         menu.addAction(color_act)
 
+        delete_act = QAction("Delete items", self)
+        delete_act.setStatusTip("Delete selection")
+        delete_act.triggered.connect(self.deleteSelection)
+        menu.addAction(delete_act)
+
         menu.exec_(self.mapToGlobal(point))
     # end def
 
@@ -238,6 +244,32 @@ class OutlinerTreeWidget(QTreeWidget):
                 print("item unshowable", item.__class__.__name__)
     # end def
 
+    def deleteSelection(self):
+        cmds = []
+        doc = self._document
+        u_s = doc.undoStack()
+        do_exec = True
+        for item in self.selectedItems():
+            if isinstance(item, OligoItem):
+                model = item.cnModel()
+                cmds += model.destroy()
+            elif isinstance(item, VirtualHelixItem):
+                if do_exec:
+                    do_exec = False
+                    u_s.beginMacro("delete Virtual Helices")
+                part = item.cnModel()
+                part.removeVirtualHelix(item.idNum())
+            else:
+                print("item undeletable", item.__class__.__name__)
+        if do_exec:
+            util.execCommandList(doc,
+                                cmds,
+                                desc="Clear Items",
+                                use_undostack=True)
+        else:
+            u_s.endMacro()
+    # end def
+
     def colorSelection(self):
         dialog = QColorDialog(self)
         dialog.colorSelected.connect(self.colorSelectionSlot)
@@ -248,7 +280,7 @@ class OutlinerTreeWidget(QTreeWidget):
         column = COLOR_COL
         color_name = color.name()
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem)):
+            if isinstance(item, (VirtualHelixItem, OligoItem)):
                 item.setData(column, Qt.EditRole, color_name)
                 # print("coloring", item.__class__.__name__, item.idNum())
             else:

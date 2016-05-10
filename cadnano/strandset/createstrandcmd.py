@@ -32,7 +32,7 @@ class CreateStrandCommand(UndoCommand):
         # Add the new strand to the StrandSet strand_list
         strand = self._strand
         strandset = self._strandset
-        strandset._addToStrandList(strand)
+        strandset.addToStrandList(strand)
         # Set up the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(strand)
@@ -53,7 +53,7 @@ class CreateStrandCommand(UndoCommand):
         strand = self._strand
         strandset = self._strandset
         strandset._document.removeStrandFromSelection(strand)
-        strandset._removeFromStrandList(strand)
+        strandset.removeFromStrandList(strand)
         # Get rid of the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(None)

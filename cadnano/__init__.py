@@ -28,11 +28,11 @@ def app():
     global shared_app
     return shared_app
 
-def initAppWithGui(appArgs=None):
+def initAppWithGui(app_args=None):
     global shared_app
     from cadnano.cadnanoqt import CadnanoQt
     # 1. Create the application object
-    shared_app = CadnanoQt(appArgs)
+    shared_app = CadnanoQt(app_args)
     # 2. Use the object to finish importing and creating
     # application wide objects
     shared_app.finishInit()

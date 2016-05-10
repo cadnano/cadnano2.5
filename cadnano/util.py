@@ -19,15 +19,15 @@ from itertools import dropwhile, starmap
 IS_PY_3 = int(sys.version_info[0] > 2)
 prng = Random()
 
-def clamp(x, minX, maxX):
-    if x < minX:
-        return minX
-    elif x > maxX:
-        return maxX
+def clamp(x, min_x, max_x):
+    if x < min_x:
+        return min_x
+    elif x > max_x:
+        return max_x
     else:
         return x
 
-def overlap(x,y, a,b):
+def overlap(x, y, a, b):
     """
     finds the overlap of the range x to y in a to b
     assumes an overlap exists, i.e.
@@ -74,7 +74,7 @@ def nowhite(seqStr):
     """Gets rid of whitespace in a string."""
     return ''.join([c for c in seqStr if c in string.letters])
 
-nearest=lambda a,l:min(l,key=lambda x:abs(x-a))
+nearest=lambda a, l:min(l, key=lambda x: abs(x - a) )
 
 def isWindows():
     if platform.system() == 'Windows':
@@ -291,7 +291,7 @@ def parse_args(argv=None, gui=None):
     Qt command line args include:
         -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
     """
-    parser = argparse.ArgumentParser(description="Cadnano 2.5")
+    parser = argparse.ArgumentParser(description="cadnano 2.5")
     parser.add_argument("--testing", "-t", action="store_true", help="Enable testing mode/environment.")
     parser.add_argument("--profile", "-p", action="store_true", help="Profile app execution.")
     parser.add_argument("--print-stats", "-P", action="store_true", help="Print profiling statistics.")
@@ -302,7 +302,7 @@ def parse_args(argv=None, gui=None):
                         help="Debug modules whose names start with any of the given strings. For instance, to "\
                              "debug the cadnano file decoder, use --debug-modules cadnano.fileio.nnodecode ."\
                              "To debug all gui modules, use --debug-modules cadnano.gui .")
-    parser.add_argument("--file", "-f", metavar="designfile.json", help="Cadnano design to load upon start up.")
+    parser.add_argument("--file", "-f", metavar="designfile.json", help="cadnano design to load upon start up.")
     if gui and (gui is True or gui.lower() == "qt"):
         # Command line args might include Qt-specific switches and parameters.
         argns, unused = parser.parse_known_args(argv)
@@ -334,9 +334,8 @@ def init_logging(args=None, logdir=None):
 
     ## We want different output formatting for file vs console logging output.
     ## File logs should be simple and easy to regex; console logs should be short and nice on the eyes
-    logfilefmt = '%(asctime)s %(levelname)-6s - %(name)s:%(lineno)s - %(funcName)s() - %(message)s'
+    logfilefmt = "%(asctime)s %(levelname)-6s - %(name)s:%(lineno)s - %(funcName)s() - %(message)s"
     logdatefmt = "%Y%m%d-%H:%M:%S"
-    loguserfmt = "%(asctime)s %(levelname)-5s %(name)30s:%(lineno)-4s%(funcName)16s() %(message)s"
     loguserfmt = "%(asctime)s %(levelname)-5s %(module)30s:%(lineno)-4s%(funcName)16s() %(message)s"
     logtimefmt = "%H:%M:%S" # Nice for output to user in console and testing.
     # See https://docs.python.org/3/library/logging.html#logrecord-attributes for full list of attributes
