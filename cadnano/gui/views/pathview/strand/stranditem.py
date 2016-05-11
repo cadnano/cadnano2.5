@@ -31,6 +31,12 @@ SELECT_COLOR = "#ff3333"
 class StrandItem(QGraphicsLineItem):
     FILTER_NAME = "strand"
 
+    __slots__ = ('_model_strand', '_virtual_helix_item', '_viewroot',
+                '_getActiveTool', '_controller', 'is_forward',
+                '_strand_filter', '_insertion_items',
+                '_low_cap', '_high_cap', '_dual_cap',
+                '_seq_label', '_click_area', 'xover_3p_end')
+
     def __init__(self, model_strand, virtual_helix_item, viewroot):
         """The parent should be a VirtualHelixItem."""
         super(StrandItem, self).__init__(virtual_helix_item)

@@ -1,15 +1,16 @@
 class ProxyObject(object):
+    # __slots__ = '_parent', '_signals'
     def __init__(self, parent):
-        self.parent = parent
+        self._parent = parent
         self._signals = {}
     #end def
 
     def parent(self):
-        return self.parent
+        return self._parent
     #end def
 
     def setParent(self, parent):
-        self.parent = parent
+        self._parent = parent
     #end def
 
     def connect(self, sender, bsignal, method):
@@ -30,33 +31,6 @@ class ProxyObject(object):
         pass
     #end def
 #end class
-
-# class DummySignal(object):
-#     def __init__(self, *args):
-#         """ We don't actually do anything with argtypes. """
-#         self.signalEmitters = {}
-#         self.argtypes = args
-#     # def __call__(self, emitter):
-#     #     return self.__get__(emitter)
-
-#     def __get__(self, emitter):
-#         try:
-#             return self.signalEmitters[emitter]
-#         except KeyError:
-#             new_sig = DummyBoundSignal()
-#             self.signalEmitters[emitter] = new_sig
-#             return new_sig
-
-# class DummyBoundSignal(object):
-#     def __init__(self):
-#         self.targets = {}
-#     def connect(self, target):
-#         self.targets.add(target)
-#     def disconnect(self, target):
-#         self.targets.remove(target)
-#     def emit(self, *args):
-#         for t in self.targets:
-#             t(*args)
 
 class DummySignal(object):
     def __init__(self, *args, **kwargs):

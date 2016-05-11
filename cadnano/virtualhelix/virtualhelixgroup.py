@@ -50,6 +50,19 @@ DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
 DEFAULT_RADIUS = 1.125
 
 class VirtualHelixGroup(CNObject):
+
+    __slots__ = ('_document', '_radius', 'total_points',
+                    'axis_pts', 'fwd_pts', 'rev_pts',
+                    'id_nums', 'indices',
+                    'total_id_nums', 'origin_pts',
+                    'origin_limits', 'directions',
+                    'offset_and_size', 'reserved_ids',
+                    '_point_cache', '_point_cache_keys',
+                    '_origin_cache', '_origin_cache_keys',
+                    'm3_scratch0', 'm3_scratch1', 'm3_scratch2',
+                    'eye3_scratch', 'delta2D_scratch', 'delta3D_scratch',
+                    'recycle_bin', '_highest_id_num_used')
+
     def __init__(self, *args, **kwargs):
         """ this is composed of a group of arrays
         that

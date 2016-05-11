@@ -24,7 +24,10 @@ class Document(CNObject):
     1. Serve as the parent all Part objects within the model.
     2. Track all sub-model actions on its undoStack.
     """
-
+    __slots__ = ('_undostack', '_children',
+                '_instances', '_controller', '_selected_instance'
+                '_selection_dict', '_strand_selected_changed_dict',
+                'view_names', 'filter_set')
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 

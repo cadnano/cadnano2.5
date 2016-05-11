@@ -71,7 +71,9 @@ MOD_RECT = QRectF(.25*_BASE_WIDTH, -.25*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.5*_BASE_
 class EndpointItem(QGraphicsPathItem):
 
     FILTER_NAME = "endpoint"
-
+    __slots__ = ('_strand_item', '_getActiveTool', 'cap_type',
+                '_low_drag_bound', '_high_drag_bound', '_mod_item',
+                '_click_area')
     def __init__(self, strand_item, cap_type, is_drawn5to3):
         """The parent should be a StrandItem."""
         super(EndpointItem, self).__init__(strand_item.virtualHelixItem())
@@ -93,9 +95,6 @@ class EndpointItem(QGraphicsPathItem):
         cA.setPen(_NO_PEN)
         self.setFlag(QGraphicsItem.ItemIsSelectable)
     # end def
-
-    # def __repr__(self):
-    #     return "%s" % self.__class__.__name__
 
     ### SIGNALS ###
 

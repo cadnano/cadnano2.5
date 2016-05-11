@@ -4,6 +4,7 @@ from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand, UndoStack
 
 class ObjectInstance(CNObject):
+    # __slots__ = ('_parent', '_object', '_position')
     def __init__(self, reference_object, parent=None):
         super(ObjectInstance, self).__init__(reference_object)
         self._parent = parent   # parent is either a document or assembly

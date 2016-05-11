@@ -6,6 +6,7 @@ class AbstractVirtualHelixItem(object):
 
     Slots that must be overridden should raise an exception.
     """
+    # __slots__ = ('_id_num', '_part_item', '_model_part')
     def __init__(self, id_num, part_item):
         self._id_num = id_num
         self._part_item = part_item

@@ -200,6 +200,8 @@ class XoverItem(QGraphicsPathItem):
     XoverItem should be a child of a PartItem.
     """
     FILTER_NAME = "xover"
+    __slots__ = ('_strand_item', '_virtual_helix_item', '_strand5p',
+            '_node5', '_node3', '_click_area', '_getActiveTool')
 
     def __init__(self, strand_item, virtual_helix_item):
         """

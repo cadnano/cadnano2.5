@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
-from math import floor
+from math import floor, atan2, sqrt
 
 from PyQt5.QtCore import QRectF, Qt
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
@@ -24,8 +24,8 @@ _VH_XOFFSET = styles.VH_XOFFSET
 def v2DistanceAndAngle(a, b):
     dx = b[0] - a[0]
     dy = b[1] - a[1]
-    dist = math.sqrt(dx*dx + dy*dy)
-    angle = math.atan2(dy, dx)
+    dist = sqrt(dx*dx + dy*dy)
+    angle = atan2(dy, dx)
     return dist, angle
 
 

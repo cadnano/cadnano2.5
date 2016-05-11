@@ -29,6 +29,11 @@ class StrandSet(CNObject):
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
     """
+    __slots__ = ('_document', '_is_fwd', '_strand_type',
+                '_id_num', '_part',
+                'strand_array', 'strand_heap',
+                '_undo_stack', '_last_strandset_idx')
+
     def __init__(self, is_fwd, id_num, part, initial_size):
         self._document = part.document()
         super(StrandSet, self).__init__(part)
