@@ -7,12 +7,17 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsPathItem,
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 
+from . import slicestyles as styles
+_ZVALUE = styles.ZSLICEHELIX + 1
+
 class GridItem(QGraphicsPathItem):
     def __init__(self, part_item):
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
-        dot_size = 0.5
-        self.dots = (dot_size, dot_size/2)
+        dot_size = 4.
+        self.dots = (dot_size, dot_size / 2)
+        self.allow_snap = True
+        # self.allow_snap = False
         self.is_honeycomb = True
         self.draw_lines = True
         self.points = []
@@ -20,6 +25,7 @@ class GridItem(QGraphicsPathItem):
         color.setAlphaF(0.1)
         self.setPen(color)
         self.updateGrid()
+        print("GridItem", self.scenePos(), self.scene(), self.pos())
     # end def
 
     def updateGrid(self):
@@ -67,8 +73,9 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                pt = QGraphicsEllipseItem(x - half_dot_size, -y - half_dot_size,
-                                    dot_size, dot_size, self)
+                pt = GridPoint( x - half_dot_size,
+                                -y - half_dot_size,
+                                dot_size, self)
                 pt.setPen(QPen(Qt.black))
                 points.append(pt)
             is_pen_down = False
@@ -105,8 +112,8 @@ class GridItem(QGraphicsPathItem):
         is_pen_down = False
         draw_lines = self.draw_lines
 
-        for i in range(row_l, row_h+1):
-            for j in range(col_l, col_h+1):
+        for i in range(row_l, row_h + 1):
+            for j in range(col_l, col_h + 1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
@@ -118,15 +125,16 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                pt = QGraphicsEllipseItem(x - half_dot_size, -y - half_dot_size,
-                                    dot_size, dot_size, self)
+                pt = GridPoint( x - half_dot_size,
+                                -y - half_dot_size,
+                                dot_size, self)
                 pt.setPen(QPen(Qt.black))
                 points.append(pt)
             is_pen_down = False # pen up
         # DO VERTICAL LINES
         if draw_lines:
-            for j in range(col_l, col_h+1):
-                for i in range(row_l, row_h+1):
+            for j in range(col_l, col_h + 1):
+                for i in range(row_l, row_h + 1):
                     x, y = doLattice(radius, i, j, scale_factor=sf)
                     if is_pen_down:
                         path.lineTo(x, -y)
@@ -144,3 +152,54 @@ class GridItem(QGraphicsPathItem):
             scene.remove(points.pop())
     # end def
 # end class
+
+class GridPoint(QGraphicsEllipseItem):
+    __slots__ = 'grid', 'offset'
+
+    def __init__(self, x, y, diameter, parent_grid):
+        super(GridPoint, self).__init__(0., 0.,
+                                        diameter, diameter, parent=parent_grid)
+        self.offset = diameter / 2
+        self.grid = parent_grid
+        self.setPos(x, y)
+        self.setZValue(_ZVALUE)
+    # end def
+
+    def mousePressEvent(self, event):
+        if self.grid.allow_snap:
+            part_item = self.grid.part_item
+            tool = part_item._getActiveTool()
+            tool_method_name = tool.methodPrefix() + "MousePress"
+            if hasattr(self, tool_method_name):
+                getattr(self, tool_method_name)(tool, part_item, event)
+        else:
+            QGraphicsEllipseItem.mousePressEvent(self, event)
+    # end def
+
+    def selectToolMousePress(self, tool, part_item, event):
+        part = part_item.part()
+        part.setSelected(True)
+        print("monkey")
+        alt_event = GridEvent(self, self.offset)
+        tool.selectOrSnap(part_item, alt_event, event)
+    # end def
+
+    def createToolMousePress(self, tool, part_item, event):
+        part = part_item.part()
+        part.setSelected(True)
+        print("paws")
+        alt_event = GridEvent(self, self.offset)
+        part_item.createToolMousePress(tool, event, alt_event)
+    # end def
+
+class GridEvent(object):
+    __slots__ = 'grid_pt', 'offset'
+    def __init__(self, grid_pt, offset):
+        self.grid_pt = grid_pt
+        self.offset = QPointF(offset, offset)
+
+    def scenePos(self):
+        return self.grid_pt.scenePos() + self.offset
+
+    def pos(self):
+        return self.grid_pt.pos() + self.offset

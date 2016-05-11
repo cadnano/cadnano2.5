@@ -91,8 +91,6 @@ class SelectSliceTool(AbstractSliceTool):
             doc = self._manager.document
             doc.clearAllSelected()
             doc.addVirtualHelicesToSelection(part, res)
-            # self.selection_set = res
-            # self.getSelectionBoundingRect()
         else:
             self.last_rubberband_vals = (rect, from_pt, to_point)
     # end def
@@ -154,69 +152,55 @@ class SelectSliceTool(AbstractSliceTool):
         return False
     # end def
 
-    # Deprecated by moving selection to the model
-    # def addToSelection(self, vhi):
-    #     group = self.group
-    #     group.addToGroup(vhi)
-    #     self.selection_set.add(vhi.idNum())
-    #     if len(group.childItems()) > 0:
-    #         self.is_selection_active = True
-    #         group.setSelectionRect()
-    #         group.show()
-    #         self.individual_pick = True
-    #         self.snap_origin_item = None
-    # # end def
-
-    # def addSetToSelection(self, vh_set):
-    #     group = self.group
-    #     part_item = self.part_item
-    #     selection_set = self.selection_set
-    #     for id_num in vh_set:
-    #         vhi = part_item.getVirtualHelixItem(id_num)
-    #         group.addToGroup(vhi)
-    #         selection_set.add(id_num)
-    #     # end
-    #     if len(group.childItems()) > 0:
-    #         self.is_selection_active = True
-    #         group.setSelectionRect()
-    #         group.show()
-    #         self.individual_pick = True
-    #         self.snap_origin_item = None
-    # # end def
-
-    def selectOrSnap(self, part_item, virtual_helix_item, event):
+    def selectOrSnap(self, part_item, target_item, event):
+        """
+        Args:
+            part_item (PartItem):
+            snap_to_item (VirtualHelixItem or GridEvent): Item to snap
+                selection to
+        """
         self.setPartItem(part_item)
-        if self.snap_origin_item is not None and event.modifiers() != Qt.ShiftModifier:
-            self.doSnap(part_item, virtual_helix_item)
+        if (self.snap_origin_item is not None and
+            event.modifiers() != Qt.ShiftModifier):
+            self.doSnap(part_item, target_item)
             self.individual_pick = False
         else: # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
                 self.modelClear()   # deselect if shift isn't held
 
-            # self.is_selection_active = True
+            if isinstance(target_item, VirtualHelixItem):
+                # NOTE: individual_pick seems not needed.
+                # it's supposed to allow for single item picking
+                # self.individual_pick = True
 
-            # NOTE: individual_pick seems not needed.
-            # it's supposed to allow for single item picking
-            # self.individual_pick = True
+                self.snap_origin_item = None
 
-            self.snap_origin_item = None
-
-            doc = self._manager.document
-            part = part_item.part()
-            doc.addVirtualHelicesToSelection(part, [virtual_helix_item.idNum()])
+                doc = self._manager.document
+                part = part_item.part()
+                doc.addVirtualHelicesToSelection(part, [target_item.idNum()])
     # end def
 
-    def doSnap(self, part_item, virtual_helix_item):
+    def doSnap(self, part_item, snap_to_item):
+        """
+        Args:
+            part_item (PartItem):
+            snap_to_item (VirtualHelixItem or GridEvent): Item to snap
+                selection to
+        """
         # print("snapping")
         origin = self.snap_origin_item.getCenterScenePos()
 
-        # xy = part_item.mapFromScene(virtual_helix_item.scenePos())
+        # xy = part_item.mapFromScene(snap_to_item.scenePos())
         # xy2 = part_item.mapFromScene(self.snap_origin_item.scenePos())
         # print("snapping from:", xy2.x(), xy2.y())
         # print("snapped to:", xy.x(), xy.y())
 
-        self.setVirtualHelixItem(virtual_helix_item)
-        destination = self.findNearestPoint(part_item, origin)
+        if isinstance(snap_to_item, VirtualHelixItem):
+            self.setVirtualHelixItem(snap_to_item)
+            destination = self.findNearestPoint(part_item, origin)
+        else: # GridEvent
+            destination = snap_to_item.pos()
+
         origin = part_item.mapFromScene(origin)
         if destination is None:
             destination = origin
@@ -293,15 +277,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
 
     """ reimplement boundingRect if you want to call resetGroupPos
     """
-    # def boundingRect(self):
-    #     return self.childrenBoundingRect()
-    # # end def
-
-    # def paint(self, painter, option, widget=None):
-    #     painter.setPen(getPenObj(_TEST_COLOR,
-    #                                         _SELECT_PEN_WIDTH))
-    #     painter.drawRect(self.boundingRect())
-
     def clearSelectionRect(self):
         """ reset positions to zero to keep things in check
         """
@@ -344,8 +319,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                             break
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
-            # self.drag_start_scene_position = event.scenePos()
-            # self.drag_last_position = self.pos()
+
             return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 

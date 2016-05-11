@@ -402,10 +402,17 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def getVirtualHelixItems(self):
         return self._virtual_helix_item_hash.values()
 
-    def createToolMousePress(self, tool, event):
+    def createToolMousePress(self, tool, event, alt_event=None):
         # 1. get point in model coordinates:
-        # print("ctmp")
-        pt = tool.eventToPosition(self, event)
+        if alt_event is None:
+            pt = tool.eventToPosition(self, event)
+            # print("reg_event", pt)
+        else:
+            # pt = alt_event.scenePos()
+            # pt = self.mapFromScene(pt)
+            pt = alt_event.pos()
+            # print("alt_event", pt)
+
         if pt is None:
             tool.deactivate()
             return QGraphicsItem.mousePressEvent(self, event)
@@ -420,6 +427,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # VirtualHelix
         current_id_num = tool.idNum()
         check = part.isVirtualHelixNearPoint(part_pt_tuple, current_id_num)
+        # print("current_id_num", current_id_num, check)
+        # print(part_pt_tuple)
         tool.setPartItem(self)
         if check:
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
@@ -430,12 +439,12 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
+            # print("creating", part_pt_tuple)
             part.createVirtualHelix(*part_pt_tuple)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
             vhi = self._virtual_helix_item_hash[id_num]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
-        QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def createToolHoverMove(self, tool, event):
@@ -466,12 +475,4 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
-
-    class IntersectionProbe(QGraphicsItem):
-        def boundingRect(self):
-            return QRectF(0, 0, .1, .1)
-        def paint(self, painter, option, widget=None):
-            pass
-
-
 # end class

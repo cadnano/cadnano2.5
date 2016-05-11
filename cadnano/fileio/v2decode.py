@@ -87,11 +87,9 @@ def decode(document, obj):
     # end for
 
     delta_row = (max_row + min_row) // 2
-    print("dr:", delta_row)
     if delta_row & 1:
         delta_row += 1
     delta_column = (max_col + min_col) // 2
-    print("dc:", delta_column)
     if delta_column & 1:
         delta_column += 1
 
