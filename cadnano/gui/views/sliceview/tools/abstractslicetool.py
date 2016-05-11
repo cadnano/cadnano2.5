@@ -13,7 +13,7 @@ class AbstractSliceTool(QGraphicsObject):
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
     def __init__(self, manager):
-        super(AbstractSliceTool, self).__init__(None)
+        super(AbstractSliceTool, self).__init__(parent=manager.viewroot)
         self._manager = manager
         self._active = False
         self._last_location = None
