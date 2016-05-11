@@ -44,7 +44,11 @@ class Strand(CNObject):
     or high-to-low directions, connection accessor methods (connectionLow and
     connectionHigh) are bound during the init for convenience.
     """
-
+    __slots__ = ('_document', '_strandset', '_id_num',
+                '_oligo', '_is_forward',
+                '_base_idx_low', '_base_idx_high',
+                '_strand5p', '_strand3p',
+                '_sequence')
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
         super(Strand, self).__init__(strandset)
@@ -58,9 +62,8 @@ class Strand(CNObject):
         self._strand3p = None  # 3' connection to another strand
         self._sequence = None
 
-        # TODO REMOVE THESE two fields
+        # TODO REMOVE THIS field
         self._decorators = {}
-        self._modifiers = {}
 
         # dynamic methods for mapping high/low connection /indices
         # to corresponding 3Prime 5Prime
@@ -794,7 +797,6 @@ class Strand(CNObject):
 
         """
         # decs = self._decorators
-        # mods = self._modifiers
         cIdxL, cIdxH = self.idxs()
         nIdxL, nIdxH = new_idxs
 
@@ -854,10 +856,6 @@ class Strand(CNObject):
         return self.clearInsertionsCommands(insertions, *self.idxs())
     # end def
 
-    def hasDecoratorAt(self, idx):
-        return idx in self._decorators
-    # end def
-
     def hasInsertion(self):
         """
         Iterate through dict of insertions for this strand's virtualhelix
@@ -873,10 +871,6 @@ class Strand(CNObject):
     def hasInsertionAt(self, idx):
         insts = self.part().insertions()[self._id_num]
         return idx in insts
-    # end def
-
-    def hasModifierAt(self, idx):
-        return idx in self._modifiers
     # end def
 
     def shallowCopy(self):
