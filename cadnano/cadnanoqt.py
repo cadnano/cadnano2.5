@@ -27,8 +27,8 @@ CADNANO_DEFAULT_DOCUMENT = 'super_barcode_hex.json'
 # CADNANO_DEFAULT_DOCUMENT = 'Hinge_v5.2.json'
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(
-                ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
+# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(
+#                 ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
 
 import platform
 

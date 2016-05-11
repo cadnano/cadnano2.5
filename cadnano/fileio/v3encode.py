@@ -31,12 +31,14 @@ def encodePart(part):
     xover_list = []
     strand_list = []
     vh_list = []
-    for id_num in range(number_of_helices+1):
-        if self.getOffsetAndSize(id_num) is None:
+    for id_num in range(number_of_helices + 1):
+        offset_and_size = self.getOffsetAndSize(id_num)
+        if offset_and_size is None:
             # add a placeholder
             strand_list.append((None, None))
         else:
-            vh_list.append(id_num)
+            offset, size = offset_and_size
+            vh_list.append((id_num, size))
             fwd_ss, rev_ss = part.getStrandSets(id_num)
             fwd_idxs = fwd_ss.dump(xover_list)
             rev_idxs = rev_ss.dump(xover_list)

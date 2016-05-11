@@ -636,9 +636,8 @@ class VirtualHelixGroup(CNObject):
             origin (Sequence[float]): (1,3) ndarray or length 3 sequence.  The origin should be
                         referenced from an index of 0.
             direction (Sequence[float]): (1,3) ndarray or length 3 sequence
-
-            color (str): the offset index into a helix to start the helix at.
-                Useful for appending points. if index less than zero
+            num_points (int): number of bases in Virtual Helix
+            color (str):
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
@@ -832,7 +831,8 @@ class VirtualHelixGroup(CNObject):
         self.vh_properties.loc[id_num, keys] = values
         if not isinstance(values, (tuple, list)):
             keys, values = (keys,) , (values,)
-        self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
+        if safe:
+            self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):

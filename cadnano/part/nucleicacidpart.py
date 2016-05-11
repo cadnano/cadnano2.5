@@ -303,8 +303,12 @@ class NucleicAcidPart(Part):
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def createVirtualHelix(self, x, y, length=42, id_num=None, use_undostack=True):
-        c = CreateVirtualHelixCommand(self, x, y, length, id_num=id_num)
+    def createVirtualHelix(self, x, y,
+                            length=42, id_num=None, properties=None,
+                            safe=True, use_undostack=True):
+        c = CreateVirtualHelixCommand(  self, x, y, length,
+                                        id_num=id_num, properties=properties,
+                                        safe=safe)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
                                                 use_undostack=use_undostack)
     # end def

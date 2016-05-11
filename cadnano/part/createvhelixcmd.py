@@ -4,7 +4,14 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.virtualhelix import VirtualHelixGroup
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(self, part, x, y, length, id_num=None):
+    def __init__(   self, part, x, y, length,
+                    id_num=None, properties=None,
+                    safe=True):
+        """
+        Args:
+            safe (bool): safe must be True to update neighbors
+            otherwise, neighbors need to be explicitly updated
+        """
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
@@ -15,8 +22,18 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.origin_pt = (x, y, 0.)
         self.length = length
         self.color = part.getColor()
-        self.neighbors = []
+        self.keys = None
+        if properties is not None:
+            if not safe and isinstance(properties, tuple): # usually for unsafe
+                self.keys, self.values = properties
+            else:
+                self.keys = list(properties.keys())
+                self.values = list(properties.values())
+        if safe:
+            self.neighbors = []
+
         self.threshold = 2.1*part.radius()
+        self.safe = safe
     # end def
 
     def redo(self):
@@ -26,17 +43,23 @@ class CreateVirtualHelixCommand(UndoCommand):
         # need to always reserve an id
         part.createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
-        if not self.neighbors:
-            self.neighbors = part.getVirtualHelixOriginNeighbors(id_num, self.threshold)
+        if self.safe:   # update all neighbors
+            if not self.neighbors:
+                self.neighbors = part.getVirtualHelixOriginNeighbors(id_num, self.threshold)
 
-        neighbors = self.neighbors
-        part.vh_properties.loc[id_num, 'neighbors'] = str(list(neighbors))
-        for neighbor_id in neighbors:
-            nneighbors = literal_eval(
-                part.getVirtualHelixProperties(neighbor_id, 'neighbors')
-            )
-            bisect.insort_left(nneighbors, id_num)
-            part.vh_properties.loc[neighbor_id, 'neighbors'] =str(list(nneighbors))
+            neighbors = self.neighbors
+            part.vh_properties.loc[id_num, 'neighbors'] = str(list(neighbors))
+            for neighbor_id in neighbors:
+                nneighbors = literal_eval(
+                    part.getVirtualHelixProperties(neighbor_id, 'neighbors')
+                )
+                bisect.insort_left(nneighbors, id_num)
+                part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
+
+        if self.keys is not None:
+            part.setVirtualHelixProperties( id_num,
+                                            self.keys, self.values,
+                                            safe=False)
 
         part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
         part.partActiveSliceResizeSignal.emit(part)
