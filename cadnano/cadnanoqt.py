@@ -23,7 +23,8 @@ ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
 
 # CADNANO_DEFAULT_DOCUMENT = 'C:\\Users\\nick\\Documents\\GitHub\\cadnano2.5\\tests\super_barcode_hex.json'
-# os.environ['CADNANO_DEFAULT_DOCUMENT'] = CADNANO_DEFAULT_DOCUMENT
+CADNANO_DEFAULT_DOCUMENT = '/Users/nick/projects/cadnano2.5/tests/Hinge_v5.2.json'
+os.environ['CADNANO_DEFAULT_DOCUMENT'] = CADNANO_DEFAULT_DOCUMENT
 
 import platform
 

@@ -508,42 +508,45 @@ class Strand(CNObject):
             return False
         ss = self.strandSet()
         is_same_strand = from_strand == self
-        # commenting out to allow same-strand xovers
-        # is_strand_type_match = \
-        #         from_strand.strandSet().strandType() == ss.strandType() \
-        #                                         if from_strand else True
-        # if not is_strand_type_match:
-        #     return False
+
         is_forward = ss.isForward()
         index_diff_H = self.highIdx() - idx
         index_diff_L = idx - self.lowIdx()
-        index3_lim = self.idx3Prime() - 1 if is_forward \
-                                            else self.idx3Prime() + 1
+        idx3p = self.idx3Prime()
+        idx5p = self.idx5Prime()
+        # ensure 2 bps from 3p end if not the 3p end
+        index3_lim = idx3p - 1 if is_forward else idx3p + 1
+
         if is_same_strand:
             index_diff_strands = from_idx - idx
-            if idx == self.idx5Prime() or idx == index3_lim:
+            if idx == idx5p or idx == index3_lim:
                 return True
             elif index_diff_strands > -3 and index_diff_strands < 3:
                 return False
         # end if for same Strand
         else:
-            if idx == self.idx5Prime() or idx == index3_lim:
-                if from_strand.idx3Prime() == from_idx:
+            from_idx3p = from_strand.idx3Prime()
+            from_idx5p = from_strand.idx5Prime()
+            if idx == idx5p or idx == index3_lim:
+                if from_idx3p == from_idx:
                     return True
-                elif abs(from_strand.idx3Prime() - from_idx) > 1 and \
-                    abs(from_strand.idx5Prime() - from_idx) > 1:
+                elif (  abs(from_idx3p - from_idx) > 1 and
+                        abs(from_idx5p - from_idx) > 1 ):
                     return True
                 else:
+                    # print("this:", idx, idx3p, idx5p)
+                    # print("from:", from_idx, from_idx3p, from_idx5p)
                     return False
             elif index_diff_H > 2 and index_diff_L > 1:
-                if from_strand.idx3Prime() == from_idx:
+                if from_idx3p == from_idx:
                     return True
-                elif abs(from_strand.idx3Prime() - from_idx) > 1 and \
-                    abs(from_strand.idx5Prime() - from_idx) > 1:
+                elif (  abs(from_idx3p - from_idx) > 1 and
+                        abs(from_idx5p - from_idx) > 1 ):
                     return True
                 else:
                     return False
             else:
+                # print("default", index_diff_H, index_diff_L)
                 return False
     #end def
 
