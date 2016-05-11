@@ -87,7 +87,13 @@ def decode(document, obj):
     # end for
 
     delta_row = (max_row + min_row) // 2
+    print("dr:", delta_row)
+    if delta_row & 1:
+        delta_row += 1
     delta_column = (max_col + min_col) // 2
+    print("dc:", delta_column)
+    if delta_column & 1:
+        delta_column += 1
 
     print("Found cadnano version 2 file")
     print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
@@ -128,8 +134,6 @@ def decode(document, obj):
         for helix in obj['vstrands']:
             vh_num = helix['num']
             row, col = vh_num_to_coord[vh_num]
-            # row = helix['row']
-            # col = helix['col']
             scaf = helix['scaf']
             stap = helix['stap']
             insertions = helix['loop']
@@ -140,9 +144,11 @@ def decode(document, obj):
             else:
                 stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
 
-                #len(stap) == part.maxBaseIdx() + 1
-            assert(len(scaf) == len(stap) and
-                   len(scaf) == len(insertions) and len(insertions) == len(skips))
+            # validate file serialization of lists
+            assert( len(scaf) == len(stap) and
+                    len(scaf) == len(insertions) and
+                    len(insertions) == len(skips) )
+
             # read scaffold segments and xovers
             for i in range(len(scaf)):
                 five_vh, five_idx, three_vh, three_idx = scaf[i]
@@ -156,11 +162,13 @@ def decode(document, obj):
                 if is3primeXover(StrandType.SCAFFOLD, vh_num, i, three_vh, three_idx):
                     scaf_xo[vh_num].append((i, three_vh, three_idx))
             assert (len(scaf_seg[vh_num]) % 2 == 0)
+
             # install scaffold segments
             for i in range(0, len(scaf_seg[vh_num]), 2):
                 low_idx = scaf_seg[vh_num][i]
                 high_idx = scaf_seg[vh_num][i + 1]
                 scaf_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+
             # read staple segments and xovers
             for i in range(len(stap)):
                 five_vh, five_idx, three_vh, three_idx = stap[i]
@@ -174,6 +182,7 @@ def decode(document, obj):
                 if is3primeXover(StrandType.STAPLE, vh_num, i, three_vh, three_idx):
                     stap_xo[vh_num].append((i, three_vh, three_idx))
             assert (len(stap_seg[vh_num]) % 2 == 0)
+
             # install staple segments
             for i in range(0, len(stap_seg[vh_num]), 2):
                 low_idx = stap_seg[vh_num][i]
@@ -188,12 +197,6 @@ def decode(document, obj):
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row, col = vh_num_to_coord[vh_num]
-        # row = helix['row']
-        # col = helix['col']
-        scaf = helix['scaf']
-        stap = helix['stap']
-        insertions = helix['loop']
-        skips = helix['skip']
 
         if isEven(row, col):
             scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
@@ -216,8 +219,11 @@ def decode(document, obj):
             else:
                 to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
             strand3p = to_scaf_strand_set.getStrand(idx3p)
-            part.createXover(strand5p, idx5p, strand3p, idx3p,
-                update_oligo=False, use_undostack=False)
+            part.createXover(   strand5p, idx5p,
+                                strand3p, idx3p,
+                                update_oligo=False,
+                                use_undostack=False)
+
         # install staple xovers
         for (idx5p, to_vh_num, idx3p) in stap_xo[vh_num]:
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
@@ -228,14 +234,16 @@ def decode(document, obj):
             else:
                 to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
             strand3p = to_stap_strand_set.getStrand(idx3p)
-            part.createXover(strand5p, idx5p, strand3p, idx3p,
-                update_oligo=False, use_undostack=False)
+            part.createXover(   strand5p, idx5p,
+                                strand3p, idx3p,
+                                update_oligo=False,
+                                use_undostack=False)
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
     RefreshOligosCommand(part,
-        colors=(prefs.DEFAULT_SCAF_COLOR,
-                prefs.DEFAULT_STAP_COLOR)).redo()
+                         colors=(   prefs.DEFAULT_SCAF_COLOR,
+                                    prefs.DEFAULT_STAP_COLOR)).redo()
 
     # KEEP COMMENTED OUT
     # SET DEFAULT COLOR
@@ -249,8 +257,6 @@ def decode(document, obj):
     # COLORS, INSERTIONS, SKIPS
     for helix in obj['vstrands']:
         vh_num = helix['num']
-        # row = helix['row']
-        # col = helix['col']
         row, col = vh_num_to_coord[vh_num]
         scaf = helix['scaf']
         stap = helix['stap']
@@ -267,7 +273,9 @@ def decode(document, obj):
             sum_of_insert_skip = insertions[base_idx] + skips[base_idx]
             if sum_of_insert_skip != 0:
                 strand = scaf_strand_set.getStrand(base_idx)
-                strand.addInsertion(base_idx, sum_of_insert_skip, use_undostack=False)
+                strand.addInsertion(base_idx,
+                                    sum_of_insert_skip,
+                                    use_undostack=False)
         # end for
         # populate colors
         for base_idx, color_number in helix['stap_colors']:
@@ -290,10 +298,6 @@ def decode(document, obj):
                 # print "sequence", seq, vh, idx,  strand.oligo()._strand5p
                 strand.oligo().applySequence(seq, use_undostack=False)
     if 'modifications' in obj:
-        # print("AD", cadnano.app().activeDocument)
-        # win = cadnano.app().activeDocument.win
-        # modstool = win.pathToolManager.modsTool
-        # modstool.connectSignals(part)
         for mod_id, item in obj['modifications'].items():
             if mod_id != 'int_instances' and mod_id != 'ext_instances':
                 part.createMod(item, mod_id)
@@ -317,33 +321,43 @@ def decode(document, obj):
 # end def
 
 def isSegmentStartOrEnd(strandtype, vh_num, base_idx, five_vh, five_idx, three_vh, three_idx):
-    """Returns True if the base is a breakpoint or crossover."""
+    """
+    Returns:
+        bool: True if the base is a breakpoint or crossover.
+    """
     if strandtype == StrandType.SCAFFOLD:
         offset = 1
     else:
         offset = -1
-    if (five_vh == vh_num and three_vh != vh_num):
+    if five_vh == vh_num and three_vh != vh_num:
         return True
-    if (five_vh != vh_num and three_vh == vh_num):
+    if five_vh != vh_num and three_vh == vh_num:
         return True
-    if (vh_num % 2 == 0 and five_vh == vh_num and five_idx != base_idx-offset):
+    if (vh_num % 2 == 0 and five_vh == vh_num and
+        five_idx != base_idx - offset):
         return True
-    if (vh_num % 2 == 0 and three_vh == vh_num and three_idx != base_idx+offset):
+    if (vh_num % 2 == 0 and three_vh == vh_num and
+        three_idx != base_idx + offset):
         return True
-    if (vh_num % 2 == 1 and five_vh == vh_num and five_idx != base_idx+offset):
+    if (vh_num % 2 == 1 and five_vh == vh_num and
+        five_idx != base_idx + offset):
         return True
-    if (vh_num % 2 == 1 and three_vh == vh_num and three_idx != base_idx-offset):
+    if (vh_num % 2 == 1 and three_vh == vh_num and
+        three_idx != base_idx - offset):
         return True
-    if (five_vh == -1 and three_vh != -1):
+    if five_vh == -1 and three_vh != -1:
         return True
-    if (five_vh != -1 and three_vh == -1):
+    if five_vh != -1 and three_vh == -1:
         return True
     return False
 # end def
 
 def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
-    """Returns True of the three_vh doesn't match vh_num, or three_idx
-    is not a natural neighbor of base_idx."""
+    """
+    Returns:
+        bool: True of the three_vh doesn't match vh_num, or three_idx
+                is not a natural neighbor of base_idx.
+    """
     if three_vh == -1:
         return False
     if vh_num != three_vh:
@@ -352,8 +366,10 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
         offset = 1
     else:
         offset = -1
-    if (vh_num % 2 == 0 and three_vh == vh_num and three_idx != base_idx+offset):
+    if (vh_num % 2 == 0 and three_vh == vh_num and
+        three_idx != base_idx + offset):
         return True
-    if (vh_num % 2 == 1 and three_vh == vh_num and three_idx != base_idx-offset):
+    if (vh_num % 2 == 1 and three_vh == vh_num and
+        three_idx != base_idx - offset):
         return True
 # end def

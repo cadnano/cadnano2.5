@@ -328,22 +328,34 @@ class NucleicAcidPart(Part):
     # end def
 
     def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True, use_undostack=True):
-        # prexoveritem needs to store left or right, and determine
-        # locally whether it is from or to
-        # pass that info in here in and then do the breaks
+        """ Xovers are ALWAYS installed FROM the 3' end of the 5' most
+        strand (strand5p) TO the 5' end of the 3' most strand (strand3p)
+
+        Args:
+            strand5p (Strand):
+            idx5p (int): index of the 3 prime end of the xover in strand5p
+            strand3p (Strand):
+            idx3p (int): index of the 5 prime end of the xover in strand3p
+        """
+        # test for reordering malformed input
+        # if (strand5p.idx5Prime() == idx5p and
+        #     strand3p.idx3Prime() == idx3p):
+        #     strand5p, strand3p = strand3p, strand5p
+        #     idx5p, idx3p = idx3p, idx5p
+
         if not strand3p.canInstallXoverAt(idx3p, strand5p, idx5p):
             print("createXover: no xover can be installed here")
-            print(strand5p, idx5p)
-            print(strand3p, idx3p)
-            raise ValueError("$$$$$$$$$$$$$$$")
+            print("strand 5p", strand5p)
+            print("\tidx: %d\tidx5p: %d\tidx3p: %d" %
+                    (idx5p, strand5p.idx5Prime(), strand5p.idx3Prime()) )
+            print("strand 3p", strand3p)
+            print("\tidx: %d\tidx5p: %d\tidx3p: %d" %
+                    (idx3p, strand3p.idx5Prime(), strand3p.idx3Prime()) )
+            # raise ValueError("Part.createXover:")
             return
 
         ss5p = strand5p.strandSet()
         ss3p = strand3p.strandSet()
-
-        # commenting out if statement below allows scaf-to-stap xovers
-        # if ss5p.strandType() != ss3p.strandType():
-        #     return
 
         if use_undostack:
             self.undoStack().beginMacro("Create Xover")
@@ -381,14 +393,14 @@ class NucleicAcidPart(Part):
                 if ss3p.strandCanBeSplit(strand3p, idx3p + offset3p):
                     c = SplitCommand(strand3p, idx3p + offset3p)
                     # cmds.append(c)
-                    xo_strand3 = c._strand_high if ss3p.isForward() else c._strand_low
+                    xo_strand3 = c.strand_high if ss3p.isForward() else c.strand_low
                     # adjust the target 5prime strand, always necessary if a split happens here
                     if idx5p > idx3p and ss3p.isForward():
                         temp5 = xo_strand3
                     elif idx5p < idx3p and not ss3p.isForward():
                         temp5 = xo_strand3
                     else:
-                        temp5 = c._strand_low if ss3p.isForward() else c._strand_high
+                        temp5 = c.strand_low if ss3p.isForward() else c.strand_high
                     if use_undostack:
                         self.undoStack().push(c)
                     else:
@@ -418,7 +430,7 @@ class NucleicAcidPart(Part):
                 if ss5p.strandCanBeSplit(temp5, idx5p):
                     d = SplitCommand(temp5, idx5p)
                     # cmds.append(d)
-                    xo_strand5 = d._strand_low if ss5p.isForward() else d._strand_high
+                    xo_strand5 = d.strand_low if ss5p.isForward() else d.strand_high
                     if use_undostack:
                         self.undoStack().push(d)
                     else:
@@ -446,7 +458,7 @@ class NucleicAcidPart(Part):
                     if ss3p.getStrandIndex(strand3p)[0]:
                         c = SplitCommand(strand3p, idx3p + offset3p)
                         # cmds.append(c)
-                        xo_strand3 = c._strand_high if ss3p.isForward() else c._strand_low
+                        xo_strand3 = c.strand_high if ss3p.isForward() else c.strand_low
                         if use_undostack:
                             self.undoStack().push(c)
                         else:
@@ -468,7 +480,7 @@ class NucleicAcidPart(Part):
                     if ss5p.getStrandIndex(strand5p)[0]:
                         d = SplitCommand(strand5p, idx5p)
                         # cmds.append(d)
-                        xo_strand5 = d._strand_low if ss5p.isForward() else d._strand_high
+                        xo_strand5 = d.strand_low if ss5p.isForward() else d.strand_high
                         if use_undostack:
                             self.undoStack().push(d)
                         else:

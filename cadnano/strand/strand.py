@@ -83,9 +83,8 @@ class Strand(CNObject):
     # end def
 
     def __repr__(self):
-        clsName = self.__class__.__name__
         s = "%s.<%s(%s, %s)>" % (self._strandset.__repr__(),
-                                clsName,
+                                self.__class__.__name__,
                                 self._base_idx_low,
                                 self._base_idx_high)
         return s

@@ -28,8 +28,8 @@ class SplitCommand(UndoCommand):
         self._s_set = s_set = strand.strandSet()
         self._old_oligo = oligo = strand.oligo()
         # Create copies
-        self._strand_low = strand_low = strand.shallowCopy()
-        self._strand_high = strand_high = strand.shallowCopy()
+        self.strand_low = strand_low = strand.shallowCopy()
+        self.strand_high = strand_high = strand.shallowCopy()
 
         if oligo.isLoop():
             self._l_oligo = self._h_oligo = l_oligo = h_oligo = oligo.shallowCopy()
@@ -103,8 +103,8 @@ class SplitCommand(UndoCommand):
 
     def redo(self):
         ss = self._s_set
-        s_low = self._strand_low
-        s_high = self._strand_high
+        s_low = self.strand_low
+        s_high = self.strand_high
         o_strand = self._old_strand
         # idx = self._s_set_idx
         olg = self._old_oligo
@@ -158,8 +158,8 @@ class SplitCommand(UndoCommand):
 
     def undo(self):
         ss = self._s_set
-        s_low = self._strand_low
-        s_high = self._strand_high
+        s_low = self.strand_low
+        s_high = self.strand_high
         o_strand = self._old_strand
         # idx = self._s_set_idx
         olg = self._old_oligo
