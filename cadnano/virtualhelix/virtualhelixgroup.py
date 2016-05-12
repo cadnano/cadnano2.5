@@ -75,6 +75,7 @@ class VirtualHelixGroup(CNObject):
         do_copy = kwargs.get('do_copy', False)
         if do_copy:
             return
+
         self._radius = DEFAULT_RADIUS     # probably a property???
 
         # 1. per virtual base pair allocations
