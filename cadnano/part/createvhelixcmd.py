@@ -31,6 +31,10 @@ class CreateVirtualHelixCommand(UndoCommand):
                 self.values = list(properties.values())
         if safe:
             self.neighbors = []
+        else:
+            self.neighbors = literal_eval(self.values[
+                                            self.keys.index('neighbors')]
+                                            )
 
         self.threshold = 2.1*part.radius()
         self.safe = safe
@@ -55,7 +59,8 @@ class CreateVirtualHelixCommand(UndoCommand):
                 )
                 bisect.insort_left(nneighbors, id_num)
                 part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
-
+        else:
+            neighbors = self.neighbors
         if self.keys is not None:
             part.setVirtualHelixProperties( id_num,
                                             self.keys, self.values,

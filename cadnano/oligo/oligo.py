@@ -76,7 +76,8 @@ class Oligo(CNObject):
         key = { 'id_num': s5p.idNum(),
                 'idx5p':s5p.idx5Prime(),
                 'is_5p_fwd': s5p.isForward(),
-                'is_loop': self._is_loop}
+                'is_loop': self._is_loop,
+                'sequence': self.sequence() }
         key.update(self._props)
         return key
     # end def

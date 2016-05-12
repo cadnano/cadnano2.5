@@ -270,6 +270,12 @@ class Part(VirtualHelixGroup):
         return self._insertions
     # end def
 
+    def dumpInsertions(self):
+        for id_num, id_dict in self._insertions.items():
+            for idx, insertion in id_dict.items():
+                yield (id_num, idx, insertion.length())
+    # end def
+
     def isSelected(self):
         return self.is_selected
     # end def

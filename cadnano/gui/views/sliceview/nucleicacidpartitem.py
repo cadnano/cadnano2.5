@@ -215,8 +215,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
-            nvhi = self._virtual_helix_item_hash[nvh]
-            vhi.setWedgeGizmo(nvh, nvhi)
+            nvhi = self._virtual_helix_item_hash.get(nvh, False)
+            if nvhi:
+                vhi.setWedgeGizmo(nvh, nvhi)
         # end for
         vhi.endAddWedgeGizmos()
     # end def
@@ -233,8 +234,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._virtual_helix_item_hash[id_num] = vhi
         self._refreshVirtualHelixItemGizmos(id_num, vhi)
         for neighbor_id in neighbors:
-            nvhi = self._virtual_helix_item_hash[neighbor_id]
-            self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+            nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
+            if nvhi:
+                self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
         # print(neighbors)
     # end def
 

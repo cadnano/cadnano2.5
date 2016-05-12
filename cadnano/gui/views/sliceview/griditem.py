@@ -25,7 +25,6 @@ class GridItem(QGraphicsPathItem):
         color.setAlphaF(0.1)
         self.setPen(color)
         self.updateGrid()
-        print("GridItem", self.scenePos(), self.scene(), self.pos())
     # end def
 
     def updateGrid(self):

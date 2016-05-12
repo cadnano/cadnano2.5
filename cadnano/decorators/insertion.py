@@ -6,6 +6,8 @@ class Insertion(object):
     Insertions do affect an applied sequence and do not store a sequence
     themselves.  They are a skip if the length is less than 0
     """
+    __slots__ = '_length', '_index'
+
     def __init__(self, index, length):
         self._length = length
         self._index  = index

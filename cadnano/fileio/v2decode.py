@@ -58,7 +58,10 @@ def decode(document, obj):
         num_rows = max(30, max_row_json, prefs.SQUARE_PART_MAXROWS)
         num_cols = max(32, max_col_json, prefs.SQUARE_PART_MAXCOLS)
 
-        part = document._controller.actionAddDnaPart()
+        dc = document._controller
+        part = document.addDnaPart()
+        dc.setActivePart(part)
+
         doLattice = SquareDnaPart.latticeCoordToPositionXY
         isEven = SquareDnaPart.isEvenParity
     else:
@@ -239,18 +242,7 @@ def decode(document, obj):
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
-    RefreshOligosCommand(part,
-                         colors=(   prefs.DEFAULT_SCAF_COLOR,
-                                    prefs.DEFAULT_STAP_COLOR)).redo()
-
-    # KEEP COMMENTED OUT
-    # SET DEFAULT COLOR
-    # for oligo in part.oligos():
-    #     if oligo.isStaple():
-    #         default_color = prefs.DEFAULT_STAP_COLOR
-    #     else:
-    #         default_color = prefs.DEFAULT_SCAF_COLOR
-    #     oligo.applyColor(default_color, use_undostack=False)
+    RefreshOligosCommand(part).redo()
 
     # COLORS, INSERTIONS, SKIPS
     for helix in obj['vstrands']:
@@ -318,7 +310,9 @@ def decode(document, obj):
         # modstool.disconnectSignals(part)
 # end def
 
-def isSegmentStartOrEnd(strandtype, vh_num, base_idx, five_vh, five_idx, three_vh, three_idx):
+def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
+                        five_vh, five_idx,
+                        three_vh, three_idx):
     """
     Returns:
         bool: True if the base is a breakpoint or crossover.

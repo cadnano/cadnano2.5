@@ -5,6 +5,7 @@ import io
 from cadnano.document import Document
 
 import cadnano.fileio.v2decode as v2decode
+import cadnano.fileio.v3decode as v3decode
 
 def decodeFile(filename, document=None):
     with io.open(filename, 'r', encoding='utf-8') as fd:
@@ -14,7 +15,7 @@ def decodeFile(filename, document=None):
     if 'format' not in nno_dict:
         v2decode.decode(document, nno_dict)
     else:
-        pass
+        v3decode.decode(document, nno_dict)
     return document
 # end def
 

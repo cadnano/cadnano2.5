@@ -6,7 +6,6 @@ from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
 
 proxyConfigure('PyQt')
-decode = None
 decodeFile = None
 Document = None
 DocumentController = None
@@ -74,7 +73,6 @@ class CadnanoQt(QObject):
 
 
     def finishInit(self):
-        global decode
         global decodeFile
         global Document
         global DocumentController
@@ -149,6 +147,7 @@ class CadnanoQt(QObject):
             dc = DocumentController(base_doc)
             logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
+            dc.setFilename(default_file)
             print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)

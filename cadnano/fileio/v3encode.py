@@ -32,10 +32,10 @@ def encodePart(part):
     strand_list = []
     vh_list = []
     for id_num in range(number_of_helices + 1):
-        offset_and_size = self.getOffsetAndSize(id_num)
+        offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
             # add a placeholder
-            strand_list.append((None, None))
+            strand_list.append(None)
         else:
             offset, size = offset_and_size
             vh_list.append((id_num, size))
@@ -48,7 +48,7 @@ def encodePart(part):
     group_props['strands'] = {  'indices': strand_list,
                                 'properties': []
                             }
-    group_props['insertions'] = vh_insertions
+    group_props['insertions'] = list(part.dumpInsertions())
     group_props['xovers'] = xover_list
     # oligo_dict = {k: v for k, v in zip( oligo.ALL_KEYS,
     #                                 zip(o.dump() for o in part.oligos()))
