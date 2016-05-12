@@ -12,7 +12,7 @@ from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller impor
 from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import slicestyles as styles
-from .activesliceitem import ActiveSliceItem
+
 from .virtualhelixitem import VirtualHelixItem
 from .prexovermanager import PreXoverManager
 from .griditem import GridItem
@@ -52,7 +52,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._getActiveTool = viewroot.manager.activeToolGetter
 
         self._controller = NucleicAcidPartItemController(self, m_p)
-        self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self.scale_factor = self._RADIUS / m_p.radius()
         self.scale_tuple = (self._RADIUS, m_p.radius())
 
@@ -155,7 +154,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
-        self._active_slice_item.removed()
         self.parentItem().removePartItem(self)
 
         scene = self.scene()

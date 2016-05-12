@@ -148,9 +148,9 @@ class AbstractSliceTool(QGraphicsObject):
 
     def deactivate(self):
         self.is_started = False
+        self.hideLineItem()
         self._vhi = None
         self.part_item = None
-        self.hideLineItem()
         self.hide()
         self._active = False
     # end def

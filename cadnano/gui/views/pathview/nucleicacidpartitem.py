@@ -13,7 +13,6 @@ from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller impor
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import pathstyles as styles
-from .activesliceitem import ActiveSliceItem
 # from .prexoveritem import PreXoverItem
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
@@ -43,7 +42,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._model_props = m_props = m_p.getPropertyDict()
         self._viewroot = viewroot
         self._getActiveTool = viewroot.manager.activeToolGetter
-        self._active_slice_item = ActiveSliceItem(self, m_p.activeBaseIndex())
         self.active_virtual_helix_item = None
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.prexover_manager = PreXoverManager(self)
@@ -121,7 +119,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
             self._vh_rect.setRight(vhi_rect.right())
         self.scene().views()[0].zoomToFit()
-        self._active_slice_item.resetBounds()
         self._updateBoundingRect()
     # end def
 
@@ -153,7 +150,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def partRemovedSlot(self, sender):
         """docstring for partRemovedSlot"""
-        self._active_slice_item.removed()
         self.parentItem().removePartItem(self)
         scene = self.scene()
         scene.removeItem(self)
