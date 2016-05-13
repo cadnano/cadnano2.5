@@ -34,23 +34,26 @@ def encodePart(part):
 
     xover_list = []
     strand_list = []
+    prop_list = []
     vh_list = []
     for id_num in range(number_of_helices + 1):
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
             # add a placeholder
             strand_list.append(None)
+            prop_list.append(None)
         else:
             offset, size = offset_and_size
             vh_list.append((id_num, size))
             fwd_ss, rev_ss = part.getStrandSets(id_num)
-            fwd_idxs = fwd_ss.dump(xover_list)
-            rev_idxs = rev_ss.dump(xover_list)
+            fwd_idxs, fwd_colors  = fwd_ss.dump(xover_list)
+            rev_idxs, rev_colors  = rev_ss.dump(xover_list)
             strand_list.append((fwd_idxs, rev_idxs))
+            prop_list.append((fwd_colors, rev_colors))
     # end for
     group_props['vh_list'] = vh_list
     group_props['strands'] = {  'indices': strand_list,
-                                'properties': []
+                                'properties': prop_list
                             }
     group_props['insertions'] = list(part.dumpInsertions())
     group_props['xovers'] = xover_list
@@ -77,7 +80,6 @@ def encodePart2(part, vh_group_list=None):
 
     # iterate through virtualhelix list
     group_props = part.getPropertyDict().copy()
-    view_props = part.view_properties
     vh_props, origins = part.helixPropertiesAndOrigins(vh_group_list)
 
     group_props['virtual_helices'] = vh_props
@@ -85,6 +87,7 @@ def encodePart2(part, vh_group_list=None):
 
     xover_list = []
     strand_list = []
+    prop_list = []
     vh_list = []
     vh_group_set = set(vh_group_list)
     filter_xovers = lambda x: (  x[0] in vh_group_set and
@@ -95,13 +98,15 @@ def encodePart2(part, vh_group_list=None):
         if offset_and_size is None:
             # add a placeholder
             strand_list.append(None)
+            prop_list.append(None)
         else:
             offset, size = offset_and_size
             vh_list.append((id_num, size))
             fwd_ss, rev_ss = part.getStrandSets(id_num)
-            fwd_idxs = fwd_ss.dump(xover_list)
-            rev_idxs = rev_ss.dump(xover_list)
+            fwd_idxs, fwd_colors = fwd_ss.dump(xover_list)
+            rev_idxs, rev_colors = rev_ss.dump(xover_list)
             strand_list.append((fwd_idxs, rev_idxs))
+            prop_list.append((fwd_colors, rev_colors))
     # end for
 
     remap = {x: y for x, y in zip(   vh_group_list,
@@ -123,8 +128,14 @@ def encodePart2(part, vh_group_list=None):
     #             }
 
     group_props['oligos'] = [o.dump() for o in part.oligos()]
+
+    view_props = part.view_properties.copy()
+    vh_order = view_props['path:virtual_helix_order']
+    vh_order = [remap(x) for x in vh_order]
+    view_props['path:virtual_helix_order'] = vh_order
     group_props['view_properties'] = view_props
-    group_props['modifications'] = part.mods()
+
+    # group_props['modifications'] = part.mods()
 
     return group_props
 # end def

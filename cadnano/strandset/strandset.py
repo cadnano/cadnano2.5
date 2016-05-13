@@ -534,13 +534,14 @@ class StrandSet(CNObject):
         """
         sh = self.strand_heap
         idxs = [strand.idxs() for strand in sh]
+        colors = [strand.getColor() for strand in sh]
         is_fwd = self._is_fwd
         for strand in sh:
             s3p = strand.connection3p()
             if s3p is not None:
                 xover = (strand.idNum(), is_fwd, strand.idx3Prime()) + s3p.dump5p()
                 xover_list.append(xover)
-        return idxs
+        return idxs, colors
     #end def
 
     def getLegacyArray(self):

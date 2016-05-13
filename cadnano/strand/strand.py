@@ -185,6 +185,10 @@ class Strand(CNObject):
         return self._oligo
     # end def
 
+    def getColor(self):
+        return self._oligo.getColor()
+    # end def
+
     def sequence(self, for_export=False):
         seq = self._sequence
         if seq:
@@ -260,20 +264,6 @@ class Strand(CNObject):
         """
         return range(self._base_idx_low, self._base_idx_high + 1)
     # end def
-
-    # def getPreDecoratorIdxList(self):
-    #     """Return positions where predecorators should be displayed."""
-    #     part = self._strandset.part()
-    #     validIdxs = sorted([idx[0] for idx in part._stapL + part._stapH])
-    #     lo, hi = self._base_idx_low, self._base_idx_high
-    #     start = lo if self.connectionLow() is None else lo+1
-    #     end = hi if self.connectionHigh() is None else hi-1
-    #     ret = []
-    #     for i in range(start, end+1):
-    #         if i % part.stepSize() in validIdxs:
-    #             ret.append(i)
-    #     return ret
-    # # end def
 
     def setComplementSequence(self, sequence_string, strand):
         """

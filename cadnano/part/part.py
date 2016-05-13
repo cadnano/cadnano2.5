@@ -233,7 +233,7 @@ class Part(VirtualHelixGroup):
         """ the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
         """
-        return self.getViewProperty('path', 'virtual_helix_order')
+        return self.getViewProperty('path:virtual_helix_order')
     # end def
 
     def activeIdNum(self):
