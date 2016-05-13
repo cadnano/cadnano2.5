@@ -126,6 +126,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     ### SLOTS ###
     def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            return
         part_item = self._part_item
         tool = part_item._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"

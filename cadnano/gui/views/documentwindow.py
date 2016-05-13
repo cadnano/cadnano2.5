@@ -19,7 +19,11 @@ from cadnano.gui.ui.mainwindow import ui_mainwindow
 
 # for OpenGL mode
 try:
-    from OpenGL import GL
+    # from OpenGL import GL
+    from PyQt5.QtOpenGL import QGLWidget
+    # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
+    # for an example of the QOpenGlWidget added in Qt 5.4
+    GL = True
 except:
     GL = False
 
@@ -170,7 +174,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     """
     #     if painter.paintEngine().type() != QPaintEngine.OpenGL and \
     #         painter.paintEngine().type() != QPaintEngine.OpenGL2:
-    #
+
     #         qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
     #         return
     #     # end if
@@ -178,7 +182,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     #     GL.glDisable(GL.GL_DEPTH_TEST) # disable for 2D drawing
     #     GL.glClearColor(1.0, 1.0, 1.0, 1.0)
     #     GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-    #
+
     #     painter.endNativePainting()
     # # end def
 

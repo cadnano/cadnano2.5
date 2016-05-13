@@ -16,12 +16,14 @@ from cadnano import util
 from PyQt5.QtCore import pyqtSignal, Qt, QTimer, QTimeLine
 
 from PyQt5.QtGui import QPaintEngine, QPen
-from PyQt5.QtWidgets import qApp, QGraphicsView, QGraphicsScene, QWidget
+from PyQt5.QtWidgets import (qApp, QGraphicsView,
+                            QGraphicsScene, QWidget, QMenu,
+                            QAction)
 
 # for OpenGL mode
 try:
-    from OpenGL import GL
-    from PyQt5.QtOpenGL import QGLWidget, QGLFormat, QGL
+    # from OpenGL import GL
+    from PyQt5.QtWidgets import QOpenGLWidget
 except:
     GL = False
 
@@ -89,10 +91,20 @@ class CustomQGraphicsView(QGraphicsView):
         self.toolbar = None  # custom hack for the paint tool palette
         self._name = None
 
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        # self.customContextMenuRequested.connect(self.getCustomContextMenu)
+
         if GL:
-            self.setViewport(QGLWidget(QGLFormat(QGL.SampleBuffers)))
+            self.is_GL = True
+            # self.glwidget = QGLWidget(QGLFormat(QGL.SampleBuffers))
+            self.glwidget = QOpenGLWidget()
+            # self.setupGL()
+            self.gl = self.glwidget.context().versionFunctions()
+            self.setViewport(self.glwidget)
             self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+            # self.resetGL()
         else:
+            self.is_GL = False
             self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
             # self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         # self.setFocusPolicy(Qt.ClickFocus)
@@ -160,7 +172,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def setupGL(self):
         scene = self.scene()
-        win = self.scene_root_item.window()
+        # win = self.scene_root_item.window()
         self.is_GL = True
         self.is_GL_switch_allowed = True
         self.qTimer = QTimer()
@@ -450,7 +462,8 @@ class CustomQGraphicsView(QGraphicsView):
         scale_change = new_scale_level / current_scale_level
         self.scale(scale_change, scale_change)
 
-        # self.resetGL()
+        if self.is_GL:
+            self.resetGL()
     # end def
 
     def zoomIn(self, fraction_of_max=0.5):

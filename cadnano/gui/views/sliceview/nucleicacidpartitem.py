@@ -366,6 +366,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
+        if event.button() == Qt.RightButton:
+            return
         self.part().setSelected(True)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"

@@ -1,7 +1,7 @@
 from .abstractslicetool import AbstractSliceTool
 from PyQt5.QtCore import QRect, QRectF, QPointF, Qt
-from PyQt5.QtWidgets import QGraphicsItemGroup, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
+                             QGraphicsItem, QMenu, QAction)
 
 from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
 from cadnano.gui.palette import getPenObj
@@ -297,6 +297,13 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     def mousePressEvent(self, event):
         tool = self.tool
         if event.button() != Qt.LeftButton:
+            """ do context menu?
+            """
+            sgv = self.tool.sgv
+            print(sgv)
+            # pos = sgv.mapFromScene(event.scenePos())
+            # sgv.getCustomContextMenu(pos)
+            self.getCustomContextMenu(event.screenPos())
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
@@ -321,6 +328,18 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             self.drag_last_position = sp
 
             return QGraphicsItemGroup.mousePressEvent(self, event)
+    # end def
+
+    def getCustomContextMenu(self, point):
+        """ point (QPoint)
+        """
+        sgv = self.tool.sgv
+        menu = QMenu(sgv)
+        hide_act = QAction("duplicate selection", sgv)
+        hide_act.setStatusTip("duplicate selection")
+        # hide_act.triggered.connect(self.hideSelection)
+        menu.addAction(hide_act)
+        menu.exec_(point)
     # end def
 
     def mouseMoveEvent(self, event):

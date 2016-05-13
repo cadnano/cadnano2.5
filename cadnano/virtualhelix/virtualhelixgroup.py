@@ -793,12 +793,21 @@ class VirtualHelixGroup(CNObject):
             return props.item() if isinstance(props, (np.float64, np.int64, np.bool_)) else props
     # end
 
-    def helixPropertiesAndOrigins(self):
-        lim = self._highest_id_num_used + 1
-        props = self.vh_properties[:lim]
-        props = props.to_dict(orient='list')
-        origins = self.origin_pts[:lim]
-        return props, origins
+    def helixPropertiesAndOrigins(self, id_num_list=None):
+        if id_num_list is None:
+            lim = self._highest_id_num_used + 1
+            props = self.vh_properties.iloc[:lim]
+            props = props.to_dict(orient='list')
+            origins = self.origin_pts[:lim]
+            return props, origins
+        elif isinstance(id_num_list, list):
+            # select by list of indices
+            props = self.vh_properties.iloc[id_num_list].reset_index(drop=True)
+            props = props.to_dict(orient='list')
+            origins = self.origin_pts[id_num_list]
+            return props, origins
+        else:
+            raise ValueError("id_num_list bad type: {}".format(type(id_num_list)))
     # end def
 
     def getAllVirtualHelixProperties(self, id_num, safe=True):
