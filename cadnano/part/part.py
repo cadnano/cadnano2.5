@@ -3,7 +3,6 @@ from collections import defaultdict
 from heapq import heapify, heappush, heappop
 from itertools import product, islice
 from uuid import uuid4
-izip = zip
 
 from cadnano import util
 from cadnano import preferences as prefs
@@ -47,7 +46,8 @@ class Part(VirtualHelixGroup):
         self._instance_count = 0
         # Data structure
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
-        self._mods = defaultdict(dict)
+        self._mods = {  'int_instances':{},
+                        'ext_instances':{}}
         self._oligos = set()
         # Properties
         self.view_properties = {} #self._document.newViewProperties()
@@ -55,6 +55,7 @@ class Part(VirtualHelixGroup):
         self._group_properties["name"] = "Part%d" % len(self._document.children())
         self._group_properties["color"] = "#000000" # outlinerview will override from styles
         self._group_properties["visible"] = True
+        self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4()
 
         # Selections
         self._selections = {}
@@ -122,13 +123,6 @@ class Part(VirtualHelixGroup):
     # D. Strand
     partStrandChangedSignal = ProxySignal(object, int,
                         name='partStrandChangedSignal')         # self, virtual_helix
-    # E. Mod
-    partModAddedSignal = ProxySignal(object, object, object,
-                        name='partModAddedSignal')
-    partModRemovedSignal = ProxySignal(object, object,
-                        name='partModRemovedSignal')
-    partModChangedSignal = ProxySignal(object, object, object,
-                        name='partModChangedSignal')
 
     ### SLOTS ###
 
@@ -293,18 +287,28 @@ class Part(VirtualHelixGroup):
             return mods_strand[key]
     # end def
 
-    def getModSequence(self, strand, idx, modtype):
+    def getStrandModSequence(self, strand, idx, mod_type):
+        """
+        Args:
+            strand (Strand):
+            idx (int):
+            mod_type (int): 0, 1, or 2
+        """
         mid = self.getModID(strand, idx)
-        name = '' if mid is None else self._mods[mid]['name']
-        if modtype == 0:
-            seq = '' if mid is None else self._mods[mid]['seq5p']
-        elif modtype == 1:
-            seq = '' if mid is None else self._mods[mid]['seq3p']
-        else:
-            seq = '' if mid is None else self._mods[mid]['seqInt']
-        return seq, name
+        return self._document.getModSequence(mid, mod_type)
+
+    def getModKeyTokens(self, key):
+        keylist = key.split(',')
+        id_num = int(keylist[0])
+        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        idx = int(keylist[2])
+        return id_num, is_fwd, idx
+    # end def
 
     def getModStrandIdx(self, key):
+        """ Convert a key of a mod instance relative to a part
+        to a strand and an index
+        """
         keylist = key.split(',')
         id_num = int(keylist[0])
         is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
@@ -313,81 +317,81 @@ class Part(VirtualHelixGroup):
         return strand, idx
     # end def
 
-    def addModInstance(self, id_num, idx, is_rev, isinternal, mid):
+    def addModInstance(self, id_num, idx, is_rev, is_internal, mid):
         key =  "{},{},{}".format(id_num, is_rev, idx)
-        mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
-        try:
-            doc_locations = self._document.getModLocationsSet(mid, isinternal)
-        except:
-            print(mid, self._mods[mid])
-            raise
+        mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
         if key in mods_strands:
-            self.removeModInstance(id_num, idx, is_rev, isinternal, mid)
-        self.addModInstanceKey(key, mods_strands, doc_locations, mid)
+            self.removeModInstance(id_num, idx, is_rev, is_internal, mid)
+        self._document.addModInstance(mid, is_internal, self, key)
+        self.addModInstanceKey(key, mods_strands, mid)
     # end def
 
-    def addModInstanceKey(self, key, mods_strands, doc_locations, mid):
+    def addModInstanceKey(self, key, mods_strands, mid):
         mods_strands[key] = mid # add to strand lookup
-        # add to set of locations
-        doc_locations.add(key)
     # end def
 
-    def addModStrandInstance(self, strand, idx, mid):
+    def addModStrandInstance(self, strand, idx, mid, is_internal=False):
         id_num = strand.idNum()
         strandtype = strand.strandType()
         if mid is not None:
             self.addModInstance(id_num, idx, strandtype, False, mid)
     # end def
 
-    def removeModInstance(self, id_num, idx, is_rev, isinternal, mid):
+    def removeModInstance(self, id_num, idx, is_rev, is_internal, mid):
         key =  "{},{},{}".format(id_num, is_rev, idx)
-        mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
-        doc_locations = self._document.getModLocationsSet(mid, isinternal)
+        mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
+        self._document.removeModInstance(mid, is_internal, self, key)
         if key in mods_strands:
-            self.removeModInstanceKey(key, mods_strands, doc_locations)
+            del mods_strands[key]
     # end def
 
-    def removeModInstanceKey(self, key, mods_strands, doc_locations):
-        del mods_strands[key]
-        doc_locations.remove(key)
-    # end def
-
-    def removeModStrandInstance(self, strand, idx, mid):
+    def removeModStrandInstance(self, strand, idx, mid, is_internal=False):
         id_num = strand.idNum()
         is_rev = strand.isReverse()
         if mid is not None:
-            self.removeModInstance(id_num, idx, is_rev, False, mid)
+            self.removeModInstance(id_num, idx, is_rev, is_internal, mid)
     # end def
 
-    def changeModInstance(self, id_num, idx, is_rev, isinternal, mid_old, mid_new):
-        if mid_new != mid_old:
-            mods = self._mods
-            if mid_old in mods and mid_new in mods:
-                self.removeModInstance(id_num, idx, is_rev, isinternal, mid_old)
-                self.addModInstance(id_num, idx, is_rev, isinternal, mid_new)
+    def dumpModInstances(self, is_internal):
+        mods = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
+        for key, mid in mods:
+            id_num, is_fwd, idx = self.getModKeyTokens(key)
+            yield (id_num, is_fwd, idx, mid)
     # end def
 
-    def changeModLocation(self, id_num, idx_old, idx, is_rev, isinternal, mid):
-        if idx_old != idx:
-            self.removeModInstance(id_num, idx_old, is_rev, isinternal, mid)
-            self.addModInstance(id_num, idx, is_rev, isinternal, mid)
-    # end def
+    # def changeModInstance(self, id_num, idx, is_rev, is_internal, mid_old, mid_new):
+    #     if mid_new != mid_old:
+    #         mods = self._mods
+    #         if mid_old in mods and mid_new in mods:
+    #             self.removeModInstance(id_num, idx, is_rev, is_internal, mid_old)
+    #             self.addModInstance(id_num, idx, is_rev, is_internal, mid_new)
+    # # end def
 
-    def changeModStrandLocation(self, strand, idxs_old, idxs):
-        id_num = strand.idNum()
-        is_rev = strand.isReverse()
-        mods_strands = self._mods['ext_instances']
-        for i in [0,1]:
-            idx_old = idxs_old[i]
-            idx = idxs[i]
-            if idx_old != idx:
-                key_old =  "{},{},{}".format(id_num, is_rev, idx_old)
-                if key_old in mods_strands:
-                    mid = mods_strands[key_old]
-                    locations = self._mods[mid]['ext_locations']
-                    self.removeModInstanceKey(key_old, mods_strands, locations)
-                    key =  "{},{},{}".format(id_num, is_rev, idx)
-                    self.addModInstanceKey(key, mods_strands, locations, mid)
-        # end for
-    # end def
+    # def changeModLocation(self, id_num, idx_old, idx, is_rev, is_internal, mid):
+    #     if idx_old != idx:
+    #         self.removeModInstance(id_num, idx_old, is_rev, is_internal, mid)
+    #         self.addModInstance(id_num, idx, is_rev, is_internal, mid)
+    # # end def
+
+    # def changeModStrandLocation(self, strand, idxs_old, idxs):
+    #     """ Only supports external modifications (3' or 5' end for now)
+    #     """
+    #     id_num = strand.idNum()
+    #     is_rev = strand.isReverse()
+    #     mods_strands = self._mods['ext_instances']
+    #     document = self._document
+    #     is_internal = False
+    #     for i in [0, 1]:
+    #         idx_old = idxs_old[i]
+    #         idx = idxs[i]
+    #         if idx_old != idx:
+    #             key_old =  "{},{},{}".format(id_num, is_rev, idx_old)
+    #             if key_old in mods_strands:
+    #                 mid = mods_strands[key_old]
+    #                 document.removeModInstance(mid, is_internal, self, key_old)
+    #                 del mods_strands[key_old]
+    #                 key =  "{},{},{}".format(id_num, is_rev, idx)
+    #                 self.addModInstanceKey(key, mods_strands, mid)
+    #     # end for
+    # # end def
 # end class

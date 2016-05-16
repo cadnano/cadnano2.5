@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from operator import itemgetter
+from uuid import uuid4
 
 from cadnano import app
 from cadnano import preferences as prefs
@@ -10,13 +11,14 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack, UndoCommand
 
+from cadnano.enum import ModType
 from cadnano.strand import Strand
 
 from cadnano.part import Part
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.part.pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
+from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 
 class Document(CNObject):
     """
@@ -69,6 +71,15 @@ class Document(CNObject):
                                                name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(CNObject,
                                          name='documentClearSelectionsSignal')
+
+    # E. Mod
+    documentModAddedSignal = ProxySignal(object, object, object,
+                        name='documentModAddedSignal')
+    documentModRemovedSignal = ProxySignal(object, object,
+                        name='documentModRemovedSignal')
+    documentModChangedSignal = ProxySignal(object, object, object,
+                        name='documentModChangedSignal')
+
     ### SLOTS ###
 
     ### ACCESSORS ###
@@ -554,6 +565,18 @@ class Document(CNObject):
                 yield item
     # end def
 
+    def getPartUUID(self, uuid):
+        """
+        Args:
+            uuid (str):
+        Returns:
+            Part or None if no matching part is found
+        """
+        for item in self._children:
+            if isinstance(item, Part) and item.uuid == uuid:
+                return item
+    # end def
+
     ### PUBLIC SUPPORT METHODS ###
     def controller(self):
         return self._controller
@@ -593,28 +616,29 @@ class Document(CNObject):
         note = params.get('note', '')
 
         cmdparams = {
-            'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt,
+            'props': {  'name': name,
+                        'color': color,
+                        'note': note,
+                        'seq5p': seq5p,
+                        'seq3p': seq3p,
+                        'seqInt': seqInt,
+                    },
             'ext_locations': set(), # external mods, mod belongs to idx outside of strand
             'int_locations': set()  # internal mods, mod belongs between idx and idx + 1
         }
 
-        item = { 'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt
+        item = {'name': name,
+                'color': color,
+                'note': note,
+                'seq5p': seq5p,
+                'seq3p': seq3p,
+                'seqInt': seqInt
         }
         cmds = []
         c = AddModCommand(self, cmdparams, mid)
         cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Mod", \
-                                                use_undostack=use_undostack)
+        util.execCommandList(self, cmds, desc="Create Mod",
+                                            use_undostack=use_undostack)
         return item, mid
     # end def
 
@@ -623,7 +647,7 @@ class Document(CNObject):
             cmds = []
             c = ModifyModCommand(self, params, mid)
             cmds.append(c)
-            util.execCommandList(self, cmds, desc="Modify Mod", \
+            util.execCommandList(self, cmds, desc="Modify Mod",
                                                 use_undostack=use_undostack)
     # end def
 
@@ -632,7 +656,7 @@ class Document(CNObject):
             cmds = []
             c = RemoveModCommand(self, mid)
             cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Mod", \
+            util.execCommandList(self, cmds, desc="Remove Mod",
                                                 use_undostack=use_undostack)
     # end def
 
@@ -647,20 +671,57 @@ class Document(CNObject):
             return self._mods[mid]['ext_locations']
     # end def
 
-    def mods(self, get_instances=False):
+    def addModInstance(self, mid, is_internal, part, key):
+        location_set = self.getModLocationsSet(mid, is_internal)
+        doc_key = (part.uuid,) + key
+        location_set.add(key)
+    # end def
+
+    def removeModInstance(self, mid, is_internal, part, key):
+        location_set = self.getModLocationsSet(mid, is_internal)
+        doc_key = (part.uuid,) + key
+        location_set.remove(key)
+    # end def
+
+    def modifications(self):
         """
         """
         mods = self._mods
         res = {}
         for mid in list(mods.keys()):
-            if mid != 'int_instances' and mid != 'ext_instances':
-                res[mid] = mods[mid].copy()
-                if get_instances:
-                    res[mid]['int_locations'] = list(res[mid]['int_locations'])
-                    res[mid]['ext_locations'] = list(res[mid]['ext_locations'])
-                else:
-                    del res[mid]['int_locations']
-                    del res[mid]['ext_locations']
+            mod_dict = mods[mid]
+            res[mid] = { 'props': mod_dict['props'].copy(),
+                        'int_locations': list(mod_dict['int_locations']),
+                        'ext_locations': list(mod_dict['ext_locations'])
+                        }
         return res
     #end def
+
+    def getModStrandIdx(self, key):
+        """
+         Convert a key of a mod instance relative to a part
+        to a part, a strand and an index
+        """
+        keylist = key.split(',')
+        part_uuid = keylist[0]
+        id_num = int(keylist[1])
+        is_fwd = int(keylist[2])    # enumeration of StrandType.FWD or StrandType.REV
+        idx = int(keylist[3])
+        part = self.getPartUUID(part_uuid)
+        if part is None:
+            raise KeyError("Part with uuid {} not found".format(part_uuid))
+        strand = part.getStrand(is_fwd, id_num, idx)
+        return part, strand, idx
+    # end def
+
+    def getModSequence(self, mid, mod_type):
+        mod_dict = self._mods[mid]
+        name = '' if mid is None else mod_dict['name']
+        if mod_type == ModType.END_5PRIME:
+            seq = '' if mid is None else mod_dict['seq5p']
+        elif mod_type == ModType.END_3PRIME:
+            seq = '' if mid is None else mod_dict['seq3p']
+        else:
+            seq = '' if mid is None else mod_dict['seqInt']
+        return seq, name
 # end class

@@ -65,6 +65,11 @@ class StrandType:
     FWD = 0
     REV = 1
 
+class ModType:
+    END_5PRIME = 0
+    END_3PRIME = 1
+    INTERNAL = 2
+
 class LatticeType:
     SQUARE = 0
     HONEYCOMB = 1

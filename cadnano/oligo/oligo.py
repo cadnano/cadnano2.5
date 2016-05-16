@@ -7,6 +7,7 @@ OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
 import copy
 
 from cadnano import util
+from cadnano.enum import ModType
 from cadnano.cnproxy import ProxySignal, UndoCommand
 from cadnano.cnobject import CNObject
 from cadnano.strand import Strand
@@ -240,8 +241,10 @@ class Oligo(CNObject):
             if strand.connection3p() is None:  # last strand in the oligo
                 vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
-        modseq5p, modseq5p_name = part.getModSequence(strand5p, idx5p, 0)
-        modseq3p, modseq3p_name = part.getModSequence(strand, idx3p, 1)
+        modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,
+                                                            ModType.END_5PRIME)
+        modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
+                                                            ModType.END_3PRIME)
         seq = modseq5p + seq + modseq3p
         output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
                 (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),

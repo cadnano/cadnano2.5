@@ -157,16 +157,16 @@ class ModsTool(AbstractPathTool):
     #     item['note'] = str(uiDlg.noteTextEdit.toPlainText()) # notes
     # # end def
 
-    def connectSignals(self, part):
-        part.partModAddedSignal.connect(self.updateDialogMods)
-        part.partModRemovedSignal.connect(self.deleteDialogMods)
-        part.partModChangedSignal.connect(self.updateDialogMods)
+    def connectSignals(self, document):
+        document.documentModAddedSignal.connect(self.updateDialogMods)
+        document.documentModRemovedSignal.connect(self.deleteDialogMods)
+        document.documentModChangedSignal.connect(self.updateDialogMods)
     # end def
 
-    def disconnectSignals(self, part):
-        part.partModAddedSignal.disconnect(self.updateDialogMods)
-        part.partModRemovedSignal.disconnect(self.deleteDialogMods)
-        part.partModChangedSignal.disconnect(self.updateDialogMods)
+    def disconnectSignals(self, document):
+        document.documentModAddedSignal.disconnect(self.updateDialogMods)
+        document.documentModRemovedSignal.disconnect(self.deleteDialogMods)
+        document.documentModChangedSignal.disconnect(self.updateDialogMods)
     # end def
 
     def updateDialogMods(self, part, item, mid):
@@ -199,7 +199,8 @@ class ModsTool(AbstractPathTool):
         self.current_strand = strand
         self.current_idx = idx
         part = strand.part()
-        self.connectSignals(part)
+        document = manager.document
+        self.connectSignals(document)
         self.dialog.show()
         mid = part.getModID(strand, idx)
         if mid:
@@ -212,4 +213,4 @@ class ModsTool(AbstractPathTool):
         if self.dialog.exec_():  # apply the sequence if accept was clicked
             item, mid = self.getCurrentItem()
             strand.addMods(mid, idx)
-            self.disconnectSignals(part)
+            self.disconnectSignals(document)

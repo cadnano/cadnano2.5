@@ -6,11 +6,16 @@ from cadnano import setBatch, getReopen, setReopen
 def decode(document, obj):
     ""
     name = obj['name']
-    modifications = obj['modifications']
-    for mod_id, item in modifications.items():
-        part.createMod(item, mod_id)
     for part_dict in obj['parts']:
         part_dict = decodePart(document, part_dict)
+
+    modifications = obj['modifications']
+    for mod_id, item in modifications.items():
+        document.createMod(item['props'], mod_id)
+        ext_locations = item['ext_locations']
+        for key in ext_locations:
+            part, strand, idx = document.getModStrandIdx(key)
+            part.addModStrandInstance(strand, idx, mod_id)
     return
 # end def
 
@@ -70,22 +75,4 @@ def decodePart(document, part_dict):
     for id_num, idx, length in part_dict['insertions']:
         strand = part.getStrand(True, id_num, idx)
         strand.addInsertion(idx, length, use_undostack=False)
-
-    modifications = part_dict['modifications']
-    for key, mid in modifications['ext_instances'].items():
-        # strand, idx, coord, isstaple = part.getModStrandIdx(key)
-        strand, idx = part.getModStrandIdx(key)
-        try:
-            strand.addMods(mid, idx, use_undostack=False)
-        except:
-            print(strand, idx)
-            raise
-    for key in modifications['int_instances'].items():
-        # strand, idx, coord, isstaple  = part.getModStrandIdx(key)
-        strand, idx = part.getModStrandIdx(key)
-        try:
-            strand.addMods(mid, idx, use_undostack=False)
-        except:
-            print(strand, idx)
-            raise
 # end def

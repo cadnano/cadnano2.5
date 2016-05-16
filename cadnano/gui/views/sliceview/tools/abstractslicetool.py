@@ -1,6 +1,6 @@
 import math
 
-from PyQt5.QtCore import pyqtSignal, QObject, QPointF, QLineF
+from PyQt5.QtCore import pyqtSignal, QObject, QPointF, QLineF, QRectF
 from PyQt5.QtWidgets import QActionGroup, QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
 
@@ -14,6 +14,8 @@ class AbstractSliceTool(QGraphicsObject):
     """Abstract base class to be subclassed by all other pathview tools."""
     def __init__(self, manager):
         super(AbstractSliceTool, self).__init__(parent=manager.viewroot)
+        """ Pareting to viewroot to prevent orphan _line_item from occuring
+        """
         self._manager = manager
         self._active = False
         self._last_location = None
@@ -67,6 +69,11 @@ class AbstractSliceTool(QGraphicsObject):
         """
         part_item.mapFromItem(self._line_item, pt)
     # end def
+
+    def boundingRect(self):
+        """ Required to prevent NotImplementedError()
+        """
+        return QRectF()
 
     def eventToPosition(self, part_item, event):
         """ take an event and return a position as a QPointF

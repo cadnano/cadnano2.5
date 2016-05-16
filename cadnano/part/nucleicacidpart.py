@@ -4,7 +4,6 @@ from heapq import heapify, heappush, heappop
 from itertools import product, islice
 from uuid import uuid4
 from ast import literal_eval
-izip = zip
 
 from cadnano import util
 from cadnano import preferences as prefs
@@ -23,7 +22,7 @@ from cadnano.virtualhelix import RemoveVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand
-from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
+
 from .resizepartcmd import ResizePartCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand

@@ -7,7 +7,7 @@ def encodeDocument(document):
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'name': "",
         'parts': [],
-        'modifications': document.mods()
+        'modifications': document.modifications()
   }
   parts_list = doc_dict['parts']
   for part in document.getParts():
@@ -63,8 +63,7 @@ def encodePart(part):
     #             }
     group_props['oligos'] = [o.dump() for o in part.oligos()]
     group_props['view_properties'] = view_props
-    group_props['modifications'] = part.mods()
-
+    group_props['uuid'] = part.uuid
     return group_props
 # end def
 
@@ -93,7 +92,7 @@ def encodePart2(part, vh_group_list=None):
     vh_group_set = set(vh_group_list)
     filter_xovers = lambda x: (  x[0] in vh_group_set and
                     x[3] in vh_group_set)
-    filter_insertions = lambda x: x[0] in vh_group_set
+    filter_vh = lambda x: x[0] in vh_group_set
     for id_num in vh_group_list:
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
@@ -117,7 +116,7 @@ def encodePart2(part, vh_group_list=None):
     group_props['strands'] = {  'indices': strand_list,
                                 'properties': []
                             }
-    filtered_insertions = filter(filter_insertions, part.dumpInsertions())
+    filtered_insertions = filter(filter_vh, part.dumpInsertions())
     group_props['insertions'] = [(remap[x], y, z) for x, y, z in filtered_insertions]
 
     filtered_xover_list = filter(filter_xovers, xover_list)
@@ -130,5 +129,9 @@ def encodePart2(part, vh_group_list=None):
     view_props['path:virtual_helix_order'] = vh_order
     group_props['view_properties'] = view_props
 
+    external_mods_instances = filter(filter_vh,
+                                 part.dumpModInstances(is_internal=False))
+    group_props['external_mod_instances'] = [(remap[w], x, y, z)
+                            for w, x, y, z in external_mods_instances]
     return group_props
 # end def
