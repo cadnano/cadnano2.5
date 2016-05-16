@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
 
 from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
 from cadnano.gui.palette import getPenObj
+from cadnano.fileio import v3encode, v3decode
 
 def normalizeRect(rect):
     x1, y1, x2, y2 = rect
@@ -32,6 +33,7 @@ class SelectSliceTool(AbstractSliceTool):
         self.is_selection_active = False
         self.individual_pick = False
         self.snap_origin_item = None
+        self.clip_board = None
     # end def
 
     def __repr__(self):
@@ -218,6 +220,19 @@ class SelectSliceTool(AbstractSliceTool):
         self.hideLineItem()
     # end def
 
+    def copySelection(self):
+        part = self.part_item.part()
+        copy_dict = v3encode.encodePart2(part,
+                                        list(self.selection_set))
+        self.clip_board = copy_dict
+    # end def
+
+    def pasteClipboard(self):
+        part = self.part_item.part()
+        v3decode.importVH(part, self.clip_board)
+    # end def
+
+
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
         """ Y-axis is inverted in Qt +y === DOWN
         """
@@ -333,12 +348,18 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     def getCustomContextMenu(self, point):
         """ point (QPoint)
         """
-        sgv = self.tool.sgv
+        tool = self.tool
+        sgv = tool.sgv
         menu = QMenu(sgv)
-        hide_act = QAction("duplicate selection", sgv)
-        hide_act.setStatusTip("duplicate selection")
-        # hide_act.triggered.connect(self.hideSelection)
-        menu.addAction(hide_act)
+        copy_act = QAction("copy selection", sgv)
+        copy_act.setStatusTip("copy selection")
+        copy_act.triggered.connect(tool.copySelection)
+        menu.addAction(copy_act)
+        if tool.clip_board:
+            copy_act = QAction("paste", sgv)
+            copy_act.setStatusTip("paste from clip board")
+            copy_act.triggered.connect(tool.copySelection)
+            menu.addAction(copy_act)
         menu.exec_(point)
     # end def
 

@@ -112,9 +112,9 @@ def encodePart2(part, vh_group_list=None):
     remap = {x: y for x, y in zip(   vh_group_list,
                                     range(len(vh_group_list))
                                 )}
-    group_props['vh_list'] = vh_group_list
+    group_props['vh_list'] = vh_list
     group_props['strands'] = {  'indices': strand_list,
-                                'properties': []
+                                'properties': prop_list
                             }
     filtered_insertions = filter(filter_vh, part.dumpInsertions())
     group_props['insertions'] = [(remap[x], y, z) for x, y, z in filtered_insertions]
@@ -124,8 +124,8 @@ def encodePart2(part, vh_group_list=None):
                                 for a, b, c, x, y, z in filtered_xover_list]
 
     view_props = part.view_properties.copy()
-    vh_order = view_props['path:virtual_helix_order']
-    vh_order = [remap(x) for x in vh_order]
+    vh_order = filter(lambda x: x in vh_group_set, view_props['path:virtual_helix_order'])
+    vh_order = [remap[x] for x in vh_order]
     view_props['path:virtual_helix_order'] = vh_order
     group_props['view_properties'] = view_props
 
@@ -133,5 +133,8 @@ def encodePart2(part, vh_group_list=None):
                                  part.dumpModInstances(is_internal=False))
     group_props['external_mod_instances'] = [(remap[w], x, y, z)
                             for w, x, y, z in external_mods_instances]
+    """ TODO Add in Document modifications
+
+    """
     return group_props
 # end def
