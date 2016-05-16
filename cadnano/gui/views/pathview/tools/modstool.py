@@ -68,25 +68,28 @@ class ModsTool(AbstractPathTool):
 
     def saveModChecker(self):
         part = self.current_strand.part()
+        doc = self.manager.document
+
         item, mid = self.getCurrentItem()
         # print "save clicked", mid, item
         if mid == "new":
-            item, mid = part.createMod(item)
+            item, mid = doc.createMod(item)
             # combobox = self.uiDlg.nameComboBox
             # combobox.addItem(item['name'], mid)
-        elif part.getMod(mid) is None:
-            item, mid = part.createMod(item, mid=mid)
+        elif doc.getMod(mid) is None:
+            item, mid = doc.createMod(item, mid=mid)
         else:
             # print "modifying mod"
-            part.modifyMod(item, mid)
+            doc.modifyMod(item, mid)
         return
     # end def
 
     def deleteModChecker(self):
-        part = self.current_strand.part()
+        # part = self.current_strand.part()
+        doc = self.manager.document
         item, mid = self.getCurrentItem()
         if mid != "new":
-            part.destroyMod(mid)
+            doc.destroyMod(mid)
     # end def
 
     def deleteInstModChecker(self):

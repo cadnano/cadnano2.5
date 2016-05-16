@@ -7,6 +7,7 @@ def encodeDocument(document):
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'name': "",
         'parts': [],
+        'modifications': document.mods()
   }
   parts_list = doc_dict['parts']
   for part in document.getParts():
@@ -119,23 +120,15 @@ def encodePart2(part, vh_group_list=None):
     filtered_insertions = filter(filter_insertions, part.dumpInsertions())
     group_props['insertions'] = [(remap[x], y, z) for x, y, z in filtered_insertions]
 
-    filtered_xover_list = filter(filter_xovers, xover_list))
+    filtered_xover_list = filter(filter_xovers, xover_list)
     group_props['xovers'] = [(remap[a], b, c, remap[x], y, z)
                                 for a, b, c, x, y, z in filtered_xover_list]
-
-    # oligo_dict = {k: v for k, v in zip( oligo.ALL_KEYS,
-    #                                 zip(o.dump() for o in part.oligos()))
-    #             }
-
-    group_props['oligos'] = [o.dump() for o in part.oligos()]
 
     view_props = part.view_properties.copy()
     vh_order = view_props['path:virtual_helix_order']
     vh_order = [remap(x) for x in vh_order]
     view_props['path:virtual_helix_order'] = vh_order
     group_props['view_properties'] = view_props
-
-    # group_props['modifications'] = part.mods()
 
     return group_props
 # end def

@@ -13,8 +13,6 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.enum import StrandType
 from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup
 
-from .pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
-
 class Part(VirtualHelixGroup):
     """
     A Part is a group of VirtualHelix items that are on the same lattice.
@@ -286,82 +284,6 @@ class Part(VirtualHelixGroup):
         self.partSelectedChangedSignal.emit(self, is_selected)
     # end def
 
-    def createMod(self, params, mid=None, use_undostack=True):
-        if mid is None:
-            mid =  str(uuid4())
-        elif mid in self._mods:
-            raise KeyError("createMod: Duplicate mod id: {}".format(mid))
-
-        name = params.get('name', mid)
-        color = params.get('color', '#00FF00')
-        seq5p = params.get('seq5p', '')
-        seq3p = params.get('seq3p', '')
-        seqInt = params.get('seqInt', '')
-        note = params.get('note', '')
-
-        cmdparams = {
-            'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt,
-            'ext_locations': set(), # external mods, mod belongs to idx outside of strand
-            'int_locations': set()  # internal mods, mod belongs between idx and idx + 1
-        }
-
-        item = { 'name': name,
-            'color': color,
-            'note': note,
-            'seq5p': seq5p,
-            'seq3p': seq3p,
-            'seqInt': seqInt
-        }
-        cmds = []
-        c = AddModCommand(self, cmdparams, mid)
-        cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Mod", \
-                                                use_undostack=use_undostack)
-        return item, mid
-    # end def
-
-    def modifyMod(self, params, mid, use_undostack=True):
-        if mid in self._mods:
-            cmds = []
-            c = ModifyModCommand(self, params, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Modify Mod", \
-                                                use_undostack=use_undostack)
-    # end def
-
-    def destroyMod(self, mid):
-        if mid in self._mods:
-            cmds = []
-            c = RemoveModCommand(self, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Mod", \
-                                                use_undostack=use_undostack)
-    # end def
-
-    def getMod(self, mid):
-        return self._mods.get(mid)
-    # end def
-
-    def mods(self):
-        """
-        """
-        mods = self._mods
-        res = {}
-        for mid in list(mods.keys()):
-            if mid != 'int_instances' and mid != 'ext_instances':
-                res[mid] = mods[mid].copy()
-                del res[mid]['int_locations']
-                del res[mid]['ext_locations']
-        res['int_instances'] = mods['int_instances']
-        res['ext_instances'] = mods['ext_instances']
-        return res
-    #end def
-
     def getModID(self, strand, idx):
         id_num = strand.idNum()
         strandtype = strand.strandType()
@@ -395,19 +317,19 @@ class Part(VirtualHelixGroup):
         key =  "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
         try:
-            locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
+            doc_locations = self._document.getModLocationsSet(mid, isinternal)
         except:
             print(mid, self._mods[mid])
             raise
         if key in mods_strands:
             self.removeModInstance(id_num, idx, is_rev, isinternal, mid)
-        self.addModInstanceKey(key, mods_strands, locations, mid)
+        self.addModInstanceKey(key, mods_strands, doc_locations, mid)
     # end def
 
-    def addModInstanceKey(self, key, mods_strands, locations, mid):
+    def addModInstanceKey(self, key, mods_strands, doc_locations, mid):
         mods_strands[key] = mid # add to strand lookup
         # add to set of locations
-        locations.add(key)
+        doc_locations.add(key)
     # end def
 
     def addModStrandInstance(self, strand, idx, mid):
@@ -420,14 +342,14 @@ class Part(VirtualHelixGroup):
     def removeModInstance(self, id_num, idx, is_rev, isinternal, mid):
         key =  "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if isinternal else self._mods['ext_instances']
-        locations = self._mods[mid]['int_locations'] if isinternal else self._mods[mid]['ext_locations']
+        doc_locations = self._document.getModLocationsSet(mid, isinternal)
         if key in mods_strands:
-            self.removeModInstanceKey(key, mods_strands, locations)
+            self.removeModInstanceKey(key, mods_strands, doc_locations)
     # end def
 
-    def removeModInstanceKey(self, key, mods_strands, locations):
+    def removeModInstanceKey(self, key, mods_strands, doc_locations):
         del mods_strands[key]
-        locations.remove(key)
+        doc_locations.remove(key)
     # end def
 
     def removeModStrandInstance(self, strand, idx, mid):

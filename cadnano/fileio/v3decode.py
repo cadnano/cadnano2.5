@@ -6,6 +6,9 @@ from cadnano import setBatch, getReopen, setReopen
 def decode(document, obj):
     ""
     name = obj['name']
+    modifications = obj['modifications']
+    for mod_id, item in modifications.items():
+        part.createMod(item, mod_id)
     for part_dict in obj['parts']:
         part_dict = decodePart(document, part_dict)
     return
@@ -69,9 +72,6 @@ def decodePart(document, part_dict):
         strand.addInsertion(idx, length, use_undostack=False)
 
     modifications = part_dict['modifications']
-    for mod_id, item in modifications.items():
-        if mod_id != 'int_instances' and mod_id != 'ext_instances':
-            part.createMod(item, mod_id)
     for key, mid in modifications['ext_instances'].items():
         # strand, idx, coord, isstaple = part.getModStrandIdx(key)
         strand, idx = part.getModStrandIdx(key)

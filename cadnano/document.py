@@ -16,7 +16,7 @@ from cadnano.part import Part
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
-
+from cadnano.part.pmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 
 class Document(CNObject):
     """
@@ -42,6 +42,7 @@ class Document(CNObject):
         self._strand_selected_changed_dict = {}
         self.view_names = []
         self.filter_set = set()
+        self._mods = {} # modifications keyed by mod id
         app().documentWasCreatedSignal.emit(self)
     # end def
 
@@ -577,4 +578,89 @@ class Document(CNObject):
                         self, [c], desc="Add part", use_undostack=use_undostack)
         return c.instance()
     # end def
+
+    def createMod(self, params, mid=None, use_undostack=True):
+        if mid is None:
+            mid =  str(uuid4())
+        elif mid in self._mods:
+            raise KeyError("createMod: Duplicate mod id: {}".format(mid))
+
+        name = params.get('name', mid)
+        color = params.get('color', '#00FF00')
+        seq5p = params.get('seq5p', '')
+        seq3p = params.get('seq3p', '')
+        seqInt = params.get('seqInt', '')
+        note = params.get('note', '')
+
+        cmdparams = {
+            'name': name,
+            'color': color,
+            'note': note,
+            'seq5p': seq5p,
+            'seq3p': seq3p,
+            'seqInt': seqInt,
+            'ext_locations': set(), # external mods, mod belongs to idx outside of strand
+            'int_locations': set()  # internal mods, mod belongs between idx and idx + 1
+        }
+
+        item = { 'name': name,
+            'color': color,
+            'note': note,
+            'seq5p': seq5p,
+            'seq3p': seq3p,
+            'seqInt': seqInt
+        }
+        cmds = []
+        c = AddModCommand(self, cmdparams, mid)
+        cmds.append(c)
+        util.execCommandList(self, cmds, desc="Create Mod", \
+                                                use_undostack=use_undostack)
+        return item, mid
+    # end def
+
+    def modifyMod(self, params, mid, use_undostack=True):
+        if mid in self._mods:
+            cmds = []
+            c = ModifyModCommand(self, params, mid)
+            cmds.append(c)
+            util.execCommandList(self, cmds, desc="Modify Mod", \
+                                                use_undostack=use_undostack)
+    # end def
+
+    def destroyMod(self, mid):
+        if mid in self._mods:
+            cmds = []
+            c = RemoveModCommand(self, mid)
+            cmds.append(c)
+            util.execCommandList(self, cmds, desc="Remove Mod", \
+                                                use_undostack=use_undostack)
+    # end def
+
+    def getMod(self, mid):
+        return self._mods.get(mid)
+    # end def
+
+    def getModLocationsSet(self, mid, is_internal):
+        if is_internal:
+            return self._mods[mid]['int_locations']
+        else:
+            return self._mods[mid]['ext_locations']
+    # end def
+
+    def mods(self, get_instances=False):
+        """
+        """
+        mods = self._mods
+        res = {}
+        for mid in list(mods.keys()):
+            if mid != 'int_instances' and mid != 'ext_instances':
+                res[mid] = mods[mid].copy()
+                if get_instances:
+                    res[mid]['int_locations'] = list(res[mid]['int_locations'])
+                    res[mid]['ext_locations'] = list(res[mid]['ext_locations'])
+                else:
+                    del res[mid]['int_locations']
+                    del res[mid]['ext_locations']
+        return res
+    #end def
 # end class
