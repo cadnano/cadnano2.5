@@ -24,7 +24,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.color = part.getColor()
         self.keys = None
         if properties is not None:
-            if not safe and isinstance(properties, tuple): # usually for unsafe
+            if isinstance(properties, tuple): # usually for unsafe
                 self.keys, self.values = properties
             else:
                 self.keys = list(properties.keys())

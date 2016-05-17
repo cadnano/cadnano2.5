@@ -97,6 +97,7 @@ def encodePart2(part, vh_group_list=None):
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
             # add a placeholder
+            # print("Whoops", id_num)
             strand_list.append(None)
             prop_list.append(None)
         else:

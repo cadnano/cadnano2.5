@@ -228,8 +228,13 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def pasteClipboard(self):
+        doc = self._manager.document
         part = self.part_item.part()
-        v3decode.importVH(part, self.clip_board)
+        doc.undoStack().beginMacro("Paste VirtualHelices")
+        new_vh_set = v3decode.importToPart(part, self.clip_board)
+        doc.undoStack().endMacro()
+        self.modelClear()
+        doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
 
@@ -322,6 +327,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
+            print("the right event")
             is_shift = event.modifiers() == Qt.ShiftModifier
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
@@ -358,7 +364,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         if tool.clip_board:
             copy_act = QAction("paste", sgv)
             copy_act.setStatusTip("paste from clip board")
-            copy_act.triggered.connect(tool.copySelection)
+            copy_act.triggered.connect(tool.pasteClipboard)
             menu.addAction(copy_act)
         menu.exec_(point)
     # end def

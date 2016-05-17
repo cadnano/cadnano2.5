@@ -44,9 +44,9 @@ def decodePart(document, part_dict):
             fwd_strand_set, rev_strand_set = part.getStrandSets(id_num)
             fwd_idxs, rev_idxs = idx_set
             for low_idx, high_idx in fwd_idxs:
-                fwd_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+                fwd_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
             for low_idx, high_idx in rev_idxs:
-                rev_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+                rev_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
     # end def
 
     xovers = part_dict['xovers']
@@ -78,23 +78,24 @@ def decodePart(document, part_dict):
 # end def
 
 def importToPart(part, copy_dict, use_undostack=True):
-    dc.setActivePart(part)
+    # dc.setActivePart(part)
 
     """ This is the Virtual Helix id number offset
     """
-    next_id_num = part.part.getIdNumMax()
-
-    vh_id_list = part_dict['vh_list']
+    next_id_num = part.getIdNumMax() + 1
+    print("Starting from", next_id_num)
+    vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
 
     keys = list(vh_props.keys())
 
     news_id_set = set()
-    for id_num, size in vh_id_list:
-        x, y = origins[id_num]
-        vals = [vh_props[k][id_num] for k in keys]
-        new_id_num = id_num + next_id_num
+    for i, pair in enumerate(vh_id_list):
+        id_num, size = pair
+        x, y = origins[i]
+        vals = [vh_props[k][i] for k in keys]
+        new_id_num = i + next_id_num
         part.createVirtualHelix(x, y, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
@@ -116,8 +117,8 @@ def importToPart(part, copy_dict, use_undostack=True):
 
     xovers = copy_dict['xovers']
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
-        from_strand = part.getStrand(from_is_fwd, from_id + new_id_num, from_idx)
-        to_strand = part.getStrand(to_is_fwd, to_id + new_id_num, to_idx)
+        from_strand = part.getStrand(from_is_fwd, from_id + next_id_num, from_idx)
+        to_strand = part.getStrand(to_is_fwd, to_id + next_id_num, to_idx)
         part.createXover(   from_strand, from_idx,
                             to_strand, to_idx,
                             update_oligo=use_undostack,
@@ -127,7 +128,7 @@ def importToPart(part, copy_dict, use_undostack=True):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in copy_dict['insertions']:
-        strand = part.getStrand(True, id_num + new_id_num, idx)
+        strand = part.getStrand(True, id_num + next_id_num, idx)
         strand.addInsertion(idx, length, use_undostack=use_undostack)
 
     return news_id_set
