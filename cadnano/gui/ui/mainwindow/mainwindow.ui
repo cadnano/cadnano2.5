@@ -383,6 +383,7 @@
    <addaction name="action_new_dnapart"/>
    <addaction name="separator"/>
    <addaction name="action_vhelix_select"/>
+   <addaction name="action_vhelix_move"/>
    <addaction name="action_vhelix_create"/>
    <addaction name="action_vhelix_snap"/>
    <addaction name="action_vhelix_set_angles"/>
@@ -1237,6 +1238,21 @@
    </property>
    <property name="text">
     <string>gridPoints</string>
+   </property>
+  </action>
+  <action name="action_vhelix_move">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/move</normaloff>:/slicetools/move</iconset>
+   </property>
+   <property name="text">
+    <string>move</string>
+   </property>
+   <property name="shortcut">
+    <string>W</string>
    </property>
   </action>
  </widget>

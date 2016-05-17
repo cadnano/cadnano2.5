@@ -58,6 +58,17 @@ class XoverNode3(QGraphicsRectItem):
     def customMouseRelease(self, event):
         pass
     # end def
+<<<<<<< HEAD
+=======
+
+    def virtualHelix(self):
+        return self._vhi.virtualHelix()
+    # end def
+
+    def strandType(self):
+        return self._strand_type
+    # end def
+>>>>>>> master
 
     def refreshXover(self):
         self._xover_item.refreshXover()
@@ -344,7 +355,12 @@ class XoverItem(QGraphicsPathItem):
         vhi5 = self._virtual_helix_item
         pt5 = vhi5.mapToItem(parent, *node5.point())
 
+<<<<<<< HEAD
         n5_is_forward = node5.is_forward
+=======
+        five_is_top = node5.isOnTop()
+        five_is_5to3 = node5.isDrawn5to3()
+>>>>>>> master
 
         vhi3 = node3.virtualHelixItem()
         pt3 = vhi3.mapToItem(parent, *node3.point())

@@ -88,7 +88,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def refreshColor(self):
         part_color = self._model_part.getProperty('color')
         self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
-        self._USE_BRUSH = getBrushObj(part_color, alpha=128)
+        self._USE_BRUSH = getBrushObj(styles.DEFAULT_BRUSH_COLOR)
         self.setPen(self._USE_PEN)
         self.setBrush(self._USE_BRUSH)
         self.update(self.boundingRect())

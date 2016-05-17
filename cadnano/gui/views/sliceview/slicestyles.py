@@ -18,7 +18,7 @@ ZPARTITEM = 200
 # top
 
 # Part apperance
-OUT_OF_SLICE_FILL = "#fafafa"
+OUT_OF_SLICE_FILL = "#ffffff"
 
 DEFAULT_PEN_WIDTH = 1
 DEFAULT_ALPHA = 2

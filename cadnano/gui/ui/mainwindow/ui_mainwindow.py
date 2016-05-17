@@ -456,6 +456,12 @@ class Ui_MainWindow(object):
         icon44.addPixmap(QtGui.QPixmap(":/slicetools/grid-points"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.actionGridPoints.setIcon(icon44)
         self.actionGridPoints.setObjectName("actionGridPoints")
+        self.action_vhelix_move = QtWidgets.QAction(MainWindow)
+        self.action_vhelix_move.setCheckable(True)
+        icon45 = QtGui.QIcon()
+        icon45.addPixmap(QtGui.QPixmap(":/slicetools/move"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_vhelix_move.setIcon(icon45)
+        self.action_vhelix_move.setObjectName("action_vhelix_move")
         self.right_toolbar.addAction(self.action_path_select)
         self.right_toolbar.addAction(self.action_path_pencil)
         self.right_toolbar.addAction(self.action_path_nick)
@@ -479,6 +485,7 @@ class Ui_MainWindow(object):
         self.left_toolbar.addAction(self.action_new_dnapart)
         self.left_toolbar.addSeparator()
         self.left_toolbar.addAction(self.action_vhelix_select)
+        self.left_toolbar.addAction(self.action_vhelix_move)
         self.left_toolbar.addAction(self.action_vhelix_create)
         self.left_toolbar.addAction(self.action_vhelix_snap)
         self.left_toolbar.addAction(self.action_vhelix_set_angles)
@@ -639,6 +646,8 @@ class Ui_MainWindow(object):
         self.actionGridLines.setText(_translate("MainWindow", "gridLines"))
         self.actionGridCircles.setText(_translate("MainWindow", "gridCircles"))
         self.actionGridPoints.setText(_translate("MainWindow", "gridPoints"))
+        self.action_vhelix_move.setText(_translate("MainWindow", "move"))
+        self.action_vhelix_move.setShortcut(_translate("MainWindow", "W"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
