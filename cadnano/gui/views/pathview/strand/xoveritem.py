@@ -492,12 +492,12 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def tempReparent(self, pos=None):
-        partItem = self.partItem()
+        part_item = self.partItem()
         if pos is None:
             pos = self.scenePos()
-        self.setParentItem(partItem)
-        tempP = partItem.mapFromScene(pos)
-        self.setPos(tempP)
+        self.setParentItem(part_item)
+        temp_pos = part_item.mapFromScene(pos)
+        self.setPos(temp_pos)
     # end def
 
     def setSelectedColor(self, value):

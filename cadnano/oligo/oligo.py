@@ -162,7 +162,8 @@ class Oligo(CNObject):
         before = self.shouldHighlight()
         # self._length = length
         key = 'length'
-        self.setProperty(key, length)
+        # self.setProperty(key, length)
+        self._props[key] = length
         if before != self.shouldHighlight():
             self.oligoSequenceClearedSignal.emit(self)
             self.oligoPropertyChangedSignal.emit(self, key, length)

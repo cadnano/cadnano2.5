@@ -693,8 +693,13 @@ class VirtualHelixGroup(CNObject):
         self.origin_limits = (xLL, yLL, xUR, yUR)
         self.directions[id_num] = direction
         self.vh_properties.loc[id_num, ['name', 'color', 'length']] = "vh%d" % (id_num), color, num_points
-        self.fwd_strandsets[id_num] = StrandSet(True, id_num, self, num_points)
-        self.rev_strandsets[id_num] = StrandSet(False, id_num, self, num_points)
+
+        if self.fwd_strandsets[id_num] is None:
+            self.fwd_strandsets[id_num] = StrandSet(True, id_num, self, num_points)
+            self.rev_strandsets[id_num] = StrandSet(False, id_num, self, num_points)
+        else:
+            self.fwd_strandsets[id_num].reset(num_points)
+            self.rev_strandsets[id_num].reset(num_points)
 
         self.total_id_nums += 1
 

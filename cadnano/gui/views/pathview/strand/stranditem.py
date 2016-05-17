@@ -171,7 +171,11 @@ class StrandItem(QGraphicsLineItem):
                 self.hide()
                 xover_3p_end.hide()
                 return
-        self._updateAppearance(strand)
+        try:
+            self._updateAppearance(strand)
+        except:
+            print(model_oligo, key, new_value)
+            raise
         for insertion in self.insertionItems().values():
             insertion.updateItem()
     # end def

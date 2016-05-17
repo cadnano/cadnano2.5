@@ -39,14 +39,20 @@ def decodePart(document, part_dict):
     # end for
     strands = part_dict['strands']
     strand_index_list = strands['indices']
+    color_list = strands['properties']
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
             fwd_strand_set, rev_strand_set = part.getStrandSets(id_num)
             fwd_idxs, rev_idxs = idx_set
-            for low_idx, high_idx in fwd_idxs:
-                fwd_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
-            for low_idx, high_idx in rev_idxs:
-                rev_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
+            fwd_colors, rev_colors = color_list[id_num]
+            for idxs, color in zip(fwd_idxs, fwd_colors):
+                low_idx, high_idx = idxs
+                fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
+                                                        use_undostack=False)
+            for idxs, color in zip(rev_idxs, rev_colors):
+                low_idx, high_idx = idxs
+                rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
+                                                        use_undostack=False)
     # end def
 
     xovers = part_dict['xovers']
@@ -67,7 +73,7 @@ def decodePart(document, part_dict):
         sequence = oligo['sequence']
         strand5p = part.getStrand(is_fwd, id_num, idx)
         this_oligo = strand5p.oligo()
-        this_oligo.applyColor(color, use_undostack=False)
+        # this_oligo.applyColor(color, use_undostack=False)
         if sequence is not None:
             this_oligo.applySequence(sequence, use_undostack=False)
 
@@ -82,43 +88,56 @@ def importToPart(part, copy_dict, use_undostack=True):
 
     """ This is the Virtual Helix id number offset
     """
-    next_id_num = part.getIdNumMax() + 1
-    print("Starting from", next_id_num)
+    id_num_offset = part.getIdNumMax() + 1
+    print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
+    name_suffix = ".%d"
 
     keys = list(vh_props.keys())
-
-    news_id_set = set()
+    name_index = keys.index('name')
+    new_vh_id_set = set()
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
         vals = [vh_props[k][i] for k in keys]
-        new_id_num = i + next_id_num
+        new_id_num = i + id_num_offset
+        vals[name_index] += (name_suffix % new_id_num)
         part.createVirtualHelix(x, y, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
-        news_id_set.add(new_id_num)
+        new_vh_id_set.add(new_id_num)
     # end for
     strands = copy_dict['strands']
     strand_index_list = strands['indices']
+    color_list = strands['properties']
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
-            fwd_strand_set, rev_strand_set = part.getStrandSets(id_num + next_id_num)
+            fwd_strand_set, rev_strand_set = part.getStrandSets(
+                                                        id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
-            for low_idx, high_idx in fwd_idxs:
-                fwd_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
-            for low_idx, high_idx in rev_idxs:
-                rev_strand_set.createDeserializedStrand(low_idx, high_idx, use_undostack=False)
+            fwd_colors, rev_colors = color_list[id_num]
+            for idxs, color in zip(fwd_idxs, fwd_colors):
+                low_idx, high_idx = idxs
+                fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
+                                                    use_undostack=use_undostack)
+                # fwd_strand_set.createStrand(low_idx, high_idx, color,
+                #                                     use_undostack=use_undostack)
+            for idxs, color in zip(rev_idxs, rev_colors):
+                low_idx, high_idx = idxs
+                rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
+                                                    use_undostack=use_undostack)
+                # rev_strand_set.createStrand(low_idx, high_idx, color,
+                #                                     use_undostack=use_undostack)
     # end def
 
     xovers = copy_dict['xovers']
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
-        from_strand = part.getStrand(from_is_fwd, from_id + next_id_num, from_idx)
-        to_strand = part.getStrand(to_is_fwd, to_id + next_id_num, to_idx)
+        from_strand = part.getStrand(from_is_fwd, from_id + id_num_offset, from_idx)
+        to_strand = part.getStrand(to_is_fwd, to_id + id_num_offset, to_idx)
         part.createXover(   from_strand, from_idx,
                             to_strand, to_idx,
                             update_oligo=use_undostack,
@@ -128,10 +147,10 @@ def importToPart(part, copy_dict, use_undostack=True):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in copy_dict['insertions']:
-        strand = part.getStrand(True, id_num + next_id_num, idx)
+        strand = part.getStrand(True, id_num + id_num_offset, idx)
         strand.addInsertion(idx, length, use_undostack=use_undostack)
 
-    return news_id_set
+    return new_vh_id_set
 # end def
 
 

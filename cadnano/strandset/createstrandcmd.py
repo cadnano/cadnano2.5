@@ -12,18 +12,15 @@ class CreateStrandCommand(UndoCommand):
     create a new Oligo, add it to the Part, and point the new Strand
     at the oligo.
     """
-    def __init__(self, strandset, base_idx_low, base_idx_high):
+    def __init__(self, strandset, base_idx_low, base_idx_high, color):
+        """ TODO: Now that parts have a UUID this could be instantiated via
+        a document, uuid, id_num, is_fwd, base_idx_low, ... instead of an object
+        to be independent of parts keeping strandsets live
+        """
         super(CreateStrandCommand, self).__init__("create strand")
         self._strandset = strandset
-        # self._s_set_idx = strandset_idx
         doc = strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
-        # if strandset.isStaple():
-        #     color_list = prefs.STAP_COLORS
-        #     color = random.choice(color_list)
-        # else:
-        #     #prefs.SCAF_COLORS
-        color = strandset.part().getProperty('color')
         self._new_oligo = Oligo(None, color)  # redo will set part
         self._new_oligo.setLength(self._strand.totalLength())
     # end def
@@ -40,12 +37,12 @@ class CreateStrandCommand(UndoCommand):
 
         oligo.addToPart(strandset.part())
 
-        # if strandset.isStaple():
-        strand.reapplySequence()
+        # strand.reapplySequence()
         # Emit a signal to notify on completion
         strandset.strandsetStrandAddedSignal.emit(strandset, strand)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(  strandset.part(),
+                                                        strandset.idNum())
     # end def
 
     def undo(self):
@@ -62,6 +59,7 @@ class CreateStrandCommand(UndoCommand):
         strand.strandRemovedSignal.emit(strand)
         strand.setOligo(None)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(  strandset.part(),
+                                                        strandset.idNum())
     # end def
 # end class

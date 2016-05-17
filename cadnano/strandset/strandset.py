@@ -42,11 +42,10 @@ class StrandSet(CNObject):
         self._id_num = id_num
         self._part = part
 
-        self.strand_array = [None]*(initial_size)
-        self.strand_heap = []
+        self.reset(initial_size)
 
         self._undo_stack = None
-        self._last_strandset_idx = None
+
     # end def
 
     def simpleCopy(self, part):
@@ -90,6 +89,12 @@ class StrandSet(CNObject):
 
     def strands(self):
         return self.strand_heap
+
+    def reset(self, initial_size):
+        self.strand_array = [None]*(initial_size)
+        self.strand_heap = []
+        self._last_strandset_idx = None
+    # end def
 
     def resize(self, delta_low, delta_high):
         if delta_low < 0:
@@ -266,18 +271,21 @@ class StrandSet(CNObject):
 
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def createStrand(self, base_idx_low, base_idx_high, use_undostack=True):
+    def createStrand(self, base_idx_low, base_idx_high, color=None, use_undostack=True):
         """
         Assumes a strand is being created at a valid set of indices.
         """
         # print("sss creating strand")
+        part = self._part
+        if color is None:
+            color = part.getProperty('color')
         bounds_low, bounds_high = \
                             self.getBoundsOfEmptyRegionContaining(base_idx_low)
 
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
-            c = CreateStrandCommand(self, base_idx_low, base_idx_high)
-            x, y = self._part.getVirtualHelixOrigin(self._id_num)
+            c = CreateStrandCommand(self, base_idx_low, base_idx_high, color)
+            x, y = part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
@@ -287,13 +295,13 @@ class StrandSet(CNObject):
             return -1
     # end def
 
-    def createDeserializedStrand(self, base_idx_low, base_idx_high, use_undostack=False):
+    def createDeserializedStrand(self, base_idx_low, base_idx_high, color, use_undostack=False):
         """
         Passes a strand to AddStrandCommand that was read in from file input.
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
         """
-        c = CreateStrandCommand(self, base_idx_low, base_idx_high)
+        c = CreateStrandCommand(self, base_idx_low, base_idx_high, color)
         x, y = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
         # print("strand", d)

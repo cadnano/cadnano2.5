@@ -316,6 +316,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
     def removeVirtualHelixItem(self, id_num):
         vhi = self._virtual_helix_item_hash[id_num]
+        if vhi == self.active_virtual_helix_item:
+            self.active_virtual_helix_item = None
         vhi.virtualHelixRemovedSlot()
         del self._virtual_helix_item_hash[id_num]
     # end def
