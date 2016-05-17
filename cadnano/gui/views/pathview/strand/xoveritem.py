@@ -58,17 +58,6 @@ class XoverNode3(QGraphicsRectItem):
     def customMouseRelease(self, event):
         pass
     # end def
-<<<<<<< HEAD
-=======
-
-    def virtualHelix(self):
-        return self._vhi.virtualHelix()
-    # end def
-
-    def strandType(self):
-        return self._strand_type
-    # end def
->>>>>>> master
 
     def refreshXover(self):
         self._xover_item.refreshXover()
