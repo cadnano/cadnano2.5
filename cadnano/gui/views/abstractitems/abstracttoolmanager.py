@@ -48,7 +48,8 @@ class AbstractToolManager(QObject):
         list(map((lambda tool_name: self.ag.addAction(self.installTool(tool_name))),
                         tnames))
         self.ag.setExclusive(True)
-        # Select the preferred Startup tool
+        """ Select the preferred Startup tool
+        """
         startup_tool_name = app().prefs.getStartupToolName()
         getattr(self, 'choose' + startup_tool_name + 'Tool')()
     # end def
@@ -67,7 +68,6 @@ class AbstractToolManager(QObject):
         set_active_tool_method_name = 'choose%sTool' % (tool_name)
 
         def clickHandler(self):
-            # window.deactiveToolManagers(this)
             tool_widget.setChecked(True)
             self.setActiveTool(tool)
             if hasattr(tool, 'widgetClicked'):

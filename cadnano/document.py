@@ -33,7 +33,8 @@ class Document(CNObject):
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 
-        self._undostack = UndoStack()
+        self._undostack = us = UndoStack()  # notice NO parent, what does this mean?
+        us.setUndoLimit(30)
         self._children = []     # for storing a reference to Parts (and Assemblies)
         self._instances = []    # for storing instances of Parts (and Assemblies)
         self._controller = None

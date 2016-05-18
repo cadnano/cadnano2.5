@@ -64,7 +64,7 @@ class DocumentController():
         o = self.win.outliner_widget
         p_e = self.win.property_widget
         o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
-        self.actionFilterHandleSlot()
+        self.actionFilterVirtualHelixSlot()
     # end def
 
     def _connectWindowSignalsToSelf(self):
@@ -91,19 +91,12 @@ class DocumentController():
         win.action_feedback.triggered.connect(self.actionFeedbackSlot)
 
         # make it so select tool in slice view activation turns on vh filter
-        win.action_filter_handle.triggered.connect(self.actionFilterHandleSlot)
+        win.action_filter_handle.triggered.connect(self.actionFilterVirtualHelixSlot)
         self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
         win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
-        win.action_vhelix_select.triggered.connect(self.actionFilterHandleSlot)
+        win.action_vhelix_select.triggered.connect(self.actionFilterVirtualHelixSlot)
 
-        # Commented out for now as this call to connect somehow disconnects the
-        # the Select tool due to call resolution.  Forced filter toggling should be
-        # handled differently
-        # self.trigger_path_select = lambda x: win.action_path_select.trigger()
-        # self.trigger_path_select = lambda x: win.action_path_select.setChecked(True)
-        # win.action_vhelix_select.triggered.connect(self.trigger_path_select) # for now connects to path tool
-
-        win.action_vhelix_create.triggered.connect(self.actionFilterHandleSlot)
+        win.action_vhelix_create.triggered.connect(self.actionFilterVirtualHelixSlot)
         win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)
 
         win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
@@ -129,7 +122,7 @@ class DocumentController():
         dialog.exec_()
 
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
-    def actionFilterHandleSlot(self):
+    def actionFilterVirtualHelixSlot(self):
         """Disables all other selection filters when active."""
         fH = self.win.action_filter_handle
         fE = self.win.action_filter_endpoint

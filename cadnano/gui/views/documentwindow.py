@@ -66,7 +66,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.scene_root_item = self.sliceroot
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
-
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
         self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),\
@@ -92,10 +91,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
 
         self.insertToolBarBreak(self.right_toolbar)
-
-        # set the selection filter default
-        doc.documentSelectionFilterChangedSignal.emit(["endpoint", "forward", "reverse", "xover"])
-        doc.documentPreXoverFilterChangedSignal.emit("prexover_a")
 
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()
@@ -128,6 +123,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])
+
     # end def
 
     def document(self):
