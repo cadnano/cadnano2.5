@@ -92,7 +92,6 @@ class CustomQGraphicsView(QGraphicsView):
         self._name = None
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)
-        # self.customContextMenuRequested.connect(self.getCustomContextMenu)
 
         if GL:
             self.is_GL = True

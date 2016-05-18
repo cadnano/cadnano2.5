@@ -25,7 +25,6 @@ class SelectSliceTool(AbstractSliceTool):
     """"""
     def __init__(self, manager):
         super(SelectSliceTool, self).__init__(manager)
-        self.sgv = None
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
         self.group = SliceSelectionGroup(self)
@@ -53,14 +52,15 @@ class SelectSliceTool(AbstractSliceTool):
     def setPartItem(self, part_item):
         if part_item != self.part_item:
             if self.sgv is not None:
-                self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-                self.sgv = None
-            # self.deselectItems()
-            # if self.part_item != None:
+                # attempt to enforce good housekeeping, not required
+                try:
+                    self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
+                except:
+                    # required for first call
+                    pass
             self.modelClear()
             self.part_item = part_item
             self.group.setParentItem(part_item)
-            self.sgv = self._manager.window.slice_graphics_view
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
             self.sgv.activateSelection(True)
@@ -253,12 +253,33 @@ class SelectSliceTool(AbstractSliceTool):
 
     def deactivate(self):
         if self.sgv is not None:
-            self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-            self.sgv = None
+            try:
+                self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
+            except:
+                pass    # required for first call
         self.modelClear()
         self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def
+
+    def getCustomContextMenu(self, point):
+        """ point (QPoint)
+        """
+        if len(self.selection_set) > 0:
+            sgv = self.sgv
+            menu = QMenu(sgv)
+            copy_act = QAction("copy selection", sgv)
+            copy_act.setStatusTip("copy selection")
+            copy_act.triggered.connect(self.copySelection)
+            menu.addAction(copy_act)
+            if self.clip_board:
+                copy_act = QAction("paste", sgv)
+                copy_act.setStatusTip("paste from clip board")
+                copy_act.triggered.connect(self.pasteClipboard)
+                menu.addAction(copy_act)
+            menu.exec_(sgv.mapToGlobal(point))
+    # end def
+
 # end class
 
 class SliceSelectionGroup(QGraphicsItemGroup):
@@ -319,11 +340,9 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         if event.button() != Qt.LeftButton:
             """ do context menu?
             """
-            sgv = self.tool.sgv
-            print(sgv)
-            # pos = sgv.mapFromScene(event.scenePos())
-            # sgv.getCustomContextMenu(pos)
-            self.getCustomContextMenu(event.screenPos())
+            # sgv = self.tool.sgv
+            # print(sgv)
+            # self.getCustomContextMenu(event.screenPos())
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
@@ -349,24 +368,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             self.drag_last_position = sp
 
             return QGraphicsItemGroup.mousePressEvent(self, event)
-    # end def
-
-    def getCustomContextMenu(self, point):
-        """ point (QPoint)
-        """
-        tool = self.tool
-        sgv = tool.sgv
-        menu = QMenu(sgv)
-        copy_act = QAction("copy selection", sgv)
-        copy_act.setStatusTip("copy selection")
-        copy_act.triggered.connect(tool.copySelection)
-        menu.addAction(copy_act)
-        if tool.clip_board:
-            copy_act = QAction("paste", sgv)
-            copy_act.setStatusTip("paste from clip board")
-            copy_act.triggered.connect(tool.pasteClipboard)
-            menu.addAction(copy_act)
-        menu.exec_(point)
     # end def
 
     def mouseMoveEvent(self, event):
