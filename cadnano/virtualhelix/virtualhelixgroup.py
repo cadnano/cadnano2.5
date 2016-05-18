@@ -34,10 +34,13 @@ def defaultProperties(id_num):
     ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
     ('twist_per_base', 360. / 10.5), # 360/_bases_per_turn
     ('minor_groove_angle', 171.),
-    ('length', -1)
+    ('length', -1),
+    ('z', 0.0)
     ]
     return tuple(zip(*props))
 # end def
+
+Z_PROP_INDEX = -1 # index for Dataframe.iloc calls
 
 def defaultDataFrame(size):
     dummy_id_num = 999
@@ -412,6 +415,7 @@ class VirtualHelixGroup(CNObject):
             # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
             # print("new origin", self.locationQt(id_num, 15./self.radius()))
+        self.vh_properties.iloc[id_nums, Z_PROP_INDEX] += delta[2]
     # end def
 
     def getIndices(self, id_num):

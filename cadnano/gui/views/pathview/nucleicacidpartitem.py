@@ -64,11 +64,15 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         return self._model_part.getProperty('color')
     # end def
 
-    def getModelAxisPoint(self, z):
+    def convertToModelZ(self, z):
         """ scale Z-axis coordinate to the model
         """
         sf = self._scale_factor
         return z / sf
+    # end def
+
+    def convertToQtZ(self, z):
+        return z * self._scale_factor
     # end def
 
     def _initModifierRect(self):

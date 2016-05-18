@@ -13,7 +13,7 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.enum import PartType, StrandType
 from cadnano.oligo import Oligo
 from cadnano.oligo import RemoveOligoCommand
-from cadnano.part.part import Part
+from cadnano.part.part import Part, Z_PROP_INDEX
 from cadnano.strand import Strand
 from cadnano.strandset import CreateStrandCommand
 from cadnano.strandset import SplitCommand
@@ -603,6 +603,13 @@ class NucleicAcidPart(Part):
                 util.finalizeCommands(self, [c], desc="Translate VHs")
                 # only emit this on finalize due to cost.
                 self.partDimensionsChangedSignal.emit(self, *self.zBoundsIds())
+                vh_list = list(vh_set)
+                z_vals = self.vh_properties.iloc[vh_list, Z_PROP_INDEX]
+                if isinstance(z_vals, float):
+                    z_vals = (z_vals, )
+                for id_num, z_val in zip(vh_list, z_vals):
+                    self.partVirtualHelixPropertyChangedSignal.emit(
+                                            self, id_num, ('z',), (z_val,))
             else:
                 util.execCommandList(self, [c], desc="Translate VHs", \
                                                             use_undostack=True)
