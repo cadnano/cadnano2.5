@@ -65,7 +65,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     def getModelAxisPoint(self, z):
-        """ Z-axis
+        """ scale Z-axis coordinate to the model
         """
         sf = self._scale_factor
         return z / sf
@@ -100,13 +100,19 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             pxoig.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
-    def partDimensionsChangedSlot(self, model_part, longest_id_num):
+    def partDimensionsChangedSlot(self, model_part, min_id_num, max_id_num):
         if len(self._virtual_helix_item_list) > 0:
-            vhi = self._virtual_helix_item_hash[longest_id_num]
-            vhi_rect = vhi.boundingRect()
-            vhi_h_rect = vhi.handle().boundingRect()
-            self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
-            self._vh_rect.setRight(vhi_rect.right())
+            vhi_hash = self._virtual_helix_item_hash
+
+            vhi_max = vhi_hash[max_id_num]
+            vhi_rect_max = vhi_max.boundingRect()
+            self._vh_rect.setRight(vhi_rect_max.right())
+
+            vhi_min = vhi_hash[min_id_num]
+            vhi_h_rect = vhi_min.handle().boundingRect()
+            self._vh_rect.setLeft( (vhi_h_rect.left() -
+                                    styles.VH_XOFFSET +
+                                    vhi_min.x()))
         self.scene().views()[0].zoomToFit()
         self._updateBoundingRect()
     # end def

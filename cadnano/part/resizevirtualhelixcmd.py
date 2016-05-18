@@ -24,20 +24,20 @@ class ResizeVirtualHelixCommand(UndoCommand):
     def redo(self):
         part = self._part
         id_num, is_right, delta = self._info
-        longest_id = part.resizeHelix(id_num, is_right, delta)
+        id_min, id_max = part.resizeHelix(id_num, is_right, delta)
         part.partVirtualHelixResizedSignal.emit(part, id_num)
         # if self._old_active_idx > part._max_base:
         #     part.setActiveBaseIndex(part._max_base)
-        part.partDimensionsChangedSignal.emit(part, longest_id)
+        part.partDimensionsChangedSignal.emit(part, id_min, id_max)
     # end def
 
     def undo(self):
         part = self._part
         id_num, is_right, delta = self._info
-        longest_id = part.resizeHelix(id_num, is_right, -delta)
+        id_min, id_max = part.resizeHelix(id_num, is_right, -delta)
         part.partVirtualHelixResizedSignal.emit(part, id_num)
         # if self._old_active_idx != part.activeBaseIndex():
         #     part.setActiveBaseIndex(self._old_active_idx)
-        part.partDimensionsChangedSignal.emit(part, longest_id)
+        part.partDimensionsChangedSignal.emit(part, id_min, id_max)
     # end def
 # end class

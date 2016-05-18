@@ -222,13 +222,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             delta = new_pos - self.drag_last_position
             dx = int(floor(delta.x() / _BASE_WIDTH ))*_BASE_WIDTH
             x = self.handle_start.x() + dx
-            if abs(dx) > MOVE_THRESHOLD:
+            if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
                 old_x = self.x()
                 self.setX(x)
                 self._virtual_helix_item.setX(x + _VH_XOFFSET)
                 self._part_item.updateXoverItems(self._virtual_helix_item)
                 dz = self._part_item.getModelAxisPoint(x - old_x)
-                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, False, use_undostack=False)
+                self._model_part.translateVirtualHelices([self.idNum()],
+                                    0, 0, dz, False, use_undostack=False)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
@@ -241,7 +242,8 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             dz = delta.x()
             if abs(dz) > MOVE_THRESHOLD:
                 dz = self._part_item.getModelAxisPoint(dz)
-                self._model_part.translateVirtualHelices([self.idNum()], 0, 0, dz, True)
+                self._model_part.translateVirtualHelices([self.idNum()],
+                                            0, 0, dz, True, use_undostack=True)
     # end def
 
     def restoreParent(self, pos=None):

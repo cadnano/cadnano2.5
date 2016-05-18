@@ -122,14 +122,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                     self.hide()
                     self._handle.hide()
                     return
-            # if key == 'z':
-            #     z = float(value)
-            #     self.setX(z)
-            #     self._handle.setX(z-_VH_XOFFSET)
-            #     self.part().partDimensionsChangedSignal.emit(self.part(), True)
-            # elif key == 'eulerZ':
-            #     self._handle.rotateWithCenterOrigin(value)
-            #     self._prexoveritemgroup.updatePositionsAfterRotation(value)
+            if key == 'z':
+                z = float(value)
+                self.setX(z)
+                self._handle.setX(z-_VH_XOFFSET)
+                # self.part().partDimensionsChangedSignal.emit(self.part(), True)
+            elif key == 'eulerZ':
+                self._handle.rotateWithCenterOrigin(value)
+                # self._prexoveritemgroup.updatePositionsAfterRotation(value)
             ### GEOMETRY PROPERTIES ###
             elif key == 'repeats':
                 self.updateRepeats(int(value))

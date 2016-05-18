@@ -81,6 +81,7 @@ class VirtualHelixGroup(CNObject):
         # 1. per virtual base pair allocations
         self.total_points = 0
         self.axis_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
+        self.axis_pts[:, 2] = 0.0
         self.fwd_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         self.rev_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         self.id_nums = np.full((DEFAULT_FULL_SIZE,), -1, dtype=int)
@@ -512,7 +513,7 @@ class VirtualHelixGroup(CNObject):
             total_rows = len_axis_pts + number_of_new_elements
             # resize per virtual base allocations
             self.axis_pts.resize((total_rows, 3))
-            self.axis_pts[len_axis_pts:] = np.inf
+            self.axis_pts[len_axis_pts:] = [np.inf, np.inf, 0.] # np.inf
 
             self.fwd_pts.resize((total_rows, 3))
             self.fwd_pts[len_axis_pts:] = np.inf
@@ -919,7 +920,18 @@ class VirtualHelixGroup(CNObject):
         self.vh_properties.loc[id_num, 'length'] =  final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
-        return self.vh_properties['length'].idxmax()
+        # return 0, self.vh_properties['length'].idxmax()
+        return self.zBoundsIds()
+    # end def
+
+    def zBoundsIds(self):
+        """ get the Z bounds accounting for infinity for unitialized
+        Virtual Helices
+        """
+        test = self.axis_pts[:, 2]
+        id_z_min = self.id_nums[np.argmin(test)]
+        id_z_max = self.id_nums[np.argmax(test)]
+        return id_z_min, id_z_max
     # end def
 
     def removeHelix(self, id_num):

@@ -34,7 +34,13 @@ class AbstractPartItem(object):
         return self._virtual_helix_item_hash[id_num]
     # end def
 
-    def partDimensionsChangedSlot(self, part, longest_id_num):
+    def partDimensionsChangedSlot(self, part, min_id_num, max_id_num):
+        """ Accounts for Z translations in parts
+        Args:
+            part (Part):
+            min_id_num (int): id number of the least Z Virtual Helix
+            max_id_num (int): id number of most Z Virtual Helix
+        """
         pass
     def partOligoAddedSlot(self, part, oligo):
         pass

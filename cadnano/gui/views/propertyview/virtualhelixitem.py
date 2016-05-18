@@ -102,6 +102,8 @@ class VirtualHelixItem(QTreeWidgetItem):
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
+            tpb = AbstractVirtualHelixItem.getProperty(self, 'twist_per_base')
+            editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
         elif key == 'scamZ':

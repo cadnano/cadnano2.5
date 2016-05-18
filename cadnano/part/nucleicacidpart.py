@@ -601,6 +601,8 @@ class NucleicAcidPart(Part):
             c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy, dz)
             if finalize:
                 util.finalizeCommands(self, [c], desc="Translate VHs")
+                # only emit this on finalize due to cost.
+                self.partDimensionsChangedSignal.emit(self, *self.zBoundsIds())
             else:
                 util.execCommandList(self, [c], desc="Translate VHs", \
                                                             use_undostack=True)
