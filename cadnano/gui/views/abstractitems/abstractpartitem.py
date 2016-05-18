@@ -34,7 +34,7 @@ class AbstractPartItem(object):
         return self._virtual_helix_item_hash[id_num]
     # end def
 
-    def partDimensionsChangedSlot(self, part):
+    def partDimensionsChangedSlot(self, part, longest_id_num):
         pass
     def partOligoAddedSlot(self, part, oligo):
         pass

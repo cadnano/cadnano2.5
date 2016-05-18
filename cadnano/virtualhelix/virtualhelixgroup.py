@@ -871,7 +871,8 @@ class VirtualHelixGroup(CNObject):
                 from the virtual helix
 
         Returns:
-            None
+            int: the ID number of the longest Virtual Helix in the
+                VirtualHelixGroup
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -916,6 +917,9 @@ class VirtualHelixGroup(CNObject):
             return
         _, final_size = self.getOffsetAndSize(id_num)
         self.vh_properties.loc[id_num, 'length'] =  final_size
+        # print("New max:", self.vh_properties['length'].idxmax(),
+        #         self.vh_properties['length'].max())
+        return self.vh_properties['length'].idxmax()
     # end def
 
     def removeHelix(self, id_num):

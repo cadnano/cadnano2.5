@@ -346,7 +346,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
-            print("the right event")
+            # print("the right event")
             is_shift = event.modifiers() == Qt.ShiftModifier
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:

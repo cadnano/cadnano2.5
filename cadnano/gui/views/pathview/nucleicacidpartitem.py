@@ -49,7 +49,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
         self._initModifierRect()
-        self._initResizeButtons()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
@@ -80,16 +79,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         m_r.hide()
     # end def
 
-    def _initResizeButtons(self):
-        """Instantiate the buttons used to change the canvas size."""
-        self._add_bases_button = SVGButton(":/pathtools/add-bases", self)
-        self._add_bases_button.clicked.connect(self._addBasesClicked)
-        self._add_bases_button.hide()
-        self._remove_bases_button = SVGButton(":/pathtools/remove-bases", self)
-        self._remove_bases_button.clicked.connect(self._removeBasesClicked)
-        self._remove_bases_button.hide()
-    # end def
-
     def vhItemForIdNum(self, id_num):
         """Returns the pathview VirtualHelixItem corresponding to id_num"""
         return self._virtual_helix_item_hash.get(id_num)
@@ -111,9 +100,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
             pxoig.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
-    def partDimensionsChangedSlot(self, model_part):
+    def partDimensionsChangedSlot(self, model_part, longest_id_num):
         if len(self._virtual_helix_item_list) > 0:
-            vhi = self._virtual_helix_item_list[0]
+            vhi = self._virtual_helix_item_hash[longest_id_num]
             vhi_rect = vhi.boundingRect()
             vhi_h_rect = vhi.handle().boundingRect()
             self._vh_rect.setLeft(vhi_h_rect.left()) # this has a bug upon resize
@@ -285,55 +274,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     ### PRIVATE METHODS ###
-    def _addBasesClicked(self):
-        part = self._model_part
-        step = part.stepSize()
-        self._addBasesDialog = dlg = QInputDialog(self.window())
-        dlg.setInputMode(QInputDialog.IntInput)
-        dlg.setIntMinimum(0)
-        dlg.setIntValue(step)
-        dlg.setIntMaximum(100000)
-        dlg.setIntStep(step)
-        dlg.setLabelText(( "Number of bases to add to the existing"\
-                         + " %i bases\n(must be a multiple of %i)")\
-                         % (0, step))   # TODO fix this
-        dlg.intValueSelected.connect(self._addBasesCallback)
-        dlg.open()
-    # end def
-
-    @pyqtSlot(int)
-    def _addBasesCallback(self, n):
-        """
-        Given a user-chosen number of bases to add, snap it to an index
-        where index modulo stepsize is 0 and calls resizeVirtualHelices to
-        adjust to that size.
-        """
-        part = self._model_part
-        self._addBasesDialog.intValueSelected.disconnect(self._addBasesCallback)
-        del self._addBasesDialog
-        maxDelta = n // part.stepSize() * part.stepSize()
-        part.resizeVirtualHelices(0, maxDelta)
-    # end def
-
-    def _removeBasesClicked(self):
-        """
-        Determines the minimum maxBase index where index modulo stepsize == 0
-        and is to the right of the rightmost nonempty base, and then resize
-        each calls the resizeVirtualHelices to adjust to that size.
-        """
-        part = self._model_part
-        step_size = part.stepSize()
-        # first find out the right edge of the part
-        idx = part.indexOfRightmostNonemptyBase() # TODO fix this
-        # next snap to a multiple of stepsize
-        idx = ceil((idx + 1) / step_size)*step_size
-        # finally, make sure we're a minimum of step_size bases
-        idx = util.clamp(idx, step_size, 10000)
-        delta = idx - (part.maxBaseIdx(0) + 1)  # TODO fix this
-        if delta < 0:
-            part.resizeVirtualHelices(0, delta)
-    # end def
-
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):
         """
         Give me a list of VirtualHelixItems and I'll parent them to myself if
@@ -411,22 +351,6 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
         self.setRect(self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2))
-        # move and show or hide the buttons if necessary
-        add_button = self._add_bases_button
-        rm_button = self._remove_bases_button
-
-        if len(self._virtual_helix_item_list) > 0:
-            add_rect = add_button.boundingRect()
-            rm_rect = rm_button.boundingRect()
-            x = self._vh_rect.right()
-            y = -styles.PATH_HELIX_PADDING
-            add_button.setPos(x, y)
-            rm_button.setPos(x - rm_rect.width(), y)
-            add_button.show()
-            rm_button.show()
-        else:
-            add_button.hide()
-            rm_button.hide()
     # end def
 
     ### PUBLIC METHODS ###

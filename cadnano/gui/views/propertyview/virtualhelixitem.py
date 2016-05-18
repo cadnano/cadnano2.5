@@ -110,6 +110,12 @@ class VirtualHelixItem(QTreeWidgetItem):
             editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
+        elif key == 'length':
+            editor = QSpinBox(parent_QWidget)
+            bpr, length = AbstractVirtualHelixItem.getProperty(self,
+                                        ['bases_per_repeat', 'length'] )
+            editor.setRange(length, 4*length)
+            editor.setSingleStep(bpr)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor
@@ -117,7 +123,11 @@ class VirtualHelixItem(QTreeWidgetItem):
 
     def updateCNModel(self):
         value = self.data(1, Qt.DisplayRole)
-        AbstractVirtualHelixItem.setProperty(self, self._key, value)
+        if self._key == 'length':
+            print("I am Property updating", self._key, value)
+            AbstractVirtualHelixItem.setSize(self, value)
+        else:
+            AbstractVirtualHelixItem.setProperty(self, self._key, value)
     # end def
 
     def setValue(self, property_key, new_value):

@@ -37,6 +37,10 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
+    def setSize(self, new_size):
+        return self._model_part.setVirtualHelixSize(self._id_num, new_size)
+    # end def
+
     def getAxisPoint(self, idx):
         return self._model_part.getCoordinate(self._id_num, idx)
     # end def

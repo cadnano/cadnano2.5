@@ -81,7 +81,7 @@ class Part(VirtualHelixGroup):
                         name='partActiveSliceIndexSignal')      #(self, index)
     partActiveSliceResizeSignal = ProxySignal(CNObject,
                         name='partActiveSliceResizeSignal')     # self
-    partDimensionsChangedSignal = ProxySignal(CNObject,
+    partDimensionsChangedSignal = ProxySignal(CNObject, int,
                         name='partDimensionsChangedSignal')     # self
     partInstanceAddedSignal = ProxySignal(CNObject,
                         name='partInstanceAddedSignal')         # self

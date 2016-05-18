@@ -24,6 +24,7 @@ from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
 
 from .resizepartcmd import ResizePartCommand
+from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
@@ -578,6 +579,18 @@ class NucleicAcidPart(Part):
         c = ResizePartCommand(self, min_delta, max_delta)
         util.execCommandList(self, [c], desc="Resize part", \
                                                     use_undostack=use_undostack)
+    # end def
+
+    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):
+        old_size = self.vh_properties.loc[id_num, 'length']
+        delta = new_size - old_size
+        if delta > 0:
+            c = ResizeVirtualHelixCommand(self, id_num, True, delta)
+            util.execCommandList(self, [c], desc="Resize part", \
+                                                        use_undostack=use_undostack)
+        else:
+            err ="shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
+            raise NotImplementedError(err)
     # end def
 
     def translateVirtualHelices(self,   vh_set,
