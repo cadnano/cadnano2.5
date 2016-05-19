@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class AbstractPartItem(object):
     """
     AbstractPartItem is a base class for partitems in all views.
@@ -12,6 +13,8 @@ class AbstractPartItem(object):
     def __init__(self):
         self._oligo_item_hash = {}
         self._virtual_helix_item_hash = {}
+        self.active_virtual_helix_item = None
+        self.is_active = False
     # end def
 
     def part(self):
@@ -32,6 +35,10 @@ class AbstractPartItem(object):
 
     def idToVirtualHelixItem(self, id_num):
         return self._virtual_helix_item_hash[id_num]
+    # end def
+
+    def setActive(self):
+        self._model_part.setActive(True)
     # end def
 
     def partDimensionsChangedSlot(self, part, min_id_num, max_id_num):
@@ -55,6 +62,8 @@ class AbstractPartItem(object):
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
     def partActiveBaseInfoSlot(self, sender, info):
+        pass
+    def partActiveChangedSlot(self, sender, is_active):
         pass
     def partPreDecoratorSelectedSlot(self, sender):
         pass

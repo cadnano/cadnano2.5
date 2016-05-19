@@ -7,7 +7,6 @@ from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LE
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
-
 class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False

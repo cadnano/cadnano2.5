@@ -233,22 +233,19 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self.refreshPath()
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActive(self, is_fwd, idx):
-        """Makes active the virtual helix associated with this item."""
-        self.part().setActiveVirtualHelix(self._id_num, is_fwd, idx)
-    # end def
-
     def activate(self):
         pen = self.pen()
         pen.setColor(getColorObj(styles.MINOR_GRID_STROKE_ACTIVE))
         self.setPen(pen)
         self.is_active = True
+    #end def
 
     def deactivate(self):
         pen = self.pen()
         pen.setColor(getColorObj(styles.MINOR_GRID_STROKE))
         self.setPen(pen)
         self.is_active = False
+    # end def
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):

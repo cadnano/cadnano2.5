@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class AbstractVirtualHelixItem(object):
     """
     AbstractVirtualHelixItem is a base class for virtualhelixitem in all views.
@@ -11,6 +12,7 @@ class AbstractVirtualHelixItem(object):
         self._id_num = id_num
         self._part_item = part_item
         self._model_part = part_item.part()
+        self.is_active = False
 
     def virtualHelixNumberChangedSlot(self, virtual_helix, number):
         pass
@@ -71,6 +73,11 @@ class AbstractVirtualHelixItem(object):
 
     def partItem(self):
         return self._part_item
+    # end def
+
+    def setActive(self, is_fwd, idx):
+        """Makes active the virtual helix associated with this item."""
+        self.part().setActiveVirtualHelix(self._id_num, is_fwd, idx)
     # end def
 
     def isActive(self):

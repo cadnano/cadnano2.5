@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtGui import QColor, QFont
 
 from cadnano.gui.views.styles import *

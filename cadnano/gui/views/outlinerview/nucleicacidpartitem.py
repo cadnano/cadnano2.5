@@ -15,8 +15,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def __init__(self, model_part, parent):
         super(NucleicAcidPartItem, self).__init__(model_part, parent)
         self._controller = NucleicAcidPartItemController(self, model_part)
+        self._model_part = model_part
         self.setExpanded(True)
-
         # properties
         temp_color = model_part.getColor()
         # outlinerview takes responsibility of overriding default part color
@@ -30,6 +30,9 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helices', self)
         self._root_items['OligoList'] = self.createRootPartItem('Oligos', self)
         # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
+        if model_part.is_active:
+            print("should be active")
+            self.activate()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -140,5 +143,26 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         root_vhi.takeChildren()
         for vhi in new_list:
             root_vhi.addChild(vhi)
+    # end def
+
+    ### SLOTS ###
+    def partActiveVirtualHelixChangedSlot(self, part, id_num):
+        vhi = self._virtual_helix_item_hash.get(id_num, None)
+        if vhi is not None:
+            self.setActiveVirtualHelixItem(vhi)
+    #end def
+
+    def partActiveChangedSlot(self, part, is_active):
+        if part == self._cn_model:
+            self.activate() if is_active else self.deactivate()
+    #end def
+
+    def setActiveVirtualHelixItem(self, new_active_vhi):
+        current_vhi = self.active_virtual_helix_item
+        if new_active_vhi != current_vhi:
+            if current_vhi is not None:
+                current_vhi.deactivate()
+            new_active_vhi.activate()
+            self.active_virtual_helix_item = new_active_vhi
     # end def
 # end class

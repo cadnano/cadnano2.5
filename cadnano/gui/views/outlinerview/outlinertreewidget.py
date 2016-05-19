@@ -33,6 +33,7 @@ class OutlinerTreeWidget(QTreeWidget):
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
         self.setAttribute(Qt.WA_MacShowFocusRect, 0) # no mac focus halo
+        self.to_be_activated = None
 
     def configure(self, window, document):
         self._window = window
@@ -196,10 +197,32 @@ class OutlinerTreeWidget(QTreeWidget):
                             item.updateCNModel()
     # end def
 
+    def setActiveItem(self):
+        tba = self.to_be_activated
+        if isinstance(tba, NucleicAcidPartItem):
+            print("trying to activate")
+            tba.setActive()
+        else:
+            tba.setActive(True, 0)
+        self.to_be_activated = None
+    # end def
+
     def getCustomContextMenu(self, point):
         """ point (QPoint)
         """
         menu = QMenu(self)
+
+        item = self.itemAt(point)
+        if isinstance(item, (NucleicAcidPartItem, VirtualHelixItem)):
+            if isinstance(item, NucleicAcidPartItem):
+                message = "set active Part"
+            else:
+                message = "set active Virtual Helix"
+            self.to_be_activated = item
+            setactive_act = QAction(message, self)
+            setactive_act.setStatusTip("set active")
+            setactive_act.triggered.connect(self.setActiveItem)
+            menu.addAction(setactive_act)
 
         hide_act = QAction("Hide selection", self)
         hide_act.setStatusTip("Hide selection")
@@ -470,16 +493,16 @@ class OutlinerTreeWidget(QTreeWidget):
         return data
     # end def
 
-    def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
-        if parent_QTreeWidgetItem is None:
-            parent_QTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
-        tw_item.setData(0, Qt.EditRole, part_name)
-        tw_item.setData(1, Qt.EditRole, visible)
-        tw_item.setData(2, Qt.EditRole, color)
-        tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
-        return tw_item
-    # end def
+    # def addDummyRow(self, part_name, visible, color, parent_QTreeWidgetItem=None):
+    #     if parent_QTreeWidgetItem is None:
+    #         parent_QTreeWidgetItem = self.invisibleRootItem()
+    #     tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
+    #     tw_item.setData(0, Qt.EditRole, part_name)
+    #     tw_item.setData(1, Qt.EditRole, visible)
+    #     tw_item.setData(2, Qt.EditRole, color)
+    #     tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
+    #     return tw_item
+    # # end def
 
     def getInstanceCount(self):
         return len(self._instance_items)

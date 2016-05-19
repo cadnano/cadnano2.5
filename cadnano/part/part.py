@@ -52,9 +52,9 @@ class Part(VirtualHelixGroup):
         # Properties
         self.view_properties = {} #self._document.newViewProperties()
 
-        self._group_properties["name"] = "Part%d" % len(self._document.children())
-        self._group_properties["color"] = "#000000" # outlinerview will override from styles
-        self._group_properties["visible"] = True
+        self._group_properties['name'] = "Part%d" % len(self._document.children())
+        self._group_properties['color'] = "#000000" # outlinerview will override from styles
+        self._group_properties['is_visible'] = True
         self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4()
 
         # Selections
@@ -65,6 +65,7 @@ class Part(VirtualHelixGroup):
         self._active_id_num = None
         self.active_base_info = None
         self._selected = False
+        self.is_active = False
 
         if self.__class__ == Part:
             e = "This class is abstract. Perhaps you want HoneycombPart."
@@ -93,6 +94,8 @@ class Part(VirtualHelixGroup):
                         name='partPropertyChangedSignal')       # self, property_name, new_value
     partSelectedChangedSignal = ProxySignal(CNObject, object,
                         name='partSelectedChangedSignal')       # self, is_selected
+    partActiveChangedSignal = ProxySignal(CNObject, bool,       # self, is_active
+                        name='partActiveChangedSignal')
 
     # B. Virtual Helix
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num
@@ -230,7 +233,22 @@ class Part(VirtualHelixGroup):
 
     def activeIdNum(self):
         return self._active_id_num
-     # end def
+    # end def
+
+    def setActive(self, is_active):
+        dc = self._document._controller
+        current_active_part = dc.activePart()
+        if is_active:
+            if current_active_part == self:
+                return
+            dc.setActivePart(self)
+            if current_active_part is not None:
+                current_active_part.setActive(False)
+        elif current_active_part == self:   # there always needs to be an active
+                return
+        self.is_active = is_active
+        self.partActiveChangedSignal.emit(self, is_active)
+    # end def
 
     def activeBaseIndex(self):
         return self._active_base_index

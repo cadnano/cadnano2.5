@@ -1,5 +1,7 @@
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWidgets import QTreeWidgetItem
+from cadnano.gui.palette import getBrushObj
+from . import outlinerstyles as styles
 
 NAME_COL = 0
 VISIBLE_COL = 1
@@ -90,4 +92,13 @@ class CNOutlinerItem(QTreeWidgetItem):
             # raise KeyError("No property %s in cn_model" % (key))
     # end def
 
+    def activate(self):
+        self.setBackground(NAME_COL, getBrushObj(styles.ACTIVE_COLOR))
+        self.is_active = True
+    #end def
+
+    def deactivate(self):
+        self.setBackground(NAME_COL, getBrushObj(styles.INACTIVE_COLOR))
+        self.is_active = False
+    # end def
 # end class

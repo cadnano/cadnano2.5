@@ -23,7 +23,8 @@ def decodePart(document, part_dict):
     name = part_dict['name']
     dc = document._controller
     part = document.addDnaPart()
-    dc.setActivePart(part)
+    part.setActive(True)
+    # dc.setActivePart(part)
     vh_id_list = part_dict['vh_list']
     vh_props = part_dict['virtual_helices']
     origins = part_dict['origins']
@@ -84,8 +85,6 @@ def decodePart(document, part_dict):
 # end def
 
 def importToPart(part, copy_dict, use_undostack=True):
-    # dc.setActivePart(part)
-
     """ This is the Virtual Helix id number offset
     """
     id_num_offset = part.getIdNumMax() + 1

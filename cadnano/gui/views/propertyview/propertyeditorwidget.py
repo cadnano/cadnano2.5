@@ -64,14 +64,14 @@ class PropertyEditorWidget(QTreeWidget):
         # p2 = self.addDummyRow("circular",  True)
     # end def
 
-    def addDummyRow(self, property_name, value, parent_QTreeWidgetItem=None):
-        if parent_QTreeWidgetItem is None:
-            parent_QTreeWidgetItem = self.invisibleRootItem()
-        tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
-        tw_item.setData(0, Qt.EditRole, property_name)
-        tw_item.setData(1, Qt.EditRole, value)
-        tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
-        return tw_item
+    # def addDummyRow(self, property_name, value, parent_QTreeWidgetItem=None):
+    #     if parent_QTreeWidgetItem is None:
+    #         parent_QTreeWidgetItem = self.invisibleRootItem()
+    #     tw_item = QTreeWidgetItem(parent_QTreeWidgetItem)
+    #     tw_item.setData(0, Qt.EditRole, property_name)
+    #     tw_item.setData(1, Qt.EditRole, value)
+    #     tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
+    #     return tw_item
     # end def
 
     ### SIGNALS ###
