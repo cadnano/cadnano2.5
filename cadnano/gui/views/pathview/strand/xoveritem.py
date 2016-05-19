@@ -63,6 +63,18 @@ class XoverNode3(QGraphicsRectItem):
         self._xover_item.refreshXover()
     # end def
 
+    def showXover(self):
+        """ partner VH must be visible
+        """
+        xoi = self._xover_item
+        part_item = xoi.partItem()
+        vhi = part_item.idToVirtualHelixItem(self._partner_virtual_helix_id_num)
+        if vhi.isVisible():
+            self._xover_item.show()
+
+    def hideXover(self):
+        self._xover_item.hide()
+
     def setPartnerVirtualHelix(self, strand):
         if strand.connection5p():
             self._partner_virtual_helix_id_num = strand.connection5p().idNum()
@@ -252,6 +264,8 @@ class XoverItem(QGraphicsPathItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def hideIt(self):
+        """ Used by PencilTool
+        """
         self.hide()
         if self._node3:
             self._node3.hide()
@@ -261,6 +275,8 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def showIt(self):
+        """ Used by PencilTool
+        """
         self.show()
         if self._node3:
             self._node3.show()

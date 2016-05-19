@@ -445,7 +445,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         for item in virtual_helix_item.childItems():
             if isinstance(item, XoverNode3):
                 item.refreshXover()
-     # end def
+    # end def
 
     def updateStatusBar(self, status_string):
         """Shows status_string in the MainWindow's status bar."""

@@ -323,8 +323,8 @@ class VirtualHelixGroup(CNObject):
         given a id_num get the coordinate at a given index
         """
         valid_pts = np.where(self.origin_pts != np.inf)
-        xs = valid_pts[:,0]
-        ys = valid_pts[:,1]
+        xs = valid_pts[:, 0]
+        ys = valid_pts[:, 1]
         xLL = np.amin(xs)
         xUR = np.amax(xs)
         yLL = np.amin(ys)

@@ -15,6 +15,7 @@ from cadnano.gui.palette import ( newPenObj, getNoPen, getPenObj,
                                 getBrushObj, getNoBrush, getColorObj )
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
+from .strand.xoveritem import XoverNode3, XoverNode5
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
 
@@ -118,7 +119,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                 if val:
                     self.show()
                     self._handle.show()
+                    self.showXoverItems()
                 else:
+                    self.hideXoverItems()
                     self.hide()
                     self._handle.hide()
                     return
@@ -153,6 +156,18 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                 if self.isActive():
                     self._part_item.setPreXoverItemsVisible(self)
         self.refreshPath()
+    # end def
+
+    def showXoverItems(self):
+        for item in self.childItems():
+            if isinstance(item, XoverNode3):
+                item.showXover()
+    # end def
+
+    def hideXoverItems(self):
+        for item in self.childItems():
+            if isinstance(item, XoverNode3):
+                item.hideXover()
     # end def
 
     ### ACCESSORS ###
