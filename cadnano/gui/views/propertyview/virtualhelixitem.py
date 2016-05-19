@@ -85,6 +85,7 @@ class VirtualHelixItem(QTreeWidgetItem):
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
         if self._cn_model == sender and id_num == self._id_num:
             for key, val in zip(keys, values):
+                # print("change slot", key, val)
                 self.setValue(key, val)
 
     def partVirtualHelixRemovedSlot(self, sender, id_num):
@@ -120,6 +121,9 @@ class VirtualHelixItem(QTreeWidgetItem):
             editor.setSingleStep(bpr)
         elif key == 'z':
             editor = QDoubleSpinBox(parent_QWidget)
+            bw = self._model_part.baseWidth()
+            editor.setSingleStep(bw)
+            editor.setRange(-bw*21, bw*21)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor
@@ -129,12 +133,11 @@ class VirtualHelixItem(QTreeWidgetItem):
         value = self.data(1, Qt.DisplayRole)
         key = self._key
         if key == 'length':
-            print("I am Property updating", key, value)
+            print("Property view 'length' updating", key, value)
             AbstractVirtualHelixItem.setSize(self, value)
         elif key == 'z':
-            pass
-            # print("I am Property updating", self._key, value)
-            # AbstractVirtualHelixItem.setSize(self, value)
+            print("Property view 'z' updating", key, value)
+            AbstractVirtualHelixItem.setZ(self, value)
         else:
             AbstractVirtualHelixItem.setProperty(self, self._key, value)
     # end def

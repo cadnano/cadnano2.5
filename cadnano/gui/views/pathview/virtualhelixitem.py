@@ -123,11 +123,19 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                     self._handle.hide()
                     return
             if key == 'z':
-                z = self._part_item.convertToQtZ(val)
+                part_item = self._part_item
+                z = part_item.convertToQtZ(val)
                 if self.x() != z:
                     self.setX(z)
-                    self._handle.setX(z-_VH_XOFFSET)
-                    # self.part().partDimensionsChangedSignal.emit(self.part(), True)
+                    """ The handle is selected, so deselect to
+                    accurately position then reselect
+                    """
+                    vhi_h = self._handle
+                    vhi_h.tempReparent()
+                    vhi_h.setX(z - _VH_XOFFSET)
+                    part_item.updateXoverItems(self)
+                    vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
+                    vhi_h_selection_group.addToGroup(vhi_h)
             elif key == 'eulerZ':
                 self._handle.rotateWithCenterOrigin(value)
                 # self._prexoveritemgroup.updatePositionsAfterRotation(value)

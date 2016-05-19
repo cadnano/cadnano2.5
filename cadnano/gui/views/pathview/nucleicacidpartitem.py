@@ -51,7 +51,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._initModifierRect()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-        self._scale_factor = _BASE_WIDTH/ m_p.baseWidth()
+        self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
+        self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
         # self.setBrush(QBrush(Qt.NoBrush)))
     # end def
 
@@ -67,12 +68,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     def convertToModelZ(self, z):
         """ scale Z-axis coordinate to the model
         """
-        sf = self._scale_factor
-        return z / sf
+        return z * self._scale_2_model
     # end def
 
     def convertToQtZ(self, z):
-        return z * self._scale_factor
+        return z * self._scale_2_Qt
     # end def
 
     def _initModifierRect(self):
@@ -300,7 +300,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
         for vhi in new_list:
             _, _, _z = vhi.getAxisPoint(0)
-            _z *= self._scale_factor
+            _z *= self._scale_2_Qt
             vhi.setPos(_z, y)
             if vhi_rect is None:
                 vhi_rect = vhi.boundingRect()

@@ -41,6 +41,17 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.setVirtualHelixSize(self._id_num, new_size)
     # end def
 
+    def setZ(self, new_z):
+        id_num = self._id_num
+        m_p = self._model_part
+        old_z = m_p.getVirtualHelixProperties(id_num, 'z')
+        if new_z != old_z:
+            dz = new_z - old_z
+            print("setZ", dz)
+            return m_p.translateVirtualHelices([id_num], 0, 0, dz,
+                                        finalize=False, use_undostack=True)
+    # end def
+
     def getAxisPoint(self, idx):
         return self._model_part.getCoordinate(self._id_num, idx)
     # end def

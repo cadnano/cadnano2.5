@@ -415,7 +415,11 @@ class VirtualHelixGroup(CNObject):
             # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
             # print("new origin", self.locationQt(id_num, 15./self.radius()))
-        self.vh_properties.iloc[id_nums, Z_PROP_INDEX] += delta[2]
+        try:
+            self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
+        except:
+            print(list(id_nums), Z_PROP_INDEX)
+            raise
     # end def
 
     def getIndices(self, id_num):
