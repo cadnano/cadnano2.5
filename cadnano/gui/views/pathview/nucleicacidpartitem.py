@@ -12,6 +12,8 @@ from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.grabcorneritem import GrabCornerItem
+
 from . import pathstyles as styles
 # from .prexoveritem import PreXoverItem
 from .prexovermanager import PreXoverManager
@@ -53,7 +55,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
-        # self.setBrush(QBrush(Qt.NoBrush)))
+        self.grab_corner = GrabCornerItem(20, self)
+        self.grab_corner.setBrush(getBrushObj('#cccc00'))
     # end def
 
     def proxy(self):
@@ -360,7 +363,9 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         # self.setRect(self.childrenBoundingRect())
         _p = _BOUNDING_RECT_PADDING
-        self.setRect(self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2))
+        temp_rect = self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2)
+        self.grab_corner.setTopLeft(temp_rect.topLeft())
+        self.setRect(temp_rect)
     # end def
 
     ### PUBLIC METHODS ###
