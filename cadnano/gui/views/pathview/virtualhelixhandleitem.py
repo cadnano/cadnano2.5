@@ -77,6 +77,17 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         return self._model_part.getVirtualHelixProperties(self._id_num, key)
     # end def
 
+    def getAngularProperties(self):
+        """
+        Returns:
+            Tuple: 'bases_per_repeat, 'bases_per_turn',
+                    'twist_per_base', 'minor_groove_angle'
+        """
+        bpr, tpr, mga= self._model_part.getVirtualHelixProperties(self._id_num,
+                ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
+        bases_per_turn = bpr / tpr
+        return bpr, bases_per_turn, tpr*360./bpr, mga
+
     def setProperty(self, key, value):
         return self._model_part.setVirtualHelixProperties(self._id_num, key, value)
     # end def

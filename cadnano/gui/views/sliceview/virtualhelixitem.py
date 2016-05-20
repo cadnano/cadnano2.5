@@ -309,7 +309,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._pen1.setBrush(fwd_strand_color_obj)
         self.arrow1.setPen(self._pen1)
         part = self.part()
-        eulerZ, tpb = self.getProperty(['eulerZ', 'twist_per_base'])
+        tpb, eulerZ = self.getTwistPerBase()
         angle = idx*tpb
         # for some reason rotation is CW and not CCW with increasing angle
         self.arrow1.setRotation(angle + eulerZ)
@@ -326,7 +326,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._pen2.setBrush(rev_strand_color_obj)
         self.arrow2.setPen(self._pen2)
         part = self.part()
-        eulerZ, tpb = self.getProperty(['eulerZ', 'twist_per_base'])
+        tpb, eulerZ = self.getTwistPerBase()
         angle = idx*tpb
         self.arrow2.setRotation(angle + eulerZ + 180)
     # end def

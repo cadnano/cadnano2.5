@@ -29,10 +29,8 @@ def defaultProperties(id_num):
     ('neighbors', '[]'),
     ('bases_per_repeat', 21),
     ('turns_per_repeat', 2),
-    ('repeats', 2),
+    ('repeat_hint', 2), # used in path view for how many repeats to display PXIs
     ('helical_pitch', 1.),
-    ('bases_per_turn', 10.5), # bases_per_repeat/turns_per_repeat
-    ('twist_per_base', 360. / 10.5), # 360/_bases_per_turn
     ('minor_groove_angle', 171.),
     ('length', -1),
     ('z', 0.0)
@@ -824,10 +822,21 @@ class VirtualHelixGroup(CNObject):
             raise ValueError("id_num_list bad type: {}".format(type(id_num_list)))
     # end def
 
-    def getAllVirtualHelixProperties(self, id_num, safe=True):
-        """
+    def getAllVirtualHelixProperties(self, id_num, inject_extras=True, safe=True):
+        """ NOT to be used for a list of Virtual Helix property keys unless
+        `inject_extras` is False
+
         Args:
             id_num (int): virtual helix ID number
+            inject_extras (Optional[bool]): Adds in 'bases_per_turn' and
+                'twist_per_base'  Default True
+            safe (bool): check if id_num exists. Default True
+
+        Returns:
+            dictionary: properties of a given ids
+
+        Raises:
+            IndexError
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -837,7 +846,13 @@ class VirtualHelixGroup(CNObject):
         series = self.vh_properties.loc[id_num]
         # to_dict doesn't promote to python native types needed by QVariant
         # leaves as numpy integers and floats
-        return dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_)) else (k, v) for k, v in zip(series.index, series.tolist()))
+        out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_)) else (k, v) for k, v in zip(series.index, series.tolist()))
+        if inject_extras:
+            bpr = out['bases_per_repeat']
+            tpr = out['turns_per_repeat']
+            out['bases_per_turn'] = bpr / tpr
+            out['twist_per_base'] = tpr*360. / bpr
+        return out
     # end
 
     def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
@@ -853,6 +868,7 @@ class VirtualHelixGroup(CNObject):
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
         self.vh_properties.loc[id_num, keys] = values
+
         if not isinstance(values, (tuple, list)):
             keys, values = (keys,) , (values,)
         if safe:
@@ -1307,8 +1323,9 @@ class VirtualHelixGroup(CNObject):
             None
         """
         offset, size = self.getOffsetAndSize(id_num)
-        bases_per_turn, bpr = self.vh_properties.loc[id_num,
-                                    ['bases_per_turn', 'bases_per_repeat']]
+        bpr, tpr = self.vh_properties.loc[id_num,
+                                    ['bases_per_repeat', 'turns_per_repeat']]
+        bases_per_turn = bpr / tpr
         if index is None:
             start, length = 0, size
         else:
@@ -1483,26 +1500,6 @@ class VirtualHelixGroup(CNObject):
         return theta, math.sqrt(R*R + x*x)
         # return theta, 1.125
     # end def
-
-    # def indexToAngle(self, id_num, idx):
-    #     """
-    #     Args:
-    #         id_num (int): virtual helix ID number
-    #     """
-    #     tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
-    #     twist_per_base = math.radians(twist_per_base)
-    #     return eulerZ + twist_per_base*idx
-    # # end def
-
-    # def angleBetweemPoints(self, id_num, idx):
-    #     """
-    #     Args:
-    #         id_num (int): virtual helix ID number
-    #     """
-    #     tpb, eulerZ = self.vh_properties.loc[id_num, ['twist_per_base', 'eulerZ']]
-    #     twist_per_base = math.radians(twist_per_base)
-    #     return eulerZ + twist_per_base*idx
-    # # end def
 
     def projectionPointOnPlane(self, id_num, point):
         """ VirtualHelices are straight for now so only one direction for the axis

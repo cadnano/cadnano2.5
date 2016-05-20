@@ -31,6 +31,26 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.getVirtualHelixProperties(self._id_num, keys)
     # end def
 
+    def getTwistPerBase(self):
+        """
+        Returns:
+            Tuple: twist per base in degrees, eulerZ
+        """
+        bpr, tpr = self._model_part.getVirtualHelixProperties(self._id_num,
+                        ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
+        return tpr*360./bpr, eulerZ
+
+    def getAngularProperties(self):
+        """
+        Returns:
+            Tuple: 'bases_per_repeat, 'bases_per_turn',
+                    'twist_per_base', 'minor_groove_angle'
+        """
+        bpr, tpr, mga= self._model_part.getVirtualHelixProperties(self._id_num,
+                ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
+        bases_per_turn = bpr / tpr
+        return bpr, bases_per_turn, tpr*360./bpr, mga
+
     def getAllProperties(self):
         return self._model_part.getAllVirtualHelixProperties(self._id_num)
     # end def

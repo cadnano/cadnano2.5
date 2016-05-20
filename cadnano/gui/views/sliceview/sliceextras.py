@@ -310,9 +310,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
         radius = self._radius
-        step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
-                                                        'twist_per_base',
-                                                        'minor_groove_angle'])
+        step_size, bases_per_turn, tpb, mgroove = self.virtual_helix_item.getAngularProperties()
         iw = PXI_PP_ITEM_WIDTH
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
@@ -366,9 +364,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def updateTurnsPerRepeat(self):
-        step_size, tpb, mgroove = self.virtual_helix_item.getProperty(['bases_per_repeat',
-                                                        'twist_per_base',
-                                                        'minor_groove_angle'])
+        step_size, bases_per_turn, tpb, mgroove = self.virtual_helix_item.getAngularProperties()
         mgroove = -mgroove
         tpb = -tpb
         fpxis = self.fwd_prexover_items

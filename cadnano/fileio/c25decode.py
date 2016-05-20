@@ -101,6 +101,8 @@ def decode(document, obj):
 
     encoded_keys = ['eulerZ', 'repeats', 'bases_per_repeat',
                     'turns_per_repeat', 'z']
+    model_keys = ['eulerZ', 'repeat_hint', 'bases_per_repeat',
+                    'turns_per_repeat', 'z']
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row = helix['row']
@@ -121,9 +123,10 @@ def decode(document, obj):
         z = convertToModelZ(props[-1])
         props[-1] = z
         # print("%d:" % vh_num, x, y, z)
+        # print({k:v for k, v in zip(encoded_keys, props)})
         part.createVirtualHelix(x, y, z, num_bases,
                                 id_num=vh_num,
-                                properties=(encoded_keys, props),
+                                properties=(model_keys, props),
                                 use_undostack=False)
     if not getReopen():
         setBatch(False)
