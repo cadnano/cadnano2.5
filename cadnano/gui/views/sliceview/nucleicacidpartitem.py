@@ -11,6 +11,8 @@ from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.grabcorneritem import GrabCornerItem
+
 from . import slicestyles as styles
 
 from .virtualhelixitem import VirtualHelixItem
@@ -62,7 +64,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self.hide() # hide while until after attemptResize() to avoid flicker
 
         self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
-        self._updateGeometry()
+        self.boundRectToModel()
 
         self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
@@ -83,6 +85,13 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         self._outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         self._outline.setZValue(styles.ZDESELECTOR)
         self._outline.setPen(getPenObj(self.modelColor(), _DEFAULT_WIDTH))
+
+        self.grab_cornerTL = GrabCornerItem(20, self)
+        self.grab_cornerTL.setBrush(getBrushObj('#cccc00'))
+        self.grab_cornerTL.setTopLeft(_orect.topLeft())
+        self.grab_cornerBL = GrabCornerItem(20, self)
+        self.grab_cornerBL.setBrush(getBrushObj('#cccc00'))
+        self.grab_cornerBL.setBottomRight(_orect.bottomRight())
 
         self.griditem = GridItem(self)
 
@@ -327,7 +336,7 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         pass  # subclass
     # end def
 
-    def _updateGeometry(self):
+    def boundRectToModel(self):
         """ update the boundaries to what's in the model with a minimum
         size
         """
