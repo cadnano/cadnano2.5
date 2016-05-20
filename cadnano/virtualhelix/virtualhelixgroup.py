@@ -732,10 +732,13 @@ class VirtualHelixGroup(CNObject):
             None
         """
         rad = self._radius
-        hp, twist_per_base, eulerZ, mgroove = self.vh_properties.loc[id_num,
+        hp, bpr, tpr, eulerZ, mgroove = self.vh_properties.loc[id_num,
                                                             ['helical_pitch',
-                                                            'twist_per_base',
-                                                            'eulerZ', 'minor_groove_angle']]
+                                                            'bases_per_repeat',
+                                                            'turns_per_repeat',
+                                                            'eulerZ',
+                                                            'minor_groove_angle']]
+        twist_per_base = tpr*360./bpr
         """
         + angle is CCW
         - angle is CW
@@ -1356,10 +1359,11 @@ class VirtualHelixGroup(CNObject):
         # print("THE search radius", radius, RADIUS)
         rsquared2 = radius*radius
         per_neighbor_hits = {}
+        key_prop_list = [   'eulerZ', 'bases_per_repeat',
+                            'turns_per_repeat', 'minor_groove_angle']
         for neighbor_id in neighbors:
-            twist_per_base, eulerZ, bpr, mgroove = self.vh_properties.loc[neighbor_id,
-                                                        ['twist_per_base', 'eulerZ',
-                                                        'bases_per_repeat', 'minor_groove_angle']]
+            eulerZ, bpr, tpr, mgroove = self.vh_properties.loc[neighbor_id, key_prop_list]
+            twist_per_base = tpr*360./bpr
             half_period = math.floor(bpr / 2)
             tpb = math.radians(twist_per_base)
             eulerZ = math.radians(eulerZ)
