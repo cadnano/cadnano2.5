@@ -541,12 +541,12 @@ class Document(CNObject):
     # # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addDnaPart(self):
+    def addDnaPart(self, use_undostack=True):
         """
         Create and store a new DnaPart and instance, and return the instance.
         """
         dnapart = NucleicAcidPart(document=self)
-        self._addPart(ObjectInstance(dnapart))
+        self._addPart(ObjectInstance(dnapart), use_undostack=use_undostack)
         return dnapart
     # end def
 

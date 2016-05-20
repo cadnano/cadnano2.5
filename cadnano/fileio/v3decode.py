@@ -22,17 +22,18 @@ def decode(document, obj):
 def decodePart(document, part_dict):
     name = part_dict['name']
     dc = document._controller
-    part = document.addDnaPart()
+    part = document.addDnaPart(use_undostack=False)
     part.setActive(True)
-    # dc.setActivePart(part)
+
     vh_id_list = part_dict['vh_list']
     vh_props = part_dict['virtual_helices']
     origins = part_dict['origins']
     keys = list(vh_props.keys())
     for id_num, size in vh_id_list:
         x, y = origins[id_num]
+        z = vh_props['z'][id_num]
         vals = [vh_props[k][id_num] for k in keys]
-        part.createVirtualHelix(x, y, size,
+        part.createVirtualHelix(x, y, z, size,
                                 id_num=id_num,
                                 properties=(keys, vals),
                                 safe=False,
@@ -100,10 +101,11 @@ def importToPart(part, copy_dict, use_undostack=True):
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
+        z = vh_props['z'][id_num]
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] += (name_suffix % new_id_num)
-        part.createVirtualHelix(x, y, size,
+        part.createVirtualHelix(x, y, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
                                 safe=use_undostack,

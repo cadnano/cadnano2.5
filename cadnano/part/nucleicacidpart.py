@@ -303,10 +303,10 @@ class NucleicAcidPart(Part):
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def createVirtualHelix(self, x, y,
+    def createVirtualHelix(self, x, y, z=0.0,
                             length=42, id_num=None, properties=None,
                             safe=True, use_undostack=True):
-        c = CreateVirtualHelixCommand(  self, x, y, length,
+        c = CreateVirtualHelixCommand(  self, x, y, z, length,
                                         id_num=id_num, properties=properties,
                                         safe=safe)
         util.execCommandList(self, [c], desc="Add VirtualHelix", \
@@ -420,7 +420,7 @@ class NucleicAcidPart(Part):
             if xo_strand3.idx3Prime() == idx5p:
                 xo_strand5 = temp5
             else:
-                ss_idx5p = ss_idx3p
+                idx5p = idx3p
                 """
                 if the strand was split for the strand3p, then we need to
                 adjust the strandset index
@@ -428,9 +428,9 @@ class NucleicAcidPart(Part):
                 if c:
                     # the insertion index into the set is increases
                     if ss3p.isForward():
-                        ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
+                        idx5p = idx3p + 1 if idx5p > idx3p else idx3p
                     else:
-                        ss_idx5p = ss_idx3p + 1 if idx5p > idx3p else ss_idx3p
+                        idx5p = idx3p + 1 if idx5p > idx3p else idx3p
                 if ss5p.strandCanBeSplit(temp5, idx5p):
                     d = SplitCommand(temp5, idx5p)
                     # cmds.append(d)

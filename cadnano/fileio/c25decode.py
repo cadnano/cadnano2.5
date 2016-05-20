@@ -10,34 +10,35 @@ from cadnano.virtualhelix.virtualhelixgroup import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
 
+# hard code these for version changes
+PATH_BASE_WIDTH = 10
+PART_BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
+SCALE_2_MODEL =  PART_BASE_WIDTH/PATH_BASE_WIDTH
+def convertToModelZ(z):
+    """ scale Z-axis coordinate to the model
+    """
+    return z * SCALE_2_MODEL
+# end def
+
 def decode(document, obj):
     """
     Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
     """
-    num_bases = len(obj['vstrands'][0]['scaf'])
-    if num_bases % 32 == 0:
-        lattice_type = LatticeType.SQUARE
-    elif num_bases % 21 == 0:
-        lattice_type = LatticeType.HONEYCOMB
-    else:
-        raise IOError("error decoding number of bases")
+    num_bases = len(obj['vstrands'][0]['fwd_ss'])
+
+    lattice_type = LatticeType.HONEYCOMB
 
     part = None
     # DETERMINE MAX ROW,COL
     max_row_json = max_col_json = 0
     for helix in obj['vstrands']:
-        max_row_json = max(max_row_json, int(helix['row'])+1)
-        max_col_json = max(max_col_json, int(helix['col'])+1)
+        max_row_json = max(max_row_json, int(helix['row']) + 1)
+        max_col_json = max(max_col_json, int(helix['col']) + 1)
 
     # CREATE PART ACCORDING TO LATTICE TYPE
     if lattice_type == LatticeType.HONEYCOMB:
         steps = num_bases // 21
-        # num_rows = max(30, max_row_json, cadnano.app().prefs.honeycombRows)
-        # num_cols = max(32, max_col_json, cadnano.app().prefs.honeycombCols)
-        # num_rows = max(30, max_row_json, prefs.HONEYCOMB_PART_MAXROWS)
-        # num_cols = max(32, max_col_json, prefs.HONEYCOMB_PART_MAXCOLS)
-
         doLattice = HoneycombDnaPart.latticeCoordToPositionXY
         isEven = HoneycombDnaPart.isEvenParity
     elif lattice_type == LatticeType.SQUARE:
@@ -68,6 +69,7 @@ def decode(document, obj):
     delta = num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
+    property_dict = {}
     vh_num_to_coord = {}
     min_row, max_row = 10000, -10000
     min_col, max_col = 10000, -10000
@@ -93,29 +95,36 @@ def decode(document, obj):
     if delta_column & 1:
         delta_column += 1
 
-    print("Found cadnano version 2 file")
+    print("Found cadnano version 2.5 file")
     print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
     print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
 
+    encoded_keys = ['eulerZ', 'repeats', 'bases_per_repeat',
+                    'turns_per_repeat', 'z']
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row = helix['row']
         col = helix['col']
-        scaf= helix['scaf']
         # align row and columns to the center 0, 0
         coord = (row -  delta_row, col - delta_column)
+        coord = (row, col)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
+        property_dict[vh_num] = [helix[key] for key in encoded_keys]
     # end for
 
-    # make sure we retain the original order
     radius = DEFAULT_RADIUS
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        # print("%d:" % vh_num, x, y)
-        part.createVirtualHelix(x, y, 0., num_bases,
-                                id_num=vh_num, use_undostack=False)
+        props = property_dict[vh_num]
+        z = convertToModelZ(props[-1])
+        props[-1] = z
+        # print("%d:" % vh_num, x, y, z)
+        part.createVirtualHelix(x, y, z, num_bases,
+                                id_num=vh_num,
+                                properties=(encoded_keys, props),
+                                use_undostack=False)
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)
@@ -124,114 +133,116 @@ def decode(document, obj):
 
     # INSTALL STRANDS AND COLLECT XOVER LOCATIONS
     num_helices = len(obj['vstrands']) - 1
-    scaf_seg = defaultdict(list)
-    scaf_xo = defaultdict(list)
-    stap_seg = defaultdict(list)
-    stap_xo = defaultdict(list)
+    fwd_ss_seg = defaultdict(list)
+    fwd_ss_xo = defaultdict(list)
+    rev_ss_seg = defaultdict(list)
+    rev_ss_xo = defaultdict(list)
     try:
         for helix in obj['vstrands']:
             vh_num = helix['num']
             row, col = vh_num_to_coord[vh_num]
-            scaf = helix['scaf']
-            stap = helix['stap']
-            insertions = helix['loop']
-            skips = helix['skip']
+            insertions = helix['insertions']
+            deletions = helix['deletions']
 
             if isEven(row, col):
-                scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
+                # parity matters still despite the fwd and rev naming of
+                # this format
+                fwd_strandset, rev_strandset = part.getStrandSets(vh_num)
+                fwd_ss = helix['fwd_ss']
+                rev_ss = helix['rev_ss']
             else:
-                stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
+                rev_strandset, fwd_strandset = part.getStrandSets(vh_num)
+                rev_ss = helix['fwd_ss']
+                fwd_ss = helix['rev_ss']
 
             # validate file serialization of lists
-            assert( len(scaf) == len(stap) and
-                    len(scaf) == len(insertions) and
-                    len(insertions) == len(skips) )
+            assert( len(fwd_ss) == len(rev_ss) and
+                    len(fwd_ss) == len(insertions) and
+                    len(insertions) == len(deletions) )
 
-            # read scaffold segments and xovers
-            for i in range(len(scaf)):
-                five_vh, five_idx, three_vh, three_idx = scaf[i]
+            # read fwd_strandset segments and xovers
+            for i in range(len(fwd_ss)):
+                five_vh, five_strand, five_idx, three_vh, three_strand, three_idx = fwd_ss[i]
+
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i, five_vh,\
-                                       five_idx, three_vh, three_idx):
-                    scaf_seg[vh_num].append(i)
+                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i,
+                                        five_vh, five_idx, three_vh, three_idx):
+                    fwd_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
-                    scaf_seg[vh_num].append(i)  # end segment on a double crossover
+                    fwd_ss_seg[vh_num].append(i)  # end segment on a double crossover
                 if is3primeXover(StrandType.SCAFFOLD, vh_num, i, three_vh, three_idx):
-                    scaf_xo[vh_num].append((i, three_vh, three_idx))
-            assert (len(scaf_seg[vh_num]) % 2 == 0)
+                    fwd_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
+            assert (len(fwd_ss_seg[vh_num]) % 2 == 0)
 
-            # install scaffold segments
-            for i in range(0, len(scaf_seg[vh_num]), 2):
-                low_idx = scaf_seg[vh_num][i]
-                high_idx = scaf_seg[vh_num][i + 1]
-                scaf_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+            # install fwd_strandset segments
+            for i in range(0, len(fwd_ss_seg[vh_num]), 2):
+                low_idx = fwd_ss_seg[vh_num][i]
+                high_idx = fwd_ss_seg[vh_num][i + 1]
+                fwd_strandset.createStrand(low_idx, high_idx, use_undostack=False)
 
-            # read staple segments and xovers
-            for i in range(len(stap)):
-                five_vh, five_idx, three_vh, three_idx = stap[i]
+            # read rev_strandset segments and xovers
+            for i in range(len(rev_ss)):
+                five_vh, five_strand, five_idx, three_vh, three_strand, three_idx = rev_ss[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i, five_vh,\
-                                       five_idx, three_vh, three_idx):
-                    stap_seg[vh_num].append(i)
+                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i,
+                                        five_vh, five_idx, three_vh, three_idx):
+                    rev_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
-                    stap_seg[vh_num].append(i)  # end segment on a double crossover
+                    rev_ss_seg[vh_num].append(i)  # end segment on a double crossover
                 if is3primeXover(StrandType.STAPLE, vh_num, i, three_vh, three_idx):
-                    stap_xo[vh_num].append((i, three_vh, three_idx))
-            assert (len(stap_seg[vh_num]) % 2 == 0)
+                    rev_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
+            assert (len(rev_ss_seg[vh_num]) % 2 == 0)
 
-            # install staple segments
-            for i in range(0, len(stap_seg[vh_num]), 2):
-                low_idx = stap_seg[vh_num][i]
-                high_idx = stap_seg[vh_num][i + 1]
-                stap_strand_set.createStrand(low_idx, high_idx, use_undostack=False)
+            # install rev_strandset segments
+            for i in range(0, len(rev_ss_seg[vh_num]), 2):
+                low_idx = rev_ss_seg[vh_num][i]
+                high_idx = rev_ss_seg[vh_num][i + 1]
+                rev_strandset.createStrand(low_idx, high_idx, use_undostack=False)
         # end for
     except AssertionError:
         print("Unrecognized file format.")
         raise
 
-    # INSTALL XOVERS
+    """ INSTALL XOVERS
+    parity matters for the from idx but is already encoded in
+    the `to_strand3p` parameter of the tuple in `fwd_ss_xo` and `rev_ss_xo`
+    """
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row, col = vh_num_to_coord[vh_num]
-
         if isEven(row, col):
-            scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
+            fwd_strandset, rev_strandset = part.getStrandSets(vh_num)
         else:
-            stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
+            rev_strandset, fwd_strandset = part.getStrandSets(vh_num)
 
-        # install scaffold xovers
-        for (idx5p, to_vh_num, idx3p) in scaf_xo[vh_num]:
+        # install fwd_strandset xovers
+        for (idx5p, to_vh_num, to_strand3p, idx3p) in fwd_ss_xo[vh_num]:
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
-            try:
-                strand5p = scaf_strand_set.getStrand(idx5p)
-            except:
-                print(vh_num, idx5p)
-                print(scaf_strand_set.strand_heap)
-                print(stap_strand_set.strand_heap)
-                raise
-            coord = vh_num_to_coord[to_vh_num]
-            if isEven(*coord):
-                to_scaf_strand_set, to_stap_strand_set = part.getStrandSets(to_vh_num)
+            strand5p = fwd_strandset.getStrand(idx5p)
+            to_fwd_strandset, to_rev_strandset = part.getStrandSets(to_vh_num)
+
+            if to_strand3p == 0:
+                strand3p = to_fwd_strandset.getStrand(idx3p)
             else:
-                to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
-            strand3p = to_scaf_strand_set.getStrand(idx3p)
+                strand3p = to_rev_strandset.getStrand(idx3p)
             part.createXover(   strand5p, idx5p,
                                 strand3p, idx3p,
                                 update_oligo=False,
                                 use_undostack=False)
 
-        # install staple xovers
-        for (idx5p, to_vh_num, idx3p) in stap_xo[vh_num]:
+        # install rev_strandset xovers
+        for (idx5p, to_vh_num, to_strand3p, idx3p) in rev_ss_xo[vh_num]:
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
-            strand5p = stap_strand_set.getStrand(idx5p)
+            strand5p = rev_strandset.getStrand(idx5p)
+            to_fwd_strandset, to_rev_strandset = part.getStrandSets(to_vh_num)
             coord = vh_num_to_coord[to_vh_num]
-            if isEven(*coord):
-                to_scaf_strand_set, to_stap_strand_set = part.getStrandSets(to_vh_num)
+
+            if to_strand3p == 0:
+                strand3p = to_fwd_strandset.getStrand(idx3p)
             else:
-                to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
-            strand3p = to_stap_strand_set.getStrand(idx3p)
+                strand3p = to_rev_strandset.getStrand(idx3p)
             part.createXover(   strand5p, idx5p,
                                 strand3p, idx3p,
                                 update_oligo=False,
@@ -241,33 +252,31 @@ def decode(document, obj):
     # oligo for the next steps
     RefreshOligosCommand(part).redo()
 
-    # COLORS, INSERTIONS, SKIPS
+    # COLORS, INSERTIONS, deletions
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row, col = vh_num_to_coord[vh_num]
-        scaf = helix['scaf']
-        stap = helix['stap']
-        insertions = helix['loop']
-        skips = helix['skip']
+        fwd_ss = helix['fwd_ss']
+        rev_ss = helix['rev_ss']
+        insertions = helix['insertions']
+        deletions = helix['deletions']
 
-        if isEven(row, col):
-            scaf_strand_set, stap_strand_set = part.getStrandSets(vh_num)
-        else:
-            stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
+        fwd_strandset, rev_strandset = part.getStrandSets(vh_num)
 
-        # install insertions and skips
-        for base_idx in range(len(stap)):
-            sum_of_insert_skip = insertions[base_idx] + skips[base_idx]
-            if sum_of_insert_skip != 0:
-                strand = scaf_strand_set.getStrand(base_idx)
+        # install insertions and deletions
+        for base_idx in range(len(rev_ss)):
+            sum_of_insert_deletion = insertions[base_idx] + deletions[base_idx]
+            if sum_of_insert_deletion != 0:
+                strand = fwd_strandset.getStrand(base_idx)
                 strand.addInsertion(base_idx,
-                                    sum_of_insert_skip,
+                                    sum_of_insert_deletion,
                                     use_undostack=False)
         # end for
+
         # populate colors
-        for base_idx, color_number in helix['stap_colors']:
-            color = intToColorHex(color_number)
-            strand = stap_strand_set.getStrand(base_idx)
+        for strand_type, base_idx, color in helix['colors']:
+            strandset = fwd_strandset if strand_type == 0 else rev_strandset
+            strand = strandset.getStrand(base_idx)
             strand.oligo().applyColor(color, use_undostack=False)
 
     if 'oligos' in obj:
@@ -277,13 +286,10 @@ def decode(document, obj):
             seq = str(oligo['seq']) if oligo['seq'] is not None else ''
             if seq != '':
                 coord = vh_num_to_coord[vh_num]
-                if isEven(*coord):
-                    scaf_ss, stap_ss = part.getStrandSets(vh_num)
-                else:
-                    stap_ss, scaf_ss = part.getStrandSets(vh_num)
-                strand = scaf_ss.getStrand(idx)
-                # print "sequence", seq, vh, idx,  strand.oligo()._strand5p
+                fwd_strandset, rev_strandset = part.getStrandSets(vh_num)
+                strand = fwd_strandset.getStrand(idx)
                 strand.oligo().applySequence(seq, use_undostack=False)
+
     if 'modifications' in obj:
         for mod_id, item in obj['modifications'].items():
             if mod_id != 'int_instances' and mod_id != 'ext_instances':
