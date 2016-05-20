@@ -143,7 +143,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                 self._handle.rotateWithCenterOrigin(value)
                 # self._prexoveritemgroup.updatePositionsAfterRotation(value)
             ### GEOMETRY PROPERTIES ###
-            elif key == 'repeats':
+            elif key == 'repeat_hint':
                 self.updateRepeats(int(value))
             elif key == 'bases_per_repeat':
                 self.updateBasesPerRepeat(int(value))
