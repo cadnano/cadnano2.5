@@ -39,6 +39,7 @@ def decodePart(document, part_dict):
                                 safe=False,
                                 use_undostack=False)
     # end for
+    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds())
     strands = part_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']

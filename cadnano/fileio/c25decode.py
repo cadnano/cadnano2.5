@@ -109,7 +109,6 @@ def decode(document, obj):
         col = helix['col']
         # align row and columns to the center 0, 0
         coord = (row -  delta_row, col - delta_column)
-        coord = (row, col)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
         property_dict[vh_num] = [helix[key] for key in encoded_keys]
@@ -131,6 +130,7 @@ def decode(document, obj):
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)
+    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds())
     setReopen(False)
     setBatch(False)
 
