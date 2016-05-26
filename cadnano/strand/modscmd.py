@@ -1,42 +1,42 @@
 from cadnano.cnproxy import UndoCommand
 
 class AddModsCommand(UndoCommand):
-    def __init__(self, strand, idx, mod_id):
+    def __init__(self, document, strand, idx, mod_id):
         super(AddModsCommand, self).__init__()
         self._strand = strand
         self._id_num = strand.idNum()
         self._idx = idx
         self._mod_id = mod_id
+        self.document = document
     # end def
 
     def redo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.addModInstance(self._id_num, self._idx,
-            isstaple, False, mid)
-        strand.strandModsAddedSignal.emit(strand, mid, self._idx)
+        idx = self._idx
+        part.addModStrandInstance(strand, idx, mid)
+        strand.strandModsAddedSignal.emit(strand, self.document, mid, idx)
     # end def
 
     def undo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.removeModInstance(self._id_num, self._idx,
-            isstaple, False, self._mod_id)
-        strand.strandModsRemovedSignal.emit(strand, mid, self._idx)
+        idx = self._idx
+        part.removeModStrandInstance(strand, idx, mid)
+        strand.strandModsRemovedSignal.emit(strand, self.document, mid, idx)
     # end def
 # end class
 
 class RemoveModsCommand(UndoCommand):
-    def __init__(self, strand, idx, mod_id):
+    def __init__(self, document, strand, idx, mod_id):
         super(RemoveModsCommand, self).__init__()
         self._strand = strand
         self._id_num = strand.idNum()
         self._idx = idx
         self._mod_id = mod_id
+        self.document = document
     # end def
 
     def redo(self):
@@ -44,9 +44,9 @@ class RemoveModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.removeModInstance(self._id_num, self._idx,
-            isstaple, False, mid)
-        strand.strandModsRemovedSignal.emit(strand, mid, self._idx)
+        idx = self._idx
+        part.removeModStrandInstance(strand, idx, mid)
+        strand.strandModsRemovedSignal.emit(strand, self.document, mid, idx)
     # end def
 
     def undo(self):
@@ -54,8 +54,8 @@ class RemoveModsCommand(UndoCommand):
         isstaple = strand.isStaple()
         mid = self._mod_id
         part = strand.part()
-        part.addModInstance(self._id_num, self._idx,
-            isstaple, False, mid)
-        strand.strandModsAddedSignal.emit(strand, mid, self._idx)
+        idx = self._idx
+        part.addModStrandInstance(strand, idx, mid)
+        strand.strandModsAddedSignal.emit(strand, self.document, mid, idx)
     # end def
 # end class

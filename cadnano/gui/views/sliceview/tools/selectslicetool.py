@@ -46,7 +46,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def modelClear(self):
-        doc = self._manager.document
+        doc = self.manager.document
         doc.clearAllSelected()
 
     def setPartItem(self, part_item):
@@ -90,7 +90,7 @@ class SelectSliceTool(AbstractSliceTool):
             res = part.getVirtualHelicesInArea(query_rect)
             # print(res)
 
-            doc = self._manager.document
+            doc = self.manager.document
             doc.clearAllSelected()
             doc.addVirtualHelicesToSelection(part, res)
         else:
@@ -177,7 +177,7 @@ class SelectSliceTool(AbstractSliceTool):
 
                 self.snap_origin_item = None
 
-                doc = self._manager.document
+                doc = self.manager.document
                 part = part_item.part()
                 doc.addVirtualHelicesToSelection(part, [target_item.idNum()])
     # end def
@@ -228,7 +228,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def pasteClipboard(self):
-        doc = self._manager.document
+        doc = self.manager.document
         part = self.part_item.part()
         doc.undoStack().beginMacro("Paste VirtualHelices")
         new_vh_set = v3decode.importToPart(part, self.clip_board)
@@ -355,7 +355,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 for item in tool.sgv.scene().items(pos):
                     if isinstance(item, VirtualHelixItem):
                         if is_shift:
-                            doc = tool._manager.document
+                            doc = tool.manager.document
                             part = item.part()
                             id_num = item.idNum()
                             if doc.isVirtualHelixSelected(part, id_num):    # maybe should ask the model?

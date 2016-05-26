@@ -17,7 +17,7 @@ class AbstractSliceTool(QGraphicsObject):
         """ Pareting to viewroot to prevent orphan _line_item from occuring
         """
         self.sgv = None
-        self._manager = manager
+        self.manager = manager
         self._active = False
         self._last_location = None
         self._line_item = QGraphicsLineItem(None)
@@ -43,10 +43,6 @@ class AbstractSliceTool(QGraphicsObject):
         #                 rad*(0 + 2*math.cos(x)), rad*(0 + 2*math.sin(x))
         #                 ) for x in self.angles]
     # end def
-
-    def manager(self):
-        return self._manager
-    # end
 
     def setVirtualHelixItem(self, virtual_helix_item):
         rad = self._RADIUS
@@ -152,7 +148,7 @@ class AbstractSliceTool(QGraphicsObject):
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        self.sgv = self._manager.window.slice_graphics_view
+        self.sgv = self.manager.window.slice_graphics_view
         if hasattr(self, 'getCustomContextMenu'):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections

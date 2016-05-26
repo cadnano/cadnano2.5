@@ -36,7 +36,7 @@ class AbstractVirtualHelixItem(object):
         Returns:
             Tuple: twist per base in degrees, eulerZ
         """
-        bpr, tpr = self._model_part.getVirtualHelixProperties(self._id_num,
+        bpr, tpr, eulerZ = self._model_part.getVirtualHelixProperties(self._id_num,
                         ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
         return tpr*360./bpr, eulerZ
 

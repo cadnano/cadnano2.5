@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 z = BASE_LENGTH*((idx_high + idx_low) / 2.0)
 
                 vh = strand.virtualHelix()
-                x,y = part.latticeCoordToPositionXY(*vh.coord())
+                x, y = part.latticeCoordToPositionXY(*vh.coord())
                 m4 = makeTranslation(x, y, z)
                 cylinder = Cylinder("%s" % str(vh.coord()), radius, length)
                 # cylinder = HalfCylinder("%s" % str(vh.coord()),

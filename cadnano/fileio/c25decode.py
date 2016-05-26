@@ -301,7 +301,7 @@ def decode(document, obj):
             # strand, idx, coord, isstaple = part.getModStrandIdx(key)
             strand, idx = part.getModStrandIdx(key)
             try:
-                strand.addMods(mid, idx, use_undostack=False)
+                strand.addMods(document, mid, idx, use_undostack=False)
             except:
                 print(strand, idx)
                 raise
@@ -309,7 +309,7 @@ def decode(document, obj):
             # strand, idx, coord, isstaple  = part.getModStrandIdx(key)
             strand, idx = part.getModStrandIdx(key)
             try:
-                strand.addMods(mid, idx, use_undostack=False)
+                strand.addMods(document, mid, idx, use_undostack=False)
             except:
                 print(strand, idx)
                 raise

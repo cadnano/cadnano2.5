@@ -212,27 +212,27 @@ class StrandItem(QGraphicsLineItem):
         del self.insertionItems()[index]
     # end def
 
-    def strandModsAddedSlot(self, strand, mod_id, idx):
+    def strandModsAddedSlot(self, strand, document, mod_id, idx):
         idx_l, idx_h = strand.idxs()
-        color = strand.part().getMod(mod_id)['color']
+        color = document.getModProperties(mod_id)['color']
         if idx == idx_h:
             self._high_cap.showMod(mod_id, color)
         else:
             self._low_cap.showMod(mod_id, color)
     # end def
 
-    def strandModsChangedSlot(self, strand, mod_id, idx):
+    def strandModsChangedSlot(self, strand, document, mod_id, idx):
         idx_l, idx_h = strand.idxs()
-        color = strand.part().getMod(mod_id)['color']
+        color = document.getModProperties(mod_id)['color']
         if idx == idx_h:
             self._high_cap.changeMod(mod_id, color)
         else:
             self._low_cap.changeMod(mod_id, color)
     # end def
 
-    def strandModsRemovedSlot(self, strand, mod_id, idx):
+    def strandModsRemovedSlot(self, strand, document, mod_id, idx):
         idx_l, idx_h = strand.idxs()
-        color = strand.part().getMod(mod_id)['color']
+        color = document.getModProperties(mod_id)['color']
         if idx == idx_h:
             self._high_cap.destroyMod()
         else:

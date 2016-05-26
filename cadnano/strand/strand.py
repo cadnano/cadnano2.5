@@ -148,11 +148,10 @@ class Strand(CNObject):
     # Parameters: (strand, insertion index)
     strandInsertionRemovedSignal = ProxySignal(CNObject, int, name='strandInsertionRemovedSignal') #pyqtSignal(QObject, int)
 
-    # Parameters: (strand, decorator object)
-    strandModsAddedSignal = ProxySignal(CNObject, object, int, name='strandModsAddedSignal') #pyqtSignal(QObject, object)
-    strandModsChangedSignal = ProxySignal(CNObject, object, int, name='strandModsChangedSignal') #pyqtSignal(QObject, object)
-    # Parameters: (strand, decorator index)
-    strandModsRemovedSignal = ProxySignal(CNObject, object, int, name='strandModsRemovedSignal') #pyqtSignal(QObject, int)
+    # Parameters: (strand, document, mod_id, idx)
+    strandModsAddedSignal = ProxySignal(CNObject, CNObject, str, int, name='strandModsAddedSignal') #pyqtSignal(QObject, object)
+    strandModsChangedSignal = ProxySignal(CNObject, CNObject, str, int, name='strandModsChangedSignal') #pyqtSignal(QObject, object)
+    strandModsRemovedSignal = ProxySignal(CNObject, CNObject, str, int, name='strandModsRemovedSignal') #pyqtSignal(QObject, int)
 
     # Parameters: (strand, modifier object)
     strandModifierAddedSignal = ProxySignal(CNObject, object, name='strandModifierAddedSignal') #pyqtSignal(QObject, object)
@@ -610,19 +609,19 @@ class Strand(CNObject):
         self._decorators.update(additionalDecorators)
     # end def
 
-    def addMods(self, mod_id, idx, use_undostack=True):
+    def addMods(self, document, mod_id, idx, use_undostack=True):
         """Used to add mods during a merge operation."""
         cmds = []
         idx_low, idx_high = self.idxs()
         if idx_low == idx or idx == idx_high:
             check_mid1 = self.part().getModID(self, idx)
-            check_mid2 = self.part().getMod(mod_id)
+            check_mid2 = document.getMod(mod_id)
             if check_mid2 is not None:
                 if check_mid1 != mod_id:
                     if check_mid1 is not None:
-                        cmds.append(RemoveModsCommand(self, idx, check_mid1))
+                        cmds.append(RemoveModsCommand(document, self, idx, check_mid1))
                     # print("adding a {} modification at {}".format(mod_id, idx))
-                    cmds.append(AddModsCommand(self, idx, mod_id))
+                    cmds.append(AddModsCommand(document, self, idx, mod_id))
                     util.execCommandList(
                                         self, cmds, desc="Add Modification",
                                             use_undostack=use_undostack)
@@ -631,14 +630,14 @@ class Strand(CNObject):
         # end if
     # end def
 
-    def removeMods(self, mod_id, idx, use_undostack=True):
+    def removeMods(self, document, mod_id, idx, use_undostack=True):
         """Used to add mods during a merge operation."""
         cmds = []
         idx_low, idx_high = self.idxs()
         print("attempting to remove")
         if idx_low == idx or idx == idx_high:
             print("removing a modification at {}".format(idx))
-            cmds.append(RemoveModsCommand(self, idx, mod_id))
+            cmds.append(RemoveModsCommand(document, self, idx, mod_id))
             util.execCommandList(
                                 self, cmds, desc="Remove Modification",
                                     use_undostack=use_undostack)

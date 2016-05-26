@@ -55,7 +55,7 @@ class Part(VirtualHelixGroup):
         self._group_properties['name'] = "Part%d" % len(self._document.children())
         self._group_properties['color'] = "#000000" # outlinerview will override from styles
         self._group_properties['is_visible'] = True
-        self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4()
+        self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4().hex
 
         # Selections
         self._selections = {}
@@ -365,9 +365,9 @@ class Part(VirtualHelixGroup):
 
     def removeModStrandInstance(self, strand, idx, mid, is_internal=False):
         id_num = strand.idNum()
-        is_rev = strand.isReverse()
+        strandtype = strand.strandType()
         if mid is not None:
-            self.removeModInstance(id_num, idx, is_rev, is_internal, mid)
+            self.removeModInstance(id_num, idx, strandtype, is_internal, mid)
     # end def
 
     def dumpModInstances(self, is_internal):

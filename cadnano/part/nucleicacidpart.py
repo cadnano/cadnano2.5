@@ -2,7 +2,7 @@ import random
 from collections import defaultdict
 from heapq import heapify, heappush, heappop
 from itertools import product, islice
-from uuid import uuid4
+
 from ast import literal_eval
 
 from cadnano import util

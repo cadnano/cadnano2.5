@@ -605,7 +605,7 @@ class Document(CNObject):
 
     def createMod(self, params, mid=None, use_undostack=True):
         if mid is None:
-            mid =  str(uuid4())
+            mid =  uuid4().hex
         elif mid in self._mods:
             raise KeyError("createMod: Duplicate mod id: {}".format(mid))
 
@@ -665,6 +665,10 @@ class Document(CNObject):
         return self._mods.get(mid)
     # end def
 
+    def getModProperties(self, mid):
+        return self._mods.get(mid)['props']
+    # end def
+
     def getModLocationsSet(self, mid, is_internal):
         if is_internal:
             return self._mods[mid]['int_locations']
@@ -674,13 +678,13 @@ class Document(CNObject):
 
     def addModInstance(self, mid, is_internal, part, key):
         location_set = self.getModLocationsSet(mid, is_internal)
-        doc_key = (part.uuid,) + key
+        doc_key = ''.join((part.uuid,',',key))
         location_set.add(key)
     # end def
 
     def removeModInstance(self, mid, is_internal, part, key):
         location_set = self.getModLocationsSet(mid, is_internal)
-        doc_key = (part.uuid,) + key
+        doc_key = ''.join((part.uuid,',',key))
         location_set.remove(key)
     # end def
 

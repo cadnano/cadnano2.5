@@ -19,8 +19,9 @@ class AddModCommand(UndoCommand):
     def redo(self):
         document = self._document
         mid = self._mid
-        document._mods[mid] = self._params
-        document.documentModAddedSignal.emit(document, self._params, mid)
+        params = self._params
+        document._mods[mid] = params
+        document.documentModAddedSignal.emit(document, params['props'], mid)
     # end def
 
     def undo(self):
@@ -36,7 +37,7 @@ class RemoveModCommand(UndoCommand):
         super(RemoveModCommand, self).__init__()
         self._document = document
         # just reference the whole dictionary
-        self._params_old = self._document._mods[mid]
+        self._params_old = self._document._mods[mid]['props']
         self._mid = mid
         self._ext_instances = []
         locations = document._mods[mid]['ext_locations']
@@ -55,12 +56,12 @@ class RemoveModCommand(UndoCommand):
         mid = self._mid
         # Destroy all instances of the mod
         for key, part, strand, idx in self._ext_instances:
-            strand.strandModsRemovedSignal.emit(strand, mid, idx)
+            strand.strandModsRemovedSignal.emit(strand, document, mid, idx)
             part.removeModStrandInstance(strand, idx, mid)
 
         # now internal location
         for key, part, strand, idx in self._int_instances:
-            strand.strandModsRemovedSignal.emit(strand, mid, idx)
+            strand.strandModsRemovedSignal.emit(strand, document, mid, idx)
             part.removeModStrandInstance(strand, idx, mid, is_internal=True)
         del document._mods[mid]
         document.documentModRemovedSignal.emit(part, mid)
@@ -69,16 +70,17 @@ class RemoveModCommand(UndoCommand):
     def undo(self):
         document = self._document
         mid = self._mid
-        document._mods[mid] = self._params_old
+        params_old = self._params_old
+        document._mods[mid]['props'] = params_old
         # Destroy all instances of the mod
         for key, strand, idx in self._ext_instances:
             part.addModStrandInstance(strand, idx, mid)
-            strand.strandModsAddedSignal.emit(strand, mid, idx)
+            strand.strandModsAddedSignal.emit(strand, document, mid, idx)
         # now internal locations
         for key, strand, idx in self._int_instances:
             part.addModStrandInstance(strand, idx, mid, is_internal=True)
-            strand.strandModsAddedSignal.emit(strand, mid, idx)
-        document.documentModAddedSignal.emit(document, self._params_old, mid)
+            strand.strandModsAddedSignal.emit(strand, document, mid, idx)
+        document.documentModAddedSignal.emit(document, params_old, mid)
     # end def
 # end class
 
@@ -112,9 +114,9 @@ class ModifyModCommand(UndoCommand):
         document._mods[mid]['props'].update(self._params)
         document.documentModChangedSignal.emit(document, self._params, mid)
         for key, part, strand, idx in self._ext_instances:
-            strand.strandModsChangedSignal.emit(strand, mid, idx)
+            strand.strandModsChangedSignal.emit(strand, document, mid, idx)
         for key, part, strand, idx in self._int_instances:
-            strand.strandModsChangedSignal.emit(strand, mid, idx)
+            strand.strandModsChangedSignal.emit(strand, document, mid, idx)
     # end def
 
     def undo(self):

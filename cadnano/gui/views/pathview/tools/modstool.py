@@ -98,7 +98,7 @@ class ModsTool(AbstractPathTool):
         part = strand.part()
         mid = part.getModID(strand, idx)
         if mid:
-            strand.removeMods(mid, idx)
+            strand.removeMods(self.manager.document, mid, idx)
         # part.removeModInstance(mid)
     # end def
 
@@ -176,7 +176,12 @@ class ModsTool(AbstractPathTool):
             local_item.update(item)
             idx = self.getItemIdxByMID(mid)
             if idx:
-                combobox.setItemText(idx, item['name'])
+                try:
+                    combobox.setItemText(idx, item['name'])
+                except:
+                    print(local_item)
+                    print(item)
+                    raise
         else:
             # print "adding a mods", item, mid
             mods[mid] = {}
@@ -199,7 +204,7 @@ class ModsTool(AbstractPathTool):
         self.current_strand = strand
         self.current_idx = idx
         part = strand.part()
-        document = manager.document
+        document = self.manager.document
         self.connectSignals(document)
         self.dialog.show()
         mid = part.getModID(strand, idx)
@@ -211,6 +216,6 @@ class ModsTool(AbstractPathTool):
             combobox.setCurrentIndex(cidx)
         self.dialog.setFocus()
         if self.dialog.exec_():  # apply the sequence if accept was clicked
-            item, mid = self.getCurrentItem()
-            strand.addMods(mid, idx)
+            item, mod_id = self.getCurrentItem()
+            strand.addMods(document, mod_id, idx)
             self.disconnectSignals(document)
