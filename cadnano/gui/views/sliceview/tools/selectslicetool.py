@@ -290,7 +290,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
-        self.bounding_rect_item = QGraphicsRectItem()
+        self.bounding_rect_item = QGraphicsRectItem(tool)
         self.bounding_rect_item.hide()
         self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
                                             _SELECT_PEN_WIDTH))
@@ -324,6 +324,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         bri = self.bounding_rect_item
         bri.hide()
         self.removeFromGroup(bri)
+        bri.setParentItem(self.tool)
         self.setFocus(False)
     # end def
 

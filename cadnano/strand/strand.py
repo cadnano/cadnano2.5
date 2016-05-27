@@ -7,11 +7,11 @@ import sys
 IS_PY_3 = int(sys.version_info[0] > 2)
 if IS_PY_3:
     sixb = lambda x: x.encode('utf-8')
-    array_type = 'B'
+    ARRAY_TYPE = 'B'
     tostring = lambda x: x.tostring().decode('utf-8')
 else:
     sixb = lambda x: x
-    array_type = 'c'
+    ARRAY_TYPE = 'c'
     tostring = lambda x: x.tostring()
 
 from cadnano import util
@@ -44,11 +44,6 @@ class Strand(CNObject):
     or high-to-low directions, connection accessor methods (connectionLow and
     connectionHigh) are bound during the init for convenience.
     """
-    __slots__ = ('_document', '_strandset', '_id_num',
-                '_oligo', '_is_forward',
-                '_base_idx_low', '_base_idx_high',
-                '_strand5p', '_strand3p',
-                '_sequence')
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
         super(Strand, self).__init__(strandset)
@@ -61,7 +56,7 @@ class Strand(CNObject):
         self._strand5p = None  # 5' connection to another strand
         self._strand3p = None  # 3' connection to another strand
         self._sequence = None
-
+        self.abstract_sequence = []
         # TODO REMOVE THIS field
         self._decorators = {}
 
@@ -286,7 +281,8 @@ class Strand(CNObject):
         """
         s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
         c_low_idx, c_high_idx = strand.idxs()
-
+        is_forward = self._is_forward
+        self_seq = self._sequence
         # get the ovelap
         low_idx, high_idx = util.overlap(s_low_idx, s_high_idx, c_low_idx, c_high_idx)
 
@@ -300,15 +296,14 @@ class Strand(CNObject):
             # clear out string for in case of not total overlap
             use_seq = ''.join([' ' for x in range(total_length)])
         else:  # use the string as is
-            use_seq = sequence_string[::-1] if self._is_forward \
-                                            else sequence_string
+            use_seq = sequence_string[::-1] if is_forward else sequence_string
 
-        temp = array(array_type, sixb(use_seq))
-        if self._sequence is None:
-            temp_self = array(array_type, sixb(''.join([' ' for x in range(total_length)])))
+        temp = array(ARRAY_TYPE, sixb(use_seq))
+        if self_seq is None:
+            temp_self = array(ARRAY_TYPE, sixb(''.join([' ' for x in range(total_length)])))
         else:
-            temp_self = array(array_type, sixb(self._sequence) if self._is_forward \
-                                                    else sixb(self._sequence[::-1]))
+            temp_self = array(ARRAY_TYPE, sixb(self_seq) if is_forward \
+                                                    else sixb(self_seq[::-1]))
 
         # generate the index into the compliment string
         a = self.insertionLengthBetweenIdxs(s_low_idx, low_idx - 1)
@@ -318,19 +313,112 @@ class Strand(CNObject):
         end = start + b + high_idx - low_idx + 1
         temp_self[low_idx - s_low_idx + a:high_idx - s_low_idx + 1 + a + b] = \
                                                                 temp[start:end]
-        # print "old sequence", self._sequence
+        # print("old sequence", self_seq)
         self._sequence = tostring(temp_self)
 
         # if we need to reverse it do it now
-        if not self._is_forward:
+        if not is_forward:
             self._sequence = self._sequence[::-1]
 
         # test to see if the string is empty(), annoyingly expensive
-        if len(self._sequence.strip()) == 0:
+        # if len(self._sequence.strip()) == 0:
+        if not self._sequence:
             self._sequence = None
 
-        # print "new sequence", self._sequence
+        # print("new sequence", self._sequence)
         return self._sequence
+    # end def
+
+    def applyVirtualSequence(self):
+        """
+        Assigns virtual index from 5' to 3' on strand and it's complement location.
+        """
+        v_seq = self.abstract_sequence
+        s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
+        counter = self.part().abstractSequenceCounter()
+
+        # make sure we apply numbers from 5' to 3'
+        if self._is_forward:
+            strand_order, comp_order = 1, -1
+        else:
+            strand_order, comp_order = -1, 1
+
+        # assign virtual sequence to self
+        for i in range(s_low_idx, s_high_idx + 1)[::strand_order]:
+            if i in v_seq:
+                # print(self, i, v_seq[i])
+                pass
+            else:
+                abstract_sequence_num = next(counter)
+                # print(self, i, abstract_sequence_num, "*")
+                self.setVirtualSequenceNumberAt(i, abstract_sequence_num)
+
+        # assign matching virtual sequence to overlap regions of complement strands
+        for comp_strand in self.getComplementStrands():
+            c_low_idx, c_high_idx = comp_strand.idxs()
+            low_idx, high_idx = util.overlap(   s_low_idx, s_high_idx,
+                                                c_low_idx, c_high_idx)
+
+            for i in range(low_idx, high_idx + 1)[::comp_order]:
+                if i in v_seq:
+                    # print(comp_strand, i, v_seq[i])
+                    comp_strand.setVirtualSequenceNumberAt(i, v_seq[i])
+                else:
+                    abstract_sequence_num = next(counter)
+                    # print(comp_strand, i, abstract_sequence_num, "*")
+                    comp_strand.setVirtualSequenceNumberAt(i, abstract_sequence_num)
+    # end def
+
+    def applyVirtualSegments(self):
+        """
+        Assigns virtual index from 5' to 3' on strand and it's complement location.
+        """
+        segments = []
+        comp_strands = []
+        segment_ids = []
+        s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
+        indices = set(range(s_low_idx, s_high_idx + 1))
+        counter = self.part().abstractSequenceCounter()
+
+        # make sure we apply numbers from 5' to 3'
+        if self._is_forward:
+            strand_order, comp_order = 1, -1
+        else:
+            strand_order, comp_order = -1, 1
+
+        # assign matching virtual sequence to overlap regions of complement strands
+        comp_strands = [x for x in self.getComplementStrands]
+        for comp_strand in comp_strands:
+            c_low_idx, c_high_idx = comp_strand.idxs()
+            low_idx, high_idx = util.overlap(   s_low_idx, s_high_idx,
+                                                c_low_idx, c_high_idx)
+
+            segments.append((low_idx, high_idx))
+            s_indices = s_indices.difference(range(low_idx, high_idx + 1))
+        leftovers = list(s_indices).sort()
+        num_leftover = len(leftovers)
+        i = 0
+        while i < num_leftover:
+            start = end = leftovers[i]
+            j = i + 1
+            while j < num_leftover - 1:
+                if leftovers[j] == end + 1:
+                    end = leftovers[j]
+                    j += 1
+                else:
+                    break
+            i = j
+            segments.append((start, end))
+        segments.sort()
+        segment_dict = {}
+        for segment in segments:
+            for comp_strands in comp_strands:
+                if segment in comp_strands.segment_dict:
+                    segment_dict[segment] = comp_strands.segment_dict[segment]
+                else:
+                    segment_dict[segment] = next(counter)
+        self.segment_dict = segment_dict
+        self.segments = segments
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
