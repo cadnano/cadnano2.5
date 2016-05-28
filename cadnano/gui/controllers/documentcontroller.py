@@ -692,7 +692,7 @@ class DocumentController():
             fname = QFileDialog.getOpenFileName(
                         None,
                         "Open Document", path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.cadnano)")
+                        "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
             self.filesavedialog = None
             self.openAfterMaybeSaveCallback(fname)
         else:  # access through non-blocking callback
@@ -700,7 +700,7 @@ class DocumentController():
                         self.win,
                         "Open Document",
                         path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.cadnano)")
+                        "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
             fdialog.setAcceptMode(QFileDialog.AcceptOpen)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
