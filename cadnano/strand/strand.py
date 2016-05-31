@@ -828,6 +828,7 @@ class Strand(CNObject):
         util.execCommandList(
                             self, cmds, desc="Resize strand",
                             use_undostack=use_undostack)
+        print(self.part().segments(self._id_num))
     # end def
 
     def setConnection3p(self, strand):
