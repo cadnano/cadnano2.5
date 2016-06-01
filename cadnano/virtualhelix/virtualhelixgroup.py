@@ -1,5 +1,6 @@
 import math
 from heapq import heapify, heappush, nsmallest
+from bisect import bisect_left
 
 import numpy as np
 import pandas as pd
@@ -360,119 +361,65 @@ class VirtualHelixGroup(CNObject):
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
         fwd_ss = self.fwd_strandsets[id_num]
         rev_ss = self.rev_strandsets[id_num]
-        # f_endpoints = [i for x in fwd_ss.generatorStrand() for i in x.idxs()]
-        # r_endpoints = [i for x in rev_ss.generatorStrand() for i in x.idxs()]
-        fwd_list = list(zip(*[x.idxs() for x in fwd_ss.generatorStrand()]))
-        f_endpts_lo, f_endpts_hi = (set(fwd_list[0]), set(fwd_list[1])) if fwd_list else (set(), set())
 
-        rev_list = list(zip(*[x.idxs() for x in rev_ss.generatorStrand()]))
-        r_endpts_lo, r_endpts_hi = (set(rev_list[0]), set(rev_list[1])) if rev_list else (set(), set())
+        return self._segments(fwd_ss, rev_ss)
+    # end def
 
-        max_idx = fwd_ss.length() - 1
+    def _segments(self, fwd_ss, rev_ss):
+        """ Testable private version
+        """
 
-        endpoints = f_endpts_lo | f_endpts_hi  | r_endpts_lo | r_endpts_hi
-        endpoints = list(endpoints)
-        endpoints.sort()
+        """ 1. Grab all endpoints separated by low and
+        high indices of the strands
+        """
+        fwd_idxs = [x.idxs() for x in fwd_ss.generatorStrand()]
+        if fwd_idxs:
+            f_endpts_lo, f_endpts_hi = zip(*fwd_idxs)
+        else:
+            f_endpts_lo = []
+            f_endpts_hi = []
 
+        rev_idxs = [x.idxs() for x in rev_ss.generatorStrand()]
+        if rev_idxs:
+            r_endpts_lo, r_endpts_hi = zip(*rev_idxs)
+        else:
+            r_endpts_lo = []
+            r_endpts_hi = []
+
+        """ 2. create virtual high endpoints below the low endpoints
+        and include them in a set and convert to a sorted list
+        """
+        hi_endpoints = set([x - 1 for x in f_endpts_lo])
+        hi_endpoints.update([x - 1 for x in r_endpts_lo])
+        hi_endpoints.update(f_endpts_hi)
+        hi_endpoints.update(r_endpts_hi)
+        hi_endpoints = list(hi_endpoints)
+        hi_endpoints.sort()
+
+        """ 3. now iterate through the strands and
+        convert to
+        """
         fwd_segments = []
         rev_segments = []
-        f_pt_lo = fwd_list[0][0]
-        r_pt_lo = rev_list[0][0]
-        for pt in endpoints:
-            if pt in f_endpts_lo:
-                f_pt_lo = pt
-                if pt > 0 and rev_ss.strand_array[pt - 1] is not None:
-                    r_pt_hi = pt - 1
-                    rev_segments.append((r_pt_lo, r_pt_hi))
-                    r_pt_lo = None
-            elif pt in f_endpts_hi:
-                f_pt_hi = pt
-                fwd_segments.append((f_pt_lo, f_pt_hi))
-                f_pt_lo = None
-                if r_pt_lo is not None and rev_ss.strand_array[pt] is not None:
-                    rev_segments.append((r_pt_lo, pt))
-                    r_pt_lo = None
-                if (r_pt_lo is None and
-                    pt < max_idx and
-                    rev_ss.strand_array[pt + 1] is not None):
-                    r_pt_lo = pt + 1
-
-
-            if pt in r_endpts_lo:
-                r_pt_lo = pt
-                if pt > 0 and fwd_ss.strand_array[pt - 1] is not None:
-                    f_pt_hi = pt - 1
-                    fwd_segments.append((f_pt_lo, f_pt_hi))
-                    f_pt_lo = None
-            elif pt in r_endpts_hi:
-                r_pt_hi = pt
-                rev_segments.append((r_pt_lo, r_pt_hi))
-                r_pt_lo = None
-                if f_pt_lo is not None and fwd_ss.strand_array[pt] is not None:
-                    fwd_segments.append((f_pt_lo, pt))
-                    f_pt_lo = None
-                if (f_pt_lo is None and
-                    pt < max_idx and
-                    fwd_ss.strand_array[pt + 1] is not None):
-                    f_pt_lo = pt + 1
-
-        return fwd_segments, rev_segments
-
-        # f_endpoint_set = set(f_endpoints)
-        # r_endpoints_set = set(r_endpoints)
-
-        # endpoints = set(f_endpoints)
-
-        # endpoints.update(r_endpoints)
-        # endpoints = list(endpoints)
-        # endpoints.sort()
-
-        # fwd_segments = []
-        # rev_segments = []
-        # if f_endpoints:
-        #     last_pt_fwd = f_endpoints[0]
-        #     f_end_idx = f_endpoints[-1]
-        #     last_strand_fwd = fwd_ss.strand_array[last_pt_fwd]
-        # else:
-        #     last_pt_fwd = None
-        #     f_end_idx = None
-        #     last_fwd_strand = None
-        # if r_endpoints:
-        #     last_pt_rev = r_endpoints[0]
-        #     r_end_idx = r_endpoints[-1]
-        #     last_strand_rev = rev_ss.strand_array[last_pt_rev]
-        # else:
-        #     last_pt_rev = None
-        #     r_end_idx = None
-        #     last_strand_rev = None
-
-        # last_pt = endpoints[0]
-        # for pt in endpoints[1:]:
-        #     fwd_strand = fwd_ss.strand_array[pt]
-        #     rev_strand = rev_ss.strand_array[pt]
-        #     if (fwd_strand is not last_strand_fwd or
-        #         rev_strand is not last_strand_rev):
-        #         if fwd_strand is not None:
-        #             fwd_segments.append((last_pt_fwd, last_pt))
-        #             last_pt_fwd = pt
-
-        #         if rev_strand is not None:
-        #             rev_segments.append((last_pt_rev, last_pt))
-        #             last_pt_rev = pt
-        #     elif pt == f_end_idx or pt == r_end_idx:
-        #         if fwd_strand is not None:
-        #             fwd_segments.append((last_pt_fwd, pt))
-        #             last_pt_fwd = pt
-
-        #         if rev_strand is not None:
-        #             rev_segments.append((last_pt_rev, pt))
-        #             last_pt_rev = pt
-        #     last_strand_fwd = fwd_strand
-        #     last_strand_rev = rev_strand
-        #     last_pt = pt
-
-        # for pt in f_endpoints:
-        #     if
+        lim_hi_endpoints = len(hi_endpoints) - 1
+        i = 0
+        for idx_lo, idx_hi in fwd_idxs:
+            start = idx_lo
+            end = start
+            while start <= idx_hi:
+                i = bisect_left(hi_endpoints, start, lo=i)
+                end = hi_endpoints[i]
+                fwd_segments.append((start, end))
+                start = end + 1
+        i = 0
+        for idx_lo, idx_hi in rev_idxs:
+            start = idx_lo
+            end = start
+            while start <= idx_hi:
+                i = bisect_left(hi_endpoints, start, lo=i)
+                end = hi_endpoints[i]
+                rev_segments.append((start, end))
+                start = end + 1
 
         return fwd_segments, rev_segments
     # end def
