@@ -823,16 +823,15 @@ class Strand(CNObject):
             raise IndexError
     # end def
 
-    def resize(self, new_idxs, use_undostack=True):
+    def resize(self, new_idxs, use_undostack=True, update_segments=True):
         cmds = []
         # if self.strandSet().isScaffold():
         #     cmds.append(self.oligo().applySequenceCMD(None))
         cmds += self.getRemoveInsertionCommands(new_idxs)
-        cmds.append(ResizeCommand(self, new_idxs))
+        cmds.append(ResizeCommand(self, new_idxs, update_segments=update_segments))
         util.execCommandList(
                             self, cmds, desc="Resize strand",
                             use_undostack=use_undostack)
-        print(self.part().refreshSegments(self._id_num))
     # end def
 
     def setConnection3p(self, strand):

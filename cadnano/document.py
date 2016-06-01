@@ -15,6 +15,7 @@ from cadnano.enum import ModType
 from cadnano.strand import Strand
 
 from cadnano.part import Part
+from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.objectinstance import ObjectInstance
 from cadnano.addinstancecmd import AddInstanceCommand
@@ -445,12 +446,15 @@ class Document(CNObject):
         create illegal state), then applying a resize command to each strand.
         """
         resize_list = []
+        vh_set = set()
         if do_maximize:
             print("this could be maximized")
         # calculate new idxs
+        part = None
         for strandset_dict in self._selection_dict.values():
             for strand, selected in strandset_dict.items():
-                part = strand.part()
+                if part is None:
+                    part = strand.part()
                 idx_low, idx_high = strand.idxs()
                 new_low, new_high = strand.idxs()
                 delta_low = delta_high = delta
@@ -476,19 +480,30 @@ class Document(CNObject):
                 if new_low > new_high:  # check for illegal state
                     return
 
+                vh_set.add(strand.idNum())
                 resize_list.append((strand, new_low, new_high))
             # end for
         # end for
 
         # execute the resize commands
+        us = self.undoStack()
         if use_undostack:
-            self.undoStack().beginMacro("Resize Selection")
+            us.beginMacro("Resize Selection")
 
         for strand, idx_low, idx_high in resize_list:
-            Strand.resize(strand, (idx_low, idx_high), use_undostack)
+            Strand.resize(strand,
+                            (idx_low, idx_high),
+                            use_undostack,
+                            update_segments=False)
+        if resize_list:
+            cmd = RefreshSegmentsCommand(part, vh_set)
+            if use_undostack:
+                us.push(cmd)
+            else:
+                cmd.redo()
 
         if use_undostack:
-            self.undoStack().endMacro()
+            us.endMacro()
     # end def
 
     def updateStrandSelection(self):
