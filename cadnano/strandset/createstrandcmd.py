@@ -12,7 +12,10 @@ class CreateStrandCommand(UndoCommand):
     create a new Oligo, add it to the Part, and point the new Strand
     at the oligo.
     """
-    def __init__(self, strandset, base_idx_low, base_idx_high, color):
+    def __init__(self,  strandset,
+                        base_idx_low, base_idx_high,
+                        color,
+                        update_segments=True):
         """ TODO: Now that parts have a UUID this could be instantiated via
         a document, uuid, id_num, is_fwd, base_idx_low, ... instead of an object
         to be independent of parts keeping strandsets live
@@ -23,13 +26,14 @@ class CreateStrandCommand(UndoCommand):
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
         self._new_oligo = Oligo(None, color)  # redo will set part
         self._new_oligo.setLength(self._strand.totalLength())
+        self.update_segments = update_segments
     # end def
 
     def redo(self):
         # Add the new strand to the StrandSet strand_list
         strand = self._strand
         strandset = self._strandset
-        strandset.addToStrandList(strand)
+        strandset.addToStrandList(strand, self.update_segments)
         # Set up the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(strand)
@@ -50,7 +54,7 @@ class CreateStrandCommand(UndoCommand):
         strand = self._strand
         strandset = self._strandset
         strandset._document.removeStrandFromSelection(strand)
-        strandset.removeFromStrandList(strand)
+        strandset.removeFromStrandList(strand, self.update_segments)
         # Get rid of the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(None)

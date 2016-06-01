@@ -50,6 +50,10 @@ class Strand(CNObject):
         self._strandset = strandset
         self._id_num = strandset.idNum()
 
+        """ keep track of it's own segments.  Updated on creation and resizing
+        """
+        self.segments = []
+
         self._base_idx_low = base_idx_low  # base index of the strand's left bound
         self._base_idx_high = base_idx_high  # base index of the right bound
         self._oligo = oligo
@@ -828,7 +832,7 @@ class Strand(CNObject):
         util.execCommandList(
                             self, cmds, desc="Resize strand",
                             use_undostack=use_undostack)
-        print(self.part().segments(self._id_num))
+        print(self.part().refreshSegments(self._id_num))
     # end def
 
     def setConnection3p(self, strand):

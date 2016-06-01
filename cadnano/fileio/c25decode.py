@@ -203,6 +203,7 @@ def decode(document, obj):
                 low_idx = rev_ss_seg[vh_num][i]
                 high_idx = rev_ss_seg[vh_num][i + 1]
                 rev_strandset.createStrand(low_idx, high_idx, use_undostack=False)
+            part.refreshSegments(vh_num)
         # end for
     except AssertionError:
         print("Unrecognized file format.")

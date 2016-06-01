@@ -72,8 +72,8 @@ class MergeCommand(UndoCommand):
         h_olg = s_high.oligo()
 
         # Remove old strands from the s_set (reusing idx, so order matters)
-        ss.removeFromStrandList(s_low)
-        ss.removeFromStrandList(s_high)
+        ss.removeFromStrandList(s_low, update_segments=False)
+        ss.removeFromStrandList(s_high, update_segments=False)
         # Add the new_strand to the s_set
         ss.addToStrandList(new_strand)
 
@@ -120,9 +120,9 @@ class MergeCommand(UndoCommand):
         l_olg = self._s_low_oligo
         h_olg = self._s_high_oligo
         # Remove the new_strand from the s_set
-        ss.removeFromStrandList(new_strand)
+        ss.removeFromStrandList(new_strand, update_segments=False)
         # Add old strands to the s_set (reusing idx, so order matters)
-        ss.addToStrandList(s_high)
+        ss.addToStrandList(s_high, update_segments=False)
         ss.addToStrandList(s_low)
 
         # update connectivity of strands

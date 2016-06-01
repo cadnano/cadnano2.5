@@ -57,9 +57,9 @@ class ResizePartCommand(UndoCommand):
             # end for
         # end for
         for vh in part._coord_to_virtual_velix.values():
-            for strand in vh.scaffoldStrand().generatorStrand():
+            for strand in vh.scaffoldStrand().strand_heap:
                 strand.updateIdxs(low_idx_delta)
-            for strand in vh.stapleStrand().generatorStrand():
+            for strand in vh.stapleStrand().strand_heap:
                 strand.updateIdxs(low_idx_delta)
         # end for
         part.changeModsDeltaLowIdx(low_idx_delta)

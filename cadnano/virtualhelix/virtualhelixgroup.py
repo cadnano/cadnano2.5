@@ -112,6 +112,7 @@ class VirtualHelixGroup(CNObject):
 
         self.fwd_strandsets = [None]*DEFAULT_SIZE
         self.rev_strandsets = [None]*DEFAULT_SIZE
+        self.segment_dict = {}
 
         # Cache Stuff
         self._point_cache = None
@@ -350,11 +351,13 @@ class VirtualHelixGroup(CNObject):
         return (self.fwd_strandsets[id_num], self.rev_strandsets[id_num])
     # end def
 
-    def segments(self, id_num):
+    def refreshSegments(self, id_num):
         """ Partition strandsets into overlapping segments
         Returns:
-            Tuple(List(Tuple)):  segments for the forward and reverse strand
-                (start, end)
+            Tuple(List(List(Tuple))):  segments for the forward and reverse
+                strand
+
+                `( [ [(start, end),...], ...], [ [(start, end),...], ...])`
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -362,24 +365,26 @@ class VirtualHelixGroup(CNObject):
         fwd_ss = self.fwd_strandsets[id_num]
         rev_ss = self.rev_strandsets[id_num]
 
-        return self._segments(fwd_ss, rev_ss)
+        self.segment_dict[id_num] = {}
+        return self._refreshSegments(fwd_ss, rev_ss)
     # end def
 
-    def _segments(self, fwd_ss, rev_ss):
+    def _refreshSegments(self, fwd_ss, rev_ss):
         """ Testable private version
+        return a
         """
 
         """ 1. Grab all endpoints separated by low and
         high indices of the strands
         """
-        fwd_idxs = [x.idxs() for x in fwd_ss.generatorStrand()]
+        fwd_idxs = [x.idxs() for x in fwd_ss.strand_heap]
         if fwd_idxs:
             f_endpts_lo, f_endpts_hi = zip(*fwd_idxs)
         else:
             f_endpts_lo = []
             f_endpts_hi = []
 
-        rev_idxs = [x.idxs() for x in rev_ss.generatorStrand()]
+        rev_idxs = [x.idxs() for x in rev_ss.strand_heap]
         if rev_idxs:
             r_endpts_lo, r_endpts_hi = zip(*rev_idxs)
         else:
@@ -403,24 +408,29 @@ class VirtualHelixGroup(CNObject):
         rev_segments = []
         lim_hi_endpoints = len(hi_endpoints) - 1
         i = 0
-        for idx_lo, idx_hi in fwd_idxs:
-            start = idx_lo
+        for f_strand, f_idxs in zip(fwd_ss.strand_heap, fwd_idxs):
+            start, idx_hi = f_idxs
             end = start
+            segments = []
             while start <= idx_hi:
                 i = bisect_left(hi_endpoints, start, lo=i)
                 end = hi_endpoints[i]
-                fwd_segments.append((start, end))
+                segments.append((start, end))
                 start = end + 1
+            f_strand.segments = segments
+            fwd_segments.append(segments)
         i = 0
-        for idx_lo, idx_hi in rev_idxs:
-            start = idx_lo
+        for r_strand, r_idxs in zip(rev_ss.strand_heap, rev_idxs):
+            start, idx_hi = r_idxs
             end = start
+            segments = []
             while start <= idx_hi:
                 i = bisect_left(hi_endpoints, start, lo=i)
                 end = hi_endpoints[i]
-                rev_segments.append((start, end))
+                segments.append((start, end))
                 start = end + 1
-
+            r_strand.segments = segments
+            rev_segments.append(segments)
         return fwd_segments, rev_segments
     # end def
 

@@ -106,11 +106,6 @@ class StrandSet(CNObject):
                     [None]*delta_high
     # end def
 
-    def generatorStrand(self):
-        """Return a generator that yields the strands in self.strand_array."""
-        return iter(self.strand_heap)
-    # end def
-
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def isDrawn5to3(self):
         return self.isForward()
@@ -271,7 +266,8 @@ class StrandSet(CNObject):
 
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def createStrand(self, base_idx_low, base_idx_high, color=None, use_undostack=True):
+    def createStrand(self, base_idx_low, base_idx_high,
+                        color=None, use_undostack=True):
         """
         Assumes a strand is being created at a valid set of indices.
         """
@@ -284,7 +280,9 @@ class StrandSet(CNObject):
 
         if bounds_low is not None and bounds_low <= base_idx_low and \
             bounds_high is not None and bounds_high >= base_idx_high:
-            c = CreateStrandCommand(self, base_idx_low, base_idx_high, color)
+            c = CreateStrandCommand(self, base_idx_low, base_idx_high,
+                                        color,
+                                        update_segments=use_undostack)
             x, y = part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             # print("strand", d)
@@ -301,7 +299,9 @@ class StrandSet(CNObject):
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
         """
-        c = CreateStrandCommand(self, base_idx_low, base_idx_high, color)
+        c = CreateStrandCommand(self, base_idx_low, base_idx_high,
+                                    color,
+                                    update_segments=use_undostack)
         x, y = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
         # print("strand", d)
@@ -614,29 +614,33 @@ class StrandSet(CNObject):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def addToStrandList(self, strand):
+    def addToStrandList(self, strand, update_segments=True):
         """Inserts strand into the strand_array at idx."""
         # print("Adding to strandlist")
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
             self.strand_array[i] = strand
         insort_left(self.strand_heap, strand)
+        if update_segments:
+            self._part.refreshSegments(self._id_num)
 
     def updateStrandIdxs(self, strand, old_idxs, new_idxs):
         """update indices in the strand array/list of an existing strand"""
-        for i in range(old_idxs[0], old_idxs[1]+1):
+        for i in range(old_idxs[0], old_idxs[1] + 1):
             self.strand_array[i] = None
-        for i in range(new_idxs[0], new_idxs[1]+1):
+        for i in range(new_idxs[0], new_idxs[1] + 1):
             self.strand_array[i] = strand
 
-    def removeFromStrandList(self, strand):
+    def removeFromStrandList(self, strand, update_segments=True):
         """Remove strand from strand_array."""
         self._document.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
         idx_low, idx_high = strand.idxs()
-        for i in range(idx_low, idx_high+1):
+        for i in range(idx_low, idx_high + 1):
             self.strand_array[i] = None
         i = bisect_left(self.strand_heap, strand)
         self.strand_heap.pop(i)
+        if update_segments:
+            self._part.refreshSegments(self._id_num)
 
     def getStrandIndex(self, strand):
         try:

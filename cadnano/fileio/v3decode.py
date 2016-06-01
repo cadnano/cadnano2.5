@@ -56,6 +56,7 @@ def decodePart(document, part_dict):
                 low_idx, high_idx = idxs
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
                                                         use_undostack=False)
+        part.refreshSegments(id_num)   # update segments
     # end def
 
     xovers = part_dict['xovers']
