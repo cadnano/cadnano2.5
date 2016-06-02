@@ -52,7 +52,6 @@ class Strand(CNObject):
 
         """ keep track of it's own segments.  Updated on creation and resizing
         """
-        self.segments = []
 
         self._base_idx_low = base_idx_low  # base index of the strand's left bound
         self._base_idx_high = base_idx_high  # base index of the right bound
@@ -60,7 +59,10 @@ class Strand(CNObject):
         self._strand5p = None  # 5' connection to another strand
         self._strand3p = None  # 3' connection to another strand
         self._sequence = None
+
+        self.segments = []
         self.abstract_sequence = []
+
         # TODO REMOVE THIS field
         self._decorators = {}
 
@@ -333,96 +335,55 @@ class Strand(CNObject):
         return self._sequence
     # end def
 
-    def applyVirtualSequence(self):
+    # def clearAbstractSequence(self):
+    #     self.abstract_sequence = {}
+    # # end def
+
+    # def applyVirtualSequence(self):
+    #     """
+    #     Assigns virtual index from 5' to 3' on strand and it's complement location.
+    #     """
+    #     abstract_seq = self.abstract_sequence
+    #     part = self.part()
+    #     seg_dict = part.segment_dict(self._id_num)
+
+    #     # make sure we apply numbers from 5' to 3'
+    #     strand_order = 1 if self._is_forward else -1
+
+    #     for segment in self.segments[::strand_order]:
+    #         seg_id, offset, length = seg_dict[segment]
+    #         j = 0
+    #         for i in range(*segment)[::strand_order]:
+    #             abstract_seq[i] = offset + j
+    #             j += 1
+    # # end def
+
+    def applyAbstractSequence(self):
         """
-        Assigns virtual index from 5' to 3' on strand and it's complement location.
+        Assigns virtual index from 5' to 3' on strand and it's complement
+        location.
         """
-        v_seq = self.abstract_sequence
-        s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
-        counter = self.part().abstractSequenceCounter()
+        abstract_seq = []
+        part = self.part()
+        seg_dict = part.segment_dict(self._id_num)
 
         # make sure we apply numbers from 5' to 3'
-        if self._is_forward:
-            strand_order, comp_order = 1, -1
-        else:
-            strand_order, comp_order = -1, 1
+        strand_order = 1 if self._is_forward else -1
 
-        # assign virtual sequence to self
-        for i in range(s_low_idx, s_high_idx + 1)[::strand_order]:
-            if i in v_seq:
-                # print(self, i, v_seq[i])
-                pass
+        for segment in self.segments[::strand_order]:
+            if segment in seg_dict:
+                seg_id, offset, length = seg_dict[segment]
             else:
-                abstract_sequence_num = next(counter)
-                # print(self, i, abstract_sequence_num, "*")
-                self.setVirtualSequenceNumberAt(i, abstract_sequence_num)
-
-        # assign matching virtual sequence to overlap regions of complement strands
-        for comp_strand in self.getComplementStrands():
-            c_low_idx, c_high_idx = comp_strand.idxs()
-            low_idx, high_idx = util.overlap(   s_low_idx, s_high_idx,
-                                                c_low_idx, c_high_idx)
-
-            for i in range(low_idx, high_idx + 1)[::comp_order]:
-                if i in v_seq:
-                    # print(comp_strand, i, v_seq[i])
-                    comp_strand.setVirtualSequenceNumberAt(i, v_seq[i])
-                else:
-                    abstract_sequence_num = next(counter)
-                    # print(comp_strand, i, abstract_sequence_num, "*")
-                    comp_strand.setVirtualSequenceNumberAt(i, abstract_sequence_num)
-    # end def
-
-    def applyVirtualSegments(self):
-        """
-        Assigns virtual index from 5' to 3' on strand and it's complement location.
-        """
-        segments = []
-        comp_strands = []
-        segment_ids = []
-        s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
-        indices = set(range(s_low_idx, s_high_idx + 1))
-        counter = self.part().abstractSequenceCounter()
-
-        # make sure we apply numbers from 5' to 3'
-        if self._is_forward:
-            strand_order, comp_order = 1, -1
-        else:
-            strand_order, comp_order = -1, 1
-
-        # assign matching virtual sequence to overlap regions of complement strands
-        comp_strands = [x for x in self.getComplementStrands]
-        for comp_strand in comp_strands:
-            c_low_idx, c_high_idx = comp_strand.idxs()
-            low_idx, high_idx = util.overlap(   s_low_idx, s_high_idx,
-                                                c_low_idx, c_high_idx)
-
-            segments.append((low_idx, high_idx))
-            s_indices = s_indices.difference(range(low_idx, high_idx + 1))
-        leftovers = list(s_indices).sort()
-        num_leftover = len(leftovers)
-        i = 0
-        while i < num_leftover:
-            start = end = leftovers[i]
-            j = i + 1
-            while j < num_leftover - 1:
-                if leftovers[j] == end + 1:
-                    end = leftovers[j]
-                    j += 1
-                else:
-                    break
-            i = j
-            segments.append((start, end))
-        segments.sort()
-        segment_dict = {}
-        for segment in segments:
-            for comp_strands in comp_strands:
-                if segment in comp_strands.segment_dict:
-                    segment_dict[segment] = comp_strands.segment_dict[segment]
-                else:
-                    segment_dict[segment] = next(counter)
-        self.segment_dict = segment_dict
-        self.segments = segments
+                seg_id, offset, length = part.getNewAbstractSegmentId(segment)
+                segment_dict[segment] = (seg_id, offset, length)
+            # j = 0
+            # for i in range(*segment)[::strand_order]:
+            #     abstract_seq[i] = offset + j
+            #     j += 1
+            for i in range(length)[::strand_order]:
+                abstract_seq.append(offset + i)
+            # abstract_seq += [offset + i for i in range(length)[::strand_order]]
+        self.abstract_sequence = abstract_seq
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###

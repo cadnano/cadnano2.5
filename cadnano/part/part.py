@@ -1,7 +1,6 @@
-import random
+# -*- coding: utf-8 -*-
 from collections import defaultdict
-from heapq import heapify, heappush, heappop
-from itertools import product, islice
+from itertools import count
 from uuid import uuid4
 
 from cadnano import util
@@ -66,6 +65,9 @@ class Part(VirtualHelixGroup):
         self.active_base_info = None
         self._selected = False
         self.is_active = False
+
+        self._abstract_segment_id = None
+        self._current_base_count = None
 
         if self.__class__ == Part:
             e = "This class is abstract. Perhaps you want HoneycombPart."
@@ -221,6 +223,20 @@ class Part(VirtualHelixGroup):
     def destroy(self):
         self.setParent(None)
         self.deleteLater()  # QObject also emits a destroyed() Signal
+    # end def
+
+    def getNewAbstractSegmentId(self, segment):
+        low_idx, high_idx = segment
+        seg_id = next(self._abstract_segment_id)
+        offset = self._current_base_count
+        segment_length = (high_idx - low_idx + 1)
+        self._current_base_count = offset + segment_length
+        return seg_id, offset, segment_length
+    # end def
+
+    def initializeAbstractSegmentId(self):
+        self._abstract_segment_id = count(0)
+        self._current_base_count = 0
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
