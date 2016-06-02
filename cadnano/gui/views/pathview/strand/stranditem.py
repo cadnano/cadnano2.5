@@ -450,18 +450,19 @@ class StrandItem(QGraphicsLineItem):
         """
         docstring for _updateSequenceText
         """
+        # print("updating sequence")
         bw = _BASE_WIDTH
         seq_lbl = self._seq_label
         strand = self.strand()
 
         seq_txt = strand.sequence()
         isDrawn3to5 = not self.is_forward
-        textXCenteringOffset = styles.SEQUENCETEXTXCENTERINGOFFSET
+        text_X_centering_offset = styles.SEQUENCETEXTXCENTERINGOFFSET
 
         if seq_txt == '':
             seq_lbl.hide()
-            for iItem in self.insertionItems().values():
-                iItem.hideSequence()
+            for i_item in self.insertionItems().values():
+                i_item.hideSequence()
             return
         # end if
 
@@ -484,21 +485,21 @@ class StrandItem(QGraphicsLineItem):
         seq_lbl.setFont(styles.SEQUENCEFONT)
 
         # this will always draw from the 5 Prime end!
-        seqX = 2*textXCenteringOffset + bw*strand.idx5Prime()
+        seqX = 2*text_X_centering_offset + bw*strand.idx5Prime()
         seqY = styles.SEQUENCETEXTYCENTERINGOFFSET
 
         if isDrawn3to5:
             # offset it towards the bottom
             seqY += bw * .8
             # offset X by the reverse centering offset and the string length
-            seqX += textXCenteringOffset
+            seqX += text_X_centering_offset
             # rotate the characters upside down this does not affect positioning
             # coordinate system, +Y is still Down, and +X is still Right
             seq_lbl.setRotation(180)
             # draw the text and reverse the string to draw 5 prime to 3 prime
             # seq_txt = seq_txt[::-1]
         # end if
-        seq_lbl.setPos(seqX,seqY)
+        seq_lbl.setPos(seqX, seqY)
         seq_lbl.setText(seq_txt)
         seq_lbl.show()
     # end def

@@ -272,6 +272,30 @@ class Oligo(CNObject):
         self.oligoRemovedSignal.emit(self._part, self)
     # end def
 
+    def applyAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.applyAbstractSequence()
+    # end def
+
+    def clearAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.clearAbstractSequence()
+    # end def
+
+    def displayAbstractSequences(self):
+        temp = self.strand5p()
+        if not temp:
+            return
+        for strand in temp.generator3pStrand():
+            strand.copyAbstractSequenceToSequence()
+    # end def
+
     def applyColor(self, color, use_undostack=True):
         if color == self.getColor():
             return  # oligo already has this color

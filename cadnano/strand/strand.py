@@ -3,6 +3,7 @@
 
 from operator import attrgetter
 from array import array
+from string import ascii_letters
 import sys
 IS_PY_3 = int(sys.version_info[0] > 2)
 if IS_PY_3:
@@ -335,28 +336,9 @@ class Strand(CNObject):
         return self._sequence
     # end def
 
-    # def clearAbstractSequence(self):
-    #     self.abstract_sequence = {}
-    # # end def
-
-    # def applyVirtualSequence(self):
-    #     """
-    #     Assigns virtual index from 5' to 3' on strand and it's complement location.
-    #     """
-    #     abstract_seq = self.abstract_sequence
-    #     part = self.part()
-    #     seg_dict = part.segment_dict(self._id_num)
-
-    #     # make sure we apply numbers from 5' to 3'
-    #     strand_order = 1 if self._is_forward else -1
-
-    #     for segment in self.segments[::strand_order]:
-    #         seg_id, offset, length = seg_dict[segment]
-    #         j = 0
-    #         for i in range(*segment)[::strand_order]:
-    #             abstract_seq[i] = offset + j
-    #             j += 1
-    # # end def
+    def clearAbstractSequence(self):
+        self.abstract_sequence = []
+    # end def
 
     def applyAbstractSequence(self):
         """
@@ -365,25 +347,26 @@ class Strand(CNObject):
         """
         abstract_seq = []
         part = self.part()
-        seg_dict = part.segment_dict(self._id_num)
+        segment_dict = part.segment_dict[self._id_num]
 
         # make sure we apply numbers from 5' to 3'
         strand_order = 1 if self._is_forward else -1
 
         for segment in self.segments[::strand_order]:
-            if segment in seg_dict:
-                seg_id, offset, length = seg_dict[segment]
+            if segment in segment_dict:
+                seg_id, offset, length = segment_dict[segment]
             else:
                 seg_id, offset, length = part.getNewAbstractSegmentId(segment)
                 segment_dict[segment] = (seg_id, offset, length)
-            # j = 0
-            # for i in range(*segment)[::strand_order]:
-            #     abstract_seq[i] = offset + j
-            #     j += 1
+
             for i in range(length)[::strand_order]:
                 abstract_seq.append(offset + i)
-            # abstract_seq += [offset + i for i in range(length)[::strand_order]]
         self.abstract_sequence = abstract_seq
+    # end def
+
+    def copyAbstractSequenceToSequence(self):
+        abstract_seq = self.abstract_sequence
+        self._sequence = ''.join([ascii_letters[i % 52] for i in abstract_seq])
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###

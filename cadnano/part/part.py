@@ -239,6 +239,24 @@ class Part(VirtualHelixGroup):
         self._current_base_count = 0
     # end def
 
+    def setAbstractSequences(self):
+        """Reset, assign, and display abstract sequence numbers."""
+        # reset all sequence numbers
+        print("setting abstract sequence")
+        for oligo in self._oligos:
+            oligo.clearAbstractSequences()
+
+        self.initializeAbstractSegmentId()
+
+        for oligo in self._oligos:
+            oligo.applyAbstractSequences()
+
+        # display new sequence numbers
+        for oligo in self._oligos:
+            oligo.displayAbstractSequences()
+            oligo.oligoSequenceAddedSignal.emit(oligo)
+    # end def
+
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def getImportVirtualHelixOrder(self):
         """ the order of VirtualHelix items in the path view

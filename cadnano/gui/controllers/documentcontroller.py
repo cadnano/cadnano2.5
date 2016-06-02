@@ -104,6 +104,8 @@ class DocumentController():
         win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
         win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
         win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
+
+        self.win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
     # end def
 
 
@@ -401,6 +403,11 @@ class DocumentController():
             self.saveStaplesDialog = fdialog
             self.saveStaplesDialog.filesSelected.connect(self.exportStaplesCallback)
             fdialog.open()
+    # end def
+
+    def actionPathAddSeqSlot(self):
+        print("triggered seqslot")
+        self.activePart().setAbstractSequences()
     # end def
 
     def actionPrefsSlot(self):
