@@ -33,6 +33,7 @@ class QAbstractPartItem(QGraphicsRectItem):
 
     def setMovable(self, is_movable):
         self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
+        self.setPos(self.pos())
     # end def
 
     def isMovable(self):

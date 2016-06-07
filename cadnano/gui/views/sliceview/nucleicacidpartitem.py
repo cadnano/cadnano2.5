@@ -81,14 +81,14 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._outline = QGraphicsRectItem(_orect, self)
         self._outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         self._outline.setZValue(styles.ZDESELECTOR)
-        self._outline.setPen(getPenObj(self.modelColor(), _DEFAULT_WIDTH))
+        model_color = m_p.getColor()
+        self._outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
 
-        self.grab_cornerTL = GrabCornerItem(20, self)
-        self.grab_cornerTL.setBrush(getBrushObj('#cccc00'))
+        GC_SIZE = 20
+        self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, self)
         self.grab_cornerTL.setTopLeft(_orect.topLeft())
-        self.grab_cornerBL = GrabCornerItem(20, self)
-        self.grab_cornerBL.setBrush(getBrushObj('#cccc00'))
-        self.grab_cornerBL.setBottomRight(_orect.bottomRight())
+        self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, self)
+        self.grab_cornerBR.setBottomRight(_orect.bottomRight())
 
         self.griditem = GridItem(self)
 
@@ -151,6 +151,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 self._outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.items():
                     vhi.updateAppearance()
+                self.grab_cornerTL.setBrush(getBrushObj(new_value))
+                self.grab_cornerBR.setBrush(getBrushObj(new_value))
             elif property_key == 'circular':
                 pass
             elif property_key == 'dna_sequence':

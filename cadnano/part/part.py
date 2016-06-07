@@ -98,6 +98,8 @@ class Part(VirtualHelixGroup):
                         name='partSelectedChangedSignal')       # self, is_selected
     partActiveChangedSignal = ProxySignal(CNObject, bool,       # self, is_active
                         name='partActiveChangedSignal')
+    partViewPropertySignal = ProxySignal(CNObject, str, str, object,    # self, view, key, val
+                                name='partViewPropertySignal')
 
     # B. Virtual Helix
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num

@@ -29,6 +29,7 @@ from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
 from .renumbercmd import RenumberVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
+from .changeviewpropertycmd import ChangeViewPropertyCommand
 
 class NucleicAcidPart(Part):
     """
@@ -706,4 +707,9 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
+    def setViewPosition(self, view, position):
+        c = ChangeViewPropertyCommand(self, view, '%s:position' % view, position)
+        util.execCommandList(self, [c], desc="Move Part in view", \
+                                        use_undostack=use_undostack)
+    # end def
 # end class

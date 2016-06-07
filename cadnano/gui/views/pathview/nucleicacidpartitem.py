@@ -52,8 +52,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
-        self.grab_corner = GrabCornerItem(20, self)
-        self.grab_corner.setBrush(getBrushObj('#cccc00'))
+        GC_SIZE = 20
+        self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), self)
     # end def
 
     def proxy(self):
@@ -136,6 +136,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 self._updateBoundingRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
+                self.grab_corner.setBrush(getBrushObj(new_value))
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,

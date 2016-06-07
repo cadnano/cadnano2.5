@@ -4,13 +4,14 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import qApp
 
 class GrabCornerItem(QGraphicsRectItem):
-    def __init__(self, width, parent):
+    def __init__(self, width, color, parent):
         super(GrabCornerItem, self).__init__(parent)
         self.width = width
         self.offset = QPointF(width, width)
         self.offset_x = QPointF(width, 0)
         self.offset_y = QPointF(0, width)
         self.is_grabbing = False
+        self.setBrush(getBrushObj(color))
     # end def
 
     def mousePressEvent(self, event):
@@ -31,24 +32,25 @@ class GrabCornerItem(QGraphicsRectItem):
         return res
 
     def mouseReleaseEvent(self, event):
-        print("I am released")
-        self.is_grabbing = False
-        parent = self.parentItem()
-        parent.setMovable(False)
-        qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
-        QGraphicsItem.mouseReleaseEvent(parent, event)
-
-    def focusWindowChangedSlot(self, focus_window):
         if self.is_grabbing:
-            print("I am released focus stylee")
+            print("I am released")
+            parent = self.parentItem()
             self.is_grabbing = False
             self.parentItem().setMovable(False)
-            qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
+            QGraphicsItem.mouseReleaseEvent(parent, event)
+    # end def
+
+    def focusWindowChangedSlot(self, focus_window):
+        self.finishDrag("I am released focus stylee")
     # end def
 
     def dragLeaveEvent(self, event):
+        self.finishDrag("dragLeaveEvent")
+    # end def
+
+    def finishDrag(self, message):
         if self.is_grabbing:
-            print("dragLeaveEvent")
+            print(message)
             self.is_grabbing = False
             self.parentItem().setMovable(False)
             qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
