@@ -149,7 +149,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             if property_key == 'color':
                 self._model_props['color'] = new_value
                 self._outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
-                for vhi in self._virtual_helix_item_hash.items():
+                for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
                 self.grab_cornerTL.setBrush(getBrushObj(new_value))
                 self.grab_cornerBR.setBrush(getBrushObj(new_value))
