@@ -11,7 +11,7 @@ from cadnano import app, getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
-from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
 from . import pathstyles as styles
@@ -33,18 +33,15 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
-class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
+class NucleicAcidPartItem(QAbstractPartItem):
     findChild = util.findChild  # for debug
 
     def __init__(self, model_part_instance, viewroot, parent):
         """parent should always be pathrootitem"""
-        super(NucleicAcidPartItem, self).__init__(parent)
-        self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.reference()
-        self._model_props = m_props = m_p.getPropertyDict()
-        self._viewroot = viewroot
+        super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
         self._getActiveTool = viewroot.manager.activeToolGetter
         self.active_virtual_helix_item = None
+        m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.prexover_manager = PreXoverManager(self)
         self._virtual_helix_item_list = []
@@ -476,6 +473,11 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
     # end def
 
     ### TOOL METHODS ###
+    def mousePressEvent(self, event):
+        if self.isMovable():
+            QGraphicsItem.mousePressEvent(self, event)
+
+
     def hoverMoveEvent(self, event):
         """
         Parses a mouseMoveEvent to extract strandSet and base index,

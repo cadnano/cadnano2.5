@@ -10,7 +10,7 @@ from cadnano import getReopen, util
 from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj
-from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
 from . import slicestyles as styles
@@ -34,7 +34,7 @@ _SELECTED_ALPHA = styles.SELECTED_ALPHA
 
 _BOUNDING_RECT_PADDING = 10
 
-class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
+class NucleicAcidPartItem(QAbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, viewroot, parent=None):
@@ -46,13 +46,10 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
 
         Order matters for deselector, probe, and setlattice
         """
-        super(NucleicAcidPartItem, self).__init__(parent)
-        self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.reference()
-        self._model_props = m_props = m_p.getPropertyDict()
-        self._viewroot = viewroot
-        self._getActiveTool = viewroot.manager.activeToolGetter
+        super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
+        self._getActiveTool = viewroot.manager.activeToolGetter
+        m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
         self.scale_tuple = (self._RADIUS, m_p.radius())
@@ -380,6 +377,8 @@ class NucleicAcidPartItem(QGraphicsRectItem, AbstractPartItem):
         if event.button() == Qt.RightButton:
             return
         self.part().setSelected(True)
+        if self.isMovable():
+            QGraphicsItem.mousePressEvent(self, event)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
         if hasattr(self, tool_method_name):

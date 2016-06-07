@@ -1,6 +1,7 @@
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from cadnano.gui.palette import getPenObj, getBrushObj
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import qApp
 
 class GrabCornerItem(QGraphicsRectItem):
     def __init__(self, width, parent):
@@ -9,6 +10,48 @@ class GrabCornerItem(QGraphicsRectItem):
         self.offset = QPointF(width, width)
         self.offset_x = QPointF(width, 0)
         self.offset_y = QPointF(0, width)
+        self.is_grabbing = False
+    # end def
+
+    def mousePressEvent(self, event):
+        print("mousePressEvent")
+        parent = self.parentItem()
+        self.is_grabbing = True
+        self.drag_start_position = sp = event.pos()
+        self.drag_last_position = sp
+        parent.setMovable(True)
+        # ensure we handle window toggling during moves
+        qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
+        res = QGraphicsItem.mousePressEvent(parent, event)
+        return res
+
+    def mouseMoveEvent(self, event):
+        parent = self.parentItem()
+        res = QGraphicsItem.mouseMoveEvent(parent, event)
+        return res
+
+    def mouseReleaseEvent(self, event):
+        print("I am released")
+        self.is_grabbing = False
+        parent = self.parentItem()
+        parent.setMovable(False)
+        qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
+        QGraphicsItem.mouseReleaseEvent(parent, event)
+
+    def focusWindowChangedSlot(self, focus_window):
+        if self.is_grabbing:
+            print("I am released focus stylee")
+            self.is_grabbing = False
+            self.parentItem().setMovable(False)
+            qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
+    # end def
+
+    def dragLeaveEvent(self, event):
+        if self.is_grabbing:
+            print("dragLeaveEvent")
+            self.is_grabbing = False
+            self.parentItem().setMovable(False)
+            qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
     # end def
 
     def setTopLeft(self, topleft):
