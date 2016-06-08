@@ -16,6 +16,8 @@ class SliceRootItem(QGraphicsRectItem):
     SliceRootItem must instantiate its own controller to receive signals
     from the model.
     """
+    name = 'slice'
+
     def __init__(self, rect, parent, window, document):
         super(SliceRootItem, self).__init__(rect, parent)
         self._window = window

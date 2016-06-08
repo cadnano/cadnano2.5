@@ -18,6 +18,7 @@ class PathRootItem(QGraphicsRectItem):
     from the model.
     """
     findChild = util.findChild  # for debug
+    name = 'path'
 
     def __init__(self, rect, parent, window, document):
         super(PathRootItem, self).__init__(rect, parent)

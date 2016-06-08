@@ -22,6 +22,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._virtual_helix_item_hash = {}
         self.active_virtual_helix_item = None
         self.is_active = False
+        m_p.setViewProperty('%s:position' % (viewroot.name), (0.,0.))
     # end def
 
     def part(self):
@@ -33,11 +34,21 @@ class QAbstractPartItem(QGraphicsRectItem):
 
     def setMovable(self, is_movable):
         self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
-        self.setPos(self.pos())
     # end def
 
     def isMovable(self):
         return self.flags() & QGraphicsItem.ItemIsMovable
+    # end def
+
+    def finishDrag(self):
+        """ set the view position in the model
+        Does NOT convert to model coordinates, for now
+        """
+        pos = self.pos()
+        position = pos.x(), pos.y()
+        view_name = self._viewroot.name
+        self._model_part.setViewPosition(view_name, position)
+    # end def
 
     def document(self):
         """Return a reference to the model's document object"""
@@ -80,6 +91,11 @@ class QAbstractPartItem(QGraphicsRectItem):
         pass
     def partActiveChangedSlot(self, sender, is_active):
         pass
+    def partViewPropertySlot(self, sender, view_name, key, value):
+        if view_name == self._viewroot.name:
+            if key == 'position':
+                self.setPos(*value)
+    # end def
     def partPreDecoratorSelectedSlot(self, sender):
         pass
     def updatePreXoverItemsSlot(self, sender):
@@ -174,6 +190,8 @@ class AbstractPartItem(object):
     def partActiveBaseInfoSlot(self, sender, info):
         pass
     def partActiveChangedSlot(self, sender, is_active):
+        pass
+    def partViewPropertySlot(self, sender, view_name, key, value):
         pass
     def partPreDecoratorSelectedSlot(self, sender):
         pass

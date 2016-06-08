@@ -38,6 +38,7 @@ class GrabCornerItem(QGraphicsRectItem):
             self.is_grabbing = False
             self.parentItem().setMovable(False)
             QGraphicsItem.mouseReleaseEvent(parent, event)
+            parent.finishDrag()
     # end def
 
     def focusWindowChangedSlot(self, focus_window):
@@ -54,6 +55,7 @@ class GrabCornerItem(QGraphicsRectItem):
             self.is_grabbing = False
             self.parentItem().setMovable(False)
             qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
+            parent.finishDrag()
     # end def
 
     def setTopLeft(self, topleft):

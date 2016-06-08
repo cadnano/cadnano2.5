@@ -380,7 +380,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             return
         self.part().setSelected(True)
         if self.isMovable():
-            QGraphicsItem.mousePressEvent(self, event)
+            return QGraphicsItem.mousePressEvent(self, event)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
         if hasattr(self, tool_method_name):

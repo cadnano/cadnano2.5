@@ -707,8 +707,8 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
-    def setViewPosition(self, view, position):
-        c = ChangeViewPropertyCommand(self, view, '%s:position' % view, position)
+    def setViewPosition(self, view, position, use_undostack=True):
+        c = ChangeViewPropertyCommand(self, view, 'position', position)
         util.execCommandList(self, [c], desc="Move Part in view", \
                                         use_undostack=use_undostack)
     # end def
