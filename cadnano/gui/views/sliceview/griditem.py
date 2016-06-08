@@ -148,7 +148,7 @@ class GridItem(QGraphicsPathItem):
         points = self.points
         scene = self.scene()
         while points:
-            scene.remove(points.pop())
+            scene.removeItem(points.pop())
     # end def
 # end class
 

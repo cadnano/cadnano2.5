@@ -22,7 +22,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._virtual_helix_item_hash = {}
         self.active_virtual_helix_item = None
         self.is_active = False
-        m_p.setViewProperty('%s:position' % (viewroot.name), (0.,0.))
+        m_p.setViewProperty('%s:position' % (viewroot.name), (0., 0.))
     # end def
 
     def part(self):

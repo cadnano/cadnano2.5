@@ -49,11 +49,15 @@ class Part(VirtualHelixGroup):
                         'ext_instances':{}}
         self._oligos = set()
         # Properties
-        self.view_properties = {} #self._document.newViewProperties()
+        self.view_properties = {}
 
-        self._group_properties['name'] = "Part%d" % len(self._document.children())
-        self._group_properties['color'] = "#000000" # outlinerview will override from styles
-        self._group_properties['is_visible'] = True
+
+        self._group_properties = {  'name':         "Part%d" % len(self._document.children()),
+                                    'color':        "#000000", # outlinerview will override from styles
+                                    'is_visible':   True,
+                                    'virtual_helix_order': []
+                                }
+
         self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4().hex
 
         # Selections
@@ -254,13 +258,6 @@ class Part(VirtualHelixGroup):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def getImportVirtualHelixOrder(self):
-        """ the order of VirtualHelix items in the path view
-        each element is the coord of the virtual helix
-        """
-        return self.getViewProperty('path:virtual_helix_order')
-    # end def
-
     def activeIdNum(self):
         return self._active_id_num
     # end def

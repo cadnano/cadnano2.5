@@ -164,7 +164,7 @@ class NucleicAcidPart(Part):
         return per_neighbor_hits
 
     # end def
-    def dimensions(self, scale_factor=1.0):
+    def boundDimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
         DMIN = 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
@@ -690,10 +690,20 @@ class NucleicAcidPart(Part):
         return part
     # end def
 
+    def getImportVirtualHelixOrder(self):
+        """ the order of VirtualHelix items in the path view
+        each element is the coord of the virtual helix
+        """
+        return self.getProperty('virtual_helix_order')
+    # end def
 
     def setImportedVHelixOrder(self, ordered_id_list, check_batch=True):
-        """Used on file import to store the order of the virtual helices."""
-        self.setViewProperty('path:virtual_helix_order', ordered_id_list)
+        """Used on file import to store the order of the virtual helices.
+        TODO: figure out how to get rid of this and use changeViewProperty
+        instead.  probably no need to do the zoom to fit with check_batch
+        thing
+        """
+        self.setProperty('virtual_helix_order', ordered_id_list)
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 

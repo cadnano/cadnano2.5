@@ -52,7 +52,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
         GC_SIZE = 20
-        self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), self)
+        self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
     # end def
 
     def proxy(self):
@@ -60,7 +60,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def modelColor(self):
-        # return self._model_props['color']
         return self._model_part.getProperty('color')
     # end def
 
@@ -403,7 +402,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         # call the method to move the items and store the list
         self.part().setImportedVHelixOrder([vhi.idNum() for vhi in new_list], check_batch=False)
-        # self._setVirtualHelixItemList(new_list, zoom_to_fit=False)
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):

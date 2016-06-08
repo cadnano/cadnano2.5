@@ -125,9 +125,9 @@ def encodePart2(part, vh_group_list=None):
                                 for a, b, c, x, y, z in filtered_xover_list]
 
     view_props = part.view_properties.copy()
-    vh_order = filter(lambda x: x in vh_group_set, view_props['path:virtual_helix_order'])
+    vh_order = filter(lambda x: x in vh_group_set, group_props['virtual_helix_order'])
     vh_order = [remap[x] for x in vh_order]
-    view_props['path:virtual_helix_order'] = vh_order
+    group_props['virtual_helix_order'] = vh_order
     group_props['view_properties'] = view_props
 
     external_mods_instances = filter(filter_vh,

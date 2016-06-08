@@ -76,19 +76,18 @@ class NucleicAcidPartItem(QAbstractPartItem):
         # self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
 
-        _p = _BOUNDING_RECT_PADDING
-        self._outlinerect = _orect = self.rect().adjusted(-_p, -_p, _p, _p)
-        self._outline = QGraphicsRectItem(_orect, self)
-        self._outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
-        self._outline.setZValue(styles.ZDESELECTOR)
+        self.outline = outline =  QGraphicsRectItem(self)
+        o_rect = self.configureOutline(outline)
+        outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
+        outline.setZValue(styles.ZDESELECTOR)
         model_color = m_p.getColor()
-        self._outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
+        self.outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
 
         GC_SIZE = 20
-        self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, self)
-        self.grab_cornerTL.setTopLeft(_orect.topLeft())
-        self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, self)
-        self.grab_cornerBR.setBottomRight(_orect.bottomRight())
+        self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, True, self)
+        self.grab_cornerTL.setTopLeft(o_rect.topLeft())
+        self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
+        self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
 
         self.griditem = GridItem(self)
 
@@ -104,27 +103,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def getVHItemList(self):
         return sorted(self._virtual_helix_hash.values(), key=lambda t:t.number())
 
-    # def _adjustPosition(self):
-    #     """Find the left-most bottom-most sibling, and reposition below."""
-    #     _p = _BOUNDING_RECT_PADDING
-    #     _visible_topleft_pos = self.visibleTopLeftScenePos()
-    #     _bot_left_sib = self.mapToScene(QPointF(-_p*2,-_p*2)) # choose a starting point
-    #     for sibling in self.parentItem().childItems():
-    #         if sibling is self:
-    #             continue
-    #         _sib = sibling.visibleBottomLeftScenePos()
-    #         if (_sib.x() >= _bot_left_sib.x() and _sib.y() >= _bot_left_sib.y()):
-    #             _bot_left_sib = _sib
-    #     # reposition visible-topleft curner under sibling, plus padding
-    #     self.setPos(-_visible_topleft_pos + _bot_left_sib + QPointF(0, 2*_p) )
-    # # end def
-
     def visibleTopLeftScenePos(self):
-        return self.mapToScene(self._outlinerect.topLeft())
+        return self.mapToScene(self.outlinerect.topLeft())
     # end def
 
     def visibleBottomLeftScenePos(self):
-        return self.mapToScene(self._outlinerect.bottomLeft())
+        return self.mapToScene(self.outlinerect.bottomLeft())
     # end def
 
     ### SIGNALS ###
@@ -148,7 +132,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if self._model_part == model_part:
             if property_key == 'color':
                 self._model_props['color'] = new_value
-                self._outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
+                self.outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
                 self.grab_cornerTL.setBrush(getBrushObj(new_value))
@@ -177,10 +161,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.deselector = None
         self._controller.disconnectSignals()
         self._controller = None
-    # end def
-
-    def partVirtualHelicesReorderedSlot(self, sender, ordered_coord_list):
-        pass
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
@@ -330,17 +310,34 @@ class NucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
+    def reconfigureRect(self, top_left, bottom_right):
+        rect = self._rect
+        ptTL = QPointF(*top_left) if top_left else rect.topLeft()
+        ptBR = QPointF(*bottom_right) if bottom_right else rect.bottomRight()
+        self._rect = new_rect = QRectF(ptTL, ptBR)
+        self.setRect(new_rect)
+        self.configureOutline(self.outline)
+        self.griditem.updateGrid()
+    # end def
+
     ### PRIVATE SUPPORT METHODS ###
-    def _upperLeftCornerForCoords(self, row, col):
-        pass  # subclass
+    def configureOutline(self, outline):
+        _p = _BOUNDING_RECT_PADDING
+        o_rect = self.rect().adjusted(-_p, -_p, _p, _p)
+        outline.setRect(o_rect)
+        return o_rect
     # end def
 
     def boundRectToModel(self):
         """ update the boundaries to what's in the model with a minimum
         size
         """
-        xLL, yLL, xUR, yUR = self.part().dimensions(self.scale_factor)
-        self._rect = QRectF(QPointF(xLL, yLL), QPointF(xUR, yUR))
+        xTL, yTL, xBR, yBR = self.part().boundDimensions(self.scale_factor)
+        self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
+    # end def
+
+    def getModelBounds(self):
+        return self.part().boundDimensions(self.scale_factor)
     # end def
 
     def bounds(self):

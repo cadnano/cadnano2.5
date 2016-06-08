@@ -85,6 +85,7 @@ def decodePart(document, part_dict):
     for id_num, idx, length in part_dict['insertions']:
         strand = part.getStrand(True, id_num, idx)
         strand.addInsertion(idx, length, use_undostack=False)
+    part.setImportedVHelixOrder(part_dict['virtual_helix_order'])
 # end def
 
 def importToPart(part, copy_dict, use_undostack=True):
@@ -127,14 +128,11 @@ def importToPart(part, copy_dict, use_undostack=True):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
                                                     use_undostack=use_undostack)
-                # fwd_strand_set.createStrand(low_idx, high_idx, color,
-                #                                     use_undostack=use_undostack)
+
             for idxs, color in zip(rev_idxs, rev_colors):
                 low_idx, high_idx = idxs
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
                                                     use_undostack=use_undostack)
-                # rev_strand_set.createStrand(low_idx, high_idx, color,
-                #                                     use_undostack=use_undostack)
     # end def
 
     xovers = copy_dict['xovers']
@@ -152,6 +150,11 @@ def importToPart(part, copy_dict, use_undostack=True):
     for id_num, idx, length in copy_dict['insertions']:
         strand = part.getStrand(True, id_num + id_num_offset, idx)
         strand.addInsertion(idx, length, use_undostack=use_undostack)
+
+
+    """
+    TODO: figure out copy_dict['view_properties'] handling here
+    """
 
     return new_vh_id_set
 # end def
