@@ -15,7 +15,6 @@ from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
 from . import pathstyles as styles
-# from .prexoveritem import PreXoverItem
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
@@ -197,15 +196,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
         self._updateBoundingRect()
-    # end def
-
-    def partVirtualHelixRenumberedSlot(self, sender, id_old, id_new):
-        """Notifies the virtualhelix at coord to change its number"""
-        # check for new number
-        # notify VirtualHelixHandleItem to update its label
-        # notify VirtualHelix to update its xovers
-        # if the VirtualHelix is active, refresh prexovers
-        pass
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num):

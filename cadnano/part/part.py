@@ -80,10 +80,6 @@ class Part(VirtualHelixGroup):
 
     ### SIGNALS ###
     # A. Part
-    partActiveSliceIndexSignal = ProxySignal(CNObject, int,
-                        name='partActiveSliceIndexSignal')      #(self, index)
-    partActiveSliceResizeSignal = ProxySignal(CNObject,
-                        name='partActiveSliceResizeSignal')     # self
     partDimensionsChangedSignal = ProxySignal(CNObject, int, int, # self, id_min, id_max
                         name='partDimensionsChangedSignal')     # self
     partInstanceAddedSignal = ProxySignal(CNObject,
@@ -110,8 +106,6 @@ class Part(VirtualHelixGroup):
                         name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num, neighbor list
     partVirtualHelixRemovedSignal = ProxySignal(object, int, object,
                         name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num, neighbor list
-    partVirtualHelixRenumberedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixRenumberedSignal')# self, virtual_helix id_num
     partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
                         name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
     partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
@@ -288,11 +282,6 @@ class Part(VirtualHelixGroup):
 
     def activeBaseIndex(self):
         return self._active_base_index
-    # end def
-
-    def setActiveBaseIndex(self, idx):
-        self._active_base_index = idx
-        self.partActiveSliceIndexSignal.emit(self, idx)
     # end def
 
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):

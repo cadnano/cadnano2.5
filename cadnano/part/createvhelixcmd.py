@@ -67,7 +67,6 @@ class CreateVirtualHelixCommand(UndoCommand):
                                             safe=False)
 
         part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
-        part.partActiveSliceResizeSignal.emit(part)
     # end def
 
     def undo(self):
@@ -84,6 +83,5 @@ class CreateVirtualHelixCommand(UndoCommand):
         part.partVirtualHelixRemovedSignal.emit(part, id_num, self.neighbors)
         part.removeHelix(id_num)
         # clear out part references
-        part.partActiveSliceResizeSignal.emit(part)
     # end def
 # end class

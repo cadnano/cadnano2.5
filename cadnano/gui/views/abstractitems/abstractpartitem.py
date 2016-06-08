@@ -47,7 +47,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         pos = self.pos()
         position = pos.x(), pos.y()
         view_name = self._viewroot.name
-        self._model_part.setViewPosition(view_name, position)
+        self._model_part.changeViewProperty(view_name, 'position', position)
     # end def
 
     def document(self):
@@ -103,8 +103,6 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partVirtualHelixAddedSlot(self, sender):
         pass
     def partVirtualHelixRemovedSlot(self, sender, id_num):
-        pass
-    def partVirtualHelixRenumberedSlot(self, sender, id_num):
         pass
     def partVirtualHelixResizedSlot(self, sender, id_num):
         pass
@@ -200,8 +198,6 @@ class AbstractPartItem(object):
     def partVirtualHelixAddedSlot(self, sender):
         pass
     def partVirtualHelixRemovedSlot(self, sender, id_num):
-        pass
-    def partVirtualHelixRenumberedSlot(self, sender, id_num):
         pass
     def partVirtualHelixResizedSlot(self, sender, id_num):
         pass

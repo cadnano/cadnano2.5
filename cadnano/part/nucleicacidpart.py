@@ -23,7 +23,6 @@ from .translatevhelixcmd import TranslateVirtualHelicesCommand
 
 from .createvhelixcmd import CreateVirtualHelixCommand
 
-from .resizepartcmd import ResizePartCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .refresholigoscmd import RefreshOligosCommand
 from .removepartcmd import RemovePartCommand
@@ -573,15 +572,6 @@ class NucleicAcidPart(Part):
             print("error removing oligo", oligo)
     # end def
 
-    def resizeVirtualHelices(self, min_delta, max_delta, use_undostack=True):
-        """docstring for resizeVirtualHelices
-        TODO Update this to allow differing lengths of VirtualHelices
-        """
-        c = ResizePartCommand(self, min_delta, max_delta)
-        util.execCommandList(self, [c], desc="Resize part", \
-                                                    use_undostack=use_undostack)
-    # end def
-
     def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):
         old_size = self.vh_properties.loc[id_num, 'length']
         delta = new_size - old_size
@@ -707,9 +697,9 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
-    def setViewPosition(self, view, position, use_undostack=True):
-        c = ChangeViewPropertyCommand(self, view, 'position', position)
-        util.execCommandList(self, [c], desc="Move Part in view", \
+    def changeViewProperty(self, view, key, value, use_undostack=True):
+        c = ChangeViewPropertyCommand(self, view, key, value)
+        util.execCommandList(self, [c], desc="Change Part View Property `%s`" % key, \
                                         use_undostack=use_undostack)
     # end def
 # end class
