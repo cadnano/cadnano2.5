@@ -156,6 +156,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._virtual_helix_item_list = None
         self._controller.disconnectSignals()
         self._controller = None
+        self.grab_corner = None
     # end def
 
     def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):

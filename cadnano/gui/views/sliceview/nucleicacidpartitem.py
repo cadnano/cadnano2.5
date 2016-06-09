@@ -161,6 +161,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.deselector = None
         self._controller.disconnectSignals()
         self._controller = None
+        self.grab_cornerTL = None
+        self.grab_cornerBR = None
+        self.griditem = None
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
