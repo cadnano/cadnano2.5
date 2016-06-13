@@ -1,6 +1,6 @@
 import sys, os
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
 from code import interact
 from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
@@ -27,8 +27,8 @@ CADNANO_DEFAULT_DOCUMENT = 'super_barcode_hex.json'
 # CADNANO_DEFAULT_DOCUMENT = 'octa.13.c25'
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(
-                ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
+# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(
+#                 ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
 
 import platform
 
@@ -36,7 +36,7 @@ if platform.system() == 'Windows':
     import ctypes
     myappid = 'cadnano.cadnano.radnano.2.5.0' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-
+print("plop")
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
     shouldPerformBoilerplateStartupScript = False
@@ -47,8 +47,8 @@ class CadnanoQt(QObject):
         """ Create the application object
         """
         self.argns, unused = util.parse_args(argv, gui=True)
-        util.init_logging(self.argns.__dict__)
-        logger.info("CadnanoQt initializing...")
+        # util.init_logging(self.argns.__dict__)
+        # logger.info("CadnanoQt initializing...")
         if argv is None:
             argv = sys.argv
         self.argv = argv
@@ -72,7 +72,6 @@ class CadnanoQt(QObject):
         self.vhi = {}
         self.partItem = None
 
-
     def finishInit(self):
         global decodeFile
         global Document
@@ -81,6 +80,7 @@ class CadnanoQt(QObject):
         from cadnano.fileio.nnodecode import decodeFile
         from cadnano.gui.controllers.documentcontroller import DocumentController
         from cadnano.gui.views.pathview import pathstyles as styles
+
         doc = Document()
         self.d = self.newDocument(base_doc=doc)
         styles.setFontMetrics()
@@ -91,6 +91,7 @@ class CadnanoQt(QObject):
         if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
             self.shouldPerformBoilerplateStartupScript = True
         util.loadAllPlugins()
+
         if self.argns.interactive:
             print("Welcome to cadnano's debug mode!")
             print("Some handy locals:")
@@ -126,8 +127,6 @@ class CadnanoQt(QObject):
             interact('', local={'a':self, 'd':d, 'w':w,\
                                 'p':p, 'pi':pi, 'vh':vh, 'vhi':vhi,\
                                 })
-        # else:
-        #     self.exec_()
 
 
     def exec_(self):
@@ -146,13 +145,13 @@ class CadnanoQt(QObject):
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
             dc = DocumentController(base_doc)
-            logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
+            # logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             dc.setFilename(default_file)
             print("Loaded default document: %s" % (default_file))
         else:
             doc_ctrlr_count = len(self.document_controllers)
-            logger.info("Creating new empty document...")
+            # logger.info("Creating new empty document...")
             if doc_ctrlr_count == 0:  # first dc
                 # dc adds itself to app.document_controllers
                 dc = DocumentController(base_doc)

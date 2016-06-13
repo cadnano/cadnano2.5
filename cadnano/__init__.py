@@ -1,3 +1,4 @@
+import sys
 from .cnproxy import tapp
 
 global shared_app
@@ -28,7 +29,7 @@ def app():
     global shared_app
     return shared_app
 
-def initAppWithGui(app_args=None):
+def initAppWithGui(app_args=None, do_exec=True):
     global shared_app
     from cadnano.cadnanoqt import CadnanoQt
     # 1. Create the application object
@@ -36,6 +37,8 @@ def initAppWithGui(app_args=None):
     # 2. Use the object to finish importing and creating
     # application wide objects
     shared_app.finishInit()
+    if do_exec:
+        sys.exit(shared_app.exec_())
     return shared_app
 
 

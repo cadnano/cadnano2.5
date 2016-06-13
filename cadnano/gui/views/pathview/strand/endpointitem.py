@@ -3,8 +3,8 @@
 
 from math import floor
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
 
 from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
@@ -287,9 +287,10 @@ class EndpointItem(QGraphicsPathItem):
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
         else:
-            logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-                        s_i.strandFilter(), self.FILTER_NAME)
+            pass
+            # logger.info("The clicked strand %s does not match current selection filter %s. "\
+            #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+            #             s_i.strandFilter(), self.FILTER_NAME)
     # end def
 
     def modsToolMousePress(self, modifiers, event, idx):

@@ -3,8 +3,8 @@
 
 from math import floor
 
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
 from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
 from .endpointitem import EndpointItem
 from cadnano.gui.views.pathview import pathstyles as styles
@@ -683,9 +683,10 @@ class StrandItem(QGraphicsLineItem):
                     msg = msg + " Warning: %d sequence bases unused." % d
                 self.partItem().updateStatusBar(msg)
         else:
-            logger.info("The clicked strand %s does not match current selection filter %s. "\
-                        "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-                        self.strandFilter(), self.FILTER_NAME)
+            pass
+            # logger.info("The clicked strand %s does not match current selection filter %s. "\
+            #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+            #             self.strandFilter(), self.FILTER_NAME)
     # end def
 
     def restoreParent(self, pos=None):

@@ -2,8 +2,8 @@
 # encoding: utf-8
 import sys
 import os
-import logging
-logger = logging.getLogger(__name__)
+# import logging
+# logger = logging.getLogger(__name__)
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 PROJECT_DIR = os.path.dirname(LOCAL_DIR)
 sys.path.append(PROJECT_DIR)
@@ -24,7 +24,7 @@ def main(argv=None):
     # print(argv)
     from cadnano import initAppWithGui
     # Things are a lot easier if we can pass None instead of sys.argv and only fall back to sys.argv when we need to.
-    app = initAppWithGui(argv)
+    app = initAppWithGui(argv, do_exec=False)
     if app.argns.profile:
         print("Collecting profile data into cadnano.profile")
         import cProfile
