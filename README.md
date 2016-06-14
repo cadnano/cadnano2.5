@@ -105,3 +105,4 @@ There is an open issue on Anaconda to support PyQt5: [ContinuumIO/anaconda-issue
 # *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 
 The purpose of this is for 3D printing cadnano designs.  see bin/creatsly.py
+C:\Users\Nick\Documents\GitHub\rcedit\Default>rcedit.exe C:\Users\Nick\Documents\GitHub\cadnano2.5\cadnano\install_exe\cadnano.exe --set-icon C:\Users\Nick\Downloads\radnano-app-icon.ico

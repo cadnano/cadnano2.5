@@ -17,6 +17,7 @@ you may do so using either pip or the setup.py script::
             or
   $ python setup.py install
 
+Use rcedit to change icon
 '''
 
 import os
@@ -24,15 +25,14 @@ import shutil
 import subprocess
 import sys
 
+from setuptools import find_packages
 try:
     from setuptools import setup, Extension
-    from setuptools.command import install_lib, sdist, build_ext
-    from setuptools import log as setup_log
 except ImportError:
     from distutils.core import setup, Extension
-    from distutils.command import install_lib, sdist, build_ext
-    from distutils import log as setup_log
-
+from distutils.command import install_lib, sdist, build_ext, install_scripts
+from distutils.command.install import install as _install
+from distutils import log as setup_log
 
 from os.path import join as pjoin
 from os.path import relpath as rpath
@@ -45,19 +45,16 @@ with open('new_readme.rst') as fd:
 
 PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH =           pjoin(PACKAGE_PATH, 'cadnano')
+BIN_PATH =              pjoin(MODULE_PATH, 'install_exe')
 TESTS_PATH =            pjoin(MODULE_PATH, 'tests')
 
-CADNANO_BUILT = False
+# batch files and launch scripts
 
-
-# Find all necessary primer3 binaries / data files to include with the package
-cadnano_binaries = ['oligotm', 'ntthal', 'primer3_core']
-cadnano_binary_fps = [pjoin(PACKAGE_PATH, fn) for fn in cadnano_binaries]
 
 test_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
                 os.walk(TESTS_PATH) for f in files]
 
-cadnano_files = test_files
+# cadnano_files = [] + cadnano_binary_fps
 
 
 # Insure that the copied binaries are executable
@@ -69,48 +66,49 @@ def makeExecutable(fp):
     os.chmod(fp, mode)
 
 
-class CustomInstallLib(install_lib.install_lib):
+if sys.platform == 'win32':
+    path_scheme = {
+        'scripts': 'Scripts',
+    }
+    cadnano_binaries = ['cadnano.exe']
+    cadnano_binary_fps = [pjoin(BIN_PATH, fn) for fn in cadnano_binaries]
+else:
+    path_scheme = {
+    'scripts': 'bin',
+    }
+script_path = os.path.join(sys.exec_prefix, path_scheme['scripts'])
 
+# class CustomInstallLib(install_lib.install_lib):
+
+#     def run(self):
+#         install_lib.install_lib.run(self)
+#         # Copy binary files over to build directory and make executable
+#         if not self.dry_run:
+#             new_cadnano_binary_fps = [pjoin( script_path, fn)
+#                                              for fn in cadnano_binaries]
+#             print(new_cadnano_binary_fps)
+#             print(cadnano_binary_fps)
+#             [shutil.copyfile(o, d) for o, d in zip(cadnano_binary_fps,
+#                                                    new_cadnano_binary_fps)]
+#             list(map(makeExecutable, new_cadnano_binary_fps))
+
+def _post_install(dir):
+    new_cadnano_binary_fps = [pjoin( script_path, fn)
+                                     for fn in cadnano_binaries]
+    print(new_cadnano_binary_fps)
+    print(cadnano_binary_fps)
+    [shutil.copyfile(o, d) for o, d in zip(cadnano_binary_fps,
+                                           new_cadnano_binary_fps)]
+    list(map(makeExecutable, new_cadnano_binary_fps))
+
+
+class myinstall(_install):
     def run(self):
-        global CADNANO_BUILT
-        install_lib.install_lib.run(self)
-        # Copy binary files over to build directory and make executable
-        if not self.dry_run:
-            if not CADNANO_BUILT:
-                pass
-            new_cadnano_binary_fps = [pjoin(self.install_dir, 'cadnano', 'bin',
-                                 , fn) for fn in cadnano_binaries]
-            [shutil.copyfile(o, d) for o, d in zip(cadnano_binary_fps,
-                                                   new_cadnano_binary_fps)]
-            list(map(makeExecutable, new_cadnano_binary_fps))
-
-
-class CustomSdist(sdist.sdist):
-
-    def run(self):
-        global CADNANO_BUILT
-        # Clean up the cadnano build prior to sdist command to remove
-        # binaries and object/library files
-        CADNANO_BUILT = False
-        sdist.sdist.run(self)
-
-
-class CustomBuildExt(build_ext.build_ext):
-
-    def run(self):
-        global CADNANO_BUILT
-        # Build primer3 prior to building the extension, if not already built
-        if not self.dry_run and not CADNANO_BUILT:
-            CADNANO_BUILT = True
-        build_ext.build_ext.run(self)
-
+        _install.run(self)
+        self.execute(_post_install, (self.install_lib,),
+                     msg="Running post install task")
 
 # Build the C API and Cython extensions
-
-if ('build_ext' in sys.argv or 'install' in sys.argv):
-    if not CADNANO_BUILT:
-        CADNANO_BUILT = True
-
 is_py_3 = int(sys.version_info[0] > 2)
 
 # Insure that we don't include the built Cython module in the dist
@@ -120,6 +118,12 @@ if 'sdist' in sys.argv:
     for fn in c_files:
         os.remove(os.path.join(MODULE_PATH, fn))
 
+
+exclude_list = ['*.genbank', '*.fasta',
+                '*.tests.*', '*.tests', 'tests.*', 'tests', '*.test',
+                'pyqtdeploy', 'nno2stl', '*.autobreak']
+cn_packages = find_packages(exclude=exclude_list)
+# print(cn_packages)
 
 setup(
     name='cadnano',
@@ -141,18 +145,22 @@ setup(
         'Topic :: Scientific/Engineering :: Bio-Informatics',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)'
     ],
-    packages=['cadnano'],
+    cmdclass={'install': myinstall},
+    packages=cn_packages,
     ext_modules=[],
-    package_data={'cadnano': cadnano_files},
-    cmdclass={'install_lib': CustomInstallLib, 'sdist': CustomSdist,
-              'build_ext': CustomBuildExt},
-    test_suite='tests',
+    # test_suite='tests',
     zip_safe=False,
     install_requires=[
         'PyQt5>=5.6',
         'numpy>=1.10.0',
-        'pandas>=0.21',
+        'pandas>=0.18',
         'pytz>=2011k',
-        'python-dateutil >= 2'
-    ]
+        'python-dateutil>=2'
+    ],
+    entry_points={
+        'console_scripts': [
+            'cadnano = cadnano.bin.main:main',
+        ],
+    }
+
 )
