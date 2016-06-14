@@ -30,4 +30,4 @@ def scrapeExtensionFiles(sysroot, modules, ext, install_dir, version='3.5'):
 		shutil.copyfile(src, dst)
 
 if __name__ == '__main__':
-	scrapeExtensionFiles(sysroot, ['numpy', 'pandas'], '.pyd', INSTALL_DIR)
+	scrapeExtensionFiles(sysroot, ['numpy', 'pandas', 'numexpr', 'bottleneck'], '.pyd', INSTALL_DIR)
