@@ -92,12 +92,14 @@ class DocumentController():
 
         # make it so select tool in slice view activation turns on vh filter
         win.action_filter_handle.triggered.connect(self.actionFilterVirtualHelixSlot)
-        self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
-        win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
-        win.action_vhelix_select.triggered.connect(self.actionFilterVirtualHelixSlot)
+        # self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
+        # win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
+        # win.action_vhelix_select.triggered.connect(self.actionFilterVirtualHelixSlot)
 
-        win.action_vhelix_create.triggered.connect(self.actionFilterVirtualHelixSlot)
-        win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)
+        # win.action_vhelix_create.triggered.connect(self.actionFilterVirtualHelixSlot)
+        # win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)
+        win.action_global_select.triggered.connect(self.actionSelectForkSlot)
+        win.action_global_pencil.triggered.connect(self.actionCreateForkSlot)
 
         win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
         win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
@@ -110,6 +112,18 @@ class DocumentController():
 
 
     ### SLOTS ###
+    def actionSelectForkSlot(self):
+        win = self.win
+        win.action_path_select.trigger()
+        win.action_vhelix_select.trigger()
+    # end def
+
+    def actionCreateForkSlot(self):
+        win = self.win
+        win.action_vhelix_create.trigger()
+        win.action_path_pencil.trigger()
+    # end def
+
     def undoStackCleanChangedSlot(self):
         """The title changes to include [*] on modification."""
         self.win.setWindowModified(not self.undoStack().isClean())
