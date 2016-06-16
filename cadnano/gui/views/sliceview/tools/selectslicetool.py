@@ -45,6 +45,10 @@ class SelectSliceTool(AbstractSliceTool):
         return self.is_selection_active
     # end def
 
+    def resetSelections(self):
+        doc = self.manager.document
+        doc.clearAllSelected()
+
     def modelClear(self):
         doc = self.manager.document
         doc.clearAllSelected()
