@@ -119,7 +119,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([180, 400, 400])  # balance main_splitter size
+        self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])

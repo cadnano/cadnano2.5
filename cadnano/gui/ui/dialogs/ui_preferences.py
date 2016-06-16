@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'dialogs/preferences.ui'
 #
-# Created: Wed Dec  3 21:08:34 2014
-#      by: PyQt5 UI code generator 5.3.2
+# Created by: PyQt5 UI code generator 5.5
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -21,6 +20,8 @@ class Ui_Preferences(object):
         self.vertical_layout = QtWidgets.QVBoxLayout(Preferences)
         self.vertical_layout.setObjectName("vertical_layout")
         self.tab_widget = QtWidgets.QTabWidget(Preferences)
+        self.tab_widget.setTabPosition(QtWidgets.QTabWidget.North)
+        self.tab_widget.setTabShape(QtWidgets.QTabWidget.Rounded)
         self.tab_widget.setObjectName("tab_widget")
         self.interface_tab = QtWidgets.QWidget()
         self.interface_tab.setObjectName("interface_tab")
@@ -29,6 +30,14 @@ class Ui_Preferences(object):
         self.form_layout = QtWidgets.QFormLayout()
         self.form_layout.setFieldGrowthPolicy(QtWidgets.QFormLayout.FieldsStayAtSizeHint)
         self.form_layout.setObjectName("form_layout")
+        self.show_icon_label_text = QtWidgets.QLabel(self.interface_tab)
+        self.show_icon_label_text.setObjectName("show_icon_label_text")
+        self.form_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.show_icon_label_text)
+        self.show_icon_labels = QtWidgets.QCheckBox(self.interface_tab)
+        self.show_icon_labels.setText("")
+        self.show_icon_labels.setChecked(True)
+        self.show_icon_labels.setObjectName("show_icon_labels")
+        self.form_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.show_icon_labels)
         self.default_tool_label = QtWidgets.QLabel(self.interface_tab)
         self.default_tool_label.setObjectName("default_tool_label")
         self.form_layout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.default_tool_label)
@@ -64,14 +73,21 @@ class Ui_Preferences(object):
         self.zoom_speed_slider.setTickInterval(0)
         self.zoom_speed_slider.setObjectName("zoom_speed_slider")
         self.form_layout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.zoom_speed_slider)
-        self.show_icon_label_text = QtWidgets.QLabel(self.interface_tab)
-        self.show_icon_label_text.setObjectName("show_icon_label_text")
-        self.form_layout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.show_icon_label_text)
-        self.show_icon_labels = QtWidgets.QCheckBox(self.interface_tab)
-        self.show_icon_labels.setText("")
-        self.show_icon_labels.setChecked(True)
-        self.show_icon_labels.setObjectName("show_icon_labels")
-        self.form_layout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.show_icon_labels)
+        self.Grid = QtWidgets.QLabel(self.interface_tab)
+        self.Grid.setObjectName("Grid")
+        self.form_layout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.Grid)
+        self.comboBox = QtWidgets.QComboBox(self.interface_tab)
+        self.comboBox.setObjectName("comboBox")
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/part/grid_circles"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.comboBox.addItem(icon4, "")
+        icon5 = QtGui.QIcon()
+        icon5.addPixmap(QtGui.QPixmap(":/part/grid_lines"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.comboBox.addItem(icon5, "")
+        icon6 = QtGui.QIcon()
+        icon6.addPixmap(QtGui.QPixmap(":/part/grid_points"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.comboBox.addItem(icon6, "")
+        self.form_layout.setWidget(5, QtWidgets.QFormLayout.FieldRole, self.comboBox)
         self.vertical_layout_4.addLayout(self.form_layout)
         self.button_box = QtWidgets.QDialogButtonBox(self.interface_tab)
         self.button_box.setStandardButtons(QtWidgets.QDialogButtonBox.RestoreDefaults)
@@ -135,9 +151,9 @@ class Ui_Preferences(object):
         self.honeycomb_g_layout.addWidget(self.h_bases_label, 1, 2, 1, 1)
         self.formLayout_3.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.honeycomb_g_layout)
         self.vertical_layout_3.addLayout(self.formLayout_3)
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/part/dlg_honeycomb"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tab_widget_2.addTab(self.tab_honeycomb, icon4, "")
+        icon7 = QtGui.QIcon()
+        icon7.addPixmap(QtGui.QPixmap(":/part/dlg_honeycomb"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tab_widget_2.addTab(self.tab_honeycomb, icon7, "")
         self.tab_square = QtWidgets.QWidget()
         self.tab_square.setObjectName("tab_square")
         self.vertical_layout_2 = QtWidgets.QVBoxLayout(self.tab_square)
@@ -181,9 +197,9 @@ class Ui_Preferences(object):
         self.square_g_layout.addWidget(self.s_bases_label, 1, 2, 1, 1)
         self.formLayout_2.setLayout(0, QtWidgets.QFormLayout.FieldRole, self.square_g_layout)
         self.vertical_layout_2.addLayout(self.formLayout_2)
-        icon5 = QtGui.QIcon()
-        icon5.addPixmap(QtGui.QPixmap(":/part/dlg_square"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.tab_widget_2.addTab(self.tab_square, icon5, "")
+        icon8 = QtGui.QIcon()
+        icon8.addPixmap(QtGui.QPixmap(":/part/dlg_square"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.tab_widget_2.addTab(self.tab_square, icon8, "")
         self.verticalLayout.addWidget(self.tab_widget_2)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -213,7 +229,7 @@ class Ui_Preferences(object):
         self.add_plugin_button.setObjectName("add_plugin_button")
         self.vertical_layout_5.addWidget(self.add_plugin_button)
         self.tab_widget.addTab(self.plugins_tab, "")
-        self.vertical_layout.addWidget(self.tab_widget, QtCore.Qt.AlignTop)
+        self.vertical_layout.addWidget(self.tab_widget, 0, QtCore.Qt.AlignTop)
         self.actionClose = QtWidgets.QAction(Preferences)
         self.actionClose.setObjectName("actionClose")
 
@@ -225,13 +241,17 @@ class Ui_Preferences(object):
     def retranslateUi(self, Preferences):
         _translate = QtCore.QCoreApplication.translate
         Preferences.setWindowTitle(_translate("Preferences", "Preferences"))
+        self.show_icon_label_text.setText(_translate("Preferences", "Show Icon Labels:"))
         self.default_tool_label.setText(_translate("Preferences", "Default tool at startup:"))
         self.default_tool_combo_box.setItemText(0, _translate("Preferences", "Select Tool"))
         self.default_tool_combo_box.setItemText(1, _translate("Preferences", "Pencil Tool"))
         self.default_tool_combo_box.setItemText(2, _translate("Preferences", "Paint"))
         self.default_tool_combo_box.setItemText(3, _translate("Preferences", "Add Seq"))
         self.zoom_speed_label.setText(_translate("Preferences", "Mousewheel zoom speed:"))
-        self.show_icon_label_text.setText(_translate("Preferences", "Show Icon Labels:"))
+        self.Grid.setText(_translate("Preferences", "Grid Style"))
+        self.comboBox.setItemText(0, _translate("Preferences", "Circles"))
+        self.comboBox.setItemText(1, _translate("Preferences", "Lines"))
+        self.comboBox.setItemText(2, _translate("Preferences", "Points"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.interface_tab), _translate("Preferences", "Interface"))
         self.dimensionsLabel1.setText(_translate("Preferences", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -264,4 +284,4 @@ class Ui_Preferences(object):
         self.actionClose.setText(_translate("Preferences", "Close"))
         self.actionClose.setShortcut(_translate("Preferences", "Ctrl+W"))
 
-import cadnano.gui.ui.dialogs.dialogicons_rc as dialogicons_rc
+import cadnano.gui.ui.dialogs.dialogicons_rc

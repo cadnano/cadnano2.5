@@ -25,6 +25,9 @@
     <height>32</height>
    </size>
   </property>
+  <property name="tabShape">
+   <enum>QTabWidget::Rounded</enum>
+  </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
   </property>
@@ -65,81 +68,6 @@
       <property name="handleWidth">
        <number>0</number>
       </property>
-      <widget class="QSplitter" name="outliner_property_splitter">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="handleWidth">
-        <number>0</number>
-       </property>
-       <widget class="OutlinerTreeWidget" name="outliner_widget">
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }
-
-</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-        </property>
-        <property name="dragEnabled">
-         <bool>true</bool>
-        </property>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="PropertyEditorWidget" name="property_widget">
-        <property name="font">
-         <font>
-          <stylestrategy>PreferAntialias</stylestrategy>
-         </font>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="columnCount">
-         <number>2</number>
-        </property>
-        <column>
-         <property name="text">
-          <string notr="true">1</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string notr="true">2</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="QDialogButtonBox" name="property_buttonbox">
-        <property name="layoutDirection">
-         <enum>Qt::LeftToRight</enum>
-        </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel</set>
-        </property>
-        <property name="centerButtons">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </widget>
       <widget class="CustomQGraphicsView" name="slice_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -240,13 +168,100 @@
         <enum>QGraphicsView::AnchorUnderMouse</enum>
        </property>
       </widget>
+      <widget class="QSplitter" name="outliner_property_splitter">
+       <property name="baseSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="handleWidth">
+        <number>0</number>
+       </property>
+       <widget class="OutlinerTreeWidget" name="outliner_widget">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }
+
+</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+        </property>
+        <property name="dragEnabled">
+         <bool>true</bool>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="PropertyEditorWidget" name="property_widget">
+        <property name="font">
+         <font>
+          <stylestrategy>PreferAntialias</stylestrategy>
+         </font>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::AdjustToContents</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed|QAbstractItemView::SelectedClicked</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
+        </property>
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <column>
+         <property name="text">
+          <string notr="true">1</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string notr="true">2</string>
+         </property>
+        </column>
+       </widget>
+       <widget class="QDialogButtonBox" name="property_buttonbox">
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+        <property name="standardButtons">
+         <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel</set>
+        </property>
+        <property name="centerButtons">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
   </widget>
   <widget class="QToolBar" name="right_toolbar">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -270,11 +285,12 @@
     <enum>Qt::ToolButtonTextUnderIcon</enum>
    </property>
    <attribute name="toolBarArea">
-    <enum>RightToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_new_dnapart"/>
    <addaction name="action_path_select"/>
    <addaction name="action_path_pencil"/>
    <addaction name="action_path_nick"/>
@@ -283,15 +299,18 @@
    <addaction name="action_path_skip"/>
    <addaction name="action_path_add_seq"/>
    <addaction name="action_path_mods"/>
+   <addaction name="action_vhelix_snap"/>
    <addaction name="separator"/>
    <addaction name="action_autostaple"/>
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
    <addaction name="action_renumber"/>
+   <addaction name="separator"/>
+   <addaction name="action_outliner"/>
   </widget>
   <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
@@ -313,7 +332,10 @@
     <string>Path Tools</string>
    </property>
    <property name="layoutDirection">
-    <enum>Qt::LeftToRight</enum>
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
    </property>
    <property name="allowedAreas">
     <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
@@ -328,69 +350,16 @@
     <enum>Qt::ToolButtonIconOnly</enum>
    </property>
    <attribute name="toolBarArea">
-    <enum>RightToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>true</bool>
-   </attribute>
-   <addaction name="action_filter_fwd"/>
-   <addaction name="action_filter_rev"/>
-   <addaction name="action_filter_endpoint"/>
-   <addaction name="action_filter_xover"/>
-   <addaction name="separator"/>
-   <addaction name="action_filter_handle"/>
-  </widget>
-  <widget class="QToolBar" name="left_toolbar">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>0</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>9</pointsize>
-    </font>
-   </property>
-   <property name="windowTitle">
-    <string>Slice Tools</string>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>20</width>
-     <height>20</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>LeftToolBarArea</enum>
+    <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_outliner"/>
-   <addaction name="action_new_dnapart"/>
-   <addaction name="separator"/>
-   <addaction name="action_vhelix_select"/>
-   <addaction name="action_vhelix_move"/>
-   <addaction name="action_vhelix_create"/>
-   <addaction name="action_vhelix_snap"/>
-   <addaction name="action_vhelix_set_angles"/>
-   <addaction name="separator"/>
-   <addaction name="actionGridLines"/>
-   <addaction name="actionGridCircles"/>
-   <addaction name="actionGridPoints"/>
+   <addaction name="action_filter_handle"/>
+   <addaction name="action_filter_fwd"/>
+   <addaction name="action_filter_rev"/>
+   <addaction name="action_filter_endpoint"/>
+   <addaction name="action_filter_xover"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -949,13 +918,13 @@
   <action name="action_new_dnapart">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/new-dna-part</normaloff>:/slicetools/new-dna-part</iconset>
+     <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
    </property>
    <property name="text">
-    <string>dna</string>
+    <string>New</string>
    </property>
    <property name="iconText">
-    <string>dna</string>
+    <string>New</string>
    </property>
    <property name="toolTip">
     <string>Add DNAPart </string>
@@ -973,13 +942,10 @@
      <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
    </property>
    <property name="text">
-    <string>browser</string>
+    <string>inspector</string>
    </property>
    <property name="toolTip">
     <string>Toggle Outliner</string>
-   </property>
-   <property name="shortcut">
-    <string>O</string>
    </property>
   </action>
   <action name="action_new_part">
@@ -1178,12 +1144,15 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/snap-helix</normaloff>:/slicetools/snap-helix</iconset>
    </property>
    <property name="text">
-    <string>snap</string>
+    <string>Snap</string>
    </property>
    <property name="toolTip">
     <string>Snap Helix</string>

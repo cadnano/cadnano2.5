@@ -51,8 +51,10 @@ class PropertyEditorWidget(QTreeWidget):
         # Header
         self.setHeaderLabels(["Property", "Value"])
         h = self.header()
-        h.setSectionResizeMode(QHeaderView.Stretch)
-        h.setSectionsMovable(True)
+        h.resizeSection(0, 200)
+        h.resizeSection(1, 100)
+        h.setSectionResizeMode(QHeaderView.Interactive)
+        # h.setStretchLastSection(False)
 
         custom_delegate = CustomStyleItemDelegate(self)
         self.setItemDelegate(custom_delegate)
