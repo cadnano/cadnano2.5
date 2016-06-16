@@ -291,8 +291,8 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_new_dnapart"/>
-   <addaction name="action_path_select"/>
-   <addaction name="action_path_pencil"/>
+   <addaction name="action_global_select"/>
+   <addaction name="action_global_pencil"/>
    <addaction name="action_path_nick"/>
    <addaction name="action_path_paint"/>
    <addaction name="action_path_insertion"/>
@@ -559,9 +559,6 @@
    <property name="toolTip">
     <string>Select Tool (v)</string>
    </property>
-   <property name="shortcut">
-    <string>V</string>
-   </property>
   </action>
   <action name="action_slice_first">
    <property name="icon">
@@ -600,9 +597,6 @@
    </property>
    <property name="toolTip">
     <string>Pe(n)cil Tool</string>
-   </property>
-   <property name="shortcut">
-    <string>N</string>
    </property>
   </action>
   <action name="action_path_insertion">
@@ -1222,6 +1216,45 @@
    </property>
    <property name="shortcut">
     <string>W</string>
+   </property>
+  </action>
+  <action name="action_global_pencil">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/pathtools/force</normaloff>:/pathtools/force</iconset>
+   </property>
+   <property name="text">
+    <string>Pencil</string>
+   </property>
+   <property name="toolTip">
+    <string>Pe(n)cil Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>N</string>
+   </property>
+  </action>
+  <action name="action_global_select">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/pathtools/select</normaloff>:/pathtools/select</iconset>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+   <property name="iconText">
+    <string>Select</string>
+   </property>
+   <property name="toolTip">
+    <string>Select Tool (v)</string>
+   </property>
+   <property name="shortcut">
+    <string>V</string>
    </property>
   </action>
  </widget>

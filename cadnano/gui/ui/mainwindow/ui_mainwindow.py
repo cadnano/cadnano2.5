@@ -2,7 +2,8 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.5
+# Created: Thu Jun 16 15:35:54 2016
+#      by: PyQt5 UI code generator 5.3.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -450,9 +451,17 @@ class Ui_MainWindow(object):
         icon44.addPixmap(QtGui.QPixmap(":/slicetools/move"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_vhelix_move.setIcon(icon44)
         self.action_vhelix_move.setObjectName("action_vhelix_move")
+        self.action_global_pencil = QtWidgets.QAction(MainWindow)
+        self.action_global_pencil.setCheckable(True)
+        self.action_global_pencil.setIcon(icon9)
+        self.action_global_pencil.setObjectName("action_global_pencil")
+        self.action_global_select = QtWidgets.QAction(MainWindow)
+        self.action_global_select.setCheckable(True)
+        self.action_global_select.setIcon(icon6)
+        self.action_global_select.setObjectName("action_global_select")
         self.right_toolbar.addAction(self.action_new_dnapart)
-        self.right_toolbar.addAction(self.action_path_select)
-        self.right_toolbar.addAction(self.action_path_pencil)
+        self.right_toolbar.addAction(self.action_global_select)
+        self.right_toolbar.addAction(self.action_global_pencil)
         self.right_toolbar.addAction(self.action_path_nick)
         self.right_toolbar.addAction(self.action_path_paint)
         self.right_toolbar.addAction(self.action_path_insertion)
@@ -528,14 +537,12 @@ class Ui_MainWindow(object):
         self.action_path_select.setText(_translate("MainWindow", "Select"))
         self.action_path_select.setIconText(_translate("MainWindow", "Select"))
         self.action_path_select.setToolTip(_translate("MainWindow", "Select Tool (v)"))
-        self.action_path_select.setShortcut(_translate("MainWindow", "V"))
         self.action_slice_first.setText(_translate("MainWindow", "First"))
         self.action_slice_first.setToolTip(_translate("MainWindow", "Move the slice bar to the first position."))
         self.action_slice_last.setText(_translate("MainWindow", "Last"))
         self.action_slice_last.setToolTip(_translate("MainWindow", "Move the slice bar to the last position."))
         self.action_path_pencil.setText(_translate("MainWindow", "Pencil"))
         self.action_path_pencil.setToolTip(_translate("MainWindow", "Pe(n)cil Tool"))
-        self.action_path_pencil.setShortcut(_translate("MainWindow", "N"))
         self.action_path_insertion.setText(_translate("MainWindow", "Insert"))
         self.action_path_insertion.setToolTip(_translate("MainWindow", "(I)nsert Tool"))
         self.action_path_insertion.setShortcut(_translate("MainWindow", "I"))
@@ -625,8 +632,15 @@ class Ui_MainWindow(object):
         self.actionGridPoints.setText(_translate("MainWindow", "gridPoints"))
         self.action_vhelix_move.setText(_translate("MainWindow", "move"))
         self.action_vhelix_move.setShortcut(_translate("MainWindow", "W"))
+        self.action_global_pencil.setText(_translate("MainWindow", "Pencil"))
+        self.action_global_pencil.setToolTip(_translate("MainWindow", "Pe(n)cil Tool"))
+        self.action_global_pencil.setShortcut(_translate("MainWindow", "N"))
+        self.action_global_select.setText(_translate("MainWindow", "Select"))
+        self.action_global_select.setIconText(_translate("MainWindow", "Select"))
+        self.action_global_select.setToolTip(_translate("MainWindow", "Select Tool (v)"))
+        self.action_global_select.setShortcut(_translate("MainWindow", "V"))
 
-from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
+from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.propertyview.propertyeditorwidget import PropertyEditorWidget
 import cadnano.gui.ui.mainwindow.icons_rc
