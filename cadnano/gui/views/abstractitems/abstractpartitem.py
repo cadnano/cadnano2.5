@@ -33,6 +33,7 @@ class QAbstractPartItem(QGraphicsRectItem):
     # end def
 
     def setMovable(self, is_movable):
+        self._viewroot.manager.select_tool.resetSelections()
         self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
 

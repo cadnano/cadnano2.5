@@ -18,6 +18,10 @@ Install System Python to `SYSROOT`:
 Install Static qt 5
 
 C:/qt-everywhere-opensource-src-5.6.1/qt5.6.1src/configure.bat -platform win32-msvc2015 -prefix %SYSROOT%/qt5.6 -static -release -nomake examples -skip qtactiveqt -skip qtandroidextras -skip qtconnectivity -skip qtdeclarative -skip qtdoc -skip qtenginio -skip qtgraphicaleffects -skip qtlocation -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtsensors -skip qtserialport -skip qttools -skip qttranslations -skip qtwayland -skip qtx11extras -skip qtandroidextras -skip qtxmlpatterns -skip qtwebchannel -opengl desktop
+
+
+~/Downloads/qt5.6.1src/qt-src-5.6.1/configure -prefix ~/qt5.6.1 -release -nomake examples -skip qtactiveqt -skip qtandroidextras -skip qtconnectivity -skip qtdeclarative -skip qtdoc -skip qtenginio -skip qtgraphicaleffects -skip qtlocation -skip qtquickcontrols -skip qtquickcontrols2 -skip qtscript -skip qtsensors -skip qtserialport -skip qttools -skip qttranslations -skip qtwayland -skip qtx11extras -skip qtandroidextras -skip qtxmlpatterns -skip qtwebchannel -opengl desktop
+
 nmake
 nmake install
 
@@ -52,10 +56,12 @@ In PyQt5 source directory
 	--disable=QtXmlPatterns
 	--disable=_QOpenGLFunctions_ES2
 
+	python configure.py --static --no-tools --no-qsci-api --no-designer-plugin --no-qml-plugin --qmake=/Users/nick/qt5.6.1/bin/qmake --sip=/Users/nick/virtualenvs/radnano35/bin/sip --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtMacExtras
+
 
 # Modifications to Numpy and Pandas
 
-	In the SYSROOT copies of these files comment out 
+	In the SYSROOT copies of these files comment out
 
 	pandas/__init__.py
 

@@ -36,7 +36,7 @@ if platform.system() == 'Windows':
     import ctypes
     myappid = 'cadnano.cadnano.radnano.2.5.0' # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-print("plop")
+
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
     shouldPerformBoilerplateStartupScript = False
