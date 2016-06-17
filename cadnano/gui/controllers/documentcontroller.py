@@ -436,7 +436,9 @@ class DocumentController():
 
     def actionPathAddSeqSlot(self):
         print("triggered seqslot")
-        self.activePart().setAbstractSequences()
+        ap = self.activePart()
+        if ap is not None:
+            self.activePart().setAbstractSequences()
     # end def
 
     def actionPrefsSlot(self):
@@ -446,7 +448,7 @@ class DocumentController():
     def actionAutostapleSlot(self):
         print("autoStapleSlot")
         part = self.activePart()
-        if part:
+        if part is not None:
             self.win.path_graphics_view.setViewportUpdateOn(False)
             part.autoStaple()
             self.win.path_graphics_view.setViewportUpdateOn(True)
@@ -482,7 +484,7 @@ class DocumentController():
 
     def actionRenumberSlot(self):
         part = self.activePart()
-        if part:
+        if part is not None:
             coordList = self.win.pathroot.getSelectedInstanceOrderedVHList()
             part.renumber(coordList)
     # end def
@@ -607,9 +609,11 @@ class DocumentController():
             del self.saveStaplesDialog
             self.saveStaplesDialog = None
         # write the file
-        output = self.activePart().getStapleSequences()
-        with open(fname, 'w') as f:
-            f.write(output)
+        ap = self.activePart():
+        if ap is not None
+            output = ap.getStapleSequences()
+            with open(fname, 'w') as f:
+                f.write(output)
     # end def
 
     def newClickedCallback(self):
