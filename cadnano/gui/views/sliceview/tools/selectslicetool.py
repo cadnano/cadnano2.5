@@ -46,15 +46,17 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def resetSelections(self):
+        # print("resetSelections")
         doc = self.manager.document
         doc.clearAllSelected()
 
     def modelClear(self):
+        # print("modelClear")
         doc = self.manager.document
         doc.clearAllSelected()
 
     def setPartItem(self, part_item):
-        if part_item != self.part_item:
+        if part_item is not self.part_item:
             if self.sgv is not None:
                 # attempt to enforce good housekeeping, not required
                 try:
@@ -62,7 +64,9 @@ class SelectSliceTool(AbstractSliceTool):
                 except:
                     # required for first call
                     pass
-            self.modelClear()
+            if self.part_item is not None:
+                print("modelClear yikes")
+                self.modelClear()
             self.part_item = part_item
             self.group.setParentItem(part_item)
 

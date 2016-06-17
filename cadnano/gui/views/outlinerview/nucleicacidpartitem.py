@@ -117,22 +117,28 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         top_midx = model.index(top_idx, 0)
         vh_list = self._root_items['VHelixList']
         root_midx = model.index(self.indexOfChild(vh_list), 0, top_midx)
+        tw.selection_filter_disabled = True
         if is_adding:
             flag = QItemSelectionModel.Select
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
                 # selecting a selected item will deselect it, so check
-                if not vhi.isSelected():
-                    idx = vh_list.indexOfChild(vhi)
-                    selection_model.select(model.index(idx, 0, root_midx), flag)
+                idx = vh_list.indexOfChild(vhi)
+                qmodel_idx = model.index(idx, 0, root_midx)
+                if not vhi.isSelected() and not selection_model.isSelected(qmodel_idx):
+                    # print("++++++slot Sselect outlinerview", vh_set)
+                    selection_model.select(qmodel_idx, flag)
         else:
             flag = QItemSelectionModel.Deselect
             for id_num in vh_set:
                 vhi = vhi_hash.get(id_num)
                 # deselecting a deselected item will select it, so check
-                if vhi.isSelected():
-                    idx = vh_list.indexOfChild(vhi)
-                    selection_model.select(model.index(idx, 0, root_midx), flag)
+                idx = vh_list.indexOfChild(vhi)
+                qmodel_idx = model.index(idx, 0, root_midx)
+                if vhi.isSelected() and selection_model.isSelected(qmodel_idx):
+                    # print("-----slot deselect outlinerview", vh_set)
+                    selection_model.select(qmodel_idx, flag)
+        tw.selection_filter_disabled = False
     # end def
 
     def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):

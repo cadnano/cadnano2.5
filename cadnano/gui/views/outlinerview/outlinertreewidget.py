@@ -76,8 +76,14 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setItemDelegate(custom_delegate)
 
         self.selectionModel().selectionChanged.connect(self.selectionFilter)
+
+        '''Temporarily disable the selectionFilter with this so you dont
+        get double events
+        '''
+        self.selection_filter_disabled = False
+
         self.model().dataChanged.connect(self.dataChangedSlot)
-        # self.itemSelectionChanged.connect(self.selectedChangedSlot)
+
         self.itemClicked.connect(self.itemClickedHandler)
     # end def
 
@@ -87,6 +93,8 @@ class OutlinerTreeWidget(QTreeWidget):
         this is the next best thing I think
         """
         # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
+        if self.selection_filter_disabled:
+            return
         filter_set = self._document.filter_set
         out_deselection = []
         out_selection = []
@@ -100,9 +108,9 @@ class OutlinerTreeWidget(QTreeWidget):
                     out_deselection.append(index)
             else:
                 out_selection.append(index)
+        sm = self.selectionModel()
         if len(out_deselection) > 0:
             self.indexFromItem(item)
-            sm = self.selectionModel()
             deselection = QItemSelection(out_deselection[0], out_deselection[-1])
             sm.blockSignals(True)
             sm.select(deselection, flags)
@@ -110,14 +118,16 @@ class OutlinerTreeWidget(QTreeWidget):
 
         # now group the indices into items in sets
         tbs, tbd = self.model_selection_changes
+        # print("sets:", tbs, tbd)
         for idx in out_selection:
             item = self.itemFromIndex(idx)
             # print("did select", item)
             tbs.add(item)
         for idx in deselected_items.indexes():
-            item = self.itemFromIndex(idx)
-            # print("did deselect", item)
-            tbd.add(item)
+            if sm.isSelected(idx):
+                item = self.itemFromIndex(idx)
+                # print("did deselect", item)
+                tbd.add(item)
     # end def
 
     def itemClickedHandler(self, tree_widget_item, column):
@@ -140,6 +150,7 @@ class OutlinerTreeWidget(QTreeWidget):
 
 
         # 2. handle document selection
+        # self.blockSignals(True)
         if isinstance(tree_widget_item, NucleicAcidPartItem):
             pass
         elif isinstance(tree_widget_item, VirtualHelixItem):
@@ -149,6 +160,7 @@ class OutlinerTreeWidget(QTreeWidget):
                     is_selected = document.isVirtualHelixSelected(part, id_num)
                     # print("select id_num", id_num, is_selected)
                     if not is_selected:
+                        # print("selecting vh", id_num)
                         document.addVirtualHelicesToSelection(part, [id_num])
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
@@ -157,6 +169,7 @@ class OutlinerTreeWidget(QTreeWidget):
                     is_selected = document.isVirtualHelixSelected(part, id_num)
                     # print("de id_num", id_num, is_selected)
                     if is_selected:
+                        # print("deselecting vh", id_num)
                         document.removeVirtualHelicesFromSelection(part, [id_num])
             model_to_be_deselected.clear()
         elif isinstance(tree_widget_item, OligoItem):
@@ -165,7 +178,7 @@ class OutlinerTreeWidget(QTreeWidget):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
                     if not is_selected:
-                        print("selecting", m_oligo)
+                        # print("selecting", m_oligo)
                         document.selectOligo(m_oligo)
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
@@ -173,10 +186,11 @@ class OutlinerTreeWidget(QTreeWidget):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
                     if is_selected:
-                        print("deselecting", m_oligo)
+                        # print("deselecting", m_oligo)
                         document.deselectOligo(m_oligo)
             model_to_be_deselected.clear()
-        # end def
+        # end if
+        # self.blockSignals(False)
     # end def
 
     def dataChangedSlot(self, top_left, bottom_right):
@@ -549,7 +563,7 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def clearSelectionsSlot(self, doc):
-        # print("clearSelection")
+        # print("clearSelection OutlinerTreeWidget")
         self.selectionModel().clearSelection()
     # end def
 

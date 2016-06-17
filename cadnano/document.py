@@ -169,6 +169,7 @@ class Document(CNObject):
         going to be in the changed_dict either, so go ahead and add
 
         """
+        # print("Document add vh", id_nums)
         selection_dict = self._selection_dict
         if part not in selection_dict:
             # print("creating new set", id(part))
@@ -220,15 +221,12 @@ class Document(CNObject):
     #end def
 
     def clearAllSelected(self):
+        # print("clearAllSelected")
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}
         self.documentClearSelectionsSignal.emit(self)
     # end def
-
-    # def isModelSelected(self, obj):
-    #     return obj in self._selection_dict
-    # # end def
 
     def isModelStrandSelected(self, strand):
         ss = strand.strandSet()
