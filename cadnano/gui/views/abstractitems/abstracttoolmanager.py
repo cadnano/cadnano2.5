@@ -46,10 +46,7 @@ class AbstractToolManager(QObject):
             raise ValueError("Please define tools_names of AbstractToolManager subclass")
         for tool_name in tnames:
             self.installTool(tool_name)
-        """ Select the preferred Startup tool
-        """
-        startup_tool_name = app().prefs.getStartupToolName()
-        getattr(self, 'choose' + startup_tool_name + 'Tool')()
+        getattr(self, 'chooseSelectTool')() # init with Select tool
     # end def
 
     def installTool(self, tool_name):

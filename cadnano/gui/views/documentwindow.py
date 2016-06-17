@@ -34,7 +34,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         # Appearance pref
         if not app().prefs.show_icon_labels:
-            self.right_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
+            self.main_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
         # Outliner & PropertyEditor setup
         self.outliner_widget.configure(window=self, document=doc)
@@ -81,7 +81,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
         self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
 
-        self.insertToolBarBreak(self.right_toolbar)
+        self.insertToolBarBreak(self.main_toolbar)
 
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()

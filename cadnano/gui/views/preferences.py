@@ -20,22 +20,22 @@ class Preferences(object):
         self.readPreferences()
         self.widget.addAction(self.ui_prefs.actionClose)
         self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
-        self.ui_prefs.auto_scaf_combo_box.currentIndexChanged.connect(self.setAutoScaf)
-        self.ui_prefs.default_tool_combo_box.currentIndexChanged.connect(self.setStartupTool)
+        self.ui_prefs.grid_appearance_type_combo_box.currentIndexChanged.connect(self.setGridAppearanceType)
         self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
         self.ui_prefs.add_plugin_button.clicked.connect(self.addPlugin)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
+    # end def
 
     def showDialog(self):
-        # self.exec_()
         self.readPreferences()
         self.widget.show()  # launch prefs in mode-less dialog
+    # end def
 
     def hideDialog(self):
         self.widget.hide()
+    # end def
 
-    # @pyqtSlot(object)
     def handleButtonClick(self, button):
         """
         Restores defaults. Other buttons are ignored because connections
@@ -43,17 +43,15 @@ class Preferences(object):
         """
         if self.ui_prefs.button_box.buttonRole(button) == QDialogButtonBox.ResetRole:
             self.restoreDefaults()
+    # end def
 
     def readPreferences(self):
         self.qs.beginGroup("Preferences")
-        self.auto_scaf_index = self.qs.value("autoScaf", styles.PREF_AUTOSCAF_INDEX)
-        self.startup_tool_index = self.qs.value("startup_tool", styles.PREF_STARTUP_TOOL_INDEX)
+        self.grid_appearance_type_index = self.qs.value("grid_appearance_type", styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
-        self.zoom_on_helix_add = self.qs.value("zoom_on_helix_add", styles.PREF_ZOOM_AFTER_HELIX_ADD)
         self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
-        self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(self.auto_scaf_index)
-        self.ui_prefs.default_tool_combo_box.setCurrentIndex(self.startup_tool_index)
+        self.ui_prefs.grid_appearance_type_combo_box.setCurrentIndex(self.grid_appearance_type_index)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
         self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         ptw = self.ui_prefs.plugin_table_widget
@@ -63,52 +61,38 @@ class Preferences(object):
             row = QTableWidgetItem(loaded_plugin_paths[i])
             row.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable)
             ptw.setItem(i, 0, row)
-        # self.ui_prefs.helixAddCheckBox.setChecked(self.zoom_on_helix_add)
     # end def
 
     def restoreDefaults(self):
-        self.ui_prefs.auto_scaf_combo_box.setCurrentIndex(styles.PREF_AUTOSCAF_INDEX)
-        self.ui_prefs.default_tool_combo_box.setCurrentIndex(styles.PREF_STARTUP_TOOL_INDEX)
+        self.ui_prefs.grid_appearance_type_combo_box.setCurrentIndex(styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
         self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)
-        self.ui_prefs.show_icon_labels.setChecked("value", self.PREF_SHOW_ICON_LABELS)
-        # self.ui_prefs.helixAddCheckBox.setChecked(styles.PREF_ZOOM_AFTER_HELIX_ADD)
+        self.ui_prefs.show_icon_labels.setChecked(styles.PREF_SHOW_ICON_LABELS)
     # end def
 
-    def setAutoScaf(self, index):
-        self.auto_scaf_index = index
+    def setGridAppearanceType(self, grid_appearance_type):
+        self.grid_appearance_type = grid_appearance_type
         self.qs.beginGroup("Preferences")
-        self.qs.setValue("autoScaf", self.auto_scaf_index)
+        self.qs.setValue("grid_appearance_type", grid_appearance_type)
         self.qs.endGroup()
+    # end def
 
-    def setStartupTool(self, index):
-        self.startup_tool_index = index
-        self.qs.beginGroup("Preferences")
-        self.qs.setValue("startup_tool", self.startup_tool_index)
-        self.qs.endGroup()
+    def getGridAppearanceType(self):
+        return ['Circles', 'Lines', 'Points'][self.grid_appearance_type_index]
+    # end def
 
     def setZoomSpeed(self, speed):
         self.zoom_speed = speed
         self.qs.beginGroup("Preferences")
         self.qs.setValue("zoom_speed", self.zoom_speed)
         self.qs.endGroup()
+    # end def
 
     def setShowIconLabels(self, checked):
         self.show_icon_labels = checked
         self.qs.beginGroup("Preferences")
         self.qs.setValue("ui_icons_labels", self.show_icon_labels)
         self.qs.endGroup()
-
-    # def setZoomToFitOnHelixAddition(self, checked):
-    #     self.zoom_on_helix_add = checked
-    #     self.qs.beginGroup("Preferences")
-    #     self.qs.setValue("zoom_on_helix_add", self.zoom_on_helix_add)
-    #     self.qs.endGroup()
-
-    def getAutoScafType(self):
-        return ['Mid-seam', 'Raster'][self.auto_scaf_index]
-
-    def getStartupToolName(self):
-        return ['Select', 'Pencil', 'Paint', 'AddSeq'][self.startup_tool_index]
+    # end def
 
     def addPlugin(self):
         fdialog = QFileDialog(
@@ -122,6 +106,7 @@ class Preferences(object):
         fdialog.filesSelected.connect(self.addPluginAtPath)
         self.fileopendialog = fdialog
         fdialog.open()
+    # end def
 
     def addPluginAtPath(self, fname):
         self.fileopendialog.close()
@@ -162,6 +147,7 @@ class Preferences(object):
             print("Unable to load anythng from plugin %s" % fname)
         self.readPreferences()
         shutil.rmtree(tdir)
+    # end def
 
     def darwinAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
         envirn={"DST":util.this_path()+'/plugins'}
@@ -177,6 +163,7 @@ class Preferences(object):
         retval = self.waitForProcExit(proc)
         if retval != 0:
             self.failWithMsg('cp failed with code %i'%retval)
+    # end def
 
     def linuxAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
         args = ['gksudo', 'cp', '-fR']
@@ -186,6 +173,7 @@ class Preferences(object):
         retval = self.waitForProcExit(proc)
         if retval != 0:
             self.failWithMsg('cp failed with code %i'%retval)
+    # end def
 
     def confirmDestructiveIfNecessary(self, files_in_zip):
         for file_name, file_path in files_in_zip:
@@ -194,6 +182,7 @@ class Preferences(object):
                 return self.confirmDestructive()
             elif os.path.isdir(target):
                 return self.confirmDestructive()
+    # end def
 
     def confirmDestructive(self):
         mb = QMessageBox(self.widget)
@@ -203,6 +192,7 @@ has already been installed. Replace the currently installed one?")
         mb.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
         mb.exec_()
         return mb.clickedButton() == mb.button(QMessageBox.Yes)
+    # end def
 
     def removePluginsToBeOverwritten(self, files_in_zip):
         for file_name, file_path in files_in_zip:
@@ -211,11 +201,13 @@ has already been installed. Replace the currently installed one?")
                 os.unlink(target)
             elif os.path.isdir(target):
                 shutil.rmtree(target)
+    # end def
 
     def movePluginsIntoPluginsFolder(self, files_in_zip):
         for file_name, file_path in files_in_zip:
             target = os.path.join(util.this_path(), 'plugins', file_name)
             shutil.move(file_path, target)
+    # end def
 
     def waitForProcExit(self, proc):
         procexit = False
@@ -227,6 +219,7 @@ has already been installed. Replace the currently installed one?")
                 if e.errno != errno.EINTR:
                     raise ose
         return retval
+    # end def
 
     def failWithMsg(self, str):
         mb = QMessageBox(self.widget)
@@ -235,8 +228,10 @@ has already been installed. Replace the currently installed one?")
         mb.buttonClicked.connect(self.closeFailDialog)
         self.fail_message_box = mb
         mb.open()
+    # end def
 
     def closeFailDialog(self, button):
         self.fail_message_box.close()
         del self.fail_message_box
         self.fail_message_box = None
+    # end def
