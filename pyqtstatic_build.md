@@ -58,6 +58,15 @@ In PyQt5 source directory
 
 	python configure.py --static --no-tools --no-qsci-api --no-designer-plugin --no-qml-plugin --qmake=/Users/nick/qt5.6.1/bin/qmake --sip=/Users/nick/virtualenvs/radnano35/bin/sip --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtMacExtras
 
+## OS X modification to shared libraries
+Copy qt dynamic build library to python root, i.e. root of virtualenv, etc
+basically `sys.base_prefix` and then for each *.so library call `install_name_tool`
+as follows (example QtWidgets):
+
+	install_name_tool -add_rpath @executable_path/../Qt5.5/lib ~/virtualenvs/testqtpy/lib/python3.5/site-packages/PyQt5/QtWidgets.so
+
+and we could even remove the original rpath
+
 
 # Modifications to Numpy and Pandas
 
