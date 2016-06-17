@@ -7,6 +7,9 @@ from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .abstractproppartitem import AbstractPropertyPartItem
 
+KEY_COL = 0
+VAL_COL = 1
+
 class NucleicAcidPartItem(AbstractPropertyPartItem):
     def __init__(self, model_part, parent, key=None):
         super(NucleicAcidPartItem, self).__init__(model_part, parent, key=key)

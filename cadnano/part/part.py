@@ -28,7 +28,7 @@ class Part(VirtualHelixGroup):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color']
+    editable_properties = ['name', 'color', 'grid_type']
     _STEP_SIZE = 21  # this is the period (in bases) of the part lattice
     _RADIUS = 1.125  # nanometers
     _TURNS_PER_STEP = 2
@@ -52,11 +52,9 @@ class Part(VirtualHelixGroup):
         # Properties
         self.view_properties = {}
 
-
         self._group_properties = {  'name':         "Part%d" % len(self._document.children()),
                                     'color':        "#000000", # outlinerview will override from styles
-                                    'is_visible':   True,
-                                    'virtual_helix_order': []
+                                    'is_visible':   True
                                 }
 
         self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4().hex

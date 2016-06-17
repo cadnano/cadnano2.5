@@ -16,18 +16,10 @@ from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.gui.ui.mainwindow import ui_mainwindow
 
+# from PyQt5.QtOpenGL import QGLWidget
+# # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
+# # for an example of the QOpenGlWidget added in Qt 5.4
 
-# for OpenGL mode
-try:
-    # from OpenGL import GL
-    from PyQt5.QtOpenGL import QGLWidget
-    # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
-    # for an example of the QOpenGlWidget added in Qt 5.4
-    GL = True
-except:
-    GL = False
-
-GL = False
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     """docstring for DocumentWindow"""
@@ -93,10 +85,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()
-        if GL:
-            pass
-            # self.slicescene.drawBackground = self.drawBackgroundGL
-            # self.pathscene.drawBackground = self.drawBackgroundGL
 
         # Edit menu setup
         self.actionUndo = doc_ctrlr.undoStack().createUndoAction(self)
@@ -163,31 +151,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     # end def
 
     ### DRAWING RELATED ###
-    # def drawBackgroundGL(self, painter, rect):
-    #     """
-    #     This method is for overloading the QGraphicsScene.
-    #     """
-    #     if painter.paintEngine().type() != QPaintEngine.OpenGL and \
-    #         painter.paintEngine().type() != QPaintEngine.OpenGL2:
-
-    #         qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
-    #         return
-    #     # end if
-    #     painter.beginNativePainting()
-    #     GL.glDisable(GL.GL_DEPTH_TEST) # disable for 2D drawing
-    #     GL.glClearColor(1.0, 1.0, 1.0, 1.0)
-    #     GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
-
-    #     painter.endNativePainting()
-    # # end def
-
-    # def drawBackgroundNonGL(self, painter, rect):
-    #     """
-    #     This method is for overloading the QGraphicsScene.
-    #     """
-    #     print self
-    #     return QGraphicsScene.drawBackground(self, painter, rect)
-    # # end def
 
     ### PRIVATE HELPER METHODS ###
     def _readSettings(self):

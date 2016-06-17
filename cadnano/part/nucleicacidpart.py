@@ -10,7 +10,7 @@ from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
-from cadnano.enum import PartType, StrandType
+from cadnano.enum import PartType, StrandType, GridType
 from cadnano.oligo import Oligo
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
@@ -65,6 +65,7 @@ class NucleicAcidPart(Part):
         self._group_properties['crossover_span_angle'] = 45
         self._group_properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._group_properties['neighbor_active_angle'] = ''
+        self._group_properties['grid_type'] = GridType.HONEYCOMB
     # end def
 
     def __repr__(self):

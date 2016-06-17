@@ -89,7 +89,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
         self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
 
-        self.griditem = GridItem(self)
+        self.griditem = GridItem(self, self._model_props['grid_type'])
 
         # select upon creation
         for part in m_p.document().children():
@@ -130,8 +130,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._model_part == model_part:
+            self._model_props[property_key] = new_value
             if property_key == 'color':
-                self._model_props['color'] = new_value
                 self.outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
@@ -141,7 +141,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 pass
             elif property_key == 'dna_sequence':
                 pass
-                # self.updateRects()
+            elif property_key == 'grid_type':
+                self.griditem.setGridType(new_value)
     # end def
 
     def partRemovedSlot(self, sender):

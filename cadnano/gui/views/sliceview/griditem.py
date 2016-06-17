@@ -6,25 +6,25 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsPathItem,
                             QGraphicsLineItem)
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.enum import GridType
 
 from . import slicestyles as styles
 _ZVALUE = styles.ZSLICEHELIX + 1
 
 class GridItem(QGraphicsPathItem):
-    def __init__(self, part_item):
+    def __init__(self, part_item, grid_type):
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
         dot_size = 4.
         self.dots = (dot_size, dot_size / 2)
         self.allow_snap = True
         # self.allow_snap = False
-        self.is_honeycomb = True
         self.draw_lines = True
         self.points = []
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
-        self.updateGrid()
+        self.setGridType(grid_type)
     # end def
 
     def updateGrid(self):
@@ -39,8 +39,8 @@ class GridItem(QGraphicsPathItem):
             self.doSquare(part_item, radius, bounds)
     # end def
 
-    def setHoneycomb(self, is_honeycomb):
-        self.is_honeycomb = is_honeycomb
+    def setGridType(self, grid_type):
+        self.is_honeycomb = True if grid_type == GridType.HONEYCOMB else False
         self.updateGrid()
     # end def
 
