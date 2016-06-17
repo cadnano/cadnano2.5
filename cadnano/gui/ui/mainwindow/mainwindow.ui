@@ -259,7 +259,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="right_toolbar">
+  <widget class="QToolBar" name="main_toolbar">
    <property name="sizePolicy">
     <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
      <horstretch>0</horstretch>
@@ -301,10 +301,8 @@
    <addaction name="action_path_mods"/>
    <addaction name="action_vhelix_snap"/>
    <addaction name="separator"/>
-   <addaction name="action_autostaple"/>
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
-   <addaction name="action_renumber"/>
    <addaction name="separator"/>
    <addaction name="action_outliner"/>
   </widget>
