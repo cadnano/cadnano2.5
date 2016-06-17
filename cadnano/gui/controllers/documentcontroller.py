@@ -609,8 +609,8 @@ class DocumentController():
             del self.saveStaplesDialog
             self.saveStaplesDialog = None
         # write the file
-        ap = self.activePart():
-        if ap is not None
+        ap = self.activePart()
+        if ap is not None:
             output = ap.getStapleSequences()
             with open(fname, 'w') as f:
                 f.write(output)
