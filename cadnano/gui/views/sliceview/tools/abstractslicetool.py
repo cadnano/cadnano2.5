@@ -166,7 +166,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.is_started = False
         self.hideLineItem()
         self._vhi = None
-        # self.part_item = None
+        self.part_item = None
         self.hide()
         self._active = False
     # end def
