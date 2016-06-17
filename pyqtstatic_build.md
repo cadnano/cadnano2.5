@@ -65,7 +65,11 @@ as follows (example QtWidgets):
 
 	install_name_tool -add_rpath @executable_path/../Qt5.5/lib ~/virtualenvs/testqtpy/lib/python3.5/site-packages/PyQt5/QtWidgets.so
 
-and we could even remove the original rpath
+and we could even remove the original rpath.
+
+## Windows modifications to support shared libraries
+
+	Just put dlls in same directory as python libs.
 
 
 # Modifications to Numpy and Pandas
