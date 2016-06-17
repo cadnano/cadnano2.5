@@ -324,10 +324,10 @@ class EndpointItem(QGraphicsPathItem):
     def paintToolMousePress(self, modifiers, event, idx):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
-        # if m_strand.isStaple():
-        color = self.window().path_color_panel.stapColorName()
-        # else:
-            # color = self.window().path_color_panel.scafColorName()
+        if modifiers & Qt.ShiftModifier:
+            color = self.window().path_color_panel.shiftColorName()
+        else:
+            color = self.window().path_color_panel.colorName()
         m_strand.oligo().applyColor(color)
     # end def
 

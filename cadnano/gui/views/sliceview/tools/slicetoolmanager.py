@@ -15,9 +15,8 @@ class SliceToolManager(AbstractToolManager):
         references to both the layer above (UI) and the layer below (model)
         """
         super(SliceToolManager, self).__init__('vhelix', window, viewroot)
-        self.tool_names = ('Select', 'Move', 'Create')
+        self.tool_names = ('Select', 'Create')
         self.select_tool = SelectSliceTool(self)
-        self.move_tool = MoveSliceTool(self)
         self.create_tool = CreateSliceTool(self)
         self.viewroot.setManager(self)
         self.installTools()

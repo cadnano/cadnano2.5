@@ -1,7 +1,8 @@
 
 from PyQt5.QtCore import  QRectF, Qt
 from PyQt5.QtGui import QBrush, QFont, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSimpleTextItem, QColorDialog
+from PyQt5.QtWidgets import (   QGraphicsItem, QColorDialog,
+                                QGraphicsSimpleTextItem, QGraphicsTextItem)
 
 from cadnano import util
 from cadnano.gui.palette import getPenObj, getBrushObj, newBrushObj, getColorObj
@@ -12,8 +13,8 @@ _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 
 
 class ColorPanel(QGraphicsItem):
-    _scaf_colors = [getColorObj(x) for x in styles.SCAF_COLORS]
-    _stap_colors = [getColorObj(x) for x in styles.STAP_COLORS]
+    _shift_colors = [getColorObj(x) for x in styles.SCAF_COLORS]
+    _colors = [getColorObj(x) for x in styles.STAP_COLORS]
     _PEN = Qt.NoPen
 
     def __init__(self, parent=None):
@@ -21,76 +22,65 @@ class ColorPanel(QGraphicsItem):
         self.rect = QRectF(0, 0, 30, 30)
         self.setFlag(QGraphicsItem.ItemIgnoresTransformations)
         self.colordialog = QColorDialog()
-        # self.colordialog.setOption(QColorDialog.DontUseNativeDialog)
-        self._scaf_color_index = -1  # init on -1, painttool will cycle to 0
-        self._stap_color_index = -1  # init on -1, painttool will cycle to 0
-        self._scaf_color = self._scaf_colors[self._scaf_color_index]
-        self._stap_color = self._stap_colors[self._stap_color_index]
-        self._scaf_brush = QBrush(self._scaf_color)
-        self._stap_brush = QBrush(self._stap_color)
+        self._shift_color_index = -1  # init on -1, painttool will cycle to 0
+        self._color_index = -1  # init on -1, painttool will cycle to 0
+        self._shift_color = self._shift_colors[self._shift_color_index]
+        self._color = self._colors[self._color_index]
+        self._shift_brush = QBrush(self._shift_color)
+        self._brush = QBrush(self._color)
         self._initLabel()
         self.hide()
 
     def _initLabel(self):
-        self._label = label = QGraphicsSimpleTextItem("scaf\nstap", parent=self)
-        label.setPos(32, 0)
+        self._label = label = QGraphicsTextItem("⇧", parent=self)
+        label.setPos(28, -4)
         label.setFont(_FONT)
-        # label.setBrush(_labelbrush)
-        # label.hide()
 
     def boundingRect(self):
         return self.rect
 
     def paint(self, painter, option, widget=None):
         painter.setPen(self._PEN)
-        painter.setBrush(self._scaf_brush)
+        painter.setBrush(self._shift_brush)
         painter.drawRect(0, 0, 30, 15)
-        painter.setBrush(self._stap_brush)
+        painter.setBrush(self._brush)
         painter.drawRect(0, 15, 30, 15)
 
     def nextColor(self):
-        self._stap_color_index += 1
-        if self._stap_color_index == len(self._stap_colors):
-            self._stap_color_index = 0
-        self._stap_color = self._stap_colors[self._stap_color_index]
-        self._stap_brush.setColor(self._stap_color)
+        self._color_index += 1
+        if self._color_index == len(self._colors):
+            self._color_index = 0
+        self._color = self._colors[self._color_index]
+        self._brush.setColor(self._color)
         self.update()
 
     def prevColor(self):
-        self._stap_color_index -= 1
+        self._color_index -= 1
 
     def color(self):
-        return self._stap_color
+        return self._color
 
-    def scafColorName(self):
-        return self._scaf_color.name()
+    def shiftColorName(self):
+        return self._shift_color.name()
 
-    def stapColorName(self):
-        return self._stap_color.name()
-
-    def changeScafColor(self):
-        self.update()
-
-    def changeStapColor(self):
-        self._stap_color = self.colordialog.currentColor()
-        self._stap_brush = QBrush(self._stap_color)
-        self.update()
+    def colorName(self):
+        return self._color.name()
 
     def mousePressEvent(self, event):
         if event.pos().y() < 10:
-            new_color = self.colordialog.getColor(self._scaf_color)
-            if new_color.isValid() and new_color.name() != self._scaf_color.name():
-                self._scaf_color = new_color
-                self._scaf_brush = QBrush(new_color)
-                if not new_color in self._scaf_colors:
-                    self._scaf_colors.insert(self._scaf_color_index, new_color)
+            new_color = self.colordialog.getColor(self._shift_color)
+            if new_color.isValid() and new_color.name() != self._shift_color.name():
+                self._shift_color = new_color
+                self._shift_brush = QBrush(new_color)
+                if not new_color in self._shift_colors:
+                    self._shift_colors.insert(self._shift_color_index, new_color)
                 self.update()
         else:
-            new_color = self.colordialog.getColor(self._stap_color)
-            if new_color.isValid() and new_color.name() != self._stap_color.name():
-                self._stap_color = new_color
-                self._stap_brush = QBrush(new_color)
-                if not new_color in self._stap_colors:
-                    self._stap_colors.insert(self._stap_color_index, new_color)
+            new_color = self.colordialog.getColor(self._color)
+            if new_color.isValid() and new_color.name() != self._color.name():
+                self._color = new_color
+                self._brush = QBrush(new_color)
+                if not new_color in self._colors:
+                    self._colors.insert(self._color_index, new_color)
                 self.update()
 

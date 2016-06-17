@@ -15,8 +15,10 @@ from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
 
 from PyQt5.QtGui import QPainter, QIcon, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog, QDockWidget, QFileDialog
-from PyQt5.QtWidgets import QGraphicsItem, QMainWindow, QMessageBox, QStyleOptionGraphicsItem
+from PyQt5.QtWidgets import (   QApplication, QDialog,
+                                QDockWidget, QFileDialog, QActionGroup)
+from PyQt5.QtWidgets import (   QGraphicsItem, QMainWindow,
+                                QMessageBox, QStyleOptionGraphicsItem)
 from PyQt5.QtSvg import QSvgGenerator
 
 """ Allow only one part per document for now until part moving
@@ -54,17 +56,30 @@ class DocumentController():
 
     def _initWindow(self):
         """docstring for initWindow"""
-        self.win = DocumentWindow(doc_ctrlr=self)
-        app().documentWindowWasCreatedSignal.emit(self._document, self.win)
+        self.win = win = DocumentWindow(doc_ctrlr=self)
+        app().documentWindowWasCreatedSignal.emit(self._document, win)
         self._connectWindowSignalsToSelf()
-        self.win.show()
+        win.show()
         app().active_document = self
 
         # Connect outliner with property editor
-        o = self.win.outliner_widget
-        p_e = self.win.property_widget
+        o = win.outliner_widget
+        p_e = win.property_widget
         o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
         self.actionFilterVirtualHelixSlot()
+
+        # setup tool exclusivity
+        self.actiongroup = ag = QActionGroup(win)
+        action_group_list = [   'action_global_select',
+                                'action_global_pencil',
+                                'action_path_nick',
+                                'action_path_paint',
+                                'action_path_insertion',
+                                'action_path_skip',
+                                'action_path_add_seq',
+                                'action_path_mods']
+        for action_name in action_group_list:
+            ag.addAction(getattr(win, action_name))
     # end def
 
     def _connectWindowSignalsToSelf(self):
