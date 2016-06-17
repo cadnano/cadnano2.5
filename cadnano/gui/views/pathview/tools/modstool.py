@@ -210,8 +210,8 @@ class ModsTool(AbstractPathTool):
         mid = part.getModID(strand, idx)
         if mid:
             combobox = self.uiDlg.nameComboBox
-            mod = strand.part().getMod(mid)
-            # print mod, mid
+            mod = document.getModProperties(mid)
+            # print(mod, mid)
             cidx = combobox.findText(mod['name'])
             combobox.setCurrentIndex(cidx)
         self.dialog.setFocus()
