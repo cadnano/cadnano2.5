@@ -33,14 +33,21 @@ class GridItem(QGraphicsPathItem):
         radius = part.radius()
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
-        if self.is_honeycomb:
+        if self.grid_type == GridType.HONEYCOMB:
             self.doHoneycomb(part_item, radius, bounds)
-        else:
+        elif self.grid_type == GridType.SQUARE:
             self.doSquare(part_item, radius, bounds)
+        else:
+            self.setPath(QPainterPath())
     # end def
 
     def setGridType(self, grid_type):
-        self.is_honeycomb = True if grid_type == GridType.HONEYCOMB else False
+        self.grid_type = grid_type
+        self.updateGrid()
+    # end def
+
+    def setDrawlines(self, draw_lines):
+        self.draw_lines = draw_lines
         self.updateGrid()
     # end def
 

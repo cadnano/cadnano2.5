@@ -84,8 +84,9 @@ class Parity:
     ODD = 1
 
 class GridType:
-    SQUARE = 0
-    HONEYCOMB = 1
+    NONE = 0
+    SQUARE = 1
+    HONEYCOMB = 2
 ENUM_NAMES['grid_type'] = enumNames(GridType)
 
 class BreakType:
