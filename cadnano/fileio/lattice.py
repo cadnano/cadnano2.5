@@ -1,5 +1,6 @@
 """
 """
+from math import ceil, floor
 
 root3 = 1.732051
 class HoneycombDnaPart(object):
@@ -44,7 +45,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLattticeCoord(radius, x, y, scale_factor=1.0):
+    def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
         column = int(x / (radius*root3*scale_factor) + 0.5)
 
         row_temp = y / (radius*scale_factor)
@@ -58,16 +59,19 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLattticeCoordRound(radius, x, y, scale_factor=1.0):
-        column = round(x / (radius*root3*scale_factor))
+    def positionToLatticeCoordRound(radius, x, y,
+                                round_up_row, round_up_col, scale_factor=1.0):
+        roundRow = ceil if round_up_row else floor
+        roundCol = ceil if round_up_col else floor
+        column = roundCol(x / (radius*root3*scale_factor))
 
         row_temp = y / (radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
             # odd parity
-            row = round((row_temp - 1)/3.)
+            row = roundRow((row_temp - 1)/3.)
         else:
             # even parity
-            row = round(row_temp/3.)
+            row = roundRow(row_temp/3.)
         return row, column
     # end def
 # end class
@@ -106,7 +110,7 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLattticeCoord(radius, x, y, scale_factor=1.0):
+    def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
         """
         """
         row = int(y/(2.*radius*scale_factor) + 0.5)
@@ -115,7 +119,7 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLattticeCoordRound(radius, x, y, scale_factor=1.0):
+    def positionToLatticeCoordRound(radius, x, y, scale_factor=1.0):
         """
         """
         row = round(y/(2.*radius*scale_factor))
