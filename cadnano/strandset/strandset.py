@@ -388,8 +388,7 @@ class StrandSet(CNObject):
 
     def splitStrand(self, strand, base_idx, update_sequence=True, use_undostack=True):
         """
-        Break strand into two strands. Reapply sequence by default (disabled
-        during autostaple).
+        Break strand into two strands. Reapply sequence by default.
         """
         if self.strandCanBeSplit(strand, base_idx):
             if self.isStrandInSet(strand):

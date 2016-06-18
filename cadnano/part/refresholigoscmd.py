@@ -13,7 +13,7 @@ class RefreshOligosCommand(UndoCommand):
     Hence, we disable oligo assignment during the xover creation step,
     and then do it all in one pass at the end with this command.
 
-    This command is meant for non-undoable steps, like file-io and autostaple
+    This command is meant for non-undoable steps, like file-io.
     """
     def __init__(self, part):
         super(RefreshOligosCommand, self).__init__("refresh oligos")

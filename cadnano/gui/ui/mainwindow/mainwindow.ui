@@ -558,30 +558,6 @@
     <string>Select Tool (v)</string>
    </property>
   </action>
-  <action name="action_slice_first">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/go-first</normaloff>:/slicetools/go-first</iconset>
-   </property>
-   <property name="text">
-    <string>First</string>
-   </property>
-   <property name="toolTip">
-    <string>Move the slice bar to the first position.</string>
-   </property>
-  </action>
-  <action name="action_slice_last">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/go-last</normaloff>:/slicetools/go-last</iconset>
-   </property>
-   <property name="text">
-    <string>Last</string>
-   </property>
-   <property name="toolTip">
-    <string>Move the slice bar to the last position.</string>
-   </property>
-  </action>
   <action name="action_path_pencil">
    <property name="checkable">
     <bool>true</bool>
@@ -643,18 +619,6 @@
    </property>
    <property name="shortcut">
     <string>S</string>
-   </property>
-  </action>
-  <action name="action_renumber">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/renum</normaloff>:/parttools/renum</iconset>
-   </property>
-   <property name="text">
-    <string>Rnum</string>
-   </property>
-   <property name="toolTip">
-    <string>Renumber Slice helices according to helix ordering in Path panel.</string>
    </property>
   </action>
   <action name="action_path_paint">
@@ -836,57 +800,9 @@
     <string>H</string>
    </property>
   </action>
-  <action name="action_filter_fwd">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-scaf</normaloff>:/parttools/filter-scaf</iconset>
-   </property>
-   <property name="toolTip">
-    <string>(C)Forward</string>
-   </property>
-   <property name="shortcut">
-    <string>C</string>
-   </property>
-  </action>
-  <action name="action_filter_rev">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-stap</normaloff>:/parttools/filter-stap</iconset>
-   </property>
-   <property name="toolTip">
-    <string>(T)Reverse</string>
-   </property>
-   <property name="shortcut">
-    <string>T</string>
-   </property>
-  </action>
   <action name="action_about">
    <property name="text">
     <string>About cadnano</string>
-   </property>
-  </action>
-  <action name="action_autostaple">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/autostaple</normaloff>:/pathtools/autostaple</iconset>
-   </property>
-   <property name="text">
-    <string>Auto</string>
-   </property>
-   <property name="toolTip">
-    <string>Create staple strands complementary to existing scaffold.</string>
    </property>
   </action>
   <action name="action_path_mods">
@@ -920,6 +836,9 @@
    </property>
    <property name="toolTip">
     <string>Add DNAPart </string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
   <action name="action_outliner">
