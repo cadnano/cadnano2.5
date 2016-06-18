@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsPathItem,
                             QGraphicsLineItem)
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.enum import GridType
 
 from . import slicestyles as styles
@@ -15,7 +16,7 @@ class GridItem(QGraphicsPathItem):
     def __init__(self, part_item, grid_type):
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
-        dot_size = 4.
+        dot_size = 0.5
         self.dots = (dot_size, dot_size / 2)
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = True
@@ -81,7 +82,7 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint( x - half_dot_size,
                                 -y - half_dot_size,
                                 dot_size, self)
-                pt.setPen(QPen(Qt.black))
+                pt.setPen(getPenObj(Qt.blue, 1.0))
                 points.append(pt)
             is_pen_down = False
         # end for i
@@ -133,7 +134,7 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint( x - half_dot_size,
                                 -y - half_dot_size,
                                 dot_size, self)
-                pt.setPen(QPen(Qt.black))
+                pt.setPen(getPenObj(Qt.blue, 1.0))
                 points.append(pt)
             is_pen_down = False # pen up
         # DO VERTICAL LINES
@@ -203,11 +204,13 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def hoverEnterEvent(self, event):
-        self.setPen(QPen(Qt.green))
+        self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
+        self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
     # end def
 
     def hoverLeaveEvent(self, event):
-        self.setPen(QPen(Qt.black))
+        self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
+        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.0))
     # end def
 
     def selectToolMousePress(self, tool, part_item, event):
