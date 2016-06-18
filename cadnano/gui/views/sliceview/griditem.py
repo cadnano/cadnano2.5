@@ -17,8 +17,7 @@ class GridItem(QGraphicsPathItem):
         self.part_item = part_item
         dot_size = 4.
         self.dots = (dot_size, dot_size / 2)
-        self.allow_snap = True
-        # self.allow_snap = False
+        self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = True
         self.points = []
         color = QColor(Qt.blue)
@@ -160,10 +159,21 @@ class GridItem(QGraphicsPathItem):
 # end class
 
 class ClickArea(QGraphicsEllipseItem):
-    pass
-    # def mousePressEvent(self, event):
-    #     event.setAccepted(False)
-    #     return False
+    _RADIUS = styles.SLICE_HELIX_RADIUS
+    no_pen = QPen(Qt.NoPen)
+    def __init__(self, diameter, parent):
+        nd = 2*self._RADIUS
+        offset = -0.5*nd + diameter/2
+        super(ClickArea, self).__init__(offset, offset,
+                                        nd,  nd, parent=parent)
+        self.parent_obj = parent
+        self.setAcceptHoverEvents(True)
+        self.setPen(self.no_pen)
+    # end def
+
+    def mousePressEvent(self, event):
+        return self.parent_obj.mousePressEvent(event)
+# end class
 
 class GridPoint(QGraphicsEllipseItem):
     __slots__ = 'grid', 'offset'
@@ -173,11 +183,9 @@ class GridPoint(QGraphicsEllipseItem):
                                         diameter, diameter, parent=parent_grid)
         self.offset = diameter / 2
         self.grid = parent_grid
-        self.setFiltersChildEvents(True)
-        self.clickarea = QGraphicsEllipseItem(-1.5*diameter, -1.5*diameter,
-                                    4*diameter, 4*diameter, parent=self)
-        self.clickarea.setAcceptHoverEvents(True)
-        self.clickarea.setAcceptedMouseButtons(Qt.LeftButton)
+
+        self.clickarea = ClickArea(diameter, parent=self)
+
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
         self.setAcceptHoverEvents(True)
@@ -205,7 +213,7 @@ class GridPoint(QGraphicsEllipseItem):
     def selectToolMousePress(self, tool, part_item, event):
         part = part_item.part()
         part.setSelected(True)
-        print("monkey")
+        # print("monkey")
         alt_event = GridEvent(self, self.offset)
         tool.selectOrSnap(part_item, alt_event, event)
     # end def
@@ -213,7 +221,7 @@ class GridPoint(QGraphicsEllipseItem):
     def createToolMousePress(self, tool, part_item, event):
         part = part_item.part()
         part.setSelected(True)
-        print("paws")
+        # print("paws")
         alt_event = GridEvent(self, self.offset)
         part_item.createToolMousePress(tool, event, alt_event)
     # end def

@@ -23,7 +23,7 @@ class SliceRootItem(QGraphicsRectItem):
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
-        self._instance_items = {}
+        self.instance_items = {}
         self.manager = None
         self.select_tool = None
     ### SIGNALS ###
@@ -39,7 +39,7 @@ class SliceRootItem(QGraphicsRectItem):
             na_part_item = NucleicAcidPartItem(model_part_instance,
                 viewroot=self,
                 parent=self)
-            self._instance_items[na_part_item] = na_part_item
+            self.instance_items[na_part_item] = na_part_item
             self.select_tool.setPartItem(na_part_item)
             na_part_item.zoomToFit()
         else:
@@ -83,20 +83,20 @@ class SliceRootItem(QGraphicsRectItem):
 
     ### METHODS ###
     def removePartItem(self, part_item):
-        del self._instance_items[part_item]
+        del self.instance_items[part_item]
     # end def
 
     def resetDocumentAndController(self, document):
         """docstring for resetDocumentAndController"""
         self._document = document
         self._controller = ViewRootController(self, document)
-        if len(self._instance_items) > 0:
+        if len(self.instance_items) > 0:
             raise ImportError
     # end def
 
     def setModifyState(self, bool):
         """docstring for setModifyState"""
-        for nucleicacid_part_item in self._instance_items:
+        for nucleicacid_part_item in self.instance_items:
             nucleicacid_part_item.setModifyState(bool)
     # end def
 

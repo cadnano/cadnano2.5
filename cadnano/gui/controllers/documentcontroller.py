@@ -124,7 +124,9 @@ class DocumentController():
         win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
         win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
 
-        self.win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
+        win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
+
+        win.action_vhelix_snap.triggered.connect(self.actionVhelixSnapSlot)
     # end def
 
 
@@ -139,6 +141,11 @@ class DocumentController():
         win = self.win
         win.action_vhelix_create.trigger()
         win.action_path_pencil.trigger()
+    # end def
+
+    def actionVhelixSnapSlot(self, state):
+        for item in self.win.sliceroot.instance_items.values():
+            item.griditem.allow_snap = state
     # end def
 
     def undoStackCleanChangedSlot(self):
