@@ -80,6 +80,8 @@ class DocumentController():
                                 'action_path_mods']
         for action_name in action_group_list:
             ag.addAction(getattr(win, action_name))
+
+        win.action_global_select.trigger()
     # end def
 
     def _connectWindowSignalsToSelf(self):
@@ -92,13 +94,13 @@ class DocumentController():
         win.action_save.triggered.connect(self.actionSaveSlot)
         win.action_save_as.triggered.connect(self.actionSaveAsSlot)
         win.action_SVG.triggered.connect(self.actionSVGSlot)
-        win.action_autostaple.triggered.connect(self.actionAutostapleSlot)
         win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         win.action_preferences.triggered.connect(self.actionPrefsSlot)
         win.action_modify.triggered.connect(self.actionModifySlot)
         win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
 
         win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
+        win.action_new_dnapart.triggered.connect(lambda: win.action_global_pencil.trigger())
 
         win.closeEvent = self.windowCloseEventHandler
         win.action_about.triggered.connect(self.actionAboutSlot)
