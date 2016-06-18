@@ -159,6 +159,12 @@ class GridItem(QGraphicsPathItem):
     # end def
 # end class
 
+class ClickArea(QGraphicsEllipseItem):
+    pass
+    # def mousePressEvent(self, event):
+    #     event.setAccepted(False)
+    #     return False
+
 class GridPoint(QGraphicsEllipseItem):
     __slots__ = 'grid', 'offset'
 
@@ -167,8 +173,14 @@ class GridPoint(QGraphicsEllipseItem):
                                         diameter, diameter, parent=parent_grid)
         self.offset = diameter / 2
         self.grid = parent_grid
+        self.setFiltersChildEvents(True)
+        self.clickarea = QGraphicsEllipseItem(-1.5*diameter, -1.5*diameter,
+                                    4*diameter, 4*diameter, parent=self)
+        self.clickarea.setAcceptHoverEvents(True)
+        self.clickarea.setAcceptedMouseButtons(Qt.LeftButton)
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
+        self.setAcceptHoverEvents(True)
     # end def
 
     def mousePressEvent(self, event):
@@ -180,6 +192,14 @@ class GridPoint(QGraphicsEllipseItem):
                 getattr(self, tool_method_name)(tool, part_item, event)
         else:
             QGraphicsEllipseItem.mousePressEvent(self, event)
+    # end def
+
+    def hoverEnterEvent(self, event):
+        self.setPen(QPen(Qt.green))
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.setPen(QPen(Qt.black))
     # end def
 
     def selectToolMousePress(self, tool, part_item, event):

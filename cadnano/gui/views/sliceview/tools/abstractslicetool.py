@@ -20,7 +20,7 @@ class AbstractSliceTool(QGraphicsObject):
         self.manager = manager
         self._active = False
         self._last_location = None
-        self._line_item = QGraphicsLineItem(None)
+        self._line_item = QGraphicsLineItem(self)
         self._line_item.hide()
         self._vhi = None
         # self._rect = _RECT
