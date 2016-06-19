@@ -4,7 +4,12 @@ import sys
 import os
 import logging
 logger = logging.getLogger(__name__)
-LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
+
+if getattr(sys, 'frozen', False):
+    LOCAL_DIR = os.path.dirname(sys.executable)
+else:
+    LOCAL_DIR = datadir = os.path.dirname(__file__)
+
 PROJECT_DIR = os.path.dirname(LOCAL_DIR)
 sys.path.append(PROJECT_DIR)
 sys.path.insert(0, '.')
