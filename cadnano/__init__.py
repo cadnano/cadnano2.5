@@ -1,5 +1,6 @@
 import sys
 from .cnproxy import tapp
+from ._version import __version__
 
 global shared_app
 shared_app = tapp
@@ -42,4 +43,8 @@ def initAppWithGui(app_args=None, do_exec=True):
     return shared_app
 
 
-__all__ = ["document", "enum", "decorators", "fileio", "oligo", "part", "strand", "strand", "strandset", "virtualhelix"]
+__all__ = ["document", "enum", "decorators", "fileio", "oligo", "part",
+           "strand", "strand", "strandset", "virtualhelix", "__version__"]
+
+
+

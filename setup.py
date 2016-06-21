@@ -33,6 +33,7 @@ except ImportError:
 from distutils.command import install_lib, sdist, build_ext, install_scripts
 from distutils.command.install import install as _install
 from distutils import log as setup_log
+from distutils.util import convert_path
 
 from os.path import join as pjoin
 from os.path import relpath as rpath
@@ -125,26 +126,28 @@ exclude_list = ['*.genbank', '*.fasta',
 cn_packages = find_packages(exclude=exclude_list)
 # print(cn_packages)
 
+# Get the version number
+version_ns = {}
+ver_path = convert_path('cadnano/_version.py')
+with open(ver_path) as ver_file:
+    exec(ver_file.read(), version_ns)
+
+# Get cadnano variables
+cadnano_ns = {}
+cadnano_path = convert_path('cadnano/_info.py')
+with open(cadnano_path) as cadnano_file:
+    exec(cadnano_file.read(), cadnano_ns)
+
 setup(
     name='cadnano',
-    version='2.5.0',
-    license='GPLv2',
-    author='Nick Conway, Shawn Douglas',
-    author_email='a.grinner@gmail.com',
-    url='https://github.com/cadnano/cadnano2.5',
+    version=version_ns['__version__'],
+    license=license,
+    author=cadnano_ns['author'],
+    author_email=cadnano_ns['email'],
+    url=cadnano_ns['url'],
     description='radnano',
     long_description=LONG_DESCRIPTION,
-    classifiers=[
-        'Programming Language :: C',
-        'Programming Language :: Cython',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5',
-        'Development Status :: 4 - Beta',
-        'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Bio-Informatics',
-        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)'
-    ],
+    classifiers=cadnano_ns['classifiers'],
     cmdclass={'install': myinstall},
     packages=cn_packages,
     ext_modules=[],
