@@ -26,6 +26,9 @@ nmake
 nmake install
 
 
+C:\Users\Nick\Downloads\qt-src-5.5.1\qt-src-5.5.1\configure.bat -platform win32-msvc2015 -prefix %QT551% -release -nomake examples -skip qtactiveqt -skip qtandroidextras -skip qtconnectivity -skip qtdeclarative -skip qtdoc -skip qtenginio -skip qtgraphicaleffects -skip qtlocation -skip qtquickcontrols -skip qtscript -skip qtsensors -skip qtserialport -skip qttools -skip qttranslations -skip qtwayland -skip qtx11extras -skip qtmacextras -skip qtxmlpatterns -skip qtwebchannel -opengl desktop
+
+
 In SIP source directory
 
 	pyqtdeploycli --package sip --target win-64 configure
@@ -42,6 +45,11 @@ In PyQt5 source directory
 	python C:\Users\Nick\Downloads\PyQt5_gpl-5.6\PyQt5_gpl-5.6\configure.py --static --sysroot=%SYSROOT% --no-tools --no-qsci-api --no-designer-plugin --no-qml-plugin --qmake=%SYSROOT%/qt5.6/bin/qmake.exe --sip="C:\Anaconda3\sip.exe" --configuration=pyqt5-win.cfg --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtWinExtras --bindir=$Env:SYSROOT --destdir=%SYSROOT%\lib\python3.5\site-packages
 	nmake
 	nmake install
+
+
+	# window need to rename qmake in Anaconda\Library\bin since Anaconda adds it to the top of the PATH at runtime
+	# so configure.py works since PyQt5 on windows makes sure you have only one qmake.exe on the PATH
+	python C:\Users\Nick\Downloads\PyQt-gpl-5.5.1\PyQt-gpl-5.5.1\configure.py --no-qsci-api --no-designer-plugin --no-qml-plugin --sip="C:\Anaconda3\sip.exe" --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtWinExtras
 
 	--disable=QAxContainer
 	--disable=QtDesigner
