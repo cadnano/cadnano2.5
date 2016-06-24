@@ -53,14 +53,14 @@ class GridItem(QGraphicsPathItem):
 
     def doHoneycomb(self, part_item, radius, bounds):
         doLattice = HoneycombDnaPart.latticeCoordToPositionXY
-        doPosition = HoneycombDnaPart.positionToLattticeCoordRound
+        doPosition = HoneycombDnaPart.positionToLatticeCoordRound
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points
-        row_l, col_l = doPosition(radius, x_l, -y_l, scale_factor=sf)
-        row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
+        row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
+        row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
         # print(row_l, row_h, col_l, col_h)
 
         path = QPainterPath()
@@ -105,7 +105,7 @@ class GridItem(QGraphicsPathItem):
 
     def doSquare(self, part_item, radius, bounds):
         doLattice = SquareDnaPart.latticeCoordToPositionXY
-        doPosition = SquareDnaPart.positionToLattticeCoordRound
+        doPosition = SquareDnaPart.positionToLatticeCoordRound
         x_l, x_h, y_l, y_h = bounds
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
