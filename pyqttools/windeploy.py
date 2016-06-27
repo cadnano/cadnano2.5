@@ -8,19 +8,15 @@ import glob
 If you install Qt5 / PyQt5 with pyqt5_check.py this will
 create a relocatable build of this such that we can create a wheel
 
+uses Qt5 windeployqt.exe tool for windows
+
+PyQt5
+https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662
+sip
+https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532
+
 """
 """ Install Qt5 libraries to environment root
-
-Use otool -l <file> to look for
-
-LC_RPATH for rpaths to delete
-and use `install_name_tool` `-add_rpath` and `-delete_rpath` to change it
-
-change LC_ID_DYLIB to change the name of the LC_ID_DYLIB which is a little
-harder to do
-
-you can list files only with
-otool -L <file> | awk '{print $1}'
 
 """
 
@@ -63,7 +59,7 @@ def installRename(file_list, in_path, out_path=""):
         out_path = in_path
 
     for file_name in file_list:
-        cmd_add_rpath = ["windeploy.exe",
+        cmd_add_rpath = ["windeployqt.exe",
                         os.path.join(out_path, file_name)
                         ]
         cmd_add_rpath = ' '.join(cmd_add_rpath)
@@ -78,11 +74,11 @@ def moveExtras(destination_path):
     extras to Qt/[resourses, plugins, translations]
     a la the official wheels
     """
-    destination_path = os.path.abspath(destination_path)
-    dst_path = os.path.join(destination_path, 'Qt')
+    local_path = os.path.join(os.path.abspath(destination_path), 'PyQt5')
+    dst_path = os.path.join(local_path, 'Qt')
     if os.path.exists(dst_path):
         shutil.rmtree(dst_path)
-    plugin_path = os.path.join(dst_path, 'Qt', 'plugins')
+    plugin_path = os.path.join(dst_path, 'plugins')
     os.makedirs(plugin_path)
     folder_list = [ 'audio',
                     'bearer',
@@ -100,15 +96,15 @@ def moveExtras(destination_path):
                     'sensors',
                     'sqldrivers']
     for folder in folder_list:
-        src = os.path.join(destination_path, folder)
+        src = os.path.join(local_path, folder)
         if os.path.exists(src):
             dst = os.path.join(plugin_path, folder)
-            shutil.copytree(src, dst)
+            shutil.move(src, dst)
     for folder in ['resources', 'translations']:
-        src = os.path.join(destination_path, folder)
+        src = os.path.join(local_path, folder)
         if os.path.exists(src):
             dst = os.path.join(dst_path, folder)
-            shutil.copytree(src, dst)
+            shutil.move(src, dst)
     # end for
 # end def
 
@@ -128,6 +124,7 @@ def copyPyQt5(destination_path):
     file_list = [os.path.basename(x) for x in filepath_list]
     # copy special init which fixes Library path
     shutil.copy2('__wininit__.py', os.path.join(dst_path, '__init__.py'))
+    shutil.copy2('winpyqtwheelsetup.py', os.path.join(destination_path, 'setup.py'))
     return dst_path, file_list
 # end def
 
