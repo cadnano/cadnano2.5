@@ -50,29 +50,29 @@ On OS X, [homebrew](http://brew.sh/) is another great way to install Python 3.X
 
 1. Install [SIP](https://riverbankcomputing.com/software/sip/intro) and [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) as the dependencies.
 
-Currently (6/27/2016), `PyQt5` v 5.6  there is a bug with `QGraphicsItem.itemChange`
+..Currently (6/27/2016), `PyQt5` v 5.6  there is a bug with `QGraphicsItem.itemChange`
 that prevents us from being able to use the [wheels on pypi](https://pypi.python.org/pypi/PyQt5/5.6).
 We've built our own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
 problem:
 
-* [Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
-* [Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
+..* [Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
+..* [Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
 
-And install with:
+..And install with:
 
     pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.whl
     pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
 
 
-* [Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
-* [Windows Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662)
+..* [Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
+..* [Windows Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662)
 
-And install with:
+..And install with:
 
     pip install sip-4.18.1-cp35-none-win_amd64.whl
     pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
 
-**Ultimately***, we plan to maintain PyQt5 wheel builds that work on Linux,
+..**Ultimately**, we plan to maintain PyQt5 wheel builds that work on Linux,
  Windows and OS X for Python 3.4+ so you can rely on a single version of
  Python 3.X.  This of course is subject to change, and will change this notice
  once the official wheels are rebuilt with the bug fix.
@@ -81,7 +81,7 @@ And install with:
 
     python setup.py install
 
-Once things are stable, we will distribute a cadnano wheel and start bundling
+..Once things are stable, we will distribute a cadnano wheel and start bundling
 cross platform installers.  For now have fun running radnano.
 
 ### PyQt5 building from scratch
