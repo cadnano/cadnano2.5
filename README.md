@@ -1,6 +1,7 @@
-# cadnano 2.5 beta  *radnano*
+# *radnano* : cadnano 2.5 beta
 This is a development version of cadnano ported to `Qt5/PyQt5`,
-the dev branch is most up to date.  `cadnano` looks better in lower case
+the dev branch is most up to date.  
+`cadnano` looks better in lower case
 
 ## Changes
 A number of organizational and style changes have occured from cadnano 2
@@ -84,7 +85,7 @@ problem:
    Once things are stable, we will distribute a cadnano wheel and start bundling
 cross platform installers.  For now have fun running radnano.
 
-### PyQt5 building from scratch
+### Advanced: PyQt5 building from scratch
 
 Should the above not work for you:
 
@@ -128,6 +129,3 @@ your own
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful for some people.
 
-# *nno2stl*: Conversion of cadnano *.json files to 3D STL model
-
-The purpose of this is for 3D printing cadnano designs.  see bin/creatsly.py
