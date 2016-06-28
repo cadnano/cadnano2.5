@@ -40,33 +40,44 @@ Currently, cadnano will run on Python 3.3, 3.4 and 3.5.
 We do not support Python 2.X.
 
 There are many ways to get Python on your system.  Anaconda Python is a great
-easy way on both Mac OS X, Windows and Linux.
+and easy way on Mac OS X, Windows or Linux.  Python.orgs installers work great too.
 
-On OS X, `homebrew` is another great way to install Python 3.X.
+On OS X, `homebrew` is another great way to install Python 3.X
 
 ### PyQt5 Installation
 
 Install SIP and PyQt as the dependencies.
 
-Currently (6/27/2016), PyQt5 v 5.6  the is a bug with QGraphicsItem.itemChange
+Currently (6/27/2016), `PyQt5` v 5.6  there is a bug with `QGraphicsItem.itemChange`
 that prevents us from being able to use the wheel on pypi.  We've built our
 own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
 problem:
 
-[Mac Python 3.5 SIP 64-bit]
-[Mac Python 3.5 PyQt5 64-bit]
+[Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
+[Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
 
     pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.wh
     pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
 
-[Windows Python 3.5 SIP 64-bit]
-[Windows Python 3.5 PyQt5 64-bit]
+[Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
+[Windows Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662)
 
     pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
     pip install sip-4.18.1-cp35-none-win_amd64.wh
 
+Ultimately, we will maintain PyQt5 wheel builds that work on Linux, Windows and OS X
+for Python 3.4+ so you cab to rely on a single version of Python 3.X.  This of course
+is subject to change.
 
-#### PyQt5 building from scratch
+Then clone the source from github:
+
+
+    pip setup.py install
+
+Once things are stable, we will distribute a cadnano wheel and start bundling
+cross platform installers
+
+### PyQt5 building from scratch
 
 the requirements PyQt5 and sip are available from Riverbank Computing Limited at:
 
@@ -74,7 +85,7 @@ the requirements PyQt5 and sip are available from Riverbank Computing Limited at
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
 
-### Windows from scratch
+#### Windows from scratch
 
 Instructions coming
 
@@ -89,12 +100,12 @@ You can run the included `pyqt5_check.py` which will grab, build and install
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
 
     mkvirtualenv --always-copy <myvenv>
-    python pyqt5_check.py
+    python pyqttools/install_pyqt_from_src.py
 
 and then running the script, but you can definitely install in your system
 python if you run:
 
-    sudo python pyqt5_check.py
+    sudo python pyqttools/install_pyqt_from_src.py
 
 This script only builds required parts of Qt5 and PyQt5 in the interest of time.
 
@@ -110,4 +121,3 @@ OS X and Linux installs of `PyQt5` can be painful for some people.
 # *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 
 The purpose of this is for 3D printing cadnano designs.  see bin/creatsly.py
-C:\Users\Nick\Documents\GitHub\rcedit\Default>rcedit.exe C:\Users\Nick\Documents\GitHub\cadnano2.5\cadnano\install_exe\cadnano.exe --set-icon C:\Users\Nick\Downloads\radnano-app-icon.ico
