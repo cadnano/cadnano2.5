@@ -45,11 +45,11 @@ On OS X, [homebrew](http://brew.sh/) is another great way to install Python 3.X
 
 ### PyQt5 Installation
 
-Install SIP and PyQt as the dependencies.
+Install [SIP](https://riverbankcomputing.com/software/sip/intro) and [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) as the dependencies.
 
 Currently (6/27/2016), `PyQt5` v 5.6  there is a bug with `QGraphicsItem.itemChange`
-that prevents us from being able to use the wheel on pypi.  We've built our
-own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
+that prevents us from being able to use the [wheels on pypi](https://pypi.python.org/pypi/PyQt5/5.6).
+We've built our own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
 problem:
 
 * [Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
@@ -70,8 +70,9 @@ And install with:
     pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
 
 **Ultimately***, we plan to maintain PyQt5 wheel builds that work on Linux,
- Windows and OS X for Python 3.4+ so you cab to rely on a single version of
- Python 3.X.  This of course is subject to change.
+ Windows and OS X for Python 3.4+ so you can rely on a single version of
+ Python 3.X.  This of course is subject to change, and will change this notice
+ once the official wheels are rebuilt with the bug fix.
 
 Then clone the source from github:
 
