@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-'''
+__doc__ = '''
 =========================================================
 cadnano: DNA nanostructure CAD software
 =========================================================
@@ -11,13 +11,9 @@ Installation
 ------------
 
 If you would like to install cadnano in your local Python environment
-you may do so using either pip or the setup.py script::
+you may do so the setup.py script::
 
-  $ pip install cadnano
-            or
   $ python setup.py install
-
-Use rcedit to change icon
 '''
 
 import os
@@ -38,10 +34,8 @@ from distutils import log as setup_log
 from os.path import join as pjoin
 from os.path import relpath as rpath
 
-# from Cython.Build import cythonize
-
-with open('new_readme.rst') as fd:
-    LONG_DESCRIPTION = fd.read()
+# with open('new_readme.rst') as fd:
+#     LONG_DESCRIPTION = fd.read()
 
 
 PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
