@@ -60,8 +60,8 @@ problem:
 
    And install with:
 
-    pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.whl
-    pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
+        pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.whl
+        pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
 
 
   * [Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
@@ -69,8 +69,8 @@ problem:
 
    And install with:
 
-    pip install sip-4.18.1-cp35-none-win_amd64.whl
-    pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
+        pip install sip-4.18.1-cp35-none-win_amd64.whl
+        pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
 
    **Ultimately**, we plan to maintain PyQt5 wheel builds that work on Linux,
  Windows and OS X for Python 3.4+ so you can rely on a single version of
@@ -79,7 +79,7 @@ problem:
 
 2. Then clone the cadnano source from github and run:
 
-    python setup.py install
+        python setup.py install
 
    Once things are stable, we will distribute a cadnano wheel and start bundling
 cross platform installers.  For now have fun running radnano.
