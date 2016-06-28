@@ -36,7 +36,7 @@ from os.path import relpath as rpath
 
 # with open('new_readme.rst') as fd:
 #     LONG_DESCRIPTION = fd.read()
-
+LONG_DESCRIPTION = __doc__
 
 PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH =           pjoin(PACKAGE_PATH, 'cadnano')
