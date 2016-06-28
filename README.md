@@ -36,6 +36,7 @@ Currently, cadnano will run on Python 3.3, 3.4 and 3.5.
 We do not support Python 2.X.
 
 There are many ways to get Python on your system.
+
 [Anaconda Python](https://www.continuum.io/downloads) is a great and easy way
 on Mac OS X, Windows or Linux.
 [Python.orgs](https://www.python.org/) installers work great too.
@@ -51,14 +52,14 @@ that prevents us from being able to use the wheel on pypi.  We've built our
 own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
 problem:
 
-[Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
-[Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
+* [Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
+* [Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
 
     pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.whl
     pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
 
-[Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
-[Windows Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662)
+* [Windows Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=hHzHovkboxbgsl5ZH46X%2f4uSw52mVuRsTSJOONafsis%3d&docid=06d4c2a4776be46f8b0aad84f43c58532)
+* [Windows Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=ngRHdMEIrmXYJ3W2dOIrs9L68nVLqeslinQHsbwcGCg%3d&docid=08daf362df3b14bf084973d85e4efd662)
 
     pip install sip-4.18.1-cp35-none-win_amd64.whl
     pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
