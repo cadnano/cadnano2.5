@@ -8,15 +8,15 @@ A number of organizational and style changes have occured from cadnano 2
 
 * cadnano can be run in python without `PyQt5` installed at all
 * Python 3 compatible
-* added a STL generator to generate models for 3D printing (experimental)
-* added a PDB file generator (experimental, requires additional dependency)
 * Maya code removed.
 * stablized code base so fewer crashes
+* added a STL generator to generate models for 3D printing (experimental)
+* added a PDB file generator (experimental, requires additional dependency)
 
-The only additional burden for development on this code base is installing PyQt5
+The only additional burden for development on this code base is installing `PyQt5`
 to use the GUI which is not a one click situation.  Below gives details on
-installing PyQt5.  If you just want to script your designs (no GUI) you
-**DO NOT** need to install PyQt5.
+installing `PyQt5`.  If you just want to script your designs (no GUI) you
+**DO NOT** need to install `PyQt5`.
 
 ## Running
 
@@ -73,7 +73,7 @@ problem:
         pip install sip-4.18.1-cp35-none-win_amd64.whl
         pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
 
-   **Ultimately**, we plan to maintain PyQt5 wheel builds that work on Linux,
+   **Ultimately**, we plan to maintain `PyQt5` wheel builds that work on Linux,
  Windows and OS X for Python 3.4+ so you can rely on a single version of
  Python 3.X.  This of course is subject to change, and will change this notice
  once the official wheels are rebuilt with the bug fix.
@@ -90,7 +90,7 @@ cross platform installers.  For now have fun running radnano.
 Should the above not work for you:
 
 1. Let us know
-2. the requirements PyQt5 and sip are available from Riverbank Computing Limited at:
+2. the requirements `PyQt5` and `SIP` are available from Riverbank Computing Limited at:
 
 * [Qt5](https://www.qt.io/download/)
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
@@ -107,7 +107,7 @@ under Xcode 7.0.1 and 6.5.  It has also been tested on Debian 7.9 Wheezy
 Please provide feedback if you have problems running this in issues.
 
 You can run the included `pyqt5_check.py` which will grab, build and install
-`Qt5`, `sip` and `PyQt5` in your python environment.  It is cleanest using
+`Qt5`, `SIP` and `PyQt5` in your python environment.  It is cleanest using
 `virtualenv` and `virtualenvwrapper` creating a virtualenv with:
 
     mkvirtualenv --always-copy <myvenv>
@@ -118,13 +118,13 @@ python if you run:
 
     sudo python pyqttools/install_pyqt_from_src.py
 
-This script only builds required parts of Qt5 and PyQt5 in the interest of time.
+This script only builds required parts of `Qt5` and `PyQt5` in the interest of time.
 
-Manual installation of PyQt5 is fine too, but you'll need to trouble shoot on
+Manual installation of `PyQt5` is fine too, but you'll need to trouble shoot on
 your own
 
-1.  Install Qt5. download the [online installer](http://www.qt.io/download-open-source/)
-2.  Build sip and PyQt5 against this Qt5
+1.  Install `Qt5`. download the [online installer](http://www.qt.io/download-open-source/)
+2.  Build sip and PyQt5 against this `Qt5`
 
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful for some people.
