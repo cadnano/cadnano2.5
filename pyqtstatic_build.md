@@ -51,6 +51,8 @@ In PyQt5 source directory
 	# so configure.py works since PyQt5 on windows makes sure you have only one qmake.exe on the PATH
 	python C:\Users\Nick\Downloads\PyQt-gpl-5.5.1\PyQt-gpl-5.5.1\configure.py --no-qsci-api --no-designer-plugin --no-qml-plugin --sip="C:\Anaconda3\sip.exe" --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtWinExtras
 
+		python configure.py --no-qsci-api --no-designer-plugin --no-qml-plugin --sip="C:\Anaconda3\sip.exe" --enable=QtCore --enable=QtGui --enable=QtSvg --enable=QtOpenGL --enable=QtWidgets --enable=QtPrintSupport --enable=QtTest --enable=QtWinExtras
+
 	--disable=QAxContainer
 	--disable=QtDesigner
 	--disable=QtLocation
@@ -105,3 +107,6 @@ and we could even remove the original rpath.
 		class Tester():
 			bench = None
 			test = None
+
+
+C:\Users\Nick\Documents\GitHub\rcedit\Default>rcedit.exe C:\Users\Nick\Documents\GitHub\cadnano2.5\cadnano\install_exe\cadnano.exe --set-icon C:\Users\Nick\Downloads\radnano-app-icon.ico

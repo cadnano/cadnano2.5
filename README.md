@@ -23,9 +23,9 @@ installing PyQt5.  If you just want to script your designs (no GUI) you
 
 ## Running
 
-to run with a GUI:
+to run with a GUI from the command line :
 
-    python bin/main.py
+    cadnano
 
 when in python interpreter you can just:
 
@@ -33,20 +33,52 @@ when in python interpreter you can just:
 
 And script your designs without a GUI
 
-## PyQt5 Installation
+## Installation
+
+Currently, cadnano will run on Python 3.3, 3.4 and 3.5.
+
+We do not support Python 2.X.
+
+There are many ways to get Python on your system.  Anaconda Python is a great
+easy way on both Mac OS X, Windows and Linux.
+
+On OS X, `homebrew` is another great way to install Python 3.X.
+
+### PyQt5 Installation
+
+Install SIP and PyQt as the dependencies.
+
+Currently (6/27/2016), PyQt5 v 5.6  the is a bug with QGraphicsItem.itemChange
+that prevents us from being able to use the wheel on pypi.  We've built our
+own versions for Windows and Mac OS X for Python 3.5 64 bit that don't have this
+problem:
+
+[Mac Python 3.5 SIP 64-bit]
+[Mac Python 3.5 PyQt5 64-bit]
+
+    pip install sip-4.16.9-cp35-none-macosx_10_10_x86_64.wh
+    pip install PyQt5-5.5.1-cp35-none-macosx_10_10_x86_64.whl
+
+[Windows Python 3.5 SIP 64-bit]
+[Windows Python 3.5 PyQt5 64-bit]
+
+    pip install PyQt5-5.6.1-cp35-none-win_amd64.whl
+    pip install sip-4.18.1-cp35-none-win_amd64.wh
+
+
+#### PyQt5 building from scratch
 
 the requirements PyQt5 and sip are available from Riverbank Computing Limited at:
 
+* [Qt5](https://www.qt.io/download/)
 * [PyQt5 downloads](http://www.riverbankcomputing.com/software/pyqt/download5)
 * [SIP downloads](http://www.riverbankcomputing.com/software/sip/download)
 
-### Windows
+### Windows from scratch
 
-On Windows just download the installer from Riverbank computing for your python
-version.  We have no experience with other installation methods other than
-Anaconda for Windows. See below.
+Instructions coming
 
-### Mac and Linux
+#### Mac and Linux from scratch
 
 These instructions can work 10.10 Yosemite and  10.11 El Capitan
 under Xcode 7.0.1 and 6.5.  It has also been tested on Debian 7.9 Wheezy
@@ -74,33 +106,6 @@ your own
 
 Of course there are many ways to accomplish this feat, but needless to say
 OS X and Linux installs of `PyQt5` can be painful for some people.
-
-### Anaconda Installation
-
-First create a new conda environment. The default anaconda install typically
-have PyQt4 installed, and that doesn't always play well with PyQt5, so we need
-to create an empty one.
-
-(If you know what you are doing, you can omit the `--no-default-packages` flag.)
-
-    conda create --no-default-packages -n pyqt5 python=3
-
-followed by:
-
-    activate pyqt5
-
-Second, install PyQt5 in the new environment. (Make sure you have activated
-the `pyqt5` environment using the `activate` command). Unfortunately, Anaconda
-doesn't have an official PyQt5 build at the moment, but [`dsdale24` has 64-bit Win/OSX/Linux builds on his channel](https://anaconda.org/dsdale24/pyqt5).
-Install this using:
-
-    conda install -c https://conda.anaconda.org/dsdale24 pyqt5
-
-Note: Before doing the step above, you may want to check if an official
-Anaconda pyqt5 build is available. You can check this simply using `conda search
-pyqt5` or `conda install pyqt5`.
-
-There is an open issue on Anaconda to support PyQt5: [ContinuumIO/anaconda-issues#138](https://github.com/ContinuumIO/anaconda-issues/issues/138).
 
 # *nno2stl*: Conversion of cadnano *.json files to 3D STL model
 

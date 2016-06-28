@@ -61,7 +61,7 @@ class CadnanoQt(QObject):
         super(CadnanoQt, self).__init__()
         from cadnano.gui.views.preferences import Preferences
         self.prefs = Preferences()
-        icon = QIcon(ICON_PATH1)
+        self.icon = icon = QIcon(ICON_PATH1)
         icon.addFile(ICON_PATH2, QSize(256, 256))
         icon.addFile(ICON_PATH3, QSize(48, 48))
         self.qApp.setWindowIcon(icon)
