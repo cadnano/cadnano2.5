@@ -31,7 +31,10 @@ And script your designs without a GUI
 
 ## Installation
 
-Currently, cadnano will run on Python 3.3, 3.4 and 3.5.
+### Install Python 3.5 as necessary
+
+Currently, cadnano will run on Python 3.3, 3.4 and 3.5.  We provide direct
+support for 3.5
 
 We do not support Python 2.X.
 
@@ -43,9 +46,9 @@ on Mac OS X, Windows or Linux.
 
 On OS X, [homebrew](http://brew.sh/) is another great way to install Python 3.X
 
-### PyQt5 Installation
+### Install cadnano
 
-Install [SIP](https://riverbankcomputing.com/software/sip/intro) and [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) as the dependencies.
+1. Install [SIP](https://riverbankcomputing.com/software/sip/intro) and [PyQt5](https://www.riverbankcomputing.com/software/pyqt/intro) as the dependencies.
 
 Currently (6/27/2016), `PyQt5` v 5.6  there is a bug with `QGraphicsItem.itemChange`
 that prevents us from being able to use the [wheels on pypi](https://pypi.python.org/pypi/PyQt5/5.6).
@@ -74,12 +77,12 @@ And install with:
  Python 3.X.  This of course is subject to change, and will change this notice
  once the official wheels are rebuilt with the bug fix.
 
-Then clone the source from github:
+2. Then clone the cadnano source from github and run:
 
     python setup.py install
 
 Once things are stable, we will distribute a cadnano wheel and start bundling
-cross platform installers.  Now have fun running radnano.
+cross platform installers.  For now have fun running radnano.
 
 ### PyQt5 building from scratch
 
