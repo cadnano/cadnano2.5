@@ -66,6 +66,7 @@ class NucleicAcidPart(Part):
         self._group_properties['max_vhelix_length'] = self._STEP_SIZE*2
         self._group_properties['neighbor_active_angle'] = ''
         self._group_properties['grid_type'] = GridType.HONEYCOMB
+        self._group_properties['virtual_helix_order'] = []
     # end def
 
     def __repr__(self):
@@ -160,8 +161,9 @@ class NucleicAcidPart(Part):
 
         # idx = None # FORCE this for now to prevent animation GC crashes
 
-        per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
-                                                        alpha, index=idx)
+        # per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
+        #                                                 alpha, index=idx)
+        per_neighbor_hits = self.queryIdNumNeighbor(id_num, neighbors, index=idx)
         return per_neighbor_hits
 
     # end def

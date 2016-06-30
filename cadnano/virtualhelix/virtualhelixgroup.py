@@ -1547,6 +1547,114 @@ class VirtualHelixGroup(CNObject):
         return per_neighbor_hits
     # end def
 
+    def queryIdNumNeighbor(self, id_num, neighbors, index=None):
+        """ Get indices of all virtual helices phosphates within a bond
+        length of each phosphate for the id_num Virtual Helix.
+
+        Args:
+            id_num (int): virtual helix ID number
+            neighbors (sequence): neighbors of id_num
+            index_slice (Optional[tuple]): (start_index, length) into a virtual
+                helix
+
+        Returns:
+            dictionary of tuples:
+
+                neighbor_id_num: (fwd_hit_list, rev_hit_list)
+
+            where each list has the form:
+
+                [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
+
+        Raises:
+            None
+        """
+        offset, size = self.getOffsetAndSize(id_num)
+        bpr, tpr = self.vh_properties.loc[id_num,
+                                    ['bases_per_repeat', 'turns_per_repeat']]
+        bases_per_turn = bpr / tpr
+        if index is None:
+            start, length = 0, size
+        else:
+            half_period = bpr // 2
+            if size - index < bpr:
+                start, length = size - bpr, bpr
+            else:
+                start, length = max(index - half_period, 0), bpr
+        norm = np.linalg.norm
+        cross = np.cross
+        dot = np.dot
+        normalize = self.normalize
+        PI = math.pi
+        TWOPI = 2*PI
+        RADIUS = self._radius
+        BW = self._BASE_WIDTH
+
+        # theta, radius = self.radiusForAngle(alpha, RADIUS, bases_per_turn, BW)
+        # convert to a list since we can't speed this loop up without cython or something
+        axis_pts = self.axis_pts
+        fwd_pts = self.fwd_pts
+        rev_pts = self.rev_pts
+        this_axis_pts = axis_pts[offset + start:offset + start + length].tolist()
+        this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
+        this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
+
+        # TODO: decide how we wnat to handle maintaining bond length
+        # rsquared2_min = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
+        rsquared2_min = 0
+        rsquared2_max = (2*RADIUS*math.sin(1.4*PI/bases_per_turn))**2 + BW*BW
+        # print(rsquared2_min, rsquared2_max, BW*BW)
+        per_neighbor_hits = {}
+
+        for neighbor_id in neighbors:
+
+            offset, size = self.getOffsetAndSize(neighbor_id)
+
+            # 1. Finds points that point at neighbors axis point
+            nfwd_pts = fwd_pts[offset:offset + size]
+            nrev_pts = rev_pts[offset:offset + size]
+
+            direction = self.directions[neighbor_id]
+            len_neighbor_pts = len(nfwd_pts)
+            delta = self.delta3D_scratch
+            if len_neighbor_pts != len(delta):
+                self.delta3D_scratch = delta = np.empty((len_neighbor_pts,), dtype=float)
+
+            fwd_axis_hits = []
+            for i, point in enumerate(this_fwd_pts):
+                difference = nfwd_pts - point
+                inner1d(difference, difference, out=delta)
+                # assume there is only one possible index of intersection with the neighbor
+                f_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+
+                difference = nrev_pts - point
+                inner1d(difference, difference, out=delta)
+                # assume there is only one possible index of intersection with the neighbor
+                r_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                if f_idxs or r_idxs:
+                    fwd_axis_hits.append((start + i, f_idxs, r_idxs))
+            # end for
+
+            rev_axis_hits = []
+            for i, point in enumerate(this_rev_pts):
+                difference = nfwd_pts - point
+                inner1d(difference, difference, out=delta)
+                # assume there is only one possible index of intersection with the neighbor
+                f_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+
+                difference = nrev_pts - point
+                inner1d(difference, difference, out=delta)
+                # assume there is only one possible index of intersection with the neighbor
+                r_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                if f_idxs or r_idxs:
+                    rev_axis_hits.append((start + i, f_idxs, r_idxs))
+            # end for
+            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
+        # end for
+        return per_neighbor_hits
+    # end def
+
+
     @staticmethod
     def angleNormalize(angle):
         """ ensure angle is normalized to [0, 2*PI]
