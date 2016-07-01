@@ -1599,10 +1599,16 @@ class VirtualHelixGroup(CNObject):
         this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
 
-        # TODO: decide how we wnat to handle maintaining bond length
-        rsquared2 = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
-        rsquared2_min = 0.5*rsquared2
-        rsquared2_max = 1.1*rsquared2
+        # TODO: decide how we want to handle maintaining bond length
+        # 1. For anti-parallel
+        rsquared_ap = 2.*RADIUS*(1.-math.cos(1.8*PI/bases_per_turn))
+        rsquared_ap_min = 0 #0.5*rsquared_ap
+        rsquared_ap_max = 1.0*rsquared_ap
+
+        # 2. for parallel
+        rsquared_p = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
+        rsquared_p_min = 0.9*rsquared_p
+        rsquared_p_max = 1.25*rsquared_p
         # print(rsquared2_min, rsquared2_max, BW*BW)
         per_neighbor_hits = {}
 
@@ -1625,12 +1631,12 @@ class VirtualHelixGroup(CNObject):
                 difference = nfwd_pts - point
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
-                f_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                f_idxs = np.where((delta > rsquared_p_min) & (delta < rsquared_p_max))[0].tolist()
 
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
-                r_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                r_idxs = np.where((delta > rsquared_ap_min) & (delta < rsquared_ap_max))[0].tolist()
                 if f_idxs or r_idxs:
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
@@ -1640,12 +1646,12 @@ class VirtualHelixGroup(CNObject):
                 difference = nfwd_pts - point
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
-                f_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                f_idxs = np.where((delta > rsquared_ap_min) & (delta < rsquared_ap_max))[0].tolist()
 
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
-                r_idxs = np.where((delta > rsquared2_min) & (delta < rsquared2_max))[0].tolist()
+                r_idxs = np.where((delta > rsquared_p_min) & (delta < rsquared_p_max))[0].tolist()
                 if f_idxs or r_idxs:
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
