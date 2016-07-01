@@ -23,7 +23,7 @@ def defaultProperties(id_num):
     ('name', "vh%d" % (id_num)),
     ('is_visible', True),
     ('color', '#00000000'),
-    # ('eulerZ', -10.),
+    # ('eulerZ', 17.143*2),    # 0.5*360/10.5
     ('eulerZ', 0.),
     ('scamZ', 10.),
     ('neighbor_active_angle', 0.0),
@@ -1592,17 +1592,17 @@ class VirtualHelixGroup(CNObject):
 
         # theta, radius = self.radiusForAngle(alpha, RADIUS, bases_per_turn, BW)
         # convert to a list since we can't speed this loop up without cython or something
-        axis_pts = self.axis_pts
+        # axis_pts = self.axis_pts
         fwd_pts = self.fwd_pts
         rev_pts = self.rev_pts
-        this_axis_pts = axis_pts[offset + start:offset + start + length].tolist()
+        # this_axis_pts = axis_pts[offset + start:offset + start + length].tolist()
         this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
 
         # TODO: decide how we wnat to handle maintaining bond length
-        # rsquared2_min = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
-        rsquared2_min = 0
-        rsquared2_max = (2*RADIUS*math.sin(1.4*PI/bases_per_turn))**2 + BW*BW
+        rsquared2 = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
+        rsquared2_min = 0.5*rsquared2
+        rsquared2_max = 1.1*rsquared2
         # print(rsquared2_min, rsquared2_max, BW*BW)
         per_neighbor_hits = {}
 
