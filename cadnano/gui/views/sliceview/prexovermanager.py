@@ -68,7 +68,7 @@ class PreXoverManager(QGraphicsRectItem):
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             ngroup = PreXoverItemGroup(_RADIUS, WEDGE_RECT, nvhi, False)
             groups[neighbor_id] = ngroup
-            fwd_axis_hits, rev_axis_hits = hits
+            fwd_axis_hits, rev_axis_hits, idx_bounds = hits
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 neighbor_pxis = []

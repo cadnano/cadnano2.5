@@ -263,7 +263,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._radius = radius
         self._rect = rect
         self.virtual_helix_item = virtual_helix_item
-        self.model_part = virtual_helix_item.part()
+        self.model_part = mpart = virtual_helix_item.part()
         self.id_num = virtual_helix_item.idNum()
         self.is_active = is_active
 
@@ -277,7 +277,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         z = styles.ZPXIGROUP + 10 if is_active else styles.ZPXIGROUP
         self.setZValue(z)
         self.setTransformOriginPoint(rect.center())
-        self.setRotation(-virtual_helix_item.getProperty('eulerZ')) # add 180
+        bpr, tpr, eulerZ = virtual_helix_item.getProperty(['bases_per_repeat',
+                                                'turns_per_repeat', 'eulerZ'])
+
+        # twist_per_base = tpr*360./bpr
+        # print('z:', z, mpart.baseWidth(), z/mpart.baseWidth(), twist_per_base)
+        self.setRotation(-eulerZ) # add 180
     # end def
 
     ### ACCESSORS ###

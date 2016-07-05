@@ -192,7 +192,7 @@ class PreXoverItem(QGraphicsRectItem):
             phos.setPen(getNoPen())
             phos.setBrush(getBrushObj(color))
             bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
-            self.setPos(from_index*BASE_WIDTH,-BASE_WIDTH)
+            self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
         else:
             phos.setPath(REVPHOS_PP)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())

@@ -141,7 +141,9 @@ class PreXoverManager(QGraphicsRectItem):
             virtual_helix_item (VirtualHelixItem):
             per_neighbor_hits (Tuple()):
         """
-        # print("ACTIVATING VH", virtual_helix_item.idNum())
+        print("ACTIVATING VH", virtual_helix_item.idNum())
+        print(per_neighbor_hits[1])
+
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
@@ -180,7 +182,7 @@ class PreXoverManager(QGraphicsRectItem):
 
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
-            fwd_axis_hits, rev_axis_hits = hits
+            fwd_axis_hits, rev_axis_hits, idx_bounds = hits
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:

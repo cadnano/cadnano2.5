@@ -1599,25 +1599,50 @@ class VirtualHelixGroup(CNObject):
         this_fwd_pts = fwd_pts[offset + start:offset + start + length].tolist()
         this_rev_pts = rev_pts[offset + start:offset + start + length].tolist()
 
-        # TODO: decide how we want to handle maintaining bond length
-        # 1. For anti-parallel
-        rsquared_ap = 2.*RADIUS*(1.-math.cos(1.8*PI/bases_per_turn))
-        rsquared_ap_min = 0 #0.5*rsquared_ap
-        rsquared_ap_max = 1.0*rsquared_ap
+        """TODO: decide how we want to handle maintaining bond length
+        ideal adjacent ANTI-PARALLEL xover strands project to a plane normal
+        to the helical axis and point in the SAME direction
 
-        # 2. for parallel
-        rsquared_p = (2*RADIUS*math.sin(PI/bases_per_turn))**2 + BW*BW
-        rsquared_p_min = 0.9*rsquared_p
-        rsquared_p_max = 1.25*rsquared_p
+        ideal adjacent PARALLEL xover strands  project to a plane normal
+        to the helical axis and point in the OPPOSITE directions
+        """
+        # 1. compute generallized r squared values for an ideal crossover of
+        # both types
+        half_twist_per_base = PI/bases_per_turn
+        r2_radial = (2.*RADIUS*(1. - math.cos(half_twist_per_base)))**2
+        r2_tangent = (2.*RADIUS*math.sin(half_twist_per_base))**2
+        r2_axial = BW*BW
+
+
+        # MISALIGNED by 10% twist per base so that's 1.20*half_twist_per_base
+        # r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base) ) +
+        #                     (1. - math.cos(1.20*half_twist_per_base) ) ) )**2
+        # r2_tangent = (RADIUS*(  math.sin(half_twist_per_base) +
+        #                         math.sin(1.20*half_twist_per_base) ) )**2
+        # r2_axial = BW*BW
+
+        # print("r2:", r2_radial, r2_tangent, r2_axial)
+        # 2. ANTI-PARALLEL
+        rsquared_ap = r2_tangent + r2_radial
+        rsquared_ap_min = rsquared_ap
+        rsquared_ap_max = rsquared_ap + 0.25*r2_axial
+
+        # 3. PARALLEL
+        rsquared_p = r2_tangent + r2_radial + r2_axial
+        rsquared_p_min = rsquared_p
+        rsquared_p_max = rsquared_p + 0.25*r2_axial
         # print(rsquared2_min, rsquared2_max, BW*BW)
         per_neighbor_hits = {}
 
         for neighbor_id in neighbors:
-
+            nmin_idx = 999999
+            nmax_idx = -1
             offset, size = self.getOffsetAndSize(neighbor_id)
 
             # 1. Finds points that point at neighbors axis point
             nfwd_pts = fwd_pts[offset:offset + size]
+            # if neighbor_id == 1:
+            #     print("a point:", this_fwd_pts[0])
             nrev_pts = rev_pts[offset:offset + size]
 
             direction = self.directions[neighbor_id]
@@ -1632,12 +1657,22 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
                 f_idxs = np.where((delta > rsquared_p_min) & (delta < rsquared_p_max))[0].tolist()
-
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_ap_min) & (delta < rsquared_ap_max))[0].tolist()
+                if neighbor_id == 1 and i == 8:
+                    print("dmin,max", rsquared_ap_min, rsquared_ap_max)
+                    # print(delta[0:10])
+                    print(r_idxs)
+                    print("deltas")
+                    print([delta[x] for x in r_idxs])
+                    print("point", point)
+                    print("nrevpoints")
+                    print([nrev_pts[x] for x in r_idxs])
                 if f_idxs or r_idxs:
+                    nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
+                    nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
 
@@ -1653,13 +1688,22 @@ class VirtualHelixGroup(CNObject):
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_p_min) & (delta < rsquared_p_max))[0].tolist()
                 if f_idxs or r_idxs:
+                    nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
+                    nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
-            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
+            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits, (nmin_idx, nmax_idx))
         # end for
         return per_neighbor_hits
     # end def
 
+    def getAngleAtIdx(self, id_num, idx):
+        """ Account for Z translation ??????????
+        """
+        bpr, tpr, eulerZ = self.getVirtualHelixProperties(id_num,
+                        ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
+        return eulerZ + idx*tpr*360./bpr
+    # end def
 
     @staticmethod
     def angleNormalize(angle):
