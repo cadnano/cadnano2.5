@@ -29,7 +29,6 @@ def encodePart(part):
     view_props = part.view_properties
     vh_props, origins = part.helixPropertiesAndOrigins()
 
-    # group_props['total_id_nums'] =
     group_props['virtual_helices'] = vh_props
     group_props['origins'] = origins
 

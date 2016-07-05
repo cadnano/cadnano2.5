@@ -42,7 +42,7 @@ class NucleicAcidPart(Part):
 
     _SUB_STEP_SIZE = Part._STEP_SIZE / 3
 
-    _MINOR_GROOVE_ANGLE = 171
+    # _MINOR_GROOVE_ANGLE = 171
 
     __count = 0
 
@@ -78,9 +78,9 @@ class NucleicAcidPart(Part):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def minorGrooveAngle(self):
-        return self._MINOR_GROOVE_ANGLE
-    # end def
+    # def minorGrooveAngle(self):
+    #     return self._MINOR_GROOVE_ANGLE
+    # # end def
 
     def subStepSize(self):
         return self._SUB_STEP_SIZE
@@ -707,7 +707,7 @@ class NucleicAcidPart(Part):
         thing
         """
         self.setProperty('virtual_helix_order', ordered_id_list)
-        self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
+        # self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
     def changeViewProperty(self, view, key, value, use_undostack=True):

@@ -142,7 +142,7 @@ class PreXoverManager(QGraphicsRectItem):
             per_neighbor_hits (Tuple()):
         """
         print("ACTIVATING VH", virtual_helix_item.idNum())
-        print(per_neighbor_hits[1])
+        # print(per_neighbor_hits[1])
 
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()

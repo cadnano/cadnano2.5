@@ -32,7 +32,7 @@ def defaultProperties(id_num):
     ('turns_per_repeat', 2),
     ('repeat_hint', 2), # used in path view for how many repeats to display PXIs
     ('helical_pitch', 1.),
-    ('minor_groove_angle', 171.),
+    ('minor_groove_angle', 180.), #171.),
     ('length', -1),
     ('z', 0.0)
     ]
@@ -1621,10 +1621,10 @@ class VirtualHelixGroup(CNObject):
         #                         math.sin(1.20*half_twist_per_base) ) )**2
         # r2_axial = BW*BW
 
-        # print("r2:", r2_radial, r2_tangent, r2_axial)
+        print("r2:", r2_radial, r2_tangent, r2_axial)
         # 2. ANTI-PARALLEL
         rsquared_ap = r2_tangent + r2_radial
-        rsquared_ap_min = rsquared_ap
+        rsquared_ap_min = r2_axial
         rsquared_ap_max = rsquared_ap + 0.25*r2_axial
 
         # 3. PARALLEL
@@ -1661,15 +1661,16 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_ap_min) & (delta < rsquared_ap_max))[0].tolist()
-                if neighbor_id == 1 and i == 8:
+                if neighbor_id == 1 and i == 18:
                     print("dmin,max", rsquared_ap_min, rsquared_ap_max)
-                    # print(delta[0:10])
+                    print(delta[17:20])
                     print(r_idxs)
                     print("deltas")
                     print([delta[x] for x in r_idxs])
                     print("point", point)
                     print("nrevpoints")
-                    print([nrev_pts[x] for x in r_idxs])
+                    print(nrev_pts[18])
+                    # print([nrev_pts[x] for x in r_idxs])
                 if f_idxs or r_idxs:
                     nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
                     nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)

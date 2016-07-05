@@ -22,7 +22,8 @@ ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
 
 
-CADNANO_DEFAULT_DOCUMENT = 'super_barcode_hex.json'
+CADNANO_DEFAULT_DOCUMENT = 'simple.json'
+# CADNANO_DEFAULT_DOCUMENT = 'super_barcode_hex.json'
 # CADNANO_DEFAULT_DOCUMENT = 'Hinge_v5.2.json'
 # CADNANO_DEFAULT_DOCUMENT = 'octa.13.c25'
 ROOTDIR = os.path.dirname(LOCAL_DIR)

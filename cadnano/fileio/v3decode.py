@@ -32,6 +32,7 @@ def decodePart(document, part_dict):
     for id_num, size in vh_id_list:
         x, y = origins[id_num]
         z = vh_props['z'][id_num]
+        vh_props['eulerZ'][id_num] = 360/10.5/4
         vals = [vh_props[k][id_num] for k in keys]
         part.createVirtualHelix(x, y, z, size,
                                 id_num=id_num,
