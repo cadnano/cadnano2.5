@@ -1073,9 +1073,9 @@ class VirtualHelixGroup(CNObject):
         if offset_and_size_tuple is None:
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
         offset, size = offset_and_size_tuple
-        origin = self.origin_pts[id_num]
-        direction = self.origin_pts[direction]
-        points = self.pointsFromDirection(id_num, origin, direction, size)
+        origin = self.axis_pts[offset] # zero point of axis
+        direction = self.directions[id_num]
+        points = self.pointsFromDirection(id_num, origin, direction, size, 0)
         self.setCoordinates(id_num, points)
     # end def
 
@@ -1102,7 +1102,7 @@ class VirtualHelixGroup(CNObject):
 
         new_axis_pts, new_fwd_pts, new_rev_pts = points
         lo = offset + idx_start
-        hi = lo + len(axis_pts)
+        hi = lo + len(new_axis_pts)
         self.axis_pts[lo:hi] = new_axis_pts
         self.fwd_pts[lo:hi] = new_fwd_pts
         self.rev_pts[lo:hi] = new_rev_pts
@@ -1624,8 +1624,8 @@ class VirtualHelixGroup(CNObject):
         print("r2:", r2_radial, r2_tangent, r2_axial)
         # 2. ANTI-PARALLEL
         rsquared_ap = r2_tangent + r2_radial
-        rsquared_ap_min = r2_axial
-        rsquared_ap_max = rsquared_ap + 0.25*r2_axial
+        rsquared_ap_min = 0 #r2_axial
+        rsquared_ap_max = 0.7 #rsquared_ap + 0.8*r2_axial
 
         # 3. PARALLEL
         rsquared_p = r2_tangent + r2_radial + r2_axial
@@ -1661,15 +1661,15 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_ap_min) & (delta < rsquared_ap_max))[0].tolist()
-                if neighbor_id == 1 and i == 18:
+                if neighbor_id == 3 and i == 6:
                     print("dmin,max", rsquared_ap_min, rsquared_ap_max)
-                    print(delta[17:20])
+                    print(delta[0:7])
                     print(r_idxs)
                     print("deltas")
                     print([delta[x] for x in r_idxs])
                     print("point", point)
                     print("nrevpoints")
-                    print(nrev_pts[18])
+                    print(nrev_pts[6])
                     # print([nrev_pts[x] for x in r_idxs])
                 if f_idxs or r_idxs:
                     nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)

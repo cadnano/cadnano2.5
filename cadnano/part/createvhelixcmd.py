@@ -65,7 +65,7 @@ class CreateVirtualHelixCommand(UndoCommand):
             part.setVirtualHelixProperties( id_num,
                                             self.keys, self.values,
                                             safe=False)
-
+            part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
     # end def
 
