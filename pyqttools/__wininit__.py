@@ -20,8 +20,5 @@
 import sys
 import os.path
 from .QtCore import QCoreApplication
-
-if sys.platform == 'win32':
-    import PyQt5
-    LOCAL_QT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Qt')
-    QCoreApplication.addLibraryPath(os.path.join(LOCAL_QT, 'plugins'))
+LOCAL_QT = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'Qt')
+QCoreApplication.addLibraryPath(os.path.join(LOCAL_QT, 'plugins'))

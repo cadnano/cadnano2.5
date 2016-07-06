@@ -1,5 +1,6 @@
 import sys
 import os.path
+pjoin = os.path.join
 from subprocess import PIPE, Popen, check_output
 import shutil
 import glob
@@ -84,7 +85,7 @@ def installRename(file_list, in_path, out_path="", old_rpath=""):
             cmd_delete_rpath = ["install_name_tool",
                                 "-delete_rpath",
                                 old_rpath,
-                                os.path.join(out_path, file_name)
+                                pjoin(out_path, file_name)
                             ]
             cmd_delete_rpath = ' '.join(cmd_delete_rpath)
             renameproc = Popen(cmd_delete_rpath, shell=True,
@@ -93,7 +94,7 @@ def installRename(file_list, in_path, out_path="", old_rpath=""):
         cmd_add_rpath = ["install_name_tool",
                         "-add_rpath",
                         "@loader_path/Qt/lib",
-                        os.path.join(out_path, file_name)
+                        pjoin(out_path, file_name)
                         ]
         cmd_add_rpath = ' '.join(cmd_add_rpath)
         renameproc = Popen(cmd_add_rpath, shell=True,
@@ -102,8 +103,8 @@ def installRename(file_list, in_path, out_path="", old_rpath=""):
 
         cmd_id = ["install_name_tool",
                         "-id",
-                        "@executable_path/lib/python{}/site-packages/PyQt5/{}".format(PY_VERSION, file_name + '.so'),
-                        os.path.join(out_path, file_name)
+                        "@executable_path/lib/python{}/site-packages/PyQt5/{}".format(PY_VERSION, file_name),
+                        pjoin(out_path, file_name)
                         ]
         cmd_id = ' '.join(cmd_id)
         idproc = Popen(cmd_id, shell=True,
@@ -116,25 +117,25 @@ def copyFrameworks(destination_path, get_translations=False):
     Copy Qt/{lib, plugins, translations}
     """
     destination_path = os.path.abspath(destination_path)
-    dst_path = os.path.join(destination_path, 'Qt')
+    dst_path = pjoin(destination_path, 'Qt')
     if os.path.exists(dst_path):
         shutil.rmtree(dst_path)
 
     plugin_path = 'Qt%s/plugins' % (QT_VERSION)
     shutil.copytree(os.path.join(python_root, plugin_path),
-            os.path.join(dst_path, 'plugins'))
+            pjoin(dst_path, 'plugins'))
     if get_translations:
         translations_path = 'Qt%s/translations' % (QT_VERSION)
-        shutil.copytree(os.path.join(python_root, translations_path),
-                os.path.join(dst_path, 'translations'))
+        shutil.copytree(pjoin(python_root, translations_path),
+                pjoin(dst_path, 'translations'))
 
-    check_path = os.path.join(python_root, 'Qt{}/lib/*.framework'.format(QT_VERSION))
+    check_path = pjoin(python_root, 'Qt{}/lib/*.framework'.format(QT_VERSION))
     filepath_list = glob.glob(check_path)
     file_list = [os.path.splitext(os.path.basename(x))[0] for x in filepath_list]
 
     qt_src = "Qt{}/lib/{}.framework/Versions/5/{}"
-    src_path = os.path.join(python_root, qt_src)
-    dst_path = os.path.join(destination_path, qt_src)
+    src_path = pjoin(python_root, qt_src)
+    dst_path = pjoin(destination_path, qt_src)
     for file_name in file_list:
         src = src_path.format(QT_VERSION, file_name, file_name)
         dst = dst_path.format('', file_name, file_name)
@@ -149,17 +150,17 @@ def copyPyQt5(destination_path):
     """ Location to put a folder called PyQt5
     """
     destination_path = os.path.abspath(destination_path)
-    dst_path = os.path.join(destination_path, 'PyQt5')
+    dst_path = pjoin(destination_path, 'PyQt5')
     if os.path.exists(dst_path):
         shutil.rmtree(dst_path)
-    src = os.path.join(site_packages_path, 'PyQt5')
+    src = pjoin(site_packages_path, 'PyQt5')
     if not os.path.exists(src):
         raise ValueError("Source PyQt5 %s does not exist" % (src))
     shutil.copytree(src, dst_path)
 
     filepath_list = glob.glob(dst_path + '/*.so')
     file_list = [os.path.basename(x) for x in filepath_list]
-
+    shutil.copy2('__wininit__.py', pjoin(dst_path, 'PyQt5', '__init__.py'))
     return dst_path, file_list
 # end def
 

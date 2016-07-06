@@ -15,7 +15,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         neighbors = part.getVirtualHelixProperties(id_num, 'neighbors')
         self.neighbors = literal_eval(neighbors)
         self.color = part.getVirtualHelixProperties(id_num, 'color')
-        self.props = part.getAllVirtualHelixProperties(inject_extras=False)
+        self.props = part.getAllVirtualHelixProperties(id_num, inject_extras=False)
     # end def
 
     def redo(self):

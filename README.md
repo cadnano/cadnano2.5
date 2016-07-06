@@ -1,6 +1,6 @@
 # *radnano* : cadnano 2.5 beta
 This is a development version of cadnano ported to `Qt5/PyQt5`,
-the dev branch is most up to date.  
+the dev branch is most up to date.
 `cadnano` looks better in lower case
 
 ## Changes
@@ -57,7 +57,7 @@ We've built our own versions for Windows and Mac OS X for Python 3.5 64 bit that
 problem:
 
   * [Mac Python 3.5 SIP 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=l9ewGX%2bbgyXEsOFJb4ADP7gEICEj6HvulLGmZ8%2fEzfc%3d&docid=00790fc3650cb4bafa45c2689c71acddd)
-  * [Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=o394KW4txWYaslZXPAKX9%2fPtfSRK33MT3M47Dt9sMD0%3d&docid=0d19cd6e489244909bde6fef25723d7f6)
+  * [Mac Python 3.5 PyQt5 64-bit](https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/guestaccess.aspx?guestaccesstoken=4K1bIvG9EwTvTNm5fxpCRxKLafkWpNd45nLs%2fekGpN0%3d&docid=0980b254529b940d3bb026a8006ab2ff2)
 
    And install with:
 
