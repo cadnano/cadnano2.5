@@ -53,6 +53,9 @@ class AbstractSliceTool(QGraphicsObject):
         # li.setLine(0., 0., 0., 0.)
     # end def
 
+    def resetTool(self):
+        self._line_item.setParentItem(self)
+
     def idNum(self):
         if self._vhi is not None:
             return self._vhi.idNum()

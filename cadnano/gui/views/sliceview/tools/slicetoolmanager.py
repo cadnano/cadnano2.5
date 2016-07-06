@@ -20,9 +20,13 @@ class SliceToolManager(AbstractToolManager):
         self.create_tool = CreateSliceTool(self)
         self.viewroot.setManager(self)
         self.installTools()
-        # self._connectWindowSignalsToSelf()
     # end def
 
     ### SIGNALS ###
 
     ### SLOTS ###
+
+    def resetTools(self):
+        self.select_tool.resetTool()
+        self.create_tool.resetTool()
+    # end def

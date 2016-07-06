@@ -231,6 +231,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixRemovedSlot(self, sender, id_num, neighbors):
+        tm = self._viewroot.manager
+        tm.resetTools()
         self.removeVirtualHelixItem(id_num)
         for neighbor_id in neighbors:
             nvhi = self._virtual_helix_item_hash[neighbor_id]
