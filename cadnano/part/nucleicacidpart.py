@@ -707,7 +707,7 @@ class NucleicAcidPart(Part):
         thing
         """
         self.setProperty('virtual_helix_order', ordered_id_list)
-        # self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
+        self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
     def changeViewProperty(self, view, key, value, use_undostack=True):

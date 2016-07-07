@@ -86,7 +86,10 @@ def decodePart(document, part_dict):
     for id_num, idx, length in part_dict['insertions']:
         strand = part.getStrand(True, id_num, idx)
         strand.addInsertion(idx, length, use_undostack=False)
-    part.setImportedVHelixOrder(part_dict['virtual_helix_order'])
+    vh_order = part_dict['virtual_helix_order']
+    if vh_order:
+        # print("import order", vh_order)
+        part.setImportedVHelixOrder(vh_order)
 # end def
 
 def importToPart(part, copy_dict, use_undostack=True):

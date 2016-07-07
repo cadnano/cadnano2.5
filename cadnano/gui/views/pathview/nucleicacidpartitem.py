@@ -183,18 +183,18 @@ class NucleicAcidPartItem(QAbstractPartItem):
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vhi = VirtualHelixItem(id_num, self, self._viewroot)
         self._virtual_helix_item_hash[id_num] = vhi
-
+        vhi_list = self._virtual_helix_item_list
         # reposition when first VH is added
-        if len(self._virtual_helix_item_list) == 0:
+        if len(vhi_list) == 0:
             view = self.window().path_graphics_view
             p = view.scene_root_item.childrenBoundingRect().bottomLeft()
             _p = _BOUNDING_RECT_PADDING
             self.setPos(p.x() + _p*6 + styles.VIRTUALHELIXHANDLEITEM_RADIUS, p.y() + _p*3)
             # self.setPos(p.x() + _VH_XOFFSET, p.y() + _p*3)
 
-        self._virtual_helix_item_list.append(vhi)
+        vhi_list.append(vhi)
         ztf = not getBatch()
-        self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
+        self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
         self._updateBoundingRect()
     # end def
 
@@ -208,7 +208,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """docstring for partVirtualHelicesReorderedSlot"""
         vhi_dict = self._virtual_helix_item_hash
         new_list = [vhi_dict[id_num] for id_num in ordered_id_list]
-
         ztf = not getBatch() if check_batch == True else False
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
@@ -284,7 +283,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         y = 0  # How far down from the top the next PH should be
         leftmost_extent = 0
         rightmost_extent = 0
-
         scene = self.scene()
         vhi_rect = None
         vhi_h_rect = None
