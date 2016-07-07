@@ -304,7 +304,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         bri.hide()
         bri.setPen(getPenObj(_SELECT_COLOR, _SELECT_PEN_WIDTH))
 
-        self.setZValue(styles.ZPARTITEM + 30)
+        self.setZValue(styles.ZSELECTION)
 
         self.drag_start_position = QPointF()
         self.drag_last_position = QPointF()
@@ -380,7 +380,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                                 tool.snap_origin_item = item
                                 break
                             else:
-                                return QGraphicsItemGroup.mousePressEvent(self, event)
+                                item.mousePressEvent(event)
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
 
