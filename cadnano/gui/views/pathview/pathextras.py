@@ -230,11 +230,13 @@ class PreXoverItem(QGraphicsRectItem):
             scene.removeItem(self._label)
             self._label = None
             self._phos_item.adapter.resetAnimations()
+            self._phos_item.adapter = None
             scene.removeItem(self._phos_item)
             self._phos_item = None
             scene.removeItem(self._bond_item)
             self._bond_item = None
             self.adapter.resetAnimations()
+            self.adapter = None
             scene.removeItem(self)
     # end defS
 

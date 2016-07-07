@@ -175,14 +175,14 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def animate(self, item, property_name, duration, start_value, end_value):
-        b_name = property_name.encode('ascii')
-        anim = QPropertyAnimation(item.adapter, b_name)
-        anim.setDuration(duration)
-        anim.setStartValue(start_value)
-        anim.setEndValue(end_value)
-        anim.start()
-        item.adapter.saveRef(property_name, anim)
-
+        if item is not None:
+            b_name = property_name.encode('ascii')
+            anim = QPropertyAnimation(item.adapter, b_name)
+            anim.setDuration(duration)
+            anim.setStartValue(start_value)
+            anim.setEndValue(end_value)
+            anim.start()
+            item.adapter.saveRef(property_name, anim)
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active):
@@ -256,9 +256,11 @@ class PreXoverItem(QGraphicsPathItem):
 
     def destroy(self, scene):
         self.phos_item.adapter.resetAnimations()
+        self.phos_item.adapter = None
         scene.removeItem(self.phos_item)
         self.phos_item = None
         self.line_3p.adapter.resetAnimations()
+        self.line_3p.adapter = None
         scene.removeItem(self.line_3p)
         self.line_3p = None
         scene.removeItem(self)
