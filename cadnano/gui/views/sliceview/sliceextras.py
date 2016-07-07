@@ -70,6 +70,7 @@ class PropertyWrapperObject(QObject):
     def resetAnimations(self):
         for item in self.animations.values():
             item.deleteLater()
+        self.item = None
         self.animations = {}
 
 
@@ -252,6 +253,15 @@ class PreXoverItem(QGraphicsPathItem):
         else:
             self.setActive5p(is_active)
     # end def
+
+    def destroy(self, scene):
+        self.phos_item.adapter.resetAnimations()
+        scene.removeItem(self.phos_item)
+        self.phos_item = None
+        self.line_3p.adapter.resetAnimations()
+        scene.removeItem(self.line_3p)
+        self.line_3p = None
+        scene.removeItem(self)
 # end class
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
@@ -353,13 +363,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         scene = self.scene()
         for i in range(len(fpxis)):
             x = fpxis.pop(i)
-            x.phos_item.adapter.resetAnimations()
-            x.line_3p.adapter.resetAnimations()
-            scene.removeItem(x)
+            x.destroy(scene)
             x = rpxis.pop(i)
-            x.phos_item.adapter.resetAnimations()
-            x.line_3p.adapter.resetAnimations()
-            scene.removeItem(x)
+            x.destroy(scene)
         self.virtual_helix_item = None
         self.model_part = None
         scene = self.scene()
