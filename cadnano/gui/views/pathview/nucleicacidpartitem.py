@@ -461,10 +461,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### TOOL METHODS ###
-    def mousePressEvent(self, event):
-        if self.isMovable():
-            QGraphicsItem.mousePressEvent(self, event)
-
+    # def mousePressEvent(self, event):
+    #     # if self.isMovable():
+    #     QGraphicsItem.mousePressEvent(self, event)
 
     def hoverMoveEvent(self, event):
         """
