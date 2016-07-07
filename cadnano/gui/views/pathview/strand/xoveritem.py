@@ -373,9 +373,9 @@ class XoverItem(QGraphicsPathItem):
         # overall.
         five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5)*bw
         five_center_pt = pt5 + QPointF(.5, .5)*bw
-        five_exit_pt = pt5 + QPointF(.5, 0 if n5_is_forward else 1)*bw
+        five_exit_pt = pt5 + QPointF(.85 if n5_is_forward else .15, 0 if n5_is_forward else 1)*bw
 
-        three_enter_pt = pt3 + QPointF(.5, 0 if n3_is_forward else 1)*bw
+        three_enter_pt = pt3 + QPointF(.15 if n3_is_forward else .85, 0 if n3_is_forward else 1)*bw
         three_center_pt = pt3 + QPointF(.5, .5)*bw
         three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5)*bw
 
