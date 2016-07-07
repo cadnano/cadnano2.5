@@ -804,6 +804,7 @@ class VirtualHelixGroup(CNObject):
         # 3. Create points
         points = self.pointsFromDirection(id_num, origin, direction, num_points, 0)
         self.addCoordinates(id_num, points, is_right=False)
+        self._group_properties['virtual_helix_order'].append(id_num)
     # end def
 
     def pointsFromDirection(self, id_num, origin, direction, num_points, index):
@@ -1067,6 +1068,7 @@ class VirtualHelixGroup(CNObject):
         did_remove = self.removeCoordinates(id_num, size, is_right=False)
         self.recycleIdNum(id_num)
         assert did_remove
+        self._group_properties['virtual_helix_order'].remove(id_num)
     # end def
 
     def resetCoordinates(self, id_num):
