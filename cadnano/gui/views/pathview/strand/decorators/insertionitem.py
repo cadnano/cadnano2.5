@@ -51,7 +51,7 @@ _BIG_RECT = _DEFAULT_RECT.united(_INSERT_PATH_UP_RECT)
 _BIG_RECT = _BIG_RECT.united(_INSERT_PATH_DOWNRect)
 _B_PEN2 = getPenObj(styles.BLUE_STROKE, 2)
 _OFFSET2   = _BW*0.75
-_FONT = QFont(styles.THE_FONT, 10, QFont.Bold)
+_FONT = QFont(styles.THE_FONT, styles.THE_FONT_SIZE/2, QFont.Bold)
 _BIG_RECT.adjust(-15, -15, 30, 30)
 # Bases are drawn along and above the insert path.
 # These calculations revolve around fixing the characters at a certain
@@ -141,7 +141,6 @@ class InsertionItem(QGraphicsPathItem):
         self._label = InsertionLabel(self)
         self._seq_item = QGraphicsPathItem(parent=self)
         self._seq_text = None
-        # self.updateItem()
         self.show()
     # end def
 
@@ -368,7 +367,7 @@ class InsertionLabel(QGraphicsTextItem):
             return
         txt_offset = self.boundingRect().width()/2
         insertion = parent._insertion
-        y = -_BW if parent._is_on_top else _BW
+        y = -1.1*_BW if parent._is_on_top else 1.3*_HBW
         self.setPos(_OFFSET2 - txt_offset, y)
         if insertion.length() > 0:
             self.show()
