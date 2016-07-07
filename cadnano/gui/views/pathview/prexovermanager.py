@@ -89,11 +89,18 @@ class PreXoverManager(QGraphicsRectItem):
         # DEFAULT CASE: the active strand acts as strand5p,
         # install a crossover to the neighbor acting as strand3p
         if a_strand_type == n_strand_type:
-            if part.isAGreaterThanB_Z(  active_id_num, a_idx,
-                                        neighbor_id_num, n_idx):
-                part.createXover(n_strand, n_idx, a_strand, a_idx)
+            if a_is_fwd:
+                if part.isAGreaterThanB_Z(  active_id_num, a_idx,
+                                            neighbor_id_num, n_idx):
+                    part.createXover(n_strand, n_idx, a_strand, a_idx)
+                else:
+                    part.createXover(a_strand, a_idx, n_strand, n_idx)
             else:
-                part.createXover(a_strand, a_idx, n_strand, n_idx)
+                if part.isAGreaterThanB_Z(  active_id_num, a_idx,
+                                            neighbor_id_num, n_idx):
+                    part.createXover(a_strand, a_idx, n_strand, n_idx)
+                else:
+                    part.createXover(n_strand, n_idx, a_strand, a_idx)
         else:
             part.createXover(a_strand, a_idx, n_strand, n_idx)
     # end def
