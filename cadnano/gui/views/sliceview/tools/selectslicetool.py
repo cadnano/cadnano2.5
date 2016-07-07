@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
 from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
+from cadnano.gui.views.sliceview import slicestyles as styles
 
 def normalizeRect(rect):
     x1, y1, x2, y2 = rect
@@ -298,10 +299,12 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
-        self.bounding_rect_item = QGraphicsRectItem(tool)
-        self.bounding_rect_item.hide()
-        self.bounding_rect_item.setPen(getPenObj(_SELECT_COLOR,
-                                            _SELECT_PEN_WIDTH))
+        self.bounding_rect_item = bri = QGraphicsRectItem(tool)
+        bri.hide()
+        bri.setPen(getPenObj(_SELECT_COLOR, _SELECT_PEN_WIDTH))
+
+        self.setZValue(styles.ZPARTITEM + 30)
+
         self.drag_start_position = QPointF()
         self.drag_last_position = QPointF()
     # end def
