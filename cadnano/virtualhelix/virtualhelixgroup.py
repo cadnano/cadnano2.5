@@ -1626,7 +1626,6 @@ class VirtualHelixGroup(CNObject):
         # r2_tangent = (2.*RADIUS*math.sin(half_twist_per_base))**2
         # r2_axial = BW*BW
 
-
         # MISALIGNED by 27.5% twist per base so that's 1.55*half_twist_per_base
         r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base) ) +
                             (1. - math.cos(1.55*half_twist_per_base) ) ) )**2
@@ -1634,7 +1633,7 @@ class VirtualHelixGroup(CNObject):
                                 math.sin(1.55*half_twist_per_base) ) )**2
         r2_axial = BW*BW
 
-        print("r2:", r2_radial, r2_tangent, r2_axial)
+        # print("r2:", r2_radial, r2_tangent, r2_axial)
         # 2. ANTI-PARALLEL
         rsquared_ap = r2_tangent + r2_radial
         rsquared_ap_min = 0
@@ -1644,7 +1643,6 @@ class VirtualHelixGroup(CNObject):
         rsquared_p = r2_tangent + r2_radial + r2_axial
         rsquared_p_min = r2_axial
         rsquared_p_max = rsquared_p + 0.25*r2_axial
-        # print(rsquared2_min, rsquared2_max, BW*BW)
         per_neighbor_hits = {}
 
         for neighbor_id in neighbors:
@@ -1680,18 +1678,18 @@ class VirtualHelixGroup(CNObject):
                 r_idxs = np.where(  (delta > rsquared_ap_min) &
                                     (delta < rsquared_ap_max) &
                                     (zdelta < 0.3*r2_axial))[0].tolist()
-                if neighbor_id == 3 and r_idxs:
-                    print("dmin,max", rsquared_ap_min, rsquared_ap_max, rsquared_ap)
-                    # print(delta[0:7])
-                    print(r_idxs)
-                    print("deltas")
-                    print([delta[x] for x in r_idxs])
-                    print("zdeltas")
-                    print([zdelta[x] for x in r_idxs])
-                    print("point", point)
-                    print("nrevpoints")
-                    print([nrev_pts[x] for x in r_idxs])
-                    # print([nrev_pts[x] for x in r_idxs])
+                # if neighbor_id == 3 and r_idxs:
+                #     print("dmin,max", rsquared_ap_min, rsquared_ap_max, rsquared_ap)
+                #     # print(delta[0:7])
+                #     print(r_idxs)
+                #     print("deltas")
+                #     print([delta[x] for x in r_idxs])
+                #     print("zdeltas")
+                #     print([zdelta[x] for x in r_idxs])
+                #     print("point", point)
+                #     print("nrevpoints")
+                #     print([nrev_pts[x] for x in r_idxs])
+                #     # print([nrev_pts[x] for x in r_idxs])
                 if f_idxs or r_idxs:
                     nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
                     nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)

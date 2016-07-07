@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QApplication
 from cadnano import getReopen, util
 from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
@@ -63,8 +63,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
         self.boundRectToModel()
 
-        self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
-        self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
+        # self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
+        # self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
+        self.setPen(getNoPen())
+
         self.setRect(self._rect)
         self.setAcceptHoverEvents(True)
 
