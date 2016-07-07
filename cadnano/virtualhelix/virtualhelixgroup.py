@@ -299,6 +299,12 @@ class VirtualHelixGroup(CNObject):
             raise IndexError("idx {} greater than size {}".format(idx, size))
     # end def
 
+    def isAGreaterThanB_Z(self, id_numA, idxA, id_numB, idxB):
+        a = self.getCoordinate(id_numA, idxA)
+        b = self.getCoordinate(id_numB, idxB)
+        return a[2] > b[2]
+    # end def
+
     def getVirtualHelixOrigin(self, id_num):
         """given a id_num get the origin coordinate
 
