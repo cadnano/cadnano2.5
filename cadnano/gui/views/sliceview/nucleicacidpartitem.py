@@ -91,6 +91,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         self.griditem = GridItem(self, self._model_props['grid_type'])
 
+        self.griditem.setZValue(1)
+        self.grab_cornerTL.setZValue(2)
+        self.grab_cornerBR.setZValue(2)
+
         # select upon creation
         for part in m_p.document().children():
             if part is m_p:

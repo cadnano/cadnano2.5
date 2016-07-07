@@ -62,18 +62,18 @@ class GrabCornerItem(QGraphicsRectItem):
             hwidth = self.half_width
             if ct == TOP_LEFT:
                 new_x_TL = xTL - hwidth  if new_x + hwidth > xTL else new_x
-            
+
                 new_y_TL = yTL - hwidth if new_y + hwidth > yTL else new_y
-                    
+
                 self.setPos(new_x_TL, new_y_TL)
                 parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), ())
             elif ct == BOTTOM_RIGHT:
                 new_x_BR = xBR + hwidth if new_x + hwidth < xBR else new_x
-                    
+
                 new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
-                    
+
                 self.setPos(new_x_BR, new_y_BR)
-                parent.reconfigureRect((), (new_x_BR - hwidth, new_y_BR - hwidth))
+                parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth))
             else:
                 raise NotImplementedError("corner_type %d not supported" % (ct))
         else:
