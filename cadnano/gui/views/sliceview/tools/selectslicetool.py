@@ -211,6 +211,7 @@ class SelectSliceTool(AbstractSliceTool):
             destination = self.findNearestPoint(part_item, origin)
         else: # GridEvent
             destination = snap_to_item.pos()
+            print("GridEvent", destination)
 
         origin = part_item.mapFromScene(origin)
         if destination is None:
@@ -366,16 +367,20 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):
                     if isinstance(item, VirtualHelixItem):
+                        doc = tool.manager.document
+                        part = item.part()
                         if is_shift:
-                            doc = tool.manager.document
-                            part = item.part()
                             id_num = item.idNum()
                             if doc.isVirtualHelixSelected(part, id_num):    # maybe should ask the model?
                                 doc.removeVirtualHelicesFromSelection(part, [id_num])
                         else:
-                            print("origin", item.idNum())
-                            tool.snap_origin_item = item
-                            break
+                            origin_id_num = item.idNum()
+                            if doc.isVirtualHelixSelected(part, origin_id_num):
+                                print("origin", origin_id_num)
+                                tool.snap_origin_item = item
+                                break
+                            else:
+                                return QGraphicsItemGroup.mousePressEvent(self, event)
             self.drag_start_position = sp = self.pos()
             self.drag_last_position = sp
 
