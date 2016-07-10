@@ -10,7 +10,7 @@ from cadnano.gui.palette import getColorObj, getBrushObj, getNoBrush
 from cadnano.gui.palette import getPenObj, newPenObj, getNoPen
 from . import slicestyles as styles
 
-PXI_PP_ITEM_WIDTH = IW = 1.5
+PXI_PP_ITEM_WIDTH = IW = 2.0 #1.5
 TRIANGLE = QPolygonF()
 TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75*IW, 0.5*IW))
@@ -45,6 +45,14 @@ class PropertyWrapperObject(QObject):
         line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
         self.item.setLine(line)
 
+    def __get_bondP1(self):
+        return self.item.line().p2()
+
+    def __set_bondP1(self, p1):
+        p2 = self.item.line().p2()
+        line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
+        self.item.setLine(line)
+
     def __get_rotation(self):
         return self.item.rotation()
 
@@ -75,6 +83,7 @@ class PropertyWrapperObject(QObject):
 
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
+    bondp1 = pyqtProperty(QPointF, __get_bondP1, __set_bondP1)
     pen_alpha = pyqtProperty(int, __get_penAlpha, __set_penAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
 # end class
@@ -98,6 +107,7 @@ class Triangle(QGraphicsPathItem):
             self.setPath(REVPXI_PP)
             self.setPen(getPenObj(color, 0.25, alpha=128))
             self._click_area.setPos(-0.5*IW, -0.25*IW)
+        # self.setTransformOriginPoint()
     # end def
 # end class
 
@@ -126,14 +136,11 @@ class PreXoverItem(QGraphicsPathItem):
         self.phos_item = Triangle(is_fwd, self)
         self.item_5p = None
         self.item_3p = None
-        self._default_line_5p = QLineF()
-        self._default_line_3p = QLineF()
+        self._default_bond_5p = QLineF()
+        self._default_bond_3p = QLineF()
         self._default_p2_5p = QPointF(0,0)
         self._default_p2_3p = QPointF(0,0)
-        self.line_5p = PhosBond(is_fwd, self)
-        self.line_5p.hide()
-        self.line_3p = PhosBond(is_fwd, self)
-
+        self.bond_3p = PhosBond(is_fwd, self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
     # end def
@@ -187,44 +194,46 @@ class PreXoverItem(QGraphicsPathItem):
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active):
         phos = self.phos_item
-        bond = self.line_5p
+        bond = self.bond_3p
         if bond is None: return
 
         if is_active:
             # print("ENTERING", self.step_idx)
             # angle = 90 if self.is_fwd else -90
-            angle = -90 if self.is_fwd else 90
+            angle = 90 if self.is_fwd else -90
             self.animate(phos, 'rotation', 300, 0, angle)
-            bond.show()
+            # bond.show()
             # if self.item_5p:
-            #     self.item_5p.line_3p.hide()
-            self.animate(bond, 'bondp2', 300, self._default_p2_5p, self._active_p2_5p)
+            #     self.item_5p.bond_3p.hide()
+            self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
         else:
             # print("LEAVING", self.step_idx)
             # QTimer.singleShot(300, bond.hide)
             self.animate(phos, 'rotation', 300, phos.rotation(), 0)
-            if self.item_5p: QTimer.singleShot(300, self.item_5p.line_3p.show)
-            self.animate(bond, 'bondp2', 300, self._active_p2_5p, self._default_p2_5p)
+            # if self.item_5p: QTimer.singleShot(300, self.item_5p.bond_3p.show)
+            self.animate(bond, 'bondp2', 300, self._active_p2_3p, self._default_p2_3p)
     # end def
 
     def setActive3p(self, is_active):
         phos = self.phos_item
-        bond = self.line_3p
-        if self.line_5p:
-            self.line_5p.hide()
+        bond = self.bond_3p
         if is_active:
-            # angle = -90 if self.is_fwd else 90
-            angle = 90 if self.is_fwd else -90
+            if self.item_5p is not None:
+                self.item_5p.bond_3p.hide()
+            angle = -90 if self.is_fwd else 90
             self.animate(phos, 'rotation', 300, 0, angle)
-            self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
+            # self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
             alpha = 42 if self.is_fwd else 64
             self.animate(bond, 'pen_alpha', 300, alpha, 180)
         else:
             self.animate(phos, 'rotation', 300, phos.rotation(), 0)
-            self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2_3p)
+            # self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2_3p)
+            # self.animate(bond, 'bondp2', 300, self._active_p2_3p, self._default_p2_3p)
             start_alpha = bond.pen().color().alpha()
             end_alpha = 42 if self.is_fwd else 64
             self.animate(bond, 'pen_alpha', 300, start_alpha, end_alpha)
+            if self.item_5p is not None:
+                self.item_5p.bond_3p.show()
     # end def
 
     def set5pItem(self, item_5p):
@@ -233,8 +242,8 @@ class PreXoverItem(QGraphicsPathItem):
         p1 = QPointF(0, 0)
         p2 = self.mapFromScene(scenePos)
         self._default_p2_5p = p2
-        self._default_line_5p = QLineF(p1,p2)
-        self.line_5p.setLine(self._default_line_5p)
+        self._default_bond_5p = QLineF(p1, p2)
+        # self.bond_5p.setLine(self._default_bond_5p)
     # end def
 
     def set3pItem(self, item_3p):
@@ -243,8 +252,8 @@ class PreXoverItem(QGraphicsPathItem):
         p1 = QPointF(0, 0)
         p2 = self.mapFromScene(scenePos)
         self._default_p2_3p = p2
-        self._default_line_3p = QLineF(p1,p2)
-        self.line_3p.setLine(self._default_line_3p)
+        self._default_bond_3p = QLineF(p1, p2)
+        self.bond_3p.setLine(self._default_bond_3p)
     # end def
 
     def updateItemApperance(self, is_active, show_3p=True):
@@ -259,10 +268,10 @@ class PreXoverItem(QGraphicsPathItem):
         self.phos_item.adapter = None
         scene.removeItem(self.phos_item)
         self.phos_item = None
-        self.line_3p.adapter.resetAnimations()
-        self.line_3p.adapter = None
-        scene.removeItem(self.line_3p)
-        self.line_3p = None
+        self.bond_3p.adapter.resetAnimations()
+        self.bond_3p.adapter = None
+        scene.removeItem(self.bond_3p)
+        self.bond_3p = None
         scene.removeItem(self)
 # end class
 

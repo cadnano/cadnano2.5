@@ -130,12 +130,12 @@ class PreXoverManager(QGraphicsRectItem):
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is None:
             apxi = agroup.getItemIdx(is_fwd, idx)
-            apxi.setActive3p(True)
+            apxi.setActive5p(True) if is_fwd else apxi.setActive3p(True)
             agroup.active_wedge_gizmo.showActive(apxi)
             active_items.append(apxi)
         else:
             apxi, npxig, neighbor_list = item
-            apxi.setActive3p(True)
+            apxi.setActive5p(True) if is_fwd else apxi.setActive3p(True)
             agroup.active_wedge_gizmo.showActive(apxi)
             active_items.append(apxi)
             self.active_neighbor_group = npxig
@@ -143,11 +143,8 @@ class PreXoverManager(QGraphicsRectItem):
             color = neighbor_list[0].color if neighbor_list else '#aaaaa'
             angle = 0
             for k, npxi in enumerate(neighbor_list):
-                angle -= npxi.rotation()
-                npxi.setActive5p(True)
+                npxi.setActive3p(True) if is_fwd else npxi.setActive5p(True)
                 active_items.append(npxi)
-            # npxig.active_wedge_gizmo.showWedge(angle/(1+k), color,
-            #                             extended=True, rev_gradient=True)
     # end def
 
     def deactivateNeighbors(self):
