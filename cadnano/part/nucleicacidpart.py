@@ -157,7 +157,7 @@ class NucleicAcidPart(Part):
 
         """
         neighbors = literal_eval(self.vh_properties.loc[id_num, 'neighbors'])
-        alpha = self.getProperty('crossover_span_angle')
+        # alpha = self.getProperty('crossover_span_angle')
 
         # idx = None # FORCE this for now to prevent animation GC crashes
 
@@ -366,9 +366,7 @@ class NucleicAcidPart(Part):
 
         if use_undostack:
             self.undoStack().beginMacro("Create Xover")
-        # if ss5p.isScaffold() and use_undostack:  # ignore on import
-        #     strand5p.oligo().applySequence(None)
-        #     strand3p.oligo().applySequence(None)
+
         if strand5p == strand3p:
             """
             This is a complicated case basically we need a truth table.

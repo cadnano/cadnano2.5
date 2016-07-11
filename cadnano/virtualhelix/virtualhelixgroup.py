@@ -1678,23 +1678,19 @@ class VirtualHelixGroup(CNObject):
                 r_idxs = np.where(  (delta > rsquared_ap_min) &
                                     (delta < rsquared_ap_max) &
                                     (zdelta < 0.3*r2_axial))[0].tolist()
-                # if neighbor_id == 3 and r_idxs:
-                #     print("dmin,max", rsquared_ap_min, rsquared_ap_max, rsquared_ap)
-                #     # print(delta[0:7])
-                #     print(r_idxs)
-                #     print("deltas")
-                #     print([delta[x] for x in r_idxs])
-                #     print("zdeltas")
-                #     print([zdelta[x] for x in r_idxs])
-                #     print("point", point)
-                #     print("nrevpoints")
-                #     print([nrev_pts[x] for x in r_idxs])
-                #     # print([nrev_pts[x] for x in r_idxs])
                 if f_idxs or r_idxs:
                     nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
                     nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
+
+            # Scan for pairs of bases in AP xovers
+            idx_last = -2
+            for i, f_idxs, r_idxs in fwd_axis_hits:
+                if r_idxs:
+                    if idx_last + 1 == i:
+                        print("pair", idx_last, i)
+                    idx_last = i
 
             rev_axis_hits = []
             for i, point in enumerate(this_rev_pts):

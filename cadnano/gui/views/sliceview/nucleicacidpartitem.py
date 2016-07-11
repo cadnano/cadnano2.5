@@ -306,6 +306,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if vhi is None:
             return
 
+        print("slice.setPreXoverItemsVisible", virtual_helix_item.idNum())
         part = self.part()
         info = part.active_base_info
         if info is not None:

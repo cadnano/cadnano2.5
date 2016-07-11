@@ -281,15 +281,20 @@ class Part(VirtualHelixGroup):
     # end def
 
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
-        self._active_id_num = id_num
-        self.active_base_info = abi = (id_num, is_fwd, idx, -1)
+        abi = (id_num, is_fwd, idx, -1)
+        if self.active_base_info == abi:
+            return
+        else:
+            self._active_id_num = id_num
+            self.active_base_info  = abi
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
     # end def
 
     def setActiveBaseInfo(self, info):
-        self.active_base_info = info
-        self.partActiveBaseInfoSignal.emit(self, info)
+        if info != self.active_base_info:
+            self.active_base_info = info
+            self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
     def isVirtualHelixActive(self, id_num):
