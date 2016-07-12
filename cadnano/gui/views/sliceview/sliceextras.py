@@ -126,9 +126,13 @@ class Triangle(QGraphicsPathItem):
             self._click_area.setPos(-0.5*IW, -0.75*IW)
         else:
             self.setPath(REVPXI_PP)
-            self.setPen(getPenObj(color, 0.25, alpha=128))
+            # self.setPen(getPenObj(color, 0.25, alpha=128))
+            grad = QLinearGradient(0., 0., 0., -1.)
+            grad.setColorAt(1, getColorObj(color))
+            grad.setColorAt(0, Qt.black)
+            self.setPen(getNoPen())
+            self.setBrush(grad)
             self._click_area.setPos(-0.5*IW, -0.25*IW)
-        # self.setTransformOriginPoint()
     # end def
 # end class
 
@@ -155,6 +159,7 @@ class PreXoverItem(QGraphicsPathItem):
         self.is_fwd = is_fwd
         self.pre_xover_item_group = pre_xover_item_group
         self.phos_item = Triangle(is_fwd, self)
+        self.phos_item.setScale((21 - step_idx)/42 + 0.5)
         self.item_5p = None
         self.item_3p = None
         self._default_bond_5p = QLineF()
@@ -322,6 +327,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         bpr, tpr, eulerZ = virtual_helix_item.getProperty(['bases_per_repeat',
                                                 'turns_per_repeat', 'eulerZ'])
 
+        self.bpr = bpr
         # twist_per_base = tpr*360./bpr
         # print('z:', z, mpart.baseWidth(), z/mpart.baseWidth(), twist_per_base)
         self.setRotation(-eulerZ) # add 180
