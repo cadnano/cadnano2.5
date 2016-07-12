@@ -23,7 +23,8 @@ T90.rotate(90)
 T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
 # FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
-FWDPXI_PP = QPainterPath()
+# REVPXI_PP.addPolygon(T90.map(TRIANGLE))
+
 FWDPXI_PP.moveTo(-0.5*IW, 0.7*IW)
 FWDPXI_PP.lineTo(0., -0.2*IW)
 FWDPXI_PP.lineTo(0.5*IW, 0.7*IW)
@@ -34,8 +35,12 @@ extra2.addEllipse(-0.35*IW, 0.5*IW, 0.7*IW, 0.3*IW)
 FWDPXI_PP += extra1
 FWDPXI_PP -= extra2
 
-REVPXI_PP.addPolygon(T90.map(TRIANGLE))
-# REVPXI_PP.addEllipse(QRectF(0., 0.25*IW, IW, 0))
+REVPXI_PP.moveTo(-0.5*IW, -0.7*IW)
+REVPXI_PP.lineTo(0., 0.2*IW)
+REVPXI_PP.lineTo(0.5*IW, -0.7*IW)
+extra1 = QPainterPath()
+extra1.addEllipse(-0.5*IW, -0.9*IW, IW, 0.4*IW)
+REVPXI_PP += extra1
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _WEDGE_RECT_GAIN = 0.25
