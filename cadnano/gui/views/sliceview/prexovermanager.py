@@ -24,6 +24,7 @@ class PreXoverManager(QGraphicsRectItem):
         # tracks connections between prexovers
         self.prexover_item_map = {}
         self.neighbor_prexover_items = {}   # just a dictionary of neighbors
+        self.neighbor_pairs = () # accounting for neighbor pairing
         self._active_items = []
     # end def
 
@@ -48,13 +49,15 @@ class PreXoverManager(QGraphicsRectItem):
         for group in self.groups.values():
             group.hide()
 
-    def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits):
+    def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits, pairs):
         """ Create PreXoverItemGroups for the active virtual_helix_item and it's
         neighbors and connect the neighboring bases
         """
         self.clearPreXoverItemGroups()
         pxis = self.prexover_item_map
-        neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
+        neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates)
+        neighbor_pairs = self.neighbor_pairs = pairs
+
         self.virtual_helix_item = virtual_helix_item
         part_item = self.part_item
         groups = self.groups
@@ -68,7 +71,9 @@ class PreXoverManager(QGraphicsRectItem):
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             ngroup = PreXoverItemGroup(_RADIUS, WEDGE_RECT, nvhi, False)
             groups[neighbor_id] = ngroup
-            fwd_axis_hits, rev_axis_hits, idx_bounds = hits
+
+            fwd_axis_hits, rev_axis_hits = hits
+
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 neighbor_pxis = []
@@ -127,6 +132,7 @@ class PreXoverManager(QGraphicsRectItem):
             raise ValueError("not active id_num {} != {}".format(id_num,
                                                 agroup.id_num))
         active_items = self._active_items
+
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is None:
             apxi = agroup.getItemIdx(is_fwd, idx)
@@ -135,16 +141,34 @@ class PreXoverManager(QGraphicsRectItem):
             active_items.append(apxi)
         else:
             apxi, npxig, neighbor_list = item
-            apxi.setActive5p(True) if is_fwd else apxi.setActive3p(True)
+            pairs = self.neighbor_pairs[0] if is_fwd else self.neighbor_pairs[1]
+            check_5prime = pairs.get(idx)
+            is_5prime_strand = None
+            if check_5prime is not None:
+                is_5prime_strand = check_5prime[0]
+            else:
+                if is_fwd and idx == 0:
+                    is_5prime_strand = False
+                elif not is_5prime_strand and self.virtual_helix_item.getProperty('length') == idx + 1:
+                    is_5prime_strand = False
+                else:
+                    # do some more checks
+                    # part = part_item.part()
+                    # part.hasStrandAtIdx(id_num, idx)
+                    # strand = part.getStrand(is_fwd, id_num, idx)
+                    is_5prime_strand = True
+
             agroup.active_wedge_gizmo.showActive(apxi)
             active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))
             color = neighbor_list[0].color if neighbor_list else '#aaaaa'
             angle = 0
-            for k, npxi in enumerate(neighbor_list):
-                npxi.setActive3p(True) if is_fwd else npxi.setActive5p(True)
+            for npxi in neighbor_list:
+                npxi.setActive3p(True, apxi) if is_5prime_strand else npxi.setActive5p(True, apxi)
                 active_items.append(npxi)
+
+            apxi.setActive5p(True, npxi) if is_5prime_strand else apxi.setActive3p(True, npxi)
     # end def
 
     def deactivateNeighbors(self):

@@ -16,31 +16,33 @@ TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75*IW, 0.5*IW))
 TRIANGLE.append(QPointF(0, IW))
 TRIANGLE.append(QPointF(0, 0))
-TRIANGLE.translate(-0.75*IW, -0.5*IW)
+# TRIANGLE.translate(-0.75*IW, -0.5*IW)
+TRIANGLE.translate(-0.25*IW, -0.5*IW)
+
 PXI_RECT = QRectF(0, 0, IW, IW)
 T90, T270 = QTransform(), QTransform()
 T90.rotate(90)
 T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
-# FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
-# REVPXI_PP.addPolygon(T90.map(TRIANGLE))
+FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
+REVPXI_PP.addPolygon(T90.map(TRIANGLE))
 
-FWDPXI_PP.moveTo(-0.5*IW, 0.7*IW)
-FWDPXI_PP.lineTo(0., -0.2*IW)
-FWDPXI_PP.lineTo(0.5*IW, 0.7*IW)
-extra1 = QPainterPath()
-extra1.addEllipse(-0.5*IW, 0.5*IW, IW, 0.4*IW)
-extra2 = QPainterPath()
-extra2.addEllipse(-0.35*IW, 0.5*IW, 0.7*IW, 0.3*IW)
-FWDPXI_PP += extra1
-FWDPXI_PP -= extra2
+# FWDPXI_PP.moveTo(-0.5*IW, 0.7*IW)
+# FWDPXI_PP.lineTo(0., -0.2*IW)
+# FWDPXI_PP.lineTo(0.5*IW, 0.7*IW)
+# extra1 = QPainterPath()
+# extra1.addEllipse(-0.5*IW, 0.5*IW, IW, 0.4*IW)
+# extra2 = QPainterPath()
+# extra2.addEllipse(-0.35*IW, 0.5*IW, 0.7*IW, 0.3*IW)
+# FWDPXI_PP += extra1
+# FWDPXI_PP -= extra2
 
-REVPXI_PP.moveTo(-0.5*IW, -0.7*IW)
-REVPXI_PP.lineTo(0., 0.2*IW)
-REVPXI_PP.lineTo(0.5*IW, -0.7*IW)
-extra1 = QPainterPath()
-extra1.addEllipse(-0.5*IW, -0.9*IW, IW, 0.4*IW)
-REVPXI_PP += extra1
+# REVPXI_PP.moveTo(-0.5*IW, -0.7*IW)
+# REVPXI_PP.lineTo(0., 0.2*IW)
+# REVPXI_PP.lineTo(0.5*IW, -0.7*IW)
+# extra1 = QPainterPath()
+# extra1.addEllipse(-0.5*IW, -0.9*IW, IW, 0.4*IW)
+# REVPXI_PP += extra1
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _WEDGE_RECT_GAIN = 0.25
@@ -62,13 +64,13 @@ class PropertyWrapperObject(QObject):
         line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
         self.item.setLine(line)
 
-    def __get_bondP1(self):
-        return self.item.line().p2()
+    # def __get_bondP1(self):
+    #     return self.item.line().p2()
 
-    def __set_bondP1(self, p1):
-        p2 = self.item.line().p2()
-        line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
-        self.item.setLine(line)
+    # def __set_bondP1(self, p1):
+    #     p2 = self.item.line().p2()
+    #     line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
+    #     self.item.setLine(line)
 
     def __get_rotation(self):
         return self.item.rotation()
@@ -100,7 +102,7 @@ class PropertyWrapperObject(QObject):
 
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
-    bondp1 = pyqtProperty(QPointF, __get_bondP1, __set_bondP1)
+    # bondp1 = pyqtProperty(QPointF, __get_bondP1, __set_bondP1)
     pen_alpha = pyqtProperty(int, __get_penAlpha, __set_penAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
 # end class
@@ -116,23 +118,24 @@ class Triangle(QGraphicsPathItem):
         click_area.setPen(getNoPen())
         click_area.hoverMoveEvent = self.hoverMoveEvent
         if is_fwd:
-            grad = QLinearGradient(0., 0., 0., 1.)
-            grad.setColorAt(1, getColorObj(color))
-            grad.setColorAt(0, Qt.black)
+            # grad = QLinearGradient(0., 0., 0., 1.)
+            # grad.setColorAt(0, getColorObj(color))
+            # grad.setColorAt(1, Qt.black)
+            # self.setBrush(grad)
+            self.setBrush(getBrushObj(color, alpha=128))
             self.setPath(FWDPXI_PP)
             self.setPen(getNoPen())
-            # self.setBrush(getBrushObj(color, alpha=128))
-            self.setBrush(grad)
             self._click_area.setPos(-0.5*IW, -0.75*IW)
         else:
             self.setPath(REVPXI_PP)
-            # self.setPen(getPenObj(color, 0.25, alpha=128))
-            grad = QLinearGradient(0., 0., 0., -1.)
-            grad.setColorAt(1, getColorObj(color))
-            grad.setColorAt(0, Qt.black)
-            self.setPen(getNoPen())
-            self.setBrush(grad)
+            self.setPen(getPenObj(color, 0.25, alpha=128))
+            # grad = QLinearGradient(0., 0., 0., -1.)
+            # grad.setColorAt(1, getColorObj(color))
+            # grad.setColorAt(0, Qt.black)
+            # self.setPen(getNoPen())
+            # self.setBrush(grad)
             self._click_area.setPos(-0.5*IW, -0.25*IW)
+        # self.setPos(TRIANGLE_OFFSET)
     # end def
 # end class
 
@@ -152,14 +155,20 @@ class PhosBond(QGraphicsLineItem):
 # end class
 
 class PreXoverItem(QGraphicsPathItem):
-    def __init__(self, step_idx, color, pre_xover_item_group, is_fwd=True):
+    def __init__(self,  step_idx,
+                        twist_per_base, bases_per_repeat,
+                        color, pre_xover_item_group,
+                        is_fwd=True):
         super(PreXoverItem, self).__init__(pre_xover_item_group)
         self.step_idx = step_idx
         self.color = color
         self.is_fwd = is_fwd
         self.pre_xover_item_group = pre_xover_item_group
         self.phos_item = Triangle(is_fwd, self)
-        self.phos_item.setScale((21 - step_idx)/42 + 0.5)
+        self.phos_item.setScale((bases_per_repeat - step_idx)/(2*bases_per_repeat) + 0.5)
+        self.theta0 = rot = twist_per_base/2 if is_fwd else -twist_per_base/2
+        self.phos_item.setRotation(rot)
+        self.is_active5p = self.is_active3p = False
         self.item_5p = None
         self.item_3p = None
         self._default_bond_5p = QLineF()
@@ -169,6 +178,7 @@ class PreXoverItem(QGraphicsPathItem):
         self.bond_3p = PhosBond(is_fwd, self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
+        # self.setZValue(styles.ZPARTITEM)
     # end def
 
     ### ACCESSORS ###
@@ -218,55 +228,56 @@ class PreXoverItem(QGraphicsPathItem):
             item.adapter.saveRef(property_name, anim)
 
     ### PUBLIC SUPPORT METHODS ###
-    def setActive5p(self, is_active):
+    def setActive5p(self, is_active, neighbor_item=None):
         phos = self.phos_item
         bond = self.bond_3p
         if bond is None: return
-
-        if is_active:
-            # print("ENTERING", self.step_idx)
-            # angle = 90 if self.is_fwd else -90
-            angle = 90 if self.is_fwd else -90
-            self.animate(phos, 'rotation', 300, 0, angle)
-            # bond.show()
-            # if self.item_5p:
-            #     self.item_5p.bond_3p.hide()
-            self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
-        else:
-            # print("LEAVING", self.step_idx)
-            # QTimer.singleShot(300, bond.hide)
-            self.animate(phos, 'rotation', 300, phos.rotation(), 0)
-            # if self.item_5p: QTimer.singleShot(300, self.item_5p.bond_3p.show)
-            self.animate(bond, 'bondp2', 300, self._active_p2_3p, self._default_p2_3p)
+        if not self.is_active5p and is_active:
+            self.pre_xover_item_group.virtual_helix_item.setZValue(styles.ZSLICEHELIX + 10)
+            self.is_active5p = True
+            if neighbor_item is not None:
+                n_scene_pos = neighbor_item.scenePos()
+                p2 = self.mapFromScene(n_scene_pos)
+                bline = bond.line()
+                test = QLineF(bline.p1(), p2)
+                angle = test.angleTo(bline) + self.theta0 if self.is_fwd else -bline.angleTo(test) + self.theta0
+                # angle = 90 if self.is_fwd else -90
+            else:
+                p2 = self._active_p2_3p
+                angle = 90 if self.is_fwd else -90
+            self.animate(phos, 'rotation', 300, self.theta0, angle)
+            self.animate(bond, 'bondp2', 300, self._default_p2_3p, p2)
+        elif self.is_active5p:
+            self.pre_xover_item_group.virtual_helix_item.setZValue(styles.ZSLICEHELIX)
+            self.is_active5p = False
+            self.animate(phos, 'rotation', 300, phos.rotation(), self.theta0)
+            self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2_3p)
     # end def
 
-    def setActive3p(self, is_active):
+    def setActive3p(self, is_active, neighbor_item=None):
         phos = self.phos_item
         bond = self.bond_3p
-        if is_active:
+        if not self.is_active3p and is_active:
+            self.is_active3p = True
             if self.item_5p is not None:
                 self.item_5p.bond_3p.hide()
             angle = -90 if self.is_fwd else 90
-            self.animate(phos, 'rotation', 300, 0, angle)
-            # self.animate(bond, 'bondp2', 300, self._default_p2_3p, self._active_p2_3p)
             alpha = 42 if self.is_fwd else 64
-            self.animate(bond, 'pen_alpha', 300, alpha, 180)
-        else:
-            self.animate(phos, 'rotation', 300, phos.rotation(), 0)
-            # self.animate(bond, 'bondp2', 300, bond.line().p2(), self._default_p2_3p)
-            # self.animate(bond, 'bondp2', 300, self._active_p2_3p, self._default_p2_3p)
-            start_alpha = bond.pen().color().alpha()
+            self.animate(phos, 'pen_alpha', 300, alpha, 255)
+        elif self.is_active3p:
+            self.is_active3p = False
+            start_alpha = phos.pen().color().alpha()
             end_alpha = 42 if self.is_fwd else 64
-            self.animate(bond, 'pen_alpha', 300, start_alpha, end_alpha)
+            self.animate(phos, 'pen_alpha', 300, start_alpha, end_alpha)
             if self.item_5p is not None:
                 self.item_5p.bond_3p.show()
     # end def
 
     def set5pItem(self, item_5p):
         self.item_5p = item_5p
-        scenePos = item_5p.scenePos()
+        scene_pos5p = item_5p.phos_item.scenePos()
         p1 = QPointF(0, 0)
-        p2 = self.mapFromScene(scenePos)
+        p2 = self.mapFromScene(scene_pos5p)
         self._default_p2_5p = p2
         self._default_bond_5p = QLineF(p1, p2)
         # self.bond_5p.setLine(self._default_bond_5p)
@@ -274,9 +285,9 @@ class PreXoverItem(QGraphicsPathItem):
 
     def set3pItem(self, item_3p):
         self.item_3p = item_3p
-        scenePos = item_3p.scenePos()
+        scene_pos3p = item_3p.phos_item.scenePos()
         p1 = QPointF(0, 0)
-        p2 = self.mapFromScene(scenePos)
+        p2 = self.mapFromScene(scene_pos3p)
         self._default_p2_3p = p2
         self._default_bond_3p = QLineF(p1, p2)
         self.bond_3p.setLine(self._default_bond_3p)
@@ -327,7 +338,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         bpr, tpr, eulerZ = virtual_helix_item.getProperty(['bases_per_repeat',
                                                 'turns_per_repeat', 'eulerZ'])
 
-        self.bpr = bpr
         # twist_per_base = tpr*360./bpr
         # print('z:', z, mpart.baseWidth(), z/mpart.baseWidth(), twist_per_base)
         self.setRotation(-eulerZ) # add 180
@@ -364,31 +374,36 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     def addItems(self):
         radius = self._radius
         step_size, bases_per_turn, tpb, mgroove = self.virtual_helix_item.getAngularProperties()
+        # print("TPB", tpb, step_size)
         iw = PXI_PP_ITEM_WIDTH
+        spiral_factor = self.SPIRAL_FACTOR
+        colors = self._colors
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
         y = ctr.y()
         tpb = -tpb # Qt +angle is Clockwise
         mgroove = -mgroove
+        fwd_pxis = self.fwd_prexover_items
+        rev_pxis = self.rev_prexover_items
         for i in range(step_size):
-            inset = i*self.SPIRAL_FACTOR # spiral layout
-            fwd = PreXoverItem(i, self._colors[i], self, is_fwd=True)
-            rev = PreXoverItem(i, self._colors[-1 - i], self, is_fwd=False)
+            inset = i*spiral_factor # spiral layout
+            fwd = PreXoverItem(i, tpb, step_size, colors[i], self, is_fwd=True)
+            rev = PreXoverItem(i, tpb, step_size, colors[-1 - i], self, is_fwd=False)
             fwd.setPos(x - inset, y)
             rev.setPos(x - inset, y)
             fwd.setTransformOriginPoint((-radius + iw + inset), 0)
             rev.setTransformOriginPoint((-radius + iw + inset), 0)
-            fwd.setRotation(round((i*tpb) % 360, 3))
-            rev.setRotation(round((i*tpb + mgroove) % 360, 3))
+            fwd.setRotation(round(i*tpb % 360, 3))
+            rev.setRotation(round( (i*tpb + mgroove) % 360, 3))
             fwd.setBondLineLength(inset + iw)
             rev.setBondLineLength(inset + iw)
-            self.fwd_prexover_items[i] = fwd
-            self.rev_prexover_items[i] = rev
+            fwd_pxis[i] = fwd
+            rev_pxis[i] = rev
 
         for i in range(step_size - 1):
-            fwd, next_fwd = self.fwd_prexover_items[i], self.fwd_prexover_items[i + 1]
+            fwd, next_fwd = fwd_pxis[i], fwd_pxis[i + 1]
             j = (step_size - 1) - i
-            rev, next_rev = self.rev_prexover_items[j], self.rev_prexover_items[j - 1]
+            rev, next_rev = rev_pxis[j], rev_pxis[j - 1]
             fwd.set3pItem(next_fwd)
             rev.set3pItem(next_rev)
             next_fwd.set5pItem(fwd)

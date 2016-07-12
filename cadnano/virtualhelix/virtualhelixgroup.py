@@ -1645,6 +1645,9 @@ class VirtualHelixGroup(CNObject):
         rsquared_p_max = rsquared_p + 0.25*r2_axial
         per_neighbor_hits = {}
 
+        fwd_axis_pairs = {}
+        rev_axis_pairs = {}
+
         for neighbor_id in neighbors:
             nmin_idx = 999999
             nmax_idx = -1
@@ -1679,18 +1682,23 @@ class VirtualHelixGroup(CNObject):
                                     (delta < rsquared_ap_max) &
                                     (zdelta < 0.3*r2_axial))[0].tolist()
                 if f_idxs or r_idxs:
-                    nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
-                    nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
+                    # nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
+                    # nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
 
             # Scan for pairs of bases in AP xovers
             idx_last = -2
+            fwd_axis_pairs = {}
             for i, f_idxs, r_idxs in fwd_axis_hits:
                 if r_idxs:
                     if idx_last + 1 == i:
-                        print("pair", idx_last, i)
+                        # print("pair", idx_last, i)
+                        fwd_axis_pairs[idx_last] = (True, neighbor_id) # 5 prime  most strand
+                        fwd_axis_pairs[i] = (False, neighbor_id)       # 3 prime most strand
                     idx_last = i
+
+
 
             rev_axis_hits = []
             for i, point in enumerate(this_rev_pts):
@@ -1712,13 +1720,24 @@ class VirtualHelixGroup(CNObject):
                                     (zdelta < 1.1*r2_axial)
                                     )[0].tolist()
                 if f_idxs or r_idxs:
-                    nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
-                    nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
+                    # nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
+                    # nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
-            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits, (nmin_idx, nmax_idx))
+
+            # Scan for pairs of bases in AP xovers
+            idx_last = -2
+            for i, f_idxs, r_idxs in rev_axis_hits:
+                if f_idxs:
+                    if idx_last + 1 == i:
+                        # print("pair", idx_last, i)
+                        rev_axis_pairs[idx_last] = (False, neighbor_id)    # 3 prime  most strand
+                        rev_axis_pairs[i] = (True, neighbor_id)            # 5 prime most strand
+                    idx_last = i
+
+            per_neighbor_hits[neighbor_id] = ( fwd_axis_hits, rev_axis_hits)
         # end for
-        return per_neighbor_hits
+        return per_neighbor_hits, (fwd_axis_pairs, rev_axis_pairs)
     # end def
 
     def getAngleAtIdx(self, id_num, idx):

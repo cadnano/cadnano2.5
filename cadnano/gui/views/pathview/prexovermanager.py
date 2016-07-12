@@ -162,6 +162,7 @@ class PreXoverManager(QGraphicsRectItem):
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
+        # neighbor_pairs_dict = self.neighbor_pairs_dict
         part_item = self.part_item
         pxi_pool = self.pxi_pool
         getPoolItem = self.getPoolItem
@@ -196,11 +197,10 @@ class PreXoverManager(QGraphicsRectItem):
 
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
-            fwd_axis_hits, rev_axis_hits, idx_bounds = hits
+            fwd_axis_hits, rev_axis_hits = hits
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
-                # from_virtual_helix_item, from_index, fwd_st_type, prexoveritemgroup, color):
                 neighbor_pxis = []
                 # print((id_num, fwd_st_type, idx))
                 apxi = active_pxis[(fwd_st_type, idx)]

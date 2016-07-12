@@ -311,8 +311,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
         info = part.active_base_info
         if info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
-            per_neighbor_hits = part.potentialCrossoverMap(id_num, idx)
-            self.prexover_manager.activateVirtualHelix(virtual_helix_item, idx, per_neighbor_hits)
+            per_neighbor_hits, pairs = part.potentialCrossoverMap(id_num, idx)
+            self.prexover_manager.activateVirtualHelix(
+                                    virtual_helix_item, idx,
+                                    per_neighbor_hits, pairs)
     # end def
 
     def removeVirtualHelixItem(self, id_num):
