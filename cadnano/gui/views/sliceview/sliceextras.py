@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QLineF, QObject, QPointF, Qt, QRectF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty, QTimer
-from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
+from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF, QLinearGradient
 from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
@@ -22,8 +22,20 @@ T90, T270 = QTransform(), QTransform()
 T90.rotate(90)
 T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
-FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
+# FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
+FWDPXI_PP = QPainterPath()
+FWDPXI_PP.moveTo(-0.5*IW, 0.7*IW)
+FWDPXI_PP.lineTo(0., -0.2*IW)
+FWDPXI_PP.lineTo(0.5*IW, 0.7*IW)
+extra1 = QPainterPath()
+extra1.addEllipse(-0.5*IW, 0.5*IW, IW, 0.4*IW)
+extra2 = QPainterPath()
+extra2.addEllipse(-0.35*IW, 0.5*IW, 0.7*IW, 0.3*IW)
+FWDPXI_PP += extra1
+FWDPXI_PP -= extra2
+
 REVPXI_PP.addPolygon(T90.map(TRIANGLE))
+# REVPXI_PP.addEllipse(QRectF(0., 0.25*IW, IW, 0))
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _WEDGE_RECT_GAIN = 0.25
@@ -99,9 +111,13 @@ class Triangle(QGraphicsPathItem):
         click_area.setPen(getNoPen())
         click_area.hoverMoveEvent = self.hoverMoveEvent
         if is_fwd:
+            grad = QLinearGradient(0., 0., 0., 1.)
+            grad.setColorAt(1, getColorObj(color))
+            grad.setColorAt(0, Qt.black)
             self.setPath(FWDPXI_PP)
             self.setPen(getNoPen())
-            self.setBrush(getBrushObj(color, alpha=128))
+            # self.setBrush(getBrushObj(color, alpha=128))
+            self.setBrush(grad)
             self._click_area.setPos(-0.5*IW, -0.75*IW)
         else:
             self.setPath(REVPXI_PP)
