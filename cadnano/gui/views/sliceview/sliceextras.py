@@ -479,9 +479,10 @@ class WedgeGizmo(QGraphicsPathItem):
         # Hack to keep wedge in front
         scene_pos = self.scenePos()
         ctr = self.mapToScene(pre_xover_item_group.boundingRect().center())
-        self.setParentItem(pre_xover_item_group.parentItem())
+        self.setParentItem(pre_xover_item_group.partItem())
         self.setPos(self.mapFromScene(scene_pos))
         self.setTransformOriginPoint(self.mapFromScene(ctr))
+    # end def
 
     def showWedge(self, angle, color,
                     extended=False, rev_gradient=False, outline_only=False):

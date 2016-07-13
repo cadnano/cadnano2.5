@@ -1690,6 +1690,7 @@ class VirtualHelixGroup(CNObject):
             # Scan for pairs of bases in AP xovers
             idx_last = -2
             fwd_axis_pairs = {}
+            isAGreaterThanB_Z = self.isAGreaterThanB_Z
             for i, f_idxs, r_idxs in fwd_axis_hits:
                 if r_idxs:
                     if idx_last + 1 == i:
@@ -1697,8 +1698,12 @@ class VirtualHelixGroup(CNObject):
                         fwd_axis_pairs[idx_last] = (True, neighbor_id) # 5 prime  most strand
                         fwd_axis_pairs[i] = (False, neighbor_id)       # 3 prime most strand
                     idx_last = i
-
-
+                if f_idxs:
+                    for idxB in f_idxs:
+                        if isAGreaterThanB_Z(id_num, i, neighbor_id, idxB):
+                            fwd_axis_pairs[i] = (False, neighbor_id)
+                        else:
+                            fwd_axis_pairs[i] = (True, neighbor_id)
 
             rev_axis_hits = []
             for i, point in enumerate(this_rev_pts):
@@ -1734,6 +1739,12 @@ class VirtualHelixGroup(CNObject):
                         rev_axis_pairs[idx_last] = (False, neighbor_id)    # 3 prime  most strand
                         rev_axis_pairs[i] = (True, neighbor_id)            # 5 prime most strand
                     idx_last = i
+                if r_idxs:
+                    for idxB in r_idxs:
+                        if isAGreaterThanB_Z(id_num, i, neighbor_id, idxB):
+                            rev_axis_pairs[i] = (True, neighbor_id)
+                        else:
+                            rev_axis_pairs[i] = (False, neighbor_id)
 
             per_neighbor_hits[neighbor_id] = ( fwd_axis_hits, rev_axis_hits)
         # end for
