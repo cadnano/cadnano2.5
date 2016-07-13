@@ -28,6 +28,10 @@ class PreXoverManager(QGraphicsRectItem):
         self._active_items = []
     # end def
 
+    def partItem(self):
+        return self.part_item
+    # end def
+
     def clearPreXoverItemGroups(self):
         groups = self.groups
         while groups:
@@ -48,6 +52,7 @@ class PreXoverManager(QGraphicsRectItem):
             self.active_group.hide()
         for group in self.groups.values():
             group.hide()
+    # end def
 
     def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits, pairs):
         """ Create PreXoverItemGroups for the active virtual_helix_item and it's

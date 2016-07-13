@@ -348,6 +348,11 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         return -self.virtual_helix_item.getProperty('eulerZ')
     # end def
 
+
+    def partItem(self):
+        return self.virtual_helix_item.partItem()
+    # end def
+
     def getItem(self, is_fwd, step_idx):
         items = self.fwd_prexover_items if is_fwd else self.rev_prexover_items
         if step_idx in items:
@@ -471,8 +476,17 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setZValue(styles.ZWEDGEGIZMO - 10)
         self._last_params = None
 
+        # Hack to keep wedge in front
+        scene_pos = self.scenePos()
+        ctr = self.mapToScene(pre_xover_item_group.boundingRect().center())
+        self.setParentItem(pre_xover_item_group.parentItem())
+        self.setPos(self.mapFromScene(scene_pos))
+        self.setTransformOriginPoint(self.mapFromScene(ctr))
+
     def showWedge(self, angle, color,
                     extended=False, rev_gradient=False, outline_only=False):
+        self.setRotation(self.pre_xover_item_group.rotation())
+
         self._last_params = (angle, color, extended, rev_gradient, outline_only)
         radius = self._radius
         span = self.pre_xover_item_group.partCrossoverSpanAngle() / 2
@@ -502,8 +516,6 @@ class WedgeGizmo(QGraphicsPathItem):
             self.setPen(getPenObj(color, 0.5, alpha=128, capstyle=Qt.RoundCap))
             path.moveTo(line1.p2())
             path.quadTo(line0.p2(), line2.p2())
-            self.setPath(path)
-            self.show()
         else:
             gradient = QRadialGradient(tip, radius_adjusted * EXT)
             color1 = getColorObj(color, alpha=80)
@@ -525,8 +537,10 @@ class WedgeGizmo(QGraphicsPathItem):
             path.lineTo(line1.p2())
             path.quadTo(line0.p2(), line2.p2())
             path.lineTo(line2.p1())
+
         self.setPath(path)
         self.show()
+
     # end def
 
     def updateWedgeAngle(self):
