@@ -118,17 +118,19 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def clearPreXoverItems(self):
+        # self.deactivateNeighbors()
         self.hovered_items = []
         pxi_pool = self.pxi_pool
         active_pxis = self.active_pxis
         while active_pxis:
             k, x = active_pxis.popitem()
-            x.hide()
+            x.shutdown()
             pxi_pool.append(x)
         self.prexover_item_map = {}
         for x in self.neighbor_prexover_items.values():
-            x.hide()
+            x.shutdown()
             pxi_pool.append(x)
+        self._key_press_dict = {}
         self.neighbor_prexover_items = {}
     # end def
 

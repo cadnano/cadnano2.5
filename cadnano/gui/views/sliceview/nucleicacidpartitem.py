@@ -199,10 +199,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
             self._refreshVirtualHelixItemGizmos(id_num, vhi)
 
         # 0. clear PreXovers:
-        self.prexover_manager.hideGroups()
-        if self.active_virtual_helix_item is not None:
-            self.active_virtual_helix_item.deactivate()
-            self.active_virtual_helix_item = None
+        # self.prexover_manager.hideGroups()
+        # if self.active_virtual_helix_item is not None:
+        #     self.active_virtual_helix_item.deactivate()
+        #     self.active_virtual_helix_item = None
+        avhi = self.active_virtual_helix_item
+        self.setPreXoverItemsVisible(avhi)
     # end def
 
     def _refreshVirtualHelixItemGizmos(self, id_num, vhi):

@@ -96,6 +96,7 @@ class PropertyWrapperObject(QObject):
 
     def resetAnimations(self):
         for item in self.animations.values():
+            item.stop()
             item.deleteLater()
         self.item = None
         self.animations = {}

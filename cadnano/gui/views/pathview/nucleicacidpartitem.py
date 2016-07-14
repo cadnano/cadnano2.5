@@ -140,10 +140,13 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def partVirtualHelicesTranslatedSlot(self, sender,
                                             vh_set, left_overs,
                                             do_deselect):
-        self.prexover_manager.clearPreXoverItems()
+        # self.prexover_manager.clearPreXoverItems()
+        # if self.active_virtual_helix_item is not None:
+        #     self.active_virtual_helix_item.deactivate()
+        #     self.active_virtual_helix_item = None
+
         if self.active_virtual_helix_item is not None:
-            self.active_virtual_helix_item.deactivate()
-            self.active_virtual_helix_item = None
+            self.setPreXoverItemsVisible(self.active_virtual_helix_item)
     # end def
 
     def partRemovedSlot(self, sender):

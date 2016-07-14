@@ -66,7 +66,9 @@ class PropertyWrapperObject(QObject):
 
     def resetAnimations(self):
         for item in self.animations.values():
+            item.stop()
             item.deleteLater()
+            item = None
         self.animations = {}
 
     brush_alpha = pyqtProperty(int, __get_brushAlpha, __set_brushAlpha)
@@ -159,30 +161,37 @@ class PreXoverItem(QGraphicsRectItem):
                 to_vh_id_num, prexoveritemgroup, color)
     # end def
 
+    def shutdown(self):
+        self.setBrush(getBrushObj(self._color, alpha=0))
+        self.to_vh_id_num = None
+        self.adapter.resetAnimations()
+        phos = self._phos_item
+        phos.adapter.resetAnimations()
+        phos.resetTransform()
+        phos.setPos(0, 0)
+        self.setAcceptHoverEvents(False)
+        self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
+        self.hide()
+    # end def
+
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
                 to_vh_id_num, prexoveritemgroup, color):
         self.setParentItem(from_virtual_helix_item)
-        self.enableActive(False)
         self.resetTransform()
         self._from_vh_item = from_virtual_helix_item
         self._id_num = from_virtual_helix_item.idNum()
         self.idx = from_index
-        self.prexoveritemgroup = prexoveritemgroup
+        self.is_fwd = is_fwd
         self.to_vh_id_num = to_vh_id_num
         self._color = color
-        self.is_fwd = is_fwd
+        self.prexoveritemgroup = prexoveritemgroup
         self._bond_item.hide()
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self.setLabel(text=lbt)
         self._label.resetItem(is_fwd, color)
 
-        self.adapter.resetAnimations()
 
         phos = self._phos_item
-        phos.adapter.resetAnimations()
-        phos.resetTransform()
-        phos.setPos(0, 0)
-
         bonditem = self._bond_item
 
         if is_fwd:
@@ -202,14 +211,13 @@ class PreXoverItem(QGraphicsRectItem):
             bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
                                     penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
-        self.show()
 
         if to_vh_id_num is not None:
             inactive_alpha = PROX_ALPHA
             self.setBrush(getBrushObj(color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
         else:
             self.setBrush(getBrushObj(color, alpha=0))
+        self.show()
     #end def
 
     def getInfo(self):
@@ -308,6 +316,7 @@ class PreXoverItem(QGraphicsRectItem):
             self.setAcceptHoverEvents(True)
             if to_vh_id_num is None:
                 self.setLabel(text=None)
+                self.setBrush(getBrushObj(self._color, alpha=0))
             else:
                 self.setLabel(text= str(to_vh_id_num))
                 inactive_alpha = PROX_ALPHA
@@ -315,6 +324,8 @@ class PreXoverItem(QGraphicsRectItem):
                 self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
                 self.setFlag(KEYINPUT_ACTIVE_FLAG, True)
         else:
+            self.setBrush(getNoBrush())
+            # self.setLabel(text=None)
             self.setAcceptHoverEvents(False)
             self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
 
@@ -345,6 +356,8 @@ class PreXoverItem(QGraphicsRectItem):
         elif idx == active_idx - 1:
             alpha = 255
 
+        # if active_prexoveritem.idx == 1 and active_prexoveritem._id_num == 1 and active_prexoveritem.is_fwd:
+        #     print("activateNeighbor")
         inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
         self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
         self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
@@ -353,12 +366,13 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbor(self):
-        inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
-        self.setBrush(getBrushObj(self._color, alpha=128))
-        self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-        self.animate(self._phos_item, 'rotation', 500, -90, 0)
-        self._bond_item.hide()
-        self.setLabel(text=self._label_txt)
+        if self.isVisible():
+            inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
+            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
+            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
+            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+            self._bond_item.hide()
+            self.setLabel(text=self._label_txt)
     # end def
 # end class
 
