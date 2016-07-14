@@ -20,15 +20,14 @@ class PathToolManager(AbstractToolManager):
     """
     def __init__(self, window, viewroot):
         super(PathToolManager, self).__init__('path', window, viewroot)
-        self.tool_names = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Mods')
-        # self.tool_names = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
+        self.tool_names = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
         self.select_tool = SelectTool(self, viewroot)
         self.pencil_tool = PencilTool(self)
         self.nick_tool = BreakTool(self)
         self.insertion_tool = InsertionTool(self)
         self.skip_tool = SkipTool(self)
         self.paint_tool = PaintTool(self) # (self, win.path_graphics_view.toolbar)
-        # self.add_seq_tool = AddSeqTool(self)
+        self.add_seq_tool = AddSeqTool(self)
         self.mods_tool = ModsTool(self)
         self.viewroot.setManager(self)
         self.installTools()

@@ -54,7 +54,6 @@ class StrandItem(QGraphicsLineItem):
         # caps
         self._low_cap = EndpointItem(self, 'low', is_forward)
         self._high_cap = EndpointItem(self, 'high', is_forward)
-        # self._high_cap = None
         self._dual_cap = EndpointItem(self, 'dual', is_forward)
 
         # orientation

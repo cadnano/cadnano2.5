@@ -45,7 +45,6 @@ class AbstractToolManager(QObject):
         if tnames is None:
             raise ValueError("Please define tools_names of AbstractToolManager subclass")
         for tool_name in tnames:
-            print("tool_name",tool_name)
             self.installTool(tool_name)
     # end def
 

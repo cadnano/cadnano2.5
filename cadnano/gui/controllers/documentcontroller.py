@@ -66,7 +66,9 @@ class DocumentController():
         o = win.outliner_widget
         p_e = win.property_widget
         o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
-        self.actionFilterVirtualHelixSlot()
+        # self.actionFilterVirtualHelixSlot()
+        self.actionFilterEndpointSlot()
+        self.actionFilterXoverSlot()
 
         # setup tool exclusivity
         self.actiongroup = ag = QActionGroup(win)
@@ -192,6 +194,7 @@ class DocumentController():
             fH.setChecked(False)
         if not fS.isChecked() and not fX.isChecked():
             fE.setChecked(True)
+            fS.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
@@ -250,10 +253,11 @@ class DocumentController():
         add_oligo = False
         if win.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
-            add_oligo = True
-        if win.action_filter_strand.isChecked():
             filter_list.append("strand")
             add_oligo = True
+        # if win.action_filter_strand.isChecked():
+        #     filter_list.append("strand")
+        #     add_oligo = True
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
             add_oligo = True
