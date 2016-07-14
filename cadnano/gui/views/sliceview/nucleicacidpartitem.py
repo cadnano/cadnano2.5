@@ -132,11 +132,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if info and info is not None:
             id_num, is_fwd, idx, _ = info
             pxom.activateNeighbors(id_num, is_fwd, idx)
-        if not info:
-            pxom.hideGroups()
-            if self.active_virtual_helix_item is not None:
-                self.active_virtual_helix_item.deactivate()
-                self.active_virtual_helix_item = None
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -310,8 +305,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
         """
         vhi = virtual_helix_item
-
+        pxom = self.prexover_manager
         if vhi is None:
+            pxom.hideGroups()
             return
 
         # print("slice.setPreXoverItemsVisible", virtual_helix_item.idNum())
@@ -320,7 +316,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if info:
             id_num, is_fwd, idx, to_vh_id_num = info
             per_neighbor_hits, pairs = part.potentialCrossoverMap(id_num, idx)
-            self.prexover_manager.activateVirtualHelix(
+            pxom.activateVirtualHelix(
                                     virtual_helix_item, idx,
                                     per_neighbor_hits, pairs)
     # end def
