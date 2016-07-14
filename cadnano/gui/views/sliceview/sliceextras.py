@@ -427,7 +427,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             x.destroy(scene)
         self.virtual_helix_item = None
         self.model_part = None
-        scene = self.scene()
         scene.removeItem(self.active_wedge_gizmo)
         self.active_wedge_gizmo = None
         scene.removeItem(self)

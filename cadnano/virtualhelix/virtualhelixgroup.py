@@ -1578,7 +1578,11 @@ class VirtualHelixGroup(CNObject):
         Raises:
             None
         """
-        offset, size = self.getOffsetAndSize(id_num)
+        offset_and_size = self.getOffsetAndSize(id_num)
+        if offset_and_size is None:
+            raise ValueError("offset_and_size is None for {}".format(id_num))
+        else:
+            offset, size = offset_and_size
         bpr, tpr = self.vh_properties.loc[id_num,
                                     ['bases_per_repeat', 'turns_per_repeat']]
         bases_per_turn = bpr / tpr

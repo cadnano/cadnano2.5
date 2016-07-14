@@ -154,8 +154,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     ### SLOTS ###
     def partActiveVirtualHelixChangedSlot(self, part, id_num):
         vhi = self._virtual_helix_item_hash.get(id_num, None)
-        if vhi is not None:
-            self.setActiveVirtualHelixItem(vhi)
+        # if vhi is not None:
+        self.setActiveVirtualHelixItem(vhi)
     #end def
 
     def partActiveChangedSlot(self, part, is_active):
@@ -168,7 +168,8 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
                 current_vhi.deactivate()
-            new_active_vhi.activate()
+            if new_active_vhi is not None:
+                new_active_vhi.activate()
             self.active_virtual_helix_item = new_active_vhi
     # end def
 # end class

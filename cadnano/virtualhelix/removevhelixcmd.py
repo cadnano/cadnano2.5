@@ -16,19 +16,20 @@ class RemoveVirtualHelixCommand(UndoCommand):
         self.neighbors = literal_eval(neighbors)
         self.color = part.getVirtualHelixProperties(id_num, 'color')
         self.props = part.getAllVirtualHelixProperties(id_num, inject_extras=False)
+        self.old_active_base_info = part.active_base_info
     # end def
 
     def redo(self):
         part = self.part
         id_num = self.id_num
         # clear out part references
+        part.clearActiveVirtualHelix()
         for neighbor_id in self.neighbors:
             nneighbors = literal_eval(
                             part.getVirtualHelixProperties(neighbor_id, 'neighbors')
                         )
             nneighbors.remove(id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
-
         part.partVirtualHelixRemovedSignal.emit(part, id_num, self.neighbors)
         part.removeHelix(id_num)
     # end def
@@ -44,11 +45,12 @@ class RemoveVirtualHelixCommand(UndoCommand):
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
         part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
         keys = list(self.props.keys())
-        vals = list(self.props.val())
+        vals = list(self.props.values())
         part.setVirtualHelixProperties( id_num,
                                         keys, vals,
                                         safe=False)
         part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, self.neighbors)
+        part.setActiveVirtualHelix(*self.old_active_base_info[0:3])
     # end def
 # end class

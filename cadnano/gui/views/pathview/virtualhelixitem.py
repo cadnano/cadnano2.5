@@ -63,6 +63,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self.setAcceptHoverEvents(True)  # for pathtools
         self.setZValue(styles.ZPATHHELIX)
 
+        self._right_mouse_move = False
+        self.drag_last_position = self.handle_start = self.pos()
+
     # end def
 
     ### SIGNALS ###
@@ -268,6 +271,13 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         Parses a mousePressEvent to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
         """
+        # 1. Check if we are doing a Z translation
+        if event.button() == Qt.RightButton:
+            self._right_mouse_move = True
+            self.drag_last_position = event.scenePos()
+            self.handle_start = self.pos()
+            return
+
         self.scene().views()[0].addToPressList(self)
         strand_set, idx = self.baseAtPoint(event.pos())
         self.setActive(strand_set.isForward(), idx)
@@ -286,6 +296,23 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         Parses a mouseMoveEvent to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
         """
+        # 1. Check if we are doing a Z translation
+        if self._right_mouse_move:
+            MOVE_THRESHOLD = 0.01   # ignore small moves
+            new_pos = event.scenePos()
+            delta = new_pos - self.drag_last_position
+            dx = int(floor(delta.x() / _BASE_WIDTH ))*_BASE_WIDTH
+            x = self.handle_start.x() + dx
+            if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
+                old_x = self.x()
+                self._handle.setX(x - _VH_XOFFSET)
+                self.setX(x)
+                self._part_item.updateXoverItems(self)
+                dz = self._part_item.convertToModelZ(x - old_x)
+                self._model_part.translateVirtualHelices([self.idNum()],
+                                    0, 0, dz, False, use_undostack=False)
+                return
+        # 2. Forward event to tool
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):
@@ -295,6 +322,20 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                 getattr(self, tool_method_name)(strand_set, idx)
         else:
             event.setAccepted(False)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        """ Called in the event of doing a Z translation drag
+        """
+        if self._right_mouse_move and event.button() == Qt.RightButton:
+            MOVE_THRESHOLD = 0.01   # ignore small moves
+            self._right_mouse_move = False
+            delta = self.pos() - self.handle_start
+            dz = delta.x()
+            if abs(dz) > MOVE_THRESHOLD:
+                dz = self._part_item.convertToModelZ(dz)
+                self._model_part.translateVirtualHelices([self.idNum()],
+                                            0, 0, dz, True, use_undostack=True)
     # end def
 
     def customMouseRelease(self, event):

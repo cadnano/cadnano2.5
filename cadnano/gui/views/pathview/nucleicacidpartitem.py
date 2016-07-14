@@ -97,7 +97,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def partActiveBaseInfoSlot(self, part, info):
         pxoig = self.prexover_manager
         pxoig.deactivateNeighbors()
-        if info is not None:
+        if info and info is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
             pxoig.activateNeighbors(id_num, is_fwd, idx)
     # end def
@@ -257,6 +257,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def removeVirtualHelixItem(self, id_num):
+        self.setActiveVirtualHelixItem(None)
         vhi = self._virtual_helix_item_hash[id_num]
         vhi.virtualHelixRemovedSlot()
         self._virtual_helix_item_list.remove(vhi)
@@ -411,7 +412,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
                 current_vhi.deactivate()
-            new_active_vhi.activate()
+            if new_active_vhi is not None:
+                new_active_vhi.activate()
             self.active_virtual_helix_item = new_active_vhi
     # end def
 
@@ -429,10 +431,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
         # print("path.setPreXoverItemsVisible", virtual_helix_item.idNum())
         part = self.part()
         info = part.active_base_info
-        if info is not None:
+        if info and virtual_helix_item is not None:
             id_num, is_fwd, idx, to_vh_id_num = info
             per_neighbor_hits, pairs = part.potentialCrossoverMap(id_num, idx)
             self.prexover_manager.activateVirtualHelix(virtual_helix_item, idx, per_neighbor_hits)
+        else:
+            self.prexover_manager.reset()
     # end def
 
     def updateXoverItems(self, virtual_helix_item):

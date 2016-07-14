@@ -148,6 +148,11 @@ class PreXoverManager(QGraphicsRectItem):
             return cls(*args)
     # end def
 
+    def reset(self):
+        self.clearPreXoverItems()
+        self.virtual_helix_item = None
+    # end def
+
     def activateVirtualHelix(self, virtual_helix_item, this_idx, per_neighbor_hits):
         """ Populate self.prexover_item_map dictionary which maps a tuple
         of (id_num, is_fwd, idx) to a given PreXoverItem and a List of neighbor PreXoverItems

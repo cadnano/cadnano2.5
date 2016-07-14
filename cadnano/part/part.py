@@ -65,7 +65,7 @@ class Part(VirtualHelixGroup):
         # Runtime state
         self._active_base_index = self._STEP_SIZE
         self._active_id_num = None
-        self.active_base_info = None
+        self.active_base_info = ()
         self._selected = False
         self.is_active = False
 
@@ -280,6 +280,13 @@ class Part(VirtualHelixGroup):
         return self._active_base_index
     # end def
 
+    def clearActiveVirtualHelix(self):
+        self.active_base_info = active_base_info = ()
+        self._active_id_num = id_num = -1
+        self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
+        self.partActiveBaseInfoSignal.emit(self, active_base_info)
+    # end def
+
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
         abi = (id_num, is_fwd, idx, -1)
         if self.active_base_info == abi:
@@ -292,8 +299,15 @@ class Part(VirtualHelixGroup):
     # end def
 
     def setActiveBaseInfo(self, info):
+        """ to_vh_num is not use as of now and may change
+        Args:
+            info (Tuple): id_num, is_fwd, idx, to_vh_num
+
+        """
         if info != self.active_base_info:
-            self.active_base_info = info
+            # keep the info the same but let views know it's not fresh
+            if info is not None:
+                self.active_base_info = info
             self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
