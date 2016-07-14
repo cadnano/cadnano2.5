@@ -366,7 +366,8 @@ class Strand(CNObject):
 
     def copyAbstractSequenceToSequence(self):
         abstract_seq = self.abstract_sequence
-        self._sequence = ''.join([ascii_letters[i % 52] for i in abstract_seq])
+        # self._sequence = ''.join([ascii_letters[i % 52] for i in abstract_seq])
+        self._sequence = ''.join(['|' for i in abstract_seq])
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###

@@ -481,7 +481,7 @@ class StrandItem(QGraphicsLineItem):
         seq_txt = ''.join(seq_list)
 
         # seq_lbl.setPen(QPen( Qt.NoPen))    # leave the Pen as None for unless required
-        seq_lbl.setBrush(QBrush(Qt.black))
+        seq_lbl.setBrush(QBrush(Qt.gray))
         seq_lbl.setFont(styles.SEQUENCEFONT)
 
         # this will always draw from the 5 Prime end!
@@ -492,7 +492,7 @@ class StrandItem(QGraphicsLineItem):
             # offset it towards the bottom
             seqY += bw * .8
             # offset X by the reverse centering offset and the string length
-            seqX += text_X_centering_offset
+            seqX += text_X_centering_offset*.75
             # rotate the characters upside down this does not affect positioning
             # coordinate system, +Y is still Down, and +X is still Right
             seq_lbl.setRotation(180)
