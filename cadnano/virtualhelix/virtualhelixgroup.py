@@ -1140,14 +1140,12 @@ class VirtualHelixGroup(CNObject):
         Returns:
             bool: True if id_num is removed, False otherwise
         """
-
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
 
         if offset_and_size_tuple is None:
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
 
         offset, size = offset_and_size_tuple
-
         if length > size:
             raise IndexError("length longer {} than indices existing".format(length))
         lo, hi = offset, offset + size
@@ -1195,8 +1193,8 @@ class VirtualHelixGroup(CNObject):
         # 2. Adjust the offsets of id_nums greater than id_num
         for i, item in enumerate(offset_and_size[id_num:]):
             if item is not None:
-                offset, size = item
-                offset_and_size[i + id_num] = (offset - length, size)
+                offset_other, size_other = item
+                offset_and_size[i + id_num] = (offset_other - length, size_other)
 
         # 3. Check if we need to remove Virtual Helix
         if size == length:
@@ -1214,7 +1212,7 @@ class VirtualHelixGroup(CNObject):
             self.offset_and_size = offset_and_size[:current_offset_and_size_length - remove_count]
             did_remove = True
         else:
-            print("Did remove", size, length)
+            # print("Did remove", size, length)
             did_remove = False
         self.total_points -= length
         return did_remove
