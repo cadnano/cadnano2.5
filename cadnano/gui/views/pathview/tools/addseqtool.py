@@ -62,16 +62,16 @@ class AddSeqTool(AbstractPathTool):
         ui_dlg.setupUi(self.dialog)
         self.signal_mapper = QSignalMapper(self)
         # set up the radio buttons
-        for i, name in enumerate(sorted(sequences.keys())):
+        for i, name in enumerate(['Abstract', 'Custom'] + sorted(sequences.keys())):
             radio_button = QRadioButton(ui_dlg.group_box)
             radio_button.setObjectName(name + "Button")
             radio_button.setText(name)
             self.buttons.append(radio_button)
-            ui_dlg.verticalLayout.addWidget(radio_button)
+            ui_dlg.horizontalLayout.addWidget(radio_button)
             self.signal_mapper.setMapping(radio_button, i)
             radio_button.clicked.connect(self.signal_mapper.map)
         self.signal_mapper.mapped.connect(self.standardSequenceChangedSlot)
-        ui_dlg.tab_widget.currentChanged.connect(self.tabWidgetChangedSlot)
+        # ui_dlg.tab_widget.currentChanged.connect(self.tabWidgetChangedSlot)
         # disable apply until valid option or custom sequence is chosen
         self.apply_button = ui_dlg.custom_button_box.button(QDialogButtonBox.Apply)
         self.apply_button.setEnabled(False)
@@ -89,21 +89,21 @@ class AddSeqTool(AbstractPathTool):
         for i in range(len(buttons)-1):
             ui_dlg.group_box.setTabOrder(buttons[i], buttons[i+1])
 
-    def tabWidgetChangedSlot(self, index):
-        apply_enabled = False
-        if index == 1:  # Custom Sequence
-            self.validateCustomSequence()
-            if self.custom_sequence_is_valid:
-                apply_enabled = True
-        else:  # Standard Sequence
-            self.use_custom_sequence = False
-            if self.chosen_standard_sequence is not None:
-                # Overwrite sequence in case custom has been applied
-                active_button = self.buttons[self.chosen_standard_sequence]
-                sequence_name = active_button.text()
-                self.validated_sequence_to_apply = sequences.get(sequence_name, None)
-                apply_enabled = True
-        self.apply_button.setEnabled(apply_enabled)
+    # def tabWidgetChangedSlot(self, index):
+    #     apply_enabled = False
+    #     if index == 1:  # Custom Sequence
+    #         self.validateCustomSequence()
+    #         if self.custom_sequence_is_valid:
+    #             apply_enabled = True
+    #     else:  # Standard Sequence
+    #         self.use_custom_sequence = False
+    #         if self.chosen_standard_sequence is not None:
+    #             # Overwrite sequence in case custom has been applied
+    #             active_button = self.buttons[self.chosen_standard_sequence]
+    #             sequence_name = active_button.text()
+    #             self.validated_sequence_to_apply = sequences.get(sequence_name, None)
+    #             apply_enabled = True
+    #     self.apply_button.setEnabled(apply_enabled)
 
     def standardSequenceChangedSlot(self, option_chosen):
         """
