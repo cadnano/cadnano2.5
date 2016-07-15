@@ -91,6 +91,8 @@ class PropertyEditorWidget(QTreeWidget):
         if len(selected_items) == 1:
             # get the selected item
             item = selected_items[0]
+            if item.FILTER_NAME not in self._document.filter_set:
+                return
             item_type = item.itemType()
             if item_type is ItemType.OLIGO:
                 pe_item = OligoItem(item.cnModel(), self)
