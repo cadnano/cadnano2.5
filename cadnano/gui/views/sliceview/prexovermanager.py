@@ -144,7 +144,7 @@ class PreXoverManager(QGraphicsRectItem):
         if item is None:
             apxi = agroup.getItemIdx(is_fwd, idx)
             apxi.setActive5p(True) if is_fwd else apxi.setActive3p(True)
-            agroup.active_wedge_gizmo.showActive(apxi)
+            agroup.active_wedge_gizmo.pointToPreXoverItem(apxi)
             active_items.append(apxi)
         else:
             apxi, npxig, neighbor_list = item
@@ -165,7 +165,7 @@ class PreXoverManager(QGraphicsRectItem):
                     # strand = part.getStrand(is_fwd, id_num, idx)
                     is_5prime_strand = True
 
-            agroup.active_wedge_gizmo.showActive(apxi)
+            agroup.active_wedge_gizmo.pointToPreXoverItem(apxi)
             active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))

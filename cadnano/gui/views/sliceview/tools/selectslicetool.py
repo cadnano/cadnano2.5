@@ -78,6 +78,9 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
+        fset = self.manager.document.filter_set
+        if self.FILTER_NAME not in fset:
+            return
         rbr_last, fp_last, tp_last = self.last_rubberband_vals
         if rect.isNull() and rbr_last.isValid():
             part_item = self.part_item

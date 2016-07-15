@@ -328,6 +328,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
         self.active_item = None
         self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
+
         self.fwd_prexover_items = {}
         self.rev_prexover_items = {}
         self._colors = self._getColors()
@@ -336,6 +337,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         z = styles.ZPXIGROUP + 10 if is_active else styles.ZPXIGROUP
         self.setZValue(z)
         self.setTransformOriginPoint(rect.center())
+
         bpr, tpr, eulerZ = virtual_helix_item.getProperty(['bases_per_repeat',
                                                 'turns_per_repeat', 'eulerZ'])
 
@@ -476,17 +478,18 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setZValue(styles.ZWEDGEGIZMO - 10)
         self._last_params = None
 
-        # Hack to keep wedge in front
-        scene_pos = self.scenePos()
-        ctr = self.mapToScene(pre_xover_item_group.boundingRect().center())
-        self.setParentItem(pre_xover_item_group.partItem())
-        self.setPos(self.mapFromScene(scene_pos))
-        self.setTransformOriginPoint(self.mapFromScene(ctr))
+        # # Hack to keep wedge in front
+        # scene_pos = self.scenePos()
+        # ctr = self.mapToScene(pre_xover_item_group.boundingRect().center())
+        # self.setParentItem(pre_xover_item_group.partItem())
+        # self.setPos(self.mapFromScene(scene_pos))
+        # self.setTransformOriginPoint(self.mapFromScene(ctr))
     # end def
 
     def showWedge(self, angle, color,
                     extended=False, rev_gradient=False, outline_only=False):
-        self.setRotation(self.pre_xover_item_group.rotation())
+        # Hack to keep wedge in front
+        # self.setRotation(self.pre_xover_item_group.rotation())
 
         self._last_params = (angle, color, extended, rev_gradient, outline_only)
         radius = self._radius
@@ -553,18 +556,26 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setZValue(styles.ZWEDGEGIZMO - 10)
     # end def
 
-    def showActive(self, pre_xover_item):
+    def pointToPreXoverItem(self, pre_xover_item):
+        pxig = self.pre_xover_item_group
+        scene_pos = self.scenePos()
+        self.setParentItem(pxig)
+        temp_point = pxig.mapFromScene(scene_pos)
+        self.setPos(temp_point)
+        scene_pos = self.scenePos()
+
         pxi = pre_xover_item
-        pos = pxi.pos()
         angle = -pxi.rotation()
         color = pxi.color
         self.setZValue(styles.ZWEDGEGIZMO)
-        # self.showWedge(angle, color, span=5.0)
         if pxi.is_fwd:
             self.showWedge(angle, color, extended=True, rev_gradient=True)
-            # self.showWedge(angle, color, extended=True)
         else:
             self.showWedge(angle, color, extended=True, rev_gradient=True)
-            # self.showWedge(angle, color, extended=True, rev_gradient=True)
+        part_item = pxig.partItem()
+        self.setParentItem(part_item)
+        temp_point = part_item.mapFromScene(scene_pos)
+        self.setPos(temp_point)
+        self.setRotation(pxig.rotation())
     # end def
 # end class

@@ -33,6 +33,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
     and paints its corresponding VirtualHelix number.
     """
+    FILTER_NAME = 'virtual_helix'
+
     def __init__(self, id_num, part_item):
         """
         """
@@ -58,7 +60,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._label = self.createLabel()
         self.setNumber()
         self._pen1, self._pen2 = (QPen(), QPen())
-        self.createArrows()
+        # self.createArrows()
         self.is_active = False
         self.updateAppearance()
 
@@ -126,6 +128,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     ### SLOTS ###
     def mousePressEvent(self, event):
+        if self.FILTER_NAME not in self._part_item.getFilterSet():
+            return
         if event.button() == Qt.RightButton:
             return
         part_item = self._part_item
@@ -266,69 +270,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             wg_dict[neighbor_virtual_helix] = wedge_item
         wedge_item.showWedge(line.angle(), color, outline_only=False)
         self._added_wedge_gizmos.add(neighbor_virtual_helix)
-    # end def
-
-    def createArrows(self):
-        rad = _RADIUS
-        pen1 = self._pen1
-        pen2 = self._pen2
-        pen1.setCapStyle(Qt.RoundCap)
-        pen2.setCapStyle(Qt.RoundCap)
-        pen1.setWidth(3)
-        pen2.setWidth(3)
-        pen1.setBrush(Qt.gray)
-        pen2.setBrush(Qt.lightGray)
-        arrow1 = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
-        arrow2 = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
-        #     arrow2 = QGraphicsLineItem(0, rad, rad, rad, self)
-        # else:
-        #     arrow1 = QGraphicsLineItem(0, rad, rad, rad, self)
-        #     arrow2 = QGraphicsLineItem(rad, rad, 2*rad, rad, self)
-        arrow1.setTransformOriginPoint(rad, rad)
-        arrow2.setTransformOriginPoint(rad, rad)
-        arrow1.setZValue(40)
-        arrow2.setZValue(40)
-        arrow1.setPen(pen1)
-        arrow2.setPen(pen2)
-        self.arrow1 = arrow1
-        self.arrow2 = arrow2
-        self.arrow1.hide()
-        self.arrow2.hide()
-    # end def
-
-    def updateFwdArrow(self, idx):
-        fwd_strand = self.fwdStrand(idx)
-        if fwd_strand:
-            fwd_strand_color = fwd_strand.oligo().getColor()
-            fwd_alpha = 230 if fwd_strand.hasXoverAt(idx) else 128
-        else:
-            fwd_strand_color = '#a0a0a4' #Qt.gray
-            fwd_alpha = 26
-
-        fwd_strand_color_obj = getColorObj(fwd_strand_color, alpha=fwd_alpha)
-        self._pen1.setBrush(fwd_strand_color_obj)
-        self.arrow1.setPen(self._pen1)
-        part = self.part()
-        tpb, eulerZ = self.getTwistPerBase()
-        angle = idx*tpb
-        # for some reason rotation is CW and not CCW with increasing angle
-        self.arrow1.setRotation(angle + eulerZ)
-
-    def updateRevArrow(self, idx):
-        rev_strand = self.revStrand(idx)
-        if rev_strand:
-            rev_strand_color = rev_strand.oligo().getColor()
-            rev_alpha = 230 if rev_strand.hasXoverAt(idx) else 128
-        else:
-            rev_strand_color = '#c0c0c0' # Qt.lightGray
-            rev_alpha = 26
-        rev_strand_color_obj = getColorObj(rev_strand_color, alpha=rev_alpha)
-        self._pen2.setBrush(rev_strand_color_obj)
-        self.arrow2.setPen(self._pen2)
-        part = self.part()
-        tpb, eulerZ = self.getTwistPerBase()
-        angle = idx*tpb
-        self.arrow2.setRotation(angle + eulerZ + 180)
     # end def
 
     def setNumber(self):

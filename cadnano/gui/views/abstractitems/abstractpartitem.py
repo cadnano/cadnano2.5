@@ -32,6 +32,10 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._model_part = new_part
     # end def
 
+    def getFilterSet(self):
+        return self._viewroot._document.filter_set
+    # end def
+
     def setMovable(self, is_movable):
         self._viewroot.manager.select_tool.resetSelections()
         self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
