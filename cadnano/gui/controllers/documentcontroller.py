@@ -607,12 +607,17 @@ class DocumentController():
         self.newDocument()
 
     def exportStaplesCallback(self, selected):
-        """Export all staple sequences to selected CSV file."""
+        """Export all staple sequences to selected CSV file.
+        Args:
+            selected (Tuple, List or str): if a List or Tuple,
+                the filename should be the first element
+        """
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
         else:
             fname = selected
-        if fname is None or os.path.isdir(fname):
+        # Return if fname is '', None, or a directory path
+        if not fname or fname is None or os.path.isdir(fname):
             return False
         if not fname.lower().endswith(".csv"):
             fname += ".csv"

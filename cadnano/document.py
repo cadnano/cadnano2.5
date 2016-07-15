@@ -733,7 +733,15 @@ class Document(CNObject):
     # end def
 
     def getModSequence(self, mid, mod_type):
-        mod_dict = self._mods[mid]
+        """
+        Args:
+            mid: mod id or None
+            mod_type: [ModType.END_5PRIME, ModType.END_3PRIME]
+        Returns:
+            Tuple: (sequence [str],
+                    name [str] )
+        """
+        mod_dict = self._mods.get(mid)
         name = '' if mid is None else mod_dict['name']
         if mod_type == ModType.END_5PRIME:
             seq = '' if mid is None else mod_dict['seq5p']
