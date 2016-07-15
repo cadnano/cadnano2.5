@@ -86,7 +86,6 @@ class AddSeqTool(AbstractPathTool):
         a sequence option.
         """
         option_name = self.buttons[option_chosen].text()
-        print("sequenceOptionChangedSlot: ", option_name)
         if option_name == 'Abstract':
             self.use_abstract_sequence = True
         elif option_name == 'Custom':
