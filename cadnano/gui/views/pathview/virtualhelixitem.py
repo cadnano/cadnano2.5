@@ -3,7 +3,7 @@
 
 from math import floor, atan2, sqrt
 
-from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtCore import QRectF, Qt, QPointF
 from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
@@ -33,6 +33,7 @@ def v2DistanceAndAngle(a, b):
 class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     """VirtualHelixItem for PathView"""
     findChild = util.findChild  # for debug
+    FILTER_NAME = "virtual_helix"
 
     def __init__(self, id_num, part_item, viewroot):
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
@@ -273,9 +274,12 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         # 1. Check if we are doing a Z translation
         if event.button() == Qt.RightButton:
-            self._right_mouse_move = True
-            self.drag_last_position = event.scenePos()
-            self.handle_start = self.pos()
+            viewroot = self._viewroot
+            current_filter_set = viewroot.selectionFilterSet()
+            if self.FILTER_NAME in current_filter_set:
+                self._right_mouse_move = True
+                self.drag_last_position = event.scenePos()
+                self.handle_start = self.pos()
             return
 
         self.scene().views()[0].addToPressList(self)
@@ -305,8 +309,10 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             x = self.handle_start.x() + dx
             if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
                 old_x = self.x()
-                self._handle.setX(x - _VH_XOFFSET)
                 self.setX(x)
+                vhi_h = self._handle
+                vhi_h.tempReparent()
+                vhi_h.setX(x - _VH_XOFFSET)
                 self._part_item.updateXoverItems(self)
                 dz = self._part_item.convertToModelZ(x - old_x)
                 self._model_part.translateVirtualHelices([self.idNum()],
