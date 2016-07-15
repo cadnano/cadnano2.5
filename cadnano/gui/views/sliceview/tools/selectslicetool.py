@@ -129,7 +129,9 @@ class SelectSliceTool(AbstractSliceTool):
     def deselectItems(self):
         # print("deselecting")
         group = self.group
-        self.snap_origin_item = None
+        if self.snap_origin_item is not None:
+            self.snap_origin_item.setSnapOrigin(False)
+            self.snap_origin_item = None
         if self.is_selection_active:
             part_item = self.part_item
             for id_num in self.selection_set:
@@ -147,7 +149,9 @@ class SelectSliceTool(AbstractSliceTool):
 
     def deselectSet(self, vh_set):
         group = self.group
-        self.snap_origin_item = None
+        if self.snap_origin_item is not None:
+            self.snap_origin_item.setSnapOrigin(False)
+            self.snap_origin_item = None
         selection_set = self.selection_set
         if self.is_selection_active:
             part_item = self.part_item
@@ -175,7 +179,7 @@ class SelectSliceTool(AbstractSliceTool):
         """
         self.setPartItem(part_item)
         if (self.snap_origin_item is not None and
-            event.modifiers() != Qt.ShiftModifier):
+            event.modifiers() == Qt.AltModifier):
             self.doSnap(part_item, target_item)
             self.individual_pick = False
         else: # just do a selection
@@ -187,7 +191,9 @@ class SelectSliceTool(AbstractSliceTool):
                 # it's supposed to allow for single item picking
                 # self.individual_pick = True
 
-                self.snap_origin_item = None
+                if self.snap_origin_item is not None:
+                    self.snap_origin_item.setSnapOrigin(False)
+                    self.snap_origin_item = None
 
                 doc = self.manager.document
                 part = part_item.part()
@@ -381,6 +387,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                             if doc.isVirtualHelixSelected(part, origin_id_num):
                                 print("origin", origin_id_num)
                                 tool.snap_origin_item = item
+                                item.setSnapOrigin(True)
                                 break
                             else:
                                 item.mousePressEvent(event)

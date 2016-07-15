@@ -59,8 +59,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # handle the label specific stuff
         self._label = self.createLabel()
         self.setNumber()
-        self._pen1, self._pen2 = (QPen(), QPen())
-        # self.createArrows()
+
+        self.old_pen = None
         self.is_active = False
         self.updateAppearance()
 
@@ -73,6 +73,13 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     def part(self):
         return self._part_item.part()
     # end def
+
+    def setSnapOrigin(self, is_snap):
+        if is_snap:
+            self.old_pen = op = self.pen()
+            self.setPen(getPenObj(op.color().name(), 3))
+        else:
+            self.setPen(self.old_pen)
 
     def partItem(self):
         return self._part_item
