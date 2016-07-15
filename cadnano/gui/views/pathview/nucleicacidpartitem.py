@@ -105,10 +105,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def partDimensionsChangedSlot(self, model_part, min_id_num, max_id_num):
         if len(self._virtual_helix_item_list) > 0:
             vhi_hash = self._virtual_helix_item_hash
-
             vhi_max = vhi_hash[max_id_num]
             vhi_rect_max = vhi_max.boundingRect()
-            self._vh_rect.setRight(vhi_rect_max.right())
+            self._vh_rect.setRight(vhi_rect_max.right() + vhi_max.x())
 
             vhi_min = vhi_hash[min_id_num]
             vhi_h_rect = vhi_min.handle().boundingRect()

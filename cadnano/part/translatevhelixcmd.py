@@ -27,7 +27,6 @@ class TranslateVirtualHelicesCommand(UndoCommand):
     # end def
 
     def doSignals(self, part, vh_set):
-        part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds())
         vh_list = list(vh_set)
         z_vals = part.vh_properties.iloc[vh_list, Z_PROP_INDEX]
         if isinstance(z_vals, float):
@@ -35,6 +34,7 @@ class TranslateVirtualHelicesCommand(UndoCommand):
         for id_num, z_val in zip(vh_list, z_vals):
             part.partVirtualHelixPropertyChangedSignal.emit(
                                     part, id_num, ('z',), (z_val,))
+        part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds())
     # end def
 
     def specialUndo(self):
