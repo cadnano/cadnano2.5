@@ -19,7 +19,8 @@ class DNAHighlighter(QSyntaxHighlighter):
         QSyntaxHighlighter.__init__(self, parent)
         self.parent = parent
         self.format = QTextCharFormat()
-        self.format.setForeground(getBrushObj(styles.INVALID_DNA_COLOR))
+        self.format.setForeground(getBrushObj(Qt.white))
+        self.format.setBackground(getBrushObj(styles.INVALID_DNA_COLOR))
         if styles.UNDERLINE_INVALID_DNA:
             self.format.setFontUnderline(True)
             self.format.setUnderlineColor(getColorObj(styles.INVALID_DNA_COLOR))
@@ -37,9 +38,8 @@ class AddSeqTool(AbstractPathTool):
         self.dialog = QDialog()
         self.buttons = []
         self.seq_box = None
-        self.chosen_standard_sequence = None  # state for tab switching
-        self.custom_sequence_is_valid = False  # state for tab switching
-        self.use_custom_sequence = False  # for applying sequence
+        self.sequence_radio_button_id = {}
+        self.use_abstract_sequence = True
         self.validated_sequence_to_apply = None
         self.initDialog()
 
@@ -51,12 +51,9 @@ class AddSeqTool(AbstractPathTool):
 
     def initDialog(self):
         """
-        1. Create buttons according to available scaffold sequences and
-        add them to the dialog.
+        1. Create buttons for each sequence option and add them to the dialog.
         2. Map the clicked signal of those buttons to keep track of what
         sequence gets selected.
-        3. Watch the tab_widget change signal to determine whether a
-        standard or custom sequence should be applied.
         """
         ui_dlg = Ui_AddSeqDialog()
         ui_dlg.setupUi(self.dialog)
@@ -70,8 +67,9 @@ class AddSeqTool(AbstractPathTool):
             ui_dlg.horizontalLayout.addWidget(radio_button)
             self.signal_mapper.setMapping(radio_button, i)
             radio_button.clicked.connect(self.signal_mapper.map)
-        self.signal_mapper.mapped.connect(self.standardSequenceChangedSlot)
-        # ui_dlg.tab_widget.currentChanged.connect(self.tabWidgetChangedSlot)
+            if name in sequences:
+                self.sequence_radio_button_id[sequences[name]] = i
+        self.signal_mapper.mapped.connect(self.sequenceOptionChangedSlot)
         # disable apply until valid option or custom sequence is chosen
         self.apply_button = ui_dlg.custom_button_box.button(QDialogButtonBox.Apply)
         self.apply_button.setEnabled(False)
@@ -79,68 +77,64 @@ class AddSeqTool(AbstractPathTool):
         self.seq_box = ui_dlg.seq_text_edit
         self.seq_box.textChanged.connect(self.validateCustomSequence)
         self.highlighter = DNAHighlighter(self.seq_box)
-        # finally, pre-click the M13mp18 radio button
+        # finally, pre-click the first radio button
         self.buttons[0].click()
-        buttons = self.buttons
 
-        self.dialog.setFocusProxy(ui_dlg.group_box)
-        self.dialog.setFocusPolicy(Qt.TabFocus)
-        ui_dlg.group_box.setFocusPolicy(Qt.TabFocus)
-        for i in range(len(buttons)-1):
-            ui_dlg.group_box.setTabOrder(buttons[i], buttons[i+1])
-
-    # def tabWidgetChangedSlot(self, index):
-    #     apply_enabled = False
-    #     if index == 1:  # Custom Sequence
-    #         self.validateCustomSequence()
-    #         if self.custom_sequence_is_valid:
-    #             apply_enabled = True
-    #     else:  # Standard Sequence
-    #         self.use_custom_sequence = False
-    #         if self.chosen_standard_sequence is not None:
-    #             # Overwrite sequence in case custom has been applied
-    #             active_button = self.buttons[self.chosen_standard_sequence]
-    #             sequence_name = active_button.text()
-    #             self.validated_sequence_to_apply = sequences.get(sequence_name, None)
-    #             apply_enabled = True
-    #     self.apply_button.setEnabled(apply_enabled)
-
-    def standardSequenceChangedSlot(self, option_chosen):
+    def sequenceOptionChangedSlot(self, option_chosen):
         """
-        Connected to signal_mapper to receive a signal whenever user selects
-        a different sequence in the standard tab.
+        Connects to signal_mapper to receive a signal whenever user selects
+        a sequence option.
         """
-        sequence_name = self.buttons[option_chosen].text()
-        self.validated_sequence_to_apply = sequences.get(sequence_name, None)
-        self.chosen_standard_sequence = option_chosen
-        self.apply_button.setEnabled(True)
+        option_name = self.buttons[option_chosen].text()
+        print("sequenceOptionChangedSlot: ", option_name)
+        if option_name == 'Abstract':
+            self.use_abstract_sequence = True
+        elif option_name == 'Custom':
+            self.use_abstract_sequence = False
+        else:
+            self.use_abstract_sequence = False
+            user_sequence = sequences.get(option_name, None)
+            if self.seq_box.toPlainText() != user_sequence:
+                self.seq_box.setText(user_sequence)
 
     def validateCustomSequence(self):
         """
-        Called when:
-        1. User enters custom sequence (i.e. seq_box emits textChanged signal)
-        2. tabWidgetChangedSlot sees the user has switched to custom tab.
-
-        When the sequence is valid, make the apply_button active for clicking.
-        Otherwise
+        Called when user changes sequence (seq_box emits textChanged signal)
+        If sequence is valid, make the apply_button active to click.
+        Select an appropriate sequence option radio button, if necessary.
         """
         user_sequence = self.seq_box.toPlainText()
-        if len(user_sequence) == 0:
-            self.custom_sequence_is_valid = False
-            return  # tabWidgetChangedSlot will disable apply_button
+        # Validate the sequence and activate the button if it checks out.
         if re.search(RE_DNA_PATTERN, user_sequence) is None:
-            self.use_custom_sequence = True
-            self.custom_sequence_is_valid = True
             self.apply_button.setEnabled(True)
         else:
-            self.custom_sequence_is_valid = False
             self.apply_button.setEnabled(False)
+
+        if len(user_sequence) == 0:
+            # A zero-length custom sequence defaults to Abstract type.
+            if not self.buttons[0].isChecked():
+                self.buttons[0].click()
+        else: 
+            # Does this match a known sequence?
+            if user_sequence in self.sequence_radio_button_id:
+                # Handles case where the user might copy & paste in a known sequence
+                i = self.sequence_radio_button_id[user_sequence]
+                if not self.buttons[i].isChecked():
+                    # Select the corresponding radio button for known sequence
+                    self.buttons[i].click()
+            else:
+                # Unrecognized, Custom type
+                if not self.buttons[1].isChecked():
+                    self.buttons[1].click()
 
     def applySequence(self, oligo):
         self.dialog.setFocus()
         if self.dialog.exec_():  # apply the sequence if accept was clicked
-            if self.use_custom_sequence:
+            if self.use_abstract_sequence:
+                oligo.applySequence(None)
+                return (oligo.length(), None)
+            else:
                 self.validated_sequence_to_apply = self.seq_box.toPlainText().upper()
-            oligo.applySequence(self.validated_sequence_to_apply)
-            return oligo.length(), len(self.validated_sequence_to_apply)
+                oligo.applySequence(self.validated_sequence_to_apply)
+                return oligo.length(), len(self.validated_sequence_to_apply)
         return (None, None)
