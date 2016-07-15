@@ -83,7 +83,7 @@ class VirtualHelixGroup(CNObject):
         # 1. per virtual base pair allocations
         self.total_points = 0
         self.axis_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
-        self.axis_pts[:, 2] = 0.0
+        # self.axis_pts[:, 2] = 0.0
         self.fwd_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         self.rev_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         self.id_nums = np.full((DEFAULT_FULL_SIZE,), -1, dtype=int)
@@ -600,7 +600,13 @@ class VirtualHelixGroup(CNObject):
             insert_idx = offset
 
         # new_lims = (hi_idx_limit, hi_idx_limit + num_points)
+        # print("{} settting offset {} and size {}".format(id_num, offset, size + num_points))
+        # print("length before {}".format(len_axis_pts))
         offset_and_size[id_num] = (offset, size + num_points)
+        # increment the offset for every higher index
+        for i, o_and_s in enumerate(offset_and_size[id_num + 1:], start=id_num + 1):
+            if o_and_s is not None:
+                offset_and_size[i] = (o_and_s[0] + num_points, o_and_s[1])
 
         # 2. Did exceed allocation???
         total_points = self.total_points
@@ -610,7 +616,7 @@ class VirtualHelixGroup(CNObject):
             total_rows = len_axis_pts + number_of_new_elements
             # resize per virtual base allocations
             self.axis_pts.resize((total_rows, 3))
-            self.axis_pts[len_axis_pts:] = [np.inf, np.inf, 0.] # np.inf
+            self.axis_pts[len_axis_pts:] = [np.inf, np.inf, np.inf]
 
             self.fwd_pts.resize((total_rows, 3))
             self.fwd_pts[len_axis_pts:] = np.inf
@@ -642,7 +648,9 @@ class VirtualHelixGroup(CNObject):
         rev_pts[insert_idx:move_idx_start] = new_rev_pts
 
         # just overwrite everything for indices and id_nums no need to move
+        id_nums[move_idx_start:move_idx_end] = id_nums[insert_idx:total_points]
         id_nums[insert_idx:move_idx_start] = id_num
+        indices[move_idx_start:move_idx_end] = indices[insert_idx:total_points]
         indices[lo_idx_limit:lo_idx_limit + num_points + size] = list(range(num_points + size))
 
         self.total_points += num_points
@@ -860,8 +868,8 @@ class VirtualHelixGroup(CNObject):
                                         np.zeros(num_points)))
         rev_pts[:,2] = z_pts
 
-        coord_pts = np.zeros((num_points,3))
-        coord_pts[:,2] = z_pts
+        coord_pts = np.zeros((num_points, 3))
+        coord_pts[:, 2] = z_pts
 
         # create scratch array for stashing intermediate results
         scratch = np.zeros((3, num_points), dtype=float)
@@ -1050,7 +1058,9 @@ class VirtualHelixGroup(CNObject):
         """
         test = self.axis_pts[:, 2]
         id_z_min = self.id_nums[np.argmin(test)]
-        id_z_max = self.id_nums[np.argmax(test)]
+        # use numpy masked arrays to mask out infinites
+        id_z_max = self.id_nums[np.argmax(  np.ma.array(test,
+                                                        mask=np.isinf(test)))]
         return id_z_min, id_z_max
     # end def
 
@@ -1204,6 +1214,7 @@ class VirtualHelixGroup(CNObject):
             self.offset_and_size = offset_and_size[:current_offset_and_size_length - remove_count]
             did_remove = True
         else:
+            print("Did remove", size, length)
             did_remove = False
         self.total_points -= length
         return did_remove
