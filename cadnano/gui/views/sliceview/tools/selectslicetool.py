@@ -277,6 +277,7 @@ class SelectSliceTool(AbstractSliceTool):
             except:
                 pass    # required for first call
         self.modelClear()
+        self.snap_origin_item.setSnapOrigin(False)
         self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def

@@ -76,7 +76,9 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     def setSnapOrigin(self, is_snap):
         if is_snap:
-            self.old_pen = op = self.pen()
+            op = self.pen()
+            if self.old_pen is None:
+                self.old_pen = op
             self.setPen(getPenObj(op.color().name(), 3))
         else:
             self.setPen(self.old_pen)
