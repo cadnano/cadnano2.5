@@ -19,11 +19,13 @@ _RADIUS = styles.SLICE_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 _FONT = styles.SLICE_NUM_FONT
 _ZVALUE = styles.ZSLICEHELIX
-_OUT_OF_SLICE_BRUSH_DEFAULT = getBrushObj(styles.OUT_OF_SLICE_FILL) # QBrush(QColor(250, 250, 250))
+_BRUSH_DEFAULT = getBrushObj(styles.SLICE_FILL)
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 
 _HOVER_PEN = getPenObj('#ffffff', 128)
 _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
+
+SNAP_WIDTH = 3
 
 class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
@@ -79,7 +81,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             op = self.pen()
             if self.old_pen is None:
                 self.old_pen = op
-            self.setPen(getPenObj(op.color().name(), 3))
+            self.setPen(getPenObj(op.color().name(), SNAP_WIDTH))
         else:
             self.setPen(self.old_pen)
             self.old_pen = None
@@ -187,22 +189,21 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.hide()
             return
 
+        pwidth = styles.SLICE_HELIX_STROKE_WIDTH if self.old_pen is None else SNAP_WIDTH
+
         if self.is_active:
-            self._OUT_OF_SLICE_PEN = self._USE_PEN = getPenObj(styles.ACTIVE_STROKE,
-                                                                styles.SLICE_HELIX_STROKE_WIDTH)
+            self._USE_PEN = getPenObj(styles.ACTIVE_STROKE, pwidth)
         else:
-            self._USE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
-            self._OUT_OF_SLICE_PEN = getPenObj(color, styles.SLICE_HELIX_STROKE_WIDTH)
+            self._USE_PEN = getPenObj(color, pwidth)
 
-        self._OUT_OF_SLICE_TEXT_BRUSH = getBrushObj(styles.OUT_OF_SLICE_TEXT_COLOR)
+        self._TEXT_BRUSH = getBrushObj(styles.SLICE_TEXT_COLOR)
 
-        self._OUT_OF_SLICE_BRUSH = _OUT_OF_SLICE_BRUSH_DEFAULT
+        self._BRUSH = _BRUSH_DEFAULT
         self._USE_BRUSH = getBrushObj(color, alpha=150)
 
-        self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
-        self.setBrush(self._OUT_OF_SLICE_BRUSH)
-        if self.old_pen is None:
-            self.setPen(self._OUT_OF_SLICE_PEN)
+        self._label.setBrush(self._TEXT_BRUSH)
+        self.setBrush(self._BRUSH)
+        self.setPen(self._USE_PEN)
         self.setRect(_RECT)
     # end def
 
@@ -304,25 +305,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         posx = b_rect.width()/2
         posy = b_rect.height()/2
         label.setPos(_RADIUS-posx, _RADIUS-posy)
-    # end def
-
-    def setActiveSliceView(self, idx, has_fwd, has_rev):
-        if has_fwd:
-            self.setPen(self._USE_PEN)
-            self.setBrush(self._USE_BRUSH)
-            self._label.setBrush(_USE_TEXT_BRUSH)
-            self.updateFwdArrow(idx)
-            self.arrow1.show()
-        else:
-            self.setPen(self._OUT_OF_SLICE_PEN)
-            self.setBrush(self._OUT_OF_SLICE_BRUSH)
-            self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
-            self.arrow1.hide()
-        if has_rev:
-            self.updateRevArrow(idx)
-            self.arrow2.show()
-        else:
-            self.arrow2.hide()
     # end def
 # end class
 
