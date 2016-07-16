@@ -80,6 +80,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.setPen(getPenObj(op.color().name(), 3))
         else:
             self.setPen(self.old_pen)
+            self.old_pen = None
 
     def partItem(self):
         return self._part_item
@@ -198,7 +199,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         self._label.setBrush(self._OUT_OF_SLICE_TEXT_BRUSH)
         self.setBrush(self._OUT_OF_SLICE_BRUSH)
-        self.setPen(self._OUT_OF_SLICE_PEN)
+        if self.old_pen is None:
+            self.setPen(self._OUT_OF_SLICE_PEN)
         self.setRect(_RECT)
     # end def
 
