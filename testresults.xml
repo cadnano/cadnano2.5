@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuite errors="10" failures="0" name="unittest.suite.TestSuite" tests="10" time="12.011">
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testFunctional1" time="10.6489">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_Gap_Vs_Skip" time="0.1357">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_Nature09_monolith" time="0.1365">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_Nature09_squarenut" time="0.1347">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_Science09_beachball_v1_json" time="0.1351">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_Science09_prot120_98_v3" time="0.1495">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_insert_size_1" time="0.1348">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_inserts_and_skips" time="0.1368">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_simple42legacy" time="0.1379">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <testcase classname="cadnano.tests.functionaltests.FunctionalTests" name="testStapleOutput_skip" time="0.2608">
+    <error type="builtins.SystemExit">
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 58, in testPartExecutor
+    yield
+  File "/Library/Frameworks/Python.framework/Versions/3.5/lib/python3.5/unittest/case.py", line 596, in run
+    self.setUp()
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/functionaltests.py", line 55, in setUp
+    CadnanoGuiTestCase.setUp(self)
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/tests/cadnanoguitestcase.py", line 46, in setUp
+    self.app = cadnano.initAppWithGui() # kick off a Gui style app
+  File "/Users/shawn/Desktop/projects/cadnano2.5/cadnano/__init__.py", line 41, in initAppWithGui
+    sys.exit(shared_app.exec_())
+    </error>
+  </testcase>
+  <system-out><![CDATA[setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+setting fs {'strand', 'reverse', 'forward', 'endpoint', 'oligo', 'xover'}
+Loaded default document: /Users/shawn/Desktop/projects/cadnano2.5/tests/simple.json
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,26 @@
+
+Unreleased
+----------
+
+* GUI: 3D view
+* I/O: Export to PDB (experimental)
+
+
+v2.5
+----
+
+Major changes and new features since cadnano 2:
+
+* Installer: Distribution as a Python package
+* Design/GUI: Helices no longer constrained to lattices
+* Design/GUI: Added support for "abstract" sequences
+* Design/GUI: Added support for parallel crossovers
+* Code: Updated from Python 2 → 3
+* Code: Updated from PyQt4 → PyQt5
+* Code: Rewrote underlying data model
+* Code: Better stability
+* GUI: Improved hinting across views
+* GUI/Installer: Removed Maya plugin code
+* I/O: New file format
+* I/O: Easier scripting via command-line mode
+* I/O: Export to STL (experimental)

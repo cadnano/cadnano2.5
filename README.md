@@ -1,22 +1,6 @@
 # *radnano* : cadnano 2.5 beta
-This is a development version of cadnano ported to `Qt5/PyQt5`,
-the dev branch is most up to date.
+
 `cadnano` looks better in lower case
-
-## Changes
-A number of organizational and style changes have occured from cadnano 2
-
-* cadnano can be run in python without `PyQt5` installed at all
-* Python 3 compatible
-* Maya code removed.
-* stablized code base so fewer crashes
-* added a STL generator to generate models for 3D printing (experimental)
-* added a PDB file generator (experimental, requires additional dependency)
-
-The only additional burden for development on this code base is installing `PyQt5`
-to use the GUI which is not a one click situation.  Below gives details on
-installing `PyQt5`.  If you just want to script your designs (no GUI) you
-**DO NOT** need to install `PyQt5`.
 
 ## Running
 
