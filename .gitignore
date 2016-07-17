@@ -6,4 +6,4 @@ __pycache__
 build/
 dist/
 cadnano.egg-info/
-
+docs/_build/
