@@ -13,23 +13,23 @@ CADNANO_RUN_PLAINTEXT_TESTS=YES CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME=YES python
 import glob
 import os
 import unittest
-from xmlrunner import XMLTestRunner
+from cadnano.tests.xmlrunner import XMLTestRunner
 # from unittests import UnitTests
 # from modeltests import ModelTests
-from functionaltests import FunctionalTests
+from cadnano.tests.functionaltests import FunctionalTests
 # from recordedtests.template import RecordedTests
 
 def main(useXMLRunner=True):
     # load hard-coded tests
     # unitsuite = unittest.makeSuite(UnitTests)
     # modelsuite = unittest.makeSuite(ModelTests)
-    funsuite = unittest.makeSuite(FunctionalTests)
+    funcsuite = unittest.makeSuite(FunctionalTests)
 
     # combine and run tests
-    # alltests = unittest.TestSuite([unitsuite, modelsuite, funsuite])
-    alltests = unittest.TestSuite([funsuite])
+    # alltests = unittest.TestSuite([unitsuite, modelsuite, funcsuite])
+    alltests = unittest.TestSuite([funcsuite])
     if useXMLRunner:
-        stream = file("testresults.xml", "w")
+        stream = open("testresults.xml", "w")
         runner = XMLTestRunner(stream)
         result = runner.run(alltests)
         stream.close()

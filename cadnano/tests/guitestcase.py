@@ -24,8 +24,9 @@
 
 import time
 import unittest
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import qApp, QApplication
 
 main = unittest.main
 

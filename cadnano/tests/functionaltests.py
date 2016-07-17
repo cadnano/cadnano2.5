@@ -32,12 +32,10 @@ import sys
 sys.path.insert(0, '.')
 
 import time
-from PyQt4.QtCore import Qt, QPoint
-from data.dnasequences import sequences
-from model.enum import StrandType
-from model.virtualhelix import VirtualHelix
-from tests.cadnanoguitestcase import CadnanoGuiTestCase
-import tests.cadnanoguitestcase  # for main()
+# from PyQt4.QtCore import Qt, QPoint
+from cadnano.data.dnasequences import sequences
+from cadnano.tests.cadnanoguitestcase import CadnanoGuiTestCase
+import cadnano.tests.cadnanoguitestcase  # for main()
 
 
 class FunctionalTests(CadnanoGuiTestCase):
@@ -249,5 +247,5 @@ class FunctionalTests(CadnanoGuiTestCase):
 
 
 if __name__ == '__main__':
-    print "Running Functional Tests"
+    print("Running Functional Tests")
     tests.cadnanoguitestcase.main()

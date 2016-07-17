@@ -22,15 +22,15 @@
 #
 # http://www.opensource.org/licenses/mit-license.php
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
 import cadnano
-import tests.guitestcase
+import cadnano.tests.guitestcase
 
-main = tests.guitestcase.main
+main = cadnano.tests.guitestcase.main
 
 
-class CadnanoGuiTestCase(tests.guitestcase.GUITestCase):
+class CadnanoGuiTestCase(cadnano.tests.guitestcase.GUITestCase):
     """
     SEE: http://docs.python.org/library/unittest.html
     """

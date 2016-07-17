@@ -38,11 +38,10 @@ find . -name "*tests.py" -exec "${TM_PYTHON:-python}" '{}' \;|pre
 import sys
 sys.path.insert(0, '.')
 
-import tests.cadnanoguitestcase
-from tests.cadnanoguitestcase import CadnanoGuiTestCase
-import time
-from model.virtualhelix import VirtualHelix
-from model.enum import StrandType
+from cadnano.tests.cadnanoguitestcase import CadnanoGuiTestCase
+# import time
+# from model.virtualhelix import VirtualHelix
+# from model.enum import StrandType
 
 
 class ModelTests(CadnanoGuiTestCase):

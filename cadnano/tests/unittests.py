@@ -32,10 +32,10 @@ import sys, os
 sys.path.insert(0, '.')
 
 import time, code
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-import tests.cadnanoguitestcase
-from tests.cadnanoguitestcase import CadnanoGuiTestCase
+# from PyQt5.QtCore import *
+# from PyQt5.QtGui import *
+import cadnano.tests.cadnanoguitestcase
+from cadnano.tests.cadnanoguitestcase import CadnanoGuiTestCase
 from model.enum import StrandType
 from model.virtualhelix import VirtualHelix
 import unittest
