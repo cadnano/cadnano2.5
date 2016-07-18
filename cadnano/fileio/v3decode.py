@@ -41,7 +41,7 @@ def decodePart(document, part_dict):
                                 use_undostack=False)
     # end for
     # zoom to fit
-    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+    part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
     strands = part_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']

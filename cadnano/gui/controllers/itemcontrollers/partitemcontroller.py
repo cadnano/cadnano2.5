@@ -8,7 +8,7 @@ class PartItemController():
         m_p = self._model_part
         p_i = self._part_item
 
-        m_p.partDimensionsChangedSignal.connect(p_i.partDimensionsChangedSlot)
+        m_p.partZDimensionsChangedSignal.connect(p_i.partZDimensionsChangedSlot)
         m_p.partParentChangedSignal.connect(p_i.partParentChangedSlot)
         m_p.partRemovedSignal.connect(p_i.partRemovedSlot)
         m_p.partPropertyChangedSignal.connect(p_i.partPropertyChangedSlot)
@@ -37,7 +37,7 @@ class PartItemController():
         m_p = self._model_part
         p_i = self._part_item
 
-        m_p.partDimensionsChangedSignal.disconnect(p_i.partDimensionsChangedSlot)
+        m_p.partZDimensionsChangedSignal.disconnect(p_i.partZDimensionsChangedSlot)
         m_p.partParentChangedSignal.disconnect(p_i.partParentChangedSlot)
         m_p.partRemovedSignal.disconnect(p_i.partRemovedSlot)
         m_p.partPropertyChangedSignal.disconnect(p_i.partPropertyChangedSlot)

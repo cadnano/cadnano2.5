@@ -205,6 +205,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         #     self.active_virtual_helix_item = None
         avhi = self.active_virtual_helix_item
         self.setPreXoverItemsVisible(avhi)
+        self.enlargeRectToFit()
     # end def
 
     def _refreshVirtualHelixItemGizmos(self, id_num, vhi):
@@ -349,6 +350,13 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.setRect(new_rect)
         self.configureOutline(self.outline)
         self.griditem.updateGrid()
+    # end def
+
+    def enlargeRectToFit(self):
+        xTL, yTL, xBR, yBR = self.getModelBounds()
+        self.reconfigureRect((xTL, yTL), (xBR, yBR))
+        self.grab_cornerTL.alignPos(xTL, yTL)
+        self.grab_cornerBR.alignPos(xBR, yBR)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###

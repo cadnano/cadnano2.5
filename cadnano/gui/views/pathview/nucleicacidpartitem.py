@@ -102,7 +102,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             pxoig.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
-    def partDimensionsChangedSlot(self, model_part, min_id_num, max_id_num, ztf=False):
+    def partZDimensionsChangedSlot(self, model_part, min_id_num, max_id_num, ztf=False):
         if len(self._virtual_helix_item_list) > 0:
             vhi_hash = self._virtual_helix_item_hash
             vhi_max = vhi_hash[max_id_num]
@@ -347,7 +347,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Updates the bounding rect to the size of the childrenBoundingRect,
         and refreshes the addBases and removeBases buttons accordingly.
 
-        Called by partVirtualHelixAddedSlot, partDimensionsChangedSlot, or
+        Called by partVirtualHelixAddedSlot, partZDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
         self.setPen(getPenObj(self.modelColor(), 0))

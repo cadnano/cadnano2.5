@@ -83,8 +83,8 @@ class Part(VirtualHelixGroup):
 
     ### SIGNALS ###
     # A. Part
-    partDimensionsChangedSignal = ProxySignal(CNObject, int, int, bool, # self, id_min, id_max, zoom to fit
-                        name='partDimensionsChangedSignal')     # self
+    partZDimensionsChangedSignal = ProxySignal(CNObject, int, int, bool, # self, id_min, id_max, zoom to fit
+                        name='partZDimensionsChangedSignal')     # self
     partInstanceAddedSignal = ProxySignal(CNObject,
                         name='partInstanceAddedSignal')         # self
     partParentChangedSignal = ProxySignal(CNObject,

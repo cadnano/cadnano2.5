@@ -329,8 +329,10 @@ class VirtualHelixGroup(CNObject):
         given a id_num get the coordinate at a given index
         """
         valid_pts = np.where(self.origin_pts != np.inf)
-        xs = valid_pts[:, 0]
-        ys = valid_pts[:, 1]
+        vps = self.origin_pts[valid_pts]
+        vps = vps.reshape((len(vps)//2, 2))
+        xs = vps[:, 0]
+        ys = vps[:, 1]
         xLL = np.amin(xs)
         xUR = np.amax(xs)
         yLL = np.amin(ys)
@@ -509,6 +511,7 @@ class VirtualHelixGroup(CNObject):
         except:
             print(list(id_nums), Z_PROP_INDEX)
             raise
+        self.setVirtualHelixOriginLimits()
     # end def
 
     def getIndices(self, id_num):

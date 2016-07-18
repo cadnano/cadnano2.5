@@ -117,7 +117,7 @@ def decode(document, obj):
         part.createVirtualHelix(x, y, 0., num_bases,
                                 id_num=vh_num, use_undostack=False)
     # zoom to fit
-    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+    part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)

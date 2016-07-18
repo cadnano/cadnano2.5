@@ -72,7 +72,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._model_part.setActive(True)
     # end def
 
-    def partDimensionsChangedSlot(self, part, min_id_num, max_id_num):
+    def partZDimensionsChangedSlot(self, part, min_id_num, max_id_num):
         """ Accounts for Z translations in parts
         Args:
             part (Part):
@@ -175,7 +175,7 @@ class AbstractPartItem(object):
         self._model_part.setActive(True)
     # end def
 
-    def partDimensionsChangedSlot(self, part, min_id_num, max_id_num):
+    def partZDimensionsChangedSlot(self, part, min_id_num, max_id_num):
         """ Accounts for Z translations in parts
         Args:
             part (Part):

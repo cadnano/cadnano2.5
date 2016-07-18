@@ -79,6 +79,20 @@ class GrabCornerItem(QGraphicsRectItem):
         else:
             res = QGraphicsItem.mouseMoveEvent(parent, event)
             return res
+    # end def
+
+    def alignPos(self, new_x, new_y):
+        ct = self.corner_type
+        hwidth = self.half_width
+        if ct == TOP_LEFT:
+            new_x_TL = new_x - hwidth
+            new_y_TL = new_y - hwidth
+            self.setPos(new_x_TL, new_y_TL)
+        elif ct == BOTTOM_RIGHT:
+            new_x_BR = new_x + hwidth
+            new_y_BR = new_y + hwidth
+            self.setPos(new_x_BR, new_y_BR)
+    # end def
 
     def mouseReleaseEvent(self, event):
         if self.model_bounds:
