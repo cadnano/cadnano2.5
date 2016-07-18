@@ -140,6 +140,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                     vhi_h = self._handle
                     vhi_h.tempReparent()
                     vhi_h.setX(z - _VH_XOFFSET)
+                    # if self.isSelected():
+                    #     print("ImZ", self.idNum())
                     part_item.updateXoverItems(self)
                     vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
                     vhi_h_selection_group.addToGroup(vhi_h)

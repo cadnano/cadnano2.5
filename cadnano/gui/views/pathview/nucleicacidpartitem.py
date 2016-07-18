@@ -102,7 +102,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             pxoig.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
-    def partDimensionsChangedSlot(self, model_part, min_id_num, max_id_num):
+    def partDimensionsChangedSlot(self, model_part, min_id_num, max_id_num, ztf=False):
         if len(self._virtual_helix_item_list) > 0:
             vhi_hash = self._virtual_helix_item_hash
             vhi_max = vhi_hash[max_id_num]
@@ -114,11 +114,13 @@ class NucleicAcidPartItem(QAbstractPartItem):
             self._vh_rect.setLeft( (vhi_h_rect.left() -
                                     styles.VH_XOFFSET +
                                     vhi_min.x()))
-        self.scene().views()[0].zoomToFit()
+        if ztf:
+            self.scene().views()[0].zoomToFit()
         self._updateBoundingRect()
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
+        print("partSelectedChangedSlot", is_selected)
         if is_selected:
             self.resetPen(styles.SELECTED_COLOR, styles.SELECTED_PEN_WIDTH)
             self.resetBrush(styles.SELECTED_BRUSH_COLOR, styles.SELECTED_ALPHA)
@@ -144,8 +146,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
         #     self.active_virtual_helix_item.deactivate()
         #     self.active_virtual_helix_item = None
 
-        if self.active_virtual_helix_item is not None:
-            self.setPreXoverItemsVisible(self.active_virtual_helix_item)
+        # if self.active_virtual_helix_item is not None:
+        #     self.setPreXoverItemsVisible(self.active_virtual_helix_item)
+        pass
     # end def
 
     def partRemovedSlot(self, sender):

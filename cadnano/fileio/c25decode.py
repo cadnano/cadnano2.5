@@ -130,7 +130,8 @@ def decode(document, obj):
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)
-    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds())
+    # zoom to fit
+    part.partDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
     setReopen(False)
     setBatch(False)
 

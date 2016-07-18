@@ -83,7 +83,7 @@ class Part(VirtualHelixGroup):
 
     ### SIGNALS ###
     # A. Part
-    partDimensionsChangedSignal = ProxySignal(CNObject, int, int, # self, id_min, id_max
+    partDimensionsChangedSignal = ProxySignal(CNObject, int, int, bool, # self, id_min, id_max, zoom to fit
                         name='partDimensionsChangedSignal')     # self
     partInstanceAddedSignal = ProxySignal(CNObject,
                         name='partInstanceAddedSignal')         # self
@@ -332,8 +332,9 @@ class Part(VirtualHelixGroup):
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def setSelected(self, is_selected):
-        self._selected = is_selected
-        self.partSelectedChangedSignal.emit(self, is_selected)
+        if is_selected != self._selected:
+            self._selected = is_selected
+            self.partSelectedChangedSignal.emit(self, is_selected)
     # end def
 
     def getModID(self, strand, idx):
