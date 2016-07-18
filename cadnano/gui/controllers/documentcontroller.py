@@ -129,6 +129,7 @@ class DocumentController():
         win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
 
         win.action_vhelix_snap.triggered.connect(self.actionVhelixSnapSlot)
+
     # end def
 
 

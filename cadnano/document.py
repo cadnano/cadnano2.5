@@ -47,7 +47,8 @@ class Document(CNObject):
         self.view_names = []
         self.filter_set = set()
         self._mods = {} # modifications keyed by mod id
-        app().documentWasCreatedSignal.emit(self)
+        this_app = app()
+        this_app.documentWasCreatedSignal.emit(self)
     # end def
 
     ### SIGNALS ###

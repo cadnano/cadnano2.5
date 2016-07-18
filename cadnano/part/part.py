@@ -128,6 +128,10 @@ class Part(VirtualHelixGroup):
     partStrandChangedSignal = ProxySignal(object, int,
                         name='partStrandChangedSignal')         # self, virtual_helix
 
+    # E.
+    partDocumentSettingChangedSignal = ProxySignal(object, str, object, # self, key, value
+                                    name='partDocumentSettingChangedSignal')
+
     ### SLOTS ###
 
     ### ACCESSORS ###

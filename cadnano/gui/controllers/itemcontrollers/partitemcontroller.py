@@ -29,7 +29,7 @@ class PartItemController():
 
         m_p.partOligoAddedSignal.connect(p_i.partOligoAddedSlot)
         # m_p.partStrandChangedSignal.connect(p_i.updatePreXoverItemsSlot)
-
+        m_p.partDocumentSettingChangedSignal.connect(p_i.partDocumentSettingChangedSlot)
 
     # end def
 
@@ -58,4 +58,5 @@ class PartItemController():
 
         m_p.partOligoAddedSignal.disconnect(p_i.partOligoAddedSlot)
         # m_p.partStrandChangedSignal.disconnect(p_i.updatePreXoverItemsSlot)
+        m_p.partDocumentSettingChangedSignal.disconnect(p_i.partDocumentSettingChangedSlot)
     # end def

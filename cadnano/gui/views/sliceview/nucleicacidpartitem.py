@@ -275,6 +275,18 @@ class NucleicAcidPartItem(QAbstractPartItem):
             select_tool.deselectSet(vh_set)
     # end def
 
+    def partDocumentSettingChangedSlot(self, part, key, value):
+        if key == 'grid':
+            print("grid change", value)
+            if value == 'lines and points':
+                self.griditem.setDrawlines(True)
+            elif value == 'points':
+                self.griditem.setDrawlines(False)
+            else:
+                raise ValueError("unknown grid styling")
+
+    # end def
+
     ### ACCESSORS ###
     def boundingRect(self):
         return self._rect

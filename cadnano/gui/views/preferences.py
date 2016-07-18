@@ -1,6 +1,6 @@
 import os.path, zipfile, shutil, platform, subprocess, tempfile, errno
 
-from PyQt5.QtCore import pyqtSlot, Qt, QObject, QSettings
+from PyQt5.QtCore import Qt, QObject, QSettings, pyqtSignal
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox, QTableWidgetItem
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QMessageBox
 
@@ -25,11 +25,21 @@ class Preferences(object):
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
         self.ui_prefs.add_plugin_button.clicked.connect(self.addPlugin)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
+
+        self.ui_prefs.grid_appearance_type_combo_box.activated.connect(self.updateGrid)
+        self.document = None
     # end def
 
     def showDialog(self):
         self.readPreferences()
         self.widget.show()  # launch prefs in mode-less dialog
+    # end def
+
+    def updateGrid(self, index):
+        self.setGridAppearanceType(index)
+        value = self.getGridAppearanceType()
+        for part in self.document.getParts():
+            part.partDocumentSettingChangedSignal.emit(part, 'grid', value)
     # end def
 
     def hideDialog(self):
@@ -47,7 +57,7 @@ class Preferences(object):
 
     def readPreferences(self):
         self.qs.beginGroup("Preferences")
-        self.grid_appearance_type_index = self.qs.value("grid_appearance_type", styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
+        self.grid_appearance_type_index = self.qs.value("grid_appearance_type_index", styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
         self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
@@ -69,15 +79,15 @@ class Preferences(object):
         self.ui_prefs.show_icon_labels.setChecked(styles.PREF_SHOW_ICON_LABELS)
     # end def
 
-    def setGridAppearanceType(self, grid_appearance_type):
-        self.grid_appearance_type = grid_appearance_type
+    def setGridAppearanceType(self, grid_appearance_type_index):
+        self.grid_appearance_type_index = grid_appearance_type_index
         self.qs.beginGroup("Preferences")
-        self.qs.setValue("grid_appearance_type", grid_appearance_type)
+        self.qs.setValue("grid_appearance_type_index", grid_appearance_type_index)
         self.qs.endGroup()
     # end def
 
     def getGridAppearanceType(self):
-        return ['Circles', 'Lines', 'Points'][self.grid_appearance_type_index]
+        return ['circles', 'lines and points', 'points'][self.grid_appearance_type_index]
     # end def
 
     def setZoomSpeed(self, speed):

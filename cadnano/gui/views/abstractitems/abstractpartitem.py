@@ -80,6 +80,7 @@ class QAbstractPartItem(QGraphicsRectItem):
             max_id_num (int): id number of most Z Virtual Helix
         """
         pass
+
     def partOligoAddedSlot(self, part, oligo):
         pass
     def partParentChangedSlot(self, sender):
@@ -122,6 +123,10 @@ class QAbstractPartItem(QGraphicsRectItem):
         pass
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass
+
+    def partDocumentSettingChangedSlot(self, part, key, value):
+        pass
+    # end defS
 # end class
 
 class AbstractPartItem(object):
@@ -217,6 +222,9 @@ class AbstractPartItem(object):
         pass
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass
+    def partDocumentSettingChangedSlot(self, part, key, value):
+        pass
+    # end defS
 # end class
 
 

@@ -72,6 +72,7 @@ class CadnanoQt(QObject):
         self.vh = {}  # Newly created VirtualHelix register here by idnum.
         self.vhi = {}
         self.partItem = None
+        self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
 
     def finishInit(self):
         global decodeFile
@@ -163,3 +164,6 @@ class CadnanoQt(QObject):
 
     def prefsClicked(self):
         self.prefs.showDialog()
+
+    def wirePrefsSlot(self, document):
+        self.prefs.document = document
