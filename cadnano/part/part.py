@@ -10,7 +10,7 @@ from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
 from cadnano.enum import StrandType
 
-from cadnano.virtualhelix.virtualhelixgroup import VirtualHelixGroup, Z_PROP_INDEX
+from cadnano.part.virtualhelixgroup import VirtualHelixGroup, Z_PROP_INDEX
 
 class Part(VirtualHelixGroup):
     """

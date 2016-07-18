@@ -1,5 +1,5 @@
 from cadnano.cnproxy import UndoCommand
-from cadnano.virtualhelix.virtualhelixgroup import Z_PROP_INDEX
+from cadnano.part.virtualhelixgroup import Z_PROP_INDEX
 
 class TranslateVirtualHelicesCommand(UndoCommand):
     """ Move Virtual Helices around"""

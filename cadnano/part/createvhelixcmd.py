@@ -1,7 +1,7 @@
 from ast import literal_eval
 import bisect
 from cadnano.cnproxy import UndoCommand
-from cadnano.virtualhelix import VirtualHelixGroup
+from cadnano.part import VirtualHelixGroup
 
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(   self, part, x, y, z, length,

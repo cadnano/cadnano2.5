@@ -284,7 +284,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 self.griditem.setDrawlines(False)
             else:
                 raise ValueError("unknown grid styling")
-
     # end def
 
     ### ACCESSORS ###
