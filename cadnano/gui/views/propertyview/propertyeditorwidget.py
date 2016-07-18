@@ -91,17 +91,21 @@ class PropertyEditorWidget(QTreeWidget):
         if len(selected_items) == 1:
             # get the selected item
             item = selected_items[0]
+            item_type = item.itemType()
+
+            # special case for parts since there is currently no part filter
+            if item_type is ItemType.NUCLEICACID:
+                pe_item = NucleicAcidPartItem(item.cnModel(), self)
+                self.show()
+                return
+
             if item.FILTER_NAME not in self._document.filter_set:
                 return
-            item_type = item.itemType()
             if item_type is ItemType.OLIGO:
                 pe_item = OligoItem(item.cnModel(), self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
                 pe_item = VirtualHelixItem(item.cnModel(), self, item.idNum())
-                self.show()
-            elif item_type is ItemType.NUCLEICACID:
-                pe_item = NucleicAcidPartItem(item.cnModel(), self)
                 self.show()
             else:
                 raise NotImplementedError
