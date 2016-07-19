@@ -371,12 +371,18 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """ update the boundaries to what's in the model with a minimum
         size
         """
-        xTL, yTL, xBR, yBR = self.part().boundDimensions(self.scale_factor)
+        xTL, yTL, xBR, yBR = self.getModelBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
     def getModelBounds(self):
-        return self.part().boundDimensions(self.scale_factor)
+        """
+        Bounds in form of Qt scaled from model
+        Returns:
+            Tuple (top_left, bottom_right)
+        """
+        xLL, yLL, xUR, yUR = self.part().boundDimensions(self.scale_factor)
+        return xLL, -yUR, xUR, -yLL
     # end def
 
     def bounds(self):

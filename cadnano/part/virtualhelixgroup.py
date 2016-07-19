@@ -343,6 +343,8 @@ class VirtualHelixGroup(CNObject):
     def getVirtualHelixOriginLimits(self):
         """
         given a id_num get the coordinate at a given index
+        Returns:
+            Tuple: (xLL, yLL, xUR, yUR)
         """
         return self.origin_limits
     # end def
