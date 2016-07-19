@@ -89,8 +89,8 @@ class GrabCornerItem(QGraphicsRectItem):
             new_y_TL = new_y - hwidth
             self.setPos(new_x_TL, new_y_TL)
         elif ct == BOTTOM_RIGHT:
-            new_x_BR = new_x + hwidth
-            new_y_BR = new_y + hwidth
+            new_x_BR = new_x - hwidth
+            new_y_BR = new_y - hwidth
             self.setPos(new_x_BR, new_y_BR)
     # end def
 
