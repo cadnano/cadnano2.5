@@ -46,6 +46,14 @@ class PartType(_Enum):
     NUCLEICACIDPART = 1
     PLASMIDPART = 2
 
+# For serializing virtual helices as only pointing in the Z direction
+# or pointing in arbitrary directions
+class PointType:
+    Z_ONLY = 0
+    ARBITRARY = 1
+ENUM_NAMES['point_type'] = enumNames(PointType)
+
+
 class ItemType(_Enum):
     DNA = 0
     PLASMID = 1

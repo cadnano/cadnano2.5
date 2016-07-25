@@ -241,7 +241,7 @@ class SelectSliceTool(AbstractSliceTool):
 
     def copySelection(self):
         part = self.part_item.part()
-        copy_dict = v3encode.encodePart2(part,
+        copy_dict = v3encode.encodePartList(part,
                                         list(self.selection_set))
         self.clip_board = copy_dict
     # end def

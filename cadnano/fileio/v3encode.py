@@ -1,36 +1,53 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from cadnano.enum import PointType
+
 FORMAT_VERSION = "3.0"
 
 def encodeDocument(document):
-  doc_dict = {'format': FORMAT_VERSION,
+    """
+    Args:
+        document (Document):
+
+    Returns:
+        dict:
+    """
+    doc_dict = {'format': FORMAT_VERSION,
         'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'name': "",
         'parts': [],
         'modifications': document.modifications()
-  }
-  parts_list = doc_dict['parts']
-  for part in document.getParts():
-      part_dict = encodePart(part)
-      parts_list.append(part_dict)
-  return doc_dict
+    }
+    parts_list = doc_dict['parts']
+    for part in document.getParts():
+        part_dict = encodePart(part)
+        parts_list.append(part_dict)
+    return doc_dict
 # end def
 
 def encodePart(part):
     """
     Args:
         part (Part):
+
+    Returns:
+        dict
     """
     number_of_helices = part.getIdNumMax()
     vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
     group_props = part.getPropertyDict().copy()
-    view_props = part.view_properties
-    vh_props, origins = part.helixPropertiesAndOrigins()
 
-    group_props['virtual_helices'] = vh_props
-    group_props['origins'] = origins
+    view_props = part.view_properties
+
+    if group_props.get('point_type') == PointType.ARBITRARY:
+        # TODO add code to encode Parts with ARBITRARY point configurations
+        pass
+    else:
+        vh_props, origins = part.helixPropertiesAndOrigins()
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
 
     xover_list = []
     strand_list = []
@@ -66,12 +83,17 @@ def encodePart(part):
     return group_props
 # end def
 
-def encodePart2(part, vh_group_list=None):
-    """
+def encodePartList(part, vh_group_list):
+    """ Used for copying and pasting
+    TODO: unify encodePart and encodePartList
+
     Args:
         part (Part):
         vh_group_list (List[int]): list of virtual_helices to encode to be used
             with copy and paste serialization
+
+    Returns:
+        dict
     """
     vh_group_list.sort()
     number_of_helices = part.getIdNumMax()
@@ -79,10 +101,14 @@ def encodePart2(part, vh_group_list=None):
 
     # iterate through virtualhelix list
     group_props = part.getPropertyDict().copy()
-    vh_props, origins = part.helixPropertiesAndOrigins(vh_group_list)
 
-    group_props['virtual_helices'] = vh_props
-    group_props['origins'] = origins
+    if group_props.get('point_type') == PointType.ARBITRARY:
+        # TODO add code to encode Parts with ARBITRARY point configurations
+        pass
+    else:
+        vh_props, origins = part.helixPropertiesAndOrigins(vh_group_list)
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
 
     xover_list = []
     strand_list = []

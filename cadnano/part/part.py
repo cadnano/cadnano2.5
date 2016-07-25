@@ -8,7 +8,7 @@ from cadnano import preferences as prefs
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoCommand
-from cadnano.enum import StrandType
+from cadnano.enum import StrandType, PointType
 
 from cadnano.part.virtualhelixgroup import VirtualHelixGroup, Z_PROP_INDEX
 
@@ -163,6 +163,10 @@ class Part(VirtualHelixGroup):
 
     def getProperty(self, key):
         return self._group_properties[key]
+    # end def
+
+    def isZEditable(self):
+        return self._group_properties['point_type'] == PointType.Z_ONLY
     # end def
 
     def getOutlineProperties(self):

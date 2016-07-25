@@ -214,7 +214,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             selection_group.mousePressEvent(event)
         elif event.button() == Qt.RightButton:
             current_filter_set = self._viewroot.selectionFilterSet()
-            if self.FILTER_NAME in current_filter_set:
+            if self.FILTER_NAME in current_filter_set and self.part().isZEditable():
                 self._right_mouse_move = True
                 self.drag_last_position = event.scenePos()
                 self.handle_start = self.pos()

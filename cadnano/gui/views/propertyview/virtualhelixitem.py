@@ -119,7 +119,7 @@ class VirtualHelixItem(QTreeWidgetItem):
                                         ['bases_per_repeat', 'length'] )
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
-        elif key == 'z':
+        elif key == 'z' and self._model_part.isZEditable():
             editor = QDoubleSpinBox(parent_QWidget)
             bw = self._model_part.baseWidth()
             editor.setSingleStep(bw)

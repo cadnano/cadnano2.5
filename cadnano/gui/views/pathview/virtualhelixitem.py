@@ -278,7 +278,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         if event.button() == Qt.RightButton:
             viewroot = self._viewroot
             current_filter_set = viewroot.selectionFilterSet()
-            if self.FILTER_NAME in current_filter_set:
+            if self.FILTER_NAME in current_filter_set and self.part().isZEditable():
                 self._right_mouse_move = True
                 self.drag_last_position = event.scenePos()
                 self.handle_start = self.pos()

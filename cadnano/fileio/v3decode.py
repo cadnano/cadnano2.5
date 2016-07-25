@@ -2,6 +2,7 @@
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
+from cadnano.enum import PointType
 
 def decode(document, obj):
     ""
@@ -29,19 +30,25 @@ def decodePart(document, part_dict):
     vh_props = part_dict['virtual_helices']
     origins = part_dict['origins']
     keys = list(vh_props.keys())
-    for id_num, size in vh_id_list:
-        x, y = origins[id_num]
-        z = vh_props['z'][id_num]
-        vh_props['eulerZ'][id_num] = -2.25*(360./10.5)
-        vals = [vh_props[k][id_num] for k in keys]
-        part.createVirtualHelix(x, y, z, size,
-                                id_num=id_num,
-                                properties=(keys, vals),
-                                safe=False,
-                                use_undostack=False)
-    # end for
-    # zoom to fit
-    part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+
+    if part_dict.get('point_type') == PointType.ARBITRARY:
+        # TODO add code to deserialize parts
+        pass
+    else:
+        for id_num, size in vh_id_list:
+            x, y = origins[id_num]
+            z = vh_props['z'][id_num]
+            vh_props['eulerZ'][id_num] = -2.25*(360./10.5)
+            vals = [vh_props[k][id_num] for k in keys]
+            part.createVirtualHelix(x, y, z, size,
+                                    id_num=id_num,
+                                    properties=(keys, vals),
+                                    safe=False,
+                                    use_undostack=False)
+        # end for
+        # zoom to fit
+        part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+
     strands = part_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']

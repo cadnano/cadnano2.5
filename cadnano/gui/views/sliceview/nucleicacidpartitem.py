@@ -302,7 +302,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     def setActiveVirtualHelixItem(self, new_active_vhi):
         current_vhi = self.active_virtual_helix_item
-        print(current_vhi, new_active_vhi)
+        # print(current_vhi, new_active_vhi)
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
                 current_vhi.deactivate()
