@@ -4,38 +4,12 @@ cadnano.strand package
 Submodules
 ----------
 
-cadnano.strand.insertioncmd module
-----------------------------------
+.. toctree::
 
-.. automodule:: cadnano.strand.insertioncmd
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.strand.modscmd module
------------------------------
-
-.. automodule:: cadnano.strand.modscmd
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.strand.resizecmd module
--------------------------------
-
-.. automodule:: cadnano.strand.resizecmd
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.strand.strand module
-----------------------------
-
-.. automodule:: cadnano.strand.strand
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cadnano.strand.insertioncmd
+   cadnano.strand.modscmd
+   cadnano.strand.resizecmd
+   cadnano.strand.strand
 
 Module contents
 ---------------

@@ -4,14 +4,9 @@ cadnano.decorators package
 Submodules
 ----------
 
-cadnano.decorators.insertion module
------------------------------------
+.. toctree::
 
-.. automodule:: cadnano.decorators.insertion
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cadnano.decorators.insertion
 
 Module contents
 ---------------

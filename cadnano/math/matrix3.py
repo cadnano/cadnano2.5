@@ -5,6 +5,9 @@ import math
 Matrix3 = namedtuple('Matrix3', ['n11','n12', 'n13',
                                 'n21', 'n22', 'n23',
                                 'n31', 'n32', 'n33'])
+"""
+namedtuple: 3 x 3 matrix
+"""
 
 def getInverse(m4):
     """

@@ -6,6 +6,9 @@ Matrix4 = namedtuple('Matrix4', ['n11','n12', 'n13', 'n14',
                                 'n21', 'n22', 'n23', 'n24',
                                 'n31', 'n32', 'n33', 'n34',
                                 'n41', 'n42', 'n43', 'n44'])
+"""
+namedtuple: 4 x 4 matrix
+"""
 
 def makeTranslation(x, y, z):
     """ create a translation matrix given a displacement x, y, z

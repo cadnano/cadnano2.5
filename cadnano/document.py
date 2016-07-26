@@ -679,7 +679,7 @@ class Document(CNObject):
     # end def
 
     def getParts(self):
-        """ Get all child `Part`s in the document
+        """Get all child `Part` in the document
 
         Yields:
             Part: the next Part in the the list of children

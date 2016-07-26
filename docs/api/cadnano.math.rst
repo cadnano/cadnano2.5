@@ -4,54 +4,14 @@ cadnano.math package
 Submodules
 ----------
 
-cadnano.math.box module
------------------------
+.. toctree::
 
-.. automodule:: cadnano.math.box
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.math.face module
-------------------------
-
-.. automodule:: cadnano.math.face
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.math.matrix3 module
----------------------------
-
-.. automodule:: cadnano.math.matrix3
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.math.matrix4 module
----------------------------
-
-.. automodule:: cadnano.math.matrix4
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.math.solid module
--------------------------
-
-.. automodule:: cadnano.math.solid
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.math.vector module
---------------------------
-
-.. automodule:: cadnano.math.vector
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cadnano.math.box
+   cadnano.math.face
+   cadnano.math.matrix3
+   cadnano.math.matrix4
+   cadnano.math.solid
+   cadnano.math.vector
 
 Module contents
 ---------------

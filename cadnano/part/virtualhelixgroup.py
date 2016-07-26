@@ -258,6 +258,13 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
+
+        Returns:
+            :obj:`tuple` of :obj:'ndarray': of form::
+
+                axis_pts, fwd_pts, rev_pts
+
+            for a given virtual helix ID number
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -271,10 +278,17 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getCoordinate(self, id_num, idx):
-        """ given a id_num get the coordinate at a given index
+        """Given a id_num get the coordinate at a given index
+
         Args:
             id_num (int): virtual helix ID number
             idx (int): index
+
+        Returns:
+            :obj:`ndarray` of obj:`float`: (3, 1)
+
+        Raises:
+            KeyError, IndexError
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -288,6 +302,17 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def isAGreaterThanB_Z(self, id_numA, idxA, id_numB, idxB):
+        """ Compare z values at each IDX
+
+        Args:
+            id_numA (int):
+            idxA (int):
+            id_numB (int):
+            idxB (int):
+
+        Returns:
+            bool: True if A > B
+        """
         a = self.getCoordinate(id_numA, idxA)
         b = self.getCoordinate(id_numB, idxB)
         return a[2] > b[2]
@@ -298,6 +323,12 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
+
+        Returns:
+            tuple
+
+        Raises:
+            KeyError
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -307,14 +338,16 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getidNums(self):
-        """ return a list of used id_nums
+        """Return a list of used id_nums
+
+        Returns:
+            :obj:`list` of :obj:`int`: list of virtual helix ID numbers used
         """
         return [i for i, x in filter(lambda i, x: x is not None, enumerate(self.offset_and_size))]
     # end def
 
     def setVirtualHelixOriginLimits(self):
-        """
-        given a id_num get the coordinate at a given index
+        """Set origin limits
         """
         valid_pts = np.where(self.origin_pts != np.inf)
         vps = self.origin_pts[valid_pts]
@@ -332,15 +365,19 @@ class VirtualHelixGroup(CNObject):
         """
         given a id_num get the coordinate at a given index
         Returns:
-            Tuple: (xLL, yLL, xUR, yUR)
+            tuple: (xLL, yLL, xUR, yUR)
         """
         return self.origin_limits
     # end def
 
     def getStrandSets(self, id_num):
-        """given a id_num get the coordinate at a given index
+        """Given a id_num get the coordinate at a given index
+
         Args:
             id_num (int): virtual helix ID number
+
+        Returns:
+            :obj:`tuple` of :obj:`StrandSet`
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -351,6 +388,7 @@ class VirtualHelixGroup(CNObject):
 
     def refreshSegments(self, id_num):
         """ Partition strandsets into overlapping segments
+
         Returns:
             Tuple(List(List(Tuple))):  segments for the forward and reverse
                 strand
@@ -433,25 +471,29 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def hasStrandAtIdx(self, id_num, idx):
-        """
+        """Check if `Strand` exists at an index
+
         Args:
             id_num (int): virtual helix ID number
             idx (int): index that the strand is at
 
         Returns:
             tuple[Scaffold, Staple]: True if a strand is present at idx,
-                False otherwise.
+            False otherwise.
         """
         return (self.fwd_strandsets[id_num].hasStrandAt(idx, idx),\
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
     def getStrand(self, is_fwd, id_num, idx):
-        """
+        """Get a `Strand` object
         Args:
             is_fwd (bool): is the StrandType Forward
             id_num (int): virtual helix ID number
             idx (int): index that the strand is at
+
+        Returns:
+            Strand: if it exists
         """
 
         if is_fwd:
@@ -461,8 +503,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def indexOfRightmostNonemptyBase(self):
-        """
-        During reduction of the number of bases in a part, the first click
+        """During reduction of the number of bases in a part, the first click
         removes empty bases from the right hand side of the part (red
         left-facing arrow). This method returns the new numBases that will
         effect that reduction.
@@ -481,8 +522,8 @@ class VirtualHelixGroup(CNObject):
         for now support XY translation
 
         Args:
-            id_nums (Sequence[int]): virtual helix ID numbers
-            delta (Sequence[float]): 1x3 vector
+            id_nums (:obj:`sequence` of :obj:`int`): virtual helix ID numbers
+            delta (:obj:`sequence` of :obj:`float`): 1x3 vector
         """
         self.resetOriginCache()
         self.resetPointCache()
@@ -531,6 +572,11 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
             radius (float): radial distance within which a neighbors origin exists
             idx (:obj:`int`, optional): index to center the neighbor search at
+
+        Returns:
+            :obj:`list` of :obj:`tuple`: a list of tuples of form::
+
+                (neighbor ID, index)
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -652,7 +698,7 @@ class VirtualHelixGroup(CNObject):
     def getDirections(self, id_nums):
         """
         Args:
-            id_nums (Sequence[int]): array_like list of indices or scalar index
+            id_nums (:obj:`sequence` of :obj:`int`): array_like list of indices or scalar index
         """
         return np.take(self.directions, id_nums, axis=0)
     # end def
@@ -660,7 +706,7 @@ class VirtualHelixGroup(CNObject):
     def normalize(self, v):
         """
         Args:
-            v (Sequence[float]): (1,3) ndarray or length 3 sequence
+            v (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
         """
         norm = np.linalg.norm(v)
         if norm == 0:
@@ -669,9 +715,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def lengthSq(self, v):
-        """ Compute the length of a sequence
+        """Compute the length of a sequence
+
         Args:
-            v (Sequence[float]): (1,3) ndarray or length 3 sequence
+            v (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
 
         Returns:
             float
@@ -679,13 +726,14 @@ class VirtualHelixGroup(CNObject):
         return inner1d(v, v)
 
     def cross(self, a, b):
-        """ Compute the cross product of two vectors of length 3
+        """Compute the cross product of two vectors of length 3
+
         Args:
-            a (Sequence[float]): (1,3) ndarray or length 3 sequence
-            b (Sequence[float]): (1,3) ndarray or length 3 sequence
+            a (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            b (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
 
         Returns:
-            List
+            :obj:`list` of :obj:`float`: (1, 3) list
         """
         ax, ay, az = a
         bx, by, bz = b
@@ -702,8 +750,8 @@ class VirtualHelixGroup(CNObject):
         see: http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/180436#180436
 
         Args:
-            v1 (Sequence[float]): (1,3) ndarray or length 3 sequence
-            v2 (Sequence[float]): (1,3) ndarray or length 3 sequence
+            v1 (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            v2 (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
 
         Returns:
             ndarray: (3,3) m0
@@ -743,9 +791,9 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            origin (Sequence[float]): (1,3) ndarray or length 3 sequence.
+            origin (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence.
                 The origin should be referenced from an index of 0.
-            direction (Sequence[float]): (1,3) ndarray or length 3 sequence
+            direction (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
             num_points (int): number of bases in Virtual Helix
             color (str):
         """
@@ -825,9 +873,9 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            origin (Sequence[float]): (1, 3) ndarray or length 3 sequence.  The origin should be
+            origin (:obj:`sequence` of :obj:`float`): (1, 3) ndarray or length 3 sequence.  The origin should be
                         referenced from an index of 0.
-            direction (Sequence[float]): (1,3) ndarray or length 3 sequence
+            direction (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
             index (int): the offset index into a helix to start the helix at.
                 Useful for appending points. if index less than zero
 
@@ -893,10 +941,12 @@ class VirtualHelixGroup(CNObject):
 
     def getVirtualHelixProperties(self, id_num, keys, safe=True):
         """
+
         Args:
             id_num (int): virtual helix ID number
-            keys (str or List/Tuple):
+            keys (:obj:`str` or :obj:`list`/:obj:`tuple`):
             safe (:obj:`bool`, optional):
+
         Returns:
             Type of single key property or List: depending on type of arg `keys`
         """
@@ -979,8 +1029,13 @@ class VirtualHelixGroup(CNObject):
         """ keys and values can be sequences of equal length or
         singular values
 
+        emits `partVirtualHelixPropertyChangedSignal`
+
         Args:
             id_num (int): virtual helix ID number
+            keys (:obj:`str` or :obj:`list`/:obj:`tuple`):
+            value (:obj:`object` or :obj:`list`/:obj:`tuple`)
+            safe (:obj:`bool`, optional): optionally echew signalling
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -1003,14 +1058,14 @@ class VirtualHelixGroup(CNObject):
             scale_factor (:obj:`float`, optional): default 1.0
 
         Returns:
-            tuple: x, y coordinates
+            :obj:`tuple` of :obj:`float`: x, y coordinates
         """
         x, y = self.getVirtualHelixOrigin(id_num)
         return scale_factor*x, -scale_factor*y
     # end def
 
     def resizeHelix(self, id_num, is_right, delta):
-        """
+        """Resize vritual helix given by ID number
 
         Args:
             id_num (int): virtual helix ID number
@@ -1021,7 +1076,7 @@ class VirtualHelixGroup(CNObject):
 
         Returns:
             int: the ID number of the longest Virtual Helix in the
-                VirtualHelixGroup
+            VirtualHelixGroup
 
         Raises:
             IndexError, ValueError
@@ -1091,7 +1146,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def removeHelix(self, id_num):
-        """ Remove a helix and recycle it's `id_num`
+        """Remove a helix and recycle it's `id_num`
 
         Args:
             id_num (int): virtual helix ID number
@@ -1111,7 +1166,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def resetCoordinates(self, id_num):
-        """ call this after changing helix vh_properties to update the points
+        """Call this after changing helix vh_properties to update the points
         controlled by the properties
 
         Args:
@@ -1131,7 +1186,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def setCoordinates(self, id_num, points, idx_start=0):
-        """ change the coordinates stored, useful when adjusting
+        """Change the coordinates stored, useful when adjusting
         helix vh_properties
 
         Args:
@@ -1163,7 +1218,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def removeCoordinates(self, id_num, length, is_right):
-        """ remove coordinates given a length, reindex as necessary
+        """Remove coordinates given a length, reindex as necessary
 
         Args:
             id_num (int): virtual helix ID number
@@ -1257,11 +1312,11 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryBasePoint(self, radius, point):
-        """ cached query
+        """Cached query
 
         Args:
             radius (float): distance to consider
-            point (Sequence[float]): is an array_like of length 3
+            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
 
         Returns:
             :obj:`tuple` of :obj:`ndarray`
@@ -1286,7 +1341,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (Sequence[float]): is an array_like of length 3
+            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
 
         Returns:
             :obj:`tuple` of :obj:`ndarray`
@@ -1312,10 +1367,10 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (Sequence[float]): is an array_like of length 3
+            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
 
         Returns:
-            List
+            ndarray
         """
         qc = self._origin_cache
         query = (radius, point)
@@ -1345,7 +1400,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (Sequence[float]): is an array_like of length 3
+            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
 
         Returns:
             ndarray
@@ -1366,11 +1421,15 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryVirtualHelixOriginRect(self, rect):
-        """
+        """Query based on a Rectangle
+
         Args:
-            rect (Sequence[float]): rectangle defined by x1, y1, x2, y2
+            rect (:obj:`sequence` of :obj:`float`): rectangle defined by x1, y1, x2, y2
                 definining the lower left and upper right corner of the
                 rectangle respetively
+
+        Returns:
+            ndarray: list of ID numbers satisfying the query
         """
         # search children
         x1, y1, x2, y2 = rect
@@ -1387,14 +1446,28 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryIdNumRange(self, id_num, radius, index_slice=None):
-        """ return the indices of all virtual helices phosphates closer
-        than radius to id_num's helical axis
+        """Return the indices of all virtual helices phosphates closer
+        than `radius` to `id_num`'s helical axis
 
         Args:
             id_num (int): virtual helix ID number
             radius (float): distance to consider
             index_slice (Tuple): a tuple of the start index and length into
                 a virtual helix
+
+        Returns:
+            :obj:`tuple` of :obj:`list`: fwd_axis_hits, rev_axis_hits
+            where each element in the list is::
+
+                :obj:`tuple` of :obj:`int`, :obj:`tuple`
+
+            corresponding to an index into id_num and a tuple of hits on a neighbors
+            looking like::
+
+                        :obj:`tuple` of :obj:`list`:
+
+            with the item in the first element the neighbors ID and the item in second
+            element the index into that neighbor
         """
         offset, size = self.getOffsetAndSize(id_num)
         start, length = 0, size if index_slice is None else index_slice
@@ -1439,6 +1512,13 @@ class VirtualHelixGroup(CNObject):
     def normalizedRange(self, id_num, index):
         """ given an `index` within the bounds `[0, size]`
         return an range of length `bases_per_repeat` if pro
+
+        Args:
+            id_num (int):
+            index (int):
+
+        Returns:
+            :obj:`tuple` of :obj:`int`: (start index, bases per repeat)
         """
         offset, size = self.getOffsetAndSize(id_num)
         bpr = self.vh_properties.loc[id_num, 'bases_per_repeat']
@@ -1451,7 +1531,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
-        """ Get indices of all virtual helices phosphates closer within an
+        """Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
 
         Args:
@@ -1609,7 +1689,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def queryIdNumNeighbor(self, id_num, neighbors, index=None):
-        """ Get indices of all virtual helices phosphates within a bond
+        """Get indices of all virtual helices phosphates within a bond
         length of each phosphate for the id_num Virtual Helix.
 
         Args:
@@ -1627,8 +1707,6 @@ class VirtualHelixGroup(CNObject):
 
                 [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
 
-        Raises:
-            None
         """
         offset_and_size = self.getOffsetAndSize(id_num)
         if offset_and_size is None:
@@ -1808,7 +1886,14 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getAngleAtIdx(self, id_num, idx):
-        """ Account for Z translation ??????????
+        """Account for Z translation ??????????
+
+        Args:
+            id_num (int): ID number of virtual helix
+            idx (int): index of interest
+
+        Returns:
+            float: angle at the index
         """
         bpr, tpr, eulerZ = self.getVirtualHelixProperties(id_num,
                         ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
@@ -1817,21 +1902,28 @@ class VirtualHelixGroup(CNObject):
 
     @staticmethod
     def angleNormalize(angle):
-        """ ensure angle is normalized to [0, 2*PI]
-        angle (float): radians
+        """Ensure angle is normalized to [0, 2*PI]
+
+        Args:
+            angle (float): radians
+
+        Returns:
+            float:
         """
         TWOPI = 2*3.141592653589793
         return ((angle % TWOPI) + TWOPI) % TWOPI
 
     @staticmethod
     def angleRangeCheck(angle, target_angle, theta):
-        """ see if `angle` falls in range
-            `[target_angle - theta`, target_angle + theta]`
-            Accounting for wrap around
+        """See if `angle` falls in range
+        `[target_angle - theta`, target_angle + theta]`
+        Accounting for wrap around
+
         Args:
             angle (float): radians
             target_angle (float): radians
             theta (float): radians
+
         Returns:
             bool: True if in range, False otherwise
         """
@@ -1842,29 +1934,41 @@ class VirtualHelixGroup(CNObject):
 
     @staticmethod
     def radiusForAngle(angle, radius_in, bases_per_turn, base_width):
-        """ calculate the distance from the center axis of
+        """Calculate the distance from the center axis of
         a virtual helix with radius_in radius to a bounds of
         an arc on tangent virtual helix with the same radius
         the arc center is on the line connecting the two
         virtual helices.  Using trig identities and Pythagorean theorem
         additionally we need to account the axial distance between bases
         (the BASE_WIDTH)
+
+        Args:
+            angle (float):
+            radius_in (float):
+            bases_per_turn (float):
+            base_width (float):
+
+        Returns:
+            :obj:`tuple` of :obj:`float`: angle and radius
         """
         theta = math.radians(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
         x = base_width*(angle/2/360*bases_per_turn)
         x = 0
         return theta, math.sqrt(R*R + x*x)
-        # return theta, 1.125
     # end def
 
     def projectionPointOnPlane(self, id_num, point):
-        """ VirtualHelices are straight for now so only one direction for the axis
+        """VirtualHelices are straight for now so only one direction for the axis
         assume directions are alway normalized, so no need to divide by the
         magnitude of the direction vector squared
 
         Args:
             id_num (int): virtual helix ID number
+            point (sequence): length 3
+
+        Returns:
+            sequence: length 3
         """
         direction = self.directions[id_num]
         return point - np.dot(point, direction)*direction
@@ -1872,8 +1976,15 @@ class VirtualHelixGroup(CNObject):
 # end class
 
 def distanceToPoint(origin, direction, point):
-    """
+    """ See:
     http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+
+    Args:
+        direction (sequence):
+        point (sequence):
+
+    Returns:
+        float: R squared distance
     """
     direction_distance = np.dot(point - origin,  direction)
     # point behind the ray
@@ -1887,8 +1998,16 @@ def distanceToPoint(origin, direction, point):
 # end def
 
 def remapSlice(start, stop, length):
-    """ remap a slice to positive indices for a given
+    """Remap a slice to positive indices for a given
     length
+
+    Args:
+        start (int):
+        stop (int):
+        length (int):
+
+    Returns
+        :obj:`tuple` of :obj:`int`: positive start and stop index
     """
     new_start = length - start if start < 0 else start
     new_stop = length - stop if stop < 0 else stop

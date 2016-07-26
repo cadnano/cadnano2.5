@@ -12,22 +12,10 @@ Subpackages
 Submodules
 ----------
 
-cadnano.data.dnasequences module
---------------------------------
+.. toctree::
 
-.. automodule:: cadnano.data.dnasequences
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-cadnano.data.sequencemods module
---------------------------------
-
-.. automodule:: cadnano.data.sequencemods
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+   cadnano.data.dnasequences
+   cadnano.data.sequencemods
 
 Module contents
 ---------------

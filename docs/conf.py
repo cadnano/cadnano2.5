@@ -27,7 +27,7 @@ sys.path.insert(0, LOCAL_PATH)
 sys.path.insert(0, CADNANO_PATH)
 
 """ Run in docs folder
-sphinx-apidoc -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
+sphinx-apidoc -e -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
 """
 
 # -- General configuration ------------------------------------------------
