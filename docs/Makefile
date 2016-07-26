@@ -47,6 +47,7 @@ help:
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -rf api
 
 .PHONY: html
 html:
@@ -223,3 +224,8 @@ dummy:
 	$(SPHINXBUILD) -b dummy $(ALLSPHINXOPTS) $(BUILDDIR)/dummy
 	@echo
 	@echo "Build finished. Dummy builder generates no files."
+
+buildapi:
+	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
+	@echo "Auto-generation of API documentation finished. " \
+	      "The generated files are in 'api/'"

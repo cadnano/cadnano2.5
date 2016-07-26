@@ -27,7 +27,7 @@ sys.path.insert(0, LOCAL_PATH)
 sys.path.insert(0, CADNANO_PATH)
 
 """ Run in docs folder
-sphinx-apidoc -e -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
+sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
 """
 
 # -- General configuration ------------------------------------------------
@@ -100,7 +100,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']#, 'api/cadnano.rst']
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #
