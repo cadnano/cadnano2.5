@@ -6,18 +6,15 @@ Subpackages
 
 .. toctree::
 
-    cadnano.bin
     cadnano.data
     cadnano.decorators
     cadnano.fileio
     cadnano.gui
-    cadnano.install_exe
     cadnano.math
     cadnano.oligo
     cadnano.part
     cadnano.strand
     cadnano.strandset
-    cadnano.tests
 
 Submodules
 ----------

@@ -26,6 +26,10 @@ CADNANO_PATH = dirname(LOCAL_PATH)
 sys.path.insert(0, LOCAL_PATH)
 sys.path.insert(0, CADNANO_PATH)
 
+""" Run in docs folder
+sphinx-apidoc -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
+"""
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -97,7 +101,6 @@ language = None
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #
