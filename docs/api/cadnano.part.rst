@@ -60,6 +60,14 @@ cadnano.part.removepartcmd module
     :undoc-members:
     :show-inheritance:
 
+cadnano.part.removevhelixcmd module
+-----------------------------------
+
+.. automodule:: cadnano.part.removevhelixcmd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 cadnano.part.renumbercmd module
 -------------------------------
 
@@ -80,6 +88,14 @@ cadnano.part.translatevhelixcmd module
 --------------------------------------
 
 .. automodule:: cadnano.part.translatevhelixcmd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+cadnano.part.virtualhelixgroup module
+-------------------------------------
+
+.. automodule:: cadnano.part.virtualhelixgroup
     :members:
     :undoc-members:
     :show-inheritance:

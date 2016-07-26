@@ -18,8 +18,13 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+abspath = os.path.abspath
+dirname = os.path.dirname
 import sys
-sys.path.insert(0, os.path.abspath('.'))
+LOCAL_PATH = dirname(abspath(__file__))
+CADNANO_PATH = dirname(LOCAL_PATH)
+sys.path.insert(0, LOCAL_PATH)
+sys.path.insert(0, CADNANO_PATH)
 
 # -- General configuration ------------------------------------------------
 
@@ -34,6 +39,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
     'sphinx.ext.todo',
 ]
 

@@ -18,7 +18,6 @@ Subpackages
     cadnano.strand
     cadnano.strandset
     cadnano.tests
-    cadnano.virtualhelix
 
 Submodules
 ----------
