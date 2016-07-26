@@ -6,6 +6,9 @@ from cadnano.part import Part
 class RemoveInstanceCommand(UndoCommand):
     """
     Undo ready command for adding an instance.
+
+    Args:
+        obj_instance (ObjectInstance): Object instance remove
     """
     def __init__(self, obj_instance):
         super(RemoveInstanceCommand, self).__init__("add instance")
@@ -13,6 +16,10 @@ class RemoveInstanceCommand(UndoCommand):
     # end def
 
     def instance(self):
+        """
+        Returns:
+            ObjectInstance: the object instance attribute of the Command
+        """
         return self._items[0]
     # end def
 

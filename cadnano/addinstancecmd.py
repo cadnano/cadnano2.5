@@ -4,8 +4,11 @@ from cadnano.part import Part
 
 ### COMMANDS ###
 class AddInstanceCommand(UndoCommand):
-    """
-    Undo ready command for adding an instance.
+    """Undo ready command for adding an instance.
+
+    Args:
+        document (Document): m
+        obj_instance (ObjectInstance): Object instance to add to Document
     """
     def __init__(self, document, obj_instance):
         super(AddInstanceCommand, self).__init__("add instance")
@@ -14,6 +17,10 @@ class AddInstanceCommand(UndoCommand):
     # end def
 
     def instance(self):
+        """
+        Returns:
+            ObjectInstance: the object instance attribute of the Command
+        """
         return self._obj_instance
     # end def
 

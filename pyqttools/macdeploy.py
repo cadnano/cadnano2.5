@@ -70,8 +70,8 @@ def installRename(file_list, in_path, out_path="", old_rpath=""):
 
     Args:
         in_path (str): location of PyQt5 build
-        out_path (Optional[str]): location to copy renamed fixed module to
-        old_rpath (Optional[str]): rpath to remove
+        out_path (:obj:`str`, optional): location to copy renamed fixed module to
+        old_rpath (:obj:`str`, optional): rpath to remove
     """
     if out_path:
         if os.path.exists(out_path):

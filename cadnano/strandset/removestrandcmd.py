@@ -7,15 +7,14 @@ class RemoveStrandCommand(UndoCommand):
     """
     RemoveStrandCommand deletes a strand. It should only be called on
     strands with no connections to other strands.
+
+    Args:
+        strandset (StrandSet):
+        strand (Strand):
+        solo (:obj:`bool`, optional): set to True if only one strand is being
+            removed to minimize signaling
     """
     def __init__(self, strandset, strand, solo=True):
-        """
-        Args:
-            strandset (StrandSet):
-            strand (Strand):
-            solo (Optional[bool]): set to True if only one strand is being
-                removed to minimize signaling
-        """
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
         self._strand = strand

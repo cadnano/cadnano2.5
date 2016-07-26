@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 class Box(object):
+    """Cube box object
+
+    For doing an oct tree type thing
+
+    Args:
+        min_point (Tuple): length 3 lower left corner
+        max_point (Tuple): length 3 diagonal opposite top corner
+    """
+
     def __init__(self, min_point, max_point):
-        """Cube box object
-
-        For doing an oct tree type thing
-
-        Args:
-            min_point (Tuple): length 3 lower left corner
-            max_point (Tuple): length 3 diagonal opposite top corner
-        """
         self.min_pt = min_point
         self.max_pt = max_point
     # end def

@@ -2,7 +2,6 @@
 # encoding: utf-8
 
 
-from exceptions import NotImplementedError
 from cadnano import util
 from .abstractdecoratoritem import AbstractDecoratorItem
 

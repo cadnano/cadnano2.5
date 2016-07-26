@@ -32,12 +32,12 @@ def makeRotationZ(theta):
     Returns:
         Matrix4: rotation matrix about the Z axis
     """
-        c = math.cos(theta)
-        s = math.sin(theta)
-        return Matrix4(
-            c, - s, 0, 0,
-            s,  c, 0, 0,
-            0,  0, 1, 0,
-            0,  0, 0, 1
-        )
+    c = math.cos(theta)
+    s = math.sin(theta)
+    return Matrix4(
+        c, - s, 0, 0,
+        s,  c, 0, 0,
+        0,  0, 1, 0,
+        0,  0, 0, 1
+    )
 # end def

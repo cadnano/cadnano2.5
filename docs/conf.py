@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# cadnano documentation build configuration file, created by
-# sphinx-quickstart on Sat Jul 16 12:34:36 2016.
+# cadnano documentation build configuration file, originally created by
+# sphinx-quickstart on Sat Jul 16 12:34:36 2016. Modified by NC
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.

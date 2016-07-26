@@ -26,11 +26,14 @@ class Document(CNObject):
     The Document class is the root of the model. It has two main purposes:
     1. Serve as the parent all Part objects within the model.
     2. Track all sub-model actions on its undoStack.
+
+    Args:
+        parent (:obj:`CNObject`, optional): defaults to None
+
+    Attributes:
+        view_names (list):
+        filter_set (set):
     """
-    __slots__ = ('_undostack', '_children',
-                '_instances', '_controller', '_selected_instance'
-                '_selection_dict', '_strand_selected_changed_dict',
-                'view_names', 'filter_set')
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 
@@ -95,16 +98,34 @@ class Document(CNObject):
         return self._undostack
 
     def children(self):
-        """Returns a list of parts associated with the document."""
+        """Returns a list of parts associated with the document.
+
+        Returns:
+            list: list of all child objects
+        """
         return self._children
 
     def addChild(self, child):
+        """
+        Args:
+            child (object):
+        """
         self._children.append(child)
 
     def addInstance(self, instance):
+        """ Add an object instance to the list of instances
+
+        Args:
+            instance (ObjectInstance):
+        """
         self._instances.append(instance)
 
     def removeInstance(self, instance):
+        """ Remove an object instance from the list of instances
+
+        Args:
+            instance (ObjectInstance):
+        """
         self._instances.remove(instance)
         self.documentClearSelectionsSignal.emit(self)
 
@@ -116,6 +137,13 @@ class Document(CNObject):
     # end def
 
     def setFilterSet(self, filter_list):
+        """ Set the Document filter list.
+
+        Emits `documentSelectionFilterChangedSignal`
+
+        Args:
+            filter_list (list): list of filter key names
+        """
         vhkey = 'virtual_helix'
         fs = self.filter_set
         if vhkey in filter_list and vhkey not in fs:
@@ -129,6 +157,11 @@ class Document(CNObject):
     # end def
 
     def removeChild(self, child):
+        """ Remove child
+
+        Args:
+            child (object):
+        """
         self._children.remove(child)
     # end def
 
@@ -141,6 +174,15 @@ class Document(CNObject):
     #     return self._selected_instance
 
     def addStrandToSelection(self, strand, value):
+        """ Add `Strand` object to Document selection
+
+        Args:
+            strand (Strand):
+            value (:obj:`tuple` of :obj:`bool`, :obj:`bool`):
+                            (is low index selected, is high index selected)
+        Returns:
+            bool: True if successful, False otherwise
+        """
         ss = strand.strandSet()
         if ss in self._selection_dict:
             self._selection_dict[ss][strand] = value
@@ -150,6 +192,14 @@ class Document(CNObject):
     # end def
 
     def removeStrandFromSelection(self, strand):
+        """Remove `Strand` object from Document selection
+
+        Args:
+            strand (Strand):
+
+        Returns:
+            bool: True if successful, False otherwise
+        """
         ss = strand.strandSet()
         if ss in self._selection_dict:
             temp = self._selection_dict[ss]
@@ -169,6 +219,9 @@ class Document(CNObject):
         """ If the Part isn't in the _selection_dict its not
         going to be in the changed_dict either, so go ahead and add
 
+        Args:
+            part (Part):
+            id_nums (:obj:`sequence`)
         """
         # print("Document add vh", id_nums)
         selection_dict = self._selection_dict
@@ -187,6 +240,13 @@ class Document(CNObject):
     # end def
 
     def removeVirtualHelicesFromSelection(self, part, id_nums):
+        """ Remove virtual helices by sequence of their respective id numbers
+        from the `part`'s selection
+
+        Args:
+            part (Part):
+            id_nums (sequence)
+        """
         # print("remove called", id(part), id_nums,  self._selection_dict.get(part))
         selection_dict = self._selection_dict
         if part in selection_dict:
@@ -203,13 +263,19 @@ class Document(CNObject):
     # end def
 
     def selectionDict(self):
+        """
+        Returns:
+            dict
+        """
         return self._selection_dict
     # end def
 
     def selectedOligos(self):
-        """
-        as long as one endpoint of a strand is in the selection, then the oligo
+        """As long as one endpoint of a strand is in the selection, then the oligo
         is considered selected
+
+        Returns:
+            :obj:`set` or None
         """
         s_dict = self._selection_dict
         selected_oligos = set()
@@ -222,6 +288,9 @@ class Document(CNObject):
     #end def
 
     def clearAllSelected(self):
+        """ Clear all selections
+        emits documentClearSelectionsSignal
+        """
         # print("clearAllSelected")
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
@@ -241,6 +310,15 @@ class Document(CNObject):
     # end def
 
     def isVirtualHelixSelected(self, part, id_num):
+        """ For a given part
+
+        Args:
+            part (Part): part in question
+            id_num (int): ID number of a virtual helix
+
+        Returns:
+            bool: True if id_num is selected else False
+        """
         if part in self._selection_dict:
             return id_num in self._selection_dict[part]
         else:
@@ -248,11 +326,24 @@ class Document(CNObject):
     # end def
 
     def isOligoSelected(self, oligo):
+        """ Determine if given `Oligo` is selected
+
+        Args:
+            oligo (Oligo)
+
+        Returns:
+            bool: True if `oligo` is selected otherwise False
+        """
         strand5p = oligo.strand5p()
         return self.isModelStrandSelected(strand5p)
     # end def
 
     def selectOligo(self, oligo):
+        """Select given `Oligo`
+
+        Args:
+            oligo (Oligo):
+        """
         strand5p = oligo.strand5p()
         both_ends = (True, True)
         for strand in strand5p.generator3pStrand():
@@ -261,6 +352,11 @@ class Document(CNObject):
     # end def
 
     def deselectOligo(self, oligo):
+        """Deselect given `Oligo`
+
+        Args:
+            oligo (Oligo):
+        """
         strand5p = oligo.strand5p()
         for strand in strand5p.generator3pStrand():
             self.removeStrandFromSelection(strand)
@@ -268,21 +364,34 @@ class Document(CNObject):
     # end def
 
     def getSelectedValue(self, obj):
-        """
-        obj is an objects to look up
+        """`obj` is an objects to look up
         it is prevetted to be in the dictionary
+
+        Args:
+            obj (object):
         """
         return self._selection_dict[obj]
 
     def getSelectedStrandValue(self, strand):
-        """
-        strand is an objects to look up
+        """ strand is an objects to look up
         it is prevetted to be in the dictionary
+
+        Args:
+            strand (Strand):
         """
         return self._selection_dict[strand.strandSet()][strand]
     # end def
 
     def sortedSelectedStrands(self, strandset):
+        """ Get a list sorted from low to high index of `Strands` in a `StrandSet`
+        that are selected
+
+        Args:
+            strandset (StrandSet):
+
+        Returns:
+            :obj:`list` of :obj:`Strand`s
+        """
         out_list = [x for x in self._selection_dict[strandset].items()]
         getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))
         out_list.sort(key=getLowIdx)
@@ -290,6 +399,16 @@ class Document(CNObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
+        """ Determine the bounds of a `StrandSet` `strandset` among a
+        a list of selected strands in that same `strandset`
+
+        Args:
+            selected_strand_list (list):
+            strandset (StrandSet):
+
+        Returns:
+            :obj:`tuple` of :obj:`int`, :obj:`int`:
+        """
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
         ss_dict = self._selection_dict[strandset]
@@ -351,6 +470,11 @@ class Document(CNObject):
     # end def
 
     def getSelectionBounds(self):
+        """ Get the index bounds of a strand selection
+
+        Returns:
+            :obj:`tuple` of :obj:`int`, :obj:`int`:
+        """
         min_low_delta = -1
         min_high_delta = -1
         for strandset in self._selection_dict.keys():
@@ -417,37 +541,22 @@ class Document(CNObject):
                 strand.strandSet().removeStrand(strand)
         if use_undostack:
             self.undoStack().endMacro()
-
-    # def paintSelection(self, scafColor, stapColor, use_undostack=True):
-    #     """Delete xovers if present. Otherwise delete everything."""
-    #     scaf_oligos = {}
-    #     stap_oligos = {}
-    #     for strandset_dict in self._selection_dict.values():
-    #         for strand, value in strandset_dict.items():
-    #             if strand.isScaffold():
-    #                 scaf_oligos[strand.oligo()] = True
-    #             else:
-    #                 stap_oligos[strand.oligo()] = True
-
-    #     if use_undostack:
-    #         self.undoStack().beginMacro("Paint strands")
-    #     for olg in scaf_oligos.keys():
-    #         olg.applyColor(scafColor)
-    #     for olg in stap_oligos.keys():
-    #         olg.applyColor(stapColor)
-    #     if use_undostack:
-    #         self.undoStack().endMacro()
+    # end def
 
     def resizeSelection(self, delta, do_maximize=False, use_undostack=True):
-        """
-        Moves the selected idxs by delta by first iterating over all strands
+        """ Moves the selected idxs by delta by first iterating over all strands
         to calculate new idxs (method will return if snap-to behavior would
         create illegal state), then applying a resize command to each strand.
+
+        Args:
+            delta (float):
+            do_maximize (:obj:`bool`, optional)
+            use_undostack(:obj:`bool`, optional)
         """
         resize_list = []
         vh_set = set()
-        if do_maximize:
-            print("this could be maximized")
+        # if do_maximize:
+        #     print("this could be maximized")
         # calculate new idxs
         part = None
         for strandset_dict in self._selection_dict.values():
@@ -506,13 +615,10 @@ class Document(CNObject):
     # end def
 
     def updateStrandSelection(self):
-        """
-        do it this way in the future when we have
+        """ do it this way in the future when we have
         a better signaling architecture between views
-        """
-        # self.documentSelectedChangedSignal.emit(self._strand_selected_changed_dict)
-        """
         For now, individual objects need to emit signals
+
         """
         for obj, value in self._strand_selected_changed_dict.items():
             obj.strandSelectedChangedSignal.emit(obj, value)
@@ -521,8 +627,7 @@ class Document(CNObject):
     # end def
 
     def resetViews(self):
-        """
-        This is a fast way to clear selections and the views.
+        """ This is a fast way to clear selections and the views.
         We could manually deselect each item from the Dict, but we'll just
         let them be garbage collect
         the dictionary maintains what is selected
@@ -535,10 +640,14 @@ class Document(CNObject):
     # end def
 
     def setViewNames(self, view_name_list, do_clear=False):
-        """ tell the model what views the document should support
+        """ Tell the model what views the document should support
         Allows non-visible views to be used.
         Intended to be called at application launch only at
         present
+
+        Args:
+            view_name_list (list):
+            do_clear (:obj:`bool`, optional): clear the names or not? defaults to False
         """
         view_names = [] if do_clear else self.view_names
         for view_name in view_name_list:
@@ -547,17 +656,12 @@ class Document(CNObject):
         self.view_names = view_names
     # end def
 
-    # def newViewProperties(self):
-    #     """ get a dictionary prepopulated with a view dictionary
-    #     for use with view specific parameters
-    #     """
-    #     return {key:{} for key in self.view_names}
-    # # end def
-
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def addDnaPart(self, use_undostack=True):
-        """
-        Create and store a new DnaPart and instance, and return the instance.
+        """ Create and store a new DnaPart and instance, and return the instance.
+
+        Args:
+            use_undostack (:obj:`bool`, optional): defaults to True
         """
         dnapart = NucleicAcidPart(document=self)
         self._addPart(ObjectInstance(dnapart), use_undostack=use_undostack)
@@ -575,15 +679,22 @@ class Document(CNObject):
     # end def
 
     def getParts(self):
+        """ Get all child `Part`s in the document
+
+        Yields:
+            Part: the next Part in the the list of children
+        """
         for item in self._children:
             if isinstance(item, Part):
                 yield item
     # end def
 
     def getPartUUID(self, uuid):
-        """
+        """ Get the part given the uuid string
+
         Args:
             uuid (str):
+
         Returns:
             Part or None if no matching part is found
         """
@@ -610,7 +721,8 @@ class Document(CNObject):
 
     ### PRIVATE SUPPORT METHODS ###
     def _addPart(self, part_instance, use_undostack=True):
-        """Add part to the document via AddInstanceCommand."""
+        """Add part to the document via AddInstanceCommand.
+        """
         c = AddInstanceCommand(self, part_instance)
         util.execCommandList(
                         self, [c], desc="Add part", use_undostack=use_undostack)
@@ -618,6 +730,17 @@ class Document(CNObject):
     # end def
 
     def createMod(self, params, mid=None, use_undostack=True):
+        """ Create a modification
+
+        Args:
+            params (dict):
+            mid (:obj:`str`, optional): modification ID string
+            use_undostack (:obj:`bool`, optional): default is True
+
+        Returns:
+            :obj:`tuple` of :obj:`dict`, :obj:`str`:
+                dictionary of modification paramemters, modification ID string
+        """
         if mid is None:
             mid =  uuid4().hex
         elif mid in self._mods:
@@ -658,6 +781,13 @@ class Document(CNObject):
     # end def
 
     def modifyMod(self, params, mid, use_undostack=True):
+        """Modify an existing modification
+
+        Args:
+            params (dict):
+            mid (:obj:`str`, optional): modification ID string
+            use_undostack (:obj:`bool`, optional): default is True
+        """
         if mid in self._mods:
             cmds = []
             c = ModifyModCommand(self, params, mid)
@@ -666,7 +796,13 @@ class Document(CNObject):
                                                 use_undostack=use_undostack)
     # end def
 
-    def destroyMod(self, mid):
+    def destroyMod(self, mid, use_undostack=True):
+        """Destroy an existing modification
+
+        Args:
+            mid (:obj:`str`, optional): modification ID string
+            use_undostack (:obj:`bool`, optional): default is True
+        """
         if mid in self._mods:
             cmds = []
             c = RemoveModCommand(self, mid)
@@ -676,14 +812,40 @@ class Document(CNObject):
     # end def
 
     def getMod(self, mid):
+        """Get an existing modification
+
+        Args:
+            mid (:obj:`str`, optional): modification ID string
+
+        Returns:
+            dict or None
+        """
         return self._mods.get(mid)
     # end def
 
     def getModProperties(self, mid):
+        """Get an existing modification properties
+
+        Args:
+            mid (:obj:`str`, optional): modification ID string
+
+        Returns:
+            dict or None
+        """
         return self._mods.get(mid)['props']
     # end def
 
     def getModLocationsSet(self, mid, is_internal):
+        """Get an existing modifications locations in a Document
+        (Part, Virtual Helix ID, Strand)
+
+        Args:
+            mid (:obj:`str`, optional): modification ID string
+            is_internal (bool):
+
+        Returns:
+            dict or None
+        """
         if is_internal:
             return self._mods[mid]['int_locations']
         else:
@@ -691,19 +853,38 @@ class Document(CNObject):
     # end def
 
     def addModInstance(self, mid, is_internal, part, key):
+        """ Add an instance of a modification to the Document
+
+        Args:
+            mid (str): modification id string
+            is_internal (bool):
+            part (Part): associated Part
+            key (str): key of the modification at the part level
+        """
         location_set = self.getModLocationsSet(mid, is_internal)
-        doc_key = ''.join((part.uuid,',',key))
+        doc_key = ''.join((part.uuid, ',', key))
         location_set.add(key)
     # end def
 
     def removeModInstance(self, mid, is_internal, part, key):
+        """Remove an instance of a modification from the Document
+
+        Args:
+            mid (str): modification id string
+            is_internal (bool):
+            part (Part): associated Part
+            key (str): key of the modification at the part level
+        """
         location_set = self.getModLocationsSet(mid, is_internal)
-        doc_key = ''.join((part.uuid,',',key))
+        doc_key = ''.join((part.uuid, ',' ,key))
         location_set.remove(key)
     # end def
 
     def modifications(self):
-        """
+        """ Get a copy of the dictionary of the modifications in this Document
+
+        Returns:
+            dict:
         """
         mods = self._mods
         res = {}
@@ -717,9 +898,11 @@ class Document(CNObject):
     #end def
 
     def getModStrandIdx(self, key):
-        """
-         Convert a key of a mod instance relative to a part
+        """ Convert a key of a mod instance relative to a part
         to a part, a strand and an index
+
+        Args:
+            key (str): Mod key
         """
         keylist = key.split(',')
         part_uuid = keylist[0]
@@ -734,13 +917,15 @@ class Document(CNObject):
     # end def
 
     def getModSequence(self, mid, mod_type):
-        """
+        """Getter for the modification sequence give by the arguments
+
         Args:
-            mid: mod id or None
-            mod_type: [ModType.END_5PRIME, ModType.END_3PRIME]
+            mid (str or None): mod id or None
+            mod_type (int): [ModType.END_5PRIME, ModType.END_3PRIME]
+
         Returns:
-            Tuple: (sequence [str],
-                    name [str] )
+            :obj:`tuple` of :obj:`str`, :obj:`str` : (sequence [str],
+                                                        name [str] )
         """
         mod_dict = self._mods.get(mid)
         name = '' if mid is None else mod_dict['name']
