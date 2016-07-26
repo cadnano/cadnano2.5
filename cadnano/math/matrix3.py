@@ -7,6 +7,13 @@ Matrix3 = namedtuple('Matrix3', ['n11','n12', 'n13',
                                 'n31', 'n32', 'n33'])
 
 def getInverse(m4):
+    """
+    Args:
+        m4 (Matrix4):
+
+    Returns:
+        Matrix3:
+    """
     o0 =   m4[10] * m4[5] - m4[6] * m4[9]
     o1 = - m4[10] * m4[1] + m4[2] * m4[9]
     o2 =   m4[6 ] * m4[1] - m4[2] * m4[5]
@@ -27,10 +34,25 @@ def getInverse(m4):
 # end def
 
 def transpose(m):
+    """Compute the inverse of `m`
+
+    Args:
+        m (Matrix3):
+
+    Returns:
+        Matrix3: the inverse
+    """
     return Matrix3(m[0], m[3], m[6],
                     m[1], m[4], m[7],
                      m[2], m[5], m[8])
 # end def
 
 def getNormalMatrix(m):
+    """ Normalize the matrix `m`
+    Args:
+        m (Matrix3):
+
+    Returns:
+        Matrix3
+    """
     return transpose(getInverse( m ))

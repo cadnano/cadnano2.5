@@ -27,13 +27,14 @@ class Box(object):
     # end def
 
     def containsPoint(self, point):
-        """
+        """ Is the `point` within this Box?
+
         Args:
             point (Vector3): to check for inclusion.
 
         Returns:
-            bool:  true if the specified point lies within the boundaries
-                of this box.
+            bool:  True if the specified point lies within the boundaries
+                of this box False otherwise
         """
         if point.x < self.min_pt.x or point.x > self.max_pt.x or \
              point.y < self.min_pt.y or point.y > self.max_pt.y or \
@@ -76,7 +77,8 @@ class Box(object):
 
 
     def clone(self):
-        """ Clone this Box
+        """Clone this Box
+
         Returns:
             Box: a copy of this box.
         """
@@ -84,7 +86,8 @@ class Box(object):
     # end def
 
     def center(self):
-        """
+        """ Return the center of this Box
+
         Returns:
             Vector3: the center point of this box.
         """
@@ -92,7 +95,8 @@ class Box(object):
     # end def
 
     def size(self):
-        """
+        """Find the dimensions of the Box
+
         Returns:
             Tuple: the width, height, and depth of this box.
         """

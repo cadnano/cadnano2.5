@@ -14,11 +14,17 @@ class Solid(object):
     # end def
 
     def addFace(self, v1, v2, v3, normal=None):
-        """
-        List vertices using right hand rule so that unit
+        """ List vertices using right hand rule so that unit
         normal will point out of the surface
 
         vertices are given by index into vertices list
+
+        Args:
+            v1 (Vector3):
+            v2 (Vector3):
+            v3 (Vector3):
+            normal (Vector3): face normal
+
         """
         # for v in vertices:
         #     if v is not in self.vertices:
@@ -30,6 +36,10 @@ class Solid(object):
     # end def
 
     def addVertex(self, vertex):
+        """ Add a vertex to the Solid
+        Args:
+            vertex (Vector3):
+        """
         self.vertices.append(vertex)
     # end def
 
