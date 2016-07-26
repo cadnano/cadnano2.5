@@ -52,14 +52,18 @@ DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
 DEFAULT_RADIUS = 1.125
 
 class VirtualHelixGroup(CNObject):
+    """This is composed of a group of arrays
+    that
+    1. contain the coordinates of every virtual base stored
+        in their index order per id_num
+    2. contains the id_num per coordinate
+
+    Args:
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+    """
 
     def __init__(self, *args, **kwargs):
-        """ this is composed of a group of arrays
-        that
-        1. contain the coordinates of every virtual base stored
-            in their index order per id_num
-        2. contains the id_num per coordinate
-        """
         self._document = document = kwargs.get('document', None)
         super(VirtualHelixGroup, self).__init__(document)
         do_copy = kwargs.get('do_copy', False)
@@ -134,17 +138,32 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getSize(self):
+        """ Getter for the number of virtual helices in use
+
+        Returns:
+            int
+        """
         return len(self.reserved_ids)
     # end def
 
     def document(self):
+        """Document attribute getter
+
+        Returns:
+            Document
+        """
         return self._document
     # end def
 
     def copy(self, document, new_object=None):
-        """ copy all arrays and counters and create new StrandSets
+        """Copy all arrays and counters and create new StrandSets
 
         TODO: consider renaming this method
+
+        Args:
+            document (Document): Documenet object
+            new_object (:class:`VirtualHelixGroup`, optional): whether to copy into
+            an allocated :class:`VirtualHelixGroup`
         """
         new_vhg = new_object
         if new_vhg is None:
@@ -178,20 +197,28 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getOffsetAndSize(self, id_num):
-        """
+        """Get the index offset of this ID into the point buffers
+
         Args:
             id_num (int): virtual helix ID number
 
         Returns:
-            tuple[int, int] or None: offset, size into the coordinate arrays
-                for a given id_num
+            :obj:`tuple` of :obj:`int` or :obj:`None`: of the form::
+
+                (offset, size)
+
+            into the coordinate arrays for a given id_num
         """
         offset_and_size = self.offset_and_size
         return offset_and_size[id_num] if id_num < len(offset_and_size) else None
     # end def
 
     def getNewIdNum(self):
-        """  Query the lowest available id_num
+        """Query the lowest available id_num. Internally id numbers are
+        recycled when virtual helices are deleted
+
+        Returns:
+            int: ID number
         """
         if len(self.recycle_bin):
             return nsmallest(1, self.recycle_bin)[0]
@@ -205,12 +232,19 @@ class VirtualHelixGroup(CNObject):
         return self._highest_id_num_used
 
     def getVirtualHelixName(self, id_num):
+        """getter for the name of a virtual helix
+
+        Args:
+            id_num (int):
+
+        Returns:
+            str
+        """
         return self.getVirtualHelixProperties(id_num, 'name')
     # end def
 
     def reserveIdNum(self, requested_id_num):
-        """
-        Reserves and returns a unique numerical id_num appropriate for a
+        """Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
 
@@ -230,10 +264,9 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def recycleIdNum(self, id_num):
-        """
-        The caller's contract is to ensure that id_num is not used in *any* helix
-        at the time of the calling of this function (or afterwards, unless
-        reserveIdNumForHelix returns the id_num again).
+        """The caller's contract is to ensure that id_num is not used in *any*
+        helix at the time of the calling of this function (or afterwards, unless
+        `reserveIdNumForHelix` returns the id_num again).
 
         Args:
             id_num (int): virtual helix ID number
@@ -243,7 +276,8 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def isIdNumUsed(self, id_num):
-        """
+        """Test if an `id_num` is used by :class:Part
+
         Args:
             id_num (int): virtual helix ID number
 
@@ -254,15 +288,15 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getCoordinates(self, id_num):
-        """ return a view onto the numpy array for a given id_num
+        """Return a view onto the numpy array for a given id_num
 
         Args:
             id_num (int): virtual helix ID number
 
         Returns:
-            :obj:`tuple` of :obj:'ndarray': of form::
+            :obj:`tuple` of :obj:'ndarray': of the form::
 
-                axis_pts, fwd_pts, rev_pts
+                (axis_pts, fwd_pts, rev_pts)
 
             for a given virtual helix ID number
         """
@@ -302,7 +336,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def isAGreaterThanB_Z(self, id_numA, idxA, id_numB, idxB):
-        """ Compare z values at each IDX
+        """Compare z values at each IDX
 
         Args:
             id_numA (int):
@@ -325,7 +359,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Returns:
-            tuple
+            ndarray: (1, 3) origin of the Virtual Helix (0 index)
 
         Raises:
             KeyError
@@ -362,10 +396,12 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getVirtualHelixOriginLimits(self):
-        """
-        given a id_num get the coordinate at a given index
+        """Given a id_num get the coordinate at a given index
+
         Returns:
-            tuple: (xLL, yLL, xUR, yUR)
+            :obj:`tuple` of :obj:`int`: of the form::
+
+                (xLL, yLL, xUR, yUR)
         """
         return self.origin_limits
     # end def
@@ -377,7 +413,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Returns:
-            :obj:`tuple` of :obj:`StrandSet`
+            :obj:`tuple`: (forward :class:`StrandSet`, reverse :class:`StrandSet`)
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -391,7 +427,7 @@ class VirtualHelixGroup(CNObject):
 
         Returns:
             Tuple(List(List(Tuple))):  segments for the forward and reverse
-                strand
+            strand
 
                 `( [ [(start, end),...], ...], [ [(start, end),...], ...])`
         """

@@ -13,6 +13,7 @@ API
    api/cadnano.cnproxy.rst
    api/cadnano.decorators.rst
    api/cadnano.document.rst
+   api/cadnano.docsmodscmd.rst
    api/cadnano.enum.rst
    api/cadnano.fileio.rst
    api/cadnano.math.rst
