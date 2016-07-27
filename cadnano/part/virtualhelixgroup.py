@@ -1775,6 +1775,8 @@ class VirtualHelixGroup(CNObject):
 
                 [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
 
+        Raises:
+            ValueError
         """
         offset_and_size = self.getOffsetAndSize(id_num)
         if offset_and_size is None:
