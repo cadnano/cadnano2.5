@@ -53,10 +53,10 @@ DEFAULT_RADIUS = 1.125
 
 class VirtualHelixGroup(CNObject):
     """This is composed of a group of arrays
-    that
+    that:
 
-    1. contain the coordinates of every virtual base stored
-        in their index order per id_num
+    1. contain the coordinates of every virtual base stored in their index
+       order per id_num
     2. contains the id_num per coordinate
 
     Uses args and kwargs to make subclassing easier

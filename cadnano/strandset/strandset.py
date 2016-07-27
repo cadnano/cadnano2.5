@@ -1,8 +1,8 @@
+# -*- coding: utf-8 -*-
 import array
 from bisect import bisect_left, insort_left
 from itertools import repeat
 from operator import itemgetter
-izip = zip
 
 import cadnano.util as util
 
@@ -20,13 +20,25 @@ from .splitcmd import SplitCommand
 from .mergecmd import MergeCommand
 
 class StrandSet(CNObject):
-    """StrandSet is a container class for Strands, and provides the several
-    publicly accessible methods for editing strands, including operations
+    """:class:`StrandSet` is a container class for :class:`Strands`, and provides
+    the several publicly accessible methods for editing strands, including operations
     for creation, destruction, resizing, splitting, and merging strands.
 
-    Views may also query StrandSet for information that is useful in
+    Views may also query :class:`StrandSet` for information that is useful in
     determining if edits can be made, such as the bounds of empty space in
     which a strand can be created or resized.
+
+    Internally :class:`StrandSet` uses redundant heap and a list data structures
+    to track :class:`Strands` objects, with the list of length of a virtual
+    helix looking like::
+
+        strand_array = [strandA, strandA, strandA, ..., None, strandB, strandB, ...]
+
+    Where every index strandA spans has a reference to strandA and strand_heap::
+
+        strand_heap = [strandA, strandB, strandC, ...]
+
+    is merely a sorted list from low index to high index of strand objects
 
     Args:
         is_fwd (bool):  is this a forward or reverse StrandSet?
@@ -141,10 +153,20 @@ class StrandSet(CNObject):
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def isForward(self):
+        """Is the set 5' to 3' (forward) or is it 3' to 5' (reverse)
+
+        Returns:
+            bool: True if is forward, False otherwise
+        """
         return self._is_fwd
     # end def
 
     def strandType(self):
+        """Store the enum of strand type
+
+        Returns:
+            int: :class:`StrandType.FWD` if is forward, otherwise :class:`StrandType.REV`
+        """
         return self._strand_type
 
     def isReverse(self):
@@ -152,9 +174,20 @@ class StrandSet(CNObject):
     # end def
 
     def length(self):
+        """ length of the :class:`StrandSet` and therefore also the associated
+        virtual helix in bases
+
+        Returns:
+            int: length of the set
+        """
         return len(self.strand_array)
 
     def idNum(self):
+        """Get the associated virtual helix ID number
+
+        Returns:
+            int: virtual helix ID number
+        """
         return self._id_num
     # end def
 
@@ -241,16 +274,23 @@ class StrandSet(CNObject):
     # end def
 
     def partMaxBaseIdx(self):
-        """Return the bounds of the StrandSet as defined in the part."""
-        return self.length() - 1    # end def
+        """Return the bounds of the :class:`StrandSet` as defined in the
+        :class:`Part`.
+
+        Returns:
+            int: highest index in set
+        """
+        return self.length() - 1
+    # end def
 
     def strandCount(self):
-        return len(self.strands())
+        """Getter for the number of :class:`Strands` in the set
 
-
-    def strandType(self):
-        return self._is_fwd
-
+        Returns:
+            int: the number of :class:`Strands` in the set
+        """
+        return len(self.strand_heap)
+    # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def createStrand(self, base_idx_low, base_idx_high,
@@ -382,14 +422,14 @@ class StrandSet(CNObject):
         should be handled by addStrand
 
         Returns:
-            :obj:`None` or :obj:`tuple`: None if the strands can't be merged
-            if the strands can be merged it returns the strand with the lower
-            index in the form::
+            tuple: empty :obj:`tuple` if the strands can't be
+            merged if the strands can be merged it returns the strand with the
+            lower index in the form::
 
                 (strand_low, strand_high)
         """
         if strandA.strandSet() != strandB.strandSet():
-            return None
+            return ()
         if abs(strandA.lowIdx() - strandB.highIdx()) == 1 or \
             abs(strandB.lowIdx() - strandA.highIdx()) == 1:
             if strandA.lowIdx() < strandB.lowIdx():
