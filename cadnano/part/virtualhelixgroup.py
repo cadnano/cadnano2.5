@@ -67,6 +67,8 @@ class VirtualHelixGroup(CNObject):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        """
         self._document = document = kwargs.get('document', None)
         super(VirtualHelixGroup, self).__init__(document)
         do_copy = kwargs.get('do_copy', False)
@@ -86,20 +88,24 @@ class VirtualHelixGroup(CNObject):
 
         # 2. per virtual helix allocations
         self.total_id_nums = 0 # should be equal to len(self.reserved_ids)
-        """
-        for doing 2D X,Y manipulation for now.  keep track of
-        XY position of virtual helices
-        """
+
         self.origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
+        """DOCIGNORE
+        For doing 2D X,Y manipulation for now.  keep track of
+        XY position of virtual helices
+        DOCIGNORE
+        """
         self.origin_limits = (0., 0., 0., 0.)
 
         self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float)
-        """
+
+        self.offset_and_size = [None]*DEFAULT_SIZE
+        '''DOCIGNORE
         book keeping for fast lookup of indices for insertions and deletions
         and coordinate points
         the length of this is the max id_num used
-        """
-        self.offset_and_size = [None]*DEFAULT_SIZE
+        DOCIGNORE
+        '''
         self.reserved_ids = set()
 
         self.vh_properties = _defaultDataFrame(DEFAULT_SIZE)

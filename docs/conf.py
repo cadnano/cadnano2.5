@@ -355,3 +355,23 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+def skipOffsetandsize(app, what, name, obj, skip, options):
+    """skip certain variable names
+    """
+    skip_offset_and_size = name == 'offset_and_size'
+    # print(name, type(name), skip_offsetandsize)
+    if skip_offset_and_size:
+        print("Skipping", name, skip_offset_and_size, skip)
+    return skip or skip_offset_and_size
+
+from sphinx.ext.autodoc import between
+def setup(app):
+    """Register a sphinx.ext.autodoc.between listener to ignore everything
+    between lines that contain the word DOCIGNORE
+
+    Consider switching to using the skip-member method
+    """
+    app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
+    # app.connect('autodoc-skip-member', skipOffsetandsize)
+    return app
