@@ -19,14 +19,17 @@ PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
 
 class Oligo(CNObject):
-    """
-    Oligo is a group of Strands that are connected via 5' and/or 3'
+    """Oligo is a group of Strands that are connected via 5' and/or 3'
     connections. It corresponds to the physical DNA strand, and is thus
     used tracking and storing properties that are common to a single strand,
     such as its color.
 
     Commands that affect Strands (e.g. create, remove, merge, split) are also
     responsible for updating the affected Oligos.
+
+    Args:
+        part (Part): the model :class:`Part`
+        color (:obj:`str`, optional): color property of the :class:`Oligo`
     """
     editable_properties = ['name', 'color']
 
@@ -59,9 +62,6 @@ class Oligo(CNObject):
         olg._strand5p = self._strand5p
         olg._is_loop = self._is_loop
         olg._props = self._props.copy()
-        # print(">>>>checking color")
-        # self.getColor()
-        # olg.getColor()
         return olg
     # end def
 
@@ -71,9 +71,6 @@ class Oligo(CNObject):
         if mutating
         """
         s5p = self._strand5p
-        # key = [s5p.idNum(), s5p.idx5Prime(), self._is_loop]
-        # props = self._props
-        # return key + [props[k] for k in PROPERTY_KEYS]
         key = { 'id_num': s5p.idNum(),
                 'idx5p':s5p.idx5Prime(),
                 'is_5p_fwd': s5p.isForward(),
@@ -82,21 +79,6 @@ class Oligo(CNObject):
         key.update(self._props)
         return key
     # end def
-
-    # def copyProperties(self):
-    #     return self._props()
-    # # end
-
-    # def deepCopy(self, part):
-    #     """ not sure this actually gets called anywhere
-    #     """
-    #     olg = Oligo(part)
-    #     olg._strand5p = None
-    #     olg._is_loop = self._is_loop
-    #     # do we copy length?
-    #     olg._props = self._props.copy()
-    #     return olg
-    # # end def
 
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(CNObject,
@@ -160,9 +142,7 @@ class Oligo(CNObject):
 
     def setLength(self, length):
         before = self.shouldHighlight()
-        # self._length = length
         key = 'length'
-        # self.setProperty(key, length)
         self._props[key] = length
         if before != self.shouldHighlight():
             self.oligoSequenceClearedSignal.emit(self)
@@ -205,15 +185,7 @@ class Oligo(CNObject):
         return self._is_loop
     # end def
 
-    # def isStaple(self):
-    #     if self._strand5p is not None:
-    #         return self._strand5p.isStaple()
-    #     else:
-    #         return False
-    # # end def
-
     def length(self):
-        # return self._length
         return self._props['length']
     # end def
 
@@ -364,8 +336,7 @@ class Oligo(CNObject):
     # end def
 
     def removeFromPart(self):
-        """
-        This method merely disconnects the object from the model.
+        """This method merely disconnects the object from the model.
         It still lives on in the undoStack until clobbered
 
         Note: don't set self._part = None because we need to continue passing
@@ -376,8 +347,7 @@ class Oligo(CNObject):
     # end def
 
     def strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):
-        """
-        This method sets the isLoop status of the oligo and the oligo's
+        """This method sets the isLoop status of the oligo and the oligo's
         5' strand.
         """
         # check loop status
@@ -403,16 +373,14 @@ class Oligo(CNObject):
     # end def
 
     def strandResized(self, delta):
-        """
-        Called by a strand after resize. Delta is used to update the length,
+        """Called by a strand after resize. Delta is used to update the length,
         which may case an appearance change.
         """
         pass
     # end def
 
     def strandSplitUpdate(self, new_strand5p, new_strand3p, oligo3p, old_merged_strand):
-        """
-        If the oligo is a loop, splitting the strand does nothing. If the
+        """If the oligo is a loop, splitting the strand does nothing. If the
         oligo isn't a loop, a new oligo must be created and assigned to the
         new_strand and everything connected to it downstream.
         """

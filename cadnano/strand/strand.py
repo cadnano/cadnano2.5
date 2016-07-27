@@ -27,8 +27,7 @@ from .resizecmd import ResizeCommand
 
 
 class Strand(CNObject):
-    """
-    A Strand is a continuous stretch of bases that are all in the same
+    """A Strand is a continuous stretch of bases that are all in the same
     StrandSet (recall: a VirtualHelix is made up of two StrandSets).
 
     Every Strand has two endpoints. The naming convention for keeping track
@@ -44,6 +43,12 @@ class Strand(CNObject):
     respectively. Since Strands can point 5'-to-3' in either the low-to-high
     or high-to-low directions, connection accessor methods (connectionLow and
     connectionHigh) are bound during the init for convenience.
+
+    Args:
+        strandset (StrandSet):
+        base_idx_low (int): low index
+        base_idx_high (int): high index
+        oligo (:class:`Oligo`, optional): default=None
     """
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
@@ -99,9 +104,8 @@ class Strand(CNObject):
         return self._base_idx_low < other._base_idx_low
 
     def generator5pStrand(self):
-        """
-        Iterate from self to the final _strand5p is None
-        3prime to 5prime
+        """Iterate from self to the final _strand5p is None
+        3' to 5'
         Includes originalCount to check for circular linked list
         """
         node0 = node = self
@@ -210,8 +214,7 @@ class Strand(CNObject):
         return self._strandset.isForward()
 
     def setSequence(self, sequence_string):
-        """
-        Applies sequence string from 5' to 3'
+        """Applies sequence string from 5' to 3'
         return the tuple (used, unused) portion of the sequence_string
         """
         if sequence_string is None:
@@ -267,8 +270,7 @@ class Strand(CNObject):
     # end def
 
     def setComplementSequence(self, sequence_string, strand):
-        """
-        This version takes anothers strand and only sets the indices that
+        """This version takes anothers strand and only sets the indices that
         align with the given complimentary strand
 
         return the used portion of the sequence_string
@@ -341,8 +343,7 @@ class Strand(CNObject):
     # end def
 
     def applyAbstractSequence(self):
-        """
-        Assigns virtual index from 5' to 3' on strand and it's complement
+        """Assigns virtual index from 5' to 3' on strand and it's complement
         location.
         """
         abstract_seq = []
@@ -414,8 +415,7 @@ class Strand(CNObject):
     # def
 
     def getSequenceList(self):
-        """
-        return the list of sequences strings comprising the sequence and the
+        """return the list of sequences strings comprising the sequence and the
         inserts as a tuple with the index of the insertion
         [(idx, (strandItemString, insertionItemString), ...]
 
@@ -482,15 +482,16 @@ class Strand(CNObject):
         return False
 
     def getResizeBounds(self, idx):
-        """
-        Determines (inclusive) low and high drag boundaries resizing
+        """Determines (inclusive) low and high drag boundaries resizing
         from an endpoint located at idx.
 
-        When resizing from _base_idx_low:
+        When resizing from _base_idx_low::
+
             low bound is determined by checking for lower neighbor strands.
             high bound is the index of this strand's high cap, minus 1.
 
-        When resizing from _base_idx_high:
+        When resizing from _base_idx_high::
+
             low bound is the index of this strand's low cap, plus 1.
             high bound is determined by checking for higher neighbor strands.
 
@@ -515,8 +516,7 @@ class Strand(CNObject):
     # end def
 
     def hasXoverAt(self, idx):
-        """
-        An xover is necessarily at an enpoint of a strand
+        """An xover is necessarily at an enpoint of a strand
         """
         if idx == self.highIdx():
             return True if self.connectionHigh() is not None else False
@@ -527,8 +527,7 @@ class Strand(CNObject):
     # end def
 
     def canInstallXoverAt(self, idx, from_strand, from_idx):
-        """
-        Assumes idx is:
+        """Assumes idx is:
         self.lowIdx() <= idx <= self.highIdx()
         """
 
@@ -579,8 +578,7 @@ class Strand(CNObject):
     #end def
 
     def insertionLengthBetweenIdxs(self, idxL, idxH):
-        """
-        includes the length of insertions in addition to the bases
+        """includes the length of insertions in addition to the bases
         """
         tL = 0
         insertions = self.insertionsOnStrand(idxL, idxH)
@@ -590,8 +588,7 @@ class Strand(CNObject):
     # end def
 
     def insertionsOnStrand(self, idxL=None, idxH=None):
-        """
-        if passed indices it will use those as a bounds
+        """if passed indices it will use those as a bounds
         """
         insertions = []
         insertionsDict = self.part().insertions()[self._id_num]
@@ -629,8 +626,7 @@ class Strand(CNObject):
     # end def
 
     def totalLength(self):
-        """
-        includes the length of insertions in addition to the bases
+        """includes the length of insertions in addition to the bases
         """
         tL = 0
         insertions = self.insertionsOnStrand()
@@ -682,9 +678,9 @@ class Strand(CNObject):
     # end def
 
     def addInsertion(self, idx, length, use_undostack=True):
-        """
-        Adds an insertion or skip at idx.
-        length should be
+        """Adds an insertion or skip at idx.
+        length should be::
+
             >0 for an insertion
             -1 for a skip
         """
@@ -813,8 +809,7 @@ class Strand(CNObject):
 
     ### PUBLIC SUPPORT METHODS ###
     def getRemoveInsertionCommands(self, new_idxs):
-        """
-        Removes Insertions, Decorators, and Modifiers that have fallen out of
+        """Removes Insertions, Decorators, and Modifiers that have fallen out of
         range of new_idxs.
 
         For insertions, it finds the ones that have neither Staple nor Scaffold
@@ -850,8 +845,7 @@ class Strand(CNObject):
     # end def
 
     def clearInsertionsCommands(self, insertions, idxL, idxH):
-        """
-        clear out insertions in this range
+        """clear out insertions in this range
         """
         commands = []
         comp_ss = self.strandSet().complementStrandSet()
@@ -883,8 +877,7 @@ class Strand(CNObject):
     # end def
 
     def hasInsertion(self):
-        """
-        Iterate through dict of insertions for this strand's virtualhelix
+        """Iterate through dict of insertions for this strand's virtualhelix
         and return True of any of the indices overlap with the strand.
         """
         insts = self.part().insertions()[self._id_num]
@@ -900,8 +893,7 @@ class Strand(CNObject):
     # end def
 
     def shallowCopy(self):
-        """
-        can't use python module 'copy' as the dictionary _decorators
+        """can't use python module 'copy' as the dictionary _decorators
         needs to be shallow copied as well, but wouldn't be if copy.copy()
         is used, and copy.deepcopy is undesired
         """
@@ -916,8 +908,7 @@ class Strand(CNObject):
     # end def
 
     def deepCopy(self, strandset, oligo):
-        """
-        can't use python module 'copy' as the dictionary _decorators
+        """can't use python module 'copy' as the dictionary _decorators
         needs to be shallow copied as well, but wouldn't be if copy.copy()
         is used, and copy.deepcopy is undesired
 
