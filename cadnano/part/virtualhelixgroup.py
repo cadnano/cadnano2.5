@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import math
 from heapq import heapify, heappush, nsmallest
 from bisect import bisect_left
@@ -289,7 +290,7 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def isIdNumUsed(self, id_num):
-        """Test if an `id_num` is used by :class:Part
+        """Test if an `id_num` is used by :class:`Part`
 
         Args:
             id_num (int): virtual helix ID number
@@ -1037,8 +1038,8 @@ class VirtualHelixGroup(CNObject):
     def helixPropertiesAndOrigins(self, id_num_list=None):
         """
         Args:
-            id_num_list (:obj:`list` of :obj:`int`, optional): List of
-            virtual helix id numbers to get the origins and properties of
+            id_num_list (:obj:`list` of :obj:`int`, optional): list of virtual
+                helix id numbers to get the origins and properties of
 
         Returns:
             tuple: of (:obj:`dict`, :obj:`ndarray`) (properties dictionary
