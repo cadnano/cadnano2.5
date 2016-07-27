@@ -1,22 +1,21 @@
-#!/usr/bin/env python
-# encoding: utf-8
-import sys, traceback
-OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
-OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
-
-import copy
+import sys
+import traceback
 
 from cadnano import util
 from cadnano.enum import ModType
-from cadnano.cnproxy import ProxySignal, UndoCommand
+from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 
+OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
+
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
+
 
 class Oligo(CNObject):
     """Oligo is a group of Strands that are connected via 5' and/or 3'
@@ -71,26 +70,26 @@ class Oligo(CNObject):
         if mutating
         """
         s5p = self._strand5p
-        key = { 'id_num': s5p.idNum(),
-                'idx5p':s5p.idx5Prime(),
-                'is_5p_fwd': s5p.isForward(),
-                'is_loop': self._is_loop,
-                'sequence': self.sequence() }
+        key = {'id_num': s5p.idNum(),
+               'idx5p': s5p.idx5Prime(),
+               'is_5p_fwd': s5p.isForward(),
+               'is_loop': self._is_loop,
+               'sequence': self.sequence()}
         key.update(self._props)
         return key
     # end def
 
     ### SIGNALS ###
     oligoIdentityChangedSignal = ProxySignal(CNObject,
-                                        name='oligoIdentityChangedSignal')  # new oligo
+                                             name='oligoIdentityChangedSignal')  # new oligo
     oligoRemovedSignal = ProxySignal(CNObject, CNObject,
-                                        name='oligoRemovedSignal')  # part, self
+                                             name='oligoRemovedSignal')  # part, self
     oligoSequenceAddedSignal = ProxySignal(CNObject,
-                                        name='oligoSequenceAddedSignal')  # self
+                                             name='oligoSequenceAddedSignal')  # self
     oligoSequenceClearedSignal = ProxySignal(CNObject,
-                                        name='oligoSequenceClearedSignal')  # self
-    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object,
-                                        name='oligoPropertyChangedSignal')  # self, property_name, new_value
+                                             name='oligoSequenceClearedSignal')  # self
+    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object, 
+                                             name='oligoPropertyChangedSignal')  # self, property_name, new_value
 
     ### SLOTS ###
 
@@ -194,8 +193,8 @@ class Oligo(CNObject):
         if not temp:
             return None
         if temp.sequence():
-            return ''.join([Strand.sequence(strand) \
-                        for strand in self.strand5p().generator3pStrand()])
+            return ''.join([Strand.sequence(strand)
+                           for strand in self.strand5p().generator3pStrand()])
         else:
             return None
     # end def
@@ -220,8 +219,8 @@ class Oligo(CNObject):
                                                             ModType.END_3PRIME)
         seq = modseq5p + seq + modseq3p
         output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
-                (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
-                    self.getColor(), modseq5p_name, modseq3p_name)
+                 (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
+                  self.getColor(), modseq5p_name, modseq3p_name)
         return output
     # end def
 
@@ -306,7 +305,7 @@ class Oligo(CNObject):
         # self.deleteLater()
         cmds = []
         s5p = self._strand5p
-        strandset = s5p.strandSet()
+        # strandset = s5p.strandSet()
         for strand in s5p.generator3pStrand():
             # strandset = strand.strandSet()
             # strandset.oligoStrandRemover(strand, cmds,
