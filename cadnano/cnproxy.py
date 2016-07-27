@@ -60,6 +60,7 @@ UndoStack = undostack.UndoStack
 
 class TempApp(object):
     documentWasCreatedSignal = ProxySignal(name='documentWasCreatedSignal')
+    is_temp_app = True
 
 tapp = TempApp()
 
