@@ -41,9 +41,9 @@ sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.coverage',
+    # 'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
-    'sphinx.ext.viewcode',
+    # 'sphinx.ext.viewcode',
     'sphinx.ext.todo',
 ]
 
@@ -57,7 +57,6 @@ source_parsers = {'.md': CommonMarkParser}
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
 #
-# source_suffix = ['.rst', '.md']
 source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
@@ -356,11 +355,17 @@ texinfo_documents = [
 #
 # texinfo_no_detailmenu = False
 
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_use_rtype = False
+
 def skipOffsetandsize(app, what, name, obj, skip, options):
     """skip certain variable names
     """
     skip_offset_and_size = name == 'offset_and_size'
     # print(name, type(name), skip_offsetandsize)
+    if what == 'attribute':
+        print(name, type(name))
     if skip_offset_and_size:
         print("Skipping", name, skip_offset_and_size, skip)
     return skip or skip_offset_and_size
@@ -372,6 +377,6 @@ def setup(app):
 
     Consider switching to using the skip-member method
     """
-    app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
+    # app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
     # app.connect('autodoc-skip-member', skipOffsetandsize)
     return app
