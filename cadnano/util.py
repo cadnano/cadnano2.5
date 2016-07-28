@@ -219,8 +219,7 @@ def endSuperMacro(model_object):
 # end def
 
 def findChild(self):
-    """
-    When called when self is a QGraphicsItem, iterates through self's
+    """When called when self is a QGraphicsItem, iterates through self's
     childItems(), placing a red rectangle (a sibling of self) around
     each item in sequence (press return to move between items). Since
     the index of each child item is displayed as it is highlighted,
@@ -273,8 +272,7 @@ def findChild(self):
 # end def
 
 def parse_args(argv=None, gui=None):
-    """
-    Uses argparse to parse commandline args.
+    """Uses argparse to parse commandline args.
     Returns a NameSpace object. This can easily be converted to a regular dict through:
         argns.__dict__
 
@@ -311,8 +309,7 @@ def parse_args(argv=None, gui=None):
     return argns, unused
 
 def init_logging(args=None, logdir=None):
-    """
-    Set up standard logging system based on parameters in args, e.g. loglevel and testing.
+    """Set up standard logging system based on parameters in args, e.g. loglevel and testing.
     """
     if args is None:
         args = {}

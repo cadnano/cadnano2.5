@@ -28,7 +28,7 @@ class Document(CNObject):
     2. Track all sub-model actions on its undoStack.
 
     Args:
-        parent (:obj:`CNObject`, optional): defaults to None
+        parent (CNObject): optional, defaults to None
 
     Attributes:
         view_names (list):
@@ -178,8 +178,10 @@ class Document(CNObject):
 
         Args:
             strand (Strand):
-            value (:obj:`tuple` of :obj:`bool`, :obj:`bool`):
-                            (is low index selected, is high index selected)
+            value (tuple): of :obj:`bool of form::
+
+                (is low index selected, is high index selected)
+
         Returns:
             bool: True if successful, False otherwise
         """
@@ -221,7 +223,7 @@ class Document(CNObject):
 
         Args:
             part (Part):
-            id_nums (:obj:`sequence`)
+            id_nums (array-like):
         """
         # print("Document add vh", id_nums)
         selection_dict = self._selection_dict
@@ -275,7 +277,7 @@ class Document(CNObject):
         is considered selected
 
         Returns:
-            :obj:`set` or None
+            set: or :obj:`None` if nothing is found
         """
         s_dict = self._selection_dict
         selected_oligos = set()
@@ -390,7 +392,7 @@ class Document(CNObject):
             strandset (StrandSet):
 
         Returns:
-            :obj:`list` of :obj:`Strand`s
+            list: of :obj:`Strand`s
         """
         out_list = [x for x in self._selection_dict[strandset].items()]
         getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))
@@ -399,7 +401,7 @@ class Document(CNObject):
     # end def
 
     def determineStrandSetBounds(self, selected_strand_list, strandset):
-        """ Determine the bounds of a `StrandSet` `strandset` among a
+        """ Determine the bounds of a :class:`StrandSet` `strandset` among a
         a list of selected strands in that same `strandset`
 
         Args:
@@ -407,7 +409,7 @@ class Document(CNObject):
             strandset (StrandSet):
 
         Returns:
-            :obj:`tuple` of :obj:`int`, :obj:`int`:
+            tuple: of :obj:`int`
         """
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
@@ -473,7 +475,7 @@ class Document(CNObject):
         """ Get the index bounds of a strand selection
 
         Returns:
-            :obj:`tuple` of :obj:`int`, :obj:`int`:
+            tuple: of :obj:`int`
         """
         min_low_delta = -1
         min_high_delta = -1
@@ -543,20 +545,17 @@ class Document(CNObject):
             self.undoStack().endMacro()
     # end def
 
-    def resizeSelection(self, delta, do_maximize=False, use_undostack=True):
+    def resizeSelection(self, delta, use_undostack=True):
         """ Moves the selected idxs by delta by first iterating over all strands
         to calculate new idxs (method will return if snap-to behavior would
         create illegal state), then applying a resize command to each strand.
 
         Args:
             delta (float):
-            do_maximize (:obj:`bool`, optional)
-            use_undostack(:obj:`bool`, optional)
+            use_undostack (bool): optional, default is True
         """
         resize_list = []
         vh_set = set()
-        # if do_maximize:
-        #     print("this could be maximized")
         # calculate new idxs
         part = None
         for strandset_dict in self._selection_dict.values():
@@ -647,7 +646,7 @@ class Document(CNObject):
 
         Args:
             view_name_list (list):
-            do_clear (:obj:`bool`, optional): clear the names or not? defaults to False
+            do_clear (bool): optional, clear the names or not? defaults to False
         """
         view_names = [] if do_clear else self.view_names
         for view_name in view_name_list:
@@ -661,7 +660,7 @@ class Document(CNObject):
         """ Create and store a new DnaPart and instance, and return the instance.
 
         Args:
-            use_undostack (:obj:`bool`, optional): defaults to True
+            use_undostack (bool): optional, defaults to True
         """
         dnapart = NucleicAcidPart(document=self)
         self._addPart(ObjectInstance(dnapart), use_undostack=use_undostack)
@@ -734,12 +733,13 @@ class Document(CNObject):
 
         Args:
             params (dict):
-            mid (:obj:`str`, optional): modification ID string
-            use_undostack (:obj:`bool`, optional): default is True
+            mid (str): optional, modification ID string
+            use_undostack (bool): optional, default is True
 
         Returns:
-            :obj:`tuple` of :obj:`dict`, :obj:`str`:
-                dictionary of modification paramemters, modification ID string
+            tuple: of :obj:`dict`, :obj:`str` of form::
+
+                (dictionary of modification paramemters, modification ID string)
         """
         if mid is None:
             mid =  uuid4().hex
@@ -785,8 +785,8 @@ class Document(CNObject):
 
         Args:
             params (dict):
-            mid (:obj:`str`, optional): modification ID string
-            use_undostack (:obj:`bool`, optional): default is True
+            mid (str): optional, modification ID string
+            use_undostack (bool): optional, default is True
         """
         if mid in self._mods:
             cmds = []
@@ -800,8 +800,8 @@ class Document(CNObject):
         """Destroy an existing modification
 
         Args:
-            mid (:obj:`str`, optional): modification ID string
-            use_undostack (:obj:`bool`, optional): default is True
+            mid (str): optional, modification ID string
+            use_undostack (bool): optional, default is True
         """
         if mid in self._mods:
             cmds = []
@@ -815,7 +815,7 @@ class Document(CNObject):
         """Get an existing modification
 
         Args:
-            mid (:obj:`str`, optional): modification ID string
+            mid (str): optional, modification ID string
 
         Returns:
             dict or None
@@ -827,7 +827,7 @@ class Document(CNObject):
         """Get an existing modification properties
 
         Args:
-            mid (:obj:`str`, optional): modification ID string
+            mid (str): optional, modification ID string
 
         Returns:
             dict or None
@@ -840,7 +840,7 @@ class Document(CNObject):
         (Part, Virtual Helix ID, Strand)
 
         Args:
-            mid (:obj:`str`, optional): modification ID string
+            mid (str): optional, modification ID string
             is_internal (bool):
 
         Returns:
@@ -924,8 +924,9 @@ class Document(CNObject):
             mod_type (int): [ModType.END_5PRIME, ModType.END_3PRIME]
 
         Returns:
-            :obj:`tuple` of :obj:`str`, :obj:`str` : (sequence [str],
-                                                        name [str] )
+            tuple: of :obj:`str` of form::
+
+                (sequence, name)
         """
         mod_dict = self._mods.get(mid)
         name = '' if mid is None else mod_dict['name']

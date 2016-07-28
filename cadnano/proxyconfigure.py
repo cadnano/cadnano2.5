@@ -37,6 +37,3 @@ def proxyConfigure(signal_type=None):
         # cnp.UndoStack = cnp.UndoStack
         import cadnano
         cadnano.app = cnp.app
-
-    # from cadnano.document import Document
-    # return Document()

@@ -48,7 +48,7 @@ class Strand(CNObject):
         strandset (StrandSet):
         base_idx_low (int): low index
         base_idx_high (int): high index
-        oligo (:class:`Oligo`, optional): default=None
+        oligo (Oligo: optional, default=None
     """
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
@@ -106,7 +106,11 @@ class Strand(CNObject):
     def generator5pStrand(self):
         """Iterate from self to the final _strand5p is None
         3' to 5'
+
         Includes originalCount to check for circular linked list
+
+        Yields:
+            Strand: 5' connected :class:`Strand`
         """
         node0 = node = self
         f = attrgetter('_strand5p')
@@ -119,10 +123,12 @@ class Strand(CNObject):
     # end def
 
     def generator3pStrand(self):
-        """
-        Iterate from self to the final _strand3p is None
+        """Iterate from self to the final _strand3p is None
         5prime to 3prime
         Includes originalCount to check for circular linked list
+
+        Yields:
+            Strand: 3' connected :class:`Strand`
         """
         node0 = node = self
         f = attrgetter('_strand3p')
@@ -216,6 +222,14 @@ class Strand(CNObject):
     def setSequence(self, sequence_string):
         """Applies sequence string from 5' to 3'
         return the tuple (used, unused) portion of the sequence_string
+
+        Args:
+            sequence_string (str):
+
+        Returns:
+            tuple: of :obj:`str` of form::
+
+                (used, unused)
         """
         if sequence_string is None:
             self._sequence = None
@@ -250,8 +264,7 @@ class Strand(CNObject):
     # end def
 
     def getComplementStrands(self):
-        """
-        return the list of complement strands that overlap with this strand
+        """Return the list of complement strands that overlap with this strand
         """
         comp_ss = self.strandSet().complementStrandSet()
         return [comp_strand for comp_strand in
@@ -260,8 +273,7 @@ class Strand(CNObject):
     # end def
 
     def getPreDecoratorIdxList(self):
-        """
-        Return positions where predecorators should be displayed. This is
+        """Return positions where predecorators should be displayed. This is
         just a very simple check for the presence of xovers on the strand.
 
         Will refine later by checking for lattice neighbors in 3D.
@@ -287,6 +299,13 @@ class Strand(CNObject):
 
         Perhaps it's wiser to merely store them left to right and reverse them
         at draw time, or export time
+
+        Args:
+            sequence_string (str):
+            strand (Strand):
+
+        Returns:
+            str:
         """
         s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
         c_low_idx, c_high_idx = strand.idxs()
@@ -465,8 +484,7 @@ class Strand(CNObject):
     # end def
 
     def canResizeTo(self, new_low, new_high):
-        """
-        Checks to see if a resize is allowed. Similar to getResizeBounds
+        """Checks to see if a resize is allowed. Similar to getResizeBounds
         but works for two bounds at once.
         """
         part = self.part()
@@ -683,6 +701,11 @@ class Strand(CNObject):
 
             >0 for an insertion
             -1 for a skip
+
+        Args:
+            idx (int):
+            length (int):
+            use_undostack (bool): optional, default is True
         """
         cmds = []
         idx_low, idx_high = self.idxs()
@@ -704,6 +727,12 @@ class Strand(CNObject):
     # end def
 
     def changeInsertion(self, idx, length, use_undostack=True):
+        """
+        Args:
+            idx (int):
+            length (int):
+            use_undostack (bool): optional, default is True
+        """
         cmds = []
         idx_low, idx_high = self.idxs()
         if idx_low <= idx <= idx_high:
@@ -727,6 +756,11 @@ class Strand(CNObject):
     # end def
 
     def removeInsertion(self,  idx, use_undostack=True):
+        """
+        Args:
+            idx (int):
+            use_undostack (bool): optional, default is True
+        """
         cmds = []
         idx_low, idx_high = self.idxs()
         if idx_low <= idx <= idx_high:
@@ -749,7 +783,14 @@ class Strand(CNObject):
     # end def
 
     def merge(self, idx):
-        """Check for neighbor, then merge if possible."""
+        """Check for neighbor, then merge if possible.
+
+        Args:
+            idx (int):
+
+        Raises:
+            IndexError:
+        """
         low_neighbor, high_neighbor = self._strandset.getNeighbors(self)
         # determine where to check for neighboring endpoint
         if idx == self._base_idx_low:
@@ -766,8 +807,6 @@ class Strand(CNObject):
 
     def resize(self, new_idxs, use_undostack=True, update_segments=True):
         cmds = []
-        # if self.strandSet().isScaffold():
-        #     cmds.append(self.oligo().applySequenceCMD(None))
         cmds += self.getRemoveInsertionCommands(new_idxs)
         cmds.append(ResizeCommand(self, new_idxs, update_segments=update_segments))
         util.execCommandList(

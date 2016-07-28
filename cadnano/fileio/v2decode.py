@@ -11,8 +11,7 @@ from cadnano.part.virtualhelixgroup import DEFAULT_RADIUS
 from .lattice import HoneycombDnaPart, SquareDnaPart
 
 def decode(document, obj):
-    """
-    Parses a dictionary (obj) created from reading a json file and uses it
+    """Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
     """
     num_bases = len(obj['vstrands'][0]['scaf'])

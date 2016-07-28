@@ -1,5 +1,6 @@
 class ProxyObject(object):
-    # __slots__ = '_parent', '_signals'
+    __slots__ = '_parent', '_signals'
+
     def __init__(self, parent):
         self._parent = parent
         self._signals = {}

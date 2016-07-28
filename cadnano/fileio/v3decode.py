@@ -5,7 +5,8 @@ from cadnano import setBatch, getReopen, setReopen
 from cadnano.enum import PointType
 
 def decode(document, obj):
-    ""
+    """
+    """
     name = obj['name']
     for part_dict in obj['parts']:
         part_dict = decodePart(document, part_dict)

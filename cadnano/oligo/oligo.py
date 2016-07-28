@@ -28,7 +28,7 @@ class Oligo(CNObject):
 
     Args:
         part (Part): the model :class:`Part`
-        color (:obj:`str`, optional): color property of the :class:`Oligo`
+        color (str): optional, color property of the :class:`Oligo`
     """
     editable_properties = ['name', 'color']
 
@@ -88,7 +88,7 @@ class Oligo(CNObject):
                                              name='oligoSequenceAddedSignal')  # self
     oligoSequenceClearedSignal = ProxySignal(CNObject,
                                              name='oligoSequenceClearedSignal')  # self
-    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object, 
+    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object,
                                              name='oligoPropertyChangedSignal')  # self, property_name, new_value
 
     ### SLOTS ###

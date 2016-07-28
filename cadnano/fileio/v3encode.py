@@ -31,7 +31,7 @@ def encodePart(part):
         part (Part):
 
     Returns:
-        dict
+        dict:
     """
     number_of_helices = part.getIdNumMax()
     vh_insertions = part.insertions()
@@ -89,11 +89,11 @@ def encodePartList(part, vh_group_list):
 
     Args:
         part (Part):
-        vh_group_list (List[int]): list of virtual_helices to encode to be used
-            with copy and paste serialization
+        vh_group_list (list): of :obj:`int`, virtual_helices IDs to encode to
+            be used with copy and paste serialization
 
     Returns:
-        dict
+        dict:
     """
     vh_group_list.sort()
     number_of_helices = part.getIdNumMax()
