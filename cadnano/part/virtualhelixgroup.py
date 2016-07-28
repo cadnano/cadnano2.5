@@ -188,7 +188,7 @@ class VirtualHelixGroup(CNObject):
         new_vhg.indices = self.indices.copy()
 
         new_vhg.total_id_nums = self.total_id_nums
-        new_vhg.origin_pts = self.origin_pts
+        new_vhg._origin_pts = self._origin_pts
         new_vhg.origin_limits = self.origin_limits
         new_vhg.directions = self.directions
 
@@ -212,11 +212,12 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Returns:
-            tuple: (:obj:`int`, :obj:`int`) or :obj:`None` of the form::
+            tuple: (:obj:`int`, :obj:`int`) of the form::
 
                 (offset, size)
 
-            into the coordinate arrays for a given ID number
+            into the coordinate arrays for a given ID number or or :obj:`None`
+            if `id_num` if out of range
         """
         offset_and_size = self._offset_and_size
         return offset_and_size[id_num] if id_num < len(offset_and_size) else None
@@ -333,10 +334,11 @@ class VirtualHelixGroup(CNObject):
             idx (int): index
 
         Returns:
-            ndarray: shape (3, 1) of :obj:`float`
+            ndarray: of :obj:`float` shape (1, 3)
 
         Raises:
-            KeyError, IndexError
+            KeyError:
+            IndexError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -376,13 +378,13 @@ class VirtualHelixGroup(CNObject):
             ndarray: (1, 3) origin of the Virtual Helix (0 index)
 
         Raises:
-            KeyError
+            KeyError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
 
-        return self.origin_pts[id_num]
+        return self._origin_pts[id_num]
     # end def
 
     def getidNums(self):
@@ -398,7 +400,7 @@ class VirtualHelixGroup(CNObject):
         """Set origin limits
         """
         valid_pts = np.where(self._origin_pts != np.inf)
-        vps = self.origin_pts[valid_pts]
+        vps = self._origin_pts[valid_pts]
         vps = vps.reshape((len(vps)//2, 2))
         xs = vps[:, 0]
         ys = vps[:, 1]
@@ -582,11 +584,11 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_nums (array-like): of :obj:`int` virtual helix ID numbers
-            delta (array-like):  of :obj:`float` 1x3 vector
+            delta (array-like):  of :obj:`float` of length 3
         """
         self._resetOriginCache()
         self.resetPointCache()
-        origin_pts = self.origin_pts
+        origin_pts = self._origin_pts
         delta_origin = delta[:2] # x, y only
         for id_num in id_nums:
             coord_pts, fwd_pts, rev_pts = self.getCoordinates(id_num)
@@ -612,7 +614,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Returns:
-            ndarray[int]: array of indices corresponding to points
+            ndarray: of :obj:`int` array of indices corresponding to points
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -661,7 +663,7 @@ class VirtualHelixGroup(CNObject):
         Returns:
             set: set of neighbor candidate ID numbers
         """
-        origin = self.origin_pts[id_num]
+        origin = self._origin_pts[id_num]
         neighbors = self.queryVirtualHelixOrigin(radius, tuple(origin))
         neighbor_candidates = set(neighbors)
         neighbor_candidates.discard(id_num)
@@ -675,7 +677,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            points (ndarray): n x 3 shaped numpy ndarray of floats or
+            points (array-like): n x 3 shaped numpy ndarray of floats or
                 2D Python list. points are stored in order and by index
             is_right (bool): whether we are extending in the positive index
                 direction or prepending
@@ -893,14 +895,14 @@ class VirtualHelixGroup(CNObject):
         offset_and_size[id_num] = (total_points, 0) # initialize with size 0
 
         # 2. Assign origin on creation, resizing as needed
-        len_origin_pts = len(self.origin_pts)
+        len_origin_pts = len(self._origin_pts)
         if id_num >= len_origin_pts:
             diff = id_num - len_origin_pts
             number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
-            self.origin_pts.resize((total_rows, 2))
-            self.origin_pts[len_origin_pts:] = np.inf
+            self._origin_pts.resize((total_rows, 2))
+            self._origin_pts[len_origin_pts:] = np.inf
 
             self.directions.resize((total_rows, 3))
             self.directions[len_origin_pts:] = 0 # unnecessary as resize fills with zeros
@@ -909,7 +911,7 @@ class VirtualHelixGroup(CNObject):
                                         _defaultDataFrame(number_of_new_elements),
                                         ignore_index=True)
 
-        self.origin_pts[id_num] = origin[:2]
+        self._origin_pts[id_num] = origin[:2]
         new_x, new_y = origin[:2]
         xLL, yLL, xUR, yUR = self.origin_limits
         if new_x < xLL:
@@ -1048,19 +1050,19 @@ class VirtualHelixGroup(CNObject):
             and, (n, 2) array of origins
 
         Raises:
-            ValueError
+            ValueError:
         """
         if id_num_list is None:
             lim = self._highest_id_num_used + 1
             props = self.vh_properties.iloc[:lim]
             props = props.to_dict(orient='list')
-            origins = self.origin_pts[:lim]
+            origins = self._origin_pts[:lim]
             return props, origins
         elif isinstance(id_num_list, list):
             # select by list of indices
             props = self.vh_properties.iloc[id_num_list].reset_index(drop=True)
             props = props.to_dict(orient='list')
-            origins = self.origin_pts[id_num_list]
+            origins = self._origin_pts[id_num_list]
             return props, origins
         else:
             raise ValueError("id_num_list bad type: {}".format(type(id_num_list)))
@@ -1080,7 +1082,7 @@ class VirtualHelixGroup(CNObject):
             dict: properties of a given ids
 
         Raises:
-            IndexError
+            IndexError:
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -1154,7 +1156,8 @@ class VirtualHelixGroup(CNObject):
             VirtualHelixGroup
 
         Raises:
-            IndexError, ValueError
+            IndexError:
+            ValueError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -1165,7 +1168,7 @@ class VirtualHelixGroup(CNObject):
         direction = self.directions[id_num]
 
         # make origin 3D
-        origin = self.origin_pts[id_num]
+        origin = self._origin_pts[id_num]
         origin = (origin[0], origin[1], 0.)
 
         if delta > 0:   # adding points
@@ -1227,7 +1230,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Raises:
-            IndexError
+            IndexError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -1248,7 +1251,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
 
         Raises:
-            KeyError
+            KeyError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -1272,7 +1275,8 @@ class VirtualHelixGroup(CNObject):
             assign points to. default to 0
 
         Raises:
-            KeyError, IndexError
+            KeyError:
+            IndexError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -1297,7 +1301,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            length (int):
+            length (int): number of coordinates to remove
             is_right (bool): whether the removal occurs at the right or left
                 end of a virtual helix since virtual helix arrays are always contiguous
 
@@ -1305,7 +1309,8 @@ class VirtualHelixGroup(CNObject):
             bool: True if id_num is removed, False otherwise
 
         Raises:
-            KeyError, IndexError
+            KeyError:
+            IndexError:
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
 
@@ -1369,7 +1374,7 @@ class VirtualHelixGroup(CNObject):
             self.total_id_nums -= 1
             self._resetOriginCache()
             offset_and_size[id_num] = None
-            self.origin_pts[id_num, :] = (np.inf, np.inf)  # set off to infinity
+            self._origin_pts[id_num, :] = (np.inf, np.inf)  # set off to infinity
             # trim the unused id_nums at the end
             remove_count = 0
             for i in range(current_offset_and_size_length - 1, id_num - 1, -1):
@@ -1511,7 +1516,7 @@ class VirtualHelixGroup(CNObject):
         """
         # search children
         x1, y1, x2, y2 = rect
-        origin_pts = self.origin_pts
+        origin_pts = self._origin_pts
         xs = origin_pts[:, 0]
         ys = origin_pts[:, 1]
         x_lo_mask = xs > x1
@@ -1788,7 +1793,7 @@ class VirtualHelixGroup(CNObject):
                 [(id_num_index, forward_neighbor_idxs, reverse_neighbor_idxs), ...]]
 
         Raises:
-            ValueError
+            ValueError:
         """
         offset_and_size = self.getOffsetAndSize(id_num)
         if offset_and_size is None:
@@ -2092,7 +2097,7 @@ def remapSlice(start, stop, length):
         tuple: of :obj:`int`, positive start and stop index
 
     Raises:
-        IndexError
+        IndexError:
     """
     new_start = length - start if start < 0 else start
     new_stop = length - stop if stop < 0 else stop
