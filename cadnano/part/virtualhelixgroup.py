@@ -170,9 +170,9 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             document (Document): :class:`Document` object
-            new_object (:class:`VirtualHelixGroup`, optional): whether to copy
-            into new_object or to allocate a new one internal to this method
-            an allocated :class:`VirtualHelixGroup`
+            new_object (VirtualHelixGroup): optional, whether to copy
+                into new_object or to allocate a new one internal to this method
+                an allocated :class:`VirtualHelixGroup`
         """
         new_vhg = new_object
         if new_vhg is None:
@@ -440,10 +440,9 @@ class VirtualHelixGroup(CNObject):
         """ Partition strandsets into overlapping segments
 
         Returns:
-            Tuple(List(List(Tuple))):  segments for the forward and reverse
-            strand
+            tuple: of segments for the forward and reverse strand of form::
 
-                `( [ [(start, end),...], ...], [ [(start, end),...], ...])`
+                ( [ [(start, end),...], ...], [ [(start, end),...], ...])
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -543,6 +542,7 @@ class VirtualHelixGroup(CNObject):
 
     def getStrand(self, is_fwd, id_num, idx):
         """Get a `Strand` object
+
         Args:
             is_fwd (bool): is the StrandType Forward
             id_num (int): virtual helix ID number
@@ -577,12 +577,12 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def translateCoordinates(self, id_nums, delta):
-        """ delta is a sequence of floats of length 3
+        """ delta is a :obj:`array-like` of floats of length 3
         for now support XY translation
 
         Args:
-            id_nums (:obj:`sequence` of :obj:`int`): virtual helix ID numbers
-            delta (:obj:`sequence` of :obj:`float`): 1x3 vector
+            id_nums (array-like): of :obj:`int` virtual helix ID numbers
+            delta (array-like):  of :obj:`float` 1x3 vector
         """
         self._resetOriginCache()
         self.resetPointCache()
@@ -630,7 +630,7 @@ class VirtualHelixGroup(CNObject):
         Args:
             id_num (int): virtual helix ID number
             radius (float): radial distance within which a neighbors origin exists
-            idx (:obj:`int`, optional): index to center the neighbor search at
+            idx (int): optional, index to center the neighbor search at. default to 0
 
         Returns:
             list: of :obj:`tuple` of form::
@@ -760,10 +760,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getDirections(self, id_nums):
-        """ Get directions for a sequence of ID numbers
+        """ Get directions for a :obj:`array-like` of ID numbers
 
         Args:
-            id_nums (:obj:`sequence` of :obj:`int`): array_like list of indices
+            id_nums (array-like): of :obj:`int` array_like list of indices
             or scalar index
 
         Returns:
@@ -776,7 +776,7 @@ class VirtualHelixGroup(CNObject):
         """Normlize a vector
 
         Args:
-            v (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            v (array-like): of :obj:`float` of length 3
 
         Returns:
             ndarray: of :obj:`float`, norm of `v`
@@ -788,10 +788,10 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def lengthSq(self, v):
-        """Compute the length of a sequence
+        """Compute the length of a :obj:`array-like`
 
         Args:
-            v (:obj:`sequence` of :obj:`float`): shape (1,3) ndarray or length 3 sequence
+            v (array-like):  of :obj:`float` length 3
 
         Returns:
             float
@@ -802,8 +802,8 @@ class VirtualHelixGroup(CNObject):
         """Compute the cross product of two vectors of length 3
 
         Args:
-            a (:obj:`sequence` of :obj:`float`): shape (1, 3) :obj:`ndarray` or length 3 :obj:`sequence`
-            b (:obj:`sequence` of :obj:`float`): shape (1, 3) :obj:`ndarray` or length 3 :obj:`sequence`
+            a (array-like):  of :obj:`float` of length 3
+            b (array-like):  of :obj:`float` of length 3
 
         Returns:
             list: of :obj:`float` of length 3
@@ -823,8 +823,8 @@ class VirtualHelixGroup(CNObject):
         see: http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/180436#180436
 
         Args:
-            v1 (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
-            v2 (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            v1 (array-like):  of :obj:`float` of length 3
+            v2 (array-like):  of :obj:`float` of length 3
 
         Returns:
             ndarray: shape (3, 3) m0
@@ -864,9 +864,9 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            origin (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence.
+            origin (array-like):  of :obj:`float` of length 3
                 The origin should be referenced from an index of 0.
-            direction (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            direction (array-like):  of :obj:`float` of length 3
             num_points (int): number of bases in Virtual Helix
             color (str):
         """
@@ -946,9 +946,9 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            origin (:obj:`sequence` of :obj:`float`): (1, 3) ndarray or length 3 sequence.  The origin should be
-                        referenced from an index of 0.
-            direction (:obj:`sequence` of :obj:`float`): (1,3) ndarray or length 3 sequence
+            origin (array-like):  of :obj:`float` of length 3
+                The origin should be referenced from an index of 0.
+            direction (array-like):  of :obj:`float` of length 3
             index (int): the offset index into a helix to start the helix at.
                 Useful for appending points. if index less than zero
 
@@ -1017,11 +1017,11 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            keys (:obj:`str` or :obj:`list`/:obj:`tuple`):
-            safe (:obj:`bool`, optional):
+            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`
+            safe (:obj:`bool`): optional, default to True
 
         Returns:
-            object or list: depending on type of arg `keys`
+            object: object or list depending on type of arg `keys`
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -1038,8 +1038,9 @@ class VirtualHelixGroup(CNObject):
     def helixPropertiesAndOrigins(self, id_num_list=None):
         """
         Args:
-            id_num_list (:obj:`list` of :obj:`int`, optional): list of virtual
-                helix id numbers to get the origins and properties of
+            id_num_list (list): optional, of :obj:`int` list of virtual
+                helix ID numbers to get the origins and properties of. defaults to
+                all IDs
 
         Returns:
             tuple: of (:obj:`dict`, :obj:`ndarray`) (properties dictionary
@@ -1071,8 +1072,8 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            inject_extras (:obj:`bool`, optional): Adds in 'bases_per_turn' and
-            'twist_per_base'  Default True
+            inject_extras (bool): optional, adds in 'bases_per_turn' and
+            'twist_per_base'.  default to True
             safe (bool): check if id_num exists. Default True
 
         Returns:
@@ -1099,16 +1100,17 @@ class VirtualHelixGroup(CNObject):
     # end
 
     def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
-        """ keys and values can be sequences of equal length or
+        """ keys and values can be :obj:`array-like`s of equal length or
         singular values
 
         emits `partVirtualHelixPropertyChangedSignal`
 
         Args:
             id_num (int): virtual helix ID number
-            keys (:obj:`str` or :obj:`list`/:obj:`tuple`):
-            value (:obj:`object` or :obj:`list`/:obj:`tuple`)
-            safe (:obj:`bool`, optional): optionally echew signalling
+            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
+            value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
+                the value or values matching the key order
+            safe (bool): optionally echew signalling
         """
         if safe:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -1128,7 +1130,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int):
-            scale_factor (:obj:`float`, optional): default 1.0
+            scale_factor (float): optional, default 1.0
 
         Returns:
             tuple: of :obj:`float`, x, y coordinates
@@ -1264,10 +1266,10 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            points (tuple): tuple containing :obj:`sequence`s of axis, and forward
+            points (tuple): tuple containing :obj:`array-like`s of axis, and forward
             and reverse phosphates points
-            idx_start (:obj:`int`, optional): index offset into the virtual helix to
-            assign points to.
+            idx_start (int): optional index offset into the virtual helix to
+            assign points to. default to 0
 
         Raises:
             KeyError, IndexError
@@ -1297,8 +1299,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
             length (int):
             is_right (bool): whether the removal occurs at the right or left
-            end of a virtual helix since virtual helix arrays are always
-            contiguous
+                end of a virtual helix since virtual helix arrays are always contiguous
 
         Returns:
             bool: True if id_num is removed, False otherwise
@@ -1390,7 +1391,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
+            point (array-like): :obj:`float` of length 3
 
         Returns:
             tuple: of :obj:`ndarray`
@@ -1415,7 +1416,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
+            point (array-like): of :obj:`float` of length 3
 
         Returns:
             tuple: of :obj:`ndarray`
@@ -1441,7 +1442,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
+            point (array-like): of :obj:`float` of length 3
 
         Returns:
             ndarray: close origin points to `point`
@@ -1474,7 +1475,7 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             radius (float): distance to consider
-            point (:obj:`sequence` of :obj:`float`): is an array_like of length 3
+            point (array-like): of :obj:`float` of length 3
 
         Returns:
             ndarray: close origin points to `point`
@@ -1498,7 +1499,10 @@ class VirtualHelixGroup(CNObject):
         """Query based on a Rectangle
 
         Args:
-            rect (:obj:`sequence` of :obj:`float`): rectangle defined by x1, y1, x2, y2
+            rect (array-like): of :obj:`float` rectangle defined by::
+
+                    ( x1, y1, x2, y2)
+
                 definining the lower left and upper right corner of the
                 rectangle respetively
 
@@ -1612,10 +1616,10 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            neighbors (sequence): neighbors of id_num
+            neighbors (array-like): neighbors of id_num
             alpha (float): angle (degrees) commensurate with radius
-            index (:obj:`tuple` of :obj:`int`, optional): (start_index, length)
-            into a virtual helix
+            index (tuple): optional, of :obj:`int` (start_index, length) into
+                a virtual helix, default to `(0, size)`
 
         Returns:
             dict: of :obj:`tuple` of form::
@@ -1770,8 +1774,8 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            neighbors (sequence): neighbors of id_num
-            index_slice (:obj:`tuple` of :obj:`int`, optional): (start_index, length) into a virtual
+            neighbors (array-like): neighbors of id_num
+            index_slice (tuple):  optional, of :obj:`int`(start_index, length) into a virtual
                 helix
 
         Returns:
@@ -2043,10 +2047,10 @@ class VirtualHelixGroup(CNObject):
 
         Args:
             id_num (int): virtual helix ID number
-            point (sequence): length 3
+            point (array-like): length 3
 
         Returns:
-            sequence: length 3
+            array-like: length 3
         """
         direction = self.directions[id_num]
         return point - np.dot(point, direction)*direction
@@ -2058,8 +2062,8 @@ def distanceToPoint(origin, direction, point):
     http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
     Args:
-        direction (sequence):
-        point (sequence):
+        direction (array-like):
+        point (array-like):
 
     Returns:
         float: R squared distance

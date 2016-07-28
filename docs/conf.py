@@ -359,24 +359,31 @@ napoleon_google_docstring = True
 napoleon_numpy_docstring = False
 napoleon_use_rtype = False
 
-def skipOffsetandsize(app, what, name, obj, skip, options):
-    """skip certain variable names
-    """
-    skip_offset_and_size = name == 'offset_and_size'
-    # print(name, type(name), skip_offsetandsize)
-    if what == 'attribute':
-        print(name, type(name))
-    if skip_offset_and_size:
-        print("Skipping", name, skip_offset_and_size, skip)
-    return skip or skip_offset_and_size
+# def add_line(self, line, source, *lineno):
+#     """Append one line of generated reST to the output."""
+#     print(self.indent + line)
+#     self.directive.result.append(self.indent + line, source, *lineno)
+# from sphinx.ext.autodoc import Documenter
+# Documenter.add_line = add_line
 
-from sphinx.ext.autodoc import between
-def setup(app):
-    """Register a sphinx.ext.autodoc.between listener to ignore everything
-    between lines that contain the word DOCIGNORE
+# def skipOffsetandsize(app, what, name, obj, skip, options):
+#     """skip certain variable names
+#     """
+#     skip_offset_and_size = name == 'offset_and_size'
+#     # print(name, type(name), skip_offsetandsize)
+#     if what == 'attribute':
+#         print(name, type(name))
+#     if skip_offset_and_size:
+#         print("Skipping", name, skip_offset_and_size, skip)
+#     return skip or skip_offset_and_size
 
-    Consider switching to using the skip-member method
-    """
-    # app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
-    # app.connect('autodoc-skip-member', skipOffsetandsize)
-    return app
+# from sphinx.ext.autodoc import between
+# def setup(app):
+#     """Register a sphinx.ext.autodoc.between listener to ignore everything
+#     between lines that contain the word DOCIGNORE
+
+#     Consider switching to using the skip-member method
+#     """
+#     # app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
+#     # app.connect('autodoc-skip-member', skipOffsetandsize)
+#     return app
