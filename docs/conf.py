@@ -23,7 +23,9 @@ dirname = os.path.dirname
 import sys
 LOCAL_PATH = dirname(abspath(__file__))
 CADNANO_PATH = dirname(LOCAL_PATH)
+CADNANO_GUI_PATH = CADNANO_PATH + "/gui"
 sys.path.insert(0, LOCAL_PATH)
+sys.path.insert(0, CADNANO_GUI_PATH)
 sys.path.insert(0, CADNANO_PATH)
 
 """ Run in docs folder
@@ -41,6 +43,7 @@ sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    # 'sphinx.ext.autosummary',
     # 'sphinx.ext.coverage',
     'sphinx.ext.napoleon',
     # 'sphinx.ext.viewcode',
@@ -112,7 +115,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']#, 'api/cadnano.rst']
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
 #
-# add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.

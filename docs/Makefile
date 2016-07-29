@@ -225,7 +225,19 @@ dummy:
 	@echo
 	@echo "Build finished. Dummy builder generates no files."
 
+.PHONY: buildapi
 buildapi:
-	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
+	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
 	@echo "Auto-generation of API documentation finished. " \
 	      "The generated files are in 'api/'"
+
+# .PHONY: buildgui
+# buildgui:
+# 	sphinx-apidoc -e -d 1 -f -o gui ../cadnano ../cadnano/bin ../cadnano/data ../cadnano/decorators ../cadnano/fileio ../cadnano/install_exe ../cadnano/math ../cadnano/oligo ../cadnano/part ../cadnano/strand ../cadnano/strandset ../cadnano/tests
+# 	@echo "Auto-generation of GUI documentation finished. " \
+# 	      "The generated files are in 'gui/'"
+
+.PHONY: livehtml
+livehtml:
+	sphinx-autobuild -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo "Autobuild finished. "

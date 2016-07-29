@@ -27,6 +27,7 @@ Welcome to cadnano's documentation!
    :caption: Developer Documentation
 
    api
+   gui
    changelog
    authors
    license

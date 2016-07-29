@@ -9,6 +9,7 @@ Subpackages
     cadnano.data
     cadnano.decorators
     cadnano.fileio
+    cadnano.gui
     cadnano.math
     cadnano.oligo
     cadnano.part

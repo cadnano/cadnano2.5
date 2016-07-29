@@ -3,29 +3,40 @@
 API
 ===
 
+
+Packages
+--------
+
 .. toctree::
    :maxdepth: 1
    :glob:
 
-   api/cadnano.addinstancecommand.rst
-   api/cadnano.color.rst
-   api/cadnano.cnobject.rst
-   api/cadnano.cnproxy.rst
-   api/cadnano.decorators.rst
-   api/cadnano.document.rst
-   api/cadnano.docsmodscmd.rst
-   api/cadnano.enum.rst
-   api/cadnano.fileio.rst
-   api/cadnano.math.rst
-   api/cadnano.objectinstance.rst
-   api/cadnano.oligo.rst
-   api/cadnano.part.rst
-   api/cadnano.preferences.rst
-   api/cadnano.proxyconfigure.rst
-   api/cadnano.removeinstancecommand.rst
-   api/cadnano.strand.rst
-   api/cadnano.strandset.rst
-   api/cadnano.undocommand.rst
-   api/cadnano.undostack.rst
-   api/cadnano.util.rst
+   api/cadnano.decorators
+   api/cadnano.docmodscmd
+   api/cadnano.fileio
+   api/cadnano.math
+   api/cadnano.oligo
+   api/cadnano.part
+   api/cadnano.removeinstancecmd
+   api/cadnano.strand
+   api/cadnano.strandset
 
+Modules
+-------
+
+.. toctree::
+   :maxdepth: 1
+   :glob:
+
+   api/cadnano.addinstancecmd
+   api/cadnano.color
+   api/cadnano.cnobject
+   api/cadnano.cnproxy
+   api/cadnano.document
+   api/cadnano.enum
+   api/cadnano.objectinstance
+   api/cadnano.preferences
+   api/cadnano.proxyconfigure
+   api/cadnano.undocommand
+   api/cadnano.undostack
+   api/cadnano.util
