@@ -40,6 +40,3 @@ def initAppWithGui(app_args=None, do_exec=True):
     if do_exec:
         sys.exit(shared_app.exec_())
     return shared_app
-
-
-__all__ = ["document", "enum", "decorators", "fileio", "oligo", "part", "strand", "strand", "strandset", "virtualhelix"]
