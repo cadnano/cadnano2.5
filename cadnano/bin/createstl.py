@@ -1,17 +1,15 @@
-import sys
 import os
-root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(root_path)
-
+import sys
 from cadnano.fileio import nnodecode
+from cadnano.math.matrix4 import makeTranslation
 from nno2stl import stlwriter
 from nno2stl.cylinder import Cylinder
+# from nno2stl.halfcylinder import HalfCylinder
 
-from nno2stl.halfcylinder import HalfCylinder
-
-from cadnano.math.matrix4 import makeTranslation
-
+root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(root_path)
 BASE_LENGTH = 0.3
+
 
 if __name__ == "__main__":
 

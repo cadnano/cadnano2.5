@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+
 class Insertion(object):
     """Insertions do affect an applied sequence and do not store a sequence
     themselves.  They are a skip if the length is less than 0
@@ -13,7 +14,7 @@ class Insertion(object):
 
     def __init__(self, index, length):
         self._length = length
-        self._index  = index
+        self._index = index
     # end def
 
     def length(self):

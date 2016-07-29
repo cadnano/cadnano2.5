@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 __doc__ = '''
-=========================================================
-cadnano: DNA nanostructure CAD software
-=========================================================
+===================================================================
+cadnano: computer-aided design tool for creating DNA nanostructures
+===================================================================
 
 **cadnano**
 
@@ -119,7 +119,7 @@ setup(
     author='Nick Conway, Shawn Douglas',
     author_email='a.grinner@gmail.com',
     url='https://github.com/cadnano/cadnano2.5',
-    description='radnano',
+    description='computer-aided design tool for creating DNA nanostructures',
     long_description=LONG_DESCRIPTION,
     classifiers=[
         'Programming Language :: C',

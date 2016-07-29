@@ -295,8 +295,8 @@ class DocumentController():
         """
         1. If document is untouched, proceed to open dialog.
         2. If document is dirty, call maybesave and continue if it succeeds.
-        Downstream, the file is selected in openAfterMaybeSave,
-        and the selected file is actually opened in openAfterMaybeSaveCallback.
+        3. Downstream, the file is selected in openAfterMaybeSave, and the selected 
+           file is actually opened in openAfterMaybeSaveCallback.
         """
         if self.maybeSave() == False:
             return  # user canceled in maybe save
@@ -609,9 +609,10 @@ class DocumentController():
 
     def exportStaplesCallback(self, selected):
         """Export all staple sequences to selected CSV file.
+        
         Args:
-            selected (Tuple, List or str): if a List or Tuple,
-                the filename should be the first element
+            selected (Tuple, List or str): if a List or Tuple, the filename should 
+            be the first element
         """
         if isinstance(selected, (list, tuple)):
             fname = selected[0]

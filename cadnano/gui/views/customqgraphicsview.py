@@ -2,11 +2,14 @@
 # encoding: utf-8
 
 """
-CustomQGraphicsView.py
-.. module:: CustomQGraphicsView
-   :platform: Unix, Windows, Mac OS X
-   :synopsis: A Custom QGraphicsView module to allow focus input events
-   like mouse clicks and panning and zooming
+CustomQGraphicsView
+
+Platform:
+    Unix, Windows, Mac OS X
+
+Synopsis:
+    A Custom QGraphicsView module to allow focus input events like mouse clicks,
+    panning, and zooming.
 """
 from cadnano import app
 
@@ -41,16 +44,9 @@ class CustomQGraphicsView(QGraphicsView):
     Ctrl-RightMouseButton = Dolly Zoom
     MouseWheel = Zoom
 
-    Parameters
-    ----------
-    parent: type of QWidget, such as QWidget.main_splitter() for the type of
-    View its has
-
-    See Also
-    --------
-
-    Examples
-    --------
+    Args:
+        parent(QWidget): type of QWidget such as QWidget.main_splitter() for the type of
+                         View its has
 
     For details on these and other miscellaneous methods, see below.
     """

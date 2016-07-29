@@ -19,7 +19,12 @@ an absolute path, but will be accessed via an absolute path. If the
 project name is not specified, it will be taken from the root name of
 the script.
 '''
-import sys, os, os.path, stat, shutil
+import sys
+import os
+import os.path
+import stat
+# import shutil
+
 pjoin = os.path.join
 
 def Usage():

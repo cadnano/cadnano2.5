@@ -3,23 +3,19 @@
 
 from operator import itemgetter
 from uuid import uuid4
-
 from cadnano import app
-from cadnano import preferences as prefs
 from cadnano import util
+from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
-from cadnano.cnproxy import UndoStack, UndoCommand
-
+from cadnano.cnproxy import UndoStack
+from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from cadnano.enum import ModType
-from cadnano.strand import Strand
-
+from cadnano.objectinstance import ObjectInstance
 from cadnano.part import Part
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
 from cadnano.part.nucleicacidpart import NucleicAcidPart
-from cadnano.objectinstance import ObjectInstance
-from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
+from cadnano.strand import Strand
 
 class Document(CNObject):
     """
@@ -178,7 +174,7 @@ class Document(CNObject):
 
         Args:
             strand (Strand):
-            value (tuple): of :obj:`bool of form::
+            value (tuple): of :obj:`bool` of form::
 
                 (is low index selected, is high index selected)
 
@@ -392,7 +388,7 @@ class Document(CNObject):
             strandset (StrandSet):
 
         Returns:
-            list: of :obj:`Strand`s
+            list: of :obj: `Strand`
         """
         out_list = [x for x in self._selection_dict[strandset].items()]
         getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))

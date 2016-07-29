@@ -1,13 +1,13 @@
 """
 util.py
 """
+import os
+import sys
+from os import path
 import inspect
 from traceback import extract_stack
 from random import Random
 import string
-import sys
-import os
-from os import path
 import platform
 import argparse
 import logging
