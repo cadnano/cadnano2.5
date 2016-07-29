@@ -195,16 +195,6 @@ class EndpointItem(QGraphicsPathItem):
         self.setPath(path)
     # end def
 
-    def _getNewIdxsForResize(self, base_idx):
-        """Returns a tuple containing idxs to be passed to the """
-        c_t = self.cap_type
-        if c_t == 'low':
-            return (base_idx, self._strand_item.idxs()[1])
-        elif c_t == 'high':
-            return (self._strand_item.idxs()[0], base_idx)
-        elif c_t == 'dual':
-            raise NotImplementedError
-
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         """
@@ -364,21 +354,6 @@ class EndpointItem(QGraphicsPathItem):
             active_tool.attemptToCreateXover(vhi, m_strand, idx)
     # end def
 
-    # def selectToolMousePress(self, modifiers, event):
-    #     """
-    #     Set the allowed drag bounds for use by selectToolMouseMove.
-    #     """
-    #     print("mouse press ep", self.parentItem())
-    #     # print "%s.%s [%d]" % (self, util.methodName(), self.idx())
-    #     self._low_drag_bound, self._high_drag_bound = \
-    #                 self._strand_item._model_strand.getResizeBounds(self.idx())
-    #     s_i = self._strand_item
-    #     viewroot = s_i.viewroot()
-    #     selection_group = viewroot.strandItemSelectionGroup()
-    #     selection_group.setInstantAdd(True)
-    #     self.setSelected(True)
-    # # end def
-
     def selectToolMousePress(self, modifiers, event, idx):
         """
         Set the allowed drag bounds for use by selectToolMouseMove.
@@ -399,8 +374,6 @@ class EndpointItem(QGraphicsPathItem):
             selection_group.pendToAdd(self)
             selection_group.processPendingToAddList()
             return selection_group.mousePressEvent(event)
-        # else:
-        #     print("mpselect from endpoint", self.FILTER_NAME, s_i.strandFilter(), current_filter_set)
     # end def
 
     def selectToolMouseMove(self, modifiers, idx):
@@ -410,10 +383,6 @@ class EndpointItem(QGraphicsPathItem):
         parent strandItem to redraw its horizontal line.
         """
         pass
-        # idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
-        # x = int(idx * _BASE_WIDTH)
-        # self.setPos(x, self.y())
-        # self._strand_item.updateLine(self)
     # end def
 
     def selectToolMouseRelease(self, modifiers, x):
@@ -426,17 +395,6 @@ class EndpointItem(QGraphicsPathItem):
             alt = extend to max drag bound
         """
         m_strand = self._strand_item._model_strand
-        # base_idx = int(floor(self.x() / _BASE_WIDTH))
-        # if base_idx != self.idx():
-        #     new_idxs = self._getNewIdxsForResize(base_idx)
-        #     m_strand.resize(new_idxs)
-
-        # if modifiers & Qt.AltModifier:
-        #     if self.cap_type == 'low':
-        #         new_idxs = self._getNewIdxsForResize(self._low_drag_bound)
-        #     else:
-        #         new_idxs = self._getNewIdxsForResize(self._high_drag_bound)
-        #     m_strand.resize(new_idxs)
 
         if modifiers & Qt.ShiftModifier:
             self.setSelected(False)
@@ -455,7 +413,6 @@ class EndpointItem(QGraphicsPathItem):
         Required to restore parenting and positioning in the partItem
         """
         # map the position
-        # print "restoring parent ep"
         self.tempReparent(pos=pos)
         self.setSelectedColor(False)
         self.setSelected(False)

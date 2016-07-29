@@ -93,14 +93,18 @@ class SelectionItemGroup(QGraphicsItemGroup):
         Adds to the local selection and the document if required
         """
         doc = self.document()
-
-        # print "instant add is 1 from process pending"
-        if len(self._pending_to_add_dict) > 0:
-            for item in self._pending_to_add_dict:
-                # print "just checking1", item, item.group(), item.parentItem()
-                self.addToGroup(item)
-                item.modelSelect(doc)
+        p2add = self._pending_to_add_dict
+        # print("processPendingToAddList")
+        if len(p2add) > 0:
+            plist = list(self._pending_to_add_dict.keys())
+            for item in plist:
+                if p2add[item]:
+                    p2add[item] = False
+                    # print("just checking1", item, item.group(), item.parentItem())
+                    self.addToGroup(item)
+                    item.modelSelect(doc)
             # end for
+            # print("finished")
             self._pending_to_add_dict = {}
             doc.updateStrandSelection()
     # end def

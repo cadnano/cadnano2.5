@@ -64,14 +64,6 @@ class PropertyWrapperObject(QObject):
         line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
         self.item.setLine(line)
 
-    # def __get_bondP1(self):
-    #     return self.item.line().p2()
-
-    # def __set_bondP1(self, p1):
-    #     p2 = self.item.line().p2()
-    #     line = QLineF(p1.x(), p1.y(), p2.x(), p2.y())
-    #     self.item.setLine(line)
-
     def __get_rotation(self):
         return self.item.rotation()
 
@@ -103,7 +95,6 @@ class PropertyWrapperObject(QObject):
 
 
     bondp2 = pyqtProperty(QPointF, __get_bondP2, __set_bondP2)
-    # bondp1 = pyqtProperty(QPointF, __get_bondP1, __set_bondP1)
     pen_alpha = pyqtProperty(int, __get_penAlpha, __set_penAlpha)
     rotation = pyqtProperty(float, __get_rotation, __set_rotation)
 # end class
@@ -172,21 +163,14 @@ class PreXoverItem(QGraphicsPathItem):
         self.is_active5p = self.is_active3p = False
         self.item_5p = None
         self.item_3p = None
-        self._default_bond_5p = QLineF()
         self._default_bond_3p = QLineF()
-        self._default_p2_5p = QPointF(0,0)
-        self._default_p2_3p = QPointF(0,0)
+        self._default_p2_3p = QPointF(0, 0)
         self.bond_3p = PhosBond(is_fwd, self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
-        # self.setZValue(styles.ZPARTITEM)
     # end def
 
     ### ACCESSORS ###
-    def facingAngle(self):
-        facing_angle = self.pre_xover_item_group.eulerZAngle() + self.rotation()
-        return facing_angle % 360
-
     def getInfo(self):
         """
         Returns:
@@ -196,13 +180,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def name(self):
         return "%s.%d" % ("r" if self.is_fwd else "f", self.step_idx)
-
-    def stepIdx(self):
-        return self.step_idx
+    # end def
 
     def setBondLineLength(self, value):
         self._active_p2_3p = QPointF(value, 0)
         self._active_p2_5p = QPointF(value, 0)
+    # end def
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
@@ -276,12 +259,6 @@ class PreXoverItem(QGraphicsPathItem):
 
     def set5pItem(self, item_5p):
         self.item_5p = item_5p
-        scene_pos5p = item_5p.phos_item.scenePos()
-        p1 = QPointF(0, 0)
-        p2 = self.mapFromScene(scene_pos5p)
-        self._default_p2_5p = p2
-        self._default_bond_5p = QLineF(p1, p2)
-        # self.bond_5p.setLine(self._default_bond_5p)
     # end def
 
     def set3pItem(self, item_3p):
@@ -292,13 +269,6 @@ class PreXoverItem(QGraphicsPathItem):
         self._default_p2_3p = p2
         self._default_bond_3p = QLineF(p1, p2)
         self.bond_3p.setLine(self._default_bond_3p)
-    # end def
-
-    def updateItemApperance(self, is_active, show_3p=True):
-        if show_3p:
-            self.setActive3p(is_active)
-        else:
-            self.setActive5p(is_active)
     # end def
 
     def destroy(self, scene):
@@ -322,11 +292,10 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self._radius = radius
         self._rect = rect
         self.virtual_helix_item = virtual_helix_item
-        self.model_part = mpart = virtual_helix_item.part()
+        self.model_part = virtual_helix_item.part()
         self.id_num = virtual_helix_item.idNum()
         self.is_active = is_active
 
-        self.active_item = None
         self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
 
         self.fwd_prexover_items = {}
@@ -341,17 +310,10 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         bpr, tpr, eulerZ = virtual_helix_item.getProperty(['bases_per_repeat',
                                                 'turns_per_repeat', 'eulerZ'])
 
-        # twist_per_base = tpr*360./bpr
-        # print('z:', z, mpart.baseWidth(), z/mpart.baseWidth(), twist_per_base)
         self.setRotation(-eulerZ) # add 180
     # end def
 
     ### ACCESSORS ###
-    def eulerZAngle(self):
-        return -self.virtual_helix_item.getProperty('eulerZ')
-    # end def
-
-
     def partItem(self):
         return self.virtual_helix_item.partItem()
     # end def
@@ -544,11 +506,6 @@ class WedgeGizmo(QGraphicsPathItem):
 
         self.setPath(path)
         self.show()
-
-    # end def
-
-    def updateWedgeAngle(self):
-        self.showWedge(*self._last_params)
     # end def
 
     def deactivate(self):

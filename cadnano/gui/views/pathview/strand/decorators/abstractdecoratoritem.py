@@ -21,14 +21,6 @@ class AbstractDecoratorItem(QGraphicsPathItem):
         """docstring for strandResizedSlot"""
         pass
 
-    def sequenceAddedSlot(self, oligo):
-        """docstring for sequenceAddedSlot"""
-        pass
-
-    def decoratorRemovedSlot(self, oligo):
-        """docstring for sequenceClearedSlot"""
-        pass
-
     ### METHODS ###
 
     ### COMMANDS ###

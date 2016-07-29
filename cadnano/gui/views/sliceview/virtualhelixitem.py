@@ -112,16 +112,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.setPos(pos)
     # end def
 
-    def getCenterPos(self):
-        """ get the scene position in case parented by a selection
-        group.  Shouldn't be
-        """
-        pos = self.scenePos()
-        pos = self._part_item.mapFromScene(pos)
-        # return pos
-        return QPointF(pos.x() + _RADIUS, pos.y() + _RADIUS)
-    # end def
-
     def getCenterScenePos(self):
         """ return QPointF of the scenePos of the center
         """
@@ -224,14 +214,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         if new_pos != tl_pos:
             parent_item = self.parentItem()
-            br = self.boundingRect()
-            # print("Rect", br.width(), br.height(), _RADIUS)
-            # print("xy", tl_pos.x(), tl_pos.y())
-            # print("xy1", new_pos.x(), new_pos.y())
             if parent_item != part_item:
-                # print("different parent", parent_item)
                 new_pos = parent_item.mapFromItem(part_item, new_pos)
-            # print("xy2", new_pos.x(), new_pos.y())
             self.setPos(new_pos)
     # end def
 

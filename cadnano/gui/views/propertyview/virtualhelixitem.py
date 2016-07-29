@@ -30,7 +30,6 @@ class VirtualHelixItem(QTreeWidgetItem):
         # self.setCheckState(VAL_COL, Qt.Checked)
         if key is None:
             self._controller = VirtualHelixItemController(self, model_part, True, False)
-            self._parent_tree = parent
             root = parent.invisibleRootItem() # add propertyitems as siblings
 
             # Properties
@@ -153,10 +152,10 @@ class VirtualHelixItem(QTreeWidgetItem):
         return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
 
-    def updateViewProperty(self, property_key):
-        model_value = AbstractVirtualHelixItem.getProperty(self, property_key)
-        item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
-        if model_value != item_value:
-            self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
-    # end def
+    # def updateViewProperty(self, property_key):
+    #     model_value = AbstractVirtualHelixItem.getProperty(self, property_key)
+    #     item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
+    #     if model_value != item_value:
+    #         self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
+    # # end def
 # end class

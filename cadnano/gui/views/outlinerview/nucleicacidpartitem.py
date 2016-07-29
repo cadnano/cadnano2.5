@@ -50,6 +50,16 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         return ItemType.NUCLEICACID
     # end def
 
+    def isModelSelected(self, document):
+        """Make sure the item is selected in the model
+        TODO implement Part selection
+
+        Args:
+            document (Document): reference the the model :class:`Document`
+        """
+        return False
+    # end def
+
     ### SLOTS ###
     def partRemovedSlot(self, sender):
         self._controller.disconnectSignals()

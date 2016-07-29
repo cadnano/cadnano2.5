@@ -281,8 +281,12 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def itemChange(self, change, value):
-        # for selection changes test against QGraphicsItem.ItemSelectedChange
-        # intercept the change instead of the has changed to enable features.
+        """For selection changes test against QGraphicsItem.ItemSelectedChange
+        intercept the change instead of the has changed to enable features.
+
+        Basically, you should
+        """
+
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
             viewroot = self._viewroot
             current_filter_set = viewroot.selectionFilterSet()
@@ -291,45 +295,54 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             # only add if the selection_group is not locked out
             if value == True and self.FILTER_NAME in current_filter_set:
                 if self.group() != selection_group:
-                    selection_group.pendToAdd(self)
-                    selection_group.setSelectionLock(selection_group)
-                    self.setSelectedColor(True)
+                    if not selection_group.isPending(self):
+                        selection_group.pendToAdd(self)
+                        selection_group.setSelectionLock(selection_group)
+                        self.setSelectedColor(True)
+                        return False # only select if mode says so
                     return True
                 else:
                     return False
             # end if
             elif value == True:
+                # print("don't select", value)
                 # don't select
                 return False
             else:
                 # Deselect
+                # print("Deselect", value)
                 selection_group.pendToRemove(self)
                 self.setSelectedColor(False)
                 return False
             # end else
         # end if
-        return QGraphicsEllipseItem.itemChange(self, change, value)
+        else:
+            return QGraphicsEllipseItem.itemChange(self, change, value)
     # end def
 
     def modelDeselect(self, document):
+        # print("model Deselect")
         id_num = self._id_num
         part = self._model_part
-        is_selected = document.isVirtualHelixSelected(part, id_num)
-        if is_selected:
-            # print("VHHI remove")
+        is_model_selected = document.isVirtualHelixSelected(part, id_num)
+        if is_model_selected:
             document.removeVirtualHelicesFromSelection(part, [id_num])
         else:
             self.restoreParent()
     # end def
 
     def modelSelect(self, document):
+        # print("select ms")
         id_num = self._id_num
         part = self._model_part
-        is_selected = document.isVirtualHelixSelected(part, id_num)
-        if not is_selected:
-            # print("VHHHI add")
+        is_model_selected = document.isVirtualHelixSelected(part, id_num)
+        if not is_model_selected:
+            # print("tell model to select")
             document.addVirtualHelicesToSelection(part, [id_num])
         else:
-            self.setSelected(True)
+            # print("model selected")
+            if not self.isSelected():
+                # print("setting anyway")
+                self.setSelected(True)
     # end def
 # end class

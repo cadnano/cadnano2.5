@@ -227,7 +227,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             # end for
             vhhi_group.processPendingToAddList()
         else:
-            # print("got the adding slot in path")
+            # print("got the removing slot in path")
             for id_num in vh_set:
                 vhi = vh_hash[id_num]
                 vhhi = vhi.handle()

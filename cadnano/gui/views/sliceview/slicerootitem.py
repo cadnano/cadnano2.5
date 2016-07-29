@@ -72,11 +72,6 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### ACCESSORS ###
-    def sliceToolManager(self):
-        """docstring for sliceToolManager"""
-        return self._window.slice_tool_manager
-    # end def
-
     def window(self):
         return self._window
     # end def

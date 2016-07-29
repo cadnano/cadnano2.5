@@ -164,12 +164,6 @@ class Strand(CNObject):
     strandModsChangedSignal = ProxySignal(CNObject, CNObject, str, int, name='strandModsChangedSignal') #pyqtSignal(QObject, object)
     strandModsRemovedSignal = ProxySignal(CNObject, CNObject, str, int, name='strandModsRemovedSignal') #pyqtSignal(QObject, int)
 
-    # Parameters: (strand, modifier object)
-    strandModifierAddedSignal = ProxySignal(CNObject, object, name='strandModifierAddedSignal') #pyqtSignal(QObject, object)
-    strandModifierChangedSignal = ProxySignal(CNObject, object, name='strandModifierChangedSignal') #pyqtSignal(QObject, object)
-    # Parameters: (strand, modifier index)
-    strandModifierRemovedSignal = ProxySignal(CNObject, int, name='strandModifierRemovedSignal') #pyqtSignal(QObject, int)
-
     # Parameters: (strand, value)
     strandSelectedChangedSignal = ProxySignal(CNObject, tuple, name='strandSelectedChangedSignal') #pyqtSignal(QObject, tuple)
 

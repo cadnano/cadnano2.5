@@ -58,5 +58,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
             self.setProperty('color', new_color)
     # end def
 
+    def isModelSelected(self, document):
+        """Make sure the item is selected in the model
+
+        Args:
+            document (Document): reference the the model :class:`Document`
+        """
+        return document.isVirtualHelixSelected(self._model_part, self._id_num)
+    # end def
+
     ### SLOTS ###
 # end class

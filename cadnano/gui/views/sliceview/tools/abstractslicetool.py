@@ -24,13 +24,11 @@ class AbstractSliceTool(QGraphicsObject):
         self._line_item = QGraphicsLineItem(self)
         self._line_item.hide()
         self._vhi = None
-        # self._rect = _RECT
-        # self._pen = _PEN
+
         self.hide()
         self.is_started = False
         self.angles = [math.radians(x) for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
-        self._direction = None
         self.part_item = None
     # end def
 
@@ -40,9 +38,6 @@ class AbstractSliceTool(QGraphicsObject):
         return [QLineF( rad, rad,
                         rad*(1. + 2.*math.cos(x)), rad*(1. + 2.*math.sin(x))
                         ) for x in self.angles]
-        # return [QLineF( 0, 0,
-        #                 rad*(0 + 2*math.cos(x)), rad*(0 + 2*math.sin(x))
-        #                 ) for x in self.angles]
     # end def
 
     def setVirtualHelixItem(self, virtual_helix_item):
@@ -63,12 +58,6 @@ class AbstractSliceTool(QGraphicsObject):
 
     def setPartItem(self, part_item):
         self.part_item = part_item
-    # end def
-
-    def getAdjacentPoint(self, part_item, pt):
-        """ takes and returns a QPointF
-        """
-        part_item.mapFromItem(self._line_item, pt)
     # end def
 
     def boundingRect(self):
@@ -108,7 +97,6 @@ class AbstractSliceTool(QGraphicsObject):
                 direction_min = vector
                 angle_min = angle_new
         if direction_min is not None:
-            self._direction_min = direction_min
             li.setLine(direction_min)
             return part_item.mapFromItem(li, direction_min.p2())
         else:

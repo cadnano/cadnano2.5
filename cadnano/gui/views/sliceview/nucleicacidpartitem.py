@@ -34,24 +34,20 @@ _SELECTED_ALPHA = styles.SELECTED_ALPHA
 _BOUNDING_RECT_PADDING = 10
 
 class NucleicAcidPartItem(QAbstractPartItem):
+    """Parent should be either a SliceRootItem, or an AssemblyItem.
+
+    Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
+    where x is the cartesian product.
+    """
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, viewroot, parent=None):
-        """
-        Parent should be either a SliceRootItem, or an AssemblyItem.
-
-        Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
-        where x is the cartesian product.
-
-        Order matters for deselector, probe, and setlattice
-        """
         super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
-        self.scale_tuple = (self._RADIUS, m_p.radius())
 
         self.active_virtual_helix_item = None
 
@@ -62,8 +58,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
         self.boundRectToModel()
 
-        # self.setPen(getPenObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
-        # self.setBrush(getBrushObj(_SELECTED_COLOR, _DEFAULT_WIDTH))
         self.setPen(getNoPen())
 
         self.setRect(self._rect)
@@ -74,7 +68,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         # Connect destructor. This is for removing a part from scenes.
 
         # initialize the NucleicAcidPartItem with an empty set of old coords
-        # self.setFlag(QGraphicsItem.ItemHasNoContents)  # never call paint
         self.setZValue(styles.ZPARTITEM)
 
         self.outline = outline =  QGraphicsRectItem(self)
@@ -103,17 +96,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
             else:
                 part.setSelected(False)
         self.show()
-    # end def
-
-    def getVHItemList(self):
-        return sorted(self._virtual_helix_hash.values(), key=lambda t:t.number())
-
-    def visibleTopLeftScenePos(self):
-        return self.mapToScene(self.outlinerect.topLeft())
-    # end def
-
-    def visibleBottomLeftScenePos(self):
-        return self.mapToScene(self.outlinerect.bottomLeft())
     # end def
 
     ### SIGNALS ###
@@ -156,15 +138,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         scene = self.scene()
 
-        self._virtual_helix_hash = None
-
         scene.removeItem(self)
 
         self._model_part = None
-        self.probe = None
         self._mod_circ = None
 
-        self.deselector = None
         self._controller.disconnectSignals()
         self._controller = None
         self.grab_cornerTL = None
@@ -227,7 +205,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, sender, id_num, neighbors):
-        # TODO test to see if self._virtual_helix_hash is necessary
         vhi = VirtualHelixItem(id_num, self)
         self._virtual_helix_item_hash[id_num] = vhi
         self._refreshVirtualHelixItemGizmos(id_num, vhi)
@@ -235,7 +212,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
             nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
             if nvhi:
                 self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-        # print(neighbors)
     # end def
 
     def partVirtualHelixRemovedSlot(self, sender, id_num, neighbors):
@@ -387,23 +363,18 @@ class NucleicAcidPartItem(QAbstractPartItem):
         return (rect.left(), rect.right(), rect.bottom(), rect.top())
 
     ### PUBLIC SUPPORT METHODS ###
-    def selectionWillChange(self, new_sel):
-        if self.part() is None:
-            return
-        if self.part().selectAllBehavior():
-            return
+    def setModifyState(self, bool_val):
+        """Hides the mod_rect when modify state disabled."""
+        self._can_show_mod_circ = bool_val
+        if bool_val == False:
+            self._mod_circ.hide()
     # end def
 
-    def setModifyState(self, bool):
-        """Hides the mod_rect when modify state disabled."""
-        self._can_show_mod_circ = bool
-        if bool == False:
-            self._mod_circ.hide()
-
-    def updateStatusBar(self, statusString):
-        """Shows statusString in the MainWindow's status bar."""
+    def updateStatusBar(self, status_str):
+        """Shows status_str in the MainWindow's status bar."""
         pass  # disabled for now.
-        # self.window().statusBar().showMessage(statusString, timeout)
+        # self.window().statusBar().showMessage(status_str, timeout)
+    # end def
 
     def zoomToFit(self):
         thescene = self.scene()
@@ -441,17 +412,13 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """ Y-axis is inverted in Qt +y === DOWN
         """
         sf = self.scale_factor
-        # numerator, denominator = self.scale_tuple
-        # x, y = denominator*pos.x()/numerator, -denominator*pos.y()/numerator
         x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def
 
     def getVirtualHelixItem(self, id_num):
         return self._virtual_helix_item_hash.get(id_num)
-
-    def getVirtualHelixItems(self):
-        return self._virtual_helix_item_hash.values()
+    # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
         # 1. get point in model coordinates:

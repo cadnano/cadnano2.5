@@ -419,40 +419,4 @@ class Part(VirtualHelixGroup):
             id_num, is_fwd, idx = self.getModKeyTokens(key)
             yield (id_num, is_fwd, idx, mid)
     # end def
-
-    # def changeModInstance(self, id_num, idx, is_rev, is_internal, mid_old, mid_new):
-    #     if mid_new != mid_old:
-    #         mods = self._mods
-    #         if mid_old in mods and mid_new in mods:
-    #             self.removeModInstance(id_num, idx, is_rev, is_internal, mid_old)
-    #             self.addModInstance(id_num, idx, is_rev, is_internal, mid_new)
-    # # end def
-
-    # def changeModLocation(self, id_num, idx_old, idx, is_rev, is_internal, mid):
-    #     if idx_old != idx:
-    #         self.removeModInstance(id_num, idx_old, is_rev, is_internal, mid)
-    #         self.addModInstance(id_num, idx, is_rev, is_internal, mid)
-    # # end def
-
-    # def changeModStrandLocation(self, strand, idxs_old, idxs):
-    #     """ Only supports external modifications (3' or 5' end for now)
-    #     """
-    #     id_num = strand.idNum()
-    #     is_rev = strand.isReverse()
-    #     mods_strands = self._mods['ext_instances']
-    #     document = self._document
-    #     is_internal = False
-    #     for i in [0, 1]:
-    #         idx_old = idxs_old[i]
-    #         idx = idxs[i]
-    #         if idx_old != idx:
-    #             key_old =  "{},{},{}".format(id_num, is_rev, idx_old)
-    #             if key_old in mods_strands:
-    #                 mid = mods_strands[key_old]
-    #                 document.removeModInstance(mid, is_internal, self, key_old)
-    #                 del mods_strands[key_old]
-    #                 key =  "{},{},{}".format(id_num, is_rev, idx)
-    #                 self.addModInstanceKey(key, mods_strands, mid)
-    #     # end for
-    # # end def
 # end class

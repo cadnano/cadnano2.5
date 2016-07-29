@@ -319,13 +319,6 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.drag_last_position = QPointF()
     # end def
 
-    def resetGroupPos(self, child):
-        """ call this to prevent the group from drifting position over time
-        """
-        if len(self.childItems()) == 0:
-            self.setPos(self.mapFromScene(child.scenePos()))
-    # end def
-
     def setSelectionRect(self):
         bri = self.bounding_rect_item
         rect = self.childrenBoundingRect()

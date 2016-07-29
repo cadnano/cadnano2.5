@@ -20,16 +20,19 @@ class OligoItem(CNOutlinerItem, AbstractOligoItem):
         return ItemType.OLIGO
     # end def
 
+    def isModelSelected(self, document):
+        """Make sure the item is selected in the model
+
+        Args:
+            document (Document): reference the the model :class:`Document`
+        """
+        oligo = self._cn_model
+        return document.isOligoSelected(oligo)
+    # end def
+
     ### SLOTS ###
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
         if self._cn_model == model_oligo:
             self.setValue(key, new_value)
     # end def
-
-    # def oligoAppearanceChangedSlot(self, model_oligo):
-    #     color = model_oligo.getColor()
-    #     self.setValue('color', color)
-    # # end def
-
-
 # end class

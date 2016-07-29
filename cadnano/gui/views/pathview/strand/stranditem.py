@@ -110,16 +110,6 @@ class StrandItem(QGraphicsLineItem):
             group_high.addToGroup(self._high_cap)
     # end def
 
-    def sequenceAddedSlot(self, oligo):
-        """docstring for sequenceAddedSlot"""
-        pass
-    # end def
-
-    def sequenceClearedSlot(self, oligo):
-        """docstring for sequenceClearedSlot"""
-        pass
-    # end def
-
     def strandRemovedSlot(self, strand):
         # self._model_strand = None
         self._controller.disconnectSignals()
@@ -236,16 +226,6 @@ class StrandItem(QGraphicsLineItem):
             self._high_cap.destroyMod()
         else:
             self._low_cap.destroyMod()
-    # end def
-
-    def strandModifierAddedSlot(self, strand, modifier):
-        pass
-    # end def
-    def strandModifierChangedSlot(self, strand, modifier):
-        pass
-    # end def
-    def strandModifierRemovedSlot(self, strand, index):
-        pass
     # end def
 
     def strandSelectedChangedSlot(self, strand, indices):

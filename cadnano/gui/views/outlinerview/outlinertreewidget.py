@@ -92,6 +92,7 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
+        document = self._document
         # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
         if self.selection_filter_disabled:
             return
@@ -122,10 +123,12 @@ class OutlinerTreeWidget(QTreeWidget):
         for idx in out_selection:
             item = self.itemFromIndex(idx)
             # print("did select", item)
+            s_idx = idx
             tbs.add(item)
         for idx in deselected_items.indexes():
-            if sm.isSelected(idx):
-                item = self.itemFromIndex(idx)
+            # print("could deselect?", self.itemFromIndex(idx))
+            item = self.itemFromIndex(idx)
+            if item not in tbd and item.isModelSelected(document):
                 # print("did deselect", item)
                 tbd.add(item)
     # end def
