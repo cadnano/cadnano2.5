@@ -612,19 +612,16 @@ class NucleicAcidPart(Part):
     # end def
 
     def deepCopy(self):
-        """Create's a new part, copies the virual helices, and then maps the
-        original's oligos onto the new_part.
+        """Deep copy is used to create an entirely new copy of a Part in
+        memory, rather than an instance pointer to an existing part.
 
-        The steps are:
-        1) Create a new part
-        2) copy the VirtualHelices
-        3) Now you need to map the ORIGINAL's Oligos onto the COPY's Oligos
-        To do this you can for each Oligo in the ORIGINAL
-            a) get the strand5p() of the ORIGINAL
-            b) get the corresponding strand5p() in the COPY based on
-                i) lookup the hash id_num of the ORIGINAL strand5p() VirtualHelix
-                ii) get the StrandSet() that you created in Step 2 for the
-                StrandType of the original using the hash id_num
+        It works as follows:
+
+        1. Create a new part (the "copy").
+        2. deepCopy the VirtualHelices from the "original" part.
+        3. Map the original part's Oligos onto the copy's Oligos, using 
+        lookups of the hash id_num and the StrandSet from step 2.
+
         """
         # 1) new part
         new_part = self.newPart()
