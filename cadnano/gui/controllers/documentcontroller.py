@@ -8,7 +8,8 @@ from PyQt5.QtWidgets import QFileDialog, QActionGroup
 from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
 from PyQt5.QtWidgets import QStyleOptionGraphicsItem
 from PyQt5.QtSvg import QSvgGenerator
-from cadnano.fileio.nnodecode import decodeFile, encodeToFile
+from cadnano.fileio.nnodecode import decodeFile
+from cadnano.fileio.nnoencode import encodeToFile
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
@@ -297,7 +298,7 @@ class DocumentController():
         if self.maybeSave() is False:
             return  # user canceled in maybe save
         else:  # user did not cancel
-            if hasattr(self, "filesavedialog"): # user did save
+            if hasattr(self, "filesavedialog"):  # user did save
                 if self.filesavedialog is not None:
                     self.filesavedialog.finished.connect(self.openAfterMaybeSave)
                 else:
@@ -330,11 +331,10 @@ class DocumentController():
         else:
             directory = QFileInfo(fname).path()
 
-        fdialog = QFileDialog(
-                    self.win,
-                    "%s - Save As" % QApplication.applicationName(),
-                    directory,
-                    "%s (*.svg)" % QApplication.applicationName())
+        fdialog = QFileDialog(self.win,
+                              "%s - Save As" % QApplication.applicationName(),
+                              directory,
+                              "%s (*.svg)" % QApplication.applicationName())
         fdialog.setAcceptMode(QFileDialog.AcceptSave)
         fdialog.setWindowFlags(Qt.Sheet)
         fdialog.setWindowModality(Qt.WindowModal)
@@ -344,7 +344,8 @@ class DocumentController():
 
     class DummyChild(QGraphicsItem):
         def boundingRect(self):
-            return QRect(200, 200) # self.parentObject().boundingRect()
+            return QRect(200, 200)  # self.parentObject().boundingRect()
+
         def paint(self, painter, option, widget=None):
             pass
 
@@ -423,19 +424,17 @@ class DocumentController():
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(
-                            self.win,
-                            "%s - Export As" % QApplication.applicationName(),
-                            directory,
-                            "(*.csv)")
+            fname = QFileDialog.getSaveFileName(self.win,
+                                                "%s - Export As" % QApplication.applicationName(),
+                                                directory,
+                                                "(*.csv)")
             self.saveStaplesDialog = None
             self.exportStaplesCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(
-                            self.win,
-                            "%s - Export As" % QApplication.applicationName(),
-                            directory,
-                            "(*.csv)")
+            fdialog = QFileDialog(self.win,
+                                  "%s - Export As" % QApplication.applicationName(),
+                                  directory,
+                                  "(*.csv)")
             fdialog.setAcceptMode(QFileDialog.AcceptSave)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
@@ -464,7 +463,7 @@ class DocumentController():
 
     def actionAddDnaPart(self):
         if ONLY_ONE:
-            self.newDocument() # only allow one part for now
+            self.newDocument()  # only allow one part for now
         part = self._document.addDnaPart()
         self.setActivePart(part)
         return part
@@ -534,26 +533,23 @@ class DocumentController():
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(
-                            self.win,
-                            "%s - Save As" % QApplication.applicationName(),
-                            directory,
-                            "%s (*.json)" % QApplication.applicationName())
+            fname = QFileDialog.getSaveFileName(self.win,
+                                                "%s - Save As" % QApplication.applicationName(),
+                                                directory,
+                                                "%s (*.json)" % QApplication.applicationName())
             if isinstance(fname, (list, tuple)):
                 fname = fname[0]
             self.writeDocumentToFile(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(
-                            self.win,
-                            "%s - Save As" % QApplication.applicationName(),
-                            directory,
-                            "%s (*.json)" % QApplication.applicationName())
+            fdialog = QFileDialog(self.win,
+                                  "%s - Save As" % QApplication.applicationName(),
+                                  directory,
+                                  "%s (*.json)" % QApplication.applicationName())
             fdialog.setAcceptMode(QFileDialog.AcceptSave)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
             self.filesavedialog = fdialog
-            self.filesavedialog.filesSelected.connect(
-                                                self.saveFileDialogCallback)
+            self.filesavedialog.filesSelected.connect(self.saveFileDialogCallback)
             fdialog.open()
     # end def
 
@@ -646,7 +642,6 @@ class DocumentController():
         self.win.path_graphics_view.setViewportUpdateOn(False)
         self.win.slice_graphics_view.setViewportUpdateOn(False)
 
-
         # NC commented out single document stuff
         if ONLY_ONE:
             self.newDocument(fname=fname)
@@ -659,10 +654,9 @@ class DocumentController():
         self.win.path_graphics_view.update()
         self.win.slice_graphics_view.update()
 
-        if hasattr(self, "filesavedialog"): # user did save
+        if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
-                self.fileopendialog.filesSelected.disconnect(\
-                                              self.openAfterMaybeSaveCallback)
+                self.fileopendialog.filesSelected.disconnect(self.openAfterMaybeSaveCallback)
             # manual garbage collection to prevent hang (in osx)
             del self.fileopendialog
             self.fileopendialog = None
@@ -679,8 +673,7 @@ class DocumentController():
         if not fname.lower().endswith(".json"):
             fname += ".json"
         if self.filesavedialog is not None:
-            self.filesavedialog.filesSelected.disconnect(
-                                                self.saveFileDialogCallback)
+            self.filesavedialog.filesSelected.disconnect(self.saveFileDialogCallback)
             del self.filesavedialog  # prevents hang
             self.filesavedialog = None
         self.writeDocumentToFile(fname)
@@ -724,18 +717,16 @@ class DocumentController():
         """
         path = self._file_open_path
         if util.isWindows():  # required for native looking file window#"/",
-            fname = QFileDialog.getOpenFileName(
-                        None,
-                        "Open Document", path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
+            fname = QFileDialog.getOpenFileName(None,
+                                                "Open Document", path,
+                                                "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
             self.filesavedialog = None
             self.openAfterMaybeSaveCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(
-                        self.win,
-                        "Open Document",
-                        path,
-                        "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
+            fdialog = QFileDialog(self.win,
+                                  "Open Document",
+                                  path,
+                                  "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
             fdialog.setAcceptMode(QFileDialog.AcceptOpen)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)
@@ -750,11 +741,11 @@ class DocumentController():
         if app().dontAskAndJustDiscardUnsavedChanges:
             return True
         if not self.undoStack().isClean():    # document dirty?
-            savebox = QMessageBox(QMessageBox.Warning,   "Application",
-                "The document has been modified.\nDo you want to save your changes?",
-                QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                self.win,
-                Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet)
+            savebox = QMessageBox(QMessageBox.Warning, "Application",
+                                  "The document has been modified.\nDo you want to save your changes?",
+                                  QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
+                                  self.win,
+                                  Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet)
             savebox.setWindowModality(Qt.WindowModal)
             save = savebox.button(QMessageBox.Save)
             discard = savebox.button(QMessageBox.Discard)
@@ -800,4 +791,3 @@ class DocumentController():
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
-
