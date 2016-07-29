@@ -33,7 +33,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
 
         self._drag_enable = False
         self._dragged = False
-        self._base_click = 0  # tri-state counter to enable deselection on click away
 
         self._r0 = 0  # save original mousedown
         self._r = 0  # latest position for moving
@@ -54,7 +53,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
             self.translateR = self.selectionbox.translateX
 
         self._normal_select = True
-        self._instant_add = 0
 
         self.setZValue(styles.ZPATHSELECTION)
     # end def
@@ -250,7 +248,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
         restore it's original parent
         """
         doc = self.document()
-        t_pos = child.scenePos()
         self.removeFromGroup(child)
         child.modelDeselect(doc)
     # end def

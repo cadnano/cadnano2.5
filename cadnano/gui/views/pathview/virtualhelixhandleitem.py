@@ -36,7 +36,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._viewroot = viewroot
 
         self._right_mouse_move = False
-        self._being_hovered_over = False
         self.setAcceptHoverEvents(True)
         self.refreshColor()
         # handle the label specific stuff
@@ -53,7 +52,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         # rotation
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
-        self._hover_rect = QRectF(_RECT)
         # self.show()
 
         self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self, False)
@@ -124,13 +122,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         scene.removeItem(self._label)
         scene.removeItem(self)
         self._label = None
-    # end def
-
-    def someVHChangedItsNumber(self, r, c):
-        # If it was our VH, we need to update the number we
-        # are displaying!
-        if (r,c) == self.vhelix.coord():
-            self.setNumber()
     # end def
 
     def createLabel(self):

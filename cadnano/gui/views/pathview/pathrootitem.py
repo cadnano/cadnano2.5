@@ -51,8 +51,6 @@ class PathRootItem(QGraphicsRectItem):
 
         if part_type == PartType.PLASMIDPART:
             pass
-            # plasmid_part_item = PlasmidPartItem(model_part_instance, parent=self)
-            # self._instance_items[plasmid_part_item] = plasmid_part_item
         elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
                                                viewroot=self,

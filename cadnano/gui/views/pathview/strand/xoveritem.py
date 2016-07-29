@@ -119,14 +119,8 @@ class XoverNode3(QGraphicsRectItem):
         self._updateLabel(isLeft)
     # end def
 
-    def updateConnectivity(self):
-        isLeft = True if self.is_forward else False
-        self._updateLabel(isLeft)
-    # end def
-
     def remove(self):
-        """
-        Clean up this joint
+        """Clean up this joint
         """
         scene = self.scene()
         if scene:
@@ -136,9 +130,8 @@ class XoverNode3(QGraphicsRectItem):
     # end def
 
     def _updateLabel(self, isLeft):
-        """
-        Called by updatePositionAndAppearance during init, or later by
-        updateConnectivity. Updates drawing and position of the label.
+        """Called by updatePositionAndAppearance during init. Updates drawing
+        and position of the label.
         """
         lbl = self._label
         if self._idx is not None:
@@ -426,12 +419,6 @@ class XoverItem(QGraphicsPathItem):
 
         self._updateColor(strand5p)
     # end def
-
-    def updateLabels(self):
-        if self._node3:
-            self._node3._updateLabel()
-        if self._node5:
-            self._node5._updateLabel()
 
     def _updateColor(self, strand):
         oligo = strand.oligo()

@@ -37,16 +37,7 @@ class AbstractPathTool(QGraphicsObject):
         return self._rect
 
     ######################### Positioning and Parenting ####################
-    def hoverEnterVirtualHelixItem(self, virtual_helix_item, event):
-        self.updateLocation(virtual_helix_item, event.scenePos())
-
-    def hoverLeaveVirtualHelixItem(self, virtual_helix_item, event):
-        self.updateLocation(None, event.scenePos())
-
-    def hoverMoveVirtualHelixItem(self, virtual_helix_item, event, flag=None):
-        self.updateLocation(virtual_helix_item, event.scenePos())
-
-    def updateLocation(self, virtual_helix_item, scene_pos, *varargs):
+    def updateLocation(self, virtual_helix_item, scene_pos, *args):
         """Takes care of caching the location so that a tool switch
         outside the context of an event will know where to
         position the new tool and snaps self's pos to the upper
@@ -62,15 +53,11 @@ class AbstractPathTool(QGraphicsObject):
                 if pos != self.pos():
                     self.setPos(pos)
                 self.update(self.boundingRect())
-                # if not self.isVisible():
-                #     self.show()
-                #     pass
         else:
             self._last_location = None
             if self.isVisible():
                 self.hide()
-            # if self.parentItem() != _mother:
-            #     self.setParentItem(_mother)
+    # end def
 
     def lastLocation(self):
         """A tool's last_location consists of a VirtualHelixItem and a ScenePos

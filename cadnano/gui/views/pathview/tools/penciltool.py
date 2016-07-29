@@ -410,10 +410,6 @@ class ForcedXoverNode3(QGraphicsRectItem):
         return pt.x(), pt.y()
     # end def
 
-    def isOnTop(self):
-        return self._is_on_top
-    # end def
-
     def isForward(self):
         return self.is_forward
     # end def
@@ -439,14 +435,8 @@ class ForcedXoverNode3(QGraphicsRectItem):
             self.hideItems()
     # end def
 
-    def updateConnectivity(self):
-        is_left = True if self.is_forward else False
-        self._updateLabel(is_left)
-    # end def
-
     def remove(self):
-        """
-        Clean up this joint
+        """Clean up this joint
         """
         scene = self.scene()
         scene.removeItem(self._label)
@@ -459,9 +449,8 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def _updateLabel(self, is_left):
-        """
-        Called by updatePositionAndAppearance during init, or later by
-        updateConnectivity. Updates drawing and position of the label.
+        """Called by updatePositionAndAppearance during init.
+        Updates drawing and position of the label.
         """
         lbl = self._label
         if self._idx is not None:
@@ -580,16 +569,6 @@ class ForcedXoverItem(QGraphicsPathItem):
 
     def deactivate(self):
         self._tool.setFloatingXoverBegin(True)
-
-    def hide5prime(self):
-        self._node5._path_thing.hide()
-
-    def hide3prime(self):
-        self._node3._path_thing.hide()
-
-    def show3prime(self):
-        if self._node3._blank_thing.isVisible():
-            self._node3._path_thing.show()
 
     def hideIt(self):
         self.hide()
@@ -875,16 +854,6 @@ class EndpointItem(QGraphicsPathItem):
             path = PP53 if is_forward else PP35
         self.setPath(path)
     # end def
-
-    def _getNewIdxsForResize(self, baseIdx):
-        """Returns a tuple containing idxs to be passed to the """
-        c_t = self.cap_type
-        if c_t == 'low':
-            return (baseIdx, self._strand_item.idxs()[1])
-        elif c_t == 'high':
-            return (self._strand_item.idxs()[0], baseIdx)
-        elif c_t == 'dual':
-            raise NotImplementedError
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
