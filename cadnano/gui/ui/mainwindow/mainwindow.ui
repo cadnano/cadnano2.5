@@ -387,7 +387,6 @@
     </property>
     <addaction name="action_copy"/>
     <addaction name="action_paste"/>
-    <addaction name="action_modify"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -675,21 +674,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
-   </property>
-  </action>
-  <action name="action_modify">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/modify</normaloff>:/pathtools/modify</iconset>
-   </property>
-   <property name="text">
-    <string>Modify mode</string>
-   </property>
-   <property name="toolTip">
-    <string>Modify mode</string>
    </property>
   </action>
   <action name="action_cadnano_website">
