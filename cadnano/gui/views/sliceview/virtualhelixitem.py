@@ -7,7 +7,7 @@ from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
 
-from cadnano.enum import Parity, PartType, StrandType
+from cadnano.enum import PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush

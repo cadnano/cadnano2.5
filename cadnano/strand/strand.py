@@ -148,7 +148,6 @@ class Strand(CNObject):
     strandResizedSignal = ProxySignal(CNObject, tuple, name='strandResizedSignal') #pyqtSignal(QObject, tuple)
 
     # Parameters: (strand3p, strand5p)
-    strandXover5pChangedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pChangedSignal') #pyqtSignal(QObject, QObject)
     strandXover5pRemovedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pRemovedSignal') #pyqtSignal(QObject, QObject)
 
     # Parameters: (strand)
@@ -270,15 +269,6 @@ class Strand(CNObject):
         return [comp_strand for comp_strand in
                             comp_ss.getOverlappingStrands(self._base_idx_low,
                                                     self._base_idx_high)]
-    # end def
-
-    def getPreDecoratorIdxList(self):
-        """Return positions where predecorators should be displayed. This is
-        just a very simple check for the presence of xovers on the strand.
-
-        Will refine later by checking for lattice neighbors in 3D.
-        """
-        return range(self._base_idx_low, self._base_idx_high + 1)
     # end def
 
     def setComplementSequence(self, sequence_string, strand):
@@ -833,18 +823,9 @@ class Strand(CNObject):
             self.strandHasNewOligoSignal.emit(self)
     # end def
 
-    def setStrandSet(self, strandset):
-        self._strandset = strandset
-    # end def
-
     def split(self, idx, update_sequence=True):
         """Called by view items to split this strand at idx."""
         self._strandset.splitStrand(self, idx, update_sequence)
-
-    def updateIdxs(self, delta):
-        self._base_idx_low += delta
-        self._base_idx_high += delta
-    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def getRemoveInsertionCommands(self, new_idxs):
@@ -915,16 +896,16 @@ class Strand(CNObject):
         return self.clearInsertionsCommands(insertions, *self.idxs())
     # end def
 
-    def hasInsertion(self):
-        """Iterate through dict of insertions for this strand's virtualhelix
-        and return True of any of the indices overlap with the strand.
-        """
-        insts = self.part().insertions()[self._id_num]
-        for i in range(self._base_idx_low, self._base_idx_high + 1):
-            if i in insts:
-                return True
-        return False
-    # end def
+    # def hasInsertion(self):
+    #     """Iterate through dict of insertions for this strand's virtualhelix
+    #     and return True of any of the indices overlap with the strand.
+    #     """
+    #     insts = self.part().insertions()[self._id_num]
+    #     for i in range(self._base_idx_low, self._base_idx_high + 1):
+    #         if i in insts:
+    #             return True
+    #     return False
+    # # end def
 
     def hasInsertionAt(self, idx):
         insts = self.part().insertions()[self._id_num]

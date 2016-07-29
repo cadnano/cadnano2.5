@@ -38,27 +38,9 @@ def decode(document, obj):
 
     # CREATE PART ACCORDING TO LATTICE TYPE
     if lattice_type == LatticeType.HONEYCOMB:
-        steps = num_bases // 21
         doLattice = HoneycombDnaPart.latticeCoordToPositionXY
         isEven = HoneycombDnaPart.isEvenParity
     elif lattice_type == LatticeType.SQUARE:
-        is_SQ_100 = True  # check for custom SQ100 format
-        for helix in obj['vstrands']:
-            if helix['col'] != 0:
-                is_SQ_100 = False
-                break
-        if is_SQ_100:
-            # num_rows, num_cols = 100, 1
-            num_rows, num_cols = 40, 30
-        else:
-            num_rows, num_cols = 40, 30
-        steps = num_bases // 32
-        # num_rows = max(30, max_row_json, cadnano.app().prefs.squareRows)
-        # num_cols = max(32, max_col_json, cadnano.app().prefs.squareCols)
-        num_rows = max(30, max_row_json, prefs.SQUARE_PART_MAXROWS)
-        num_cols = max(32, max_col_json, prefs.SQUARE_PART_MAXCOLS)
-
-
         doLattice = SquareDnaPart.latticeCoordToPositionXY
         isEven = SquareDnaPart.isEvenParity
     else:
@@ -136,7 +118,6 @@ def decode(document, obj):
     setBatch(False)
 
     # INSTALL STRANDS AND COLLECT XOVER LOCATIONS
-    num_helices = len(obj['vstrands']) - 1
     fwd_ss_seg = defaultdict(list)
     fwd_ss_xo = defaultdict(list)
     rev_ss_seg = defaultdict(list)

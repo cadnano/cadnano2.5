@@ -260,14 +260,6 @@ class Document(CNObject):
                 part.partVirtualHelicesSelectedSignal.emit(part, changed_set, False)
     # end def
 
-    def selectionDict(self):
-        """
-        Returns:
-            dict
-        """
-        return self._selection_dict
-    # end def
-
     def selectedOligos(self):
         """As long as one endpoint of a strand is in the selection, then the oligo
         is considered selected
@@ -360,15 +352,6 @@ class Document(CNObject):
             self.removeStrandFromSelection(strand)
         self.updateStrandSelection()
     # end def
-
-    def getSelectedValue(self, obj):
-        """`obj` is an objects to look up
-        it is prevetted to be in the dictionary
-
-        Args:
-            obj (object):
-        """
-        return self._selection_dict[obj]
 
     def getSelectedStrandValue(self, strand):
         """ strand is an objects to look up
@@ -859,7 +842,7 @@ class Document(CNObject):
         """
         location_set = self.getModLocationsSet(mid, is_internal)
         doc_key = ''.join((part.uuid, ',', key))
-        location_set.add(key)
+        location_set.add(doc_key)
     # end def
 
     def removeModInstance(self, mid, is_internal, part, key):
@@ -873,7 +856,7 @@ class Document(CNObject):
         """
         location_set = self.getModLocationsSet(mid, is_internal)
         doc_key = ''.join((part.uuid, ',' ,key))
-        location_set.remove(key)
+        location_set.remove(doc_key)
     # end def
 
     def modifications(self):

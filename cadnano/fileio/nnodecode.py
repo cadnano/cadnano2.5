@@ -32,20 +32,3 @@ def loadtest():
 
 if __name__ == '__main__':
     loadtest()
-
-NODETAG = "node"
-NAME = "name"
-OBJ_ID = "objectid"
-INST_ID = "instanceid"
-DONE = "done"
-CHECKED = "check"
-LOCKED = "locked"
-
-VHELIX = "vhelix"
-NUM = "num"
-COL = "col"
-ROW = "row"
-SCAFFOLD = "scaffold"
-STAPLE = "staple"
-INSERTION = "insertion"
-DELETION = "deletion"

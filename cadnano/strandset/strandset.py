@@ -131,7 +131,6 @@ class StrandSet(CNObject):
         """
         self.strand_array = [None]*(initial_size)
         self.strand_heap = []
-        self._last_strandset_idx = None
     # end def
 
     def resize(self, delta_low, delta_high):
@@ -271,16 +270,6 @@ class StrandSet(CNObject):
             return sh[-1].highIdx()
         else:
             return 0
-    # end def
-
-    def partMaxBaseIdx(self):
-        """Return the bounds of the :class:`StrandSet` as defined in the
-        :class:`Part`.
-
-        Returns:
-            int: highest index in set
-        """
-        return self.length() - 1
     # end def
 
     def strandCount(self):

@@ -86,11 +86,6 @@ class LatticeType:
     SQUARE = 0
     HONEYCOMB = 1
 
-
-class Parity:
-    EVEN = 0
-    ODD = 1
-
 class GridType:
     NONE = 0
     SQUARE = 1

@@ -13,15 +13,14 @@ from cadnano.enum import StrandType, PointType
 from cadnano.part.virtualhelixgroup import VirtualHelixGroup, Z_PROP_INDEX
 
 class Part(VirtualHelixGroup):
-    """
-    A Part is a group of VirtualHelix items that are on the same lattice.
+    """A Part is a group of VirtualHelix items that are on the same lattice.
     Parts are the model component that most directly corresponds to a
     DNA origami design.
 
     Parts are always parented to the document.
     Parts know about their oligos, and the internal geometry of a part
-    Copying a part recursively copies all elements in a part:
-        VirtualHelices, Strands, etc
+    Copying a part recursively copies all elements in a part: StrandSets,
+    Strands, etc
 
     PartInstances are parented to either the document or an assembly
     PartInstances know global position of the part
@@ -37,8 +36,7 @@ class Part(VirtualHelixGroup):
     _BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
 
     def __init__(self, *args, **kwargs):
-        """
-        Sets the parent document, sets bounds for part dimensions, and sets up
+        """Sets the parent document, sets bounds for part dimensions, and sets up
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
         """

@@ -17,7 +17,6 @@ logger = logging.getLogger(__name__)
 from itertools import dropwhile, starmap
 
 IS_PY_3 = int(sys.version_info[0] > 2)
-prng = Random()
 
 def clamp(x, min_x, max_x):
     if x < min_x:
@@ -47,10 +46,6 @@ def trace(n):
         # ('/path/script.py', 42, 'funcname', 'current = line - of / code')
         frames.append( (path.basename(f[0])+':%i'%f[1])+'(%s)'%f[2] )
     return " > ".join(frames)
-
-def strToDna(seqStr):
-    """Returns str having been reduced to capital ACTG."""
-    return "".join([c for c in seqStr if c in 'ACGTacgt']).upper()
 
 if IS_PY_3:
     complement = str.maketrans('ACGTacgt','TGCATGCA')
@@ -97,13 +92,6 @@ def isLinux():
 def methodName():
     """Returns string containing name of the calling method."""
     return inspect.stack()[1][3]
-
-def starmapExec(f, tupleIter):
-    """
-    takes a function f and * starmaps the list but drops the results
-    """
-    list(dropwhile(lambda x: True, starmap(f, tupleIter)))
-# end def
 
 def execCommandList(model_object, commands, desc=None, use_undostack=True):
     """

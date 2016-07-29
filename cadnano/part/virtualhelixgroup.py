@@ -270,18 +270,6 @@ class VirtualHelixGroup(CNObject):
         self.reserved_ids.remove(id_num)
     # end def
 
-    def isIdNumUsed(self, id_num):
-        """Test if an `id_num` is used by :class:`Part`
-
-        Args:
-            id_num (int): virtual helix ID number
-
-        Returns:
-            bool:   True if used False otherwise
-        """
-        return True if self.getOffsetAndSize(id_num) is not None else False
-    # end def
-
     def getCoordinates(self, id_num):
         """Return a view onto the numpy array for a given id_num
 
@@ -480,7 +468,7 @@ class VirtualHelixGroup(CNObject):
         """
         fwd_segments = []
         rev_segments = []
-        lim_hi_endpoints = len(hi_endpoints) - 1
+
         i = 0
         for f_strand, f_idxs in zip(fwd_ss.strand_heap, fwd_idxs):
             start, idx_hi = f_idxs
@@ -1855,8 +1843,6 @@ class VirtualHelixGroup(CNObject):
         rev_axis_pairs = {}
 
         for neighbor_id in neighbors:
-            nmin_idx = 999999
-            nmax_idx = -1
             offset, size = self.getOffsetAndSize(neighbor_id)
 
             # 1. Finds points that point at neighbors axis point
@@ -1888,8 +1874,6 @@ class VirtualHelixGroup(CNObject):
                                     (delta < rsquared_ap_max) &
                                     (zdelta < 0.3*r2_axial))[0].tolist()
                 if f_idxs or r_idxs:
-                    # nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
-                    # nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
 
@@ -1931,8 +1915,6 @@ class VirtualHelixGroup(CNObject):
                                     (zdelta < 1.1*r2_axial)
                                     )[0].tolist()
                 if f_idxs or r_idxs:
-                    # nmin_idx = min(nmin_idx, *f_idxs, *r_idxs)
-                    # nmax_idx = max(nmax_idx, *f_idxs, *r_idxs)
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
 

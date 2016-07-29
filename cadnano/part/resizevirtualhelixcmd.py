@@ -18,7 +18,6 @@ class ResizeVirtualHelixCommand(UndoCommand):
         super(ResizeVirtualHelixCommand, self).__init__("resize virtual helix")
         self._part = part
         self._info = (id_num, is_right, delta)
-        self._old_active_idx = part.activeBaseIndex()
     # end def
 
     def redo(self):

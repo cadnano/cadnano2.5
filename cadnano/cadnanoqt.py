@@ -31,7 +31,6 @@ if platform.system() == 'Windows':
 
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
-    shouldPerformBoilerplateStartupScript = False
     documentWasCreatedSignal = pyqtSignal(object)  # doc
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
@@ -81,8 +80,6 @@ class CadnanoQt(QObject):
         os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
-        if os.environ.get('CADNANO_DEFAULT_DOCUMENT', False) and not self.ignoreEnv():
-            self.shouldPerformBoilerplateStartupScript = True
         util.loadAllPlugins()
 
         if self.argns.interactive:

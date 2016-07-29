@@ -20,12 +20,6 @@ def encode(document):
     json_string = json.dumps(obj, separators=(',', ':'), cls=EncoderforPandas)  # compact encoding
     return json_string
 
-def legacy_dict_from_doc(document):
-    part = document.selectedInstance().reference()
-    num_bases = part.maxBaseIdx() + 1
-    return v2encode.encodePart(part, name=fname)
-# end def
-
 class EncoderforPandas(json.JSONEncoder):
     """ Special encoder to coerce numpy number types
     python types

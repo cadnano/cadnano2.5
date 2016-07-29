@@ -40,8 +40,6 @@ class DocumentController():
         self._filename = None
         self._file_open_path = None  # will be set in _readSettings
         self._has_no_associated_file = True
-        self._path_view_instance = None
-        self._slice_view_instance = None
         self._undo_stack = None
         self.win = None
         self.fileopendialog = None

@@ -55,16 +55,13 @@ class CreateXoverCommand(UndoCommand):
         strand5p.setConnection3p(strand3p)
         strand3p.setConnection5p(strand5p)
 
-        ss5 = strand5p.strandSet()
-        id_5p = ss5.idNum()
-        st5p = ss5.strandType()
-        ss3 = strand3p.strandSet()
-        id_3p = ss3.idNum()
-        st3p = ss3.strandType()
+        # ss5 = strand5p.strandSet()
+        # id_5p = ss5.idNum()
+        # st5p = ss5.strandType()
+        # ss3 = strand3p.strandSet()
+        # id_3p = ss3.idNum()
+        # st3p = ss3.strandType()
 
-        # part.partActiveVirtualHelixChangedSignal.emit(part, id_5p)
-        # strand5p.strandXover5pChangedSignal.emit(strand5p, strand3p)
-        # if self._update_oligo and not getBatch():
         if self._update_oligo:
             strand5p.strandUpdateSignal.emit(strand5p)
             strand3p.strandUpdateSignal.emit(strand3p)
@@ -101,15 +98,13 @@ class CreateXoverCommand(UndoCommand):
                     # emits strandHasNewOligoSignal
                     Strand.setOligo(strand, old_olg3p)
 
-        ss5 = strand5p.strandSet()
-        id_5p = ss5.idNum()
-        st5p = ss5.strandType()
-        ss3 = strand3p.strandSet()
-        id_3p = ss3.idNum()
-        st3p = ss3.strandType()
+        # ss5 = strand5p.strandSet()
+        # id_5p = ss5.idNum()
+        # st5p = ss5.strandType()
+        # ss3 = strand3p.strandSet()
+        # id_3p = ss3.idNum()
+        # st3p = ss3.strandType()
 
-        # part.partActiveVirtualHelixChangedSignal.emit(part, id_5p)
-        # strand5p.strandXover5pChangedSignal.emit(strand5p, strand3p)
         if self._update_oligo:
             strand5p.strandUpdateSignal.emit(strand5p)
             strand3p.strandUpdateSignal.emit(strand3p)
@@ -178,15 +173,13 @@ class RemoveXoverCommand(UndoCommand):
                 # emits strandHasNewOligoSignal
                 Strand.setOligo(strand, new_olg3p)
 
-        ss5 = strand5p.strandSet()
-        id_5p = ss5.idNum()
-        st5p = ss5.strandType()
-        ss3 = strand3p.strandSet()
-        id_3p = ss3.idNum()
-        st3p = ss3.strandType()
+        # ss5 = strand5p.strandSet()
+        # id_5p = ss5.idNum()
+        # st5p = ss5.strandType()
+        # ss3 = strand3p.strandSet()
+        # id_3p = ss3.idNum()
+        # st3p = ss3.strandType()
 
-        # part.partActiveVirtualHelixChangedSignal.emit(part, id_5p)
-        # strand5p.strandXover5pChangedSignal.emit(strand5p, strand3p)
         strand5p.strandUpdateSignal.emit(strand5p)
         strand3p.strandUpdateSignal.emit(strand3p)
     # end def
@@ -222,15 +215,13 @@ class RemoveXoverCommand(UndoCommand):
         strand5p.setConnection3p(strand3p)
         strand3p.setConnection5p(strand5p)
 
-        ss5 = strand5p.strandSet()
-        id_5p = ss5.idNum()
-        st5p = ss5.strandType()
-        ss3 = strand3p.strandSet()
-        id_3p = ss3.idNum()
-        st3p = ss3.strandType()
+        # ss5 = strand5p.strandSet()
+        # id_5p = ss5.idNum()
+        # st5p = ss5.strandType()
+        # ss3 = strand3p.strandSet()
+        # id_3p = ss3.idNum()
+        # st3p = ss3.strandType()
 
-        # part.partActiveVirtualHelixChangedSignal.emit(part, id_5p)
-        # strand5p.strandXover5pChangedSignal.emit(strand5p, strand3p)
         strand5p.strandUpdateSignal.emit(strand5p)
         strand3p.strandUpdateSignal.emit(strand3p)
     # end def

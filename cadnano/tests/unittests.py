@@ -46,7 +46,7 @@ enviroseed = os.environ.get('UNITTESTS_PRNG_SEED', False)
 if enviroseed != False:
     seed = int(enviroseed)
 del enviroseed
-print "Seeding tests.unittests; use setenv UNITTESTS_PRNG_SEED=%i to replay."%seed
+print("Seeding tests.unittests; use setenv UNITTESTS_PRNG_SEED=%i to replay." % seed)
 
 
 class UnitTests(CadnanoGuiTestCase):

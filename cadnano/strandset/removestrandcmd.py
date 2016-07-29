@@ -77,7 +77,6 @@ class RemoveStrandCommand(UndoCommand):
                 id_num = strandset.idNum()
                 # Why is this signal emitted here?
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-                #strand5p.strandXover5pChangedSignal.emit(strand5p, strand)
             strand5p.strandUpdateSignal.emit(strand5p)
         # end if
         if strand3p is not None:
@@ -90,7 +89,6 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-                # strand.strandXover5pChangedSignal.emit(strand, strand3p)
             strand3p.strandUpdateSignal.emit(strand3p)
         # end if
         # Emit a signal to notify on completion
@@ -164,8 +162,6 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-                # strand5p.strandXover5pChangedSignal.emit(
-                #                                        strand5p, strand)
             strand5p.strandUpdateSignal.emit(strand5p)
             strand.strandUpdateSignal.emit(strand)
 
@@ -174,7 +170,6 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-                # strand.strandXover5pChangedSignal.emit(strand, strand3p)
             strand3p.strandUpdateSignal.emit(strand3p)
             strand.strandUpdateSignal.emit(strand)
     # end def

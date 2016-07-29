@@ -74,5 +74,5 @@ class ModelTests(CadnanoGuiTestCase):
 
 
 if __name__ == '__main__':
-    print "Running Model Tests"
+    print("Running Model Tests")
     tests.cadnanoguitestcase.main()
