@@ -1,11 +1,9 @@
-from PyQt5.QtCore import QObject, pyqtSignal
 from PyQt5.QtWidgets import QGraphicsRectItem
-
 from cadnano import util
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-
 from .nucleicacidpartitem import NucleicAcidPartItem
+
 
 class PathRootItem(QGraphicsRectItem):
     """
@@ -57,11 +55,10 @@ class PathRootItem(QGraphicsRectItem):
             # self._instance_items[plasmid_part_item] = plasmid_part_item
         elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = NucleicAcidPartItem(model_part_instance,
-                                                viewroot=self,
-                                                parent=self)
+                                               viewroot=self,
+                                               parent=self)
             self._part_item_for_part_instance[model_part_instance] = na_part_item
             win.path_tool_manager.setActivePart(na_part_item)
-            self.setModifyState(win.action_modify.isChecked())
         else:
             raise NotImplementedError
     # end def

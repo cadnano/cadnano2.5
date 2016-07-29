@@ -1,12 +1,10 @@
-from PyQt5.QtCore import pyqtSignal, Qt
-from PyQt5.QtCore import QFileInfo, QSettings
+from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSettings
 from PyQt5.QtCore import QPoint, QSize
-from PyQt5.QtGui import QPaintEngine, QIcon
-from PyQt5.QtWidgets import QGraphicsObject, QGraphicsScene
-from PyQt5.QtWidgets import QGraphicsView, QMainWindow
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsScene
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QApplication, QWidget, QAction
-from PyQt5.QtWidgets import QSizePolicy, QFrame
 
 from cadnano import app
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
@@ -22,7 +20,13 @@ from cadnano.gui.ui.mainwindow import ui_mainwindow
 
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
-    """docstring for DocumentWindow"""
+    """DocumentWindow subclasses QMainWindow and Ui_MainWindow. It performs
+    some initialization operations that must be done in code rather than
+    using Qt Creator.
+
+    Attributes:
+        controller (DocumentController): 
+    """
     def __init__(self, parent=None, doc_ctrlr=None):
         super(DocumentWindow, self).__init__(parent)
 
@@ -41,13 +45,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.property_widget.configure(window=self, document=doc)
         self.property_buttonbox.setVisible(False)
 
-        self.tool_managers = None # initialize
+        self.tool_managers = None  # initialize
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
-        self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),\
-                                       parent=None,\
-                                       window=self,\
+        self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),
+                                       parent=None,
+                                       window=self,
                                        document=doc)
         self.sliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
         self.slicescene.addItem(self.sliceroot)
@@ -59,9 +63,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
-        self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),\
-                                     parent=None,\
-                                     window=self,\
+        self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),
+                                     parent=None,
+                                     window=self,
                                      document=doc)
         self.pathroot.setFlag(QGraphicsItem.ItemHasNoContents)
         self.pathscene.addItem(self.pathroot)
@@ -89,21 +93,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         # Edit menu setup
         self.actionUndo = doc_ctrlr.undoStack().createUndoAction(self)
         self.actionRedo = doc_ctrlr.undoStack().createRedoAction(self)
-        self.actionUndo.setText(QApplication.translate(
-                                            "MainWindow", "Undo",
-                                            None))
-        self.actionUndo.setShortcut(QApplication.translate(
-                                            "MainWindow", "Ctrl+Z",
-                                            None))
-        self.actionRedo.setText(QApplication.translate(
-                                            "MainWindow", "Redo",
-                                            None))
-        self.actionRedo.setShortcut(QApplication.translate(
-                                            "MainWindow", "Ctrl+Shift+Z",
-                                            None))
+        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
+        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
+        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
+        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
         self.sep = QAction(self)
         self.sep.setSeparator(True)
-        self.menu_edit.insertAction(self.action_modify, self.sep)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
         self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size

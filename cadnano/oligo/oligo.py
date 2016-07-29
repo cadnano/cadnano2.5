@@ -38,11 +38,11 @@ class Oligo(CNObject):
         self._strand5p = None
         self._is_loop = False
         self._props = {
-                'name': "oligo%s" % str(id(self))[-4:],
-                'color': "#cc0000" if color is None else color,
-                'length': 0,
-                'is_visible': True
-        }
+                       'name': "oligo%s" % str(id(self))[-4:],
+                       'color': "#cc0000" if color is None else color,
+                       'length': 0,
+                       'is_visible': True
+                      }
     # end def
 
     def __repr__(self):

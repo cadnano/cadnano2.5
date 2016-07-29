@@ -95,7 +95,7 @@ class CNOutlinerItem(QTreeWidgetItem):
     def activate(self):
         self.setBackground(NAME_COL, getBrushObj(styles.ACTIVE_COLOR))
         self.is_active = True
-    #end def
+    # end def
 
     def deactivate(self):
         self.setBackground(NAME_COL, getBrushObj(styles.INACTIVE_COLOR))

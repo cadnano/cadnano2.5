@@ -5,9 +5,8 @@ from bisect import bisect_left
 
 import numpy as np
 import pandas as pd
-from collections import deque, Iterable
+from collections import deque
 from cadnano.strandset import StrandSet
-from cadnano.enum import StrandType
 from cadnano.cnobject import CNObject
 
 """
@@ -19,28 +18,29 @@ from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
 
+
 def _defaultProperties(id_num):
-    props = [
-    ('name', "vh%d" % (id_num)),
-    ('is_visible', True),
-    ('color', '#00000000'),
-    # ('eulerZ', 17.143*2),    # 0.5*360/10.5
-    ('eulerZ', 0.),
-    ('scamZ', 10.),
-    ('neighbor_active_angle', 0.0),
-    ('neighbors', '[]'),
-    ('bases_per_repeat', 21),
-    ('turns_per_repeat', 2),
-    ('repeat_hint', 2), # used in path view for how many repeats to display PXIs
-    ('helical_pitch', 1.),
-    ('minor_groove_angle', 180.), #171.),
-    ('length', -1),
-    ('z', 0.0)
-    ]
+    props = [('name', "vh%d" % (id_num)),
+             ('is_visible', True),
+             ('color', '#00000000'),
+             # ('eulerZ', 17.143*2),    # 0.5*360/10.5
+             ('eulerZ', 0.),
+             ('scamZ', 10.),
+             ('neighbor_active_angle', 0.0),
+             ('neighbors', '[]'),
+             ('bases_per_repeat', 21),
+             ('turns_per_repeat', 2),
+             ('repeat_hint', 2),  # used in path view for how many repeats to display PXIs
+             ('helical_pitch', 1.),
+             ('minor_groove_angle', 180.),  # 171.),
+             ('length', -1),
+             ('z', 0.0)
+             ]
     return tuple(zip(*props))
 # end def
 
-Z_PROP_INDEX = -1 # index for Dataframe.iloc calls
+Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
+
 
 def _defaultDataFrame(size):
     dummy_id_num = 999
@@ -49,8 +49,9 @@ def _defaultDataFrame(size):
     return df
 # end def
 DEFAULT_SIZE = 256
-DEFAULT_FULL_SIZE = DEFAULT_SIZE*48
+DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
 DEFAULT_RADIUS = 1.125
+
 
 class VirtualHelixGroup(CNObject):
     """This is composed of a group of arrays
@@ -88,7 +89,7 @@ class VirtualHelixGroup(CNObject):
         self.indices = np.zeros((DEFAULT_FULL_SIZE,), dtype=int)
 
         # 2. per virtual helix allocations
-        self.total_id_nums = 0 # should be equal to len(self.reserved_ids)
+        self.total_id_nums = 0  # should be equal to len(self.reserved_ids)
 
         self._origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
         """For doing 2D X,Y manipulation for now.  keep track of
@@ -99,7 +100,7 @@ class VirtualHelixGroup(CNObject):
 
         self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float)
 
-        self._offset_and_size = [None]*DEFAULT_SIZE
+        self._offset_and_size = [None] * DEFAULT_SIZE
         '''book keeping for fast lookup of indices for insertions and deletions
         and coordinate points
         the length of this is the max id_num used
@@ -110,8 +111,8 @@ class VirtualHelixGroup(CNObject):
         self.vh_properties = _defaultDataFrame(DEFAULT_SIZE)
         self._group_properties = {}
 
-        self.fwd_strandsets = [None]*DEFAULT_SIZE
-        self.rev_strandsets = [None]*DEFAULT_SIZE
+        self.fwd_strandsets = [None] * DEFAULT_SIZE
+        self.rev_strandsets = [None] * DEFAULT_SIZE
         self.segment_dict = {}  # for tracking strand segments
 
         # Cache Stuff
@@ -123,9 +124,9 @@ class VirtualHelixGroup(CNObject):
         self._resetOriginCache()
 
         # scratch allocations for vector calculations
-        self.m3_scratch0 = np.zeros((3,3), dtype=float)
-        self.m3_scratch1 = np.zeros((3,3), dtype=float)
-        self.m3_scratch2 = np.zeros((3,3), dtype=float)
+        self.m3_scratch0 = np.zeros((3, 3), dtype=float)
+        self.m3_scratch1 = np.zeros((3, 3), dtype=float)
+        self.m3_scratch2 = np.zeros((3, 3), dtype=float)
         self.eye3_scratch = np.eye(3, 3, dtype=float)    # don't change this
         self.delta2D_scratch = np.empty((1,), dtype=float)
         self.delta3D_scratch = np.empty((1,), dtype=float)
@@ -137,12 +138,12 @@ class VirtualHelixGroup(CNObject):
 
     def _resetOriginCache(self):
         self._origin_cache = {}
-        self._origin_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
+        self._origin_cache_keys = deque([None] * DEFAULT_CACHE_SIZE)
     # end def
 
     def _resetPointCache(self):
         self._point_cache = {}
-        self._point_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
+        self._point_cache_keys = deque([None] * DEFAULT_CACHE_SIZE)
     # end def
 
     def document(self):
@@ -291,7 +292,7 @@ class VirtualHelixGroup(CNObject):
         lo, hi = offset, offset + size
         return (self.axis_pts[lo:hi],
                 self.fwd_pts[lo:hi],
-                self.rev_pts[lo:hi] )
+                self.rev_pts[lo:hi])
     # end def
 
     def getCoordinate(self, id_num, idx):
@@ -370,7 +371,7 @@ class VirtualHelixGroup(CNObject):
         """
         valid_pts = np.where(self._origin_pts != np.inf)
         vps = self._origin_pts[valid_pts]
-        vps = vps.reshape((len(vps)//2, 2))
+        vps = vps.reshape((len(vps) // 2, 2))
         xs = vps[:, 0]
         ys = vps[:, 1]
         xLL = np.amin(xs)
@@ -507,7 +508,7 @@ class VirtualHelixGroup(CNObject):
             tuple[bool, bool]: True if a strand is present at idx,
             False otherwise.
         """
-        return (self.fwd_strandsets[id_num].hasStrandAt(idx, idx),\
+        return (self.fwd_strandsets[id_num].hasStrandAt(idx, idx),
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
@@ -542,8 +543,9 @@ class VirtualHelixGroup(CNObject):
         fwd_strandsets = self.fwd_strandsets
         rev_strandsets = self.rev_strandsets
         for id_num in self.reserved_ids:
-            ret = max(ret, fwd_strandsets[id_num].indexOfRightmostNonemptyBase(),
-                            rev_strandsets[id_num].indexOfRightmostNonemptyBase())
+            ret = max(ret,
+                      fwd_strandsets[id_num].indexOfRightmostNonemptyBase(),
+                      rev_strandsets[id_num].indexOfRightmostNonemptyBase())
         return ret
     # end def
 
@@ -558,12 +560,12 @@ class VirtualHelixGroup(CNObject):
         self._resetOriginCache()
         self._resetPointCache()
         origin_pts = self._origin_pts
-        delta_origin = delta[:2] # x, y only
+        delta_origin = delta[:2]  # x, y only
         for id_num in id_nums:
             coord_pts, fwd_pts, rev_pts = self.getCoordinates(id_num)
-            coord_pts += delta # use += to modify the view
-            fwd_pts += delta # use += to modify the view
-            rev_pts += delta # use += to modify the view
+            coord_pts += delta  # use += to modify the view
+            fwd_pts += delta  # use += to modify the view
+            rev_pts += delta  # use += to modify the view
             # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
             # print("new origin", self.locationQt(id_num, 15./self.radius()))
@@ -618,7 +620,9 @@ class VirtualHelixGroup(CNObject):
         neighbors, indices = self.queryBasePoint(radius, *coord)
         non_id_num_idxs, _ = np.where(neighbors != id_num)
         return list(zip(np.take(neighbors, non_id_num_idxs),
-                        np.take(indices, non_id_num_idxs)    ))
+                        np.take(indices, non_id_num_idxs)
+                        )
+                    )
     # end def
 
     def getVirtualHelixOriginNeighbors(self, id_num, radius):
@@ -661,7 +665,7 @@ class VirtualHelixGroup(CNObject):
         len_axis_pts = len(self.axis_pts)
 
         new_axis_pts, new_fwd_pts, new_rev_pts = points
-        num_points = len(new_axis_pts) # number of points being added
+        num_points = len(new_axis_pts)  # number of points being added
 
         self._resetPointCache()
 
@@ -670,7 +674,7 @@ class VirtualHelixGroup(CNObject):
         lo_idx_limit, hi_idx_limit = offset, offset + size
         if is_right:
             insert_idx = hi_idx_limit
-        else: # prepend
+        else:  # prepend
             insert_idx = offset
 
         # new_lims = (hi_idx_limit, hi_idx_limit + num_points)
@@ -686,7 +690,7 @@ class VirtualHelixGroup(CNObject):
         total_points = self.total_points
         if total_points + num_points > len_axis_pts:
             diff = self.total_points + num_points - len_axis_pts
-            number_of_new_elements = math.ceil(diff / DEFAULT_FULL_SIZE)*DEFAULT_FULL_SIZE
+            number_of_new_elements = math.ceil(diff / DEFAULT_FULL_SIZE) * DEFAULT_FULL_SIZE
             total_rows = len_axis_pts + number_of_new_elements
             # resize per virtual base allocations
             self.axis_pts.resize((total_rows, 3))
@@ -754,7 +758,7 @@ class VirtualHelixGroup(CNObject):
         """
         norm = np.linalg.norm(v)
         if norm == 0:
-           return v
+            return v
         return v / norm
     # end def
 
@@ -930,10 +934,10 @@ class VirtualHelixGroup(CNObject):
         BW = self._BASE_WIDTH
         hp, bpr, tpr, eulerZ, mgroove = self.vh_properties.loc[id_num,
                                                             ['helical_pitch',
-                                                            'bases_per_repeat',
-                                                            'turns_per_repeat',
-                                                            'eulerZ',
-                                                            'minor_groove_angle']]
+                                                             'bases_per_repeat',
+                                                             'turns_per_repeat',
+                                                             'eulerZ',
+                                                             'minor_groove_angle']]
         twist_per_base = tpr*360./bpr
         """
         + angle is CCW

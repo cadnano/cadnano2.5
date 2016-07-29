@@ -17,7 +17,7 @@ elif util.isWindows():
     THE_FONT = "Calibri"
     THE_FONT = "Arial"
     THE_FONT_SIZE = 9
-else: # linux
+else:  # linux
     THE_FONT = "DejaVu Sans"
     THE_FONT_SIZE = 9
 
@@ -29,9 +29,9 @@ BLUE_STROKE = '#0066cc'
 # PINK_STROKE = '#cc6633'
 # LIGHT_ORANGE_FILL = '#ffeab7'
 # LIGHT_ORANGE_STROKE = '#ea8451'
-GRAY_FILL = '#eeeeee' # (was #a1a1a1)
+GRAY_FILL = '#eeeeee'  # (was #a1a1a1)
 # MIDGRAY_FILL = '#9a9a9a'
-GRAY_STROKE = '#666666' # (was 424242)
+GRAY_STROKE = '#666666'  # (was 424242)
 
 
 # PARTCOLORS = [QColor() for i in range(12)]

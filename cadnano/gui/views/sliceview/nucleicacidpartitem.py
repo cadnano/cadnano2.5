@@ -1,6 +1,5 @@
-from collections import OrderedDict
 from ast import literal_eval
-from PyQt5.QtCore import QPointF, Qt, QLineF, QRectF, QEvent, pyqtSignal, pyqtSlot, QObject
+from PyQt5.QtCore import QPointF, Qt, QRectF, pyqtSlot
 from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsRectItem
@@ -12,11 +11,10 @@ from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
-from . import slicestyles as styles
-
 from .virtualhelixitem import VirtualHelixItem
 from .prexovermanager import PreXoverManager
 from .griditem import GridItem
+from . import slicestyles as styles
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -32,6 +30,7 @@ _SELECTED_WIDTH = styles.SELECTED_PEN_WIDTH
 _SELECTED_ALPHA = styles.SELECTED_ALPHA
 
 _BOUNDING_RECT_PADDING = 10
+
 
 class NucleicAcidPartItem(QAbstractPartItem):
     """Parent should be either a SliceRootItem, or an AssemblyItem.
@@ -53,7 +52,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         self.prexover_manager = PreXoverManager(self)
 
-        self.hide() # hide while until after attemptResize() to avoid flicker
+        self.hide()  # hide while until after attemptResize() to avoid flicker
 
         self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
         self.boundRectToModel()
@@ -105,7 +104,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
-    #end def
+    # end def
 
     def partActiveBaseInfoSlot(self, part, info):
         pxom = self.prexover_manager
@@ -366,7 +365,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def setModifyState(self, bool_val):
         """Hides the mod_rect when modify state disabled."""
         self._can_show_mod_circ = bool_val
-        if bool_val == False:
+        if bool_val is False:
             self._mod_circ.hide()
     # end def
 

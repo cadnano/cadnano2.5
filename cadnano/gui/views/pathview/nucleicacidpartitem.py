@@ -1,16 +1,11 @@
 from __future__ import division
 
-from collections import defaultdict
-from math import ceil
+from PyQt5.QtCore import QRectF
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, pyqtSlot, QSignalMapper
-from PyQt5.QtGui import QBrush, QColor, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsPathItem, QInputDialog
-
-from cadnano import app, getBatch, util
+from cadnano import getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.ui.mainwindow.svgbutton import SVGButton
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
@@ -18,14 +13,13 @@ from . import pathstyles as styles
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import VirtualHelixItem
-from cadnano.enum import StrandType
-
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 _BOUNDING_RECT_PADDING = 20
 _VH_XOFFSET = styles.VH_XOFFSET
+
 
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering"""
@@ -92,7 +86,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
-    #end def
+    # end def
 
     def partActiveBaseInfoSlot(self, part, info):
         pxoig = self.prexover_manager
@@ -338,7 +332,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def setModifyState(self, bool):
         """Hides the modRect when modify state disabled."""
         self._can_show_mod_rect = bool
-        if bool == False:
+        if bool is False:
             self._mod_rect.hide()
 
     def getOrderedVirtualHelixList(self):

@@ -146,4 +146,4 @@ if __name__ == '__main__':
         raise ValueError("wrong number of arguments")
 
     file_list = createPyQt5Module(in_path)
-#end def
+# end def

@@ -1,9 +1,10 @@
 import sys
 import os.path
-pjoin = os.path.join
-from subprocess import PIPE, Popen, check_output
 import shutil
 import glob
+from subprocess import Popen, check_output
+
+pjoin = os.path.join
 
 """
 If you install Qt5 / PyQt5 with pyqt5_check.py this will
@@ -25,6 +26,7 @@ otool -L <file> | awk '{print $1}'
 
 """
 
+
 def getsitePackagesPath():
     if hasattr(sys, 'real_prefix'):
         # virtualenv
@@ -40,9 +42,10 @@ def getsitePackagesPath():
 # end def
 
 QT_VERSION = "5.5"
-PY_VERSION =  "%d.%d" % (sys.version_info[0], sys.version_info[1])
+PY_VERSION = "%d.%d" % (sys.version_info[0], sys.version_info[1])
 python_root = os.path.abspath(sys.exec_prefix)
 site_packages_path = getsitePackagesPath()
+
 
 def getLinkedInfo(file_name, do_print=False):
     """ Wrapper for `otool -l`
@@ -59,6 +62,7 @@ def getLinkedInfo(file_name, do_print=False):
         print(paths)
     return paths
 # end def
+
 
 def installRename(file_list, in_path, out_path="", old_rpath=""):
     """ For renaming PyQt5 *.so rpaths such that the Qt5 libraries will
@@ -86,31 +90,29 @@ def installRename(file_list, in_path, out_path="", old_rpath=""):
                                 "-delete_rpath",
                                 old_rpath,
                                 pjoin(out_path, file_name)
-                            ]
+                                ]
             cmd_delete_rpath = ' '.join(cmd_delete_rpath)
-            renameproc = Popen(cmd_delete_rpath, shell=True,
-                                            cwd=out_path)
+            renameproc = Popen(cmd_delete_rpath, shell=True, cwd=out_path)
             renameproc.wait()
         cmd_add_rpath = ["install_name_tool",
-                        "-add_rpath",
-                        "@loader_path/Qt/lib",
-                        pjoin(out_path, file_name)
-                        ]
+                         "-add_rpath",
+                         "@loader_path/Qt/lib",
+                         pjoin(out_path, file_name)
+                         ]
         cmd_add_rpath = ' '.join(cmd_add_rpath)
-        renameproc = Popen(cmd_add_rpath, shell=True,
-                                        cwd=out_path)
+        renameproc = Popen(cmd_add_rpath, shell=True, cwd=out_path)
         renameproc.wait()
 
         cmd_id = ["install_name_tool",
-                        "-id",
-                        "@executable_path/lib/python{}/site-packages/PyQt5/{}".format(PY_VERSION, file_name),
-                        pjoin(out_path, file_name)
-                        ]
+                  "-id",
+                  "@executable_path/lib/python{}/site-packages/PyQt5/{}".format(PY_VERSION, file_name),
+                  pjoin(out_path, file_name)
+                  ]
         cmd_id = ' '.join(cmd_id)
-        idproc = Popen(cmd_id, shell=True,
-                             cwd=out_path)
+        idproc = Popen(cmd_id, shell=True, cwd=out_path)
         idproc.wait()
 # end for
+
 
 def copyFrameworks(destination_path, get_translations=False):
     """
@@ -123,11 +125,11 @@ def copyFrameworks(destination_path, get_translations=False):
 
     plugin_path = 'Qt%s/plugins' % (QT_VERSION)
     shutil.copytree(os.path.join(python_root, plugin_path),
-            pjoin(dst_path, 'plugins'))
+                    pjoin(dst_path, 'plugins'))
     if get_translations:
         translations_path = 'Qt%s/translations' % (QT_VERSION)
         shutil.copytree(pjoin(python_root, translations_path),
-                pjoin(dst_path, 'translations'))
+                        pjoin(dst_path, 'translations'))
 
     check_path = pjoin(python_root, 'Qt{}/lib/*.framework'.format(QT_VERSION))
     filepath_list = glob.glob(check_path)
@@ -146,6 +148,7 @@ def copyFrameworks(destination_path, get_translations=False):
     # end for
 # end def
 
+
 def copyPyQt5(destination_path):
     """ Location to put a folder called PyQt5
     """
@@ -163,6 +166,7 @@ def copyPyQt5(destination_path):
     shutil.copy2('__wininit__.py', pjoin(dst_path, 'PyQt5', '__init__.py'))
     return dst_path, file_list
 # end def
+
 
 def createPyQt5Module(destination_path):
     if not os.path.exists(destination_path):
@@ -187,4 +191,4 @@ if __name__ == '__main__':
         raise ValueError("wrong number of arguments")
 
     file_list = createPyQt5Module(in_path)
-#end def
+# end def

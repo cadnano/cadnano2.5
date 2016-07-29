@@ -1,20 +1,19 @@
-from PyQt5.QtCore import QRectF, Qt, QPointF
-from PyQt5.QtGui import QBrush, QPen, QFont
-from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsItemGroup, QGraphicsObject
+from PyQt5.QtCore import QRectF, QPointF
+from PyQt5.QtWidgets import QGraphicsObject
 
 from cadnano import util
-from cadnano.enum import StrandType
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import getPenObj, getNoBrush
 
 _BW = styles.PATH_BASE_WIDTH
 _TOOL_RECT = QRectF(0, 0, _BW, _BW)  # protected not private
-_RECT = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,\
-               -styles.PATH_BASE_HL_STROKE_WIDTH,\
-               _BW + 2*styles.PATH_BASE_HL_STROKE_WIDTH,\
-               _BW + 2*styles.PATH_BASE_HL_STROKE_WIDTH)
+_RECT = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,
+               -styles.PATH_BASE_HL_STROKE_WIDTH,
+               _BW + 2 * styles.PATH_BASE_HL_STROKE_WIDTH,
+               _BW + 2 * styles.PATH_BASE_HL_STROKE_WIDTH)
 _PEN = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
 _BRUSH = getNoBrush()
+
 
 class AbstractPathTool(QGraphicsObject):
     """Abstract base class to be subclassed by all other pathview tools."""
@@ -51,7 +50,8 @@ class AbstractPathTool(QGraphicsObject):
         """Takes care of caching the location so that a tool switch
         outside the context of an event will know where to
         position the new tool and snaps self's pos to the upper
-        left hand corner of the base the user is mousing over"""
+        left hand corner of the base the user is mousing over.
+        """
         if virtual_helix_item:
             if self.parentObject() != virtual_helix_item:
                 self.setParentItem(virtual_helix_item)
@@ -73,11 +73,20 @@ class AbstractPathTool(QGraphicsObject):
             #     self.setParentItem(_mother)
 
     def lastLocation(self):
-        """A tuple (virtual_helix_item, QPoint) representing the last
-        known location of the mouse for purposes of positioning
-        the graphic of a new tool on switching tools (the tool
-        will have updateLocation(*old_tool.lastLocation()) called
-        on it)"""
+        """A tool's last_location consists of a VirtualHelixItem and a ScenePos
+        (QPoint) representing the last known location of the mouse.
+
+        It can be used to provide visual continuity when switching tools.
+        When the new tool is selected, this method will be invoked by
+        calling updateLocation(*old_tool.lastLocation()).
+
+        Returns:
+            location (tuple): (virtual_helix_item, QPoint) representing the last
+            known location of the mouse for purposes of positioning
+            the graphic of a new tool on switching tools (the tool
+            will have called
+            on it)
+        """
         return self._last_location
 
     def setActive(self, will_be_active, old_tool=None):
@@ -98,7 +107,8 @@ class AbstractPathTool(QGraphicsObject):
 
     def widgetClicked(self):
         """Called every time a widget representing self gets clicked,
-        not just when changing tools."""
+        not just when changing tools.
+        """
         pass
 
     ####################### Coordinate Utilities ###########################
@@ -111,10 +121,10 @@ class AbstractPathTool(QGraphicsObject):
         return (is_fwd, x, strand_idx)
 
     def helixIndex(self, point):
-        """
-        Returns the (row, col) of the base which point
-        lies within.
-        point is in virtual_helix_item coordinates.
+        """Returns the (row, col) of the base which point lies within.
+
+        Returns:
+            point (tuple) in virtual_helix_item coordinates
         """
         x = int(int(point.x()) / _BW)
         y = int(int(point.y()) / _BW)
@@ -132,7 +142,7 @@ class AbstractPathTool(QGraphicsObject):
         # Doesn't know numBases, can't check if point is too far right
         if col < 0 or row < 0 or row > 1:
             return None
-        return QPointF(col*_BW, row*_BW)
+        return QPointF(col * _BW, row * _BW)
     # end def
 
     def hoverLeaveEvent(self, event):

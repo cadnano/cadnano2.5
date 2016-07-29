@@ -269,7 +269,7 @@ class Document(CNObject):
             # end for
         # end for
         return selected_oligos if len(selected_oligos) > 0 else None
-    #end def
+    # end def
 
     def clearAllSelected(self):
         """ Clear all selections
@@ -868,7 +868,7 @@ class Document(CNObject):
                         'ext_locations': list(mod_dict['ext_locations'])
                         }
         return res
-    #end def
+    # end def
 
     def getModStrandIdx(self, key):
         """ Convert a key of a mod instance relative to a part

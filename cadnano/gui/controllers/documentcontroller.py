@@ -1,31 +1,23 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
-
-from cadnano import app, setReopen, setBatch
-from cadnano.fileio.nnodecode import decodeFile
-from cadnano.fileio.nnoencode import encodeToFile
-
-from cadnano.gui.views.documentwindow import DocumentWindow
-from cadnano.gui.ui.dialogs.ui_about import Ui_About
-
-from cadnano.gui.views import styles
-from cadnano import util
-
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
-
-from PyQt5.QtGui import QPainter, QIcon, QKeySequence
-from PyQt5.QtWidgets import (   QApplication, QDialog,
-                                QDockWidget, QFileDialog, QActionGroup)
-from PyQt5.QtWidgets import (   QGraphicsItem, QMainWindow,
-                                QMessageBox, QStyleOptionGraphicsItem)
+from PyQt5.QtGui import QPainter, QKeySequence
+from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QFileDialog, QActionGroup
+from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
+from PyQt5.QtWidgets import QStyleOptionGraphicsItem
 from PyQt5.QtSvg import QSvgGenerator
+from cadnano.fileio.nnodecode import decodeFile, encodeToFile
+from cadnano.gui.views.documentwindow import DocumentWindow
+from cadnano.gui.ui.dialogs.ui_about import Ui_About
+from cadnano.gui.views import styles
+from cadnano import app, setReopen, setBatch, util
 
-""" Allow only one part per document for now until part moving
-is properly supported
-"""
+
 ONLY_ONE = True
+"""bool: Retricts Document to creating only one Part if True."""
+
 
 class DocumentController():
     """
@@ -71,14 +63,14 @@ class DocumentController():
 
         # setup tool exclusivity
         self.actiongroup = ag = QActionGroup(win)
-        action_group_list = [   'action_global_select',
-                                'action_global_pencil',
-                                'action_path_nick',
-                                'action_path_paint',
-                                'action_path_insertion',
-                                'action_path_skip',
-                                'action_path_add_seq',
-                                'action_path_mods']
+        action_group_list = ['action_global_select',
+                             'action_global_pencil',
+                             'action_path_nick',
+                             'action_path_paint',
+                             'action_path_insertion',
+                             'action_path_skip',
+                             'action_path_add_seq',
+                             'action_path_mods']
         for action_name in action_group_list:
             ag.addAction(getattr(win, action_name))
 
@@ -97,7 +89,6 @@ class DocumentController():
         win.action_SVG.triggered.connect(self.actionSVGSlot)
         win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
         win.action_preferences.triggered.connect(self.actionPrefsSlot)
-        win.action_modify.triggered.connect(self.actionModifySlot)
         win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
 
         win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
@@ -131,7 +122,6 @@ class DocumentController():
 
     # end def
 
-
     ### SLOTS ###
     def actionSelectForkSlot(self):
         win = self.win
@@ -163,11 +153,14 @@ class DocumentController():
         """Displays the about cadnano dialog."""
         dialog = QDialog()
         dialog_about = Ui_About()  # reusing this dialog, should rename
-        dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
+        dialog.setStyleSheet(
+            "QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
         dialog_about.setupUi(dialog)
         dialog.exec_()
 
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
+    """list: String names of enabled filter types."""
+
     def actionFilterVirtualHelixSlot(self):
         """Disables all other selection filters when active."""
         fH = self.win.action_filter_handle
@@ -286,7 +279,7 @@ class DocumentController():
 
         if len(self._document.children()) == 0:
             return  # no parts
-        if self.maybeSave() == False:
+        if self.maybeSave() is False:
             return  # user canceled in maybe save
         else:  # user did not cancel
             if self.filesavedialog is not None:
@@ -301,7 +294,7 @@ class DocumentController():
         3. Downstream, the file is selected in openAfterMaybeSave, and the selected
            file is actually opened in openAfterMaybeSaveCallback.
         """
-        if self.maybeSave() == False:
+        if self.maybeSave() is False:
             return  # user canceled in maybe save
         else:  # user did not cancel
             if hasattr(self, "filesavedialog"): # user did save

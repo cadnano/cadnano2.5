@@ -10,7 +10,7 @@ def write(filename, solids, format="binary"):
         write_binary(filename, solids)
     else:
         write_ascii(filename, solids)
-#end def
+# end def
 
 # derived from stl.py in visvis
 # Copyright (C) 2012, Almar Klein

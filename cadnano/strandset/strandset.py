@@ -661,7 +661,7 @@ class StrandSet(CNObject):
                 xover = (strand.idNum(), is_fwd, strand.idx3Prime()) + s3p.dump5p()
                 xover_list.append(xover)
         return idxs, colors
-    #end def
+    # end def
 
     ### PRIVATE SUPPORT METHODS ###
     def addToStrandList(self, strand, update_segments=True):

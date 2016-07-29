@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from itertools import product
-
-from PyQt5.QtCore import QRectF, QLineF, Qt, QObject, QPointF
+from PyQt5.QtCore import QRectF, Qt, QObject, QPointF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
+from PyQt5.QtGui import QBrush, QColor, QPainterPath
 from PyQt5.QtGui import QPolygonF, QTransform
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
@@ -32,6 +30,7 @@ FWDPHOS_PP.addPolygon(TRIANGLE)
 REVPHOS_PP.addPolygon(T180.map(TRIANGLE))
 
 KEYINPUT_ACTIVE_FLAG = QGraphicsItem.ItemIsFocusable
+
 
 class PropertyWrapperObject(QObject):
     def __init__(self, item):
@@ -84,6 +83,7 @@ class Triangle(QGraphicsPathItem):
     # end def
 # end class
 
+
 class PreXoverLabel(QGraphicsSimpleTextItem):
     _XO_FONT = styles.XOVER_LABEL_FONT
     _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
@@ -110,7 +110,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         half_label_H = tBR.height() / 2.0
         half_label_W = tBR.width() / 2.0
 
-        labelX = BASE_WIDTH/2.0 - half_label_W #
+        labelX = BASE_WIDTH/2.0 - half_label_W
         if str_txt == '1':  # adjust for the number one
             labelX -= tBR.width()
 
@@ -128,7 +128,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 
         if outline:
             r = QRectF(self._tbr).adjusted(-half_label_W, 0,
-                                            half_label_W, half_label_H)
+                                           half_label_W, half_label_H)
             self._outline.setRect(r)
             self._outline.setPen(getPenObj('#ff0000', 0.25))
             self._outline.setY(2*half_label_H)
@@ -141,12 +141,13 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 
 PROX_ALPHA = 64
 
+
 class PreXoverItem(QGraphicsRectItem):
     """ A PreXoverItem exists between a single 'from' VirtualHelixItem index
     and zero or more 'to' VirtualHelixItem Indices
     """
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
-                to_vh_id_num, prexoveritemgroup, color):
+                 to_vh_id_num, prexoveritemgroup, color):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
@@ -155,7 +156,7 @@ class PreXoverItem(QGraphicsRectItem):
         self._phos_item = Triangle(FWDPHOS_PP, self)
         self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index,
-                to_vh_id_num, prexoveritemgroup, color)
+                       to_vh_id_num, prexoveritemgroup, color)
     # end def
 
     def shutdown(self):
@@ -172,7 +173,7 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
-                to_vh_id_num, prexoveritemgroup, color):
+                  to_vh_id_num, prexoveritemgroup, color):
         self.setParentItem(from_virtual_helix_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
@@ -185,7 +186,6 @@ class PreXoverItem(QGraphicsRectItem):
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self.setLabel(text=lbt)
         self._label.resetItem(is_fwd, color)
-
 
         phos = self._phos_item
         bonditem = self._bond_item
@@ -205,7 +205,7 @@ class PreXoverItem(QGraphicsRectItem):
             phos.setPen(getPenObj(color, 0.25))
             phos.setBrush(getNoBrush())
             bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
-                                    penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
+                                      penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
 
         if to_vh_id_num is not None:
@@ -214,7 +214,7 @@ class PreXoverItem(QGraphicsRectItem):
         else:
             self.setBrush(getBrushObj(color, alpha=0))
         self.show()
-    #end def
+    # end def
 
     def getInfo(self):
         """
@@ -262,7 +262,7 @@ class PreXoverItem(QGraphicsRectItem):
 
     def keyPressEvent(self, event):
         self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
-      # end def
+    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def setLabel(self, text=None, outline=False):
@@ -271,7 +271,7 @@ class PreXoverItem(QGraphicsRectItem):
             self._label.show()
         else:
             self._label.hide()
-    #end def
+    # end def
 
     def animate(self, item, property_name, duration, start_value, end_value):
         b_name = property_name.encode('ascii')
@@ -286,15 +286,15 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def setActiveHovered(self, is_active):
-        """
-        only rotate phosphate Triangle if `self.to_vh_id_num` is not `None`
+        """Rotate phosphate Triangle if `self.to_vh_id_num` is not `None`
+
         Args:
             is_active (bool): whether or not the PreXoverItem is parented to the
                 active VirtualHelixItem
         """
         if is_active:
             self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1, 0, 128) # overwrite running anim
+            self.animate(self, 'brush_alpha', 1, 0, 128)  # overwrite running anim
             # if self.to_vh_id_num is not None:
             self.animate(self._phos_item, 'rotation', 500, 0, -90)
         else:
@@ -314,7 +314,7 @@ class PreXoverItem(QGraphicsRectItem):
                 self.setLabel(text=None)
                 self.setBrush(getBrushObj(self._color, alpha=0))
             else:
-                self.setLabel(text= str(to_vh_id_num))
+                self.setLabel(text=str(to_vh_id_num))
                 inactive_alpha = PROX_ALPHA
                 self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
                 self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
@@ -371,5 +371,3 @@ class PreXoverItem(QGraphicsRectItem):
             self.setLabel(text=self._label_txt)
     # end def
 # end class
-
-

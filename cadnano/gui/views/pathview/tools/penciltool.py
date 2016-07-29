@@ -53,7 +53,7 @@ class PencilTool(AbstractPathTool):
 
     def setIsDrawingStrand(self, boolval):
         self._is_drawing_strand = boolval
-        if boolval == False:
+        if boolval is False:
             self._temp_strand_item.hideIt()
     # end def
 

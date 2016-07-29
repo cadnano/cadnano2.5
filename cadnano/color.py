@@ -87,7 +87,7 @@ except:
                 str: QColor compatible hex string in format '#rrggbbaa'
             """
             return "#{:02X}{:02X}{:02X}{:02X}".format(self.r, self.g, self.b, self.a)
-    #end def
+    # end def
 
 def _intToColor(color_number):
     """ legacy color support for converting integers to color objects based on the

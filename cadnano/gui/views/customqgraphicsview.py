@@ -153,7 +153,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def setGLView(self, boolval):
         scene = self.scene()
-        if boolval and self.is_GL == False:
+        if boolval and self.is_GL is False:
             self.is_GL = True
             # scene.drawBackground = self.drawBackgroundGL
             # self.setViewport(QGLWidget(QGLFormat(QGL.SampleBuffers)))
@@ -393,7 +393,7 @@ class CustomQGraphicsView(QGraphicsView):
                 QGraphicsView.mousePressEvent(self, event)
         else:
             QGraphicsView.mousePressEvent(self, event)
-    #end def
+    # end def
 
     def mouseReleaseEvent(self, event):
         """If panning, stop. If handles were pressed, release them."""
@@ -423,7 +423,7 @@ class CustomQGraphicsView(QGraphicsView):
                 self._selection_lock.processPendingToAddList()
             return QGraphicsView.mouseReleaseEvent(self, event)
 
-    #end def
+    # end def
 
     def _panEnable(self):
         """Enable ScrollHandDrag Mode in QGraphicsView (displays a hand

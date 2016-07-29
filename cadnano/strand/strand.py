@@ -577,7 +577,7 @@ class Strand(CNObject):
             else:
                 # print("default", index_diff_H, index_diff_L)
                 return False
-    #end def
+    # end def
 
     def insertionLengthBetweenIdxs(self, idxL, idxH):
         """includes the length of insertions in addition to the bases

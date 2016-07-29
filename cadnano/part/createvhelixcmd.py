@@ -1,12 +1,12 @@
 from ast import literal_eval
 import bisect
 from cadnano.cnproxy import UndoCommand
-from cadnano.part import VirtualHelixGroup
+
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(   self, part, x, y, z, length,
-                    id_num=None, properties=None,
-                    safe=True):
+    def __init__(self, part, x, y, z, length,
+                 id_num=None, properties=None,
+                 safe=True):
         """
         Args:
             safe (bool): safe must be True to update neighbors
@@ -24,7 +24,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.color = part.getColor()
         self.keys = None
         if properties is not None:
-            if isinstance(properties, tuple): # usually for unsafe
+            if isinstance(properties, tuple):  # usually for unsafe
                 self.keys, self.values = properties
             else:
                 self.keys = list(properties.keys())
@@ -32,9 +32,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         if safe:
             self.neighbors = []
         else:
-            self.neighbors = literal_eval(self.values[
-                                            self.keys.index('neighbors')]
-                                            )
+            self.neighbors = literal_eval(self.values[self.keys.index('neighbors')])
 
         self.threshold = 2.1*part.radius()
         self.safe = safe
@@ -62,9 +60,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         else:
             neighbors = self.neighbors
         if self.keys is not None:
-            part.setVirtualHelixProperties( id_num,
-                                            self.keys, self.values,
-                                            safe=False)
+            part.setVirtualHelixProperties(id_num,
+                                           self.keys, self.values,
+                                           safe=False)
             part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
     # end def

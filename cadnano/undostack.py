@@ -69,8 +69,8 @@ class UndoStack(object):
 
     def canUndo(self):
         return True if self.undostack > 0 else False
-    #end def
+    # end def
 
     def canRedo(self):
         return True if self.redostack > 0 else False
-    #end def
+    # end def

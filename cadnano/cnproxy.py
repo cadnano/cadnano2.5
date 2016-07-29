@@ -5,15 +5,15 @@ class ProxyObject(object):
     def __init__(self, parent):
         self._parent = parent
         self._signals = {}
-    #end def
+    # end def
 
     def parent(self):
         return self._parent
-    #end def
+    # end def
 
     def setParent(self, parent):
         self._parent = parent
-    #end def
+    # end def
 
     def connect(self, sender, bsignal, method):
         f = lambda x, y: method(x, *y)
@@ -31,7 +31,7 @@ class ProxyObject(object):
 
     def deleteLater(self):
         pass
-    #end def
+    # end def
 #end class
 
 class DummySignal(object):

@@ -3,24 +3,22 @@
 
 from math import floor, atan2, sqrt
 
-from PyQt5.QtCore import QRectF, Qt, QPointF
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtGui import QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
-from cadnano.enum import StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import ( newPenObj, getNoPen, getPenObj,
-                                getBrushObj, getNoBrush, getColorObj )
+from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
-from .strand.xoveritem import XoverNode3, XoverNode5
+from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
+
 
 def v2DistanceAndAngle(a, b):
     dx = b[0] - a[0]
@@ -245,7 +243,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         pen.setColor(getColorObj(styles.MINOR_GRID_STROKE_ACTIVE))
         self.setPen(pen)
         self.is_active = True
-    #end def
+    # end def
 
     def deactivate(self):
         pen = self.pen()

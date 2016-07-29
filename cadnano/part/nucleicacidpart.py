@@ -1,34 +1,18 @@
-import random
-from collections import defaultdict
-from heapq import heapify, heappush, heappop
-from itertools import product, islice
-
 from ast import literal_eval
 
 from cadnano import util
-from cadnano import preferences as prefs
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import UndoCommand
-from cadnano.enum import PartType, StrandType, GridType, PointType
-from cadnano.oligo import Oligo
+from cadnano.enum import PartType, GridType, PointType
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
-from cadnano.strand import Strand
-from cadnano.strandset import CreateStrandCommand
 from cadnano.strandset import SplitCommand
-from cadnano.strandset import StrandSet
+from .changeviewpropertycmd import ChangeViewPropertyCommand
+from .createvhelixcmd import CreateVirtualHelixCommand
+from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
+from .removepartcmd import RemovePartCommand
 from .removevhelixcmd import RemoveVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
-
-from .createvhelixcmd import CreateVirtualHelixCommand
-
-from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
-from .refresholigoscmd import RefreshOligosCommand
-from .removepartcmd import RemovePartCommand
-from .renumbercmd import RenumberVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
-from .changeviewpropertycmd import ChangeViewPropertyCommand
+
 
 class NucleicAcidPart(Part):
     """
@@ -64,7 +48,7 @@ class NucleicAcidPart(Part):
         gps["name"] = "NaPart%d" % self._count()
         gps['active_phos'] = None
         gps['crossover_span_angle'] = 45
-        gps['max_vhelix_length'] = self._STEP_SIZE*2
+        gps['max_vhelix_length'] = self._STEP_SIZE * 2
         gps['neighbor_active_angle'] = ''
         gps['grid_type'] = GridType.HONEYCOMB
         gps['virtual_helix_order'] = []
@@ -121,7 +105,7 @@ class NucleicAcidPart(Part):
         """
         radius = self._RADIUS
         # add a margin of 0.001 to account for floating point errors
-        res = self.queryVirtualHelixOrigin(2*radius - 0.001, point)
+        res = self.queryVirtualHelixOrigin(2 * radius - 0.001, point)
         res = list(res)
         if len(res) > 0:
             # print(res)
@@ -134,10 +118,10 @@ class NucleicAcidPart(Part):
                         existing_id_num = check_id_num
                         existing_pt = self.getVirtualHelixOrigin(existing_id_num)
                         print("vh{}\n{}\n{}\ndx: {}, dy: {}".format(existing_id_num,
-                                                        existing_pt,
-                                                        point,
-                                                        existing_pt[0] - point[0],
-                                                        existing_pt[1] - point[1]))
+                                                                    existing_pt,
+                                                                    point,
+                                                                    existing_pt[0] - point[0],
+                                                                    existing_pt[1] - point[1]))
                         return True
         return False
     # end def
@@ -171,7 +155,7 @@ class NucleicAcidPart(Part):
     # end def
     def boundDimensions(self, scale_factor=1.0):
         """Returns a tuple of rectangle definining the XY limits of a part"""
-        DMIN = 10#30
+        DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
         if xLL > -DMIN:
             xLL = -DMIN
@@ -181,7 +165,7 @@ class NucleicAcidPart(Part):
             xUR = DMIN
         if yUR < DMIN:
             yUR = DMIN
-        return xLL*scale_factor, yLL*scale_factor, xUR*scale_factor, yUR*scale_factor
+        return xLL * scale_factor, yLL * scale_factor, xUR * scale_factor, yUR * scale_factor
     # end def
 
     def getStapleSequences(self):
@@ -280,7 +264,6 @@ class NucleicAcidPart(Part):
         self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-
     def removeOligoFromSet(self, oligo):
         """ Not a designated method
         (there exist methods that also directly
@@ -294,19 +277,29 @@ class NucleicAcidPart(Part):
             print("error removing oligo", oligo)
     # end def
 
-    def createVirtualHelix(self, x, y, z=0.0,
-                            length=42, id_num=None, properties=None,
-                            safe=True, use_undostack=True):
-        c = CreateVirtualHelixCommand(  self, x, y, z, length,
-                                        id_num=id_num, properties=properties,
-                                        safe=safe)
-        util.execCommandList(self, [c], desc="Add VirtualHelix", \
-                                                use_undostack=use_undostack)
+    def createVirtualHelix(self, x, y, z=0.0, length=42, id_num=None,
+                           properties=None, safe=True, use_undostack=True):
+        """Create new VirtualHelix by calling CreateVirtualHelixCommand.
+
+        Args:
+            x (float): x coordinate
+            y (float): y coordinate
+            z (float): z coordinate
+            length (int): Size of VirtualHelix.
+            properties (tuple): Tuple of two lists: `keys` and `values`, which
+                contain full set of properties for the VirualHelix.
+            safe (bool): Update neighbors otherwise,
+                neighbors need to be explicitly updated
+
+            use_undostack (bool): Set to False to disable undostack for bulk
+                operations such as file import.
+        """
+        c = CreateVirtualHelixCommand(self, x, y, z, length, id_num=id_num, properties=properties, safe=safe)
+        util.execCommandList(self, [c], desc="Add VirtualHelix", use_undostack=use_undostack)
     # end def
 
     def removeVirtualHelix(self, id_num, use_undostack=True):
-        """
-        Removes a VirtualHelix from the model. Accepts a reference to the
+        """Removes a VirtualHelix from the model. Accepts a reference to the
         VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
         """
         if use_undostack:
@@ -323,7 +316,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True, use_undostack=True):
-        """ Xovers are ALWAYS installed FROM the 3' end of the 5' most
+        """Xovers are ALWAYS installed FROM the 3' end of the 5' most
         strand (strand5p) TO the 5' end of the 3' most strand (strand3p)
 
         Args:
@@ -342,10 +335,12 @@ class NucleicAcidPart(Part):
             print("createXover: no xover can be installed here")
             print("strand 5p", strand5p)
             print("\tidx: %d\tidx5p: %d\tidx3p: %d" %
-                    (idx5p, strand5p.idx5Prime(), strand5p.idx3Prime()) )
+                  (idx5p, strand5p.idx5Prime(), strand5p.idx3Prime())
+                  )
             print("strand 3p", strand3p)
             print("\tidx: %d\tidx5p: %d\tidx3p: %d" %
-                    (idx3p, strand3p.idx5Prime(), strand3p.idx3Prime()) )
+                  (idx3p, strand3p.idx5Prime(), strand3p.idx3Prime())
+                  )
             # raise ValueError("Part.createXover:")
             return
 
@@ -488,7 +483,7 @@ class NucleicAcidPart(Part):
                     return
         # end else
         e = CreateXoverCommand(self, xo_strand5, idx5p,
-                xo_strand3, idx3p, update_oligo=update_oligo)
+                               xo_strand3, idx3p, update_oligo=update_oligo)
         if use_undostack:
             self.undoStack().push(e)
             self.undoStack().endMacro()
@@ -501,8 +496,8 @@ class NucleicAcidPart(Part):
         if strand5p.connection3p() == strand3p:
             c = RemoveXoverCommand(self, strand5p, strand3p)
             cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Xover", \
-                                                    use_undostack=use_undostack)
+            util.execCommandList(self, cmds, desc="Remove Xover",
+                                 use_undostack=use_undostack)
     # end def
 
     # def xoverSnapTo(self, strand, idx, delta):
@@ -553,25 +548,21 @@ class NucleicAcidPart(Part):
         delta = new_size - old_size
         if delta > 0:
             c = ResizeVirtualHelixCommand(self, id_num, True, delta)
-            util.execCommandList(self, [c], desc="Resize part", \
-                                                        use_undostack=use_undostack)
+            util.execCommandList(self, [c], desc="Resize part", use_undostack=use_undostack)
         else:
-            err ="shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
+            err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
             raise NotImplementedError(err)
     # end def
 
-    def translateVirtualHelices(self,   vh_set,
-                                        dx, dy, dz,
-                                        finalize,
-                                        use_undostack=False):
+    def translateVirtualHelices(self, vh_set, dx, dy, dz, finalize,
+                                use_undostack=False):
         if use_undostack:
             c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy, dz)
             if finalize:
                 util.finalizeCommands(self, [c], desc="Translate VHs")
                 # only emit this on finalize due to cost.
             else:
-                util.execCommandList(self, [c], desc="Translate VHs", \
-                                                            use_undostack=True)
+                util.execCommandList(self, [c], desc="Translate VHs", use_undostack=True)
         else:
             self._translateVirtualHelices(vh_set, dx, dy, dz, False)
     # end def
@@ -611,7 +602,7 @@ class NucleicAcidPart(Part):
                 print("neighbors", list(neighbors))
                 raise
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
-    #end def
+    # end def
 
     ### PRIVATE SUPPORT METHODS ###
 
@@ -621,10 +612,13 @@ class NucleicAcidPart(Part):
     # end def
 
     def deepCopy(self):
-        """
+        """Create's a new part, copies the virual helices, and then maps the
+        original's oligos onto the new_part.
+
+        The steps are:
         1) Create a new part
         2) copy the VirtualHelices
-        3) Now you need to map the ORIGINALs Oligos onto the COPY's Oligos
+        3) Now you need to map the ORIGINAL's Oligos onto the COPY's Oligos
         To do this you can for each Oligo in the ORIGINAL
             a) get the strand5p() of the ORIGINAL
             b) get the corresponding strand5p() in the COPY based on
@@ -663,7 +657,7 @@ class NucleicAcidPart(Part):
             # add to new_part
             oligo.addToPart(new_part)
         # end for
-        return part
+        return new_part
     # end def
 
     def getImportVirtualHelixOrder(self):
@@ -685,7 +679,8 @@ class NucleicAcidPart(Part):
 
     def changeViewProperty(self, view, key, value, use_undostack=True):
         c = ChangeViewPropertyCommand(self, view, key, value)
-        util.execCommandList(self, [c], desc="Change Part View Property `%s`" % key, \
-                                        use_undostack=use_undostack)
+        util.execCommandList(self, [c],
+                             desc="Change Part View Property `%s`" % key,
+                             use_undostack=use_undostack)
     # end def
 # end class

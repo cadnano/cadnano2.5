@@ -152,7 +152,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             # for some reason we need to skip the first mouseMoveEvent
             self._dragged = False
 
-            if self._added_to_press_list == False:
+            if self._added_to_press_list is False:
                 self._added_to_press_list = True
                 self.scene().views()[0].addToPressList(self)
             return QGraphicsItemGroup.mousePressEvent(self, event)
@@ -165,7 +165,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             # to help keep coordinates uniform
             rf = self.getR(self.mapFromScene(QPointF(event.scenePos())))
             # for some reason we need to skip the first mouseMoveEvent
-            if self._dragged == False:
+            if self._dragged is False:
                 self._dragged = True
                 self._r0 = rf
             # end if
@@ -209,7 +209,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
     def clearSelection(self, value):
         """ value is for keyPressEvents
         """
-        if value == False:
+        if value is False:
             self.selectionbox.hide()
             self.selectionbox.resetPosition()
             self.removeSelectedItems()
@@ -227,13 +227,13 @@ class SelectionItemGroup(QGraphicsItemGroup):
     def itemChange(self, change, value):
         """docstring for itemChange"""
         if change == QGraphicsItem.ItemSelectedChange:
-            if value == False:
+            if value is False:
                 self.clearSelection(False)
                 return False
             else:
                 return True
         elif change == QGraphicsItem.ItemChildAddedChange:
-            if self._added_to_press_list == False:
+            if self._added_to_press_list is False:
                 # print("kid added")
                 self.setFocus()  # this is to get delete keyPressEvents
                 self.selectionbox.boxParent()
