@@ -102,8 +102,6 @@ class AbstractToolManager(QObject):
             return
         if new_active_tool is None:
             new_active_tool = dummy_tool
-        # if self.lastLocation():
-        #     new_active_tool.updateLocation(*self.lastLocation())
 
         if self._active_tool is not None:
             self._active_tool.setActive(False)

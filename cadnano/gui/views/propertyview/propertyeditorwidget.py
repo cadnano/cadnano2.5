@@ -114,12 +114,6 @@ class PropertyEditorWidget(QTreeWidget):
             # self.hide() # show nothing
     # end def
 
-    # def itemClicked(self, item, column):
-    #     print("itemClicked", item, column)
-    #
-    # def itemDoubleClicked(self, item, column):
-    #     print("itemDoubleClicked", item, column)
-
     def partAddedSlot(self, sender, model_part):
         pass
     # end def

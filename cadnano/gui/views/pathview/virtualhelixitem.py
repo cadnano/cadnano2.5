@@ -45,7 +45,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._handle = VirtualHelixHandleItem(self, part_item, viewroot)
         self._last_strand_set = None
         self._last_idx = None
-        self._scaffold_background = None
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         self.setBrush(getNoBrush())
@@ -231,8 +230,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         path.lineTo(bw * canvas_size, bw)
 
         self.setPath(path)
-
-        scaffoldY = bw
     # end def
 
     def resize(self):
