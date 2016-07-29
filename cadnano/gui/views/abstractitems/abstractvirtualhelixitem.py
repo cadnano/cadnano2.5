@@ -40,9 +40,6 @@ class AbstractVirtualHelixItem(object):
                         ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
         return tpr*360./bpr, eulerZ
 
-    def getAngleAtIdx(self, idx):
-        return self._model_part.getAngleAtIdx(self._id_num, idx)
-
     def getAngularProperties(self):
         """
         Returns:

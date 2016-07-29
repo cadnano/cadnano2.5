@@ -33,7 +33,7 @@ def encodePart(part):
     Returns:
         dict:
     """
-    number_of_helices = part.getIdNumMax()
+    max_id_number_of_helices = part.getIdNumMax()
     vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
@@ -53,7 +53,7 @@ def encodePart(part):
     strand_list = []
     prop_list = []
     vh_list = []
-    for id_num in range(number_of_helices + 1):
+    for id_num in range(max_id_number_of_helices + 1):
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
             # add a placeholder
@@ -96,7 +96,7 @@ def encodePartList(part, vh_group_list):
         dict:
     """
     vh_group_list.sort()
-    number_of_helices = part.getIdNumMax()
+    max_id_number_of_helices = part.getIdNumMax()
     vh_insertions = part.insertions()
 
     # iterate through virtualhelix list

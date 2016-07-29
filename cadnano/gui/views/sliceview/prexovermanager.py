@@ -159,10 +159,6 @@ class PreXoverManager(QGraphicsRectItem):
                 elif not is_5prime_strand and self.virtual_helix_item.getProperty('length') == idx + 1:
                     is_5prime_strand = False
                 else:
-                    # do some more checks
-                    # part = part_item.part()
-                    # part.hasStrandAtIdx(id_num, idx)
-                    # strand = part.getStrand(is_fwd, id_num, idx)
                     is_5prime_strand = True
 
             agroup.active_wedge_gizmo.pointToPreXoverItem(apxi)

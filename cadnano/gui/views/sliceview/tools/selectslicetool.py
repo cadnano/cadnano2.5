@@ -100,7 +100,6 @@ class SelectSliceTool(AbstractSliceTool):
             # print("Query rect", query_rect,
             #     query_rect[0] < query_rect[2], query_rect[1] < query_rect[3])
             res = part.getVirtualHelicesInArea(query_rect)
-            # print(res)
 
             doc = self.manager.document
             doc.clearAllSelected()

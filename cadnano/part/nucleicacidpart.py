@@ -163,7 +163,7 @@ class NucleicAcidPart(Part):
 
         # idx = None # FORCE this for now to prevent animation GC crashes
 
-        # per_neighbor_hits = self.queryIdNumRangeNeighbor(id_num, neighbors,
+        # per_neighbor_hits = self._queryIdNumRangeNeighbor(id_num, neighbors,
         #                                                 alpha, index=idx)
         per_neighbor_hits = self.queryIdNumNeighbor(id_num, neighbors, index=idx)
         return per_neighbor_hits
@@ -214,10 +214,6 @@ class NucleicAcidPart(Part):
         o_and_s = self.getOffsetAndSize(id_num)
         size = 42 if o_and_s is None else o_and_s[1]
         return size
-    # end def
-
-    def numberOfVirtualHelices(self):
-        return self.getSize()
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###

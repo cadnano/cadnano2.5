@@ -375,10 +375,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         return ret
     # end def
 
-    def numberOfVirtualHelices(self):
-        return len(self._virtual_helix_item_list)
-    # end def
-
     def reorderHelices(self, first, last, index_delta):
         """
         Reorder helices by moving helices _pathHelixList[first:last]

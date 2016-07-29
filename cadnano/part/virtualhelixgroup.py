@@ -117,7 +117,7 @@ class VirtualHelixGroup(CNObject):
         # Cache Stuff
         self._point_cache = None
         self._point_cache_keys = None
-        self.resetPointCache()
+        self._resetPointCache()
         self._origin_cache = None
         self._origin_cache_keys = None
         self._resetOriginCache()
@@ -140,18 +140,9 @@ class VirtualHelixGroup(CNObject):
         self._origin_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
     # end def
 
-    def resetPointCache(self):
+    def _resetPointCache(self):
         self._point_cache = {}
         self._point_cache_keys = deque([None]*DEFAULT_CACHE_SIZE)
-    # end def
-
-    def getSize(self):
-        """ Getter for the number of virtual helices in use
-
-        Returns:
-            int
-        """
-        return len(self.reserved_ids)
     # end def
 
     def document(self):
@@ -245,17 +236,6 @@ class VirtualHelixGroup(CNObject):
             int: max virtual helix ID number used
         """
         return self._highest_id_num_used
-
-    def getVirtualHelixName(self, id_num):
-        """getter for the name of a virtual helix
-
-        Args:
-            id_num (int): the ID number
-
-        Returns:
-            str: name of the virtual helix at `id_num`
-        """
-        return self.getVirtualHelixProperties(id_num, 'name')
     # end def
 
     def reserveIdNum(self, requested_id_num):
@@ -397,7 +377,8 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def setVirtualHelixOriginLimits(self):
-        """Set origin limits
+        """Set origin limits by grabbing the max `x` and `y` values of the
+        origins of all virtual helices
         """
         valid_pts = np.where(self._origin_pts != np.inf)
         vps = self._origin_pts[valid_pts]
@@ -587,7 +568,7 @@ class VirtualHelixGroup(CNObject):
             delta (array-like):  of :obj:`float` of length 3
         """
         self._resetOriginCache()
-        self.resetPointCache()
+        self._resetPointCache()
         origin_pts = self._origin_pts
         delta_origin = delta[:2] # x, y only
         for id_num in id_nums:
@@ -694,7 +675,7 @@ class VirtualHelixGroup(CNObject):
         new_axis_pts, new_fwd_pts, new_rev_pts = points
         num_points = len(new_axis_pts) # number of points being added
 
-        self.resetPointCache()
+        self._resetPointCache()
 
         # 1. existing id_num
         offset, size = offset_and_size_tuple
@@ -1244,8 +1225,9 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def resetCoordinates(self, id_num):
-        """Call this after changing helix vh_properties to update the points
-        controlled by the properties
+        """Call this after changing helix `vh_properties` to update the points
+        controlled by the properties.  Basically clears things back to a simple
+        version of a virtual helix
 
         Args:
             id_num (int): virtual helix ID number
@@ -1326,7 +1308,7 @@ class VirtualHelixGroup(CNObject):
         else:
             idx_start, idx_stop = lo, lo + length
 
-        self.resetPointCache()
+        self._resetPointCache()
         offset_and_size = self._offset_and_size
         current_offset_and_size_length = len(offset_and_size)
 
@@ -1528,9 +1510,12 @@ class VirtualHelixGroup(CNObject):
         return id_nums
     # end def
 
-    def queryIdNumRange(self, id_num, radius, index_slice=None):
+    def _queryIdNumRange(self, id_num, radius, index_slice=None):
         """Return the indices of all virtual helices phosphates closer
         than `radius` to `id_num`'s helical axis
+
+        Currently UNUSED code, but keeping it around to show how to search
+        ranges
 
         Args:
             id_num (int): virtual helix ID number
@@ -1615,7 +1600,7 @@ class VirtualHelixGroup(CNObject):
         return start, bpr
     # end def
 
-    def queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
+    def _queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
         """Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
 
@@ -1972,21 +1957,6 @@ class VirtualHelixGroup(CNObject):
         return per_neighbor_hits, (fwd_axis_pairs, rev_axis_pairs)
     # end def
 
-    def getAngleAtIdx(self, id_num, idx):
-        """Account for Z translation ??????????
-
-        Args:
-            id_num (int): ID number of virtual helix
-            idx (int): index of interest
-
-        Returns:
-            float: angle at the index
-        """
-        bpr, tpr, eulerZ = self.getVirtualHelixProperties(id_num,
-                        ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
-        return eulerZ + idx*tpr*360./bpr
-    # end def
-
     @staticmethod
     def angleNormalize(angle):
         """Ensure angle is normalized to [0, 2*PI]
@@ -2063,12 +2033,15 @@ class VirtualHelixGroup(CNObject):
 # end class
 
 def distanceToPoint(origin, direction, point):
-    """ See:
+    """Distance of a line to a point
+
+    See:
     http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
     Args:
-        direction (array-like):
-        point (array-like):
+        origin (array_like): of :obj:`float`, length 3, a starting point for the line
+        direction (array-like): of :obj:`float`, length 3, the direction of the line
+        point (array-like): of :obj:`float`, length 3, the point of interest
 
     Returns:
         float: R squared distance
