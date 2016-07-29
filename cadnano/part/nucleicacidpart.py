@@ -217,18 +217,6 @@ class NucleicAcidPart(Part):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def verifyOligoStrandCounts(self):
-        total_stap_strands = 0
-        rev_oligos = set()
-        total_stap_oligos = 0
-
-        for id_num in self.getIdNums():
-            fwd_ss, rev_ss = part.getStrandSets(id_num)
-            total_stap_strands += rev_ss.strandCount()
-            for strand in rev_ss:
-                rev_oligos.add(strand.oligo())
-    # end def
-
     def verifyOligos(self):
         total_errors = 0
         total_passed = 0
@@ -243,12 +231,10 @@ class NucleicAcidPart(Part):
             # end for
             if o_l != a:
                 total_errors += 1
-                # print("wtf", total_errors, "oligo_l", o_l, "strandsL", a, "isStaple?", o.isStaple())
                 o.applyColor('#ff0000')
             else:
                 total_passed += 1
         # end for
-        # print("Total Passed: ", total_passed, "/", total_passed+total_errors)
     # end def
 
     def remove(self, use_undostack=True):
@@ -263,7 +249,6 @@ class NucleicAcidPart(Part):
         not emitted.  This causes problems with undo and redo down the road
         but works as of now.
         """
-        self._active_virtual_helix = None
         if use_undostack:
             self.undoStack().beginMacro("Delete Part")
         # remove strands and oligos
@@ -290,18 +275,23 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
-    def removeOligo(self, oligo, use_undostack=True):
-        # clear existing oligos
-        cmds = []
-        for o in list(self.oligos()):
-            cmds.append(RemoveOligoCommand(o))
-        # end for
-        util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
-    # end def
-
     def addOligoToSet(self, oligo):
         self._oligos.add(oligo)
         self.partOligoAddedSignal.emit(self, oligo)
+    # end def
+
+
+    def removeOligoFromSet(self, oligo):
+        """ Not a designated method
+        (there exist methods that also directly
+        remove parts from self._oligos)
+        """
+        try:
+            self._oligos.remove(oligo)
+            oligo.oligoRemovedSignal.emit(self, oligo)
+        except KeyError:
+            print(util.trace(5))
+            print("error removing oligo", oligo)
     # end def
 
     def createVirtualHelix(self, x, y, z=0.0,
@@ -556,19 +546,6 @@ class NucleicAcidPart(Part):
 
     def newPart(self):
         return Part(self._document)
-    # end def
-
-    def removeOligoFromSet(self, oligo):
-        """ Not a designated method
-        (there exist methods that also directly
-        remove parts from self._oligos)
-        """
-        try:
-            self._oligos.remove(oligo)
-            oligo.oligoRemovedSignal.emit(self, oligo)
-        except KeyError:
-            print(util.trace(5))
-            print("error removing oligo", oligo)
     # end def
 
     def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):

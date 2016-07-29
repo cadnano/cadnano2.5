@@ -39,7 +39,7 @@ class OutlinerTreeWidget(QTreeWidget):
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
-        self._root = self.invisibleRootItem()
+        self._root = self.invisibleRootItem()   # access to top level item
         self._instance_items = {}
 
         # Appearance
@@ -489,7 +489,6 @@ class OutlinerTreeWidget(QTreeWidget):
         http://doc.qt.io/qt-5.5/datastreamformat.html
         """
         data = {}
-        data_list = []
         ds = QDataStream(bytearray)
         while not ds.atEnd():
             item = []
@@ -503,7 +502,6 @@ class OutlinerTreeWidget(QTreeWidget):
                 ds >> value
                 item.append((value.value(), Qt.ItemDataRole(key)))
             data[(row, column)] = item
-            # data_list.append(((row, column), item))
         return data
     # end def
 
@@ -517,9 +515,6 @@ class OutlinerTreeWidget(QTreeWidget):
     #     tw_item.setFlags(tw_item.flags() | Qt.ItemIsEditable)
     #     return tw_item
     # # end def
-
-    def getInstanceCount(self):
-        return len(self._instance_items)
 
     ### SIGNALS ###
 
@@ -541,14 +536,6 @@ class OutlinerTreeWidget(QTreeWidget):
             print("part type", part_type)
             raise NotImplementedError
     # end def
-
-    # def selectedChangedSlot(self):
-    #     for mpi in self._instance_items:
-    #         if self._instance_items[mpi] in self.selectedItems():
-    #             mpi.reference().setSelected(True)
-    #         else:
-    #             mpi.reference().setSelected(False)
-    # # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
         pass

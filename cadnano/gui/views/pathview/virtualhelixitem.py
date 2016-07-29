@@ -90,20 +90,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         StrandItem(strand, self, self._viewroot)
     # end def
 
-    def decoratorAddedSlot(self, decorator):
-        """
-        Instantiates a DecoratorItem upon notification that the model has a
-        new Decorator.  The Decorator is responsible for creating its own
-        controller for communication with the model, and for adding itself to
-        its parent (which is *this* VirtualHelixItem, i.e. 'self').
-        """
-        pass
-
-    # def partPropertyChangedSlot(self, model_part, property_key, new_value):
-    #     if property_key == 'color':
-    #         self._handle.refreshColor()
-    # # end def
-
     def virtualHelixRemovedSlot(self):
         self._controller.disconnectSignals()
         self._controller = None

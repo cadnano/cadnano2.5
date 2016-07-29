@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class ProxyObject(object):
     __slots__ = '_parent', '_signals'
 
@@ -17,15 +18,15 @@ class ProxyObject(object):
     def connect(self, sender, bsignal, method):
         f = lambda x, y: method(x, *y)
         bsignal.connect(method, sender=sender)
-        self.signals[(sender, bsignal, method)] = f
+        self._signals[(sender, bsignal, method)] = f
 
     def disconnect(self, sender, bsignal, method):
-        f  = self.signals[(sender, bsignal, method)]
+        f  = self._signals[(sender, bsignal, method)]
         bsignal.disconnect(f, sender=sender)
-        del self.signals[(sender, bsignal, method)]
+        del self._signals[(sender, bsignal, method)]
 
     def signals(self):
-        return self.signals
+        return self._signals
     # end def
 
     def deleteLater(self):

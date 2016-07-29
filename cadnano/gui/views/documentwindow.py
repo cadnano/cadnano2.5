@@ -158,10 +158,4 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.resize(self.settings.value("size", QSize(1100, 800)))
         self.move(self.settings.value("pos", QPoint(200, 200)))
         self.settings.endGroup()
-
-    def deactiveToolManagers(self, active_tool_manager):
-        tms = self.tool_managers
-        if tms is not None:
-            for manager in tms:
-                if manager is not active_tool_manager:
-                    manager.deactivateAllTools()
+# end class

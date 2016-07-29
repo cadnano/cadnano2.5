@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 
@@ -40,7 +41,7 @@ class DocumentController():
         self._filename = None
         self._file_open_path = None  # will be set in _readSettings
         self._has_no_associated_file = True
-        self._undo_stack = None
+        # self._undo_stack = None
         self.win = None
         self.fileopendialog = None
         self.filesavedialog = None
@@ -150,9 +151,13 @@ class DocumentController():
     # end def
 
     def undoStackCleanChangedSlot(self):
-        """The title changes to include [*] on modification."""
+        """The title changes to include [*] on modification.
+        Use this when clearing out undostack to set the modified status of
+        the document
+        """
         self.win.setWindowModified(not self.undoStack().isClean())
         self.win.setWindowTitle(self.documentTitle())
+    # end def
 
     def actionAboutSlot(self):
         """Displays the about cadnano dialog."""
@@ -293,7 +298,7 @@ class DocumentController():
         """
         1. If document is untouched, proceed to open dialog.
         2. If document is dirty, call maybesave and continue if it succeeds.
-        3. Downstream, the file is selected in openAfterMaybeSave, and the selected 
+        3. Downstream, the file is selected in openAfterMaybeSave, and the selected
            file is actually opened in openAfterMaybeSaveCallback.
         """
         if self.maybeSave() == False:
@@ -457,26 +462,12 @@ class DocumentController():
         app().prefsClicked()
     # end def
 
-    def actionAutostapleSlot(self):
-        print("autoStapleSlot")
-        part = self.activePart()
-        if part is not None:
-            self.win.path_graphics_view.setViewportUpdateOn(False)
-            part.autoStaple()
-            self.win.path_graphics_view.setViewportUpdateOn(True)
-    # end def
-
     def actionModifySlot(self):
         """
         Notifies that part root items that parts should respond to modifier
         selection signals.
         """
         pass
-        # uncomment for debugging
-        # isChecked = self.win.actionModify.isChecked()
-        # self.win.pathroot.setModifyState(isChecked)
-        # self.win.sliceroot.setModifyState(isChecked)
-
 
     def actionAddDnaPart(self):
         if ONLY_ONE:
@@ -492,13 +483,6 @@ class DocumentController():
             outliner.hide()
         else:
             outliner.show()
-    # end def
-
-    def actionRenumberSlot(self):
-        part = self.activePart()
-        if part is not None:
-            coordList = self.win.pathroot.getSelectedInstanceOrderedVHList()
-            part.renumber(coordList)
     # end def
 
     ### ACCESSORS ###
@@ -607,9 +591,9 @@ class DocumentController():
 
     def exportStaplesCallback(self, selected):
         """Export all staple sequences to selected CSV file.
-        
+
         Args:
-            selected (Tuple, List or str): if a List or Tuple, the filename should 
+            selected (Tuple, List or str): if a List or Tuple, the filename should
             be the first element
         """
         if isinstance(selected, (list, tuple)):

@@ -16,7 +16,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         super(QAbstractPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
-        self._model_props = m_props = m_p.getPropertyDict()
+        self._model_props = m_p.getPropertyDict()
         self._viewroot = viewroot
         self._oligo_item_hash = {}
         self._virtual_helix_item_hash = {}
@@ -27,10 +27,6 @@ class QAbstractPartItem(QGraphicsRectItem):
 
     def part(self):
         return self._model_part
-
-    def setPart(self, new_part):
-        self._model_part = new_part
-    # end def
 
     def getFilterSet(self):
         return self._viewroot._document.filter_set
@@ -102,10 +98,6 @@ class QAbstractPartItem(QGraphicsRectItem):
             if key == 'position':
                 self.setPos(*value)
     # end def
-    def partPreDecoratorSelectedSlot(self, sender):
-        pass
-    def updatePreXoverItemsSlot(self, sender):
-        pass
     def partVirtualHelixAddedSlot(self, sender):
         pass
     def partVirtualHelixRemovedSlot(self, sender, id_num):
@@ -149,9 +141,6 @@ class AbstractPartItem(object):
 
     def part(self):
         return self._model_part
-
-    def setPart(self, new_part):
-        self._model_part = new_part
     # end def
 
     def setMovable(self, is_movable):
@@ -201,10 +190,6 @@ class AbstractPartItem(object):
         pass
     def partViewPropertySlot(self, sender, view_name, key, value):
         pass
-    def partPreDecoratorSelectedSlot(self, sender):
-        pass
-    def updatePreXoverItemsSlot(self, sender):
-        pass
     def partVirtualHelixAddedSlot(self, sender):
         pass
     def partVirtualHelixRemovedSlot(self, sender, id_num):
@@ -224,7 +209,7 @@ class AbstractPartItem(object):
         pass
     def partDocumentSettingChangedSlot(self, part, key, value):
         pass
-    # end defS
+    # end def
 # end class
 
 

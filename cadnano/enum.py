@@ -55,20 +55,20 @@ ENUM_NAMES['point_type'] = enumNames(PointType)
 
 
 class ItemType(_Enum):
-    DNA = 0
-    PLASMID = 1
-    RNA = 2
-    PEPTIDE = 3
-    PROTEIN = 4
+    # DNA = 0
+    # PLASMID = 1
+    # RNA = 2
+    # PEPTIDE = 3
+    # PROTEIN = 4
     OLIGO = 6
-    SELECTION = 7
-    ANNOTATION = 8
+    # SELECTION = 7
+    # ANNOTATION = 8
     NUCLEICACID = 9
     VIRTUALHELIX = 10
 
-class EndType:
-    FIVE_PRIME = 0
-    THREE_PRIME = 1
+# class EndType:
+#     FIVE_PRIME = 0
+#     THREE_PRIME = 1
 
 
 class StrandType:
@@ -92,29 +92,29 @@ class GridType:
     HONEYCOMB = 2
 ENUM_NAMES['grid_type'] = enumNames(GridType)
 
-class BreakType:
-    LEFT5PRIME = 0
-    LEFT3PRIME = 1
-    RIGHT5PRIME = 2
-    RIGHT3PRIME = 3
+# class BreakType:
+#     LEFT5PRIME = 0
+#     LEFT3PRIME = 1
+#     RIGHT5PRIME = 2
+#     RIGHT3PRIME = 3
 
 
-class HandleOrient:
-    LEFT_UP = 0
-    RIGHT_UP = 1
-    LEFT_DOWN = 2
-    RIGHT_DOWN = 3
+# class HandleOrient:
+#     LEFT_UP = 0
+#     RIGHT_UP = 1
+#     LEFT_DOWN = 2
+#     RIGHT_DOWN = 3
 
-class PartEdges(Enum):
-    NONE     = 0x0001
-    TOP      = 0x0002
-    LEFT     = 0x0004
-    RIGHT    = 0x0008
-    BOTTOM   = 0x0010
-    TOPLEFT  = TOP|LEFT
-    TOPRIGHT = TOP|RIGHT
-    BOTLEFT  = BOTTOM|LEFT
-    BOTRIGHT = BOTTOM|RIGHT
-    SIDE     = LEFT|RIGHT
-    TOPBOT   = TOP|BOTTOM
+# class PartEdges(Enum):
+#     NONE     = 0x0001
+#     TOP      = 0x0002
+#     LEFT     = 0x0004
+#     RIGHT    = 0x0008
+#     BOTTOM   = 0x0010
+#     TOPLEFT  = TOP|LEFT
+#     TOPRIGHT = TOP|RIGHT
+#     BOTLEFT  = BOTTOM|LEFT
+#     BOTRIGHT = BOTTOM|RIGHT
+#     SIDE     = LEFT|RIGHT
+#     TOPBOT   = TOP|BOTTOM
 

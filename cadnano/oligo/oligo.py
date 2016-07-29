@@ -80,8 +80,6 @@ class Oligo(CNObject):
     # end def
 
     ### SIGNALS ###
-    oligoIdentityChangedSignal = ProxySignal(CNObject,
-                                             name='oligoIdentityChangedSignal')  # new oligo
     oligoRemovedSignal = ProxySignal(CNObject, CNObject,
                                              name='oligoRemovedSignal')  # part, self
     oligoSequenceAddedSignal = ProxySignal(CNObject,
@@ -369,13 +367,6 @@ class Oligo(CNObject):
             else:
                 self._strand5p = new_strand
         # end if
-    # end def
-
-    def strandResized(self, delta):
-        """Called by a strand after resize. Delta is used to update the length,
-        which may case an appearance change.
-        """
-        pass
     # end def
 
     def strandSplitUpdate(self, new_strand5p, new_strand3p, oligo3p, old_merged_strand):

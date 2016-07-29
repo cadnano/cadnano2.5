@@ -197,10 +197,6 @@ class Part(VirtualHelixGroup):
         self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
-    def getSelectionDict(self):
-        return self._selections
-    # end def
-
     def oligos(self):
         return self._oligos
     # end def

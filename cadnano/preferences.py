@@ -11,5 +11,5 @@ STAP_COLORS = [      '#cc0000'
                      '#333333',
                      '#888888']
 SCAF_COLORS = ['#0066cc']
-DEFAULT_STAP_COLOR = "#888888"
-DEFAULT_SCAF_COLOR = "#0066cc"
+# DEFAULT_STAP_COLOR = "#888888"
+# DEFAULT_SCAF_COLOR = "#0066cc"

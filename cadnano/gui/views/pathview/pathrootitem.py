@@ -74,7 +74,6 @@ class PathRootItem(QGraphicsRectItem):
 
     def selectionFilterChangedSlot(self, filter_name_set):
         self.select_tool.clearSelections(False)
-        pass
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -88,14 +87,6 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     ### ACCESSORS ###
-    def sliceToolManager(self):
-        """
-        Used for getting access to button signals that need to be connected
-        to item slots.
-        """
-        return self._window.slice_tool_manager
-    # end def
-
     def window(self):
         return self._window
     # end def
@@ -105,12 +96,6 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     ### PUBLIC METHODS ###
-    def getSelectedInstanceOrderedVHList(self):
-        """Used for encoding."""
-        selected_instance = self._document.selectedInstance()
-        return self._part_item_for_part_instance[selected_instance].getOrderedVirtualHelixList()
-    # end def
-
     def removePartItem(self, part_item):
         for k in self._part_item_for_part_instance.keys():
             if k == part_item:
@@ -134,9 +119,6 @@ class PathRootItem(QGraphicsRectItem):
         return self._document.filter_set
     # end def
 
-    def preXoverFilter(self):
-        return self._prexover_filter
-
     def vhiHandleSelectionGroup(self):
         return self.select_tool.vhi_h_selection_group
     # end def
@@ -152,10 +134,6 @@ class PathRootItem(QGraphicsRectItem):
     def setSelectionLock(self, locker):
         self.scene().views()[0].setSelectionLock(locker)
     # end def
-
-    # def clearStrandSelections(self):
-    #     self._strand_item_selection_group.clearSelection(False)
-    # # end def
 
     def setManager(self, manager):
         self.manager = manager

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from cadnano.gui.palette import getPenObj, getBrushObj
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
@@ -35,13 +36,13 @@ class GrabCornerItem(QGraphicsRectItem):
             print("""We are resizing""")
             self.event_start_position = sp = event.scenePos()
             self.item_start = self.pos()
-            self.event_last_position = sp
+            # self.event_last_position = sp
             return
         else:
             parent = self.parentItem()
             self.is_grabbing = True
             self.event_start_position = sp = event.pos()
-            self.event_last_position = sp
+            # self.event_last_position = sp
             parent.setMovable(True)
             # ensure we handle window toggling during moves
             qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
@@ -98,7 +99,7 @@ class GrabCornerItem(QGraphicsRectItem):
         if self.model_bounds:
             self.model_bounds = ()
         if self.is_grabbing:
-            print("I am released")
+            # print("I am released")
             parent = self.parentItem()
             self.is_grabbing = False
             self.parentItem().setMovable(False)
@@ -130,8 +131,6 @@ class GrabCornerItem(QGraphicsRectItem):
         Args:
             topleft (QPointF): top left corner
         """
-        # grabrect = QRectF(topleft, topleft + self.offset)
-        # self.setRect(grabrect)
         self.setPos(topleft)
         self.corner_type = TOP_LEFT
     # end def
@@ -141,9 +140,6 @@ class GrabCornerItem(QGraphicsRectItem):
         Args:
             bottomleft (QPointF): bottom left corner
         """
-        # grabrect = QRectF(  bottonleft - self.offset_y,
-        #                     bottonleft + self.offset_x)
-        # self.setRect(grabrect)
         self.setPos(bottonleft - self.offset_y)
         self.corner_type = BOTTOM_LEFT
     # end def
@@ -153,9 +149,6 @@ class GrabCornerItem(QGraphicsRectItem):
         Args:
             bottomright (QPointF): bottom right corner
         """
-        # grabrect = QRectF(  bottonright - self.offset,
-        #                     bottonright)
-        # self.setRect(grabrect)
         self.setPos(bottonright - self.offset)
         self.corner_type = BOTTOM_RIGHT
     # end def
@@ -165,9 +158,6 @@ class GrabCornerItem(QGraphicsRectItem):
         Args:
             top right (QPointF): top right corner
         """
-        # grabrect = QRectF(  topright - self.offset_x,
-        #                     topright + self.offset_y)
-        # self.setRect(grabrect)
         self.setPos(topright - self.offset_x)
         self.corner_type = TOP_RIGHT
     # end def

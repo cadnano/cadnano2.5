@@ -101,7 +101,6 @@ def decode(document, obj):
     setBatch(False)
 
     # INSTALL STRANDS AND COLLECT XOVER LOCATIONS
-    num_helices = len(obj['vstrands']) - 1
     scaf_seg = defaultdict(list)
     scaf_xo = defaultdict(list)
     stap_seg = defaultdict(list)

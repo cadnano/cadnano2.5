@@ -58,12 +58,6 @@ class Document(CNObject):
                                         CNObject,
                                         name='documentAssemblyAddedSignal') # doc, assembly
 
-    # dict of tuples of objects using the reference as the key,
-    # and the value is a tuple with meta data
-    # in the case of strands the metadata would be which endpoints of selected
-    # e.g. { objectRef: (value0, value1),  ...}
-    documentSelectedChangedSignal = ProxySignal(dict,
-                                         name='documentSelectedChangedSignal') # tuples of items + data
     documentSelectionFilterChangedSignal = ProxySignal(object,
                                   name='documentSelectionFilterChangedSignal')
     documentPreXoverFilterChangedSignal = ProxySignal(str,

@@ -14,8 +14,8 @@ class AbstractVirtualHelixItem(object):
         self._model_part = part_item.part()
         self.is_active = False
 
-    def virtualHelixNumberChangedSlot(self, virtual_helix, number):
-        pass
+    # def virtualHelixNumberChangedSlot(self, virtual_helix, number):
+    #     pass
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
         pass
     def virtualHelixRemovedSlot(self):
@@ -76,10 +76,6 @@ class AbstractVirtualHelixItem(object):
 
     def getAxisPoint(self, idx):
         return self._model_part.getCoordinate(self._id_num, idx)
-    # end def
-
-    def getOtherAxisPoint(self, id_num, idx):
-        return self._model_part.getCoordinate(id_num, idx)
     # end def
 
     def getSize(self):

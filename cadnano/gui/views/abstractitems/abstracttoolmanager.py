@@ -49,7 +49,6 @@ class AbstractToolManager(QObject):
     # end def
 
     def installTool(self, tool_name):
-        this = self
         window = self.window
         tgn = self.tool_group_name
 

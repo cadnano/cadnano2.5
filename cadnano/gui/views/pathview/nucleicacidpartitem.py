@@ -164,22 +164,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.grab_corner = None
     # end def
 
-    def partPreDecoratorSelectedSlot(self, sender, row, col, base_idx):
-        """docstring for partPreDecoratorSelectedSlot"""
-        part = self._model_part
-        vh = part.virtualHelixAtCoord((row,col))
-        vhi = self.idToVirtualHelixItem(vh)
-        y_offset = _BW if vh.isEvenParity() else 0
-        p = QPointF(base_idx*_BW, vhi.y() + y_offset)
-        view = self.window().path_graphics_view
-        view.scene_root_item.resetTransform()
-        view.centerOn(p)
-        view.zoomIn()
-        self._mod_rect.setPos(p)
-        if self._can_show_mod_rect:
-            self._mod_rect.show()
-    # end def
-
     def partVirtualHelixAddedSlot(self, model_part, id_num):
         """
         When a virtual helix is added to the model, this slot handles
@@ -253,11 +237,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### ACCESSORS ###
-
-    def activeVirtualHelixItem(self):
-        return self.active_virtual_helix_item
-    # end def
-
     def removeVirtualHelixItem(self, id_num):
         self.setActiveVirtualHelixItem(None)
         vhi = self._virtual_helix_item_hash[id_num]
@@ -268,11 +247,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._setVirtualHelixItemList(self._virtual_helix_item_list,
             zoom_to_fit=ztf)
         self._updateBoundingRect()
-
-    # end def
-
-    def virtualHelixBoundingRect(self):
-        return self._vh_rect
     # end def
 
     def window(self):

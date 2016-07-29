@@ -34,7 +34,7 @@ def encodePart(part):
         dict:
     """
     max_id_number_of_helices = part.getIdNumMax()
-    vh_insertions = part.insertions()
+    # vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
     group_props = part.getPropertyDict().copy()

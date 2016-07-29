@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from itertools import product
 
 from PyQt5.QtCore import QRectF, QLineF, Qt, QObject, QPointF
@@ -90,10 +91,8 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 
     def __init__(self, is_fwd, color, pre_xover_item):
         super(QGraphicsSimpleTextItem, self).__init__(pre_xover_item)
-        self._txt = ''
         self.is_fwd = is_fwd
         self._color = color
-        self._pre_xover_item = pre_xover_item
         self._tbr = None
         self._outline = QGraphicsRectItem(self)
         self.setFont(self._XO_FONT)
@@ -106,7 +105,6 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     # end def
 
     def setTextAndStyle(self, text, outline=False):
-        self._txt = text
         str_txt = str(text)
         self._tbr = tBR = self._FM.tightBoundingRect(str_txt)
         half_label_H = tBR.height() / 2.0
@@ -141,7 +139,6 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 
 # end class
 
-ACTIVE_ALPHA = 128
 PROX_ALPHA = 64
 
 class PreXoverItem(QGraphicsRectItem):
@@ -178,7 +175,6 @@ class PreXoverItem(QGraphicsRectItem):
                 to_vh_id_num, prexoveritemgroup, color):
         self.setParentItem(from_virtual_helix_item)
         self.resetTransform()
-        self._from_vh_item = from_virtual_helix_item
         self._id_num = from_virtual_helix_item.idNum()
         self.idx = from_index
         self.is_fwd = is_fwd
@@ -334,7 +330,7 @@ class PreXoverItem(QGraphicsRectItem):
         is for the parts `active_base`
         """
         p1 = self._phos_item.scenePos()
-        p2 = active_pos = active_prexoveritem._phos_item.scenePos()
+        p2 = active_prexoveritem._phos_item.scenePos()
         scale = 3
         delta1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
         delta2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale

@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QApplication
 
 from cadnano import getReopen, util
-from cadnano.enum import PartEdges
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
@@ -246,10 +245,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         for neighbor_id in neighbors:
             nvhi = self._virtual_helix_item_hash[neighbor_id]
             self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-    # end def
-
-    def updatePreXoverItemsSlot(self, sender, virtual_helix):
-        pass
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):

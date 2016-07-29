@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cadnano.cnproxy import BaseObject
 
 class CNObject(BaseObject):

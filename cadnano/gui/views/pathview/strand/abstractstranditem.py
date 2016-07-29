@@ -26,21 +26,14 @@ class AbstractStrandItem(QGraphicsPathItem):
         """docstring for strandRemovedSlot"""
         pass
 
-    def decoratorAddedSlot(self, decorator):
-        """docstring for decoratorAddedSlot"""
-        pass
-
     ### METHODS ###
     def connectSignals(self):
         self._oligo.appearanceChangedSignal.connect(self.oligoAppeareanceChanged)
         self._strand.strandHasNewOligoSignal.connect(self.hasNewOligoSlot)
         self._strand.destroyedSignal.connect(self.strandRemovedSlot)
-        self._strand.decoratorAddedSignal.connect(self.decoratorAddedSlot)
 
     def disconnectSignals(self):
         self._oligo.appearanceChangedSignal.disconnect(self.oligoAppeareanceChanged)
         self._strand.strandHasNewOligoSignal.disconnect(self.hasNewOligoSlot)
         self._strand.destroyedSignal.disconnect(self.strandRemovedSlot)
-        self._strand.decoratorAddedSignal.disconnect(self.decoratorAddedSlot)
-
     ### COMMANDS ###
