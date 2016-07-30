@@ -4,6 +4,7 @@ from cadnano.cnproxy import UndoCommand
 For adding modifications from a document
 """
 
+
 class AddModCommand(UndoCommand):
     def __init__(self, document, params, mid):
         """
@@ -32,6 +33,7 @@ class AddModCommand(UndoCommand):
     # end def
 # end class
 
+
 class RemoveModCommand(UndoCommand):
     def __init__(self, document, mid):
         super(RemoveModCommand, self).__init__()
@@ -47,7 +49,7 @@ class RemoveModCommand(UndoCommand):
         self._int_instances = []
         locations = document._mods[mid]['int_locations']
         for key in locations:
-            part, strand, idx  = document.getModStrandIdx(key)
+            part, strand, idx = document.getModStrandIdx(key)
             self._int_instances.append(key, part, strand, idx)
     # end def
 
@@ -73,16 +75,17 @@ class RemoveModCommand(UndoCommand):
         params_old = self._params_old
         document._mods[mid]['props'] = params_old
         # Destroy all instances of the mod
-        for key, strand, idx in self._ext_instances:
+        for key, part, strand, idx in self._ext_instances:
             part.addModStrandInstance(strand, idx, mid)
             strand.strandModsAddedSignal.emit(strand, document, mid, idx)
         # now internal locations
-        for key, strand, idx in self._int_instances:
+        for key, part, strand, idx in self._ext_instances:
             part.addModStrandInstance(strand, idx, mid, is_internal=True)
             strand.strandModsAddedSignal.emit(strand, document, mid, idx)
         document.documentModAddedSignal.emit(document, params_old, mid)
     # end def
 # end class
+
 
 class ModifyModCommand(UndoCommand):
     def __init__(self, document, params, mid):
