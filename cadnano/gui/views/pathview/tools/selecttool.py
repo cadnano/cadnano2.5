@@ -1,9 +1,8 @@
-import sys
-
 from .abstractpathtool import AbstractPathTool
 from .pathselection import EndpointHandleSelectionBox
 from .pathselection import SelectionItemGroup
 from .pathselection import VirtualHelixHandleSelectionBox
+
 
 class SelectTool(AbstractPathTool):
     """
@@ -13,16 +12,17 @@ class SelectTool(AbstractPathTool):
     def __init__(self, manager, viewroot):
         super(SelectTool, self).__init__(manager)
         b_type = VirtualHelixHandleSelectionBox
-        self.vhi_h_selection_group = SelectionItemGroup(boxtype=b_type,\
-                                                      constraint='y',\
-                                                      parent=viewroot)
+        self.vhi_h_selection_group = SelectionItemGroup(boxtype=b_type,
+                                                        constraint='y',
+                                                        parent=viewroot)
         b_type = EndpointHandleSelectionBox
-        self.strand_item_selection_group = SelectionItemGroup(boxtype=b_type,\
-                                                      constraint='x',\
-                                                      parent=viewroot)
+        self.strand_item_selection_group = SelectionItemGroup(boxtype=b_type,
+                                                              constraint='x',
+                                                              parent=viewroot)
     # end def
 
     def resetSelections(self):
+
         self.vhi_h_selection_group.resetSelection()
         self.strand_item_selection_group.resetSelection()
 

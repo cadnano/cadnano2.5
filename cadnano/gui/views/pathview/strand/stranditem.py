@@ -818,7 +818,7 @@ class StrandItem(QGraphicsLineItem):
                 selection_group.addToGroup(self)
                 self.modelSelect(document)
                 selection_group.setNormalSelect(True)
-        elif idx_l is False and idx_h is False:
+        elif idx_l == False and idx_h == False:
             self.modelDeselect(document)
     # end def
 

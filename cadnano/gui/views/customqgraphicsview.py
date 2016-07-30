@@ -11,17 +11,13 @@ Synopsis:
     A Custom QGraphicsView module to allow focus input events like mouse clicks,
     panning, and zooming.
 """
-from cadnano import app
 
+from cadnano import app
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano import util
-
-from PyQt5.QtCore import pyqtSignal, Qt, QTimer, QTimeLine
-
-from PyQt5.QtGui import QPaintEngine, QPen
-from PyQt5.QtWidgets import (qApp, QGraphicsView,
-                            QGraphicsScene, QWidget, QMenu,
-                            QAction)
+from PyQt5.QtCore import pyqtSignal, Qt, QTimer
+from PyQt5.QtGui import QPaintEngine
+from PyQt5.QtWidgets import qApp, QGraphicsView
 
 # for OpenGL mode
 try:
@@ -31,6 +27,7 @@ except:
     GL = False
 
 GL = False
+
 
 class CustomQGraphicsView(QGraphicsView):
     """
@@ -67,7 +64,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._x0 = 0
         self._y0 = 0
         self._scale_size = 1.0
-        self._scale_limit_max = 24.0 # OLD 3.0
+        self._scale_limit_max = 24.0  # OLD 3.0
         self._scale_limit_min = 0.21
         self._scale_up_rate = 0.01
         self._scale_down_rate = 0.01
@@ -158,7 +155,7 @@ class CustomQGraphicsView(QGraphicsView):
             # scene.drawBackground = self.drawBackgroundGL
             # self.setViewport(QGLWidget(QGLFormat(QGL.SampleBuffers)))
             # self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        elif not boolval and self.is_GL == True:
+        elif not boolval and self.is_GL is True:
             self.is_GL = False
             # scene.drawBackground = self.drawBackgroundNonGL
             # self.setViewport(QWidget())

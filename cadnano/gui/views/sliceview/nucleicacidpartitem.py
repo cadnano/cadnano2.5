@@ -361,7 +361,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def setModifyState(self, bool_val):
         """Hides the mod_rect when modify state disabled."""
         self._can_show_mod_circ = bool_val
-        if bool_val is False:
+        if bool_val == False:
             self._mod_circ.hide()
     # end def
 

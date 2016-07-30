@@ -1,11 +1,10 @@
 from math import floor
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
-from PyQt5.QtGui import QPen, QPainterPath
-from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
+from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtGui import QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
 
-from cadnano import util
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getPenObj
 from cadnano.gui.views.pathview import pathstyles as styles
 
 
@@ -27,7 +26,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
 
         self._rect = QRectF()
         self._PEN = getPenObj(styles.BLUE_STROKE,
-                                styles.PATH_SELECTBOX_STROKE_WIDTH)
+                              styles.PATH_SELECTBOX_STROKE_WIDTH)
 
         self.selectionbox = boxtype(self)
 
@@ -157,7 +156,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def mouseMoveEvent(self, event):
-        if self._drag_enable == True:
+        if self._drag_enable is True:
 
             # map the item to the scene coordinates
             # to help keep coordinates uniform
@@ -191,7 +190,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
         # end if
         self._r0 = 0  # reset
         self._r = 0  # reset
-        self.setFocus() # needed to get keyPresses post a move
+        self.setFocus()  # needed to get keyPresses post a move
         self._added_to_press_list = False
     # end def
 
@@ -205,9 +204,12 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def clearSelection(self, value):
-        """ value is for keyPressEvents
+        """value is for keyPressEvents
+
+        Arguments:
+            value (QVariant): resolves in Python as an integer
         """
-        if value is False:
+        if value == False:  # noqa
             self.selectionbox.hide()
             self.selectionbox.resetPosition()
             self.removeSelectedItems()
@@ -223,11 +225,16 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def itemChange(self, change, value):
-        """docstring for itemChange"""
+        """docstring for itemChange
+
+        Arguments:
+            change (GraphicsItemChange): see http://doc.qt.io/qt-5/qgraphicsitem.html#GraphicsItemChange-enum
+            value (QVariant): resolves in Python as an integer
+        """
         # print("ps itemChange")
         if change == QGraphicsItem.ItemSelectedChange:
             # print("isc", value)
-            if value == False:
+            if value == False:  # noqa
                 self.clearSelection(False)
                 return False
             else:
