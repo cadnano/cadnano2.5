@@ -4,16 +4,20 @@ https://github.com/mdrasmus/compbio/blob/master/rasmus/quadtree.py
 adds in joins and ability to remove nodes
 """
 from math import sqrt
+
+
 def allClose(a, b):
     for x, y in zip(a, b):
         if abs(x - y) > 0.001:
             return False
     return True
 
+
 def v2Distance(a, b):
     dx = b[0] - a[0]
     dy = b[1] - a[1]
     return sqrt(dx*dx + dy*dy)
+
 
 class QuadtreeBase(object):
     """ QuadTreeBase that has a configurable lower size limit of a box
@@ -32,43 +36,42 @@ class QuadtreeBase(object):
         self.children = []  # if this is not a leaf then len(children) >= 0
         self.center = (x, y)
         self.size = size
-        self.min_size = min_size # lower limit of quadtree
+        self.min_size = min_size  # lower limit of quadtree
         self.parent = parent
         self.depth = depth
     # end def
 
     def resize(self):
-        quadtree = QuadtreeBase()
+        # quadtree = QuadtreeBase()
         new_children = []
         full_size = self.size
         new_size = full_size*2
         min_size = self.min_size
         x_center, y_center = self.center
-        new_children = [
-                QuadtreeBase(x_center - full_size,
-                                          y_center - full_size,
-                                          new_size,
-                                          min_size,
-                                          self,
-                                          1),
-                QuadtreeBase(x_center - full_size,
-                                          y_center + full_size,
-                                          new_size,
-                                          min_size,
-                                          self,
-                                          1),
-                QuadtreeBase(x_center + full_size,
-                                          y_center - full_size,
-                                          new_size,
-                                          min_size,
-                                          self,
-                                          1),
-                QuadtreeBase(x_center + full_size,
-                                          y_center + full_size,
-                                          new_size,
-                                          min_size,
-                                          self,
-                                          1)]
+        new_children = [QuadtreeBase(x_center - full_size,
+                                     y_center - full_size,
+                                     new_size,
+                                     min_size,
+                                     self,
+                                     1),
+                        QuadtreeBase(x_center - full_size,
+                                     y_center + full_size,
+                                     new_size,
+                                     min_size,
+                                     self,
+                                     1),
+                        QuadtreeBase(x_center + full_size,
+                                     y_center - full_size,
+                                     new_size,
+                                     min_size,
+                                     self,
+                                     1),
+                        QuadtreeBase(x_center + full_size,
+                                     y_center + full_size,
+                                     new_size,
+                                     min_size,
+                                     self,
+                                     1)]
         if len(self.children) > 0:
             for qt in new_children:
                 next_depth = 2
@@ -77,29 +80,29 @@ class QuadtreeBase(object):
                 min_size = self.min_size
                 x_center, y_center = qt.center
                 qt.children = [QuadtreeBase(x_center - quarter_size,
-                                          y_center - quarter_size,
-                                          next_size,
-                                          min_size,
-                                          self,
-                                          next_depth),
-                                 QuadtreeBase(x_center - quarter_size,
-                                          y_center + quarter_size,
-                                          next_size,
-                                          min_size,
-                                          self,
-                                          next_depth),
-                                 QuadtreeBase(x_center + quarter_size,
-                                          y_center - quarter_size,
-                                          next_size,
-                                          min_size,
-                                          self,
-                                          next_depth),
-                                 QuadtreeBase(x_center + quarter_size,
-                                          y_center + quarter_size,
-                                          next_size,
-                                          min_size,
-                                          self,
-                                          next_depth)]
+                                            y_center - quarter_size,
+                                            next_size,
+                                            min_size,
+                                            self,
+                                            next_depth),
+                               QuadtreeBase(x_center - quarter_size,
+                                            y_center + quarter_size,
+                                            next_size,
+                                            min_size,
+                                            self,
+                                            next_depth),
+                               QuadtreeBase(x_center + quarter_size,
+                                            y_center - quarter_size,
+                                            next_size,
+                                            min_size,
+                                            self,
+                                            next_depth),
+                               QuadtreeBase(x_center + quarter_size,
+                                            y_center + quarter_size,
+                                            next_size,
+                                            min_size,
+                                            self,
+                                            next_depth)]
             # end for
             """
             0 --> 3
@@ -152,7 +155,6 @@ class QuadtreeBase(object):
     # end def
 
     def insertIntoChildren(self, node):
-
         # if node is close to the center then insert here
         # multiply by sqrt(2) == 1.4142...-> 1.4143 rounded
         nloc = node.location()
@@ -188,29 +190,29 @@ class QuadtreeBase(object):
         min_size = self.min_size
         x_center, y_center = self.center
         self.children = [QuadtreeBase(x_center - quarter_size,
-                                  y_center - quarter_size,
-                                  next_size,
-                                  min_size,
-                                  self,
-                                  next_depth),
+                                      y_center - quarter_size,
+                                      next_size,
+                                      min_size,
+                                      self,
+                                      next_depth),
                          QuadtreeBase(x_center - quarter_size,
-                                  y_center + quarter_size,
-                                  next_size,
-                                  min_size,
-                                  self,
-                                  next_depth),
+                                      y_center + quarter_size,
+                                      next_size,
+                                      min_size,
+                                      self,
+                                      next_depth),
                          QuadtreeBase(x_center + quarter_size,
-                                  y_center - quarter_size,
-                                  next_size,
-                                  min_size,
-                                  self,
-                                  next_depth),
+                                      y_center - quarter_size,
+                                      next_size,
+                                      min_size,
+                                      self,
+                                      next_depth),
                          QuadtreeBase(x_center + quarter_size,
-                                  y_center + quarter_size,
-                                  next_size,
-                                  min_size,
-                                  self,
-                                  next_depth)]
+                                      y_center + quarter_size,
+                                      next_size,
+                                      min_size,
+                                      self,
+                                      next_depth)]
 
         nodes = self.nodes
         self.nodes = []
@@ -356,7 +358,6 @@ class QuadtreeBase(object):
         return None
     # end def
 
-
     def getSize(self):
         size = 0
         for child in self.children:
@@ -375,6 +376,7 @@ class QuadtreeBase(object):
     # end def
 # end class
 
+
 class Quadtree(QuadtreeBase):
     def __init__(self, x, y, size, min_size=4):
         super(Quadtree, self).__init__(x, y, size, min_size)
@@ -391,13 +393,13 @@ class Quadtree(QuadtreeBase):
             node_results = set()
             x, y = location
             rect = (x - distance, y - distance,
-                        x + distance, y + distance)
+                    x + distance, y + distance)
             res = QuadtreeBase.query(self,
-                                    location,
-                                    rect,
-                                    distance,
-                                    node_results)
-            qc[location] =  res
+                                     location,
+                                     rect,
+                                     distance,
+                                     node_results)
+            qc[location] = res
             return res
     # end def
 
@@ -407,21 +409,21 @@ class Quadtree(QuadtreeBase):
         rect = (x - distance, y - distance,
                 x + distance, y + distance)
         res = QuadtreeBase.query(self,
-                                query_point,
-                                rect,
-                                distance,
-                                node_results)
+                                 query_point,
+                                 rect,
+                                 distance,
+                                 node_results)
         return res
     # end def
 
     def removeNode(self, node):
-        self._query_cache = {} # clear cache
+        self._query_cache = {}  # clear cache
         self._all_nodes.remove(node)
         return QuadtreeBase.removeNode(self, node)
     # end def
 
     def insertNode(self, node):
-        self._query_cache = {} # clear cache
+        self._query_cache = {}  # clear cache
         self._all_nodes.append(node)
         return QuadtreeBase.insertNode(self, node)
     # end def
