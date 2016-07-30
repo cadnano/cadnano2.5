@@ -1,12 +1,12 @@
-from .abstractslicetool import AbstractSliceTool
-from PyQt5.QtCore import QRect, QRectF, QPointF, Qt
+from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
-
 from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
 from cadnano.gui.views.sliceview import slicestyles as styles
+from .abstractslicetool import AbstractSliceTool
+
 
 def normalizeRect(rect):
     x1, y1, x2, y2 = rect
@@ -22,8 +22,9 @@ _SELECT_PEN_WIDTH = 2
 _SELECT_COLOR = "#ff0000"
 _TEST_COLOR = "#00ff00"
 
+
 class SelectSliceTool(AbstractSliceTool):
-    """"""
+    """Handles SelectTool operations in the Slice view"""
     def __init__(self, manager):
         super(SelectSliceTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
@@ -95,7 +96,7 @@ class SelectSliceTool(AbstractSliceTool):
             from_model_point = part_item.getModelPos(from_pt_part_item)
             to_model_point = part_item.getModelPos(to_pt_part_item)
             query_rect = (from_model_point[0], from_model_point[1],
-                            to_model_point[0], to_model_point[1])
+                          to_model_point[0], to_model_point[1])
             query_rect = normalizeRect(query_rect)
             # print("Query rect", query_rect,
             #     query_rect[0] < query_rect[2], query_rect[1] < query_rect[3])
@@ -177,11 +178,10 @@ class SelectSliceTool(AbstractSliceTool):
                 selection to
         """
         self.setPartItem(part_item)
-        if (self.snap_origin_item is not None and
-            event.modifiers() == Qt.AltModifier):
+        if (self.snap_origin_item is not None and event.modifiers() == Qt.AltModifier):
             self.doSnap(part_item, target_item)
             self.individual_pick = False
-        else: # just do a selection
+        else:  # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
                 self.modelClear()   # deselect if shift isn't held
 
@@ -217,7 +217,7 @@ class SelectSliceTool(AbstractSliceTool):
         if isinstance(snap_to_item, VirtualHelixItem):
             self.setVirtualHelixItem(snap_to_item)
             destination = self.findNearestPoint(part_item, origin)
-        else: # GridEvent
+        else:  # GridEvent
             destination = snap_to_item.pos()
             print("GridEvent", destination)
 
@@ -240,8 +240,7 @@ class SelectSliceTool(AbstractSliceTool):
 
     def copySelection(self):
         part = self.part_item.part()
-        copy_dict = v3encode.encodePartList(part,
-                                        list(self.selection_set))
+        copy_dict = v3encode.encodePartList(part, list(self.selection_set))
         self.clip_board = copy_dict
     # end def
 
@@ -255,7 +254,6 @@ class SelectSliceTool(AbstractSliceTool):
         doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
-
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
         """ Y-axis is inverted in Qt +y === DOWN
         """
@@ -264,9 +262,9 @@ class SelectSliceTool(AbstractSliceTool):
         sf = part_item.scaleFactor()
         part = part_item.part()
         part.translateVirtualHelices(self.selection_set,
-                                        dx / sf, -dy / sf, 0,
-                                        finalize,
-                                        use_undostack=use_undostack)
+                                     dx / sf, -dy / sf, 0,
+                                     finalize,
+                                     use_undostack=use_undostack)
     # end def
 
     def deactivate(self):
@@ -276,8 +274,9 @@ class SelectSliceTool(AbstractSliceTool):
             except:
                 pass    # required for first call
         self.modelClear()
-        self.snap_origin_item.setSnapOrigin(False)
-        self.snap_origin_item = None
+        if self.snap_origin_item is not None:
+            self.snap_origin_item.setSnapOrigin(False)
+            self.snap_origin_item = None
         AbstractSliceTool.deactivate(self)
     # end def
 
@@ -298,8 +297,8 @@ class SelectSliceTool(AbstractSliceTool):
                 menu.addAction(copy_act)
             menu.exec_(sgv.mapToGlobal(point))
     # end def
-
 # end class
+
 
 class SliceSelectionGroup(QGraphicsItemGroup):
     def __init__(self, tool, parent=None):
