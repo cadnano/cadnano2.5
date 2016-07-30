@@ -224,13 +224,16 @@ class SelectionItemGroup(QGraphicsItemGroup):
 
     def itemChange(self, change, value):
         """docstring for itemChange"""
+        # print("ps itemChange")
         if change == QGraphicsItem.ItemSelectedChange:
-            if value is False:
+            # print("isc", value)
+            if value == False:
                 self.clearSelection(False)
                 return False
             else:
                 return True
         elif change == QGraphicsItem.ItemChildAddedChange:
+            # print("icac")
             if self._added_to_press_list is False:
                 # print("kid added")
                 self.setFocus()  # this is to get delete keyPressEvents
@@ -465,13 +468,13 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         """docstring for processSelectedItems"""
         delta = self.delta(r_end, r_start)
 
-        if modifiers & Qt.AltModifier:
-            do_maximize = True
-        else:
-            do_maximize = False
+        # TODO reenable do_maximize?????
+        # if modifiers & Qt.AltModifier:
+        #     do_maximize = True
+        # else:
+        #     do_maximize = False
 
-        self._item_group.viewroot.document().resizeSelection(delta,
-                                                do_maximize=do_maximize)
+        self._item_group.viewroot.document().resizeSelection(delta)
     # end def
 
     def deleteSelection(self):

@@ -134,4 +134,14 @@ class PathRootItem(QGraphicsRectItem):
         self.manager = manager
         self.select_tool = manager.select_tool
     # end def
+
+    def clearSelectionsIfActiveTool(self):
+        if self.manager.isSelectToolActive():
+            self.select_tool.clearSelections(False)
+    # end def
+
+    def mousePressEvent(self, event):
+        print("ADSDsadf")
+        self.clearSelectionsIfActiveTool()
+        return QGraphicsRectItem.mousePressEvent(self, event)
 # end class

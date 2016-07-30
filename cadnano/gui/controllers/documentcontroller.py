@@ -251,7 +251,7 @@ class DocumentController():
         add_oligo = False
         if win.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
-            filter_list.append("strand")
+            # filter_list.append("strand")
             add_oligo = True
         # if win.action_filter_strand.isChecked():
         #     filter_list.append("strand")
