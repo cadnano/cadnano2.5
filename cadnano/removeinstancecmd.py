@@ -2,7 +2,7 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
 from cadnano.part import Part
 
-### COMMANDS ###
+
 class RemoveInstanceCommand(UndoCommand):
     """
     Undo ready command for adding an instance.

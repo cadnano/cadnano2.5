@@ -9,25 +9,31 @@ batch = False
 global reopen
 reopen = False
 
+
 def getBatch():
     global batch
     return batch
+
 
 def setBatch(is_batch):
     global batch
     batch = is_batch
 
+
 def getReopen():
     global reopen
     return reopen
+
 
 def setReopen(is_reopen):
     global reopen
     reopen = is_reopen
 
+
 def app():
     global shared_app
     return shared_app
+
 
 def initAppWithGui(app_args=None, do_exec=True):
     global shared_app

@@ -89,6 +89,7 @@ except:
             return "#{:02X}{:02X}{:02X}{:02X}".format(self.r, self.g, self.b, self.a)
     # end def
 
+
 def _intToColor(color_number):
     """ legacy color support for converting integers to color objects based on the
     cadnano 2 file format
@@ -100,6 +101,7 @@ def _intToColor(color_number):
         Color: the :class:`Color` object
     """
     return Color('#%0.6x' % (color_number))
+
 
 def intToColorHex(color_number):
     """Convert an integer to a hexadecimal string compatible with :class:`QColor`

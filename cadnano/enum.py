@@ -1,22 +1,24 @@
 from enum import Enum as _Enum
 
+
 def enumNames(cls):
     return [a for a, b in sorted(filter(lambda z: isinstance(z[1], int),
-                    cls.__dict__.items()), key=lambda x: x[1])]
+            cls.__dict__.items()), key=lambda x: x[1])]
 ENUM_NAMES = {}
+
 
 class EnumMask(object):
     def __init__(self, enum, value):
-        self._enum=enum
-        self._value=value
+        self._enum = enum
+        self._value = value
 
     def __and__(self, other):
-        assert isinstance(other,self._enum)
-        return self._value&other.bwv
+        assert isinstance(other, self._enum)
+        return self._value & other.bwv
 
     def __or__(self, other):
-        assert isinstance(other,self._enum)
-        return EnumMask(self._enum, self._value|other.bwv)
+        assert isinstance(other, self._enum)
+        return EnumMask(self._enum, self._value | other.bwv)
 
     def __repr__(self):
         return "<{} for {}: {}>".format(
@@ -25,30 +27,35 @@ class EnumMask(object):
             self._value
         )
 
+
 class Enum(_Enum):
     @property
-    def bwv(self): # bitwise value
-        cls=self.__class__
-        idx=list(cls.__members__.values()).index(self)
+    def bwv(self):  # bitwise value
+        cls = self.__class__
+        idx = list(cls.__members__.values()).index(self)
         return 2**idx
 
     def __or__(self, other):
-        return EnumMask(self.__class__, self.bwv|other.bwv)
+        return EnumMask(self.__class__, self.bwv | other.bwv)
 
     def __and__(self, other):
         if isinstance(other, self.__class__):
-            return self.bwv&other.bwv
+            return self.bwv & other.bwv
         elif isinstance(other, EnumMask):
-            return other&self
-        else: raise
+            return other & self
+        else:
+            raise
+
 
 class PartType(_Enum):
     NUCLEICACIDPART = 1
     PLASMIDPART = 2
 
-# For serializing virtual helices as only pointing in the Z direction
-# or pointing in arbitrary directions
+
 class PointType:
+    """For serializing virtual helices as only pointing in the Z direction
+    or pointing in arbitrary directions.
+    """
     Z_ONLY = 0
     ARBITRARY = 1
 ENUM_NAMES['point_type'] = enumNames(PointType)
@@ -77,14 +84,17 @@ class StrandType:
     FWD = 0
     REV = 1
 
+
 class ModType:
     END_5PRIME = 0
     END_3PRIME = 1
     INTERNAL = 2
 
+
 class LatticeType:
     SQUARE = 0
     HONEYCOMB = 1
+
 
 class GridType:
     NONE = 0
@@ -117,4 +127,3 @@ ENUM_NAMES['grid_type'] = enumNames(GridType)
 #     BOTRIGHT = BOTTOM|RIGHT
 #     SIDE     = LEFT|RIGHT
 #     TOPBOT   = TOP|BOTTOM
-

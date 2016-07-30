@@ -1,7 +1,6 @@
-from cadnano import util
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
-from cadnano.cnproxy import UndoCommand, UndoStack
+
 
 class ObjectInstance(CNObject):
     # __slots__ = ('_parent', '_object', '_position')
@@ -12,17 +11,14 @@ class ObjectInstance(CNObject):
         self._position = [0, 0, 0, 0, 0, 0]  # x, y, z, phi, theta, psi
     # end def
 
-    ### SIGNALS ###
-    instanceDestroyedSignal = ProxySignal(CNObject,
-                                        name="instanceDestroyedSignal")
-    instanceMovedSignal = ProxySignal(CNObject,
-                                        name="instanceMovedSignal")
-    instanceParentChangedSignal = ProxySignal(CNObject,
-                                        name="instanceParentChangedSignal")
+    # SIGNALS #
+    instanceDestroyedSignal = ProxySignal(CNObject, name="instanceDestroyedSignal")
+    instanceMovedSignal = ProxySignal(CNObject, name="instanceMovedSignal")
+    instanceParentChangedSignal = ProxySignal(CNObject, name="instanceParentChangedSignal")
 
-    ### SLOTS ###
+    # SLOTS #
 
-    ### METHODS ###
+    # METHODS #
     def destroy(self):
         self.setParent(None)
         self.deleteLater()
@@ -35,15 +31,13 @@ class ObjectInstance(CNObject):
     def wipe(self, doc):
         """For adding ObjectInstances to a Document"""
         self._object.decrementInstance()
-        obj.decrementInstance()
         doc.removeInstance(self)
         doc.setSelectedInstance(None)
     # end def
 
     def unwipe(self, doc):
         """For Removing ObjectInstances from a Document"""
-        obj = self._object
-        obj.incrementInstance(doc)
+        self._object.incrementInstance(doc)
         doc.addInstance(self)
         doc.setSelectedInstance(self)
     # end def

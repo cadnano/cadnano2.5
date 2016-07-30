@@ -1,5 +1,6 @@
 import cadnano.cnproxy as cnp
 
+
 def proxyConfigure(signal_type=None):
     """ call once per application at the start of
     the import chain

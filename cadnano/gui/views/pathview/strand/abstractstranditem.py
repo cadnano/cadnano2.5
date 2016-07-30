@@ -36,4 +36,3 @@ class AbstractStrandItem(QGraphicsPathItem):
         self._oligo.appearanceChangedSignal.disconnect(self.oligoAppeareanceChanged)
         self._strand.strandHasNewOligoSignal.disconnect(self.hasNewOligoSlot)
         self._strand.destroyedSignal.disconnect(self.strandRemovedSlot)
-    ### COMMANDS ###

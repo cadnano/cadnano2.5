@@ -7,6 +7,7 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 # from cadnano.cnproxy import UndoCommand, UndoStack
 
+
 class Assembly(CNObject):
     """
     An Assembly is a collection of components, comprised recursively of
@@ -29,15 +30,13 @@ class Assembly(CNObject):
         self._assembly_instances = []
     # end def
 
-    ### SIGNALS ###
-    assemblyInstanceAddedSignal = ProxySignal(CNObject,
-                                name='assemblyInstanceAddedSignal')
-    assemblyDestroyedSignal = ProxySignal(CNObject,
-                                name='assemblyDestroyedSignal')
+    # SIGNALS #
+    assemblyInstanceAddedSignal = ProxySignal(CNObject, name='assemblyInstanceAddedSignal')
+    assemblyDestroyedSignal = ProxySignal(CNObject, name='assemblyDestroyedSignal')
 
-    ### SLOTS ###
+    # SLOTS #
 
-    ### METHODS ###
+    # METHODS #
     def undoStack(self):
         return self._document.undoStack()
 

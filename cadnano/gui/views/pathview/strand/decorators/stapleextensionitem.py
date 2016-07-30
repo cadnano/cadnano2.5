@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
-
-
-from cadnano import util
 from .abstractdecoratoritem import AbstractDecoratorItem
+
 
 class StapleExtensionItem(AbstractDecoratorItem):
     def __init__(self, parent):

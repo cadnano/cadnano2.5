@@ -1,11 +1,8 @@
 from ast import literal_eval
-from PyQt5.QtCore import QPointF, Qt, QRectF, pyqtSlot
-from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt5.QtCore import QPointF, Qt, QRectF
+from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtWidgets import QApplication
 
-from cadnano import getReopen, util
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
@@ -69,7 +66,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         # initialize the NucleicAcidPartItem with an empty set of old coords
         self.setZValue(styles.ZPARTITEM)
 
-        self.outline = outline =  QGraphicsRectItem(self)
+        self.outline = outline = QGraphicsRectItem(self)
         o_rect = self.configureOutline(outline)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
@@ -150,8 +147,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
-                                                vh_set, left_overs,
-                                                do_deselect):
+                                         vh_set, left_overs,
+                                         do_deselect):
         """
         left_overs are neighbors that need updating due to changes
         """
@@ -299,9 +296,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if info:
             id_num, is_fwd, idx, to_vh_id_num = info
             per_neighbor_hits, pairs = part.potentialCrossoverMap(id_num, idx)
-            pxom.activateVirtualHelix(
-                                    virtual_helix_item, idx,
-                                    per_neighbor_hits, pairs)
+            pxom.activateVirtualHelix(virtual_helix_item, idx,
+                                      per_neighbor_hits, pairs)
     # end def
 
     def removeVirtualHelixItem(self, id_num):
@@ -472,7 +468,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def selectToolMousePress(self, tool, event):
         """
         """
-        # print("select tool part item")
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
@@ -482,8 +477,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             if id_num is not None:
                 print(id_num)
                 loc = part.getCoordinate(id_num, 0)
-                print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(vh.number(),
-                    loc[0], loc[1] ))
+                print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))
             else:
                 # tool.deselectItems()
                 tool.modelClear()

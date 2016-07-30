@@ -27,7 +27,7 @@ def clamp(x, min_x, max_x):
 
 
 def overlap(x, y, a, b):
-    """Finds the overlap of the range x to y in a to b. 
+    """Finds the overlap of (x, y) and (a, b).
     Assumes an overlap exists, i.e. y >= a and b >= x.
     """
     c = clamp(x, a, b)
@@ -346,8 +346,8 @@ def init_logging(args=None, logdir=None):
         os.makedirs(logdir)
     logfilepath = os.path.join(logdir, appname+".log")
 
-    ## We want different output formatting for file vs console logging output.
-    ## File logs should be simple and easy to regex; console logs should be short and nice on the eyes
+    # We want different output formatting for file vs console logging output.
+    # File logs should be simple and easy to regex; console logs should be short and nice on the eyes
     logfilefmt = "%(asctime)s %(levelname)-6s - %(name)s:%(lineno)s - %(funcName)s() - %(message)s"
     logdatefmt = "%Y%m%d-%H:%M:%S"
     loguserfmt = "%(asctime)s %(levelname)-5s %(module)30s:%(lineno)-4s%(funcName)16s() %(message)s"
@@ -389,8 +389,6 @@ def init_logging(args=None, logdir=None):
 
         # Set filter for debugging:
         if args.get('debug_modules'):
-            debug_modules = args['debug_modules']
-
             def module_debug_filter(record):
                 """
                 All Filters attached to a logger or handler are asked.

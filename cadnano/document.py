@@ -51,7 +51,7 @@ class Document(CNObject):
         this_app.documentWasCreatedSignal.emit(self)
     # end def
 
-    ### SIGNALS ###
+    # SIGNALS #
     documentPartAddedSignal = ProxySignal(object, CNObject, name='documentPartAddedSignal')
     """`Document`, `Part`"""
 
@@ -66,9 +66,9 @@ class Document(CNObject):
     documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
     documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
 
-    ### SLOTS ###
+    # SLOTS #
 
-    ### ACCESSORS ###
+    # ACCESSORS #
     def undoStack(self):
         """This is the actual undoStack to use for all commands. Any children
         needing to perform commands should just ask their parent for the
@@ -148,7 +148,7 @@ class Document(CNObject):
     #     """Returns a list of assemblies associated with the document."""
     #     return self._assemblies
 
-    ### PUBLIC METHODS FOR QUERYING THE MODEL ###
+    # PUBLIC METHODS FOR QUERYING THE MODEL #
     # def selectedInstance(self):
     #     return self._selected_instance
 
@@ -612,7 +612,7 @@ class Document(CNObject):
         self.view_names = view_names
     # end def
 
-    ### PUBLIC METHODS FOR EDITING THE MODEL ###
+    # PUBLIC METHODS FOR EDITING THE MODEL #
     def addDnaPart(self, use_undostack=True):
         """ Create and store a new DnaPart and instance, and return the instance.
 
@@ -649,7 +649,7 @@ class Document(CNObject):
                 return item
     # end def
 
-    ### PUBLIC SUPPORT METHODS ###
+    # PUBLIC SUPPORT METHODS #
     def controller(self):
         return self._controller
     # end def
@@ -665,7 +665,7 @@ class Document(CNObject):
         self._selected_instance = new_instance
     # end def
 
-    ### PRIVATE SUPPORT METHODS ###
+    # PRIVATE SUPPORT METHODS #
     def _addPart(self, part_instance, use_undostack=True):
         """Add part to the document via AddInstanceCommand.
         """

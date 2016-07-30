@@ -15,20 +15,20 @@ Document = None
 DocumentController = None
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
-ICON_DIR = os.path.join(LOCAL_DIR, 'gui','ui', 'mainwindow', 'images')
+ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'ui', 'mainwindow', 'images')
 ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
 ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
 CADNANO_DEFAULT_DOCUMENT = 'simple.json'
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(
-                ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
+os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
 
 if platform.system() == 'Windows':
     import ctypes
-    myappid = 'cadnano.cadnano.radnano.2.5.0' # arbitrary string
+    myappid = 'cadnano.cadnano.radnano.2.5.0'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+
 
 class CadnanoQt(QObject):
     dontAskAndJustDiscardUnsavedChanges = False
@@ -78,7 +78,7 @@ class CadnanoQt(QObject):
         self.d = self.newDocument(base_doc=doc)
         styles.setFontMetrics()
 
-        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True' ## added by Nick
+        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()
@@ -88,43 +88,48 @@ class CadnanoQt(QObject):
             print("Some handy locals:")
             print("\ta\tcadnano.app() (the shared cadnano application object)")
             print("\td()\tthe last created Document")
+
             def d():
                 return self.d
 
             print("\tw()\tshortcut for d().controller().window()")
+
             def w():
                 return self.d.controller().window()
 
             print("\tp()\tshortcut for d().selectedInstance().reference()")
+
             def p():
                 return self.d.selectedInstance().reference()
 
             print("\tpi()\tthe PartItem displaying p()")
+
             def pi():
                 part_instance = self.d.selectedInstance()
                 return w().pathroot.partItemForPart(part_instance)
 
-            print( "\tvh(i)\tshortcut for p().reference().getStrandSets(i)")
+            print("\tvh(i)\tshortcut for p().reference().getStrandSets(i)")
+
             def strandsets(id_num):
                 return p().reference().getStrandSets(id_num)
 
-            print( "\tvhi(i)\tvirtualHelixItem displaying vh(i)")
+            print("\tvhi(i)\tvirtualHelixItem displaying vh(i)")
+
             def vhi(id_num):
                 partitem = pi()
                 return partitem.vhItemForIdNum(id_num)
 
             print("\tquit()\tquit (for when the menu fails)")
             print("\tgraphicsItm.findChild()  see help(pi().findChild)")
-            interact('', local={'a':self, 'd':d, 'w':w,
-                                'p':p, 'pi':pi, 'vh':vh, 'vhi':vhi,
+            interact('', local={'a': self, 'd': d, 'w': w,
+                                'p': p, 'pi': pi, 'vhi': vhi,
                                 })
-
 
     def exec_(self):
         if hasattr(self, 'qApp'):
             self.mainEventLoop = QEventLoop()
             self.mainEventLoop.exec_()
-            #self.qApp.exec_()
+            # self.qApp.exec_()
 
     def ignoreEnv(self):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)

@@ -1,24 +1,27 @@
 #!/usr/bin/env python
-'''
-From http://stackoverflow.com/questions/7827430/setting-mac-osx-application-menu-menu-bar-item-to-other-than-python-in-my-pyth
+"""
+From http://stackoverflow.com/questions/7827430/
 https://creativecommons.org/licenses/by-sa/3.0/
 
-This creates an app to launch a python script. The app is
-created in the directory where python is called. A version of Python
-is created via a softlink, named to match the app, which means that
-the name of the app rather than Python shows up as the name in the
-menu bar, etc, but this requires locating an app version of Python
-(expected name .../Resources/Python.app/Contents/MacOS/Python in
-directory tree of calling python interpreter).
+This creates an app to launch a python script. The app is created in the
+directory where python is called. A version of Python is created via a
+softlink, named to match the app, which means that the name of the app rather
+than Python shows up as the name in the menu bar, etc, but this requires
+locating an app version of Python (expected name
+.../Resources/Python.app/Contents/MacOS/Python in directory tree of calling
+python interpreter).
 
 Run this script with one or two arguments:
     <python script>
     <project name>
+
 The script path may be specified relative to the current path or given
 an absolute path, but will be accessed via an absolute path. If the
 project name is not specified, it will be taken from the root name of
 the script.
-'''
+
+"""
+
 import sys
 import os
 import os.path
@@ -26,6 +29,7 @@ import stat
 # import shutil
 
 pjoin = os.path.join
+
 
 def Usage():
     print("\n\tUsage: python " + sys.argv[0] + " <python script> [<project name>]\n")
@@ -50,7 +54,7 @@ if len(sys.argv) == 3:
 else:
     project = os.path.splitext(os.path.split(script)[1])[0]
 
-apppath = os.path.abspath(pjoin('.',  project + ".app"))
+apppath = os.path.abspath(pjoin('.', project + ".app"))
 projectversion = project + " " + version
 if os.path.exists(apppath):
     print("\nSorry, an app named " + project + " exists in this location (" + str(apppath) + ")")
@@ -93,8 +97,7 @@ f.write('''<?xml version="1.0" encoding="UTF-8"?>
     <string>NSApplication</string>
 </dict>
 </plist>
-'''.format(projectversion, bundleIdentifier, project, projectversion, version)
-    )
+'''.format(projectversion, bundleIdentifier, project, projectversion, version))
 f.close()
 
 # not sure what this file does

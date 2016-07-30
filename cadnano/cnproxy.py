@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+
+from cadnano import undostack
+from cadnano import undocommand
+
+
 class ProxyObject(object):
     __slots__ = '_parent', '_signals'
 
@@ -21,7 +26,7 @@ class ProxyObject(object):
         self._signals[(sender, bsignal, method)] = f
 
     def disconnect(self, sender, bsignal, method):
-        f  = self._signals[(sender, bsignal, method)]
+        f = self._signals[(sender, bsignal, method)]
         bsignal.disconnect(f, sender=sender)
         del self._signals[(sender, bsignal, method)]
 
@@ -32,7 +37,8 @@ class ProxyObject(object):
     def deleteLater(self):
         pass
     # end def
-#end class
+# end class
+
 
 class DummySignal(object):
     def __init__(self, *args, **kwargs):
@@ -42,27 +48,26 @@ class DummySignal(object):
         self.targets = {}
         self.argtypes = args
         self.name = name
+
     def connect(self, target):
         self.targets.add(target)
+
     def disconnect(self, target):
         self.targets.remove(target)
+
     def emit(self, *args):
         for t in self.targets:
             t(*args)
 # end class
-
-
-from cadnano import undostack
-from cadnano import undocommand
 
 ProxySignal = DummySignal
 BaseObject = ProxyObject
 UndoCommand = undocommand.UndoCommand
 UndoStack = undostack.UndoStack
 
+
 class TempApp(object):
     documentWasCreatedSignal = ProxySignal(name='documentWasCreatedSignal')
     is_temp_app = True
 
 tapp = TempApp()
-
