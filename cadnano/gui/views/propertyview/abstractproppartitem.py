@@ -1,14 +1,6 @@
-from collections import defaultdict
-
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
-from PyQt5.QtWidgets import QSizePolicy
-
-from cadnano.enum import ItemType
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
-
 from .cnpropertyitem import CNPropertyItem
+
 
 class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
     def __init__(self, model_part, parent, key=None):

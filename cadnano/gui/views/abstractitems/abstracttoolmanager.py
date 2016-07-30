@@ -1,21 +1,24 @@
 from PyQt5.QtCore import pyqtSignal, QObject
 # from PyQt5.QtWidgets import QActionGroup
 
-from cadnano import app
 
 class DummyTool(object):
     """ For use in place of None checks in the code
     reduces boilerplate
     """
     action_name = 'action_dummy_tool'
+
     def methodPrefix(self):
         return "dummyTool"  # first letter should be lowercase
+
     def setActive(self, bool):
         pass
+
     def lastLocation(self):
         return None
 
 dummy_tool = DummyTool()
+
 
 class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""

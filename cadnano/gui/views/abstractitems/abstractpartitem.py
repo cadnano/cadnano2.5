@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
+
 class QAbstractPartItem(QGraphicsRectItem):
     """ Use for single inheritance
     QAbstractPartItem is a base class for partitems in all views.
@@ -79,40 +80,55 @@ class QAbstractPartItem(QGraphicsRectItem):
 
     def partOligoAddedSlot(self, part, oligo):
         pass
+
     def partParentChangedSlot(self, sender):
         pass
+
     def partPropertyChangedSlot(model_part, property_key, new_value):
         pass
+
     def partRemovedSlot(self, sender):
         pass
+
     def partSelectedChangedSlot(self, model_part, is_selected):
         pass
+
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
+
     def partActiveBaseInfoSlot(self, sender, info):
         pass
+
     def partActiveChangedSlot(self, sender, is_active):
         pass
+
     def partViewPropertySlot(self, sender, view_name, key, value):
         if view_name == self._viewroot.name:
             if key == 'position':
                 self.setPos(*value)
     # end def
+
     def partVirtualHelixAddedSlot(self, sender):
         pass
+
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         pass
+
     def partVirtualHelixResizedSlot(self, sender, id_num):
         pass
+
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
+
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
+
     def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
         """ is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
         pass
+
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass
 
@@ -120,6 +136,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         pass
     # end defS
 # end class
+
 
 class AbstractPartItem(object):
     """ Use for multiple inheritance
@@ -172,47 +189,59 @@ class AbstractPartItem(object):
             max_id_num (int): id number of most Z Virtual Helix
         """
         pass
+
     def partOligoAddedSlot(self, part, oligo):
         pass
+
     def partParentChangedSlot(self, sender):
         pass
+
     def partPropertyChangedSlot(model_part, property_key, new_value):
         pass
+
     def partRemovedSlot(self, sender):
         pass
+
     def partSelectedChangedSlot(self, model_part, is_selected):
         pass
+
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
+
     def partActiveBaseInfoSlot(self, sender, info):
         pass
+
     def partActiveChangedSlot(self, sender, is_active):
         pass
+
     def partViewPropertySlot(self, sender, view_name, key, value):
         pass
+
     def partVirtualHelixAddedSlot(self, sender):
         pass
+
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         pass
+
     def partVirtualHelixResizedSlot(self, sender, id_num):
         pass
+
     def partVirtualHelicesReorderedSlot(self, sender):
         pass
+
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
+
     def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
-        """ is_adding (bool): adding (True) virtual helices to a selection
+        """is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
         pass
+
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
         pass
+
     def partDocumentSettingChangedSlot(self, part, key, value):
         pass
     # end def
 # end class
-
-
-
-
-
