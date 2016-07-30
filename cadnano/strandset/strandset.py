@@ -1,23 +1,13 @@
-# -*- coding: utf-8 -*-
-import array
 from bisect import bisect_left, insort_left
-from itertools import repeat
-from operator import itemgetter
-
 import cadnano.util as util
-
-from cadnano import preferences as prefs
-from cadnano.enum import StrandType
-from cadnano.cnproxy import UndoStack, UndoCommand
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
-from cadnano.oligo import Oligo
-from cadnano.strand import Strand
-
+from cadnano.enum import StrandType
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
-from .splitcmd import SplitCommand
 from .mergecmd import MergeCommand
+from .splitcmd import SplitCommand
+
 
 class StrandSet(CNObject):
     """:class:`StrandSet` is a container class for :class:`Strands`, and provides
@@ -69,7 +59,7 @@ class StrandSet(CNObject):
             part (Part): part to copy this into
         """
         return StrandSet(self._is_fwd, self._id_num,
-                        part, len(self.strand_array))
+                         part, len(self.strand_array))
     # end def
 
     def __iter__(self):
@@ -91,8 +81,8 @@ class StrandSet(CNObject):
     # end def
 
     ### SIGNALS ###
-    strandsetStrandAddedSignal = ProxySignal(CNObject, CNObject,
-                                    name='strandsetStrandAddedSignal')#pyqtSignal(QObject, QObject)  # strandset, strand
+    strandsetStrandAddedSignal = ProxySignal(CNObject, CNObject, name='strandsetStrandAddedSignal')
+    """pyqtSignal(QObject, QObject): strandset, strand"""
 
     ### SLOTS ###
 
@@ -124,7 +114,8 @@ class StrandSet(CNObject):
         return self.strand_heap
 
     def reset(self, initial_size):
-        """Reset this object clearing out references to all :class:`Strand`s
+        """Reset this object clearing out references to all :class:`Strand` 
+        objects.
 
         Args:
             initial_size (int): size to revert to
@@ -145,9 +136,7 @@ class StrandSet(CNObject):
             self.strand_array = self.strand_array[delta_low:]
         if delta_high < 0:
             self.strand_array = self.strand_array[:delta_high]
-        self.strand_array = [None]*delta_low + \
-                self.strand_array + \
-                    [None]*delta_high
+        self.strand_array = [None]*delta_low + self.strand_array + [None]*delta_high
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
@@ -237,6 +226,7 @@ class StrandSet(CNObject):
         """
         class DummyStrand(object):
             _base_idx_low = base_idx
+
             def __lt__(self, other):
                 return self._base_idx_low < other._base_idx_low
 
@@ -283,7 +273,7 @@ class StrandSet(CNObject):
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def createStrand(self, base_idx_low, base_idx_high,
-                        color=None, use_undostack=True):
+                     color=None, use_undostack=True):
         """Assumes a strand is being created at a valid set of indices.
 
         Args:
@@ -299,14 +289,13 @@ class StrandSet(CNObject):
         part = self._part
         if color is None:
             color = part.getProperty('color')
-        bounds_low, bounds_high = \
-                            self.getBoundsOfEmptyRegionContaining(base_idx_low)
+        bounds_low, bounds_high = self.getBoundsOfEmptyRegionContaining(base_idx_low)
 
         if bounds_low is not None and bounds_low <= base_idx_low and \
-            bounds_high is not None and bounds_high >= base_idx_high:
+           bounds_high is not None and bounds_high >= base_idx_high:
             c = CreateStrandCommand(self, base_idx_low, base_idx_high,
-                                        color,
-                                        update_segments=use_undostack)
+                                    color,
+                                    update_segments=use_undostack)
             x, y = part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             # print("strand", d)
@@ -324,8 +313,8 @@ class StrandSet(CNObject):
 
         """
         c = CreateStrandCommand(self, base_idx_low, base_idx_high,
-                                    color,
-                                    update_segments=use_undostack)
+                                color,
+                                update_segments=use_undostack)
         x, y = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
         # print("strand", d)
@@ -367,7 +356,7 @@ class StrandSet(CNObject):
 
         Args:
             strand (Strand): a strand to remove
-            cmds (list): a list of :class:`UndoCommand`s to append to
+            cmds (list): a list of :class:`UndoCommand` objects to append to
             solo (:obj:`bool`, optional): to pass on to RemoveStrandCommand,
             default=True
         """
@@ -378,7 +367,7 @@ class StrandSet(CNObject):
     # end def
 
     def removeAllStrands(self, use_undostack=True):
-        """Remove all :class:`Strand`s in the set
+        """Remove all :class:`Strand` objects in the set
 
         Args:
          use_undostack (:obj:`bool`, optional): default=True
@@ -420,7 +409,7 @@ class StrandSet(CNObject):
         if strandA.strandSet() != strandB.strandSet():
             return ()
         if abs(strandA.lowIdx() - strandB.highIdx()) == 1 or \
-            abs(strandB.lowIdx() - strandA.highIdx()) == 1:
+           abs(strandB.lowIdx() - strandA.highIdx()) == 1:
             if strandA.lowIdx() < strandB.lowIdx():
                 if not strandA.connectionHigh() and not strandB.connectionLow():
                     return strandA, strandB
@@ -526,6 +515,7 @@ class StrandSet(CNObject):
         if strand is None:
             class DummyStrand(object):
                 _base_idx_low = idx_low
+
                 def __lt__(self, other):
                     return self._base_idx_low < other._base_idx_low
 
@@ -546,14 +536,14 @@ class StrandSet(CNObject):
     # end def
 
     def getOverlappingStrands(self, idx_low, idx_high):
-        """Get :class:`Strand`s that overlap the range given
+        """Gets :class:`Strand` list that overlap the given range.
 
         Args:
-            idx_low (int): low index
-            idx_high (int): high index
+            idx_low (int): low index of overlap region
+            idx_high (int): high index of overlap region
 
         Returns:
-            :obj:`list` of :class:`Strand`: all :class:`Strand`s in range
+            :obj:`list` of :class:`Strand`: all :class:`Strand` objects in range
         """
         sa = self.strand_array
         sh = self.strand_heap
@@ -564,6 +554,7 @@ class StrandSet(CNObject):
         if strand is None:
             class DummyStrand(object):
                 _base_idx_low = idx_low
+
                 def __lt__(self, other):
                     return self._base_idx_low < other._base_idx_low
 

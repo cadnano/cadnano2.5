@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
-from PyQt5.QtGui import QColor, QFont
+from PyQt5.QtGui import QFont
+from cadnano.gui.views.styles import THE_FONT, THE_FONT_SIZE
+from cadnano.gui.views.styles import BLUE_FILL, BLUE_STROKE
+from cadnano.gui.views.styles import GRAY_FILL, GRAY_STROKE
 
-from cadnano.gui.views.styles import *
 
 # Slice Sizing
 SLICE_HELIX_RADIUS = 15.
@@ -34,4 +35,4 @@ SLICE_TEXT_COLOR = "#000000"
 
 ACTIVE_STROKE = '#cccc00'
 DEFAULT_GRID_DOT_COLOR = '#0000ff'
-ACTIVE_GRID_DOT_COLOR = '#ff3333' # item color
+ACTIVE_GRID_DOT_COLOR = '#ff3333'  # item color

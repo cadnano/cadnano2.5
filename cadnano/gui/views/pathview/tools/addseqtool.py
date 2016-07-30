@@ -1,18 +1,18 @@
 import re
 
-from PyQt5.QtCore import Qt, QObject, QPointF, QRegExp, QSignalMapper, pyqtSignal, pyqtSlot
-from PyQt5.QtGui import QFont, QTextCharFormat, QSyntaxHighlighter
+from PyQt5.QtCore import Qt, QSignalMapper
+from PyQt5.QtGui import QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
 
 from cadnano.data.dnasequences import sequences
-from cadnano.enum import StrandType
 from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getColorObj, getBrushObj
 
 from .abstractpathtool import AbstractPathTool
 
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
+
 
 class DNAHighlighter(QSyntaxHighlighter):
     def __init__(self, parent):
@@ -32,6 +32,7 @@ class DNAHighlighter(QSyntaxHighlighter):
             self.setFormat(index, length, self.format)
         self.setCurrentBlockState(0)
 
+
 class AddSeqTool(AbstractPathTool):
     def __init__(self, manager):
         AbstractPathTool.__init__(self, manager)
@@ -50,10 +51,9 @@ class AddSeqTool(AbstractPathTool):
         return "addSeqTool"  # first letter should be lowercase
 
     def initDialog(self):
-        """
-        1. Create buttons for each sequence option and add them to the dialog.
-        2. Map the clicked signal of those buttons to keep track of what
-        sequence gets selected.
+        """Creates buttons for each sequence option and add them to the dialog.
+        Maps the clicked signal of those buttons to keep track of what sequence
+        gets selected.
         """
         ui_dlg = Ui_AddSeqDialog()
         ui_dlg.setupUi(self.dialog)
@@ -113,7 +113,7 @@ class AddSeqTool(AbstractPathTool):
             # A zero-length custom sequence defaults to Abstract type.
             if not self.buttons[0].isChecked():
                 self.buttons[0].click()
-        else: 
+        else:
             # Does this match a known sequence?
             if user_sequence in self.sequence_radio_button_id:
                 # Handles case where the user might copy & paste in a known sequence

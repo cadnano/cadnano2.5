@@ -619,15 +619,14 @@ class NucleicAcidPart(Part):
 
         1. Create a new part (the "copy").
         2. deepCopy the VirtualHelices from the "original" part.
-        3. Map the original part's Oligos onto the copy's Oligos, using 
-        lookups of the hash id_num and the StrandSet from step 2.
+        3. Map the original part's Oligos onto the copy's Oligos, using lookups
+            of the hash id_num and the StrandSet from step 2.
 
         """
         # 1) new part
         new_part = self.newPart()
         # 2) Copy VirtualHelix Group
         new_part = self.copy(self._document, new_object=new_part)
-        # end for
         # 3) Copy oligos, populating the strandsets
         for oligo, val in self._oligos:
             strandGenerator = oligo.strand5p().generator3pStrand()

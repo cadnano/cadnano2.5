@@ -58,13 +58,13 @@ class VirtualHelixGroup(CNObject):
 
     1. Contain the coordinates of every virtual base stored in their index
        order per id_num
-    2. contains the id_num per coordinate
+    2. Contains the id_num per coordinate.
 
-    Uses *args and **kwargs to make subclassing easier
+    Uses `*args` and `**kwargs` to make subclassing easier
 
     Args:
-        *args: Variable length argument list.
-        **kwargs: Arbitrary keyword arguments.
+        `*args`: Variable length argument list.
+        `**kwargs`: Arbitrary keyword arguments.
     """
 
     def __init__(self, *args, **kwargs):
@@ -811,19 +811,19 @@ class VirtualHelixGroup(CNObject):
 
         v = np.cross(v1, v2)
         sin_squared = inner1d(v, v)
-        cos_ = inner1d(v1, v2) # fast dot product
+        cos_ = inner1d(v1, v2)  # fast dot product
 
         m1 = self.m3_scratch1
         m2 = self.m3_scratch2
         m0 = self.m3_scratch0
         m0[:] = 0.
 
-        m0[1, 0] =  v[2]
-        m0[0, 1] =  -v[2]
-        m0[2, 0] =  -v[1]
-        m0[0, 2] =  v[1]
-        m0[2, 1] =  v[0]
-        m0[1, 2] =  -v[0]
+        m0[1, 0] = v[2]
+        m0[0, 1] = -v[2]
+        m0[2, 0] = -v[1]
+        m0[0, 2] = v[1]
+        m0[2, 1] = v[0]
+        m0[1, 2] = -v[0]
 
         # do the following efficiently
         # self.eye3_scratch + m0 + np.dot(m0, m0)*((1 - cos_)/sin_squared)
@@ -862,9 +862,9 @@ class VirtualHelixGroup(CNObject):
         self.rev_strandsets += [None]*number_of_new_elements
 
         total_points = self.total_points
-        lo_idx_limit = total_points
+        # lo_idx_limit = total_points
         # new_lims = (total_points, total_points + num_points)
-        offset_and_size[id_num] = (total_points, 0) # initialize with size 0
+        offset_and_size[id_num] = (total_points, 0)  # initialize with size 0
 
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self._origin_pts)
@@ -877,11 +877,10 @@ class VirtualHelixGroup(CNObject):
             self._origin_pts[len_origin_pts:] = np.inf
 
             self.directions.resize((total_rows, 3))
-            self.directions[len_origin_pts:] = 0 # unnecessary as resize fills with zeros
+            self.directions[len_origin_pts:] = 0  # unnecessary as resize fills with zeros
 
-            self.vh_properties = self.vh_properties.append(
-                                        _defaultDataFrame(number_of_new_elements),
-                                        ignore_index=True)
+            self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements),
+                                                           ignore_index=True)
 
         self._origin_pts[id_num] = origin[:2]
         new_x, new_y = origin[:2]
@@ -922,7 +921,7 @@ class VirtualHelixGroup(CNObject):
             id_num (int): virtual helix ID number
             origin (array-like):  of :obj:`float` of length 3
                 The origin should be referenced from an index of 0.
-            direction (array-like):  of :obj:`float` of length 3
+            direction (array-like): of :obj:`float` of length 3
             index (int): the offset index into a helix to start the helix at.
                 Useful for appending points. if index less than zero
 
@@ -932,11 +931,11 @@ class VirtualHelixGroup(CNObject):
         rad = self._radius
         BW = self._BASE_WIDTH
         hp, bpr, tpr, eulerZ, mgroove = self.vh_properties.loc[id_num,
-                                                            ['helical_pitch',
-                                                             'bases_per_repeat',
-                                                             'turns_per_repeat',
-                                                             'eulerZ',
-                                                             'minor_groove_angle']]
+                                                               ['helical_pitch',
+                                                                'bases_per_repeat',
+                                                                'turns_per_repeat',
+                                                                'eulerZ',
+                                                                'minor_groove_angle']]
         twist_per_base = tpr*360./bpr
         """
         + angle is CCW
@@ -955,16 +954,16 @@ class VirtualHelixGroup(CNObject):
         z_pts = BW*np.arange(index, num_points + index)
 
         # invert the X coordinate for Right handed DNA
-        fwd_pts = rad*np.column_stack(( np.cos(fwd_angles),
-                                        np.sin(fwd_angles),
-                                        np.zeros(num_points)))
-        fwd_pts[:,2] = z_pts
+        fwd_pts = rad*np.column_stack((np.cos(fwd_angles),
+                                       np.sin(fwd_angles),
+                                       np.zeros(num_points)))
+        fwd_pts[:, 2] = z_pts
 
         # invert the X coordinate for Right handed DNA
-        rev_pts = rad*np.column_stack(( np.cos(rev_angles),
-                                        np.sin(rev_angles),
-                                        np.zeros(num_points)))
-        rev_pts[:,2] = z_pts
+        rev_pts = rad*np.column_stack((np.cos(rev_angles),
+                                       np.sin(rev_angles),
+                                       np.zeros(num_points)))
+        rev_pts[:, 2] = z_pts
 
         coord_pts = np.zeros((num_points, 3))
         coord_pts[:, 2] = z_pts
@@ -973,7 +972,7 @@ class VirtualHelixGroup(CNObject):
         scratch = np.zeros((3, num_points), dtype=float)
 
         # rotate about 0 index and then translate
-        m = self.makeRotation( (0, 0, 1), direction)
+        m = self.makeRotation((0, 0, 1), direction)
         # print(m)
 
         np.add(np.dot(m, fwd_pts.T, out=scratch).T, origin, out=fwd_pts)
@@ -1064,7 +1063,8 @@ class VirtualHelixGroup(CNObject):
         series = self.vh_properties.loc[id_num]
         # to_dict doesn't promote to python native types needed by QVariant
         # leaves as numpy integers and floats
-        out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_)) else (k, v) for k, v in zip(series.index, series.tolist()))
+        out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_))
+                   else (k, v) for k, v in zip(series.index, series.tolist()))
         if inject_extras:
             bpr = out['bases_per_repeat']
             tpr = out['turns_per_repeat']
@@ -1074,8 +1074,8 @@ class VirtualHelixGroup(CNObject):
     # end
 
     def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
-        """ keys and values can be :obj:`array-like`s of equal length or
-        singular values
+        """Keys and values can be :obj:`array-like` of equal length or
+        singular values.
 
         emits `partVirtualHelixPropertyChangedSignal`
 
@@ -1094,7 +1094,7 @@ class VirtualHelixGroup(CNObject):
         self.vh_properties.loc[id_num, keys] = values
 
         if not isinstance(values, (tuple, list)):
-            keys, values = (keys,) , (values,)
+            keys, values = (keys,), (values,)
         if safe:
             self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
     # end
@@ -1136,7 +1136,7 @@ class VirtualHelixGroup(CNObject):
             raise IndexError("id_num {} does not exist")
 
         offset, size = offset_and_size_tuple
-        len_axis_pts = len(self.axis_pts)
+        # len_axis_pts = len(self.axis_pts)
         direction = self.directions[id_num]
 
         # make origin 3D
@@ -1158,7 +1158,7 @@ class VirtualHelixGroup(CNObject):
             else:
                 self.fwd_strandsets[id_num].resize(delta, 0)
                 self.rev_strandsets[id_num].resize(delta, 0)
-        elif delta < 0: # trimming points
+        elif delta < 0:  # trimming points
             if abs(delta) >= size:
                 raise ValueError("can't delete virtual helix this way")
             # TODO add checks for strandsets etc here:
@@ -1170,10 +1170,10 @@ class VirtualHelixGroup(CNObject):
             else:
                 self.fwd_strandsets[id_num].resize(delta, 0)
                 self.rev_strandsets[id_num].resize(delta, 0)
-        else: # delta == 0
+        else:  # delta == 0
             return
         _, final_size = self.getOffsetAndSize(id_num)
-        self.vh_properties.loc[id_num, 'length'] =  final_size
+        self.vh_properties.loc[id_num, 'length'] = final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
         # return 0, self.vh_properties['length'].idxmax()
@@ -1190,8 +1190,8 @@ class VirtualHelixGroup(CNObject):
         test = self.axis_pts[:, 2]
         id_z_min = self.id_nums[np.argmin(test)]
         # use numpy masked arrays to mask out infinites
-        id_z_max = self.id_nums[np.argmax(  np.ma.array(test,
-                                                        mask=np.isinf(test)))]
+        id_z_max = self.id_nums[np.argmax(np.ma.array(test,
+                                                      mask=np.isinf(test)))]
         return id_z_min, id_z_max
     # end def
 
@@ -1230,19 +1230,19 @@ class VirtualHelixGroup(CNObject):
         if offset_and_size_tuple is None:
             raise KeyError("id_num {} not in VirtualHelixGroup".format(id_num))
         offset, size = offset_and_size_tuple
-        origin = self.axis_pts[offset] # zero point of axis
+        origin = self.axis_pts[offset]  # zero point of axis
         direction = self.directions[id_num]
         points = self.pointsFromDirection(id_num, origin, direction, size, 0)
         self.setCoordinates(id_num, points)
     # end def
 
     def setCoordinates(self, id_num, points, idx_start=0):
-        """Change the coordinates stored, useful when adjusting
-        helix vh_properties
+        """Change the stored coordinates.
+        Useful when adjusting helix vh_properties.
 
         Args:
             id_num (int): virtual helix ID number
-            points (tuple): tuple containing :obj:`array-like`s of axis, and forward
+            points (tuple): tuple containing :obj:`array-like` of axis, and forward
             and reverse phosphates points
             idx_start (int): optional index offset into the virtual helix to
             assign points to. default to 0
@@ -1258,7 +1258,7 @@ class VirtualHelixGroup(CNObject):
         offset, size = offset_and_size_tuple
         if idx_start + len(points) > size:
             err = ("Number of Points {} out of range for"
-                    "start index {} given existing size {}")
+                   "start index {} given existing size {}")
             raise IndexError(err.format(len(points), idx_start, size))
 
         new_axis_pts, new_fwd_pts, new_rev_pts = points
@@ -1381,7 +1381,7 @@ class VirtualHelixGroup(CNObject):
         else:
             res = self._queryBasePoint(radius, point)
             self._point_cache_keys.append(query)
-            qc[query] =  res
+            qc[query] = res
             # limit the size of the cache
             old_key = self._point_cache_keys.popleft()
             if old_key is not None:
@@ -1411,7 +1411,7 @@ class VirtualHelixGroup(CNObject):
         # return list(zip(    np.take(self.id_nums, close_points),
         #                     np.take(self.indices, close_points) ))
         return (np.take(self.id_nums, close_points),
-                            np.take(self.indices, close_points) )
+                np.take(self.indices, close_points))
     # end def
 
     def queryVirtualHelixOrigin(self, radius, point):
@@ -1434,7 +1434,7 @@ class VirtualHelixGroup(CNObject):
             res = self._queryVirtualHelixOrigin(radius, point)
             res = res.tolist()
             self._origin_cache_keys.append(query)
-            qc[query] =  res
+            qc[query] = res
             # print("size", len(qc))
             # limit the size of the cache
             old_key = self._origin_cache_keys.popleft()
@@ -1549,21 +1549,21 @@ class VirtualHelixGroup(CNObject):
             # compute square of distance to point
             delta = inner1d(difference, difference, out=delta)
             close_points, = np.where(delta < rsquared)
-            close_points, = np.where(   (close_points < offset) |
-                                        (close_points > (offset + size)))
+            close_points, = np.where((close_points < offset) |
+                                     (close_points > (offset + size)))
             if len(close_points) > 0:
                 fwd_hits = (np.take(self.id_nums, close_points).tolist(),
-                                    np.take(self.indices, close_points).tolist() )
+                            np.take(self.indices, close_points).tolist())
                 fwd_hit_list.append((start + i, fwd_hits))
 
             difference = rev_pts - point
             delta = inner1d(difference, difference, out=delta)
             close_points, = np.where(delta < rsquared)
-            close_points, = np.where(   (close_points < offset) |
-                                        (close_points > (offset + size)))
+            close_points, = np.where((close_points < offset) |
+                                     (close_points > (offset + size)))
             if len(close_points) > 0:
                 rev_hits = (np.take(self.id_nums, close_points).tolist(),
-                                    np.take(self.indices, close_points).tolist() )
+                            np.take(self.indices, close_points).tolist())
                 rev_hit_list.append((start + i, rev_hits))
         return fwd_hit_list, rev_hit_list
     # end def
@@ -1614,7 +1614,7 @@ class VirtualHelixGroup(CNObject):
         """
         offset, size = self.getOffsetAndSize(id_num)
         bpr, tpr = self.vh_properties.loc[id_num,
-                                    ['bases_per_repeat', 'turns_per_repeat']]
+                                          ['bases_per_repeat', 'turns_per_repeat']]
         bases_per_turn = bpr / tpr
         if index is None:
             start, length = 0, size
@@ -1624,12 +1624,12 @@ class VirtualHelixGroup(CNObject):
                 start, length = size - bpr, bpr
             else:
                 start, length = max(index - half_period, 0), bpr
-        norm = np.linalg.norm
+        # norm = np.linalg.norm
         cross = np.cross
         dot = np.dot
         normalize = self.normalize
-        PI = math.pi
-        TWOPI = 2*PI
+        # PI = math.pi
+        # TWOPI = 2*PI
         RADIUS = self._radius
         BW = self._BASE_WIDTH
 
@@ -1646,8 +1646,8 @@ class VirtualHelixGroup(CNObject):
         # print("THE search radius", radius, RADIUS)
         rsquared2 = radius*radius
         per_neighbor_hits = {}
-        key_prop_list = [   'eulerZ', 'bases_per_repeat',
-                            'turns_per_repeat', 'minor_groove_angle']
+        key_prop_list = ['eulerZ', 'bases_per_repeat',
+                         'turns_per_repeat', 'minor_groove_angle']
         for neighbor_id in neighbors:
             eulerZ, bpr, tpr, mgroove = self.vh_properties.loc[neighbor_id, key_prop_list]
             twist_per_base = tpr*360./bpr
@@ -1700,11 +1700,11 @@ class VirtualHelixGroup(CNObject):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
-                                                                                    min(neighbor_min_delta_idx + half_period, size)) ]
+                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                         min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta)]
                     fwd_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
 
@@ -1736,11 +1736,11 @@ class VirtualHelixGroup(CNObject):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range( max(neighbor_min_delta_idx - half_period, 0),
-                                                                                    min(neighbor_min_delta_idx + half_period, size)) ]
+                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                         min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
-                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ]
+                    passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta)]
                     # print(math.degrees(native_angle), 'r', [math.degrees(x) for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta) ])
                     rev_axis_hits.append((start + i, passing_fwd_angles_idxs, passing_rev_angles_idxs))
             # end for
@@ -1756,7 +1756,7 @@ class VirtualHelixGroup(CNObject):
         Args:
             id_num (int): virtual helix ID number
             neighbors (array-like): neighbors of id_num
-            index_slice (tuple):  optional, of :obj:`int`(start_index, length) into a virtual
+            index_slice (tuple):  optional, of :obj:`int` (start_index, length) into a virtual
                 helix
 
         Returns:
@@ -1777,7 +1777,7 @@ class VirtualHelixGroup(CNObject):
         else:
             offset, size = offset_and_size
         bpr, tpr = self.vh_properties.loc[id_num,
-                                    ['bases_per_repeat', 'turns_per_repeat']]
+                                          ['bases_per_repeat', 'turns_per_repeat']]
         bases_per_turn = bpr / tpr
         if index is None:
             start, length = 0, size
@@ -1787,12 +1787,12 @@ class VirtualHelixGroup(CNObject):
                 start, length = size - bpr, bpr
             else:
                 start, length = max(index - half_period, 0), bpr
-        norm = np.linalg.norm
-        cross = np.cross
-        dot = np.dot
-        normalize = self.normalize
+        # norm = np.linalg.norm
+        # cross = np.cross
+        # dot = np.dot
+        # normalize = self.normalize
         PI = math.pi
-        TWOPI = 2*PI
+        # TWOPI = 2*PI
         RADIUS = self._radius
         BW = self._BASE_WIDTH
 
@@ -1824,10 +1824,10 @@ class VirtualHelixGroup(CNObject):
         # r2_axial = BW*BW
 
         # MISALIGNED by 27.5% twist per base so that's 1.55*half_twist_per_base
-        r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base) ) +
-                            (1. - math.cos(1.55*half_twist_per_base) ) ) )**2
-        r2_tangent = (RADIUS*(  math.sin(half_twist_per_base) +
-                                math.sin(1.55*half_twist_per_base) ) )**2
+        r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base)) +
+                             (1. - math.cos(1.55*half_twist_per_base))))**2
+        r2_tangent = (RADIUS*(math.sin(half_twist_per_base) +
+                              math.sin(1.55*half_twist_per_base)))**2
         r2_axial = BW*BW
 
         # print("r2:", r2_radial, r2_tangent, r2_axial)
@@ -1852,7 +1852,7 @@ class VirtualHelixGroup(CNObject):
             nfwd_pts = fwd_pts[offset:offset + size]
             nrev_pts = rev_pts[offset:offset + size]
 
-            direction = self.directions[neighbor_id]
+            # direction = self.directions[neighbor_id]
             len_neighbor_pts = len(nfwd_pts)
             delta = self.delta3D_scratch
             if len_neighbor_pts != len(delta):
@@ -1864,18 +1864,18 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 zdelta = np.square(difference[:, 2])
                 # assume there is only one possible index of intersection with the neighbor
-                f_idxs = np.where(  (delta > rsquared_p_min) &
-                                    (delta < rsquared_p_max) &
-                                    (zdelta > 0.3*r2_axial) &
-                                    (zdelta < 1.1*r2_axial)
-                                    )[0].tolist()
+                f_idxs = np.where((delta > rsquared_p_min) &
+                                  (delta < rsquared_p_max) &
+                                  (zdelta > 0.3*r2_axial) &
+                                  (zdelta < 1.1*r2_axial)
+                                  )[0].tolist()
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
                 zdelta = np.square(difference[:, 2])
                 # assume there is only one possible index of intersection with the neighbor
-                r_idxs = np.where(  (delta > rsquared_ap_min) &
-                                    (delta < rsquared_ap_max) &
-                                    (zdelta < 0.3*r2_axial))[0].tolist()
+                r_idxs = np.where((delta > rsquared_ap_min) &
+                                  (delta < rsquared_ap_max) &
+                                  (zdelta < 0.3*r2_axial))[0].tolist()
                 if f_idxs or r_idxs:
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
@@ -1888,8 +1888,8 @@ class VirtualHelixGroup(CNObject):
                 if r_idxs:
                     if idx_last + 1 == i:
                         # print("pair", idx_last, i)
-                        fwd_axis_pairs[idx_last] = (True, neighbor_id) # 5 prime  most strand
-                        fwd_axis_pairs[i] = (False, neighbor_id)       # 3 prime most strand
+                        fwd_axis_pairs[idx_last] = (True, neighbor_id)  # 5 prime  most strand
+                        fwd_axis_pairs[i] = (False, neighbor_id)        # 3 prime most strand
                     idx_last = i
                 if f_idxs:
                     for idxB in f_idxs:
@@ -1904,19 +1904,19 @@ class VirtualHelixGroup(CNObject):
                 inner1d(difference, difference, out=delta)
                 zdelta = np.square(difference[:, 2])
                 # assume there is only one possible index of intersection with the neighbor
-                f_idxs = np.where(  (delta > rsquared_ap_min) &
-                                    (delta < rsquared_ap_max) &
-                                    (zdelta < 0.3*r2_axial))[0].tolist()
+                f_idxs = np.where((delta > rsquared_ap_min) &
+                                  (delta < rsquared_ap_max) &
+                                  (zdelta < 0.3*r2_axial))[0].tolist()
 
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
                 zdelta = np.square(difference[:, 2])
                 # assume there is only one possible index of intersection with the neighbor
-                r_idxs = np.where(  (delta > rsquared_p_min) &
-                                    (delta < rsquared_p_max) &
-                                    (zdelta > 0.3*r2_axial) &
-                                    (zdelta < 1.1*r2_axial)
-                                    )[0].tolist()
+                r_idxs = np.where((delta > rsquared_p_min) &
+                                  (delta < rsquared_p_max) &
+                                  (zdelta > 0.3*r2_axial) &
+                                  (zdelta < 1.1*r2_axial)
+                                  )[0].tolist()
                 if f_idxs or r_idxs:
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
@@ -1937,7 +1937,7 @@ class VirtualHelixGroup(CNObject):
                         else:
                             rev_axis_pairs[i] = (False, neighbor_id)
 
-            per_neighbor_hits[neighbor_id] = ( fwd_axis_hits, rev_axis_hits)
+            per_neighbor_hits[neighbor_id] = (fwd_axis_hits, rev_axis_hits)
         # end for
         return per_neighbor_hits, (fwd_axis_pairs, rev_axis_pairs)
     # end def
@@ -2017,6 +2017,7 @@ class VirtualHelixGroup(CNObject):
     # end
 # end class
 
+
 def distanceToPoint(origin, direction, point):
     """Distance of a line to a point
 
@@ -2031,16 +2032,17 @@ def distanceToPoint(origin, direction, point):
     Returns:
         float: R squared distance
     """
-    direction_distance = np.dot(point - origin,  direction)
+    direction_distance = np.dot(point - origin, direction)
     # point behind the ray
     if direction_distance < 0:
         diff = origin - point
         return diff*diff
 
-    v = (direction * direction_distance ) + origin
+    v = (direction * direction_distance) + origin
     diff = v - point
     return diff*diff
 # end def
+
 
 def remapSlice(start, stop, length):
     """Remap a slice to positive indices for a given

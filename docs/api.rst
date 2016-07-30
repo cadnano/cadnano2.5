@@ -28,6 +28,7 @@ Modules
    :maxdepth: 1
    :glob:
 
+   api/modules
    api/cadnano.addinstancecmd
    api/cadnano.color
    api/cadnano.cnobject

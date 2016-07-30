@@ -17,6 +17,7 @@ from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.strand import Strand
 
+
 class Document(CNObject):
     """
     The Document class is the root of the model. It has two main purposes:
@@ -27,8 +28,8 @@ class Document(CNObject):
         parent (CNObject): optional, defaults to None
 
     Attributes:
-        view_names (list):
-        filter_set (set):
+        view_names (list): views the document should support
+        filter_set (set): filters that should be applied when selecting.
     """
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
@@ -45,43 +46,31 @@ class Document(CNObject):
         self._strand_selected_changed_dict = {}
         self.view_names = []
         self.filter_set = set()
-        self._mods = {} # modifications keyed by mod id
+        self._mods = {}  # modifications keyed by mod id
         this_app = app()
         this_app.documentWasCreatedSignal.emit(self)
     # end def
 
     ### SIGNALS ###
-    documentPartAddedSignal =  ProxySignal(object,
-                                        CNObject,
-                                        name='documentPartAddedSignal') # doc, part
-    documentAssemblyAddedSignal =  ProxySignal(object,
-                                        CNObject,
-                                        name='documentAssemblyAddedSignal') # doc, assembly
+    documentPartAddedSignal = ProxySignal(object, CNObject, name='documentPartAddedSignal')
+    """`Document`, `Part`"""
 
-    documentSelectionFilterChangedSignal = ProxySignal(object,
-                                  name='documentSelectionFilterChangedSignal')
-    documentPreXoverFilterChangedSignal = ProxySignal(str,
-                                   name='documentPreXoverFilterChangedSignal')
+    documentAssemblyAddedSignal = ProxySignal(object, CNObject, name='documentAssemblyAddedSignal')
+    """`Document`, `Assembly`"""
 
-    documentViewResetSignal = ProxySignal(CNObject,
-                                               name='documentViewResetSignal')
-    documentClearSelectionsSignal = ProxySignal(CNObject,
-                                         name='documentClearSelectionsSignal')
-
-    # E. Mod
-    documentModAddedSignal = ProxySignal(object, object, object,
-                        name='documentModAddedSignal')
-    documentModRemovedSignal = ProxySignal(object, object,
-                        name='documentModRemovedSignal')
-    documentModChangedSignal = ProxySignal(object, object, object,
-                        name='documentModChangedSignal')
+    documentSelectionFilterChangedSignal = ProxySignal(object, name='documentSelectionFilterChangedSignal')
+    documentPreXoverFilterChangedSignal = ProxySignal(str, name='documentPreXoverFilterChangedSignal')
+    documentViewResetSignal = ProxySignal(CNObject, name='documentViewResetSignal')
+    documentClearSelectionsSignal = ProxySignal(CNObject, name='documentClearSelectionsSignal')
+    documentModAddedSignal = ProxySignal(object, object, object, name='documentModAddedSignal')
+    documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
+    documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
 
     ### SLOTS ###
 
     ### ACCESSORS ###
     def undoStack(self):
-        """
-        This is the actual undoStack to use for all commands. Any children
+        """This is the actual undoStack to use for all commands. Any children
         needing to perform commands should just ask their parent for the
         undoStack, and eventually the request will get here.
         """
@@ -103,7 +92,7 @@ class Document(CNObject):
         self._children.append(child)
 
     def addInstance(self, instance):
-        """ Add an object instance to the list of instances
+        """Add an object instance to the list of instances
 
         Args:
             instance (ObjectInstance):
@@ -232,12 +221,12 @@ class Document(CNObject):
     # end def
 
     def removeVirtualHelicesFromSelection(self, part, id_nums):
-        """ Remove virtual helices by sequence of their respective id numbers
-        from the `part`'s selection
+        """Remove from the `Part` selection the `VirtualHelix` objects specified
+        by id_nums.
 
         Args:
-            part (Part):
-            id_nums (sequence)
+            part (Part)
+            id_nums (array-like)
         """
         # print("remove called", id(part), id_nums,  self._selection_dict.get(part))
         selection_dict = self._selection_dict
@@ -265,7 +254,7 @@ class Document(CNObject):
         selected_oligos = set()
         for ss in s_dict.keys():
             for strand in ss:
-                 selected_oligos.add(strand.oligo())
+                selected_oligos.add(strand.oligo())
             # end for
         # end for
         return selected_oligos if len(selected_oligos) > 0 else None
@@ -385,7 +374,7 @@ class Document(CNObject):
             tuple: of :obj:`int`
         """
         length = strandset.length()
-        min_high_delta = min_low_delta = max_ss_idx = length - 1 # init the return values
+        min_high_delta = min_low_delta = max_ss_idx = length - 1  # init the return values
         ss_dict = self._selection_dict[strandset]
 
         for strand, value in selected_strand_list:
@@ -399,8 +388,7 @@ class Document(CNObject):
                     if low_neighbor in ss_dict:
                         value_N = ss_dict[low_neighbor]
                         # we only care if the low neighbor is not selected
-                        temp = min_low_delta if value_N[1] \
-                                        else idx_low - low_neighbor.highIdx() - 1
+                        temp = min_low_delta if value_N[1] else idx_low - low_neighbor.highIdx() - 1
                     # end if
                     else:  # not selected
                         temp = idx_low - low_neighbor.highIdx() - 1
@@ -423,8 +411,7 @@ class Document(CNObject):
                     if high_neighbor in ss_dict:
                         value_N = ss_dict[high_neighbor]
                         # we only care if the low neighbor is not selected
-                        temp = min_high_delta if value_N[0] \
-                                        else high_neighbor.lowIdx() - idx_high - 1
+                        temp = min_high_delta if value_N[0] else high_neighbor.lowIdx() - idx_high - 1
                     # end if
                     else:  # not selected
                         temp = high_neighbor.lowIdx() - idx_high - 1
@@ -454,8 +441,7 @@ class Document(CNObject):
         min_high_delta = -1
         for strandset in self._selection_dict.keys():
             selected_list = self.sortedSelectedStrands(strandset)
-            temp_low, temp_high = self.determineStrandSetBounds(
-                                                    selected_list, strandset)
+            temp_low, temp_high = self.determineStrandSetBounds(selected_list, strandset)
             if temp_low < min_low_delta or min_low_delta < 0:
                 min_low_delta = temp_low
             if temp_high < min_high_delta or min_high_delta < 0:
@@ -495,7 +481,6 @@ class Document(CNObject):
                     if not strand5p:  # idx5p is a selected endpoint
                         strand_dict[strand] = True
 
-
         if use_undostack and xoList:
             self.undoStack().beginMacro("Delete xovers")
         for part, strand, strand3p, useUndo in xoList:
@@ -505,7 +490,7 @@ class Document(CNObject):
         self._selection_dict = {}
         self.documentClearSelectionsSignal.emit(self)
         if use_undostack:
-            if xoList: # end xover macro if it was started
+            if xoList:  # end xover macro if it was started
                 self.undoStack().endMacro()
             if True in strand_dict.values():
                 self.undoStack().beginMacro("Delete selection")
@@ -572,9 +557,9 @@ class Document(CNObject):
 
         for strand, idx_low, idx_high in resize_list:
             Strand.resize(strand,
-                            (idx_low, idx_high),
-                            use_undostack,
-                            update_segments=False)
+                          (idx_low, idx_high),
+                          use_undostack,
+                          update_segments=False)
         if resize_list:
             cmd = RefreshSegmentsCommand(part, vh_set)
             if use_undostack:
@@ -614,8 +599,7 @@ class Document(CNObject):
     def setViewNames(self, view_name_list, do_clear=False):
         """ Tell the model what views the document should support
         Allows non-visible views to be used.
-        Intended to be called at application launch only at
-        present
+        Intended to be called at application launch only at present.
 
         Args:
             view_name_list (list):
@@ -623,7 +607,7 @@ class Document(CNObject):
         """
         view_names = [] if do_clear else self.view_names
         for view_name in view_name_list:
-            if not view_name in view_names:
+            if view_name not in view_names:
                 view_names.append(view_name)
         self.view_names = view_names
     # end def
@@ -638,16 +622,6 @@ class Document(CNObject):
         dnapart = NucleicAcidPart(document=self)
         self._addPart(ObjectInstance(dnapart), use_undostack=use_undostack)
         return dnapart
-    # end def
-
-    def removeAllParts(self):
-        """Used to reset the document. Not undoable.
-        DEPRECATED, use removeAllChildren
-        """
-        self.documentClearSelectionsSignal.emit(self)
-        for item in self._children:
-            if isinstance(item, Part):
-                part.remove(use_undostack=False)
     # end def
 
     def getParts(self):
@@ -696,8 +670,7 @@ class Document(CNObject):
         """Add part to the document via AddInstanceCommand.
         """
         c = AddInstanceCommand(self, part_instance)
-        util.execCommandList(
-                        self, [c], desc="Add part", use_undostack=use_undostack)
+        util.execCommandList(self, [c], desc="Add part", use_undostack=use_undostack)
         return c.instance()
     # end def
 
@@ -715,7 +688,7 @@ class Document(CNObject):
                 (dictionary of modification paramemters, modification ID string)
         """
         if mid is None:
-            mid =  uuid4().hex
+            mid = uuid4().hex
         elif mid in self._mods:
             raise KeyError("createMod: Duplicate mod id: {}".format(mid))
 
@@ -727,15 +700,15 @@ class Document(CNObject):
         note = params.get('note', '')
 
         cmdparams = {
-            'props': {  'name': name,
-                        'color': color,
-                        'note': note,
-                        'seq5p': seq5p,
-                        'seq3p': seq3p,
-                        'seqInt': seqInt,
-                    },
-            'ext_locations': set(), # external mods, mod belongs to idx outside of strand
-            'int_locations': set()  # internal mods, mod belongs between idx and idx + 1
+            'props': {'name': name,
+                      'color': color,
+                      'note': note,
+                      'seq5p': seq5p,
+                      'seq3p': seq3p,
+                      'seqInt': seqInt,
+                      },
+            'ext_locations': set(),  # external mods, mod belongs to idx outside of strand
+            'int_locations': set()   # internal mods, mod belongs between idx and idx + 1
         }
 
         item = {'name': name,
@@ -744,12 +717,11 @@ class Document(CNObject):
                 'seq5p': seq5p,
                 'seq3p': seq3p,
                 'seqInt': seqInt
-        }
+                }
         cmds = []
         c = AddModCommand(self, cmdparams, mid)
         cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Mod",
-                                            use_undostack=use_undostack)
+        util.execCommandList(self, cmds, desc="Create Mod", use_undostack=use_undostack)
         return item, mid
     # end def
 
@@ -765,8 +737,7 @@ class Document(CNObject):
             cmds = []
             c = ModifyModCommand(self, params, mid)
             cmds.append(c)
-            util.execCommandList(self, cmds, desc="Modify Mod",
-                                                use_undostack=use_undostack)
+            util.execCommandList(self, cmds, desc="Modify Mod", use_undostack=use_undostack)
     # end def
 
     def destroyMod(self, mid, use_undostack=True):
@@ -780,8 +751,7 @@ class Document(CNObject):
             cmds = []
             c = RemoveModCommand(self, mid)
             cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Mod",
-                                                use_undostack=use_undostack)
+            util.execCommandList(self, cmds, desc="Remove Mod", use_undostack=use_undostack)
     # end def
 
     def getMod(self, mid):
@@ -849,7 +819,7 @@ class Document(CNObject):
             key (str): key of the modification at the part level
         """
         location_set = self.getModLocationsSet(mid, is_internal)
-        doc_key = ''.join((part.uuid, ',' ,key))
+        doc_key = ''.join((part.uuid, ',', key))
         location_set.remove(doc_key)
     # end def
 
@@ -863,7 +833,7 @@ class Document(CNObject):
         res = {}
         for mid in list(mods.keys()):
             mod_dict = mods[mid]
-            res[mid] = { 'props': mod_dict['props'].copy(),
+            res[mid] = {'props': mod_dict['props'].copy(),
                         'int_locations': list(mod_dict['int_locations']),
                         'ext_locations': list(mod_dict['ext_locations'])
                         }

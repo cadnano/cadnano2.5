@@ -2,14 +2,15 @@ from collections import deque
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
-from .pathextras import (PreXoverItem, #NeighborPreXoverItem, ActivePreXoverItem,
-                        PHOS_ITEM_WIDTH, BASE_WIDTH)
-from cadnano.gui.palette import newPenObj, getNoPen, getPenObj
+from .pathextras import PreXoverItem
+from cadnano.gui.palette import getNoPen
 from cadnano.enum import StrandType
+
 
 class PreXoverManager(QGraphicsRectItem):
     HUE_FACTOR = 1.6
-    KEYMAP = { i: getattr(Qt, 'Key_%d' % i) for i in range(10) }
+    KEYMAP = {i: getattr(Qt, 'Key_%d' % i) for i in range(10)}
+
     def __init__(self, part_item):
         super(QGraphicsRectItem, self).__init__(part_item)
         self.part_item = part_item
@@ -47,8 +48,8 @@ class PreXoverManager(QGraphicsRectItem):
     def updateBasesPerRepeat(self, step_size):
         """Recreates colors, all vhi"""
         hue_scale = step_size*self.HUE_FACTOR
-        self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() \
-                                    for i in range(step_size)]
+        self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name()
+                        for i in range(step_size)]
         # self.removeRepeats()
         # self.addRepeats()
     # end def
@@ -77,8 +78,10 @@ class PreXoverManager(QGraphicsRectItem):
         a_strand = a_strandset.getStrand(a_idx)
         n_strand = n_strandset.getStrand(n_idx)
 
-        if a_strand.hasXoverAt(a_idx): return
-        if n_strand.hasXoverAt(n_idx): return
+        if a_strand.hasXoverAt(a_idx):
+            return
+        if n_strand.hasXoverAt(n_idx):
+            return
 
         # SPECIAL CASE: neighbor already has a 3' end, and active has
         # a 5' end, so assume the user wants to install a returning xover
@@ -90,14 +93,14 @@ class PreXoverManager(QGraphicsRectItem):
         # install a crossover to the neighbor acting as strand3p
         if a_strand_type == n_strand_type:
             if a_is_fwd:
-                if part.isAGreaterThanB_Z(  active_id_num, a_idx,
-                                            neighbor_id_num, n_idx):
+                if part.isAGreaterThanB_Z(active_id_num, a_idx,
+                                          neighbor_id_num, n_idx):
                     part.createXover(n_strand, n_idx, a_strand, a_idx)
                 else:
                     part.createXover(a_strand, a_idx, n_strand, n_idx)
             else:
-                if part.isAGreaterThanB_Z(  active_id_num, a_idx,
-                                            neighbor_id_num, n_idx):
+                if part.isAGreaterThanB_Z(active_id_num, a_idx,
+                                          neighbor_id_num, n_idx):
                     part.createXover(a_strand, a_idx, n_strand, n_idx)
                 else:
                     part.createXover(n_strand, n_idx, a_strand, a_idx)
@@ -159,7 +162,7 @@ class PreXoverManager(QGraphicsRectItem):
         This also effectively deactivates the existing VirtualHelix
 
         Args:
-            virtual_helix_item (VirtualHelixItem):
+            virtual_helix_item (cadnano.guil.views.pathview.virtualhelixitem.VirtualHelixItem):
             per_neighbor_hits (Tuple()):
         """
         # print("ACTIVATING VH", virtual_helix_item.idNum())
@@ -168,7 +171,7 @@ class PreXoverManager(QGraphicsRectItem):
         # 1. clear all PreXoverItems
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
-        neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates
+        neighbor_pxis_dict = self.neighbor_prexover_items  # for avoiding duplicates
         # neighbor_pairs_dict = self.neighbor_pairs_dict
         part_item = self.part_item
         pxi_pool = self.pxi_pool
@@ -187,18 +190,18 @@ class PreXoverManager(QGraphicsRectItem):
         start, length = part_item.part().normalizedRange(id_num, this_idx)
         active_pxis = self.active_pxis
         for idx in range(start, start + length):
-            apxi = getPoolItem(     pxi_pool,
-                                    PreXoverItem,
-                                    virtual_helix_item, fwd_st_type, idx,
-                                    None, self, colors[idx % bpr]
-                                )
+            apxi = getPoolItem(pxi_pool,
+                               PreXoverItem,
+                               virtual_helix_item, fwd_st_type, idx,
+                               None, self, colors[idx % bpr]
+                               )
             apxi.enableActive(True, None)
             active_pxis[(fwd_st_type, idx)] = apxi
-            apxi = getPoolItem(     pxi_pool,
-                                    PreXoverItem,
-                                    virtual_helix_item, rev_st_type, idx,
-                                    None, self, colors[-1 - (idx % bpr)]
-                        )
+            apxi = getPoolItem(pxi_pool,
+                               PreXoverItem,
+                               virtual_helix_item, rev_st_type, idx,
+                               None, self, colors[-1 - (idx % bpr)]
+                               )
             apxi.enableActive(True, None)
             active_pxis[(rev_st_type, idx)] = apxi
 
@@ -217,53 +220,53 @@ class PreXoverManager(QGraphicsRectItem):
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = getPoolItem( pxi_pool,
-                                            PreXoverItem,
-                                            nvhi, fwd_st_type, j,
-                                            id_num, self, colors[j % n_step_size]
-                                            )
+                        npxi = getPoolItem(pxi_pool,
+                                           PreXoverItem,
+                                           nvhi, fwd_st_type, j,
+                                           id_num, self, colors[j % n_step_size]
+                                           )
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append(  npxi  )
+                    neighbor_pxis.append(npxi)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = getPoolItem(     pxi_pool,
-                                                PreXoverItem,
-                                                nvhi, rev_st_type, j,
-                                                id_num, self, colors[-1 - (j % n_step_size)]
-                                                )
+                        npxi = getPoolItem(pxi_pool,
+                                           PreXoverItem,
+                                           nvhi, rev_st_type, j,
+                                           id_num, self, colors[-1 - (j % n_step_size)]
+                                           )
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
 
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, rev_st_type, idx))
                 apxi = active_pxis[(rev_st_type, idx)]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
-                pxis[(id_num, rev_st_type, idx)] = ( apxi, neighbor_pxis )
+                pxis[(id_num, rev_st_type, idx)] = (apxi, neighbor_pxis)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = getPoolItem( pxi_pool,
-                                            PreXoverItem,
-                                            nvhi, fwd_st_type, j,
-                                            id_num, self, colors[j % n_step_size]
-                                            )
+                        npxi = getPoolItem(pxi_pool,
+                                           PreXoverItem,
+                                           nvhi, fwd_st_type, j,
+                                           id_num, self, colors[j % n_step_size]
+                                           )
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
-                        npxi = getPoolItem( pxi_pool,
-                                            PreXoverItem,
-                                            nvhi, rev_st_type, j,
-                                            id_num, self, colors[-1 - (j % n_step_size)]
-                                            )
+                        npxi = getPoolItem(pxi_pool,
+                                           PreXoverItem,
+                                           nvhi, rev_st_type, j,
+                                           id_num, self, colors[-1 - (j % n_step_size)]
+                                           )
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
         # end for per_neighbor_hits
     # end def
 

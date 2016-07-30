@@ -4,19 +4,18 @@ util.py
 import os
 import sys
 from os import path
-import inspect
-from traceback import extract_stack
-from random import Random
-import string
-import platform
 import argparse
+import inspect
+import platform
+import string
+from traceback import extract_stack
+
 import logging
 import logging.handlers
 logger = logging.getLogger(__name__)
-# import imp
-from itertools import dropwhile, starmap
 
 IS_PY_3 = int(sys.version_info[0] > 2)
+
 
 def clamp(x, min_x, max_x):
     if x < min_x:
@@ -26,16 +25,16 @@ def clamp(x, min_x, max_x):
     else:
         return x
 
+
 def overlap(x, y, a, b):
-    """
-    finds the overlap of the range x to y in a to b
-    assumes an overlap exists, i.e.
-        y >= a and b >= x
+    """Finds the overlap of the range x to y in a to b. 
+    Assumes an overlap exists, i.e. y >= a and b >= x.
     """
     c = clamp(x, a, b)
     d = clamp(y, a, b)
     return c, d
 # end def
+
 
 def trace(n):
     """Returns a stack trace n frames deep"""
@@ -44,54 +43,69 @@ def trace(n):
     for f in s[-n-1:-1]:
         # f is a stack frame like
         # ('/path/script.py', 42, 'funcname', 'current = line - of / code')
-        frames.append( (path.basename(f[0])+':%i'%f[1])+'(%s)'%f[2] )
+        frames.append((path.basename(f[0])+':%i' % f[1])+'(%s)' % f[2])
     return " > ".join(frames)
 
 if IS_PY_3:
-    complement = str.maketrans('ACGTacgt','TGCATGCA')
+    complement = str.maketrans('ACGTacgt', 'TGCATGCA')
 else:
-    complement = string.maketrans('ACGTacgt','TGCATGCA')
+    complement = string.maketrans('ACGTacgt', 'TGCATGCA')
+
+
 def rcomp(seqStr):
     """Returns the reverse complement of the sequence in seqStr."""
     return seqStr.translate(complement)[::-1]
+
+
 def comp(seqStr):
     """Returns the complement of the sequence in seqStr."""
     return seqStr.translate(complement)
 
 if IS_PY_3:
-    whitetoQ = str.maketrans(' ','?')
+    whitetoQ = str.maketrans(' ', '?')
 else:
-    whitetoQ = string.maketrans(' ','?')
+    whitetoQ = string.maketrans(' ', '?')
+
+
 def markwhite(seqStr):
     return seqStr.translate(whitetoQ)
 
+
 def nowhite(seqStr):
-    """Gets rid of whitespace in a string."""
+    """Gets rid of non-letters in a string."""
     return ''.join([c for c in seqStr if c in string.letters])
 
-nearest=lambda a, l:min(l, key=lambda x: abs(x - a) )
+nearest = lambda a, l: min(l, key=lambda x: abs(x - a))
+
 
 def isWindows():
+    """Returns True if platform is detected as Windows, otherwise False"""
     if platform.system() == 'Windows':
         return True
     else:
         return False
 
+
 def isMac():
+    """Returns True if platform is detected as Darwin, otherwise False"""
     try:
         return platform.system() == 'Darwin'
     except:
         return path.exists('/System/Library/CoreServices/Finder.app')
 
+
 def isLinux():
+    """Returns True if platform is detected as Linux, otherwise False"""
     if platform.system() == 'Linux':
         return True
     else:
         return False
 
+
 def methodName():
     """Returns string containing name of the calling method."""
     return inspect.stack()[1][3]
+
 
 def execCommandList(model_object, commands, desc=None, use_undostack=True):
     """
@@ -103,7 +117,7 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
     methods are called directly.
     """
     if use_undostack:
-        undoStackId = str(id(model_object.undoStack()))[-4:]
+        # undoStackId = str(id(model_object.undoStack()))[-4:]
         # print "<QUndoStack %s> %s" % (undoStackId, desc)
         model_object.undoStack().beginMacro(desc)
         for c in commands:
@@ -115,19 +129,20 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
             c.redo()
 # end def
 
+
 def finalizeCommands(model_object, commands, desc=None):
-    """
-    used to enable interaction with the model but not push
+    """Used to enable interaction with the model but not push
     commands to the undostack.  In practice:
 
     1. Call a bunch of commands and don't push them to the undostack AKA:
         cmd.redo()
     2. call finalizeCommands() to push the cummulative change to the stack
 
-    this assumes that the UndoCommands provided this function are respresent
+    This assumes that the UndoCommands provided this function respresent
     a transition from the initial state to the final state
-    UndoCommands need to implement specialUndo which could just call normal
-    undo
+
+    Note:
+        UndoCommands need to implement specialUndo (e.g. just call normal undo.)
     """
     # 1. undo the command to get back to the initial _state
     for c in commands:
@@ -140,14 +155,16 @@ def finalizeCommands(model_object, commands, desc=None):
     model_object.undoStack().endMacro()
 # end def
 
+
 def this_path():
     return os.path.abspath(os.path.dirname(__file__))
 
 # maps plugin path (extension stripped) -> plugin module
 loadedPlugins = {}
 
+
 def unloadedPlugins():
-    """ Returns a list of plugin paths that have yet to
+    """Returns a list of plugin paths that have yet to
     be loaded but are in the top level of one of the
     search directories specified in pluginDirs"""
     internalPlugins = os.path.join(this_path(), 'plugins')
@@ -167,6 +184,7 @@ def unloadedPlugins():
                 results.append(f)
     return list(filter(lambda x: x not in loadedPlugins, results))
 
+
 def loadPlugin(f):
     pass
     # path, fname = os.path.split(f)
@@ -182,12 +200,14 @@ def loadPlugin(f):
     # loadedPlugins[pluginKey] = mod
     # return mod
 
+
 def loadAllPlugins():
     loadedAPlugin = False
     for p in unloadedPlugins():
         loadPlugin(p)
         loadedAPlugin = True
     return loadedAPlugin
+
 
 def beginSuperMacro(model_object, desc=None):
     """
@@ -201,10 +221,12 @@ def beginSuperMacro(model_object, desc=None):
     model_object.undoStack().beginMacro(desc)
 # end def
 
+
 def endSuperMacro(model_object):
     """Ends a SuperMacro. Should be called after beginSuperMacro."""
     model_object.undoStack().endMacro()
 # end def
+
 
 def findChild(self):
     """When called when self is a QGraphicsItem, iterates through self's
@@ -230,7 +252,7 @@ def findChild(self):
     childVisibility = [(child, child.isVisible()) for child in children]
     for n in range(len(children)):
         child = children[n]
-        print("Highlighting %s.childItems()[%i] = %s"%(self, n, child))
+        print("Highlighting %s.childItems()[%i] = %s" % (self, n, child))
         childBR = child.mapToItem(parent, child.boundingRect())
         childBR = childBR.boundingRect()  # xform gives us a QPolygonF
         debugHighlighter = QGraphicsRectItem(childBR, parent)
@@ -259,22 +281,28 @@ def findChild(self):
             child.setVisible(wasVisible)
 # end def
 
+
 def parse_args(argv=None, gui=None):
-    """Uses argparse to parse commandline args.
-    Returns a NameSpace object. This can easily be converted to a regular dict through:
+    """Uses argparse to process commandline arguments.
+
+    Returns:
+        NameSpace object. This can easily be converted to a regular dict through:
         argns.__dict__
 
     This also presents a nice command line help to the user, exposed with --help flag:
         python main.py --help
 
-    If gui is set to "qt", then the parser will use parse_known_args.
-    Unlike parse_args(), parse_known_args() will not cause abort by show the help message and exit,
-    if it finds any unrecognized command-line arguments.
-    Alternatively, you can initialize your app via
+    If gui is set to "qt", then the parser will use parse_known_args. Unlike
+    parse_args(), parse_known_args() will not cause abort by show the help
+    message and exit, if it finds any unrecognized command-line arguments.
+
+    Alternatively, you can initialize your app via:
         app = QApplication(sys.argv)
         parse_args(app.arguments())
-    QApplication.arguments() returns a list of arguments with all Qt arguments stripped away.
-    Qt command line args include:
+
+    QApplication.arguments() returns a list of arguments with all Qt arguments
+    stripped away. Qt command line args include:
+
         -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
     """
     parser = argparse.ArgumentParser(description="cadnano 2.5")
@@ -285,8 +313,8 @@ def parse_args(argv=None, gui=None):
     parser.add_argument('--loglevel',
                         help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
     parser.add_argument("--debug-modules", nargs='*', metavar="MODULE-STR",
-                        help="Debug modules whose names start with any of the given strings. For instance, to "\
-                             "debug the cadnano file decoder, use --debug-modules cadnano.fileio.nnodecode ."\
+                        help="Debug modules whose names start with any of the given strings. For instance, to "
+                             "debug the cadnano file decoder, use --debug-modules cadnano.fileio.nnodecode ."
                              "To debug all gui modules, use --debug-modules cadnano.gui .")
     parser.add_argument("--file", "-f", metavar="designfile.json", help="cadnano design to load upon start up.")
     if gui and (gui is True or gui.lower() == "qt"):
@@ -295,6 +323,7 @@ def parse_args(argv=None, gui=None):
     else:
         argns, unused = parser.parse_args(argv), None
     return argns, unused
+
 
 def init_logging(args=None, logdir=None):
     """Set up standard logging system based on parameters in args, e.g. loglevel and testing.
@@ -322,7 +351,7 @@ def init_logging(args=None, logdir=None):
     logfilefmt = "%(asctime)s %(levelname)-6s - %(name)s:%(lineno)s - %(funcName)s() - %(message)s"
     logdatefmt = "%Y%m%d-%H:%M:%S"
     loguserfmt = "%(asctime)s %(levelname)-5s %(module)30s:%(lineno)-4s%(funcName)16s() %(message)s"
-    logtimefmt = "%H:%M:%S" # Nice for output to user in console and testing.
+    logtimefmt = "%H:%M:%S"  # Nice for output to user in console and testing.
     # See https://docs.python.org/3/library/logging.html#logrecord-attributes for full list of attributes
 
     # Loglevel (for console messages)
@@ -338,7 +367,7 @@ def init_logging(args=None, logdir=None):
         logging.basicConfig(level=loglevel,
                             format=loguserfmt,
                             datefmt=logtimefmt,
-                            filename=logfilename)
+                            filename=logfilepath)
         logger.debug("Logging system initialized with loglevel %s", loglevel)
     else:
 
@@ -353,7 +382,7 @@ def init_logging(args=None, logdir=None):
         print("Logging to file:", logfilepath)
 
         # Add a custom StreamHandler for outputting to the console (default level is 0 = ANY)
-        logstreamhandler = logging.StreamHandler() # default stream is sys.stderr
+        logstreamhandler = logging.StreamHandler()  # default stream is sys.stderr
         logging.root.addHandler(logstreamhandler)
         logstreamformatter = logging.Formatter(loguserfmt, logtimefmt)
         logstreamhandler.setFormatter(logstreamformatter)
@@ -361,6 +390,7 @@ def init_logging(args=None, logdir=None):
         # Set filter for debugging:
         if args.get('debug_modules'):
             debug_modules = args['debug_modules']
+
             def module_debug_filter(record):
                 """
                 All Filters attached to a logger or handler are asked.
@@ -375,13 +405,16 @@ def init_logging(args=None, logdir=None):
             logstreamhandler.setLevel(loglevel)
     logger.info("Logging system initialized...")
 
+
 def read_fasta(fp):
     name, seq = None, []
     for line in fp:
         line = line.rstrip()
         if line.startswith(">"):
-            if name: yield (name, ''.join(seq))
+            if name:
+                yield (name, ''.join(seq))
             name, seq = line, []
         else:
             seq.append(line)
-    if name: yield (name, ''.join(seq))
+    if name:
+        yield (name, ''.join(seq))

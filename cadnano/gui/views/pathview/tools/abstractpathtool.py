@@ -65,14 +65,14 @@ class AbstractPathTool(QGraphicsObject):
 
         It can be used to provide visual continuity when switching tools.
         When the new tool is selected, this method will be invoked by
-        calling updateLocation(*old_tool.lastLocation()).
+        calling `updateLocation(*old_tool.lastLocation())`.
 
         Returns:
             location (tuple): (virtual_helix_item, QPoint) representing the last
-            known location of the mouse for purposes of positioning
-            the graphic of a new tool on switching tools (the tool
-            will have called
-            on it)
+                known location of the mouse for purposes of positioning
+                the graphic of a new tool on switching tools (the tool
+                will have called on it)
+
         """
         return self._last_location
 
