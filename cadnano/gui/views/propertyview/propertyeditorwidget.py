@@ -1,20 +1,18 @@
+"""Summary
 
+Attributes:
+    COLOR_PATTERN (TYPE): Description
+"""
 import re
-
-from PyQt5.QtCore import pyqtSignal, QObject
-from PyQt5.QtCore import Qt, QRect, QSize
+from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
-from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
+from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
-from PyQt5.QtWidgets import QCheckBox
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
-from cadnano import util
 from cadnano.enum import ItemType
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getBrushObj
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
 
@@ -34,10 +32,24 @@ class PropertyEditorWidget(QTreeWidget):
     item that is selected in the Outliner.
     """
     def __init__(self, parent=None):
+        """Summary
+
+        Args:
+            parent (None, optional): Description
+        """
         super(PropertyEditorWidget, self).__init__(parent)
-        self.setAttribute(Qt.WA_MacShowFocusRect, 0) # no mac focus halo
+        self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
 
     def configure(self, window, document):
+        """Summary
+
+        Args:
+            window (TYPE): Description
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
@@ -80,6 +92,14 @@ class PropertyEditorWidget(QTreeWidget):
 
     ### SLOTS ###
     def outlinerItemSelectionChanged(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        
+        Raises:
+            NotImplementedError: Description
+        """
         o = self._window.outliner_widget
         for child in self.children():
             if isinstance(child, (CNPropertyItem, VirtualHelixItem)):
@@ -115,15 +135,37 @@ class PropertyEditorWidget(QTreeWidget):
     # end def
 
     def partAddedSlot(self, sender, model_part):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            model_part (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def clearSelectionsSlot(self, doc):
+        """Summary
+
+        Args:
+            doc (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def dataChangedSlot(self, top_left, bot_right):
-        """docstring for propertyChangedSlot"""
+        """docstring for propertyChangedSlot
+
+        Args:
+            top_left (TYPE): Description
+            bot_right (TYPE): Description
+        """
         c_i = self.currentItem()
         if c_i is None:
             return
@@ -132,29 +174,70 @@ class PropertyEditorWidget(QTreeWidget):
     # end def
 
     def selectedChangedSlot(self, item_dict):
+        """Summary
+
+        Args:
+            item_dict (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
+        """Summary
+
+        Args:
+            filter_name_list (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
+        """Summary
+
+        Args:
+            filter_name (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def resetRootItemSlot(self, doc):
+        """Summary
+
+        Args:
+            doc (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.clear()
     # end def
 
     ### ACCESSORS ###
     def window(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._window
     # end def
 
     ### METHODS ###
     def resetDocumentAndController(self, document):
-        """docstring for resetDocumentAndController"""
+        """docstring for resetDocumentAndController
+
+        Args:
+            document (TYPE): Description
+        """
         self._document = document
         self._controller = ViewRootController(self, document)
     # end def
@@ -163,20 +246,43 @@ class PropertyEditorWidget(QTreeWidget):
 
 
 class CustomStyleItemDelegate(QStyledItemDelegate):
+    """Summary
+    """
     def createEditor(self, parent_QWidget, option, model_index):
+        """Summary
+
+        Args:
+            parent_QWidget (TYPE): Description
+            option (TYPE): Description
+            model_index (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         column = model_index.column()
         treewidgetitem = self.parent().itemFromIndex(model_index)
-        if column == 0: # Property Name
+        if column == 0:  # Property Name
             return None
         elif column == 1:
             editor = treewidgetitem.configureEditor(parent_QWidget, option, model_index)
             return editor
         else:
-            return QStyledItemDelegate.createEditor(self, \
-                            parent_QWidget, option, model_index)
+            return QStyledItemDelegate.createEditor(self,
+                                                    parent_QWidget,
+                                                    option, model_index)
     # end def
 
     def updateEditorGeometry(self, editor, option, model_index):
+        """Summary
+
+        Args:
+            editor (TYPE): Description
+            option (TYPE): Description
+            model_index (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         column = model_index.column()
         if column == 0:
             editor.setGeometry(option.rect)
@@ -186,7 +292,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             if data_type is bool:
                 rect = QRect(option.rect)
                 delta = option.rect.width() / 2 - 9
-                rect.setX(option.rect.x() + delta) # Hack to center the checkbox
+                rect.setX(option.rect.x() + delta)  # Hack to center the checkbox
                 editor.setGeometry(rect)
             else:
                 editor.setGeometry(option.rect)
@@ -195,12 +301,22 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     # end def
 
     def paint(self, painter, option, model_index):
+        """Summary
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            model_index (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         row = model_index.row()
         column = model_index.column()
-        if column == 0: # Part Name
+        if column == 0:  # Part Name
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
-        if column == 1: # Visibility
+        if column == 1:  # Visibility
             value = model_index.model().data(model_index, Qt.EditRole)
             data_type = type(value)
             if data_type is str:
@@ -230,7 +346,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 styleoption.palette.setBrush(QPalette.HighlightedText, Qt.black)
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
                 if checked:
-                    element =  _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
+                    element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                     _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)

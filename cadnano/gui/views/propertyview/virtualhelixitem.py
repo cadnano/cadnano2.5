@@ -1,25 +1,33 @@
-from collections import defaultdict
+"""Summary
 
-from PyQt5.QtCore import pyqtSignal, QObject, QVariant
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtWidgets import QTreeWidget, QTreeWidgetItem
-from PyQt5.QtWidgets import QSizePolicy
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox, QLineEdit
-
-from PyQt5.QtWidgets import QCheckBox
+Attributes:
+    KEY_COL (int): Description
+    VAL_COL (int): Description
+"""
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTreeWidgetItem
+from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
+from cadnano.enum import ItemType
+from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from .cnpropertyitem import CNPropertyItem
 
 KEY_COL = 0
 VAL_COL = 1
 
 
-from cadnano.enum import ItemType
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-
-from .cnpropertyitem import CNPropertyItem
-
 class VirtualHelixItem(QTreeWidgetItem):
+    """Summary
+    """
     def __init__(self, model_part, parent, id_num, key=None):
+        """Summary
+
+        Args:
+            model_part (TYPE): Description
+            parent (TYPE): Description
+            id_num (TYPE): Description
+            key (None, optional): Description
+        """
         self._id_num = id_num
         self._cn_model = model_part
         self._model_part = model_part
@@ -30,7 +38,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         # self.setCheckState(VAL_COL, Qt.Checked)
         if key is None:
             self._controller = VirtualHelixItemController(self, model_part, True, False)
-            root = parent.invisibleRootItem() # add propertyitems as siblings
+            root = parent.invisibleRootItem()  # add propertyitems as siblings
 
             # Properties
             self._prop_items = {}
@@ -63,18 +71,38 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def key(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
     def cnModel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._cn_model
     # end def
 
     def itemType(self):
-        return None
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
+        return ItemType.VIRTUALHELIX
     # end def
 
     def disconnectSignals(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         if self._controller is not None:
             self._controller.disconnectSignals()
             self._controller = None
@@ -82,23 +110,48 @@ class VirtualHelixItem(QTreeWidgetItem):
 
     # SLOTS
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            id_num (TYPE): Description
+            keys (TYPE): Description
+            values (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self._cn_model == sender and id_num == self._id_num:
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
 
     def partVirtualHelixRemovedSlot(self, sender, id_num):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            id_num (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self._cn_model == sender and id_num == self._id_num:
             self._cn_model = None
             self._controller = None
             self.parent().removeChild(self)
 
-    ### PUBLIC SUPPORT METHODS ###
-    def itemType(self):
-        return ItemType.VIRTUALHELIX
-    # end def
-
     def configureEditor(self, parent_QWidget, option, model_index):
+        """Summary
+
+        Args:
+            parent_QWidget (TYPE): Description
+            option (TYPE): Description
+            model_index (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -115,7 +168,8 @@ class VirtualHelixItem(QTreeWidgetItem):
         elif key == 'length':
             editor = QSpinBox(parent_QWidget)
             bpr, length = AbstractVirtualHelixItem.getProperty(self,
-                                        ['bases_per_repeat', 'length'] )
+                                                               ['bases_per_repeat',
+                                                                'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
         elif key == 'z' and self._model_part.isZEditable():
@@ -129,6 +183,11 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def updateCNModel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         value = self.data(1, Qt.DisplayRole)
         key = self._key
         if key == 'length':
@@ -142,6 +201,15 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def setValue(self, property_key, new_value):
+        """Summary
+
+        Args:
+            property_key (TYPE): Description
+            new_value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         p_i = self._prop_items[property_key]
         current_value = p_i.data(VAL_COL, Qt.DisplayRole)
         if current_value != new_value:
@@ -149,6 +217,14 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def getItemValue(self, property_key):
+        """Summary
+
+        Args:
+            property_key (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
 

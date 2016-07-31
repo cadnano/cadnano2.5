@@ -1,27 +1,38 @@
+"""cnpropertyitem descroption"""
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import (   QDoubleSpinBox, QSpinBox,
-                                QLineEdit, QCheckBox, QComboBox)
-
+from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
+                             QLineEdit, QCheckBox, QComboBox)
 from cadnano.enum import ENUM_NAMES
 
 KEY_COL = 0
 VAL_COL = 1
 
+
 class CNPropertyItem(QTreeWidgetItem):
-    """ enum types from cadnano.enum are supported by the convention that
+    """enum types from cadnano.enum are supported by the convention that
     the key will end with the string '_type' and the list of ENUM_NAMES
     is fetched by key to populate the QComboBox
+
+    Attributes:
+        is_enum (bool): Description
     """
     def __init__(self, cn_model, parent, key=None):
+        """Summary
+
+        Args:
+            cn_model (TYPE): Description
+            parent (TYPE): Description
+            key (None, optional): Description
+        """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self._cn_model = cn_model
         self._controller = None
         self.is_enum = False
         if key is None:
-            root = parent.invisibleRootItem() # add propertyitems as siblings
+            root = parent.invisibleRootItem()  # add propertyitems as siblings
 
             # Properties
             self._prop_items = {}
@@ -61,24 +72,57 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def key(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
     def cnModel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._cn_model
     # end def
 
     def itemType(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return None
     # end def
 
     def disconnectSignals(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         if self._controller is not None:
             self._controller.disconnectSignals()
             self._controller = None
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
+        """Summary
+
+        Args:
+            parent_QWidget (TYPE): Description
+            option (TYPE): Description
+            model_index (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        
+        Raises:
+            NotImplementedError: Description
+        """
         cn_m = self._cn_model
         key = self.key()
         if key == 'name':
@@ -95,11 +139,11 @@ class CNPropertyItem(QTreeWidgetItem):
                 editor = QLineEdit(parent_QWidget)
             elif data_type is int:
                 editor = QSpinBox(parent_QWidget)
-                editor.setRange(-359,359)
+                editor.setRange(-359, 359)
             elif data_type is float:
                 editor = QDoubleSpinBox(parent_QWidget)
                 editor.setDecimals(0)
-                editor.setRange(-359,359)
+                editor.setRange(-359, 359)
             elif data_type is bool:
                 editor = QCheckBox(parent_QWidget)
             elif data_type is type(None):
@@ -110,6 +154,11 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def updateCNModel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         value = self.data(VAL_COL, Qt.DisplayRole)
         key = self._key
         if self.is_enum:
@@ -118,6 +167,15 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def setValue(self, property_key, new_value):
+        """Summary
+
+        Args:
+            property_key (TYPE): Description
+            new_value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         p_i = self._prop_items[property_key]
         if p_i.is_enum:
             new_value = ENUM_NAMES[property_key][new_value]
@@ -127,6 +185,14 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def getItemValue(self, property_key):
+        """Summary
+
+        Args:
+            property_key (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
 

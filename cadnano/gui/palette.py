@@ -89,7 +89,7 @@ def newPenObj(hex_string, stroke_width, alpha=None):
     such as  `setCosmetic <http://doc.qt.io/qt-5/qpen.html#setCosmetic>`_.
 
     Does not use the cache.
-    
+
     Args:
         hex_string (str): hexadecimal color code in the form: #RRGGBB
         stroke_width (int)
