@@ -129,15 +129,15 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                     vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
                     vhi_h_selection_group.addToGroup(vhi_h)
             elif key == 'eulerZ':
-                self._handle.rotateWithCenterOrigin(value)
+                self._handle.rotateWithCenterOrigin(val)
                 # self._prexoveritemgroup.updatePositionsAfterRotation(value)
             ### GEOMETRY PROPERTIES ###
             elif key == 'repeat_hint':
-                self.updateRepeats(int(value))
+                self.updateRepeats(int(val))
             elif key == 'bases_per_repeat':
-                self.updateBasesPerRepeat(int(value))
+                self.updateBasesPerRepeat(int(val))
             elif key == 'turns_per_repeat':
-                self.updateTurnsPerRepeat(int(value))
+                self.updateTurnsPerRepeat(int(val))
             ### RUNTIME PROPERTIES ###
             elif key == 'neighbors':
                 # this means a virtual helix in the slice view has moved
