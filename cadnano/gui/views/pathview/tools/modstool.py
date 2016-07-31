@@ -1,6 +1,5 @@
-import sys
-
-from PyQt5.QtCore import QSignalMapper
+"""Summary
+"""
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QPushButton
 
 from cadnano.data.sequencemods import mods
@@ -10,13 +9,33 @@ from .abstractpathtool import AbstractPathTool
 
 
 def _fromUtf8(s):
+    """Summary
+
+    Args:
+        s (TYPE): Description
+
+    Returns:
+        TYPE: Description
+    """
     return s
+
 
 class ModsTool(AbstractPathTool):
     """
     docstring for ModsTool
+
+    Attributes:
+        current_idx (TYPE): Description
+        current_strand (TYPE): Description
+        dialog (TYPE): Description
+        uiDlg (TYPE): Description
     """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         super(ModsTool, self).__init__(manager)
         self.dialog = QDialog()
         self.initDialog()
@@ -24,9 +43,19 @@ class ModsTool(AbstractPathTool):
         self.current_idx = None
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "mods_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "modsTool"  # first letter should be lowercase
 
     def initDialog(self):
@@ -67,7 +96,12 @@ class ModsTool(AbstractPathTool):
         self.displayCurrent()
 
     def saveModChecker(self):
-        part = self.current_strand.part()
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
+        # part = self.current_strand.part()
         doc = self.manager.document
 
         item, mid = self.getCurrentItem()
@@ -85,6 +119,11 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def deleteModChecker(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         # part = self.current_strand.part()
         doc = self.manager.document
         item, mid = self.getCurrentItem()
@@ -93,6 +132,11 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def deleteInstModChecker(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         strand = self.current_strand
         idx = self.current_idx
         part = strand.part()
@@ -103,6 +147,14 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def getCurrentItem(self, mid=None):
+        """Summary
+
+        Args:
+            mid (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         uiDlg = self.uiDlg
         combobox = uiDlg.nameComboBox
         if mid is None:
@@ -110,16 +162,21 @@ class ModsTool(AbstractPathTool):
             mid = combobox.itemData(idx)
             # mid = str(qvmid.toString())
         item = {}
-        item['name'] = str(combobox.currentText()) ##str(combobox.itemText(idx))
+        item['name'] = str(combobox.currentText())  # str(combobox.itemText(idx))
         item['color'] = str(uiDlg.colorLineEdit.text())
         item['seq5p'] = str(uiDlg.sequence5LineEdit.text())
         item['seq3p'] = str(uiDlg.sequence3LineEdit.text())
         item['seqInt'] = str(uiDlg.sequenceInternalLineEdit.text())
-        item['note'] = str(uiDlg.noteTextEdit.toPlainText()) # notes
+        item['note'] = str(uiDlg.noteTextEdit.toPlainText())  # notes
         return item, mid
     # end def
 
     def retrieveCurrentItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         uiDlg = self.uiDlg
         combobox = uiDlg.nameComboBox
         idx = combobox.currentIndex()
@@ -130,12 +187,25 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def getItemIdxByMID(self, mid):
+        """Summary
+
+        Args:
+            mid (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         combobox = self.uiDlg.nameComboBox
         idx = combobox.findData(mid)
         if idx > -1:
             return idx
 
     def displayCurrent(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         item, mid = self.retrieveCurrentItem()
         if mid != 'new':
             uiDlg = self.uiDlg
@@ -143,7 +213,7 @@ class ModsTool(AbstractPathTool):
             uiDlg.sequence5LineEdit.setText(item['seq5p'])
             uiDlg.sequence3LineEdit.setText(item['seq3p'])
             uiDlg.sequenceInternalLineEdit.setText(item['seqInt'])
-            uiDlg.noteTextEdit.setText(item['note']) # notes
+            uiDlg.noteTextEdit.setText(item['note'])  # notes
     # end def
 
     # def saveCurrent(self):
@@ -158,18 +228,44 @@ class ModsTool(AbstractPathTool):
     # # end def
 
     def connectSignals(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         document.documentModAddedSignal.connect(self.updateDialogMods)
         document.documentModRemovedSignal.connect(self.deleteDialogMods)
         document.documentModChangedSignal.connect(self.updateDialogMods)
     # end def
 
     def disconnectSignals(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         document.documentModAddedSignal.disconnect(self.updateDialogMods)
         document.documentModRemovedSignal.disconnect(self.deleteDialogMods)
         document.documentModChangedSignal.disconnect(self.updateDialogMods)
     # end def
 
     def updateDialogMods(self, part, item, mid):
+        """Summary
+
+        Args:
+            part (TYPE): Description
+            item (TYPE): Description
+            mid (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         local_item = mods.get(mid)
         combobox = self.uiDlg.nameComboBox
         if local_item:
@@ -191,6 +287,15 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def deleteDialogMods(self, part, mid):
+        """Summary
+
+        Args:
+            part (TYPE): Description
+            mid (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         local_item = mods.get(mid)
         combobox = self.uiDlg.nameComboBox
         if local_item:
@@ -201,6 +306,15 @@ class ModsTool(AbstractPathTool):
     # end def
 
     def applyMod(self, strand, idx):
+        """Summary
+
+        Args:
+            strand (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.current_strand = strand
         self.current_idx = idx
         part = strand.part()

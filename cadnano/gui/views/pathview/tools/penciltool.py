@@ -1,13 +1,28 @@
-from math import floor
-import sys
+"""Summary
 
-from PyQt5.QtCore import Qt, QEvent, QPointF, QRectF
-from PyQt5.QtGui import QBrush, QColor, QFont, QFontMetrics, QPainterPath, QPen, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsPathItem
+Attributes:
+    L3_POLY (TYPE): Description
+    POLY_35 (TYPE): Description
+    POLY_53 (TYPE): Description
+    PP35 (TYPE): Description
+    PP53 (TYPE): Description
+    PPL3 (TYPE): Description
+    PPL5 (TYPE): Description
+    PPR3 (TYPE): Description
+    PPR5 (TYPE): Description
+    R3_POLY (TYPE): Description
+"""
+from math import floor
+
+from PyQt5.QtCore import Qt, QPointF, QRectF
+from PyQt5.QtGui import QPen, QBrush, QColor
+from PyQt5.QtGui import QFontMetrics, QPainterPath, QPolygonF
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsObject
+from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano import util
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getPenObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 
 from .abstractpathtool import AbstractPathTool
@@ -15,7 +30,7 @@ from .abstractpathtool import AbstractPathTool
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _PENCIL_COLOR = styles.RED_STROKE
-_DEFAULT_RECT = QRectF(0,0, _BASE_WIDTH, _BASE_WIDTH)
+_DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _NO_PEN = QPen(Qt.NoPen)
 
 
@@ -24,6 +39,11 @@ class PencilTool(AbstractPathTool):
     docstring for PencilTool
     """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         super(PencilTool, self).__init__(manager)
         self._temp_xover = ForcedXoverItem(self, None, None)
         self._temp_strand_item = ForcedStrandItem(self, None)
@@ -33,31 +53,74 @@ class PencilTool(AbstractPathTool):
         self._is_drawing_strand = False
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "pencil_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "pencilTool"  # first letter should be lowercase
 
     def strandItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._temp_strand_item
     # end def
 
     def deactivate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.setIsDrawingStrand(False)
         self._temp_xover.deactivate()
         self.hide()
 
     def isDrawingStrand(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._is_drawing_strand
     # end def
 
     def setIsDrawingStrand(self, boolval):
+        """Summary
+
+        Args:
+            boolval (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._is_drawing_strand = boolval
-        if boolval == False:
+        if boolval is False:
             self._temp_strand_item.hideIt()
     # end def
 
     def initStrandItemFromVHI(self, virtual_helix_item, strand_set, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand_set (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         s_i = self._temp_strand_item
         self._start_idx = idx
         self._start_strand_set = strand_set
@@ -66,6 +129,16 @@ class PencilTool(AbstractPathTool):
     # end def
 
     def updateStrandItemFromVHI(self, virtual_helix_item, strand_set, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand_set (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         s_i = self._temp_strand_item
         s_idx = self._start_idx
         if abs(s_idx - idx) > 1 and self.isWithinBounds(idx):
@@ -76,6 +149,14 @@ class PencilTool(AbstractPathTool):
     # end def
 
     def isDragLow(self, idx):
+        """Summary
+
+        Args:
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         s_idx = self._start_idx
         if s_idx - idx > 0:
             return True
@@ -84,10 +165,28 @@ class PencilTool(AbstractPathTool):
     # end def
 
     def isWithinBounds(self, idx):
+        """Summary
+
+        Args:
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._low_drag_bound <= idx <= self._high_drag_bound
     # end def
 
     def attemptToCreateStrand(self, virtual_helix_item, strand_set, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand_set (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._temp_strand_item.hideIt()
         s_idx = self._start_idx
         if abs(s_idx - idx) > 1:
@@ -97,14 +196,32 @@ class PencilTool(AbstractPathTool):
     # end def
 
     def floatingXover(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._temp_xover
     # end def
 
     def isFloatingXoverBegin(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._is_floating_xover_begin
     # end def
 
     def setFloatingXoverBegin(self, boolval):
+        """Summary
+
+        Args:
+            boolval (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._is_floating_xover_begin = boolval
         if boolval:
             self._temp_xover.hideIt()
@@ -113,6 +230,16 @@ class PencilTool(AbstractPathTool):
     # end def
 
     def attemptToCreateXover(self, virtual_helix_item, strand3p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand3p (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         xoi = self._temp_xover
         n5 = xoi._node5
         idx5 = n5._idx
@@ -124,6 +251,9 @@ class PencilTool(AbstractPathTool):
     def keyPressEvent(self, event):
         """
         Must intercept invalid input events.  Make changes here
+
+        Args:
+            event (TYPE): Description
         """
         a = event.key()
         # print("PencilTool keypress", a)
@@ -137,8 +267,18 @@ class PencilTool(AbstractPathTool):
 
 
 class ForcedStrandItem(QGraphicsLineItem):
+    """Summary
+
+    Attributes:
+        is_forward (TYPE): Description
+    """
     def __init__(self, tool, virtual_helix_item):
-        """The parent should be a VirtualHelixItem."""
+        """The parent should be a VirtualHelixItem.
+
+        Args:
+            tool (TYPE): Description
+            virtual_helix_item (TYPE): Description
+        """
         super(ForcedStrandItem, self).__init__(virtual_helix_item)
         self._virtual_helix_item = virtual_helix_item
         self._tool = tool
@@ -174,7 +314,11 @@ class ForcedStrandItem(QGraphicsLineItem):
 
     ### SLOTS ###
     def strandResizedSlot(self, idxs):
-        """docstring for strandResizedSlot"""
+        """docstring for strandResizedSlot
+
+        Args:
+            idxs (TYPE): Description
+        """
         low_moved = self._low_cap.updatePosIfNecessary(idxs[0])
         high_moved = self._high_cap.updatePosIfNecessary(idxs[1])
         if low_moved:
@@ -184,6 +328,11 @@ class ForcedStrandItem(QGraphicsLineItem):
     # end def
 
     def strandRemovedSlot(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         scene = self.scene()
         scene.removeItem(self._click_area)
         scene.removeItem(self._high_cap)
@@ -199,13 +348,28 @@ class ForcedStrandItem(QGraphicsLineItem):
     ### ACCESSORS ###
 
     def virtualHelixItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._virtual_helix_item
 
     def activeTool(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._tool
     # end def
 
     def hideIt(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.hide()
         self._low_cap.hide()
         self._high_cap.hide()
@@ -213,6 +377,11 @@ class ForcedStrandItem(QGraphicsLineItem):
     # end def
 
     def showIt(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._low_cap.show()
         self._high_cap.show()
         self._click_area.show()
@@ -220,12 +389,29 @@ class ForcedStrandItem(QGraphicsLineItem):
     # end def
 
     def resetStrandItem(self, virtualHelixItem, is_forward):
+        """Summary
+
+        Args:
+            virtualHelixItem (TYPE): Description
+            is_forward (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.setParentItem(virtualHelixItem)
         self._virtual_helix_item = virtualHelixItem
         self.resetEndPointItems(is_forward)
     # end def
 
     def resetEndPointItems(self, is_forward):
+        """Summary
+
+        Args:
+            is_forward (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         bw = _BASE_WIDTH
         self.is_forward = is_forward
         self._low_cap.resetEndPoint(is_forward)
@@ -248,6 +434,14 @@ class ForcedStrandItem(QGraphicsLineItem):
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
     def updateLine(self, moved_cap):
+        """Summary
+
+        Args:
+            moved_cap (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # setup
         bw = _BASE_WIDTH
         c_a = self._click_area
@@ -273,6 +467,11 @@ class ForcedStrandItem(QGraphicsLineItem):
     # end def
 
     def _updatePensAndBrushes(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         color = QColor(_PENCIL_COLOR)
         penWidth = styles.PATH_STRAND_STROKE_WIDTH
         pen = QPen(color, penWidth)
@@ -303,7 +502,7 @@ PPL3 = QPainterPath()  # Left 3' PainterPath
 PPR3 = QPainterPath()  # Right 3' PainterPath
 
 # set up PPL5 (left 5' blue square)
-PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH,0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
 # set up PPR5 (right 5' blue square)
 PPR5.addRect(0, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
 # set up PPL3 (left 3' blue triangle)
@@ -319,12 +518,24 @@ R3_POLY.append(QPointF(0.75*_BASE_WIDTH, 0.5*_BASE_WIDTH))
 R3_POLY.append(QPointF(0, _BASE_WIDTH))
 PPR3.addPolygon(R3_POLY)
 
+
 class ForcedXoverNode3(QGraphicsRectItem):
     """
     This is a QGraphicsRectItem to allow actions and also a
     QGraphicsSimpleTextItem to allow a label to be drawn
+
+    Attributes:
+        is_forward (TYPE): Description
     """
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            xover_item (TYPE): Description
+            strand3p (TYPE): Description
+            idx (TYPE): Description
+        """
         super(ForcedXoverNode3, self).__init__(virtual_helix_item)
         self._vhi = virtual_helix_item
         self._xover_item = xover_item
@@ -350,7 +561,11 @@ class ForcedXoverNode3(QGraphicsRectItem):
 
     def updateForFloatFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
         """
-
+        Args:
+            virtual_helix_item (TYPE): Description
+            is_forward (TYPE): Description
+            idx_x (TYPE): Description
+            idx_y (TYPE): Description
         """
         self._vhi = virtual_helix_item
         self.setParentItem(virtual_helix_item)
@@ -361,7 +576,10 @@ class ForcedXoverNode3(QGraphicsRectItem):
 
     def updateForFloatFromStrand(self, virtual_helix_item, strand3p, idx):
         """
-
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand3p (TYPE): Description
+            idx (TYPE): Description
         """
         self._vhi = virtual_helix_item
         self._strand = strand3p
@@ -372,6 +590,11 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def configurePath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
         path = PPR3 if self.is_forward else PPL3
         offset = -_BASE_WIDTH if self.is_forward else _BASE_WIDTH
@@ -386,31 +609,69 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def refreshXover(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._xover_item.refreshXover()
     # end def
 
     def setPartnerVirtualHelix(self, virtual_helix_item):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._partner_virtual_helix = virtual_helix_item
     # end def
 
     def idx(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._idx
     # end def
 
     def virtualHelixItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._vhi
     # end def
 
     def point(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._vhi.upperLeftCornerOfBaseType(self._idx, self.is_forward)
     # end def
 
     def floatPoint(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         pt = self.pos()
         return pt.x(), pt.y()
     # end def
 
     def isForward(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.is_forward
     # end def
 
@@ -419,6 +680,9 @@ class ForcedXoverNode3(QGraphicsRectItem):
         Sets position by asking the VirtualHelixItem
         Sets appearance by choosing among pre-defined painterpaths (from
         normalstrandgraphicsitem) depending on drawing direction.
+
+        Args:
+            is_from_strand (bool, optional): Description
         """
         self.setPos(*self.point())
         n5 = self._xover_item._node5
@@ -451,6 +715,9 @@ class ForcedXoverNode3(QGraphicsRectItem):
     def _updateLabel(self, is_left):
         """Called by updatePositionAndAppearance during init.
         Updates drawing and position of the label.
+
+        Args:
+            is_left (TYPE): Description
         """
         lbl = self._label
         if self._idx is not None:
@@ -469,7 +736,8 @@ class ForcedXoverNode3(QGraphicsRectItem):
             label_x_offset = 0.25*bw if is_left else -0.25*bw
             label_x += label_x_offset
             # adjust x for numeral 1
-            if num == 1: label_x -= half_label_w/2.0
+            if num == 1:
+                label_x -= half_label_w/2.0
             # create text item
             if lbl is None:
                 lbl = QGraphicsSimpleTextItem(str(num), self)
@@ -478,12 +746,17 @@ class ForcedXoverNode3(QGraphicsRectItem):
             lbl.setFont(_TO_HELIX_NUM_FONT)
             self._label = lbl
 
-            lbl.setText( str(self._partner_virtual_helix.idNum()) )
+            lbl.setText(str(self._partner_virtual_helix.idNum()))
             lbl.show()
         # end if
     # end def
 
     def hideItems(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         if self._label:
             self._label.hide()
         if self._blank_thing:
@@ -497,18 +770,32 @@ class ForcedXoverNode3(QGraphicsRectItem):
 class ForcedXoverNode5(ForcedXoverNode3):
     """
     XoverNode5 is the partner of XoverNode3. It dif
+
     XoverNode3 handles:
-    1. Drawing of the 5' end of an xover, and its text label. Drawing style
-    is determined by the location of the xover with in a vhelix (is it a top
-    or bottom vstrand?).
-    2. Notifying XoverStrands in the model when connectivity changes.
+        1. Drawing of the 5' end of an xover, and its text label. Drawing style
+        is determined by the location of the xover with in a vhelix (is it a top
+        or bottom vstrand?).
+        2. Notifying XoverStrands in the model when connectivity changes.
 
     """
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            xover_item (TYPE): Description
+            strand5p (TYPE): Description
+            idx (TYPE): Description
+        """
         super(ForcedXoverNode5, self).__init__(virtual_helix_item, xover_item, strand5p, idx)
     # end def
 
     def configurePath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
         path = PPL5 if self.is_forward else PPR5
         offset = _BASE_WIDTH if self.is_forward else -_BASE_WIDTH
@@ -523,7 +810,11 @@ class ForcedXoverNode5(ForcedXoverNode3):
     # end def
 
     def updatePositionAndAppearance(self, is_from_strand=True):
-        """Same as XoverItem3, but exposes 3' end"""
+        """Same as XoverItem3, but exposes 3' end
+
+        Args:
+            is_from_strand (bool, optional): Description
+        """
         self.setPos(*self.point())
         self.configurePath()
         # # We can only expose a 3' end. But on which side?
@@ -532,26 +823,32 @@ class ForcedXoverNode5(ForcedXoverNode3):
     # end def
 # end class
 
+
 class ForcedXoverItem(QGraphicsPathItem):
     """
     This class handles:
-    1. Drawing the spline between the XoverNode3 and XoverNode5 graphics
-    items in the path view.
+        1. Drawing the spline between the XoverNode3 and XoverNode5 graphics
+        items in the path view.
 
-    XoverItem should be a child of a PartItem.
+        XoverItem should be a child of a PartItem.
     """
 
     def __init__(self, tool, nucleicacid_part_item, virtual_helix_item):
         """
         strand_item is a the model representation of the 5prime most strand
         of a Xover
+
+        Args:
+            tool (TYPE): Description
+            nucleicacid_part_item (TYPE): Description
+            virtual_helix_item (TYPE): Description
         """
         super(ForcedXoverItem, self).__init__(nucleicacid_part_item)
         self._tool = tool
         self._virtual_helix_item = virtual_helix_item
         self._node5 = None
         self._node3 = None
-        self.setFlag(QGraphicsItem.ItemIsFocusable) # for keyPressEvents
+        self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setZValue(styles.ZPATHTOOL)
         self.hide()
     # end def
@@ -560,6 +857,11 @@ class ForcedXoverItem(QGraphicsPathItem):
 
     ### METHODS ###
     def remove(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         scene = self.scene()
         if self._node3 is not None:
             scene.removeItem(self._node3)
@@ -568,9 +870,19 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 
     def deactivate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._tool.setFloatingXoverBegin(True)
 
     def hideIt(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.hide()
         self.clearFocus()
         if self._node3:
@@ -579,6 +891,11 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 
     def showIt(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.show()
         self.setFocus()
         if self._node3:
@@ -593,6 +910,9 @@ class ForcedXoverItem(QGraphicsPathItem):
         regain focus if necessary in DocumentWindow or CustomGraphicsView classes
         looking for event.type() QEvent.ActivationChange and using isActiveWindow()
         or focus to get focus
+
+        Args:
+            event (TYPE): Description
         """
         a = event.key()
         # print("ForcedXoverItem keypress", a)
@@ -604,6 +924,16 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 
     def updateBase(self, virtual_helix_item, strand5p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand5p (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # floating Xover!
         self._virtual_helix_item = virtual_helix_item
         self.setParentItem(virtual_helix_item.partItem())
@@ -616,6 +946,17 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 
     def updateFloatingFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            is_forward (TYPE): Description
+            idx_x (TYPE): Description
+            idx_y (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # floating Xover!
         self._node5.setPartnerVirtualHelix(virtual_helix_item)
         self._node5.updatePositionAndAppearance()
@@ -625,12 +966,31 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 
     def updateFloatingFromStrandItem(self, virtual_helix_item, strand3p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            strand3p (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # floating Xover!
         self._node3.updateForFloatFromStrand(virtual_helix_item, strand3p, idx)
         self.updateFloatPath()
     # end def
 
     def updateFloatingFromPartItem(self, nucleicacid_part_item, pt):
+        """Summary
+
+        Args:
+            nucleicacid_part_item (TYPE): Description
+            pt (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._node3.hideItems()
         self.updateFloatPath(pt)
     # end def
@@ -644,6 +1004,9 @@ class ForcedXoverItem(QGraphicsPathItem):
         If floatPos!=None, this is a floatingXover and floatPos is the
         destination point (where the mouse is) while toHelix, toIndex
         are potentially None and represent the base at floatPos.
+
+        Args:
+            point (None, optional): Description
 
         """
         node3 = self._node3
@@ -692,16 +1055,16 @@ class ForcedXoverItem(QGraphicsPathItem):
                 c1.setY(five_exit_pt.y() + _yScale * dx)
             # case 2: same parity
         elif same_parity:
-             dy = abs(three_enter_pt.y() - five_exit_pt.y())
-             c1.setX(five_exit_pt.x() + _xScale * dy)
-             c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
+            dy = abs(three_enter_pt.y() - five_exit_pt.y())
+            c1.setX(five_exit_pt.x() + _xScale * dy)
+            c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
         # case 3: different parity
         else:
             if n5_is_forward:
-                c1.setX(five_exit_pt.x() - _xScale *\
+                c1.setX(five_exit_pt.x() - _xScale *
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             else:
-                c1.setX(five_exit_pt.x() + _xScale *\
+                c1.setX(five_exit_pt.x() + _xScale *
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
 
@@ -731,6 +1094,11 @@ class ForcedXoverItem(QGraphicsPathItem):
     # # end def
 
     def _updateFloatPen(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         pen_width = styles.PATH_STRAND_STROKE_WIDTH
         pen = getPenObj(_PENCIL_COLOR, pen_width)
         pen.setCapStyle(Qt.FlatCap)
@@ -745,7 +1113,7 @@ PPR3 = QPainterPath()  # Right 3' PainterPath
 PP53 = QPainterPath()  # Left 5', Right 3' PainterPath
 PP35 = QPainterPath()  # Left 5', Right 3' PainterPath
 # set up PPL5 (left 5' blue square)
-PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH,0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
 # set up PPR5 (right 5' blue square)
 PPR5.addRect(0, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
 # set up PPL3 (left 3' blue triangle)
@@ -776,9 +1144,23 @@ POLY_35.append(QPointF(0, 0.5*_BASE_WIDTH))
 POLY_35.append(QPointF(0.5*_BASE_WIDTH, _BASE_WIDTH))
 PP35.addPolygon(POLY_35)
 
+
 class EndpointItem(QGraphicsPathItem):
+    """Summary
+
+    Attributes:
+        cap_type (TYPE): Description
+        mouseMoveEvent (TYPE): Description
+        mousePressEvent (TYPE): Description
+    """
     def __init__(self, strand_item, cap_type, is_forward):
-        """The parent should be a StrandItem."""
+        """The parent should be a StrandItem.
+
+        Args:
+            strand_item (TYPE): Description
+            cap_type (TYPE): Description
+            is_forward (TYPE): Description
+        """
         super(EndpointItem, self).__init__(strand_item.virtualHelixItem())
 
         self._strand_item = strand_item
@@ -799,6 +1181,11 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "%s" % self.__class__.__name__
 
     ### SIGNALS ###
@@ -807,7 +1194,8 @@ class EndpointItem(QGraphicsPathItem):
 
     ### ACCESSORS ###
     def idx(self):
-        """Look up baseIdx, as determined by strand_item idxs and cap type."""
+        """Look up baseIdx, as determined by strand_item idxs and cap type.
+        """
         if self.cap_type == 'low':
             return self._strand_item.idxs()[0]
         else:  # high or dual, doesn't matter
@@ -815,21 +1203,40 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     def partItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._strand_item.partItem()
     # end def
 
     def disableEvents(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._click_area.setAcceptHoverEvents(False)
         self.mouseMoveEvent = QGraphicsPathItem.mouseMoveEvent
         self.mousePressEvent = QGraphicsPathItem.mousePressEvent
     # end def
 
     def window(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._strand_item.window()
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
     def updatePosIfNecessary(self, idx):
-        """Update position if necessary and return True if updated."""
+        """Update position if necessary and return True if updated.
+
+        Args:
+            idx (TYPE): Description
+        """
         x = int(idx*_BASE_WIDTH)
         if x != self.x():
             self.setPos(x, self.y())
@@ -837,6 +1244,14 @@ class EndpointItem(QGraphicsPathItem):
         return False
 
     def resetEndPoint(self, is_forward):
+        """Summary
+
+        Args:
+            is_forward (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.setParentItem(self._strand_item.virtualHelixItem())
         self._initCapSpecificState(is_forward)
         upper_left_y = 0 if is_forward else _BASE_WIDTH
@@ -845,6 +1260,14 @@ class EndpointItem(QGraphicsPathItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def _initCapSpecificState(self, is_forward):
+        """Summary
+
+        Args:
+            is_forward (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         c_t = self.cap_type
         if c_t == 'low':
             path = PPL5 if is_forward else PPL3
@@ -860,6 +1283,9 @@ class EndpointItem(QGraphicsPathItem):
         """
         Parses a mousePressEvent, calling the approproate tool method as
         necessary. Stores _move_idx for future comparison.
+
+        Args:
+            event (TYPE): Description
         """
         self.scene().views()[0].addToPressList(self)
         self._strand_item.setActiveEndpoint(self.cap_type)
@@ -876,6 +1302,9 @@ class EndpointItem(QGraphicsPathItem):
         """
         Parses a mousePressEvent, calling the approproate tool method as
         necessary. Stores _move_idx for future comparison.
+
+        Args:
+            event (TYPE): Description
         """
         active_tool_str = self._getActiveTool().methodPrefix()
         if active_tool_str == 'pencilTool':
@@ -885,6 +1314,9 @@ class EndpointItem(QGraphicsPathItem):
         """
         Parses a mouseMoveEvent, calling the approproate tool method as
         necessary. Updates _move_idx if it changed.
+
+        Args:
+            event (TYPE): Description
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -898,6 +1330,9 @@ class EndpointItem(QGraphicsPathItem):
         """
         Parses a mouseReleaseEvent, calling the approproate tool method as
         necessary. Deletes _move_idx if necessary.
+
+        Args:
+            event (TYPE): Description
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):  # if the tool method exists

@@ -1,12 +1,10 @@
-from PyQt5.QtCore import Qt, QRectF, QPointF
-from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem
-
+"""Summary
+"""
+from PyQt5.QtCore import QRectF, QPointF
+from PyQt5.QtGui import QPainterPath, QPolygonF
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj
-
 from .abstractpathtool import AbstractPathTool
-
 
 _BW = styles.PATH_BASE_WIDTH
 _PEN = getPenObj(styles.RED_STROKE, 1)
@@ -30,16 +28,41 @@ class BreakTool(AbstractPathTool):
     docstring for BreakTool
     """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         super(BreakTool, self).__init__(manager)
         self._is_top_strand = True
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "nick_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "nickTool"  # first letter should be lowercase
 
     def paint(self, painter, option, widget=None):
+        """Summary
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            widget (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         AbstractPathTool.paint(self, painter, option, widget)
         painter.setPen(_PEN)
         if self._is_top_strand:
@@ -51,6 +74,9 @@ class BreakTool(AbstractPathTool):
         """
         Called in hoverMovePathHelix to set whether breaktool is hovering
         over a top strand (goes 5' to 3' left to right) or bottom strand.
+
+        Args:
+            is_top (TYPE): Description
         """
         self._is_top_strand = is_top
 
@@ -58,6 +84,11 @@ class BreakTool(AbstractPathTool):
         """
         flag is for the case where an item in the path also needs to
         implement the hover method
+
+        Args:
+            item (TYPE): Description
+            event (TYPE): Description
+            flag (None, optional): Description
         """
         self.show()
         self.updateLocation(item, item.mapToScene(QPointF(event.pos())))
@@ -67,4 +98,3 @@ class BreakTool(AbstractPathTool):
         new_position = self.helixPos(pos_item)
         if new_position is not None:
             self.setPos(new_position)
-

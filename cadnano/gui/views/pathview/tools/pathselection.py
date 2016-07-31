@@ -1,3 +1,5 @@
+"""Summary
+"""
 from math import floor
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
@@ -11,8 +13,21 @@ from cadnano.gui.views.pathview import pathstyles as styles
 class SelectionItemGroup(QGraphicsItemGroup):
     """
     SelectionItemGroup
+
+    Attributes:
+        getR (TYPE): Description
+        selectionbox (TYPE): Description
+        translateR (TYPE): Description
+        viewroot (TYPE): Description
     """
     def __init__(self, boxtype, constraint='y', parent=None):
+        """Summary
+
+        Args:
+            boxtype (TYPE): Description
+            constraint (str, optional): Description
+            parent (None, optional): Description
+        """
         super(SelectionItemGroup, self).__init__(parent)
         self.viewroot = parent
         self.setFiltersChildEvents(True)
@@ -61,27 +76,69 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # # end def
 
     def pendToAdd(self, item):
+        """Summary
+
+        Args:
+            item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._pending_to_add_dict[item] = True
     # end def
 
     def isPending(self, item):
+        """Summary
+
+        Args:
+            item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return item in self._pending_to_add_dict
     # end def
 
     def document(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.viewroot.document()
     # end def
 
     def pendToRemove(self, item):
+        """Summary
+
+        Args:
+            item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if item in self._pending_to_add_dict:
             del self._pending_to_add_dict[item]
     # end def
 
     def setNormalSelect(self, bool_val):
+        """Summary
+
+        Args:
+            bool_val (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._normal_select = bool_val
     # end def
 
     def isNormalSelect(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._normal_select
     # end def
 
@@ -107,16 +164,32 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def selectionLock(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.viewroot.selectionLock()
     # end def
 
     def setSelectionLock(self, selection_group):
+        """Summary
+
+        Args:
+            selection_group (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.viewroot.setSelectionLock(selection_group)
     # end def
 
     def keyPressEvent(self, event):
         """
         Must intercept invalid input events.  Make changes here
+
+        Args:
+            event (TYPE): Description
         """
         key = event.key()
         if key in [Qt.Key_Backspace, Qt.Key_Delete]:
@@ -128,6 +201,14 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def mousePressEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # self.show()
         if event.button() != Qt.LeftButton:
             return QGraphicsItemGroup.mousePressEvent(self, event)
@@ -156,6 +237,14 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def mouseMoveEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self._drag_enable is True:
 
             # map the item to the scene coordinates
@@ -179,7 +268,11 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def customMouseRelease(self, event):
-        """docstring for customMouseRelease"""
+        """docstring for customMouseRelease
+
+        Args:
+            event (TYPE): Description
+        """
         self.selectionbox.hide()
         self.selectionbox.resetTransform()
         self._drag_enable = False
@@ -195,6 +288,11 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def resetSelection(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._pending_to_add_dict = {}
         self._added_to_press_list = False
         self.clearSelection(False)
@@ -256,6 +354,9 @@ class SelectionItemGroup(QGraphicsItemGroup):
         """
         remove only the child and ask it to
         restore it's original parent
+
+        Args:
+            child (TYPE): Description
         """
         doc = self.document()
         self.removeFromGroup(child)
@@ -263,7 +364,8 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def removeSelectedItems(self):
-        """docstring for removeSelectedItems"""
+        """docstring for removeSelectedItems
+        """
         doc = self.document()
         for item in self.childItems():
             self.removeFromGroup(item)
@@ -273,11 +375,24 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def setBoundingRect(self, rect):
+        """Summary
+
+        Args:
+            rect (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.prepareGeometryChange()
         self._rect = rect
     # end def
 
     def boundingRect(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._rect
 
 # end class
@@ -295,9 +410,11 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     def __init__(self, item_group):
         """
         The item_group.parentItem() is expected to be a partItem
+
+        Args:
+            item_group (TYPE): Description
         """
-        super(VirtualHelixHandleSelectionBox, self).__init__(
-                                                        item_group.parentItem())
+        super(VirtualHelixHandleSelectionBox, self).__init__(item_group.parentItem())
         self._item_group = item_group
         self._rect = item_group.boundingRect()
         self.hide()
@@ -308,21 +425,47 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def getY(self, pos):
+        """Summary
+
+        Args:
+            pos (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pos = self._item_group.mapToScene(QPointF(pos))
         return pos.y()
     # end def
 
     def translateY(self, delta):
+        """Summary
+
+        Args:
+            delta (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.setY(delta)
-     # end def
+    # end def
 
     def refreshPath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.prepareGeometryChange()
         self.setPath(self.painterPath())
         self._pos0 = self.pos()
     # end def
 
     def painterPath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         i_g = self._item_group
         # the childrenBoundingRect is necessary to get this to work
         rect = self.mapRectFromItem(i_g, i_g.childrenBoundingRect())
@@ -330,15 +473,19 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
 
         path = QPainterPath()
         path.addRoundedRect(rect, radius, radius)
-        path.moveTo(rect.right(),\
-                         rect.center().y())
-        path.lineTo(rect.right() + radius / 2,\
-                         rect.center().y())
+        path.moveTo(rect.right(), rect.center().y())
+        path.lineTo(rect.right() + radius / 2, rect.center().y())
         return path
     # end def
 
     def processSelectedItems(self, r_start, r_end, modifiers):
-        """docstring for processSelectedItems"""
+        """docstring for processSelectedItems
+
+        Args:
+            r_start (TYPE): Description
+            r_end (TYPE): Description
+            modifiers (TYPE): Description
+        """
         margin = styles.VIRTUALHELIXHANDLEITEM_RADIUS
         delta = (r_end - r_start)  # r delta
         mid_height = (self.boundingRect().height()) / 2 - margin
@@ -353,13 +500,18 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         # sort on y to determine the extremes of the selection group
         items = sorted(self._item_group.childItems(), key=lambda vhhi: vhhi.y())
         part_item = items[0].partItem()
-        part_item.reorderHelices(items[0].idNum(),\
-                                items[-1].idNum(),\
-                                indexDelta)
+        part_item.reorderHelices(items[0].idNum(),
+                                 items[-1].idNum(),
+                                 indexDelta)
         part_item.updateStatusBar("")
     # end def
 
     def boxParent(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         temp = self._item_group.childItems()[0].partItem()
         self.setParentItem(temp)
         return temp
@@ -381,20 +533,41 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def bounds(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._bounds
     # end def
 
     def delta(self, yf, y0):
+        """Summary
+
+        Args:
+            yf (TYPE): Description
+            y0 (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return yf - y0
     # end def
 
     def resetPosition(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.setPos(self._pos0)
     # end def
 # end class
 
 
 class EndpointHandleSelectionBox(QGraphicsPathItem):
+    """Summary
+    """
     _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
     _BOX_PEN = getPenObj(styles.SELECTED_COLOR, _PEN_WIDTH)
     _BASE_WIDTH = styles.PATH_BASE_WIDTH
@@ -402,9 +575,11 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     def __init__(self, item_group):
         """
         The item_group.parentItem() is expected to be a partItem
+
+        Args:
+            item_group (TYPE): Description
         """
-        super(EndpointHandleSelectionBox, self).__init__(
-                                                    item_group.parentItem())
+        super(EndpointHandleSelectionBox, self).__init__(item_group.parentItem())
         self._item_group = item_group
         self._rect = item_group.boundingRect()
         self.hide()
@@ -415,10 +590,26 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def getX(self, pos):
+        """Summary
+
+        Args:
+            pos (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return pos.x()
     # end def
 
     def translateX(self, delta):
+        """Summary
+
+        Args:
+            delta (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         children = self._item_group.childItems()
         if children:
             p_i = children[0].partItem()
@@ -428,9 +619,23 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def resetPosition(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.setPos(self._pos0)
 
     def delta(self, xf, x0):
+        """Summary
+
+        Args:
+            xf (TYPE): Description
+            x0 (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         bound_l, bound_h = self._bounds
         delta = int(floor((xf - x0) / self._BASE_WIDTH))
         if delta > 0 and delta > bound_h:
@@ -440,11 +645,13 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         return delta
 
     def refreshPath(self):
-        temp_low, temp_high = \
-                    self._item_group.viewroot.document().getSelectionBounds()
+        """Summary
 
+        Returns:
+            TYPE: Description
+        """
+        temp_low, temp_high = self._item_group.viewroot.document().getSelectionBounds()
         self._bounds = (temp_low, temp_high)
-
         # print("rp:", self._bounds)
         self.prepareGeometryChange()
         self.setPath(self.painterPath())
@@ -452,6 +659,11 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def painterPath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         bw = self._BASE_WIDTH
         i_g = self._item_group
         # the childrenBoundingRect is necessary to get this to work
@@ -472,7 +684,13 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def processSelectedItems(self, r_start, r_end, modifiers):
-        """docstring for processSelectedItems"""
+        """docstring for processSelectedItems
+
+        Args:
+            r_start (TYPE): Description
+            r_end (TYPE): Description
+            modifiers (TYPE): Description
+        """
         delta = self.delta(r_end, r_start)
 
         # TODO reenable do_maximize?????
@@ -485,15 +703,30 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def deleteSelection(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._item_group.document().deleteStrandSelection()
 
     def boxParent(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         temp = self._item_group.childItems()[0].partItem().proxy()
         self.setParentItem(temp)
         return temp
     # end def
 
     def bounds(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._bounds
     # end def
 # end class

@@ -1,21 +1,34 @@
-import re
+"""Summary
 
+Attributes:
+    RE_DNA_PATTERN (SRE_Pattern): Matches any letters that are not valid DNA.
+"""
+import re
 from PyQt5.QtCore import Qt, QSignalMapper
 from PyQt5.QtGui import QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
-
 from cadnano.data.dnasequences import sequences
 from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getColorObj, getBrushObj
-
 from .abstractpathtool import AbstractPathTool
 
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
 
 
 class DNAHighlighter(QSyntaxHighlighter):
+    """Summary
+
+    Attributes:
+        format (TYPE): Description
+        parent (TYPE): Description
+    """
     def __init__(self, parent):
+        """Summary
+
+        Args:
+            parent (TYPE): Description
+        """
         QSyntaxHighlighter.__init__(self, parent)
         self.parent = parent
         self.format = QTextCharFormat()
@@ -26,6 +39,14 @@ class DNAHighlighter(QSyntaxHighlighter):
             self.format.setUnderlineColor(getColorObj(styles.INVALID_DNA_COLOR))
 
     def highlightBlock(self, text):
+        """Summary
+
+        Args:
+            text (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         for match in re.finditer(RE_DNA_PATTERN, text):
             index = match.start()
             length = match.end() - index
@@ -34,7 +55,25 @@ class DNAHighlighter(QSyntaxHighlighter):
 
 
 class AddSeqTool(AbstractPathTool):
+    """Summary
+
+    Attributes:
+        apply_button (TYPE): Description
+        buttons (list): Description
+        dialog (TYPE): Description
+        highlighter (TYPE): Description
+        seq_box (TYPE): Description
+        sequence_radio_button_id (dict): Description
+        signal_mapper (TYPE): Description
+        use_abstract_sequence (bool): Description
+        validated_sequence_to_apply (TYPE): Description
+    """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         AbstractPathTool.__init__(self, manager)
         self.dialog = QDialog()
         self.buttons = []
@@ -45,9 +84,19 @@ class AddSeqTool(AbstractPathTool):
         self.initDialog()
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "add_seq_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "addSeqTool"  # first letter should be lowercase
 
     def initDialog(self):
@@ -84,6 +133,9 @@ class AddSeqTool(AbstractPathTool):
         """
         Connects to signal_mapper to receive a signal whenever user selects
         a sequence option.
+
+        Args:
+            option_chosen (TYPE): Description
         """
         option_name = self.buttons[option_chosen].text()
         if option_name == 'Abstract':
@@ -127,6 +179,14 @@ class AddSeqTool(AbstractPathTool):
                     self.buttons[1].click()
 
     def applySequence(self, oligo):
+        """Summary
+
+        Args:
+            oligo (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.dialog.setFocus()
         if self.dialog.exec_():  # apply the sequence if accept was clicked
             if self.use_abstract_sequence:

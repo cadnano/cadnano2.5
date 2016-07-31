@@ -1,3 +1,5 @@
+"""Summary
+"""
 from PyQt5.QtCore import QRectF, QPointF
 from PyQt5.QtWidgets import QGraphicsObject
 
@@ -16,8 +18,17 @@ _BRUSH = getNoBrush()
 
 
 class AbstractPathTool(QGraphicsObject):
-    """Abstract base class to be subclassed by all other pathview tools."""
+    """Abstract base class to be subclassed by all other pathview tools.
+
+    Attributes:
+        manager (TYPE): Description
+    """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         super(AbstractPathTool, self).__init__(None)
         self.manager = manager
         self._window = manager.window
@@ -29,11 +40,26 @@ class AbstractPathTool(QGraphicsObject):
 
     ######################## Drawing #######################################
     def paint(self, painter, option, widget=None):
+        """Summary
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            widget (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         painter.setPen(self._pen)
         painter.setBrush(_BRUSH)
         painter.drawRect(_TOOL_RECT)
 
     def boundingRect(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._rect
 
     ######################### Positioning and Parenting ####################
@@ -42,6 +68,11 @@ class AbstractPathTool(QGraphicsObject):
         outside the context of an event will know where to
         position the new tool and snaps self's pos to the upper
         left hand corner of the base the user is mousing over.
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            scene_pos (TYPE): Description
+            *args (TYPE): Description
         """
         if virtual_helix_item:
             if self.parentObject() != virtual_helix_item:
@@ -80,16 +111,26 @@ class AbstractPathTool(QGraphicsObject):
         """
         Called by PathToolManager.setActiveTool when the tool becomes
         active. Used, for example, to show/hide tool-specific ui elements.
+
+        Args:
+            will_be_active (TYPE): Description
+            old_tool (None, optional): Description
         """
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
 
     def deactivate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.hide()
 
     def isActive(self):
-        """Returns isActive"""
+        """Returns isActive
+        """
         return self._active
 
     def widgetClicked(self):
@@ -101,7 +142,12 @@ class AbstractPathTool(QGraphicsObject):
     ####################### Coordinate Utilities ###########################
     def baseAtPoint(self, virtual_helix_item, pt):
         """Returns the (is_fwd, base_idx, strand_idx) corresponding
-        to pt in virtual_helix_item."""
+        to pt in virtual_helix_item.
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            pt (TYPE): Description
+        """
         x, strand_idx = self.helixIndex(pt)
 
         is_fwd = False if util.clamp(strand_idx, 0, 1) else True
@@ -112,6 +158,9 @@ class AbstractPathTool(QGraphicsObject):
 
         Returns:
             point (tuple) in virtual_helix_item coordinates
+
+        Args:
+            point (TYPE): Description
         """
         x = int(int(point.x()) / _BW)
         y = int(int(point.y()) / _BW)
@@ -123,6 +172,9 @@ class AbstractPathTool(QGraphicsObject):
         Snaps a point to the upper left corner of the base
         it is within.
         point is in virtual_helix_item coordinates
+
+        Args:
+            point (TYPE): Description
         """
         col = int(int(point.x()) / _BW)
         row = int(int(point.y()) / _BW)
@@ -136,6 +188,9 @@ class AbstractPathTool(QGraphicsObject):
         """
         flag is for the case where an item in the path also needs to
         implement the hover method
+
+        Args:
+            event (TYPE): Description
         """
         self.hide()
     # end def
