@@ -1,3 +1,9 @@
+"""Summary
+
+Attributes:
+    DELTA (TYPE): Description
+    HIGHLIGHT_WIDTH (TYPE): Description
+"""
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
@@ -34,10 +40,26 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
     where x is the cartesian product.
+
+    Attributes:
+        active_virtual_helix_item (TYPE): Description
+        grab_cornerBR (TYPE): Description
+        grab_cornerTL (TYPE): Description
+        griditem (TYPE): Description
+        outline (TYPE): Description
+        prexover_manager (TYPE): Description
+        scale_factor (TYPE): Description
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, model_part_instance, viewroot, parent=None):
+        """Summary
+
+        Args:
+            model_part_instance (TYPE): Description
+            viewroot (TYPE): Description
+            parent (None, optional): Description
+        """
         super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
@@ -98,12 +120,32 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### SLOTS ###
     def partActiveVirtualHelixChangedSlot(self, part, id_num):
+        """Summary
+
+        Args:
+            part (TYPE): Description
+            id_num (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
     # end def
 
     def partActiveBaseInfoSlot(self, part, info):
+        """Summary
+
+        Args:
+            part (TYPE): Description
+            info (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         pxom = self.prexover_manager
         pxom.deactivateNeighbors()
         if info and info is not None:
@@ -112,6 +154,17 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
+        """Summary
+
+        Args:
+            model_part (TYPE): Description
+            property_key (TYPE): Description
+            new_value (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
             if property_key == 'color':
@@ -129,7 +182,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot"""
+        """docstring for partRemovedSlot
+
+        Args:
+            sender (TYPE): Description
+        """
         self.parentItem().removePartItem(self)
 
         scene = self.scene()
@@ -151,6 +208,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
                                          do_deselect):
         """
         left_overs are neighbors that need updating due to changes
+
+        Args:
+            sender (TYPE): Description
+            vh_set (TYPE): Description
+            left_overs (TYPE): Description
+            do_deselect (TYPE): Description
         """
         if do_deselect:
             tool = self._getActiveTool()
@@ -182,7 +245,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def _refreshVirtualHelixItemGizmos(self, id_num, vhi):
-        """Update props and appearance of self & recent neighbors."""
+        """Update props and appearance of self & recent neighbors.
+
+        Args:
+            id_num (TYPE): Description
+            vhi (TYPE): Description
+        """
         neighbors = vhi.getProperty('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
@@ -195,12 +263,35 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            id_num (TYPE): Description
+            keys (TYPE): Description
+            values (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         if self._model_part == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
             vh_i.virtualHelixPropertyChangedSlot(keys, values)
     # end def
 
     def partVirtualHelixAddedSlot(self, sender, id_num, neighbors):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            id_num (TYPE): Description
+            neighbors (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         vhi = VirtualHelixItem(id_num, self)
         self._virtual_helix_item_hash[id_num] = vhi
         self._refreshVirtualHelixItemGizmos(id_num, vhi)
@@ -211,6 +302,17 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixRemovedSlot(self, sender, id_num, neighbors):
+        """Summary
+
+        Args:
+            sender (TYPE): Description
+            id_num (TYPE): Description
+            neighbors (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         tm = self._viewroot.manager
         tm.resetTools()
         self.removeVirtualHelixItem(id_num)
@@ -220,7 +322,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
-        """Set this Z to front, and return other Zs to default."""
+        """Set this Z to front, and return other Zs to default.
+
+        Args:
+            model_part (TYPE): Description
+            is_selected (TYPE): Description
+        """
         if is_selected:
             # self._drag_handle.resetAppearance(_SELECTED_COLOR, _SELECTED_WIDTH, _SELECTED_ALPHA)
             self.setZValue(styles.ZPARTITEM + 1)
@@ -230,8 +337,13 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
-        """ is_adding (bool): adding (True) virtual helices to a selection
+        """is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
+
+        Args:
+            sender (TYPE): Description
+            vh_set (TYPE): Description
+            is_adding (TYPE): Description
         """
         select_tool = self._viewroot.select_tool
         if is_adding:
@@ -244,6 +356,20 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partDocumentSettingChangedSlot(self, part, key, value):
+        """Summary
+
+        Args:
+            part (TYPE): Description
+            key (TYPE): Description
+            value (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         if key == 'grid':
             print("grid change", value)
             if value == 'lines and points':
@@ -256,18 +382,42 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### ACCESSORS ###
     def boundingRect(self):
+        """Summary
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         return self._rect
     # end def
 
     def modelColor(self):
+        """Summary
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         return self._model_props['color']
     # end def
 
     def window(self):
+        """Summary
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         return self.parentItem().window()
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):
+        """Summary
+
+        Args:
+            new_active_vhi (TYPE): Description
+
+        """
         current_vhi = self.active_virtual_helix_item
         # print(current_vhi, new_active_vhi)
         if new_active_vhi != current_vhi:
@@ -283,6 +433,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._pre_xover_items list references prexovers parented to other
         PathHelices such that only the activeHelix maintains the list of
         visible prexovers
+
+        Args:
+            virtual_helix_item (TYPE): Description
         """
         vhi = virtual_helix_item
         pxom = self.prexover_manager
@@ -301,6 +454,15 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def removeVirtualHelixItem(self, id_num):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         vhi = self._virtual_helix_item_hash[id_num]
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
@@ -309,6 +471,14 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def reconfigureRect(self, top_left, bottom_right):
+        """Summary
+
+        Args:
+            top_left (TYPE): Description
+            bottom_right (TYPE): Description
+
+        Returns:
+        """
         rect = self._rect
         ptTL = QPointF(*top_left) if top_left else rect.topLeft()
         ptBR = QPointF(*bottom_right) if bottom_right else rect.bottomRight()
@@ -319,6 +489,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def enlargeRectToFit(self):
+        """Summary
+
+        Returns:
+        """
         xTL, yTL, xBR, yBR = self.getModelBounds()
         self.reconfigureRect((xTL, yTL), (xBR, yBR))
         self.grab_cornerTL.alignPos(xTL, yTL)
@@ -327,6 +501,14 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def configureOutline(self, outline):
+        """Adjusts `outline` size with default padding.
+
+        Args:
+            outline (TYPE): Description
+
+        Returns:
+            o_rect (QRect): `outline` rect adjusted by _BOUNDING_RECT_PADDING
+        """
         _p = _BOUNDING_RECT_PADDING
         o_rect = self.rect().adjusted(-_p, -_p, _p, _p)
         outline.setRect(o_rect)
@@ -334,7 +516,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def boundRectToModel(self):
-        """ update the boundaries to what's in the model with a minimum
+        """update the boundaries to what's in the model with a minimum
         size
         """
         xTL, yTL, xBR, yBR = self.getModelBounds()
@@ -342,9 +524,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def getModelBounds(self):
-        """
-        Bounds in form of Qt scaled from model
+        """Bounds in form of Qt scaled from model
+
         Returns:
+        Args:
             Tuple (top_left, bottom_right)
         """
         xLL, yLL, xUR, yUR = self.part().boundDimensions(self.scale_factor)
@@ -352,26 +535,40 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def bounds(self):
-        """ x_low, x_high, y_low, y_high
+        """x_low, x_high, y_low, y_high
         """
         rect = self._rect
         return (rect.left(), rect.right(), rect.bottom(), rect.top())
 
     ### PUBLIC SUPPORT METHODS ###
     def setModifyState(self, bool_val):
-        """Hides the mod_rect when modify state disabled."""
+        """Hides the mod_rect when modify state disabled.
+
+        Args:
+            bool_val (TYPE): what the modifystate should be set to.
+        """
         self._can_show_mod_circ = bool_val
         if bool_val == False:
             self._mod_circ.hide()
     # end def
 
     def updateStatusBar(self, status_str):
-        """Shows status_str in the MainWindow's status bar."""
+        """Shows status_str in the MainWindow's status bar.
+
+        Args:
+            status_str (TYPE): Description
+        """
         pass  # disabled for now.
         # self.window().statusBar().showMessage(status_str, timeout)
     # end def
 
     def zoomToFit(self):
+        """Summary
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         thescene = self.scene()
         theview = thescene.views()[0]
         theview.zoomToFit()
@@ -379,6 +576,15 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         if event.button() == Qt.RightButton:
             return
         self.part().setSelected(True)
@@ -394,6 +600,15 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+        Args:
+            TYPE: Description
+        """
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -404,7 +619,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def getModelPos(self, pos):
-        """ Y-axis is inverted in Qt +y === DOWN
+        """Y-axis is inverted in Qt +y === DOWN
+
+        Args:
+            pos (TYPE): Description
         """
         sf = self.scale_factor
         x, y = pos.x()/sf, -1.0*pos.y()/sf
@@ -412,10 +630,28 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def getVirtualHelixItem(self, id_num):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._virtual_helix_item_hash.get(id_num)
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
+        """Summary
+
+        Args:
+            tool (TYPE): Description
+            event (TYPE): Description
+            alt_event (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         # 1. get point in model coordinates:
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
@@ -461,12 +697,24 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverMove(self, tool, event):
+        """Summary
+
+        Args:
+            tool (TYPE): Description
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def selectToolMousePress(self, tool, event):
         """
+        Args:
+            tool (TYPE): Description
+            event (TYPE): Description
         """
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)

@@ -1,18 +1,17 @@
-from math import sqrt, atan2, degrees, pi
+"""Summary
 
-import cadnano.util as util
+Attributes:
+    SNAP_WIDTH (int): Description
+"""
+from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF, QEvent
-from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem, QGraphicsLineItem
-
-from cadnano.enum import PartType, StrandType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.gui.palette import getColorObj, getNoPen, getPenObj, getBrushObj, getNoBrush
+from cadnano.gui.palette import getPenObj, getBrushObj
 from . import slicestyles as styles
-from .sliceextras import PreXoverItemGroup, WedgeGizmo, WEDGE_RECT
+from .sliceextras import WedgeGizmo, WEDGE_RECT
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -27,18 +26,27 @@ _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 
 SNAP_WIDTH = 3
 
+
 class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
-    """
-    The VirtualHelixItem is an individual circle that gets drawn in the SliceView
+    """The VirtualHelixItem is an individual circle that gets drawn in the SliceView
     as a child of the OrigamiPartItem. Taken as a group, many SliceHelix
     instances make up the crossection of the PlasmidPart. Clicking on a SliceHelix
     adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
     and paints its corresponding VirtualHelix number.
+
+    Attributes:
+        FILTER_NAME (str): Description
+        is_active (bool): Description
+        old_pen (TYPE): Description
+        wedge_gizmos (dict): Description
     """
     FILTER_NAME = 'virtual_helix'
 
     def __init__(self, id_num, part_item):
         """
+        Args:
+            id_num (TYPE): Description
+            part_item (TYPE): Description
         """
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
@@ -73,10 +81,23 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     ### ACCESSORS ###
     def part(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._part_item.part()
     # end def
 
     def setSnapOrigin(self, is_snap):
+        """Summary
+
+        Args:
+            is_snap (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if is_snap:
             op = self.pen()
             if self.old_pen is None:
@@ -87,42 +108,81 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.old_pen = None
 
     def partItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._part_item
     # end def
 
     def idNum(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._id_num
     # end def
 
     def activate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.is_active = True
         self.updateAppearance()
 
     def deactivate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.is_active = False
         self.updateAppearance()
 
     def setCenterPos(self, x, y):
+        """Summary
+
+        Args:
+            x (TYPE): Description
+            y (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # invert the y axis
         part_item = self._part_item
         parent_item = self.parentItem()
-        pos = QPointF(x - _RADIUS, y- _RADIUS)
+        pos = QPointF(x - _RADIUS, y - _RADIUS)
         if parent_item != part_item:
             pos = parent_item.mapFromItem(part_item, pos)
         self.setPos(pos)
     # end def
 
     def getCenterScenePos(self):
-        """ return QPointF of the scenePos of the center
+        """return QPointF of the scenePos of the center
         """
         return self.scenePos() + QPointF(_RADIUS, _RADIUS)
     # end def
 
     def modelColor(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.part().getProperty('color')
     # end def
 
     def partCrossoverSpanAngle(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return float(self.part().getProperty('crossover_span_angle'))
     # end def
 
@@ -130,6 +190,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     ### SLOTS ###
     def mousePressEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             return
         if event.button() == Qt.RightButton:
@@ -144,6 +212,16 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def selectToolMousePress(self, tool, part_item, event):
+        """Summary
+
+        Args:
+            tool (TYPE): Description
+            part_item (TYPE): Description
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         part = self._model_part
         part.setSelected(True)
         tool.selectOrSnap(part_item, self, event)
@@ -151,13 +229,26 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
+        """Summary
+
+        Args:
+            keys (TYPE): Description
+            values (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # for key, val in zip(keys, values):
         #     pass
         self.updateAppearance()
     # end def
 
-
     def virtualHelixRemovedSlot(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._controller.disconnectSignals()
         self._controller = None
         part_item = self._part_item
@@ -172,6 +263,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def updateAppearance(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         is_visible, color = self.getProperty(['is_visible', 'color'])
         if is_visible:
             self.show()
@@ -203,7 +299,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         coordinate frame
         """
         part_item = self._part_item
-        sf = part_item.scaleFactor()
+        # sf = part_item.scaleFactor()
         x, y = self._model_part.locationQt(self._id_num, part_item.scaleFactor())
         new_pos = QPointF(x - _RADIUS, y - _RADIUS)         # top left
         tl_pos = part_item.mapFromScene(self.scenePos())    # top left
@@ -220,6 +316,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def createLabel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         label = QGraphicsSimpleTextItem("%d" % self.idNum())
         label.setFont(_FONT)
         label.setZValue(_ZVALUE)
@@ -228,10 +329,20 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def beginAddWedgeGizmos(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._added_wedge_gizmos.clear()
     # end def
 
     def endAddWedgeGizmos(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         remove_list = []
         scene = self.scene()
         wg_dict = self.wedge_gizmos
@@ -246,18 +357,27 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def setWedgeGizmo(self, neighbor_virtual_helix, neighbor_virtual_helix_item):
+        """Summary
+
+        Args:
+            neighbor_virtual_helix (TYPE): Description
+            neighbor_virtual_helix_item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
         nvhi_name = nvhi.getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
-        line.translate(_RADIUS,_RADIUS)
+        line.translate(_RADIUS, _RADIUS)
         if line.length() > (_RADIUS*1.99):
             color = '#5a8bff'
         else:
             color = '#cc0000'
-            nvhi_name = nvhi_name + '*' # mark as invalid
+            nvhi_name = nvhi_name + '*'  # mark as invalid
         line.setLength(_RADIUS)
         if neighbor_virtual_helix in wg_dict:
             wedge_item = wg_dict[neighbor_virtual_helix]
@@ -269,7 +389,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def setNumber(self):
-        """docstring for setNumber"""
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         num = self.idNum()
         label = self._label
 
@@ -283,7 +407,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             label.setPos(_RADIUS / 1.5, y_val)
         elif num < 100:
             label.setPos(_RADIUS / 3, y_val)
-        else: # _number >= 100
+        else:  # _number >= 100
             label.setPos(0, y_val)
         b_rect = label.boundingRect()
         posx = b_rect.width()/2
@@ -291,4 +415,3 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         label.setPos(_RADIUS-posx, _RADIUS-posy)
     # end def
 # end class
-

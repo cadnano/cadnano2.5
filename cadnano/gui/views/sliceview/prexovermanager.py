@@ -1,17 +1,31 @@
-from PyQt5.QtCore import Qt
+"""Summary
+"""
 from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtGui import QColor
-
 from . import slicestyles as styles
-from .sliceextras import PreXoverItemGroup, WedgeGizmo, WEDGE_RECT
-from cadnano.gui.palette import newPenObj, getNoPen, getPenObj
-from cadnano.enum import StrandType
+from .sliceextras import PreXoverItemGroup, WEDGE_RECT
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 
-class PreXoverManager(QGraphicsRectItem):
 
+class PreXoverManager(QGraphicsRectItem):
+    """Summary
+
+    Attributes:
+        active_group (TYPE): Description
+        active_neighbor_group (TYPE): Description
+        groups (dict): Description
+        neighbor_pairs (tuple): Description
+        neighbor_prexover_items (dict): Description
+        part_item (TYPE): Description
+        prexover_item_map (dict): Description
+        virtual_helix_item (TYPE): Description
+    """
     def __init__(self, part_item):
+        """Summary
+
+        Args:
+            part_item (TYPE): Description
+        """
         super(PreXoverManager, self).__init__(part_item)
         self.part_item = part_item
         self.virtual_helix_item = None
@@ -24,15 +38,25 @@ class PreXoverManager(QGraphicsRectItem):
         # tracks connections between prexovers
         self.prexover_item_map = {}
         self.neighbor_prexover_items = {}   # just a dictionary of neighbors
-        self.neighbor_pairs = () # accounting for neighbor pairing
+        self.neighbor_pairs = ()  # accounting for neighbor pairing
         self._active_items = []
     # end def
 
     def partItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.part_item
     # end def
 
     def clearPreXoverItemGroups(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         groups = self.groups
         while groups:
             k, item = groups.popitem()
@@ -48,6 +72,11 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def hideGroups(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.clearPreXoverItemGroups()
         if self.active_group is not None:
             self.active_group.hide()
@@ -57,19 +86,25 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits, pairs):
-        """ Create PreXoverItemGroups for the active virtual_helix_item and it's
+        """Create PreXoverItemGroups for the active virtual_helix_item and it's
         neighbors and connect the neighboring bases
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            idx (TYPE): Description
+            per_neighbor_hits (TYPE): Description
+            pairs (TYPE): Description
         """
         self.clearPreXoverItemGroups()
         pxis = self.prexover_item_map
-        neighbor_pxis_dict = self.neighbor_prexover_items # for avoiding duplicates)
-        neighbor_pairs = self.neighbor_pairs = pairs
+        neighbor_pxis_dict = self.neighbor_prexover_items  # for avoiding duplicates)
+        self.neighbor_pairs = pairs
 
         self.virtual_helix_item = virtual_helix_item
         part_item = self.part_item
         groups = self.groups
         self.active_group = agroup = PreXoverItemGroup(_RADIUS, WEDGE_RECT,
-                                                    virtual_helix_item, True)
+                                                       virtual_helix_item, True)
         id_num = virtual_helix_item.idNum()
         virtual_helix_item.setZValue(styles.ZSLICEHELIX + 10)
 
@@ -81,63 +116,74 @@ class PreXoverManager(QGraphicsRectItem):
 
             fwd_axis_hits, rev_axis_hits = hits
 
-            n_step_size = nvhi.getProperty('bases_per_repeat')
+            # n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, fwd_st_type, idx))
-                pxis[(id_num, fwd_st_type, idx)] = (
-                                        agroup.getItemIdx(fwd_st_type, idx),
-                                        ngroup,
-                                        neighbor_pxis
-                                        )
+                pxis[(id_num, fwd_st_type, idx)] = (agroup.getItemIdx(fwd_st_type, idx),
+                                                    ngroup,
+                                                    neighbor_pxis
+                                                    )
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
                         npxi = ngroup.getItemIdx(fwd_st_type, j)
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append(  npxi  )
+                    neighbor_pxis.append(npxi)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
                         npxi = ngroup.getItemIdx(rev_st_type, j)
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
 
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
                 # print((id_num, rev_st_type, idx))
-                pxis[(id_num, rev_st_type, idx)] = (
-                                        agroup.getItemIdx(rev_st_type, idx),
-                                        ngroup,
-                                        neighbor_pxis
-                                        )
+                pxis[(id_num, rev_st_type, idx)] = (agroup.getItemIdx(rev_st_type, idx),
+                                                    ngroup,
+                                                    neighbor_pxis
+                                                    )
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
                         npxi = ngroup.getItemIdx(fwd_st_type, j)
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
                         npxi = ngroup.getItemIdx(rev_st_type, j)
                         neighbor_pxis_dict[nkey] = npxi
-                    neighbor_pxis.append( npxi )
+                    neighbor_pxis.append(npxi)
         # end for per_neighbor_hits
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+            is_fwd (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+
+        Raises:
+            ValueError: Description
+        """
         # print("ACTIVATING neighbors", id_num, idx)
         if self.active_group is None:
             return
         agroup = self.active_group
         if id_num != agroup.id_num:
             raise ValueError("not active id_num {} != {}".format(id_num,
-                                                agroup.id_num))
+                                                                 agroup.id_num))
         active_items = self._active_items
 
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
@@ -165,8 +211,8 @@ class PreXoverManager(QGraphicsRectItem):
             active_items.append(apxi)
             self.active_neighbor_group = npxig
             # print("Should have {} neighbors".format(len(neighbor_list)))
-            color = neighbor_list[0].color if neighbor_list else '#aaaaa'
-            angle = 0
+            # color = neighbor_list[0].color if neighbor_list else '#aaaaa'
+            # angle = 0
             for npxi in neighbor_list:
                 npxi.setActive3p(True, apxi) if is_5prime_strand else npxi.setActive5p(True, apxi)
                 active_items.append(npxi)
@@ -175,6 +221,11 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbors(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         while self._active_items:
             npxi = self._active_items.pop()
             npxi.setActive3p(False)
