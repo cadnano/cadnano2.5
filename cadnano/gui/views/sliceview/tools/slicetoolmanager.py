@@ -1,18 +1,26 @@
-from PyQt5.QtCore import pyqtSignal
+"""Summary
+"""
+from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
 from .selectslicetool import SelectSliceTool
-from .moveslicetool import MoveSliceTool
 from .createslicetool import CreateSliceTool
 
 
-from cadnano import util
-from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
-
 class SliceToolManager(AbstractToolManager):
-    """Manages interactions between the slice widgets/UI and the model."""
+    """Manages interactions between the slice widgets/UI and the model.
+
+    Attributes:
+        create_tool (CreateSliceTool): Description
+        select_tool (SelectSliceTool): Description
+        tool_names (tuple): `str` names of tools
+    """
     def __init__(self, window, viewroot):
         """
         We store mainWindow because a controller's got to have
         references to both the layer above (UI) and the layer below (model)
+
+        Args:
+            window (TYPE): Description
+            viewroot (TYPE): Description
         """
         super(SliceToolManager, self).__init__('vhelix', window, viewroot)
         self.tool_names = ('Select', 'Create')
@@ -27,6 +35,11 @@ class SliceToolManager(AbstractToolManager):
     ### SLOTS ###
 
     def resetTools(self):
+        """Calls resetTool on each tool managed by this tool manager.
+
+        Returns:
+            TYPE: Description
+        """
         self.select_tool.resetTool()
         self.create_tool.resetTool()
     # end def

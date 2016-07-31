@@ -14,7 +14,7 @@ class SliceRootItem(QGraphicsRectItem):
     
     SliceRootItem must instantiate its own controller to receive signals
     from the model.
-    
+
     Attributes:
         instance_items (dict): Description
         manager (TYPE): Description
@@ -25,7 +25,7 @@ class SliceRootItem(QGraphicsRectItem):
 
     def __init__(self, rect, parent, window, document):
         """Summary
-        
+
         Args:
             rect (TYPE): Description
             parent (TYPE): Description
@@ -46,7 +46,7 @@ class SliceRootItem(QGraphicsRectItem):
         """
         Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
-        
+
         Args:
             sender (TYPE): Description
             model_part_instance (TYPE): Description
@@ -68,7 +68,7 @@ class SliceRootItem(QGraphicsRectItem):
 
     def selectedChangedSlot(self, item_dict):
         """docstring for selectedChangedSlot
-        
+
         Args:
             item_dict (TYPE): Description
         """
@@ -77,10 +77,12 @@ class SliceRootItem(QGraphicsRectItem):
 
     def selectionFilterChangedSlot(self, filter_name_list):
         """Summary
-        
+
         Args:
             filter_name_list (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -91,10 +93,12 @@ class SliceRootItem(QGraphicsRectItem):
 
     def preXoverFilterChangedSlot(self, filter_name):
         """Summary
-        
+
         Args:
             filter_name (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -103,10 +107,12 @@ class SliceRootItem(QGraphicsRectItem):
 
     def clearSelectionsSlot(self, doc):
         """Summary
-        
+
         Args:
             doc (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -116,10 +122,12 @@ class SliceRootItem(QGraphicsRectItem):
 
     def resetRootItemSlot(self, doc):
         """Summary
-        
+
         Args:
             doc (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -130,7 +138,9 @@ class SliceRootItem(QGraphicsRectItem):
     ### ACCESSORS ###
     def window(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -140,10 +150,12 @@ class SliceRootItem(QGraphicsRectItem):
     ### METHODS ###
     def removePartItem(self, part_item):
         """Summary
-        
+
         Args:
             part_item (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -152,7 +164,7 @@ class SliceRootItem(QGraphicsRectItem):
 
     def resetDocumentAndController(self, document):
         """docstring for resetDocumentAndController
-        
+
         Args:
             document (TYPE): Description
         
@@ -167,7 +179,7 @@ class SliceRootItem(QGraphicsRectItem):
 
     def setModifyState(self, bool):
         """docstring for setModifyState
-        
+
         Args:
             bool (TYPE): Description
         """
@@ -177,10 +189,12 @@ class SliceRootItem(QGraphicsRectItem):
 
     def setManager(self, manager):
         """Summary
-        
+
         Args:
             manager (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """

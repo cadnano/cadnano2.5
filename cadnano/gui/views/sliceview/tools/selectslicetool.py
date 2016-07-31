@@ -1,3 +1,5 @@
+"""Summary
+"""
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
@@ -9,6 +11,14 @@ from .abstractslicetool import AbstractSliceTool
 
 
 def normalizeRect(rect):
+    """Summary
+
+    Args:
+        rect (TYPE): Description
+
+    Returns:
+        TYPE: Description
+    """
     x1, y1, x2, y2 = rect
     if x1 > x2:
         # swap
@@ -24,8 +34,24 @@ _TEST_COLOR = "#00ff00"
 
 
 class SelectSliceTool(AbstractSliceTool):
-    """Handles SelectTool operations in the Slice view"""
+    """Handles SelectTool operations in the Slice view
+
+    Attributes:
+        clip_board (TYPE): Description
+        group (TYPE): Description
+        individual_pick (bool): Description
+        is_selection_active (bool): Description
+        last_rubberband_vals (tuple): Description
+        part_item (TYPE): Description
+        selection_set (TYPE): Description
+        snap_origin_item (TYPE): Description
+    """
     def __init__(self, manager):
+        """Summary
+
+        Args:
+            manager (TYPE): Description
+        """
         super(SelectSliceTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
@@ -38,26 +64,59 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def __repr__(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "select_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return "selectTool"  # first letter should be lowercase
 
     def isSelectionActive(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.is_selection_active
     # end def
 
     def resetSelections(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         # print("resetSelections")
         doc = self.manager.document
         doc.clearAllSelected()
 
     def modelClear(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         # print("modelClear")
         doc = self.manager.document
         doc.clearAllSelected()
 
     def setPartItem(self, part_item):
+        """Summary
+
+        Args:
+            part_item (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if part_item is not self.part_item:
             if self.sgv is not None:
                 # attempt to enforce good housekeeping, not required
@@ -79,6 +138,16 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
+        """Summary
+
+        Args:
+            rect (TYPE): Description
+            from_pt (TYPE): Description
+            to_point (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         fset = self.manager.document.filter_set
         if self.FILTER_NAME not in fset:
             return
@@ -110,6 +179,11 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def getSelectionBoundingRect(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         part_item = self.part_item
         group = self.group
         # self.deselectItems()
@@ -127,6 +201,11 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def deselectItems(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         # print("deselecting")
         group = self.group
         if self.snap_origin_item is not None:
@@ -148,6 +227,14 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def deselectSet(self, vh_set):
+        """Summary
+
+        Args:
+            vh_set (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         group = self.group
         if self.snap_origin_item is not None:
             self.snap_origin_item.setSnapOrigin(False)
@@ -173,7 +260,11 @@ class SelectSliceTool(AbstractSliceTool):
     def selectOrSnap(self, part_item, target_item, event):
         """
         Args:
-            part_item (PartItem):
+            part_item (PartItem)
+            target_item (TYPE): Description
+            event (TYPE): Description
+
+        Deleted Parameters:
             snap_to_item (VirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
@@ -202,7 +293,7 @@ class SelectSliceTool(AbstractSliceTool):
     def doSnap(self, part_item, snap_to_item):
         """
         Args:
-            part_item (PartItem):
+            part_item (PartItem)
             snap_to_item (VirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
@@ -239,12 +330,22 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def copySelection(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         part = self.part_item.part()
         copy_dict = v3encode.encodePartList(part, list(self.selection_set))
         self.clip_board = copy_dict
     # end def
 
     def pasteClipboard(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         doc = self.manager.document
         part = self.part_item.part()
         doc.undoStack().beginMacro("Paste VirtualHelices")
@@ -255,7 +356,13 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
-        """ Y-axis is inverted in Qt +y === DOWN
+        """Y-axis is inverted in Qt +y === DOWN
+
+        Args:
+            dx (TYPE): Description
+            dy (TYPE): Description
+            finalize (TYPE): Description
+            use_undostack (bool, optional): Description
         """
         # print("moveSelection: {}, {}".format(dx, dy))
         part_item = self.part_item
@@ -268,6 +375,11 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def deactivate(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         if self.sgv is not None:
             try:
                 self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
@@ -281,7 +393,10 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def getCustomContextMenu(self, point):
-        """ point (QPoint)
+        """point (QPoint)
+
+        Args:
+            point (TYPE): Description
         """
         if len(self.selection_set) > 0:
             sgv = self.sgv
@@ -301,7 +416,21 @@ class SelectSliceTool(AbstractSliceTool):
 
 
 class SliceSelectionGroup(QGraphicsItemGroup):
+    """Summary
+
+    Attributes:
+        bounding_rect_item (TYPE): Description
+        drag_last_position (TYPE): Description
+        drag_start_position (TYPE): Description
+        tool (TYPE): Description
+    """
     def __init__(self, tool, parent=None):
+        """Summary
+
+        Args:
+            tool (TYPE): Description
+            parent (None, optional): Description
+        """
         super(SliceSelectionGroup, self).__init__(parent)
         self.tool = tool
         self.setFiltersChildEvents(True)
@@ -319,6 +448,11 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def setSelectionRect(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         bri = self.bounding_rect_item
         rect = self.childrenBoundingRect()
         point = rect.topLeft() + self.scenePos()
@@ -332,7 +466,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     """ reimplement boundingRect if you want to call resetGroupPos
     """
     def clearSelectionRect(self):
-        """ reset positions to zero to keep things in check
+        """reset positions to zero to keep things in check
         """
         bri = self.bounding_rect_item
         bri.hide()
@@ -342,7 +476,11 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def keyPressEvent(self, event):
-        """ event.key() seems to be capital only? """
+        """event.key() seems to be capital only?
+
+        Args:
+            event (TYPE): Description
+        """
         print("press", ord('g'))
         if event.text() == 'g':
             print("hey het")
@@ -350,6 +488,14 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mousePressEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         tool = self.tool
         if event.button() != Qt.LeftButton:
             """ do context menu?
@@ -390,10 +536,13 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mouseMoveEvent(self, event):
-        """ because SliceSelectionGroup has the flag
+        """because SliceSelectionGroup has the flag
         QGraphicsItem.ItemIsMovable
         we need only get the position of the item to figure
         out what to submit to the model
+
+        Args:
+            event (TYPE): Description
         """
         # 1. call this super class method first to get the item position updated
         res = QGraphicsItemGroup.mouseMoveEvent(self, event)
@@ -409,10 +558,13 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mouseReleaseEvent(self, event):
-        """ because SliceSelectionGroup has the flag
+        """because SliceSelectionGroup has the flag
         QGraphicsItem.ItemIsMovable
         we need only get the position of the item to figure
         out what to submit to the model
+
+        Args:
+            event (TYPE): Description
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
         # print("mouse mouseReleaseEvent", self.tool.individual_pick)

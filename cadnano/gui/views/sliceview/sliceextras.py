@@ -61,7 +61,7 @@ _WEDGE_RECT_CENTERPT = WEDGE_RECT.center()
 
 class PropertyWrapperObject(QObject):
     """Summary
-    
+
     Attributes:
         animations (dict): Description
         bondp2 (TYPE): Description
@@ -71,7 +71,7 @@ class PropertyWrapperObject(QObject):
     """
     def __init__(self, item):
         """Summary
-        
+
         Args:
             item (TYPE): Description
         """
@@ -81,7 +81,9 @@ class PropertyWrapperObject(QObject):
 
     def __get_bondP2(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -89,10 +91,12 @@ class PropertyWrapperObject(QObject):
 
     def __set_bondP2(self, p2):
         """Summary
-        
+
         Args:
             p2 (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -102,7 +106,9 @@ class PropertyWrapperObject(QObject):
 
     def __get_rotation(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -110,10 +116,12 @@ class PropertyWrapperObject(QObject):
 
     def __set_rotation(self, angle):
         """Summary
-        
+
         Args:
             angle (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -121,7 +129,9 @@ class PropertyWrapperObject(QObject):
 
     def __get_penAlpha(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -129,10 +139,12 @@ class PropertyWrapperObject(QObject):
 
     def __set_penAlpha(self, alpha):
         """Summary
-        
+
         Args:
             alpha (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -144,11 +156,13 @@ class PropertyWrapperObject(QObject):
 
     def saveRef(self, property_name, animation):
         """Summary
-        
+
         Args:
             property_name (TYPE): Description
             animation (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -156,10 +170,12 @@ class PropertyWrapperObject(QObject):
 
     def getRef(self, property_name):
         """Summary
-        
+
         Args:
             property_name (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -167,7 +183,9 @@ class PropertyWrapperObject(QObject):
 
     def resetAnimations(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -185,13 +203,13 @@ class PropertyWrapperObject(QObject):
 
 class Triangle(QGraphicsPathItem):
     """Summary
-    
+
     Attributes:
         adapter (TYPE): Description
     """
     def __init__(self, is_fwd, pre_xover_item):
         """Summary
-        
+
         Args:
             is_fwd (TYPE): Description
             pre_xover_item (TYPE): Description
@@ -229,13 +247,13 @@ class Triangle(QGraphicsPathItem):
 
 class PhosBond(QGraphicsLineItem):
     """Summary
-    
+
     Attributes:
         adapter (TYPE): Description
     """
     def __init__(self, is_fwd, parent=None):
         """Summary
-        
+
         Args:
             is_fwd (TYPE): Description
             parent (None, optional): Description
@@ -256,7 +274,7 @@ class PhosBond(QGraphicsLineItem):
 
 class PreXoverItem(QGraphicsPathItem):
     """Summary
-    
+
     Attributes:
         bond_3p (TYPE): Description
         color (TYPE): Description
@@ -275,7 +293,7 @@ class PreXoverItem(QGraphicsPathItem):
                  color, pre_xover_item_group,
                  is_fwd=True):
         """Summary
-        
+
         Args:
             step_idx (TYPE): Description
             twist_per_base (TYPE): Description
@@ -313,7 +331,9 @@ class PreXoverItem(QGraphicsPathItem):
 
     def name(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -322,10 +342,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def setBondLineLength(self, value):
         """Summary
-        
+
         Args:
             value (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -336,10 +358,12 @@ class PreXoverItem(QGraphicsPathItem):
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         """Summary
-        
+
         Args:
             event (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -350,10 +374,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def hoverLeaveEvent(self, event):
         """Summary
-        
+
         Args:
             event (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -365,14 +391,16 @@ class PreXoverItem(QGraphicsPathItem):
     ### PRIVATE SUPPORT METHODS ###
     def animate(self, item, property_name, duration, start_value, end_value):
         """Summary
-        
+
         Args:
             item (TYPE): Description
             property_name (TYPE): Description
             duration (TYPE): Description
             start_value (TYPE): Description
             end_value (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -388,11 +416,13 @@ class PreXoverItem(QGraphicsPathItem):
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active, neighbor_item=None):
         """Summary
-        
+
         Args:
             is_active (TYPE): Description
             neighbor_item (None, optional): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -424,11 +454,13 @@ class PreXoverItem(QGraphicsPathItem):
 
     def setActive3p(self, is_active, neighbor_item=None):
         """Summary
-        
+
         Args:
             is_active (TYPE): Description
             neighbor_item (None, optional): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -452,10 +484,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def set5pItem(self, item_5p):
         """Summary
-        
+
         Args:
             item_5p (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -464,10 +498,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def set3pItem(self, item_3p):
         """Summary
-        
+
         Args:
             item_3p (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -482,10 +518,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     def destroy(self, scene):
         """Summary
-        
+
         Args:
             scene (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -503,7 +541,7 @@ class PreXoverItem(QGraphicsPathItem):
 
 class PreXoverItemGroup(QGraphicsEllipseItem):
     """Summary
-    
+
     Attributes:
         active_wedge_gizmo (TYPE): Description
         fwd_prexover_items (dict): Description
@@ -520,7 +558,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def __init__(self, radius, rect, virtual_helix_item, is_active):
         """Summary
-        
+
         Args:
             radius (TYPE): Description
             rect (TYPE): Description
@@ -556,7 +594,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### ACCESSORS ###
     def partItem(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -565,11 +605,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def getItem(self, is_fwd, step_idx):
         """Summary
-        
+
         Args:
             is_fwd (TYPE): Description
             step_idx (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -582,11 +624,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def getItemIdx(self, is_fwd, idx):
         """Summary
-        
+
         Args:
             is_fwd (TYPE): Description
             idx (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -599,7 +643,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PRIVATE SUPPORT METHODS ###
     def _getColors(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -611,7 +657,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -655,7 +703,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def remove(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -676,7 +726,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def updateTurnsPerRepeat(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -702,7 +754,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def partCrossoverSpanAngle(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -710,7 +764,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state.
-        
+
         Args:
             pre_xover_info (TYPE): Description
         """
@@ -721,13 +775,13 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
 class WedgeGizmo(QGraphicsPathItem):
     """Summary
-    
+
     Attributes:
         pre_xover_item_group (TYPE): Description
     """
     def __init__(self, radius, rect, pre_xover_item_group):
         """parent could be a PreXoverItemGroup or a VirtualHelixItem
-        
+
         Args:
             radius (TYPE): Description
             rect (TYPE): Description
@@ -752,14 +806,16 @@ class WedgeGizmo(QGraphicsPathItem):
     def showWedge(self, angle, color,
                   extended=False, rev_gradient=False, outline_only=False):
         """Summary
-        
+
         Args:
             angle (TYPE): Description
             color (TYPE): Description
             extended (bool, optional): Description
             rev_gradient (bool, optional): Description
             outline_only (bool, optional): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -823,7 +879,9 @@ class WedgeGizmo(QGraphicsPathItem):
 
     def deactivate(self):
         """Summary
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
@@ -833,10 +891,12 @@ class WedgeGizmo(QGraphicsPathItem):
 
     def pointToPreXoverItem(self, pre_xover_item):
         """Summary
-        
+
         Args:
             pre_xover_item (TYPE): Description
-        
+
+        Returns:
+        Args:
         Returns:
             TYPE: Description
         """
