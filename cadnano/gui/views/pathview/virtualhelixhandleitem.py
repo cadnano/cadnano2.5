@@ -1,20 +1,20 @@
-from math import sqrt, atan2, degrees, pi, floor
+"""Summary
+"""
+from math import floor
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QBrush, QFont, QPen, QPainterPath, QTransform
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsSimpleTextItem
-from PyQt5.QtWidgets import QGraphicsLineItem
-from PyQt5.QtWidgets import QUndoCommand, QStyle
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano import util
-from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj, getNoBrush
-from cadnano.gui.views.sliceview.sliceextras import PreXoverItem, PreXoverItemGroup
+from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.views.sliceview.sliceextras import PreXoverItemGroup
 from . import pathstyles as styles
 
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
-_RECT = QRectF(0, 0, 2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,\
-        2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+_RECT = QRectF(0,
+               0,
+               2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,
+               2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _DEF_BRUSH = getBrushObj(styles.GRAY_FILL)
 _DEF_PEN = getPenObj(styles.GRAY_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
@@ -24,10 +24,25 @@ _FONT = styles.VIRTUALHELIXHANDLEITEM_FONT
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
 
+
 class VirtualHelixHandleItem(QGraphicsEllipseItem):
+    """Summary
+
+    Attributes:
+        drag_last_position (TYPE): Description
+        FILTER_NAME (str): Description
+        handle_start (TYPE): Description
+    """
     FILTER_NAME = "virtual_helix"
 
     def __init__(self, virtual_helix_item, part_item, viewroot):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            part_item (TYPE): Description
+            viewroot (TYPE): Description
+        """
         super(VirtualHelixHandleItem, self).__init__(part_item)
         self._virtual_helix_item = virtual_helix_item
         self._id_num = virtual_helix_item.idNum()
@@ -47,8 +62,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.setZValue(styles.ZPATHHELIX)
         self.setRect(_RECT)
         self.setTransformOriginPoint(self.boundingRect().center())
-
-
         # rotation
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
@@ -60,18 +73,44 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def rotateWithCenterOrigin(self, angle):
+        """Summary
+
+        Args:
+            angle (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self._prexoveritemgroup.setRotation(angle)
     # end def
 
     def part(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._model_part
     # end def
 
     def idNum(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._id_num
     # end def
 
     def getProperty(self, key):
+        """Summary
+
+        Args:
+            key (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._model_part.getVirtualHelixProperties(self._id_num, key)
     # end def
 
@@ -81,20 +120,41 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             Tuple: 'bases_per_repeat, 'bases_per_turn',
                     'twist_per_base', 'minor_groove_angle'
         """
-        bpr, tpr, mga= self._model_part.getVirtualHelixProperties(self._id_num,
-                ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
+        bpr, tpr, mga = self._model_part.getVirtualHelixProperties(self._id_num,
+                                                                   ['bases_per_repeat',
+                                                                    'turns_per_repeat',
+                                                                    'minor_groove_angle'])
         bases_per_turn = bpr / tpr
         return bpr, bases_per_turn, tpr*360./bpr, mga
 
     def setProperty(self, key, value):
+        """Summary
+
+        Args:
+            key (TYPE): Description
+            value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self._model_part.setVirtualHelixProperties(self._id_num, key, value)
     # end def
 
     def modelColor(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._model_part.getProperty('color')
     # end def
 
     def refreshColor(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         part_color = self._model_part.getProperty('color')
         self._USE_PEN = getPenObj(part_color, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
         self._USE_BRUSH = getBrushObj(styles.DEFAULT_BRUSH_COLOR)
@@ -104,8 +164,16 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def setSelectedColor(self, value):
+        """Summary
+
+        Args:
+            value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if self._id_num >= 0:
-            if value == True:
+            if value == True:  # noqa
                 self.setBrush(_HOV_BRUSH)
                 self.setPen(_HOV_PEN)
             else:
@@ -118,6 +186,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def remove(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         scene = self.scene()
         scene.removeItem(self._label)
         scene.removeItem(self)
@@ -125,6 +198,11 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def createLabel(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         label = QGraphicsSimpleTextItem("%d" % (self._id_num))
         label.setFont(_FONT)
         label.setZValue(styles.ZPATHHELIX)
@@ -133,7 +211,8 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def setNumber(self):
-        """docstring for setNumber"""
+        """docstring for setNumber
+        """
         num = self._id_num
         label = self._label
         radius = _RADIUS
@@ -147,7 +226,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             label.setPos(radius / 1.5, y_val)
         elif num < 100:
             label.setPos(radius / 3, y_val)
-        else: # _number >= 100
+        else:  # _number >= 100
             label.setPos(0, y_val)
         bRect = label.boundingRect()
         posx = bRect.width()/2
@@ -156,23 +235,36 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def partItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._part_item
     # end def
 
     ### DRAWING ###
     def paint(self, painter, option, widget):
-        """Need to override paint so selection appearance is correct."""
+        """Need to override paint so selection appearance is correct.
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            widget (TYPE): Description
+        """
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawEllipse(self.rect())
     # end def
-
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         """
         hoverEnterEvent changes the PathHelixHandle brush and pen from default
         to the hover colors if necessary.
+
+        Args:
+            event (TYPE): Description
         """
         if not self.isSelected():
             if self._id_num >= 0:
@@ -190,6 +282,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """
         hoverEnterEvent changes the PathHelixHanle brush and pen from hover
         to the default colors if necessary.
+
+        Args:
+            event (TYPE): Description
         """
         if not self.isSelected():
             self.setSelectedColor(False)
@@ -199,6 +294,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def mousePressEvent(self, event):
         """
         All mousePressEvents are passed to the group if it's in a group
+
+        Args:
+            event (TYPE): Description
         """
         selection_group = self.group()
         if selection_group is not None:
@@ -216,6 +314,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     def mouseMoveEvent(self, event):
         """
         All mouseMoveEvents are passed to the group if it's in a group
+
+        Args:
+            event (TYPE): Description
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
         selection_group = self.group()
@@ -224,7 +325,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         elif self._right_mouse_move:
             new_pos = event.scenePos()
             delta = new_pos - self.drag_last_position
-            dx = int(floor(delta.x() / _BASE_WIDTH ))*_BASE_WIDTH
+            dx = int(floor(delta.x() / _BASE_WIDTH))*_BASE_WIDTH
             x = self.handle_start.x() + dx
             if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
                 old_x = self.x()
@@ -233,12 +334,21 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
                 self._part_item.updateXoverItems(self._virtual_helix_item)
                 dz = self._part_item.convertToModelZ(x - old_x)
                 self._model_part.translateVirtualHelices([self.idNum()],
-                                    0, 0, dz, False, use_undostack=False)
+                                                         0, 0, dz, False,
+                                                         use_undostack=False)
         else:
             QGraphicsItem.mouseMoveEvent(self, event)
     # end def
 
     def mouseReleaseEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         MOVE_THRESHOLD = 0.01   # ignore small moves
         if self._right_mouse_move and event.button() == Qt.RightButton:
             self._right_mouse_move = False
@@ -247,12 +357,16 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             if abs(dz) > MOVE_THRESHOLD:
                 dz = self._part_item.convertToModelZ(dz)
                 self._model_part.translateVirtualHelices([self.idNum()],
-                                            0, 0, dz, True, use_undostack=True)
+                                                         0, 0, dz, True,
+                                                         use_undostack=True)
     # end def
 
     def restoreParent(self, pos=None):
         """
         Required to restore parenting and positioning in the part_item
+
+        Args:
+            pos (None, optional): Description
         """
 
         # map the position
@@ -263,6 +377,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def tempReparent(self, pos=None):
+        """Summary
+
+        Args:
+            pos (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         part_item = self._part_item
         if pos is None:
             pos = self.scenePos()
@@ -275,7 +397,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """For selection changes test against QGraphicsItem.ItemSelectedChange
         intercept the change instead of the has changed to enable features.
 
-        Basically, you should
+        Args:
+            change (TYPE): Description
+            value (TYPE): Description
         """
 
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
@@ -284,18 +408,18 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
             selection_group = viewroot.vhiHandleSelectionGroup()
             # print("filter set", current_filter_set, self.FILTER_NAME)
             # only add if the selection_group is not locked out
-            if value == True and self.FILTER_NAME in current_filter_set:
+            if value == True and self.FILTER_NAME in current_filter_set:    # noqa
                 if self.group() != selection_group:
                     if not selection_group.isPending(self):
                         selection_group.pendToAdd(self)
                         selection_group.setSelectionLock(selection_group)
                         self.setSelectedColor(True)
-                        return False # only select if mode says so
+                        return False  # only select if mode says so
                     return True
                 else:
                     return False
             # end if
-            elif value == True:
+            elif value == True:  # noqa
                 # print("don't select", value)
                 # don't select
                 return False
@@ -312,6 +436,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def modelDeselect(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # print("model Deselect")
         id_num = self._id_num
         part = self._model_part
@@ -323,6 +455,14 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     # end def
 
     def modelSelect(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # print("select ms")
         id_num = self._id_num
         part = self._model_part

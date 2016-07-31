@@ -1,4 +1,15 @@
 # -*- coding: utf-8 -*-
+"""Summary
+
+Attributes:
+    BASE_RECT (TYPE): Description
+    BASE_WIDTH (TYPE): Description
+    KEYINPUT_ACTIVE_FLAG (TYPE): Description
+    PHOS_ITEM_WIDTH (TYPE): Description
+    PROX_ALPHA (int): Description
+    T180 (TYPE): Description
+    TRIANGLE (TYPE): Description
+"""
 from PyQt5.QtCore import QRectF, Qt, QObject, QPointF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QColor, QPainterPath
@@ -33,38 +44,104 @@ KEYINPUT_ACTIVE_FLAG = QGraphicsItem.ItemIsFocusable
 
 
 class PropertyWrapperObject(QObject):
+    """Summary
+
+    Attributes:
+        animations (dict): Description
+        brush_alpha (TYPE): Description
+        item (TYPE): Description
+        rotation (TYPE): Description
+    """
     def __init__(self, item):
+        """Summary
+
+        Args:
+            item (TYPE): Description
+        """
         super(PropertyWrapperObject, self).__init__()
         self.item = item
         self.animations = {}
 
     def __get_brushAlpha(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.item.brush().color().alpha()
 
     def __set_brushAlpha(self, alpha):
+        """Summary
+
+        Args:
+            alpha (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         brush = QBrush(self.item.brush())
         color = QColor(brush.color())
         color.setAlpha(alpha)
         self.item.setBrush(QBrush(color))
 
     def __get_rotation(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.item.rotation()
 
     def __set_rotation(self, angle):
+        """Summary
+
+        Args:
+            angle (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.item.setRotation(angle)
 
     def saveRef(self, property_name, animation):
+        """Summary
+
+        Args:
+            property_name (TYPE): Description
+            animation (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.animations[property_name] = animation
 
     def getRef(self, property_name):
+        """Summary
+
+        Args:
+            property_name (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self.animations.get(property_name)
 
     def destroy(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.item = None
         self.animations = None
         self.deleteLater()
 
     def resetAnimations(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         for item in self.animations.values():
             item.stop()
             item.deleteLater()
@@ -77,7 +154,18 @@ class PropertyWrapperObject(QObject):
 
 
 class Triangle(QGraphicsPathItem):
+    """Summary
+
+    Attributes:
+        adapter (TYPE): Description
+    """
     def __init__(self, painter_path, parent=None):
+        """Summary
+
+        Args:
+            painter_path (TYPE): Description
+            parent (None, optional): Description
+        """
         super(QGraphicsPathItem, self).__init__(painter_path, parent)
         self.adapter = PropertyWrapperObject(self)
     # end def
@@ -85,11 +173,23 @@ class Triangle(QGraphicsPathItem):
 
 
 class PreXoverLabel(QGraphicsSimpleTextItem):
+    """Summary
+
+    Attributes:
+        is_fwd (TYPE): Description
+    """
     _XO_FONT = styles.XOVER_LABEL_FONT
     _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
     _FM = QFontMetrics(_XO_FONT)
 
     def __init__(self, is_fwd, color, pre_xover_item):
+        """Summary
+
+        Args:
+            is_fwd (TYPE): Description
+            color (TYPE): Description
+            pre_xover_item (TYPE): Description
+        """
         super(QGraphicsSimpleTextItem, self).__init__(pre_xover_item)
         self.is_fwd = is_fwd
         self._color = color
@@ -100,11 +200,29 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     # end def
 
     def resetItem(self, is_fwd, color):
+        """Summary
+
+        Args:
+            is_fwd (TYPE): Description
+            color (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.is_fwd = is_fwd
         self._color = color
     # end def
 
     def setTextAndStyle(self, text, outline=False):
+        """Summary
+
+        Args:
+            text (TYPE): Description
+            outline (bool, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         str_txt = str(text)
         self._tbr = tBR = self._FM.tightBoundingRect(str_txt)
         half_label_H = tBR.height() / 2.0
@@ -143,11 +261,28 @@ PROX_ALPHA = 64
 
 
 class PreXoverItem(QGraphicsRectItem):
-    """ A PreXoverItem exists between a single 'from' VirtualHelixItem index
+    """A PreXoverItem exists between a single 'from' VirtualHelixItem index
     and zero or more 'to' VirtualHelixItem Indices
+
+    Attributes:
+        adapter (TYPE): Description
+        idx (TYPE): Description
+        is_fwd (TYPE): Description
+        prexoveritemgroup (TYPE): Description
+        to_vh_id_num (TYPE): Description
     """
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
                  to_vh_id_num, prexoveritemgroup, color):
+        """Summary
+
+        Args:
+            from_virtual_helix_item (TYPE): Description
+            is_fwd (TYPE): Description
+            from_index (TYPE): Description
+            to_vh_id_num (TYPE): Description
+            prexoveritemgroup (TYPE): Description
+            color (TYPE): Description
+        """
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
         self._bond_item = QGraphicsPathItem(self)
@@ -160,6 +295,11 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def shutdown(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.setBrush(getBrushObj(self._color, alpha=0))
         self.to_vh_id_num = None
         self.adapter.resetAnimations()
@@ -174,6 +314,19 @@ class PreXoverItem(QGraphicsRectItem):
 
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
                   to_vh_id_num, prexoveritemgroup, color):
+        """Summary
+
+        Args:
+            from_virtual_helix_item (TYPE): Description
+            is_fwd (TYPE): Description
+            from_index (TYPE): Description
+            to_vh_id_num (TYPE): Description
+            prexoveritemgroup (TYPE): Description
+            color (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.setParentItem(from_virtual_helix_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
@@ -225,9 +378,19 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### ACCESSORS ###
     def color(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._color
 
     def remove(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         scene = self.scene()
         self.adapter.destroy()
         if scene:
@@ -246,8 +409,11 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        """ Only if enableActive(True) is called
+        """Only if enableActive(True) is called
         hover and key events disabled by default
+
+        Args:
+            event (TYPE): Description
         """
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
@@ -255,17 +421,42 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def hoverLeaveEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.prexoveritemgroup.updateModelActiveBaseInfo(None)
         self.setActiveHovered(False)
         self.clearFocus()
     # end def
 
     def keyPressEvent(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def setLabel(self, text=None, outline=False):
+        """Summary
+
+        Args:
+            text (None, optional): Description
+            outline (bool, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         if text:
             self._label.setTextAndStyle(text=text, outline=outline)
             self._label.show()
@@ -274,6 +465,18 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def animate(self, item, property_name, duration, start_value, end_value):
+        """Summary
+
+        Args:
+            item (TYPE): Description
+            property_name (TYPE): Description
+            duration (TYPE): Description
+            start_value (TYPE): Description
+            end_value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         b_name = property_name.encode('ascii')
         anim = item.adapter.getRef(property_name)
         if anim is None:
@@ -305,7 +508,11 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def enableActive(self, is_active, to_vh_id_num=None):
-        """ Call on PreXoverItems created on the active VirtualHelixItem
+        """Call on PreXoverItems created on the active VirtualHelixItem
+
+        Args:
+            is_active (TYPE): Description
+            to_vh_id_num (None, optional): Description
         """
         if is_active:
             self.to_vh_id_num = to_vh_id_num
@@ -326,8 +533,12 @@ class PreXoverItem(QGraphicsRectItem):
             self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
 
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
-        """ To be called with whatever the active_prexoveritem
+        """To be called with whatever the active_prexoveritem
         is for the parts `active_base`
+
+        Args:
+            active_prexoveritem (TYPE): Description
+            shortcut (None, optional): Description
         """
         p1 = self._phos_item.scenePos()
         p2 = active_prexoveritem._phos_item.scenePos()
@@ -362,6 +573,11 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbor(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         if self.isVisible():
             inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
             self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))

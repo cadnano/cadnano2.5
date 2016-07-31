@@ -1,3 +1,5 @@
+"""Summary
+"""
 from collections import deque
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
@@ -8,10 +10,28 @@ from cadnano.enum import StrandType
 
 
 class PreXoverManager(QGraphicsRectItem):
+    """Summary
+
+    Attributes:
+        active_pxis (dict): Description
+        hovered_items (list): Description
+        HUE_FACTOR (float): Description
+        KEYMAP (TYPE): Description
+        neighbor_prexover_items (dict): Description
+        part_item (TYPE): Description
+        prexover_item_map (dict): Description
+        pxi_pool (TYPE): Description
+        virtual_helix_item (TYPE): Description
+    """
     HUE_FACTOR = 1.6
     KEYMAP = {i: getattr(Qt, 'Key_%d' % i) for i in range(10)}
 
     def __init__(self, part_item):
+        """Summary
+
+        Args:
+            part_item (TYPE): Description
+        """
         super(QGraphicsRectItem, self).__init__(part_item)
         self.part_item = part_item
         self.virtual_helix_item = None
@@ -33,20 +53,43 @@ class PreXoverManager(QGraphicsRectItem):
 
     ### ACCESSORS ###
     def window(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._parent.window()
 
     def virtualHelixItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.virtual_helix_item
     # end def
 
     def addKeyPress(self, key_int, info):
+        """Summary
+
+        Args:
+            key_int (TYPE): Description
+            info (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         qtkey = self.KEYMAP[key_int]
         self._key_press_dict[qtkey] = info
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
     def updateBasesPerRepeat(self, step_size):
-        """Recreates colors, all vhi"""
+        """Recreates colors, all vhi
+
+        Args:
+            step_size (TYPE): Description
+        """
         hue_scale = step_size*self.HUE_FACTOR
         self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name()
                         for i in range(step_size)]
@@ -55,6 +98,14 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def handlePreXoverKeyPress(self, key):
+        """Summary
+
+        Args:
+            key (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         print("handling key", key, self.KEYMAP.get(key, None))
         if key not in self._key_press_dict:
             return
@@ -109,18 +160,43 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def updateTurnsPerRepeat(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def part(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.parentItem().part()
 
     ### PUBLIC SUPPORT METHODS ###
     def getItem(self, id_num, is_fwd, idx):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+            is_fwd (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self.prexover_item_map[(id_num, is_fwd, idx)]
     # end def
 
     def clearPreXoverItems(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         # self.deactivateNeighbors()
         self.hovered_items = []
         pxi_pool = self.pxi_pool
@@ -139,9 +215,14 @@ class PreXoverManager(QGraphicsRectItem):
 
     @staticmethod
     def getPoolItem(pool, cls, *args):
-        """ grab an item from a pool if there is one and reconfigure it
+        """grab an item from a pool if there is one and reconfigure it
         otherwise, create a new object of type `cls`
         Useful to avoid issues with deleting animations
+
+        Args:
+            pool (TYPE): Description
+            cls (TYPE): Description
+            *args (TYPE): Description
         """
         if len(pool) > 0:
             item = pool.pop()
@@ -152,18 +233,24 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def reset(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self.clearPreXoverItems()
         self.virtual_helix_item = None
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, this_idx, per_neighbor_hits):
-        """ Populate self.prexover_item_map dictionary which maps a tuple
+        """Populate self.prexover_item_map dictionary which maps a tuple
         of (id_num, is_fwd, idx) to a given PreXoverItem and a List of neighbor PreXoverItems
         This also effectively deactivates the existing VirtualHelix
 
         Args:
-            virtual_helix_item (cadnano.guil.views.pathview.virtualhelixitem.VirtualHelixItem):
-            per_neighbor_hits (Tuple()):
+            virtual_helix_item (cadnano.guil.views.pathview.virtualhelixitem.VirtualHelixItem)
+            this_idx (TYPE): Description
+            per_neighbor_hits (Tuple())
         """
         # print("ACTIVATING VH", virtual_helix_item.idNum())
         # print(per_neighbor_hits[1])
@@ -271,6 +358,16 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def activateNeighbors(self, id_num, is_fwd, idx):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+            is_fwd (TYPE): Description
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # print("ACTIVATING neighbors", id_num, idx)
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
         if item is None:
@@ -288,12 +385,18 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbors(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._key_press_dict = {}
         while self.hovered_items:
             self.hovered_items.pop().deactivateNeighbor()
 
     def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state.
+
         Args:
             pre_xover_info (Tuple): from call to getInfo()
         """
@@ -301,6 +404,14 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def isVirtualHelixActive(self, id_num):
+        """Summary
+
+        Args:
+            id_num (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         return self.part_item.part().isVirtualHelixActive(id_num)
     # end def
 # end class

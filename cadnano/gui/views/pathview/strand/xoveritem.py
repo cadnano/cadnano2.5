@@ -1,30 +1,41 @@
-import time
-
-from PyQt5.QtCore import QPointF, QRectF, Qt, QEvent
-from PyQt5.QtGui import QBrush, QFont, QFontMetrics, QPen, QColor, QPainterPath, QPolygonF
-from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
-
+"""Summary
+"""
+from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtGui import QFontMetrics, QPainterPath
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
+from cadnano.gui.palette import getColorObj, getPenObj, getNoPen, getNoBrush, getSolidBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT
 # precalculate the height of a number font.  Assumes a fixed font
 # and that only numbers will be used for labels
 _FM = QFontMetrics(_toHelixNumFont)
-_ENAB_BRUSH = getSolidBrush() # Also for the helix number label
+_ENAB_BRUSH = getSolidBrush()  # Also for the helix number label
 _NO_BRUSH = getNoBrush()
 # _RECT = QRectF(0, 0, baseWidth, baseWidth)
 _X_SCALE = styles.PATH_XOVER_LINE_SCALE_X  # control point x constant
 _Y_SCALE = styles.PATH_XOVER_LINE_SCALE_Y  # control point y constant
 _RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 
+
 class XoverNode3(QGraphicsRectItem):
     """
     This is a QGraphicsRectItem to allow actions and also a
     QGraphicsSimpleTextItem to allow a label to be drawn
+
+    Attributes:
+        is_forward (TYPE): Description
     """
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            xover_item (TYPE): Description
+            strand3p (TYPE): Description
+            idx (TYPE): Description
+        """
         super(XoverNode3, self).__init__(virtual_helix_item)
         self._vhi = virtual_helix_item
         self._xover_item = xover_item
@@ -40,12 +51,14 @@ class XoverNode3(QGraphicsRectItem):
         self.setZValue(styles.ZXOVERITEM)
     # end def
 
-
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
         """
         Parses a mousePressEvent to extract strandSet and base index,
         forwarding them to approproate tool method as necessary.
+
+        Args:
+            event (TYPE): Description
         """
         self.scene().views()[0].addToPressList(self)
         self._vhi.setActive(self.is_forward, self._idx)
@@ -56,15 +69,28 @@ class XoverNode3(QGraphicsRectItem):
     # end def
 
     def customMouseRelease(self, event):
+        """Summary
+
+        Args:
+            event (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         pass
     # end def
 
     def refreshXover(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._xover_item.refreshXover()
     # end def
 
     def showXover(self):
-        """ partner VH must be visible
+        """partner VH must be visible
         """
         xoi = self._xover_item
         part_item = xoi.partItem()
@@ -73,9 +99,22 @@ class XoverNode3(QGraphicsRectItem):
             self._xover_item.show()
 
     def hideXover(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         self._xover_item.hide()
 
     def setPartnerVirtualHelix(self, strand):
+        """Summary
+
+        Args:
+            strand (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if strand.connection5p():
             self._partner_virtual_helix_id_num = strand.connection5p().idNum()
         else:
@@ -83,27 +122,60 @@ class XoverNode3(QGraphicsRectItem):
     # end def
 
     def idx(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._idx
     # end def
 
     def setIdx(self, idx):
-         self._idx = idx
-     # end def
+        """Summary
+
+        Args:
+            idx (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
+        self._idx = idx
+    # end def
 
     def virtualHelixItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._vhi
     # end def
 
     def point(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._vhi.upperLeftCornerOfBaseType(self._idx, self.is_forward)
     # end def
 
     def floatPoint(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         pt = self.pos()
         return pt.x(), pt.y()
     # end def
 
     def isForward(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self.is_forward
     # end def
 
@@ -132,6 +204,9 @@ class XoverNode3(QGraphicsRectItem):
     def _updateLabel(self, isLeft):
         """Called by updatePositionAndAppearance during init. Updates drawing
         and position of the label.
+
+        Args:
+            isLeft (TYPE): Description
         """
         lbl = self._label
         if self._idx is not None:
@@ -151,7 +226,8 @@ class XoverNode3(QGraphicsRectItem):
                 labelXoffset = 0.25*bw if isLeft else -0.25*bw
                 labelX += labelXoffset
                 # adjust x for numeral 1
-                if num == 1: labelX -= half_label_w/2.0
+                if num == 1:
+                    labelX -= half_label_w/2.0
                 # create text item
                 lbl = QGraphicsSimpleTextItem(str(num), self)
                 lbl.setPos(labelX, labelY)
@@ -159,7 +235,7 @@ class XoverNode3(QGraphicsRectItem):
                 lbl.setFont(_toHelixNumFont)
                 self._label = lbl
             # end if
-            lbl.setText( str(self._partner_virtual_helix_id_num) )
+            lbl.setText(str(self._partner_virtual_helix_id_num))
         # end if
     # end def
 
@@ -169,18 +245,35 @@ class XoverNode3(QGraphicsRectItem):
 class XoverNode5(XoverNode3):
     """
     XoverNode5 is the partner of XoverNode3. It dif
+
     XoverNode3 handles:
-    1. Drawing of the 5' end of an xover, and its text label. Drawing style
-    is determined by the location of the xover with in a vhelix (is it a top
-    or bottom vstrand?).
-    2. Notifying XoverStrands in the model when connectivity changes.
+        1. Drawing of the 5' end of an xover, and its text label. Drawing style
+        is determined by the location of the xover with in a vhelix (is it a top
+        or bottom vstrand?).
+        2. Notifying XoverStrands in the model when connectivity changes.
 
     """
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
+        """Summary
+
+        Args:
+            virtual_helix_item (TYPE): Description
+            xover_item (TYPE): Description
+            strand5p (TYPE): Description
+            idx (TYPE): Description
+        """
         super(XoverNode5, self).__init__(virtual_helix_item, xover_item, strand5p, idx)
     # end def
 
     def setPartnerVirtualHelix(self, strand):
+        """Summary
+
+        Args:
+            strand (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         if strand.connection3p():
             self._partner_virtual_helix_id_num = strand.connection3p().idNum()
         else:
@@ -188,7 +281,8 @@ class XoverNode5(XoverNode3):
     # end def
 
     def updatePositionAndAppearance(self):
-        """Same as XoverItem3, but exposes 3' end"""
+        """Same as XoverItem3, but exposes 3' end
+        """
         self.setPos(*self.point())
         # # We can only expose a 3' end. But on which side?
         isLeft = False if self.is_forward else True
@@ -196,22 +290,30 @@ class XoverNode5(XoverNode3):
     # end def
 # end class
 
+
 class XoverItem(QGraphicsPathItem):
     """
     This class handles:
-    1. Drawing the spline between the XoverNode3 and XoverNode5 graphics
-    items in the path view.
+        1. Drawing the spline between the XoverNode3 and XoverNode5 graphics
+        items in the path view.
 
-    XoverItem should be a child of a PartItem.
+        XoverItem should be a child of a PartItem.
+
+    Attributes:
+        FILTER_NAME (str): Description
     """
     FILTER_NAME = "xover"
     __slots__ = ('_strand_item', '_virtual_helix_item', '_strand5p',
-            '_node5', '_node3', '_click_area', '_getActiveTool')
+                 '_node5', '_node3', '_click_area', '_getActiveTool')
 
     def __init__(self, strand_item, virtual_helix_item):
         """
         strand_item is a the model representation of the 5prime most strand
         of a Xover
+
+        Args:
+            strand_item (TYPE): Description
+            virtual_helix_item (TYPE): Description
         """
         super(XoverItem, self).__init__(virtual_helix_item.partItem())
         self._strand_item = strand_item
@@ -239,10 +341,20 @@ class XoverItem(QGraphicsPathItem):
     ### ACCESSORS ###
 
     def partItem(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         return self._virtual_helix_item.partItem()
     # end def
 
     def remove(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         scene = self.scene()
         if self._node3:
             self._node3.remove()
@@ -257,7 +369,7 @@ class XoverItem(QGraphicsPathItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def hideIt(self):
-        """ Used by PencilTool
+        """Used by PencilTool
         """
         self.hide()
         if self._node3:
@@ -268,7 +380,7 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def showIt(self):
-        """ Used by PencilTool
+        """Used by PencilTool
         """
         self.show()
         if self._node3:
@@ -278,6 +390,11 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def refreshXover(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
         strand5p = self._strand5p
         node3 = self._node3
         if strand5p:
@@ -301,6 +418,10 @@ class XoverItem(QGraphicsPathItem):
         """
         Pass idx to this method in order to install a floating
         Xover for the forced xover tool
+
+        Args:
+            strand5p (TYPE): Description
+            idx (None, optional): Description
         """
         self._strand5p = strand5p
         strand3p = strand5p.connection3p()
@@ -339,6 +460,8 @@ class XoverItem(QGraphicsPathItem):
         destination point (where the mouse is) while toHelix, toIndex
         are potentially None and represent the base at floatPos.
 
+        Args:
+            strand5p (TYPE): Description
         """
         group = self.group()
         self.tempReparent()
@@ -389,10 +512,10 @@ class XoverItem(QGraphicsPathItem):
         # case 3: different parity
         else:
             if n5_is_forward:
-                c1.setX(five_exit_pt.x() - _X_SCALE *\
+                c1.setX(five_exit_pt.x() - _X_SCALE *
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             else:
-                c1.setX(five_exit_pt.x() + _X_SCALE *\
+                c1.setX(five_exit_pt.x() + _X_SCALE *
                         abs(three_enter_pt.y() - five_exit_pt.y()))
             c1.setY(0.5 * (five_exit_pt.y() + three_enter_pt.y()))
 
@@ -421,6 +544,14 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def _updateColor(self, strand):
+        """Summary
+
+        Args:
+            strand (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         oligo = strand.oligo()
         color = self.pen().color().name() if self.isSelected() else oligo.getColor()
         if color is None:
@@ -440,6 +571,9 @@ class XoverItem(QGraphicsPathItem):
     def mousePressEvent(self, event):
         """
         Special case for xovers and select tool, for now
+
+        Args:
+            event (TYPE): Description
         """
         if self._getActiveTool().methodPrefix() == "selectTool":
             event.setAccepted(False)
@@ -451,7 +585,7 @@ class XoverItem(QGraphicsPathItem):
                 selection_group = viewroot.strandItemSelectionGroup()
                 mod = Qt.MetaModifier
                 if not (event.modifiers() & mod):
-                     selection_group.clearSelection(False)
+                    selection_group.clearSelection(False)
                 selection_group.setSelectionLock(selection_group)
                 # self.setSelectedColor(True)
                 selection_group.pendToAdd(self)
@@ -462,17 +596,20 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def eraseToolMousePress(self):
-        """Erase the strand."""
+        """Erase the strand.
+        """
         self._strand_item.eraseToolMousePress(None, None)
     # end def
 
     def paintToolMousePress(self):
-        """Paint the strand."""
+        """Paint the strand.
+        """
         self._strand_item.paintToolMousePress(None, None)
     # end def
 
     def selectToolMousePress(self):
-        """Remove the xover."""
+        """Remove the xover.
+        """
         # make sure the selection is clear
         sI = self._strand_item
         viewroot = sI.viewroot()
@@ -487,6 +624,9 @@ class XoverItem(QGraphicsPathItem):
     def restoreParent(self, pos=None):
         """
         Required to restore parenting and positioning in the partItem
+
+        Args:
+            pos (None, optional): Description
         """
         # map the position
         self.tempReparent(pos)
@@ -495,6 +635,14 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def tempReparent(self, pos=None):
+        """Summary
+
+        Args:
+            pos (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
         part_item = self.partItem()
         if pos is None:
             pos = self.scenePos()
@@ -504,7 +652,15 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def setSelectedColor(self, value):
-        if value == True:
+        """Summary
+
+        Args:
+            value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
+        if value == True:  # noqa
             color = getColorObj(styles.SELECTED_COLOR)
         else:
             oligo = self._strand_item.strand().oligo()
@@ -518,6 +674,15 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def itemChange(self, change, value):
+        """Summary
+
+        Args:
+            change (TYPE): Description
+            value (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         # for selection changes test against QGraphicsItem.ItemSelectedChange
         # intercept the change instead of the has changed to enable features.
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
@@ -528,7 +693,7 @@ class XoverItem(QGraphicsPathItem):
                 current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
                 # only add if the selection_group is not locked out
-                if value == True and (self.FILTER_NAME in current_filter_set or not selection_group.isNormalSelect()):
+                if value == True and (self.FILTER_NAME in current_filter_set or not selection_group.isNormalSelect()):    # noqa
                     if sI.strandFilter() in current_filter_set:
                         # print("might add a xoi")
                         if self.group() != selection_group and selection_group.isNormalSelect():
@@ -541,7 +706,7 @@ class XoverItem(QGraphicsPathItem):
                         # print("Doh")
                         return False
                 # end if
-                elif value == True:
+                elif value == True:  # noqa
                     # print("DOink")
                     return False
                 else:
@@ -570,6 +735,14 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def modelDeselect(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         strand5p = self._strand5p
         strand3p = strand5p.connection3p()
         test5p = document.isModelStrandSelected(strand5p)
@@ -597,6 +770,14 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def modelSelect(self, document):
+        """Summary
+
+        Args:
+            document (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         strand5p = self._strand5p
         if strand5p is None:
             return
@@ -621,6 +802,16 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def paint(self, painter, option, widget):
+        """Summary
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            widget (TYPE): Description
+
+        Returns:
+            TYPE: Description
+        """
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawPath(self.path())

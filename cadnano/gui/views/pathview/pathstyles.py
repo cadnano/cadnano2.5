@@ -1,7 +1,59 @@
+"""Summary
+
+Attributes:
+    DEFAULT_ALPHA (int): Description
+    DEFAULT_BRUSH_COLOR (str): Description
+    INSERTWIDTH (int): Description
+    INVALID_DNA_COLOR (str): Description
+    MINOR_GRID_STROKE (str): Description
+    MINOR_GRID_STROKE_ACTIVE (str): Description
+    MINOR_GRID_STROKE_WIDTH (float): Description
+    OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT (int): Description
+    OLIGO_LEN_BELOW_WHICH_HIGHLIGHT (int): Description
+    PATH_BASE_HL_STROKE_WIDTH (int): Description
+    PATH_BASE_WIDTH (int): Description
+    PATH_HELIX_HEIGHT (TYPE): Description
+    PATH_HELIX_PADDING (TYPE): Description
+    PATH_SELECTBOX_STROKE_WIDTH (float): Description
+    PATH_STRAND_HIGHLIGHT_STROKE_WIDTH (int): Description
+    PATH_STRAND_STROKE_WIDTH (int): Description
+    PATH_XOVER_LINE_SCALE_X (float): Description
+    PATH_XOVER_LINE_SCALE_Y (float): Description
+    PREXOVER_STROKE_WIDTH (float): Description
+    RED_STROKE (str): Description
+    SCAF_COLORS (list): Description
+    SELECTED_ALPHA (int): Description
+    SELECTED_BRUSH_COLOR (str): Description
+    SELECTED_COLOR (str): Description
+    SELECTED_PEN_WIDTH (int): Description
+    SELECTIONBOX_PEN_WIDTH (float): Description
+    SEQUENCEFONT (TYPE): Description
+    SEQUENCEFONTCHARWIDTH (int): Description
+    SEQUENCEFONTCOLOR (str): Description
+    SEQUENCEFONTEXTRAWIDTH (int): Description
+    SEQUENCEFONTH (int): Description
+    SEQUENCETEXTXCENTERINGOFFSET (int): Description
+    SKIPWIDTH (int): Description
+    STAP_COLORS (TYPE): Description
+    UNDERLINE_INVALID_DNA (bool): Description
+    VH_XOFFSET (TYPE): Description
+    VIRTUALHELIXHANDLEITEM_FONT (TYPE): Description
+    VIRTUALHELIXHANDLEITEM_RADIUS (int): Description
+    VIRTUALHELIXHANDLEITEM_STROKE_WIDTH (int): Description
+    XOVER_LABEL_FONT (TYPE): Description
+    XOVER_LABEL_FONT_BOLD (TYPE): Description
+    ZENDPOINTITEM (int): Description
+    ZINSERTHANDLE (int): Description
+    ZPATHHELIX (int): Description
+    ZPATHSELECTION (int): Description
+    ZPATHTOOL (int): Description
+    ZSTRANDITEM (int): Description
+    ZXOVERITEM (int): Description
+"""
 from PyQt5.QtGui import QFont, QFontMetricsF
 from cadnano.gui.views.styles import THE_FONT, THE_FONT_SIZE
-from cadnano.gui.views.styles import BLUE_FILL, BLUE_STROKE
-from cadnano.gui.views.styles import GRAY_FILL, GRAY_STROKE
+from cadnano.gui.views.styles import BLUE_FILL, BLUE_STROKE  # noqa
+from cadnano.gui.views.styles import GRAY_FILL, GRAY_STROKE  # noqa
 
 # Path Sizing
 VIRTUALHELIXHANDLEITEM_RADIUS = 15
