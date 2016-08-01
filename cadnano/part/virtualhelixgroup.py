@@ -1825,10 +1825,12 @@ class VirtualHelixGroup(CNObject):
         # r2_axial = BW*BW
 
         # MISALIGNED by 27.5% twist per base so that's 1.55*half_twist_per_base
+        # ma_f = 1.55 # NC should be this if we wanted to be strict
+        ma_f = 2.55 # NC changed to this to show all xovers in legacy Honeycomb
         r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base)) +
-                             (1. - math.cos(1.55*half_twist_per_base))))**2
+                             (1. - math.cos(ma_f*half_twist_per_base))))**2
         r2_tangent = (RADIUS*(math.sin(half_twist_per_base) +
-                              math.sin(1.55*half_twist_per_base)))**2
+                              math.sin(ma_f*half_twist_per_base)))**2
         r2_axial = BW*BW
 
         # print("r2:", r2_radial, r2_tangent, r2_axial)
