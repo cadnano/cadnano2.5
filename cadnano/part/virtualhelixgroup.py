@@ -215,8 +215,8 @@ class VirtualHelixGroup(CNObject):
     # end def
 
     def getNewIdNum(self):
-        """Query the lowest available id_num. Internally id numbers are
-        recycled when virtual helices are deleted
+        """Query the lowest available (unused) id_num. Internally id numbers are
+        recycled when virtual helices are deleted.
 
         Returns:
             int: ID number

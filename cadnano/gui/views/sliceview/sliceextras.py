@@ -83,8 +83,6 @@ class PropertyWrapperObject(QObject):
         """Summary
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         return self.item.line().p2()
@@ -96,8 +94,6 @@ class PropertyWrapperObject(QObject):
             p2 (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         p1 = self.item.line().p1()
@@ -107,8 +103,6 @@ class PropertyWrapperObject(QObject):
     def __get_rotation(self):
         """Summary
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -121,8 +115,6 @@ class PropertyWrapperObject(QObject):
             angle (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         self.item.setRotation(angle)
@@ -130,8 +122,6 @@ class PropertyWrapperObject(QObject):
     def __get_penAlpha(self):
         """Summary
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -143,8 +133,6 @@ class PropertyWrapperObject(QObject):
         Args:
             alpha (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -162,8 +150,6 @@ class PropertyWrapperObject(QObject):
             animation (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         self.animations[property_name] = animation
@@ -175,8 +161,6 @@ class PropertyWrapperObject(QObject):
             property_name (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         return self.animations.get(property_name)
@@ -184,8 +168,6 @@ class PropertyWrapperObject(QObject):
     def resetAnimations(self):
         """Summary
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -430,8 +412,6 @@ class PreXoverItem(QGraphicsPathItem):
             neighbor_item (None, optional): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         phos = self.phos_item
@@ -459,8 +439,6 @@ class PreXoverItem(QGraphicsPathItem):
             item_5p (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         self.item_5p = item_5p
@@ -472,8 +450,6 @@ class PreXoverItem(QGraphicsPathItem):
         Args:
             item_3p (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -492,8 +468,6 @@ class PreXoverItem(QGraphicsPathItem):
         Args:
             scene (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -518,7 +492,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         HUE_FACTOR (float): Description
         id_num (TYPE): Description
         is_active (TYPE): Description
-        model_part (TYPE): Description
+        model_part (Part): The model part
         rev_prexover_items (dict): Description
         SPIRAL_FACTOR (float): Description
         virtual_helix_item (TYPE): Description

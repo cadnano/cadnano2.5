@@ -11,7 +11,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             parent (TYPE): Description
             key (None, optional): Description
         """
@@ -23,7 +23,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
 
         Returns:
             TYPE: Description
@@ -38,7 +38,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             property_key (TYPE): Description
             new_value (TYPE): Description
 
@@ -53,7 +53,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             is_selected (TYPE): Description
 
         Returns:

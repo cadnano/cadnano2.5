@@ -56,7 +56,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Summary
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             part_item (TYPE): Description
             viewroot (TYPE): Description
         """
@@ -115,7 +115,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         its parent (which is *this* VirtualHelixItem, i.e. 'self').
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
         StrandItem(strand, self, self._viewroot)

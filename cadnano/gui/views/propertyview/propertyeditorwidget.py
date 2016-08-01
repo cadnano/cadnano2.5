@@ -96,7 +96,7 @@ class PropertyEditorWidget(QTreeWidget):
 
         Returns:
             TYPE: Description
-        
+
         Raises:
             NotImplementedError: Description
         """
@@ -138,8 +138,8 @@ class PropertyEditorWidget(QTreeWidget):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            model_part (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            model_part (Part): The model part
 
         Returns:
             TYPE: Description

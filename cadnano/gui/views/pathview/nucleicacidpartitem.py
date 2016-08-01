@@ -121,7 +121,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Returns the pathview VirtualHelixItem corresponding to id_num
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
         """
         return self._virtual_helix_item_hash.get(id_num)
 
@@ -133,7 +133,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             part (TYPE): Description
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
         Returns:
             TYPE: Description
@@ -164,7 +164,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             min_id_num (TYPE): Description
             max_id_num (TYPE): Description
             ztf (bool, optional): Description
@@ -192,7 +192,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             is_selected (TYPE): Description
 
         Returns:
@@ -210,7 +210,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             property_key (TYPE): Description
             new_value (TYPE): Description
 
@@ -232,7 +232,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             vh_set (TYPE): Description
             left_overs (TYPE): Description
             do_deselect (TYPE): Description
@@ -254,7 +254,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """docstring for partRemovedSlot
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
         """
         self.parentItem().removePartItem(self)
         scene = self.scene()
@@ -273,8 +273,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         the instantiation of a virtualhelix item.
 
         Args:
-            model_part (TYPE): Description
-            id_num (TYPE): Description
+            model_part (Part): The model part
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         vhi = VirtualHelixItem(id_num, self, self._viewroot)
@@ -298,8 +298,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Notifies the virtualhelix at coord to resize.
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
         """
         vhi = self._virtual_helix_item_hash[id_num]
         vhi.resize()
@@ -309,7 +309,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """docstring for partVirtualHelicesReorderedSlot
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             ordered_id_list (TYPE): Description
             check_batch (TYPE): Description
         """
@@ -323,8 +323,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
         Returns:
             TYPE: Description
@@ -336,8 +336,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             keys (TYPE): Description
             values (TYPE): Description
 
@@ -354,7 +354,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         or removing (False)
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             vh_set (TYPE): Description
             is_adding (TYPE): Description
         """
@@ -384,7 +384,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
         Returns:
             TYPE: Description

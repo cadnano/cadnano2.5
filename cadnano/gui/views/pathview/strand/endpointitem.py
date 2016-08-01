@@ -6,13 +6,12 @@ from math import floor
 # import logging
 # logger = logging.getLogger(__name__)
 
-from PyQt5.QtCore import QPointF, QRectF, Qt, QObject, pyqtSignal
-from PyQt5.QtGui import QBrush, QPen, QColor, QPainterPath, QPolygonF
+from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtGui import QBrush, QPen, QPainterPath, QPolygonF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
 
-from cadnano import util
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getColorObj
 from cadnano.gui.views.pathview import pathstyles as styles
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
@@ -25,9 +24,9 @@ PP_53 = QPainterPath()  # Left 5', Right 3' PainterPath
 PP_35 = QPainterPath()  # Left 5', Right 3' PainterPath
 # set up PP_L5 (left 5' blue square)
 PP_L5.addRect(0.25 * _BASE_WIDTH,
-            0.125 * _BASE_WIDTH,
-            0.75 * _BASE_WIDTH,
-            0.75 * _BASE_WIDTH)
+              0.125 * _BASE_WIDTH,
+              0.75 * _BASE_WIDTH,
+              0.75 * _BASE_WIDTH)
 # set up PP_R5 (right 5' blue square)
 PP_R5.addRect(0, 0.125 * _BASE_WIDTH, 0.75 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 # set up PP_L3 (left 3' blue triangle)
@@ -54,9 +53,9 @@ POLY_53.append(QPointF(0.5 * _BASE_WIDTH, _BASE_WIDTH))
 PP_53.addPolygon(POLY_53)
 # single base left 3'<-5'
 PP_35.addRect(0.50 * _BASE_WIDTH,
-            0.125 * _BASE_WIDTH,
-            0.5 * _BASE_WIDTH,
-            0.75 * _BASE_WIDTH)
+              0.125 * _BASE_WIDTH,
+              0.5 * _BASE_WIDTH,
+              0.75 * _BASE_WIDTH)
 POLY_35 = QPolygonF()
 POLY_35.append(QPointF(0.5 * _BASE_WIDTH, 0))
 POLY_35.append(QPointF(0, 0.5 * _BASE_WIDTH))
@@ -68,12 +67,14 @@ _NO_PEN = QPen(Qt.NoPen)
 
 MOD_RECT = QRectF(.25*_BASE_WIDTH, -.25*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.5*_BASE_WIDTH)
 
+
 class EndpointItem(QGraphicsPathItem):
 
     FILTER_NAME = "endpoint"
     __slots__ = ('_strand_item', '_getActiveTool', 'cap_type',
-                '_low_drag_bound', '_high_drag_bound', '_mod_item',
-                '_click_area')
+                 '_low_drag_bound', '_high_drag_bound', '_mod_item',
+                 '_click_area')
+
     def __init__(self, strand_item, cap_type, is_drawn5to3):
         """The parent should be a StrandItem."""
         super(EndpointItem, self).__init__(strand_item.virtualHelixItem())
@@ -144,7 +145,7 @@ class EndpointItem(QGraphicsPathItem):
         """
         group = self.group()
         self.tempReparent()
-        self.setPos(x,y)
+        self.setPos(x, y)
         if group:
             group.addToGroup(self)
     # end def
@@ -264,8 +265,7 @@ class EndpointItem(QGraphicsPathItem):
         s_i = self._strand_item
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
-        if (s_i.strandFilter() in current_filter_set
-                                    and self.FILTER_NAME in current_filter_set):
+        if (s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set):
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -336,7 +336,6 @@ class EndpointItem(QGraphicsPathItem):
         """Break the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
-        part_item = vhi.partItem()
         active_tool = self._getActiveTool()
 
         if active_tool.isFloatingXoverBegin():
@@ -357,13 +356,11 @@ class EndpointItem(QGraphicsPathItem):
         Set the allowed drag bounds for use by selectToolMouseMove.
         """
         # print("%s.%s [%d]" % (self, util.methodName(), self.idx()))
-        self._low_drag_bound, self._high_drag_bound = \
-                    self._strand_item._model_strand.getResizeBounds(self.idx())
+        self._low_drag_bound, self._high_drag_bound = self._strand_item._model_strand.getResizeBounds(self.idx())
         s_i = self._strand_item
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
-        if (s_i.strandFilter() in current_filter_set
-                                    and self.FILTER_NAME in current_filter_set):
+        if (s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set):
             selection_group = viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (modifiers & mod):
@@ -506,8 +503,7 @@ class EndpointItem(QGraphicsPathItem):
         """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
-        low_val, high_val = document.getSelectedStrandValue(strand) if test \
-                                                            else (False, False)
+        low_val, high_val = document.getSelectedStrandValue(strand) if test else (False, False)
         if self.cap_type == 'low':
             out_value = (False, high_val)
         else:
@@ -525,8 +521,7 @@ class EndpointItem(QGraphicsPathItem):
         """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
-        low_val, high_val = document.getSelectedStrandValue(strand) if test \
-                                                            else (False, False)
+        low_val, high_val = document.getSelectedStrandValue(strand) if test else (False, False)
         if self.cap_type == 'low':
             out_value = (True, high_val)
         else:

@@ -69,7 +69,6 @@ class GridItem(QGraphicsPathItem):
         Args:
             grid_type (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """

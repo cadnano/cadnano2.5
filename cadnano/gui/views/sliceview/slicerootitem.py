@@ -11,7 +11,7 @@ class SliceRootItem(QGraphicsRectItem):
     SliceRootItem is the root item in the SliceView. It gets added directly
     to the pathscene by DocumentWindow. It receives two signals
     (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
-    
+
     SliceRootItem must instantiate its own controller to receive signals
     from the model.
 
@@ -48,11 +48,11 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
 
         Args:
-            sender (TYPE): Description
-            model_part_instance (TYPE): Description
-        
+            sender (obj): Model object that emitted the signal.
+            model_part_instance (Part): Description
+
         Raises:
-            NotImplementedError: Description
+            NotImplementedError: partAddedSlot should always be overridden.
         """
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
@@ -82,8 +82,6 @@ class SliceRootItem(QGraphicsRectItem):
             filter_name_list (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         # if 'virtual_helix' not in filter_name_list:
@@ -98,8 +96,6 @@ class SliceRootItem(QGraphicsRectItem):
             filter_name (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         pass
@@ -111,8 +107,6 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             doc (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -127,8 +121,6 @@ class SliceRootItem(QGraphicsRectItem):
             doc (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         self.select_tool.deselectItems()
@@ -139,8 +131,6 @@ class SliceRootItem(QGraphicsRectItem):
     def window(self):
         """Summary
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -154,8 +144,6 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             part_item (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -193,8 +181,6 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             manager (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """

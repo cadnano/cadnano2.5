@@ -167,7 +167,7 @@ class PreXoverManager(QGraphicsRectItem):
         """Summary
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             is_fwd (TYPE): Description
             idx (TYPE): Description
 

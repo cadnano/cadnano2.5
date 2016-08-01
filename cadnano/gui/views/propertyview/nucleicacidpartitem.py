@@ -9,14 +9,14 @@ VAL_COL = 1
 
 
 class NucleicAcidPartItem(AbstractPropertyPartItem):
-    """Summary
+    """NucleicAcidPartItem for the PropertyView.
     """
     def __init__(self, model_part, parent, key=None):
         """Summary
 
         Args:
-            model_part (TYPE): Description
-            parent (TYPE): Description
+            model_part (Part): The model part
+            parent (PropertyEditorWidget): The property editor
             key (None, optional): Description
         """
         super(NucleicAcidPartItem, self).__init__(model_part, parent, key=key)
@@ -25,10 +25,10 @@ class NucleicAcidPartItem(AbstractPropertyPartItem):
     # end def
 
     def itemType(self):
-        """Summary
+        """Overrides AbstractPropertyPartItem method for NucleicAcidPartItem.
 
         Returns:
-            TYPE: Description
+            ItemType: NUCLEICACID
         """
         return ItemType.NUCLEICACID
     # end def

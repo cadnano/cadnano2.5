@@ -124,9 +124,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             part (TYPE): Description
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -142,7 +141,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
             part (TYPE): Description
             info (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -157,11 +155,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             property_key (TYPE): Description
             new_value (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -185,7 +182,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """docstring for partRemovedSlot
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
         """
         self.parentItem().removePartItem(self)
 
@@ -210,7 +207,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         left_overs are neighbors that need updating due to changes
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             vh_set (TYPE): Description
             left_overs (TYPE): Description
             do_deselect (TYPE): Description
@@ -245,11 +242,12 @@ class NucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def _refreshVirtualHelixItemGizmos(self, id_num, vhi):
-        """Update props and appearance of self & recent neighbors.
+        """Update props and appearance of self & recent neighbors. Ultimately
+        triggered by a partVirtualHelicesTranslatedSignal.
 
         Args:
-            id_num (TYPE): Description
-            vhi (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            vhi (VirtualHelixItem): the item associated with id_num
         """
         neighbors = vhi.getProperty('neighbors')
         neighbors = literal_eval(neighbors)
@@ -266,12 +264,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
-            keys (TYPE): Description
-            values (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            keys (tuple): keys that changed
+            values (tuple): new values for each key that changed
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -284,11 +281,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             neighbors (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -305,11 +301,10 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             neighbors (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -325,7 +320,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Set this Z to front, and return other Zs to default.
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             is_selected (TYPE): Description
         """
         if is_selected:
@@ -341,7 +336,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         or removing (False)
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             vh_set (TYPE): Description
             is_adding (TYPE): Description
         """
@@ -363,7 +358,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
             key (TYPE): Description
             value (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
 
@@ -384,7 +378,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def boundingRect(self):
         """Summary
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -394,7 +387,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def modelColor(self):
         """Summary
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -404,7 +396,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def window(self):
         """Summary
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -457,9 +448,8 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -526,7 +516,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def getModelBounds(self):
         """Bounds in form of Qt scaled from model
 
-        Returns:
         Args:
             Tuple (top_left, bottom_right)
         """
@@ -565,7 +554,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
     def zoomToFit(self):
         """Summary
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -581,7 +569,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Args:
             event (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -605,7 +592,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Args:
             event (TYPE): Description
 
-        Returns:
         Args:
             TYPE: Description
         """
@@ -633,7 +619,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
         Returns:
             TYPE: Description

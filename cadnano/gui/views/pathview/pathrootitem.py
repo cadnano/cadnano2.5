@@ -75,7 +75,7 @@ class PathRootItem(QGraphicsRectItem):
         the Sliceview handles setting up the appropriate lattice.
 
         Args:
-            sender (TYPE): Description
+            sender (obj): Model object that emitted the signal.
             model_part_instance (TYPE): Description
 
         Raises:

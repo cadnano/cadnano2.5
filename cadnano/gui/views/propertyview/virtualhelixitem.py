@@ -1,8 +1,8 @@
-"""Summary
+"""VirtualHelixItem for the PropertyView.
 
 Attributes:
-    KEY_COL (int): Description
-    VAL_COL (int): Description
+    KEY_COL (int): QTreeWidgetItem column that will display property keys
+    VAL_COL (int): QTreeWidgetItem column that will display property values
 """
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
@@ -17,15 +17,15 @@ VAL_COL = 1
 
 
 class VirtualHelixItem(QTreeWidgetItem):
-    """Summary
+    """VirtualHelixItem class for the PropertyView.
     """
     def __init__(self, model_part, parent, id_num, key=None):
         """Summary
 
         Args:
-            model_part (TYPE): Description
+            model_part (Part): The model part
             parent (TYPE): Description
-            id_num (TYPE): Description
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             key (None, optional): Description
         """
         self._id_num = id_num
@@ -89,10 +89,10 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def itemType(self):
-        """Summary
+        """Overrides AbstractPropertyPartItem.itemType
 
         Returns:
-            TYPE: Description
+            ItemType: VIRTUALHELIX
         """
         return ItemType.VIRTUALHELIX
     # end def
@@ -113,8 +113,8 @@ class VirtualHelixItem(QTreeWidgetItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             keys (TYPE): Description
             values (TYPE): Description
 
@@ -130,8 +130,8 @@ class VirtualHelixItem(QTreeWidgetItem):
         """Summary
 
         Args:
-            sender (TYPE): Description
-            id_num (TYPE): Description
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
 
         Returns:
             TYPE: Description
