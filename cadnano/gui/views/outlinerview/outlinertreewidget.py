@@ -1,18 +1,19 @@
-from PyQt5.QtCore import pyqtSignal, QObject, QDataStream
-from PyQt5.QtCore import Qt, QRect, QSize, QVariant
-from PyQt5.QtGui import QBrush, QColor, QFont, QPalette, QPen
-from PyQt5.QtWidgets import QTreeWidget, QHeaderView, QMenu, QAction, QTreeView
-from PyQt5.QtWidgets import QTreeWidgetItem, QTreeWidgetItemIterator
-from PyQt5.QtWidgets import QSizePolicy, QStyledItemDelegate
-from PyQt5.QtWidgets import QSpinBox, QLineEdit, QPushButton
-from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
-from PyQt5.QtWidgets import QAbstractItemView, QCheckBox
+from PyQt5.QtCore import QDataStream
+from PyQt5.QtCore import Qt, QRect, QVariant
+from PyQt5.QtCore import QItemSelectionModel, QItemSelection
+from PyQt5.QtCore import QPersistentModelIndex
+from PyQt5.QtGui import QBrush, QColor, QFont, QPalette
+from PyQt5.QtWidgets import QAbstractItemView, QAction
+from PyQt5.QtWidgets import QColorDialog, QHeaderView
+from PyQt5.QtWidgets import QLineEdit, QMenu
+from PyQt5.QtWidgets import QTreeWidget, QTreeView
 from PyQt5.QtWidgets import QStyle, QCommonStyle
-from PyQt5.QtWidgets import QColorDialog
-from PyQt5.QtCore import QItemSelectionModel, QModelIndex, QItemSelection, QPersistentModelIndex
+from PyQt5.QtWidgets import QStyledItemDelegate
+from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
+from PyQt5.QtWidgets import QToolTip
 
 from cadnano.enum import PartType
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj
+from cadnano.gui.palette import getColorObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
@@ -21,10 +22,11 @@ from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
 from .nucleicacidpartitem import NucleicAcidPartItem
 from .virtualhelixitem import VirtualHelixItem
 from .oligoitem import OligoItem
-import struct
+
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
+
 
 class OutlinerTreeWidget(QTreeWidget):
     """ The there needs to always be a currentItem which defaults
@@ -32,7 +34,7 @@ class OutlinerTreeWidget(QTreeWidget):
     """
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
-        self.setAttribute(Qt.WA_MacShowFocusRect, 0) # no mac focus halo
+        self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
         self.to_be_activated = None
 
     def configure(self, window, document):
@@ -123,7 +125,6 @@ class OutlinerTreeWidget(QTreeWidget):
         for idx in out_selection:
             item = self.itemFromIndex(idx)
             # print("did select", item)
-            s_idx = idx
             tbs.add(item)
         for idx in deselected_items.indexes():
             # print("could deselect?", self.itemFromIndex(idx))
@@ -135,10 +136,11 @@ class OutlinerTreeWidget(QTreeWidget):
 
     def itemClickedHandler(self, tree_widget_item, column):
         # print("I'm click", tree_widget_item.__class__.__name__,
-        #    tree_widget_item.isSelected())
+        #       tree_widget_item.isSelected())
         document = self._document
         model_to_be_selected, model_to_be_deselected = self.model_selection_changes
         # print("click column", column)
+
         # 1. handle clicks on check marks to speed things up over using an editor
         if column == VISIBLE_COL:
             self.blockSignals(True)
@@ -151,6 +153,11 @@ class OutlinerTreeWidget(QTreeWidget):
             self.blockSignals(False)
         # end if
 
+        filter_set = self._document.filter_set
+        if hasattr(tree_widget_item, "FILTER_NAME") and\
+           tree_widget_item.FILTER_NAME not in filter_set:
+            rect = self.visualItemRect(tree_widget_item)
+            QToolTip.showText(self.mapToGlobal(rect.center()), "Change filter to select")
 
         # 2. handle document selection
         # self.blockSignals(True)
@@ -303,9 +310,9 @@ class OutlinerTreeWidget(QTreeWidget):
                 print("item undeletable", item.__class__.__name__)
         if do_exec:
             util.execCommandList(doc,
-                                cmds,
-                                desc="Clear Items",
-                                use_undostack=True)
+                                 cmds,
+                                 desc="Clear Items",
+                                 use_undostack=True)
         else:
             u_s.endMacro()
     # end def
@@ -357,13 +364,13 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def myDropEvent(self, event, drop_item):
-        """ workaround for broken QTreeWidget::dropEvent
+        """Workaround for broken QTreeWidget::dropEvent
         per https://bugreports.qt.io/browse/QTBUG-45320
-        doing reverse ordering of items on dropping.  reimplementation in python
+        doing reverse ordering of items on dropping. reimplementation in python
         from C++
         """
         if event.source() == self and (event.dropAction() == Qt.MoveAction or
-                                        self.dragDropMode() == QAbstractItemView.InternalMove):
+                                       self.dragDropMode() == QAbstractItemView.InternalMove):
             droptuple = self.dropOn(event, drop_item)
             if droptuple is not None:
                 (row, col, drop_index) = droptuple
@@ -382,7 +389,7 @@ class OutlinerTreeWidget(QTreeWidget):
                 taken = []
                 for i in range(len(indexes) - 1, -1, -1):
                     # print("idx", indexes[i].row(), indexes[i].column())
-                    parent = self.itemFromIndex(indexes[i]);
+                    parent = self.itemFromIndex(indexes[i])
                     if parent is None or parent.parent() is None:
                         t_item = self.takeTopLevelItem(indexes[i].row())
                         taken.append(t_item)
@@ -428,7 +435,7 @@ class OutlinerTreeWidget(QTreeWidget):
             col = -1
             if index != root:
                 dip = self.dropPosition(event.pos(),
-                            QTreeView.visualRect(self, index), index)
+                                        QTreeView.visualRect(self, index), index)
                 if dip is QAbstractItemView.AboveItem:
                     row = index.row()
                     col = index.column()
@@ -472,9 +479,8 @@ class OutlinerTreeWidget(QTreeWidget):
         drop_action = event.dropAction()
         if self.dragDropMode() == QAbstractItemView.InternalMove:
             drop_action = Qt.MoveAction
-        if (event.source() == self
-            and event.possibleActions() & Qt.MoveAction
-            and drop_action == Qt.MoveAction):
+        if (event.source() == self and event.possibleActions() & Qt.MoveAction
+                                   and drop_action == Qt.MoveAction):
             selected_indexes = self.selectedIndexes()
             child = index
             while child.isValid() and child != root_index:
@@ -587,34 +593,36 @@ class OutlinerTreeWidget(QTreeWidget):
 class CustomStyleItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent_QWidget, option, model_index):
         column = model_index.column()
-        if column == NAME_COL: # Model name
+        if column == NAME_COL:  # Model name
             item = self.parent().itemFromIndex(model_index)
             if item.CAN_NAME_EDIT:
                 editor = QLineEdit(parent_QWidget)
                 editor.setAlignment(Qt.AlignVCenter)
                 return editor
-        elif column == 1: # Visibility checkbox
+        elif column == 1:  # Visibility checkbox
             # editor = QCheckBox(parent_QWidget)
             # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
             # return editor
             return None
-        elif column == COLOR_COL: # Color Picker
+        elif column == COLOR_COL:  # Color Picker
             editor = QColorDialog(parent_QWidget)
             return editor
         else:
-            return QStyledItemDelegate.createEditor(self, \
-                            parent_QWidget, option, model_index)
+            return QStyledItemDelegate.createEditor(self,
+                                                    parent_QWidget,
+                                                    option,
+                                                    model_index)
     # end def
 
     def setEditorData(self, editor, model_index):
         column = model_index.column()
-        if column == NAME_COL: # Part Name
+        if column == NAME_COL:  # Part Name
             text_QString = model_index.model().data(model_index, Qt.EditRole)
             editor.setText(text_QString)
         # elif column == VISIBLE_COL: # Visibility
         #     value = model_index.model().data(model_index, Qt.EditRole)
         #     editor.setChecked(value)
-        elif column == COLOR_COL: # Color
+        elif column == COLOR_COL:  # Color
             value = model_index.model().data(model_index, Qt.EditRole)
             editor.setCurrentColor(QColor(value))
         else:
@@ -623,13 +631,13 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, model_index):
         column = model_index.column()
-        if column == NAME_COL: # Part Name
+        if column == NAME_COL:  # Part Name
             text_QString = editor.text()
             model.setData(model_index, text_QString, Qt.EditRole)
         # elif column == VISIBLE_COL: # Visibility
         #     value = editor.isChecked()
         #     model.setData(model_index, value, Qt.EditRole)
-        elif column == COLOR_COL: # Color
+        elif column == COLOR_COL:  # Color
             color = editor.currentColor()
             model.setData(model_index, color.name(), Qt.EditRole)
         else:
@@ -654,10 +662,10 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     def paint(self, painter, option, model_index):
         column = model_index.column()
         new_rect = QRect(option.rect)
-        if column == NAME_COL: # Part Name
+        if column == NAME_COL:  # Part Name
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
-        if column == VISIBLE_COL: # Visibility
+        if column == VISIBLE_COL:  # Visibility
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionButton()
             styleoption.rect = new_rect
@@ -670,12 +678,12 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             if checked:
                 element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
-        elif column == COLOR_COL: # Color
+        elif column == COLOR_COL:  # Color
             color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionViewItem()
             styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
-            top_left = option.rect.topLeft()
+            # top_left = option.rect.topLeft()
             styleoption.rect = new_rect
             # print("color rect", option.rect.height())
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
