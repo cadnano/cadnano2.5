@@ -949,7 +949,8 @@ class VirtualHelixGroup(CNObject):
         eulerZ_new = math.radians(eulerZ) + twist_per_base*index
         mgroove = math.radians(mgroove)
 
-        fwd_angles = [i*twist_per_base + eulerZ_new for i in range(num_points)]
+        # right handed rotates clockwise with increasing index
+        fwd_angles = [-i*twist_per_base + eulerZ_new for i in range(num_points)]
         rev_angles = [a + mgroove for a in fwd_angles]
         z_pts = BW*np.arange(index, num_points + index)
 
@@ -1700,7 +1701,7 @@ class VirtualHelixGroup(CNObject):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                          min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
@@ -1736,7 +1737,7 @@ class VirtualHelixGroup(CNObject):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ + tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
                                                                                          min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]

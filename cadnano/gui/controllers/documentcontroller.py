@@ -166,13 +166,13 @@ class DocumentController():
         """Disables all other selection filters when active."""
         fH = self.win.action_filter_handle
         fE = self.win.action_filter_endpoint
-        fS = self.win.action_filter_strand
+        # fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
         fH.setChecked(True)
         if fE.isChecked():
             fE.setChecked(False)
-        if fS.isChecked():
-            fS.setChecked(False)
+        # if fS.isChecked():
+        #     fS.setChecked(False)
         if fX.isChecked():
             fX.setChecked(False)
         types = ["virtual_helix"]
@@ -251,11 +251,11 @@ class DocumentController():
         add_oligo = False
         if win.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
-            filter_list.append("strand")
+            # filter_list.append("strand")
             add_oligo = True
-        if win.action_filter_strand.isChecked():
-            filter_list.append("strand")
-            add_oligo = True
+        # if win.action_filter_strand.isChecked():
+        #     filter_list.append("strand")
+        #     add_oligo = True
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
             add_oligo = True

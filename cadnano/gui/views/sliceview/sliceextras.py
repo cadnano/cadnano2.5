@@ -32,8 +32,8 @@ T90, T270 = QTransform(), QTransform()
 T90.rotate(90)
 T270.rotate(270)
 FWDPXI_PP, REVPXI_PP = QPainterPath(), QPainterPath()
-FWDPXI_PP.addPolygon(T270.map(TRIANGLE))
-REVPXI_PP.addPolygon(T90.map(TRIANGLE))
+FWDPXI_PP.addPolygon(T90.map(TRIANGLE))
+REVPXI_PP.addPolygon(T270.map(TRIANGLE))
 
 # FWDPXI_PP.moveTo(-0.5*IW, 0.7*IW)
 # FWDPXI_PP.lineTo(0., -0.2*IW)
@@ -331,11 +331,6 @@ class PreXoverItem(QGraphicsPathItem):
 
     def name(self):
         """Summary
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         return "%s.%d" % ("r" if self.is_fwd else "f", self.step_idx)
     # end def
@@ -345,11 +340,6 @@ class PreXoverItem(QGraphicsPathItem):
 
         Args:
             value (TYPE): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         self._active_p2_3p = QPointF(value, 0)
         self._active_p2_5p = QPointF(value, 0)
@@ -361,11 +351,6 @@ class PreXoverItem(QGraphicsPathItem):
 
         Args:
             event (TYPE): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         pxig = self.pre_xover_item_group
         if pxig.is_active:
@@ -377,11 +362,6 @@ class PreXoverItem(QGraphicsPathItem):
 
         Args:
             event (TYPE): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         pxig = self.pre_xover_item_group
         if pxig.is_active:
@@ -398,11 +378,6 @@ class PreXoverItem(QGraphicsPathItem):
             duration (TYPE): Description
             start_value (TYPE): Description
             end_value (TYPE): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         if item is not None:
             b_name = property_name.encode('ascii')
@@ -420,11 +395,6 @@ class PreXoverItem(QGraphicsPathItem):
         Args:
             is_active (TYPE): Description
             neighbor_item (None, optional): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         phos = self.phos_item
         bond = self.bond_3p
@@ -438,11 +408,11 @@ class PreXoverItem(QGraphicsPathItem):
                 p2 = self.mapFromScene(n_scene_pos)
                 bline = bond.line()
                 test = QLineF(bline.p1(), p2)
-                angle = test.angleTo(bline) + self.theta0 if self.is_fwd else -bline.angleTo(test) + self.theta0
-                # angle = 90 if self.is_fwd else -90
+                # angle = test.angleTo(bline) + self.theta0 if self.is_fwd else -bline.angleTo(test) + self.theta0
+                angle = -bline.angleTo(test) + self.theta0 if self.is_fwd else test.angleTo(bline) + self.theta0
             else:
                 p2 = self._active_p2_3p
-                angle = 90 if self.is_fwd else -90
+                angle = -90 if self.is_fwd else 90
             self.animate(phos, 'rotation', 300, self.theta0, angle)
             self.animate(bond, 'bondp2', 300, self._default_p2_3p, p2)
         elif self.is_active5p:
@@ -596,8 +566,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Summary
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         return self.virtual_helix_item.partItem()
@@ -610,8 +578,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             is_fwd (TYPE): Description
             step_idx (TYPE): Description
 
-        Returns:
-        Args:
         Returns:
             TYPE: Description
         """
@@ -630,8 +596,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             idx (TYPE): Description
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
@@ -645,8 +609,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Summary
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
@@ -657,11 +619,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     ### PUBLIC SUPPORT METHODS ###
     def addItems(self):
         """Summary
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         radius = self._radius
         step_size, bases_per_turn, tpb, mgroove = self.virtual_helix_item.getAngularProperties()
@@ -672,7 +629,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         ctr = self.mapToParent(self._rect).boundingRect().center()
         x = ctr.x() + radius - PXI_PP_ITEM_WIDTH
         y = ctr.y()
-        tpb = -tpb  # Qt +angle is Clockwise
+        # tpb = -tpb
+        # Qt +angle is Clockwise (CW), model +angle is CCW
         mgroove = -mgroove
         fwd_pxis = self.fwd_prexover_items
         rev_pxis = self.rev_prexover_items
@@ -703,11 +661,6 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def remove(self):
         """Summary
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
@@ -726,15 +679,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
     def updateTurnsPerRepeat(self):
         """Summary
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         step_size, bases_per_turn, tpb, mgroove = self.virtual_helix_item.getAngularProperties()
         mgroove = -mgroove
-        tpb = -tpb
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
         for i in range(step_size):
@@ -756,17 +703,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         """Summary
 
         Returns:
-        Args:
-        Returns:
             TYPE: Description
         """
         return self.virtual_helix_item.partCrossoverSpanAngle()
 
     def updateModelActiveBaseInfo(self, pre_xover_info):
         """Notify model of pre_xover_item hover state.
-
-        Args:
-            pre_xover_info (TYPE): Description
         """
         self.model_part.setActiveBaseInfo(pre_xover_info)
     # end def
@@ -813,11 +755,6 @@ class WedgeGizmo(QGraphicsPathItem):
             extended (bool, optional): Description
             rev_gradient (bool, optional): Description
             outline_only (bool, optional): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         # Hack to keep wedge in front
         # self.setRotation(self.pre_xover_item_group.rotation())
@@ -879,11 +816,6 @@ class WedgeGizmo(QGraphicsPathItem):
 
     def deactivate(self):
         """Summary
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         self.hide()
         self.setZValue(styles.ZWEDGEGIZMO - 10)
@@ -894,11 +826,6 @@ class WedgeGizmo(QGraphicsPathItem):
 
         Args:
             pre_xover_item (TYPE): Description
-
-        Returns:
-        Args:
-        Returns:
-            TYPE: Description
         """
         pxig = self.pre_xover_item_group
         scene_pos = self.scenePos()
