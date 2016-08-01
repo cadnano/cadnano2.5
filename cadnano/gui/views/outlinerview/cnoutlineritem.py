@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from cadnano.gui.palette import getBrushObj
 from . import outlinerstyles as styles
@@ -9,12 +9,13 @@ COLOR_COL = 2
 
 
 LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEnabled |
-                Qt.ItemIsDragEnabled | Qt.ItemIsEditable |
-                Qt.ItemIsUserCheckable)
+              Qt.ItemIsDragEnabled | Qt.ItemIsEditable |
+              Qt.ItemIsUserCheckable)
+
 
 class CNOutlinerItem(QTreeWidgetItem):
 
-    PROPERTIES = {'name':NAME_COL, 'is_visible': VISIBLE_COL, 'color':COLOR_COL}
+    PROPERTIES = {'name': NAME_COL, 'is_visible': VISIBLE_COL, 'color': COLOR_COL}
     CAN_NAME_EDIT = True
 
     def __init__(self, cn_model, parent):
@@ -23,7 +24,7 @@ class CNOutlinerItem(QTreeWidgetItem):
         name = cn_model.getName()
         color = cn_model.getColor()
         self.setData(NAME_COL, Qt.EditRole, name)
-        self.setData(VISIBLE_COL, Qt.EditRole, True) # is_visible
+        self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, color)
     # end def
 
@@ -48,11 +49,11 @@ class CNOutlinerItem(QTreeWidgetItem):
         """
         twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
         twi.setData(NAME_COL, Qt.EditRole, item_name)
-        twi.setData(VISIBLE_COL, Qt.EditRole, True) # is_visible
-        twi.setData(COLOR_COL, Qt.EditRole, "#ffffff") # color
+        twi.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
+        twi.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
         twi.setFlags(twi.flags() & ~Qt.ItemIsSelectable)
         twi.setExpanded(True)
-        twi.part = lambda : self._cn_model
+        twi.part = lambda: self._cn_model
         return twi
     # end def
 
