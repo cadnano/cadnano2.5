@@ -949,7 +949,7 @@ class VirtualHelixGroup(CNObject):
         eulerZ_new = math.radians(eulerZ) + twist_per_base*index
         mgroove = math.radians(mgroove)
 
-        # right handed rotates clockwise with increasing index
+        # right handed rotates clockwise with increasing index / z
         fwd_angles = [-i*twist_per_base + eulerZ_new for i in range(num_points)]
         rev_angles = [a + mgroove for a in fwd_angles]
         z_pts = BW*np.arange(index, num_points + index)
