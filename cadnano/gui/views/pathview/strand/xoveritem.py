@@ -31,10 +31,10 @@ class XoverNode3(QGraphicsRectItem):
         """Summary
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             xover_item (TYPE): Description
-            strand3p (TYPE): Description
-            idx (TYPE): Description
+            strand3p (Strand): reference to the 3' strand
+            idx (int): the base index within the virtual helix
         """
         super(XoverNode3, self).__init__(virtual_helix_item)
         self._vhi = virtual_helix_item
@@ -134,7 +134,7 @@ class XoverNode3(QGraphicsRectItem):
         """Summary
 
         Args:
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description
@@ -257,10 +257,10 @@ class XoverNode5(XoverNode3):
         """Summary
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             xover_item (TYPE): Description
             strand5p (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
         """
         super(XoverNode5, self).__init__(virtual_helix_item, xover_item, strand5p, idx)
     # end def
@@ -313,7 +313,7 @@ class XoverItem(QGraphicsPathItem):
 
         Args:
             strand_item (TYPE): Description
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
         """
         super(XoverItem, self).__init__(virtual_helix_item.partItem())
         self._strand_item = strand_item

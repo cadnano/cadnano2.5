@@ -126,7 +126,7 @@ class ColorPanel(QGraphicsItem):
         """Summary
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneMouseEvent): Description
 
         Returns:
             TYPE: Description

@@ -42,7 +42,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     where x is the cartesian product.
 
     Attributes:
-        active_virtual_helix_item (TYPE): Description
+        active_virtual_helix_item (VirtualHelixItem): Description
         grab_cornerBR (TYPE): Description
         grab_cornerTL (TYPE): Description
         griditem (TYPE): Description
@@ -426,7 +426,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
         """
         vhi = virtual_helix_item
         pxom = self.prexover_manager
@@ -564,10 +564,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
-        """Summary
+        """Handler for user mouse press.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            coordinates of the the event, and previous event.
 
         Args:
             TYPE: Description

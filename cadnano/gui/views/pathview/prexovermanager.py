@@ -21,7 +21,7 @@ class PreXoverManager(QGraphicsRectItem):
         part_item (TYPE): Description
         prexover_item_map (dict): Description
         pxi_pool (TYPE): Description
-        virtual_helix_item (TYPE): Description
+        virtual_helix_item (VirtualHelixItem): Description
     """
     HUE_FACTOR = 1.6
     KEYMAP = {i: getattr(Qt, 'Key_%d' % i) for i in range(10)}
@@ -183,7 +183,7 @@ class PreXoverManager(QGraphicsRectItem):
         Args:
             id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             is_fwd (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description
@@ -249,7 +249,7 @@ class PreXoverManager(QGraphicsRectItem):
 
         Args:
             virtual_helix_item (cadnano.guil.views.pathview.virtualhelixitem.VirtualHelixItem)
-            this_idx (TYPE): Description
+            this_idx (int): the base index within the virtual helix
             per_neighbor_hits (Tuple())
         """
         # print("ACTIVATING VH", virtual_helix_item.idNum())
@@ -363,7 +363,7 @@ class PreXoverManager(QGraphicsRectItem):
         Args:
             id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             is_fwd (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description

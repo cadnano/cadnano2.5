@@ -266,7 +266,7 @@ class PreXoverItem(QGraphicsRectItem):
 
     Attributes:
         adapter (TYPE): Description
-        idx (TYPE): Description
+        idx (int): the base index within the virtual helix
         is_fwd (TYPE): Description
         prexoveritemgroup (TYPE): Description
         to_vh_id_num (TYPE): Description
@@ -276,7 +276,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            from_virtual_helix_item (TYPE): Description
+            from_virtual_helix_item (VirtualHelixItem): Description
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description
@@ -317,7 +317,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            from_virtual_helix_item (TYPE): Description
+            from_virtual_helix_item (VirtualHelixItem): Description
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description

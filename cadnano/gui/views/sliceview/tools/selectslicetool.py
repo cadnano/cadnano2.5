@@ -488,10 +488,11 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mousePressEvent(self, event):
-        """Summary
+        """Handler for user mouse press.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            coordinates of the the event, and previous event.
 
         Returns:
             TYPE: Description

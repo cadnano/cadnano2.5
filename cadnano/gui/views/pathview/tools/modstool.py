@@ -25,7 +25,7 @@ class ModsTool(AbstractPathTool):
     docstring for ModsTool
 
     Attributes:
-        current_idx (TYPE): Description
+        current_idx (int): the base index within the virtual helix
         current_strand (TYPE): Description
         dialog (TYPE): Description
         uiDlg (TYPE): Description
@@ -310,7 +310,7 @@ class ModsTool(AbstractPathTool):
 
         Args:
             strand (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description

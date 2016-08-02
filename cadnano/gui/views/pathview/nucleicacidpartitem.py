@@ -36,7 +36,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
     Attributes:
-        active_virtual_helix_item (TYPE): Description
+        active_virtual_helix_item (VirtualHelixItem): Description
         findChild (TYPE): Description
         grab_corner (TYPE): Description
         prexover_manager (TYPE): Description
@@ -497,7 +497,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """
         Updates the bounding rect to the size of the childrenBoundingRect,
         and refreshes the addBases and removeBases buttons accordingly.
-        
+
         Called by partVirtualHelixAddedSlot, partZDimensionsChangedSlot, or
         removeVirtualHelixItem.
         """
@@ -591,7 +591,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
         """
         vhi = virtual_helix_item
 
@@ -613,7 +613,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
 
         Returns:
             TYPE: Description
@@ -654,13 +654,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     ### TOOL METHODS ###
     def mousePressEvent(self, event):
-        """Summary
+        """Handler for user mouse press.
 
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            coordinates of the the event, and previous event.
         """
         self._viewroot.clearSelectionsIfActiveTool()
         return QGraphicsItem.mousePressEvent(self, event)
@@ -683,7 +681,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Pencil the strand is possible.
 
         Args:
-            pt (TYPE): Description
+            pt (QPointF): mouse cursor location of pencil tool hover.
         """
         active_tool = self._getActiveTool()
         if not active_tool.isFloatingXoverBegin():

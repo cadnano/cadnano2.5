@@ -250,7 +250,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Summary
 
         Args:
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
             strand (TYPE): Description
 
         Returns:
@@ -265,7 +265,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Summary
 
         Args:
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
             is_fwd (TYPE): Description
 
         Returns:
@@ -527,8 +527,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds
 
         Args:
-            strand_set (TYPE): Description
-            idx (TYPE): Description
+            strand_set (StrandSet): Description
+            idx (int): the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
@@ -541,8 +541,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds
 
         Args:
-            strand_set (TYPE): Description
-            idx (TYPE): Description
+            strand_set (StrandSet): Description
+            idx (int): the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
@@ -554,8 +554,8 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """strand.getDragBounds
 
         Args:
-            strand_set (TYPE): Description
-            idx (TYPE): Description
+            strand_set (StrandSet): Description
+            idx (int): the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()

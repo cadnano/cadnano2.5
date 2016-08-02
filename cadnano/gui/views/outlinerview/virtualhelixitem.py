@@ -7,6 +7,7 @@ from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LE
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
+
 class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False
@@ -41,7 +42,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     def updateCNModel(self):
         """
         """
-        cn_model = self._cn_model
+        # cn_model = self._cn_model
         new_name = self.data(NAME_COL, Qt.DisplayRole)
         new_is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
         new_color = self.data(COLOR_COL, Qt.DisplayRole)

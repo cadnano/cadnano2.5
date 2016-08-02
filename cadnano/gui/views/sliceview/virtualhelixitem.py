@@ -218,14 +218,24 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             part_item (NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
 
-        Returns:
-            TYPE: Description
         """
         part = self._model_part
         part.setSelected(True)
         tool.selectOrSnap(part_item, self, event)
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    def pencilToolMousePress(self, tool, part_item, event):
+        """Summary
+
+        Args:
+            tool (SelectSliceTool): reference to call tool-specific methods
+            part_item (NucleicAcidPartItem): reference to the part item
+            event (QMouseEvent): contains parameters that describe the mouse event
+        """
+        part = self._model_part
+        print("pencilToolMousePress", part)
+        # tool.attemptToCreateStrand
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
         """The event handler for when the a model virtual helix propety has

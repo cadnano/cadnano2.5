@@ -10,12 +10,14 @@ from PyQt5.QtCore import QLineF, QObject, QPointF, Qt, QRectF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtGui import QRadialGradient, QTransform
+from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from cadnano.gui.palette import getColorObj, getBrushObj
 from cadnano.gui.palette import getPenObj, getNoPen
+from cadnano import util
 from . import slicestyles as styles
 
 PXI_PP_ITEM_WIDTH = IW = 2.0  # 1.5
@@ -266,8 +268,8 @@ class PreXoverItem(QGraphicsPathItem):
         item_3p (TYPE): Description
         item_5p (TYPE): Description
         phos_item (TYPE): Description
-        pre_xover_item_group (TYPE): Description
-        step_idx (TYPE): Description
+        pre_xover_item_group (PreXoverItemGroup): Description
+        step_idx (int): the base index within the virtual helix
         theta0 (TYPE): Description
     """
     def __init__(self, step_idx,
@@ -277,7 +279,7 @@ class PreXoverItem(QGraphicsPathItem):
         """Summary
 
         Args:
-            step_idx (TYPE): Description
+            step_idx (int): the base index within the virtual helix
             twist_per_base (TYPE): Description
             bases_per_repeat (TYPE): Description
             color (TYPE): Description
@@ -329,11 +331,12 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        """Summary
+        """Handler for hoverEnterEvent.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): Description
         """
+        print("hoverEnterEvent")
         pxig = self.pre_xover_item_group
         if pxig.is_active:
             pxig.updateModelActiveBaseInfo(self.getInfo())
@@ -343,7 +346,7 @@ class PreXoverItem(QGraphicsPathItem):
         """Summary
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): Description
         """
         pxig = self.pre_xover_item_group
         if pxig.is_active:
@@ -495,7 +498,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         model_part (Part): The model part
         rev_prexover_items (dict): Description
         SPIRAL_FACTOR (float): Description
-        virtual_helix_item (TYPE): Description
+        virtual_helix_item (VirtualHelixItem): Description
     """
     HUE_FACTOR = 1.6
     SPIRAL_FACTOR = 0.4
@@ -506,7 +509,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         Args:
             radius (TYPE): Description
             rect (TYPE): Description
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             is_active (TYPE): Description
         """
         super(PreXoverItemGroup, self).__init__(rect, virtual_helix_item)
@@ -550,7 +553,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
         Args:
             is_fwd (TYPE): Description
-            step_idx (TYPE): Description
+            step_idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description
@@ -567,7 +570,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
         Args:
             is_fwd (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description

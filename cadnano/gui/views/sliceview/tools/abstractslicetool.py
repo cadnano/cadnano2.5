@@ -65,7 +65,7 @@ class AbstractSliceTool(QGraphicsObject):
         """Summary
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
 
         Returns:
             TYPE: Description

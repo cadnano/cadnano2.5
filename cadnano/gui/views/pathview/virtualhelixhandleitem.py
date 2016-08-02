@@ -39,7 +39,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """Summary
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             part_item (TYPE): Description
             viewroot (TYPE): Description
         """
@@ -264,7 +264,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         to the hover colors if necessary.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): Description
         """
         if not self.isSelected():
             if self._id_num >= 0:
@@ -284,7 +284,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         to the default colors if necessary.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): Description
         """
         if not self.isSelected():
             self.setSelectedColor(False)

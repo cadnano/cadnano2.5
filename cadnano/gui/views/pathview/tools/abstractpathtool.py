@@ -70,7 +70,7 @@ class AbstractPathTool(QGraphicsObject):
         left hand corner of the base the user is mousing over.
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             scene_pos (TYPE): Description
             *args (TYPE): Description
         """
@@ -145,7 +145,7 @@ class AbstractPathTool(QGraphicsObject):
         to pt in virtual_helix_item.
 
         Args:
-            virtual_helix_item (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
             pt (TYPE): Description
         """
         x, strand_idx = self.helixIndex(pt)

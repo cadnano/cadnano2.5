@@ -18,7 +18,7 @@ class PreXoverManager(QGraphicsRectItem):
         neighbor_prexover_items (dict): Description
         part_item (TYPE): Description
         prexover_item_map (dict): Description
-        virtual_helix_item (TYPE): Description
+        virtual_helix_item (VirtualHelixItem): Description
     """
     def __init__(self, part_item):
         """Summary
@@ -90,8 +90,8 @@ class PreXoverManager(QGraphicsRectItem):
         neighbors and connect the neighboring bases
 
         Args:
-            virtual_helix_item (TYPE): Description
-            idx (TYPE): Description
+            virtual_helix_item (VirtualHelixItem): Description
+            idx (int): the base index within the virtual helix
             per_neighbor_hits (TYPE): Description
             pairs (TYPE): Description
         """
@@ -169,7 +169,7 @@ class PreXoverManager(QGraphicsRectItem):
         Args:
             id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
             is_fwd (TYPE): Description
-            idx (TYPE): Description
+            idx (int): the base index within the virtual helix
 
         Returns:
             TYPE: Description

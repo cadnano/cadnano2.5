@@ -269,10 +269,11 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def mousePressEvent(self, event):
-        """Summary
+        """Handler for user mouse press.
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            coordinates of the the event, and previous event.
 
         Returns:
             TYPE: Description
@@ -291,10 +292,7 @@ class GridPoint(QGraphicsEllipseItem):
         """Summary
 
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event (QGraphicsSceneHoverEvent): Description
         """
         self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
@@ -304,10 +302,7 @@ class GridPoint(QGraphicsEllipseItem):
         """Summary
 
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event (QGraphicsSceneHoverEvent): Description
         """
         self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.0))
@@ -320,9 +315,6 @@ class GridPoint(QGraphicsEllipseItem):
             tool (TYPE): Description
             part_item (TYPE): Description
             event (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         part = part_item.part()
         part.setSelected(True)
@@ -338,9 +330,6 @@ class GridPoint(QGraphicsEllipseItem):
             tool (TYPE): Description
             part_item (TYPE): Description
             event (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         part = part_item.part()
         part.setSelected(True)
@@ -355,7 +344,7 @@ class GridEvent(object):
 
     Attributes:
         grid_pt (TYPE): Description
-        offset (TYPE): Description
+        offset (QPointF): Description
     """
     __slots__ = 'grid_pt', 'offset'
 
@@ -370,17 +359,17 @@ class GridEvent(object):
         self.offset = QPointF(offset, offset)
 
     def scenePos(self):
-        """Summary
+        """Scene position, with offset.
 
         Returns:
-            TYPE: Description
+            QPointF: Description
         """
         return self.grid_pt.scenePos() + self.offset
 
     def pos(self):
-        """Summary
+        """Local position, with offset.
 
         Returns:
-            TYPE: Description
+            QPointF: Description
         """
         return self.grid_pt.pos() + self.offset
