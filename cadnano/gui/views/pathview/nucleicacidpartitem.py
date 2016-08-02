@@ -291,7 +291,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi_list.append(vhi)
         ztf = not getBatch()
         self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
-        self._updateBoundingRect()
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num):
@@ -396,8 +395,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list,
-                                      zoom_to_fit=ztf)
-        self._updateBoundingRect()
+            zoom_to_fit=ztf)
     # end def
 
     def window(self):
@@ -421,8 +419,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
             zoom_to_fit (bool, optional): Description
         """
         y = 0  # How far down from the top the next PH should be
-        leftmost_extent = 0
-        rightmost_extent = 0
         vhi_rect = None
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
@@ -446,23 +442,23 @@ class NucleicAcidPartItem(QAbstractPartItem):
             if vhi_h_rect is None:
                 vhi_h_rect = vhi_h.boundingRect()
 
-            # vhi_h.setPos(-2 * vhi_h_rect.width(), y + (vhi_rect.height() - vhi_h_rect.height()) / 2)
             vhi_h_x = _z - _VH_XOFFSET
             vhi_h_y = y + (vhi_rect.height() - vhi_h_rect.height()) / 2
             vhi_h.setPos(vhi_h_x, vhi_h_y)
 
-            # leftmost_extent = min(leftmost_extent, vhi_h_x)
-            leftmost_extent = min(leftmost_extent, -1.5*vhi_h_rect.width())
-            rightmost_extent = max(rightmost_extent, vhi_rect.width())
             y += step
             self.updateXoverItems(vhi)
             if do_reselect:
                 vhi_h_selection_group.addToGroup(vhi_h)
         # end for
-        self._vh_rect = QRectF(leftmost_extent, -10, -leftmost_extent + rightmost_extent, y)
+        # this need only adjust top and bottom edges of the bounding rectangle
+        self._vh_rect.setTop(-10)
+        self._vh_rect.setBottom(y)
         self._virtual_helix_item_list = new_list
-        if zoom_to_fit:
-            self.scene().views()[0].zoomToFit()
+
+        # now update Z dimension (X in Qt space in the Path view)
+        part = self.part()
+        self.partZDimensionsChangedSlot(part, *part.zBoundsIds(), ztf=zoom_to_fit)
     # end def
 
     def resetPen(self, color, width=0):
@@ -498,8 +494,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Updates the bounding rect to the size of the childrenBoundingRect,
         and refreshes the addBases and removeBases buttons accordingly.
 
-        Called by partVirtualHelixAddedSlot, partZDimensionsChangedSlot, or
-        removeVirtualHelixItem.
+        Called by partZDimensionsChangedSlot and partPropertyChangedSlot
         """
         self.setPen(getPenObj(self.modelColor(), 0))
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
