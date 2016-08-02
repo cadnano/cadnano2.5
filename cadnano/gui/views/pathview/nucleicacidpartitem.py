@@ -36,7 +36,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
     Attributes:
-        active_virtual_helix_item (VirtualHelixItem): Description
+        active_virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         findChild (TYPE): Description
         grab_corner (TYPE): Description
         prexover_manager (TYPE): Description
@@ -545,16 +545,16 @@ class NucleicAcidPartItem(QAbstractPartItem):
         if index_delta < 0:  # move group earlier in the list
             new_index = max(0, index_delta + first_index)
             new_list = vhi_list[0:new_index] +\
-                                vhi_list[first_index:last_index] +\
-                                vhi_list[new_index:first_index] +\
-                                vhi_list[last_index:]
+                       vhi_list[first_index:last_index] +\
+                       vhi_list[new_index:first_index] +\
+                       vhi_list[last_index:]
         # end if
         else:  # move group later in list
             new_index = min(len(vhi_list), index_delta + last_index)
             new_list = vhi_list[:first_index] +\
-                                 vhi_list[last_index:new_index] +\
-                                 vhi_list[first_index:last_index] +\
-                                 vhi_list[new_index:]
+                       vhi_list[last_index:new_index] +\
+                       vhi_list[first_index:last_index] +\
+                       vhi_list[new_index:]
         # end else
 
         # call the method to move the items and store the list
@@ -586,7 +586,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         vhi = virtual_helix_item
 
@@ -608,7 +608,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            virtual_helix_item (VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description

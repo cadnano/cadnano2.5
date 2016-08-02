@@ -39,7 +39,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         """Summary
 
         Args:
-            virtual_helix_item (VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             part_item (TYPE): Description
             viewroot (TYPE): Description
         """

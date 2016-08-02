@@ -65,7 +65,7 @@ class AbstractSliceTool(QGraphicsObject):
         """Summary
 
         Args:
-            virtual_helix_item (VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description
