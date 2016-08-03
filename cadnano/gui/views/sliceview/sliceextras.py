@@ -17,7 +17,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from cadnano.gui.palette import getColorObj, getBrushObj
 from cadnano.gui.palette import getPenObj, getNoPen
-from cadnano import util
+# from cadnano import util
 from . import slicestyles as styles
 
 PXI_PP_ITEM_WIDTH = IW = 2.0  # 1.5
@@ -202,6 +202,7 @@ class Triangle(QGraphicsPathItem):
         color = pre_xover_item.color
         self.adapter = PropertyWrapperObject(self)
         self.setAcceptHoverEvents(True)
+        self.setFiltersChildEvents(True)
         self._click_area = click_area = QGraphicsRectItem(PXI_RECT, self)
         click_area.setAcceptHoverEvents(True)
         click_area.setPen(getNoPen())
@@ -226,6 +227,18 @@ class Triangle(QGraphicsPathItem):
             self._click_area.setPos(-0.5*IW, -0.25*IW)
         # self.setPos(TRIANGLE_OFFSET)
     # end def
+
+    # def mousePressEvent(self, event):
+    #     print("Triangle press 1")
+    #     # QGraphicsItem.mousePressEvent(self, event)
+
+    # def mouseMoveEvent(self, event):
+    #     print("Triangle move 2")
+    #     # QGraphicsItem.mouseMoveEvent(self, event)
+
+    # def mouseReleaseEvent(self, event):
+    #     print("Triangle release 3")
+    #     # QGraphicsItem.mouseReleaseEvent(self, event)
 # end class
 
 
@@ -330,13 +343,25 @@ class PreXoverItem(QGraphicsPathItem):
     # end def
 
     ### EVENT HANDLERS ###
+    def mousePressEvent(self, event):
+        print("PreXoverItem press")
+        # QGraphicsItem.mousePressEvent(self, event)
+
+    def mouseMoveEvent(self, event):
+        print("PreXoverItem move")
+        # QGraphicsItem.mouseMoveEvent(self, event)
+
+    def mouseReleaseEvent(self, event):
+        print("PreXoverItem release")
+        # QGraphicsItem.mouseMoveEvent(self, event)
+
     def hoverEnterEvent(self, event):
         """Handler for hoverEnterEvent.
 
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
-        print("hoverEnterEvent")
+        print("PreXoverItem hoverEnterEvent")
         pxig = self.pre_xover_item_group
         if pxig.is_active:
             pxig.updateModelActiveBaseInfo(self.getInfo())
@@ -513,15 +538,14 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             is_active (TYPE): Description
         """
         super(PreXoverItemGroup, self).__init__(rect, virtual_helix_item)
+
         self._radius = radius
         self._rect = rect
         self.virtual_helix_item = virtual_helix_item
         self.model_part = virtual_helix_item.part()
         self.id_num = virtual_helix_item.idNum()
         self.is_active = is_active
-
         self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
-
         self.fwd_prexover_items = {}
         self.rev_prexover_items = {}
         self._colors = self._getColors()
@@ -536,7 +560,18 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
                                                            'eulerZ'])
 
         self.setRotation(-eulerZ)  # add 180
+
+        # self.setFiltersChildEvents(False)
     # end def
+
+    def mousePressEvent(self, event):
+        print("PreXoverGroup press")
+
+    def mouseMoveEvent(self, event):
+        print("PreXoverGroup move")
+
+    def mouseReleaseEvent(self, event):
+        print("PreXoverGroup release")
 
     ### ACCESSORS ###
     def partItem(self):
@@ -677,10 +712,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
     # end def
 
     def partCrossoverSpanAngle(self):
-        """Summary
-
+        """
         Returns:
-            TYPE: Description
+            int: Crossover span angle from Part.
         """
         return self.virtual_helix_item.partCrossoverSpanAngle()
 
@@ -696,7 +730,7 @@ class WedgeGizmo(QGraphicsPathItem):
     """Summary
 
     Attributes:
-        pre_xover_item_group (TYPE): Description
+        pre_xover_item_group (PreXoverItemGroup): usually the parent of WG.
     """
     def __init__(self, radius, rect, pre_xover_item_group):
         """parent could be a PreXoverItemGroup or a VirtualHelixItem
