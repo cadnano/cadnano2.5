@@ -17,3 +17,8 @@ when in python interpreter you can just:
 
 And script your designs without a GUI
 
+## License
+
+    the GUI code is GPLv3, the rest of the code BSD3.
+    The full license can be found in LICENSE
+

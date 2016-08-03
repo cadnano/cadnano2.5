@@ -16,6 +16,11 @@ you may do so the setup.py script::
   $ python setup.py install
 '''
 
+# make Wheels with:
+# python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35
+# python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35
+
+
 import os
 import shutil
 import subprocess
@@ -130,7 +135,8 @@ setup(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
         'Topic :: Scientific/Engineering :: Bio-Informatics',
-        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)'
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: BSD License'
     ],
     packages=cn_packages,
     ext_modules=[],
