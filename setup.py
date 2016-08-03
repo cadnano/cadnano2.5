@@ -134,10 +134,9 @@ setup(
     ],
     packages=cn_packages,
     ext_modules=[],
-    # test_suite='tests',
     zip_safe=False,
     install_requires=[
-        # 'PyQt5>=5.6', Uncomment this when Official wheels get fixed
+        'PyQt5==5.7', # Uncomment this when Official wheels get fixed
         'numpy>=1.10.0',
         'pandas>=0.18',
         'pytz>=2011k',
