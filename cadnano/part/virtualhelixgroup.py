@@ -842,7 +842,7 @@ class VirtualHelixGroup(CNObject):
                 The origin should be referenced from an index of 0.
             direction (array-like):  of :obj:`float` of length 3
             num_points (int): number of bases in Virtual Helix
-            color (str):
+            color (str): hexadecimal color code in the form: `#RRGGBB`
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:

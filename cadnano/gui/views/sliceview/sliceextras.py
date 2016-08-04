@@ -6,11 +6,13 @@ Attributes:
     TRIANGLE (TYPE): Description
     WEDGE_RECT (TYPE): Description
 """
+import numpy as np
+
 from PyQt5.QtCore import QLineF, QObject, QPointF, Qt, QRectF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
 from PyQt5.QtGui import QRadialGradient, QTransform
-from PyQt5.QtWidgets import QGraphicsItem
+# from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
@@ -186,16 +188,18 @@ class PropertyWrapperObject(QObject):
 
 
 class Triangle(QGraphicsPathItem):
-    """Summary
+    """Triangle is used to represent individual bases in sliceview
+    VirtualHelixItems. Forward bases (5'–3' into the screen) are drawn with a
+    solid color fill color. Reverse bases (5'–3' out of the screen) drawn with
+    a stroke ouline and no fill.
 
     Attributes:
         adapter (TYPE): Description
     """
     def __init__(self, is_fwd, pre_xover_item):
-        """Summary
-
+        """
         Args:
-            is_fwd (TYPE): Description
+            is_fwd (bool): True if forward strand base, False if reverse.
             pre_xover_item (TYPE): Description
         """
         super(Triangle, self).__init__(pre_xover_item)
@@ -227,18 +231,6 @@ class Triangle(QGraphicsPathItem):
             self._click_area.setPos(-0.5*IW, -0.25*IW)
         # self.setPos(TRIANGLE_OFFSET)
     # end def
-
-    # def mousePressEvent(self, event):
-    #     print("Triangle press 1")
-    #     # QGraphicsItem.mousePressEvent(self, event)
-
-    # def mouseMoveEvent(self, event):
-    #     print("Triangle move 2")
-    #     # QGraphicsItem.mouseMoveEvent(self, event)
-
-    # def mouseReleaseEvent(self, event):
-    #     print("Triangle release 3")
-    #     # QGraphicsItem.mouseReleaseEvent(self, event)
 # end class
 
 
@@ -269,7 +261,7 @@ class PhosBond(QGraphicsLineItem):
 # end class
 
 
-class PreXoverItem(QGraphicsPathItem):
+class PreXoverItem(QGraphicsRectItem):
     """Summary
 
     Attributes:
@@ -285,17 +277,15 @@ class PreXoverItem(QGraphicsPathItem):
         step_idx (int): the base index within the virtual helix
         theta0 (TYPE): Description
     """
-    def __init__(self, step_idx,
-                 twist_per_base, bases_per_repeat,
-                 color, pre_xover_item_group,
-                 is_fwd=True):
+    def __init__(self, step_idx, twist_per_base, bases_per_repeat,
+                 color, pre_xover_item_group, is_fwd=True):
         """Summary
 
         Args:
             step_idx (int): the base index within the virtual helix
-            twist_per_base (TYPE): Description
-            bases_per_repeat (TYPE): Description
-            color (TYPE): Description
+            twist_per_base (float): (turns per repeat)*360/(base per repeat)
+            bases_per_repeat (int): number of bases that will be displayed
+            color (str): hexadecimal color code in the form: `#RRGGBB`
             pre_xover_item_group (TYPE): Description
             is_fwd (bool, optional): Description
         """
@@ -316,6 +306,10 @@ class PreXoverItem(QGraphicsPathItem):
         self.bond_3p = PhosBond(is_fwd, self)
         self.setAcceptHoverEvents(True)
         self.setFiltersChildEvents(True)
+        self.setRect(self.phos_item.boundingRect())
+        self.setPen(getNoPen())
+        # self.setPen(getPenObj('#cccccc', 0.1, alpha=128, capstyle=Qt.RoundCap))
+
     # end def
 
     ### ACCESSORS ###
@@ -344,15 +338,24 @@ class PreXoverItem(QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event):
-        print("PreXoverItem press")
+        # print("PreXoverItem press")
+        pxig = self.pre_xover_item_group
+        pxig.baseNearLine.show()
+        self.initStrandFromTriangle()
         # QGraphicsItem.mousePressEvent(self, event)
 
     def mouseMoveEvent(self, event):
-        print("PreXoverItem move")
+        # print("PreXoverItem move", event.pos())
+        pxig = self.pre_xover_item_group
+        pxig.baseNearestPoint(self.is_fwd, event.scenePos())
+        # self.updateStrandFromTriangle()
         # QGraphicsItem.mouseMoveEvent(self, event)
 
     def mouseReleaseEvent(self, event):
-        print("PreXoverItem release")
+        # print("PreXoverItem release")
+        pxig = self.pre_xover_item_group
+        pxig.baseNearLine.hide()
+        self.attemptToCreateStrand()
         # QGraphicsItem.mouseMoveEvent(self, event)
 
     def hoverEnterEvent(self, event):
@@ -397,6 +400,15 @@ class PreXoverItem(QGraphicsPathItem):
             anim.setEndValue(end_value)
             anim.start()
             item.adapter.saveRef(property_name, anim)
+
+    def initStrandFromTriangle(self):
+        print('initStrandFromTriangle')
+
+    def updateStrandFromTriangle(self):
+        print("updateStrandFromTriangle")
+
+    def attemptToCreateStrand(self):
+        print("attemptToCreateStrand")
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active, neighbor_item=None):
@@ -546,8 +558,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.id_num = virtual_helix_item.idNum()
         self.is_active = is_active
         self.active_wedge_gizmo = WedgeGizmo(radius, rect, self)
-        self.fwd_prexover_items = {}
-        self.rev_prexover_items = {}
+        self.fwd_prexover_items = fwd_pxis = {}
+        self.rev_prexover_items = rev_pxis = {}
         self._colors = self._getColors()
         self.addItems()
         self.setPen(getNoPen())
@@ -561,7 +573,18 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
 
         self.setRotation(-eulerZ)  # add 180
 
-        # self.setFiltersChildEvents(False)
+        # for baseNearestPoint
+        fwd_pos, rev_pos = [], []
+        step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
+        for i in range(step_size):
+            fwd_pos.append((fwd_pxis[i].scenePos().x(),
+                            fwd_pxis[i].scenePos().y()))
+            rev_pos.append((rev_pxis[i].scenePos().x(),
+                            rev_pxis[i].scenePos().y()))
+        self.fwd_pos_array = np.asarray(fwd_pos)
+        self.rev_pos_array = np.asarray(rev_pos)
+        self.baseNearLine = QGraphicsLineItem(self)
+        self.baseNearLine.setPen(getPenObj("#000000", 0.25, capstyle=Qt.RoundCap))
     # end def
 
     def mousePressEvent(self, event):
@@ -670,6 +693,26 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             next_fwd.set5pItem(fwd)
             next_rev.set5pItem(rev)
     # end def
+
+    def baseNearestPoint(self, is_fwd, scene_pos):
+        """Summary
+
+        Args:
+            is_fwd (bool): used to check fwd or rev lists.
+            scene_pos (QPointF): scene coordinate position
+
+        Returns:
+            PreXoverItem: base nearest to position
+        """
+        pos_array = self.fwd_pos_array if is_fwd else self.rev_pos_array
+        dist_2 = np.sum((pos_array - (scene_pos.x(), scene_pos.y()))**2, axis=1)
+        near_idx = np.argmin(dist_2)
+        near_pxi = self.fwd_prexover_items[near_idx] if is_fwd else self.rev_prexover_items[near_idx]
+        # Draw a line
+        p1 = self.mapFromScene(scene_pos.x(), scene_pos.y())
+        p2 = self.mapFromScene(near_pxi.scenePos())
+        line = QLineF(p1, p2)
+        self.baseNearLine.setLine(line)
 
     def remove(self):
         """Summary

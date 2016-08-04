@@ -622,7 +622,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Shows status_string in the MainWindow's status bar.
 
         Args:
-            status_string (TYPE): Description
+            status_string (str): The text to be displayed.
         """
         self.window().statusBar().showMessage(status_string)
 
