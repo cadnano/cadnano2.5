@@ -114,7 +114,7 @@ class StrandSet(CNObject):
         return self.strand_heap
 
     def reset(self, initial_size):
-        """Reset this object clearing out references to all :class:`Strand` 
+        """Reset this object clearing out references to all :class:`Strand`
         objects.
 
         Args:
@@ -222,7 +222,9 @@ class StrandSet(CNObject):
             base_idx (int): the index of interest
 
         Returns:
-            :obj:`tuple` of :obj:`int`: (low_idx, high_idx)
+            tuple: of :obj:`int` of form::
+
+                (low_idx, high_idx)
         """
         class DummyStrand(object):
             _base_idx_low = base_idx

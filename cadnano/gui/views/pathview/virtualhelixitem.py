@@ -378,7 +378,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
         if hasattr(self, tool_method_name):
             self._last_strand_set, self._last_idx = strand_set, idx
-            getattr(self, tool_method_name)(strand_set, idx)
+            getattr(self, tool_method_name)(strand_set, idx, event.modifiers())
         else:
             event.setAccepted(False)
     # end def
@@ -523,7 +523,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### TOOL METHODS ###
-    def pencilToolMousePress(self, strand_set, idx):
+    def pencilToolMousePress(self, strand_set, idx, modifiers):
         """strand.getDragBounds
 
         Args:
@@ -531,6 +531,11 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             idx (int): the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
+        if modifiers & Qt.ShiftModifier:
+            bounds = strand_set.getBoundsOfEmptyRegionContaining(idx)
+            ret = strand_set.createStrand(*bounds)
+            print("creating strand {} was successful: {}".format(bounds, ret))
+            return
         active_tool = self._getActiveTool()
         if not active_tool.isDrawingStrand():
             active_tool.initStrandItemFromVHI(self, strand_set, idx)
