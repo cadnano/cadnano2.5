@@ -318,7 +318,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
-    def partVirtualHelixRemovedSlot(self, sender, id_num):
+    def partVirtualHelixRemovingSlot(self, sender, id_num):
         """Summary
 
         Args:
@@ -329,6 +329,14 @@ class NucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         self.removeVirtualHelixItem(id_num)
+    # end def
+
+    def partVirtualHelixRemovedSlot(self, sender, id_num):
+        """ Step 2 of removing a VHI
+        """
+        ztf = not getBatch()
+        self._setVirtualHelixItemList(self._virtual_helix_item_list,
+            zoom_to_fit=ztf)
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
@@ -393,9 +401,6 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi.virtualHelixRemovedSlot()
         self._virtual_helix_item_list.remove(vhi)
         del self._virtual_helix_item_hash[id_num]
-        ztf = not getBatch()
-        self._setVirtualHelixItemList(self._virtual_helix_item_list,
-            zoom_to_fit=ztf)
     # end def
 
     def window(self):

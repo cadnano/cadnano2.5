@@ -126,7 +126,7 @@ class SelectSliceTool(AbstractSliceTool):
                     # required for first call
                     pass
             if self.part_item is not None:
-                print("modelClear yikes")
+                # print("modelClear yikes")
                 self.modelClear()
             self.part_item = part_item
             self.group.setParentItem(part_item)

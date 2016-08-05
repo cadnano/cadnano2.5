@@ -20,6 +20,7 @@ class PartItemController():
         m_p.partViewPropertySignal.connect(p_i.partViewPropertySlot)
 
         m_p.partVirtualHelixAddedSignal.connect(p_i.partVirtualHelixAddedSlot)
+        m_p.partVirtualHelixRemovingSignal.connect(p_i.partVirtualHelixRemovingSlot)
         m_p.partVirtualHelixRemovedSignal.connect(p_i.partVirtualHelixRemovedSlot)
         m_p.partVirtualHelixResizedSignal.connect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelicesReorderedSignal.connect(p_i.partVirtualHelicesReorderedSlot)
@@ -48,6 +49,7 @@ class PartItemController():
         m_p.partViewPropertySignal.disconnect(p_i.partViewPropertySlot)
 
         m_p.partVirtualHelixAddedSignal.disconnect(p_i.partVirtualHelixAddedSlot)
+        m_p.partVirtualHelixRemovingSignal.disconnect(p_i.partVirtualHelixRemovingSlot)
         m_p.partVirtualHelixRemovedSignal.disconnect(p_i.partVirtualHelixRemovedSlot)
         m_p.partVirtualHelixResizedSignal.disconnect(p_i.partVirtualHelixResizedSlot)
         m_p.partVirtualHelicesReorderedSignal.disconnect(p_i.partVirtualHelicesReorderedSlot)

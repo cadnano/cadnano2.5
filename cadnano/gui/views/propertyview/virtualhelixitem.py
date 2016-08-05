@@ -126,20 +126,29 @@ class VirtualHelixItem(QTreeWidgetItem):
                 # print("change slot", key, val)
                 self.setValue(key, val)
 
+    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+        """Summary
+
+        Args:
+            sender (obj): Model object that emitted the signal.
+            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            neighbors (list):
+        """
+        if self._cn_model == sender and id_num == self._id_num:
+            self._cn_model = None
+            self._controller = None
+            self.parent().removeChild(self)
+    # end def
+
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         """Summary
 
         Args:
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
-
-        Returns:
-            TYPE: Description
         """
-        if self._cn_model == sender and id_num == self._id_num:
-            self._cn_model = None
-            self._controller = None
-            self.parent().removeChild(self)
+        pass
+    # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
         """Summary

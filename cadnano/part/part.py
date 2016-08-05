@@ -105,8 +105,10 @@ class Part(VirtualHelixGroup):
                         name='partActiveBaseInfoSignal')
     partVirtualHelixAddedSignal = ProxySignal(object, int, object,
                         name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num, neighbor list
-    partVirtualHelixRemovedSignal = ProxySignal(object, int, object,
-                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num, neighbor list
+    partVirtualHelixRemovingSignal = ProxySignal(object, int, object,
+                        name='partVirtualHelixRemovingSignal')     # self, virtual_helix id_num, neighbor list
+    partVirtualHelixRemovedSignal = ProxySignal(object, int,
+                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
     partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
                         name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
     partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,

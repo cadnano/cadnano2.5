@@ -589,7 +589,7 @@ class Document(CNObject):
         let them be garbage collect
         the dictionary maintains what is selected
         """
-        print("reset views")
+        # print("reset views")
         self._selection_dict = {}
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}

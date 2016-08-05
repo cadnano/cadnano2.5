@@ -111,6 +111,9 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partVirtualHelixAddedSlot(self, sender):
         pass
 
+    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+        pass
+
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         pass
 
@@ -218,6 +221,9 @@ class AbstractPartItem(object):
         pass
 
     def partVirtualHelixAddedSlot(self, sender):
+        pass
+
+    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
         pass
 
     def partVirtualHelixRemovedSlot(self, sender, id_num):

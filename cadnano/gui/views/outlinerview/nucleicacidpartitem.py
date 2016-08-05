@@ -89,7 +89,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self._virtual_helix_item_hash[id_num] = vh_i
         tw.is_child_adding -= 1
 
-    def partVirtualHelixRemovedSlot(self, model_part, id_num):
+    def partVirtualHelixRemovingSlot(self, model_part, id_num, neigbors):
         vh_i = self._virtual_helix_item_hash.get(id_num)
         # in case a VirtualHelixItem Object is cleaned up before this happends
         if vh_i is not None:

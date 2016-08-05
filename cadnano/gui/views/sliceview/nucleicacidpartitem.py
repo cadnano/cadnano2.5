@@ -297,7 +297,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
     # end def
 
-    def partVirtualHelixRemovedSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
         """Summary
 
         Args:
