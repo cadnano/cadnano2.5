@@ -321,6 +321,7 @@ class GridPoint(QGraphicsEllipseItem):
         # print("monkey")
         alt_event = GridEvent(self, self.offset)
         tool.selectOrSnap(part_item, alt_event, event)
+        return QGraphicsEllipseItem.mousePressEvent(self, event)
     # end def
 
     def createToolMousePress(self, tool, part_item, event):
