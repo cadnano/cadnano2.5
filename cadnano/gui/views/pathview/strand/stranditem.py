@@ -2,40 +2,34 @@
 # encoding: utf-8
 
 from math import floor
+from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsSimpleTextItem
+from cadnano import getBatch
+from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
+from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen
+from cadnano.gui.views.pathview import pathstyles as styles
+from .decorators.insertionitem import InsertionItem
+from .endpointitem import EndpointItem
+from .xoveritem import XoverItem
 
 # import logging
 # logger = logging.getLogger(__name__)
-from cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller import StrandItemController
-from .endpointitem import EndpointItem
-from cadnano.gui.views.pathview import pathstyles as styles
-from .xoveritem import XoverItem
-from .decorators.insertionitem import InsertionItem
-
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen, getNoBrush, getSolidBrush
-
-import cadnano.util as util
-from cadnano import getBatch
-
-from PyQt5.QtCore import QRectF, Qt, QObject, pyqtSignal
-from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QFontMetricsF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsSimpleTextItem
-
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
-_DEFAULT_RECT = QRectF(0,0, _BASE_WIDTH, _BASE_WIDTH)
-_NO_PEN = QPen(Qt.NoPen)
-
+_DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
+_NO_PEN = getNoPen()
 SELECT_COLOR = "#ff3333"
+
 
 class StrandItem(QGraphicsLineItem):
     FILTER_NAME = "strand"
 
     __slots__ = ('_model_strand', '_virtual_helix_item', '_viewroot',
-                '_getActiveTool', '_controller', 'is_forward',
-                '_strand_filter', '_insertion_items',
-                '_low_cap', '_high_cap', '_dual_cap',
-                '_seq_label', '_click_area', 'xover_3p_end')
+                 '_getActiveTool', '_controller', 'is_forward',
+                 '_strand_filter', '_insertion_items',
+                 '_low_cap', '_high_cap', '_dual_cap',
+                 '_seq_label', '_click_area', 'xover_3p_end')
 
     def __init__(self, model_strand, virtual_helix_item, viewroot):
         """The parent should be a VirtualHelixItem."""
@@ -188,9 +182,10 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def strandInsertionAddedSlot(self, strand, insertion):
-        self.insertionItems()[insertion.idx()] = \
-                    InsertionItem(self._virtual_helix_item, strand, insertion)
+        self.insertionItems()[insertion.idx()] = InsertionItem(self._virtual_helix_item,
+                                                               strand, insertion)
     # end def
+
     def strandInsertionChangedSlot(self, strand, insertion):
         self.insertionItems()[insertion.idx()].updateItem()
     # end def
@@ -221,7 +216,7 @@ class StrandItem(QGraphicsLineItem):
 
     def strandModsRemovedSlot(self, strand, document, mod_id, idx):
         idx_l, idx_h = strand.idxs()
-        color = document.getModProperties(mod_id)['color']
+        # color = document.getModProperties(mod_id)['color']
         if idx == idx_h:
             self._high_cap.destroyMod()
         else:
@@ -326,7 +321,7 @@ class StrandItem(QGraphicsLineItem):
         else:
             p2 = line.p2()
             new_x = self._high_cap.pos().x()
-            #new_x = self.mapFromScene(self._high_cap.pos()).x() + bw
+            # new_x = self.mapFromScene(self._high_cap.pos()).x() + bw
             p2.setX(new_x)
             line.setP2(p2)
             temp = c_a.rect()
@@ -378,8 +373,7 @@ class StrandItem(QGraphicsLineItem):
 
         # special case: single-base strand with no L or H connections,
         # (unconnected caps were made visible in previous block of code)
-        if strand.length() == 1 and \
-                  (low_cap.isVisible() and high_cap.isVisible()):
+        if strand.length() == 1 and (low_cap.isVisible() and high_cap.isVisible()):
             low_cap.hide()
             high_cap.hide()
             dual_cap.safeSetPos(l_upper_left_x, l_upper_left_y)
@@ -493,7 +487,7 @@ class StrandItem(QGraphicsLineItem):
         self.scene().views()[0].addToPressList(self)
         idx = int(floor((event.pos().x()) / _BASE_WIDTH))
         self._virtual_helix_item.setActive(self.is_forward, idx)
-        tool_method_name =  active_tool_str + "MousePress"
+        tool_method_name = active_tool_str + "MousePress"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(event, idx)
         else:
@@ -570,7 +564,7 @@ class StrandItem(QGraphicsLineItem):
             selection_group = self._viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (event.modifiers() & mod):
-                 selection_group.clearSelection(False)
+                selection_group.clearSelection(False)
             selection_group.setSelectionLock(selection_group)
             selection_group.pendToAdd(self)
             selection_group.pendToAdd(self._low_cap)
@@ -616,7 +610,7 @@ class StrandItem(QGraphicsLineItem):
         """Break the strand is possible."""
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
-        part_item = vhi.partItem()
+        # part_item = vhi.partItem()
         active_tool = self._getActiveTool()
 
         if active_tool.isFloatingXoverBegin():
@@ -767,8 +761,8 @@ class StrandItem(QGraphicsLineItem):
         if con3p:
             # perhaps change this to a direct call, but here are seeds of an
             # indirect way of doing selection checks
-            if (    document.isModelStrandSelected(con3p) and
-                    document.isModelStrandSelected(strand5p) ):
+            if (document.isModelStrandSelected(con3p) and
+               document.isModelStrandSelected(strand5p)):
                 val3p = document.getSelectedStrandValue(con3p)
                 # print("xover idx", indices)
                 test3p = val3p[0] if con3p.isForward() else val3p[1]

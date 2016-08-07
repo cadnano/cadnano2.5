@@ -309,7 +309,6 @@ class PreXoverItem(QGraphicsRectItem):
         self.setRect(self.phos_item.boundingRect())
         self.setPen(getNoPen())
         # self.setPen(getPenObj('#cccccc', 0.1, alpha=128, capstyle=Qt.RoundCap))
-
     # end def
 
     ### ACCESSORS ###
