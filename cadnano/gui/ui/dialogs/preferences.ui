@@ -93,11 +93,11 @@
           <widget class="QComboBox" name="grid_appearance_type_combo_box">
            <item>
             <property name="text">
-             <string>Circles</string>
+             <string>Points</string>
             </property>
             <property name="icon">
              <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
-              <normaloff>:/part/grid_circles</normaloff>:/part/grid_circles</iconset>
+              <normaloff>:/part/grid_points</normaloff>:/part/grid_points</iconset>
             </property>
            </item>
            <item>
@@ -107,15 +107,6 @@
             <property name="icon">
              <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
               <normaloff>:/part/grid_lines</normaloff>:/part/grid_lines</iconset>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Points</string>
-            </property>
-            <property name="icon">
-             <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
-              <normaloff>:/part/grid_points</normaloff>:/part/grid_points</iconset>
             </property>
            </item>
           </widget>

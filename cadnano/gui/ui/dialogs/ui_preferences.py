@@ -2,8 +2,7 @@
 
 # Form implementation generated from reading ui file 'dialogs/preferences.ui'
 #
-# Created: Fri Jun 17 12:08:54 2016
-#      by: PyQt5 UI code generator 5.3.2
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -27,6 +26,7 @@ class Ui_Preferences(object):
         self.interface_tab = QtWidgets.QWidget()
         self.interface_tab.setObjectName("interface_tab")
         self.vertical_layout_4 = QtWidgets.QVBoxLayout(self.interface_tab)
+        self.vertical_layout_4.setContentsMargins(0, 0, 0, 0)
         self.vertical_layout_4.setObjectName("vertical_layout_4")
         self.form_layout = QtWidgets.QFormLayout()
         self.form_layout.setFieldGrowthPolicy(QtWidgets.QFormLayout.FieldsStayAtSizeHint)
@@ -52,14 +52,11 @@ class Ui_Preferences(object):
         self.grid_appearance_type_combo_box = QtWidgets.QComboBox(self.interface_tab)
         self.grid_appearance_type_combo_box.setObjectName("grid_appearance_type_combo_box")
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(":/part/grid_circles"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/part/grid_points"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.grid_appearance_type_combo_box.addItem(icon, "")
         icon1 = QtGui.QIcon()
         icon1.addPixmap(QtGui.QPixmap(":/part/grid_lines"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.grid_appearance_type_combo_box.addItem(icon1, "")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/part/grid_points"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.grid_appearance_type_combo_box.addItem(icon2, "")
         self.form_layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.grid_appearance_type_combo_box)
         self.show_icon_label_text = QtWidgets.QLabel(self.interface_tab)
         self.show_icon_label_text.setObjectName("show_icon_label_text")
@@ -77,6 +74,7 @@ class Ui_Preferences(object):
         self.plugins_tab = QtWidgets.QWidget()
         self.plugins_tab.setObjectName("plugins_tab")
         self.vertical_layout_5 = QtWidgets.QVBoxLayout(self.plugins_tab)
+        self.vertical_layout_5.setContentsMargins(0, 0, 0, 0)
         self.vertical_layout_5.setObjectName("vertical_layout_5")
         self.label = QtWidgets.QLabel(self.plugins_tab)
         self.label.setWordWrap(True)
@@ -107,9 +105,8 @@ class Ui_Preferences(object):
         Preferences.setWindowTitle(_translate("Preferences", "Preferences"))
         self.zoom_speed_label.setText(_translate("Preferences", "Mousewheel zoom speed:"))
         self.Grid.setText(_translate("Preferences", "Grid Appearance"))
-        self.grid_appearance_type_combo_box.setItemText(0, _translate("Preferences", "Circles"))
+        self.grid_appearance_type_combo_box.setItemText(0, _translate("Preferences", "Points"))
         self.grid_appearance_type_combo_box.setItemText(1, _translate("Preferences", "Lines"))
-        self.grid_appearance_type_combo_box.setItemText(2, _translate("Preferences", "Points"))
         self.show_icon_label_text.setText(_translate("Preferences", "Show Icon Labels:"))
         self.show_icon_labels.setText(_translate("Preferences", "(needs restart)"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.interface_tab), _translate("Preferences", "Interface"))
