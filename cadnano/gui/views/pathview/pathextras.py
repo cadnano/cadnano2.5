@@ -418,6 +418,8 @@ class PreXoverItem(QGraphicsRectItem):
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
         self.setActiveHovered(True)
+        status_string = "%d[%d]" % (self._id_num, self.idx)
+        self.parentItem().window().statusBar().showMessage(status_string)
     # end def
 
     def hoverLeaveEvent(self, event):
@@ -432,6 +434,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.prexoveritemgroup.updateModelActiveBaseInfo(None)
         self.setActiveHovered(False)
         self.clearFocus()
+        self.parentItem().window().statusBar().showMessage("")
     # end def
 
     def keyPressEvent(self, event):
@@ -563,8 +566,6 @@ class PreXoverItem(QGraphicsRectItem):
         elif idx == active_idx - 1:
             alpha = 255
 
-        # if active_prexoveritem.idx == 1 and active_prexoveritem._id_num == 1 and active_prexoveritem.is_fwd:
-        #     print("activateNeighbor")
         inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
         self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
         self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)

@@ -363,7 +363,7 @@ class PreXoverItem(QGraphicsRectItem):
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
-        print("PreXoverItem hoverEnterEvent")
+        # print("PreXoverItem hoverEnterEvent")
         pxig = self.pre_xover_item_group
         if pxig.is_active:
             pxig.updateModelActiveBaseInfo(self.getInfo())
