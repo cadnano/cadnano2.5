@@ -7,7 +7,6 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano.gui.palette import getPenObj, getBrushObj
-from cadnano.gui.views.sliceview.sliceextras import PreXoverItemGroup
 from . import pathstyles as styles
 
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
@@ -66,10 +65,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._radius = _RADIUS
         self._rect = QRectF(_RECT)
         # self.show()
-
-        self._prexoveritemgroup = _pxig = PreXoverItemGroup(_RADIUS, _RECT, self, False)
-        _pxig.setTransformOriginPoint(_RECT.center())
-
     # end def
 
     def rotateWithCenterOrigin(self, angle):
@@ -81,7 +76,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         Returns:
             TYPE: Description
         """
-        self._prexoveritemgroup.setRotation(angle)
+        pass
     # end def
 
     def part(self):
