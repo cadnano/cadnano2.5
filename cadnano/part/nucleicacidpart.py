@@ -1,11 +1,11 @@
 from ast import literal_eval
+from collections import defaultdict
 
 from cadnano import util
-from cadnano.enum import PartType, GridType, PointType
+from cadnano.enum import PartType, GridType, PointType, StrandType
 from cadnano.oligo import RemoveOligoCommand
-from cadnano.part.part import Part
+
 from cadnano.strandset import SplitCommand
-from .changeviewpropertycmd import ChangeViewPropertyCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .removepartcmd import RemovePartCommand
@@ -13,8 +13,9 @@ from .removevhelixcmd import RemoveVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
+from cadnano.part.virtualhelixgroup import VirtualHelixGroup
 
-class NucleicAcidPart(Part):
+class NucleicAcidPart(VirtualHelixGroup):
     """
     NucleicAcidPart is a group of VirtualHelix items that are on the same lattice.
     The NucleicAcidPart model component is different from the OrigamiPart:
@@ -24,7 +25,7 @@ class NucleicAcidPart(Part):
     - sequence output is more abstract ("virtual sequences" are used)
     """
 
-    _SUB_STEP_SIZE = Part._STEP_SIZE / 3
+    _SUB_STEP_SIZE = VirtualHelixGroup._STEP_SIZE / 3
 
     # _MINOR_GROOVE_ANGLE = 171
 
@@ -42,6 +43,21 @@ class NucleicAcidPart(Part):
         number assignment.
         """
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
+        # Data structure
+        self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
+        self._mods = {  'int_instances':{},
+                        'ext_instances':{}}
+        self._oligos = set()
+
+        # Runtime state
+        self._active_base_index = self._STEP_SIZE
+        self._active_id_num = None
+        self.active_base_info = ()
+        self._selected = False
+        self.is_active = False
+
+        self._abstract_segment_id = None
+        self._current_base_count = None
 
         # Properties (NucleicAcidPart-specific)
         gps = self._group_properties
@@ -673,10 +689,202 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
-    def changeViewProperty(self, view, key, value, use_undostack=True):
-        c = ChangeViewPropertyCommand(self, view, key, value)
-        util.execCommandList(self, [c],
-                             desc="Change Part View Property `%s`" % key,
-                             use_undostack=use_undostack)
+
+    def oligos(self):
+        return self._oligos
+    # end def
+
+    def getNewAbstractSegmentId(self, segment):
+        low_idx, high_idx = segment
+        seg_id = next(self._abstract_segment_id)
+        offset = self._current_base_count
+        segment_length = (high_idx - low_idx + 1)
+        self._current_base_count = offset + segment_length
+        return seg_id, offset, segment_length
+    # end def
+
+    def initializeAbstractSegmentId(self):
+        self._abstract_segment_id = count(0)
+        self._current_base_count = 0
+    # end def
+
+    def setAbstractSequences(self):
+        """Reset, assign, and display abstract sequence numbers."""
+        # reset all sequence numbers
+        print("setting abstract sequence")
+        for oligo in self._oligos:
+            oligo.clearAbstractSequences()
+
+        self.initializeAbstractSegmentId()
+
+        for oligo in self._oligos:
+            oligo.applyAbstractSequences()
+
+        # display new sequence numbers
+        for oligo in self._oligos:
+            oligo.displayAbstractSequences()
+            oligo.oligoSequenceAddedSignal.emit(oligo)
+    # end def
+
+    ### PUBLIC METHODS FOR QUERYING THE MODEL ###
+    def activeIdNum(self):
+        return self._active_id_num
+    # end def
+
+    def setActive(self, is_active):
+        dc = self._document._controller
+        current_active_part = dc.activePart()
+        if is_active:
+            if current_active_part == self:
+                return
+            dc.setActivePart(self)
+            if current_active_part is not None:
+                current_active_part.setActive(False)
+        elif current_active_part == self:   # there always needs to be an active
+                return
+        self.is_active = is_active
+        self.partActiveChangedSignal.emit(self, is_active)
+    # end def
+
+    def activeBaseIndex(self):
+        return self._active_base_index
+    # end def
+
+    def clearActiveVirtualHelix(self):
+        self.active_base_info = active_base_info = ()
+        self._active_id_num = id_num = -1
+        self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
+        self.partActiveBaseInfoSignal.emit(self, active_base_info)
+    # end def
+
+    def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
+        abi = (id_num, is_fwd, idx, -1)
+        if self.active_base_info == abi:
+            return
+        else:
+            self._active_id_num = id_num
+            self.active_base_info  = abi
+        self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
+        self.partActiveBaseInfoSignal.emit(self, abi)
+    # end def
+
+    def setActiveBaseInfo(self, info):
+        """ to_vh_num is not use as of now and may change
+        Args:
+            info (Tuple): id_num, is_fwd, idx, to_vh_num
+
+        """
+        if info != self.active_base_info:
+            # keep the info the same but let views know it's not fresh
+            if info is not None:
+                self.active_base_info = info
+            self.partActiveBaseInfoSignal.emit(self, info)
+    # end def
+
+    def isVirtualHelixActive(self, id_num):
+        return id_num == self._active_id_num
+    # end def
+
+    def insertions(self):
+        """Return dictionary of insertions."""
+        return self._insertions
+    # end def
+
+    def dumpInsertions(self):
+        for id_num, id_dict in self._insertions.items():
+            for idx, insertion in id_dict.items():
+                yield (id_num, idx, insertion.length())
+    # end def
+
+    def isSelected(self):
+        return self.is_selected
+    # end def
+
+    ### PUBLIC METHODS FOR EDITING THE MODEL ###
+    def setSelected(self, is_selected):
+        if is_selected != self._selected:
+            self._selected = is_selected
+            self.partSelectedChangedSignal.emit(self, is_selected)
+    # end def
+
+    def getModID(self, strand, idx):
+        id_num = strand.idNum()
+        strandtype = strand.strandType()
+        key =  "{},{},{}".format(id_num, strandtype, idx)
+        mods_strand  = self._mods['ext_instances']
+        if key in mods_strand:
+            return mods_strand[key]
+    # end def
+
+    def getStrandModSequence(self, strand, idx, mod_type):
+        """
+        Args:
+            strand (Strand):
+            idx (int):
+            mod_type (int): 0, 1, or 2
+        """
+        mid = self.getModID(strand, idx)
+        return self._document.getModSequence(mid, mod_type)
+
+    def getModKeyTokens(self, key):
+        keylist = key.split(',')
+        id_num = int(keylist[0])
+        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        idx = int(keylist[2])
+        return id_num, is_fwd, idx
+    # end def
+
+    def getModStrandIdx(self, key):
+        """ Convert a key of a mod instance relative to a part
+        to a strand and an index
+        """
+        keylist = key.split(',')
+        id_num = int(keylist[0])
+        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        idx = int(keylist[2])
+        strand = self.getStrand(is_fwd, id_num, idx)
+        return strand, idx
+    # end def
+
+    def addModInstance(self, id_num, idx, is_rev, is_internal, mid):
+        key =  "{},{},{}".format(id_num, is_rev, idx)
+        mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
+        if key in mods_strands:
+            self.removeModInstance(id_num, idx, is_rev, is_internal, mid)
+        self._document.addModInstance(mid, is_internal, self, key)
+        self.addModInstanceKey(key, mods_strands, mid)
+    # end def
+
+    def addModInstanceKey(self, key, mods_strands, mid):
+        mods_strands[key] = mid # add to strand lookup
+    # end def
+
+    def addModStrandInstance(self, strand, idx, mid, is_internal=False):
+        id_num = strand.idNum()
+        strandtype = strand.strandType()
+        if mid is not None:
+            self.addModInstance(id_num, idx, strandtype, False, mid)
+    # end def
+
+    def removeModInstance(self, id_num, idx, is_rev, is_internal, mid):
+        key =  "{},{},{}".format(id_num, is_rev, idx)
+        mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
+        self._document.removeModInstance(mid, is_internal, self, key)
+        if key in mods_strands:
+            del mods_strands[key]
+    # end def
+
+    def removeModStrandInstance(self, strand, idx, mid, is_internal=False):
+        id_num = strand.idNum()
+        strandtype = strand.strandType()
+        if mid is not None:
+            self.removeModInstance(id_num, idx, strandtype, is_internal, mid)
+    # end def
+
+    def dumpModInstances(self, is_internal):
+        mods = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
+        for key, mid in mods:
+            id_num, is_fwd, idx = self.getModKeyTokens(key)
+            yield (id_num, is_fwd, idx, mid)
     # end def
 # end class

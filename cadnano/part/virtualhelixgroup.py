@@ -7,6 +7,8 @@ import numpy as np
 import pandas as pd
 from collections import deque
 from cadnano.strandset import StrandSet
+from cadnano.part.part import Part
+from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 
 """
@@ -17,7 +19,6 @@ but faster
 from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
-
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -50,10 +51,10 @@ def _defaultDataFrame(size):
 # end def
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
-DEFAULT_RADIUS = 1.125
+DEFAULT_RADIUS = 1.125 # nm
 
 
-class VirtualHelixGroup(CNObject):
+class VirtualHelixGroup(Part):
     """This is composed of a group of arrays that:
 
     1. Contain the coordinates of every virtual base stored in their index
@@ -66,12 +67,16 @@ class VirtualHelixGroup(CNObject):
         `*args`: Variable length argument list.
         `**kwargs`: Arbitrary keyword arguments.
     """
+    _STEP_SIZE = 21  # this is the period (in bases) of the part lattice
+    _TURNS_PER_STEP = 2
+    _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
+    _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
+    _BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
 
     def __init__(self, *args, **kwargs):
         """
         """
-        self._document = document = kwargs.get('document', None)
-        super(VirtualHelixGroup, self).__init__(document)
+        super(VirtualHelixGroup, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
         if do_copy:
             return
@@ -108,7 +113,6 @@ class VirtualHelixGroup(CNObject):
         self.reserved_ids = set()
 
         self.vh_properties = _defaultDataFrame(DEFAULT_SIZE)
-        self._group_properties = {}
 
         self.fwd_strandsets = [None] * DEFAULT_SIZE
         self.rev_strandsets = [None] * DEFAULT_SIZE
@@ -135,6 +139,36 @@ class VirtualHelixGroup(CNObject):
         self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
     # end def
 
+    # B. Virtual Helix
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num
+                        name='partActiveVirtualHelixChangedSignal')
+    partActiveBaseInfoSignal = ProxySignal(CNObject, object,   # self.active_base_info (tuple or None)
+                        name='partActiveBaseInfoSignal')
+    partVirtualHelixAddedSignal = ProxySignal(object, int, object,
+                        name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num, neighbor list
+    partVirtualHelixRemovingSignal = ProxySignal(object, int, object,
+                        name='partVirtualHelixRemovingSignal')     # self, virtual_helix id_num, neighbor list
+    partVirtualHelixRemovedSignal = ProxySignal(object, int,
+                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
+    partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
+                        name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
+    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
+                        name='partVirtualHelicesReorderedSignal') # self, list of id_nums
+
+    partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
+                        name='partVirtualHelicesTranslatedSignal')  # self, list of id_nums, transform
+    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object, bool,
+                        name='partVirtualHelicesSelectedSignal')  # self, iterable of id_nums to select, transform
+    partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
+                                            name='partVirtualHelixPropertyChangedSignal')  # self, id_num, value
+
+    # C. Oligo
+    partOligoAddedSignal = ProxySignal(CNObject, object,
+                        name='partOligoAddedSignal')            # self, oligo
+    # D. Strand
+    partStrandChangedSignal = ProxySignal(object, int,
+                        name='partStrandChangedSignal')         # self, virtual_helix
+
     def _resetOriginCache(self):
         self._origin_cache = {}
         self._origin_cache_keys = deque([None] * DEFAULT_CACHE_SIZE)
@@ -143,15 +177,6 @@ class VirtualHelixGroup(CNObject):
     def _resetPointCache(self):
         self._point_cache = {}
         self._point_cache_keys = deque([None] * DEFAULT_CACHE_SIZE)
-    # end def
-
-    def document(self):
-        """Document attribute getter
-
-        Returns:
-            Document: the :class:`Document` object
-        """
-        return self._document
     # end def
 
     def copy(self, document, new_object=None):
@@ -194,6 +219,26 @@ class VirtualHelixGroup(CNObject):
         new_vhg.recycle_bin = self.recycle_bin
         new_vhg._highest_id_num_used = self._highest_id_num_used
         return new_vhg
+    # end def
+
+    def stepSize(self):
+        return self._STEP_SIZE
+    # end def
+
+    def baseWidth(self):
+        return self._BASE_WIDTH
+    # end def
+
+    def radius(self):
+        return self._radius
+    # end def
+
+    def helicalPitch(self):
+        return self._HELICAL_PITCH
+    # end def
+
+    def twistPerBase(self):
+        return self._TWIST_PER_BASE
     # end def
 
     def getOffsetAndSize(self, id_num):
