@@ -1,4 +1,19 @@
 # -*- coding: utf-8 -*-
+# Copyright (c) 2016 Wyss Institute at Harvard University
+#
+# This file may be used under the terms of the GNU General Public License
+# version 3.0 as published by the Free Software Foundation and appearing in
+# the file LICENSE included in the packaging of this file.  Please review the
+# following information to ensure the GNU General Public License version 3.0
+# requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+#
+# If you do not wish to use this file under the terms of the GPL version 3.0
+# then you may purchase a commercial license.  For more information contact
+# info@riverbankcomputing.com.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
 import os
 import sys
 import platform
@@ -22,7 +37,9 @@ ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
 CADNANO_DEFAULT_DOCUMENT = 'simple.json'
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(ROOTDIR, 'tests', CADNANO_DEFAULT_DOCUMENT)
+os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  ROOTDIR,
+                                                        'tests',
+                                                        CADNANO_DEFAULT_DOCUMENT)
 
 if platform.system() == 'Windows':
     import ctypes

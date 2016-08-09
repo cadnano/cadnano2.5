@@ -181,7 +181,7 @@ class PreXoverManager(QGraphicsRectItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             is_fwd (TYPE): Description
             idx (int): the base index within the virtual helix
 
@@ -361,7 +361,7 @@ class PreXoverManager(QGraphicsRectItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             is_fwd (TYPE): Description
             idx (int): the base index within the virtual helix
 
@@ -407,7 +407,7 @@ class PreXoverManager(QGraphicsRectItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
 
         Returns:
             TYPE: Description

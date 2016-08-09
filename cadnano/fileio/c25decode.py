@@ -6,7 +6,7 @@ from cadnano.part.refresholigoscmd import RefreshOligosCommand
 from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
 from cadnano.color import intToColorHex
-from cadnano.part.virtualhelixgroup import DEFAULT_RADIUS
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
 

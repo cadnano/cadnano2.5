@@ -17,7 +17,6 @@ Submodules
    cadnano.part.renumbercmd
    cadnano.part.resizevirtualhelixcmd
    cadnano.part.translatevhelixcmd
-   cadnano.part.virtualhelixgroup
    cadnano.part.xovercmds
 
 Module contents

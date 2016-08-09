@@ -56,7 +56,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (TYPE): Description
             viewroot (TYPE): Description
         """

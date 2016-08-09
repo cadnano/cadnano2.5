@@ -124,7 +124,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             part (TYPE): Description
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
 
         Args:
             TYPE: Description
@@ -246,7 +246,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         triggered by a partVirtualHelicesTranslatedSignal.
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             vhi (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): the item associated with id_num
         """
         neighbors = vhi.getProperty('neighbors')
@@ -265,7 +265,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             keys (tuple): keys that changed
             values (tuple): new values for each key that changed
 
@@ -282,7 +282,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (TYPE): Description
 
         Args:
@@ -302,7 +302,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (TYPE): Description
 
         Args:
@@ -448,7 +448,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
 
         Args:
             TYPE: Description
@@ -620,7 +620,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
 
         Returns:
             TYPE: Description

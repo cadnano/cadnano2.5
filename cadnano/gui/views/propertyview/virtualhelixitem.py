@@ -25,7 +25,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         Args:
             model_part (Part): The model part
             parent (TYPE): Description
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
         self._id_num = id_num
@@ -114,7 +114,7 @@ class VirtualHelixItem(QTreeWidgetItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             keys (TYPE): Description
             values (TYPE): Description
 
@@ -131,7 +131,7 @@ class VirtualHelixItem(QTreeWidgetItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
         if self._cn_model == sender and id_num == self._id_num:
@@ -145,7 +145,7 @@ class VirtualHelixItem(QTreeWidgetItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         pass
     # end def

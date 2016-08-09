@@ -1,7 +1,7 @@
-cadnano.part.virtualhelixgroup module
+cadnano.part.nucleicacidpart module
 =====================================
 
-.. automodule:: cadnano.part.virtualhelixgroup
+.. automodule:: cadnano.part.nucleicacidpart
     :members:
     :undoc-members:
     :show-inheritance:

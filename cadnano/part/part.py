@@ -115,10 +115,6 @@ class Part(CNObject):
         return self._group_properties[key]
     # end def
 
-    def isZEditable(self):
-        return self._group_properties['point_type'] == PointType.Z_ONLY
-    # end def
-
     def getOutlineProperties(self):
         props = self._group_properties
         return props['name'], props['color'], props['is_visible']

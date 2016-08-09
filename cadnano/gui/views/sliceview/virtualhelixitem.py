@@ -45,7 +45,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     def __init__(self, id_num, part_item):
         """
         Args:
-            id_num (int): VirtualHelix ID number. See `VirtualHelixGroup` for description and related methods.
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)

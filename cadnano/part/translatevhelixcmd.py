@@ -1,5 +1,8 @@
 from cadnano.cnproxy import UndoCommand
-from cadnano.part.virtualhelixgroup import Z_PROP_INDEX
+
+# prevent circular imports
+# from cadnano.part.nucleicacidpart import Z_PROP_INDEX
+Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
 class TranslateVirtualHelicesCommand(UndoCommand):
     """ Move Virtual Helices around"""
