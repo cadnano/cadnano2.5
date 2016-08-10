@@ -508,7 +508,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
             # print("the right event")
-            is_shift = event.modifiers() == Qt.ShiftModifier
+            modifiers = event.modifiers()
+            is_shift = modifiers == Qt.ShiftModifier
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
                 # print("clicking the box")
@@ -523,8 +524,12 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                                 doc.removeVirtualHelicesFromSelection(part, [id_num])
                         else:
                             origin_id_num = item.idNum()
-                            if doc.isVirtualHelixSelected(part, origin_id_num):
+                            is_alt = modifiers == Qt.AltModifier
+                            if (    doc.isVirtualHelixSelected(part, origin_id_num) and
+                                    not is_alt):
                                 print("origin", origin_id_num)
+                                if tool.snap_origin_item is not None:
+                                    tool.snap_origin_item.setSnapOrigin(False)
                                 tool.snap_origin_item = item
                                 item.setSnapOrigin(True)
                                 break
