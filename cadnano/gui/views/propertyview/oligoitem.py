@@ -4,12 +4,13 @@ from cadnano.enum import ItemType
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from .cnpropertyitem import CNPropertyItem
+# from cadnano import util
 
 
-class OligoItem(CNPropertyItem, AbstractOligoItem):
+class OligoItem(AbstractOligoItem, CNPropertyItem):
     """Summary
     """
-    def __init__(self, model_oligo_list, parent, key=None):
+    def __init__(self, cn_model_list, parent, key=None):
         """Summary
 
         Args:
@@ -17,11 +18,11 @@ class OligoItem(CNPropertyItem, AbstractOligoItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super(OligoItem, self).__init__(model_oligo_list, parent, key=key)
+        super(OligoItem, self).__init__(cn_model_list, parent, key=key)
+        # print(util.trace(5), "in OligoItem init", cn_model_list)
         if key is None:
-            for model_oligo in model_oligo_list:
+            for model_oligo in cn_model_list:
                 self._controller_list.append(OligoItemController(self, model_oligo))
-
     # end def
 
     def itemType(self):

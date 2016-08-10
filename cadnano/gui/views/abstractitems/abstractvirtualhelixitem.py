@@ -18,8 +18,10 @@ class AbstractVirtualHelixItem(object):
     #     pass
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
         pass
+
     def virtualHelixRemovedSlot(self):
         pass
+
     def strandAddedSlot(self, sender, strand):
         pass
 
@@ -28,7 +30,10 @@ class AbstractVirtualHelixItem(object):
     # end def
 
     def getProperty(self, keys):
-        return self._model_part.getVirtualHelixProperties(self._id_num, keys)
+        if hasattr(self, '_id_num'):
+            return self._model_part.getVirtualHelixProperties(self._id_num, keys)
+        elif hasattr(self, '_id_num_list'):
+            return self._model_part.getVirtualHelixProperties(self._id_num_list[0], keys)
     # end def
 
     def getTwistPerBase(self):
@@ -46,7 +51,7 @@ class AbstractVirtualHelixItem(object):
             Tuple: 'bases_per_repeat, 'bases_per_turn',
                     'twist_per_base', 'minor_groove_angle'
         """
-        bpr, tpr, mga= self._model_part.getVirtualHelixProperties(self._id_num,
+        bpr, tpr, mga = self._model_part.getVirtualHelixProperties(self._id_num,
                 ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
         bases_per_turn = bpr / tpr
         return bpr, bases_per_turn, tpr*360./bpr, mga
@@ -55,23 +60,37 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.getAllVirtualHelixProperties(self._id_num)
     # end def
 
-    def setProperty(self, keys, values):
-        return self._model_part.setVirtualHelixProperties(self._id_num, keys, values)
+    def getAllPropertiesForIdNum(self, id_num):
+        return self._model_part.getAllVirtualHelixProperties(id_num)
     # end def
 
-    def setSize(self, new_size):
-        return self._model_part.setVirtualHelixSize(self._id_num, new_size)
+    def setProperty(self, keys, values, id_nums=None):
+        if id_nums:
+            for id_num in id_nums:
+                self._model_part.setVirtualHelixProperties(id_num, keys, values)
+                return
+        else:
+            return self._model_part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
-    def setZ(self, new_z):
-        id_num = self._id_num
+    def setSize(self, new_size, id_nums=None):
+        if id_nums:
+            for id_num in id_nums:
+                self._model_part.setVirtualHelixSize(id_num, new_size)
+        else:
+            return self._model_part.setVirtualHelixSize(self._id_num, new_size)
+    # end def
+
+    def setZ(self, new_z, id_nums=None):
         m_p = self._model_part
-        old_z = m_p.getVirtualHelixProperties(id_num, 'z')
-        if new_z != old_z:
-            dz = new_z - old_z
-            print("setZ", dz)
-            return m_p.translateVirtualHelices([id_num], 0, 0, dz,
-                                        finalize=False, use_undostack=True)
+        if id_nums is None:
+            id_nums = self._id_num
+
+        for id_num in id_nums:
+            old_z = m_p.getVirtualHelixProperties(id_num, 'z')
+            if new_z != old_z:
+                dz = new_z - old_z
+                m_p.translateVirtualHelices([id_num], 0, 0, dz, finalize=False, use_undostack=True)
     # end def
 
     def getAxisPoint(self, idx):
@@ -112,5 +131,3 @@ class AbstractVirtualHelixItem(object):
         self._model_part.rev_strandsets[self._id_num].getStrand(idx)
     # end def
 # end class
-
-

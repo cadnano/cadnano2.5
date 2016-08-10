@@ -42,7 +42,7 @@ class CNPropertyItem(QTreeWidgetItem):
                 for cn_key, cn_val in cn_model.getPropertyDict().items():
                     if cn_key in model_props:
                         if cn_val != model_props[cn_key]:
-                            model_props[cn_key] = '_multiple_'
+                            model_props[cn_key] = '~~multiple~~'
                     else:
                         model_props[cn_key] = cn_val
 
@@ -52,7 +52,7 @@ class CNPropertyItem(QTreeWidgetItem):
                 if name is None:
                     name = "generic"
             else:
-                name = "_multiple_"
+                name = "%d items..." % len(self._cn_model_list)
             self._key = key = "name"
             self._prop_items[key] = self
             self.setData(KEY_COL, Qt.EditRole, key)
@@ -62,10 +62,12 @@ class CNPropertyItem(QTreeWidgetItem):
             for key in sorted(model_props):
                 if key == 'name':
                     continue
-                p_i = constructor(cn_model, root, key=key)
+                # p_i = constructor(cn_model, root, key=key)
+                p_i = constructor(cn_model_list, root, key=key)
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
-                model_value = cn_model.getProperty(key)
+                # model_value = cn_model.getProperty(key)
+                model_value = model_props[key]
                 if key.endswith('_type'):
                     model_value = ENUM_NAMES[key][model_value]
                     p_i.is_enum = True
@@ -140,11 +142,11 @@ class CNPropertyItem(QTreeWidgetItem):
 
         Returns:
             TYPE: Description
-        
+
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self._cn_model_list
+        cn_m = self._cn_model_list[0]
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
@@ -184,9 +186,15 @@ class CNPropertyItem(QTreeWidgetItem):
         key = self._key
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        print("updateCNModel: begin macro")
-        for cn_model in self._cn_model_list:
-            cn_model.setProperty(key, value)
+        print("updateCNModel: begin macro")  # macro here?
+        print(self._cn_model_list)
+        if isinstance(self._cn_model_list, list):
+            print("list found")
+            for cn_model in self._cn_model_list:
+                cn_model.setProperty(key, value)
+        else:  # called from line 65: p_i = constructor(cn_model, root, key=key)
+            print("single model found")
+            self._cn_model_list.setProperty(key, value)
         print("updateCNModel: end macro")
     # end def
 

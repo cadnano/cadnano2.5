@@ -125,7 +125,7 @@ class PropertyEditorWidget(QTreeWidget):
                 pe_item = OligoItem([item.cnModel()], self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem([item.cnModel()], self, item.idNum())
+                pe_item = VirtualHelixItem(item.cnModel(), self, [item.idNum()])
                 self.show()
             else:
                 raise NotImplementedError
@@ -133,30 +133,31 @@ class PropertyEditorWidget(QTreeWidget):
             print("multiple selected")
             # get the selected item
 
-            item_types = [item.itemType() for item in selected_items]
-            cn_model_list = [item.cnModel() for item in selected_items]
-            # id_num_list = [item.idNum() for item in selected_items]
+            item_types = set([item.itemType() for item in selected_items])
+            if len(item_types) > 1:  # assume no mixed types for now
+                return
 
-            print(item_types)
-            print(cn_model_list)
-            # print(id_num_list)
+            item_type = item_types.pop()
+            cn_model_list = [item.cnModel() for item in selected_items]
 
             # special case for parts since there is currently no part filter
-            # if item_type is ItemType.NUCLEICACID:
-            #     pe_item = NucleicAcidPartItem(item.cnModelList(), self)
-            #     self.show()
-            #     return
+            if item_type is ItemType.NUCLEICACID:
+                pe_item = NucleicAcidPartItem(cn_model_list, self)
+                self.show()
+                return
 
-            # if item.FILTER_NAME not in self._document.filter_set:
-            #     return
-            # if item_type is ItemType.OLIGO:
-            #     pe_item = OligoItem(item.cnModelList(), self)
-            #     self.show()
-            # elif item_type is ItemType.VIRTUALHELIX:
-            #     pe_item = VirtualHelixItem(item.cnModelList(), self, item.idNum())
-            #     self.show()
-            # else:
-            #     raise NotImplementedError
+            item = selected_items[0]
+            if item.FILTER_NAME not in self._document.filter_set:
+                return
+            if item_type is ItemType.OLIGO:
+                pe_item = OligoItem(cn_model_list, self)
+                self.show()
+            elif item_type is ItemType.VIRTUALHELIX:
+                id_num_list = [item.idNum() for item in selected_items]
+                pe_item = VirtualHelixItem(cn_model_list[0], self, id_num_list)
+                self.show()
+            else:
+                raise NotImplementedError
         else:
             pass
             # self.hide() # show nothing
@@ -339,7 +340,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         Returns:
             TYPE: Description
         """
-        row = model_index.row()
+        # row = model_index.row()
         column = model_index.column()
         if column == 0:  # Part Name
             option.displayAlignment = Qt.AlignVCenter

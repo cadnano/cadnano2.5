@@ -19,7 +19,7 @@ VAL_COL = 1
 class VirtualHelixItem(QTreeWidgetItem):
     """VirtualHelixItem class for the PropertyView.
     """
-    def __init__(self, model_part_list, parent, id_num, key=None):
+    def __init__(self, model_part, parent, id_num_list, key=None):
         """Summary
 
         Args:
@@ -28,47 +28,52 @@ class VirtualHelixItem(QTreeWidgetItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
-        self._id_num = id_num
-        self._cn_model_list = model_part_list
-        self._model_part_list = model_part_list
-        self._controller_list = []
-        # QTreeWidgetItem.__init__(self, parent, QTreeWidgetItem.UserType)
+        self._cn_model = model_part
+        self._model_part = model_part
+        self._id_num_list = id_num_list
+        self._controller = None
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        # self.setCheckState(VAL_COL, Qt.Checked)
+
         if key is None:
-            for model_part in model_part_list:
-                self._controller_list.append(VirtualHelixItemController(self, model_part, True, False))
+            self._controller = VirtualHelixItemController(self, model_part, True, False)
             root = parent.invisibleRootItem()  # add propertyitems as siblings
 
             # Properties
             self._prop_items = {}
-            # model_props = AbstractVirtualHelixItem.getAllProperties(self)
-            model_props = {}
-            for cn_model in self._cn_model_list:
-                for cn_key, cn_val in cn_model.getPropertyDict().items():
-                    if cn_key in model_props:
-                        if cn_val != model_props[cn_key]:
-                            model_props[cn_key] = '_multiple_'
+            id_num_props = {}
+            combined_props = {}
+            for id_num in self._id_num_list:
+                id_num_props[id_num] = AbstractVirtualHelixItem.getAllPropertiesForIdNum(self, id_num)
+                for cn_key, cn_val in id_num_props[id_num].items():
+                    if cn_key in combined_props:
+                        if cn_val != combined_props[cn_key]:
+                            combined_props[cn_key] = '~~multiple~~'
                     else:
-                        model_props[cn_key] = cn_val
+                        combined_props[cn_key] = cn_val
+
+            # model_props = AbstractVirtualHelixItem.getAllProperties(self)
+            # print(combined_props)
 
             # add properties alphabetically, but with 'name' on top
-            name = model_props['name']
-            if name is None:
-                name = "generic"
+            if len(self._id_num_list) == 1:
+                name = id_num_props[self._id_num_list[0]]['name']
+                if name is None:
+                    name = "generic"
+            else:
+                name = "%d helices..." % len(self._id_num_list)
             self._key = key = "name"
             self._prop_items[key] = self
             self.setData(KEY_COL, Qt.EditRole, key)
             self.setData(VAL_COL, Qt.EditRole, name)
 
-            for key in sorted(model_props):
+            for key in sorted(combined_props):
                 if key == 'name':
                     continue
-                p_i = VirtualHelixItem(model_part, root, id_num, key=key)
+                p_i = VirtualHelixItem(model_part, root, id_num_list, key=key)
                 self._prop_items[key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, key)
-                model_value = model_props[key]
+                model_value = combined_props[key]
                 # print(key, model_value, type(model_value))
                 if isinstance(model_value, float):
                     model_value = "%0.3f" % model_value
@@ -88,13 +93,13 @@ class VirtualHelixItem(QTreeWidgetItem):
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cnModelList(self):
+    def cnModel(self):
         """Summary
 
         Returns:
             TYPE: Description
         """
-        return self._cn_model_list
+        return self._cn_model
     # end def
 
     def itemType(self):
@@ -130,7 +135,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        if self._cn_model == sender and id_num == self._id_num:
+        if self._cn_model == sender and id_num in self._id_num_list:
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -143,7 +148,7 @@ class VirtualHelixItem(QTreeWidgetItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if self._cn_model == sender and id_num == self._id_num:
+        if self._cn_model == sender and id_num in self._id_num_list:
             self._cn_model = None
             self._controller = None
             self.parent().removeChild(self)
@@ -209,13 +214,13 @@ class VirtualHelixItem(QTreeWidgetItem):
         value = self.data(1, Qt.DisplayRole)
         key = self._key
         if key == 'length':
-            print("Property view 'length' updating", key, value)
-            AbstractVirtualHelixItem.setSize(self, value)
+            print("Property view 'length' updating", key, value, self._id_num_list)
+            AbstractVirtualHelixItem.setSize(self, value, id_nums=self._id_num_list)
         elif key == 'z':
             print("Property view 'z' updating", key, value)
-            AbstractVirtualHelixItem.setZ(self, value)
+            AbstractVirtualHelixItem.setZ(self, value, id_nums=self._id_num_list)
         else:
-            AbstractVirtualHelixItem.setProperty(self, self._key, value)
+            AbstractVirtualHelixItem.setProperty(self, self._key, value, id_nums=self._id_num_list)
     # end def
 
     def setValue(self, property_key, new_value):
