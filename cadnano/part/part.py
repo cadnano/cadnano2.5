@@ -106,8 +106,8 @@ class Part(CNObject):
             raise IndexError("Can't have less than zero instance of a Part")
         ic -= 1
         if ic == 0:
-            self._document = None
             self._document.removeChild(self)
+            self._document = None
         self._instance_count = ic
     # end def
 
