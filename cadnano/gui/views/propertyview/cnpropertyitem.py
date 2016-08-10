@@ -18,30 +18,41 @@ class CNPropertyItem(QTreeWidgetItem):
     Attributes:
         is_enum (bool): Description
     """
-    def __init__(self, cn_model, parent, key=None):
+    def __init__(self, cn_model_list, parent, key=None):
         """Summary
 
         Args:
-            cn_model (TYPE): Description
+            cn_model_list (list): cn_model objects for selected item(s)
             parent (TYPE): Description
             key (None, optional): Description
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        self._cn_model = cn_model
-        self._controller = None
+        self._cn_model_list = cn_model_list
+        self._controller_list = []
         self.is_enum = False
         if key is None:
             root = parent.invisibleRootItem()  # add propertyitems as siblings
 
             # Properties
             self._prop_items = {}
-            model_props = cn_model.getPropertyDict()
+
+            model_props = {}
+            for cn_model in self._cn_model_list:
+                for cn_key, cn_val in cn_model.getPropertyDict().items():
+                    if cn_key in model_props:
+                        if cn_val != model_props[cn_key]:
+                            model_props[cn_key] = '_multiple_'
+                    else:
+                        model_props[cn_key] = cn_val
 
             # add properties alphabetically, but with 'name' on top
-            name = cn_model.getName()
-            if name is None:
-                name = "generic"
+            if len(self._cn_model_list) == 1:
+                name = self._cn_model_list[0].getName()
+                if name is None:
+                    name = "generic"
+            else:
+                name = "_multiple_"
             self._key = key = "name"
             self._prop_items[key] = self
             self.setData(KEY_COL, Qt.EditRole, key)
@@ -64,7 +75,7 @@ class CNPropertyItem(QTreeWidgetItem):
                     model_value = model_value
                 elif isinstance(model_value, int):
                     model_value = str(model_value)
-                elif not isinstance(model_value, str):    # can't get non-strings to work
+                elif not isinstance(model_value, str):  # can't get non-strings to work
                     model_value = str(model_value)
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
@@ -86,7 +97,16 @@ class CNPropertyItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        return self._cn_model
+        return self._cn_model_list[0]
+    # end def
+
+    def cnModelList(self):
+        """Summary
+
+        Returns:
+            list: cn_model items
+        """
+        return self._cn_model_list
     # end def
 
     def itemType(self):
@@ -104,9 +124,10 @@ class CNPropertyItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        if self._controller is not None:
-            self._controller.disconnectSignals()
-            self._controller = None
+        if self._controller_list is not None:
+            for controller in self._controller_list:
+                controller.disconnectSignals()
+            self._controller_list = []
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
@@ -123,7 +144,7 @@ class CNPropertyItem(QTreeWidgetItem):
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self._cn_model
+        cn_m = self._cn_model_list
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
@@ -163,7 +184,10 @@ class CNPropertyItem(QTreeWidgetItem):
         key = self._key
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        self._cn_model.setProperty(key, value)
+        print("updateCNModel: begin macro")
+        for cn_model in self._cn_model_list:
+            cn_model.setProperty(key, value)
+        print("updateCNModel: end macro")
     # end def
 
     def setValue(self, property_key, new_value):

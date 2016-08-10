@@ -19,7 +19,7 @@ VAL_COL = 1
 class VirtualHelixItem(QTreeWidgetItem):
     """VirtualHelixItem class for the PropertyView.
     """
-    def __init__(self, model_part, parent, id_num, key=None):
+    def __init__(self, model_part_list, parent, id_num, key=None):
         """Summary
 
         Args:
@@ -29,20 +29,29 @@ class VirtualHelixItem(QTreeWidgetItem):
             key (None, optional): Description
         """
         self._id_num = id_num
-        self._cn_model = model_part
-        self._model_part = model_part
-        self._controller = None
+        self._cn_model_list = model_part_list
+        self._model_part_list = model_part_list
+        self._controller_list = []
         # QTreeWidgetItem.__init__(self, parent, QTreeWidgetItem.UserType)
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         # self.setCheckState(VAL_COL, Qt.Checked)
         if key is None:
-            self._controller = VirtualHelixItemController(self, model_part, True, False)
+            for model_part in model_part_list:
+                self._controller_list.append(VirtualHelixItemController(self, model_part, True, False))
             root = parent.invisibleRootItem()  # add propertyitems as siblings
 
             # Properties
             self._prop_items = {}
-            model_props = AbstractVirtualHelixItem.getAllProperties(self)
+            # model_props = AbstractVirtualHelixItem.getAllProperties(self)
+            model_props = {}
+            for cn_model in self._cn_model_list:
+                for cn_key, cn_val in cn_model.getPropertyDict().items():
+                    if cn_key in model_props:
+                        if cn_val != model_props[cn_key]:
+                            model_props[cn_key] = '_multiple_'
+                    else:
+                        model_props[cn_key] = cn_val
 
             # add properties alphabetically, but with 'name' on top
             name = model_props['name']
@@ -79,13 +88,13 @@ class VirtualHelixItem(QTreeWidgetItem):
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cnModel(self):
+    def cnModelList(self):
         """Summary
 
         Returns:
             TYPE: Description
         """
-        return self._cn_model
+        return self._cn_model_list
     # end def
 
     def itemType(self):

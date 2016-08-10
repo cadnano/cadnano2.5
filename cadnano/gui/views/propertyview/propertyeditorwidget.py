@@ -115,20 +115,48 @@ class PropertyEditorWidget(QTreeWidget):
 
             # special case for parts since there is currently no part filter
             if item_type is ItemType.NUCLEICACID:
-                pe_item = NucleicAcidPartItem(item.cnModel(), self)
+                pe_item = NucleicAcidPartItem([item.cnModel()], self)
                 self.show()
                 return
 
             if item.FILTER_NAME not in self._document.filter_set:
                 return
             if item_type is ItemType.OLIGO:
-                pe_item = OligoItem(item.cnModel(), self)
+                pe_item = OligoItem([item.cnModel()], self)
                 self.show()
             elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem(item.cnModel(), self, item.idNum())
+                pe_item = VirtualHelixItem([item.cnModel()], self, item.idNum())
                 self.show()
             else:
                 raise NotImplementedError
+        elif len(selected_items) > 1:
+            print("multiple selected")
+            # get the selected item
+
+            item_types = [item.itemType() for item in selected_items]
+            cn_model_list = [item.cnModel() for item in selected_items]
+            # id_num_list = [item.idNum() for item in selected_items]
+
+            print(item_types)
+            print(cn_model_list)
+            # print(id_num_list)
+
+            # special case for parts since there is currently no part filter
+            # if item_type is ItemType.NUCLEICACID:
+            #     pe_item = NucleicAcidPartItem(item.cnModelList(), self)
+            #     self.show()
+            #     return
+
+            # if item.FILTER_NAME not in self._document.filter_set:
+            #     return
+            # if item_type is ItemType.OLIGO:
+            #     pe_item = OligoItem(item.cnModelList(), self)
+            #     self.show()
+            # elif item_type is ItemType.VIRTUALHELIX:
+            #     pe_item = VirtualHelixItem(item.cnModelList(), self, item.idNum())
+            #     self.show()
+            # else:
+            #     raise NotImplementedError
         else:
             pass
             # self.hide() # show nothing

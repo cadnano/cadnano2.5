@@ -7,7 +7,7 @@ from .cnpropertyitem import CNPropertyItem
 class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
     """Summary
     """
-    def __init__(self, model_part, parent, key=None):
+    def __init__(self, model_part_list, parent, key=None):
         """Summary
 
         Args:
@@ -15,7 +15,7 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super(AbstractPropertyPartItem, self).__init__(model_part, parent, key=key)
+        super(AbstractPropertyPartItem, self).__init__(model_part_list, parent, key=key)
     # end def
 
     # SLOTS
@@ -29,9 +29,10 @@ class AbstractPropertyPartItem(CNPropertyItem, AbstractPartItem):
             TYPE: Description
         """
         # self.parent.removePartItem(self)
-        self._cn_model = None
-        self._controller.disconnectSignals()
-        self._controller = None
+        self._cn_model_list = None
+        for controller in self._controller_list:
+            controller.disconnectSignals()
+        self._controller_list = []
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
