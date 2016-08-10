@@ -198,7 +198,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        print("partSelectedChangedSlot", is_selected)
+        # print("partSelectedChangedSlot", is_selected)
         if is_selected:
             self.resetPen(styles.SELECTED_COLOR, styles.SELECTED_PEN_WIDTH)
             self.resetBrush(styles.SELECTED_BRUSH_COLOR, styles.SELECTED_ALPHA)

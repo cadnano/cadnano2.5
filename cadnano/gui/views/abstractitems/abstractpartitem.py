@@ -181,6 +181,7 @@ class AbstractPartItem(object):
     # end def
 
     def setActive(self):
+        print("AbstractPartItem setActive", self._model_part)
         self._model_part.setActive(True)
     # end def
 

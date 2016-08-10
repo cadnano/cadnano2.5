@@ -16,7 +16,7 @@ from cadnano.gui.views import styles
 from cadnano import app, setReopen, setBatch, util
 
 
-ONLY_ONE = True
+ONLY_ONE = False
 """bool: Retricts Document to creating only one Part if True."""
 
 
@@ -465,6 +465,10 @@ class DocumentController():
         if ONLY_ONE:
             self.newDocument()  # only allow one part for now
         part = self._document.addDnaPart()
+        if self._active_part is not None:
+            self._active_part.setActive(False)
+            self.deactivateActivePart()
+        part.setActive(True)
         self.setActivePart(part)
         return part
     # end def
@@ -500,7 +504,13 @@ class DocumentController():
     # end def
 
     def setActivePart(self, part):
+        # print("DC setActivePart")
         self._active_part = part
+    # end def
+
+    def deactivateActivePart(self):
+        # print("DC deactive Part")
+        self._active_part = None
     # end def
 
     def undoStack(self):

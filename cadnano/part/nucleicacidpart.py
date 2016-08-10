@@ -2780,12 +2780,13 @@ class NucleicAcidPart(Part):
         current_active_part = dc.activePart()
         if is_active:
             if current_active_part == self:
+                # print("Part already active", current_active_part)
                 return
             dc.setActivePart(self)
             if current_active_part is not None:
+                # print("Part deactivating by proxy", current_active_part)
                 current_active_part.setActive(False)
-        elif current_active_part == self:   # there always needs to be an active
-                return
+        # print("Part maybe activating", self, is_active)
         self.is_active = is_active
         self.partActiveChangedSignal.emit(self, is_active)
     # end def

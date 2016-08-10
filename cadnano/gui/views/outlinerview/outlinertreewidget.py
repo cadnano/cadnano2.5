@@ -224,7 +224,7 @@ class OutlinerTreeWidget(QTreeWidget):
     def setActiveItem(self):
         tba = self.to_be_activated
         if isinstance(tba, NucleicAcidPartItem):
-            print("trying to activate")
+            print("trying to activate", tba)
             tba.setActive()
         else:
             tba.setActive(True, 0)

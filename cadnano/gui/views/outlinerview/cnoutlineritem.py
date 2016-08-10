@@ -99,6 +99,7 @@ class CNOutlinerItem(QTreeWidgetItem):
     # end def
 
     def deactivate(self):
+        # print("should deactivate outliner Part")
         self.setBackground(NAME_COL, getBrushObj(styles.INACTIVE_COLOR))
         self.is_active = False
     # end def
