@@ -18,6 +18,8 @@ class CNPropertyItem(QTreeWidgetItem):
     Attributes:
         is_enum (bool): Description
     """
+    _GROUPNAME = "items"
+
     def __init__(self, cn_model_list, parent, key=None):
         """Summary
 
@@ -37,39 +39,39 @@ class CNPropertyItem(QTreeWidgetItem):
             # Properties
             self._prop_items = {}
 
-            model_props = {}
-            for cn_model in self._cn_model_list:
-                for cn_key, cn_val in cn_model.getPropertyDict().items():
-                    if cn_key in model_props:
-                        if cn_val != model_props[cn_key]:
-                            model_props[cn_key] = '~~multiple~~'
-                    else:
-                        model_props[cn_key] = cn_val
+            # model_props = {}
+            # for cn_model in self._cn_model_list:
+            #     for cn_key, cn_val in cn_model.getModelProperties().items():
+            #         if cn_key in model_props:
+            #             if cn_val != model_props[cn_key]:
+            #                 model_props[cn_key] = '~~multiple~~'
+            #         else:
+            #             model_props[cn_key] = cn_val
+            model_props = self.buildPropertyDict()
 
             # add properties alphabetically, but with 'name' on top
-            if len(self._cn_model_list) == 1:
+            if len(cn_model_list) == 1:
                 name = self._cn_model_list[0].getName()
                 if name is None:
                     name = "generic"
             else:
-                name = "%d items..." % len(self._cn_model_list)
-            self._key = key = "name"
-            self._prop_items[key] = self
-            self.setData(KEY_COL, Qt.EditRole, key)
+                print("trying multiple")
+                name = "%d %s..." % (len(cn_model_list), self._GROUPNAME)
+            self._key = the_key = "name"
+            self._prop_items[the_key] = self
+            self.setData(KEY_COL, Qt.EditRole, the_key)
             self.setData(VAL_COL, Qt.EditRole, name)
 
             constructor = type(self)
-            for key in sorted(model_props):
-                if key == 'name':
+            for that_key in sorted(model_props):
+                if that_key == 'name':
                     continue
-                # p_i = constructor(cn_model, root, key=key)
-                p_i = constructor(cn_model_list, root, key=key)
-                self._prop_items[key] = p_i
-                p_i.setData(KEY_COL, Qt.EditRole, key)
-                # model_value = cn_model.getProperty(key)
-                model_value = model_props[key]
-                if key.endswith('_type'):
-                    model_value = ENUM_NAMES[key][model_value]
+                p_i = constructor(cn_model_list, root, key=that_key)
+                self._prop_items[that_key] = p_i
+                p_i.setData(KEY_COL, Qt.EditRole, that_key)
+                model_value = model_props[that_key]
+                if that_key.endswith('_type'):
+                    model_value = ENUM_NAMES[that_key][model_value]
                     p_i.is_enum = True
                 elif isinstance(model_value, float):
                     model_value = "%0.2f" % model_value
@@ -82,6 +84,22 @@ class CNPropertyItem(QTreeWidgetItem):
                 p_i.setData(VAL_COL, Qt.EditRole, model_value)
         else:
             self._key = key
+    # end def
+
+    def cnModelList(self):
+        return self._cn_model_list
+    # end def
+
+    def buildPropertyDict(self):
+        model_props = {}
+        for cn_model in self._cn_model_list:
+            for cn_key, cn_val in cn_model.getModelProperties().items():
+                if cn_key in model_props:
+                    if cn_val != model_props[cn_key]:
+                        model_props[cn_key] = '~~multiple~~'
+                else:
+                    model_props[cn_key] = cn_val
+        return model_props
     # end def
 
     def key(self):

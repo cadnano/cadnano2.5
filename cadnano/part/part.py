@@ -137,7 +137,12 @@ class Part(CNObject):
         return self._group_properties['name']
     # end def
 
-    def getPropertyDict(self):
+    def getModelProperties(self):
+        """
+
+        Returns:
+            dict: group properties
+        """
         return self._group_properties
     # end def
 

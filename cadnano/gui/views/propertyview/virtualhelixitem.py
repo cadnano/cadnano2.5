@@ -15,11 +15,21 @@ from .cnpropertyitem import CNPropertyItem
 KEY_COL = 0
 VAL_COL = 1
 
+class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
+    """ Has no part_item
+    """
+    def __init__(self, id_num, part):
+        self._id_num = id_num
+        self._part_item = None
+        self._model_part = part
+        self.is_active = False
 
-class VirtualHelixItem(QTreeWidgetItem):
+class VirtualHelixItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """
-    def __init__(self, model_part, parent, id_num_list, key=None):
+    _GROUPNAME = "helices"
+
+    def __init__(self, reference_list, parent, key=None):
         """Summary
 
         Args:
@@ -28,82 +38,17 @@ class VirtualHelixItem(QTreeWidgetItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
-        self._cn_model = model_part
-        self._cn_model_list = [model_part]
-        self._model_part = model_part
-        self._id_num_list = id_num_list
-        self._controller = None
-        self.is_enum = False  # for use of CNPropertyItem class methods
-        super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
-        self.setFlags(self.flags() | Qt.ItemIsEditable)
-
         if key is None:
-            self._controller = VirtualHelixItemController(self, model_part, True, False)
-            root = parent.invisibleRootItem()  # add propertyitems as siblings
+            reference_list = [SimpleVirtualHelixItem(id_num, part) for part, id_num in reference_list]
+            self.lookup = set(reference_list)
 
-            # Properties
-            self._prop_items = {}
-            id_num_props = {}
-            combined_props = {}
-            for id_num in self._id_num_list:
-                id_num_props[id_num] = AbstractVirtualHelixItem.getAllPropertiesForIdNum(self, id_num)
-                for cn_key, cn_val in id_num_props[id_num].items():
-                    if cn_key in combined_props:
-                        if cn_val != combined_props[cn_key]:
-                            combined_props[cn_key] = '~~multiple~~'
-                    else:
-                        combined_props[cn_key] = cn_val
-
-            # model_props = AbstractVirtualHelixItem.getAllProperties(self)
-            # print(combined_props)
-
-            # add properties alphabetically, but with 'name' on top
-            if len(self._id_num_list) == 1:
-                name = id_num_props[self._id_num_list[0]]['name']
-                if name is None:
-                    name = "generic"
-            else:
-                name = "%d helices..." % len(self._id_num_list)
-            self._key = key = "name"
-            self._prop_items[key] = self
-            self.setData(KEY_COL, Qt.EditRole, key)
-            self.setData(VAL_COL, Qt.EditRole, name)
-
-            for key in sorted(combined_props):
-                if key == 'name':
-                    continue
-                p_i = VirtualHelixItem(model_part, root, id_num_list, key=key)
-                self._prop_items[key] = p_i
-                p_i.setData(KEY_COL, Qt.EditRole, key)
-                model_value = combined_props[key]
-                # print(key, model_value, type(model_value))
-                if isinstance(model_value, float):
-                    model_value = "%0.3f" % model_value
-                # elif not isinstance(model_value, str):
-                #     model_value = str(model_value)
-                p_i.setData(VAL_COL, Qt.EditRole, model_value)
-        else:
-            self._key = key
+        super(VirtualHelixItem, self).__init__(reference_list, parent, key=key)
+        if key is None:
+            for vhi in reference_list:
+                self._controller_list.append(VirtualHelixItemController(self, vhi.part(), True, False))
     # end def
-
-    def key(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
-        """
-        return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cnModel(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
-        """
-        return self._cn_model
-    # end def
-
     def itemType(self):
         """Overrides AbstractPropertyPartItem.itemType
 
@@ -111,17 +56,6 @@ class VirtualHelixItem(QTreeWidgetItem):
             ItemType: VIRTUALHELIX
         """
         return ItemType.VIRTUALHELIX
-    # end def
-
-    def disconnectSignals(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
-        """
-        if self._controller is not None:
-            self._controller.disconnectSignals()
-            self._controller = None
     # end def
 
     # SLOTS
@@ -137,7 +71,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        if self._cn_model == sender and id_num in self._id_num_list:
+        if (sender, id_num) in self.lookup:
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -150,7 +84,7 @@ class VirtualHelixItem(QTreeWidgetItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if self._cn_model == sender and id_num in self._id_num_list:
+        if (sender, id_num) in self.lookup:
             self._cn_model = None
             self._controller = None
             self.parent().removeChild(self)
@@ -177,29 +111,30 @@ class VirtualHelixItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
+        cn_m = self._reference_list[0]
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
-            tpb, _ = AbstractVirtualHelixItem.getTwistPerBase()
+            tpb, _ = cn_m.getTwistPerBase()
             editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
         elif key == 'scamZ':
             editor = QDoubleSpinBox(parent_QWidget)
-            tpb, _ = AbstractVirtualHelixItem.getTwistPerBase()
+            tpb, _ = cn_m.getTwistPerBase()
             editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
         elif key == 'length':
             editor = QSpinBox(parent_QWidget)
-            bpr, length = AbstractVirtualHelixItem.getProperty(self,
-                                                               ['bases_per_repeat',
-                                                                'length'])
+            bpr, length = cn_m.getProperty(self,
+                                                ['bases_per_repeat',
+                                                    'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
         elif key == 'z' and self._model_part.isZEditable():
             editor = QDoubleSpinBox(parent_QWidget)
-            bw = self._model_part.baseWidth()
+            bw = cm.part().baseWidth()
             editor.setSingleStep(bw)
             editor.setRange(-bw*21, bw*21)
         else:
@@ -215,12 +150,15 @@ class VirtualHelixItem(QTreeWidgetItem):
         key = self._key
         if key == 'length':
             print("Property view 'length' updating", key, value, self._id_num_list)
-            AbstractVirtualHelixItem.setSize(self, value, id_nums=self._id_num_list)
+            for vhi in self._reference_list:
+                vhi.setSize(value, id_nums=self._id_num_list)
         elif key == 'z':
             print("Property view 'z' updating", key, value)
-            AbstractVirtualHelixItem.setZ(self, value, id_nums=self._id_num_list)
+            for vhi in self._reference_list:
+                vhi.setZ(value, id_nums=self._id_num_list)
         else:
-            AbstractVirtualHelixItem.setProperty(self, self._key, value, id_nums=self._id_num_list)
+            for vhi in self._reference_list:
+                vhi.setProperty(self._key, value, id_nums=self._id_num_list)
     # end def
 
     def setValue(self, property_key, new_value):

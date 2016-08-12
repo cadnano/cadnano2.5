@@ -10,6 +10,8 @@ from .cnpropertyitem import CNPropertyItem
 class OligoItem(AbstractOligoItem, CNPropertyItem):
     """Summary
     """
+    _GROUPNAME = "oligos"
+
     def __init__(self, cn_model_list, parent, key=None):
         """Summary
 
@@ -45,12 +47,11 @@ class OligoItem(AbstractOligoItem, CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        for cn_model in self._cn_model_list:
-            if cn_model == model_oligo:
-                # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)
+        if model_oligo in self._cn_model_list:
+            # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)
+            # self.setValue(key, new_value)
+            displayed_val = self.getItemValue(key)
+            if displayed_val != new_value:
                 self.setValue(key, new_value)
-                displayed_val = self.getItemValue(key)
-                if displayed_val != new_value:
-                    self.setValue(key, new_value)
     # end def
 # end class

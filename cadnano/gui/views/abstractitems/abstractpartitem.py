@@ -17,7 +17,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         super(QAbstractPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
-        self._model_props = m_p.getPropertyDict()
+        self._model_props = m_p.getModelProperties()
         self._viewroot = viewroot
         self._oligo_item_hash = {}
         self._virtual_helix_item_hash = {}

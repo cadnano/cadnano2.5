@@ -101,7 +101,7 @@ class Oligo(CNObject):
         return props['name'], props['color'], props['is_visible']
     # end def
 
-    def getPropertyDict(self):
+    def getModelProperties(self):
         return self._props
     # end def
 

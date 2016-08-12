@@ -108,59 +108,35 @@ class PropertyEditorWidget(QTreeWidget):
         selected_items = o.selectedItems()
 
         self.clear()    # remove pre-existing items
-        if len(selected_items) == 1:
-            # get the selected item
-            item = selected_items[0]
-            item_type = item.itemType()
-
-            # special case for parts since there is currently no part filter
-            if item_type is ItemType.NUCLEICACID:
-                pe_item = NucleicAcidPartItem([item.cnModel()], self)
-                self.show()
-                return
-
-            if item.FILTER_NAME not in self._document.filter_set:
-                return
-            if item_type is ItemType.OLIGO:
-                pe_item = OligoItem([item.cnModel()], self)
-                self.show()
-            elif item_type is ItemType.VIRTUALHELIX:
-                pe_item = VirtualHelixItem(item.cnModel(), self, [item.idNum()])
-                self.show()
-            else:
-                raise NotImplementedError
-        elif len(selected_items) > 1:
+        if len(selected_items) > 1:
             print("multiple selected")
-            # get the selected item
+        # get the selected item
 
-            item_types = set([item.itemType() for item in selected_items])
-            if len(item_types) > 1:  # assume no mixed types for now
-                return
+        item_types = set([item.itemType() for item in selected_items])
+        num_types = len(item_types)
+        if num_types != 1:  # assume no mixed types for now
+            return
+        item_type = item_types.pop()
+        cn_model_list = [item.cnModel() for item in selected_items]
 
-            item_type = item_types.pop()
-            cn_model_list = [item.cnModel() for item in selected_items]
+        # special case for parts since there is currently no part filter
+        if item_type is ItemType.NUCLEICACID:
+            pe_item = NucleicAcidPartItem(cn_model_list, self)
+            self.show()
+            return
 
-            # special case for parts since there is currently no part filter
-            if item_type is ItemType.NUCLEICACID:
-                pe_item = NucleicAcidPartItem(cn_model_list, self)
-                self.show()
-                return
-
-            item = selected_items[0]
-            if item.FILTER_NAME not in self._document.filter_set:
-                return
-            if item_type is ItemType.OLIGO:
-                pe_item = OligoItem(cn_model_list, self)
-                self.show()
-            elif item_type is ItemType.VIRTUALHELIX:
-                id_num_list = [item.idNum() for item in selected_items]
-                pe_item = VirtualHelixItem(cn_model_list[0], self, id_num_list)
-                self.show()
-            else:
-                raise NotImplementedError
+        item = selected_items[0]
+        if item.FILTER_NAME not in self._document.filter_set:
+            return
+        if item_type is ItemType.OLIGO:
+            pe_item = OligoItem(cn_model_list, self)
+            self.show()
+        elif item_type is ItemType.VIRTUALHELIX:
+            reference_list = [(item.cnModel(), item.idNum()) for item in selected_items]
+            pe_item = VirtualHelixItem(reference_list, self)
+            self.show()
         else:
-            pass
-            # self.hide() # show nothing
+            raise NotImplementedError
     # end def
 
     def partAddedSlot(self, sender, model_part):

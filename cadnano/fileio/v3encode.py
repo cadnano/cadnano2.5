@@ -37,7 +37,7 @@ def encodePart(part):
     # vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
-    group_props = part.getPropertyDict().copy()
+    group_props = part.getModelProperties().copy()
 
     view_props = part.view_properties
 
@@ -100,7 +100,7 @@ def encodePartList(part, vh_group_list):
     vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
-    group_props = part.getPropertyDict().copy()
+    group_props = part.getModelProperties().copy()
 
     if group_props.get('point_type') == PointType.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations

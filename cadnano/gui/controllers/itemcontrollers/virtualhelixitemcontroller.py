@@ -3,6 +3,13 @@ class VirtualHelixItemController(object):
     a specialized controller for the property view
     """
     def __init__(self, virtualhelix_item, model_part, do_wire_part, do_wire_strands):
+        """
+        Args:
+            virtualhelix_item (AbstractVirtualHelixItem):
+            model_part (NucleicAcidPart):
+            do_wire_part (bool):    Signals used in property view
+            do_wire_strands:        Signals used in path view
+        """
         self._virtual_helix_item = virtualhelix_item
         self._model_part = model_part
         self._do_wire_part = do_wire_part
@@ -13,9 +20,9 @@ class VirtualHelixItemController(object):
     def connectSignals(self):
         vh_item = self._virtual_helix_item
         m_p = self._model_part
-        # if self._do_wire_part:
-            # m_p.partVirtualHelixPropertyChangedSignal.connect(vh_item.partVirtualHelixPropertyChangedSlot)
-            # m_p.partVirtualHelixRemovedSignal.connect(vh_item.partVirtualHelixRemovedSlot)
+        if self._do_wire_part:
+            m_p.partVirtualHelixPropertyChangedSignal.connect(vh_item.partVirtualHelixPropertyChangedSlot)
+            m_p.partVirtualHelixRemovedSignal.connect(vh_item.partVirtualHelixRemovedSlot)
         if self._do_wire_strands:
             for strandset in m_p.getStrandSets(vh_item.idNum()):
                 strandset.strandsetStrandAddedSignal.connect(vh_item.strandAddedSlot)
@@ -24,9 +31,9 @@ class VirtualHelixItemController(object):
     def disconnectSignals(self):
         vh_item = self._virtual_helix_item
         m_p = self._model_part
-        # if self._do_wire_part:
-            # m_p.partVirtualHelixPropertyChangedSignal.disconnect(vh_item.partVirtualHelixPropertyChangedSlot)
-            # m_p.partVirtualHelixRemovedSignal.disconnect(vh_item.partVirtualHelixRemovedSlot)
+        if self._do_wire_part:
+            m_p.partVirtualHelixPropertyChangedSignal.disconnect(vh_item.partVirtualHelixPropertyChangedSlot)
+            m_p.partVirtualHelixRemovedSignal.disconnect(vh_item.partVirtualHelixRemovedSlot)
         if self._do_wire_strands:
             for strandset in m_p.getStrandSets(vh_item.idNum()):
                 strandset.strandsetStrandAddedSignal.disconnect(vh_item.strandAddedSlot)

@@ -7,15 +7,12 @@ class AbstractVirtualHelixItem(object):
 
     Slots that must be overridden should raise an exception.
     """
-    # __slots__ = ('_id_num', '_part_item', '_model_part')
     def __init__(self, id_num, part_item):
         self._id_num = id_num
         self._part_item = part_item
         self._model_part = part_item.part()
         self.is_active = False
 
-    # def virtualHelixNumberChangedSlot(self, virtual_helix, number):
-    #     pass
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
         pass
 
@@ -30,10 +27,11 @@ class AbstractVirtualHelixItem(object):
     # end def
 
     def getProperty(self, keys):
-        if hasattr(self, '_id_num'):
-            return self._model_part.getVirtualHelixProperties(self._id_num, keys)
-        elif hasattr(self, '_id_num_list'):
-            return self._model_part.getVirtualHelixProperties(self._id_num_list[0], keys)
+        return self._model_part.getVirtualHelixProperties(self._id_num, keys)
+    # end def
+
+    def getName(self):
+        return self._model_part.getVirtualHelixProperties(self._id_num, 'name')
     # end def
 
     def getTwistPerBase(self):
@@ -56,7 +54,7 @@ class AbstractVirtualHelixItem(object):
         bases_per_turn = bpr / tpr
         return bpr, bases_per_turn, tpr*360./bpr, mga
 
-    def getAllProperties(self):
+    def getModelProperties(self):
         return self._model_part.getAllVirtualHelixProperties(self._id_num)
     # end def
 
