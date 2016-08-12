@@ -4,6 +4,7 @@ from heapq import heapify, heappush, nsmallest
 from bisect import bisect_left
 from ast import literal_eval
 from collections import defaultdict
+from itertools import count as icount
 
 import numpy as np
 import pandas as pd
@@ -2755,7 +2756,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def initializeAbstractSegmentId(self):
-        self._abstract_segment_id = count(0)
+        self._abstract_segment_id = icount(0)
         self._current_base_count = 0
     # end def
 
