@@ -65,7 +65,6 @@ class AbstractVirtualHelixItem(object):
     # end def
 
     def setProperty(self, keys, values, id_nums=None):
-        print("setProperty", keys, values, id_nums)
         if id_nums:
             for id_num in id_nums:
                 self._model_part.setVirtualHelixProperties(id_num, keys, values)

@@ -177,7 +177,6 @@ class VirtualHelixItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        print("VHI configureEditor")
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)

@@ -1,17 +1,16 @@
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QItemSelectionModel, QItemSelection
-
-from cadnano.enum import ItemType, PartType
+from PyQt5.QtCore import QItemSelectionModel
+from cadnano.enum import ItemType
 from cadnano.gui.views import styles
-
-from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import CNOutlinerItem
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OligoItem
 from .virtualhelixitem import VirtualHelixItem
 
+
 class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     FILTER_NAME = "part"
+
     def __init__(self, model_part, parent):
         super(NucleicAcidPartItem, self).__init__(model_part, parent)
         self._controller = NucleicAcidPartItemController(self, model_part)
