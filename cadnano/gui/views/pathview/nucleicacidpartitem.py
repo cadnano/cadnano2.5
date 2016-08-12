@@ -224,6 +224,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
                 self.grab_corner.setBrush(getBrushObj(new_value))
+            elif property_key == 'is_visible':
+                if new_value:
+                    self.show()
+                else:
+                    self.hide()
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,

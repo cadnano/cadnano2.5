@@ -170,10 +170,11 @@ class NucleicAcidPartItem(QAbstractPartItem):
                     vhi.updateAppearance()
                 self.grab_cornerTL.setBrush(getBrushObj(new_value))
                 self.grab_cornerBR.setBrush(getBrushObj(new_value))
-            elif property_key == 'circular':
-                pass
-            elif property_key == 'dna_sequence':
-                pass
+            elif property_key == 'is_visible':
+                if new_value:
+                    self.show()
+                else:
+                    self.hide()
             elif property_key == 'grid_type':
                 self.griditem.setGridType(new_value)
     # end def
