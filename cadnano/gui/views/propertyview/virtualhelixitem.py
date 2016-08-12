@@ -29,9 +29,11 @@ class VirtualHelixItem(QTreeWidgetItem):
             key (None, optional): Description
         """
         self._cn_model = model_part
+        self._cn_model_list = [model_part]
         self._model_part = model_part
         self._id_num_list = id_num_list
         self._controller = None
+        self.is_enum = False  # for use of CNPropertyItem class methods
         super(VirtualHelixItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
 
@@ -175,6 +177,7 @@ class VirtualHelixItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
+        print("VHI configureEditor")
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -206,10 +209,8 @@ class VirtualHelixItem(QTreeWidgetItem):
     # end def
 
     def updateCNModel(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Notify the cadnano model that a property may need updating.
+        This method should be called by the item model dataChangedSlot.
         """
         value = self.data(1, Qt.DisplayRole)
         key = self._key
@@ -250,11 +251,4 @@ class VirtualHelixItem(QTreeWidgetItem):
         """
         return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
-
-    # def updateViewProperty(self, property_key):
-    #     model_value = AbstractVirtualHelixItem.getProperty(self, property_key)
-    #     item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
-    #     if model_value != item_value:
-    #         self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
-    # # end def
 # end class
