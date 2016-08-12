@@ -55,7 +55,7 @@ class CNPropertyItem(QTreeWidgetItem):
                 if name is None:
                     name = "generic"
             else:
-                print("trying multiple")
+                # print("trying multiple")
                 name = "%d %s..." % (len(cn_model_list), self._GROUPNAME)
             self._key = the_key = "name"
             self._prop_items[the_key] = self
@@ -132,10 +132,9 @@ class CNPropertyItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        if self._controller_list is not None:
-            for controller in self._controller_list:
-                controller.disconnectSignals()
-            self._controller_list = []
+        for controller in self._controller_list:
+            controller.disconnectSignals()
+        self._controller_list = []
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):

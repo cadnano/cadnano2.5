@@ -54,6 +54,8 @@ class RemoveVirtualHelixCommand(UndoCommand):
                                         safe=False)
         part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, self.neighbors)
-        part.setActiveVirtualHelix(*self.old_active_base_info[0:3])
+        abi = self.old_active_base_info
+        if abi:
+            part.setActiveVirtualHelix(*abi[0:3])
     # end def
 # end class

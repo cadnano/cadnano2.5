@@ -24,7 +24,7 @@ class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
         self._model_part = part
         self.is_active = False
 
-class VirtualHelixItem(CNPropertyItem):
+class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """
     _GROUPNAME = "helices"
@@ -42,7 +42,7 @@ class VirtualHelixItem(CNPropertyItem):
             reference_list = [SimpleVirtualHelixItem(id_num, part) for part, id_num in reference_list]
             self.lookup = set(reference_list)
 
-        super(VirtualHelixItem, self).__init__(reference_list, parent, key=key)
+        super(VirtualHelixSetItem, self).__init__(reference_list, parent, key=key)
         if key is None:
             for vhi in reference_list:
                 self._controller_list.append(VirtualHelixItemController(self, vhi.part(), True, False))
@@ -85,8 +85,8 @@ class VirtualHelixItem(CNPropertyItem):
             neighbors (list):
         """
         if (sender, id_num) in self.lookup:
-            self._cn_model = None
-            self._controller = None
+            self.disconnectSignals()
+            self._cn_model_list = None
             self.parent().removeChild(self)
     # end def
 
@@ -111,7 +111,7 @@ class VirtualHelixItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        cn_m = self._reference_list[0]
+        cn_m = self._cn_model_list[0]
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -150,14 +150,14 @@ class VirtualHelixItem(CNPropertyItem):
         key = self._key
         if key == 'length':
             print("Property view 'length' updating", key, value, self._id_num_list)
-            for vhi in self._reference_list:
+            for vhi in self._cn_model_list:
                 vhi.setSize(value, id_nums=self._id_num_list)
         elif key == 'z':
             print("Property view 'z' updating", key, value)
-            for vhi in self._reference_list:
+            for vhi in self._cn_model_list:
                 vhi.setZ(value, id_nums=self._id_num_list)
         else:
-            for vhi in self._reference_list:
+            for vhi in self._cn_model_list:
                 vhi.setProperty(self._key, value, id_nums=self._id_num_list)
     # end def
 

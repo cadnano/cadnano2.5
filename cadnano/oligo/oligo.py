@@ -238,7 +238,6 @@ class Oligo(CNObject):
     def remove(self, use_undostack=True):
         c = RemoveOligoCommand(self)
         util.execCommandList(self, [c], desc="Remove Oligo", use_undostack=use_undostack)
-        self.oligoRemovedSignal.emit(self._part, self)
     # end def
 
     def applyAbstractSequences(self):

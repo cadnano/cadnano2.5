@@ -961,15 +961,22 @@ class NucleicAcidPart(Part):
         # expand offset and size as required
         self._resetOriginCache()
 
-        number_of_new_elements = id_num - len(offset_and_size) + 1
-        offset_and_size += [None]*number_of_new_elements
-        self.fwd_strandsets += [None]*number_of_new_elements
-        self.rev_strandsets += [None]*number_of_new_elements
-
-        total_points = self.total_points
-        # lo_idx_limit = total_points
-        # new_lims = (total_points, total_points + num_points)
-        offset_and_size[id_num] = (total_points, 0)  # initialize with size 0
+        len_offset_and_size = len(offset_and_size)
+        number_of_new_elements = id_num - len_offset_and_size + 1
+        if number_of_new_elements > 0:
+            offset_and_size += [None]*number_of_new_elements
+            self.fwd_strandsets += [None]*number_of_new_elements
+            self.rev_strandsets += [None]*number_of_new_elements
+        # find the next highest insertion offset
+        next_o = self.total_points
+        for next_o_and_s in offset_and_size[id_num + 1:]:
+            if next_o_and_s:
+                next_o, next_s = next_o_and_s
+                break
+        this_offset = num_points
+        # print("total points", self.total_points, next_o, id_num)
+        offset_and_size[id_num] = (next_o, 0)
+        # the other offsets will be adjusted later
 
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self._origin_pts)
@@ -1443,7 +1450,7 @@ class NucleicAcidPart(Part):
             indices[lo:lo + length] -= length
 
         # 2. Adjust the offsets of id_nums greater than id_num
-        for i, item in enumerate(offset_and_size[id_num:]):
+        for i, item in enumerate(offset_and_size[id_num + 1:], start=1):
             if item is not None:
                 offset_other, size_other = item
                 offset_and_size[i + id_num] = (offset_other - length, size_other)

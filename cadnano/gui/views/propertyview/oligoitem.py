@@ -7,7 +7,7 @@ from .cnpropertyitem import CNPropertyItem
 # from cadnano import util
 
 
-class OligoItem(AbstractOligoItem, CNPropertyItem):
+class OligoSetItem(AbstractOligoItem, CNPropertyItem):
     """Summary
     """
     _GROUPNAME = "oligos"
@@ -20,7 +20,7 @@ class OligoItem(AbstractOligoItem, CNPropertyItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super(OligoItem, self).__init__(cn_model_list, parent, key=key)
+        super(OligoSetItem, self).__init__(cn_model_list, parent, key=key)
         # print(util.trace(5), "in OligoItem init", cn_model_list)
         if key is None:
             for model_oligo in cn_model_list:

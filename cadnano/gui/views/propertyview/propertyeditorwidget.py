@@ -16,9 +16,9 @@ from cadnano.gui.palette import getBrushObj
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano.gui.views.pathview import pathstyles as styles
 
-from .oligoitem import OligoItem
-from .nucleicacidpartitem import NucleicAcidPartItem
-from .virtualhelixitem import VirtualHelixItem
+from .oligoitem import OligoSetItem
+from .nucleicacidpartitem import NucleicAcidPartSetItem
+from .virtualhelixitem import VirtualHelixSetItem
 from .cnpropertyitem import CNPropertyItem
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
@@ -102,14 +102,14 @@ class PropertyEditorWidget(QTreeWidget):
         """
         o = self._window.outliner_widget
         for child in self.children():
-            if isinstance(child, (CNPropertyItem, VirtualHelixItem)):
+            if isinstance(child, (CNPropertyItem)):
                 child.disconnectSignals()
 
         selected_items = o.selectedItems()
 
         self.clear()    # remove pre-existing items
-        if len(selected_items) > 1:
-            print("multiple selected")
+        # if len(selected_items) > 1:
+        #     print("multiple selected")
         # get the selected item
 
         item_types = set([item.itemType() for item in selected_items])
@@ -121,7 +121,7 @@ class PropertyEditorWidget(QTreeWidget):
 
         # special case for parts since there is currently no part filter
         if item_type is ItemType.NUCLEICACID:
-            pe_item = NucleicAcidPartItem(cn_model_list, self)
+            pe_item = NucleicAcidPartSetItem(cn_model_list, self)
             self.show()
             return
 
@@ -129,11 +129,11 @@ class PropertyEditorWidget(QTreeWidget):
         if item.FILTER_NAME not in self._document.filter_set:
             return
         if item_type is ItemType.OLIGO:
-            pe_item = OligoItem(cn_model_list, self)
+            pe_item = OligoSetItem(cn_model_list, self)
             self.show()
         elif item_type is ItemType.VIRTUALHELIX:
             reference_list = [(item.cnModel(), item.idNum()) for item in selected_items]
-            pe_item = VirtualHelixItem(reference_list, self)
+            pe_item = VirtualHelixSetItem(reference_list, self)
             self.show()
         else:
             raise NotImplementedError

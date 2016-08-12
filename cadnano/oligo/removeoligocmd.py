@@ -32,6 +32,7 @@ class RemoveOligoCommand(UndoCommand):
         # o.setPart(None)
         # remove Oligo from part but don't set parent to None?
         part.removeOligoFromSet(o)
+        o.oligoRemovedSignal.emit(part, o)
     # end def
 
     def undo(self):
