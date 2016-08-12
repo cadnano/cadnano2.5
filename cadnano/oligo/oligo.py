@@ -2,9 +2,9 @@ import sys
 import traceback
 
 from cadnano import util
-from cadnano.enum import ModType
-from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
+from cadnano.cnproxy import ProxySignal
+from cadnano.enum import ModType
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
@@ -37,12 +37,11 @@ class Oligo(CNObject):
         self._part = part
         self._strand5p = None
         self._is_loop = False
-        self._props = {
-                       'name': "oligo%s" % str(id(self))[-4:],
+        self._props = {'name': "oligo%s" % str(id(self))[-4:],
                        'color': "#cc0000" if color is None else color,
                        'length': 0,
                        'is_visible': True
-                      }
+                       }
     # end def
 
     def __repr__(self):
@@ -80,14 +79,17 @@ class Oligo(CNObject):
     # end def
 
     ### SIGNALS ###
-    oligoRemovedSignal = ProxySignal(CNObject, CNObject,
-                                             name='oligoRemovedSignal')  # part, self
-    oligoSequenceAddedSignal = ProxySignal(CNObject,
-                                             name='oligoSequenceAddedSignal')  # self
-    oligoSequenceClearedSignal = ProxySignal(CNObject,
-                                             name='oligoSequenceClearedSignal')  # self
-    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object,
-                                             name='oligoPropertyChangedSignal')  # self, property_name, new_value
+    oligoRemovedSignal = ProxySignal(CNObject, CNObject, name='oligoRemovedSignal')
+    """part, self"""
+
+    oligoSequenceAddedSignal = ProxySignal(CNObject, name='oligoSequenceAddedSignal')
+    """self"""
+
+    oligoSequenceClearedSignal = ProxySignal(CNObject, name='oligoSequenceClearedSignal')
+    """self"""
+
+    oligoPropertyChangedSignal = ProxySignal(CNObject, object, object, name='oligoPropertyChangedSignal')
+    """self, property_name, new_value"""
 
     ### SLOTS ###
 
@@ -203,22 +205,26 @@ class Oligo(CNObject):
         strand5p = self.strand5p()
         idx5p = strand5p.idx5Prime()
         seq = ''
+        a_seq = ''
         if self.isLoop():
             # print("A loop exists")
             raise Exception
         for strand in strand5p.generator3pStrand():
             seq = seq + Strand.sequence(strand, for_export=True)
+            a_seq = a_seq + Strand.abstractSeq(strand)
             if strand.connection3p() is None:  # last strand in the oligo
                 vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
+            else:
+                a_seq = a_seq + ','
         modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,
                                                             ModType.END_5PRIME)
         modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
                                                             ModType.END_3PRIME)
         seq = modseq5p + seq + modseq3p
-        output = "%d[%d],%d[%d],%s,%s,%s,%s,%s\n" % \
-                 (vh_num5p, idx5p, vh_num3p, idx3p, seq, len(seq),
-                  self.getColor(), modseq5p_name, modseq3p_name)
+        output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t%s\n" % \
+                 (vh_num5p, idx5p, vh_num3p, idx3p, self.getColor(),
+                  modseq5p_name, seq, modseq3p_name, a_seq)
         return output
     # end def
 

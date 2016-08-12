@@ -1,8 +1,8 @@
-from operator import attrgetter
 from array import array
+from operator import attrgetter
 from cadnano import util
-from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
+from cadnano.cnproxy import ProxySignal
 from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
 from .insertioncmd import ChangeInsertionCommand
 from .modscmd import AddModsCommand, RemoveModsCommand
@@ -201,6 +201,9 @@ class Strand(CNObject):
             return ''.join(['?' for x in range(self.totalLength())])
         return ''
     # end def
+
+    def abstractSeq(self):
+        return ','.join([str(i) for i in self.abstract_sequence])
 
     def strandSet(self):
         return self._strandset

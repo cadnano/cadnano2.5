@@ -1,17 +1,18 @@
 """
 util.py
 """
-import os
-import sys
-from os import path
 import argparse
 import inspect
-import platform
-import string
-from traceback import extract_stack
-
 import logging
 import logging.handlers
+import os
+import platform
+import string
+import sys
+
+from os import path
+from traceback import extract_stack
+
 logger = logging.getLogger(__name__)
 
 IS_PY_3 = int(sys.version_info[0] > 2)
@@ -62,9 +63,9 @@ def comp(seqStr):
     return seqStr.translate(complement)
 
 if IS_PY_3:
-    whitetoQ = str.maketrans(' ', '?')
+    whitetoQ = str.maketrans(' |', '??')
 else:
-    whitetoQ = string.maketrans(' ', '?')
+    whitetoQ = string.maketrans(' |', '??')
 
 
 def markwhite(seqStr):

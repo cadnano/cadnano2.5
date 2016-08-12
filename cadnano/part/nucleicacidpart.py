@@ -1,39 +1,37 @@
 # -*- coding: utf-8 -*-
 import math
-from heapq import heapify, heappush, nsmallest
-from bisect import bisect_left
 from ast import literal_eval
-from collections import defaultdict
+from bisect import bisect_left
+from collections import defaultdict, deque
+from heapq import heapify, heappush, nsmallest
 from itertools import count as icount
 
 import numpy as np
 import pandas as pd
-from collections import deque
-from cadnano.strandset import StrandSet
-from cadnano.part.part import Part
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
 
 from cadnano import util
-from cadnano.enum import PartType, GridType, PointType, StrandType
+from cadnano.cnobject import CNObject
+from cadnano.cnproxy import ProxySignal
+from cadnano.enum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
-
+from cadnano.part.part import Part
+from cadnano.strandset import StrandSet
 from cadnano.strandset import SplitCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
-from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .removepartcmd import RemovePartCommand
 from .removevhelixcmd import RemoveVirtualHelixCommand
+from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
-equivalent to np.sum(a*a, axis=1)
-but faster
+equivalent to np.sum(a*a, axis=1) but faster
 """
 from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
+
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -66,7 +64,7 @@ def _defaultDataFrame(size):
 # end def
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
-DEFAULT_RADIUS = 1.125 # nm
+DEFAULT_RADIUS = 1.125  # nm
 
 
 class NucleicAcidPart(Part):
@@ -92,7 +90,7 @@ class NucleicAcidPart(Part):
     _TURNS_PER_STEP = 2
     _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
     _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
-    _BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
+    _BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
     _SUB_STEP_SIZE = _STEP_SIZE / 3
     __count = 0
 
@@ -111,8 +109,8 @@ class NucleicAcidPart(Part):
 
         self._radius = DEFAULT_RADIUS     # probably a property???
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
-        self._mods = {  'int_instances':{},
-                        'ext_instances':{}}
+        self._mods = {'int_instances': {},
+                      'ext_instances': {}}
         self._oligos = set()
 
         # Runtime state
@@ -197,34 +195,45 @@ class NucleicAcidPart(Part):
     # end def
 
     # B. Virtual Helix
-    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int,   # id_num
-                        name='partActiveVirtualHelixChangedSignal')
-    partActiveBaseInfoSignal = ProxySignal(CNObject, object,   # self.active_base_info (tuple or None)
-                        name='partActiveBaseInfoSignal')
-    partVirtualHelixAddedSignal = ProxySignal(object, int, object,
-                        name='partVirtualHelixAddedSignal')     # self, virtual_helix id_num, neighbor list
-    partVirtualHelixRemovingSignal = ProxySignal(object, int, object,
-                        name='partVirtualHelixRemovingSignal')     # self, virtual_helix id_num, neighbor list
-    partVirtualHelixRemovedSignal = ProxySignal(object, int,
-                        name='partVirtualHelixRemovedSignal')     # self, virtual_helix id_num
-    partVirtualHelixResizedSignal = ProxySignal(CNObject, int,
-                        name='partVirtualHelixResizedSignal')   # self, virtual_helix id_num
-    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool,
-                        name='partVirtualHelicesReorderedSignal') # self, list of id_nums
+    partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int, name='partActiveVirtualHelixChangedSignal')
+    """id_num"""
+
+    partActiveBaseInfoSignal = ProxySignal(CNObject, object, name='partActiveBaseInfoSignal')
+    """self.active_base_info (tuple or None)"""
+
+    partVirtualHelixAddedSignal = ProxySignal(object, int, object, name='partVirtualHelixAddedSignal')
+    """self, virtual_helix id_num, neighbor list"""
+
+    partVirtualHelixRemovingSignal = ProxySignal(object, int, object, name='partVirtualHelixRemovingSignal')
+    """self, virtual_helix id_num, neighbor list"""
+
+    partVirtualHelixRemovedSignal = ProxySignal(object, int, name='partVirtualHelixRemovedSignal')
+    """self, virtual_helix id_num"""
+
+    partVirtualHelixResizedSignal = ProxySignal(CNObject, int, name='partVirtualHelixResizedSignal')
+    """self, virtual_helix id_num"""
+
+    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool, name='partVirtualHelicesReorderedSignal')
+    """self, list of id_nums"""
 
     partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
-                        name='partVirtualHelicesTranslatedSignal')  # self, list of id_nums, transform
-    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object, bool,
-                        name='partVirtualHelicesSelectedSignal')  # self, iterable of id_nums to select, transform
+                                                     name='partVirtualHelicesTranslatedSignal')
+    """self, list of id_nums, transform"""
+
+    partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object, bool, name='partVirtualHelicesSelectedSignal')
+    """self, iterable of id_nums to select, transform"""
+
     partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
-                                            name='partVirtualHelixPropertyChangedSignal')  # self, id_num, value
+                                                        name='partVirtualHelixPropertyChangedSignal')
+    """self, id_num, value"""
 
     # C. Oligo
-    partOligoAddedSignal = ProxySignal(CNObject, object,
-                        name='partOligoAddedSignal')            # self, oligo
+    partOligoAddedSignal = ProxySignal(CNObject, object, name='partOligoAddedSignal')
+    """self, oligo"""
     # D. Strand
-    partStrandChangedSignal = ProxySignal(object, int,
-                        name='partStrandChangedSignal')         # self, virtual_helix
+
+    partStrandChangedSignal = ProxySignal(object, int, name='partStrandChangedSignal')
+    """self, virtual_helix"""
 
     def __repr__(self):
         cls_name = self.__class__.__name__
@@ -974,7 +983,7 @@ class NucleicAcidPart(Part):
             if next_o_and_s:
                 next_o, next_s = next_o_and_s
                 break
-        this_offset = num_points
+        # this_offset = num_points
         # print("total points", self.total_points, next_o, id_num)
         offset_and_size[id_num] = (next_o, 0)
         # the other offsets will be adjusted later
@@ -1939,7 +1948,7 @@ class NucleicAcidPart(Part):
 
         # MISALIGNED by 27.5% twist per base so that's 1.55*half_twist_per_base
         # ma_f = 1.55 # NC should be this if we wanted to be strict
-        ma_f = 2.55 # NC changed to this to show all xovers in legacy Honeycomb
+        ma_f = 2.55  # NC changed to this to show all xovers in legacy Honeycomb
         r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base)) +
                              (1. - math.cos(ma_f*half_twist_per_base))))**2
         r2_tangent = (RADIUS*(math.sin(half_twist_per_base) +
@@ -2238,7 +2247,7 @@ class NucleicAcidPart(Part):
 
     def getStapleSequences(self):
         """getStapleSequences"""
-        s = "Start,End,Sequence,Length,Color\n"
+        s = "Start\tEnd\tColor\tMod5\tSequence\tMod3\tAbstractSequence\n"
         for oligo in self._oligos:
             # if oligo.strand5p().strandSet().isStaple():
             s = s + oligo.sequenceExport()
@@ -2741,7 +2750,6 @@ class NucleicAcidPart(Part):
         self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
-
     def oligos(self):
         return self._oligos
     # end def
@@ -2816,7 +2824,7 @@ class NucleicAcidPart(Part):
             return
         else:
             self._active_id_num = id_num
-            self.active_base_info  = abi
+            self.active_base_info = abi
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
     # end def
@@ -2863,8 +2871,8 @@ class NucleicAcidPart(Part):
     def getModID(self, strand, idx):
         id_num = strand.idNum()
         strandtype = strand.strandType()
-        key =  "{},{},{}".format(id_num, strandtype, idx)
-        mods_strand  = self._mods['ext_instances']
+        key = "{},{},{}".format(id_num, strandtype, idx)
+        mods_strand = self._mods['ext_instances']
         if key in mods_strand:
             return mods_strand[key]
     # end def
@@ -2900,7 +2908,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def addModInstance(self, id_num, idx, is_rev, is_internal, mid):
-        key =  "{},{},{}".format(id_num, is_rev, idx)
+        key = "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
         if key in mods_strands:
             self.removeModInstance(id_num, idx, is_rev, is_internal, mid)
@@ -2909,7 +2917,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def addModInstanceKey(self, key, mods_strands, mid):
-        mods_strands[key] = mid # add to strand lookup
+        mods_strands[key] = mid  # add to strand lookup
     # end def
 
     def addModStrandInstance(self, strand, idx, mid, is_internal=False):
@@ -2920,7 +2928,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def removeModInstance(self, id_num, idx, is_rev, is_internal, mid):
-        key =  "{},{},{}".format(id_num, is_rev, idx)
+        key = "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
         self._document.removeModInstance(mid, is_internal, self, key)
         if key in mods_strands:

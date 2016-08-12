@@ -602,8 +602,8 @@ class DocumentController():
         # Return if fname is '', None, or a directory path
         if not fname or fname is None or os.path.isdir(fname):
             return False
-        if not fname.lower().endswith(".csv"):
-            fname += ".csv"
+        if not fname.lower().endswith(".txt"):
+            fname += ".txt"
         if self.saveStaplesDialog is not None:
             self.saveStaplesDialog.filesSelected.disconnect(self.exportStaplesCallback)
             # manual garbage collection to prevent hang (in osx)
