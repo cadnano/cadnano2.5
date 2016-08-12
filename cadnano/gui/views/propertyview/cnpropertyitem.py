@@ -39,15 +39,15 @@ class CNPropertyItem(QTreeWidgetItem):
             # Properties
             self._prop_items = {}
 
-            # model_props = {}
-            # for cn_model in self._cn_model_list:
-            #     for cn_key, cn_val in cn_model.getModelProperties().items():
-            #         if cn_key in model_props:
-            #             if cn_val != model_props[cn_key]:
-            #                 model_props[cn_key] = '~~multiple~~'
-            #         else:
-            #             model_props[cn_key] = cn_val
-            model_props = self.buildPropertyDict()
+            model_props = {}
+            for cn_model in self._cn_model_list:
+                for cn_key, cn_val in cn_model.getModelProperties().items():
+                    if cn_key in model_props:
+                        if cn_val != model_props[cn_key]:
+                            model_props[cn_key] = '~~multiple~~'
+                    else:
+                        model_props[cn_key] = cn_val
+            # end for
 
             # add properties alphabetically, but with 'name' on top
             if len(cn_model_list) == 1:
@@ -88,18 +88,6 @@ class CNPropertyItem(QTreeWidgetItem):
 
     def cnModelList(self):
         return self._cn_model_list
-    # end def
-
-    def buildPropertyDict(self):
-        model_props = {}
-        for cn_model in self._cn_model_list:
-            for cn_key, cn_val in cn_model.getModelProperties().items():
-                if cn_key in model_props:
-                    if cn_val != model_props[cn_key]:
-                        model_props[cn_key] = '~~multiple~~'
-                else:
-                    model_props[cn_key] = cn_val
-        return model_props
     # end def
 
     def key(self):
