@@ -29,14 +29,16 @@ Created by Shawn Douglas on 2011-06-28.
 """
 
 import sys
-sys.path.insert(0, '.')
-
+import unittest
+import os.path
+pjoin = os.path.join
+print("$$$$$$$$$")
+print(sys.path)
+print("$$$$$$$$$")
 import time
-# from PyQt4.QtCore import Qt, QPoint
+# from PyQt5.QtCore import Qt, QPoint
+from cadnanoguitestcase import CadnanoGuiTestCase, TEST_PATH
 from cadnano.data.dnasequences import sequences
-from cadnano.tests.cadnanoguitestcase import CadnanoGuiTestCase
-import cadnano.tests.cadnanoguitestcase  # for main()
-
 
 class FunctionalTests(CadnanoGuiTestCase):
     """
@@ -73,19 +75,20 @@ class FunctionalTests(CadnanoGuiTestCase):
         (designname), apply scaffold sequence(s) to that design, and return
         the set of staple sequences."""
         # set up the document
-        from model.io.decoder import decode
+        from cadnano.fileio.nnodecode import decodeFile
 
-        inputfile = "tests/functionaltestinputs/%s" % designname
-        document = self.documentController.document()
-        with file(inputfile) as f:
-            decode(document, f.read())
-        self.setWidget(self.documentController.win, False, None)
-        part = document.selectedInstance()
+        inputfile = pjoin(TEST_PATH,
+                            "functionaltestinputs/%s" % designname)
+        document = self.document_controller.document()
+        decodeFile(inputfile, document=document)
+        self.setWidget(self.document_controller.win, False, None)
+        # part = document.selectedInstance()
+        part = self.document_controller.activePart()
         # apply one or more sequences to the design
         for sequenceName, start_id_num, start_idx in sequences_to_apply:
             sequence = sequences.get(sequenceName, None)
             for id_num in part.getIdNums():
-                fwd_ss, rev_ss = part.getStrandsets(id_num)
+                fwd_ss, rev_ss = part.getStrandSets(id_num)
                 if id_num == start_id_num:
                     strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)
@@ -94,7 +97,8 @@ class FunctionalTests(CadnanoGuiTestCase):
 
     def getRefSequences(self, designname):
         """docstring for getRefSequences"""
-        staplefile = "tests/functionaltestinputs/%s" % designname
+        staplefile = pjoin(TEST_PATH,
+                            "functionaltestinputs/%s" % designname)
         with open(staplefile, 'rU') as f:
             readSequences = f.read()
         return set(readSequences.splitlines())
@@ -189,13 +193,13 @@ class FunctionalTests(CadnanoGuiTestCase):
     #                                    self.mainWindow.actionNewHoneycombPart)
     #     self.click(newHoneycombPartButton)
     #     # Click each SliceHelix
-    #     sliceGraphicsItem = self.documentController.sliceGraphicsItem
+    #     sliceGraphicsItem = self.document_controller.sliceGraphicsItem
     #     slicehelix1 = sliceGraphicsItem.getSliceHelixByCoord(0, 0)
     #     slicehelix2 = sliceGraphicsItem.getSliceHelixByCoord(0, 1)
     #     self.click(slicehelix1, qgraphicsscene=self.mainWindow.slicescene)
     #     self.click(slicehelix2, qgraphicsscene=self.mainWindow.slicescene)
     #     # Click the activeSliceHandle with ALT and SHIFT modifiers
-    #     pathHelixGroup = self.documentController.pathHelixGroup
+    #     pathHelixGroup = self.document_controller.pathHelixGroup
     #     activeSliceHandle = pathHelixGroup.activeSliceHandle()
     #     self.mousePress(activeSliceHandle,\
     #                     modifiers=Qt.AltModifier|Qt.ShiftModifier,\
@@ -215,13 +219,13 @@ class FunctionalTests(CadnanoGuiTestCase):
     #                                    self.mainWindow.actionNewHoneycombPart)
     #     self.click(newHoneycombPartButton)
     #     # Click each SliceHelix
-    #     sliceGraphicsItem = self.documentController.sliceGraphicsItem
+    #     sliceGraphicsItem = self.document_controller.sliceGraphicsItem
     #     slicehelix1 = sliceGraphicsItem.getSliceHelixByCoord(0, 0)
     #     slicehelix2 = sliceGraphicsItem.getSliceHelixByCoord(0, 1)
     #     self.mousePress(slicehelix1, qgraphicsscene=self.mainWindow.slicescene)
     #     self.mousePress(slicehelix2, qgraphicsscene=self.mainWindow.slicescene)
     #     # Click the path helices with the ALT modifier
-    #     pathHelixGroup = self.documentController.pathHelixGroup
+    #     pathHelixGroup = self.document_controller.pathHelixGroup
     #     ph0 = pathHelixGroup.getPathHelix(0)
     #     ph1 = pathHelixGroup.getPathHelix(1)
     #     self.mousePress(ph0, position=QPoint(410, 10),\
@@ -248,4 +252,4 @@ class FunctionalTests(CadnanoGuiTestCase):
 
 if __name__ == '__main__':
     print("Running Functional Tests")
-    tests.cadnanoguitestcase.main()
+    unittest.main(verbosity=2)
