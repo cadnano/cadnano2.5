@@ -82,12 +82,13 @@ class FunctionalTests(CadnanoGuiTestCase):
         document = self.document_controller.document()
         decodeFile(inputfile, document=document)
         self.setWidget(self.document_controller.win, False, None)
-        part = document.selectedInstance()
+        # part = document.selectedInstance()
+        part = self.document_controller.activePart()
         # apply one or more sequences to the design
         for sequenceName, start_id_num, start_idx in sequences_to_apply:
             sequence = sequences.get(sequenceName, None)
             for id_num in part.getIdNums():
-                fwd_ss, rev_ss = part.getStrandsets(id_num)
+                fwd_ss, rev_ss = part.getStrandSets(id_num)
                 if id_num == start_id_num:
                     strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)
