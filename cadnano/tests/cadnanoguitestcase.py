@@ -22,15 +22,23 @@
 #
 # http://www.opensource.org/licenses/mit-license.php
 
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-import cadnano
-import cadnano.tests.guitestcase
+import sys
+import unittest
+import os
+opj, opd, opr = os.path.join, os.path.dirname, os.path.realpath
+TEST_PATH = os.path.abspath(opd(__file__))
+CN_PATH = opd(TEST_PATH)
+PROJECT_PATH = opd(CN_PATH)
+sys.path.insert(0, PROJECT_PATH)
 
-main = cadnano.tests.guitestcase.main
+
+from cadnano import initAppWithGui
+import cadnano.tests.guitestcase as guitestcase
+
+main = guitestcase.main
 
 
-class CadnanoGuiTestCase(cadnano.tests.guitestcase.GUITestCase):
+class CadnanoGuiTestCase(guitestcase.GUITestCase):
     """
     SEE: http://docs.python.org/library/unittest.html
     """
@@ -41,11 +49,10 @@ class CadnanoGuiTestCase(cadnano.tests.guitestcase.GUITestCase):
         For GUI Tests, you always have to call setWidget to tell the
         framework what you will be testing.
         """
-        import sys
-
-        self.app = cadnano.initAppWithGui() # kick off a Gui style app
-        self.documentController = list(self.app.documentControllers)[0]
-        self.mainWindow = self.documentController.win
+        argv = None
+        self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
+        self.document_controller = list(self.app.document_controllers)[0]
+        self.mainWindow = self.document_controller.win
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True
@@ -60,7 +67,7 @@ class CadnanoGuiTestCase(cadnano.tests.guitestcase.GUITestCase):
         The tearDown method is called at the end of running each test,
         generally used to clean up any objects created in setUp
         """
-        tests.guitestcase.GUITestCase.tearDown(self)
+        guitestcase.GUITestCase.tearDown(self)
 
 if __name__ == '__main__':
-    tests.guitestcase.main()
+    unittest.main(verbosity=2)
