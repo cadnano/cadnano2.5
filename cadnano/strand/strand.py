@@ -642,6 +642,7 @@ class Strand(CNObject):
         if idx_low == idx or idx == idx_high:
             check_mid1 = self.part().getModID(self, idx)
             check_mid2 = document.getMod(mod_id)
+            print("strand.addMods:", check_mid1, check_mid2)
             if check_mid2 is not None:
                 if check_mid1 != mod_id:
                     if check_mid1 is not None:

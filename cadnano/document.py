@@ -131,7 +131,6 @@ class Document(CNObject):
             self.clearAllSelected()
 
         self.filter_set = fs = set(filter_list)
-        print("setting fs", fs)
         self.documentSelectionFilterChangedSignal.emit(fs)
     # end def
 
@@ -197,17 +196,15 @@ class Document(CNObject):
     # end def
 
     def addVirtualHelicesToSelection(self, part, id_nums):
-        """ If the Part isn't in the _selection_dict its not
+        """If the Part isn't in the _selection_dict its not
         going to be in the changed_dict either, so go ahead and add
 
         Args:
             part (Part):
             id_nums (array-like):
         """
-        # print("Document add vh", id_nums)
         selection_dict = self._selection_dict
         if part not in selection_dict:
-            # print("creating new set", id(part))
             selection_dict[part] = s_set = set()
         else:
             s_set = selection_dict[part]
@@ -244,8 +241,8 @@ class Document(CNObject):
     # end def
 
     def selectedOligos(self):
-        """As long as one endpoint of a strand is in the selection, then the oligo
-        is considered selected
+        """As long as one endpoint of a strand is in the selection, then the
+        oligo is considered selected.
 
         Returns:
             set: or :obj:`None` if nothing is found
@@ -261,7 +258,7 @@ class Document(CNObject):
     # end def
 
     def clearAllSelected(self):
-        """ Clear all selections
+        """Clear all selections
         emits documentClearSelectionsSignal
         """
         # print("clearAllSelected")
@@ -283,7 +280,7 @@ class Document(CNObject):
     # end def
 
     def isVirtualHelixSelected(self, part, id_num):
-        """ For a given part
+        """For a given part
 
         Args:
             part (Part): part in question
@@ -299,7 +296,7 @@ class Document(CNObject):
     # end def
 
     def isOligoSelected(self, oligo):
-        """ Determine if given `Oligo` is selected
+        """Determine if given `Oligo` is selected
 
         Args:
             oligo (Oligo)

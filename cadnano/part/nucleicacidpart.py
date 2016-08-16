@@ -160,10 +160,9 @@ class NucleicAcidPart(Part):
         self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float)
 
         self._offset_and_size = [None] * DEFAULT_SIZE
-        '''book keeping for fast lookup of indices for insertions and deletions
-        and coordinate points
-        the length of this is the max id_num used
-        '''
+        """Bookkeeping for fast lookup of indices for insertions and deletions
+        and coordinate points. The length of this is the max id_num used.
+        """
 
         self.reserved_ids = set()
 
@@ -231,7 +230,6 @@ class NucleicAcidPart(Part):
     partOligoAddedSignal = ProxySignal(CNObject, object, name='partOligoAddedSignal')
     """self, oligo"""
     # D. Strand
-
     partStrandChangedSignal = ProxySignal(object, int, name='partStrandChangedSignal')
     """self, virtual_helix"""
 
@@ -420,8 +418,8 @@ class NucleicAcidPart(Part):
             ndarray: of :obj:`float` shape (1, 3)
 
         Raises:
-            KeyError:
-            IndexError:
+            KeyError: id_num not in NucleicAcidPart
+            IndexError: idx is greater than size
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -461,7 +459,7 @@ class NucleicAcidPart(Part):
             ndarray: (1, 3) origin of the Virtual Helix (0 index)
 
         Raises:
-            KeyError:
+            KeyError: id_num not in NucleicAcidPart
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is None:
@@ -523,7 +521,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def refreshSegments(self, id_num):
-        """ Partition strandsets into overlapping segments
+        """Partition strandsets into overlapping segments
 
         Returns:
             tuple: of segments for the forward and reverse strand of form::
@@ -541,7 +539,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def _refreshSegments(self, fwd_ss, rev_ss):
-        """ Testable private version
+        """Testable private version
 
         Returns:
             list: of :obj:`tuple`: of segments of form::
@@ -664,7 +662,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def translateCoordinates(self, id_nums, delta):
-        """ delta is a :obj:`array-like` of floats of length 3
+        """delta is a :obj:`array-like` of floats of length 3
         for now support XY translation
 
         Args:
@@ -692,8 +690,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def getIndices(self, id_num):
-        """ return a view onto the numpy array for a
-        given id_num
+        """return a view onto the numpy array for a given id_num
 
         Args:
             id_num (int): virtual helix ID number
@@ -909,7 +906,7 @@ class NucleicAcidPart(Part):
         """Create a rotation matrix for an object pointing in the `v1`
         direction to the `v2` direction.  Uses a class allocated scratch `ndarrays`
 
-        see: http://math.stackexchange.com/questions/180418/calculate-rotation-matrix-to-align-vector-a-to-vector-b-in-3d/180436#180436
+        see: http://math.stackexchange.com/questions/180418/180436#180436
 
         Args:
             v1 (array-like):  of :obj:`float` of length 3

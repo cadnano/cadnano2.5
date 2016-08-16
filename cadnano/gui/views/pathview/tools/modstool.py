@@ -105,7 +105,6 @@ class ModsTool(AbstractPathTool):
         doc = self.manager.document
 
         item, mid = self.getCurrentItem()
-        # print "save clicked", mid, item
         if mid == "new":
             item, mid = doc.createMod(item)
             # combobox = self.uiDlg.nameComboBox
@@ -113,7 +112,6 @@ class ModsTool(AbstractPathTool):
         elif doc.getMod(mid) is None:
             item, mid = doc.createMod(item, mid=mid)
         else:
-            # print "modifying mod"
             doc.modifyMod(item, mid)
         return
     # end def
