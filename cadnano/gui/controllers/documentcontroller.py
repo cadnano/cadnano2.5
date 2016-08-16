@@ -427,14 +427,14 @@ class DocumentController():
             fname = QFileDialog.getSaveFileName(self.win,
                                                 "%s - Export As" % QApplication.applicationName(),
                                                 directory,
-                                                "(*.csv)")
+                                                "(*.txt)")
             self.saveStaplesDialog = None
             self.exportStaplesCallback(fname)
         else:  # access through non-blocking callback
             fdialog = QFileDialog(self.win,
                                   "%s - Export As" % QApplication.applicationName(),
                                   directory,
-                                  "(*.csv)")
+                                  "(*.txt)")
             fdialog.setAcceptMode(QFileDialog.AcceptSave)
             fdialog.setWindowFlags(Qt.Sheet)
             fdialog.setWindowModality(Qt.WindowModal)

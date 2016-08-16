@@ -222,7 +222,7 @@ class Oligo(CNObject):
         modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
                                                             ModType.END_3PRIME)
         seq = modseq5p + seq + modseq3p
-        output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t%s\n" % \
+        output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t(%s)\n" % \
                  (vh_num5p, idx5p, vh_num3p, idx3p, self.getColor(),
                   modseq5p_name, seq, modseq3p_name, a_seq)
         return output
