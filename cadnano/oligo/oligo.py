@@ -199,32 +199,45 @@ class Oligo(CNObject):
             return None
     # end def
 
-    def sequenceExport(self):
+    def sequenceExport(self, output):
         part = self.part()
         vh_num5p = self.strand5p().idNum()
         strand5p = self.strand5p()
         idx5p = strand5p.idx5Prime()
-        seq = ''
-        a_seq = ''
+        seq = []
+        a_seq = []
         if self.isLoop():
             # print("A loop exists")
             raise Exception
         for strand in strand5p.generator3pStrand():
-            seq = seq + Strand.sequence(strand, for_export=True)
-            a_seq = a_seq + Strand.abstractSeq(strand)
+            seq.append(Strand.sequence(strand, for_export=True))
+            a_seq.append(Strand.abstractSeq(strand))
             if strand.connection3p() is None:  # last strand in the oligo
                 vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
-            else:
-                a_seq = a_seq + ','
+            # else:
+            #     a_seq = a_seq + ','
+        a_seq = ','.join(a_seq)
+        a_seq = '(%s)' % (a_seq)
         modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,
                                                             ModType.END_5PRIME)
         modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
                                                             ModType.END_3PRIME)
+        seq = ''.join(seq)
         seq = modseq5p + seq + modseq3p
-        output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t(%s)\n" % \
-                 (vh_num5p, idx5p, vh_num3p, idx3p, self.getColor(),
-                  modseq5p_name, seq, modseq3p_name, a_seq)
+        # output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t(%s)\n" % \
+        #          (vh_num5p, idx5p, vh_num3p, idx3p, self.getColor(),
+        #           modseq5p_name, seq, modseq3p_name, a_seq)
+        # these are the keys
+        # keys = ['Start','End','Color', 'Mod5',
+        #         'Sequence','Mod3','AbstractSequence']
+        output['Start'].append("%d[%d]" % (vh_num5p, idx5p))
+        output['End'].append("%d[%d]" % (vh_num3p, idx3p))
+        output['Color'].append(self.getColor())
+        output['Mod5'].append(modseq5p_name)
+        output['Sequence'].append(seq)
+        output['Mod3'].append(modseq3p_name)
+        output['AbstractSequence'].append(a_seq)
         return output
     # end def
 

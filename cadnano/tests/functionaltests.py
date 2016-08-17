@@ -85,23 +85,23 @@ class FunctionalTests(CadnanoGuiTestCase):
         # part = document.selectedInstance()
         part = self.document_controller.activePart()
         # apply one or more sequences to the design
-        for sequenceName, start_id_num, start_idx in sequences_to_apply:
-            sequence = sequences.get(sequenceName, None)
+        for sequence_name, start_id_num, start_idx in sequences_to_apply:
+            sequence = sequences.get(sequence_name, None)
             for id_num in part.getIdNums():
                 fwd_ss, rev_ss = part.getStrandSets(id_num)
                 if id_num == start_id_num:
                     strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)
-        generatedSequences = part.getStapleSequences()
-        return set(generatedSequences.splitlines())
+        generated_sequences = part.getStapleSequences()
+        return set(generated_sequences.splitlines())
 
     def getRefSequences(self, designname):
         """docstring for getRefSequences"""
-        staplefile = pjoin(TEST_PATH,
+        staple_file = pjoin(TEST_PATH,
                             "functionaltestinputs/%s" % designname)
-        with open(staplefile, 'rU') as f:
-            readSequences = f.read()
-        return set(readSequences.splitlines())
+        with open(staple_file, 'rU') as f:
+            read_sequences = f.read()
+        return set(read_sequences.splitlines())
 
     ####################### Staple Comparison Tests ########################
     def testStapleOutput_simple42legacy(self):
@@ -109,81 +109,81 @@ class FunctionalTests(CadnanoGuiTestCase):
         designname = "simple42legacy.json"
         refname = "simple42legacy.csv"
         sequences = [("p7308", 0, 0)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+        test_set = self.getTestSequences(designname, sequences)
+        ref_set = self.getRefSequences(refname)
+        self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_insert_size_1(self):
-        """Test sequence output with a single insert of size 1"""
-        designname = "loop_size_1.json"
-        refname = "loop_size_1.csv"
-        sequences = [("M13mp18", 0, 14)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_insert_size_1(self):
+    #     """Test sequence output with a single insert of size 1"""
+    #     designname = "loop_size_1.json"
+    #     refname = "loop_size_1.csv"
+    #     sequences = [("M13mp18", 0, 14)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_skip(self):
-        """Simple design with a single skip"""
-        designname = "skip.json"
-        refname = "skip.csv"
-        sequences = [("M13mp18", 0, 14)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_skip(self):
+    #     """Simple design with a single skip"""
+    #     designname = "skip.json"
+    #     refname = "skip.csv"
+    #     sequences = [("M13mp18", 0, 14)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_inserts_and_skips(self):
-        """Insert and skip stress test"""
-        designname = "loops_and_skips.json"
-        refname = "loops_and_skips.csv"
-        sequences = [("M13mp18", 0, 0)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_inserts_and_skips(self):
+    #     """Insert and skip stress test"""
+    #     designname = "loops_and_skips.json"
+    #     refname = "loops_and_skips.csv"
+    #     sequences = [("M13mp18", 0, 0)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_Nature09_monolith(self):
-        """Staples match reference set for Nature09 monolith"""
-        designname = "Nature09_monolith.json"
-        refname = "Nature09_monolith.csv"
-        sequences = [("p7560", 4, 73)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_Nature09_monolith(self):
+    #     """Staples match reference set for Nature09 monolith"""
+    #     designname = "Nature09_monolith.json"
+    #     refname = "Nature09_monolith.csv"
+    #     sequences = [("p7560", 4, 73)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_Nature09_squarenut(self):
-         """Staples match reference set for Nature09 squarenut"""
-         designname = "Nature09_squarenut.json"
-         refname = "Nature09_squarenut.csv"
-         sequences = [("p7560", 15, 100)]
-         testSet = self.getTestSequences(designname, sequences)
-         refSet = self.getRefSequences(refname)
-         self.assertEqual(testSet, refSet)
+    # def testStapleOutput_Nature09_squarenut(self):
+    #      """Staples match reference set for Nature09 squarenut"""
+    #      designname = "Nature09_squarenut.json"
+    #      refname = "Nature09_squarenut.csv"
+    #      sequences = [("p7560", 15, 100)]
+    #      test_set = self.getTestSequences(designname, sequences)
+    #      ref_set = self.getRefSequences(refname)
+    #      self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_Science09_prot120_98_v3(self):
-        """Staples match reference set for Science09 protractor 120 v3"""
-        designname = "Science09_prot120_98_v3.json"
-        refname = "Science09_prot120_98_v3.csv"
-        sequences = [("p7704", 0, 105)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_Science09_prot120_98_v3(self):
+    #     """Staples match reference set for Science09 protractor 120 v3"""
+    #     designname = "Science09_prot120_98_v3.json"
+    #     refname = "Science09_prot120_98_v3.csv"
+    #     sequences = [("p7704", 0, 105)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_Science09_beachball_v1_json(self):
-        """Staples match reference set for Science09 beachball (json source)"""
-        designname = "Science09_beachball_v1.json"
-        refname = "Science09_beachball_v1.csv"
-        sequences = [("p7308", 10, 221)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_Science09_beachball_v1_json(self):
+    #     """Staples match reference set for Science09 beachball (json source)"""
+    #     designname = "Science09_beachball_v1.json"
+    #     refname = "Science09_beachball_v1.csv"
+    #     sequences = [("p7308", 10, 221)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
-    def testStapleOutput_Gap_Vs_Skip(self):
-        """Staple gap output as '?'; staple skip output as ''"""
-        designname = "gap_vs_skip.json"
-        refname = "gap_vs_skip.csv"
-        sequences = [("M13mp18", 0, 11), ("M13mp18", 2, 11)]
-        testSet = self.getTestSequences(designname, sequences)
-        refSet = self.getRefSequences(refname)
-        self.assertEqual(testSet, refSet)
+    # def testStapleOutput_Gap_Vs_Skip(self):
+    #     """Staple gap output as '?'; staple skip output as ''"""
+    #     designname = "gap_vs_skip.json"
+    #     refname = "gap_vs_skip.csv"
+    #     sequences = [("M13mp18", 0, 11), ("M13mp18", 2, 11)]
+    #     test_set = self.getTestSequences(designname, sequences)
+    #     ref_set = self.getRefSequences(refname)
+    #     self.assertEqual(test_set, ref_set)
 
     ####################### Standard Functional Tests ########################
     # def testActiveSliceHandleAltShiftClick(self):

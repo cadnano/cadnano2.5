@@ -2244,10 +2244,14 @@ class NucleicAcidPart(Part):
 
     def getStapleSequences(self):
         """getStapleSequences"""
-        s = "Start\tEnd\tColor\tMod5\tSequence\tMod3\tAbstractSequence\n"
+        # s = "Start\tEnd\tColor\tMod5\tSequence\tMod3\tAbstractSequence\n"
+        keys = ['Start','End','Color', 'Mod5',
+                'Sequence','Mod3','AbstractSequence']
+        out = {key: [] for key in keys}
         for oligo in self._oligos:
-            # if oligo.strand5p().strandSet().isStaple():
-            s = s + oligo.sequenceExport()
+            oligo.sequenceExport(out)
+        df = pd.DataFrame(out, columns=keys)
+        s = df.to_csv(index=False)
         return s
 
     def getIdNums(self):
