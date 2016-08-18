@@ -216,7 +216,7 @@ class Oligo(CNObject):
                 vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
         a_seq = ','.join(a_seq)
-        a_seq = '(%s)' % (a_seq)
+        a_seq = "(%s)" % (a_seq)
         modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,
                                                             ModType.END_5PRIME)
         modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
