@@ -3,7 +3,7 @@ import os
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
 from PyQt5.QtGui import QPainter, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
 from PyQt5.QtWidgets import QFileDialog, QActionGroup
 from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
 from PyQt5.QtWidgets import QStyleOptionGraphicsItem
@@ -48,6 +48,7 @@ class DocumentController():
 
     def _initWindow(self):
         """docstring for initWindow"""
+        # print("new window", app().qApp.allWindows())
         self.win = win = DocumentWindow(doc_ctrlr=self)
         app().documentWindowWasCreatedSignal.emit(self._document, win)
         self._connectWindowSignalsToSelf()
@@ -78,49 +79,62 @@ class DocumentController():
         win.action_global_select.trigger()
     # end def
 
+    def destroyDC(self):
+        self.disconnectSignalsToSelf()
+        if self.win is not None:
+            self.win.destroyWin()
+            self.win = None
+    # end def
+
+    def disconnectSignalsToSelf(self):
+        win = self.win
+        o = win.outliner_widget
+        p_e = win.property_widget
+        o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
+        for signal_obj, slot_method in self.self_signals:
+            # print("dSS", slot_method.__name__)
+            signal_obj.disconnect(slot_method)
+        self.self_signals = []
+    # end def
+
     def _connectWindowSignalsToSelf(self):
         """This method serves to group all the signal & slot connections
         made by DocumentController"""
         win = self.win
-        win.action_new.triggered.connect(self.actionNewSlot)
-        win.action_open.triggered.connect(self.actionOpenSlot)
-        win.action_close.triggered.connect(self.actionCloseSlot)
-        win.action_save.triggered.connect(self.actionSaveSlot)
-        win.action_save_as.triggered.connect(self.actionSaveAsSlot)
-        win.action_SVG.triggered.connect(self.actionSVGSlot)
-        win.action_export_staples.triggered.connect(self.actionExportSequencesSlot)
-        win.action_preferences.triggered.connect(self.actionPrefsSlot)
-        win.action_outliner.triggered.connect(self.actionToggleOutlinerSlot)
-
-        win.action_new_dnapart.triggered.connect(self.actionAddDnaPart)
-        win.action_new_dnapart.triggered.connect(lambda: win.action_global_pencil.trigger())
-
         win.closeEvent = self.windowCloseEventHandler
-        win.action_about.triggered.connect(self.actionAboutSlot)
-        win.action_cadnano_website.triggered.connect(self.actionCadnanoWebsiteSlot)
-        win.action_feedback.triggered.connect(self.actionFeedbackSlot)
+        self.self_signals = [
+            (win.action_new.triggered, self.actionNewSlot),
+            (win.action_open.triggered, self.actionOpenSlot),
+            (win.action_close.triggered, self.actionCloseSlot),
+            (win.action_save.triggered, self.actionSaveSlot),
+            (win.action_save_as.triggered, self.actionSaveAsSlot),
+            (win.action_SVG.triggered, self.actionSVGSlot),
+            (win.action_export_staples.triggered, self.actionExportSequencesSlot),
+            (win.action_preferences.triggered, self.actionPrefsSlot),
+            (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
+            (win.action_new_dnapart.triggered, self.actionAddDnaPart),
+            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_about.triggered, self.actionAboutSlot),
+            (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
+            (win.action_feedback.triggered, self.actionFeedbackSlot),
 
-        # make it so select tool in slice view activation turns on vh filter
-        win.action_filter_handle.triggered.connect(self.actionFilterVirtualHelixSlot)
-        # self.trigger_vhelix_select = lambda x: win.action_vhelix_select.trigger()
-        # win.action_filter_handle.triggered.connect(self.trigger_vhelix_select)
-        # win.action_vhelix_select.triggered.connect(self.actionFilterVirtualHelixSlot)
+            # make it so select tool in slice view activation turns on vh filter
+            (win.action_filter_handle.triggered, self.actionFilterVirtualHelixSlot),
+            (win.action_global_select.triggered, self.actionSelectForkSlot),
+            (win.action_global_pencil.triggered, self.actionCreateForkSlot),
 
-        # win.action_vhelix_create.triggered.connect(self.actionFilterVirtualHelixSlot)
-        # win.action_path_select.triggered.connect(self.actionFilterEndpointSlot)
-        win.action_global_select.triggered.connect(self.actionSelectForkSlot)
-        win.action_global_pencil.triggered.connect(self.actionCreateForkSlot)
+            (win.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
+            (win.action_filter_strand.triggered, self.actionFilterStrandSlot),
+            (win.action_filter_xover.triggered, self.actionFilterXoverSlot),
+            (win.action_filter_fwd.triggered, self.actionFilterFwdSlot),
+            (win.action_filter_rev.triggered, self.actionFilterRevSlot),
 
-        win.action_filter_endpoint.triggered.connect(self.actionFilterEndpointSlot)
-        win.action_filter_strand.triggered.connect(self.actionFilterStrandSlot)
-        win.action_filter_xover.triggered.connect(self.actionFilterXoverSlot)
-        win.action_filter_fwd.triggered.connect(self.actionFilterFwdSlot)
-        win.action_filter_rev.triggered.connect(self.actionFilterRevSlot)
+            (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
-        win.action_path_add_seq.triggered.connect(self.actionPathAddSeqSlot)
-
-        win.action_vhelix_snap.triggered.connect(self.actionVhelixSnapSlot)
-
+            (win.action_vhelix_snap.triggered, self.actionVhelixSnapSlot)
+        ]
+        for signal_obj, slot_method in self.self_signals:
+            signal_obj.connect(slot_method)
     # end def
 
     ### SLOTS ###
@@ -307,10 +321,15 @@ class DocumentController():
                 self.openAfterMaybeSave()  # finalize new
 
     def actionCloseSlot(self):
-        """This will trigger a Window closeEvent."""
+        """Called when DocumentWindow is closed"""
         # if util.isWindows():
-        self.win.close()
-        app().qApp.exit(0)
+        # print("App Closing")
+        the_app = app()
+        # self.win.close()
+        self.destroyDC()
+        the_app.destroyApp()
+        # print("App closed")
+    #end def
 
     def actionSaveSlot(self):
         """SaveAs if necessary, otherwise overwrite existing file."""
@@ -700,6 +719,10 @@ class DocumentController():
         else:
             event.ignore()
         self.actionCloseSlot()
+        if self.win is not None:
+            QMainWindow.closeEvent(self.win, event)
+            # self.win = None
+    # end def
 
     ### FILE INPUT ##
     def documentTitle(self):

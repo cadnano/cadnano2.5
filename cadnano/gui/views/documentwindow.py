@@ -25,17 +25,16 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     using Qt Creator.
 
     Attributes:
-        controller (DocumentController): 
+        controller (DocumentController):
     """
     def __init__(self, parent=None, doc_ctrlr=None):
         super(DocumentWindow, self).__init__(parent)
-
         self.controller = doc_ctrlr
         doc = doc_ctrlr.document()
         self.setupUi(self)
         self.settings = QSettings()
         self._readSettings()
-
+        # self.setCentralWidget(self.slice_graphics_view)
         # Appearance pref
         if not app().prefs.show_icon_labels:
             self.main_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
@@ -105,11 +104,16 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])
-
     # end def
 
     def document(self):
         return self.controller.document()
+    # end def
+
+    def destroyWin(self):
+        for mgr in self.tool_managers:
+            mgr.destroy()
+        self.controller = None
     # end def
 
     ### ACCESSORS ###

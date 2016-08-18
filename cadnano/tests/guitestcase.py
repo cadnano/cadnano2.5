@@ -46,15 +46,16 @@ class GUITestCase(unittest.TestCase):
         """
         unittest.TestCase.__init__(self, *args, **kwargs)
 
-        if not GUITestCase.__qAppInitialized:
-            GUITestCase.__qAppInitialized = True
-            self._qApplicationFirstReference = QApplication([])
-        self._app = qApp
-        self._app.processEvents()
-        self._wait = 0
+        # if not GUITestCase.__qAppInitialized:
+        #     GUITestCase.__qAppInitialized = True
+        #     self._qApplicationFirstReference = QApplication([])
+        # self._app = qApp
+        # self._app.processEvents()
+        # self._wait = 0
 
     def tearDown(self):
         self._test_widget.close()
+        self._test_widget = None
 
     def setWidget(self, widget, show=True, wait=None):
         """
@@ -69,7 +70,7 @@ class GUITestCase(unittest.TestCase):
         self._wait = wait
         if show:
             self._test_widget.show()
-        self.processEvents()
+        # self.processEvents()
 
     # button flags
     NOBUTTON = Qt.NoButton

@@ -17,6 +17,7 @@
 import os
 import sys
 import platform
+import time
 from code import interact
 from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, QEventLoop, QSize
 from PyQt5.QtGui import QIcon
@@ -61,26 +62,29 @@ class CadnanoQt(QObject):
         if argv is None:
             argv = sys.argv
         self.argv = argv
+        # print("initializing new CadnanoQt", type(QCoreApplication.instance()))
         if QCoreApplication.instance() is None:
+            # print("!!!!!!!!!!!!!!!!!! New QApplication")
             self.qApp = QApplication(argv)
             assert(QCoreApplication.instance() is not None)
             self.qApp.setOrganizationDomain("cadnano.org")
         else:
+            # print("????????????? Old QApplication")
             self.qApp = qApp
         super(CadnanoQt, self).__init__()
+        # print("initialized new CadnanoQt")
         from cadnano.gui.views.preferences import Preferences
         self.prefs = Preferences()
         self.icon = icon = QIcon(ICON_PATH1)
         icon.addFile(ICON_PATH2, QSize(256, 256))
         icon.addFile(ICON_PATH3, QSize(48, 48))
         self.qApp.setWindowIcon(icon)
-
+        self.main_event_loop = None
         self.document_controllers = set()  # Open documents
         self.active_document = None
-        self.vh = {}  # Newly created VirtualHelix register here by idnum.
-        self.vhi = {}
-        self.partItem = None
+
         self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
+    # end def
 
     def finishInit(self):
         global decodeFile
@@ -93,6 +97,7 @@ class CadnanoQt(QObject):
 
         doc = Document()
         self.d = self.newDocument(base_doc=doc)
+
         styles.setFontMetrics()
 
         os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by Nick
@@ -141,18 +146,36 @@ class CadnanoQt(QObject):
             interact('', local={'a': self, 'd': d, 'w': w,
                                 'p': p, 'pi': pi, 'vhi': vhi,
                                 })
+    # end def
 
     def exec_(self):
         if hasattr(self, 'qApp'):
-            self.mainEventLoop = QEventLoop()
-            self.mainEventLoop.exec_()
-            # self.qApp.exec_()
+            self.main_event_loop = QEventLoop()
+            self.main_event_loop.exec_()
+
+    def destroyApp(self):
+        """ Destroy the QApplication.
+
+        Do not set `self.qApp = None` in this method.
+        Do it external to the CadnanoQt class
+        """
+        global decodeFile
+        global Document
+        global DocumentController
+        self.documentWasCreatedSignal.disconnect(self.wirePrefsSlot)
+        decodeFile = None
+        Document = None
+        DocumentController = None
+        self.document_controllers.clear()
+        self.qApp.quit()
+    # end def
 
     def ignoreEnv(self):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)
 
     def newDocument(self, base_doc=None):
         global DocumentController
+        # print("CadnanoQt newDocument begin")
         default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
@@ -171,6 +194,7 @@ class CadnanoQt(QObject):
             elif doc_ctrlr_count == 1:  # dc already exists
                 dc = list(self.document_controllers)[0]
                 dc.newDocument()  # tell it to make a new doucment
+        # print("CadnanoQt newDocument done")
         return dc.document()
 
     def prefsClicked(self):

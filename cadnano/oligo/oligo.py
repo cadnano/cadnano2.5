@@ -215,8 +215,6 @@ class Oligo(CNObject):
             if strand.connection3p() is None:  # last strand in the oligo
                 vh_num3p = strand.idNum()
                 idx3p = strand.idx3Prime()
-            # else:
-            #     a_seq = a_seq + ','
         a_seq = ','.join(a_seq)
         a_seq = '(%s)' % (a_seq)
         modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,

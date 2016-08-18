@@ -96,6 +96,23 @@ class AbstractToolManager(QObject):
         self._active_tool = dummy_tool
     # end def
 
+    def destroy(self):
+        window = self.window
+        tgn = self.tool_group_name
+        if self._active_tool is not None:
+            self._active_tool.setActive(False)
+        for tool_name in self.tool_names:
+            l_tool_name = tool_name.lower()
+            action_name = 'action_%s_%s' % (tgn, l_tool_name)
+            tool_widget = getattr(window, action_name)
+            set_active_tool_method_name = 'choose%sTool' % (tool_name)
+            handler = getattr(self, set_active_tool_method_name)
+            tool_widget.triggered.disconnect(handler)
+            tool_widget.setChecked(False)
+        self._active_tool = dummy_tool
+        self.window = None
+    # end def
+
     def activeToolGetter(self):
         return self._active_tool
     # end def

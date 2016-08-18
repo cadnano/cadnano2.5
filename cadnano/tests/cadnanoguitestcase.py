@@ -51,7 +51,7 @@ class CadnanoGuiTestCase(guitestcase.GUITestCase):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
         self.document_controller = list(self.app.document_controllers)[0]
-        self.mainWindow = self.document_controller.win
+        self.main_window = self.document_controller.win
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True
@@ -59,17 +59,15 @@ class CadnanoGuiTestCase(guitestcase.GUITestCase):
         # By setting the widget to the main window we can traverse and
         # interact with any part of it. Also, tearDown will close
         # the application so we don't need to worry about that.
-        self.setWidget(self.mainWindow, False, None)
+        self.setWidget(self.main_window, False, None)
 
     def tearDown(self):
         """
         The tearDown method is called at the end of running each test,
         generally used to clean up any objects created in setUp
         """
-        print("new doc begin")
-        self.document_controller.newDocument()
-        print("new doc end")
         guitestcase.GUITestCase.tearDown(self)
+        self.app.qApp = None
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
