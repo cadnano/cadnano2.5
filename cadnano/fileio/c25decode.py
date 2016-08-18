@@ -77,9 +77,9 @@ def decode(document, obj):
     if delta_column & 1:
         delta_column += 1
 
-    print("Found cadnano version 2.5 file")
-    print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
-    print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
+    # print("Found cadnano version 2.5 file")
+    # print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
+    # print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
 
     encoded_keys = ['eulerZ', 'repeats', 'bases_per_repeat',
                     'turns_per_repeat', 'z']

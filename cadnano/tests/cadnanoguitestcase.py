@@ -39,8 +39,7 @@ main = guitestcase.main
 
 
 class CadnanoGuiTestCase(guitestcase.GUITestCase):
-    """
-    SEE: http://docs.python.org/library/unittest.html
+    """SEE: http://docs.python.org/library/unittest.html
     """
     def setUp(self):
         """
@@ -67,6 +66,9 @@ class CadnanoGuiTestCase(guitestcase.GUITestCase):
         The tearDown method is called at the end of running each test,
         generally used to clean up any objects created in setUp
         """
+        print("new doc begin")
+        self.document_controller.newDocument()
+        print("new doc end")
         guitestcase.GUITestCase.tearDown(self)
 
 if __name__ == '__main__':

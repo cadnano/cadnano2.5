@@ -27,15 +27,12 @@ functionaltests.py
 
 Created by Shawn Douglas on 2011-06-28.
 """
-
 import sys
 import unittest
 import os.path
 pjoin = os.path.join
-print("$$$$$$$$$")
-print(sys.path)
-print("$$$$$$$$$")
 import time
+import io
 # from PyQt5.QtCore import Qt, QPoint
 from cadnanoguitestcase import CadnanoGuiTestCase, TEST_PATH
 from cadnano.data.dnasequences import sequences
@@ -65,10 +62,6 @@ class FunctionalTests(CadnanoGuiTestCase):
         CadnanoGuiTestCase.tearDown(self)
         # Add functional-test-specific cleanup here
 
-    def testFunctional1(self):
-        """docstring for testFunctional1"""
-        pass
-
     def getTestSequences(self, designname, sequences_to_apply):
         """
         Called by a sequence-verification functional test to read in a file
@@ -76,9 +69,8 @@ class FunctionalTests(CadnanoGuiTestCase):
         the set of staple sequences."""
         # set up the document
         from cadnano.fileio.nnodecode import decodeFile
-
         inputfile = pjoin(TEST_PATH,
-                            "functionaltestinputs/%s" % designname)
+                            "functionaltestinputs", designname)
         document = self.document_controller.document()
         decodeFile(inputfile, document=document)
         self.setWidget(self.document_controller.win, False, None)
@@ -98,8 +90,8 @@ class FunctionalTests(CadnanoGuiTestCase):
     def getRefSequences(self, designname):
         """docstring for getRefSequences"""
         staple_file = pjoin(TEST_PATH,
-                            "functionaltestinputs/%s" % designname)
-        with open(staple_file, 'rU') as f:
+                            "functionaltestinputs", designname)
+        with io.open(staple_file, 'r', encoding='utf-8') as f:
             read_sequences = f.read()
         return set(read_sequences.splitlines())
 
@@ -113,23 +105,23 @@ class FunctionalTests(CadnanoGuiTestCase):
         ref_set = self.getRefSequences(refname)
         self.assertEqual(test_set, ref_set)
 
-    # def testStapleOutput_insert_size_1(self):
-    #     """Test sequence output with a single insert of size 1"""
-    #     designname = "loop_size_1.json"
-    #     refname = "loop_size_1.csv"
-    #     sequences = [("M13mp18", 0, 14)]
-    #     test_set = self.getTestSequences(designname, sequences)
-    #     ref_set = self.getRefSequences(refname)
-    #     self.assertEqual(test_set, ref_set)
+    def testStapleOutput_insert_size_1(self):
+        """Test sequence output with a single insert of size 1"""
+        designname = "loop_size_1.json"
+        refname = "loop_size_1.csv"
+        sequences = [("M13mp18", 0, 14)]
+        test_set = self.getTestSequences(designname, sequences)
+        ref_set = self.getRefSequences(refname)
+        self.assertEqual(test_set, ref_set)
 
-    # def testStapleOutput_skip(self):
-    #     """Simple design with a single skip"""
-    #     designname = "skip.json"
-    #     refname = "skip.csv"
-    #     sequences = [("M13mp18", 0, 14)]
-    #     test_set = self.getTestSequences(designname, sequences)
-    #     ref_set = self.getRefSequences(refname)
-    #     self.assertEqual(test_set, ref_set)
+    def testStapleOutput_skip(self):
+        """Simple design with a single skip"""
+        designname = "skip.json"
+        refname = "skip.csv"
+        sequences = [("M13mp18", 0, 14)]
+        test_set = self.getTestSequences(designname, sequences)
+        ref_set = self.getRefSequences(refname)
+        self.assertEqual(test_set, ref_set)
 
     # def testStapleOutput_inserts_and_skips(self):
     #     """Insert and skip stress test"""
@@ -252,4 +244,12 @@ class FunctionalTests(CadnanoGuiTestCase):
 
 if __name__ == '__main__':
     print("Running Functional Tests")
-    unittest.main(verbosity=2)
+    """Use a TestRunner to get rid of dumb PendingDepricationWarning in
+    distutils.__init__.py when it call
+
+        import imp
+
+    Python 3.5 released without changing imp to importlib
+    """
+    tr = unittest.TextTestRunner(warnings=None)
+    unittest.main(testRunner=tr, verbosity=2)

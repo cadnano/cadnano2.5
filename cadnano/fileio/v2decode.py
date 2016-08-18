@@ -69,9 +69,9 @@ def decode(document, obj):
     if delta_column & 1:
         delta_column += 1
 
-    print("Found cadnano version 2 file")
-    print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
-    print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
+    # print("Found cadnano version 2 file")
+    # print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
+    # print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
 
     for helix in obj['vstrands']:
         vh_num = helix['num']

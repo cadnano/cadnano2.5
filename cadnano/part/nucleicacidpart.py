@@ -2300,8 +2300,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def remove(self, use_undostack=True):
-        """
-        This method assumes all strands are and all VirtualHelices are
+        """This method assumes all strands are and all VirtualHelices are
         going away, so it does not maintain a valid model state while
         the command is being executed.
         Everything just gets pushed onto the undostack more or less as is.
@@ -2312,7 +2311,8 @@ class NucleicAcidPart(Part):
         but works as of now.
         """
         if use_undostack:
-            self.undoStack().beginMacro("Delete Part")
+            us = self.undoStack()
+            us.beginMacro("Delete Part")
         # remove strands and oligos
         self.removeAllOligos(use_undostack)
         # remove VHs
@@ -2322,8 +2322,8 @@ class NucleicAcidPart(Part):
         # remove the part
         e = RemovePartCommand(self)
         if use_undostack:
-            self.undoStack().push(e)
-            self.undoStack().endMacro()
+            us.push(e)
+            us.endMacro()
         else:
             e.redo()
     # end def

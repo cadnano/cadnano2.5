@@ -112,7 +112,8 @@ class Document(CNObject):
         """Used to reset the document. Not undoable."""
         self.documentClearSelectionsSignal.emit(self)
         for child in self._children:
-            child.remove(use_undostack=False)
+            child.remove(use_undostack=True)
+        self.undoStack().clear()
     # end def
 
     def setFilterSet(self, filter_list):

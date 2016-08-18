@@ -518,7 +518,7 @@ class DocumentController():
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def newDocument(self, doc=None, fname=None):
+    def newDocument(self, fname=None):
         """Creates a new Document, reusing the DocumentController.
         Tells all of the views to reset and removes all items from
         them

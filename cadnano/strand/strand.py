@@ -10,7 +10,7 @@ from .resizecmd import ResizeCommand
 
 sixb = lambda x: x.encode('utf-8')
 ARRAY_TYPE = 'B'
-tostring = lambda x: x.tostring().decode('utf-8')
+tostring = lambda x: x.tobytes().decode('utf-8')
 
 
 class Strand(CNObject):
