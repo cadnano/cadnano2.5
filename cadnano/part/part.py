@@ -5,7 +5,7 @@ from cadnano import util
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from .changeviewpropertycmd import ChangeViewPropertyCommand
-
+from cadnano.setpropertycmd import SetPropertyCommand
 
 class Part(CNObject):
     """A Part is a group of VirtualHelix items that are on the same lattice.
@@ -146,8 +146,17 @@ class Part(CNObject):
         return self._group_properties
     # end def
 
-    def setProperty(self, key, value):
-        # use ModifyPropertyCommand here
+    def setProperty(self, key, value, use_undostack=True):
+        if key == 'is_visible':
+            self._document.clearAllSelected()
+        if use_undostack:
+            c = SetPropertyCommand([self], key, value)
+            self.undoStack().push(c)
+        else:
+            self._setProperty(key, value)
+    # end def
+
+    def _setProperty(self, key, value):
         self._group_properties[key] = value
         self.partPropertyChangedSignal.emit(self, key, value)
     # end def

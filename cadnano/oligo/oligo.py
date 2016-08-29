@@ -9,6 +9,7 @@ from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
+from cadnano.setpropertycmd import SetPropertyCommand
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
 OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
@@ -99,19 +100,31 @@ class Oligo(CNObject):
     # end def
 
     def getOutlineProperties(self):
+        """Convenience method for the outline view
+        """
         props = self._props
         return props['name'], props['color'], props['is_visible']
     # end def
 
     def getModelProperties(self):
+        """Return a reference to the property dictionary
+
+        Returns:
+            dict:
+        """
         return self._props
     # end def
 
-    def setProperty(self, key, value):
-        # use ModifyPropertyCommand here
+    def setProperty(self, key, value, use_undostack=True):
+        if use_undostack:
+            c = SetPropertyCommand([self], key, value)
+            self.undoStack().push(c)
+        else:
+            self._setProperty(key, value)
+    # end def
+
+    def _setProperty(self, key, value):
         self._props[key] = value
-        # if key in ('color', 'is_visible'):
-        #     self.oligoAppearanceChangedSignal.emit(self)
         self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 

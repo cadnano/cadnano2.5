@@ -23,6 +23,7 @@ from .removevhelixcmd import RemoveVirtualHelixCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
+from cadnano.setpropertycmd import SetVHPropertyCommand
 
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
@@ -1193,9 +1194,36 @@ class NucleicAcidPart(Part):
         return out
     # end
 
-    def setVirtualHelixProperties(self, id_num, keys, values, safe=True):
+    def setVirtualHelixProperties(self, id_num, keys, values, safe=True, use_undostack=True):
         """Keys and values can be :obj:`array-like` of equal length or
-        singular values.
+        singular values. Public handles undostack
+
+        This could be expanded to take a list of id numbers
+
+        emits `partVirtualHelixPropertyChangedSignal`
+
+        Args:
+            id_num (int): virtual helix ID number
+            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
+            value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
+                the value or values matching the key order
+            safe (bool): optionally echew signalling
+        """
+        if safe:
+            offset_and_size_tuple = self.getOffsetAndSize(id_num)
+            # 1. Find insert indices
+            if offset_and_size_tuple is None:
+                raise IndexError("id_num {} does not exists".format(id_num))
+        if use_undostack:
+            c = SetVHPropertyCommand(self, [id_num], keys, values, safe)
+            self.undoStack().push(c)
+        else:
+            self._setVirtualHelixProperties(id_num, keys, values, safe=safe)
+    # end
+
+    def _setVirtualHelixProperties(self, id_num, keys, values, safe=True):
+        """Private Version: Keys and values can be :obj:`array-like` of equal
+        length or singular values.
 
         emits `partVirtualHelixPropertyChangedSignal`
 
