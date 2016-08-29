@@ -179,7 +179,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def _resetLOD(self):
         scale_factor = self.transform().m11()
-        print("scale_factor", scale_factor)
+        # print("scale_factor", scale_factor)
         self.scene_root_item.window().statusBar().showMessage("%0.2f" % scale_factor)
         if scale_factor < 0.75:
             self._show_details = False

@@ -296,6 +296,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
             if nvhi:
                 self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+        self.enlargeRectToFit()
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
@@ -461,33 +462,44 @@ class NucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right):
+    def reconfigureRect(self, top_left, bottom_right, padding=_RADIUS):
         """Summary
+        NOTE: we skip padding Bottom right Y dimension
 
         Args:
             top_left (TYPE): Description
             bottom_right (TYPE): Description
 
         Returns:
+            tuple: tuple of point tuples representing the top_left and
+                bottom_right as reconfigured with padding
         """
         rect = self._rect
-        ptTL = QPointF(*top_left) if top_left else rect.topLeft()
-        ptBR = QPointF(*bottom_right) if bottom_right else rect.bottomRight()
+        ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
+        ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = new_rect = QRectF(ptTL, ptBR)
         self.setRect(new_rect)
         self.configureOutline(self.outline)
         self.griditem.updateGrid()
+        return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
+    # end def
+
+    def padTL(self, padding, xTL, yTL):
+        return xTL - padding, yTL - padding
+    # end def
+
+    def padBR(self, padding, xBR, yBR):
+        return xBR + padding, yBR
     # end def
 
     def enlargeRectToFit(self):
-        """Summary
-
-        Returns:
+        """Enlarges Part Rectangle to fit the model bounds.  Call this
+        when adding a VirtualHelixItem.  Pad
         """
         xTL, yTL, xBR, yBR = self.getModelBounds()
-        self.reconfigureRect((xTL, yTL), (xBR, yBR))
-        self.grab_cornerTL.alignPos(xTL, yTL)
-        self.grab_cornerBR.alignPos(xBR, yBR)
+        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR))
+        self.grab_cornerTL.alignPos(*tl)
+        self.grab_cornerBR.alignPos(*br)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###

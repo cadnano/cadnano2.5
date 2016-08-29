@@ -63,8 +63,9 @@ def decode(document, obj):
     # end for
 
     delta_row = (max_row + min_row) // 2
-    if delta_row & 1:
-        delta_row += 1
+    # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
+    # if delta_row & 1:
+    #     delta_row += 1
     delta_column = (max_col + min_col) // 2
     if delta_column & 1:
         delta_column += 1

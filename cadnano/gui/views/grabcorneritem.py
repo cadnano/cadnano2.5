@@ -28,13 +28,13 @@ class GrabCornerItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
-        print("mousePressEvent")
+        # print("mousePressEvent")
         if event.button() == Qt.RightButton:
             return
         parent = self.parentItem()
         if self.is_resizable and event.modifiers() & Qt.ShiftModifier:
             self.model_bounds = parent.getModelBounds()
-            print("We are resizing", self.model_bounds)
+            # print("We are resizing", self.model_bounds)
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
             return
@@ -63,15 +63,13 @@ class GrabCornerItem(QGraphicsRectItem):
             if ct == TOP_LEFT:
                 new_x_TL = xTL - hwidth if new_x + hwidth > xTL else new_x
                 new_y_TL = yTL - hwidth if new_y + hwidth > yTL else new_y
-
-                self.setPos(new_x_TL, new_y_TL)
-                parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), ())
+                tl, _ = parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), ())
+                self.alignPos(*tl)
             elif ct == BOTTOM_RIGHT:
                 new_x_BR = xBR + hwidth if new_x + hwidth < xBR else new_x
                 new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
-
-                self.setPos(new_x_BR, new_y_BR)
-                parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth))
+                _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth))
+                self.alignPos(*br)
             else:
                 raise NotImplementedError("corner_type %d not supported" % (ct))
         else:

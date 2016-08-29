@@ -5,9 +5,19 @@ import os
 # import logging
 # logger = logging.getLogger(__name__)
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
-PROJECT_DIR = os.path.dirname(LOCAL_DIR)
-sys.path.append(PROJECT_DIR)
+ROOT_DIR = os.path.dirname(LOCAL_DIR)
+sys.path.append(ROOT_DIR)
 sys.path.insert(0, '.')
+
+PROJECT_DIR = os.path.dirname(ROOT_DIR)
+
+# CADNANO_DEFAULT_DOCUMENT = 'simple.json'
+CADNANO_DEFAULT_DOCUMENT = 'Nature09_squarenut.json'
+
+os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  PROJECT_DIR,
+                                                        'tests',
+                                                        CADNANO_DEFAULT_DOCUMENT)
+
 
 """
 run with:
