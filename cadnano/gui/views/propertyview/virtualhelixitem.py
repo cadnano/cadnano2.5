@@ -127,8 +127,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             editor.setRange(0, 359)
         elif key == 'length':
             editor = QSpinBox(parent_QWidget)
-            bpr, length = cn_m.getProperty(self,
-                                                ['bases_per_repeat',
+            bpr, length = cn_m.getProperty(['bases_per_repeat',
                                                     'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
@@ -149,16 +148,17 @@ class VirtualHelixSetItem(CNPropertyItem):
         value = self.data(1, Qt.DisplayRole)
         key = self._key
         if key == 'length':
-            print("Property view 'length' updating", key, value, self._id_num_list)
+            # print("Property view 'length' updating",
+            #     key, value, [x.idNum() for x in self._cn_model_list])
             for vhi in self._cn_model_list:
-                vhi.setSize(value, id_nums=self._id_num_list)
+                vhi.setSize(value)
         elif key == 'z':
-            print("Property view 'z' updating", key, value)
+            # print("Property view 'z' updating", key, value)
             for vhi in self._cn_model_list:
-                vhi.setZ(value, id_nums=self._id_num_list)
+                vhi.setZ(value)
         else:
             for vhi in self._cn_model_list:
-                vhi.setProperty(self._key, value, id_nums=self._id_num_list)
+                vhi.setProperty(self._key, value)
     # end def
 
     def setValue(self, property_key, new_value):

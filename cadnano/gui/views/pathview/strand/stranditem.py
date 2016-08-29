@@ -586,9 +586,13 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def paintToolMousePress(self, event, idx):
-        """Add an insert to the strand if possible."""
+        """Add an insert to the strand if possible.
+        Called by XoverItem.paintToolMousePress with event as None
+        """
         m_strand = self._model_strand
-        if event.modifiers() & Qt.ShiftModifier:
+        if event is None:
+            color = m_strand.color()
+        elif event.modifiers() & Qt.ShiftModifier:
             color = self.window().path_color_panel.shiftColorName()
         else:
             color = self.window().path_color_panel.colorName()
