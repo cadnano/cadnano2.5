@@ -35,12 +35,8 @@ ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'ui', 'mainwindow', 'images')
 ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
 ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
-CADNANO_DEFAULT_DOCUMENT = 'simple.json'
-ROOTDIR = os.path.dirname(LOCAL_DIR)
 
-# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  ROOTDIR,
-#                                                         'tests',
-#                                                         CADNANO_DEFAULT_DOCUMENT)
+ROOTDIR = os.path.dirname(LOCAL_DIR)
 
 if platform.system() == 'Windows':
     import ctypes

@@ -88,9 +88,10 @@ class DocumentController():
 
     def disconnectSignalsToSelf(self):
         win = self.win
-        o = win.outliner_widget
-        p_e = win.property_widget
-        o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
+        if win is not None:
+            o = win.outliner_widget
+            p_e = win.property_widget
+            o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
         for signal_obj, slot_method in self.self_signals:
             # print("dSS", slot_method.__name__)
             signal_obj.disconnect(slot_method)
