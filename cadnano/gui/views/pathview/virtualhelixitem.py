@@ -110,7 +110,6 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         # else:
         #     pass
         self.setPen(pen)
-        self.refreshPath()
     # end def
 
     def strandAddedSlot(self, sender, strand):
