@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj
+from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj, getPenObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
@@ -73,7 +73,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
         self.setBrush(getNoBrush())
 
-        view = viewroot.scene().views()[0]
+        view = self.view()
         view.levelOfDetailChangedSignal.connect(self.levelOfDetailChangedSlot)
         should_show_details = view.shouldShowDetails()
 
@@ -104,7 +104,13 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         pen = self.pen()
         pen.setCosmetic(boolval)
+        # print("levelOfDetailChangedSlot", boolval, pen.width())
+        # if boolval:
+        #     pass
+        # else:
+        #     pass
         self.setPen(pen)
+        self.refreshPath()
     # end def
 
     def strandAddedSlot(self, sender, strand):
@@ -127,6 +133,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         Returns:
             TYPE: Description
         """
+        self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
         self._controller.disconnectSignals()
         self._controller = None
 
@@ -243,6 +250,10 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             TYPE: Description
         """
         return self._part_item.window()
+    # end def
+
+    def view(self):
+        return self._viewroot.scene().views()[0]
     # end def
 
     ### DRAWING METHODS ###

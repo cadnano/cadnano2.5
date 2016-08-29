@@ -148,11 +148,11 @@ class CustomQGraphicsView(QGraphicsView):
         self._press_list = [] # bookkeeping to handle passing mouseReleaseEvents to QGraphicsItems that don't get them
     # end def
 
-    def setGLView(self, boolval):
+    def _setGLView(self, boolval):
         scene = self.scene()
         if boolval and self.is_GL is False:
             self.is_GL = True
-            # scene.drawBackground = self.drawBackgroundGL
+            # scene.drawBackground = self._drawBackgroundGL
             # self.setViewport(QGLWidget(QGLFormat(QGL.SampleBuffers)))
             # self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
         elif not boolval and self.is_GL is True:
@@ -169,7 +169,7 @@ class CustomQGraphicsView(QGraphicsView):
         self.is_GL_switch_allowed = True
         self.qTimer = QTimer()
         # self.drawBackgroundNonGL = scene.drawBackground
-        # scene.drawBackground = self.drawBackgroundGL
+        # scene.drawBackground = self._drawBackgroundGL
         # format = QGLFormat(QGL.SampleBuffers)
         # format.setSamples(16)
         # print "# of samples", format.samples(), format.sampleBuffers()
@@ -177,34 +177,46 @@ class CustomQGraphicsView(QGraphicsView):
         # self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
     # end def
 
-    def resetGL(self):
+    def _resetLOD(self):
         scale_factor = self.transform().m11()
-        # print "scale_factor", scale_factor
+        print("scale_factor", scale_factor)
+        self.scene_root_item.window().statusBar().showMessage("%0.2f" % scale_factor)
+        if scale_factor < 0.75:
+            self._show_details = False
+            self.levelOfDetailChangedSignal.emit(False) # zoomed out
+        elif scale_factor > 0.8:
+            self._show_details = True
+            self.levelOfDetailChangedSignal.emit(True) # zoomed in
+    # end def
+
+    def _resetGL(self):
+        scale_factor = self.transform().m11()
+        # print("scale_factor", scale_factor)
         self.scene_root_item.window().statusBar().showMessage("%0.2f" % scale_factor)
 
         if scale_factor < .15:# and self.is_GL_switch_allowed:
             # self.is_GL_switch_allowed = False
-            self.setGLView(True)
+            self._setGLView(True)
             self._show_details = False
             self.levelOfDetailChangedSignal.emit(False) # zoomed out
-            self.qTimer.singleShot(500, self.allowGLSwitch)
+            self.qTimer.singleShot(500, self._allowGLSwitch)
         elif scale_factor > .2:# and self.is_GL_switch_allowed:
             # self.is_GL_switch_allowed = False
-            self.setGLView(False)
+            self._setGLView(False)
             self._show_details = True
             self.levelOfDetailChangedSignal.emit(True) # zoomed in
-            self.qTimer.singleShot(500, self.allowGLSwitch)
+            self.qTimer.singleShot(500, self._allowGLSwitch)
     # end def
 
     def shouldShowDetails(self):
         return self._show_details
     # end def
 
-    def allowGLSwitch(self):
+    def _allowGLSwitch(self):
         self.is_GL_switch_allowed = True
     # end def
 
-    def drawBackgroundGL(self, painter, rect):
+    def _drawBackgroundGL(self, painter, rect):
         """
         This method is for overloading the QGraphicsScene.
         """
@@ -454,8 +466,7 @@ class CustomQGraphicsView(QGraphicsView):
         scale_change = new_scale_level / current_scale_level
         self.scale(scale_change, scale_change)
 
-        if self.is_GL:
-            self.resetGL()
+        self._resetLOD()
     # end def
 
     def zoomIn(self, fraction_of_max=0.5):
@@ -490,7 +501,7 @@ class CustomQGraphicsView(QGraphicsView):
         # end if
     # end def
 
-    def resetScale(self):
+    def _resetScale(self):
         """reset the scale to 1"""
         # use the transform value if you want to get how much the view
         # has been scaled
@@ -521,12 +532,12 @@ class CustomQGraphicsView(QGraphicsView):
         if self.toolbar:  # HACK, pt2: move toolbar back
             self.toolbar.setPos(self.mapToScene(0, 0))
         self.fitInView(scene_rect, Qt.KeepAspectRatio) # fit in view
-        self.resetScale() # adjust scaling so that translation works
+        self._resetScale() # adjust scaling so that translation works
         # adjust scaling so that the items don't fill 100% of the view
         # this is good for selection
         self.scale(self._scale_fit_factor, self._scale_fit_factor)
         self._scale_size *= self._scale_fit_factor
-        # self.resetGL()
+        self._resetLOD()
     # end def
 
     def paintEvent(self, event):
