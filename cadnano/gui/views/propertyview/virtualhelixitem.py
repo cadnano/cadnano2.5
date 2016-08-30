@@ -43,8 +43,9 @@ class VirtualHelixSetItem(CNPropertyItem):
             key (None, optional): Description
         """
         if key is None:
+            tuple_ref_list = reference_list
             reference_list = [SimpleVirtualHelixItem(id_num, part) for part, id_num in reference_list]
-            self.lookup = set(reference_list)
+            self.lookup = {x:y for x, y in zip(tuple_ref_list, reference_list)}
 
         super(VirtualHelixSetItem, self).__init__(reference_list, parent, key=key)
         if key is None:
@@ -75,10 +76,20 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
+        print("prop slot", self.lookup)
         if (sender, id_num) in self.lookup:
             for key, val in zip(keys, values):
-                # print("change slot", key, val)
+                print("change slot", key, val)
                 self.setValue(key, val)
+    # end def
+
+    def partVirtualHelixResizedSlot(self, sender, id_num):
+        print("resize slot")
+        if (sender, id_num) in self.lookup:
+            vhi = self.lookup[(sender, id_num)]
+            val = vhi.getSize()
+            self.setValue('length', val)
+    # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
         """Summary
@@ -163,7 +174,6 @@ class VirtualHelixSetItem(CNPropertyItem):
             for vhi in self._cn_model_list:
                 vhi.setZ(value)
         else:
-            print("yeak", key)
             for vhi in self._cn_model_list:
                 vhi.setProperty(key, value)
         u_s.endMacro()

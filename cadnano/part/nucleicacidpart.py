@@ -97,7 +97,7 @@ class NucleicAcidPart(Part):
     _SUB_STEP_SIZE = _STEP_SIZE / 3
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
-    print(vh_editable_properties)
+
     @classmethod
     def _count(cls):
         NucleicAcidPart.__count += 1
@@ -1324,6 +1324,7 @@ class NucleicAcidPart(Part):
         else:  # delta == 0
             return
         _, final_size = self.getOffsetAndSize(id_num)
+        print("final_size", final_size)
         self.vh_properties.loc[id_num, 'length'] = final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
@@ -1510,6 +1511,7 @@ class NucleicAcidPart(Part):
             did_remove = True
         else:
             # print("Did remove", size, length)
+            offset_and_size[id_num] = (offset, size - length)
             did_remove = False
         self.total_points -= length
         return did_remove

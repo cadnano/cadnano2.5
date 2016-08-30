@@ -335,6 +335,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Called by part on resize.
         """
         self.refreshPath()
+    # end def
 
     ### PUBLIC SUPPORT METHODS ###
     def activate(self):
