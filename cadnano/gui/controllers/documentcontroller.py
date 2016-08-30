@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
+import sys
+import traceback
+
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
 from PyQt5.QtGui import QPainter, QKeySequence
@@ -324,12 +327,14 @@ class DocumentController():
     def actionCloseSlot(self):
         """Called when DocumentWindow is closed"""
         # if util.isWindows():
-        # print("App Closing")
+        # traceback.print_stack()
         the_app = app()
         # self.win.close()
         self.destroyDC()
-        the_app.destroyApp()
-        # print("App closed")
+        if the_app.document_controllers:    # check we haven't done this already
+            # print("App Closing")
+            the_app.destroyApp()
+            # print("App closed")
     #end def
 
     def actionSaveSlot(self):
@@ -714,15 +719,11 @@ class DocumentController():
         """Intercept close events when user attempts to close the window."""
         if self.maybeSave():
             event.accept()
-            dcs = app().document_controllers
-            if self in dcs:
-                dcs.remove(self)
         else:
             event.ignore()
         self.actionCloseSlot()
-        if self.win is not None:
-            QMainWindow.closeEvent(self.win, event)
-            # self.win = None
+        # if self.win is not None:
+        #     QMainWindow.closeEvent(self.win, event)
     # end def
 
     ### FILE INPUT ##

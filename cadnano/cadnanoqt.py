@@ -158,7 +158,9 @@ class CadnanoQt(QObject):
         global decodeFile
         global Document
         global DocumentController
-        self.documentWasCreatedSignal.disconnect(self.wirePrefsSlot)
+        # print("documentWasCreatedSignal", self.documentWasCreatedSignal)
+        if self.document_controllers:
+            self.documentWasCreatedSignal.disconnect(self.wirePrefsSlot)
         decodeFile = None
         Document = None
         DocumentController = None
