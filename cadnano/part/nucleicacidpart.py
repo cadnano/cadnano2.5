@@ -53,6 +53,8 @@ def _defaultProperties(id_num):
              ]
     return tuple(zip(*props))
 # end def
+VH_PROPERTY_KEYS = set([x for x in _defaultProperties(0)[0]])
+
 
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
@@ -94,7 +96,8 @@ class NucleicAcidPart(Part):
     _BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
     _SUB_STEP_SIZE = _STEP_SIZE / 3
     __count = 0
-
+    vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
+    print(vh_editable_properties)
     @classmethod
     def _count(cls):
         NucleicAcidPart.__count += 1

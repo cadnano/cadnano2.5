@@ -119,13 +119,13 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
     """
     if use_undostack:
         # undoStackId = str(id(model_object.undoStack()))[-4:]
-        # print "<QUndoStack %s> %s" % (undoStackId, desc)
+        # print("<QUndoStack %s> %s" % (undoStackId, desc))
         model_object.undoStack().beginMacro(desc)
         for c in commands:
             model_object.undoStack().push(c)
         model_object.undoStack().endMacro()
     else:
-        # print "<NoUndoStack> %s" % (desc)
+        # print("<NoUndoStack> %s" % (desc))
         for c in commands:
             c.redo()
 # end def

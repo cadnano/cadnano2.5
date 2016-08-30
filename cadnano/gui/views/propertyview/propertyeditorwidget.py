@@ -39,6 +39,11 @@ class PropertyEditorWidget(QTreeWidget):
         """
         super(PropertyEditorWidget, self).__init__(parent)
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
+    # end def
+
+    def undoStack(self):
+        return self._document.undoStack()
+    # end def
 
     def configure(self, window, document):
         """Summary

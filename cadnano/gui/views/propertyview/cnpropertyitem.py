@@ -189,18 +189,19 @@ class CNPropertyItem(QTreeWidgetItem):
         """
         value = self.data(VAL_COL, Qt.DisplayRole)
         key = self._key
+        u_s = self.treeWidget().undoStack()
+        u_s.beginMacro("Multi Property Edit: %s" % key)
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        print("updateCNModel: begin macro")  # macro here?
-        print(self._cn_model_list)
+        # print(self._cn_model_list)
         if isinstance(self._cn_model_list, list):
-            print("list found")
+            # print("list found")
             for cn_model in self._cn_model_list:
                 cn_model.setProperty(key, value)
         else:  # called from line 65: p_i = constructor(cn_model, root, key=key)
-            print("single model found")
+            # print("single model found")
             self._cn_model_list.setProperty(key, value)
-        print("updateCNModel: end macro")
+        u_s.endMacro()
     # end def
 
     def setValue(self, property_key, new_value):

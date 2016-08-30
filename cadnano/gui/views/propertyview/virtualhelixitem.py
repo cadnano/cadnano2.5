@@ -24,6 +24,10 @@ class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
         self._model_part = part
         self.is_active = False
 
+    @property
+    def editable_properties(self):
+        return self._model_part.vh_editable_properties
+
 class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """
@@ -147,6 +151,8 @@ class VirtualHelixSetItem(CNPropertyItem):
         """
         value = self.data(1, Qt.DisplayRole)
         key = self._key
+        u_s = self.treeWidget().undoStack()
+        u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             # print("Property view 'length' updating",
             #     key, value, [x.idNum() for x in self._cn_model_list])
@@ -157,8 +163,10 @@ class VirtualHelixSetItem(CNPropertyItem):
             for vhi in self._cn_model_list:
                 vhi.setZ(value)
         else:
+            print("yeak", key)
             for vhi in self._cn_model_list:
-                vhi.setProperty(self._key, value)
+                vhi.setProperty(key, value)
+        u_s.endMacro()
     # end def
 
     def setValue(self, property_key, new_value):
