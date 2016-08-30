@@ -11,6 +11,7 @@ import pandas as pd
 
 from cadnano import util
 from cadnano.cnobject import CNObject
+from .virtualhelix import VirtualHelix
 from cadnano.cnproxy import ProxySignal
 from cadnano.enum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
@@ -167,6 +168,7 @@ class NucleicAcidPart(Part):
         """Bookkeeping for fast lookup of indices for insertions and deletions
         and coordinate points. The length of this is the max id_num used.
         """
+        self._virtual_helices_set = {}
 
         self.reserved_ids = set()
 
@@ -1033,6 +1035,7 @@ class NucleicAcidPart(Part):
         points = self.pointsFromDirection(id_num, origin, direction, num_points, 0)
         self.addCoordinates(id_num, points, is_right=False)
         self._group_properties['virtual_helix_order'].append(id_num)
+        self._virtual_helices_set[id_num] = VirtualHelix(id_num, self)
     # end def
 
     def pointsFromDirection(self, id_num, origin, direction, num_points, index):
@@ -1365,6 +1368,7 @@ class NucleicAcidPart(Part):
         self.recycleIdNum(id_num)
         assert did_remove
         self._group_properties['virtual_helix_order'].remove(id_num)
+        del self._virtual_helices_set[id_num]
     # end def
 
     def resetCoordinates(self, id_num):
