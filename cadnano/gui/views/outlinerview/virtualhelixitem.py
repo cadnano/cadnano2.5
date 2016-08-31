@@ -12,15 +12,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False
 
-    def __init__(self, id_num, part_item):
-        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
-        model_part = self._model_part
-        CNOutlinerItem.__init__(self, model_part, parent=part_item)
+    def __init__(self, model_virtual_helix, part_item):
+        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        CNOutlinerItem.__init__(self, model_virtual_helix, parent=part_item)
         self.setFlags(LEAF_FLAGS)
-        name, color = self.getProperty(['name', 'color'])
-        self.setData(NAME_COL, Qt.DisplayRole, name)
-        self.setData(COLOR_COL, Qt.DisplayRole, color)
-        self._controller = VirtualHelixItemController(self, model_part, False, False)
+        # name, color = self.getProperty(['name', 'color'])
+        # self.setData(NAME_COL, Qt.DisplayRole, name)
+        # self.setData(COLOR_COL, Qt.DisplayRole, color)
+        self._controller = VirtualHelixItemController(self, model_virtual_helix.part(), False, False)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###

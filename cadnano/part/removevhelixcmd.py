@@ -32,7 +32,8 @@ class RemoveVirtualHelixCommand(UndoCommand):
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
         # signaling the view is two parts to clean up signals properly
         # and then allow the views to refresh
-        part.partVirtualHelixRemovingSignal.emit(part, id_num, self.neighbors)
+        part.partVirtualHelixRemovingSignal.emit(
+            part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         part.removeHelix(id_num)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def

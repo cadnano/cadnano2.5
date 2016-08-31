@@ -43,7 +43,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         origin_pt = self.origin_pt
         # need to always reserve an id
-        part.createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part.createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
         if self.safe:   # update all neighbors
             if not self.neighbors:
@@ -64,7 +64,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                                            self.keys, self.values,
                                            safe=False)
             part.resetCoordinates(id_num)
-        part.partVirtualHelixAddedSignal.emit(part, id_num, neighbors)
+        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors)
     # end def
 
     def undo(self):
@@ -80,7 +80,8 @@ class CreateVirtualHelixCommand(UndoCommand):
 
         # signaling the view is two parts to clean up signals properly
         # and then allow the views to refresh
-        part.partVirtualHelixRemovingSignal.emit(part, id_num, self.neighbors)
+        part.partVirtualHelixRemovingSignal.emit(
+            part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         # clear out part references
         part.removeHelix(id_num)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)

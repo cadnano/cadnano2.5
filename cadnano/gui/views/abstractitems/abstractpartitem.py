@@ -108,16 +108,16 @@ class QAbstractPartItem(QGraphicsRectItem):
                 self.setPos(*value)
     # end def
 
-    def partVirtualHelixAddedSlot(self, sender):
+    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         pass
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
         pass
 
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         pass
 
-    def partVirtualHelixResizedSlot(self, sender, id_num):
+    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         pass
 
     def partVirtualHelicesReorderedSlot(self, sender):
@@ -132,7 +132,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         """
         pass
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, new_value):
         pass
 
     def partDocumentSettingChangedSlot(self, part, key, value):
@@ -221,16 +221,16 @@ class AbstractPartItem(object):
     def partViewPropertySlot(self, sender, view_name, key, value):
         pass
 
-    def partVirtualHelixAddedSlot(self, sender):
+    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         pass
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
         pass
 
     def partVirtualHelixRemovedSlot(self, sender, id_num):
         pass
 
-    def partVirtualHelixResizedSlot(self, sender, id_num):
+    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         pass
 
     def partVirtualHelicesReorderedSlot(self, sender):
@@ -245,7 +245,7 @@ class AbstractPartItem(object):
         """
         pass
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, new_value):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, new_value):
         pass
 
     def partDocumentSettingChangedSlot(self, part, key, value):

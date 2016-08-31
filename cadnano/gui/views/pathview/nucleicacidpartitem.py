@@ -272,7 +272,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.grab_corner = None
     # end def
 
-    def partVirtualHelixAddedSlot(self, model_part, id_num):
+    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         """
         When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
@@ -282,7 +282,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vhi = VirtualHelixItem(id_num, self, self._viewroot)
+        vhi = VirtualHelixItem(virtual_helix, self, self._viewroot)
         self._virtual_helix_item_hash[id_num] = vhi
         vhi_list = self._virtual_helix_item_list
         # reposition when first VH is added
@@ -298,7 +298,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
     # end def
 
-    def partVirtualHelixResizedSlot(self, sender, id_num):
+    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         """Notifies the virtualhelix at coord to resize.
 
         Args:
@@ -324,7 +324,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
         """Summary
 
         Args:
@@ -345,7 +345,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             zoom_to_fit=ztf)
     # end def
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
         """Summary
 
         Args:

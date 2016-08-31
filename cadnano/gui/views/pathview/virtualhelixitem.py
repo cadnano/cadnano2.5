@@ -52,7 +52,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, id_num, part_item, viewroot):
+    def __init__(self, model_virtual_helix, part_item, viewroot):
         """Summary
 
         Args:
@@ -60,7 +60,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             part_item (TYPE): Description
             viewroot (TYPE): Description
         """
-        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsPathItem.__init__(self, parent=part_item.proxy())
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
@@ -187,11 +187,14 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                 # self._prexoveritemgroup.updatePositionsAfterRotation(value)
             ### GEOMETRY PROPERTIES ###
             elif key == 'repeat_hint':
-                self.updateRepeats(int(val))
+                pass
+                # self.updateRepeats(int(val))
             elif key == 'bases_per_repeat':
-                self.updateBasesPerRepeat(int(val))
+                pass
+                # self.updateBasesPerRepeat(int(val))
             elif key == 'turns_per_repeat':
-                self.updateTurnsPerRepeat(int(val))
+                # self.updateTurnsPerRepeat(int(val))
+                pass
             ### RUNTIME PROPERTIES ###
             elif key == 'neighbors':
                 # this means a virtual helix in the slice view has moved

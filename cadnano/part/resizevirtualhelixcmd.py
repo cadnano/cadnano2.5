@@ -24,7 +24,8 @@ class ResizeVirtualHelixCommand(UndoCommand):
         part = self._part
         id_num, is_right, delta = self._info
         id_min, id_max = part.resizeHelix(id_num, is_right, delta)
-        part.partVirtualHelixResizedSignal.emit(part, id_num)
+        part.partVirtualHelixResizedSignal.emit(
+            part, id_num, part.getVirtualHelix(id_num))
         part.partZDimensionsChangedSignal.emit(part, id_min, id_max, False)
     # end def
 
@@ -32,7 +33,8 @@ class ResizeVirtualHelixCommand(UndoCommand):
         part = self._part
         id_num, is_right, delta = self._info
         id_min, id_max = part.resizeHelix(id_num, is_right, -delta)
-        part.partVirtualHelixResizedSignal.emit(part, id_num)
+        part.partVirtualHelixResizedSignal.emit(
+            part, id_num, part.getVirtualHelix(id_num))
         part.partZDimensionsChangedSignal.emit(part, id_min, id_max, False)
     # end def
 # end class

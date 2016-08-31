@@ -261,7 +261,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi.endAddWedgeGizmos()
     # end def
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
         """Summary
 
         Args:
@@ -278,7 +278,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             vh_i.virtualHelixPropertyChangedSlot(keys, values)
     # end def
 
-    def partVirtualHelixAddedSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixAddedSlot(self, sender, id_num, virtual_helix, neighbors):
         """Summary
 
         Args:
@@ -289,7 +289,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        vhi = VirtualHelixItem(id_num, self)
+        vhi = VirtualHelixItem(virtual_helix, self)
         self._virtual_helix_item_hash[id_num] = vhi
         self._refreshVirtualHelixItemGizmos(id_num, vhi)
         for neighbor_id in neighbors:
@@ -299,7 +299,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         self.enlargeRectToFit()
     # end def
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
         """Summary
 
         Args:

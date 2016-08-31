@@ -8,32 +8,32 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 from cadnano.enum import ItemType
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+# from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
 
 KEY_COL = 0
 VAL_COL = 1
 
-class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
-    """ Has no part_item
-    """
-    def __init__(self, id_num, part):
-        self._id_num = id_num
-        self._part_item = None
-        self._model_part = part
-        self.is_active = False
+# class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
+#     """ Has no part_item
+#     """
+#     def __init__(self, id_num, part):
+#         self._id_num = id_num
+#         self._part_item = None
+#         self._model_part = part
+#         self.is_active = False
 
-    @property
-    def editable_properties(self):
-        return self._model_part.vh_editable_properties
+#     @property
+#     def editable_properties(self):
+#         return self._model_part.vh_editable_properties
 
 class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """
     _GROUPNAME = "helices"
 
-    def __init__(self, reference_list, parent, key=None):
+    def __init__(self, cn_model_list, parent, key=None):
         """Summary
 
         Args:
@@ -42,15 +42,10 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
+        super(VirtualHelixSetItem, self).__init__(cn_model_list, parent, key=key)
         if key is None:
-            tuple_ref_list = reference_list
-            reference_list = [SimpleVirtualHelixItem(id_num, part) for part, id_num in reference_list]
-            self.lookup = {x:y for x, y in zip(tuple_ref_list, reference_list)}
-
-        super(VirtualHelixSetItem, self).__init__(reference_list, parent, key=key)
-        if key is None:
-            for vhi in reference_list:
-                self._controller_list.append(VirtualHelixItemController(self, vhi.part(), True, False))
+            for vh in cn_model_list:
+                self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -64,7 +59,7 @@ class VirtualHelixSetItem(CNPropertyItem):
     # end def
 
     # SLOTS
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
         """Summary
 
         Args:
@@ -76,22 +71,21 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        print("prop slot", self.lookup)
-        if (sender, id_num) in self.lookup:
+        print("prop slot", self._cn_model_set)
+        if virtual_helix in self._cn_model_set:
             for key, val in zip(keys, values):
                 print("change slot", key, val)
                 self.setValue(key, val)
     # end def
 
-    def partVirtualHelixResizedSlot(self, sender, id_num):
+    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         print("resize slot")
-        if (sender, id_num) in self.lookup:
-            vhi = self.lookup[(sender, id_num)]
-            val = vhi.getSize()
+        if virtual_helix in self._cn_model_set:
+            val = virtual_helix.getSize()
             self.setValue('length', val)
     # end def
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, neighbors):
+    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
         """Summary
 
         Args:
@@ -99,9 +93,10 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if (sender, id_num) in self.lookup:
+        if virtual_helix in self._cn_model_set:
             self.disconnectSignals()
             self._cn_model_list = None
+            self._cn_model_set.clear()
             self.parent().removeChild(self)
     # end def
 
@@ -167,15 +162,15 @@ class VirtualHelixSetItem(CNPropertyItem):
         if key == 'length':
             # print("Property view 'length' updating",
             #     key, value, [x.idNum() for x in self._cn_model_list])
-            for vhi in self._cn_model_list:
-                vhi.setSize(value)
+            for vh in self._cn_model_list:
+                vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
-            for vhi in self._cn_model_list:
-                vhi.setZ(value)
+            for vh in self._cn_model_list:
+                vh.setZ(value)
         else:
-            for vhi in self._cn_model_list:
-                vhi.setProperty(key, value)
+            for vh in self._cn_model_list:
+                vh.setProperty(key, value)
         u_s.endMacro()
     # end def
 

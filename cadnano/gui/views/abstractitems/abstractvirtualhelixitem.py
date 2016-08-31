@@ -7,10 +7,11 @@ class AbstractVirtualHelixItem(object):
 
     Slots that must be overridden should raise an exception.
     """
-    def __init__(self, id_num, part_item):
-        self._id_num = id_num
-        self._part_item = part_item
-        self._model_part = part_item.part()
+    def __init__(self, model_virtual_helix, parent):
+        self._model_vh = model_virtual_helix
+        self._id_num = model_virtual_helix.idNum()
+        self._part_item = parent
+        self._model_part = model_virtual_helix.part()
         self.is_active = False
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):

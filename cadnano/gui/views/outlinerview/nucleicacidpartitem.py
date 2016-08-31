@@ -81,14 +81,14 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         del self._oligo_item_hash[m_o]
     # end def
 
-    def partVirtualHelixAddedSlot(self, model_part, id_num):
+    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         tw = self.treeWidget()
         tw.is_child_adding += 1
-        vh_i = VirtualHelixItem(id_num, self._root_items['VHelixList'])
+        vh_i = VirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
         self._virtual_helix_item_hash[id_num] = vh_i
         tw.is_child_adding -= 1
 
-    def partVirtualHelixRemovingSlot(self, model_part, id_num, neigbors):
+    def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
         vh_i = self._virtual_helix_item_hash.get(id_num)
         # in case a VirtualHelixItem Object is cleaned up before this happends
         if vh_i is not None:
@@ -106,7 +106,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self.setSelected(is_selected)
     # end def
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
         if self._cn_model == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
             for key, val in zip(keys, values):

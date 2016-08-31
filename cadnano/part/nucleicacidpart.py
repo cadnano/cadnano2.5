@@ -206,17 +206,17 @@ class NucleicAcidPart(Part):
     partActiveBaseInfoSignal = ProxySignal(CNObject, object, name='partActiveBaseInfoSignal')
     """self.active_base_info (tuple or None)"""
 
-    partVirtualHelixAddedSignal = ProxySignal(object, int, object, name='partVirtualHelixAddedSignal')
-    """self, virtual_helix id_num, neighbor list"""
+    partVirtualHelixAddedSignal = ProxySignal(object, int, object, object, name='partVirtualHelixAddedSignal')
+    """self, virtual_helix id_num, virtual_helix, neighbor list"""
 
-    partVirtualHelixRemovingSignal = ProxySignal(object, int, object, name='partVirtualHelixRemovingSignal')
-    """self, virtual_helix id_num, neighbor list"""
+    partVirtualHelixRemovingSignal = ProxySignal(object, int, object, object, name='partVirtualHelixRemovingSignal')
+    """self, virtual_helix id_num, virtual_helix, neighbor list"""
 
     partVirtualHelixRemovedSignal = ProxySignal(object, int, name='partVirtualHelixRemovedSignal')
     """self, virtual_helix id_num"""
 
-    partVirtualHelixResizedSignal = ProxySignal(CNObject, int, name='partVirtualHelixResizedSignal')
-    """self, virtual_helix id_num"""
+    partVirtualHelixResizedSignal = ProxySignal(CNObject, int, object, name='partVirtualHelixResizedSignal')
+    """self, virtual_helix id_num, virtual_helix"""
 
     partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool, name='partVirtualHelicesReorderedSignal')
     """self, list of id_nums"""
@@ -228,9 +228,9 @@ class NucleicAcidPart(Part):
     partVirtualHelicesSelectedSignal = ProxySignal(CNObject, object, bool, name='partVirtualHelicesSelectedSignal')
     """self, iterable of id_nums to select, transform"""
 
-    partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object,
+    partVirtualHelixPropertyChangedSignal = ProxySignal(CNObject, int, object, object, object,
                                                         name='partVirtualHelixPropertyChangedSignal')
-    """self, id_num, value"""
+    """self, id_num, virtual_helix, key, value"""
 
     # C. Oligo
     partOligoAddedSignal = ProxySignal(CNObject, object, name='partOligoAddedSignal')
@@ -331,6 +331,10 @@ class NucleicAcidPart(Part):
         """
         offset_and_size = self._offset_and_size
         return offset_and_size[id_num] if id_num < len(offset_and_size) else None
+    # end def
+
+    def getVirtualHelix(self, id_num):
+        return self._virtual_helices_set[id_num]
     # end def
 
     def getNewIdNum(self):
@@ -1035,7 +1039,8 @@ class NucleicAcidPart(Part):
         points = self.pointsFromDirection(id_num, origin, direction, num_points, 0)
         self.addCoordinates(id_num, points, is_right=False)
         self._group_properties['virtual_helix_order'].append(id_num)
-        self._virtual_helices_set[id_num] = VirtualHelix(id_num, self)
+        self._virtual_helices_set[id_num] = vh = VirtualHelix(id_num, self)
+        return vh
     # end def
 
     def pointsFromDirection(self, id_num, origin, direction, num_points, index):
@@ -1250,7 +1255,8 @@ class NucleicAcidPart(Part):
         if not isinstance(values, (tuple, list)):
             keys, values = (keys,), (values,)
         if safe:
-            self.partVirtualHelixPropertyChangedSignal.emit(self, id_num, keys, values)
+            self.partVirtualHelixPropertyChangedSignal.emit(
+                self, id_num, self.getVirtualHelix(id_num), keys, values)
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):

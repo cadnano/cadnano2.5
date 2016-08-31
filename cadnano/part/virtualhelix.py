@@ -10,6 +10,10 @@ class VirtualHelix(CNObject):
         self._part = part
     # end def
 
+    @property
+    def editable_properties(self):
+        return self._part.vh_editable_properties
+
     def part(self):
         return self._part
     # end def
@@ -41,6 +45,10 @@ class VirtualHelix(CNObject):
 
     def getName(self):
         return self._part.getVirtualHelixProperties(self._id_num, 'name')
+    # end def
+
+    def getColor(self):
+        return self._part.getVirtualHelixProperties(self._id_num, 'color')
     # end def
 
     def getSize(self):

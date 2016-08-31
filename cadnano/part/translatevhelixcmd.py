@@ -37,7 +37,7 @@ class TranslateVirtualHelicesCommand(UndoCommand):
                 z_vals = (z_vals, )
             for id_num, z_val in zip(vh_list, z_vals):
                 part.partVirtualHelixPropertyChangedSignal.emit(
-                                        part, id_num, ('z',), (z_val,))
+                                        part, id_num, part.getVirtualHelix(id_num), ('z',), (z_val,))
             part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), False)
     # end def
 

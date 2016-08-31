@@ -42,19 +42,19 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     FILTER_NAME = 'virtual_helix'
 
-    def __init__(self, id_num, part_item):
+    def __init__(self, model_virtual_helix, part_item):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
-        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         self.hide()
         model_part = self._model_part
-        x, y = model_part.locationQt(id_num, part_item.scaleFactor())
+        x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         # set position to offset for radius
         # self.setTransformOriginPoint(_RADIUS, _RADIUS)
         self.setCenterPos(x, y)

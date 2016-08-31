@@ -31,6 +31,7 @@ class CNPropertyItem(QTreeWidgetItem):
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self._cn_model_list = cn_model_list
+        self._cn_model_set = set(cn_model_list)
         self._controller_list = []
         self.is_enum = False
         if key is None:

@@ -137,8 +137,7 @@ class PropertyEditorWidget(QTreeWidget):
             pe_item = OligoSetItem(cn_model_list, self)
             self.show()
         elif item_type is ItemType.VIRTUALHELIX:
-            reference_list = [(item.cnModel(), item.idNum()) for item in selected_items]
-            pe_item = VirtualHelixSetItem(reference_list, self)
+            pe_item = VirtualHelixSetItem(cn_model_list, self)
             self.show()
         else:
             raise NotImplementedError
