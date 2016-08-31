@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.enum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from .nucleicacidpartitem import NucleicAcidPartItem
+from .nucleicacidpartitem import SliceNucleicAcidPartItem
 
 
 class SliceRootItem(QGraphicsRectItem):
@@ -56,9 +56,9 @@ class SliceRootItem(QGraphicsRectItem):
         """
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
-            na_part_item = NucleicAcidPartItem(model_part_instance,
-                                               viewroot=self,
-                                               parent=self)
+            na_part_item = SliceNucleicAcidPartItem(model_part_instance,
+                                                    viewroot=self,
+                                                    parent=self)
             self.instance_items[na_part_item] = na_part_item
             self.select_tool.setPartItem(na_part_item)
             na_part_item.zoomToFit()
@@ -155,7 +155,7 @@ class SliceRootItem(QGraphicsRectItem):
 
         Args:
             document (TYPE): Description
-        
+
         Raises:
             ImportError: Description
         """

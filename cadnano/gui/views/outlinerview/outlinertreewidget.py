@@ -19,9 +19,9 @@ from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
 
 from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
-from .nucleicacidpartitem import NucleicAcidPartItem
-from .virtualhelixitem import VirtualHelixItem
-from .oligoitem import OligoItem
+from .nucleicacidpartitem import OutlineNucleicAcidPartItem
+from .virtualhelixitem import OutlineVirtualHelixItem
+from .oligoitem import OutlineOligoItem
 
 
 _FONT = QFont(styles.THE_FONT, 12)
@@ -161,11 +161,11 @@ class OutlinerTreeWidget(QTreeWidget):
 
         # 2. handle document selection
         # self.blockSignals(True)
-        if isinstance(tree_widget_item, NucleicAcidPartItem):
+        if isinstance(tree_widget_item, OutlineNucleicAcidPartItem):
             pass
-        elif isinstance(tree_widget_item, VirtualHelixItem):
+        elif isinstance(tree_widget_item, OutlineVirtualHelixItem):
             for item in model_to_be_selected:
-                if isinstance(item, VirtualHelixItem):
+                if isinstance(item, OutlineVirtualHelixItem):
                     id_num, part = item.idNum(), item.part()
                     is_selected = document.isVirtualHelixSelected(part, id_num)
                     # print("select id_num", id_num, is_selected)
@@ -174,7 +174,7 @@ class OutlinerTreeWidget(QTreeWidget):
                         document.addVirtualHelicesToSelection(part, [id_num])
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
-                if isinstance(item, VirtualHelixItem):
+                if isinstance(item, OutlineVirtualHelixItem):
                     id_num, part = item.idNum(), item.part()
                     is_selected = document.isVirtualHelixSelected(part, id_num)
                     # print("de id_num", id_num, is_selected)
@@ -182,9 +182,9 @@ class OutlinerTreeWidget(QTreeWidget):
                         # print("deselecting vh", id_num)
                         document.removeVirtualHelicesFromSelection(part, [id_num])
             model_to_be_deselected.clear()
-        elif isinstance(tree_widget_item, OligoItem):
+        elif isinstance(tree_widget_item, OutlineOligoItem):
             for item in model_to_be_selected:
-                if isinstance(item, OligoItem):
+                if isinstance(item, OutlineOligoItem):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
                     if not is_selected:
@@ -192,7 +192,7 @@ class OutlinerTreeWidget(QTreeWidget):
                         document.selectOligo(m_oligo)
             model_to_be_selected.clear()
             for item in model_to_be_deselected:
-                if isinstance(item, OligoItem):
+                if isinstance(item, OutlineOligoItem):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
                     if is_selected:
@@ -207,7 +207,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if self.is_child_adding == 0:
             if top_left == bottom_right:    # single item
                 item = self.itemFromIndex(top_left)
-                if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
+                if isinstance(item, (OutlineVirtualHelixItem, OutlineNucleicAcidPartItem, OutlineOligoItem)):
                     # print("dataChanged", item.__class__.__name__)
                     item.updateCNModel()
             else:
@@ -215,15 +215,15 @@ class OutlinerTreeWidget(QTreeWidget):
                 for index in selection.indexes():
                     if index.column() == 0:
                         item = self.itemFromIndex(index)
-                        # if isinstance(item, VirtualHelixItem):
+                        # if isinstance(item, OutlineVirtualHelixItem):
                         #     print("slap", item.idNum())
-                        if isinstance(item, (VirtualHelixItem, NucleicAcidPartItem, OligoItem)):
+                        if isinstance(item, (OutlineVirtualHelixItem, OutlineNucleicAcidPartItem, OutlineOligoItem)):
                             item.updateCNModel()
     # end def
 
     def setActiveItem(self):
         tba = self.to_be_activated
-        if isinstance(tba, NucleicAcidPartItem):
+        if isinstance(tba, OutlineNucleicAcidPartItem):
             print("trying to activate", tba)
             tba.setActive()
         else:
@@ -237,8 +237,8 @@ class OutlinerTreeWidget(QTreeWidget):
         menu = QMenu(self)
 
         item = self.itemAt(point)
-        if isinstance(item, (NucleicAcidPartItem, VirtualHelixItem)):
-            if isinstance(item, NucleicAcidPartItem):
+        if isinstance(item, (OutlineNucleicAcidPartItem, OutlineVirtualHelixItem)):
+            if isinstance(item, OutlineNucleicAcidPartItem):
                 message = "set active Part"
             else:
                 message = "set active Virtual Helix"
@@ -274,7 +274,7 @@ class OutlinerTreeWidget(QTreeWidget):
     def hideSelection(self):
         column = VISIBLE_COL
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem, OligoItem)):
+            if isinstance(item, (OutlineVirtualHelixItem, OutlineOligoItem)):
                 item.setData(column, Qt.EditRole, False)
                 # print("hiding", item.__class__.__name__)
             else:
@@ -284,7 +284,7 @@ class OutlinerTreeWidget(QTreeWidget):
     def showSelection(self):
         column = VISIBLE_COL
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem, OligoItem)):
+            if isinstance(item, (OutlineVirtualHelixItem, OutlineOligoItem)):
                 item.setData(column, Qt.EditRole, True)
                 # print("showing", item.__class__.__name__)
             else:
@@ -297,10 +297,10 @@ class OutlinerTreeWidget(QTreeWidget):
         u_s = doc.undoStack()
         do_exec = True
         for item in self.selectedItems():
-            if isinstance(item, OligoItem):
+            if isinstance(item, OutlineOligoItem):
                 model = item.cnModel()
                 cmds += model.destroy()
-            elif isinstance(item, VirtualHelixItem):
+            elif isinstance(item, OutlineVirtualHelixItem):
                 if do_exec:
                     do_exec = False
                     u_s.beginMacro("delete Virtual Helices")
@@ -327,7 +327,7 @@ class OutlinerTreeWidget(QTreeWidget):
         column = COLOR_COL
         color_name = color.name()
         for item in self.selectedItems():
-            if isinstance(item, (VirtualHelixItem, OligoItem)):
+            if isinstance(item, (OutlineVirtualHelixItem, OutlineOligoItem)):
                 item.setData(column, Qt.EditRole, color_name)
                 # print("coloring", item.__class__.__name__, item.idNum())
             else:
@@ -356,7 +356,7 @@ class OutlinerTreeWidget(QTreeWidget):
         # print("VH:", dest_item.idNum()) # dropped above this item
         # print("selected", [x.idNum() for x in selected_items])
         res = self.myDropEvent(event, dest_item)
-        if isinstance(dest_item, VirtualHelixItem):
+        if isinstance(dest_item, OutlineVirtualHelixItem):
             part = dest_item.part()
             vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
             part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
@@ -537,7 +537,7 @@ class OutlinerTreeWidget(QTreeWidget):
         part_type = model_part.partType()
         if part_type == PartType.NUCLEICACIDPART:
             self.is_child_adding += 1
-            na_part_item = NucleicAcidPartItem(model_part, parent=self)
+            na_part_item = OutlineNucleicAcidPartItem(model_part, parent=self)
             self._instance_items[model_part_instance] = na_part_item
             self.setCurrentItem(na_part_item)
             self.is_child_adding -= 1

@@ -4,15 +4,15 @@ from cadnano.gui.views import styles
 from .cnoutlineritem import CNOutlinerItem
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from .oligoitem import OligoItem
-from .virtualhelixitem import VirtualHelixItem
+from .oligoitem import OutlineOligoItem
+from .virtualhelixitem import OutlineVirtualHelixItem
 
 
-class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
+class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     FILTER_NAME = "part"
 
     def __init__(self, model_part, parent):
-        super(NucleicAcidPartItem, self).__init__(model_part, parent)
+        super(OutlineNucleicAcidPartItem, self).__init__(model_part, parent)
         self._controller = NucleicAcidPartItemController(self, model_part)
         self._model_part = model_part
         self.setExpanded(True)
@@ -69,7 +69,7 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partOligoAddedSlot(self, model_part, model_oligo):
         m_o = model_oligo
         m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        o_i = OligoItem(m_o, self._root_items['OligoList'])
+        o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
         self._oligo_item_hash[m_o] = o_i
     # end def
 
@@ -84,13 +84,13 @@ class NucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         tw = self.treeWidget()
         tw.is_child_adding += 1
-        vh_i = VirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
+        vh_i = OutlineVirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
         self._virtual_helix_item_hash[id_num] = vh_i
         tw.is_child_adding -= 1
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
         vh_i = self._virtual_helix_item_hash.get(id_num)
-        # in case a VirtualHelixItem Object is cleaned up before this happends
+        # in case a OutlineVirtualHelixItem Object is cleaned up before this happends
         if vh_i is not None:
             del self._virtual_helix_item_hash[id_num]
             vh_i.parent().removeChild(vh_i)

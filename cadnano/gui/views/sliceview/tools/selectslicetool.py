@@ -3,7 +3,7 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
-from cadnano.gui.views.sliceview.virtualhelixitem import VirtualHelixItem
+from cadnano.gui.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
 from cadnano.gui.views.sliceview import slicestyles as styles
@@ -265,7 +265,7 @@ class SelectSliceTool(AbstractSliceTool):
             event (TYPE): Description
 
         Deleted Parameters:
-            snap_to_item (VirtualHelixItem or GridEvent): Item to snap
+            snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
         self.setPartItem(part_item)
@@ -276,7 +276,7 @@ class SelectSliceTool(AbstractSliceTool):
             if event.modifiers() != Qt.ShiftModifier:
                 self.modelClear()   # deselect if shift isn't held
 
-            if isinstance(target_item, VirtualHelixItem):
+            if isinstance(target_item, SliceVirtualHelixItem):
                 # NOTE: individual_pick seems not needed.
                 # it's supposed to allow for single item picking
                 # self.individual_pick = True
@@ -294,7 +294,7 @@ class SelectSliceTool(AbstractSliceTool):
         """
         Args:
             part_item (PartItem)
-            snap_to_item (VirtualHelixItem or GridEvent): Item to snap
+            snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
         # print("snapping")
@@ -305,7 +305,7 @@ class SelectSliceTool(AbstractSliceTool):
         # print("snapping from:", xy2.x(), xy2.y())
         # print("snapped to:", xy.x(), xy.y())
 
-        if isinstance(snap_to_item, VirtualHelixItem):
+        if isinstance(snap_to_item, SliceVirtualHelixItem):
             self.setVirtualHelixItem(snap_to_item)
             destination = self.findNearestPoint(part_item, origin)
         else:  # GridEvent
@@ -515,7 +515,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                 # print("clicking the box")
                 pos = event.scenePos()
                 for item in tool.sgv.scene().items(pos):
-                    if isinstance(item, VirtualHelixItem):
+                    if isinstance(item, SliceVirtualHelixItem):
                         doc = tool.manager.document
                         part = item.part()
                         if is_shift:

@@ -14,7 +14,7 @@ from cadnano.gui.views.grabcorneritem import GrabCornerItem
 from . import pathstyles as styles
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
-from .virtualhelixitem import VirtualHelixItem
+from .virtualhelixitem import PathVirtualHelixItem
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
@@ -32,7 +32,7 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
-class NucleicAcidPartItem(QAbstractPartItem):
+class PathNucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
     Attributes:
@@ -51,7 +51,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (TYPE): Description
         """
-        super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        super(PathNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
         self._getActiveTool = viewroot.manager.activeToolGetter
         self.active_virtual_helix_item = None
         m_p = self._model_part
@@ -282,7 +282,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vhi = VirtualHelixItem(virtual_helix, self, self._viewroot)
+        vhi = PathVirtualHelixItem(virtual_helix, self, self._viewroot)
         self._virtual_helix_item_hash[id_num] = vhi
         vhi_list = self._virtual_helix_item_list
         # reposition when first VH is added
@@ -306,7 +306,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         vhi = self._virtual_helix_item_hash[id_num]
-        print("resize:", id_num, vhi.getSize())
+        print("resize:", id_num, virtual_helix.getSize())
         vhi.resize()
     # end def
 
@@ -434,7 +434,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
         for vhi in new_list:
-            _, _, _z = vhi.getAxisPoint(0)
+            _, _, _z = vhi.model().getAxisPoint(0)
             _z *= self._scale_2_Qt
             vhi.setPos(_z, y)
             if vhi_rect is None:

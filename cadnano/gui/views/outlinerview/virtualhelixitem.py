@@ -8,7 +8,7 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
-class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
+class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False
 
@@ -46,7 +46,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
         new_is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
         new_color = self.data(COLOR_COL, Qt.DisplayRole)
         name, is_visible, color = self.getProperty(['name', 'is_visible', 'color'])
-        # work around to disable name editing for VirtualHelixItems
+        # work around to disable name editing for OutlineVirtualHelixItems
         # QTreeWidgetItem can't have only single columns editable, its all or none
         if new_name != name:
             self.treeWidget().model().blockSignals(True)

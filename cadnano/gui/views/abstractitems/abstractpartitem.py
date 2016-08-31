@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
-
 class QAbstractPartItem(QGraphicsRectItem):
     """ Use for single inheritance
     QAbstractPartItem is a base class for partitems in all views.
@@ -27,6 +26,9 @@ class QAbstractPartItem(QGraphicsRectItem):
     # end def
 
     def part(self):
+        return self._model_part
+
+    def model(self):
         return self._model_part
 
     def getFilterSet(self):

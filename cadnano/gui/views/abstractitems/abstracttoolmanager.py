@@ -1,6 +1,4 @@
 from PyQt5.QtCore import pyqtSignal, QObject
-# from PyQt5.QtWidgets import QActionGroup
-
 
 class DummyTool(object):
     """ For use in place of None checks in the code

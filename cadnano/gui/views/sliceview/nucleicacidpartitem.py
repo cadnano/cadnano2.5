@@ -14,7 +14,7 @@ from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
-from .virtualhelixitem import VirtualHelixItem
+from .virtualhelixitem import SliceVirtualHelixItem
 from .prexovermanager import PreXoverManager
 from .griditem import GridItem
 from . import slicestyles as styles
@@ -35,14 +35,14 @@ _SELECTED_ALPHA = styles.SELECTED_ALPHA
 _BOUNDING_RECT_PADDING = 10
 
 
-class NucleicAcidPartItem(QAbstractPartItem):
+class SliceNucleicAcidPartItem(QAbstractPartItem):
     """Parent should be either a SliceRootItem, or an AssemblyItem.
 
     Invariant: keys in _empty_helix_hash = range(_nrows) x range(_ncols)
     where x is the cartesian product.
 
     Attributes:
-        active_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
+        active_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
         grab_cornerBR (TYPE): Description
         grab_cornerTL (TYPE): Description
         griditem (TYPE): Description
@@ -60,7 +60,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (None, optional): Description
         """
-        super(NucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -248,9 +248,9 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            vhi (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): the item associated with id_num
+            vhi (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): the item associated with id_num
         """
-        neighbors = vhi.getProperty('neighbors')
+        neighbors = vhi.model().getProperty('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
@@ -289,7 +289,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        vhi = VirtualHelixItem(virtual_helix, self)
+        vhi = SliceVirtualHelixItem(virtual_helix, self)
         self._virtual_helix_item_hash[id_num] = vhi
         self._refreshVirtualHelixItemGizmos(id_num, vhi)
         for neighbor_id in neighbors:
@@ -428,7 +428,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
         """
         vhi = virtual_helix_item
         pxom = self.prexover_manager
@@ -494,7 +494,7 @@ class NucleicAcidPartItem(QAbstractPartItem):
 
     def enlargeRectToFit(self):
         """Enlarges Part Rectangle to fit the model bounds.  Call this
-        when adding a VirtualHelixItem.  Pad
+        when adding a SliceVirtualHelixItem.  Pad
         """
         xTL, yTL, xBR, yBR = self.getModelBounds()
         tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR))

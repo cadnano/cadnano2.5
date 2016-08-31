@@ -39,7 +39,7 @@ def v2DistanceAndAngle(a, b):
     return dist, angle
 
 
-class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
+class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     """VirtualHelixItem for PathView
 
     Attributes:
@@ -300,7 +300,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         part = self.part()
         path = QPainterPath()
         sub_step_size = part.subStepSize()
-        canvas_size = self.getSize()
+        canvas_size = self._model_vh.getSize()
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks

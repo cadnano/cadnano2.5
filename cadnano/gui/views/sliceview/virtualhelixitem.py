@@ -27,7 +27,7 @@ _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 SNAP_WIDTH = 3
 
 
-class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
+class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """The VirtualHelixItem is an individual circle that gets drawn in the SliceView
     as a child of the NucleicAcidPartItem. Taken as a group, many SliceHelix
     instances make up the crossection of the NucleicAcidPart. Clicking on a SliceHelix
@@ -276,7 +276,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Check item's current visibility, color and active state, and sets
         pen, brush, text according to style defaults.
         """
-        is_visible, color = self.getProperty(['is_visible', 'color'])
+        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
         if is_visible:
             self.show()
         else:
@@ -382,7 +382,7 @@ class VirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.getProperty('name')
+        nvhi_name = nvhi.model().getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)

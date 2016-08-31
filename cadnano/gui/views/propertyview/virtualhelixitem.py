@@ -8,25 +8,11 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 from cadnano.enum import ItemType
-# from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
 
 KEY_COL = 0
 VAL_COL = 1
-
-# class SimpleVirtualHelixItem(AbstractVirtualHelixItem):
-#     """ Has no part_item
-#     """
-#     def __init__(self, id_num, part):
-#         self._id_num = id_num
-#         self._part_item = None
-#         self._model_part = part
-#         self.is_active = False
-
-#     @property
-#     def editable_properties(self):
-#         return self._model_part.vh_editable_properties
 
 class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
@@ -161,7 +147,6 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             # print("Property view 'length' updating",
-            #     key, value, [x.idNum() for x in self._cn_model_list])
             for vh in self._cn_model_list:
                 vh.setSize(value)
         elif key == 'z':
