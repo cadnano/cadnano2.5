@@ -281,6 +281,8 @@ class GridPoint(QGraphicsEllipseItem):
         if self.grid.allow_snap:
             part_item = self.grid.part_item
             tool = part_item._getActiveTool()
+            if tool.FILTER_NAME not in part_item.part().document().filter_set:
+                return
             tool_method_name = tool.methodPrefix() + "MousePress"
             if hasattr(self, tool_method_name):
                 getattr(self, tool_method_name)(tool, part_item, event)

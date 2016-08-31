@@ -167,7 +167,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         Returns:
             str: hex representation of Color, e.g. `#0066cc`.
         """
-        return self.part().getProperty('color')
+        return self._model_part.getProperty('color')
     # end def
 
     def partCrossoverSpanAngle(self):
@@ -177,7 +177,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         Returns:
             int: The span angle (default is set in NucleicAcidPart init)
         """
-        return float(self.part().getProperty('crossover_span_angle'))
+        return float(self._model_part.getProperty('crossover_span_angle'))
     # end def
 
     ### SIGNALS ###

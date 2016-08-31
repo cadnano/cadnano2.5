@@ -14,9 +14,9 @@ PROJECT_DIR = os.path.dirname(ROOT_DIR)
 CADNANO_DEFAULT_DOCUMENT = 'simple.json'
 # CADNANO_DEFAULT_DOCUMENT = 'Nature09_squarenut.json'
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  PROJECT_DIR,
-                                                        'tests',
-                                                        CADNANO_DEFAULT_DOCUMENT)
+# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  PROJECT_DIR,
+#                                                         'tests',
+#                                                         CADNANO_DEFAULT_DOCUMENT)
 
 
 """

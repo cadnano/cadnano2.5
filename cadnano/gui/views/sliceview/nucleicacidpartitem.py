@@ -588,10 +588,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         if event.button() == Qt.RightButton:
             return
-        self.part().setSelected(True)
+        part = self._model_part
+        part.setSelected(True)
         if self.isMovable():
             return QGraphicsItem.mousePressEvent(self, event)
         tool = self._getActiveTool()
+        if tool.FILTER_NAME not in part.document().filter_set:
+            return
         tool_method_name = tool.methodPrefix() + "MousePress"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
@@ -653,6 +656,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         # 1. get point in model coordinates:
+        part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
             # print("reg_event", pt)
@@ -671,7 +675,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         mod = Qt.MetaModifier
         if not (event.modifiers() & mod):
             pass
-        part = self._model_part
+
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
         current_id_num = tool.idNum()

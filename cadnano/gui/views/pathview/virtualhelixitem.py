@@ -386,7 +386,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
         self.scene().views()[0].addToPressList(self)
         strand_set, idx = self.baseAtPoint(event.pos())
-        self.setActive(strand_set.isForward(), idx)
+        self._model_vh.setActive(strand_set.isForward(), idx)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
 
