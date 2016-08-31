@@ -28,7 +28,7 @@ class QAbstractPartItem(QGraphicsRectItem):
     def part(self):
         return self._model_part
 
-    def model(self):
+    def cnModel(self):
         return self._model_part
 
     def getFilterSet(self):

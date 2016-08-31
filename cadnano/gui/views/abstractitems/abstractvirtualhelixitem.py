@@ -27,7 +27,7 @@ class AbstractVirtualHelixItem(object):
         pass
     # end def
 
-    def model(self):
+    def cnModel(self):
         return self._model_vh
     # end def
 

@@ -57,15 +57,15 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        print("prop slot", self._cn_model_set)
+        # print("prop slot", self._cn_model_set)
         if virtual_helix in self._cn_model_set:
             for key, val in zip(keys, values):
-                print("change slot", key, val)
+                # print("change slot", key, val)
                 self.setValue(key, val)
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
-        print("resize slot")
+        # print("resize slot")
         if virtual_helix in self._cn_model_set:
             val = virtual_helix.getSize()
             self.setValue('length', val)

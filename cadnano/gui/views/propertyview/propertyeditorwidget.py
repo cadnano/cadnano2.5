@@ -113,16 +113,24 @@ class PropertyEditorWidget(QTreeWidget):
         selected_items = o.selectedItems()
 
         self.clear()    # remove pre-existing items
-        # if len(selected_items) > 1:
-        #     print("multiple selected")
-        # get the selected item
 
+        # print("prop multiple selected:", len(selected_items))
+        # if len(selected_items):
+        #     print(selected_items[0])
+
+        # get the selected item
         item_types = set([item.itemType() for item in selected_items])
         num_types = len(item_types)
         if num_types != 1:  # assume no mixed types for now
             return
         item_type = item_types.pop()
-        cn_model_list = [item.cnModel() for item in selected_items]
+        cn_model_list = [item.cnModel() for item in selected_items if item.isSelected()]
+
+        '''Workaround as items in QTreeWidget.selectedItems() may be not
+        actually selected
+        '''
+        if len(cn_model_list) == 0:
+            return
 
         # special case for parts since there is currently no part filter
         if item_type is ItemType.NUCLEICACID:

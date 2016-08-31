@@ -234,13 +234,4 @@ class CNPropertyItem(QTreeWidgetItem):
         """
         return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
-
-    # def updateViewProperty(self, property_key):
-    #     model_value = self._cn_model.getProperty(property_key)
-    #     if self.is_enum:
-    #         model_value = ENUM_NAMES[key][model_value]
-    #     item_value = self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
-    #     if model_value != item_value:
-    #         self._prop_items[property_key].setData(VAL_COL, Qt.EditRole, model_value)
-    # # end def
 # end class

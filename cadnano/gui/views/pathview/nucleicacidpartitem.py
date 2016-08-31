@@ -434,7 +434,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
         for vhi in new_list:
-            _, _, _z = vhi.model().getAxisPoint(0)
+            _, _, _z = vhi.cnModel().getAxisPoint(0)
             _z *= self._scale_2_Qt
             vhi.setPos(_z, y)
             if vhi_rect is None:
