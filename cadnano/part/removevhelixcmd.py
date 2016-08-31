@@ -17,6 +17,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         self.color = part.getVirtualHelixProperties(id_num, 'color')
         self.props = part.getAllVirtualHelixProperties(id_num, inject_extras=False)
         self.old_active_base_info = part.active_base_info
+        self._vh_order = part.getImportVirtualHelixOrder().copy()  # just copy the whole list
     # end def
 
     def redo(self):
@@ -47,16 +48,17 @@ class RemoveVirtualHelixCommand(UndoCommand):
                         )
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
-        part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
         keys = list(self.props.keys())
         vals = list(self.props.values())
         part.setVirtualHelixProperties( id_num,
                                         keys, vals,
                                         safe=False)
         part.resetCoordinates(id_num)
-        part.partVirtualHelixAddedSignal.emit(part, id_num, self.neighbors)
+        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, self.neighbors)
         abi = self.old_active_base_info
         if abi:
             part.setActiveVirtualHelix(*abi[0:3])
+        part.setImportedVHelixOrder(self._vh_order)
     # end def
 # end class
