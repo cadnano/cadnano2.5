@@ -53,7 +53,7 @@ class VirtualHelix(CNObject):
 
     def getSize(self):
         offset, size = self._part.getOffsetAndSize(self._id_num)
-        return size
+        return int(size)
     # end def
 
     def setSize(self, new_size, id_nums=None):

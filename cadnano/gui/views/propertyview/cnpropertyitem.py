@@ -20,7 +20,7 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, cn_model_list, parent, key=None):
+    def __init__(self, cn_model_list=None, parent=None, key=None):
         """Summary
 
         Args:
@@ -31,12 +31,11 @@ class CNPropertyItem(QTreeWidgetItem):
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
         self._cn_model_list = cn_model_list
-        self._cn_model_set = set(cn_model_list)
         self._controller_list = []
         self.is_enum = False
         if key is None:
             root = parent.invisibleRootItem()  # add propertyitems as siblings
-
+            # root = parent
             # Properties
             self._prop_items = {}
 
@@ -67,7 +66,7 @@ class CNPropertyItem(QTreeWidgetItem):
             for that_key in sorted(model_props):
                 if that_key == 'name':
                     continue
-                p_i = constructor(cn_model_list, root, key=that_key)
+                p_i = constructor(cn_model_list=cn_model_list, parent=root, key=that_key)
                 self._prop_items[that_key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, that_key)
                 model_value = model_props[that_key]
@@ -90,6 +89,9 @@ class CNPropertyItem(QTreeWidgetItem):
     def cnModelList(self):
         return self._cn_model_list
     # end def
+
+    def cnModelSet(self):
+        return self.treeWidget().cnModelSet()
 
     def key(self):
         """Summary

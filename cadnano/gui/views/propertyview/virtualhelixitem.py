@@ -19,7 +19,7 @@ class VirtualHelixSetItem(CNPropertyItem):
     """
     _GROUPNAME = "helices"
 
-    def __init__(self, cn_model_list, parent, key=None):
+    def __init__(self, **kwargs):
         """Summary
 
         Args:
@@ -28,9 +28,9 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
-        super(VirtualHelixSetItem, self).__init__(cn_model_list, parent, key=key)
-        if key is None:
-            for vh in cn_model_list:
+        super().__init__(**kwargs)
+        if self._key == "name":
+            for vh in self._cn_model_list:
                 self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))
     # end def
 
@@ -58,7 +58,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             TYPE: Description
         """
         # print("prop slot", self._cn_model_set)
-        if virtual_helix in self._cn_model_set:
+        if virtual_helix in self.cnModelSet():
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -66,9 +66,9 @@ class VirtualHelixSetItem(CNPropertyItem):
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         # print("resize slot")
-        if virtual_helix in self._cn_model_set:
+        if virtual_helix in self.cnModelSet():
             val = virtual_helix.getSize()
-            self.setValue('length', val)
+            self.setValue('length', int(val))
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
@@ -79,10 +79,9 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if virtual_helix in self._cn_model_set:
+        if virtual_helix in self.cnModelSet():
             self.disconnectSignals()
             self._cn_model_list = None
-            self._cn_model_set.clear()
             self.parent().removeChild(self)
     # end def
 
@@ -146,44 +145,19 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s = self.treeWidget().undoStack()
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
-            # print("Property view 'length' updating",
+            print("Property view 'length' updating")
             for vh in self._cn_model_list:
-                vh.setSize(value)
+                if value != vh.getSize():
+                    vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
             for vh in self._cn_model_list:
-                vh.setZ(value)
+                if value != vh.getZ():
+                    vh.setZ(value)
         else:
             for vh in self._cn_model_list:
-                vh.setProperty(key, value)
+                if value != vh.getProperty(key):
+                    vh.setProperty(key, value)
         u_s.endMacro()
-    # end def
-
-    def setValue(self, property_key, new_value):
-        """Summary
-
-        Args:
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
-        p_i = self._prop_items[property_key]
-        current_value = p_i.data(VAL_COL, Qt.DisplayRole)
-        if current_value != new_value:
-            p_i.setData(VAL_COL, Qt.EditRole, new_value)
-    # end def
-
-    def getItemValue(self, property_key):
-        """Summary
-
-        Args:
-            property_key (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
-        return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
     # end def
 # end class

@@ -11,7 +11,7 @@ VAL_COL = 1
 class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
     """NucleicAcidPartItem for the PropertyView.
     """
-    def __init__(self, model_part_list, parent, key=None):
+    def __init__(self, **kwargs):
         """Summary
 
         Args:
@@ -19,9 +19,9 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
             parent (PropertyEditorWidget): The property editor
             key (None, optional): Description
         """
-        super(NucleicAcidPartSetItem, self).__init__(model_part_list, parent, key=key)
-        if key is None:
-            for model_part in model_part_list:
+        super().__init__(**kwargs)
+        if self._key == "name":
+            for model_part in self._cn_model_list:
                 self._controller_list.append(NucleicAcidPartItemController(self, model_part))
 
     # end def

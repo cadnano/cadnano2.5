@@ -7,7 +7,7 @@ from .cnpropertyitem import CNPropertyItem
 class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
     """Summary
     """
-    def __init__(self, model_part_list, parent, key=None):
+    def __init__(self, **kwargs):
         """Summary
 
         Args:
@@ -15,7 +15,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super(AbstractPropertyPartSetItem, self).__init__(model_part_list, parent, key=key)
+        super().__init__(**kwargs)
     # end def
 
     # SLOTS

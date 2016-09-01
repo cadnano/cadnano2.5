@@ -12,7 +12,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
     """
     _GROUPNAME = "oligos"
 
-    def __init__(self, cn_model_list, parent, key=None):
+    def __init__(self, **kwargs):
         """Summary
 
         Args:
@@ -20,10 +20,10 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super(OligoSetItem, self).__init__(cn_model_list, parent, key=key)
+        super().__init__(**kwargs)
         # print(util.trace(5), "in OligoItem init", cn_model_list)
-        if key is None:
-            for model_oligo in cn_model_list:
+        if self._key == "name":
+            for model_oligo in self._cn_model_list:
                 self._controller_list.append(OligoItemController(self, model_oligo))
     # end def
 
