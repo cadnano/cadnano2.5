@@ -21,7 +21,7 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
         """
         super().__init__(**kwargs)
         if self._key == "name":
-            for model_part in self._cn_model_list:
+            for model_part in self.cnModelList():
                 self._controller_list.append(NucleicAcidPartItemController(self, model_part))
 
     # end def

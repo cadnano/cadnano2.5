@@ -39,6 +39,7 @@ class PropertyEditorWidget(QTreeWidget):
         """
         super(PropertyEditorWidget, self).__init__(parent)
         self._cn_model_set = set()
+        self._cn_model_list = []
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
     # end def
 
@@ -115,6 +116,7 @@ class PropertyEditorWidget(QTreeWidget):
 
         self.clear()    # remove pre-existing items
         self._cn_model_set.clear()
+        self._cn_model_list = []
         # print("prop multiple selected:", len(selected_items))
         # if len(selected_items):
         #     print(selected_items[0])
@@ -133,11 +135,11 @@ class PropertyEditorWidget(QTreeWidget):
         if len(cn_model_list) == 0:
             return
         self._cn_model_set = set(cn_model_list)
+        self._cn_model_list = cn_model_list
 
         # special case for parts since there is currently no part filter
         if item_type is ItemType.NUCLEICACID:
-            pe_item = NucleicAcidPartSetItem(   cn_model_list=cn_model_list,
-                                                parent=self)
+            pe_item = NucleicAcidPartSetItem(parent=self)
             self.show()
             return
 
@@ -145,12 +147,10 @@ class PropertyEditorWidget(QTreeWidget):
         if item.FILTER_NAME not in self._document.filter_set:
             return
         if item_type is ItemType.OLIGO:
-            pe_item = OligoSetItem( cn_model_list=cn_model_list,
-                                    parent=self)
+            pe_item = OligoSetItem(parent=self)
             self.show()
         elif item_type is ItemType.VIRTUALHELIX:
-            pe_item = VirtualHelixSetItem(  cn_model_list=cn_model_list,
-                                            parent=self)
+            pe_item = VirtualHelixSetItem(parent=self)
             self.show()
         else:
             raise NotImplementedError
@@ -255,6 +255,11 @@ class PropertyEditorWidget(QTreeWidget):
 
     def cnModelSet(self):
         return self._cn_model_set
+    # end def
+
+    def cnModelList(self):
+        return self._cn_model_list
+    # end def
 
     ### METHODS ###
     def resetDocumentAndController(self, document):

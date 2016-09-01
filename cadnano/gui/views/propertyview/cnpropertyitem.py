@@ -20,7 +20,7 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, cn_model_list=None, parent=None, key=None):
+    def __init__(self, parent=None, key=None):
         """Summary
 
         Args:
@@ -30,7 +30,7 @@ class CNPropertyItem(QTreeWidgetItem):
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        self._cn_model_list = cn_model_list
+        cn_model_list = self.cnModelList()
         self._controller_list = []
         self.is_enum = False
         if key is None:
@@ -40,7 +40,7 @@ class CNPropertyItem(QTreeWidgetItem):
             self._prop_items = {}
 
             model_props = {}
-            for cn_model in self._cn_model_list:
+            for cn_model in cn_model_list:
                 for cn_key, cn_val in cn_model.getModelProperties().items():
                     if cn_key in model_props:
                         if cn_val != model_props[cn_key]:
@@ -51,7 +51,7 @@ class CNPropertyItem(QTreeWidgetItem):
 
             # add properties alphabetically, but with 'name' on top
             if len(cn_model_list) == 1:
-                name = self._cn_model_list[0].getName()
+                name = cn_model_list[0].getName()
                 if name is None:
                     name = "generic"
             else:
@@ -66,7 +66,7 @@ class CNPropertyItem(QTreeWidgetItem):
             for that_key in sorted(model_props):
                 if that_key == 'name':
                     continue
-                p_i = constructor(cn_model_list=cn_model_list, parent=root, key=that_key)
+                p_i = constructor(parent=root, key=that_key)
                 self._prop_items[that_key] = p_i
                 p_i.setData(KEY_COL, Qt.EditRole, that_key)
                 model_value = model_props[that_key]
@@ -86,12 +86,6 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key
     # end def
 
-    def cnModelList(self):
-        return self._cn_model_list
-    # end def
-
-    def cnModelSet(self):
-        return self.treeWidget().cnModelSet()
 
     def key(self):
         """Summary
@@ -108,7 +102,7 @@ class CNPropertyItem(QTreeWidgetItem):
         Returns:
             TYPE: Description
         """
-        return self._cn_model_list[0]
+        return self.cnModelList()[0]
     # end def
 
     def cnModelList(self):
@@ -117,8 +111,11 @@ class CNPropertyItem(QTreeWidgetItem):
         Returns:
             list: cn_model items
         """
-        return self._cn_model_list
+        return self.treeWidget().cnModelList()
     # end def
+
+    def cnModelSet(self):
+        return self.treeWidget().cnModelSet()
 
     def itemType(self):
         """Summary
@@ -154,7 +151,7 @@ class CNPropertyItem(QTreeWidgetItem):
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self._cn_model_list[0]
+        cn_m = self.cnModel()
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
@@ -196,14 +193,14 @@ class CNPropertyItem(QTreeWidgetItem):
         u_s.beginMacro("Multi Property Edit: %s" % key)
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        # print(self._cn_model_list)
-        if isinstance(self._cn_model_list, list):
+        cn_model_list = self.cnModelList()
+        if isinstance(cn_model_list, list):
             # print("list found")
-            for cn_model in self._cn_model_list:
+            for cn_model in cn_model_list:
                 cn_model.setProperty(key, value)
         else:  # called from line 65: p_i = constructor(cn_model, root, key=key)
             # print("single model found")
-            self._cn_model_list.setProperty(key, value)
+            cn_model_list.setProperty(key, value)
         u_s.endMacro()
     # end def
 

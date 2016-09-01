@@ -32,7 +32,6 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
         for controller in self._controller_list:
             controller.disconnectSignals()
         self._controller_list = []
-        self._cn_model_list = None
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
@@ -46,7 +45,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
         Returns:
             TYPE: Description
         """
-        if self._cn_model_list[0] == model_part:
+        if self.cnModel() == model_part:
             self.setValue(property_key, new_value)
     # end def
 

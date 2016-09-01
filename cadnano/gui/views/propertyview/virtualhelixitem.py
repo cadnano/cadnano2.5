@@ -30,7 +30,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         """
         super().__init__(**kwargs)
         if self._key == "name":
-            for vh in self._cn_model_list:
+            for vh in self.cnModelList():
                 self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))
     # end def
 
@@ -81,7 +81,6 @@ class VirtualHelixSetItem(CNPropertyItem):
         """
         if virtual_helix in self.cnModelSet():
             self.disconnectSignals()
-            self._cn_model_list = None
             self.parent().removeChild(self)
     # end def
 
@@ -106,7 +105,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        cn_m = self._cn_model_list[0]
+        cn_m = self.cnModel()
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -146,16 +145,16 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             print("Property view 'length' updating")
-            for vh in self._cn_model_list:
+            for vh in self.cnModelList():
                 if value != vh.getSize():
                     vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
-            for vh in self._cn_model_list:
+            for vh in self.cnModelList():
                 if value != vh.getZ():
                     vh.setZ(value)
         else:
-            for vh in self._cn_model_list:
+            for vh in self.cnModelList():
                 if value != vh.getProperty(key):
                     vh.setProperty(key, value)
         u_s.endMacro()
