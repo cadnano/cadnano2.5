@@ -24,13 +24,14 @@ def copyWrapAPI(cls_from, cls_to, attr_str='model'):
         # 1. Copy call signature Python 3.5 only use getargspec, formatargspec for 2.7
         argspec_1 = inspect.signature(f)
         formatted_args_1 = str(argspec_1)
-
+        # print(formatted_args_1)
         # strip annotations from parameters
         argspec_2 = list(argspec_1.parameters)
         argspec_2[0] = (self_attr_str, )    # swap in reference
-        formatted_args_2 = ', '.join([x[0] for x in argspec_2])
+        # print(argspec_2)
+        formatted_args_2 = ', '.join([x[0] if isinstance(x, tuple) else x for x in argspec_2])
 
-        print(formatted_args_2)
+        # print(formatted_args_2)
         f_wrapper_str = 'def func_wrapper%s: \r\n    return func(%s)' % ( formatted_args_1,
                                                 formatted_args_2)
 

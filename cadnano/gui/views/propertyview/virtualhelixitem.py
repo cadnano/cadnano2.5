@@ -144,7 +144,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s = self.treeWidget().undoStack()
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
-            print("Property view 'length' updating")
+            # print("Property view 'length' updating")
             for vh in self.cnModelList():
                 if value != vh.getSize():
                     vh.setSize(value)

@@ -1333,7 +1333,7 @@ class NucleicAcidPart(Part):
         else:  # delta == 0
             return
         _, final_size = self.getOffsetAndSize(id_num)
-        print("final_size", final_size)
+        # print("final_size", final_size)
         self.vh_properties.loc[id_num, 'length'] = final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
