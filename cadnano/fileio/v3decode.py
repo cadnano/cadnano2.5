@@ -2,7 +2,7 @@
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
-from cadnano.enum import PointType
+from cadnano.cnenum import PointType
 
 def decode(document, obj):
     """

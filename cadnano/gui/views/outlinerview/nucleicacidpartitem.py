@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QItemSelectionModel
-from cadnano.enum import ItemType
+from cadnano.cnenum import ItemType
 from cadnano.gui.views import styles
 from .cnoutlineritem import CNOutlinerItem
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem

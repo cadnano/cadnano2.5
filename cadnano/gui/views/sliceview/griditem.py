@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
-from cadnano.enum import GridType
+from cadnano.cnenum import GridType
 
 from . import slicestyles as styles
 _ZVALUE = styles.ZSLICEHELIX + 1

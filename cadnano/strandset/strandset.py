@@ -2,7 +2,7 @@ from bisect import bisect_left, insort_left
 import cadnano.util as util
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
-from cadnano.enum import StrandType
+from cadnano.cnenum import StrandType
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .mergecmd import MergeCommand

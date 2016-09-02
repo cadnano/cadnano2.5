@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 
-from cadnano.enum import ItemType
+from cadnano.cnenum import ItemType
 
 from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LEAF_FLAGS
 

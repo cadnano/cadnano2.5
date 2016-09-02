@@ -1,7 +1,7 @@
 from os.path import basename
 import numpy as np
 
-from cadnano.enum import StrandType
+from cadnano.cnenum import StrandType
 import json
 import io
 

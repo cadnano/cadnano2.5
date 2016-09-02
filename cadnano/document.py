@@ -10,7 +10,7 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack
 from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
-from cadnano.enum import ModType
+from cadnano.cnenum import ModType
 from cadnano.objectinstance import ObjectInstance
 from cadnano.part import Part
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand

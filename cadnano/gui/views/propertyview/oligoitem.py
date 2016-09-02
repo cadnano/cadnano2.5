@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.enum import ItemType
+from cadnano.cnenum import ItemType
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from .cnpropertyitem import CNPropertyItem

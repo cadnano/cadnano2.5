@@ -13,7 +13,7 @@ from cadnano import util
 from cadnano.cnobject import CNObject
 from .virtualhelix import VirtualHelix
 from cadnano.cnproxy import ProxySignal
-from cadnano.enum import GridType, PartType, PointType
+from cadnano.cnenum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
 from cadnano.strandset import StrandSet

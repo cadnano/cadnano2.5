@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 from cadnano.gui.views.pathview import pathstyles as styles
-from cadnano.enum import StrandType
+from cadnano.cnenum import StrandType
 
 from cadnano import util
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
