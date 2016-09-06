@@ -19,7 +19,7 @@ from cadnano.gui.views import styles
 from cadnano import app, setReopen, setBatch, util
 
 
-ONLY_ONE = False
+ONLY_ONE = True
 """bool: Retricts Document to creating only one Part if True."""
 
 
