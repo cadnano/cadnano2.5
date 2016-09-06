@@ -44,17 +44,14 @@ class CNOutlinerItem(QTreeWidgetItem):
         return self._cn_model
     # end def
 
+    def getColor(self):
+        return self._cn_model.getProperty('color')
+    # end def
+
     def createRootPartItem(self, item_name, parent):
         """ use this for sub-lists for part items
         """
-        twi = QTreeWidgetItem(parent, QTreeWidgetItem.UserType)
-        twi.setData(NAME_COL, Qt.EditRole, item_name)
-        twi.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
-        twi.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
-        twi.setFlags(twi.flags() & ~Qt.ItemIsSelectable)
-        twi.setExpanded(True)
-        twi.part = lambda: self._cn_model
-        return twi
+        return RootPartItem(self._cn_model, item_name, parent)
     # end def
 
     def updateCNModel(self):
@@ -104,3 +101,27 @@ class CNOutlinerItem(QTreeWidgetItem):
         self.is_active = False
     # end def
 # end class
+
+class RootPartItem(QTreeWidgetItem):
+    def __init__(self, model_part, item_name, parent):
+        super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
+        self._cn_model = model_part
+        self.item_name = item_name
+        self.setData(NAME_COL, Qt.EditRole, item_name)
+        self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
+        self.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
+        self.setFlags(self.flags() & ~Qt.ItemIsSelectable)
+        self.setExpanded(True)
+    # end def
+
+    def __repr__(self):
+        return "RootPartItem %s: for %s" %  (  self.item_name,
+                                            self._cn_model.getProperty('name'))
+    # end def
+
+    def part(self):
+        return self._cn_model
+
+    def getColor(self):
+        return "#ffffff"
+

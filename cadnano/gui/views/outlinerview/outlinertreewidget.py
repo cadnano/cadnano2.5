@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QToolTip
 
 from cadnano.cnenum import PartType
-from cadnano.gui.palette import getColorObj
+from cadnano.gui.palette import getColorObj, getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
@@ -679,13 +679,19 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
                 element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
                 _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
         elif column == COLOR_COL:  # Color
+
+            # Alternate way to get color
+            # outline_tw = self.parent()
+            # item = outline_tw.itemFromIndex(model_index)
+            # color = item.getColor()
+            # print("COLOR_COL", item)
+
             color = model_index.model().data(model_index, Qt.EditRole)
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionViewItem()
-            styleoption.palette.setBrush(QPalette.Button, QBrush(getColorObj(color)))
-            # top_left = option.rect.topLeft()
+            brush = getBrushObj(color)
+            styleoption.palette.setBrush(QPalette.Button, brush)
             styleoption.rect = new_rect
-            # print("color rect", option.rect.height())
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
         else:
             QStyledItemDelegate.paint(self, painter, option, model_index)

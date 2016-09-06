@@ -14,6 +14,8 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
+    def __repr__(self):
+        return "OutlineOligoItem %s" % self._cn_model.getProperty('name')
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):

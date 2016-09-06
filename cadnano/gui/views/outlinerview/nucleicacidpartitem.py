@@ -35,6 +35,8 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
+    def __repr__(self):
+        return "OutlineNucleicAcidPartItem %s" % self._cn_model.getProperty('name')
 
     ### PUBLIC SUPPORT METHODS ###
     def rootItems(self):
