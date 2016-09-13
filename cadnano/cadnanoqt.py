@@ -60,12 +60,10 @@ class CadnanoQt(QObject):
         self.argv = argv
         # print("initializing new CadnanoQt", type(QCoreApplication.instance()))
         if QCoreApplication.instance() is None:
-            # print("!!!!!!!!!!!!!!!!!! New QApplication")
             self.qApp = QApplication(argv)
             assert(QCoreApplication.instance() is not None)
             self.qApp.setOrganizationDomain("cadnano.org")
         else:
-            # print("????????????? Old QApplication")
             self.qApp = qApp
         super(CadnanoQt, self).__init__()
         # print("initialized new CadnanoQt")
@@ -78,7 +76,7 @@ class CadnanoQt(QObject):
         self.main_event_loop = None
         self.document_controllers = set()  # Open documents
         self.active_document = None
-
+        self._document = None
         self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
     # end def
 
@@ -92,7 +90,7 @@ class CadnanoQt(QObject):
         from cadnano.gui.views.pathview import pathstyles as styles
 
         doc = Document()
-        self.d = self.createDocument(base_doc=doc)
+        self._document = self.createDocument(base_doc=doc)
 
         styles.setFontMetrics()
 
@@ -108,22 +106,22 @@ class CadnanoQt(QObject):
             print("\td()\tthe last created Document")
 
             def d():
-                return self.d
+                return self._document
 
             print("\tw()\tshortcut for d().controller().window()")
 
             def w():
-                return self.d.controller().window()
+                return self._document.controller().window()
 
             print("\tp()\tshortcut for d().selectedInstance().reference()")
 
             def p():
-                return self.d.selectedInstance().reference()
+                return self._document.selectedInstance().reference()
 
             print("\tpi()\tthe PartItem displaying p()")
 
             def pi():
-                part_instance = self.d.selectedInstance()
+                part_instance = self._document.selectedInstance()
                 return w().pathroot.partItemForPart(part_instance)
 
             print("\tvh(i)\tshortcut for p().reference().getStrandSets(i)")
@@ -196,7 +194,7 @@ class CadnanoQt(QObject):
         return dc.document()
 
     def document(self):
-        return self.d
+        return self._document
     # end def
 
     def prefsClicked(self):
