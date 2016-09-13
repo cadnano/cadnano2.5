@@ -2,10 +2,10 @@ import sys, os, io, time
 
 from PyQt5.QtCore import Qt
 
-from .cntestcase import TestApp
+from .cntestcase import CNTestApp
 from cadnano import initAppWithGui
 
-class GUITestApp(TestApp):
+class GUITestApp(CNTestApp):
     def __init__(self):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app

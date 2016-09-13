@@ -289,6 +289,8 @@ class StrandSet(CNObject):
         """
         # print("sss creating strand")
         part = self._part
+
+        # NOTE: this color defaulting thing is problematic for tests
         if color is None:
             color = part.getProperty('color')
         bounds_low, bounds_high = self.getBoundsOfEmptyRegionContaining(base_idx_low)

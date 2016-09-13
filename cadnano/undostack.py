@@ -20,7 +20,7 @@ class UndoStack(object):
         if self.macro_count > 0:
             self.current_macro.addCommand(undocommand)
         else:
-            self.undostack.appendUndoStack(undocommand)
+            self.appendUndoStack(undocommand)
     # end def
 
     def appendUndoStack(self, undocommand):
@@ -73,4 +73,8 @@ class UndoStack(object):
 
     def canRedo(self):
         return True if self.redostack > 0 else False
+    # end def
+
+    def setUndoLimit(self, lim):
+        self.limit = lim
     # end def

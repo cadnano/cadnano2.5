@@ -8,8 +8,12 @@ sys.path.insert(0, PROJECT_PATH)
 sys.path.insert(0, TEST_PATH)
 
 from cadnano.data.dnasequences import sequences
+from cadnano.document import Document
 
-class TestApp(object):
+class CNTestApp(object):
+
+    def __init__(self):
+        self.document = Document()
 
     def tearDown(self):
         pass
