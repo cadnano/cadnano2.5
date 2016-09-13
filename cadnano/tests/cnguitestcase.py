@@ -1,61 +1,29 @@
-# The MIT License
-#
-# Copyright (c) 2011 Wyss Institute at Harvard University
-#
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be included in
-# all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-# THE SOFTWARE.
-#
-# http://www.opensource.org/licenses/mit-license.php
-
-import time
-import unittest
+import sys, os, io, time
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import qApp, QApplication
 
-main = unittest.main
+from .cntestcase import TestApp
+from cadnano import initAppWithGui
 
+class GUITestApp(TestApp):
+    def __init__(self):
+        argv = None
+        self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
+        self.document_controller = list(self.app.document_controllers)[0]
+        self.main_window = self.document_controller.win
 
-class GUITestCase(unittest.TestCase):
-    __qAppInitialized = False
+        # Include this or the automatic build will hang
+        self.app.dontAskAndJustDiscardUnsavedChanges = True
 
-    def __init__(self, *args, **kwargs):
-        """
-        We have to be careful on whether we do initialize a QApplication,
-        so, we have to store a strong reference in an instance and store
-        whether we did this in the class itself. When initializing again,
-        we should not create another QApplication.
-
-        (The unittest framework creates all classes and then calls setUp-
-        tearDown on each one)
-        """
-        unittest.TestCase.__init__(self, *args, **kwargs)
-
-        # if not GUITestCase.__qAppInitialized:
-        #     GUITestCase.__qAppInitialized = True
-        #     self._qApplicationFirstReference = QApplication([])
-        # self._app = qApp
-        # self._app.processEvents()
-        # self._wait = 0
+        # By setting the widget to the main window we can traverse and
+        # interact with any part of it. Also, tearDown will close
+        # the application so we don't need to worry about that.
+        self.setWidget(self.main_window, False, None)
 
     def tearDown(self):
         self._test_widget.close()
         self._test_widget = None
+        self.app.qApp = None
 
     def setWidget(self, widget, show=True, wait=None):
         """
@@ -70,7 +38,7 @@ class GUITestCase(unittest.TestCase):
         self._wait = wait
         if show:
             self._test_widget.show()
-        # self.processEvents()
+    # end def
 
     # button flags
     NOBUTTON = Qt.NoButton
@@ -255,6 +223,7 @@ class GUITestCase(unittest.TestCase):
         @param msecs: milliseconds to call callback.
         """
         QTimer.singleShot(msecs, callback)
+# end class
 
 _toElapse = []  # List of objects that we don't want garbage collected
 

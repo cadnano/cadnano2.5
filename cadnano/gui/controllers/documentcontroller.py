@@ -331,9 +331,9 @@ class DocumentController():
         the_app = app()
         self.destroyDC()
         if the_app.document_controllers:    # check we haven't done this already
-            print("App Closing")
+            # print("App Closing")
             the_app.destroyApp()
-            print("App closed")
+            # print("App closed")
     #end def
 
     def actionSaveSlot(self):
