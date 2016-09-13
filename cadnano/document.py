@@ -164,7 +164,7 @@ class Document(CNObject):
         self._active_part = None
     # end def
 
-    def filename(self):
+    def fileName(self):
         return self._filename
     # end def
 
