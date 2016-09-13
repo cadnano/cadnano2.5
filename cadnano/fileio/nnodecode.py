@@ -3,8 +3,6 @@ import json
 import io
 import os.path
 
-from cadnano.document import Document
-
 import cadnano.fileio.v2decode as v2decode
 import cadnano.fileio.c25decode as c25decode
 import cadnano.fileio.v3decode as v3decode
@@ -13,6 +11,7 @@ def decodeFile(filename, document=None):
     with io.open(filename, 'r', encoding='utf-8') as fd:
         nno_dict = json.load(fd)
     if document is None:
+        from cadnano.document import Document
         document = Document()
     if 'format' not in nno_dict:
         if os.path.splitext(filename)[1] == '.c25':

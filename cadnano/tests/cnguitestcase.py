@@ -9,8 +9,8 @@ class GUITestApp(TestApp):
     def __init__(self):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
-        self.document_controller = list(self.app.document_controllers)[0]
-        self.main_window = self.document_controller.win
+        self.document = self.app.document()
+        self.main_window = self.document.controller().win
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True

@@ -2836,13 +2836,13 @@ class NucleicAcidPart(Part):
     # end def
 
     def setActive(self, is_active):
-        dc = self._document._controller
-        current_active_part = dc.activePart()
+        doc = self._document
+        current_active_part = doc.activePart()
         if is_active:
             if current_active_part == self:
                 # print("Part already active", current_active_part)
                 return
-            dc.setActivePart(self)
+            doc.setActivePart(self)
             if current_active_part is not None:
                 # print("Part deactivating by proxy", current_active_part)
                 current_active_part.setActive(False)

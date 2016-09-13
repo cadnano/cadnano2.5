@@ -92,7 +92,7 @@ class CadnanoQt(QObject):
         from cadnano.gui.views.pathview import pathstyles as styles
 
         doc = Document()
-        self.d = self.newDocument(base_doc=doc)
+        self.d = self.createDocument(base_doc=doc)
 
         styles.setFontMetrics()
 
@@ -171,9 +171,9 @@ class CadnanoQt(QObject):
     def ignoreEnv(self):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)
 
-    def newDocument(self, base_doc=None):
+    def createDocument(self, base_doc=None):
         global DocumentController
-        # print("CadnanoQt newDocument begin")
+        # print("CadnanoQt createDocument begin")
         default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
@@ -192,8 +192,12 @@ class CadnanoQt(QObject):
             elif doc_ctrlr_count == 1:  # dc already exists
                 dc = list(self.document_controllers)[0]
                 dc.newDocument()  # tell it to make a new doucment
-        # print("CadnanoQt newDocument done")
+        # print("CadnanoQt createDocument done")
         return dc.document()
+
+    def document(self):
+        return self.d
+    # end def
 
     def prefsClicked(self):
         self.prefs.showDialog()

@@ -20,15 +20,12 @@ class TestApp(object):
         (designname), apply scaffold sequence(s) to that design, and return
         the set of staple sequences."""
         # set up the document
-        from cadnano.fileio.nnodecode import decodeFile
         inputfile = pjoin(TEST_PATH,
                             "functionaltestinputs", designname)
-        dc = self.document_controller
-        document = dc.document()
-        decodeFile(inputfile, document=document)
-        self.setWidget(dc.win, False, None)
+        document = self.document
+        document.readFile(inputfile)
 
-        part = self.document_controller.activePart()
+        part = document.activePart()
         # apply one or more sequences to the design
         for sequence_name, start_id_num, start_idx in sequences_to_apply:
             sequence = sequences.get(sequence_name, None)

@@ -16,7 +16,9 @@ from cadnano.part import Part
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.strand import Strand
-
+from cadnano import setBatch
+from cadnano.fileio.nnodecode import decodeFile
+from cadnano.fileio.nnoencode import encodeToFile
 
 class Document(CNObject):
     """
@@ -42,6 +44,10 @@ class Document(CNObject):
         self._selected_instance = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
+        self._active_part = None
+
+        self._filename = None
+
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}
         self.view_names = []
@@ -142,6 +148,36 @@ class Document(CNObject):
             child (object):
         """
         self._children.remove(child)
+    # end def
+
+    def activePart(self):
+        return self._active_part
+    # end def
+
+    def setActivePart(self, part):
+        # print("DC setActivePart")
+        self._active_part = part
+    # end def
+
+    def deactivateActivePart(self):
+        # print("DC deactive Part")
+        self._active_part = None
+    # end def
+
+    def filename(self):
+        return self._filename
+    # end def
+
+    def setFileName(self, fname):
+        self._filename = fname
+    # end def
+
+    def writeToFile(self, filename):
+        encodeToFile(filename, self)
+    # end def
+
+    def readFile(self, filename):
+        decodeFile(filename, document=self)
     # end def
 
     # def assemblies(self):
@@ -592,6 +628,15 @@ class Document(CNObject):
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}
         self.documentViewResetSignal.emit(self)
+    # end def
+
+    def makeNew(self, fname=None):
+        self.resetViews()
+        setBatch(True)
+        self.removeAllChildren()  # clear out old parts
+        setBatch(False)
+        self.undoStack().clear()  # reset undostack
+        self._filename = fname if fname else "untitled.json"
     # end def
 
     def setViewNames(self, view_name_list, do_clear=False):

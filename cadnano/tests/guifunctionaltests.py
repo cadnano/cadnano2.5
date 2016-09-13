@@ -38,14 +38,14 @@ def testStapleOutput_inserts_and_skips(cnapp):
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
 
-def testStapleOutput_Nature09_monolith(cnapp):
-    """Staples match reference set for Nature09 monolith"""
-    designname = "Nature09_monolith.json"
-    refname = "Nature09_monolith.csv"
-    sequences = [("p7560", 4, 73)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_Nature09_monolith(cnapp):
+#     """Staples match reference set for Nature09 monolith"""
+#     designname = "Nature09_monolith.json"
+#     refname = "Nature09_monolith.csv"
+#     sequences = [("p7560", 4, 73)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
 def testStapleOutput_insert_size_1(cnapp):
     """Test sequence output with a single insert of size 1"""
@@ -66,33 +66,33 @@ def testStapleOutput_insert_size_1(cnapp):
 #      ref_set = cnapp.getRefSequences(refname)
 #      assert test_set == ref_set
 
-def testStapleOutput_Science09_prot120_98_v3(cnapp):
-    """Staples match reference set for Science09 protractor 120 v3"""
-    designname = "Science09_prot120_98_v3.json"
-    refname = "Science09_prot120_98_v3.csv"
-    sequences = [("p7704", 0, 105)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_Science09_prot120_98_v3(cnapp):
+#     """Staples match reference set for Science09 protractor 120 v3"""
+#     designname = "Science09_prot120_98_v3.json"
+#     refname = "Science09_prot120_98_v3.csv"
+#     sequences = [("p7704", 0, 105)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
-def testStapleOutput_Science09_beachball_v1_json(cnapp):
-    """Staples match reference set for Science09 beachball (json source)"""
-    designname = "Science09_beachball_v1.json"
-    refname = "Science09_beachball_v1.csv"
-    sequences = [("p7308", 10, 221)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_Science09_beachball_v1_json(cnapp):
+#     """Staples match reference set for Science09 beachball (json source)"""
+#     designname = "Science09_beachball_v1.json"
+#     refname = "Science09_beachball_v1.csv"
+#     sequences = [("p7308", 10, 221)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
-def testStapleOutput_Gap_Vs_Skip(cnapp):
-    """Staple gap output as '?'; staple skip output as ''"""
-    designname = "gap_vs_skip.json"
-    refname = "gap_vs_skip.csv"
-    sequences = [("M13mp18", 0, 11), ("M13mp18", 2, 11)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    # cnapp.writeRefSequences("gap_vs_skip.csv_2.csv", test_set)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_Gap_Vs_Skip(cnapp):
+#     """Staple gap output as '?'; staple skip output as ''"""
+#     designname = "gap_vs_skip.json"
+#     refname = "gap_vs_skip.csv"
+#     sequences = [("M13mp18", 0, 11), ("M13mp18", 2, 11)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     # cnapp.writeRefSequences("gap_vs_skip.csv_2.csv", test_set)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
 ####################### Standard Functional Tests ########################
 # def testActiveSliceHandleAltShiftClick(self):

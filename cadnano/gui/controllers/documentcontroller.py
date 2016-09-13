@@ -11,8 +11,6 @@ from PyQt5.QtWidgets import QFileDialog, QActionGroup
 from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
 from PyQt5.QtWidgets import QStyleOptionGraphicsItem
 from PyQt5.QtSvg import QSvgGenerator
-from cadnano.fileio.nnodecode import decodeFile
-from cadnano.fileio.nnoencode import encodeToFile
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
@@ -33,11 +31,9 @@ class DocumentController():
         # initialize variables
         self._document = document
         self._document.setController(self)
-        self._active_part = None
-        self._filename = None
         self._file_open_path = None  # will be set in _readSettings
         self._has_no_associated_file = True
-        # self._undo_stack = None
+
         self.win = None
         self.fileopendialog = None
         self.filesavedialog = None
@@ -349,7 +345,7 @@ class DocumentController():
 
     def actionSVGSlot(self):
         """docstring for actionSVGSlot"""
-        fname = os.path.basename(str(self.filename()))
+        fname = os.path.basename(str(self.fileName()))
         if fname is None:
             directory = "."
         else:
@@ -442,7 +438,7 @@ class DocumentController():
             return
 
         # Proceed with staple export.
-        fname = self.filename()
+        fname = self.fileName()
         if fname is None:
             directory = "."
         else:
@@ -488,12 +484,14 @@ class DocumentController():
     def actionAddDnaPart(self):
         if ONLY_ONE:
             self.newDocument()  # only allow one part for now
-        part = self._document.addDnaPart()
-        if self._active_part is not None:
-            self._active_part.setActive(False)
-            self.deactivateActivePart()
+        doc = self._document
+        part = doc.addDnaPart()
+        active_part = doc.activePart()
+        if active_part is not None:
+            active_part.setActive(False)
+            doc.deactivateActivePart()
         part.setActive(True)
-        self.setActivePart(part)
+        doc.setActivePart(part)
         return part
     # end def
 
@@ -523,20 +521,6 @@ class DocumentController():
         doc.setController(self)
     # end def
 
-    def activePart(self):
-        return self._active_part
-    # end def
-
-    def setActivePart(self, part):
-        # print("DC setActivePart")
-        self._active_part = part
-    # end def
-
-    def deactivateActivePart(self):
-        # print("DC deactive Part")
-        self._active_part = None
-    # end def
-
     def undoStack(self):
         return self._document.undoStack()
     # end def
@@ -547,21 +531,15 @@ class DocumentController():
         Tells all of the views to reset and removes all items from
         them
         """
-        if fname is not None and self._filename == fname:
+        if fname is not None and self.fileName() == fname:
             setReopen(True)
-        self._document.resetViews()
-        setBatch(True)
-        self._document.removeAllChildren()  # clear out old parts
-        setBatch(False)
-        self._document.undoStack().clear()  # reset undostack
-        self._filename = fname if fname else "untitled.json"
+        self._document.makeNew()
         self._has_no_associated_file = fname is None
-        self._active_part = None
         self.win.setWindowTitle(self.documentTitle() + '[*]')
     # end def
 
     def saveFileDialog(self):
-        fname = self.filename()
+        fname = self.fileName()
         if fname is None:
             directory = "."
         else:
@@ -680,7 +658,7 @@ class DocumentController():
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
-        decodeFile(fname, document=self._document)
+        self._document.readFile(fname)
 
         self.win.path_graphics_view.setViewportUpdateOn(True)
         self.win.slice_graphics_view.setViewportUpdateOn(True)
@@ -727,18 +705,18 @@ class DocumentController():
 
     ### FILE INPUT ##
     def documentTitle(self):
-        fname = os.path.basename(str(self.filename()))
+        fname = os.path.basename(str(self.fileName()))
         if not self.undoStack().isClean():
             fname += '[*]'
         return fname
 
-    def filename(self):
-        return self._filename
+    def fileName(self):
+        return self._document.fileName()
 
-    def setFilename(self, proposed_fname):
-        if self._filename == proposed_fname:
+    def setFileName(self, proposed_fname):
+        if self.fileName() == proposed_fname:
             return True
-        self._filename = proposed_fname
+        self._document.setFileName(proposed_fname)
         self._has_no_associated_file = False
         self.win.setWindowTitle(self.documentTitle())
         return True
@@ -799,9 +777,9 @@ class DocumentController():
         if filename is None or filename == '':
             if self._has_no_associated_file:
                 return False
-            filename = self.filename()
+            filename = self.fileName()
         try:
-            encodeToFile(filename, self._document)
+            self._document.writeToFile(filename)
         except:
             flags = Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet
             errorbox = QMessageBox(QMessageBox.Critical,

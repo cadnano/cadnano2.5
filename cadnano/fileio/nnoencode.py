@@ -5,7 +5,7 @@ from cadnano.cnenum import StrandType
 import json
 import io
 
-from cadnano.document import Document
+# from cadnano.document import Document
 
 import cadnano.fileio.v3encode as v3encode
 
