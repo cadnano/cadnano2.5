@@ -1,16 +1,18 @@
 import sys, os, io, time
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QEvent, QPoint, QPointF, QTimer
+from PyQt5.QtGui import QMouseEvent, QKeyEvent
 
-from .cntestcase import CNTestApp
 from cadnano import initAppWithGui
+from .cntestcase import CNTestApp
+
 
 class GUITestApp(CNTestApp):
     def __init__(self):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
         self.document = self.app.document()
-        self.main_window = self.document.controller().win
+        self.window = self.document.controller().win
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True
@@ -18,7 +20,7 @@ class GUITestApp(CNTestApp):
         # By setting the widget to the main window we can traverse and
         # interact with any part of it. Also, tearDown will close
         # the application so we don't need to worry about that.
-        self.setWidget(self.main_window, False, None)
+        self.setWidget(self.window, False, wait=None)
 
     def tearDown(self):
         self._test_widget.close()
@@ -140,11 +142,11 @@ class GUITestApp(CNTestApp):
         """Stops the executing of the test at the caller's position, returning
         control to qt's main loop. Useful to debug the tests.
         """
-        self._app.setActiveWindow(self._test_widget)
-        self._app.exec_()
+        self.app.qApp.setActiveWindow(self._test_widget)
+        self.app.exec_()
 
     def processEvents(self):
-        self._app.processEvents()
+        self.app.qApp.processEvents()
         if self._wait:
             time.sleep(self._wait)
 
@@ -175,7 +177,7 @@ class GUITestApp(CNTestApp):
         if qgraphicsscene:
             result = qgraphicsscene.sendEvent(widget, event)
         else:
-            self._app.postEvent(widget, event)
+            self.app.qApp.postEvent(widget, event)
         self.processEvents()
 
     def _keyEvent(self, event_type, widget, key, state=None):
@@ -187,15 +189,17 @@ class GUITestApp(CNTestApp):
             if isinstance(key, str) and key.isupper():
                 state = Qt.ShiftModifier
             else:
-                state = self.NOBUTTON
+                state = Qt.NoModifier
         new_key, ascii = self._convertKey(key)
         string = _QT_TO_STR.get(new_key, '')
         if isinstance(key, str) and key.isupper():
             string = string.upper()
         if state is None:
             state = Qt.NoModifier
-        event = Qt.QKeyEvent(event_type, new_key, state, string)
-        self._app.postEvent(widget, event)
+        # print("new_key", new_key, key)
+        event = QKeyEvent(event_type, new_key, state, string)
+        # widget.scene().sendEvent(widget, event)
+        self.app.qApp.postEvent(widget, event, Qt.HighEventPriority)
         self.processEvents()
 
     def _convertKey(self, key):
@@ -207,8 +211,8 @@ class GUITestApp(CNTestApp):
         if isinstance(key, str):
             if key.lower() in _STR_TO_QT:
                 ascii = ord(key)
-                key = _STR_TO_QT[key.lower()]
-                return key, ascii
+                out_key = _STR_TO_QT[key.lower()]
+                return out_key, ascii
             else:
                 raise ValueError('Invalid key: %s' % key)
         else:

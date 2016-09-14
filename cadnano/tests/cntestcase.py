@@ -8,11 +8,12 @@ sys.path.insert(0, PROJECT_PATH)
 sys.path.insert(0, TEST_PATH)
 
 from cadnano.data.dnasequences import sequences
-from cadnano.document import Document
 
 class CNTestApp(object):
 
     def __init__(self):
+        # Document import must be here so as to allow for GUI tests to be run
+        from cadnano.document import Document
         self.document = Document()
 
     def tearDown(self):
