@@ -122,9 +122,6 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         pass
 
-    def partVirtualHelicesReorderedSlot(self, sender):
-        pass
-
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
 
@@ -235,8 +232,6 @@ class AbstractPartItem(object):
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         pass
 
-    def partVirtualHelicesReorderedSlot(self, sender):
-        pass
 
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass

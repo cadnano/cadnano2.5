@@ -101,6 +101,13 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
         if self._cn_model == model_part:
             self.setValue(property_key, new_value)
+            if property_key == 'virtual_helix_order':
+                vhi_dict = self._virtual_helix_item_hash
+                new_list = [vhi_dict[id_num] for id_num in new_value]
+                root_vhi = self._root_items['VHelixList']
+                root_vhi.takeChildren()
+                for vhi in new_list:
+                    root_vhi.addChild(vhi)
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -152,17 +159,6 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         tw.selection_filter_disabled = False
     # end def
 
-    def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):
-        """docstring for partVirtualHelicesReorderedSlot"""
-        vhi_dict = self._virtual_helix_item_hash
-        new_list = [vhi_dict[id_num] for id_num in ordered_id_list]
-        root_vhi = self._root_items['VHelixList']
-        root_vhi.takeChildren()
-        for vhi in new_list:
-            root_vhi.addChild(vhi)
-    # end def
-
-    ### SLOTS ###
     def partActiveVirtualHelixChangedSlot(self, part, id_num):
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         # if vhi is not None:

@@ -218,9 +218,6 @@ class NucleicAcidPart(Part):
     partVirtualHelixResizedSignal = ProxySignal(CNObject, int, object, name='partVirtualHelixResizedSignal')
     """self, virtual_helix id_num, virtual_helix"""
 
-    partVirtualHelicesReorderedSignal = ProxySignal(object, object, bool, name='partVirtualHelicesReorderedSignal')
-    """self, list of id_nums"""
-
     partVirtualHelicesTranslatedSignal = ProxySignal(CNObject, object, object, bool,
                                                      name='partVirtualHelicesTranslatedSignal')
     """self, list of id_nums, transform"""
@@ -2786,12 +2783,9 @@ class NucleicAcidPart(Part):
 
     def setImportedVHelixOrder(self, ordered_id_list, check_batch=True):
         """Used on file import to store the order of the virtual helices.
-        TODO: figure out how to get rid of this and use changeViewProperty
-        instead.  probably no need to do the zoom to fit with check_batch
-        thing
+        TODO: do something with check_batch or remove it
         """
         self.setProperty('virtual_helix_order', ordered_id_list)
-        self.partVirtualHelicesReorderedSignal.emit(self, ordered_id_list, check_batch)
     # end def
 
     def oligos(self):

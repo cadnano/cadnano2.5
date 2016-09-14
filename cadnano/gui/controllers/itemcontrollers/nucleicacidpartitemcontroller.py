@@ -21,7 +21,7 @@ class NucleicAcidPartItemController(PartItemController):
         m_p.partVirtualHelixRemovingSignal.connect(p_i.partVirtualHelixRemovingSlot)
         m_p.partVirtualHelixRemovedSignal.connect(p_i.partVirtualHelixRemovedSlot)
         m_p.partVirtualHelixResizedSignal.connect(p_i.partVirtualHelixResizedSlot)
-        m_p.partVirtualHelicesReorderedSignal.connect(p_i.partVirtualHelicesReorderedSlot)
+
         m_p.partVirtualHelicesTranslatedSignal.connect(p_i.partVirtualHelicesTranslatedSlot)
         m_p.partVirtualHelicesSelectedSignal.connect(p_i.partVirtualHelicesSelectedSlot)
         m_p.partVirtualHelixPropertyChangedSignal.connect(p_i.partVirtualHelixPropertyChangedSlot)
@@ -44,7 +44,7 @@ class NucleicAcidPartItemController(PartItemController):
         m_p.partVirtualHelixRemovingSignal.disconnect(p_i.partVirtualHelixRemovingSlot)
         m_p.partVirtualHelixRemovedSignal.disconnect(p_i.partVirtualHelixRemovedSlot)
         m_p.partVirtualHelixResizedSignal.disconnect(p_i.partVirtualHelixResizedSlot)
-        m_p.partVirtualHelicesReorderedSignal.disconnect(p_i.partVirtualHelicesReorderedSlot)
+
         m_p.partVirtualHelicesTranslatedSignal.disconnect(p_i.partVirtualHelicesTranslatedSlot)
         m_p.partVirtualHelicesSelectedSignal.disconnect(p_i.partVirtualHelicesSelectedSlot)
         m_p.partVirtualHelixPropertyChangedSignal.disconnect(p_i.partVirtualHelixPropertyChangedSlot)

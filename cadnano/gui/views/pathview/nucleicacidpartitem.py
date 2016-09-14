@@ -229,6 +229,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                     self.show()
                 else:
                     self.hide()
+            elif property_key == 'virtual_helix_order':
+                vhi_dict = self._virtual_helix_item_hash
+                new_list = [vhi_dict[id_num] for id_num in new_value]
+                ztf = False
+                self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
@@ -308,20 +313,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi = self._virtual_helix_item_hash[id_num]
         # print("resize:", id_num, virtual_helix.getSize())
         vhi.resize()
-    # end def
-
-    def partVirtualHelicesReorderedSlot(self, sender, ordered_id_list, check_batch):
-        """docstring for partVirtualHelicesReorderedSlot
-
-        Args:
-            sender (obj): Model object that emitted the signal.
-            ordered_id_list (TYPE): Description
-            check_batch (TYPE): Description
-        """
-        vhi_dict = self._virtual_helix_item_hash
-        new_list = [vhi_dict[id_num] for id_num in ordered_id_list]
-        ztf = not getBatch() if check_batch == True else False
-        self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
