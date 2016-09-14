@@ -537,7 +537,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         return ret
     # end def
 
-    def reorderHelices(self, first, last, index_delta):
+    def reorderHelices(self, id_nums, index_delta):
         """
         Reorder helices by moving helices _pathHelixList[first:last]
         by a distance delta in the list. Notify each PathHelix and
@@ -550,26 +550,22 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """
         vhi_list = self._virtual_helix_item_list
         helix_numbers = [vhi.idNum() for vhi in vhi_list]
-        first_index = helix_numbers.index(first)
-        last_index = helix_numbers.index(last) + 1
+
+
+        first_index = helix_numbers.index(id_nums[0])
+        last_index = helix_numbers.index(id_nums[-1]) + 1
+
+        insert_idxs = [helix_numbers.index(id_num) for id_num in id_nums]
+        for id_num in id_nums:
+            helix_numbers.remove(id_num)
 
         if index_delta < 0:  # move group earlier in the list
-            new_index = max(0, index_delta + first_index)
-            new_list = vhi_list[0:new_index] +\
-                       vhi_list[first_index:last_index] +\
-                       vhi_list[new_index:first_index] +\
-                       vhi_list[last_index:]
-        # end if
+            new_index = max(0, index_delta + first_index) - len(id_nums)
         else:  # move group later in list
-            new_index = min(len(vhi_list), index_delta + last_index)
-            new_list = vhi_list[:first_index] +\
-                       vhi_list[last_index:new_index] +\
-                       vhi_list[first_index:last_index] +\
-                       vhi_list[new_index:]
-        # end else
-
+            new_index = min(len(vhi_list), index_delta + last_index ) - len(id_nums)
+        new_list = helix_numbers[:new_index] + id_nums + helix_numbers[new_index:]
         # call the method to move the items and store the list
-        self.part().setImportedVHelixOrder([vhi.idNum() for vhi in new_list], check_batch=False)
+        self._model_part.setImportedVHelixOrder(new_list, check_batch=False)
     # end def
 
     def setActiveVirtualHelixItem(self, new_active_vhi):

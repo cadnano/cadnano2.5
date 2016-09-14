@@ -501,9 +501,11 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
         # sort on y to determine the extremes of the selection group
         items = sorted(self._item_group.childItems(), key=lambda vhhi: vhhi.y())
         part_item = items[0].partItem()
-        part_item.reorderHelices(items[0].idNum(),
-                                 items[-1].idNum(),
+        part_item.reorderHelices([item.idNum() for item in items],
                                  indexDelta)
+        # part_item.reorderHelices(items[0].idNum(),
+        #                          items[-1].idNum(),
+        #                          indexDelta)
         part_item.updateStatusBar("")
     # end def
 
