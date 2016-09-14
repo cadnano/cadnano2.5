@@ -89,6 +89,10 @@ class OutlinerTreeWidget(QTreeWidget):
         self.itemClicked.connect(self.itemClickedHandler)
     # end def
 
+    def document(self):
+        return self._document
+    # end def
+
     def selectionFilter(self, selected_items, deselected_items):
         """ Disables selections of items not in the active filter set.
         I had issues with segfaults subclassing QItemSelectionModel so

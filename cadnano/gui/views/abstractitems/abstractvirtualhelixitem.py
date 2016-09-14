@@ -26,10 +26,6 @@ class AbstractVirtualHelixItem(object):
     def strandAddedSlot(self, sender, strand):
         pass
 
-    def setSelected(self, is_selected):
-        pass
-    # end def
-
     def cnModel(self):
         return self._model_vh
     # end def

@@ -103,11 +103,20 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             self.setValue(property_key, new_value)
             if property_key == 'virtual_helix_order':
                 vhi_dict = self._virtual_helix_item_hash
+                document = self.treeWidget().document()
                 new_list = [vhi_dict[id_num] for id_num in new_value]
+                # 0. record what was selected
+                selected_list = [(x, x.isSelected()) for x in new_list]
                 root_vhi = self._root_items['VHelixList']
+                # 1. move the items
                 root_vhi.takeChildren()
                 for vhi in new_list:
                     root_vhi.addChild(vhi)
+                # 2. now reselect the previously selected.
+                # could also query the model
+                for vhi, was_selected in selected_list:
+                    if was_selected:
+                        vhi.setSelected(True)
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
