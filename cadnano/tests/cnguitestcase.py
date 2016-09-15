@@ -2,6 +2,7 @@ import sys, os, io, time
 
 from PyQt5.QtCore import Qt, QEvent, QPoint, QPointF, QTimer
 from PyQt5.QtGui import QMouseEvent, QKeyEvent
+from PyQt5.QtTest import QTest
 
 from cadnano import initAppWithGui
 from .cntestcase import CNTestApp
@@ -98,9 +99,17 @@ class GUITestApp(CNTestApp):
 
         @see: mousePress for the meaning of the arguments.
         """
-        widget.setFocus()
-        self.mousePress(widget, button, position, state, modifiers, qgraphicsscene)
-        self.mouseRelease(widget, button, position, state, modifiers, qgraphicsscene)
+        # widget.setFocus()
+        # self.mousePress(widget, button, position, state, modifiers, qgraphicsscene)
+        # self.mouseRelease(widget, button, position, state, modifiers, qgraphicsscene)
+        if button is None:
+            button = Qt.LeftButton
+        if modifiers is None:
+            modifiers = Qt.KeyboardModifiers()
+        if position is None:
+            position = QPoint()
+        QTest.mouseClick(widget, button)#, modifiers, position)
+        self.processEvents()
 
     def doubleClick(self, widget, button=None, position=None, state=None):
         """Sends a double-click event to the given widget.

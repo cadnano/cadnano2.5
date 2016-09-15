@@ -3,7 +3,8 @@ import sys, os, io, time
 import pytest
 
 from .cnguitestcase import GUITestApp
-from PyQt5.QtCore import QPoint, QPointF
+from PyQt5.QtCore import Qt, QPoint, QPointF
+from PyQt5.QtTest import QTest
 
 @pytest.fixture()
 def cnapp():
@@ -12,32 +13,42 @@ def cnapp():
     app.tearDown()
 
 ####################### Staple Comparison Tests ########################
-def testStapleOutput_simple42legacy(cnapp):
-    """p7308 applied to 42-base duplex (json source)"""
-    designname = "simple42legacy.json"
-    refname = "simple42legacy.csv"
-    sequences = [("p7308", 0, 0)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_simple42legacy(cnapp):
+#     """p7308 applied to 42-base duplex (json source)"""
+#     designname = "simple42legacy.json"
+#     refname = "simple42legacy.csv"
+#     sequences = [("p7308", 0, 0)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
-def testStapleOutput_skip(cnapp):
-    """Simple design with a single skip"""
-    designname = "skip.json"
-    refname = "skip.csv"
-    sequences = [("M13mp18", 0, 14)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_skip(cnapp):
+#     """Simple design with a single skip"""
+#     designname = "skip.json"
+#     refname = "skip.csv"
+#     sequences = [("M13mp18", 0, 14)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
 
-def testStapleOutput_inserts_and_skips(cnapp):
-    """Insert and skip stress test"""
-    designname = "loops_and_skips.json"
-    refname = "loops_and_skips.csv"
-    sequences = [("M13mp18", 0, 0)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+# def testStapleOutput_inserts_and_skips(cnapp):
+#     """Insert and skip stress test"""
+#     designname = "loops_and_skips.json"
+#     refname = "loops_and_skips.csv"
+#     sequences = [("M13mp18", 0, 0)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
+
+# def testStapleOutput_insert_size_1(cnapp):
+#     """Test sequence output with a single insert of size 1"""
+#     designname = "loop_size_1.json"
+#     refname = "loop_size_1.csv"
+#     sequences = [("M13mp18", 0, 14)]
+#     test_set = cnapp.getTestSequences(designname, sequences)
+#     ref_set = cnapp.getRefSequences(refname)
+#     assert test_set == ref_set
+
 
 # def testStapleOutput_Nature09_monolith(cnapp):
 #     """Staples match reference set for Nature09 monolith"""
@@ -48,14 +59,7 @@ def testStapleOutput_inserts_and_skips(cnapp):
 #     ref_set = cnapp.getRefSequences(refname)
 #     assert test_set == ref_set
 
-def testStapleOutput_insert_size_1(cnapp):
-    """Test sequence output with a single insert of size 1"""
-    designname = "loop_size_1.json"
-    refname = "loop_size_1.csv"
-    sequences = [("M13mp18", 0, 14)]
-    test_set = cnapp.getTestSequences(designname, sequences)
-    ref_set = cnapp.getRefSequences(refname)
-    assert test_set == ref_set
+
 
 # def testStapleOutput_Nature09_squarenut(cnapp):
 #      """Staples match reference set for Nature09 squarenut"""
@@ -125,20 +129,27 @@ def testStapleOutput_insert_size_1(cnapp):
 def testEndpointAltClick(cnapp):
     """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
     # Create a new Honeycomb part
-    new_dna_part_button = cnapp.window.main_toolbar.widgetForAction(
+    main_toolbar = cnapp.window.main_toolbar
+    new_dna_part_button = main_toolbar.widgetForAction(
                                             cnapp.window.action_new_dnapart)
-    cnapp.click(new_dna_part_button)
+    QTest.mouseClick(new_dna_part_button, Qt.LeftButton)
     # Click each SliceHelix
     slicerootitem = cnapp.window.sliceroot
     assert len(slicerootitem.instance_items) == 1
     slice_part_item = list(slicerootitem.instance_items.values())[0]
+    QTest.keyClick(cnapp.window, Qt.Key_H, delay=100)
+    # cnapp.processEvents()
+    QTest.keyClick(cnapp.window, Qt.Key_V, delay=100)
+    cnapp.processEvents()
+    QTest.mouseClick(slice_part_item.scene().views()[0], Qt.LeftButton,
+                    pos=slice_part_item.scenePos().toPoint(), delay=100)
 
-    # cnapp.keyPress(cnapp.window, 'h')
     # time.sleep(0.5)
     # cnapp.keyPress(cnapp.window, 'n')
-    # cnapp.mousePress(   slice_part_item,
+    # cnapp.mousePress(   slice_part_item.scene().views()[0],
     #                     # position=QPoint(0, 0),
-    #                     qgraphicsscene=slicerootitem.scene())
+    #                 )
+    time.sleep(3)
     # time.sleep(3)
 
     # sliceGraphicsItem = self.document_controller.sliceGraphicsItem
