@@ -481,7 +481,7 @@ class NucleicAcidPart(Part):
         Returns:
             list: of :obj:`int` of virtual helix ID numbers used
         """
-        return [i for i, x in filter(lambda i, x: x is not None, enumerate(self._offset_and_size))]
+        return [i for i, j in filter(lambda x: x[1] is not None, enumerate(self._offset_and_size))]
     # end def
 
     def setVirtualHelixOriginLimits(self):
