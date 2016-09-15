@@ -97,8 +97,10 @@ class Part(CNObject):
 
     def incrementInstance(self, document):
         self._instance_count += 1
+        print("incrementInstance")
         if self._instance_count == 1:
             self._document = document
+            print("Adding childe")
             document.addChild(self)
     # end def
 

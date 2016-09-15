@@ -712,6 +712,7 @@ class Document(CNObject):
     def _addPart(self, part_instance, use_undostack=True):
         """Add part to the document via AddInstanceCommand.
         """
+        print("add part")
         c = AddInstanceCommand(self, part_instance)
         util.execCommandList(self, [c], desc="Add part", use_undostack=use_undostack)
         return c.instance()

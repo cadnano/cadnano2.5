@@ -27,6 +27,7 @@ class AddInstanceCommand(UndoCommand):
     def redo(self):
         doc = self._document
         obji = self._obj_instance
+        print("unwipe")
         obji.unwipe(doc)
         if isinstance(obji.reference(), Part):
             doc.documentPartAddedSignal.emit(doc, obji)
