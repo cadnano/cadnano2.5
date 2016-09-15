@@ -7,7 +7,6 @@ from PyQt5.QtTest import QTest
 from cadnano import initAppWithGui
 from .cntestcase import CNTestApp
 
-
 class GUITestApp(CNTestApp):
     def __init__(self):
         argv = None
@@ -21,197 +20,101 @@ class GUITestApp(CNTestApp):
         # By setting the widget to the main window we can traverse and
         # interact with any part of it. Also, tearDown will close
         # the application so we don't need to worry about that.
-        self.setWidget(self.window, False, wait=None)
+        self.setWidget(self.window, False)
 
     def tearDown(self):
         self._test_widget.close()
         self._test_widget = None
         self.app.qApp = None
 
-    def setWidget(self, widget, show=True, wait=None):
+    def setWidget(self, widget, show=True):
         """
         Must be called in the setUp() method, giving the test widget.
 
         @param show: If show() should be called on the GUI. Set to False if
         you don't want to see the GUI running.
-
-        @param wait: How long to wait between events, in seconds.
         """
         self._test_widget = widget
-        self._wait = wait
         if show:
             self._test_widget.show()
     # end def
 
-    # button flags
-    NOBUTTON = Qt.NoButton
-    LEFT = Qt.LeftButton
-    RIGHT = Qt.RightButton
-    MIDDLE = Qt.MidButton
-    SHIFT = Qt.ShiftModifier
-    CONTROL = Qt.ControlModifier
-    ALT = Qt.AltModifier
-
     ############################ Mouse events ############################
-    def mousePress(self, widget, button=None, position=None, state=None, modifiers=None, qgraphicsscene=None):
-        """Sends a press event for the given widget.
-        @param button: the pressed mouse button. Can be LEFT, RIGHT or MIDDLE.
-            If not given, LEFT is assumed.
-        @param position: a QPoint or a pair, indicating the position in widget
-            coordinates where the button was pressed. If not given, the center
-            of the widget is used.
-        @param state: secondary keys. optional, can be SHIFT, CONTROL, ALT.
+    @staticmethod
+    def graphicsItemClick(graphics_item, button,
+                                modifier=None, pos=None, delay=-1):
+        """ Convenience method for clicking in a QGraphicsItem to wrap a call
+        to QTest.mouseClick
+
+        Args:
+            graphics_item (QGraphicsItem):
+            button (Qt.MouseButton):
+            pos (QPoint): in item coordinates
         """
-        self._mouseEvent(QEvent.MouseButtonPress, widget, button, position, state, modifiers, qgraphicsscene)
+        gview = graphics_item.scene().views()[0]
+        if pos is None:
+            pos = GUITestApp.getItemCenterScenePos(graphics_item)
+        else:
+            pos = graphics_item.mapToScene(pos)
+        pos = gview.mapFromScene(pos)
+        if modifier is None:
+            modifier = Qt.KeyboardModifiers()
+        QTest.mouseClick(   gview.viewport(), button,
+                            modifier=modifier, pos=pos, delay=100)
+    # end def
 
-    def mouseRelease(self, widget, button=None, position=None, state=None, modifiers=None, qgraphicsscene=None):
-        """Sends a mouse release event for the given widget.
-
-        @see: mousePress for the meaning of the arguments.
-        """
-        self._mouseEvent(QEvent.MouseButtonRelease, widget, button, position, state, modifiers, qgraphicsscene)
-
-    def mouseMove(self, widget, position=None, state=None, modifiers=None, qgraphicsscene=None):
-        """Sends a mouse move event for the given widget.
-
-        @see: mousePress for the meaning of the arguments.
-        """
-        state = self.LEFT
-        self._mouseEvent(QEvent.MouseMove, widget, self.NOBUTTON, position, state, modifiers, qgraphicsscene)
-
-    def mouseDrag(self, widget, pressOn, releaseOn, button=None, state=None):
-        """
+    @staticmethod
+    def mouseDrag(  widget, press_on, release_on, button,
+                    modifier=None, delay=-1):
+        """ Convenience helper for dragging a QWidget
         Makes a drag with the mouse.
 
-        @pressOn: this is the position where the mouse is pressed.
-        @releaseOn: this is the position where the mouse is released.
+        Args:
+            widget (QWidget):
+            press_on (QPoint): this is the position where the mouse is pressed.
+            release_on (QPoint): this is the position where the mouse is released.
         """
-        if state is None:
-            state = self.LEFT
-        self.mousePress(widget, button, pressOn, state)
-        self.mouseMove(widget, releaseOn, state)
-        self.mouseRelease(widget, button, releaseOn, state)
+        if modifier is None:
+            modifier = Qt.KeyboardModifiers()
+        QTest.mousePress(widget, button, modifier, pos=press_on, delay=delay)
+        QTest.mouseMove(widget, pos=release_on, delay=delay)
+        QTest.mouseRelease(widget, button, modifier, pos=release_on, delay=delay)
+    # end def
 
-    def click(self, widget, button=None, position=None, state=None, modifiers=None, qgraphicsscene=None):
+    @staticmethod
+    def graphicsItemDrag(   graphics_item, press_on, release_on, button,
+                            modifier=None, delay=-1):
+        """ Convenience helper for dragging a QGraphicsItem
+        Args:
+            graphics_item (QGraphicsItem):
+            press_on (QPoint): this is the scene position where the mouse is pressed.
+            release_on (QPoint): this is the scene position where the mouse is released.
         """
-        Acts as if the given widget was clicked. Equivalent to send a
-        mousePress followed by a mouseRelease.
-
-        @see: mousePress for the meaning of the arguments.
-        """
-        # widget.setFocus()
-        # self.mousePress(widget, button, position, state, modifiers, qgraphicsscene)
-        # self.mouseRelease(widget, button, position, state, modifiers, qgraphicsscene)
-        if button is None:
-            button = Qt.LeftButton
-        if modifiers is None:
-            modifiers = Qt.KeyboardModifiers()
-        if position is None:
-            position = QPoint()
-        QTest.mouseClick(widget, button)#, modifiers, position)
-        self.processEvents()
-
-    def doubleClick(self, widget, button=None, position=None, state=None):
-        """Sends a double-click event to the given widget.
-
-        @see: mousePress for the meaning of the arguments.
-        """
-        widget.setFocus()
-        self._mouseEvent(QEvent.MouseButtonDblClick, widget, button, position, state)
+        gview = graphics_item.scene().views()[0]
+        press_on = gview.mapFromScene(press_on)
+        release_on = gview.mapFromScene(release_on)
+        GUITestApp.mouseDrag(   gview.viewport(), press_on, release_on, button,
+                            modifier=modifier, delay=delay)
+    # end def
 
     ########################## Keyboard events ############################
-    def keyPress(self, widget, key, state=None):
-        """Sends a key press event to the given widget.
-        @param key: a qt.Qt.Key_* constant or a one-char string.
-        @param state: secondary keys. optional, can be SHIFT, CONTROL, ALT.
-        """
-        self._keyEvent(QEvent.KeyPress, widget, key, state)
-
-    def keyRelease(self, widget, key, state=None):
-        """Sends a key release event to the given widget.
-        @see: keyPress for the meaning of the arguments.
-        """
-        self._keyEvent(QEvent.KeyRelease, widget, key, state)
-
-    def type(self, widget, key, state=None):
-        """Acts as if a key was typed in the given widget. Equivalent to a
-        keyPress followed by a keyRelease.
-        @see: keyPress for the meaning of the arguments.
-        """
-        self.keyPress(widget, key, state)
-        self.keyRelease(widget, key, state)
-
-    def typeText(self, widget, text):
+    @staticmethod
+    def typeText(widget, text, delay):
         """Types the text over the given widget."""
         for char in text:
-            self.type(widget, char)
+            QTest.keyClick(widget, char, delay=delay)
 
     ########################## Miscellaneous ############################
-    def debugHere(self):
-        """Stops the executing of the test at the caller's position, returning
-        control to qt's main loop. Useful to debug the tests.
-        """
-        self.app.qApp.setActiveWindow(self._test_widget)
-        self.app.exec_()
-
     def processEvents(self):
         self.app.qApp.processEvents()
-        if self._wait:
-            time.sleep(self._wait)
 
     ############################ Private Methods ############################
-    def _getWidgetCenter(self, widget):
-        if getattr(widget, "boundingRect", False):
-            # Can't pass a QPointF to QPoint constructor, so we let
-            # python cast x and y to ints instead...
-            return widget.boundingRect().center().toPoint()
-        else:
-            return QPoint(widget.width()/2, widget.height()/2)
+    @staticmethod
+    def getItemCenterScenePos(item):
+        return item.mapToScene(item.boundingRect().center()).toPoint()
 
-
-    def _mouseEvent(self, event_type, widget, button, position, state, modifiers, qgraphicsscene=None):
-        """Sends a MouseEvent with the given event_type.
-        """
-        if button is None:
-            button = self.LEFT
-        if position is None:
-            position = self._getWidgetCenter(widget)
-        if not isinstance(position, QPoint):
-            position = QPoint(*position)  # assume position is a tuple
-        if state is None:
-            state = self.NOBUTTON
-        if modifiers is None:
-            modifiers = Qt.NoModifier
-        event = QMouseEvent(event_type, position, button, state, modifiers)
-        if qgraphicsscene:
-            result = qgraphicsscene.sendEvent(widget, event)
-        else:
-            self.app.qApp.postEvent(widget, event)
-        self.processEvents()
-
-    def _keyEvent(self, event_type, widget, key, state=None):
-        """Sends a key event.
-        @param key: must be either a qt.Qt.Key_* constant or a one-char string
-        in string.printable.
-        """
-        if state is None:
-            if isinstance(key, str) and key.isupper():
-                state = Qt.ShiftModifier
-            else:
-                state = Qt.NoModifier
-        new_key, ascii = self._convertKey(key)
-        string = _QT_TO_STR.get(new_key, '')
-        if isinstance(key, str) and key.isupper():
-            string = string.upper()
-        if state is None:
-            state = Qt.NoModifier
-        # print("new_key", new_key, key)
-        event = QKeyEvent(event_type, new_key, state, string)
-        # widget.scene().sendEvent(widget, event)
-        self.app.qApp.postEvent(widget, event, Qt.HighEventPriority)
-        self.processEvents()
-
-    def _convertKey(self, key):
+    @staticmethod
+    def _convertKey(key):
         """
         Handles the given key for a KeyEvent. Returns (key, ascii), where
         key is one of the qt.Qt.Key_ constants. If key is a string, it is
@@ -227,18 +130,8 @@ class GUITestApp(CNTestApp):
         else:
             ascii = ord(_QT_TO_STR.get(key, '\0'))
             return key, ascii
-
-    def executeOnElapsed(self, callback, msecs):
-        """
-        This function schedules the callback to be executed when 'millis' has
-        elapsed
-        @param callback: this is the callable that should be executed.
-        @param msecs: milliseconds to call callback.
-        """
-        QTimer.singleShot(msecs, callback)
 # end class
 
-_toElapse = []  # List of objects that we don't want garbage collected
 
 KEY_RETURN = '\13'
 

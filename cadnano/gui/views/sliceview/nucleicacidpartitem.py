@@ -658,8 +658,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # 1. get point in model coordinates:
         part = self._model_part
         if alt_event is None:
+            print()
             pt = tool.eventToPosition(self, event)
-            # print("reg_event", pt)
+            print("reg_event", pt)
         else:
             # pt = alt_event.scenePos()
             # pt = self.mapFromScene(pt)

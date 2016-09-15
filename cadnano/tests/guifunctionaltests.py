@@ -12,42 +12,44 @@ def cnapp():
     yield app
     app.tearDown()
 
+DELAY = 20 # milliseconds
+
 ####################### Staple Comparison Tests ########################
-# def testStapleOutput_simple42legacy(cnapp):
-#     """p7308 applied to 42-base duplex (json source)"""
-#     designname = "simple42legacy.json"
-#     refname = "simple42legacy.csv"
-#     sequences = [("p7308", 0, 0)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_simple42legacy(cnapp):
+    """p7308 applied to 42-base duplex (json source)"""
+    designname = "simple42legacy.json"
+    refname = "simple42legacy.csv"
+    sequences = [("p7308", 0, 0)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
 
-# def testStapleOutput_skip(cnapp):
-#     """Simple design with a single skip"""
-#     designname = "skip.json"
-#     refname = "skip.csv"
-#     sequences = [("M13mp18", 0, 14)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_skip(cnapp):
+    """Simple design with a single skip"""
+    designname = "skip.json"
+    refname = "skip.csv"
+    sequences = [("M13mp18", 0, 14)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
 
-# def testStapleOutput_inserts_and_skips(cnapp):
-#     """Insert and skip stress test"""
-#     designname = "loops_and_skips.json"
-#     refname = "loops_and_skips.csv"
-#     sequences = [("M13mp18", 0, 0)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_inserts_and_skips(cnapp):
+    """Insert and skip stress test"""
+    designname = "loops_and_skips.json"
+    refname = "loops_and_skips.csv"
+    sequences = [("M13mp18", 0, 0)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
 
-# def testStapleOutput_insert_size_1(cnapp):
-#     """Test sequence output with a single insert of size 1"""
-#     designname = "loop_size_1.json"
-#     refname = "loop_size_1.csv"
-#     sequences = [("M13mp18", 0, 14)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_insert_size_1(cnapp):
+    """Test sequence output with a single insert of size 1"""
+    designname = "loop_size_1.json"
+    refname = "loop_size_1.csv"
+    sequences = [("M13mp18", 0, 14)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
 
 
 # def testStapleOutput_Nature09_monolith(cnapp):
@@ -100,56 +102,22 @@ def cnapp():
 #     assert test_set == ref_set
 
 ####################### Standard Functional Tests ########################
-# def testActiveSliceHandleAltShiftClick(self):
-#     """Alt+Shift+Click on ActiveSliceHandle extends scaffold strands."""
-#     # Create a new Honeycomb part
-#     newHoneycombPartButton = self.mainWindow.selection_toolbar.widgetForAction(\
-#                                    self.mainWindow.actionNewHoneycombPart)
-#     self.click(newHoneycombPartButton)
-#     # Click each SliceHelix
-#     sliceGraphicsItem = self.document_controller.sliceGraphicsItem
-#     slicehelix1 = sliceGraphicsItem.getSliceHelixByCoord(0, 0)
-#     slicehelix2 = sliceGraphicsItem.getSliceHelixByCoord(0, 1)
-#     self.click(slicehelix1, qgraphicsscene=self.mainWindow.slicescene)
-#     self.click(slicehelix2, qgraphicsscene=self.mainWindow.slicescene)
-#     # Click the activeSliceHandle with ALT and SHIFT modifiers
-#     pathHelixGroup = self.document_controller.pathHelixGroup
-#     activeSliceHandle = pathHelixGroup.activeSliceHandle()
-#     self.mousePress(activeSliceHandle,\
-#                     modifiers=Qt.AltModifier|Qt.ShiftModifier,\
-#                     qgraphicsscene=self.mainWindow.pathscene)
-#     # Check the model for correctness
-#     vh0 = self.app.v[0]
-#     vh1 = self.app.v[1]
-#     str0 = "0 Scaffold: _,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,_\n0 Staple:   _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_"
-#     str1 = "1 Scaffold: _,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,_\n1 Staple:   _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_"
-#     self.assertEqual(repr(vh0), str0)
-#     self.assertEqual(repr(vh1), str1)
-#
-def testEndpointAltClick(cnapp):
+def testCreateVirtualHelix(cnapp):
     """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
     # Create a new Honeycomb part
     main_toolbar = cnapp.window.main_toolbar
     new_dna_part_button = main_toolbar.widgetForAction(
                                             cnapp.window.action_new_dnapart)
-    QTest.mouseClick(new_dna_part_button, Qt.LeftButton)
+    QTest.mouseClick(new_dna_part_button, Qt.LeftButton, delay=DELAY)
     # Click each SliceHelix
     slicerootitem = cnapp.window.sliceroot
     assert len(slicerootitem.instance_items) == 1
     slice_part_item = list(slicerootitem.instance_items.values())[0]
-    QTest.keyClick(cnapp.window, Qt.Key_H, delay=100)
-    # cnapp.processEvents()
-    QTest.keyClick(cnapp.window, Qt.Key_V, delay=100)
+    QTest.keyClick(cnapp.window, Qt.Key_H, delay=DELAY)
+    QTest.keyClick(cnapp.window, Qt.Key_N, delay=DELAY)
+    # could try different positions
+    cnapp.graphicsItemClick(slice_part_item, Qt.LeftButton, delay=DELAY)
     cnapp.processEvents()
-    QTest.mouseClick(slice_part_item.scene().views()[0], Qt.LeftButton,
-                    pos=slice_part_item.scenePos().toPoint(), delay=100)
-
-    # time.sleep(0.5)
-    # cnapp.keyPress(cnapp.window, 'n')
-    # cnapp.mousePress(   slice_part_item.scene().views()[0],
-    #                     # position=QPoint(0, 0),
-    #                 )
-    time.sleep(3)
     # time.sleep(3)
 
     # sliceGraphicsItem = self.document_controller.sliceGraphicsItem
