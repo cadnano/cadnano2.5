@@ -106,6 +106,8 @@ class GUITestApp(CNTestApp):
 
     ########################## Miscellaneous ############################
     def processEvents(self):
+        """ Call this to see changes in GUI from Events
+        """
         self.app.qApp.processEvents()
 
     ############################ Private Methods ############################
@@ -114,22 +116,13 @@ class GUITestApp(CNTestApp):
         return item.mapToScene(item.boundingRect().center()).toPoint()
 
     @staticmethod
-    def _convertKey(key):
+    def getQtKey(key):
+        """Handles the given key for a KeyEvent.
+
+        Returns:
+            Qt.Key
         """
-        Handles the given key for a KeyEvent. Returns (key, ascii), where
-        key is one of the qt.Qt.Key_ constants. If key is a string, it is
-        converted to one of the qt.Qt.Key_* constants.
-        """
-        if isinstance(key, str):
-            if key.lower() in _STR_TO_QT:
-                ascii = ord(key)
-                out_key = _STR_TO_QT[key.lower()]
-                return out_key, ascii
-            else:
-                raise ValueError('Invalid key: %s' % key)
-        else:
-            ascii = ord(_QT_TO_STR.get(key, '\0'))
-            return key, ascii
+        return _STR_TO_QT[key.lower()]
 # end class
 
 
