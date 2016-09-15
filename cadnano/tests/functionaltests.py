@@ -29,14 +29,33 @@ def testStapleOutput_skip(cnapp):
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
 
-# def testStapleOutput_inserts_and_skips(cnapp):
-#     """Insert and skip stress test"""
-#     designname = "loops_and_skips.json"
-#     refname = "loops_and_skips.csv"
-#     sequences = [("M13mp18", 0, 0)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_inserts_and_skips(cnapp):
+    """Insert and skip stress test"""
+    designname = "loops_and_skips.json"
+    refname = "loops_and_skips.csv"
+    sequences = [("M13mp18", 0, 0)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
+
+def testStapleOutput_insert_size_1(cnapp):
+    """Test sequence output with a single insert of size 1"""
+    designname = "loop_size_1.json"
+    refname = "loop_size_1.csv"
+    sequences = [("M13mp18", 0, 14)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
+
+def testStapleOutput_Science09_prot120_98_v3(cnapp):
+    """Staples match reference set for Science09 protractor 120 v3"""
+    designname = "Science09_prot120_98_v3.json"
+    refname = "Science09_prot120_98_v3.csv"
+    sequences = [("p7704", 0, 105)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
+
 
 # def testStapleOutput_Nature09_monolith(cnapp):
 #     """Staples match reference set for Nature09 monolith"""
@@ -47,33 +66,15 @@ def testStapleOutput_skip(cnapp):
 #     ref_set = cnapp.getRefSequences(refname)
 #     assert test_set == ref_set
 
-# def testStapleOutput_insert_size_1(cnapp):
-#     """Test sequence output with a single insert of size 1"""
-#     designname = "loop_size_1.json"
-#     refname = "loop_size_1.csv"
-#     sequences = [("M13mp18", 0, 14)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
-
 # def testStapleOutput_Nature09_squarenut(cnapp):
 #      """Staples match reference set for Nature09 squarenut"""
 #      designname = "Nature09_squarenut.json"
-#      refname = "Nature09_squarenut.csv"
+#      refname = "Nature09_squarenut2.csv"
 #      sequences = [("p7560", 15, 100)]
 #      test_set = cnapp.getTestSequences(designname, sequences)
 #      # cnapp.writeRefSequences("Nature09_squarenut2.csv", test_set)
 #      ref_set = cnapp.getRefSequences(refname)
 #      assert test_set == ref_set
-
-# def testStapleOutput_Science09_prot120_98_v3(cnapp):
-#     """Staples match reference set for Science09 protractor 120 v3"""
-#     designname = "Science09_prot120_98_v3.json"
-#     refname = "Science09_prot120_98_v3.csv"
-#     sequences = [("p7704", 0, 105)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
 
 # def testStapleOutput_Science09_beachball_v1_json(cnapp):
 #     """Staples match reference set for Science09 beachball (json source)"""
