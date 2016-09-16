@@ -4,7 +4,7 @@ from uuid import uuid4
 from cadnano import util
 from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
-from .changeviewpropertycmd import ChangeViewPropertyCommand
+from .changeinstancepropertycmd import ChangeInstancePropertyCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 # from cadnano.addinstancecmd import AddInstanceCommand
 # from cadnano.removeinstancecmd import RemoveInstanceCommand
@@ -146,11 +146,11 @@ class Part(CNObject):
     def getColor(self):
         return self._group_properties['color']
 
-    def setViewProperty(self, key, value):
+    def setInstanceProperty(self, part_instance, key, value):
         self.view_properties[key] = value
     # end def
 
-    def getViewProperty(self, key):
+    def getInstanceProperty(self, part_instance, key):
         return self.view_properties[key]
     # end def
 
@@ -182,8 +182,8 @@ class Part(CNObject):
         self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
-    def changeViewProperty(self, view, key, value, use_undostack=True):
-        c = ChangeViewPropertyCommand(self, view, key, value)
+    def changeInstanceProperty(self, part_instance, view, key, value, use_undostack=True):
+        c = ChangeInstancePropertyCommand(self, part_instance, view, key, value)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
