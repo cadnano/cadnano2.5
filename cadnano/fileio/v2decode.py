@@ -31,10 +31,10 @@ def decode(document, obj):
 
     # CREATE PART ACCORDING TO LATTICE TYPE
     if lattice_type == LatticeType.HONEYCOMB:
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
+        doLattice = HoneycombDnaPart.legacyLatticeCoordToPositionXY
         isEven = HoneycombDnaPart.isEvenParity
     elif lattice_type == LatticeType.SQUARE:
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+        doLattice = SquareDnaPart.legacyLatticeCoordToPositionXY
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")

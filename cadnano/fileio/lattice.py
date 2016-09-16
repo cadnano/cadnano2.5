@@ -34,6 +34,17 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
+    def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+        """make sure radius is a float"""
+        x = column*radius*root3
+        if HoneycombDnaPart.isOddParity(row, column):   # odd parity
+            y = -row*radius*3 + radius
+        else:                               # even parity
+            y = -row*radius*3
+        return scale_factor*x, scale_factor*y
+    # end def
+
+    @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """make sure radius is a float"""
         x = column*radius*root3
@@ -99,6 +110,16 @@ class SquareDnaPart(object):
     def isOddParity(row, column):
         return (row % 2) ^ (column % 2)
     # end def
+
+    @staticmethod
+    def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+        """
+        """
+        y = -row*2*radius
+        x = column*2*radius
+        return scale_factor*x, scale_factor*y
+    # end def
+
 
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):

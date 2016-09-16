@@ -115,9 +115,7 @@ class Part(CNObject):
         self._instances.add(obj_instance)
         self._document = document
         document.addInstance(obj_instance)
-        print("incrementInstance")
         if self._instance_count == 1:
-            print("Adding child")
             document.addRefObj(self)
     # end def
 
