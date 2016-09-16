@@ -38,7 +38,7 @@ def decode(document, obj):
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")
-    part = document.addDnaPart(use_undostack=False)
+    part = document.createNucleicAcidPart(use_undostack=False)
     part.setActive(True)
     setBatch(True)
     delta = num_bases - 42

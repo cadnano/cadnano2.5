@@ -38,6 +38,7 @@ class AddInstanceCommand(UndoCommand):
     # end def
 
     def undo(self):
+        print("wipe")
         obji = self._obj_instance
         if isinstance(obji.reference(), Part):
             obji.reference().partRemovedSignal.emit(obji)

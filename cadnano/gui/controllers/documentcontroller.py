@@ -112,7 +112,7 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-            (win.action_new_dnapart.triggered, self.actionAddDnaPart),
+            (win.action_new_dnapart.triggered, self.actionCreateNucleicAcidPart),
             (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
@@ -481,11 +481,11 @@ class DocumentController():
         """
         pass
 
-    def actionAddDnaPart(self):
+    def actionCreateNucleicAcidPart(self):
         if ONLY_ONE:
             self.newDocument()  # only allow one part for now
         doc = self._document
-        part = doc.addDnaPart()
+        part = doc.createNucleicAcidPart()
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)

@@ -24,7 +24,7 @@ def decode(document, obj):
 def decodePart(document, part_dict):
     name = part_dict['name']
     dc = document._controller
-    part = document.addDnaPart(use_undostack=False)
+    part = document.createNucleicAcidPart(use_undostack=False)
     part.setActive(True)
 
     vh_id_list = part_dict['vh_list']

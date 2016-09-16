@@ -656,16 +656,17 @@ class Document(CNObject):
     # end def
 
     # PUBLIC METHODS FOR EDITING THE MODEL #
-    def addDnaPart(self, use_undostack=True):
+    def createNucleicAcidPart(self, use_undostack=True):
         """ Create and store a new DnaPart and instance, and return the instance.
 
         Args:
             use_undostack (bool): optional, defaults to True
         """
         dnapart = NucleicAcidPart(document=self)
-        self._addPart(ObjectInstance(dnapart), use_undostack=use_undostack)
+        self._addPart(dnapart, use_undostack=use_undostack)
         return dnapart
     # end def
+
 
     def getParts(self):
         """Get all child `Part` in the document
@@ -709,13 +710,14 @@ class Document(CNObject):
     # end def
 
     # PRIVATE SUPPORT METHODS #
-    def _addPart(self, part_instance, use_undostack=True):
+    def _addPart(self, part, use_undostack=True):
         """Add part to the document via AddInstanceCommand.
         """
         print("add part")
+        part_instance = ObjectInstance(part)
         c = AddInstanceCommand(self, part_instance)
         util.execCommandList(self, [c], desc="Add part", use_undostack=use_undostack)
-        return c.instance()
+        return part_instance
     # end def
 
     def createMod(self, params, mid=None, use_undostack=True):

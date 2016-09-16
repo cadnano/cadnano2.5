@@ -100,7 +100,7 @@ class Part(CNObject):
         print("incrementInstance")
         if self._instance_count == 1:
             self._document = document
-            print("Adding childe")
+            print("Adding child")
             document.addChild(self)
     # end def
 
@@ -112,6 +112,7 @@ class Part(CNObject):
         if ic == 0:
             self._document.removeChild(self)
             self._document = None
+            self.remove()
         self._instance_count = ic
     # end def
 

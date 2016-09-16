@@ -68,11 +68,11 @@ class UndoStack(object):
     # end def
 
     def canUndo(self):
-        return True if self.undostack > 0 else False
+        return True if len(self.undostack) > 0 else False
     # end def
 
     def canRedo(self):
-        return True if self.redostack > 0 else False
+        return True if len(self.redostack) > 0 else False
     # end def
 
     def setUndoLimit(self, lim):
