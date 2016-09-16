@@ -395,7 +395,7 @@ class StrandSet(CNObject):
             strand_low, strand_high = low_and_high_strands
             if self.isStrandInSet(strand_low):
                 c = MergeCommand(strand_low, strand_high, priority_strand)
-                util.execCommandList(self, [c], desc="Merge", use_undostack=use_undostack)
+                util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def strandsCanBeMerged(self, strandA, strandB):
@@ -439,7 +439,7 @@ class StrandSet(CNObject):
         if self.strandCanBeSplit(strand, base_idx):
             if self.isStrandInSet(strand):
                 c = SplitCommand(strand, base_idx, update_sequence)
-                util.execCommandList(self, [c], desc="Split", use_undostack=use_undostack)
+                util.doCmd(self, c, use_undostack=use_undostack)
                 return True
             else:
                 return False

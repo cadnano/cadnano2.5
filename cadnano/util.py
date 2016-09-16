@@ -118,18 +118,24 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
     methods are called directly.
     """
     if use_undostack:
-        # undoStackId = str(id(model_object.undoStack()))[-4:]
-        # print("<QUndoStack %s> %s" % (undoStackId, desc))
-        model_object.undoStack().beginMacro(desc)
+        us = model_object.undoStack()
+        us.beginMacro(desc)
         for c in commands:
-            model_object.undoStack().push(c)
-        model_object.undoStack().endMacro()
+            us.push(c)
+        us.endMacro()
     else:
-        # print("<NoUndoStack> %s" % (desc))
         for c in commands:
             c.redo()
 # end def
 
+def doCmd(model_object, command, use_undostack):
+    """Helper for pushing onto the undostack
+    """
+    if use_undostack:
+        model_object.undoStack().push(command)
+    else:
+        command.redo()
+# end def
 
 def finalizeCommands(model_object, commands, desc=None):
     """Used to enable interaction with the model but not push

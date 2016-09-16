@@ -658,14 +658,12 @@ class Strand(CNObject):
 
     def removeMods(self, document, mod_id, idx, use_undostack=True):
         """Used to add mods during a merge operation."""
-        cmds = []
         idx_low, idx_high = self.idxs()
         print("attempting to remove")
         if idx_low == idx or idx == idx_high:
             print("removing a modification at {}".format(idx))
-            cmds.append(RemoveModsCommand(document, self, idx, mod_id))
-            util.execCommandList(self, cmds, desc="Remove Modification",
-                                 use_undostack=use_undostack)
+            c = RemoveModsCommand(document, self, idx, mod_id)
+            util.doCmd(self, c, use_undostack=use_undostack)
         # end if
     # end def
 

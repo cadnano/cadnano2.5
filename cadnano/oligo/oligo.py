@@ -267,7 +267,7 @@ class Oligo(CNObject):
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
     def remove(self, use_undostack=True):
         c = RemoveOligoCommand(self)
-        util.execCommandList(self, [c], desc="Remove Oligo", use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def applyAbstractSequences(self):
@@ -298,12 +298,12 @@ class Oligo(CNObject):
         if color == self.getColor():
             return  # oligo already has this color
         c = ApplyColorCommand(self, color)
-        util.execCommandList(self, [c], desc="Color Oligo", use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def applySequence(self, sequence, use_undostack=True):
         c = ApplySequenceCommand(self, sequence)
-        util.execCommandList(self, [c], desc="Apply Sequence", use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def applySequenceCMD(self, sequence, use_undostack=True):

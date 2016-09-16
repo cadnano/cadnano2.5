@@ -19,12 +19,13 @@ from cadnano.part.part import Part
 from cadnano.strandset import StrandSet
 from cadnano.strandset import SplitCommand
 from .createvhelixcmd import CreateVirtualHelixCommand
-from .removepartcmd import RemovePartCommand
 from .removevhelixcmd import RemoveVirtualHelixCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from cadnano.setpropertycmd import SetVHPropertyCommand
+from cadnano.addinstancecmd import AddInstanceCommand
+from cadnano.removeinstancecmd import RemoveInstanceCommand
 
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
@@ -2360,12 +2361,14 @@ class NucleicAcidPart(Part):
             self.removeVirtualHelix(id_num, use_undostack=use_undostack)
         # end for
         # remove the part
-        e = RemovePartCommand(self)
+        cmdlist = [RemoveInstanceCommand(self, inst) for inst in self._instances]
         if use_undostack:
-            us.push(e)
+            for e in cmdlist:
+                us.push(e)
             us.endMacro()
         else:
-            e.redo()
+            for e in cmdlist:
+                e.redo()
     # end def
 
     def removeAllOligos(self, use_undostack=True):
@@ -2413,7 +2416,7 @@ class NucleicAcidPart(Part):
                 operations such as file import.
         """
         c = CreateVirtualHelixCommand(self, x, y, z, length, id_num=id_num, properties=properties, safe=safe)
-        util.execCommandList(self, [c], desc="Add VirtualHelix", use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def removeVirtualHelix(self, id_num, use_undostack=True):
@@ -2610,12 +2613,9 @@ class NucleicAcidPart(Part):
     # end def
 
     def removeXover(self, strand5p, strand3p, use_undostack=True):
-        cmds = []
         if strand5p.connection3p() == strand3p:
             c = RemoveXoverCommand(self, strand5p, strand3p)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Xover",
-                                 use_undostack=use_undostack)
+            util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def xoverSnapTo(self, strand, idx, delta):
@@ -2666,7 +2666,7 @@ class NucleicAcidPart(Part):
         delta = new_size - old_size
         if delta > 0:
             c = ResizeVirtualHelixCommand(self, id_num, True, delta)
-            util.execCommandList(self, [c], desc="Resize part", use_undostack=use_undostack)
+            util.doCmd(self, c, use_undostack=use_undostack)
         else:
             err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
             raise NotImplementedError(err)
@@ -2680,7 +2680,7 @@ class NucleicAcidPart(Part):
                 util.finalizeCommands(self, [c], desc="Translate VHs")
                 # only emit this on finalize due to cost.
             else:
-                util.execCommandList(self, [c], desc="Translate VHs", use_undostack=True)
+                util.doCmd(self, c, desc="Translate VHs", use_undostack=True)
         else:
             self._translateVirtualHelices(vh_set, dx, dy, dz, False)
     # end def

@@ -38,8 +38,8 @@ class Document(CNObject):
 
         self._undostack = us = UndoStack()  # notice NO parent, what does this mean?
         us.setUndoLimit(30)
-        self._children = []     # for storing a reference to Parts (and Assemblies)
-        self._instances = []    # for storing instances of Parts (and Assemblies)
+        self._children = set()     # for storing a reference to Parts (and Assemblies)
+        self._instances = set()    # for storing instances of Parts (and Assemblies)
         self._controller = None
         self._selected_instance = None
         # the dictionary maintains what is selected
@@ -90,23 +90,23 @@ class Document(CNObject):
         """
         return self._children
 
-    def addChild(self, child):
-        """
+    def addRefObj(self, child):
+        """For adding Part and Assembly object references
         Args:
             child (object):
         """
-        self._children.append(child)
+        self._children.add(child)
 
     def addInstance(self, instance):
-        """Add an object instance to the list of instances
+        """Add an ObjectInstance to the list of instances
 
         Args:
             instance (ObjectInstance):
         """
-        self._instances.append(instance)
+        self._instances.add(instance)
 
     def removeInstance(self, instance):
-        """ Remove an object instance from the list of instances
+        """ Remove an ObjectInstance from the list of instances
 
         Args:
             instance (ObjectInstance):
@@ -141,8 +141,8 @@ class Document(CNObject):
         self.documentSelectionFilterChangedSignal.emit(fs)
     # end def
 
-    def removeChild(self, child):
-        """ Remove child
+    def removeRefObj(self, child):
+        """ Remove child Part or Assembly
 
         Args:
             child (object):
@@ -714,10 +714,8 @@ class Document(CNObject):
         """Add part to the document via AddInstanceCommand.
         """
         print("add part")
-        part_instance = ObjectInstance(part)
-        c = AddInstanceCommand(self, part_instance)
-        util.execCommandList(self, [c], desc="Add part", use_undostack=use_undostack)
-        return part_instance
+        c = AddInstanceCommand(self, part)
+        util.doCmd(self, c, use_undostack)
     # end def
 
     def createMod(self, params, mid=None, use_undostack=True):
@@ -764,10 +762,8 @@ class Document(CNObject):
                 'seq3p': seq3p,
                 'seqInt': seqInt
                 }
-        cmds = []
         c = AddModCommand(self, cmdparams, mid)
-        cmds.append(c)
-        util.execCommandList(self, cmds, desc="Create Mod", use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
         return item, mid
     # end def
 
@@ -780,10 +776,8 @@ class Document(CNObject):
             use_undostack (bool): optional, default is True
         """
         if mid in self._mods:
-            cmds = []
             c = ModifyModCommand(self, params, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Modify Mod", use_undostack=use_undostack)
+            util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def destroyMod(self, mid, use_undostack=True):
@@ -794,10 +788,8 @@ class Document(CNObject):
             use_undostack (bool): optional, default is True
         """
         if mid in self._mods:
-            cmds = []
             c = RemoveModCommand(self, mid)
-            cmds.append(c)
-            util.execCommandList(self, cmds, desc="Remove Mod", use_undostack=use_undostack)
+            util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def getMod(self, mid):

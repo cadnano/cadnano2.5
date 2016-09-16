@@ -1,7 +1,7 @@
 from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
 from cadnano.part import Part
-
+from cadnano.objectinstance import ObjectInstance
 
 class AddInstanceCommand(UndoCommand):
     """Undo ready command for adding an instance.
@@ -10,40 +10,35 @@ class AddInstanceCommand(UndoCommand):
         document (Document): m
         obj_instance (ObjectInstance): Object instance to add to Document
     """
-    def __init__(self, document, obj_instance):
+    def __init__(self, document, cnobj):
         super(AddInstanceCommand, self).__init__("add instance")
         self._document = document
-        self._obj_instance = obj_instance
-    # end def
-
-    def instance(self):
-        """
-        Returns:
-            ObjectInstance: the object instance attribute of the Command
-        """
-        return self._obj_instance
+        self._cnobj = cnobj
+        self._obj_instance = ObjectInstance(cnobj)
     # end def
 
     def redo(self):
         doc = self._document
+        cnobj = self._cnobj
         obji = self._obj_instance
-        print("unwipe")
-        obji.unwipe(doc)
-        if isinstance(obji.reference(), Part):
+        cnobj.incrementInstance(doc, obji)
+        if isinstance(cnobj, Part):
             doc.documentPartAddedSignal.emit(doc, obji)
-        elif isinstance(obji.reference(), Assembly):
+        elif isinstance(cnobj, Assembly):
             doc.documentAssemblyAddedSignal.emit(doc, obji)
         else:
             raise NotImplementedError
+
     # end def
 
     def undo(self):
-        print("wipe")
+        cnobj = self._cnobj
         obji = self._obj_instance
-        if isinstance(obji.reference(), Part):
-            obji.reference().partRemovedSignal.emit(obji)
-        else:
-            obji.reference().assemblyRemovedSignal.emit(obji)
-        obji.wipe(self._document)
+        if cnobj.canRemove():
+            if isinstance(cnobj, Part):
+                cnobj.partRemovedSignal.emit(obji)
+            else:
+                cnobj.assemblyRemovedSignal.emit(obji)
+        cnobj.decrementInstance(obji)
     # end def
 # end class

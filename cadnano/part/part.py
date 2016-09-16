@@ -6,6 +6,8 @@ from cadnano.cnproxy import ProxySignal
 from cadnano.cnobject import CNObject
 from .changeviewpropertycmd import ChangeViewPropertyCommand
 from cadnano.setpropertycmd import SetPropertyCommand
+# from cadnano.addinstancecmd import AddInstanceCommand
+# from cadnano.removeinstancecmd import RemoveInstanceCommand
 
 class Part(CNObject):
     """A Part is a group of VirtualHelix items that are on the same lattice.
@@ -32,6 +34,7 @@ class Part(CNObject):
         self._document = document = kwargs.get('document', None)
         super(Part, self).__init__(document)
         self._instance_count = 0
+        self._instances = set()
         # Properties
         self.view_properties = {}
 
@@ -95,25 +98,42 @@ class Part(CNObject):
         self._document = document
     # end def
 
-    def incrementInstance(self, document):
-        self._instance_count += 1
-        print("incrementInstance")
-        if self._instance_count == 1:
-            self._document = document
-            print("Adding child")
-            document.addChild(self)
+    def canRemove(self):
+        """If _instance_count == 1 you could remove the part
+        """
+        return self._instance_count == 1
     # end def
 
-    def decrementInstance(self):
+    def canReAdd(self):
+        """If _instance_count == 0 you could re-add the part
+        """
+        return self._instance_count == 0
+    # end def
+
+    def incrementInstance(self, document, obj_instance):
+        self._instance_count += 1
+        self._instances.add(obj_instance)
+        self._document = document
+        document.addInstance(obj_instance)
+        print("incrementInstance")
+        if self._instance_count == 1:
+            print("Adding child")
+            document.addRefObj(self)
+    # end def
+
+    def decrementInstance(self, obj_instance):
         ic = self._instance_count
+        self._instances.remove(obj_instance)
+        document = self._document
+        document.removeInstance(obj_instance)
         if ic == 0:
             raise IndexError("Can't have less than zero instance of a Part")
         ic -= 1
         if ic == 0:
-            self._document.removeChild(self)
+            document.removeRefObj(self)
             self._document = None
-            self.remove()
         self._instance_count = ic
+        return ic
     # end def
 
     def getProperty(self, key):
@@ -166,9 +186,7 @@ class Part(CNObject):
 
     def changeViewProperty(self, view, key, value, use_undostack=True):
         c = ChangeViewPropertyCommand(self, view, key, value)
-        util.execCommandList(self, [c],
-                             desc="Change Part View Property `%s`" % key,
-                             use_undostack=use_undostack)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def destroy(self):

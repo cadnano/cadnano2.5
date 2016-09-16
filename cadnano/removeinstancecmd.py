@@ -5,41 +5,35 @@ from cadnano.part import Part
 
 class RemoveInstanceCommand(UndoCommand):
     """
-    Undo ready command for adding an instance.
+    Undo ready command for removing an instance.
 
     Args:
         obj_instance (ObjectInstance): Object instance remove
     """
-    def __init__(self, obj_instance):
-        super(RemoveInstanceCommand, self).__init__("add instance")
-        self._items = (obj_instance, obj_instance.document())
-    # end def
-
-    def instance(self):
-        """
-        Returns:
-            ObjectInstance: the object instance attribute of the Command
-        """
-        return self._items[0]
+    def __init__(self, cnobj, obj_instance):
+        super(RemoveInstanceCommand, self).__init__("remove instance")
+        self._items = (cnobj, cnobj.document(), obj_instance)
     # end def
 
     def redo(self):
-        obji, doc = self._items
-        if isinstance(obji.reference(), Part):
-            obji.reference().partRemovedSignal.emit(obji)
-        else:
-            obji.reference().assemblyRemovedSignal.emit(obji)
-        obji.wipe(doc)
+        cnobj, doc, obji = self._items
+        if cnobj.canRemove():
+            if isinstance(cnobj, Part):
+                cnobj.partRemovedSignal.emit(obji)
+            else:
+                cnobj.assemblyRemovedSignal.emit(obji)
+        cnobj.decrementInstance(obji)
     # end def
 
     def undo(self):
-        obji, doc = self._items
-        obji.unwipe(doc)
-        if isinstance(obji.reference(), Part):
-            doc.documentPartAddedSignal.emit(doc, obji)
-        elif isinstance(obji.reference(), Assembly):
-            doc.documentAssemblyAddedSignal.emit(doc, obji)
-        else:
-            raise NotImplementedError
+        cnobj, doc, obji = self._items
+        cnobj.incrementInstance(doc, obji)
+        if cnobj.canReAdd():
+            if isinstance(cnobj, Part):
+                doc.documentPartAddedSignal.emit(doc, obji)
+            elif isinstance(cnobj, Assembly):
+                doc.documentAssemblyAddedSignal.emit(doc, obji)
+            else:
+                raise NotImplementedError
     # end def
 # end class

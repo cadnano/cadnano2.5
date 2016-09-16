@@ -7,6 +7,7 @@ class RemovePartCommand(UndoCommand):
     def __init__(self, part):
         super(RemovePartCommand, self).__init__("remove part")
         self._part = part
+        self._instances = part.instances().copy()
         self._document = part.document()
     # end def
 
