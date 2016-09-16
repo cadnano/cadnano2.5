@@ -17,9 +17,9 @@ CADNANO_DEFAULT_DOCUMENT = 'simple.json'
 os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(  PROJECT_DIR,
                                                         'tests',
                                                         CADNANO_DEFAULT_DOCUMENT)
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(PROJECT_DIR, 'cadnano',
-                                            'tests', 'functionaltestinputs',
-                                            'Nature09_monolith.json')
+# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(PROJECT_DIR, 'cadnano',
+#                                             'tests', 'functionaltestinputs',
+#                                             'Nature09_monolith.json')
 
 """
 run with:

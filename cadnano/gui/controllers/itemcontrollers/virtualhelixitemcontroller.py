@@ -17,27 +17,37 @@ class VirtualHelixItemController(object):
         self.connectSignals()
     # end def
 
+    part_connections = [
+    ('partVirtualHelixPropertyChangedSignal',   'partVirtualHelixPropertyChangedSlot'),
+    ('partVirtualHelixRemovedSignal',           'partVirtualHelixRemovedSlot'),
+    ('partVirtualHelixResizedSignal',           'partVirtualHelixResizedSlot')
+    ]
+
+    strand_connections = [
+        ('strandsetStrandAddedSignal', 'strandAddedSlot')
+    ]
+
     def connectSignals(self):
         vh_item = self._virtual_helix_item
         m_p = self._model_part
         if self._do_wire_part:
-            m_p.partVirtualHelixPropertyChangedSignal.connect(vh_item.partVirtualHelixPropertyChangedSlot)
-            m_p.partVirtualHelixRemovedSignal.connect(vh_item.partVirtualHelixRemovedSlot)
-            m_p.partVirtualHelixResizedSignal.connect(vh_item.partVirtualHelixResizedSlot)
+            for signal, slot in self.part_connections:
+                getattr(m_p, signal).connect(getattr(vh_item, slot))
         if self._do_wire_strands:
             for strandset in m_p.getStrandSets(vh_item.idNum()):
-                strandset.strandsetStrandAddedSignal.connect(vh_item.strandAddedSlot)
+                for signal, slot in self.strand_connections:
+                    getattr(strandset, signal).connect(getattr(vh_item, slot))
     # end def
 
     def disconnectSignals(self):
         vh_item = self._virtual_helix_item
         m_p = self._model_part
         if self._do_wire_part:
-            m_p.partVirtualHelixPropertyChangedSignal.disconnect(vh_item.partVirtualHelixPropertyChangedSlot)
-            m_p.partVirtualHelixRemovedSignal.disconnect(vh_item.partVirtualHelixRemovedSlot)
-            m_p.partVirtualHelixResizedSignal.disconnect(vh_item.partVirtualHelixResizedSlot)
+            for signal, slot in self.part_connections:
+                getattr(m_p, signal).disconnect(getattr(vh_item, slot))
         if self._do_wire_strands:
             for strandset in m_p.getStrandSets(vh_item.idNum()):
-                strandset.strandsetStrandAddedSignal.disconnect(vh_item.strandAddedSlot)
+                for signal, slot in self.strand_connections:
+                    getattr(strandset, signal).disconnect(getattr(vh_item, slot))
     # end def
 # end class

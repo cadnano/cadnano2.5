@@ -4,28 +4,26 @@ class PartItemController():
         self._model_part = model_part
     # end def
 
+    connections = [
+    ('partZDimensionsChangedSignal',        'partZDimensionsChangedSlot'),
+    ('partParentChangedSignal',             'partParentChangedSlot'),
+    ('partRemovedSignal',                   'partRemovedSlot'),
+    ('partPropertyChangedSignal',           'partPropertyChangedSlot'),
+    ('partSelectedChangedSignal',           'partSelectedChangedSlot'),
+
+    ('partDocumentSettingChangedSignal',    'partDocumentSettingChangedSlot')
+    ]
+
     def connectSignals(self):
         m_p = self._model_part
         p_i = self._part_item
-
-        m_p.partZDimensionsChangedSignal.connect(p_i.partZDimensionsChangedSlot)
-        m_p.partParentChangedSignal.connect(p_i.partParentChangedSlot)
-        m_p.partRemovedSignal.connect(p_i.partRemovedSlot)
-        m_p.partPropertyChangedSignal.connect(p_i.partPropertyChangedSlot)
-        m_p.partSelectedChangedSignal.connect(p_i.partSelectedChangedSlot)
-
-        m_p.partDocumentSettingChangedSignal.connect(p_i.partDocumentSettingChangedSlot)
+        for signal, slot in self.connections:
+            getattr(m_p, signal).connect(getattr(p_i, slot))
     # end def
 
     def disconnectSignals(self):
         m_p = self._model_part
         p_i = self._part_item
-
-        m_p.partZDimensionsChangedSignal.disconnect(p_i.partZDimensionsChangedSlot)
-        m_p.partParentChangedSignal.disconnect(p_i.partParentChangedSlot)
-        m_p.partRemovedSignal.disconnect(p_i.partRemovedSlot)
-        m_p.partPropertyChangedSignal.disconnect(p_i.partPropertyChangedSlot)
-        m_p.partSelectedChangedSignal.disconnect(p_i.partSelectedChangedSlot)
-
-        m_p.partDocumentSettingChangedSignal.disconnect(p_i.partDocumentSettingChangedSlot)
+        for signal, slot in self.connections:
+            getattr(m_p, signal).disconnect(getattr(p_i, slot))
     # end def

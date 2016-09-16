@@ -5,18 +5,22 @@ class OligoItemController():
         self.connectSignals()
     # end def
 
+    connections = [
+    ('oligoSequenceAddedSignal',    'oligoSequenceAddedSlot'),
+    ('oligoSequenceClearedSignal',  'oligoSequenceClearedSlot'),
+    ('oligoPropertyChangedSignal',  'oligoPropertyChangedSlot')
+    ]
+
     def connectSignals(self):
         m_o = self._model_oligo
         o_i = self._oligo_item
-        m_o.oligoSequenceAddedSignal.connect(o_i.oligoSequenceAddedSlot)
-        m_o.oligoSequenceClearedSignal.connect(o_i.oligoSequenceClearedSlot)
-        m_o.oligoPropertyChangedSignal.connect(o_i.oligoPropertyChangedSlot)
+        for signal, slot in self.connections:
+            getattr(m_o, signal).connect(getattr(o_i, slot))
     # end def
 
     def disconnectSignals(self):
         m_o = self._model_oligo
         o_i = self._oligo_item
-        m_o.oligoSequenceAddedSignal.disconnect(o_i.oligoSequenceAddedSlot)
-        m_o.oligoSequenceClearedSignal.disconnect(o_i.oligoSequenceClearedSlot)
-        m_o.oligoPropertyChangedSignal.connect(o_i.oligoPropertyChangedSlot)
+        for signal, slot in self.connections:
+            getattr(m_o, signal).disconnect(getattr(o_i, slot))
     # end def
