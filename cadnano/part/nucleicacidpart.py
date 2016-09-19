@@ -953,7 +953,7 @@ class NucleicAcidPart(Part):
         return m0
     # end def
 
-    def createHelix(self, id_num, origin, direction, num_points, color):
+    def _createHelix(self, id_num, origin, direction, num_points, color):
         """Create a virtual helix in the group that has a Z_ONLY direction
 
         Args:
@@ -1354,7 +1354,7 @@ class NucleicAcidPart(Part):
         return id_z_min, id_z_max
     # end def
 
-    def removeHelix(self, id_num):
+    def _removeHelix(self, id_num):
         """Remove a helix and recycle it's `id_num`
 
         Args:
@@ -1371,6 +1371,8 @@ class NucleicAcidPart(Part):
         did_remove = self.removeCoordinates(id_num, size, is_right=False)
         self.recycleIdNum(id_num)
         assert did_remove
+        # TODO if making 'virtual_helix_order' an instance property,
+        # this needs to be changed
         self._group_properties['virtual_helix_order'].remove(id_num)
         del self._virtual_helices_set[id_num]
     # end def

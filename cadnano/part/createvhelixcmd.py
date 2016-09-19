@@ -43,7 +43,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         origin_pt = self.origin_pt
         # need to always reserve an id
-        vh = part.createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
         if self.safe:   # update all neighbors
             if not self.neighbors:
@@ -83,7 +83,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         part.partVirtualHelixRemovingSignal.emit(
             part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         # clear out part references
-        part.removeHelix(id_num)
+        part._removeHelix(id_num)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def
 # end class

@@ -5,7 +5,8 @@ from cadnano.cnenum import PointType
 FORMAT_VERSION = "3.0"
 
 def encodeDocument(document):
-    """
+    """ Encode a Document to a dictionary to enable serialization
+
     Args:
         document (Document):
 
@@ -34,7 +35,6 @@ def encodePart(part):
         dict:
     """
     max_id_number_of_helices = part.getIdNumMax()
-    # vh_insertions = part.insertions()
 
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
@@ -72,9 +72,6 @@ def encodePart(part):
                             }
     group_props['insertions'] = list(part.dumpInsertions())
     group_props['xovers'] = xover_list
-    # oligo_dict = {k: v for k, v in zip( oligo.ALL_KEYS,
-    #                                 zip(o.dump() for o in part.oligos()))
-    #             }
     group_props['oligos'] = [o.dump() for o in part.oligos()]
 
     instance_props = list(part.instanceProperties())
@@ -124,7 +121,6 @@ def encodePartList(part_instance, vh_group_list):
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:
             # add a placeholder
-            # print("Whoops", id_num)
             strand_list.append(None)
             prop_list.append(None)
         else:

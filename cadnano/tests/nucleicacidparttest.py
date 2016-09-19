@@ -20,10 +20,9 @@ def create3Helix(doc, direction, length):
     origin_pt90 = (0, 2*radius, 0)
     theta = math.radians(30)
     origin_pt60 = (2*radius*math.cos(-theta), 2*radius*math.sin(-theta), 0)
-    color = part.getColor()
-    part.createHelix(0, origin_pt00, direction, length, color)
-    part.createHelix(1, origin_pt60, direction, length, color)
-    part.createHelix(2, origin_pt90, direction, length, color)
+    part.createVirtualHelix(*origin_pt00, id_num=0, length=length)
+    part.createVirtualHelix(*origin_pt60, id_num=1, length=length)
+    part.createVirtualHelix(*origin_pt90, id_num=2, length=length)
     return part
 
 @pytest.mark.parametrize('direction', [(0, 0, 1), (0, 1, 0)])

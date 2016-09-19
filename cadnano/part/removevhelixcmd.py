@@ -35,7 +35,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         # and then allow the views to refresh
         part.partVirtualHelixRemovingSignal.emit(
             part, id_num, part.getVirtualHelix(id_num), self.neighbors)
-        part.removeHelix(id_num)
+        part._removeHelix(id_num)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def
 
@@ -48,7 +48,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
                         )
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
-        vh = part.createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part._createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
         keys = list(self.props.keys())
         vals = list(self.props.values())
         part.setVirtualHelixProperties( id_num,

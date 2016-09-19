@@ -5,7 +5,11 @@ from cadnano import setBatch, getReopen, setReopen
 from cadnano.cnenum import PointType
 
 def decode(document, obj):
-    """
+    """ Decode a a deserialized Document dictionary
+
+    Args:
+        document (Document):
+        obj (dict): deserialized file object
     """
     name = obj['name']
     for part_dict in obj['parts']:
@@ -22,6 +26,12 @@ def decode(document, obj):
 # end def
 
 def decodePart(document, part_dict):
+    """ Decode a a deserialized Part dictionary
+
+    Args:
+        document (Document):
+        part_dict (dict): deserialized dictionary describing the Part
+    """
     name = part_dict['name']
     dc = document._controller
     part = document.createNucleicAcidPart(use_undostack=False)
@@ -106,7 +116,13 @@ def decodePart(document, part_dict):
 # end def
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
-    """ This is the Virtual Helix id number offset
+    """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
+    will start numbering `part.getIdNumMax()` rather than the lowest available
+    id_num.  TODO should this numbering change?
+
+    Args:
+        part_instance (ObjectInstance):
+        copy_dict (dict):
     """
     part = part_instance.reference()
     id_num_offset = part.getIdNumMax() + 1
