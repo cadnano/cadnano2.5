@@ -21,7 +21,7 @@ class AddInstanceCommand(UndoCommand):
         doc = self._document
         cnobj = self._cnobj
         obji = self._obj_instance
-        cnobj.incrementInstance(doc, obji)
+        cnobj._incrementInstance(doc, obji)
         if isinstance(cnobj, Part):
             doc.documentPartAddedSignal.emit(doc, obji)
         elif isinstance(cnobj, Assembly):
@@ -34,11 +34,11 @@ class AddInstanceCommand(UndoCommand):
     def undo(self):
         cnobj = self._cnobj
         obji = self._obj_instance
-        if cnobj.canRemove():
+        if cnobj._canRemove():
             if isinstance(cnobj, Part):
                 cnobj.partRemovedSignal.emit(obji)
             else:
                 cnobj.assemblyRemovedSignal.emit(obji)
-        cnobj.decrementInstance(obji)
+        cnobj._decrementInstance(obji)
     # end def
 # end class

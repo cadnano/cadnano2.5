@@ -36,8 +36,6 @@ class Part(CNObject):
         self._instance_count = 0
         self._instances = set()
         # Properties
-        # self.view_properties = {}
-
         # TODO document could be None
         self._group_properties = {'name': "Part%d" % len(document.children()),
                                   'color': "#cc0000", # outlinerview will override from styles
@@ -91,26 +89,48 @@ class Part(CNObject):
 
     ### ACCESSORS ###
     def document(self):
+        """Get this objects Document
+
+        Returns:
+            Document
+        """
         return self._document
     # end def
 
     def setDocument(self, document):
+        """set this object's Document
+
+        Args:
+            document (Document):
+        """
         self._document = document
     # end def
 
-    def canRemove(self):
+    def _canRemove(self):
         """If _instance_count == 1 you could remove the part
+
+        Returns:
+            bool
         """
         return self._instance_count == 1
     # end def
 
-    def canReAdd(self):
+    def _canReAdd(self):
         """If _instance_count == 0 you could re-add the part
+
+        Returns:
+            bool
         """
         return self._instance_count == 0
     # end def
 
-    def incrementInstance(self, document, obj_instance):
+    def _incrementInstance(self, document, obj_instance):
+        """Increment the instances of this reference object
+
+        Args:
+            document (Document):
+            obj_instance (ObjectInstance):
+        """
         self._instance_count += 1
         self._instances.add(obj_instance)
         self._document = document
@@ -119,7 +139,12 @@ class Part(CNObject):
             document.addRefObj(self)
     # end def
 
-    def decrementInstance(self, obj_instance):
+    def _decrementInstance(self, obj_instance):
+        """Decrement the instances of this reference object
+
+        Args:
+            obj_instance (ObjectInstance):
+        """
         ic = self._instance_count
         self._instances.remove(obj_instance)
         document = self._document
@@ -134,18 +159,6 @@ class Part(CNObject):
         return ic
     # end def
 
-    def getProperty(self, key):
-        return self._group_properties[key]
-    # end def
-
-    def getOutlineProperties(self):
-        props = self._group_properties
-        return props['name'], props['color'], props['is_visible']
-    # end def
-
-    def getColor(self):
-        return self._group_properties['color']
-
     def instanceProperties(self):
         """ Generator yielding all instance properties
         """
@@ -154,21 +167,36 @@ class Part(CNObject):
     # end def
 
     def setInstanceProperty(self, part_instance, key, value):
+        """Set an instance property
+
+        Args:
+            part_instance (ObjectInstance):
+            key (str):
+            value (object):
+        """
         part_instance.setProperty(key, value)
-        # self.view_properties[key] = value
     # end def
 
     def getInstanceProperty(self, part_instance, key):
+        """Get an instance property
+
+        Args:
+            part_instance (ObjectInstance):
+            key (str):
+
+        Returns:
+            object:
+        """
         return part_instance.getProperty(key, value)
-        # return self.view_properties[key]
     # end def
 
-    def getName(self):
-        return self._group_properties['name']
+    def changeInstanceProperty(self, part_instance, view, key, value, use_undostack=True):
+        c = ChangeInstancePropertyCommand(self, part_instance, view, key, value)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def getModelProperties(self):
-        """
+        """ Get the dictionary of model properties
 
         Returns:
             dict: group properties
@@ -176,7 +204,32 @@ class Part(CNObject):
         return self._group_properties
     # end def
 
+    def getProperty(self, key):
+        """
+        Args:
+            key (str):
+        """
+        return self._group_properties[key]
+    # end def
+
+    def getOutlineProperties(self):
+        """Convenience method for getting the properties used in the outlinerview
+
+        Returns:
+            tuple: (<name>, <color>, <is_visible>)
+        """
+        props = self._group_properties
+        return props['name'], props['color'], props['is_visible']
+    # end def
+
     def setProperty(self, key, value, use_undostack=True):
+        """ Get the value of the key model properties
+
+        Args:
+            key (str):
+            value (object):
+            use_undostack (bool, optional): default True
+        """
         if key == 'is_visible':
             self._document.clearAllSelected()
         if use_undostack:
@@ -191,9 +244,12 @@ class Part(CNObject):
         self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
-    def changeInstanceProperty(self, part_instance, view, key, value, use_undostack=True):
-        c = ChangeInstancePropertyCommand(self, part_instance, view, key, value)
-        util.doCmd(self, c, use_undostack=use_undostack)
+    def getName(self):
+        return self._group_properties['name']
+    # end def
+
+    def getColor(self):
+        return self._group_properties['color']
     # end def
 
     def destroy(self):
