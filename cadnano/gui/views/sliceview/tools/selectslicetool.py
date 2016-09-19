@@ -335,8 +335,8 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
-        part = self.part_item.part()
-        copy_dict = v3encode.encodePartList(part, list(self.selection_set))
+        part_instance = self.part_item.partInstance()
+        copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
         self.clip_board = copy_dict
     # end def
 
@@ -348,8 +348,9 @@ class SelectSliceTool(AbstractSliceTool):
         """
         doc = self.manager.document
         part = self.part_item.part()
+        part_instance = self.part_item.partInstance()
         doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part, self.clip_board)
+        new_vh_set = v3decode.importToPart(part_instance, self.clip_board)
         doc.undoStack().endMacro()
         self.modelClear()
         doc.addVirtualHelicesToSelection(part, new_vh_set)

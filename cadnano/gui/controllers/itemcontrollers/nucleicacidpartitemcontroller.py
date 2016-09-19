@@ -10,7 +10,7 @@ class NucleicAcidPartItemController(PartItemController):
     ('partActiveVirtualHelixChangedSignal',     'partActiveVirtualHelixChangedSlot'),
     ('partActiveBaseInfoSignal',                'partActiveBaseInfoSlot'),
     ('partActiveChangedSignal',                 'partActiveChangedSlot'),
-    ('partViewPropertySignal',                  'partViewPropertySlot'),
+    ('partInstancePropertySignal',              'partInstancePropertySlot'),
 
     ('partVirtualHelixAddedSignal',             'partVirtualHelixAddedSlot'),
     ('partVirtualHelixRemovingSignal',          'partVirtualHelixRemovingSlot'),

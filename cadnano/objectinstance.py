@@ -7,13 +7,14 @@ class ObjectInstance(CNObject):
         super(ObjectInstance, self).__init__(reference_object)
         self._parent = parent   # parent is either a document or assembly
         self._ref_object = reference_object
-        self._position = [0, 0, 0, 0, 0, 0]  # x, y, z, phi, theta, psi
+        # self._position = [0, 0, 0, 0, 0, 0]  # x, y, z, phi, theta, psi
+        self._properties = {}
     # end def
 
     # SIGNALS #
-    instanceDestroyedSignal = ProxySignal(CNObject, name="instanceDestroyedSignal")
-    instanceMovedSignal = ProxySignal(CNObject, name="instanceMovedSignal")
-    instanceParentChangedSignal = ProxySignal(CNObject, name="instanceParentChangedSignal")
+    instanceDestroyedSignal = ProxySignal(CNObject,         name="instanceDestroyedSignal")
+    instancePropertyChangedSignal = ProxySignal(CNObject,   name="instancePropertyChangedSignal")
+    instanceParentChangedSignal = ProxySignal(CNObject,     name="instanceParentChangedSignal")
 
     # SLOTS #
 
@@ -31,19 +32,27 @@ class ObjectInstance(CNObject):
         return self._parent
     # end def
 
-    def position(self):
-        return self._position
+    def properties(self):
+        return self._properties.copy()
+    # end def
+
+    def setProperty(self, key, val):
+        self._properties[key] = val
+    # end def
+
+    def getProperty(self, key):
+        return self._properties[key]
     # end def
 
     def shallowCopy(self):
         oi = ObjectInstance(self._ref_object, self._parent)
-        oi._position = list(self._position)
+        oi._properties =  oi._properties.copy()
         return oi
     # end def
 
     def deepCopy(self, reference_object, parent):
         oi = ObjectInstance(reference_object, parent)
-        oi._position = list(self._position)
+        oi._properties =  oi._properties.copy()
         return oi
     # end def
 # end class

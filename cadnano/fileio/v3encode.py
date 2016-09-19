@@ -39,8 +39,6 @@ def encodePart(part):
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    view_props = part.view_properties
-
     if group_props.get('point_type') == PointType.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
@@ -78,12 +76,15 @@ def encodePart(part):
     #                                 zip(o.dump() for o in part.oligos()))
     #             }
     group_props['oligos'] = [o.dump() for o in part.oligos()]
-    group_props['view_properties'] = view_props
+
+    instance_props = list(part.instanceProperties())
+    group_props['instance_properties'] = instance_props
+
     group_props['uuid'] = part.uuid
     return group_props
 # end def
 
-def encodePartList(part, vh_group_list):
+def encodePartList(part_instance, vh_group_list):
     """ Used for copying and pasting
     TODO: unify encodePart and encodePartList
 
@@ -95,6 +96,7 @@ def encodePartList(part, vh_group_list):
     Returns:
         dict:
     """
+    part = part_instance.reference()
     vh_group_list.sort()
     max_id_number_of_helices = part.getIdNumMax()
     vh_insertions = part.insertions()
@@ -149,11 +151,12 @@ def encodePartList(part, vh_group_list):
     group_props['xovers'] = [(remap[a], b, c, remap[x], y, z)
                                 for a, b, c, x, y, z in filtered_xover_list]
 
-    view_props = part.view_properties.copy()
+    instance_props = part_instance.properties()
+    group_props['instance_properties'] = instance_props
+
     vh_order = filter(lambda x: x in vh_group_set, group_props['virtual_helix_order'])
     vh_order = [remap[x] for x in vh_order]
     group_props['virtual_helix_order'] = vh_order
-    group_props['view_properties'] = view_props
 
     external_mods_instances = filter(filter_vh,
                                  part.dumpModInstances(is_internal=False))

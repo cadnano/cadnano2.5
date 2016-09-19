@@ -17,7 +17,7 @@ class ChangeInstancePropertyCommand(UndoCommand):
         part_instance = self.part_instance
         key, val = self.keyval
         part.setInstanceProperty(part_instance, self.flat_key, val)
-        part.partViewPropertySignal.emit(part_instance, self.view_name, key, val)
+        part.partInstancePropertySignal.emit(part_instance, self.view_name, key, val)
     # end def
 
     def undo(self):
@@ -25,6 +25,6 @@ class ChangeInstancePropertyCommand(UndoCommand):
         part_instance = self.part_instance
         key, val = self.old_keyval
         part.setInstanceProperty(part_instance, self.flat_key, val)
-        part.partViewPropertySignal.emit(part_instance, self.view_name, key, val)
+        part.partInstancePropertySignal.emit(part_instance, self.view_name, key, val)
     # end def
 # end class

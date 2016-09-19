@@ -95,15 +95,20 @@ def decodePart(document, part_dict):
     for id_num, idx, length in part_dict['insertions']:
         strand = part.getStrand(True, id_num, idx)
         strand.addInsertion(idx, length, use_undostack=False)
+
+    # TODO fix this to set position
+    instance_props = part_dict['instance_properties']    # list
+
     vh_order = part_dict['virtual_helix_order']
     if vh_order:
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
 # end def
 
-def importToPart(part, copy_dict, use_undostack=True):
+def importToPart(part_instance, copy_dict, use_undostack=True):
     """ This is the Virtual Helix id number offset
     """
+    part = part_instance.reference()
     id_num_offset = part.getIdNumMax() + 1
     print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']

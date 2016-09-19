@@ -28,6 +28,9 @@ class QAbstractPartItem(QGraphicsRectItem):
     def part(self):
         return self._model_part
 
+    def partInstance(self):
+        return self._model_instance
+
     def cnModel(self):
         return self._model_part
 
@@ -105,7 +108,7 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partActiveChangedSlot(self, sender, is_active):
         pass
 
-    def partViewPropertySlot(self, sender, view_name, key, value):
+    def partInstancePropertySlot(self, sender, view_name, key, value):
         if view_name == self._viewroot.name:
             if key == 'position':
                 self.setPos(*value)
@@ -218,7 +221,7 @@ class AbstractPartItem(object):
     def partActiveChangedSlot(self, sender, is_active):
         pass
 
-    def partViewPropertySlot(self, sender, view_name, key, value):
+    def partInstancePropertySlot(self, sender, view_name, key, value):
         pass
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):

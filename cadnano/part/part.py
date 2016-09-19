@@ -36,7 +36,7 @@ class Part(CNObject):
         self._instance_count = 0
         self._instances = set()
         # Properties
-        self.view_properties = {}
+        # self.view_properties = {}
 
         # TODO document could be None
         self._group_properties = {'name': "Part%d" % len(document.children()),
@@ -81,7 +81,7 @@ class Part(CNObject):
     partActiveChangedSignal = ProxySignal(CNObject, bool, name='partActiveChangedSignal')
     """self, is_active"""
 
-    partViewPropertySignal = ProxySignal(CNObject, str, str, object, name='partViewPropertySignal')
+    partInstancePropertySignal = ProxySignal(CNObject, str, str, object, name='partInstancePropertySignal')
     """self, view, key, val"""
 
     partDocumentSettingChangedSignal = ProxySignal(object, str, object, name='partDocumentSettingChangedSignal')
@@ -146,12 +146,21 @@ class Part(CNObject):
     def getColor(self):
         return self._group_properties['color']
 
+    def instanceProperties(self):
+        """ Generator yielding all instance properties
+        """
+        for instance in self._instances:
+            yield instance.properties()
+    # end def
+
     def setInstanceProperty(self, part_instance, key, value):
-        self.view_properties[key] = value
+        part_instance.setProperty(key, value)
+        # self.view_properties[key] = value
     # end def
 
     def getInstanceProperty(self, part_instance, key):
-        return self.view_properties[key]
+        return part_instance.getProperty(key, value)
+        # return self.view_properties[key]
     # end def
 
     def getName(self):
