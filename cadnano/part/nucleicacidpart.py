@@ -1038,8 +1038,8 @@ class NucleicAcidPart(Part):
             self.fwd_strandsets[id_num] = StrandSet(True, id_num, self, num_points)
             self.rev_strandsets[id_num] = StrandSet(False, id_num, self, num_points)
         else:
-            self.fwd_strandsets[id_num].reset(num_points)
-            self.rev_strandsets[id_num].reset(num_points)
+            self.fwd_strandsets[id_num]._reset(num_points)
+            self.rev_strandsets[id_num]._reset(num_points)
 
         self.total_id_nums += 1
 
@@ -2471,8 +2471,8 @@ class NucleicAcidPart(Part):
         if use_undostack:
             self.undoStack().beginMacro("Delete VirtualHelix")
         fwd_ss, rev_ss = self.getStrandSets(id_num)
-        fwd_ss.remove(use_undostack)
-        rev_ss.remove(use_undostack)
+        fwd_ss.removeAllStrands(use_undostack)
+        rev_ss.removeAllStrands(use_undostack)
         c = RemoveVirtualHelixCommand(self, id_num)
         if use_undostack:
             self.undoStack().push(c)

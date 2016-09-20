@@ -11,14 +11,14 @@ class ApplyColorCommand(UndoCommand):
     def redo(self):
         olg = self._oligo
         nc = self._new_color
-        olg.setColor(nc)
+        olg._setColor(nc)
         olg.oligoPropertyChangedSignal.emit(olg, 'color', nc)
     # end def
 
     def undo(self):
         olg = self._oligo
         oc = self._old_color
-        olg.setColor(oc)
+        olg._setColor(oc)
         olg.oligoPropertyChangedSignal.emit(olg, 'color', oc)
     # end def
 # end class

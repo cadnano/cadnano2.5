@@ -34,14 +34,14 @@ class RemoveStrandCommand(UndoCommand):
         if olg.isLoop() or self._old_strand3p is None:
             self._new_oligo3p = olg3p = None
             if self._new_oligo5p:
-                self._new_oligo5p.setLoop(False)
+                self._new_oligo5p._setLoop(False)
         else:
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
             # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
             color_list = prefs.STAP_COLORS
             color = random.choice(color_list)
-            olg3p.setColor(color)
+            olg3p._setColor(color)
             olg3p.refreshLength()
     # end def
 
@@ -51,7 +51,7 @@ class RemoveStrandCommand(UndoCommand):
         strandset = self._strandset
         doc = strandset._document
         doc.removeStrandFromSelection(strand)
-        strandset.removeFromStrandList(strand)
+        strandset._removeFromStrandList(strand)
 
         strand5p = self._old_strand5p
         strand3p = self._old_strand3p
@@ -59,7 +59,6 @@ class RemoveStrandCommand(UndoCommand):
         olg5p = self._new_oligo5p
         olg3p = self._new_oligo3p
 
-        # oligo.incrementLength(-strand.totalLength())
         oligo.removeFromPart()
 
         if strand5p is not None:
@@ -110,7 +109,7 @@ class RemoveStrandCommand(UndoCommand):
         strandset = self._strandset
         # doc = strandset._document
         # Add the new_strand to the s_set
-        strandset.addToStrandList(strand)
+        strandset._addToStrandList(strand)
         strand5p = self._old_strand5p
         strand3p = self._old_strand3p
         oligo = self._oligo
@@ -123,8 +122,6 @@ class RemoveStrandCommand(UndoCommand):
 
         if strand3p is not None:
             strand3p.setConnection5p(strand)
-
-        # oligo.decrementLength(strand.totalLength())
 
         # Restore the oligo
         oligo.addToPart(strandset.part())

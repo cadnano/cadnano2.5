@@ -38,7 +38,7 @@ class RefreshOligosCommand(UndoCommand):
 
             # if colors is not None:
             #     # print("refresh color", colors[1])
-            #     start_oligo.setColor(colors[1])
+            #     start_oligo._setColor(colors[1])
 
             strand5gen = strand.generator5pStrand()
             # this gets the oligo and burns a strand in the generator
@@ -53,7 +53,7 @@ class RefreshOligosCommand(UndoCommand):
             start_oligo.setStrand5p(strand5)
             # is it a loop?
             if strand.connection3p() == strand5:
-                start_oligo.setLoop(True)
+                start_oligo._setLoop(True)
             else:
                 strand3gen = strand.generator3pStrand()
                 strand3 = next(strand3gen)   # burn one

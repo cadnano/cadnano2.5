@@ -44,7 +44,7 @@ class StrandSet(CNObject):
         self._id_num = id_num
         self._part = part
 
-        self.reset(initial_size)
+        self._reset(initial_size)
 
         self._undo_stack = None
     # end def
@@ -113,9 +113,9 @@ class StrandSet(CNObject):
         """
         return self.strand_heap
 
-    def reset(self, initial_size):
+    def _reset(self, initial_size):
         """Reset this object clearing out references to all :class:`Strand`
-        objects.
+        objects.  Exceptional private method to be only used by Parts
 
         Args:
             initial_size (int): size to revert to
@@ -279,7 +279,7 @@ class StrandSet(CNObject):
         """Assumes a strand is being created at a valid set of indices.
 
         Args:
-            base_idx_low (int): low index of strand
+            base_idx_low (int):     low index of strand
             base_idx_high (int):    high index of strand
             color (:obj:`str`, optional): default=True
             use_undostack (:obj:`bool`, optional): default=True
@@ -476,20 +476,6 @@ class StrandSet(CNObject):
         self.deleteLater()  # QObject will emit a destroyed() Signal
     # end def
 
-    def remove(self, use_undostack=True):
-        """Removes a VirtualHelix from the model. Accepts a reference to the
-        VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
-
-        Args:
-            use_undostack (:obj:`bool`, optional): default=True
-        """
-        if use_undostack:
-            self.undoStack().beginMacro("Delete StrandSet")
-        self.removeAllStrands(use_undostack)
-        if use_undostack:
-            self.undoStack().endMacro()
-    # end def
-
     ### PUBLIC SUPPORT METHODS ###
     def strandFilter(self):
         """Get the filter type for this set
@@ -580,43 +566,43 @@ class StrandSet(CNObject):
         return out
     # end def
 
-    def hasStrandAtAndNoXover(self, idx):
-        """Name says it all
+    # def hasStrandAtAndNoXover(self, idx):
+    #     """Name says it all
 
-        Args:
-            idx (int): index
+    #     Args:
+    #         idx (int): index
 
-        Returns:
-            bool: True if hasStrandAtAndNoXover, False otherwise
-        """
-        sl = self.strand_array
-        strand = sl[idx]
-        if strand is None:
-            return False
-        elif strand.hasXoverAt(idx):
-            return False
-        else:
-            return True
-    # end def
+    #     Returns:
+    #         bool: True if hasStrandAtAndNoXover, False otherwise
+    #     """
+    #     sl = self.strand_array
+    #     strand = sl[idx]
+    #     if strand is None:
+    #         return False
+    #     elif strand.hasXoverAt(idx):
+    #         return False
+    #     else:
+    #         return True
+    # # end def
 
-    def hasNoStrandAtOrNoXover(self, idx):
-        """Name says it all
+    # def hasNoStrandAtOrNoXover(self, idx):
+    #     """Name says it all
 
-        Args:
-            idx (int): index
+    #     Args:
+    #         idx (int): index
 
-        Returns:
-            bool: True if hasNoStrandAtOrNoXover, False otherwise
-        """
-        sl = self.strand_array
-        strand = sl[idx]
-        if strand is None:
-            return True
-        elif strand.hasXoverAt(idx):
-            return False
-        else:
-            return True
-    # end def
+    #     Returns:
+    #         bool: True if hasNoStrandAtOrNoXover, False otherwise
+    #     """
+    #     sl = self.strand_array
+    #     strand = sl[idx]
+    #     if strand is None:
+    #         return True
+    #     elif strand.hasXoverAt(idx):
+    #         return False
+    #     else:
+    #         return True
+    # # end def
 
     def getStrand(self, base_idx):
         """Returns the :class:`Strand` that overlaps with `base_idx`
@@ -659,7 +645,7 @@ class StrandSet(CNObject):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def addToStrandList(self, strand, update_segments=True):
+    def _addToStrandList(self, strand, update_segments=True):
         """Inserts strand into the strand_array at idx
 
         Args:
@@ -674,7 +660,7 @@ class StrandSet(CNObject):
         if update_segments:
             self._part.refreshSegments(self._id_num)
 
-    def updateStrandIdxs(self, strand, old_idxs, new_idxs):
+    def _updateStrandIdxs(self, strand, old_idxs, new_idxs):
         """update indices in the strand array/list of an existing strand
 
         Args:
@@ -687,7 +673,7 @@ class StrandSet(CNObject):
         for i in range(new_idxs[0], new_idxs[1] + 1):
             self.strand_array[i] = strand
 
-    def removeFromStrandList(self, strand, update_segments=True):
+    def _removeFromStrandList(self, strand, update_segments=True):
         """Remove strand from strand_array.
 
         Args:

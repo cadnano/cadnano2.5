@@ -34,7 +34,7 @@ class MergeCommand(UndoCommand):
 
         # update the new oligo length if it's not a loop
         if s_low_olg != s_high_olg:
-            self._new_oligo.setLength(s_low_olg.length() + s_high_olg.length())
+            self._new_oligo._setLength(s_low_olg.length() + s_high_olg.length())
 
         # Create the new_strand by copying the priority strand to
         # preserve its properties
@@ -45,7 +45,7 @@ class MergeCommand(UndoCommand):
 
         self._new_strand = new_strand
         # Update the oligo for things like its 5prime end and isLoop
-        self._new_oligo.strandMergeUpdate(strand_low, strand_high, new_strand)
+        self._new_oligo._strandMergeUpdate(strand_low, strand_high, new_strand)
 
         # set the new sequence by concatenating the sequence properly
         if strand_low._sequence or strand_high._sequence:
@@ -71,10 +71,10 @@ class MergeCommand(UndoCommand):
         h_olg = s_high.oligo()
 
         # Remove old strands from the s_set (reusing idx, so order matters)
-        ss.removeFromStrandList(s_low, update_segments=False)
-        ss.removeFromStrandList(s_high, update_segments=False)
+        ss._removeFromStrandList(s_low, update_segments=False)
+        ss._removeFromStrandList(s_high, update_segments=False)
         # Add the new_strand to the s_set
-        ss.addToStrandList(new_strand)
+        ss._addToStrandList(new_strand)
 
         # update connectivity of strands
         nScL = new_strand.connectionLow()
@@ -119,10 +119,10 @@ class MergeCommand(UndoCommand):
         l_olg = self._s_low_oligo
         h_olg = self._s_high_oligo
         # Remove the new_strand from the s_set
-        ss.removeFromStrandList(new_strand, update_segments=False)
+        ss._removeFromStrandList(new_strand, update_segments=False)
         # Add old strands to the s_set (reusing idx, so order matters)
-        ss.addToStrandList(s_high, update_segments=False)
-        ss.addToStrandList(s_low)
+        ss._addToStrandList(s_high, update_segments=False)
+        ss._addToStrandList(s_low)
 
         # update connectivity of strands
         sLcL = s_low.connectionLow()

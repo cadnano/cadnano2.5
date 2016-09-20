@@ -675,9 +675,9 @@ class Strand(CNObject):
                 if length < 0:
                     length = -1
                 if use_undostack:   # on import no need to blank sequences
-                    cmds.append(self.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                    cmds.append(self.oligo().applySequenceCMD(None))
                     for strand in self.getComplementStrands():
-                        cmds.append(strand.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                        cmds.append(strand.oligo().applySequenceCMD(None))
                 cmds.append(AddInsertionCommand(self, idx, length))
                 util.execCommandList(self, cmds, desc="Add Insertion",
                                      use_undostack=use_undostack)
@@ -702,9 +702,9 @@ class Strand(CNObject):
                     # make sure length is -1 if a skip
                     if length < 0:
                         length = -1
-                    cmds.append(self.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                    cmds.append(self.oligo().applySequenceCMD(None))
                     for strand in self.getComplementStrands():
-                        cmds.append(strand.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                        cmds.append(strand.oligo().applySequenceCMD(None))
                     cmds.append(ChangeInsertionCommand(self, idx, length))
                     util.execCommandList(self, cmds, desc="Change Insertion",
                                          use_undostack=use_undostack)
@@ -723,9 +723,9 @@ class Strand(CNObject):
         if idx_low <= idx <= idx_high:
             if self.hasInsertionAt(idx):
                 if use_undostack:
-                    cmds.append(self.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                    cmds.append(self.oligo().applySequenceCMD(None))
                     for strand in self.getComplementStrands():
-                        cmds.append(strand.oligo().applySequenceCMD(None, use_undostack=use_undostack))
+                        cmds.append(strand.oligo().applySequenceCMD(None))
                 cmds.append(RemoveInsertionCommand(self, idx))
                 util.execCommandList(self, cmds, desc="Remove Insertion",
                                      use_undostack=use_undostack)

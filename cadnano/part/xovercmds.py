@@ -41,10 +41,10 @@ class CreateXoverCommand(UndoCommand):
         if self._update_oligo:
             # Test for Loopiness
             if olg5p == strand3p.oligo():
-                olg5p.setLoop(True)
+                olg5p._setLoop(True)
             else:
                 # 1. update preserved oligo length
-                olg5p.incrementLength(old_olg3p.length())
+                olg5p._incrementLength(old_olg3p.length())
                 # 2. Remove the old oligo and apply the 5' oligo to the 3' strand
                 old_olg3p.removeFromPart()
                 for strand in strand3p.generator3pStrand():
@@ -88,10 +88,10 @@ class CreateXoverCommand(UndoCommand):
         if self._update_oligo:
             # Test Loopiness
             if old_olg3p.isLoop():
-                old_olg3p.setLoop(False)
+                old_olg3p._setLoop(False)
             else:
                 # 2. restore the modified oligo length
-                olg5p.decrementLength(old_olg3p.length())
+                olg5p._decrementLength(old_olg3p.length())
                 # 3. apply the old oligo to strand3p
                 old_olg3p.addToPart(part)
                 for strand in strand3p.generator3pStrand():
@@ -133,10 +133,10 @@ class RemoveXoverCommand(UndoCommand):
         # color_list = prefs.STAP_COLORS if strand5p.strandSet().isStaple() \
         #                                 else [part.getColor()]
         color_list = prefs.STAP_COLORS
-        n_o3p.setColor(random.choice(color_list))
-        n_o3p.setLength(0)
+        n_o3p._setColor(random.choice(color_list))
+        n_o3p._setLength(0)
         for strand in strand3p.generator3pStrand():
-            n_o3p.incrementLength(strand.totalLength())
+            n_o3p._incrementLength(strand.totalLength())
         # end def
         n_o3p.setStrand5p(strand3p)
 
@@ -162,11 +162,11 @@ class RemoveXoverCommand(UndoCommand):
         strand3p.setConnection5p(None)
 
         if self._isLoop:
-            olg5p.setLoop(False)
+            olg5p._setLoop(False)
             olg5p.setStrand5p(strand3p)
         else:
             # 2. restore the modified oligo length
-            olg5p.decrementLength(new_olg3p.length())
+            olg5p._decrementLength(new_olg3p.length())
             # 3. apply the old oligo to strand3p
             new_olg3p.addToPart(part)
             for strand in strand3p.generator3pStrand():
@@ -199,11 +199,11 @@ class RemoveXoverCommand(UndoCommand):
         doc.removeStrandFromSelection(strand3p)
 
         if self._isLoop:
-            olg5p.setLoop(True)
+            olg5p._setLoop(True)
             # No need to restore whatever the old Oligo._strand5p was
         else:
             # 1. update preserved oligo length
-            olg5p.incrementLength(new_olg3p.length())
+            olg5p._incrementLength(new_olg3p.length())
             # 2. Remove the old oligo and apply the 5' oligo to the 3' strand
             new_olg3p.removeFromPart()
             for strand in strand3p.generator3pStrand():

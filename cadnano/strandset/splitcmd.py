@@ -70,19 +70,19 @@ class SplitCommand(UndoCommand):
         strand_high.setIdxs((i_new_low + 1, strand.highIdx()))
 
         # Update the oligo for things like its 5prime end and isLoop
-        olg5p.strandSplitUpdate(std5p, std3p, olg3p, strand)
+        olg5p._strandSplitUpdate(std5p, std3p, olg3p, strand)
 
         if not oligo.isLoop():
             # Update the oligo color if necessary
-            l_oligo.setColor(color_low)
-            h_oligo.setColor(color_high)
+            l_oligo._setColor(color_low)
+            h_oligo._setColor(color_high)
             # settle the oligo length
             length = 0
             for strand in std3p.generator3pStrand():
                 length += strand.totalLength()
             # end for
-            olg5p.setLength(olg5p.length() - length)
-            olg3p.setLength(length)
+            olg5p._setLength(olg5p.length() - length)
+            olg3p._setLength(length)
         # end if
 
         if update_sequence and old_sequence:
@@ -114,11 +114,11 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove old Strand from the s_set
-        ss.removeFromStrandList(o_strand, update_segments=False)
+        ss._removeFromStrandList(o_strand, update_segments=False)
 
         # Add new strands to the s_set (reusing idx, so order matters)
-        ss.addToStrandList(s_high, update_segments=False)
-        ss.addToStrandList(s_low)
+        ss._addToStrandList(s_high, update_segments=False)
+        ss._addToStrandList(s_low)
 
         # update connectivity of strands
         sLcL = s_low.connectionLow()
@@ -169,10 +169,10 @@ class SplitCommand(UndoCommand):
         was_not_loop = l_olg != h_olg
 
         # Remove new strands from the s_set (reusing idx, so order matters)
-        ss.removeFromStrandList(s_low, update_segments=False)
-        ss.removeFromStrandList(s_high, update_segments=False)
+        ss._removeFromStrandList(s_low, update_segments=False)
+        ss._removeFromStrandList(s_high, update_segments=False)
         # Add the old strand to the s_set
-        ss.addToStrandList(o_strand)
+        ss._addToStrandList(o_strand)
 
         # update connectivity of strands
         oScL = o_strand.connectionLow()

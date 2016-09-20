@@ -65,9 +65,12 @@ class Oligo(CNObject):
     # end def
 
     def dump(self):
-        """ Return tuple of this oligo and its properties.
+        """ Return dictionary of this oligo and its properties.
         It's expected that caller will copy the properties
         if mutating
+
+        Returns:
+            dict:
         """
         s5p = self._strand5p
         key = {'id_num': s5p.idNum(),
@@ -101,6 +104,9 @@ class Oligo(CNObject):
 
     def getOutlineProperties(self):
         """Convenience method for the outline view
+
+        Returns:
+            tuple: (<name>, <color>, <is_visible>)
         """
         props = self._props
         return props['name'], props['color'], props['is_visible']
@@ -146,13 +152,18 @@ class Oligo(CNObject):
         return color
     # end def
 
-    def setColor(self, color):
+    def _setColor(self, color):
+        """ Set this oligos color
+
+        Args:
+            color (str): format '#ffffff'
+        """
         if color is None:
             raise ValueError("Whhat None???")
         self._props['color'] = color
     # end def
 
-    def setLength(self, length):
+    def _setLength(self, length):
         before = self.shouldHighlight()
         key = 'length'
         self._props[key] = length
@@ -202,6 +213,11 @@ class Oligo(CNObject):
     # end def
 
     def sequence(self):
+        """Get the sequence applied to this `Oligo`
+
+        Returns:
+            str or None
+        """
         temp = self.strand5p()
         if not temp:
             return None
@@ -213,6 +229,15 @@ class Oligo(CNObject):
     # end def
 
     def sequenceExport(self, output):
+        """ Iterative appending to argument `output` which is a dictionary of
+        lists
+
+        Args:
+            output (dict): dictionary with keys given in `NucleicAcidPart.getSequences`
+
+        Returns:
+            dict:
+        """
         part = self.part()
         vh_num5p = self.strand5p().idNum()
         strand5p = self.strand5p()
@@ -255,8 +280,6 @@ class Oligo(CNObject):
     def shouldHighlight(self):
         if not self._strand5p:
             return False
-        # if self._strand5p.isScaffold():
-        #     return False
         if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
         if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
@@ -306,11 +329,11 @@ class Oligo(CNObject):
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def applySequenceCMD(self, sequence, use_undostack=True):
+    def applySequenceCMD(self, sequence):
         return ApplySequenceCommand(self, sequence)
     # end def
 
-    def setLoop(self, bool):
+    def _setLoop(self, bool):
         self._is_loop = bool
     # end def
 
@@ -332,22 +355,18 @@ class Oligo(CNObject):
         # self.deleteLater()
         cmds = []
         s5p = self._strand5p
-        # strandset = s5p.strandSet()
         for strand in s5p.generator3pStrand():
-            # strandset = strand.strandSet()
-            # strandset.oligoStrandRemover(strand, cmds,
-            #                             solo=False)
             cmds += strand.clearDecoratorCommands()
         # end for
         cmds.append(RemoveOligoCommand(self))
         return cmds
     # end def
 
-    def decrementLength(self, delta):
+    def _decrementLength(self, delta):
         self.setLength(self.length() - delta)
     # end def
 
-    def incrementLength(self, delta):
+    def _incrementLength(self, delta):
         self.setLength(self.length() + delta)
     # end def
 
@@ -372,7 +391,7 @@ class Oligo(CNObject):
         self.setParent(None)
     # end def
 
-    def strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):
+    def _strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):
         """This method sets the isLoop status of the oligo and the oligo's
         5' strand.
         """
@@ -398,7 +417,7 @@ class Oligo(CNObject):
         # end if
     # end def
 
-    def strandSplitUpdate(self, new_strand5p, new_strand3p, oligo3p, old_merged_strand):
+    def _strandSplitUpdate(self, new_strand5p, new_strand3p, oligo3p, old_merged_strand):
         """If the oligo is a loop, splitting the strand does nothing. If the
         oligo isn't a loop, a new oligo must be created and assigned to the
         new_strand and everything connected to it downstream.

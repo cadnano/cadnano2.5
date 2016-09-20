@@ -25,7 +25,7 @@ class CreateStrandCommand(UndoCommand):
         doc = strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
         self._new_oligo = Oligo(None, color)  # redo will set part
-        self._new_oligo.setLength(self._strand.totalLength())
+        self._new_oligo._setLength(self._strand.totalLength())
         self.update_segments = update_segments
     # end def
 
@@ -33,7 +33,7 @@ class CreateStrandCommand(UndoCommand):
         # Add the new strand to the StrandSet strand_list
         strand = self._strand
         strandset = self._strandset
-        strandset.addToStrandList(strand, self.update_segments)
+        strandset._addToStrandList(strand, self.update_segments)
         # Set up the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(strand)
@@ -54,7 +54,7 @@ class CreateStrandCommand(UndoCommand):
         strand = self._strand
         strandset = self._strandset
         strandset._document.removeStrandFromSelection(strand)
-        strandset.removeFromStrandList(strand, self.update_segments)
+        strandset._removeFromStrandList(strand, self.update_segments)
         # Get rid of the new oligo
         oligo = self._new_oligo
         oligo.setStrand5p(None)

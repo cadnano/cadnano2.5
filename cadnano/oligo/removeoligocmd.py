@@ -5,7 +5,6 @@ class RemoveOligoCommand(UndoCommand):
         super(RemoveOligoCommand, self).__init__("remove oligo")
         self._oligo = oligo
         self._part = oligo.part()
-        # self._strand_idx_list = []
         self._strand3p = None
     # end def
 
@@ -19,8 +18,7 @@ class RemoveOligoCommand(UndoCommand):
             strandset = strand.strandSet()
             doc.removeStrandFromSelection(strand)
 
-            strandset.removeFromStrandList(strand)
-            # strandset.removeStrand(strand)
+            strandset._removeFromStrandList(strand)
 
             # emit a signal to notify on completion
             strand.strandRemovedSignal.emit(strand)
@@ -43,7 +41,7 @@ class RemoveOligoCommand(UndoCommand):
         for strand in list(s3p.generator5pStrand()):
             strandset = strand.strandSet()
 
-            strandset.addToStrandList(strand)
+            strandset._addToStrandList(strand)
 
             # Emit a signal to notify on completion
             strandset.strandsetStrandAddedSignal.emit(strandset, strand)
