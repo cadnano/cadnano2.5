@@ -35,7 +35,7 @@ class CNTestApp(object):
                 if id_num == start_id_num:
                     strand = fwd_ss.getStrand(start_idx)
                     strand.oligo().applySequence(sequence)
-        generated_sequences = part.getStapleSequences()
+        generated_sequences = part.getSequences()
         return set(generated_sequences.splitlines())
     # end def
 

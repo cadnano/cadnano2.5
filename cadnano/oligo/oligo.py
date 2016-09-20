@@ -318,7 +318,7 @@ class Oligo(CNObject):
     def addToPart(self, part):
         self._part = part
         self.setParent(part)
-        part.addOligoToSet(self)
+        part._addOligoToSet(self)
     # end def
 
     def setPart(self, part):

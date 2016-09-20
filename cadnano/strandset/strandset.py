@@ -718,7 +718,7 @@ class StrandSet(CNObject):
             return (False, 0)
     # end def
 
-    def deepCopy(self, virtual_helix):
+    def _deepCopy(self, virtual_helix):
         """docstring for deepCopy"""
         raise NotImplementedError
     # end def

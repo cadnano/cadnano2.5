@@ -42,8 +42,7 @@ class MergeCommand(UndoCommand):
         new_strand = strand_low.shallowCopy()
         new_strand.setIdxs(new_idxs)
         new_strand.setConnectionHigh(strand_high.connectionHigh())
-        # Merging any decorators
-        new_strand.addDecorators(strand_high.decorators())
+
         self._new_strand = new_strand
         # Update the oligo for things like its 5prime end and isLoop
         self._new_oligo.strandMergeUpdate(strand_low, strand_high, new_strand)

@@ -53,6 +53,6 @@ class RemoveOligoCommand(UndoCommand):
 
         # add Oligo to part but don't set parent to None?
         # o.setPart(part)
-        part.addOligoToSet(o)
+        part._addOligoToSet(o)
     # end def
 # end class

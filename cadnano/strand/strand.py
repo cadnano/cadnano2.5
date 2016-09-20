@@ -57,9 +57,6 @@ class Strand(CNObject):
         self.segments = []
         self.abstract_sequence = []
 
-        # TODO REMOVE THIS field
-        self._decorators = {}
-
         # dynamic methods for mapping high/low connection /indices
         # to corresponding 3Prime 5Prime
         is_forward = strandset.isForward()
@@ -169,10 +166,6 @@ class Strand(CNObject):
 
     ### SLOTS ###
     ### ACCESSORS ###
-    def decorators(self):
-        return self._decorators
-    # end def
-
     def part(self):
         return self._strandset.part()
     # end def
@@ -630,11 +623,6 @@ class Strand(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addDecorators(self, additionalDecorators):
-        """Used to add decorators during a merge operation."""
-        self._decorators.update(additionalDecorators)
-    # end def
-
     def addMods(self, document, mod_id, idx, use_undostack=True):
         """Used to add mods during a merge operation."""
         cmds = []
@@ -814,7 +802,6 @@ class Strand(CNObject):
         strand to new_idxs
 
         """
-        # decs = self._decorators
         cIdxL, cIdxH = self.idxs()
         nIdxL, nIdxH = new_idxs
 
@@ -872,50 +859,28 @@ class Strand(CNObject):
         return self.clearInsertionsCommands(insertions, *self.idxs())
     # end def
 
-    # def hasInsertion(self):
-    #     """Iterate through dict of insertions for this strand's virtualhelix
-    #     and return True of any of the indices overlap with the strand.
-    #     """
-    #     insts = self.part().insertions()[self._id_num]
-    #     for i in range(self._base_idx_low, self._base_idx_high + 1):
-    #         if i in insts:
-    #             return True
-    #     return False
-    # # end def
-
     def hasInsertionAt(self, idx):
         insts = self.part().insertions()[self._id_num]
         return idx in insts
     # end def
 
     def shallowCopy(self):
-        """can't use python module 'copy' as the dictionary _decorators
-        needs to be shallow copied as well, but wouldn't be if copy.copy()
-        is used, and copy.deepcopy is undesired
+        """
         """
         new_s = Strand(self._strandset, *self.idxs())
         new_s._oligo = self._oligo
         new_s._strand5p = self._strand5p
         new_s._strand3p = self._strand3p
         # required to shallow copy the dictionary
-        new_s._decorators = dict(self._decorators.items())
         new_s._sequence = None  # self._sequence
         return new_s
     # end def
 
-    def deepCopy(self, strandset, oligo):
-        """can't use python module 'copy' as the dictionary _decorators
-        needs to be shallow copied as well, but wouldn't be if copy.copy()
-        is used, and copy.deepcopy is undesired
-
-        TODO: consider renaming this method
+    def _deepCopy(self, strandset, oligo):
+        """
         """
         new_s = Strand(strandset, *self.idxs())
         new_s._oligo = oligo
-        decs = new_s._decorators
-        for key, dec_orig in self._decorators:
-            decs[key] = dec_orig.deepCopy()
-        # end fo
         new_s._sequence = self._sequence
         return new_s
     # end def

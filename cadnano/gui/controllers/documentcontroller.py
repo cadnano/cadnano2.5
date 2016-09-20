@@ -420,7 +420,7 @@ class DocumentController():
         part = self.activePart()
         if part is None:
             return
-        stap_loop_olgs = part.getStapleLoopOligos()
+        stap_loop_olgs = part.getLoopOligos()
         if stap_loop_olgs:
             from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
@@ -614,7 +614,7 @@ class DocumentController():
         # write the file
         ap = self.activePart()
         if ap is not None:
-            output = ap.getStapleSequences()
+            output = ap.getSequences()
             with open(fname, 'w') as f:
                 f.write(output)
     # end def

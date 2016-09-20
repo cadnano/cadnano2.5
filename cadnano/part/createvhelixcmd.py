@@ -15,9 +15,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            self.id_num = part.getNewIdNum()
+            self.id_num = part._getNewIdNum()
         else:
-            part.reserveIdNum(id_num)
+            part._reserveIdNum(id_num)
             self.id_num = id_num
         self.origin_pt = (x, y, z)
         self.length = length
@@ -47,7 +47,7 @@ class CreateVirtualHelixCommand(UndoCommand):
 
         if self.safe:   # update all neighbors
             if not self.neighbors:
-                self.neighbors = part.getVirtualHelixOriginNeighbors(id_num, self.threshold)
+                self.neighbors = part._getVirtualHelixOriginNeighbors(id_num, self.threshold)
 
             neighbors = self.neighbors
             part.vh_properties.loc[id_num, 'neighbors'] = str(list(neighbors))
