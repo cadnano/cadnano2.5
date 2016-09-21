@@ -3,7 +3,7 @@ import sys, os, io, time
 
 import pytest
 
-from .cnguitestcase import GUITestApp
+from cnguitestcase import GUITestApp
 from PyQt5.QtCore import Qt, QPoint, QPointF
 from PyQt5.QtTest import QTest
 

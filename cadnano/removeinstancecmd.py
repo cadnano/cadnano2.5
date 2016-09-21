@@ -17,7 +17,7 @@ class RemoveInstanceCommand(UndoCommand):
 
     def redo(self):
         cnobj, doc, obji = self._items
-        if cnobj.canRemove():
+        if cnobj._canRemove():
             if isinstance(cnobj, Part):
                 cnobj.partRemovedSignal.emit(obji)
             else:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsItemGroup
 from PyQt5.QtCore import pyqtSlot
 
@@ -18,10 +19,7 @@ class MyRectItemNOIC(QGraphicsRectItem):
     def __repr__(self):
         return str(type(self).__name__)
 
-    # def itemChange(self, change, value):
-    #     print("\nChange %s\n" % self, change, value)
-    #     return QGraphicsItem.itemChange(self, change, value)
-    # # end def
+# end class
 
 
 class MyRectItem(QGraphicsRectItem):
@@ -34,23 +32,26 @@ class MyRectItem(QGraphicsRectItem):
     #     return str(type(self).__name__)
 
     def itemChange(self, change, value):
-        print("\nChange %s\n" % self, change, value)
+        assert isinstance(self, MyRectItem)
+        # print("\nChange %s\n" % self, change, value)
         return super(MyRectItem, self).itemChange(change, value)
-        # return QGraphicsItem.itemChange(self, change, value)
     # end def
 
-if __name__ == '__main__':
+def testItemChangeRegression():
+    """Make sure PyQt5 handles QGraphicsItem.itemChange correctly
+    as there was a regression in PyQt5 v 5.6 that was fixed in v 5.7
+    """
     a = MyRectItemNOIC()
     b = MyRectItem(a)
     item_group = MyItemGroup()
-
-    print("parent:", b.parentItem())
-    print(a.childItems())
+    assert b.parentItem() is a
+    assert a.childItems()[0] is b
     item_group.addToGroup(b)
-    print(item_group.childItems(), b.parentItem())
-
+    assert item_group.childItems()[0] is b
+    assert b.parentItem() is item_group
     e = MyRectItem()
     c = MyRectItemNOIC(e)
-    print("\nparent NOIC:", c.parentItem())
+    assert c.parentItem() is e
     item_group.addToGroup(c)
-    print(item_group.childItems(), c.parentItem())
+    assert c.parentItem() is item_group
+# end def

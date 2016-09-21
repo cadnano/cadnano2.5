@@ -45,7 +45,7 @@ class DummySignal(object):
         name = kwargs.get('name')
         if name is None:
             raise ValueError("missing name")
-        self.targets = {}
+        self.targets = set()
         self.argtypes = args
         self.name = name
 

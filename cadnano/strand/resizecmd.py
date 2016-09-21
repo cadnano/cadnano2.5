@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cadnano.cnproxy import UndoCommand
 
 class ResizeCommand(UndoCommand):

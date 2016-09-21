@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from array import array
 from operator import attrgetter
 from cadnano import util
@@ -11,7 +12,6 @@ from .resizecmd import ResizeCommand
 sixb = lambda x: x.encode('utf-8')
 ARRAY_TYPE = 'B'
 tostring = lambda x: x.tobytes().decode('utf-8')
-
 
 class Strand(CNObject):
     """A Strand is a continuous stretch of bases that are all in the same

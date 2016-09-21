@@ -3,7 +3,7 @@ import sys, os, io, time
 
 import pytest
 
-from .cntestcase import CNTestApp
+from cntestcase import CNTestApp
 
 @pytest.fixture()
 def cnapp():

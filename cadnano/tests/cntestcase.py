@@ -2,7 +2,7 @@
 import os, io
 pjoin = os.path.join
 
-from .pathsetup import TEST_PATH
+from pathsetup import TEST_PATH
 from cadnano.data.dnasequences import sequences
 
 class CNTestApp(object):
@@ -22,7 +22,7 @@ class CNTestApp(object):
         the set of staple sequences."""
         # set up the document
         inputfile = pjoin(TEST_PATH,
-                            "functionaltestinputs", designname)
+                            "data", designname)
         document = self.document
         document.readFile(inputfile)
 
@@ -43,7 +43,7 @@ class CNTestApp(object):
     def getRefSequences(designname):
         """docstring for getRefSequences"""
         staple_file = pjoin(TEST_PATH,
-                            "functionaltestinputs", designname)
+                            "data", designname)
         with io.open(staple_file, 'r', encoding='utf-8') as f:
             read_sequences = f.read()
         return set(read_sequences.splitlines())
@@ -52,7 +52,7 @@ class CNTestApp(object):
     def writeRefSequences(designname, data):
         """docstring for getRefSequences"""
         staple_file = pjoin(TEST_PATH,
-                            "functionaltestinputs", designname)
+                            "data", designname)
         with io.open(staple_file, 'w', encoding='utf-8') as f:
             f.write('\n'.join(data))
 # end class

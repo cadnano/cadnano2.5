@@ -2,7 +2,7 @@
 import pytest
 import math
 
-from .cntestcase import CNTestApp
+from cntestcase import CNTestApp
 
 @pytest.fixture()
 def cnapp():

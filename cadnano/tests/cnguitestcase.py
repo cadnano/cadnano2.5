@@ -6,7 +6,7 @@ from PyQt5.QtGui import QMouseEvent, QKeyEvent
 from PyQt5.QtTest import QTest
 
 from cadnano import initAppWithGui
-from .cntestcase import CNTestApp
+from cntestcase import CNTestApp
 
 class GUITestApp(CNTestApp):
     def __init__(self):

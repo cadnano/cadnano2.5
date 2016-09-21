@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from bisect import bisect_left, insort_left
 import cadnano.util as util
 from cadnano.cnproxy import ProxySignal
