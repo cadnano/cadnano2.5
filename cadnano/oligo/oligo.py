@@ -363,11 +363,11 @@ class Oligo(CNObject):
     # end def
 
     def _decrementLength(self, delta):
-        self.setLength(self.length() - delta)
+        self._setLength(self.length() - delta)
     # end def
 
     def _incrementLength(self, delta):
-        self.setLength(self.length() + delta)
+        self._setLength(self.length() + delta)
     # end def
 
     def refreshLength(self):
@@ -377,7 +377,7 @@ class Oligo(CNObject):
         length = 0
         for strand in temp.generator3pStrand():
             length += strand.totalLength()
-        self.setLength(length)
+        self._setLength(length)
     # end def
 
     def removeFromPart(self):
