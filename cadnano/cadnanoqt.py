@@ -80,6 +80,10 @@ class CadnanoQt(QObject):
         self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
     # end def
 
+    def document(self):
+        return self._document
+    # end def
+
     def finishInit(self):
         global decodeFile
         global Document
@@ -192,10 +196,6 @@ class CadnanoQt(QObject):
                 dc.newDocument()  # tell it to make a new doucment
         # print("CadnanoQt createDocument done")
         return dc.document()
-
-    def document(self):
-        return self._document
-    # end def
 
     def prefsClicked(self):
         self.prefs.showDialog()

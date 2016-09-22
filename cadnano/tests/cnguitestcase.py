@@ -5,8 +5,8 @@ from PyQt5.QtCore import Qt, QEvent, QPoint, QPointF, QTimer
 from PyQt5.QtGui import QMouseEvent, QKeyEvent
 from PyQt5.QtTest import QTest
 
-from cadnano import initAppWithGui
 from cntestcase import CNTestApp
+from cadnano import initAppWithGui
 
 class GUITestApp(CNTestApp):
     def __init__(self):
