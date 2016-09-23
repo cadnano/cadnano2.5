@@ -1,7 +1,10 @@
 language: python
 python:
-  - "3.5"
+  - "3.5.2"
 # command to install dependencies
-install: "python setup.py install"
+install:
+    - pip install PyQt5==5.7 numpy>=1.10.0 pandas>=0.18 pytz>=2011k python-dateutil>=2
+    - python setup.py install
+
 # command to run tests
 script: pytest cadnano/tests
