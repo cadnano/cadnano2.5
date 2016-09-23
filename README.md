@@ -11,7 +11,7 @@ to run with a GUI from the command line :
 
     cadnano
 
-when in python interpreter you can just:
+when in a python interpreter you can just:
 
     import cadnano
 
