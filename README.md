@@ -19,6 +19,6 @@ And script your designs without a GUI
 
 ## License
 
-    the GUI code is GPLv3, the rest of the code BSD3.
+    the GUI code is GPLv3, the rest of the code is dual licensed as GPLv3 and BSD3.
     The full license can be found in LICENSE
 
