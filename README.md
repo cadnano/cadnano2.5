@@ -1,5 +1,5 @@
 
-[![Documentation Status](https://readthedocs.org/projects/cadnano/badge/?version=dnapart)](http://cadnano.readthedocs.io/en/dnapart/?badge=dnapart)
+[![Build Status](https://travis-ci.org/cadnano/cadnano2.5.svg?branch=master)](https://travis-ci.org/cadnano/cadnano2.5) [![Documentation Status](https://readthedocs.org/projects/cadnano/badge/?version=master)](http://cadnano.readthedocs.io/en/master/?badge=master)
 
 # *radnano* : cadnano 2.5 beta
 
