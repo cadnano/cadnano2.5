@@ -48,6 +48,7 @@ PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH =           pjoin(PACKAGE_PATH, 'cadnano')
 INSTALL_EXE_PATH =      pjoin(MODULE_PATH, 'install_exe')
 TESTS_PATH =            pjoin(MODULE_PATH, 'tests')
+TEST_DATA_PATH =        pjoin(TESTS_PATH, 'data')
 IMAGES_PATH1 =           pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
 IMAGES_PATH2 =           pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
 
@@ -55,10 +56,13 @@ IMAGES_PATH2 =           pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
 
 test_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
                 os.walk(TESTS_PATH) for f in files]
+test_data_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
+                os.walk(TEST_DATA_PATH) for f in files]
 cn_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
                 os.walk(IMAGES_PATH1) for f in files]
 cn_files += [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
                 os.walk(IMAGES_PATH2) for f in files]
+cn_files += test_files + test_data_files
 
 entry_points = {'console_scripts': [
         'cadnano = cadnano.bin.main:main',
