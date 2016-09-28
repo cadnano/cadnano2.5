@@ -33,7 +33,8 @@ except ImportError:
     from distutils.core import setup, Extension
 import distutils.command
 
-from distutils.command.install import install as _install
+# from distutils.command.install import install as _install
+from setuptools.command.install import install
 from distutils import log as setup_log
 
 from os.path import join as pjoin
@@ -120,7 +121,7 @@ cn_packages = find_packages(exclude=exclude_list)
 setup(
     name='cadnano',
     version='2.5.0',
-    license='GPLv2',
+    license='GPLv3',
     author='Nick Conway, Shawn Douglas',
     author_email='a.grinner@gmail.com',
     url='https://github.com/cadnano/cadnano2.5',
