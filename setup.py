@@ -34,7 +34,7 @@ except ImportError:
 import distutils.command
 
 # from distutils.command.install import install as _install
-from setuptools.command.install import install
+from setuptools.command.install import install as _install
 from distutils import log as setup_log
 
 from os.path import join as pjoin
