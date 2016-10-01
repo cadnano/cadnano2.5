@@ -2,8 +2,16 @@
 import os, io
 pjoin = os.path.join
 
+import pytest
+
 from pathsetup import TEST_PATH
 from cadnano.data.dnasequences import sequences
+
+@pytest.fixture()
+def cnapp():
+    app = CNTestApp()
+    yield app
+    app.tearDown()
 
 class CNTestApp(object):
 

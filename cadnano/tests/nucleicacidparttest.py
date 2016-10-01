@@ -2,13 +2,7 @@
 import pytest
 import math
 
-from cntestcase import CNTestApp
-
-@pytest.fixture()
-def cnapp():
-    app = CNTestApp()
-    yield app
-    app.tearDown()
+from cntestcase import cnapp
 
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 
