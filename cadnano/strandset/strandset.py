@@ -286,7 +286,7 @@ class StrandSet(CNObject):
             use_undostack (:obj:`bool`, optional): default=True
 
         Returns:
-            int: 0 if successful, -1 otherwise
+            object: Strand if successful, None otherwise
         """
         # print("sss creating strand")
         part = self._part
@@ -305,10 +305,10 @@ class StrandSet(CNObject):
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
-            return 0
+            return c.strand()
         else:
             # print("could not create strand", bounds_low, bounds_high, base_idx_low, base_idx_high)
-            return -1
+            return None
     # end def
 
     def createDeserializedStrand(self, base_idx_low, base_idx_high, color, use_undostack=False):

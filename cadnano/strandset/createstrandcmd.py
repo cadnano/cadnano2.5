@@ -30,6 +30,10 @@ class CreateStrandCommand(UndoCommand):
         self.update_segments = update_segments
     # end def
 
+    def strand(self):
+        return self._strand
+    # end def
+
     def redo(self):
         # Add the new strand to the StrandSet strand_list
         strand = self._strand
