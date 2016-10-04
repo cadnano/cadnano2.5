@@ -29,9 +29,6 @@ def testStrandset(cnapp):
     overlapping = fwd_ss.getOverlappingStrands(0, 21)
     assert strand1_fwd == overlapping[0]
 
-    # print('\n')
-    # print(overlapping)
-
     # 3. test neighbor getting
     neighbors = fwd_ss.getNeighbors(strand1_fwd)
     assert neighbors == (None, None)
@@ -42,7 +39,8 @@ def testStrandset(cnapp):
 
     strand2_fwd = fwd_ss.createStrand(23, 30)
     assert strand2_fwd is not None
-    strand3_fwd = fwd_ss.createStrand(31, 40)
+    idxs3 = (31, 40)
+    strand3_fwd = fwd_ss.createStrand(*idxs3)
     assert strand3_fwd is not None
 
     # 5. more neighbor testing
@@ -56,15 +54,29 @@ def testStrandset(cnapp):
     neighbors = fwd_ss.getNeighbors(strand3_fwd)
     assert neighbors == (strand1_fwd, None)
 
-    # getStrandIndex
+    # 7. getStrandIndex
+    assert fwd_ss.getStrandIndex(strand3_fwd) == (True, idxs3[0])
+    assert fwd_ss.getStrandIndex(strand2_fwd) == (False, 0)
 
-    # strandCanBeSplit
+    # 8. strandCanBeSplit
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0]) is False
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0] + 1) is False
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0] + 2) is True
 
-    # Split strand
+    # 9. Split strand
+    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0] + 1) is False
+    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0] + 2)
+    overlapping = fwd_ss.getOverlappingStrands(*idxs3)
+    assert len(overlapping) == 2
 
-    # merge strand
+    # 10. merge strand
+    assert fwd_ss.mergeStrands(*overlapping)
 
-    # removeAllStrands
+    # 11. removeAllStrands
+    assert fwd_ss.strandCount() == 2
+    fwd_ss.removeAllStrands()
+    assert fwd_ss.strandCount() == 0
+
 
     # resize --> resize Part???
 # end def

@@ -390,6 +390,9 @@ class StrandSet(CNObject):
             priority_strand (Strand): priority strand
             other_strand (Strand): other strand
             use_undostack (:obj:`bool`, optional): default=True
+
+        Returns:
+            bool: True if strands were merged, False otherwise
         """
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
@@ -397,6 +400,9 @@ class StrandSet(CNObject):
             if self.isStrandInSet(strand_low):
                 c = MergeCommand(strand_low, strand_high, priority_strand)
                 util.doCmd(self, c, use_undostack=use_undostack)
+                return True
+        else:
+            return False
     # end def
 
     def strandsCanBeMerged(self, strandA, strandB):
@@ -436,6 +442,7 @@ class StrandSet(CNObject):
 
         Returns:
             bool: True if successful, False otherwise
+            TODO consider return strands instead
         """
         if self.strandCanBeSplit(strand, base_idx):
             if self.isStrandInSet(strand):
@@ -461,13 +468,16 @@ class StrandSet(CNObject):
             bool: True if can be split, False otherwise
         """
         # no endpoints
-        if base_idx == strand.lowIdx() or base_idx == strand.highIdx():
+        lo, hi = strand.idxs()
+        if base_idx == lo or base_idx == hi:
             return False
         # make sure the base index within the strand
-        elif strand.lowIdx() > base_idx or base_idx > strand.highIdx():
+        elif lo > base_idx or base_idx > hi:
             return False
-        elif abs(base_idx - strand.idx3Prime()) > 1:
+        elif base_idx - lo > 1 and hi - base_idx > 1:
             return True
+        else:
+            return False
     # end def
 
     def destroy(self):
@@ -691,12 +701,11 @@ class StrandSet(CNObject):
             self._part.refreshSegments(self._id_num)
 
     def getStrandIndex(self, strand):
-        """Get the index of strand if it exists
+        """Get the 5' end index of strand if it exists for forward strands
+        and the 3' end index of the strand for reverse strands
 
         Returns:
             tuple: (:obj:`bool`, :obj:`int`)
-        Raises:
-            ValueError
         """
         try:
             ind = self.strand_array.index(strand)
