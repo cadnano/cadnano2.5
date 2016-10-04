@@ -55,4 +55,16 @@ def testStrandset(cnapp):
     fwd_ss.removeStrand(strand2_fwd)
     neighbors = fwd_ss.getNeighbors(strand3_fwd)
     assert neighbors == (strand1_fwd, None)
+
+    # getStrandIndex
+
+    # strandCanBeSplit
+
+    # Split strand
+
+    # merge strand
+
+    # removeAllStrands
+
+    # resize --> resize Part???
 # end def
