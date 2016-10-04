@@ -187,7 +187,7 @@ class Part(CNObject):
         Returns:
             object:
         """
-        return part_instance.getProperty(key, value)
+        return part_instance.getProperty(key)
     # end def
 
     def changeInstanceProperty(self, part_instance, view, key, value, use_undostack=True):
