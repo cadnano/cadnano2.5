@@ -2389,6 +2389,9 @@ class NucleicAcidPart(Part):
         to be parented to strands in the view so their removal Signal is
         not emitted.  This causes problems with undo and redo down the road
         but works as of now.
+
+        TODO: figure out how to decrement NucleicAcidPart._count as appropriate
+        or to change that altogether
         """
         if use_undostack:
             us = self.undoStack()
@@ -2725,7 +2728,7 @@ class NucleicAcidPart(Part):
                 util.finalizeCommands(self, [c], desc="Translate VHs")
                 # only emit this on finalize due to cost.
             else:
-                util.doCmd(self, c, desc="Translate VHs", use_undostack=True)
+                util.doCmd(self, c, use_undostack=True)
         else:
             self._translateVirtualHelices(vh_set, dx, dy, dz, False)
     # end def

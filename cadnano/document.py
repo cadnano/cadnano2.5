@@ -117,9 +117,10 @@ class Document(CNObject):
     def removeAllChildren(self):
         """Used to reset the document. Not undoable."""
         self.documentClearSelectionsSignal.emit(self)
-        for child in self._children:
+        for child in list(self._children):
             child.remove(use_undostack=True)
         self.undoStack().clear()
+        self.deactivateActivePart()
     # end def
 
     def setFilterSet(self, filter_list):
@@ -636,6 +637,7 @@ class Document(CNObject):
         self.removeAllChildren()  # clear out old parts
         setBatch(False)
         self.undoStack().clear()  # reset undostack
+        self.deactivateActivePart()
         self._filename = fname if fname else "untitled.json"
     # end def
 
