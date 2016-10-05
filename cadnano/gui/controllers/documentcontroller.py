@@ -417,7 +417,7 @@ class DocumentController():
         the file.
         """
         # Validate that no staple oligos are loops.
-        part = self.activePart()
+        part = self._document.activePart()
         if part is None:
             return
         loop_olgs = part.getLoopOligos()
@@ -465,9 +465,9 @@ class DocumentController():
 
     def actionPathAddSeqSlot(self):
         print("triggered seqslot")
-        ap = self.activePart()
+        ap = self._document.activePart()
         if ap is not None:
-            self.activePart().setAbstractSequences()
+            self._document.activePart().setAbstractSequences()
     # end def
 
     def actionPrefsSlot(self):
@@ -612,7 +612,7 @@ class DocumentController():
             del self.saveStaplesDialog
             self.saveStaplesDialog = None
         # write the file
-        ap = self.activePart()
+        ap = self._document.activePart()
         if ap is not None:
             output = ap.getSequences()
             with open(fname, 'w') as f:
