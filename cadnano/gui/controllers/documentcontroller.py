@@ -458,7 +458,7 @@ class DocumentController():
 
     def activePart(self):
         if self._active_part is None:
-            self._active_part = self._document.selectedInstance()
+            self._active_part = self._document.selectedInstance().reference()
         return self._active_part
     # end def
 
