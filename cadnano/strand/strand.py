@@ -782,9 +782,9 @@ class Strand(CNObject):
         self._base_idx_high = idxs[1]
     # end def
 
-    def setOligo(self, new_oligo, emit_signal=True):
+    def setOligo(self, new_oligo, emit_signals=False):
         self._oligo = new_oligo
-        if emit_signal:
+        if emit_signals:
             self.strandHasNewOligoSignal.emit(self)
     # end def
 

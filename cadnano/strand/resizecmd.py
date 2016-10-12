@@ -33,7 +33,7 @@ class ResizeCommand(UndoCommand):
         strandset = self.strand.strandSet()
         part = strandset.part()
 
-        std.oligo()._incrementLength(self.delta)
+        std.oligo()._incrementLength(self.delta, emit_signals=True)
         std.setIdxs(n_i)
         strandset._updateStrandIdxs(std, o_i, n_i)
         if self.update_segments:
@@ -54,7 +54,7 @@ class ResizeCommand(UndoCommand):
         strandset = self.strand.strandSet()
         part = strandset.part()
 
-        std.oligo()._decrementLength(self.delta)
+        std.oligo()._decrementLength(self.delta, emit_signals=True)
         std.setIdxs(o_i)
         strandset._updateStrandIdxs(std, n_i, o_i)
         if self.update_segments:

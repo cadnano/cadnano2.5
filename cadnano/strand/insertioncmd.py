@@ -20,10 +20,10 @@ class AddInsertionCommand(UndoCommand):
         c_strand = self._comp_strand
         inst = self._insertion
         self._insertions[self._idx] = inst
-        strand.oligo()._incrementLength(inst.length())
+        strand.oligo()._incrementLength(inst.length(), emit_signals=True)
         strand.strandInsertionAddedSignal.emit(strand, inst)
         if c_strand:
-            c_strand.oligo()._incrementLength(inst.length())
+            c_strand.oligo()._incrementLength(inst.length(), emit_signals=True)
             c_strand.strandInsertionAddedSignal.emit(c_strand, inst)
     # end def
 
@@ -31,9 +31,9 @@ class AddInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertion
-        strand.oligo()._decrementLength(inst.length())
+        strand.oligo()._decrementLength(inst.length(), emit_signals=True)
         if c_strand:
-            c_strand.oligo()._decrementLength(inst.length())
+            c_strand.oligo()._decrementLength(inst.length(), emit_signals=True)
         idx = self._idx
         del self._insertions[idx]
         strand.strandInsertionRemovedSignal.emit(strand, idx)
@@ -58,9 +58,9 @@ class RemoveInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertion
-        strand.oligo()._decrementLength(inst.length())
+        strand.oligo()._decrementLength(inst.length(), emit_signals=True)
         if c_strand:
-            c_strand.oligo()._decrementLength(inst.length())
+            c_strand.oligo()._decrementLength(inst.length(), emit_signals=True)
         idx = self._idx
         del self._insertions[idx]
         strand.strandInsertionRemovedSignal.emit(strand, idx)
@@ -72,11 +72,11 @@ class RemoveInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertion
-        strand.oligo()._incrementLength(inst.length())
+        strand.oligo()._incrementLength(inst.length(), emit_signals=True)
         self._insertions[self._idx] = inst
         strand.strandInsertionAddedSignal.emit(strand, inst)
         if c_strand:
-            c_strand.oligo()._incrementLength(inst.length())
+            c_strand.oligo()._incrementLength(inst.length(), emit_signals=True)
             c_strand.strandInsertionAddedSignal.emit(c_strand, inst)
     # end def
 # end class
@@ -103,12 +103,14 @@ class ChangeInsertionCommand(UndoCommand):
         strand = self._strand
         c_strand = self._comp_strand
         inst = self._insertions[self._idx]
-        inst.setLength(self._new_length)
-        strand.oligo()._incrementLength(self._new_length - self._old_length)
+        inst.setLength(self._new_length, emit_signals=True)
+        strand.oligo()._incrementLength(self._new_length - self._old_length,
+                                        emit_signals=True)
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo()._incrementLength(
-                                        self._new_length - self._old_length)
+                                        self._new_length - self._old_length,
+                                        emit_signals=True)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 
@@ -117,11 +119,13 @@ class ChangeInsertionCommand(UndoCommand):
         c_strand = self._comp_strand
         inst = self._insertions[self._idx]
         inst.setLength(self._old_length)
-        strand.oligo()._decrementLength(self._new_length - self._old_length)
+        strand.oligo()._decrementLength(self._new_length - self._old_length,
+                                        emit_signals=True)
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo()._decrementLength(
-                                        self._new_length - self._old_length)
+                                        self._new_length - self._old_length,
+                                        emit_signals=True)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 # end class

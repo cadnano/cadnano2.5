@@ -174,11 +174,23 @@ class Document(CNObject):
     # end def
 
     def writeToFile(self, filename):
+        """ Convenience wrapper for `encodeToFile` to set the `document`
+        argument to `self`
+
+        Args:
+            filename (str): full path file name
+        """
         encodeToFile(filename, self)
     # end def
 
     def readFile(self, filename):
-        decodeFile(filename, document=self)
+        """ Convenience wrapper for `decodeFile` to always emit_signals and
+        set the `document` argument to `self`
+
+        Args:
+            filename (str): full path file name
+        """
+        return decodeFile(filename, document=self, emit_signals=True)
     # end def
 
     # def assemblies(self):

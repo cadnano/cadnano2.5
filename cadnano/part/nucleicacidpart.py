@@ -1237,10 +1237,10 @@ class NucleicAcidPart(Part):
             c = SetVHPropertyCommand(self, [id_num], keys, values, safe)
             self.undoStack().push(c)
         else:
-            self._setVirtualHelixProperties(id_num, keys, values, safe=safe)
+            self._setVirtualHelixProperties(id_num, keys, values, emit_signals=safe)
     # end
 
-    def _setVirtualHelixProperties(self, id_num, keys, values, safe=True):
+    def _setVirtualHelixProperties(self, id_num, keys, values, emit_signals=True):
         """Private Version: Keys and values can be :obj:`array-like` of equal
         length or singular values.
 
@@ -1251,9 +1251,9 @@ class NucleicAcidPart(Part):
             keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
             value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
                 the value or values matching the key order
-            safe (bool): optionally echew signalling
+            emit_signals (bool): optionally echew signaling
         """
-        if safe:
+        if emit_signals:
             offset_and_size_tuple = self.getOffsetAndSize(id_num)
             # 1. Find insert indices
             if offset_and_size_tuple is None:
@@ -1262,7 +1262,7 @@ class NucleicAcidPart(Part):
 
         if not isinstance(values, (tuple, list)):
             keys, values = (keys,), (values,)
-        if safe:
+        if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(
                 self, id_num, self.getVirtualHelix(id_num), keys, values)
     # end
@@ -2422,7 +2422,7 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
-    def _addOligoToSet(self, oligo):
+    def _addOligoToSet(self, oligo, emit_signals=False):
         """This is an exceptional private method not part of the API as this
         is to be called only by an Oligo.
 
@@ -2430,17 +2430,19 @@ class NucleicAcidPart(Part):
             oligo (Oligo): Oligo to add to the Part
         """
         self._oligos.add(oligo)
-        self.partOligoAddedSignal.emit(self, oligo)
+        if emit_signals:
+            self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def removeOligoFromSet(self, oligo):
+    def _removeOligoFromSet(self, oligo, emit_signals=False):
         """ Not a designated method
         (there exist methods that also directly
         remove parts from self._oligos)
         """
         try:
             self._oligos.remove(oligo)
-            oligo.oligoRemovedSignal.emit(self, oligo)
+            if emit_signals:
+                oligo.oligoRemovedSignal.emit(self, oligo)
         except KeyError:
             print(util.trace(5))
             print("error removing oligo", oligo)
@@ -2854,7 +2856,7 @@ class NucleicAcidPart(Part):
         self._current_base_count = 0
     # end def
 
-    def setAbstractSequences(self):
+    def setAbstractSequences(self, emit_signals=False):
         """Reset, assign, and display abstract sequence numbers."""
         # reset all sequence numbers
         print("setting abstract sequence")
@@ -2869,7 +2871,8 @@ class NucleicAcidPart(Part):
         # display new sequence numbers
         for oligo in self._oligos:
             oligo.displayAbstractSequences()
-            oligo.oligoSequenceAddedSignal.emit(oligo)
+            if emit_signals:
+                oligo.oligoSequenceAddedSignal.emit(oligo)
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###

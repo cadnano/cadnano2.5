@@ -43,7 +43,7 @@ class RemoveStrandCommand(UndoCommand):
             color_list = prefs.STAP_COLORS
             color = random.choice(color_list)
             olg3p._setColor(color)
-            olg3p.refreshLength()
+            olg3p.refreshLength(emit_signals=True)
     # end def
 
     def redo(self):
@@ -54,13 +54,15 @@ class RemoveStrandCommand(UndoCommand):
         doc.removeStrandFromSelection(strand)
         strandset._removeFromStrandList(strand)
 
+        fSetOligo = Strand.setOligo
+
         strand5p = self._old_strand5p
         strand3p = self._old_strand3p
         oligo = self._oligo
         olg5p = self._new_oligo5p
         olg3p = self._new_oligo3p
 
-        oligo.removeFromPart()
+        oligo.removeFromPart(emit_signals=True)
 
         if strand5p is not None:
             strand5p.setConnection3p(None)
@@ -70,9 +72,9 @@ class RemoveStrandCommand(UndoCommand):
         # Clear connections and update oligos
         if strand5p is not None:
             for s5p in oligo.strand5p().generator3pStrand():
-                Strand.setOligo(s5p, olg5p)
-            olg5p.refreshLength()
-            olg5p.addToPart(strandset.part())
+                fSetOligo(s5p, olg5p, emit_signals=True)
+            olg5p.refreshLength(emit_signals=True)
+            olg5p.addToPart(strandset.part(), emit_signals=True)
             if self._solo:
                 part = strandset.part()
                 id_num = strandset.idNum()
@@ -84,8 +86,8 @@ class RemoveStrandCommand(UndoCommand):
             if not oligo.isLoop():
                 # apply 2nd oligo copy to all 3' downstream strands
                 for s3p in strand3p.generator3pStrand():
-                    Strand.setOligo(s3p, olg3p)
-                olg3p.addToPart(strandset.part())
+                    fSetOligo(s3p, olg3p, emit_signals=True)
+                olg3p.addToPart(strandset.part(), emit_signals=True)
             if self._solo:
                 part = strandset.part()
                 id_num = strandset.idNum()
@@ -108,7 +110,7 @@ class RemoveStrandCommand(UndoCommand):
         # Restore the strand
         strand = self._strand
         strandset = self._strandset
-        # doc = strandset._document
+
         # Add the new_strand to the s_set
         strandset._addToStrandList(strand)
         strand5p = self._old_strand5p
@@ -116,6 +118,8 @@ class RemoveStrandCommand(UndoCommand):
         oligo = self._oligo
         olg5p = self._new_oligo5p
         olg3p = self._new_oligo3p
+
+        fSetOligo = Strand.setOligo
 
         # Restore connections to this strand
         if strand5p is not None:
@@ -125,13 +129,13 @@ class RemoveStrandCommand(UndoCommand):
             strand3p.setConnection5p(strand)
 
         # Restore the oligo
-        oligo.addToPart(strandset.part())
+        oligo.addToPart(strandset.part(), emit_signals=True)
         if olg5p:
-            olg5p.removeFromPart()
+            olg5p.removeFromPart(emit_signals=True)
         if olg3p:
-            olg3p.removeFromPart()
+            olg3p.removeFromPart(emit_signals=True)
         for s5p in oligo.strand5p().generator3pStrand():
-            Strand.setOligo(s5p, oligo)
+            fSetOligo(s5p, oligo, emit_signals=True)
         # end for
 
         # Emit a signal to notify on completion

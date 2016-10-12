@@ -33,15 +33,12 @@ except ImportError:
     from distutils.core import setup, Extension
 import distutils.command
 
-# from distutils.command.install import install as _install
 from setuptools.command.install import install as _install
 from distutils import log as setup_log
 
 from os.path import join as pjoin
 from os.path import relpath as rpath
 
-# with open('new_readme.rst') as fd:
-#     LONG_DESCRIPTION = fd.read()
 LONG_DESCRIPTION = __doc__
 
 PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
@@ -133,7 +130,6 @@ setup(
     long_description=LONG_DESCRIPTION,
     classifiers=[
         'Programming Language :: C',
-        'Programming Language :: Cython',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',

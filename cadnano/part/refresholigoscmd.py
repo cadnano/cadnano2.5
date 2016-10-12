@@ -30,15 +30,12 @@ class RefreshOligosCommand(UndoCommand):
             for strand in fwd_ss:
                 visited[strand] = False
 
+        fSetOligo = Strand.setOligo
         for strand in list(visited.keys()):
             if visited[strand]:
                 continue
             visited[strand] = True
             start_oligo = strand.oligo()
-
-            # if colors is not None:
-            #     # print("refresh color", colors[1])
-            #     start_oligo._setColor(colors[1])
 
             strand5gen = strand.generator5pStrand()
             # this gets the oligo and burns a strand in the generator
@@ -46,8 +43,8 @@ class RefreshOligosCommand(UndoCommand):
             for strand5 in strand5gen:
                 oligo5 = strand5.oligo()
                 if oligo5 != start_oligo:
-                    oligo5.removeFromPart()
-                    Strand.setOligo(strand5, start_oligo)  # emits strandHasNewOligoSignal
+                    oligo5.removeFromPart(emit_signals=True)
+                    fSetOligo(strand5, start_oligo, emit_signals=True)  # emits strandHasNewOligoSignal
                 visited[strand5] = True
             # end for
             start_oligo.setStrand5p(strand5)
@@ -60,11 +57,11 @@ class RefreshOligosCommand(UndoCommand):
                 for strand3 in strand3gen:
                     oligo3 = strand3.oligo()
                     if oligo3 != start_oligo:
-                        oligo3.removeFromPart()
-                        Strand.setOligo(strand3, start_oligo)  # emits strandHasNewOligoSignal
+                        oligo3.removeFromPart(emit_signals=True)
+                        fSetOligo(strand3, start_oligo, emit_signals=True)  # emits strandHasNewOligoSignal
                     visited[strand3] = True
                 # end for
-            start_oligo.refreshLength()
+            start_oligo.refreshLength(emit_signals=True)
         # end for
 
         for strand in visited.keys():

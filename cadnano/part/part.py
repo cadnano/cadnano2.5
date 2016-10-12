@@ -239,9 +239,10 @@ class Part(CNObject):
             self._setProperty(key, value)
     # end def
 
-    def _setProperty(self, key, value):
+    def _setProperty(self, key, value, emit_signals=False):
         self._group_properties[key] = value
-        self.partPropertyChangedSignal.emit(self, key, value)
+        if emit_signals:
+            self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
     def getName(self):

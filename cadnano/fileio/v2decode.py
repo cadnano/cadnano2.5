@@ -10,7 +10,7 @@ from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
 
-def decode(document, obj):
+def decode(document, obj, emit_signals=False):
     """Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
     """
@@ -94,7 +94,8 @@ def decode(document, obj):
         part.createVirtualHelix(x, y, 0., num_bases,
                                 id_num=vh_num, use_undostack=False)
     # zoom to fit
-    part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+    if emit_signals:
+        part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
     if not getReopen():
         setBatch(False)
     part.setImportedVHelixOrder(ordered_id_list)

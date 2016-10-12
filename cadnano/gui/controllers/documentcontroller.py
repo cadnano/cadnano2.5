@@ -467,7 +467,7 @@ class DocumentController():
         print("triggered seqslot")
         ap = self._document.activePart()
         if ap is not None:
-            self._document.activePart().setAbstractSequences()
+            self._document.activePart().setAbstractSequences(emit_signals=True)
     # end def
 
     def actionPrefsSlot(self):

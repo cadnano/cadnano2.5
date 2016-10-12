@@ -4,7 +4,7 @@ from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
 from cadnano.cnenum import PointType
 
-def decode(document, obj):
+def decode(document, obj, emit_signals=False):
     """ Decode a a deserialized Document dictionary
 
     Args:
@@ -13,7 +13,7 @@ def decode(document, obj):
     """
     name = obj['name']
     for part_dict in obj['parts']:
-        part_dict = decodePart(document, part_dict)
+        part_dict = decodePart(document, part_dict, emit_signals=emit_signals)
 
     modifications = obj['modifications']
     for mod_id, item in modifications.items():
@@ -25,7 +25,7 @@ def decode(document, obj):
     return
 # end def
 
-def decodePart(document, part_dict):
+def decodePart(document, part_dict, emit_signals=False):
     """ Decode a a deserialized Part dictionary
 
     Args:
@@ -58,7 +58,8 @@ def decodePart(document, part_dict):
                                     use_undostack=False)
         # end for
         # zoom to fit
-        part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+        if emit_signals:
+            part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
 
     strands = part_dict['strands']
     strand_index_list = strands['indices']

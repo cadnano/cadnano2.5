@@ -29,8 +29,7 @@ class RemoveOligoCommand(UndoCommand):
         self._strand3p = strand
         # o.setPart(None)
         # remove Oligo from part but don't set parent to None?
-        part.removeOligoFromSet(o)
-        o.oligoRemovedSignal.emit(part, o)
+        part._removeOligoFromSet(o, emit_signals=True)
     # end def
 
     def undo(self):
@@ -40,7 +39,6 @@ class RemoveOligoCommand(UndoCommand):
 
         for strand in list(s3p.generator5pStrand()):
             strandset = strand.strandSet()
-
             strandset._addToStrandList(strand)
 
             # Emit a signal to notify on completion
@@ -51,6 +49,6 @@ class RemoveOligoCommand(UndoCommand):
 
         # add Oligo to part but don't set parent to None?
         # o.setPart(part)
-        part._addOligoToSet(o)
+        part._addOligoToSet(o, emit_signals=True)
     # end def
 # end class

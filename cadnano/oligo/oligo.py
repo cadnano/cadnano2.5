@@ -130,9 +130,10 @@ class Oligo(CNObject):
             self._setProperty(key, value)
     # end def
 
-    def _setProperty(self, key, value):
+    def _setProperty(self, key, value, emit_signals=False):
         self._props[key] = value
-        self.oligoPropertyChangedSignal.emit(self, key, value)
+        if emit_signals:
+            self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 
     def getName(self):
@@ -164,11 +165,11 @@ class Oligo(CNObject):
         self._props['color'] = color
     # end def
 
-    def _setLength(self, length):
+    def _setLength(self, length, emit_signals):
         before = self.shouldHighlight()
         key = 'length'
         self._props[key] = length
-        if before != self.shouldHighlight():
+        if emit_signals and before != self.shouldHighlight():
             self.oligoSequenceClearedSignal.emit(self)
             self.oligoPropertyChangedSignal.emit(self, key, length)
     # end def
@@ -339,10 +340,10 @@ class Oligo(CNObject):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def addToPart(self, part):
+    def addToPart(self, part, emit_signals=False):
         self._part = part
         self.setParent(part)
-        part._addOligoToSet(self)
+        part._addOligoToSet(self, emit_signals)
     # end def
 
     def setPart(self, part):
@@ -363,32 +364,32 @@ class Oligo(CNObject):
         return cmds
     # end def
 
-    def _decrementLength(self, delta):
+    def _decrementLength(self, delta, emit_signals):
         self._setLength(self.length() - delta)
     # end def
 
-    def _incrementLength(self, delta):
-        self._setLength(self.length() + delta)
+    def _incrementLength(self, delta, emit_signals):
+        self._setLength(self.length() + delta, emit_signals)
     # end def
 
-    def refreshLength(self):
+    def refreshLength(self, emit_signals=False):
         temp = self.strand5p()
         if not temp:
             return
         length = 0
         for strand in temp.generator3pStrand():
             length += strand.totalLength()
-        self._setLength(length)
+        self._setLength(length, emit_signals)
     # end def
 
-    def removeFromPart(self):
+    def removeFromPart(self, emit_signals=False):
         """This method merely disconnects the object from the model.
         It still lives on in the undoStack until clobbered
 
         Note: don't set self._part = None because we need to continue passing
         the same reference around.
         """
-        self._part.removeOligoFromSet(self)
+        self._part._removeOligoFromSet(self, emit_signals)
         self.setParent(None)
     # end def
 

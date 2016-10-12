@@ -21,13 +21,13 @@ class SetPropertyCommand(UndoCommand):
         key = self._key
         val = self._value
         for obj in self._objs:
-            obj._setProperty(key, val)
+            obj._setProperty(key, val, emit_signals=True)
     # end def
 
     def undo(self):
         key = self._key
         for obj, val in zip(self._objs, self._old_values):
-            obj._setProperty(key, val)
+            obj._setProperty(key, val, emit_signals=True)
     # end def
 # end class
 
@@ -56,7 +56,7 @@ class SetVHPropertyCommand(UndoCommand):
         vals = self._values
         safe = self._safe
         for id_num in self._id_nums:
-            part._setVirtualHelixProperties(id_num, keys, vals, safe=safe)
+            part._setVirtualHelixProperties(id_num, keys, vals, emit_signals=safe)
     # end def
 
     def undo(self):
@@ -64,6 +64,6 @@ class SetVHPropertyCommand(UndoCommand):
         keys = self._keys
         safe = self._safe
         for id_num, vals in zip(self._id_nums, self._old_values):
-            part._setVirtualHelixProperties(id_num, keys, vals, safe=safe)
+            part._setVirtualHelixProperties(id_num, keys, vals, emit_signals=safe)
     # end def
 # end class

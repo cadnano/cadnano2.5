@@ -35,7 +35,8 @@ class MergeCommand(UndoCommand):
 
         # update the new oligo length if it's not a loop
         if s_low_olg != s_high_olg:
-            self._new_oligo._setLength(s_low_olg.length() + s_high_olg.length())
+            self._new_oligo._setLength(s_low_olg.length() + s_high_olg.length(),
+                                        emit_signals=True)
 
         # Create the new_strand by copying the priority strand to
         # preserve its properties
@@ -71,6 +72,8 @@ class MergeCommand(UndoCommand):
         l_olg = s_low.oligo()
         h_olg = s_high.oligo()
 
+        fSetOligo = Strand.setOligo
+
         # Remove old strands from the s_set (reusing idx, so order matters)
         ss._removeFromStrandList(s_low, update_segments=False)
         ss._removeFromStrandList(s_high, update_segments=False)
@@ -95,13 +98,13 @@ class MergeCommand(UndoCommand):
 
         # Traverse the strands via 3'conns to assign the new oligo
         for strand in olg.strand5p().generator3pStrand():
-            Strand.setOligo(strand, olg)  # emits strandHasNewOligoSignal
+            fSetOligo(strand, olg, emit_signals=True)  # emits strandHasNewOligoSignal
 
         # Add new oligo and remove old oligos
-        olg.addToPart(ss.part())
-        l_olg.removeFromPart()
+        olg.addToPart(ss.part(), emit_signals=True)
+        l_olg.removeFromPart(emit_signals=True)
         if h_olg != l_olg:  # check if a loop was created
-            h_olg.removeFromPart()
+            h_olg.removeFromPart(emit_signals=True)
 
         # Emit Signals related to destruction and addition
         s_low.strandRemovedSignal.emit(s_low)
@@ -115,7 +118,9 @@ class MergeCommand(UndoCommand):
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
-        # idx = self._s_set_idx
+
+        fSetOligo = Strand.setOligo
+
         olg = self._new_oligo
         l_olg = self._s_low_oligo
         h_olg = self._s_high_oligo
@@ -143,15 +148,15 @@ class MergeCommand(UndoCommand):
 
         # Traverse the strands via 3'conns to assign the old oligo
         for strand in l_olg.strand5p().generator3pStrand():
-            Strand.setOligo(strand, l_olg)  # emits strandHasNewOligoSignal
+            fSetOligo(strand, l_olg, emit_signals=True)  # emits strandHasNewOligoSignal
         for strand in h_olg.strand5p().generator3pStrand():
-            Strand.setOligo(strand, h_olg)  # emits strandHasNewOligoSignal
+            fSetOligo(strand, h_olg, emit_signals=True)  # emits strandHasNewOligoSignal
 
         # Remove new oligo and add old oligos
-        olg.removeFromPart()
-        l_olg.addToPart(s_low.part())
+        olg.removeFromPart(emit_signals=True)
+        l_olg.addToPart(s_low.part(), emit_signals=True)
         if h_olg != l_olg:
-            h_olg.addToPart(s_high.part())
+            h_olg.addToPart(s_high.part(), emit_signals=True)
 
         # Emit Signals related to destruction and addition
         new_strand.strandRemovedSignal.emit(new_strand)
