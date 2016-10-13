@@ -229,6 +229,21 @@ class OrigamiPartItem(QGraphicsRectItem):
 
     ### PRIVATE METHODS ###
     def _addBasesClicked(self):
+
+        @pyqtSlot(int)
+        def _addBasesCallback(n):
+            """
+            Given a user-chosen number of bases to add, snap it to an index
+            where index modulo stepsize is 0 and calls resizeVirtualHelices to
+            adjust to that size.
+            """
+            part = self._model_part
+            self._addBasesDialog.intValueSelected.disconnect(_addBasesCallback)
+            del self._addBasesDialog
+            maxDelta = n // part.stepSize() * part.stepSize()
+            part.resizeVirtualHelices(0, maxDelta)
+        # end def
+
         part = self._model_part
         step = part.stepSize()
         self._addBasesDialog = dlg = QInputDialog(self.window())
@@ -240,23 +255,12 @@ class OrigamiPartItem(QGraphicsRectItem):
         dlg.setLabelText(( "Number of bases to add to the existing"\
                          + " %i bases\n(must be a multiple of %i)")\
                          % (part.maxBaseIdx(), step))
-        dlg.intValueSelected.connect(self._addBasesCallback)
+        dlg.intValueSelected.connect(_addBasesCallback)
+
         dlg.open()
     # end def
 
-    @pyqtSlot(int)
-    def _addBasesCallback(self, n):
-        """
-        Given a user-chosen number of bases to add, snap it to an index
-        where index modulo stepsize is 0 and calls resizeVirtualHelices to
-        adjust to that size.
-        """
-        part = self._model_part
-        self._addBasesDialog.intValueSelected.disconnect(self._addBasesCallback)
-        del self._addBasesDialog
-        maxDelta = n // part.stepSize() * part.stepSize()
-        part.resizeVirtualHelices(0, maxDelta)
-    # end def
+
 
     def _removeBasesClicked(self):
         """
