@@ -34,7 +34,7 @@ class Oligo(CNObject):
     """
     editable_properties = ['name', 'color']
 
-    def __init__(self, part, color=None):
+    def __init__(self, part, color=None, length=0):
         super(Oligo, self).__init__(part)
         self._part = part
         self._strand5p = None

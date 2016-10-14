@@ -7,11 +7,13 @@ from cadnano.oligo import Oligo
 from cadnano.strand import Strand
 
 class CreateStrandCommand(UndoCommand):
-    """
-    Create a new Strand based with bounds (base_idx_low, base_idx_high),
+    """Create a new `Strand` based with bounds (base_idx_low, base_idx_high),
     and insert it into the strandset at position strandset_idx. Also,
     create a new Oligo, add it to the Part, and point the new Strand
     at the oligo.
+
+    `Strand` explicitly do not create `Oligo` as do to the 1 to many nature of
+    Oligos
     """
     def __init__(self,  strandset,
                         base_idx_low, base_idx_high,
@@ -25,8 +27,7 @@ class CreateStrandCommand(UndoCommand):
         self._strandset = strandset
         doc = strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
-        self._new_oligo = Oligo(None, color)  # redo will set part
-        self._new_oligo._setLength(self._strand.totalLength(), emit_signals=True)
+        self._new_oligo = Oligo(None, color, length=self._strand.totalLength())  # redo will set part
         self.update_segments = update_segments
     # end def
 

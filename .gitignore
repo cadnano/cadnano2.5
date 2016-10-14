@@ -7,3 +7,6 @@ build/
 dist/
 cadnano.egg-info/
 docs/_build/
+misc/scratch/pyqtdeploy/build/
+misc/scratch/pyqtdeploy/winsysroot/
+.cache/
