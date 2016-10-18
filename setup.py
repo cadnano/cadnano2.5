@@ -1,30 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-__doc__ = '''
-===================================================================
-cadnano: computer-aided design tool for creating DNA nanostructures
-===================================================================
-
-**cadnano**
-
-Installation
-------------
-
-If you would like to install cadnano in your local Python environment
-you may do so the setup.py script::
-
-  $ python setup.py install
-'''
-
 # make Wheels with:
 # python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35
 # python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35
-
 
 import os
 import shutil
 import subprocess
 import sys
+import ast
+import re
 
 from setuptools import find_packages
 try:
@@ -38,6 +23,37 @@ from distutils import log as setup_log
 
 from os.path import join as pjoin
 from os.path import relpath as rpath
+
+# Begin modified code from Flask's version getter
+# BSD license
+# Copyright (c) 2015 by Armin Ronacher and contributors.
+# https://github.com/pallets/flask
+_version_re = re.compile(r'__version__\s+=\s+(.*)')
+
+with open('cadnano/__init__.py', 'rb') as f:
+    version = str(ast.literal_eval(_version_re.search(
+        f.read().decode('utf-8')).group(1)))
+# end Flask derived code
+
+__doc__ = '''
+===================================================================
+cadnano: computer-aided design tool for creating DNA nanostructures
+===================================================================
+
+**cadnano** %s beta
+
+Installation
+------------
+
+If you would like to install cadnano in your local Python environment
+you may do so the setup.py script::
+
+  $ python setup.py install
+
+or::
+
+  $ pip install cadnano
+'''% (version)
 
 LONG_DESCRIPTION = __doc__
 
@@ -121,8 +137,8 @@ cn_packages = find_packages(exclude=exclude_list)
 
 setup(
     name='cadnano',
-    version='2.5.0',
-    license='GPLv3',
+    version=version,
+    license='multiple',
     author='Nick Conway, Shawn Douglas',
     author_email='a.grinner@gmail.com',
     url='https://github.com/cadnano/cadnano2.5',
@@ -152,5 +168,6 @@ setup(
     scripts=[],
     package_data={'cadnano': cn_files},
     entry_points=entry_points,
-    cmdclass=cmdclass
+    cmdclass=cmdclass,
+    platforms='any'
 )

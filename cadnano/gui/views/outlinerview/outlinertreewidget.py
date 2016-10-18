@@ -1,3 +1,12 @@
+# This file may be used under the terms of the GNU General Public License
+# version 3.0 as published by the Free Software Foundation and appearing in
+# the file LICENSE included in the packaging of this file.  Please review the
+# following information to ensure the GNU General Public License version 3.0
+# requirements will be met: http://www.gnu.org/copyleft/gpl.html.
+#
+# This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+# WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
 from PyQt5.QtCore import QDataStream
 from PyQt5.QtCore import Qt, QRect, QVariant
 from PyQt5.QtCore import QItemSelectionModel, QItemSelection
@@ -357,14 +366,12 @@ class OutlinerTreeWidget(QTreeWidget):
         for x in selected_items:
             if x.parent() != dest_parent:
                 return
-        # print("VH:", dest_item.idNum()) # dropped above this item
-        # print("selected", [x.idNum() for x in selected_items])
+
         res = self.myDropEvent(event, dest_item)
         if isinstance(dest_item, OutlineVirtualHelixItem):
             part = dest_item.part()
             vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
             part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
-        # return QTreeWidget.dropEvent(self, event)
     # end def
 
     def myDropEvent(self, event, drop_item):
@@ -372,6 +379,8 @@ class OutlinerTreeWidget(QTreeWidget):
         per https://bugreports.qt.io/browse/QTBUG-45320
         doing reverse ordering of items on dropping. reimplementation in python
         from C++
+
+        For this code we need dual GPL3 license instead of pure BSD3
         """
         if event.source() == self and (event.dropAction() == Qt.MoveAction or
                                        self.dragDropMode() == QAbstractItemView.InternalMove):

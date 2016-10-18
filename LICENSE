@@ -1,6 +1,7 @@
 Copyright (c) 2016, Wyss Institute at Harvard University
 
-Files **NOT** in the paths `cadnano/gui` and `pyqttools/` are licensed as follows:
+Files **NOT** in the paths `cadnano/gui/views/outlinerview/outlinertreewidget.py`
+are licensed as follows:
 
 The BSD 3-Clause License
 ------------------------
@@ -33,7 +34,7 @@ The BSD 3-Clause License
     OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
     ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-Files in the paths `cadnano/gui` and `pyqttools/` are licensed as follows:
+File `cadnano/gui/views/outlinerview/outlinertreewidget.py` is licensed as follows:
 
 GNU GENERAL PUBLIC LICENSE
 --------------------------
