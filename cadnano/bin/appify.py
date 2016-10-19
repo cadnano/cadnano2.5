@@ -38,7 +38,7 @@ def Usage():
 version = "1.0.0"
 bundleIdentifier = "org.test.test"
 
-def doAppify(script, project):
+def doAppify(script, project, app_icon_path=None):
     apppath = os.path.abspath(pjoin('.', project + ".app"))
     projectversion = project + " " + version
     if os.path.exists(apppath):
@@ -92,9 +92,10 @@ def doAppify(script, project):
     f.write("APPL????")
     f.close()
 
-    # adding icon
-    # os.makedirs(pjoin(apppath, "Contents", "Resources"))
-    # shutil.copy2(my_icon, pjoin(apppath, "Contents", "Resources", "%s.icns" % project))
+    if app_icon_path is not None:
+        # adding icon
+        os.makedirs(pjoin(apppath, "Contents", "Resources"))
+        shutil.copy2(app_icon_path, pjoin(apppath, "Contents", "Resources", "%s.icns" % project))
 
     python_exe = os.path.realpath(sys.executable)
     # create a script that launches python with the requested app

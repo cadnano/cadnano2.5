@@ -41,7 +41,11 @@ def post_install():
         import cadnano.bin.appify as appify
         # print("DDD", sys.exec_prefix, pjoin(script_path, 'main.py'))
         CN_BIN_PATH = os.path.dirname(os.path.abspath(appify.__file__))
-        appify.doAppify(pjoin(CN_BIN_PATH, 'main.py'), 'cadnano')
+        CN_PATH = os.path.dirname(CN_BIN_PATH)
+        ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
+                            'mainwindow', 'images', 'radnano-app-icon.icns')
+        appify.doAppify(pjoin(CN_BIN_PATH, 'main.py'), 'cadnano',
+                            app_icon_path=ICON_PATH)
 # end def
 
 if __name__ == '__main__':
