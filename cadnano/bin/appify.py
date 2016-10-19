@@ -106,7 +106,11 @@ def doAppify(script, project, app_icon_path=None):
     f.close()
     os.chmod(shell, os.stat(shell).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     print("Copying %s.app to /Applications..." % (project))
-    shutil.move(apppath, pjoin('/Applications', project + ".app"))
+    install_path = pjoin('/Applications', project + ".app")
+    if os.path.exists(install_path):
+        print("Deleting existin /Applications/%s.app ..." % (project))
+        shutil.rmtree(install_path)
+    shutil.move(apppath, install_path)
 # end def
 
 if __name__ == '__main__':
