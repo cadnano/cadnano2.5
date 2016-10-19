@@ -37,6 +37,11 @@ def post_install():
         [shutil.copy2(o, d) for o, d in zip(cadnano_binary_fps,
                                                new_cadnano_binary_fps)]
         list(map(makeExecutable, new_cadnano_binary_fps))
+    elif sys.platform == 'darwin':
+        import cadnano.bin.appify as appify
+        # print("DDD", sys.exec_prefix, pjoin(script_path, 'main.py'))
+        CN_BIN_PATH = os.path.dirname(os.path.abspath(appify.__file__))
+        appify.doAppify(pjoin(CN_BIN_PATH, 'main.py'), 'cadnano')
 # end def
 
 if __name__ == '__main__':
