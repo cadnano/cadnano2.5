@@ -11,11 +11,11 @@ sys.path.insert(0, '.')
 
 PROJECT_DIR = os.path.dirname(ROOT_DIR)
 
-CADNANO_DEFAULT_DOCUMENT = 'simple.json'
+# CADNANO_DEFAULT_DOCUMENT = 'simple.json'
 
-os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(PROJECT_DIR, 'cadnano',
-                                            'tests', 'data',
-                                            CADNANO_DEFAULT_DOCUMENT)
+# os.environ['CADNANO_DEFAULT_DOCUMENT'] = os.path.join(PROJECT_DIR, 'cadnano',
+#                                             'tests', 'data',
+#                                             CADNANO_DEFAULT_DOCUMENT)
 
 """
 run with:
