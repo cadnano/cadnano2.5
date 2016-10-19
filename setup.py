@@ -135,6 +135,17 @@ exclude_list = ['*.genbank', '*.fasta',
                 'pyqtdeploy', 'nno2stl', '*.autobreak']
 cn_packages = find_packages(exclude=exclude_list)
 
+install_requires = [
+        'PyQt5==5.7',
+        'numpy>=1.10.0',
+        'pandas>=0.18',
+        'pytz>=2011k',
+        'python-dateutil>=2'
+]
+
+if sys.platform == 'win32':
+    install_requires += ['pypiwin32']
+
 setup(
     name='cadnano',
     version=version,
@@ -158,13 +169,7 @@ setup(
     packages=cn_packages,
     ext_modules=[],
     zip_safe=False,
-    install_requires=[
-        'PyQt5==5.7', # Uncomment this when Official wheels get fixed
-        'numpy>=1.10.0',
-        'pandas>=0.18',
-        'pytz>=2011k',
-        'python-dateutil>=2'
-    ],
+    install_requires=install_requires,
     scripts=[],
     package_data={'cadnano': cn_files},
     entry_points=entry_points,
