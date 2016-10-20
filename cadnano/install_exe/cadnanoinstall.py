@@ -32,11 +32,19 @@ def post_install():
     if sys.platform == 'win32':
         new_cadnano_binary_fps = [pjoin( script_path, fn)
                                          for fn in cadnano_binaries]
-        print("Copying from ... :", cadnano_binary_fps)
-        print("... to:", new_cadnano_binary_fps)
-        [shutil.copy2(o, d) for o, d in zip(cadnano_binary_fps,
-                                               new_cadnano_binary_fps)]
-        list(map(makeExecutable, new_cadnano_binary_fps))
+        # print("Copying from ... :", cadnano_binary_fps)
+        # print("... to:", new_cadnano_binary_fps)
+        # [shutil.copy2(o, d) for o, d in zip(cadnano_binary_fps,
+        #                                        new_cadnano_binary_fps)]
+        # list(map(makeExecutable, new_cadnano_binary_fps))
+        print("Installing Start menu shortcut...")
+        import winshell
+        link_filepath = os.path.join(winshell.programs(), "cadnano.lnk")
+        with winshell.shortcut(link_filepath) as link:
+          link.path = new_cadnano_binary_fps[0]
+          link.description = "Shortcut to cadnano"
+          # link.arguments = ""
+        print("...Installation Complete")
     elif sys.platform == 'darwin':
         import cadnano.bin.appify as appify
         CN_BIN_PATH = os.path.dirname(os.path.abspath(appify.__file__))
@@ -48,6 +56,7 @@ def post_install():
                             'mainwindow', 'images', 'radnano-app-icon.icns')
         appify.doAppify(entry_path, 'cadnano',
                             app_icon_path=ICON_PATH)
+        print("...Installation Complete")
 # end def
 
 if __name__ == '__main__':

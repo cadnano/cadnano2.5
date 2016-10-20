@@ -144,7 +144,7 @@ install_requires = [
 ]
 
 if sys.platform == 'win32':
-    install_requires += ['pypiwin32']
+    install_requires += ['pypiwin32', 'winshell']
 
 setup(
     name='cadnano',
