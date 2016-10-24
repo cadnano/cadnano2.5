@@ -40,9 +40,14 @@ def post_install():
         print("Installing Start menu shortcut...")
         import winshell
         link_filepath = os.path.join(winshell.programs(), "cadnano.lnk")
+        import cadnano
+        CN_PATH = os.path.dirname(os.path.abspath(cadnano.__file__))
+        ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
+                    'mainwindow', 'images', 'radnano-app-icon.ico')
         with winshell.shortcut(link_filepath) as link:
           link.path = new_cadnano_binary_fps[0]
           link.description = "Shortcut to cadnano"
+          link.icon_location = (ICON_PATH, 0)
           # link.arguments = ""
         print("...Installation Complete")
     elif sys.platform == 'darwin':
