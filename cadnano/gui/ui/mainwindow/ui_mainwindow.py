@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.7
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -427,7 +427,6 @@ class Ui_MainWindow(object):
         self.main_toolbar.addAction(self.action_path_skip)
         self.main_toolbar.addAction(self.action_path_add_seq)
         self.main_toolbar.addAction(self.action_path_mods)
-        self.main_toolbar.addAction(self.action_vhelix_snap)
         self.main_toolbar.addSeparator()
         self.main_toolbar.addAction(self.action_export_staples)
         self.main_toolbar.addAction(self.action_SVG)

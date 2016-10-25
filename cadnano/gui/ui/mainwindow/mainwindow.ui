@@ -299,7 +299,6 @@
    <addaction name="action_path_skip"/>
    <addaction name="action_path_add_seq"/>
    <addaction name="action_path_mods"/>
-   <addaction name="action_vhelix_snap"/>
    <addaction name="separator"/>
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
