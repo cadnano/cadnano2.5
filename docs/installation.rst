@@ -15,16 +15,38 @@ There are many ways to get Python on your system.
 - If you just want a clean Python install and nothing else, installers from `python.org <https://www.python.org/>`__ work great too.
 
 
-Cadnano will run on Python 3.3, 3.4 and 3.5, but we only support 3.5. We do not support Python 2.X.
+cadnano will run on Python 3.3, 3.4 and 3.5, but we only support 3.5. We do not support Python 2.X.
 
 
 Install cadnano
 ---------------
+Using python 3.5  `pip` will install cadnano and all dependencies from PyPi
+::
 
-   ::
+   $ pip3 install cadnano
 
-       pip3 install cadnano
+or from a root of a cloned `cadnano2.5 <https://github.com/cadnano/cadnano2.5>` repository::
 
+   $ python setup.py install
+
+Both of these methods will install key dependencies like:
+
+-   `PyQt5==5.7 <https://pypi.python.org/pypi/PyQt5/5.7>`
+-   `numpy>=1.10.0 <https://pypi.python.org/pypi/numpy/1.11.2>`
+-   `pandas>=0.18 <https://pypi.python.org/pypi/pandas/0.19.0>`
+-   `pytz>=2011k <https://pypi.python.org/pypi/pytz/2016.7>`
+-   `python-dateutil>=2 <https://pypi.python.org/pypi/python-dateutil/2.5.3>`
+
+After `pip` or `setup.py` installation you can install Windows start menu shortcuts or a MacOS Application
+of cadanno by running at the commandline::
+
+    $ cadnanoinstall
+
+Allowing you to click on the application icon to launch cadnano.  otherwise just run at the command line::
+
+    $ cadnano
+
+to launch.
 
 Advanced: Building from scratch
 -------------------------------
