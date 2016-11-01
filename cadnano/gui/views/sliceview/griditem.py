@@ -8,7 +8,10 @@ from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.cnenum import GridType
 
 from . import slicestyles as styles
+_RADIUS = styles.SLICE_HELIX_RADIUS
 _ZVALUE = styles.ZSLICEHELIX + 1
+HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
+DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 
 
 class GridItem(QGraphicsPathItem):
@@ -298,6 +301,7 @@ class GridPoint(QGraphicsEllipseItem):
         """
         self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
+        self.grid.part_item.vhi_hint_item.setPos(self.scenePos()-QPointF(_RADIUS-DELTA, _RADIUS-DELTA))
     # end def
 
     def hoverLeaveEvent(self, event):
