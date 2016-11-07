@@ -793,7 +793,7 @@ class DocumentController():
             raise
             return False
         self.undoStack().setClean()
-        self.setFilename(filename)
+        self.setFileName(filename)
         return True
 
     def actionCadnanoWebsiteSlot(self):
