@@ -672,7 +672,7 @@ class DocumentController():
             # manual garbage collection to prevent hang (in osx)
             del self.fileopendialog
             self.fileopendialog = None
-        self.setFilename(fname)
+        self.setFileName(fname)
 
     def saveFileDialogCallback(self, selected):
         """If the user chose to save, write to that file."""
