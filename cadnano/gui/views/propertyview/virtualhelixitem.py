@@ -146,6 +146,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         if key == 'length':
             # print("Property view 'length' updating")
             for vh in self.cnModelList():
+                # print("vh", vh.idNum(), value, vh.getSize())
                 if value != vh.getSize():
                     vh.setSize(value)
         elif key == 'z':

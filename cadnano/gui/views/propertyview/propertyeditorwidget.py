@@ -193,6 +193,9 @@ class PropertyEditorWidget(QTreeWidget):
             return
         if c_i == self.itemFromIndex(top_left):
             c_i.updateCNModel()
+
+        # call this to prvent UNDO calls propagating through the Widget first
+        self.outlinerItemSelectionChanged()
     # end def
 
     def selectedChangedSlot(self, item_dict):
