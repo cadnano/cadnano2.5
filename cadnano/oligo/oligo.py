@@ -365,7 +365,7 @@ class Oligo(CNObject):
     # end def
 
     def _decrementLength(self, delta, emit_signals):
-        self._setLength(self.length() - delta)
+        self._setLength(self.length() - delta, emit_signals)
     # end def
 
     def _incrementLength(self, delta, emit_signals):

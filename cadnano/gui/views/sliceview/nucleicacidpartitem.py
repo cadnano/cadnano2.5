@@ -618,14 +618,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def hoverEnterEvent(self, event):
         self.vhi_hint_item.show()
-        print("Slice VHI hoverEnterEvent")
+        #print("Slice VHI hoverEnterEvent")
 
     # def hoverMoveEvent(self, event):
         # print("Slice VHI hoverMoveEvent")
 
     def hoverLeaveEvent(self, event):
         self.vhi_hint_item.hide()
-        print("Slice VHI hoverLeaveEvent")
+        #print("Slice VHI hoverLeaveEvent")
 
     def hoverMoveEvent(self, event):
         """Summary
@@ -685,9 +685,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # 1. get point in model coordinates:
         part = self._model_part
         if alt_event is None:
-            print()
+            # print()
             pt = tool.eventToPosition(self, event)
-            print("reg_event", pt)
+            # print("reg_event", pt)
         else:
             # pt = alt_event.scenePos()
             # pt = self.mapFromScene(pt)
