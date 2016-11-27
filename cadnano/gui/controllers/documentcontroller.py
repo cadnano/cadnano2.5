@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
-import traceback
 
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
 from PyQt5.QtGui import QPainter, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtWidgets import QFileDialog, QActionGroup
 from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
 from PyQt5.QtWidgets import QStyleOptionGraphicsItem
@@ -14,7 +12,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
-from cadnano import app, setReopen, setBatch, util
+from cadnano import app, setReopen, util  # , setBatch
 
 
 ONLY_ONE = True
@@ -102,6 +100,12 @@ class DocumentController():
         made by DocumentController"""
         win = self.win
         win.closeEvent = self.windowCloseEventHandler
+
+        win.path_dock_widget.closeEvent = self.pathCloseEventHandler
+        win.slice_dock_widget.closeEvent = self.sliceCloseEventHandler
+        win.solid_dock_widget.closeEvent = self.solidCloseEventHandler
+        win.property_dock_widget.closeEvent = self.propertyCloseEventHandler
+
         self.self_signals = [
             (win.action_new.triggered, self.actionNewSlot),
             (win.action_open.triggered, self.actionOpenSlot),
@@ -111,7 +115,15 @@ class DocumentController():
             (win.action_SVG.triggered, self.actionSVGSlot),
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
-            (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
+            (win.action_toggle_inspector_window.triggered, self.actionToggleInspectorSlot),
+            (win.action_toggle_slice_window.triggered, self.actionToggleSliceWindowSlot),
+            (win.action_toggle_path_window.triggered, self.actionTogglePathWindowSlot),
+            (win.action_toggle_solid_window.triggered, self.actionToggleSolidWindowSlot),
+            # (win.path_dock_widget.destroyed, self.syncDockWindowButtonsSlot),
+            # (win.slice_dock_widget.destroyed, self.syncDockWindowButtonsSlot),
+            # (win.solid_dock_widget.destroyed, self.syncDockWindowButtonsSlot),
+            # (win.property_dock_widget.destroyed, self.syncDockWindowButtonsSlot),
+
             (win.action_new_dnapart.triggered, self.actionCreateNucleicAcidPart),
             (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
@@ -330,7 +342,7 @@ class DocumentController():
             # print("App Closing")
             the_app.destroyApp()
             # print("App closed")
-    #end def
+    # end def
 
     def actionSaveSlot(self):
         """SaveAs if necessary, otherwise overwrite existing file."""
@@ -495,12 +507,36 @@ class DocumentController():
         return part
     # end def
 
-    def actionToggleOutlinerSlot(self):
-        outliner = self.win.outliner_property_splitter
-        if outliner.isVisible():
-            outliner.hide()
+    def actionTogglePathWindowSlot(self):
+        dock_window = self.win.path_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
         else:
-            outliner.show()
+            dock_window.show()
+    # end def
+
+    def actionToggleSliceWindowSlot(self):
+        dock_window = self.win.slice_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
+    # end def
+
+    def actionToggleSolidWindowSlot(self):
+        dock_window = self.win.solid_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
+    # end def
+
+    def actionToggleInspectorSlot(self):
+        dock_window = self.win.property_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
     # end def
 
     ### ACCESSORS ###
@@ -702,6 +738,35 @@ class DocumentController():
         # if self.win is not None:
         #     QMainWindow.closeEvent(self.win, event)
     # end def
+
+    def pathCloseEventHandler(self, event):
+        button = self.win.action_toggle_path_window
+        if button.isChecked():
+            button.setChecked(False)
+        event.accept()
+    # end def
+
+    def propertyCloseEventHandler(self, event):
+        button = self.win.action_toggle_inspector_window
+        if button.isChecked():
+            button.setChecked(False)
+        event.accept()
+    # end def
+
+    def sliceCloseEventHandler(self, event):
+        button = self.win.action_toggle_slice_window
+        if button.isChecked():
+            button.setChecked(False)
+        event.accept()
+    # end def
+
+    def solidCloseEventHandler(self, event):
+        button = self.win.action_toggle_solid_window
+        if button.isChecked():
+            button.setChecked(False)
+        event.accept()
+    # end def
+
 
     ### FILE INPUT ##
     def documentTitle(self):
