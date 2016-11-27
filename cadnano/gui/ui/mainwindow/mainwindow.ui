@@ -103,7 +103,6 @@
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
    <addaction name="separator"/>
-   <addaction name="action_outliner"/>
   </widget>
   <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
@@ -152,6 +151,11 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_toggle_inspector_window"/>
+   <addaction name="action_toggle_solid_window"/>
+   <addaction name="action_toggle_path_window"/>
+   <addaction name="action_toggle_slice_window"/>
+   <addaction name="separator"/>
    <addaction name="action_filter_handle"/>
    <addaction name="action_filter_fwd"/>
    <addaction name="action_filter_rev"/>
@@ -193,8 +197,7 @@
     </property>
     <addaction name="action_toggle_slice_window"/>
     <addaction name="action_toggle_path_window"/>
-    <addaction name="action_toggle_3d_window"/>
-    <addaction name="action_toggle_inspector_window"/>
+    <addaction name="action_toggle_solid_window"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -271,6 +274,12 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="property_dock_widget">
+   <property name="maximumSize">
+    <size>
+     <width>300</width>
+     <height>524287</height>
+    </size>
+   </property>
    <property name="windowTitle">
     <string>Inspector</string>
    </property>
@@ -863,7 +872,7 @@
     <string>Ctrl+P</string>
    </property>
   </action>
-  <action name="action_outliner">
+  <action name="action_toggle_inspector_window">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -879,18 +888,6 @@
    </property>
    <property name="toolTip">
     <string>Toggle Outliner</string>
-   </property>
-  </action>
-  <action name="action_new_part">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-origami</normaloff>:/parttools/new-origami</iconset>
-   </property>
-   <property name="text">
-    <string>New</string>
-   </property>
-   <property name="toolTip">
-    <string>Add new part</string>
    </property>
   </action>
   <action name="action_new_plasmidpart">
@@ -1197,23 +1194,36 @@
    </property>
   </action>
   <action name="action_toggle_slice_window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Slice</string>
    </property>
   </action>
   <action name="action_toggle_path_window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Path</string>
    </property>
   </action>
-  <action name="action_toggle_3d_window">
+  <action name="action_toggle_solid_window">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>3D</string>
-   </property>
-  </action>
-  <action name="action_toggle_inspector_window">
-   <property name="text">
-    <string>Inspector</string>
    </property>
   </action>
  </widget>
