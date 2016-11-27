@@ -88,8 +88,8 @@ class PathRootItem(QGraphicsRectItem):
             pass
         elif part_type == PartType.NUCLEICACIDPART:
             na_part_item = PathNucleicAcidPartItem(model_part_instance,
-                                               viewroot=self,
-                                               parent=self)
+                                                   viewroot=self,
+                                                   parent=self)
             self._part_item_for_part_instance[model_part_instance] = na_part_item
             win.path_tool_manager.setActivePart(na_part_item)
         else:
