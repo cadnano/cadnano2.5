@@ -192,7 +192,7 @@ def get_sip(pyroot_path, is_static=False, dev=False, use_wget=False):
     """
     static_str = '--static' if is_static else ''
     if dev:
-        sip_str = "sip-4.19.dev1611111241"
+        sip_str = "sip-4.19.dev1611221222"
         sip_zip = '%s.tar.gz' % (sip_str)
         sip_url = "https://www.riverbankcomputing.com/static/Downloads/sip/%s" % (sip_zip)
     else:
