@@ -8,8 +8,9 @@ from math import atan2, sqrt
 # from PyQt5.QtCore import QRectF, Qt
 # from PyQt5.QtGui import QPainterPath
 
+from PyQt5.QtGui import QVector3D, QQuaternion
 from PyQt5.Qt3DCore import QEntity, QTransform
-from PyQt5.Qt3DExtras import QCylinderMesh, QPhongMaterial
+from PyQt5.Qt3DExtras import QCylinderMesh, QPhongMaterial  # , QPhongAlphaMaterial
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
@@ -21,6 +22,10 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 
 # _BASE_WIDTH = styles.PATH_BASE_WIDTH
 # _VH_XOFFSET = styles.VH_XOFFSET
+
+_CYLINDER_RADIUS = 1.1
+_CYLINDER_RINGS = 100
+_CYLINDER_SLICES = 20
 
 
 def v2DistanceAndAngle(a, b):
@@ -40,7 +45,37 @@ def v2DistanceAndAngle(a, b):
     return dist, angle
 
 
-class SolidVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
+class Cylinder(QEntity):
+    """docstring for Cube"""
+    def __init__(self, x, y, z, length, color, parent_entity):
+        super(Cylinder, self).__init__(parent_entity)
+        self._x = x
+        self._y = y
+        self._z = z
+        self._length = length
+        self._color = color
+        self._parent_entity = parent_entity
+        self._mesh = mesh = QCylinderMesh()
+        self._trans = trans = QTransform()
+        self._mat = mat = QPhongMaterial()
+
+        mesh.setRadius(_CYLINDER_RADIUS)
+        mesh.setRings(_CYLINDER_RINGS)
+        mesh.setSlices(_CYLINDER_SLICES)
+        mesh.setLength(length)
+
+        trans.setTranslation(QVector3D(x, y, z))
+        trans.setRotation(QQuaternion.fromAxisAndAngle(
+                          QVector3D(1.0, 0.0, 0.0), 90.0))
+
+        mat.setDiffuse(getColorObj(color))
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
+
+
+class SolidVirtualHelixItem(AbstractVirtualHelixItem):
     """VirtualHelixItem for PathView
 
     Attributes:
@@ -53,7 +88,7 @@ class SolidVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, model_virtual_helix, part_entity, viewroot):
+    def __init__(self, model_virtual_helix, part_item, viewroot):
         """Summary
 
         Args:
@@ -61,26 +96,21 @@ class SolidVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
             part_entity (TYPE): Description
             viewroot (TYPE): Description
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_entity)
-        QEntity.__init__(self, parent=part_entity.proxy())
+        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        self._part_entity = p_e = part_item.entity()
         self._viewroot = viewroot
-        self._getActiveTool = part_entity._getActiveTool
+        self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        # 3D view
-        self.cylinder_3d = cyl = QCylinderMesh()
-        self.material_3d = mat = QPhongMaterial()
-        self.transform_3d = trn = QTransform()
-        cyl.setRadius(1)
-        cyl.setLength(5)
-        cyl.setRings(100)
-        cyl.setSlices(20)
-        mat.setDiffuse(getColorObj('#f7931e'))
-        mat.setAlpha(0.2)
-        trn.setScale(10.0)
-        self.addComponent(cyl)
-        self.addComponent(mat)
-        self.addComponent(trn)
+        m_p = self._model_part
+        x, y = m_p.locationQt(self._id_num, part_item.scaleFactor())
+        z = 0
+        length = 42.*0.34  # hard coding for now
+        # vh_z, vh_length = m_p.getVirtualHelixProperties(self._id_num, ['z', 'length'])
+        # length = vh_length * m_p.baseWidth()
+
+
+        self.cylinder = Cylinder(x, -y, z, length, '#f7931e', p_e)
 
         # self._handle = VirtualHelixHandleItem(self, part_entity, viewroot)
         # self._last_strand_set = None

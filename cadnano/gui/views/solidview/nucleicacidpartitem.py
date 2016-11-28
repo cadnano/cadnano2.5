@@ -5,6 +5,7 @@ from __future__ import division
 from PyQt5.QtCore import QRectF
 # from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
+from PyQt5.QtGui import QVector3D  # , QQuaternion
 from PyQt5.Qt3DCore import QEntity, QTransform
 from PyQt5.Qt3DExtras import QCuboidMesh, QPhongAlphaMaterial
 
@@ -20,6 +21,38 @@ from . import solidstyles as styles
 from .virtualhelixitem import SolidVirtualHelixItem
 
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
+
+
+class Cube(QEntity):
+    """docstring for Cube"""
+    def __init__(self, x, y, z, l, w, h, color, parent_entity):
+        super(Cube, self).__init__(parent_entity)
+        self._x = x
+        self._y = y
+        self._z = z
+        self._l = l
+        self._w = w
+        self._h = h
+        self._color = color
+        self._parent_entity = parent_entity
+        self._mesh = mesh = QCuboidMesh()
+        self._trans = trans = QTransform()
+        self._mat = mat = QPhongAlphaMaterial()
+
+        mesh.setXExtent(l)
+        mesh.setYExtent(w)
+        mesh.setZExtent(h)
+
+        trans.setTranslation(QVector3D(x, y, z))
+
+        mat.setDiffuse(getColorObj(color))
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
+
+    def setAlpha(self, value):
+        self._mat.setAlpha(value)
 
 
 class SolidNucleicAcidPartItem(AbstractPartItem):
@@ -42,7 +75,7 @@ class SolidNucleicAcidPartItem(AbstractPartItem):
             parent (TYPE): Description
         """
         super(SolidNucleicAcidPartItem, self).__init__()
-        self._entity = entity = QEntity(viewroot_entity)
+        self._entity = QEntity(viewroot_entity)
         self._getActiveTool = viewroot_entity.manager.activeToolGetter
         self.active_virtual_helix_item = None
         self._model_part = m_p = model_part_instance.reference()
@@ -52,15 +85,27 @@ class SolidNucleicAcidPartItem(AbstractPartItem):
         self._virtual_helix_item_list = []
 
         # 3D view
-        cuboid = QCuboidMesh()
-        tran_3d = QTransform()
-        mat_3d = QPhongAlphaMaterial()
-        tran_3d.setScale(10.0)
-        mat_3d.setDiffuse(getColorObj('#ffffff'))
-        mat_3d.setAlpha(0.2)
-        entity.addComponent(cuboid)
-        entity.addComponent(mat_3d)
-        entity.addComponent(tran_3d)
+        xLL, yLL, xUR, yUR = m_p.boundDimensions()
+        l = xUR - xLL
+        w = yUR - yLL
+        # id_z_min, id_z_max = m_p.zBoundsIds()
+        # z_min = 0
+        # if id_z_min != -1:
+        #     axis_min, fwd_min, rev_min = m_p.getCoordinates(id_z_min)
+        #     print(axis_min)
+        # z_max = w
+        # if id_z_max != -1:
+        #     axis_max, fwd_max, rev_max = m_p.getCoordinates(id_z_max)
+        #     print(axis_max)
+        # h = z_max - z_min
+
+        h = 42*.34
+        self.bounding_cube = Cube(0, 0, 0, l, w, h, '#ffffff', viewroot_entity)
+        self.bounding_cube.setAlpha(0.2)
+        self.grab1 = Cube(-l/2.,  w/2.,  h/2., 1., 1., 1., '#cc0000', viewroot_entity)
+        self.grab2 = Cube( l/2., -w/2., -h/2., 1., 1., 1., '#cc0000', viewroot_entity)
+
+        self.scale_factor = 1.
 
         # self._vh_rect = QRectF()
         # self.setAcceptHoverEvents(True)
@@ -89,6 +134,10 @@ class SolidNucleicAcidPartItem(AbstractPartItem):
             TYPE: Description
         """
         return self._model_part.getProperty('color')
+    # end def
+
+    def entity(self):
+        return self._entity
     # end def
 
     # def convertToModelZ(self, z):
@@ -431,7 +480,7 @@ class SolidNucleicAcidPartItem(AbstractPartItem):
             new_list (TYPE): Description
             zoom_to_fit (bool, optional): Description
         """
-        print("_setVirtualHelixItemList")
+        # print("_setVirtualHelixItemList")
         return
         # y = 0  # How far down from the top the next PH should be
         # vhi_rect = None
