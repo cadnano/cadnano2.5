@@ -16,7 +16,7 @@ from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
 from cadnano import app, setReopen, setBatch, util
 
-
+DEFAULT_VHELIX_FILTER = True
 ONLY_ONE = True
 """bool: Retricts Document to creating only one Part if True."""
 
@@ -58,9 +58,13 @@ class DocumentController():
         o = win.outliner_widget
         p_e = win.property_widget
         o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
-        # self.actionFilterVirtualHelixSlot()
-        self.actionFilterEndpointSlot()
-        self.actionFilterXoverSlot()
+
+        # Set Default Filter
+        if DEFAULT_VHELIX_FILTER:
+            self.actionFilterVirtualHelixSlot()
+        else:
+            self.actionFilterEndpointSlot()
+            self.actionFilterXoverSlot()
 
         # setup tool exclusivity
         self.actiongroup = ag = QActionGroup(win)
