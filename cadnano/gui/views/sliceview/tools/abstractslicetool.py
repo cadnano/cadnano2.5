@@ -4,8 +4,19 @@ import math
 from PyQt5.QtCore import QPointF, QLineF, QRectF
 from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.gui.views.sliceview import slicestyles as styles
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 
+_RADIUS = styles.SLICE_HELIX_RADIUS
+_DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
+HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
+_MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
+DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
+# _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
+
+
+_INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 class AbstractSliceTool(QGraphicsObject):
     """Summary
@@ -46,6 +57,10 @@ class AbstractSliceTool(QGraphicsObject):
         self.angles = [math.radians(x) for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
         self.part_item = None
+
+        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
+        self.vhi_hint_item.setPen(_MOD_PEN)
+        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
     # end def
 
     ######################## Drawing #######################################
@@ -78,6 +93,13 @@ class AbstractSliceTool(QGraphicsObject):
         # li.setLine(0., 0., 0., 0.)
     # end def
 
+    def setSelectionFilter(self, filter_name_list):
+        if 'virtual_helix' in filter_name_list:
+            self.vhi_hint_item.setPen(_MOD_PEN)
+        else:
+            self.vhi_hint_item.setPen(_INACTIVE_PEN)
+    # end def
+
     def resetTool(self):
         """Summary
 
@@ -104,6 +126,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
+        self.vhi_hint_item.setParentItem(part_item)
         self.part_item = part_item
     # end def
 
@@ -121,9 +144,12 @@ class AbstractSliceTool(QGraphicsObject):
             event (TYPE): Description
         """
         if self.is_started:
-            return self.findNearestPoint(part_item, event.scenePos())
+            pos = self.findNearestPoint(part_item, event.scenePos())
         else:
-            return event.pos()
+            pos =  event.pos()
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        return pos
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -181,6 +207,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
+        self.vhi_hint_item.hide()
         li = self._line_item
         li.setParentItem(self)
         line = li.line()
@@ -189,6 +216,18 @@ class AbstractSliceTool(QGraphicsObject):
         li.hide()
         self.is_started = False
     # end def
+
+    # def hoverEnterEvent(self, event):
+    #     self.vhi_hint_item.show()
+    #     #print("Slice VHI hoverEnterEvent")
+
+    # # def hoverMoveEvent(self, event):
+    #     # print("Slice VHI hoverMoveEvent")
+
+    # def hoverLeaveEvent(self, event):
+    #     # self.vhi_hint_item.hide()
+    #     #print("Slice VHI hoverLeaveEvent")
+
 
     def hoverMoveEvent(self, part_item, event):
         """Summary
@@ -200,7 +239,10 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        return self.eventToPosition(part_item, event)
+        # self.vhi_hint_item.setPos(  event.pos()-
+        #                             QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        pos = self.eventToPosition(part_item, event)
+        return pos
     # end def
 
     def setActive(self, will_be_active, old_tool=None):

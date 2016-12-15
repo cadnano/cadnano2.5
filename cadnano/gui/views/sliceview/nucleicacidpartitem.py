@@ -8,7 +8,6 @@ from ast import literal_eval
 from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
@@ -20,14 +19,6 @@ from .prexovermanager import PreXoverManager
 from .griditem import GridItem
 from . import slicestyles as styles
 
-_RADIUS = styles.SLICE_HELIX_RADIUS
-_DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
-_HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
-_MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
-
-_INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
@@ -109,10 +100,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem.setZValue(1)
         self.grab_cornerTL.setZValue(2)
         self.grab_cornerBR.setZValue(2)
-
-        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
-        self.vhi_hint_item.setPen(_MOD_PEN)
-        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
 
         # select upon creation
         for part in m_p.document().children():
@@ -453,12 +440,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                       per_neighbor_hits, pairs)
     # end def
 
-    def setSelectionFilter(self, filter_name_list):
-        if 'virtual_helix' in filter_name_list:
-            self.vhi_hint_item.setPen(_MOD_PEN)
-        else:
-            self.vhi_hint_item.setPen(_INACTIVE_PEN)
-
     def removeVirtualHelixItem(self, id_num):
         """Summary
 
@@ -616,17 +597,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def hoverEnterEvent(self, event):
-        self.vhi_hint_item.show()
-        #print("Slice VHI hoverEnterEvent")
-
-    # def hoverMoveEvent(self, event):
-        # print("Slice VHI hoverMoveEvent")
-
-    def hoverLeaveEvent(self, event):
-        self.vhi_hint_item.hide()
-        #print("Slice VHI hoverLeaveEvent")
-
     def hoverMoveEvent(self, event):
         """Summary
 
@@ -636,8 +606,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        # print("Slice VHI hoverMoveEvent")
-        self.vhi_hint_item.setPos(event.pos()-QPointF(_RADIUS-DELTA, _RADIUS-DELTA))
 
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
@@ -647,6 +615,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
     # end def
+
+    def hoverLeaveEvent(self, event):
+        tool = self._getActiveTool()
+        tool.hideLineItem()
 
     def getModelPos(self, pos):
         """Y-axis is inverted in Qt +y === DOWN

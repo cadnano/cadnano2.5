@@ -15,6 +15,9 @@ class DummyTool(object):
     def lastLocation(self):
         return None
 
+    def setSelectionFilter(self, filter_name_list):
+        pass
+
 dummy_tool = DummyTool()
 
 

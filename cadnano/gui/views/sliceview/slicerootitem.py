@@ -87,8 +87,10 @@ class SliceRootItem(QGraphicsRectItem):
         # if 'virtual_helix' not in filter_name_list:
         #     self.manager.chooseCreateTool()
         pass
-        for nucleicacid_part_item in self.instance_items:
-            nucleicacid_part_item.setSelectionFilter(filter_name_list)
+        tool = self.manager.activeToolGetter()
+        tool.setSelectionFilter(filter_name_list)
+        # for nucleicacid_part_item in self.instance_items:
+        #     nucleicacid_part_item.setSelectionFilter(filter_name_list)
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
