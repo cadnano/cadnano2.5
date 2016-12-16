@@ -303,7 +303,7 @@ class GridPoint(QGraphicsEllipseItem):
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
-        tool.vhi_hint_item.setPos(self.scenePos()-QPointF(_RADIUS-DELTA, _RADIUS-DELTA))
+        tool.setHintPos(self.scenePos())
     # end def
 
     def hoverLeaveEvent(self, event):

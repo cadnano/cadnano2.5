@@ -152,6 +152,11 @@ class AbstractSliceTool(QGraphicsObject):
         return pos
     # end def
 
+    def setHintPos(self, pos):
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+    # end def
+
     def findNearestPoint(self, part_item, target_scenepos):
         """
         Args:
@@ -209,11 +214,12 @@ class AbstractSliceTool(QGraphicsObject):
         """
         self.vhi_hint_item.hide()
         li = self._line_item
+        li.hide()
         li.setParentItem(self)
         line = li.line()
         line.setP2(self._CENTER_OF_HELIX)
         li.setLine(line)
-        li.hide()
+        # li.hide()
         self.is_started = False
     # end def
 
