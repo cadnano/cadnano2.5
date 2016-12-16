@@ -216,6 +216,7 @@ def decode(document, obj, emit_signals=True):
                 strand3p = to_rev_strandset.getStrand(idx3p)
             part.createXover(   strand5p, idx5p,
                                 strand3p, idx3p,
+                                allow_reordering=True,
                                 update_oligo=False,
                                 use_undostack=False)
 
@@ -232,6 +233,7 @@ def decode(document, obj, emit_signals=True):
                 strand3p = to_rev_strandset.getStrand(idx3p)
             part.createXover(   strand5p, idx5p,
                                 strand3p, idx3p,
+                                allow_reordering=True,
                                 update_oligo=False,
                                 use_undostack=False)
 

@@ -2486,7 +2486,8 @@ class NucleicAcidPart(Part):
             c.redo()
     # end def
 
-    def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True, use_undostack=True):
+    def createXover(self, strand5p, idx5p, strand3p, idx3p,
+            update_oligo=True, allow_reordering=False, use_undostack=True):
         """Xovers are ALWAYS installed FROM the 3' end of the 5' most
         strand (strand5p) TO the 5' end of the 3' most strand (strand3p)
 
@@ -2497,13 +2498,14 @@ class NucleicAcidPart(Part):
             idx3p (int): index of the 5 prime end of the xover in strand3p
         """
         # test for reordering malformed input
-        # if (strand5p.idx5Prime() == idx5p and
-        #     strand3p.idx3Prime() == idx3p):
-        #     strand5p, strand3p = strand3p, strand5p
-        #     idx5p, idx3p = idx3p, idx5p
+        if (allow_reordering is True and
+            strand5p.idx5Prime() == idx5p and
+            strand3p.idx3Prime() == idx3p):
+            strand5p, strand3p = strand3p, strand5p
+            idx5p, idx3p = idx3p, idx5p
 
         if not strand3p.canInstallXoverAt(idx3p, strand5p, idx5p):
-            print("createXover: no xover can be installed here")
+            print("$$createXover: no xover can be installed here")
             print("strand 5p", strand5p)
             print("\tidx: %d\tidx5p: %d\tidx3p: %d" %
                   (idx5p, strand5p.idx5Prime(), strand5p.idx3Prime())

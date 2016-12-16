@@ -559,7 +559,7 @@ class Strand(CNObject):
                 else:
                     return False
             else:
-                # print("default", index_diff_H, index_diff_L)
+                print("default", index_diff_H, index_diff_L)
                 return False
     # end def
 
