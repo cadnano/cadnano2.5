@@ -3,6 +3,7 @@
 # make Wheels with:
 # python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35
 # python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35
+# twine upload dist/
 
 import os
 import shutil
