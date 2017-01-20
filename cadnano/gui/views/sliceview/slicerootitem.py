@@ -86,7 +86,6 @@ class SliceRootItem(QGraphicsRectItem):
         """
         # if 'virtual_helix' not in filter_name_list:
         #     self.manager.chooseCreateTool()
-        pass
         tool = self.manager.activeToolGetter()
         tool.setSelectionFilter(filter_name_list)
         # for nucleicacid_part_item in self.instance_items:
