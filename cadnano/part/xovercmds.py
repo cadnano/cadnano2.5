@@ -87,6 +87,7 @@ class CreateXoverCommand(UndoCommand):
         strand5p.setConnection3p(None)
         strand3p.setConnection5p(None)
 
+        fSetOligo = Strand.setOligo
         if self._update_oligo:
             # Test Loopiness
             if old_olg3p.isLoop():
