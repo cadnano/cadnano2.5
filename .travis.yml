@@ -1,10 +1,28 @@
 language: python
-python:
-  - "3.5.2"
-# command to install dependencies
+sudo: false
+
+matrix:
+  include:
+    - python: 3.5
+      env:
+        - PYQT_VERSION=5.7.1
+
+    - python: 3.5
+      env:
+        - PYQT_VERSION=5.8
+
+    - python: 3.6
+      env:
+        - PYQT_VERSION=5.7.1
+
+    - python: 3.6
+      env:
+        - PYQT_VERSION=5.8
+
+# Command to install dependencies
 install:
-    - pip install sip==4.18 PyQt5==5.7 numpy>=1.10.0 pandas>=0.18 pytz>=2011k python-dateutil>=2
+    - pip install PyQt5==$PYQT_VERSION numpy pandas
     - python setup.py install
 
-# command to run tests
+# Command to run tests
 script: pytest cadnano/tests
