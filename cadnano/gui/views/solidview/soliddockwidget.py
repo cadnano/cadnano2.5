@@ -254,7 +254,7 @@ class SolidDockWidget(QDockWidget):
         container = self.container
         modifier = self.modifier
 
-        view.defaultFramegraph().setClearColor(getColorObj('#666666'))
+        # view.defaultFramegraph().setClearColor(getColorObj('#666666'))
         # screenSize = view.screen().size()
         # container.setMinimumSize(QSize(200, 100))
         # container.setMaximumSize(screenSize)
