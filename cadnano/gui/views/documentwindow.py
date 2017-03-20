@@ -80,6 +80,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.solid_dock_widget = SolidDockWidget(self.solidroot)
         self.addDockWidget(Qt.DockWidgetArea(1), self.solid_dock_widget)
 
+        # Disable solid view by default
+        self.action_toggle_solid_window.setChecked(False)
+        self.solid_dock_widget.hide()
+
         # Toolbar
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
@@ -110,6 +114,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         doc.setViewNames(['slice', 'path', 'solid'])
         self.setCentralWidget(None)  # No central widget, just dock widgets
+
     # end def
 
     def document(self):
