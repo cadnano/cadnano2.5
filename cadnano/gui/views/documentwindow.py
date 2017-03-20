@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QApplication, QWidget, QAction
 
+import cadnano
 from cadnano import app
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
@@ -44,6 +45,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.property_buttonbox.setVisible(False)
 
         self.tool_managers = None  # initialize
+
+        self.setWindowTitle("cadnano {} | A computer-aided design tool for creating DNA nanostructures".format(cadnano.__version__))
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
