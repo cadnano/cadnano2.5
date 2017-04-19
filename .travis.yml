@@ -5,7 +5,7 @@ matrix:
   include:
     - python: 3.5
       env:
-        - PYQT_VERSION=5.7.1
+        - PYQT_VERSION=5.8.2
 
     - python: 3.5
       env:
@@ -13,7 +13,7 @@ matrix:
 
     - python: 3.6
       env:
-        - PYQT_VERSION=5.7.1
+        - PYQT_VERSION=5.8.2
 
     - python: 3.6
       env:
