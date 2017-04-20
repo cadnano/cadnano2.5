@@ -456,9 +456,9 @@ class CustomQGraphicsView(QGraphicsView):
 
     def safeScale(self, delta):
         current_scale_level = self.transform().m11()
-        scale_factor = 1 + delta * \
-           (self._scale_down_rate if delta < 0 else self._scale_up_rate) * \
-           (app().prefs.zoom_speed/100.)
+        scale_factor = 1 + float(delta) * \
+           (float(self._scale_down_rate) if delta < 0 else float(self._scale_up_rate)) * \
+           (float(app().prefs.zoom_speed) / 100.)
         new_scale_level = current_scale_level * scale_factor
         new_scale_level = util.clamp(current_scale_level * scale_factor,\
                               self._scale_limit_min,\

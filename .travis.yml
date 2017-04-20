@@ -21,7 +21,7 @@ matrix:
 
 # Command to install dependencies
 install:
-    - pip install PyQt5==$PYQT_VERSION numpy pandas
+    - pip install PyQt5==$PYQT_VERSION PyQt3D==$PYQT_VERSION numpy pandas
     - python setup.py install
 
 # Command to run tests

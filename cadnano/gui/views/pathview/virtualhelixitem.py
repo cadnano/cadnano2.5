@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj, getPenObj
+from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj  # getPenObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3

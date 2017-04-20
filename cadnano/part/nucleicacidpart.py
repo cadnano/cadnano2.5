@@ -1350,8 +1350,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def zBoundsIds(self):
-        """Get the ID numbers of the Z bounds accounting for infinity for
-        unitialized virtual helices
+        """Get the ID numbers of the Z bounds. Accounts for the fact that
+        unitialized virtual helices will have infinite values.
 
         Returns:
             tuple: of :obj:`int`, of form (ID_z_min, ID_z_max)

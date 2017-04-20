@@ -6,17 +6,17 @@ from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QApplication, QWidget, QAction
 
+import cadnano
 from cadnano import app
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
+from cadnano.gui.views.solidview.soliddockwidget import SolidDockWidget
+from cadnano.gui.views.solidview.solidrootitem import SolidRootItem
+from cadnano.gui.views.solidview.tools.solidtoolmanager import SolidToolManager
 from cadnano.gui.ui.mainwindow import ui_mainwindow
-
-# from PyQt5.QtOpenGL import QGLWidget
-# # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
-# # for an example of the QOpenGlWidget added in Qt 5.4
 
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
@@ -45,6 +45,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.property_buttonbox.setVisible(False)
 
         self.tool_managers = None  # initialize
+
+        self.setWindowTitle("cadnano {} | A computer-aided design tool for creating DNA nanostructures".format(cadnano.__version__))
 
         # Slice setup
         self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
@@ -75,7 +77,17 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setScaleFitFactor(0.9)
         self.path_graphics_view.setName("PathView")
 
-        # Path toolbar
+        # Solid setup
+        self.solidroot = SolidRootItem(window=self, document=doc)
+        self.solid_tool_manager = SolidToolManager(self, self.solidroot)
+        self.solid_dock_widget = SolidDockWidget(self.solidroot)
+        self.addDockWidget(Qt.DockWidgetArea(1), self.solid_dock_widget)
+
+        # Disable solid view by default
+        self.action_toggle_solid_window.setChecked(False)
+        self.solid_dock_widget.hide()
+
+        # Toolbar
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
@@ -100,10 +112,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.sep.setSeparator(True)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
+        # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")
 
-        doc.setViewNames(['slice', 'path'])
+        doc.setViewNames(['slice', 'path', 'solid'])
+        self.setCentralWidget(None)  # No central widget, just dock widgets
+
     # end def
 
     def document(self):
