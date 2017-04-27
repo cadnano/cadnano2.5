@@ -38,7 +38,7 @@ class Part(CNObject):
         # Properties
         # TODO document could be None
         self._group_properties = {'name': "Part%d" % len(document.children()),
-                                  'color': "#cc0000", # outlinerview will override from styles
+                                  'color': "#0066cc", # outlinerview will override from styles
                                   'is_visible': True
                                   }
 

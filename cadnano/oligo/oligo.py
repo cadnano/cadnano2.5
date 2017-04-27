@@ -14,6 +14,7 @@ from cadnano.setpropertycmd import SetPropertyCommand
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
 OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
+MAX_HIGHLIGHT_LENGTH = 1000
 
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
@@ -281,6 +282,8 @@ class Oligo(CNObject):
 
     def shouldHighlight(self):
         if not self._strand5p:
+            return False
+        if self.length() > MAX_HIGHLIGHT_LENGTH:
             return False
         if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
