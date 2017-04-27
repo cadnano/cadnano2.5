@@ -26,3 +26,9 @@ install:
 
 # Command to run tests
 script: pytest cadnano/tests
+
+# Slack integration
+notifications:
+  slack:
+    secure: jQxmyal8I07qEDCZvSxfCZrFgD6ZSq988AKPsyimA5Yh71UGDrblb8EZWz4oPNw/8mwWx2h7qwIxjwGEUt2eyEVf76e/JgPWMwRN4QZWWntDzdAASuwZe/4xyK2VD2wPQne8/jCgMUpgvKl+4auIB3mL7MNIIsee3/bWW+2cLco=
+    secure: L+tzEuMuDT/pSkdl/FBaBv8zaOXOUN/haJx6qf1v2mRSvJHEBmGK7QiegZvPjBWXf3bQEnSAAz9fhweGRpIA+SiZrK0Jl5D8TVixJ8Xu22Z7Jr9cya0EvpnHGHjfmihOxpUU6XMNxtJrcrtdoWb4PszY1F6P1GOR5hjaCut8Gy8=
