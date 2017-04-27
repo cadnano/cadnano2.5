@@ -29,6 +29,8 @@ script: pytest cadnano/tests
 
 # Slack integration
 notifications:
+  on_success: change
   slack:
-    secure: jQxmyal8I07qEDCZvSxfCZrFgD6ZSq988AKPsyimA5Yh71UGDrblb8EZWz4oPNw/8mwWx2h7qwIxjwGEUt2eyEVf76e/JgPWMwRN4QZWWntDzdAASuwZe/4xyK2VD2wPQne8/jCgMUpgvKl+4auIB3mL7MNIIsee3/bWW+2cLco=
-    secure: L+tzEuMuDT/pSkdl/FBaBv8zaOXOUN/haJx6qf1v2mRSvJHEBmGK7QiegZvPjBWXf3bQEnSAAz9fhweGRpIA+SiZrK0Jl5D8TVixJ8Xu22Z7Jr9cya0EvpnHGHjfmihOxpUU6XMNxtJrcrtdoWb4PszY1F6P1GOR5hjaCut8Gy8=
+    rooms:
+      - secure: L/qY5vwZNUVUyncGsJGHOj5q57Sdg0agijZvaJ5h6EK55CRcgZdqW33N811bRa/0yvnXwQ+Yx6Wg9VTky11yqdvC88k8kzKrUh6/Ag8qoAeYKR/h2s9GxqoPIPX8RanxPn8Q+KjZRp/J8gi5BouKEp2O7ZBcnxZcYt3FCmodF6Q=
+      - secure: bkZESgSGtfI3kbqA/rpU2q2t9ZzxOwtb2xgUZbTZP//f+fSahWc9tyfW56wy6HOnWGBpWctbcqXvkkSeALTQOCuEoRRxKod83ge5l1i1vpomD/bQhb21ITnUEuNlWXDYS3kQaCTh+B3gePCMcIUD56eN0jvMXfm7h8lIOwbqdAg=
