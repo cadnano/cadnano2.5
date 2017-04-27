@@ -8,6 +8,7 @@ from math import floor
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QBrush, QPen, QPainterPath, QPolygonF
+from PyQt5.QtWidgets import qApp
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
 
@@ -86,7 +87,9 @@ class EndpointItem(QGraphicsPathItem):
         self._high_drag_bound = None
         self._mod_item = None
         self._initCapSpecificState(is_drawn5to3)
-        self.setPen(QPen())
+        p = QPen()
+        p.setCosmetic(True)
+        self.setPen(p)
         # for easier mouseclick
         self._click_area = cA = QGraphicsRectItem(_DEFAULT_RECT, self)
         self._click_area.setAcceptHoverEvents(True)
@@ -314,7 +317,7 @@ class EndpointItem(QGraphicsPathItem):
     def paintToolMousePress(self, modifiers, event, idx):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
-        if modifiers & Qt.ShiftModifier:
+        if qApp.keyboardModifiers() & Qt.ShiftModifier:
             color = self.window().path_color_panel.shiftColorName()
         else:
             color = self.window().path_color_panel.colorName()
