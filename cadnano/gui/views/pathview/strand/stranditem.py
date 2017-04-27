@@ -591,7 +591,7 @@ class StrandItem(QGraphicsLineItem):
         """
         m_strand = self._model_strand
         if event is None:
-            color = m_strand.color()
+            color = m_strand.oligo().getColor()
         elif event.modifiers() & Qt.ShiftModifier:
             color = self.window().path_color_panel.shiftColorName()
         else:

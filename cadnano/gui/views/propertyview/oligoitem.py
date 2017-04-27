@@ -47,7 +47,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        if model_oligo in self._cn_model_set:
+        if model_oligo in self.cnModelList():
             # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)
             # self.setValue(key, new_value)
             displayed_val = self.getItemValue(key)
