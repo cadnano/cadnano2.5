@@ -4,8 +4,9 @@ from cadnano.gui.palette import getBrushObj
 from . import outlinerstyles as styles
 
 NAME_COL = 0
-VISIBLE_COL = 1
-COLOR_COL = 2
+LOCKED_COL = 1
+VISIBLE_COL = 2
+COLOR_COL = 3
 
 
 LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEnabled |
@@ -15,7 +16,7 @@ LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEnabled |
 
 class CNOutlinerItem(QTreeWidgetItem):
 
-    PROPERTIES = {'name': NAME_COL, 'is_visible': VISIBLE_COL, 'color': COLOR_COL}
+    PROPERTIES = {'name': NAME_COL, 'is_locked': LOCKED_COL, 'is_visible': VISIBLE_COL, 'color': COLOR_COL}
     CAN_NAME_EDIT = True
 
     def __init__(self, cn_model, parent):
@@ -24,6 +25,7 @@ class CNOutlinerItem(QTreeWidgetItem):
         name = cn_model.getName()
         color = cn_model.getColor()
         self.setData(NAME_COL, Qt.EditRole, name)
+        self.setData(LOCKED_COL, Qt.EditRole, True)  # is_visible
         self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, color)
     # end def
@@ -80,6 +82,10 @@ class CNOutlinerItem(QTreeWidgetItem):
             color = self.data(COLOR_COL, Qt.DisplayRole)
             if color != value:
                 self.setData(COLOR_COL, Qt.EditRole, value)
+        elif key == 'is_locked':
+            is_locked = self.data(LOCKED_COL, Qt.DisplayRole)
+            if is_locked != value:
+                self.setData(LOCKED_COL, Qt.EditRole, value)
         elif key == 'is_visible':
             is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
             if is_visible != value:
@@ -102,12 +108,14 @@ class CNOutlinerItem(QTreeWidgetItem):
     # end def
 # end class
 
+
 class RootPartItem(QTreeWidgetItem):
     def __init__(self, model_part, item_name, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = model_part
         self.item_name = item_name
         self.setData(NAME_COL, Qt.EditRole, item_name)
+        self.setData(LOCKED_COL, Qt.EditRole, True)  # is_locked
         self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
         self.setFlags(self.flags() & ~Qt.ItemIsSelectable)
@@ -115,7 +123,7 @@ class RootPartItem(QTreeWidgetItem):
     # end def
 
     def __repr__(self):
-        return "RootPartItem %s: for %s" %  (  self.item_name,
+        return "RootPartItem %s: for %s" % (self.item_name,
                                             self._cn_model.getProperty('name'))
     # end def
 
@@ -124,4 +132,3 @@ class RootPartItem(QTreeWidgetItem):
 
     def getColor(self):
         return "#ffffff"
-

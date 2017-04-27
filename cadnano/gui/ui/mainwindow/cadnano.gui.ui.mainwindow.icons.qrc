@@ -65,4 +65,8 @@
         <file alias="mod">images/path-mod.png</file>
         <file alias="autostaple">images/path-autostaple.png</file>
     </qresource>
+    <qresource prefix="/outlinericons">
+        <file alias="lock">images/outliner-lock.svg</file>
+        <file alias="eye">images/outliner-eye.svg</file>
+    </qresource>
 </RCC>

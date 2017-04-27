@@ -11,7 +11,7 @@ from PyQt5.QtCore import QDataStream
 from PyQt5.QtCore import Qt, QRect, QVariant
 from PyQt5.QtCore import QItemSelectionModel, QItemSelection
 from PyQt5.QtCore import QPersistentModelIndex
-from PyQt5.QtGui import QBrush, QColor, QFont, QPalette
+from PyQt5.QtGui import QColor, QFont, QPalette, QPixmap
 from PyQt5.QtWidgets import QAbstractItemView, QAction
 from PyQt5.QtWidgets import QColorDialog, QHeaderView
 from PyQt5.QtWidgets import QLineEdit, QMenu
@@ -22,19 +22,21 @@ from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QToolTip
 
 from cadnano.cnenum import PartType
-from cadnano.gui.palette import getColorObj, getBrushObj
+from cadnano.gui.palette import getBrushObj
 from cadnano.gui.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
 
-from .cnoutlineritem import NAME_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import NAME_COL, LOCKED_COL, VISIBLE_COL, COLOR_COL
 from .nucleicacidpartitem import OutlineNucleicAcidPartItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 from .oligoitem import OutlineOligoItem
 
-
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
+
+_LOCK_ICON = QPixmap(":/outlinericons/lock")
+_EYE_ICON = QPixmap(":/outlinericons/eye")
 
 
 class OutlinerTreeWidget(QTreeWidget):
@@ -59,16 +61,18 @@ class OutlinerTreeWidget(QTreeWidget):
         self.setColumnCount(3)
         self.setIndentation(14)
         # Header
-        self.setHeaderLabels(["Name", "", ""])
+        self.setHeaderLabels(["Name", "", "", ""])
         h = self.header()
         h.setStretchLastSection(False)
         h.setSectionResizeMode(0, QHeaderView.Stretch)
         h.setSectionResizeMode(1, QHeaderView.Fixed)
         h.setSectionResizeMode(2, QHeaderView.Fixed)
+        h.setSectionResizeMode(3, QHeaderView.Fixed)
         h.setSectionsMovable(True)
-        self.setColumnWidth(0, 140)
+        self.setColumnWidth(0, 120)
         self.setColumnWidth(1, 18)
         self.setColumnWidth(2, 18)
+        self.setColumnWidth(3, 18)
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.getCustomContextMenu)
@@ -155,7 +159,7 @@ class OutlinerTreeWidget(QTreeWidget):
         # print("click column", column)
 
         # 1. handle clicks on check marks to speed things up over using an editor
-        if column == VISIBLE_COL:
+        if column == LOCKED_COL or column == VISIBLE_COL:
             self.blockSignals(True)
             if tree_widget_item.data(column, Qt.DisplayRole):
                 # print("unchecking", tree_widget_item.__class__.__name__)
@@ -367,7 +371,7 @@ class OutlinerTreeWidget(QTreeWidget):
             if x.parent() != dest_parent:
                 return
 
-        res = self.myDropEvent(event, dest_item)
+        # res = self.myDropEvent(event, dest_item)
         if isinstance(dest_item, OutlineVirtualHelixItem):
             part = dest_item.part()
             vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
@@ -493,7 +497,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if self.dragDropMode() == QAbstractItemView.InternalMove:
             drop_action = Qt.MoveAction
         if (event.source() == self and event.possibleActions() & Qt.MoveAction
-                                   and drop_action == Qt.MoveAction):
+                              and drop_action == Qt.MoveAction):
             selected_indexes = self.selectedIndexes()
             child = index
             while child.isValid() and child != root_index:
@@ -678,6 +682,22 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
         if column == NAME_COL:  # Part Name
             option.displayAlignment = Qt.AlignVCenter
             QStyledItemDelegate.paint(self, painter, option, model_index)
+        if column == LOCKED_COL:  # Visibility
+            element = _QCOMMONSTYLE.PE_IndicatorCheckBox
+            styleoption = QStyleOptionButton()
+            styleoption.rect = new_rect
+            checked = model_index.model().data(model_index, Qt.EditRole)
+            styleoption.state |= QStyle.State_On if checked else QStyle.State_Off
+            # make the check box look a little more active by changing the pallete
+            styleoption.palette.setBrush(QPalette.Button, Qt.white)
+            styleoption.palette.setBrush(QPalette.HighlightedText, Qt.black)
+            _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
+            if checked:
+                # element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
+                # _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
+                # _QCOMMONSTYLE.drawItemText(painter, new_rect, Qt.AlignCenter, styleoption.palette, True, 'L')
+                icon = QPixmap(":/outlinericons/lock")
+                _QCOMMONSTYLE.drawItemPixmap(painter, new_rect, Qt.AlignCenter, icon)
         if column == VISIBLE_COL:  # Visibility
             element = _QCOMMONSTYLE.PE_IndicatorCheckBox
             styleoption = QStyleOptionButton()
@@ -689,8 +709,10 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             styleoption.palette.setBrush(QPalette.HighlightedText, Qt.black)
             _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
             if checked:
-                element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
-                _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
+                # element = _QCOMMONSTYLE.PE_IndicatorMenuCheckMark
+                # _QCOMMONSTYLE.drawPrimitive(element, styleoption, painter)
+                icon = QPixmap(":/outlinericons/eye")
+                _QCOMMONSTYLE.drawItemPixmap(painter, new_rect, Qt.AlignCenter, icon)
         elif column == COLOR_COL:  # Color
 
             # Alternate way to get color
