@@ -106,7 +106,7 @@ class PreXoverManager(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        print("handling key", key, self.KEYMAP.get(key, None))
+        # print("handling key", key, self.KEYMAP.get(key, None))
         if key not in self._key_press_dict:
             return
 

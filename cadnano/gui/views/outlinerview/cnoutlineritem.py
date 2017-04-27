@@ -25,7 +25,7 @@ class CNOutlinerItem(QTreeWidgetItem):
         name = cn_model.getName()
         color = cn_model.getColor()
         self.setData(NAME_COL, Qt.EditRole, name)
-        self.setData(LOCKED_COL, Qt.EditRole, True)  # is_visible
+        self.setData(LOCKED_COL, Qt.EditRole, False)  # is_visible
         self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, color)
     # end def
@@ -115,7 +115,7 @@ class RootPartItem(QTreeWidgetItem):
         self._cn_model = model_part
         self.item_name = item_name
         self.setData(NAME_COL, Qt.EditRole, item_name)
-        self.setData(LOCKED_COL, Qt.EditRole, True)  # is_locked
+        self.setData(LOCKED_COL, Qt.EditRole, False)  # is_locked
         self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
         self.setFlags(self.flags() & ~Qt.ItemIsSelectable)
