@@ -3,6 +3,8 @@
 from math import ceil, floor
 
 root3 = 1.732051
+
+
 class HoneycombDnaPart(object):
     """
     SCAF_LOW = [[1, 11], [8, 18], [4, 15]]
@@ -19,9 +21,15 @@ class HoneycombDnaPart(object):
     STEP = 21  # 32 in square
     TURNS_PER_STEP = 2.0
     HELICAL_PITCH = STEP / TURNS_PER_STEP
-    TWIST_PER_BASE = 360. / HELICAL_PITCH # degrees
-    TWIST_OFFSET = -(360. / 10.5)*1.0 # degrees
+    TWIST_PER_BASE = 360. / HELICAL_PITCH  # degrees
+    TWIST_OFFSET = -(360. / 10.5)*1.0  # degrees
     SUB_STEP_SIZE = STEP / 3.
+
+    # Manually tuned grid offsets
+    PAD_GRID_XL = -20
+    PAD_GRID_XH = 20
+    PAD_GRID_YL = -50
+    PAD_GRID_YH = 5
 
     @staticmethod
     def isEvenParity(row, column):
@@ -36,8 +44,8 @@ class HoneycombDnaPart(object):
     @staticmethod
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """make sure radius is a float"""
-        x = column*radius*root3
-        if HoneycombDnaPart.isOddParity(row, column):   # odd parity
+        x = (column-1)*radius*root3
+        if HoneycombDnaPart.isEvenParity(row, column):   # odd parity
             y = -row*radius*3 + radius
         else:                               # even parity
             y = -row*radius*3
@@ -70,8 +78,8 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLatticeCoordRound(radius, x, y,
-                                round_up_row, round_up_col, scale_factor=1.0):
+    def positionToLatticeCoordRound(radius, x, y, round_up_row, round_up_col,
+                                    scale_factor=1.0):
         roundRow = ceil if round_up_row else floor
         roundCol = ceil if round_up_col else floor
         column = roundCol(x / (radius*root3*scale_factor))
@@ -87,6 +95,7 @@ class HoneycombDnaPart(object):
     # end def
 # end class
 
+
 class SquareDnaPart(object):
     """
     SCAF_LOW = [[4, 26, 15], [18, 28, 7], [10, 20, 31], [2, 12, 23]]
@@ -98,8 +107,8 @@ class SquareDnaPart(object):
     SUB_STEP_SIZE = STEP / 4
     TURNS_PER_STEP = 3.0
     HELICAL_PITCH = STEP / TURNS_PER_STEP
-    TWIST_PER_BASE = 360. / HELICAL_PITCH # degrees
-    TWIST_OFFSET = 180. + TWIST_PER_BASE / 2 # degrees
+    TWIST_PER_BASE = 360. / HELICAL_PITCH  # degrees
+    TWIST_OFFSET = 180. + TWIST_PER_BASE / 2  # degrees
 
     @staticmethod
     def isEvenParity(row, column):
@@ -119,7 +128,6 @@ class SquareDnaPart(object):
         x = column*2*radius
         return scale_factor*x, scale_factor*y
     # end def
-
 
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):

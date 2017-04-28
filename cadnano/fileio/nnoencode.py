@@ -1,13 +1,8 @@
-from os.path import basename
-import numpy as np
-
-from cadnano.cnenum import StrandType
-import json
 import io
-
-# from cadnano.document import Document
-
+import json
+import numpy as np
 import cadnano.fileio.v3encode as v3encode
+
 
 def encodeToFile(filename, document):
     json_string = encode(document)
@@ -15,10 +10,12 @@ def encodeToFile(filename, document):
         fd.write(json_string)
 # end def
 
+
 def encode(document):
     obj = v3encode.encodeDocument(document)
     json_string = json.dumps(obj, separators=(',', ':'), cls=EncoderforPandas)  # compact encoding
     return json_string
+
 
 class EncoderforPandas(json.JSONEncoder):
     """ Special encoder to coerce numpy number types

@@ -64,13 +64,13 @@ def decode(document, obj, emit_signals=False):
 
     delta_row = (max_row + min_row) // 2
     # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
-    # if delta_row & 1:
-    #     delta_row += 1
+    if delta_row & 1:
+        delta_row += 1
     delta_column = (max_col + min_col) // 2
     if delta_column & 1:
         delta_column += 1
 
-    # print("Found cadnano version 2 file")
+    print("Found cadnano version 2 file")
     # print("\trows(%d, %d): avg: %d" % (min_row, max_row, delta_row))
     # print("\tcolumns(%d, %d): avg: %d" % (min_col, max_col, delta_column))
 
