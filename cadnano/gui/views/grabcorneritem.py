@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from cadnano.gui.palette import getBrushObj
+from cadnano.gui.palette import getBrushObj, getPenObj
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import qApp
 
@@ -8,6 +8,7 @@ TOP_LEFT = 0
 BOTTOM_LEFT = 1
 BOTTOM_RIGHT = 2
 TOP_RIGHT = 4
+FILL_COLOR = '#ffffff'
 
 
 class GrabCornerItem(QGraphicsRectItem):
@@ -19,22 +20,23 @@ class GrabCornerItem(QGraphicsRectItem):
         self.offset = QPointF(width, width)
         self.offset_x = QPointF(width, 0)
         self.offset_y = QPointF(0, width)
+        self.align_offset = self.parentItem()._BOUNDING_RECT_PADDING
 
         self.is_grabbing = False
-        self.setBrush(getBrushObj(color))
+        self.setBrush(getBrushObj(FILL_COLOR))
+        self.setPen(getPenObj(color, 0))
         self.is_resizable = is_resizable
         self.model_bounds = ()
         self.corner_type = TOP_LEFT
     # end def
 
     def mousePressEvent(self, event):
-        # print("mousePressEvent")
         if event.button() == Qt.RightButton:
             return
         parent = self.parentItem()
+
         if self.is_resizable and event.modifiers() & Qt.ShiftModifier:
             self.model_bounds = parent.getModelBounds()
-            # print("We are resizing", self.model_bounds)
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
             return
@@ -80,21 +82,41 @@ class GrabCornerItem(QGraphicsRectItem):
     def alignPos(self, new_x, new_y):
         ct = self.corner_type
         hwidth = self.half_width
+        ao = self.align_offset
         if ct == TOP_LEFT:
-            new_x_TL = new_x - hwidth
-            new_y_TL = new_y - hwidth
+            new_x_TL = new_x - hwidth - ao
+            new_y_TL = new_y - hwidth - ao
             self.setPos(new_x_TL, new_y_TL)
         elif ct == BOTTOM_RIGHT:
-            new_x_BR = new_x - hwidth
-            new_y_BR = new_y - hwidth
+            new_x_BR = new_x - hwidth + ao
+            new_y_BR = new_y - hwidth + ao
             self.setPos(new_x_BR, new_y_BR)
     # end def
 
     def mouseReleaseEvent(self, event):
         if self.model_bounds:
+            parent = self.parentItem()
+            xTL, yTL, xBR, yBR = self.model_bounds
+            ct = self.corner_type
+            epos = event.scenePos()
+            new_pos = self.item_start + epos - self.event_start_position
+            new_x = new_pos.x()
+            new_y = new_pos.y()
+            hwidth = self.half_width
+            if ct == TOP_LEFT:
+                new_x_TL = xTL - hwidth if new_x + hwidth > xTL else new_x
+                new_y_TL = yTL - hwidth if new_y + hwidth > yTL else new_y
+                tl, _ = parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), (), do_grid=True)
+                self.alignPos(*tl)
+            elif ct == BOTTOM_RIGHT:
+                new_x_BR = xBR + hwidth if new_x + hwidth < xBR else new_x
+                new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
+                _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth), do_grid=True)
+                self.alignPos(*br)
+            else:
+                raise NotImplementedError("corner_type %d not supported" % (ct))
             self.model_bounds = ()
         if self.is_grabbing:
-            # print("I am released")
             self.is_grabbing = False
             parent = self.parentItem()
             parent.setMovable(False)

@@ -107,6 +107,10 @@ class GridItem(QGraphicsPathItem):
         doPosition = HoneycombDnaPart.positionToLatticeCoordRound
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
+        x_l = x_l + HoneycombDnaPart.PAD_GRID_XL
+        x_h = x_h + HoneycombDnaPart.PAD_GRID_XH
+        y_h = y_h + HoneycombDnaPart.PAD_GRID_YL
+        y_l = y_l + HoneycombDnaPart.PAD_GRID_YH
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points

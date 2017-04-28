@@ -42,6 +42,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         prexover_manager (TYPE): Description
     """
     findChild = util.findChild  # for debug
+    _BOUNDING_RECT_PADDING = 0
 
     def __init__(self, model_part_instance, viewroot, parent):
         """parent should always be pathrootitem
@@ -65,7 +66,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
-        GC_SIZE = 20
+        GC_SIZE = 10
         self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
     # end def
 
