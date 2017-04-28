@@ -483,7 +483,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         Args:
             event (TYPE): Description
         """
-        print("press", ord('g'))
+        # print("press", ord('g'))
         if event.text() == 'g':
             print("hey het")
         return QGraphicsItem.keyPressEvent(self, event)

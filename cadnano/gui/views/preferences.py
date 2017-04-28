@@ -1,12 +1,17 @@
-import os.path, zipfile, shutil, platform, subprocess, tempfile, errno
+import errno
+import os.path
+import platform
+import shutil
+import subprocess
+import tempfile
+import zipfile
 
-from PyQt5.QtCore import Qt, QObject, QSettings, pyqtSignal
-from PyQt5.QtWidgets import QWidget, QDialogButtonBox, QTableWidgetItem
+from PyQt5.QtCore import Qt, QSettings
+from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QMessageBox
 
 from cadnano import util
 from cadnano.gui.views import styles
-from cadnano.gui.views.sliceview import slicestyles
 from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
 
 
@@ -57,7 +62,8 @@ class Preferences(object):
 
     def readPreferences(self):
         self.qs.beginGroup("Preferences")
-        self.grid_appearance_type_index = self.qs.value("grid_appearance_type_index", styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
+        self.grid_appearance_type_index = self.qs.value("grid_appearance_type_index",
+                                                        styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
         self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
@@ -87,7 +93,8 @@ class Preferences(object):
     # end def
 
     def getGridAppearanceType(self):
-        return ['circles', 'lines and points', 'points'][self.grid_appearance_type_index]
+        return ['points', 'lines and points'][self.grid_appearance_type_index]
+        # return ['circles', 'lines and points', 'points'][self.grid_appearance_type_index]
     # end def
 
     def setZoomSpeed(self, speed):
@@ -105,11 +112,10 @@ class Preferences(object):
     # end def
 
     def addPlugin(self):
-        fdialog = QFileDialog(
-                    self.widget,
-                    "Install Plugin",
-                    util.this_path(),
-                    "Cadnano Plugins (*.cnp)")
+        fdialog = QFileDialog(self.widget,
+                              "Install Plugin",
+                              util.this_path(),
+                              "Cadnano Plugins (*.cnp)")
         fdialog.setAcceptMode(QFileDialog.AcceptOpen)
         fdialog.setWindowFlags(Qt.Sheet)
         fdialog.setWindowModality(Qt.WindowModal)
@@ -125,18 +131,18 @@ class Preferences(object):
         try:
             zf = zipfile.ZipFile(fname, 'r')
         except Exception as e:
-            self.failWithMsg("Plugin file seems corrupt: %s."%e)
+            self.failWithMsg("Plugin file seems corrupt: %s." % e)
             return
         tdir = tempfile.mkdtemp()
         try:
             for f in zf.namelist():
                 if f.endswith('/'):
-                    os.makedirs(os.path.join(tdir,f))
+                    os.makedirs(os.path.join(tdir, f))
             for f in zf.namelist():
                 if not f.endswith('/'):
                     zf.extract(f, tdir)
         except Exception as e:
-            self.failWithMsg("Extraction of plugin archive failed: %s."%e)
+            self.failWithMsg("Extraction of plugin archive failed: %s." % e)
             return
         files_in_zip = [(f, os.path.join(tdir, f)) for f in os.listdir(tdir)]
         try:
@@ -160,19 +166,19 @@ class Preferences(object):
     # end def
 
     def darwinAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
-        envirn={"DST":util.this_path()+'/plugins'}
+        envirn = {"DST": util.this_path()+'/plugins'}
         srcstr = ''
         for i in range(len(files_in_zip)):
             file_name, file_path = files_in_zip[i]
             srcstr += ' \\"$SRC' + str(i) + '\\"'
             envirn['SRC'+str(i)] = file_path
-        proc = subprocess.Popen(['osascript','-e',\
-                          'do shell script "cp -fR ' + srcstr +\
-                          ' \\"$DST\\"" with administrator privileges'],\
-                          env=envirn)
+        proc = subprocess.Popen(['osascript', '-e',
+                                 'do shell script "cp -fR ' + srcstr +
+                                 ' \\"$DST\\"" with administrator privileges'],
+                                env=envirn)
         retval = self.waitForProcExit(proc)
         if retval != 0:
-            self.failWithMsg('cp failed with code %i'%retval)
+            self.failWithMsg('cp failed with code %i' % retval)
     # end def
 
     def linuxAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
@@ -182,7 +188,7 @@ class Preferences(object):
         proc = subprocess.Popen(args)
         retval = self.waitForProcExit(proc)
         if retval != 0:
-            self.failWithMsg('cp failed with code %i'%retval)
+            self.failWithMsg('cp failed with code %i' % retval)
     # end def
 
     def confirmDestructiveIfNecessary(self, files_in_zip):
@@ -227,7 +233,7 @@ has already been installed. Replace the currently installed one?")
                 procexit = True
             except OSError as e:
                 if e.errno != errno.EINTR:
-                    raise ose
+                    raise e
         return retval
     # end def
 

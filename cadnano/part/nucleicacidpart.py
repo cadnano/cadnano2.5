@@ -24,7 +24,6 @@ from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from cadnano.setpropertycmd import SetVHPropertyCommand
-from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano.removeinstancecmd import RemoveInstanceCommand
 
 """
@@ -2326,8 +2325,8 @@ class NucleicAcidPart(Part):
     def getSequences(self):
         """getSequences"""
         # s = "Start\tEnd\tColor\tMod5\tSequence\tMod3\tAbstractSequence\n"
-        keys = ['Start','End','Color', 'Mod5',
-                'Sequence','Mod3','AbstractSequence']
+        keys = ['Start', 'End', 'Color', 'Mod5',
+                'Sequence', 'Mod3', 'AbstractSequence']
         out = {key: [] for key in keys}
         for oligo in self._oligos:
             oligo.sequenceExport(out)
@@ -2486,8 +2485,8 @@ class NucleicAcidPart(Part):
             c.redo()
     # end def
 
-    def createXover(self, strand5p, idx5p, strand3p, idx3p,
-            update_oligo=True, allow_reordering=False, use_undostack=True):
+    def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True,
+                    allow_reordering=False, use_undostack=True):
         """Xovers are ALWAYS installed FROM the 3' end of the 5' most
         strand (strand5p) TO the 5' end of the 3' most strand (strand3p)
 
@@ -2498,9 +2497,8 @@ class NucleicAcidPart(Part):
             idx3p (int): index of the 5 prime end of the xover in strand3p
         """
         # test for reordering malformed input
-        if (allow_reordering is True and
-            strand5p.idx5Prime() == idx5p and
-            strand3p.idx3Prime() == idx3p):
+        if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
+           strand3p.idx3Prime() == idx3p):
             strand5p, strand3p = strand3p, strand5p
             idx5p, idx3p = idx3p, idx5p
 
