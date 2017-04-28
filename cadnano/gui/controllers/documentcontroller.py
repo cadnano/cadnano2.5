@@ -390,7 +390,7 @@ class DocumentController():
 
         generator = QSvgGenerator()
         generator.setFileName(fname)
-        generator.setSize(QSize(200, 200))
+        generator.setSize(QSize(200, 330))
         generator.setViewBox(QRect(0, 0, 2000, 2000))
         painter = QPainter()
 

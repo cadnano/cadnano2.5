@@ -282,14 +282,11 @@ class Oligo(CNObject):
 
     def shouldHighlight(self):
         if not self._strand5p:
-            return False
-        if self.length() > MAX_HIGHLIGHT_LENGTH:
-            return False
-        if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
             return True
-        if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
-            return True
-        return False
+        if (OLIGO_LEN_BELOW_WHICH_HIGHLIGHT < self.length() < OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT) or \
+           self.length() > MAX_HIGHLIGHT_LENGTH:
+            return False
+        return True
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
