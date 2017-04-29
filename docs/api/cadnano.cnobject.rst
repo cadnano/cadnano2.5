@@ -1,5 +1,5 @@
-cadnano.cnobject module
-=======================
+cadnano\.cnobject module
+========================
 
 .. automodule:: cadnano.cnobject
     :members:

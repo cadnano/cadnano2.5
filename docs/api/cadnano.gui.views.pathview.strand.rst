@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.strand package
-=========================================
+cadnano\.gui\.views\.pathview\.strand package
+=============================================
 
 Subpackages
 -----------

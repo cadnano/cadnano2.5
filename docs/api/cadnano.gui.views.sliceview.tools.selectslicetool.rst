@@ -1,5 +1,5 @@
-cadnano.gui.views.sliceview.tools.selectslicetool module
-========================================================
+cadnano\.gui\.views\.sliceview\.tools\.selectslicetool module
+=============================================================
 
 .. automodule:: cadnano.gui.views.sliceview.tools.selectslicetool
     :members:

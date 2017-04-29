@@ -1,5 +1,5 @@
-cadnano.removeinstancecmd module
-================================
+cadnano\.removeinstancecmd module
+=================================
 
 .. automodule:: cadnano.removeinstancecmd
     :members:

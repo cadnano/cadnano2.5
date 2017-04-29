@@ -1,5 +1,5 @@
-cadnano.undostack module
-========================
+cadnano\.undostack module
+=========================
 
 .. automodule:: cadnano.undostack
     :members:

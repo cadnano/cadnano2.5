@@ -1,5 +1,5 @@
-cadnano.strand.modscmd module
-=============================
+cadnano\.strand\.modscmd module
+===============================
 
 .. automodule:: cadnano.strand.modscmd
     :members:

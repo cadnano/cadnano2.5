@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.prexovermanager module
-=================================================
+cadnano\.gui\.views\.pathview\.prexovermanager module
+=====================================================
 
 .. automodule:: cadnano.gui.views.pathview.prexovermanager
     :members:

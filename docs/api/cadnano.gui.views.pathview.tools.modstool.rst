@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.modstool module
-================================================
+cadnano\.gui\.views\.pathview\.tools\.modstool module
+=====================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.modstool
     :members:

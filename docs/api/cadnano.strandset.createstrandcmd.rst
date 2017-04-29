@@ -1,5 +1,5 @@
-cadnano.strandset.createstrandcmd module
-========================================
+cadnano\.strandset\.createstrandcmd module
+==========================================
 
 .. automodule:: cadnano.strandset.createstrandcmd
     :members:

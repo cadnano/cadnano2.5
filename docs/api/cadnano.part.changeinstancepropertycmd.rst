@@ -1,7 +1,7 @@
-cadnano\.gui\.views\.sliceview\.griditem module
+cadnano\.part\.changeinstancepropertycmd module
 ===============================================
 
-.. automodule:: cadnano.gui.views.sliceview.griditem
+.. automodule:: cadnano.part.changeinstancepropertycmd
     :members:
     :undoc-members:
     :show-inheritance:

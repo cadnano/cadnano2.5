@@ -31,10 +31,10 @@ Modules
    api/modules
    api/cadnano.addinstancecmd
    api/cadnano.color
+   api/cadnano.cnenum
    api/cadnano.cnobject
    api/cadnano.cnproxy
    api/cadnano.document
-   api/cadnano.enum
    api/cadnano.objectinstance
    api/cadnano.preferences
    api/cadnano.proxyconfigure

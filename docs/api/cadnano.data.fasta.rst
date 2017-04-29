@@ -1,5 +1,5 @@
-cadnano.data.fasta package
-==========================
+cadnano\.data\.fasta package
+============================
 
 Module contents
 ---------------

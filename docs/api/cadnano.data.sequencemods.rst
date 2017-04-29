@@ -1,5 +1,5 @@
-cadnano.data.sequencemods module
-================================
+cadnano\.data\.sequencemods module
+==================================
 
 .. automodule:: cadnano.data.sequencemods
     :members:

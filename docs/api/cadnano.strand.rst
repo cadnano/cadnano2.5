@@ -1,5 +1,5 @@
-cadnano.strand package
-======================
+cadnano\.strand package
+=======================
 
 Submodules
 ----------

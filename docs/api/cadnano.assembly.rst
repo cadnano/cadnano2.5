@@ -1,5 +1,5 @@
-cadnano.assembly module
-=======================
+cadnano\.assembly module
+========================
 
 .. automodule:: cadnano.assembly
     :members:

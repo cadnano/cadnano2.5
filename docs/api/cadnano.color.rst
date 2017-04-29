@@ -1,5 +1,5 @@
-cadnano.color module
-====================
+cadnano\.color module
+=====================
 
 .. automodule:: cadnano.color
     :members:

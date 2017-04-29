@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview.abstractproppartitem module
-==========================================================
+cadnano\.gui\.views\.propertyview\.abstractproppartitem module
+==============================================================
 
 .. automodule:: cadnano.gui.views.propertyview.abstractproppartitem
     :members:

@@ -1,7 +1,7 @@
-cadnano\.strand\.strand module
+cadnano\.setpropertycmd module
 ==============================
 
-.. automodule:: cadnano.strand.strand
+.. automodule:: cadnano.setpropertycmd
     :members:
     :undoc-members:
     :show-inheritance:

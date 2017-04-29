@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview package
-======================================
+cadnano\.gui\.views\.propertyview package
+=========================================
 
 Submodules
 ----------

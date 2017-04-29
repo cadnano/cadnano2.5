@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview.virtualhelixitem module
-======================================================
+cadnano\.gui\.views\.propertyview\.virtualhelixitem module
+==========================================================
 
 .. automodule:: cadnano.gui.views.propertyview.virtualhelixitem
     :members:

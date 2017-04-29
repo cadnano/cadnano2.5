@@ -1,5 +1,5 @@
-cadnano.oligo.applysequencecmd module
-=====================================
+cadnano\.oligo\.applysequencecmd module
+=======================================
 
 .. automodule:: cadnano.oligo.applysequencecmd
     :members:

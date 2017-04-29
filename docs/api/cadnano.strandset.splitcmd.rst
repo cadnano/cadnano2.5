@@ -1,5 +1,5 @@
-cadnano.strandset.splitcmd module
-=================================
+cadnano\.strandset\.splitcmd module
+===================================
 
 .. automodule:: cadnano.strandset.splitcmd
     :members:

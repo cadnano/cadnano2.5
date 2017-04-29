@@ -1,5 +1,5 @@
-cadnano.gui.views.abstractitems.abstracttoolmanager module
-==========================================================
+cadnano\.gui\.views\.abstractitems\.abstracttoolmanager module
+==============================================================
 
 .. automodule:: cadnano.gui.views.abstractitems.abstracttoolmanager
     :members:

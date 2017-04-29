@@ -1,5 +1,5 @@
-cadnano.fileio.lattice module
-=============================
+cadnano\.fileio\.lattice module
+===============================
 
 .. automodule:: cadnano.fileio.lattice
     :members:

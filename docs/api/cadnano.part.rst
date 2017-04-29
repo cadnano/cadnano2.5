@@ -1,12 +1,12 @@
-cadnano.part package
-====================
+cadnano\.part package
+=====================
 
 Submodules
 ----------
 
 .. toctree::
 
-   cadnano.part.changeviewpropertycmd
+   cadnano.part.changeinstancepropertycmd
    cadnano.part.createvhelixcmd
    cadnano.part.nucleicacidpart
    cadnano.part.part
@@ -14,9 +14,9 @@ Submodules
    cadnano.part.refreshsegmentscmd
    cadnano.part.removepartcmd
    cadnano.part.removevhelixcmd
-   cadnano.part.renumbercmd
    cadnano.part.resizevirtualhelixcmd
    cadnano.part.translatevhelixcmd
+   cadnano.part.virtualhelix
    cadnano.part.xovercmds
 
 Module contents

@@ -1,5 +1,5 @@
-cadnano.data.dnasequences module
-================================
+cadnano\.data\.dnasequences module
+==================================
 
 .. automodule:: cadnano.data.dnasequences
     :members:

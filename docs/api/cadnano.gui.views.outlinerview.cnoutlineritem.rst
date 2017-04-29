@@ -1,5 +1,5 @@
-cadnano.gui.views.outlinerview.cnoutlineritem module
-====================================================
+cadnano\.gui\.views\.outlinerview\.cnoutlineritem module
+========================================================
 
 .. automodule:: cadnano.gui.views.outlinerview.cnoutlineritem
     :members:

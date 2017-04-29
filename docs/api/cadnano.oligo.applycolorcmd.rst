@@ -1,5 +1,5 @@
-cadnano.oligo.applycolorcmd module
-==================================
+cadnano\.oligo\.applycolorcmd module
+====================================
 
 .. automodule:: cadnano.oligo.applycolorcmd
     :members:

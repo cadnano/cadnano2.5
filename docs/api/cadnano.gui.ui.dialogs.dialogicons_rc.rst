@@ -1,5 +1,5 @@
-cadnano.gui.ui.dialogs.dialogicons_rc module
-============================================
+cadnano\.gui\.ui\.dialogs\.dialogicons\_rc module
+=================================================
 
 .. automodule:: cadnano.gui.ui.dialogs.dialogicons_rc
     :members:

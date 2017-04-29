@@ -1,5 +1,5 @@
-cadnano.strandset.strandset module
-==================================
+cadnano\.strandset\.strandset module
+====================================
 
 .. automodule:: cadnano.strandset.strandset
     :members:

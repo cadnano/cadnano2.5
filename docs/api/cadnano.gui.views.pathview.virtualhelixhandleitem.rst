@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.virtualhelixhandleitem module
-========================================================
+cadnano\.gui\.views\.pathview\.virtualhelixhandleitem module
+============================================================
 
 .. automodule:: cadnano.gui.views.pathview.virtualhelixhandleitem
     :members:

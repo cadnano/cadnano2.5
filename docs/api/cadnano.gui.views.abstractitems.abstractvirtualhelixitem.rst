@@ -1,5 +1,5 @@
-cadnano.gui.views.abstractitems.abstractvirtualhelixitem module
-===============================================================
+cadnano\.gui\.views\.abstractitems\.abstractvirtualhelixitem module
+===================================================================
 
 .. automodule:: cadnano.gui.views.abstractitems.abstractvirtualhelixitem
     :members:

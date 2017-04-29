@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.pathselection module
-=====================================================
+cadnano\.gui\.views\.pathview\.tools\.pathselection module
+==========================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.pathselection
     :members:

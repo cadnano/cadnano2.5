@@ -1,5 +1,5 @@
-cadnano.data package
-====================
+cadnano\.data package
+=====================
 
 Subpackages
 -----------

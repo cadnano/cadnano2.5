@@ -1,5 +1,5 @@
-cadnano.gui.ui.dialogs.ui_addseq module
-=======================================
+cadnano\.gui\.ui\.dialogs\.ui\_addseq module
+============================================
 
 .. automodule:: cadnano.gui.ui.dialogs.ui_addseq
     :members:

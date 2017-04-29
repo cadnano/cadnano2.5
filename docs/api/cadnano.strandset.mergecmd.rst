@@ -1,5 +1,5 @@
-cadnano.strandset.mergecmd module
-=================================
+cadnano\.strandset\.mergecmd module
+===================================
 
 .. automodule:: cadnano.strandset.mergecmd
     :members:

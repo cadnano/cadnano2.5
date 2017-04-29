@@ -1,5 +1,5 @@
-cadnano.part.createvhelixcmd module
-===================================
+cadnano\.part\.createvhelixcmd module
+=====================================
 
 .. automodule:: cadnano.part.createvhelixcmd
     :members:

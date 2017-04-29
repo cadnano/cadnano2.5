@@ -1,5 +1,5 @@
-cadnano.proxyconfigure module
-=============================
+cadnano\.proxyconfigure module
+==============================
 
 .. automodule:: cadnano.proxyconfigure
     :members:

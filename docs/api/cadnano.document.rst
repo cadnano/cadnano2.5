@@ -1,5 +1,5 @@
-cadnano.document module
-=======================
+cadnano\.document module
+========================
 
 .. automodule:: cadnano.document
     :members:

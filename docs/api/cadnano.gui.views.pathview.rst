@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview package
-==================================
+cadnano\.gui\.views\.pathview package
+=====================================
 
 Subpackages
 -----------

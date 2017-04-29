@@ -1,5 +1,5 @@
-cadnano.math.matrix4 module
-===========================
+cadnano\.math\.matrix4 module
+=============================
 
 .. automodule:: cadnano.math.matrix4
     :members:

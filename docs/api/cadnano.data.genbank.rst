@@ -1,5 +1,5 @@
-cadnano.data.genbank package
-============================
+cadnano\.data\.genbank package
+==============================
 
 Module contents
 ---------------

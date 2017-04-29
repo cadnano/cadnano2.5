@@ -1,5 +1,5 @@
-cadnano.decorators package
-==========================
+cadnano\.decorators package
+===========================
 
 Submodules
 ----------

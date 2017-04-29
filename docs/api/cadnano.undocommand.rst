@@ -1,5 +1,5 @@
-cadnano.undocommand module
-==========================
+cadnano\.undocommand module
+===========================
 
 .. automodule:: cadnano.undocommand
     :members:

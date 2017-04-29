@@ -1,5 +1,5 @@
-cadnano.part.translatevhelixcmd module
-======================================
+cadnano\.part\.translatevhelixcmd module
+========================================
 
 .. automodule:: cadnano.part.translatevhelixcmd
     :members:

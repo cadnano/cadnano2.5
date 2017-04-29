@@ -1,5 +1,5 @@
-cadnano.gui.ui.dialogs package
-==============================
+cadnano\.gui\.ui\.dialogs package
+=================================
 
 Submodules
 ----------

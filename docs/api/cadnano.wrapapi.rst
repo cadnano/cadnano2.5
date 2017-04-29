@@ -1,7 +1,7 @@
-cadnano\.cnproxy module
+cadnano\.wrapapi module
 =======================
 
-.. automodule:: cadnano.cnproxy
+.. automodule:: cadnano.wrapapi
     :members:
     :undoc-members:
     :show-inheritance:

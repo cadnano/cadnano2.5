@@ -1,5 +1,5 @@
-cadnano.fileio.v3decode module
-==============================
+cadnano\.fileio\.v3decode module
+================================
 
 .. automodule:: cadnano.fileio.v3decode
     :members:

@@ -1,5 +1,5 @@
-cadnano.math.box module
-=======================
+cadnano\.math\.box module
+=========================
 
 .. automodule:: cadnano.math.box
     :members:

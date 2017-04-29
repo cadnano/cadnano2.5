@@ -1,5 +1,5 @@
-cadnano.gui.views.sliceview package
-===================================
+cadnano\.gui\.views\.sliceview package
+======================================
 
 Subpackages
 -----------

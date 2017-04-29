@@ -1,5 +1,5 @@
-cadnano.gui.views.outlinerview.outlinerstyles module
-====================================================
+cadnano\.gui\.views\.outlinerview\.outlinerstyles module
+========================================================
 
 .. automodule:: cadnano.gui.views.outlinerview.outlinerstyles
     :members:

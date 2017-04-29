@@ -1,5 +1,5 @@
-cadnano.util module
-===================
+cadnano\.util module
+====================
 
 .. automodule:: cadnano.util
     :members:

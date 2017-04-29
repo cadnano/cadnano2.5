@@ -1,5 +1,5 @@
-cadnano.gui.ui.dialogs.ui_preferences module
-============================================
+cadnano\.gui\.ui\.dialogs\.ui\_preferences module
+=================================================
 
 .. automodule:: cadnano.gui.ui.dialogs.ui_preferences
     :members:

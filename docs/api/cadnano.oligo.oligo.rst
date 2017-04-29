@@ -1,5 +1,5 @@
-cadnano.oligo.oligo module
-==========================
+cadnano\.oligo\.oligo module
+============================
 
 .. automodule:: cadnano.oligo.oligo
     :members:

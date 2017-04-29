@@ -1,5 +1,5 @@
-cadnano.preferences module
-==========================
+cadnano\.preferences module
+===========================
 
 .. automodule:: cadnano.preferences
     :members:

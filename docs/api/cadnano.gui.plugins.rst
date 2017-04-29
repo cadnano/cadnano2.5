@@ -1,5 +1,5 @@
-cadnano.gui.plugins package
-===========================
+cadnano\.gui\.plugins package
+=============================
 
 Submodules
 ----------

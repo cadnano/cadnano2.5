@@ -1,5 +1,5 @@
-cadnano.gui.views.sliceview.virtualhelixitem module
-===================================================
+cadnano\.gui\.views\.sliceview\.virtualhelixitem module
+=======================================================
 
 .. automodule:: cadnano.gui.views.sliceview.virtualhelixitem
     :members:

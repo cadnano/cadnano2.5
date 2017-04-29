@@ -1,5 +1,5 @@
-cadnano.addinstancecmd module
-=============================
+cadnano\.addinstancecmd module
+==============================
 
 .. automodule:: cadnano.addinstancecmd
     :members:

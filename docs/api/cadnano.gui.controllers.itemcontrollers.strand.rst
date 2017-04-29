@@ -1,5 +1,5 @@
-cadnano.gui.controllers.itemcontrollers.strand package
-======================================================
+cadnano\.gui\.controllers\.itemcontrollers\.strand package
+==========================================================
 
 Submodules
 ----------

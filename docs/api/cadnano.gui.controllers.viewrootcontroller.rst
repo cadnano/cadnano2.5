@@ -1,5 +1,5 @@
-cadnano.gui.controllers.viewrootcontroller module
-=================================================
+cadnano\.gui\.controllers\.viewrootcontroller module
+====================================================
 
 .. automodule:: cadnano.gui.controllers.viewrootcontroller
     :members:

@@ -1,5 +1,5 @@
-cadnano.gui.views.abstractitems.abstractoligoitem module
-========================================================
+cadnano\.gui\.views\.abstractitems\.abstractoligoitem module
+============================================================
 
 .. automodule:: cadnano.gui.views.abstractitems.abstractoligoitem
     :members:

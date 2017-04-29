@@ -1,5 +1,5 @@
-cadnano.cadnanoqt module
-========================
+cadnano\.cadnanoqt module
+=========================
 
 .. automodule:: cadnano.cadnanoqt
     :members:

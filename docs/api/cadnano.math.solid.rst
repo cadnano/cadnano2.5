@@ -1,5 +1,5 @@
-cadnano.math.solid module
-=========================
+cadnano\.math\.solid module
+===========================
 
 .. automodule:: cadnano.math.solid
     :members:

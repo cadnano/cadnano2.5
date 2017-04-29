@@ -24,20 +24,22 @@ Submodules
    cadnano.addinstancecmd
    cadnano.assembly
    cadnano.cadnanoqt
+   cadnano.cnenum
    cadnano.cnobject
    cadnano.cnproxy
    cadnano.color
    cadnano.docmodscmd
    cadnano.document
-   cadnano.enum
    cadnano.objectinstance
    cadnano.pointquadtree
    cadnano.preferences
    cadnano.proxyconfigure
    cadnano.removeinstancecmd
+   cadnano.setpropertycmd
    cadnano.undocommand
    cadnano.undostack
    cadnano.util
+   cadnano.wrapapi
 
 Module contents
 ---------------

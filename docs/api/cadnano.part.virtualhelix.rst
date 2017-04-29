@@ -1,7 +1,7 @@
-cadnano\.gui\.views\.styles module
+cadnano\.part\.virtualhelix module
 ==================================
 
-.. automodule:: cadnano.gui.views.styles
+.. automodule:: cadnano.part.virtualhelix
     :members:
     :undoc-members:
     :show-inheritance:

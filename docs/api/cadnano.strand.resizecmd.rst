@@ -1,5 +1,5 @@
-cadnano.strand.resizecmd module
-===============================
+cadnano\.strand\.resizecmd module
+=================================
 
 .. automodule:: cadnano.strand.resizecmd
     :members:

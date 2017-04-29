@@ -1,5 +1,5 @@
-cadnano.fileio.nnoencode module
-===============================
+cadnano\.fileio\.nnoencode module
+=================================
 
 .. automodule:: cadnano.fileio.nnoencode
     :members:

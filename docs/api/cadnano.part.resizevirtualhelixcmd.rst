@@ -1,5 +1,5 @@
-cadnano.part.resizevirtualhelixcmd module
-=========================================
+cadnano\.part\.resizevirtualhelixcmd module
+===========================================
 
 .. automodule:: cadnano.part.resizevirtualhelixcmd
     :members:

@@ -1,5 +1,5 @@
-cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller module
-==========================================================================
+cadnano\.gui\.controllers\.itemcontrollers\.strand\.stranditemcontroller module
+===============================================================================
 
 .. automodule:: cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller
     :members:

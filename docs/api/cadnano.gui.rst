@@ -1,5 +1,5 @@
-cadnano.gui package
-===================
+cadnano\.gui package
+====================
 
 Subpackages
 -----------

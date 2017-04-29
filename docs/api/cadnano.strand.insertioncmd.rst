@@ -1,5 +1,5 @@
-cadnano.strand.insertioncmd module
-==================================
+cadnano\.strand\.insertioncmd module
+====================================
 
 .. automodule:: cadnano.strand.insertioncmd
     :members:

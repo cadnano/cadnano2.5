@@ -1,5 +1,5 @@
-cadnano.gui.views.grabcorneritem module
-=======================================
+cadnano\.gui\.views\.grabcorneritem module
+==========================================
 
 .. automodule:: cadnano.gui.views.grabcorneritem
     :members:

@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.strand.stranditem module
-===================================================
+cadnano\.gui\.views\.pathview\.strand\.stranditem module
+========================================================
 
 .. automodule:: cadnano.gui.views.pathview.strand.stranditem
     :members:

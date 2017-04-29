@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.erasetool module
-=================================================
+cadnano\.gui\.views\.pathview\.tools\.erasetool module
+======================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.erasetool
     :members:

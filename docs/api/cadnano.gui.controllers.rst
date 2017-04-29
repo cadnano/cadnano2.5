@@ -1,5 +1,5 @@
-cadnano.gui.controllers package
-===============================
+cadnano\.gui\.controllers package
+=================================
 
 Subpackages
 -----------

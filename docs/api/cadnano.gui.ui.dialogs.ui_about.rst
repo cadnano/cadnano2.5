@@ -1,5 +1,5 @@
-cadnano.gui.ui.dialogs.ui_about module
-======================================
+cadnano\.gui\.ui\.dialogs\.ui\_about module
+===========================================
 
 .. automodule:: cadnano.gui.ui.dialogs.ui_about
     :members:

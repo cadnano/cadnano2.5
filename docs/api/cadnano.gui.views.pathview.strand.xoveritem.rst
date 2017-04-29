@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.strand.xoveritem module
-==================================================
+cadnano\.gui\.views\.pathview\.strand\.xoveritem module
+=======================================================
 
 .. automodule:: cadnano.gui.views.pathview.strand.xoveritem
     :members:

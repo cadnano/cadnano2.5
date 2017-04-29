@@ -1,5 +1,5 @@
-cadnano.gui.ui.mainwindow.svgbutton module
-==========================================
+cadnano\.gui\.ui\.mainwindow\.svgbutton module
+==============================================
 
 .. automodule:: cadnano.gui.ui.mainwindow.svgbutton
     :members:

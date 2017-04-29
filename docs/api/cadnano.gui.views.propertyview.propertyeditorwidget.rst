@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview.propertyeditorwidget module
-==========================================================
+cadnano\.gui\.views\.propertyview\.propertyeditorwidget module
+==============================================================
 
 .. automodule:: cadnano.gui.views.propertyview.propertyeditorwidget
     :members:

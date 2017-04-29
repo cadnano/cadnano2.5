@@ -1,5 +1,5 @@
-cadnano.gui.ui.mainwindow package
-=================================
+cadnano\.gui\.ui\.mainwindow package
+====================================
 
 Submodules
 ----------

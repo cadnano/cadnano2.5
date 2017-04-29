@@ -1,5 +1,5 @@
-cadnano.pointquadtree module
-============================
+cadnano\.pointquadtree module
+=============================
 
 .. automodule:: cadnano.pointquadtree
     :members:

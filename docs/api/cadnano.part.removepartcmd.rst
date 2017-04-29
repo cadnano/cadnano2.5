@@ -1,5 +1,5 @@
-cadnano.part.removepartcmd module
-=================================
+cadnano\.part\.removepartcmd module
+===================================
 
 .. automodule:: cadnano.part.removepartcmd
     :members:

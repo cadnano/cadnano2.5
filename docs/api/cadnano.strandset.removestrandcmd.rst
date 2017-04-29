@@ -1,5 +1,5 @@
-cadnano.strandset.removestrandcmd module
-========================================
+cadnano\.strandset\.removestrandcmd module
+==========================================
 
 .. automodule:: cadnano.strandset.removestrandcmd
     :members:

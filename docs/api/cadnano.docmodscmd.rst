@@ -1,5 +1,5 @@
-cadnano.docmodscmd module
-=========================
+cadnano\.docmodscmd module
+==========================
 
 .. automodule:: cadnano.docmodscmd
     :members:

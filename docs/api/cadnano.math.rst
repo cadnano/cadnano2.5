@@ -1,5 +1,5 @@
-cadnano.math package
-====================
+cadnano\.math package
+=====================
 
 Submodules
 ----------

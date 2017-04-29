@@ -1,5 +1,5 @@
-cadnano.math.face module
-========================
+cadnano\.math\.face module
+==========================
 
 .. automodule:: cadnano.math.face
     :members:

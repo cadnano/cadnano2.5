@@ -1,5 +1,5 @@
-cadnano.math.vector module
-==========================
+cadnano\.math\.vector module
+============================
 
 .. automodule:: cadnano.math.vector
     :members:

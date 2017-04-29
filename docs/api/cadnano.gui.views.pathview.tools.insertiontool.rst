@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.insertiontool module
-=====================================================
+cadnano\.gui\.views\.pathview\.tools\.insertiontool module
+==========================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.insertiontool
     :members:

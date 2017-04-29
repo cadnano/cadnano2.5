@@ -1,5 +1,5 @@
-cadnano.gui.controllers.itemcontrollers.partitemcontroller module
-=================================================================
+cadnano\.gui\.controllers\.itemcontrollers\.partitemcontroller module
+=====================================================================
 
 .. automodule:: cadnano.gui.controllers.itemcontrollers.partitemcontroller
     :members:

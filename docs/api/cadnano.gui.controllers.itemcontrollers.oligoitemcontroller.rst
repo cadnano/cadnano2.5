@@ -1,5 +1,5 @@
-cadnano.gui.controllers.itemcontrollers.oligoitemcontroller module
-==================================================================
+cadnano\.gui\.controllers\.itemcontrollers\.oligoitemcontroller module
+======================================================================
 
 .. automodule:: cadnano.gui.controllers.itemcontrollers.oligoitemcontroller
     :members:

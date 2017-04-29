@@ -1,5 +1,5 @@
-cadnano.gui.controllers.itemcontrollers package
-===============================================
+cadnano\.gui\.controllers\.itemcontrollers package
+==================================================
 
 Subpackages
 -----------

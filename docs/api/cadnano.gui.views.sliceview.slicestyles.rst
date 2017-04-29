@@ -1,5 +1,5 @@
-cadnano.gui.views.sliceview.slicestyles module
-==============================================
+cadnano\.gui\.views\.sliceview\.slicestyles module
+==================================================
 
 .. automodule:: cadnano.gui.views.sliceview.slicestyles
     :members:

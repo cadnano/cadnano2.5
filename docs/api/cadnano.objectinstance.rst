@@ -1,5 +1,5 @@
-cadnano.objectinstance module
-=============================
+cadnano\.objectinstance module
+==============================
 
 .. automodule:: cadnano.objectinstance
     :members:

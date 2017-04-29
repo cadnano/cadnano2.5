@@ -1,5 +1,5 @@
-cadnano.gui.views.outlinerview package
-======================================
+cadnano\.gui\.views\.outlinerview package
+=========================================
 
 Submodules
 ----------

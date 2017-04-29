@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.breaktool module
-=================================================
+cadnano\.gui\.views\.pathview\.tools\.breaktool module
+======================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.breaktool
     :members:

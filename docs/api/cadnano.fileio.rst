@@ -1,5 +1,5 @@
-cadnano.fileio package
-======================
+cadnano\.fileio package
+=======================
 
 Submodules
 ----------

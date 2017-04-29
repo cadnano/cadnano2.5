@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.addseqtool module
-==================================================
+cadnano\.gui\.views\.pathview\.tools\.addseqtool module
+=======================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.addseqtool
     :members:

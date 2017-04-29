@@ -1,5 +1,5 @@
-cadnano.decorators.insertion module
-===================================
+cadnano\.decorators\.insertion module
+=====================================
 
 .. automodule:: cadnano.decorators.insertion
     :members:

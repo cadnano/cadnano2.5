@@ -1,5 +1,5 @@
-cadnano.oligo.removeoligocmd module
-===================================
+cadnano\.oligo\.removeoligocmd module
+=====================================
 
 .. automodule:: cadnano.oligo.removeoligocmd
     :members:

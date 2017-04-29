@@ -1,5 +1,5 @@
-cadnano.part.xovercmds module
-=============================
+cadnano\.part\.xovercmds module
+===============================
 
 .. automodule:: cadnano.part.xovercmds
     :members:

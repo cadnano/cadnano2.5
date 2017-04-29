@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.strand.decorators.insertionitem module
-=================================================================
+cadnano\.gui\.views\.pathview\.strand\.decorators\.insertionitem module
+=======================================================================
 
 .. automodule:: cadnano.gui.views.pathview.strand.decorators.insertionitem
     :members:

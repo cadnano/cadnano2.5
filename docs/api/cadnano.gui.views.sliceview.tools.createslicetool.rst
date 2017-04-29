@@ -1,5 +1,5 @@
-cadnano.gui.views.sliceview.tools.createslicetool module
-========================================================
+cadnano\.gui\.views\.sliceview\.tools\.createslicetool module
+=============================================================
 
 .. automodule:: cadnano.gui.views.sliceview.tools.createslicetool
     :members:

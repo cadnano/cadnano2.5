@@ -1,5 +1,5 @@
-cadnano.part.nucleicacidpart module
-===================================
+cadnano\.part\.nucleicacidpart module
+=====================================
 
 .. automodule:: cadnano.part.nucleicacidpart
     :members:

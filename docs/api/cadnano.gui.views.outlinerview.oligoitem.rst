@@ -1,5 +1,5 @@
-cadnano.gui.views.outlinerview.oligoitem module
-===============================================
+cadnano\.gui\.views\.outlinerview\.oligoitem module
+===================================================
 
 .. automodule:: cadnano.gui.views.outlinerview.oligoitem
     :members:

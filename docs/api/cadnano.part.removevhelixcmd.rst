@@ -1,5 +1,5 @@
-cadnano.part.removevhelixcmd module
-===================================
+cadnano\.part\.removevhelixcmd module
+=====================================
 
 .. automodule:: cadnano.part.removevhelixcmd
     :members:

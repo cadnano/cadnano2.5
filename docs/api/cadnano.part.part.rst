@@ -1,5 +1,5 @@
-cadnano.part.part module
-========================
+cadnano\.part\.part module
+==========================
 
 .. automodule:: cadnano.part.part
     :members:

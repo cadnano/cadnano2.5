@@ -1,5 +1,5 @@
-cadnano.gui.views.pathview.tools.penciltool module
-==================================================
+cadnano\.gui\.views\.pathview\.tools\.penciltool module
+=======================================================
 
 .. automodule:: cadnano.gui.views.pathview.tools.penciltool
     :members:

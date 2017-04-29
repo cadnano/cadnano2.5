@@ -1,5 +1,5 @@
-cadnano.gui.views.abstractitems package
-=======================================
+cadnano\.gui\.views\.abstractitems package
+==========================================
 
 Submodules
 ----------

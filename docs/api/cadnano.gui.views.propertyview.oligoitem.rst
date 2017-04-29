@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview.oligoitem module
-===============================================
+cadnano\.gui\.views\.propertyview\.oligoitem module
+===================================================
 
 .. automodule:: cadnano.gui.views.propertyview.oligoitem
     :members:

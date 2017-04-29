@@ -1,5 +1,5 @@
-cadnano.oligo package
-=====================
+cadnano\.oligo package
+======================
 
 Submodules
 ----------

@@ -1,5 +1,5 @@
-cadnano.strandset package
-=========================
+cadnano\.strandset package
+==========================
 
 Submodules
 ----------

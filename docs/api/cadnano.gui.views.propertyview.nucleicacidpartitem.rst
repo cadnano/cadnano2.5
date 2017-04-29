@@ -1,5 +1,5 @@
-cadnano.gui.views.propertyview.nucleicacidpartitem module
-=========================================================
+cadnano\.gui\.views\.propertyview\.nucleicacidpartitem module
+=============================================================
 
 .. automodule:: cadnano.gui.views.propertyview.nucleicacidpartitem
     :members:
