@@ -3,24 +3,23 @@
 Installation
 ============
 
-Install Python 3.5
+Install Python 3.6
 ------------------
 
 There are many ways to get Python on your system.
-
-- If you prefer the complete "batteries included" option, `Anaconda Python <https://www.continuum.io/downloads>`__ is available for Mac, Windows or Linux.
 
 - On Mac, `Homebrew <http://brew.sh/>`__ is a great way to install Python.
 
 - If you just want a clean Python install and nothing else, installers from `python.org <https://www.python.org/>`__ work great too.
 
+- If you prefer the complete "batteries included" option, `Anaconda Python <https://www.continuum.io/downloads>`__ is available for Mac, Windows or Linux.
 
-cadnano will run on Python 3.3, 3.4 and 3.5, but we only support 3.5. We do not support Python 2.X.
+cadnano will run on Python 3.5 and 3.6, but we only support 3.6. We do not support Python 2.X.
 
 
 Install cadnano
 ---------------
-Using python 3.5  `pip` will install cadnano and all dependencies from PyPi
+Using python 3.6  `pip` will install cadnano and all dependencies from PyPi
 ::
 
    $ pip3 install cadnano
@@ -31,7 +30,7 @@ or from a root of a cloned `cadnano2.5 <https://github.com/cadnano/cadnano2.5>` 
 
 Both of these methods will install key dependencies like:
 
--   `PyQt5==5.7 <https://pypi.python.org/pypi/PyQt5/5.7>`
+-   `PyQt5>=5.8.2 <https://pypi.python.org/pypi/PyQt5/5.8>`
 -   `numpy>=1.10.0 <https://pypi.python.org/pypi/numpy/1.11.2>`
 -   `pandas>=0.18 <https://pypi.python.org/pypi/pandas/0.19.0>`
 -   `pytz>=2011k <https://pypi.python.org/pypi/pytz/2016.7>`

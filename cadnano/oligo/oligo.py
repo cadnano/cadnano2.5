@@ -25,7 +25,8 @@ class SequenceLoopException(Exception):
 
 
 class Oligo(CNObject):
-    """Oligo is a group of Strands that are connected via 5' and/or 3'
+    """
+    Oligo is a group of Strands that are connected via 5' and/or 3'
     connections. It corresponds to the physical DNA strand, and is thus
     used tracking and storing properties that are common to a single strand,
     such as its color.
