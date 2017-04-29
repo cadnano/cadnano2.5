@@ -7,6 +7,7 @@ import cadnano.fileio.v2decode as v2decode
 import cadnano.fileio.c25decode as c25decode
 import cadnano.fileio.v3decode as v3decode
 
+
 def decodeFile(filename, document=None, emit_signals=False):
     with io.open(filename, 'r', encoding='utf-8') as fd:
         nno_dict = json.load(fd)
@@ -22,6 +23,7 @@ def decodeFile(filename, document=None, emit_signals=False):
         v3decode.decode(document, nno_dict, emit_signals=emit_signals)
     return document
 # end def
+
 
 def loadtest():
     import os

@@ -14,10 +14,14 @@ from cadnano.setpropertycmd import SetPropertyCommand
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
 OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
-MAX_HIGHLIGHT_LENGTH = 1000
+MAX_HIGHLIGHT_LENGTH = 800
 
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
+
+
+class SequenceLoopException(Exception):
+    pass
 
 
 class Oligo(CNObject):
@@ -57,6 +61,11 @@ class Oligo(CNObject):
             vh_num = -1
             idx = -1
         return "<%s %s>(%d[%d])" % (cls_name, olg_id, vh_num, idx)
+    # end def
+
+    def __lt__(self, other):
+        return self.length() < other.length()
+    # end def
 
     def shallowCopy(self):
         olg = Oligo(self._part)
@@ -186,10 +195,22 @@ class Oligo(CNObject):
     # end def
 
     def strand5p(self):
+        """The 5' strand is the first contiguous segment of the oligo,
+        representing the region between the 5' base to the first crossover
+        or 3' end.
+
+        Returns:
+            Strand: the 5'-most strand of the oligo.
+        """
         return self._strand5p
     # end def
 
     def strand3p(self):
+        """The 3' strand. The last strand in the oligo. See strand5p().
+
+        Returns:
+            Strand: the 3'-most strand of the oligo.
+        """
         s5p = self._strand5p
         if self._is_loop:
             return s5p._strand5p
@@ -208,6 +229,13 @@ class Oligo(CNObject):
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
     def isLoop(self):
+        """Used for checking if an oligo is circular, or has a 5' and 3' end.
+        Sequences cannot be exported of oligos for which isLoop returns True.
+        See also: Oligo.sequenceExport().
+
+        Returns:
+            bool: True if the strand3p is connected to strand5p, else False.
+        """
         return self._is_loop
     # end def
 
@@ -249,7 +277,7 @@ class Oligo(CNObject):
         a_seq = []
         if self.isLoop():
             # print("A loop exists")
-            raise Exception
+            raise StapleLoopException("Cannot export circular oligo " + self.getName())
         for strand in strand5p.generator3pStrand():
             seq.append(Strand.sequence(strand, for_export=True))
             a_seq.append(Strand.abstractSeq(strand))
@@ -437,5 +465,4 @@ class Oligo(CNObject):
             oligo3p._strand5p = new_strand3p
         # end else
     # end def
-
 # end class
