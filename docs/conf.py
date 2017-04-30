@@ -18,9 +18,11 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import sys
+from recommonmark.parser import CommonMarkParser
+
 abspath = os.path.abspath
 dirname = os.path.dirname
-import sys
 LOCAL_PATH = dirname(abspath(__file__))
 CADNANO_PATH = dirname(LOCAL_PATH)
 CADNANO_GUI_PATH = CADNANO_PATH + "/gui"
@@ -52,9 +54,6 @@ extensions = [
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-
-from recommonmark.parser import CommonMarkParser
 source_parsers = {'.md': CommonMarkParser}
 
 # The suffix(es) of source filenames.
@@ -102,7 +101,18 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']#, 'api/cadnano.rst']
+
+exclude_patterns = ['_build',
+                    'Thumbs.db',
+                    '.DS_Store',
+                    # Added by SD, temporary fix to avoid imports 
+                    # QPixmap: Must construct a QGuiApplication before a QPixmap
+                    'api/cadnano.gui.controllers.documentcontroller.rst',
+                    'api/cadnano.gui.ui.mainwindow.ui_mainwindow.rst',
+                    'api/cadnano.gui.views.documentwindow.rst',
+                    'api/cadnano.gui.views.outlinerview.outlinertreewidget.rst'
+                    ]
+
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
 #
@@ -259,21 +269,22 @@ htmlhelp_basename = 'cadnanodoc'
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
-     # The paper size ('letterpaper' or 'a4paper').
-     #
-     # 'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    # 'papersize': 'letterpaper',
 
-     # The font size ('10pt', '11pt' or '12pt').
-     #
-     # 'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    # 'pointsize': '10pt',
 
-     # Additional stuff for the LaTeX preamble.
-     #
-     # 'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    #
+    # 'preamble': '',
 
-     # Latex figure (float) alignment
-     #
-     # 'figure_align': 'htbp',
+    # Latex figure (float) alignment
+    #
+    # 'figure_align': 'htbp',
+    # }
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
