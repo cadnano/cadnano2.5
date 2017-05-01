@@ -10,6 +10,13 @@ cadnano package with ``import cadnano`` and initializing a Document, it is
 straightforward to make API calls via object references to the document, part,
 oligos, strands, and so on.
 
+.. note::
+   The code block line numbers do not line up due to a bug (`#415`_) with the readthedocs
+   theme. It is fixed in the beta (0.2.5b1) and should be pushed
+   to the main site in the next few weeks.
+
+.. _`#415`: https://github.com/rtfd/sphinx_rtd_theme/issues/415
+
 Basic concepts
 --------------
 
