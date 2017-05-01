@@ -278,7 +278,7 @@ if "%1" == "dummy" (
 	goto end
 )
 
-if "%1" == "buildapi" (
+if "%1" == "api" (
 	sphinx-apidoc -e -d 1 -f -o api ..\cadnano ..\cadnano\bin ..\cadnano\tests ..\cadnano\install_exe ..\cadnano\gui
 	echo "Auto-generation of API documentation finished. "
 	echo "The generated files are in 'api\'"

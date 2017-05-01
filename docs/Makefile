@@ -17,37 +17,48 @@ I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 .PHONY: help
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
+	@echo "  clean      to remove $(BUILDDIR)/* and api/*"
+	@echo "  api        to make API-related rst files"
 	@echo "  html       to make standalone HTML files"
-	@echo "  dirhtml    to make HTML files named index.html in directories"
-	@echo "  singlehtml to make a single large HTML file"
-	@echo "  pickle     to make pickle files"
-	@echo "  json       to make JSON files"
-	@echo "  htmlhelp   to make HTML files and a HTML help project"
-	@echo "  qthelp     to make HTML files and a qthelp project"
-	@echo "  applehelp  to make an Apple Help Book"
-	@echo "  devhelp    to make HTML files and a Devhelp project"
-	@echo "  epub       to make an epub"
-	@echo "  epub3      to make an epub3"
-	@echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
-	@echo "  latexpdf   to make LaTeX files and run them through pdflatex"
-	@echo "  latexpdfja to make LaTeX files and run them through platex/dvipdfmx"
-	@echo "  text       to make text files"
-	@echo "  man        to make manual pages"
-	@echo "  texinfo    to make Texinfo files"
-	@echo "  info       to make Texinfo files and run them through makeinfo"
-	@echo "  gettext    to make PO message catalogs"
-	@echo "  changes    to make an overview of all changed/added/deprecated items"
-	@echo "  xml        to make Docutils-native XML files"
-	@echo "  pseudoxml  to make pseudoxml-XML files for display purposes"
-	@echo "  linkcheck  to check all external links for integrity"
-	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
-	@echo "  coverage   to run coverage check of the documentation (if enabled)"
-	@echo "  dummy      to check syntax errors of document sources"
+	@echo "  all        to make api and html"
+	@echo "  livehtml   run sphinx-autobuild on 127.0.0.1:8000"
+
+# @echo "  dirhtml    to make HTML files named index.html in directories"
+# @echo "  singlehtml to make a single large HTML file"
+# @echo "  pickle     to make pickle files"
+# @echo "  json       to make JSON files"
+# @echo "  htmlhelp   to make HTML files and a HTML help project"
+# @echo "  qthelp     to make HTML files and a qthelp project"
+# @echo "  applehelp  to make an Apple Help Book"
+# @echo "  devhelp    to make HTML files and a Devhelp project"
+# @echo "  epub       to make an epub"
+# @echo "  epub3      to make an epub3"
+# @echo "  latex      to make LaTeX files, you can set PAPER=a4 or PAPER=letter"
+# @echo "  latexpdf   to make LaTeX files and run them through pdflatex"
+# @echo "  latexpdfja to make LaTeX files and run them through platex/dvipdfmx"
+# @echo "  text       to make text files"
+# @echo "  man        to make manual pages"
+# @echo "  texinfo    to make Texinfo files"
+# @echo "  info       to make Texinfo files and run them through makeinfo"
+# @echo "  gettext    to make PO message catalogs"
+# @echo "  changes    to make an overview of all changed/added/deprecated items"
+# @echo "  xml        to make Docutils-native XML files"
+# @echo "  pseudoxml  to make pseudoxml-XML files for display purposes"
+# @echo "  linkcheck  to check all external links for integrity"
+# @echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
+# @echo "  coverage   to run coverage check of the documentation (if enabled)"
+# @echo "  dummy      to check syntax errors of document sources"
 
 .PHONY: clean
 clean:
 	rm -rf $(BUILDDIR)/*
 	rm -rf api
+
+.PHONY: api
+api:
+	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
+	@echo "Auto-generation of API documentation finished. " \
+	      "The generated files are in 'api/'"
 
 .PHONY: html
 html:
@@ -55,11 +66,28 @@ html:
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
 
+all: api html
+.PHONY: all
+
 .PHONY: dirhtml
 dirhtml:
 	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) $(BUILDDIR)/dirhtml
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/dirhtml."
+
+.PHONY: livehtml
+livehtml:
+	sphinx-autobuild --open-browser -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	@echo "Autobuild finished. "
+
+
+# .PHONY: buildgui
+# buildgui:
+# 	sphinx-apidoc -e -d 1 -f -o gui ../cadnano ../cadnano/bin ../cadnano/data ../cadnano/decorators ../cadnano/fileio ../cadnano/install_exe ../cadnano/math ../cadnano/oligo ../cadnano/part ../cadnano/strand ../cadnano/strandset ../cadnano/tests
+# 	@echo "Auto-generation of GUI documentation finished. " \
+# 	      "The generated files are in 'gui/'"
+
+###################
 
 .PHONY: singlehtml
 singlehtml:
@@ -225,19 +253,3 @@ dummy:
 	@echo
 	@echo "Build finished. Dummy builder generates no files."
 
-.PHONY: buildapi
-buildapi:
-	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
-	@echo "Auto-generation of API documentation finished. " \
-	      "The generated files are in 'api/'"
-
-# .PHONY: buildgui
-# buildgui:
-# 	sphinx-apidoc -e -d 1 -f -o gui ../cadnano ../cadnano/bin ../cadnano/data ../cadnano/decorators ../cadnano/fileio ../cadnano/install_exe ../cadnano/math ../cadnano/oligo ../cadnano/part ../cadnano/strand ../cadnano/strandset ../cadnano/tests
-# 	@echo "Auto-generation of GUI documentation finished. " \
-# 	      "The generated files are in 'gui/'"
-
-.PHONY: livehtml
-livehtml:
-	sphinx-autobuild -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	@echo "Autobuild finished. "

@@ -20,6 +20,7 @@
 import os
 import sys
 from recommonmark.parser import CommonMarkParser
+from recommonmark.transform import AutoStructify
 
 abspath = os.path.abspath
 dirname = os.path.dirname
@@ -29,6 +30,7 @@ CADNANO_GUI_PATH = CADNANO_PATH + "/gui"
 sys.path.insert(0, LOCAL_PATH)
 sys.path.insert(0, CADNANO_GUI_PATH)
 sys.path.insert(0, CADNANO_PATH)
+
 
 """ Run in docs folder
 sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
@@ -105,7 +107,7 @@ language = None
 exclude_patterns = ['_build',
                     'Thumbs.db',
                     '.DS_Store',
-                    # Added by SD, temporary fix to avoid imports 
+                    # Added by SD, temporary fix to avoid import errors
                     # QPixmap: Must construct a QGuiApplication before a QPixmap
                     'api/cadnano.gui.controllers.documentcontroller.rst',
                     'api/cadnano.gui.ui.mainwindow.ui_mainwindow.rst',
@@ -401,3 +403,14 @@ napoleon_use_rtype = False
 #     # app.connect('autodoc-process-docstring', between('^.*DOCIGNORE.*$', exclude=True))
 #     # app.connect('autodoc-skip-member', skipOffsetandsize)
 #     return app
+
+rtd_doc_root = 'http://cadnano.readthedocs.io/en/master/'
+
+
+def setup(app):
+    app.add_config_value('recommonmark_config',
+                         {'url_resolver': lambda url: rtd_doc_root + url,
+                          'auto_toc_tree_section': 'Contents',
+                          'enable_eval_rst': True
+                          }, True)
+    app.add_transform(AutoStructify)

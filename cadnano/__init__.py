@@ -33,11 +33,28 @@ def setReopen(is_reopen):
 
 
 def app():
+    """
+    The global cadnano application object.
+    """
     global shared_app
     return shared_app
 
 
 def initAppWithGui(app_args=None, do_exec=True):
+    """
+    Initializes CadnanoQt object with arguments argv, and then starts the
+    application main event loop if do_exec is True. We may want to delay
+    exec for checking user-provided args, or running automated tests.
+
+    See: https://doc.qt.io/qt-5/qapplication.html#exec
+
+    Args:
+        app_args (string): see util.py :func:`~cadnano.util.parse_args`
+        do_exec (bool): don't invoke exec yet
+
+    Returns:
+        shared_app (CadnanoQt): instance of app.
+    """
     global shared_app
     from cadnano.cadnanoqt import CadnanoQt
     # 1. Create the application object

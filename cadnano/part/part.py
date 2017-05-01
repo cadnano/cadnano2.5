@@ -9,6 +9,7 @@ from cadnano.setpropertycmd import SetPropertyCommand
 # from cadnano.addinstancecmd import AddInstanceCommand
 # from cadnano.removeinstancecmd import RemoveInstanceCommand
 
+
 class Part(CNObject):
     """A Part is a group of VirtualHelix items that are on the same lattice.
     Parts are the model component that most directly corresponds to a
@@ -38,7 +39,7 @@ class Part(CNObject):
         # Properties
         # TODO document could be None
         self._group_properties = {'name': "Part%d" % len(document.children()),
-                                  'color': "#0066cc", # outlinerview will override from styles
+                                  'color': "#0066cc",  # outlinerview will override from styles
                                   'is_visible': True
                                   }
 
@@ -250,6 +251,10 @@ class Part(CNObject):
     # end def
 
     def getColor(self):
+        """
+        Returns:
+            str: The part's color. Defaults to #0066cc.
+        """
         return self._group_properties['color']
     # end def
 

@@ -11,6 +11,7 @@ Submodules
    cadnano.fileio.nnodecode
    cadnano.fileio.nnoencode
    cadnano.fileio.v2decode
+   cadnano.fileio.v2encode
    cadnano.fileio.v3decode
    cadnano.fileio.v3encode
 

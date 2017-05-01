@@ -19,6 +19,7 @@ Welcome to cadnano's documentation!
    quickstart
    installation
    tutorial
+   scripting
 
 .. _dev-docs:
 
@@ -27,6 +28,7 @@ Welcome to cadnano's documentation!
    :caption: Developer Documentation
 
    api
+   docs
    gui
    changelog
    authors

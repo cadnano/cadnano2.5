@@ -11,7 +11,6 @@ from cadnano.cnobject import CNObject
 from cadnano.cnproxy import UndoStack
 from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from cadnano.cnenum import ModType
-from cadnano.objectinstance import ObjectInstance
 from cadnano.part import Part
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
 from cadnano.part.nucleicacidpart import NucleicAcidPart
@@ -19,6 +18,7 @@ from cadnano.strand import Strand
 from cadnano import setBatch
 from cadnano.fileio.nnodecode import decodeFile
 from cadnano.fileio.nnoencode import encodeToFile
+
 
 class Document(CNObject):
     """
@@ -680,7 +680,6 @@ class Document(CNObject):
         self._addPart(dnapart, use_undostack=use_undostack)
         return dnapart
     # end def
-
 
     def getParts(self):
         """Get all child `Part` in the document

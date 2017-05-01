@@ -2824,7 +2824,7 @@ class NucleicAcidPart(Part):
         return new_part
     # end def
 
-    def getImportVirtualHelixOrder(self):
+    def getVirtualHelixOrder(self):
         """ the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
         """

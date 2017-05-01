@@ -1,31 +1,78 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-from cadnano.cnenum import PointType
+from cadnano.cnenum import PointType, StrandType
 
-FORMAT_VERSION = "3.0"
+FORMAT_VERSION = "2.0"
 
 
 def encodeDocument(document):
-    """ Encode a Document to a dictionary to enable serialization
 
-    Args:
-        document (Document):
+    part = next(document.getParts())
 
-    Returns:
-        dict:
-    """
-    doc_dict = {'format': FORMAT_VERSION,
-                'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'name': "",
-                'parts': [],
-                'modifications': document.modifications()
-                }
-    parts_list = doc_dict['parts']
-    for part in document.getParts():
-        part_dict = encodePart(part)
-        parts_list.append(part_dict)
-    return doc_dict
-# end def
+    vh_order = part.getVirtualHelixOrder()
+    print(vh_order)
+
+    # name = "legacy-export-cn25"
+    # num_bases = part.maxBaseIdx()+1
+
+    # # iterate through virtualhelix list
+    # vh_list = []
+    # for row, col in helix_order_list:
+    #     vh = part.virtualHelixAtCoord((row, col))
+    #     # insertions and skips
+    #     insertion_dict = part.insertions()[(row, col)]
+    #     insts = [0 for i in range(num_bases)]
+    #     skips = [0 for i in range(num_bases)]
+    #     for idx, insertion in insertion_dict.items():
+    #         if insertion.isSkip():
+    #             skips[idx] = insertion.length()
+    #         else:
+    #             insts[idx] = insertion.length()
+    #     # colors
+    #     stap_colors = []
+    #     stap_strandset = vh.stapleStrandSet()
+    #     for strand in stap_strandset:
+    #         if strand.connection5p() is None:
+    #             c = str(strand.oligo().getColor())[1:]  # drop the hash
+    #             stap_colors.append([strand.idx5Prime(), int(c, 16)])
+
+    #     vh_dict = {"row": row,
+    #                "col": col,
+    #                "num": vh.number(),
+    #                "scaf": vh.getLegacyStrandSetArray(StrandType.SCAFFOLD),
+    #                "stap": vh.getLegacyStrandSetArray(StrandType.STAPLE),
+    #                "loop": insts,
+    #                "skip": skips,
+    #                "scafLoop": [],
+    #                "stapLoop": [],
+    #                "stap_colors": stap_colors}
+    #     vh_list.append(vh_dict)
+    # # bname = basename(str(fname))
+    # obj = {"name": name, "vstrands": vh_list}
+    # return obj
+
+
+# def encodeDocument(document):
+#     """
+#     Encode a Document to a dictionary to enable serialization
+
+#     Args:
+#         document (Document):
+
+#     Returns:
+#         dict: encoded document as json object
+#     """
+#     doc_dict = {'format': FORMAT_VERSION,
+#                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#                 'name': "",
+#                 'parts': [],
+#                 'modifications': document.modifications()
+#                 }
+#     parts_list = doc_dict['parts']
+#     for part in document.getParts():
+#         part_dict = encodePart(part)
+#         parts_list.append(part_dict)
+#     return doc_dict
+# # end def
 
 
 def encodePart(part):
