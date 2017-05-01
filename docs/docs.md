@@ -3,12 +3,6 @@
 
 Cadnano2.5 documentation is built with [sphinx] and hosted at [readthedocs.io].
 
-## reStructuredText vs Markdown
-
-Like [docutils], Sphinx uses [reStructuredText], whose filenames have an `.rst` extension. ReStructuredText is tailored for technical documentation, and predates Markdown by about 2 years.
-
-For the sake of consistency and leveraging core sphinx features, we initially just learned the basics of rST and used it for most doc sources, including the API. However, it is possible to create documentation in markdown format using [recommonmark]. This source files for this page ([cadnano/docs/docs.md]) and the Scripting page ([cadnano/docs/scripting.md]) are both markdown. New top-level documentation files that do not require rsT features should be created in markdown with the `.md` extension.
-
 ## Building the docs
 
 **Summary**
@@ -71,6 +65,13 @@ It can get tedious to rebuild the docs during heavy editing sessions. Instead, y
 ```
 make livehtml
 ```
+
+## reStructuredText vs Markdown
+
+Like [docutils], Sphinx uses [reStructuredText], whose filenames have an `.rst` extension. ReStructuredText is tailored for technical documentation, and predates Markdown by about 2 years.
+
+For the sake of consistency and leveraging core sphinx features, we initially just learned the basics of rST and used it for most doc sources, including the API. However, it is possible to create documentation in markdown format using [recommonmark]. This source files for this page ([cadnano/docs/docs.md]). New top-level documentation files that do not require rsT features should be created in markdown with the `.md` extension.
+
 
 ## Known Issues
 
