@@ -17,7 +17,7 @@ OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
 MAX_HIGHLIGHT_LENGTH = 800
 
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
-ALL_KEYS = ['id_num', 'idx5p', 'is_loop'] + PROPERTY_KEYS
+ALL_KEYS = ['id_num', 'idx5p', 'is_circular'] + PROPERTY_KEYS
 
 
 class SequenceLoopException(Exception):
@@ -44,7 +44,7 @@ class Oligo(CNObject):
         super(Oligo, self).__init__(part)
         self._part = part
         self._strand5p = None
-        self._is_loop = False
+        self._is_circular = False
         self._props = {'name': "oligo%s" % str(id(self))[-4:],
                        'color': "#cc0000" if color is None else color,
                        'length': 0,
@@ -71,7 +71,7 @@ class Oligo(CNObject):
     def shallowCopy(self):
         olg = Oligo(self._part)
         olg._strand5p = self._strand5p
-        olg._is_loop = self._is_loop
+        olg._is_circular = self._is_circular
         olg._props = self._props.copy()
         return olg
     # end def
@@ -88,7 +88,7 @@ class Oligo(CNObject):
         key = {'id_num': s5p.idNum(),
                'idx5p': s5p.idx5Prime(),
                'is_5p_fwd': s5p.isForward(),
-               'is_loop': self._is_loop,
+               'is_circular': self._is_circular,
                'sequence': self.sequence()}
         key.update(self._props)
         return key
@@ -213,7 +213,7 @@ class Oligo(CNObject):
             Strand: the 3'-most strand of the oligo.
         """
         s5p = self._strand5p
-        if self._is_loop:
+        if self._is_circular:
             return s5p._strand5p
         for strand in s5p.generator3pStrand():
             pass
@@ -229,15 +229,15 @@ class Oligo(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def isLoop(self):
+    def isCircular(self):
         """Used for checking if an oligo is circular, or has a 5' and 3' end.
-        Sequences cannot be exported of oligos for which isLoop returns True.
+        Sequences cannot be exported of oligos for which isCircular returns True.
         See also: Oligo.sequenceExport().
 
         Returns:
             bool: True if the strand3p is connected to strand5p, else False.
         """
-        return self._is_loop
+        return self._is_circular
     # end def
 
     def length(self):
@@ -276,7 +276,7 @@ class Oligo(CNObject):
         idx5p = strand5p.idx5Prime()
         seq = []
         a_seq = []
-        if self.isLoop():
+        if self.isCircular():
             # print("A loop exists")
             raise StapleLoopException("Cannot export circular oligo " + self.getName())
         for strand in strand5p.generator3pStrand():
@@ -365,7 +365,7 @@ class Oligo(CNObject):
     # end def
 
     def _setLoop(self, bool):
-        self._is_loop = bool
+        self._is_circular = bool
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -423,12 +423,12 @@ class Oligo(CNObject):
     # end def
 
     def _strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):
-        """This method sets the isLoop status of the oligo and the oligo's
+        """This method sets the isCircular status of the oligo and the oligo's
         5' strand.
         """
         # check loop status
         if old_strand_low.oligo() == old_strand_high.oligo():
-            self._is_loop = True
+            self._is_circular = True
             self._strand5p = new_strand
             return
             # leave the _strand5p as is?
@@ -454,8 +454,8 @@ class Oligo(CNObject):
         new_strand and everything connected to it downstream.
         """
         # if you split it can't be a loop
-        self._is_loop = False
-        if old_merged_strand.oligo().isLoop():
+        self._is_circular = False
+        if old_merged_strand.oligo().isCircular():
             self._strand5p = new_strand3p
             return
         else:

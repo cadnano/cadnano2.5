@@ -32,7 +32,7 @@ class RemoveStrandCommand(UndoCommand):
 
         # only create a new 5p oligo if there is a 3' connection
         self._new_oligo5p = olg.shallowCopy() if self._old_strand5p else None
-        if olg.isLoop() or self._old_strand3p is None:
+        if olg.isCircular() or self._old_strand3p is None:
             self._new_oligo3p = olg3p = None
             if self._new_oligo5p:
                 self._new_oligo5p._setLoop(False)
@@ -83,7 +83,7 @@ class RemoveStrandCommand(UndoCommand):
             strand5p.strandUpdateSignal.emit(strand5p)
         # end if
         if strand3p is not None:
-            if not oligo.isLoop():
+            if not oligo.isCircular():
                 # apply 2nd oligo copy to all 3' downstream strands
                 for s3p in strand3p.generator3pStrand():
                     fSetOligo(s3p, olg3p, emit_signals=True)

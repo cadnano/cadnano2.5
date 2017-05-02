@@ -46,7 +46,7 @@ class MergeCommand(UndoCommand):
         new_strand.setConnectionHigh(strand_high.connectionHigh())
 
         self._new_strand = new_strand
-        # Update the oligo for things like its 5prime end and isLoop
+        # Update the oligo for things like its 5prime end and isCircular
         self._new_oligo._strandMergeUpdate(strand_low, strand_high, new_strand)
 
         # set the new sequence by concatenating the sequence properly

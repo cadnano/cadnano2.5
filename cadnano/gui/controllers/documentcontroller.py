@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import sys
-import traceback
 
 from PyQt5.QtCore import Qt, QFileInfo, QRect
 from PyQt5.QtCore import QSettings, QSize, QDir
 from PyQt5.QtGui import QPainter, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QDialog
 from PyQt5.QtWidgets import QFileDialog, QActionGroup
 from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
 from PyQt5.QtWidgets import QStyleOptionGraphicsItem
@@ -14,7 +12,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from cadnano.gui.views.documentwindow import DocumentWindow
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
-from cadnano import app, setReopen, setBatch, util
+from cadnano import app, setReopen, util
 
 DEFAULT_VHELIX_FILTER = True
 ONLY_ONE = True
@@ -334,7 +332,7 @@ class DocumentController():
             # print("App Closing")
             the_app.destroyApp()
             # print("App closed")
-    #end def
+    # end def
 
     def actionSaveSlot(self):
         """SaveAs if necessary, otherwise overwrite existing file."""
@@ -420,23 +418,23 @@ class DocumentController():
         exportStaplesCallback which collects the staple sequences and exports
         the file.
         """
-        # Validate that no staple oligos are loops.
+        # Validate that no staple oligos are circular.
         part = self._document.activePart()
         if part is None:
             return
-        loop_olgs = part.getLoopOligos()
-        if loop_olgs:
+        circ_olgs = part.getCircularOligos()
+        if circ_olgs:
             from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
             dialogWarning = Ui_Warning()  # reusing this dialog, should rename
             dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
             dialogWarning.setupUi(dialog)
 
-            locs = ", ".join([o.locString() for o in loop_olgs])
+            locs = ", ".join([o.locString() for o in circ_olgs])
             msg = "Part contains staple loop(s) at %s.\n\nUse the break tool to introduce 5' & 3' ends before exporting. Loops have been colored red; use undo to revert." % locs
             dialogWarning.title.setText("Staple validation failed")
             dialogWarning.message.setText(msg)
-            for o in loop_olgs:
+            for o in circ_olgs:
                 o.applyColor(styles.stapColors[0])
             dialog.exec_()
             return

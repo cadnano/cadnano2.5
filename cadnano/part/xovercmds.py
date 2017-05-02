@@ -90,7 +90,7 @@ class CreateXoverCommand(UndoCommand):
         fSetOligo = Strand.setOligo
         if self._update_oligo:
             # Test Loopiness
-            if old_olg3p.isLoop():
+            if old_olg3p.isCircular():
                 old_olg3p._setLoop(False)
             else:
                 # 2. restore the modified oligo length
@@ -133,7 +133,7 @@ class RemoveXoverCommand(UndoCommand):
         # end def
         n_o3p.setStrand5p(strand3p)
 
-        self._isLoop = strand3p.oligo().isLoop()
+        self._isCircular = strand3p.oligo().isCircular()
     # end def
 
     def redo(self):
@@ -156,7 +156,7 @@ class RemoveXoverCommand(UndoCommand):
         strand5p.setConnection3p(None)
         strand3p.setConnection5p(None)
 
-        if self._isLoop:
+        if self._isCircular:
             olg5p._setLoop(False)
             olg5p.setStrand5p(strand3p)
         else:
@@ -188,7 +188,7 @@ class RemoveXoverCommand(UndoCommand):
         doc.removeStrandFromSelection(strand5p)
         doc.removeStrandFromSelection(strand3p)
 
-        if self._isLoop:
+        if self._isCircular:
             olg5p._setLoop(True)
             # No need to restore whatever the old Oligo._strand5p was
         else:

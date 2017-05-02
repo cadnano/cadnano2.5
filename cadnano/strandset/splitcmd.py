@@ -29,7 +29,7 @@ class SplitCommand(UndoCommand):
         self.strand_low = strand_low = strand.shallowCopy()
         self.strand_high = strand_high = strand.shallowCopy()
 
-        if oligo.isLoop():
+        if oligo.isCircular():
             self._l_oligo = self._h_oligo = l_oligo = h_oligo = oligo.shallowCopy()
         else:
             self._l_oligo = l_oligo = oligo.shallowCopy()
@@ -64,10 +64,10 @@ class SplitCommand(UndoCommand):
         strand_low.setIdxs((strand.lowIdx(), i_new_low))
         strand_high.setIdxs((i_new_low + 1, strand.highIdx()))
 
-        # Update the oligo for things like its 5prime end and isLoop
+        # Update the oligo for things like its 5prime end and isCircular
         olg5p._strandSplitUpdate(std5p, std3p, olg3p, strand)
 
-        if not oligo.isLoop():
+        if not oligo.isCircular():
             # Update the oligo color if necessary
             l_oligo._setColor(color_low)
             h_oligo._setColor(color_high)

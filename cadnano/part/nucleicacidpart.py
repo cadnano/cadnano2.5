@@ -2339,17 +2339,17 @@ class NucleicAcidPart(Part):
         return self.reserved_ids
     # end def
 
-    def getLoopOligos(self):
+    def getCircularOligos(self):
         """
         Returns oligos with no 5'/3' ends. Used by
         actionExportSequencesSlot in documentcontroller to validate before
         exporting staple sequences.
         """
-        loop_olgs = []
+        circ_olgs = []
         for o in list(self.oligos()):
-            if o.isLoop():
-                loop_olgs.append(o)
-        return loop_olgs
+            if o.isCircular():
+                circ_olgs.append(o)
+        return circ_olgs
 
     def maxBaseIdx(self, id_num):
         o_and_s = self.getOffsetAndSize(id_num)
@@ -2814,7 +2814,7 @@ class NucleicAcidPart(Part):
                 last_strand = new_strand
             # end for
             # check loop condition
-            if oligo.isLoop():
+            if oligo.isCircular():
                 s5p = new_oligo.strand5p()
                 last_strand.set3pconnection(s5p)
                 s5p.set5pconnection(last_strand)
