@@ -7,17 +7,15 @@
 
 import os
 import shutil
-import subprocess
 import sys
 import ast
 import re
 
 from setuptools import find_packages
 try:
-    from setuptools import setup, Extension
+    from setuptools import setup
 except ImportError:
-    from distutils.core import setup, Extension
-import distutils.command
+    from distutils.core import setup
 
 from setuptools.command.install import install as _install
 from distutils import log as setup_log
@@ -31,9 +29,9 @@ from os.path import relpath as rpath
 # https://github.com/pallets/flask
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
-with open('cadnano/__init__.py', 'rb') as f:
+with open('cadnano/__init__.py', 'rb') as initfile:
     version = str(ast.literal_eval(_version_re.search(
-        f.read().decode('utf-8')).group(1)))
+                                   initfile.read().decode('utf-8')).group(1)))
 # end Flask derived code
 
 __doc__ = '''
@@ -54,34 +52,34 @@ you may do so the setup.py script::
 or::
 
   $ pip install cadnano
-'''% (version)
+''' % (version)
 
 LONG_DESCRIPTION = __doc__
 
-PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
-MODULE_PATH =           pjoin(PACKAGE_PATH, 'cadnano')
-INSTALL_EXE_PATH =      pjoin(MODULE_PATH, 'install_exe')
-TESTS_PATH =            pjoin(MODULE_PATH, 'tests')
-TEST_DATA_PATH =        pjoin(TESTS_PATH, 'data')
-IMAGES_PATH1 =           pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
-IMAGES_PATH2 =           pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
+PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
+MODULE_PATH = pjoin(PACKAGE_PATH, 'cadnano')
+INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'install_exe')
+TESTS_PATH = pjoin(MODULE_PATH, 'tests')
+TEST_DATA_PATH = pjoin(TESTS_PATH, 'data')
+IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
+IMAGES_PATH2 = pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
 
 # batch files and launch scripts
 
 test_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(TESTS_PATH) for f in files]
+              os.walk(TESTS_PATH) for f in files]
 test_data_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(TEST_DATA_PATH) for f in files]
+                   os.walk(TEST_DATA_PATH) for f in files]
 cn_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(IMAGES_PATH1) for f in files]
+            os.walk(IMAGES_PATH1) for f in files]
 cn_files += [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(IMAGES_PATH2) for f in files]
+             os.walk(IMAGES_PATH2) for f in files]
 cn_files += test_files + test_data_files
 
 entry_points = {'console_scripts': [
-        'cadnano = cadnano.bin.main:main',
-        'cadnanoinstall = cadnano.install_exe.cadnanoinstall:post_install'
-        ]}
+                'cadnano = cadnano.bin.main:main',
+                'cadnanoinstall = cadnano.install_exe.cadnanoinstall:post_install'
+                ]}
 
 if sys.platform == 'win32':
     path_scheme = {
@@ -91,11 +89,10 @@ if sys.platform == 'win32':
     cn_files += [pjoin('install_exe', 'cadnano.exe')]
 else:
     cadnano_binaries = []
-    path_scheme = {
-    'scripts': 'bin',
-    }
+    path_scheme = {'scripts': 'bin'}
 cadnano_binary_fps = [pjoin(INSTALL_EXE_PATH, fn) for fn in cadnano_binaries]
 script_path = os.path.join(sys.exec_prefix, path_scheme['scripts'])
+
 
 # Insure that the copied binaries are executable
 def makeExecutable(fp):
@@ -106,15 +103,16 @@ def makeExecutable(fp):
     os.chmod(fp, mode)
 # en def
 
+
 def _post_install(dir):
-    new_cadnano_binary_fps = [pjoin( script_path, fn)
-                                     for fn in cadnano_binaries]
+    new_cadnano_binary_fps = [pjoin(script_path, fn) for fn in cadnano_binaries]
     print(new_cadnano_binary_fps)
     print(cadnano_binary_fps)
     [shutil.copy2(o, d) for o, d in zip(cadnano_binary_fps,
-                                           new_cadnano_binary_fps)]
+                                        new_cadnano_binary_fps)]
     list(map(makeExecutable, new_cadnano_binary_fps))
 # end def
+
 
 class CNINSTALL(_install):
     def run(self):
@@ -136,14 +134,13 @@ exclude_list = ['*.genbank', '*.fasta',
                 'pyqtdeploy', 'nno2stl', '*.autobreak']
 cn_packages = find_packages(exclude=exclude_list)
 
-install_requires = [
-        'sip>=4.19',
-        'PyQt5>=5.8.2',
-        'numpy>=1.10.0',
-        'pandas>=0.18',
-        'pytz>=2011k',
-        'python-dateutil>=2'
-]
+install_requires = ['sip>=4.19',
+                    'PyQt5>=5.8.2',
+                    'numpy>=1.10.0',
+                    'pandas>=0.18',
+                    'pytz>=2011k',
+                    'python-dateutil>=2'
+                    ]
 
 if sys.platform == 'win32':
     install_requires += ['pypiwin32', 'winshell']

@@ -1,12 +1,13 @@
 from types import FunctionType
 import inspect
 
+
 def getPublicMethods(cls):
-    return [(x, y) for x, y in cls.__dict__.items() if (
-                type(y) == FunctionType and
-                not x.startswith('_')
-                )]
+    return [(x, y) for x, y in cls.__dict__.items()
+            if (type(y) == FunctionType and not x.startswith('_'))
+            ]
 # end def
+
 
 def copyWrapAPI(cls_from, cls_to, attr_str='model'):
     """Use same `eval` trick as decorator module on PyPi to match
@@ -32,8 +33,8 @@ def copyWrapAPI(cls_from, cls_to, attr_str='model'):
         formatted_args_2 = ', '.join([x[0] if isinstance(x, tuple) else x for x in argspec_2])
 
         # print(formatted_args_2)
-        f_wrapper_str = 'def func_wrapper%s: \r\n    return func(%s)' % ( formatted_args_1,
-                                                formatted_args_2)
+        f_wrapper_str = 'def func_wrapper%s: \r\n    return func(%s)' % (formatted_args_1,
+                                                                         formatted_args_2)
 
         # print(f_wrapper_str)
         # 2. Create wrapper function
@@ -56,7 +57,7 @@ def copyWrapAPI(cls_from, cls_to, attr_str='model'):
 if __name__ == '__main__':
     class Foo(object):
 
-        def awesome(self, a: int):
+        def awesome(self, a: int):  # noqa
             print(7777)
 
         def dope(self):

@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class SetPropertyCommand(UndoCommand):
     """Undo ready command for setting an object property
     Can be used by any objects implementing `getProperty` and `_setProperty`
@@ -30,6 +31,7 @@ class SetPropertyCommand(UndoCommand):
             obj._setProperty(key, val, emit_signals=True)
     # end def
 # end class
+
 
 class SetVHPropertyCommand(UndoCommand):
     """Undo ready command for setting an VirtualHelix for a part

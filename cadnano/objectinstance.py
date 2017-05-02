@@ -12,9 +12,9 @@ class ObjectInstance(CNObject):
     # end def
 
     # SIGNALS #
-    instanceDestroyedSignal = ProxySignal(CNObject,         name="instanceDestroyedSignal")
-    instancePropertyChangedSignal = ProxySignal(CNObject,   name="instancePropertyChangedSignal")
-    instanceParentChangedSignal = ProxySignal(CNObject,     name="instanceParentChangedSignal")
+    instanceDestroyedSignal = ProxySignal(CNObject, name="instanceDestroyedSignal")
+    instancePropertyChangedSignal = ProxySignal(CNObject, name="instancePropertyChangedSignal")
+    instanceParentChangedSignal = ProxySignal(CNObject, name="instanceParentChangedSignal")
 
     # SLOTS #
 
@@ -46,13 +46,13 @@ class ObjectInstance(CNObject):
 
     def shallowCopy(self):
         oi = ObjectInstance(self._ref_object, self._parent)
-        oi._properties =  oi._properties.copy()
+        oi._properties = oi._properties.copy()
         return oi
     # end def
 
     def deepCopy(self, reference_object, parent):
         oi = ObjectInstance(reference_object, parent)
-        oi._properties =  oi._properties.copy()
+        oi._properties = oi._properties.copy()
         return oi
     # end def
 # end class

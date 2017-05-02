@@ -3,6 +3,7 @@ from cadnano.assembly import Assembly
 from cadnano.part import Part
 from cadnano.objectinstance import ObjectInstance
 
+
 class AddInstanceCommand(UndoCommand):
     """Undo ready command for adding an instance.
 

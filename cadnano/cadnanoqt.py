@@ -17,7 +17,6 @@
 import os
 import sys
 import platform
-import time
 from code import interact
 from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, QEventLoop, QSize
 from PyQt5.QtGui import QIcon

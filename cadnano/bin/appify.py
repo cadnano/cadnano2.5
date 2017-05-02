@@ -38,6 +38,7 @@ def Usage():
 version = "1.0.0"
 bundleIdentifier = "org.test.test"
 
+
 def doAppify(script, project, app_icon_path=None):
     apppath = os.path.abspath(pjoin('.', project + ".app"))
     projectversion = project + " " + version
@@ -84,7 +85,7 @@ def doAppify(script, project, app_icon_path=None):
     </dict>
     </plist>
     '''.format(projectversion, project, bundleIdentifier,
-                project, projectversion, version))
+               project, projectversion, version))
     f.close()
 
     # not sure what this file does

@@ -128,6 +128,7 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
             c.redo()
 # end def
 
+
 def doCmd(model_object, command, use_undostack):
     """Helper for pushing onto the undostack
     """
@@ -136,6 +137,7 @@ def doCmd(model_object, command, use_undostack):
     else:
         command.redo()
 # end def
+
 
 def finalizeCommands(model_object, commands, desc=None):
     """Used to enable interaction with the model but not push
