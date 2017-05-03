@@ -2839,8 +2839,32 @@ class NucleicAcidPart(Part):
     # end def
 
     def oligos(self):
+        """
+        Returns:
+            set: a reference to the part's oligo set.
+        """
         return self._oligos
     # end def
+
+    def getOligoAt(self, id_num, strand_set, idx):
+        """Convenience method. Given a id_num strand_set, idx, return
+        the oligo at that location, if it exists. Otherwise return None.
+
+        Args:
+            id_num (int): virtual helix ID number
+            strand_set (int): 0 for fwd, or 1 for rev :class:`StrandSet`
+            idx (int): index
+
+        Returns:
+            Oligo: reference to oligo at (id_num, strand_set, idx) or None.
+        """
+        try:
+            ss = self.getStrandSets(id_num)[strand_set]
+            strand = ss.getStrand(idx)
+            return strand.oligo()
+        except KeyError as err:
+            print('VH %d not found' % id_num, err)
+            return None
 
     def getNewAbstractSegmentId(self, segment):
         low_idx, high_idx = segment
