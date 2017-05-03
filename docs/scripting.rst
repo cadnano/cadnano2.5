@@ -21,7 +21,7 @@ Basic concepts
 --------------
 
 Here is a simple example, which can be found in `misc/examples`_ along with
-other scripts. It reads loads a file and prints some information.
+other scripts. It reads an input file and prints some information.
 
 .. _misc/examples: https://github.com/cadnano/cadnano2.5/tree/master/misc/examples
 
@@ -146,9 +146,9 @@ the same helix axis.
    :lineno-start: 21
    :linenos:
 
-Here we use ``getStrandSets()`` to get references to both the fwd and rev
-StrandSets, and use list concatenations to print the start and end indices via ``idxs()``,
-and strand color via ``getColor()``.
+Here we use ``Part.getStrandSets()`` to get references to both the fwd and rev
+StrandSets, and use list concatenations to print the start and end indices via ``Strand.idxs()``,
+and color via ``Strand.getColor()``.
 
 
 .. image:: _static/myfile_vh012.png
@@ -172,6 +172,10 @@ and strand color via ``getColor()``.
        <rev_StrandSet(2)>    [(5, 20), (21, 41), (42, 48), (49, 57)] 
                              ['#57bb00', '#03b6a2', '#1700de', '#57bb00']
 
+Apply scaffold sequence
+-----------------------
+
+TK
 
 Break a strand
 --------------
@@ -180,10 +184,6 @@ Break a strand
 
 .. _`TK`: https://en.wikipedia.org/wiki/To_come_(publishing)
 
-Apply scaffold sequence
------------------------
-
-TK
 
 Modify oligo sequences by color
 -------------------------------
