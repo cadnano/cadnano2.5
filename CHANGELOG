@@ -1,10 +1,16 @@
+v2.5.1
+------
 
-Unreleased
-----------
-
-* GUI: 3D view
-* I/O: Export to PDB (experimental)
-
+* API: Oligo.isLoop() -> isCircular()
+* I/O: v3 oligo property "is_loop" -> "is_circular"
+* Code: flake8 linting (ignoring E226,E266,E731,E501)
+* Docs: Scripting examples
+* Docs: How to build sphinx docs
+* Installer: Update to PyQt 5.8.2 
+* GUI: Updated styles to better match cadnano2
+* GUI: Improvements to sliceview grid
+* Code: Bugfixes for issues #94, #95, #105
+* Installer: Windows shortcut icon
 
 v2.5
 ----
@@ -24,3 +30,9 @@ Major changes and new features since cadnano 2:
 * I/O: New file format
 * I/O: Easier scripting via command-line mode
 * I/O: Export to STL (experimental)
+
+Unreleased
+----------
+
+* GUI: 3D view
+* I/O: Export to PDB (experimental)
