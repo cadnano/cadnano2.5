@@ -58,10 +58,12 @@ class Oligo(CNObject):
         if self._strand5p is not None:
             vh_num = self._strand5p.idNum()
             idx = self._strand5p.idx5Prime()
+            ss_type = self._strand5p.strandType()
         else:
             vh_num = -1
             idx = -1
-        return "<%s %s>(%d[%d])" % (cls_name, olg_id, vh_num, idx)
+            ss_type = -1
+        return "<%s %s>(%d.%d[%d])" % (cls_name, olg_id, vh_num, ss_type, idx)
     # end def
 
     def __lt__(self, other):
@@ -166,7 +168,7 @@ class Oligo(CNObject):
     # end def
 
     def _setColor(self, color):
-        """ Set this oligos color
+        """Set this oligo color.
 
         Args:
             color (str): format '#ffffff'
