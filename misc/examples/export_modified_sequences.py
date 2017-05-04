@@ -12,6 +12,9 @@ from termcolor import colored
 import cadnano
 from cadnano.document import Document
 from cadnano.data.dnasequences import sequences
+# from cadnano.gui.views.styles import CADNANO1_COLORS
+
+OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 20
 
 
 def main():
@@ -73,6 +76,7 @@ def main():
 
     # Naive breaking algorithm
     min_break_len = 35  # break oligos longer than this
+    printInfo("Splitting strands")
     for staple in staple_oligos:
         break_positions = []  # pre-calculate breaks to avoid oligo changes
         if staple.length() > min_break_len:
@@ -111,15 +115,15 @@ def main():
                     print("Removing xover at <VH{0}.{1}>[{2}]".format(strand5p.idNum(), strand5p.strandType(), idx))
                     part.removeXover(strand5p, strand3p)
                 else:
-                    print("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
+                    printWarning("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
 
-    circular_oligos = part.getCircularOligos()
-    if circular_oligos:
-        print("Breaking circular oligos...")
-        for circ_oligo in circular_oligos:
-            strand5p = circ_oligo.strand5p()
-            strand3p = strand5p.connection3p()
-            part.removeXover(strand5p, strand3p)
+    # circular_oligos = part.getCircularOligos()
+    # if circular_oligos:
+    #     printInfo("Breaking circular oligos...")
+    #     for circ_oligo in circular_oligos:
+    #         strand5p = circ_oligo.strand5p()
+    #         strand3p = strand5p.connection3p()
+    #         part.removeXover(strand5p, strand3p)
 
     # seqs = part.getSequences()
     # print(seqs)
@@ -131,11 +135,49 @@ def main():
         if oligo == scaf_oligo:
             print("Scaffold {0} has length {1}".format(oligo, oligo.length()))
         else:
-            oligo_props = oligo.dump()
-            print(oligo, oligo_props['sequence'])
+            # oligo_props = oligo.dump()
+            printOligo(oligo)
 
-    print("Saving modified file as", dest_file)
+    printInfo("Saving modified file as {0}".format(dest_file))
     doc.writeToFile(dest_file)
+
+
+# color_dict = dict((color, 'white', []) for color in CADNANO1_COLORS)
+color_dict = {'#cc0000': ('red', None, []),
+              '#007200': ('green', None, ['bold']),
+              '#cc0000': ('red', None, []),
+              '#57bb00': ('green', None, []),
+              '#aaaa00': ('yellow', None, []),
+              '#1700de': ('blue', None, []),
+              '#b8056c': ('magenta', None, []),
+              '#03b6a2': ('cyan', None, []),
+              '#333333': ('white', None, ['reverse']),
+              }
+
+def printInfo(s):
+    print(colored(s, 'green', attrs=['reverse']))
+
+
+def printWarning(s):
+    print(colored(s, 'yellow', attrs=['reverse']))
+
+
+def printOligo(oligo):
+    oligo_col = oligo.getColor()
+    oligo_props = oligo.dump()
+
+    if oligo_col in color_dict:
+        text_color = color_dict[oligo_col][0]
+        highlight = color_dict[oligo_col][1]
+        style = color_dict[oligo_col][2]
+        # print (color_dict[oligo_col])
+        if oligo.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
+            style = style + ['underline']
+        oligo_seq = colored(oligo_props['sequence'], text_color, highlight, attrs=style)
+    else:
+        oligo_seq = oligo_props['sequence']
+
+    print(oligo, '\t[', oligo_col, ']\t', oligo_seq, '\t', oligo.length())
 
 
 def colorBool(b):
