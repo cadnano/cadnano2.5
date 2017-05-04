@@ -92,10 +92,10 @@ class CadnanoQt(QObject):
         from cadnano.gui.controllers.documentcontroller import DocumentController
         from cadnano.gui.views.pathview import pathstyles as styles
 
+        styles.setFontMetrics()
+
         doc = Document()
         self._document = self.createDocument(base_doc=doc)
-
-        styles.setFontMetrics()
 
         os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():

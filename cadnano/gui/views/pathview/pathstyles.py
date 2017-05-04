@@ -136,8 +136,8 @@ SEQUENCETEXTXCENTERINGOFFSET = 0
 
 
 def setFontMetrics():
-    """ Application must be running before you mess
-    too much with Fonts in Qt5
+    """
+    Application must be running before you mess too much with Fonts in Qt5.
     """
     global SEQUENCEFONT
     global SEQUENCEFONTMETRICS
