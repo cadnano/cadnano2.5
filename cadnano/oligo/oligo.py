@@ -20,7 +20,7 @@ PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
 ALL_KEYS = ['id_num', 'idx5p', 'is_circular'] + PROPERTY_KEYS
 
 
-class SequenceLoopException(Exception):
+class CircularOligoException(Exception):
     pass
 
 
@@ -278,7 +278,7 @@ class Oligo(CNObject):
         a_seq = []
         if self.isCircular():
             # print("A loop exists")
-            raise StapleLoopException("Cannot export circular oligo " + self.getName())
+            raise CircularOligoException("Cannot export circular oligo " + self.getName())
         for strand in strand5p.generator3pStrand():
             seq.append(Strand.sequence(strand, for_export=True))
             a_seq.append(Strand.abstractSeq(strand))

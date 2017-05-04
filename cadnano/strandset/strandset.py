@@ -159,6 +159,11 @@ class StrandSet(CNObject):
         return self._strand_type
 
     def isReverse(self):
+        """Is the set 3' to 5' (reverse) or 5' to 3' (forward)?
+
+        Returns:
+            bool: True if is reverse, False otherwise
+        """
         return not self._is_fwd
     # end def
 
