@@ -13,6 +13,7 @@ sixb = lambda x: x.encode('utf-8')
 ARRAY_TYPE = 'B'
 tostring = lambda x: x.tobytes().decode('utf-8')
 
+
 class Strand(CNObject):
     """A Strand is a continuous stretch of bases that are all in the same
     StrandSet (recall: a VirtualHelix is made up of two StrandSets).

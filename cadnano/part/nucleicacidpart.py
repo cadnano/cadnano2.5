@@ -2421,6 +2421,45 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
+    def splitOligoAtIdxs(self, oligo, idxs):
+        """
+        Given an oligo and list of split positions, which are lengths in number
+        of bases from the start of the oligo. The method will convert the idxs
+        into absolute (vh,strandset,baseidx) locations and attempt to split the
+        strand or remove any xover at those locations.
+
+        Args:
+            oligo (Oligo): to be split
+            ids (list): indicies at which to break
+
+        """
+        # WIP: copied from example script
+        # for idx in idxs:
+        #     ss = self.getStrandSets(id_num)[ss_type]
+        #     strand = ss.getStrand(idx)
+
+        # for id_num, ss_type, idx in break_positions:
+        #     # look up the strand
+        #     ss = part.getStrandSets(id_num)[ss_type]
+        #     strand = ss.getStrand(idx)
+        #     # simple break
+        #     if ss.strandCanBeSplit(strand, idx):
+        #         print("Splitting at <VH{0}.{1}>[{2}]".format(strand.idNum(), strand.strandType(), idx))
+        #         ss.splitStrand(strand, idx)
+        #     # xover break
+        #     elif strand.hasXoverAt(idx):
+        #         if idx == strand.idx3Prime():
+        #             strand5p = strand
+        #             strand3p = strand5p.connection3p()
+        #         else:
+        #             strand3p = strand
+        #             strand5p = strand.connection5p()
+        #         print("Removing xover at <VH{0}.{1}>[{2}]".format(strand5p.idNum(), strand5p.strandType(), idx))
+        #         part.removeXover(strand5p, strand3p)
+        #     else:
+        #         printWarning("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
+        pass
+
     def _addOligoToSet(self, oligo, emit_signals=False):
         """This is an exceptional private method not part of the API as this
         is to be called only by an Oligo.

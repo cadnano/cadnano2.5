@@ -243,6 +243,12 @@ class Oligo(CNObject):
     # end def
 
     def length(self):
+        """
+        The oligo length in bases.
+
+        Returns:
+            int: value from the oligo's property dict.
+        """
         return self._props['length']
     # end def
 
@@ -270,7 +276,7 @@ class Oligo(CNObject):
             output (dict): dictionary with keys given in `NucleicAcidPart.getSequences`
 
         Returns:
-            dict:
+            dict: output with this oligo's values appended for each key
         """
         part = self.part()
         vh_num5p = self.strand5p().idNum()
@@ -312,9 +318,17 @@ class Oligo(CNObject):
     # end def
 
     def shouldHighlight(self):
+        """
+        Checks if oligo's length falls within the range specified by
+        OLIGO_LEN_BELOW_WHICH_HIGHLIGHT and OLIGO_LEN_BELOW_WHICH_HIGHLIGHT.
+
+        Returns:
+            bool: True if circular or length outside acceptable range,
+            otherwise False.
+        """
         if not self._strand5p:
             return True
-        if (OLIGO_LEN_BELOW_WHICH_HIGHLIGHT < self.length() < OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT) or \
+        if (OLIGO_LEN_BELOW_WHICH_HIGHLIGHT < self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT) or \
            self.length() > MAX_HIGHLIGHT_LENGTH:
             return False
         return True
@@ -368,6 +382,42 @@ class Oligo(CNObject):
 
     def _setLoop(self, bool):
         self._is_circular = bool
+    # end def
+
+    def getStrandLengths(self):
+        """
+        Traverses the oligo and builds up a list of each strand's total length,
+        which also accounts for any insertions, deletions, or modifications.
+
+        Returns:
+            list: lengths of individual strands in the oligo
+        """
+        strand5p = self.strand5p()
+        strand_lengths = []
+        for strand in strand5p.generator3pStrand():
+            strand_lengths.append(strand.totalLength())
+        return strand_lengths
+
+    def getNumberOfBasesToEachXover(self, use_3p_idx=False):
+        """
+        Convenience method to get a list of absolute distances from the 5' end
+        of the oligo to each of the xovers in the oligo.
+
+        Args:
+            use_3p_idx: Adds a 1-base office to return 3' xover idx instead of
+        """
+        strand5p = self.strand5p()
+        num_bases_to_xovers = []
+        offset = 1 if use_3p_idx else 0  # 3p xover idx is always the next base
+        i = 0
+        for strand in strand5p.generator3pStrand():
+            if strand.connection3p():
+                i = i + strand.totalLength()
+                num_bases_to_xovers.append(i+offset)
+        return num_bases_to_xovers
+
+    def splitAtIdxs(self, idxs):
+        self._part.splitOligoAtIdxs(self, idxs)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
