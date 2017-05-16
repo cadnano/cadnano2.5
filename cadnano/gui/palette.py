@@ -1,6 +1,6 @@
 """
-Module for caching `QColor <http://doc.qt.io/qt-5/qcolor.html>`_, 
-`QPen <http://doc.qt.io/qt-5/qpen.html>`_, and 
+Module for caching `QColor <http://doc.qt.io/qt-5/qcolor.html>`_,
+`QPen <http://doc.qt.io/qt-5/qpen.html>`_, and
 `QBrush <http://doc.qt.io/qt-5/qbrush.html>`_ objects.
 Could be extended to cache `QFont <http://doc.qt.io/qt-5/qfont.html>`_ objects as well.
 """
@@ -14,7 +14,6 @@ brush_cache = {}
 no_pen = QPen(Qt.NoPen)
 no_brush = QBrush(Qt.NoBrush)
 solid_brush = QBrush(Qt.SolidPattern)
-
 
 
 def getColorObj(hex_string, alpha=None, lighter=None):
@@ -84,8 +83,8 @@ def getPenObj(hex_string, stroke_width,
 
 
 def newPenObj(hex_string, stroke_width, alpha=None):
-    """Returns a new QPen object. Use this when you need a pen with dynamic 
-    properties, or wish to use features that are not supported by the cache, 
+    """Returns a new QPen object. Use this when you need a pen with dynamic
+    properties, or wish to use features that are not supported by the cache,
     such as  `setCosmetic <http://doc.qt.io/qt-5/qpen.html#setCosmetic>`_.
 
     Does not use the cache.
@@ -94,8 +93,7 @@ def newPenObj(hex_string, stroke_width, alpha=None):
         hex_string (str): hexadecimal color code in the form: #RRGGBB
         stroke_width (int)
         alpha (int): 0–255
-    
-    
+
     Returns:
         pen (QPen)
     """
@@ -106,9 +104,8 @@ def newPenObj(hex_string, stroke_width, alpha=None):
 # end def
 
 
-
 def getBrushObj(hex_string, alpha=None, lighter=None):
-    """If the specified QBrush is cached, return it. 
+    """If the specified QBrush is cached, return it.
     Otherwise, cache and return a new QPen.
 
     Args:
@@ -133,8 +130,8 @@ def getBrushObj(hex_string, alpha=None, lighter=None):
 
 
 def newBrushObj(hex_string, alpha=None):
-    """ Returns a new QPen object. Use this when you need a pen with dynamic 
-    properties, or wish to use features that are not supported by the cache, 
+    """ Returns a new QPen object. Use this when you need a pen with dynamic
+    properties, or wish to use features that are not supported by the cache,
     such as  `setTexture <http://doc.qt.io/qt-5/qbrush.html#setTexture>`_.
 
     Does not use the cache.
@@ -142,7 +139,7 @@ def newBrushObj(hex_string, alpha=None):
     Args:
         hex_string (str): hexadecimal color code in the form: #RRGGBB
         alpha (int): 0–255
-        
+
     Returns:
         brush (QBrush)
     """
@@ -172,11 +169,12 @@ def getNoBrush():
     global no_brush
     return no_brush
 
+
 def getSolidBrush():
     """Global instance of QBrush(Qt.SolidPattern).
 
     Returns:
-        QBrush(Qt.SolidPattern)        
+        QBrush(Qt.SolidPattern)
     """
     global solid_brush
     return solid_brush
