@@ -328,10 +328,13 @@ class Oligo(CNObject):
         """
         if not self._strand5p:
             return True
-        if (OLIGO_LEN_BELOW_WHICH_HIGHLIGHT < self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT) or \
-           self.length() > MAX_HIGHLIGHT_LENGTH:
+        if self.length() > MAX_HIGHLIGHT_LENGTH:
             return False
-        return True
+        if self.length() < OLIGO_LEN_BELOW_WHICH_HIGHLIGHT:
+            return True
+        if self.length() > OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT:
+            return True
+        return False
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
@@ -416,8 +419,8 @@ class Oligo(CNObject):
                 num_bases_to_xovers.append(i+offset)
         return num_bases_to_xovers
 
-    def splitAtIdxs(self, idxs):
-        self._part.splitOligoAtIdxs(self, idxs)
+    def splitAtAbsoluteLengths(self, len_list):
+        self._part.splitOligoAtAbsoluteLengths(self, len_list)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -425,6 +428,27 @@ class Oligo(CNObject):
         self._part = part
         self.setParent(part)
         part._addOligoToSet(self, emit_signals)
+    # end def
+
+    def getAbsolutePositionAtLength(self, len_for_pos):
+        """
+        Convenience method convert the length in bases from the 5' end of the
+        oligo to the absolute position (vh, strandset, baseidx).
+
+        Args:
+            len_for_pos: length in bases for position lookup
+        """
+        strand5p = self.strand5p()
+        temp_len = 0
+        for strand in strand5p.generator3pStrand():
+            if (temp_len + strand.totalLength()) > len_for_pos:
+                vh = strand.idNum()
+                strandset = strand.strandType()
+                baseidx = strand.idx5Prime() + len_for_pos - temp_len
+                return (vh, strandset, baseidx)
+            else:
+                temp_len += strand.totalLength()
+        return None
     # end def
 
     def setPart(self, part):
