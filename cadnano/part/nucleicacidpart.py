@@ -2421,44 +2421,60 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
-    def splitOligoAtIdxs(self, oligo, idxs):
+    def splitOligoAtAbsoluteLengths(self, oligo, len_list):
         """
         Given an oligo and list of split positions, which are lengths in number
         of bases from the start of the oligo. The method will convert the idxs
-        into absolute (vh,strandset,baseidx) locations and attempt to split the
-        strand or remove any xover at those locations.
+        into absolute (vh,strandset,baseidx) positions and attempt to split the
+        strand or remove any xover at those positions.
 
         Args:
             oligo (Oligo): to be split
-            ids (list): indicies at which to break
+            len_list (list): lengths from 0 at which to break
 
+        Returns:
+            result: None if succeeded, otherwise the first invalid length.
         """
-        # WIP: copied from example script
-        # for idx in idxs:
-        #     ss = self.getStrandSets(id_num)[ss_type]
-        #     strand = ss.getStrand(idx)
+        # Quick validation of len_list, need at least 2-base separation
+        sorted_lens = [0] + sorted(len_list) + [oligo.length()]
+        for i in range(len(sorted_lens)-1):
+            j, k = sorted_lens[i], sorted_lens[i+1]
+            if (k-j) < 2:
+                return k
 
-        # for id_num, ss_type, idx in break_positions:
-        #     # look up the strand
-        #     ss = part.getStrandSets(id_num)[ss_type]
-        #     strand = ss.getStrand(idx)
-        #     # simple break
-        #     if ss.strandCanBeSplit(strand, idx):
-        #         print("Splitting at <VH{0}.{1}>[{2}]".format(strand.idNum(), strand.strandType(), idx))
-        #         ss.splitStrand(strand, idx)
-        #     # xover break
-        #     elif strand.hasXoverAt(idx):
-        #         if idx == strand.idx3Prime():
-        #             strand5p = strand
-        #             strand3p = strand5p.connection3p()
-        #         else:
-        #             strand3p = strand
-        #             strand5p = strand.connection5p()
-        #         print("Removing xover at <VH{0}.{1}>[{2}]".format(strand5p.idNum(), strand5p.strandType(), idx))
-        #         part.removeXover(strand5p, strand3p)
-        #     else:
-        #         printWarning("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
-        pass
+        # Convert lengths to absolute positions
+        abs_positions = []
+        for olg_len in len_list:
+            id_num, ss_type, idx = oligo.getAbsolutePositionAtLength(olg_len)
+            abs_positions.append((id_num, ss_type, idx))
+            ss = self.getStrandSets(id_num)[ss_type]
+            strand = ss.getStrand(idx)
+            if strand.hasXoverAt(idx):
+                print("Will remove xover at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, id_num, ss_type, idx))
+            elif ss.strandCanBeSplit(strand, idx):
+                print("Will split strand at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, strand.idNum(), strand.strandType(), idx))
+            else:
+                print("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
+                return (id_num, ss_type, idx)
+
+        # Now break for real
+        for id_num, ss_type, idx in abs_positions:
+            ss = self.getStrandSets(id_num)[ss_type]
+            strand = ss.getStrand(idx)
+            if strand.hasXoverAt(idx):
+                if idx == strand.idx3Prime():
+                    strand5p = strand
+                    strand3p = strand5p.connection3p()
+                else:
+                    strand3p = strand
+                    strand5p = strand.connection5p()
+                self.removeXover(strand5p, strand3p)
+            elif ss.strandCanBeSplit(strand, idx):
+                ss.splitStrand(strand, idx)
+            else:
+                print("Should never get here: <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
+                return (id_num, ss_type, idx)
+    # end def
 
     def _addOligoToSet(self, oligo, emit_signals=False):
         """This is an exceptional private method not part of the API as this
