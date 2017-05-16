@@ -5,9 +5,9 @@
 
 import argparse
 from datetime import datetime
-from os import getcwd, path
+from os import path
 import sys
-sys.path.append(getcwd())  # temporary
+# sys.path.append(getcwd())  # temporary
 import cadnano
 from cadnano.document import Document
 from cadnano.data.dnasequences import sequences
@@ -78,7 +78,7 @@ def main():
     print("> Does the longest oligo contain %s?" % str(scaf_start), 'green',
           colorBool(longest_oligo == scaf_oligo))
 
-    printInfo("Splitting circular oligos")
+    printInfo("Splitting circular oligos...")
     circular_oligos = part.getCircularOligos()
     if circular_oligos:
         printInfo("Breaking circular oligos...")
@@ -87,8 +87,8 @@ def main():
             strand3p = strand5p.connection3p()
             part.removeXover(strand5p, strand3p)
 
+    printInfo("Splitting long oligos...")
     # Naively break staples at xovers using greedy algorithm
-    printInfo("Splitting long oligos")
     min_split_len = 35  # break oligos longer than this
     for staple in staple_oligos:
         unbroken_length = staple.length()
@@ -102,50 +102,8 @@ def main():
             if min_split_len < next_strand_len and num_bases_used < unbroken_length:
                 split_idxs.append(num_bases_used)
                 next_strand_len = 0
-        print(split_idxs)
-        staple.splitAtIdxs(split_idxs)
-
-        # print('x', staple.getStrandLengths(), staple.length(), combined)
-
-    # for staple in staple_oligos:
-    #     break_positions = []  # pre-calculate breaks to avoid oligo changes
-    #     if staple.length() > min_break_len:
-    #         i = 0
-    #         for strand in staple.strand5p().generator3pStrand():
-    #             s_len = strand.totalLength()
-    #             if s_len > min_break_len:  # just add
-    #                 # segments = s_len//min_break_len-1
-    #                 step = min_break_len if strand.isForward() else -min_break_len
-    #                 break_positions.append([[strand.idNum(), strand.strandType(), idx]
-    #                                        for idx in range(strand.idx5Prime(),
-    #                                                         strand.idx3Prime(),
-    #                                                         step)])
-    #             elif strand != staple.strand3p():
-    #                 i = i + strand.totalLength()
-    #                 if i > min_break_len:
-    #                     break_positions.append([strand.idNum(), strand.strandType(), strand.idx3Prime()])
-    #                     i = 0
-    #     if break_positions:
-    #         for id_num, ss_type, idx in break_positions:
-    #             # look up the strand
-    #             ss = part.getStrandSets(id_num)[ss_type]
-    #             strand = ss.getStrand(idx)
-    #             # simple break
-    #             if ss.strandCanBeSplit(strand, idx):
-    #                 print("Splitting at <VH{0}.{1}>[{2}]".format(strand.idNum(), strand.strandType(), idx))
-    #                 ss.splitStrand(strand, idx)
-    #             # xover break
-    #             elif strand.hasXoverAt(idx):
-    #                 if idx == strand.idx3Prime():
-    #                     strand5p = strand
-    #                     strand3p = strand5p.connection3p()
-    #                 else:
-    #                     strand3p = strand
-    #                     strand5p = strand.connection5p()
-    #                 print("Removing xover at <VH{0}.{1}>[{2}]".format(strand5p.idNum(), strand5p.strandType(), idx))
-    #                 part.removeXover(strand5p, strand3p)
-    #             else:
-    #                 printWarning("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
+        if split_idxs:
+            staple.splitAtAbsoluteLengths(split_idxs)
 
     # print(scaffold, scaffold.length(), scaffold.sequence())
     p7560 = sequences['p7560']
@@ -154,9 +112,8 @@ def main():
     # seqs = part.getSequences()
     # print(seqs)
 
-    oligos = part.oligos()
-    oligos_sorted_by_color = sorted(oligos, key=lambda x: x.getColor())
-
+    # oligos = part.oligos()
+    # oligos_sorted_by_color = sorted(oligos, key=lambda x: x.getColor())
     # for oligo in oligos_sorted_by_color:
     #     if oligo == scaf_oligo:
     #         print("Scaffold {0} has length {1}".format(oligo, oligo.length()))
@@ -164,11 +121,9 @@ def main():
     #         # oligo_props = oligo.dump()
     #         printOligo(oligo)
 
-    printInfo("Saving modified file as {0}".format(dest_file))
+    print("Saving modified document as", colored("{0}".format(dest_file), 'yellow'))
+    # printInfo("{0}".format(dest_file))
     doc.writeToFile(dest_file)
-
-
-
 
 # color_dict = dict((color, 'white', []) for color in CADNANO1_COLORS)
 color_dict = {'#cc0000': ('red', None, []),
@@ -182,8 +137,9 @@ color_dict = {'#cc0000': ('red', None, []),
               '#333333': ('white', None, ['reverse']),
               }
 
+
 def printInfo(s):
-    print(colored(s, 'green', attrs=['reverse']))
+    print(colored(s, 'green'))
 
 
 def printWarning(s):
