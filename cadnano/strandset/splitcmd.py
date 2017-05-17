@@ -130,11 +130,11 @@ class SplitCommand(UndoCommand):
         # Traverse the strands via 3'conns to assign the new oligos
         fSetOligo = Strand.setOligo
         for strand in l_olg.strand5p().generator3pStrand():
-            fSetOligo(strand, l_olg)  # emits strandHasNewOligoSignal
+            fSetOligo(strand, l_olg, emit_signals=True)  # emits strandHasNewOligoSignal
         if was_not_loop:  # do the second oligo which is different
-            for strand in h_olg.strand5p().generator3pStrand():
+            for i, strand in enumerate(h_olg.strand5p().generator3pStrand()):
                 # emits strandHasNewOligoSignal
-                fSetOligo(strand, h_olg)
+                fSetOligo(strand, h_olg, emit_signals=True)
 
         # Add new oligo and remove old oligos from the part
         olg.removeFromPart(emit_signals=True)
