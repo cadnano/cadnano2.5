@@ -5,6 +5,7 @@ from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
+
 class SplitCommand(UndoCommand):
     """ The SplitCommand takes as input a strand and "splits" the strand in
     two, such that one new strand 3' end is at base_idx, and the other
@@ -20,10 +21,10 @@ class SplitCommand(UndoCommand):
         super(SplitCommand, self).__init__("split strand")
         # Store inputs
         self._old_strand = strand
-        old_sequence  = strand._sequence
+        old_sequence = strand._sequence
         is5to3 = strand.isForward()
 
-        self._s_set = s_set = strand.strandSet()
+        self._s_set = strand.strandSet()
         self._old_oligo = oligo = strand.oligo()
         # Create copies
         self.strand_low = strand_low = strand.shallowCopy()
@@ -36,7 +37,6 @@ class SplitCommand(UndoCommand):
             self._h_oligo = h_oligo = oligo.shallowCopy()
 
         color_list = prefs.STAP_COLORS
-
 
         # Determine oligo retention based on strand priority
         if is5to3:  # strand_low has priority
@@ -97,9 +97,7 @@ class SplitCommand(UndoCommand):
         s_low = self.strand_low
         s_high = self.strand_high
         o_strand = self._old_strand
-        # idx = self._s_set_idx
         olg = self._old_oligo
-        doc = ss.document()
         l_olg = self._l_oligo
         h_olg = self._h_oligo
         was_not_loop = l_olg != h_olg
@@ -115,14 +113,14 @@ class SplitCommand(UndoCommand):
         sLcL = s_low.connectionLow()
         if sLcL:
             if ( (o_strand.isForward() and sLcL.isForward()) or
-                (not o_strand.isForward() and not sLcL.isForward()) ):
+                 (not o_strand.isForward() and not sLcL.isForward()) ):
                 sLcL.setConnectionHigh(s_low)
             else:
                 sLcL.setConnectionLow(s_low)
         sHcH = s_high.connectionHigh()
         if sHcH:
             if ( (o_strand.isForward() and sHcH.isForward()) or
-                (not o_strand.isForward() and not sHcH.isForward()) ):
+                 (not o_strand.isForward() and not sHcH.isForward()) ):
                 sHcH.setConnectionLow(s_high)
             else:
                 sHcH.setConnectionHigh(s_high)
@@ -153,9 +151,7 @@ class SplitCommand(UndoCommand):
         s_low = self.strand_low
         s_high = self.strand_high
         o_strand = self._old_strand
-        # idx = self._s_set_idx
         olg = self._old_oligo
-        doc = ss.document()
         l_olg = self._l_oligo
         h_olg = self._h_oligo
         was_not_loop = l_olg != h_olg
@@ -170,14 +166,14 @@ class SplitCommand(UndoCommand):
         oScL = o_strand.connectionLow()
         if oScL:
             if ( (o_strand.isForward() and oScL.isForward()) or
-                (not o_strand.isForward() and not oScL.isForward()) ):
+                 (not o_strand.isForward() and not oScL.isForward()) ):
                 oScL.setConnectionHigh(o_strand)
             else:
                 oScL.setConnectionLow(o_strand)
         oScH = o_strand.connectionHigh()
         if oScH:
             if ( (o_strand.isForward() and oScH.isForward()) or
-                (not o_strand.isForward() and not oScH.isForward()) ):
+                 (not o_strand.isForward() and not oScH.isForward()) ):
                 oScH.setConnectionLow(o_strand)
             else:
                 oScH.setConnectionHigh(o_strand)
@@ -185,7 +181,7 @@ class SplitCommand(UndoCommand):
         # Traverse the strands via 3'conns to assign the old oligo
         fSetOligo = Strand.setOligo
         for strand in olg.strand5p().generator3pStrand():
-            fSetOligo(strand, olg)
+            fSetOligo(strand, olg, emit_signals=True)
         # Add old oligo and remove new oligos from the part
         olg.addToPart(ss.part(), emit_signals=True)
         l_olg.removeFromPart(emit_signals=True)
