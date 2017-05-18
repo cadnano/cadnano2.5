@@ -644,6 +644,7 @@ class Document(CNObject):
     # end def
 
     def makeNew(self, fname=None):
+        self.clearAllSelected()
         self.resetViews()
         setBatch(True)
         self.removeAllChildren()  # clear out old parts

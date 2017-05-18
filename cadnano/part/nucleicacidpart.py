@@ -2809,7 +2809,7 @@ class NucleicAcidPart(Part):
         for id_num in vh_set:
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)))
+                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
             except:
                 print("neighbors", list(neighbors))
                 raise
@@ -2820,7 +2820,7 @@ class NucleicAcidPart(Part):
         for id_num in left_overs:
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)))
+                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
             except:
                 print("neighbors", list(neighbors))
                 raise
