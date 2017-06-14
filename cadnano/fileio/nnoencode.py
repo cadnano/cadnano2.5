@@ -14,6 +14,7 @@ def encodeToFile(filename, document, legacy=False):
         document (Document): Document to encode
         legacy (bool): Export for use with legacy (pre v2.5) cadnano versions.
     """
+    print('encodeToFile', legacy)
     json_string = encode(document, legacy)
     with io.open(filename, 'w', encoding='utf-8') as fd:
         fd.write(json_string)
@@ -31,6 +32,7 @@ def encode(document, legacy=False):
     Returns:
         str: the json string containing the encoded document
     """
+    print("encoding to leg=", legacy)
     if legacy:
         obj = v2encode.encodeDocument(document)
     else:

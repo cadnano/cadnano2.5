@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnenum import PointType, StrandType
+from cadnano.cnenum import PointType
+# from cadnano.cnenum import StrandType
 
 FORMAT_VERSION = "2.0"
 
@@ -16,7 +17,7 @@ def encodeDocument(document):
 
     # # iterate through virtualhelix list
     # vh_list = []
-    # for row, col in helix_order_list:
+    # for row, col in part.getOrderedVirtualHelixList():
     #     vh = part.virtualHelixAtCoord((row, col))
     #     # insertions and skips
     #     insertion_dict = part.insertions()[(row, col)]

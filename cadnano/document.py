@@ -173,14 +173,15 @@ class Document(CNObject):
         self._filename = fname
     # end def
 
-    def writeToFile(self, filename):
+    def writeToFile(self, filename, legacy=False):
         """ Convenience wrapper for `encodeToFile` to set the `document`
         argument to `self`
 
         Args:
             filename (str): full path file name
+            legacy (bool): attempt to export cadnano2 format
         """
-        encodeToFile(filename, self)
+        encodeToFile(filename, self, legacy)
     # end def
 
     def readFile(self, filename):
