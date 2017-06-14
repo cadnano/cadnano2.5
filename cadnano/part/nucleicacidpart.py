@@ -2880,7 +2880,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def getVirtualHelixOrder(self):
-        """ the order of VirtualHelix items in the path view
+        """Returns the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
         """
         return self.getProperty('virtual_helix_order')

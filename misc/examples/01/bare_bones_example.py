@@ -2,21 +2,15 @@
 # bare_bones_example.py
 # Shawn M Douglas, April 2017
 # BSD-3 open-source license
-# Run from terminal: python3 bare_bones_example.py
-# Reads a design, prints oligo info, then some strand info.
-# No sequence gets applied, so oligo.sequence() should return None.
-
 
 import cadnano
 from cadnano.document import Document
 
-# Read design
 app = cadnano.app()
 doc = app.document = Document()
 doc.readFile('myfile.json')
 part = doc.activePart()
 
-# Print oligo info
 oligos = part.oligos()
 for oligo in oligos:
     print("{0}\t{1}\t\'{2}\'\t{3}".format(oligo,
@@ -24,7 +18,6 @@ for oligo in oligos:
                                           oligo.getColor(),
                                           oligo.sequence()))
 
-# Print Strand info
 vhs = list(part.getIdNums())  # convert set to list
 for vh_id in vhs[:3]:
     fwd_ss, rev_ss = part.getStrandSets(vh_id)
