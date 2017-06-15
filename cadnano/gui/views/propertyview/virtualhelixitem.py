@@ -7,9 +7,11 @@ Attributes:
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
+
 from cadnano.cnenum import ItemType
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
+
 
 KEY_COL = 0
 VAL_COL = 1
@@ -125,9 +127,9 @@ class VirtualHelixSetItem(CNPropertyItem):
                                                     'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
-        elif key == 'z' and self._model_part.isZEditable():
+        elif key == 'z' and cn_m.part().isZEditable():
             editor = QDoubleSpinBox(parent_QWidget)
-            bw = cm.part().baseWidth()
+            bw = cn_m.part().baseWidth()
             editor.setSingleStep(bw)
             editor.setRange(-bw*21, bw*21)
         else:
