@@ -13,6 +13,7 @@ import sys
 from os import path
 from traceback import extract_stack
 
+
 logger = logging.getLogger(__name__)
 
 IS_PY_3 = int(sys.version_info[0] > 2)
@@ -425,3 +426,35 @@ def read_fasta(fp):
             seq.append(line)
     if name:
         yield (name, ''.join(seq))
+
+
+def qtdb_trace():
+    """Make PDB usable by calling pyqtRemoveInputHook.
+
+    Otherwise, PDB is useless as the message
+    > QCoreApplication::exec: The event loop is already running
+    is spammed to the console.
+
+    When done, call qtdb_resume from the PDB prompt to return things back to
+    normal.
+
+    Note that PDB will drop you into the current frame (this function) and
+    hitting 'n' is required to return to the frame you wanted PDB originally.
+    This could probably be optimized at some point to manipulate the frame PDB
+    starts in.
+    """
+    import pdb
+    from PyQt5.QtCore import pyqtRemoveInputHook
+
+    pyqtRemoveInputHook()
+    pdb.set_trace()
+
+
+def qtdb_resume():
+    """Resume normal PyQt operations after calling qtdb_trace.
+
+    Note that this function assumes that pyqtRemoveInputHook has been called
+    """
+    from PyQt5.QtCore import pyqtRestoreInputHook
+
+    pyqtRestoreInputHook()
