@@ -96,7 +96,7 @@ class VirtualHelix(CNObject):
     def setZ(self, new_z, id_nums=None):
         m_p = self._part
         if id_nums is None:
-            id_nums = self._id_num
+            id_nums = [self._id_num]
 
         for id_num in id_nums:
             old_z = m_p.getVirtualHelixProperties(id_num, 'z')
@@ -104,6 +104,19 @@ class VirtualHelix(CNObject):
                 dz = new_z - old_z
                 m_p.translateVirtualHelices([id_num], 0, 0, dz, finalize=False, use_undostack=True)
     # end def
+
+    def getZ(self, id_num=None):
+        """Get the 'z' property of the VirtualHelix described by ID number
+        'id_num'.
+
+        If a VirtualHelix corresponding to id_num does not exist, an IndexError
+        will be thrown by getVirtualHelixProperties.
+        """
+        if __debug__:
+            assert isinstance(id_num, int) or id_num is None
+
+        return self._part.getVirtualHelixProperties(id_num if id_num is not None
+                else self._id_num, 'z')
 
     def getAxisPoint(self, idx):
         return self._part.getCoordinate(self._id_num, idx)
