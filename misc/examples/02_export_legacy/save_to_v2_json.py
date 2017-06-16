@@ -12,7 +12,7 @@ from cadnano.document import Document
 # Read design
 app = cadnano.app()
 doc = app.document = Document()
-doc.readFile('design02.json')
+doc.readFile('design02b.json')
 part = doc.activePart()
 
 doc.writeToFile('export.json')
