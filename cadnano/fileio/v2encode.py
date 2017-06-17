@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnenum import PointType
 from cadnano.cnenum import LatticeType
-# from cadnano.cnenum import StrandType
 from cadnano.fileio.lattice import HoneycombDnaPart
-# from cadnano.fileio.lattice import SquareDnaPart
 
 FORMAT_VERSION = "2.0"
 ROW_OFFSET = 2
 COL_OFFSET = 3
-DEFAULT_ROWS = 30
-DEFAULT_COLS = 32
+# DEFAULT_ROWS = 30
+# DEFAULT_COLS = 32
 lattice_type = LatticeType.HONEYCOMB
 positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoordRound
 
@@ -42,14 +39,12 @@ def encodeDocument(document):
 
     print("Translating vh:(row,col) to legacy coordinates...")
 
-    # iterate through virtualhelix list
+    # Iterate through virtualhelix list
     vh_list = []
     for id_num in vh_order:
-        # vh = part.getVirtualHelix(id_num)
         fwd_ss, rev_ss = part.getStrandSets(id_num)
-        # print(vh, fwd_ss, rev_ss)
 
-        # insertions and skips
+        # Insertions and skips
         insertion_dict = insertions[id_num]
         insts = [0 for i in range(max_base_idx)]
         skips = [0 for i in range(max_base_idx)]
@@ -58,31 +53,27 @@ def encodeDocument(document):
                 skips[idx] = insertion.length()
             else:
                 insts[idx] = insertion.length()
-        # if sum(insts) != 0:
-        #     print("insts", insts)
-        # if sum(skips) != 0:
-        #     print("skips", skips)
 
         if id_num % 2 == 0:
             scaf_ss, stap_ss = fwd_ss, rev_ss
         else:
             scaf_ss, stap_ss = rev_ss, fwd_ss  # noqa
 
-        # colors
+        # Colors
         stap_colors = []
         for strand in stap_ss:
             if strand.connection5p() is None:
                 c = str(strand.oligo().getColor())[1:]  # drop the hash
                 stap_colors.append([strand.idx5Prime(), int(c, 16)])
-        # print(stap_colors)
 
-        # convert x,y coordinates to new (row, col)
+        # Convert x,y coordinates to new (row, col)
         vh_x, vh_y = part.getVirtualHelixOrigin(id_num)
         row, col = positionToLatticeCoord(radius, vh_x, vh_y, False, False)
         new_row = row_range.index(row)
         new_col = col_range.index(col)
         print("{0:>2}: ({1:>2},{2:>2}) -> ({3:>2},{4:>2})".format(id_num, row, col, new_row, new_col))
 
+        # Put everything together in a new dict
         vh_dict = {"row": new_row,
                    "col": new_col,
                    "num": id_num,
@@ -94,7 +85,6 @@ def encodeDocument(document):
                    "stapLoop": [],
                    "stap_colors": stap_colors}
         vh_list.append(vh_dict)
-    # bname = basename(str(fname))
     obj = {"name": name, "vstrands": vh_list}
     return obj
 
