@@ -508,7 +508,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def getVirtualHelixOriginLimits(self):
-        """Given a id_num get the coordinate at a given index
+        """Retuns a pair of coordinates bounding the lower-left and upper-right
+        coordinates of the part.
 
         Returns:
             tuple: of :obj:`int` of the form::
