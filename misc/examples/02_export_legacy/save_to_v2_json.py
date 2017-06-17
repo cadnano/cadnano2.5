@@ -9,11 +9,15 @@
 import cadnano
 from cadnano.document import Document
 
+# design_name = 'a'
+design_name = 'b'
+# design_name = 'Nature09_monolith'
+
 # Read design
 app = cadnano.app()
 doc = app.document = Document()
-doc.readFile('design02b.json')
+doc.readFile(design_name+'.json')
 part = doc.activePart()
 
-doc.writeToFile('export.json')
-doc.writeToFile('legacy.json', legacy=True)
+doc.writeToFile(design_name+'_c25.json')
+doc.writeToFile(design_name+'_legacy.json', legacy=True)
