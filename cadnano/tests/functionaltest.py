@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys, os, io, time
-
 import pytest
 
 from cntestcase import CNTestApp
+
 
 @pytest.fixture()
 def cnapp():
     app = CNTestApp()
     yield app
     app.tearDown()
+
 
 ####################### Staple Comparison Tests ########################
 def testStapleOutput_simple42legacy(cnapp):
@@ -21,6 +21,7 @@ def testStapleOutput_simple42legacy(cnapp):
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
 
+
 def testStapleOutput_skip(cnapp):
     """Simple design with a single skip"""
     designname = "skip.json"
@@ -29,6 +30,7 @@ def testStapleOutput_skip(cnapp):
     test_set = cnapp.getTestSequences(designname, sequences)
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
+
 
 def testStapleOutput_inserts_and_skips(cnapp):
     """Insert and skip stress test"""
@@ -39,6 +41,7 @@ def testStapleOutput_inserts_and_skips(cnapp):
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
 
+
 def testStapleOutput_insert_size_1(cnapp):
     """Test sequence output with a single insert of size 1"""
     designname = "loop_size_1.json"
@@ -47,6 +50,7 @@ def testStapleOutput_insert_size_1(cnapp):
     test_set = cnapp.getTestSequences(designname, sequences)
     ref_set = cnapp.getRefSequences(refname)
     assert test_set == ref_set
+
 
 def testStapleOutput_Science09_prot120_98_v3(cnapp):
     """Staples match reference set for Science09 protractor 120 v3"""
@@ -58,14 +62,24 @@ def testStapleOutput_Science09_prot120_98_v3(cnapp):
     assert test_set == ref_set
 
 
-# def testStapleOutput_Nature09_monolith(cnapp):
-#     """Staples match reference set for Nature09 monolith"""
-#     designname = "Nature09_monolith.json"
-#     refname = "Nature09_monolith.csv"
-#     sequences = [("p7560", 4, 73)]
-#     test_set = cnapp.getTestSequences(designname, sequences)
-#     ref_set = cnapp.getRefSequences(refname)
-#     assert test_set == ref_set
+def testStapleOutput_Nature09_monolith(cnapp):
+    """Staples match reference set for Nature09 monolith"""
+    designname = "Nature09_monolith.json"
+    refname = "Nature09_monolith.csv"
+    sequences = [("p7560", 4, 73)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
+
+
+def testStapleOutput_Nature09_monolith_legacy(cnapp):
+    """Staples match reference set for Nature09 monolith"""
+    designname = "Nature09_monolith_legacy.json"
+    refname = "Nature09_monolith.csv"
+    sequences = [("p7560", 4, 73)]
+    test_set = cnapp.getTestSequences(designname, sequences)
+    ref_set = cnapp.getRefSequences(refname)
+    assert test_set == ref_set
 
 # def testStapleOutput_Nature09_squarenut(cnapp):
 #      """Staples match reference set for Nature09 squarenut"""

@@ -10,8 +10,8 @@ import cadnano
 from cadnano.document import Document
 
 # design_name = 'a'
-design_name = 'b'
-# design_name = 'Nature09_monolith'
+# design_name = 'b'
+design_name = 'Nature09_monolith'
 
 # Read design
 app = cadnano.app()
