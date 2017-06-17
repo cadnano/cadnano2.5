@@ -466,10 +466,11 @@ class DocumentController():
     # end def
 
     def actionPathAddSeqSlot(self):
-        print("triggered seqslot")
-        ap = self._document.activePart()
-        if ap is not None:
-            self._document.activePart().setAbstractSequences(emit_signals=True)
+        pass
+        # print("triggered seqslot")
+        # ap = self._document.activePart()
+        # if ap is not None:
+        #     self._document.activePart().setAbstractSequences(emit_signals=True)
     # end def
 
     def actionPrefsSlot(self):
