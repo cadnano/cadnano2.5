@@ -1,4 +1,4 @@
-STAP_COLORS = ['#cc0000'
+STAP_COLORS = ['#cc0000',
                '#f74308',
                '#f7931e',
                '#aaaa00',
