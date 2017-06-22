@@ -3,8 +3,8 @@ from cadnano.cnenum import LatticeType
 from cadnano.fileio.lattice import HoneycombDnaPart
 
 FORMAT_VERSION = "2.0"
-ROW_OFFSET = 2
-COL_OFFSET = 3
+ROW_OFFSET = 0
+COL_OFFSET = 0
 # DEFAULT_ROWS = 30
 # DEFAULT_COLS = 32
 lattice_type = LatticeType.HONEYCOMB
