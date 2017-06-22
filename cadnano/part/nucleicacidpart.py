@@ -2451,9 +2451,11 @@ class NucleicAcidPart(Part):
             ss = self.getStrandSets(id_num)[ss_type]
             strand = ss.getStrand(idx)
             if strand.hasXoverAt(idx):
-                print("Will remove xover at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, id_num, ss_type, idx))
+                # print("Will remove xover at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, id_num, ss_type, idx))
+                pass
             elif ss.strandCanBeSplit(strand, idx):
-                print("Will split strand at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, strand.idNum(), strand.strandType(), idx))
+                # print("Will split strand at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, strand.idNum(), strand.strandType(), idx))
+                pass
             else:
                 print("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
                 return (id_num, ss_type, idx)
