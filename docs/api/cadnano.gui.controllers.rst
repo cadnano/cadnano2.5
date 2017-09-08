@@ -13,9 +13,7 @@ Submodules
 
 .. toctree::
 
-   cadnano.gui.controllers.documentcontrollerbase
-   cadnano.gui.controllers.documentcontrollerexpert
-   cadnano.gui.controllers.documentcontrollerlegacy
+   cadnano.gui.controllers.documentcontroller
    cadnano.gui.controllers.viewrootcontroller
 
 Module contents
