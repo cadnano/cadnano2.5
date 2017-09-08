@@ -1221,8 +1221,8 @@ class NucleicAcidPart(Part):
         out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_))
                    else (k, v) for k, v in zip(series.index, series.tolist()))
         if inject_extras:
-            bpr = out['bases_per_repeat']
-            tpr = out['turns_per_repeat']
+            bpr = int(out['bases_per_repeat'])
+            tpr = int(out['turns_per_repeat'])
             out['bases_per_turn'] = bpr / tpr
             out['twist_per_base'] = tpr*360. / bpr
         return out

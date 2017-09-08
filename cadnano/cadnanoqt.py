@@ -15,14 +15,17 @@
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 import os
-import sys
 import platform
+import sys
 from code import interact
-from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, QEventLoop, QSize
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import qApp, QApplication
+
 from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
+from PyQt5.QtCore import (QCoreApplication, QEventLoop, QObject, QSize,
+                          pyqtSignal)
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QApplication, qApp
+
 
 proxyConfigure('PyQt')
 decodeFile = None
@@ -54,12 +57,10 @@ class CadnanoQt(QObject):
         self.argns, unused = util.parse_args(argv, gui=True)
         # util.init_logging(self.argns.__dict__)
         # logger.info("CadnanoQt initializing...")
-        if argv is None:
-            argv = sys.argv
-        self.argv = argv
+        self.argv = argv if argv is not None else sys.argv
         # print("initializing new CadnanoQt", type(QCoreApplication.instance()))
         if QCoreApplication.instance() is None:
-            self.qApp = QApplication(argv)
+            self.qApp = QApplication(self.argv)
             assert(QCoreApplication.instance() is not None)
             self.qApp.setOrganizationDomain("cadnano.org")
         else:
@@ -89,7 +90,6 @@ class CadnanoQt(QObject):
         global DocumentController
         from cadnano.document import Document
         from cadnano.fileio.nnodecode import decodeFile
-        from cadnano.gui.controllers.documentcontroller import DocumentController
         from cadnano.gui.views.pathview import pathstyles as styles
 
         styles.setFontMetrics()
@@ -173,13 +173,16 @@ class CadnanoQt(QObject):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)
 
     def createDocument(self, base_doc=None):
+        from cadnano.gui.controllers.documentcontrollerexpert import DocumentControllerExpert
+        from cadnano.gui.controllers.documentcontrollerlegacy import DocumentControllerLegacy
+
         global DocumentController
         # print("CadnanoQt createDocument begin")
         default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
-            dc = DocumentController(base_doc)
+            dc = DocumentControllerExpert(base_doc)
             # logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             dc.setFileName(default_file)
@@ -189,7 +192,7 @@ class CadnanoQt(QObject):
             # logger.info("Creating new empty document...")
             if doc_ctrlr_count == 0:  # first dc
                 # dc adds itself to app.document_controllers
-                dc = DocumentController(base_doc)
+                dc = DocumentControllerExpert(base_doc)
             elif doc_ctrlr_count == 1:  # dc already exists
                 dc = list(self.document_controllers)[0]
                 dc.newDocument()  # tell it to make a new doucment
