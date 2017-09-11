@@ -103,7 +103,6 @@ class GridItem(QGraphicsPathItem):
         Returns:
             TYPE: Description
         """
-        import pdb; pdb.set_trace()
         doLattice = HoneycombDnaPart.latticeCoordToPositionXY
         doPosition = HoneycombDnaPart.positionToLatticeCoordRound
         isEven = HoneycombDnaPart.isEvenParity
