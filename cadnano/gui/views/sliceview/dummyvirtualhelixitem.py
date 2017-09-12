@@ -3,15 +3,12 @@
 Attributes:
     SNAP_WIDTH (int): Description
 """
-from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
+from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from . import slicestyles as styles
-from .sliceextras import WedgeGizmo, WEDGE_RECT
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -41,7 +38,7 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
     """
     FILTER_NAME = 'virtual_helix' #TODO:  Figure out how this should be modified for this class
 
-    def __init__(self):
+    def __init__(self, x, y):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
@@ -51,9 +48,10 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         QGraphicsEllipseItem.__init__(self)
 
         self.hide() #FIXME:  This doesn't seem to do anything
-        model_part = self._model_part
-        #FIXME:  part_item isn't defined here, and scaleFactor comes from nucleicacidpartitem.py
-        self.x, self.y = model_part.locationQt(self._id_num, part_item.scaleFactor())
+
+        self.x = x
+        self.y = y
+
         self.setCenterPos(self.x, self.y)
 
         self.setAcceptHoverEvents(True)
@@ -61,23 +59,11 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
 
         self.old_pen = None
         self.is_active = False
-        self.updateAppearance()
 
         self.show()
-
-        self._right_mouse_move = False
     # end def
 
     ### ACCESSORS ###
-    def part(self):
-        """Reference to the model part associated with the parent part item.
-
-        Returns:
-            NucleicAcidPart: the model part
-        """
-        return self._part_item.part()
-    # end def
-
     def setSnapOrigin(self, is_snap):
         """Used to toggle an item as the snap origin. See `SelectSliceTool`.
 
@@ -92,38 +78,6 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         else:
             self.setPen(self.old_pen)
             self.old_pen = None
-
-    def partItem(self):
-        """Reference to the parent part item.
-
-        Returns:
-            NucleicAcidPartItem: the part item
-        """
-        return self._part_item
-    # end def
-
-    def idNum(self):
-        """Virual helix ID number.
-
-        Returns:
-            int: the id_num of the virtual helix object.
-        """
-        return self._id_num
-    # end def
-
-    def activate(self):
-        """Sets the VirtualHelixItem object as active (i.e. having focus due
-        to user input) and calls updateAppearance.
-        """
-        self.is_active = True
-        self.updateAppearance()
-
-    def deactivate(self):
-        """Sets the VirtualHelixItem object as not active (i.e. does not have
-        focus) and calls updateAppearance.
-        """
-        self.is_active = False
-        self.updateAppearance()
 
     def setCenterPos(self, x, y):
         """Moves this item a new position such that its center is located at
@@ -149,27 +103,6 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         """
         return self.scenePos() + QPointF(_RADIUS, _RADIUS)
     # end def
-
-    def modelColor(self):
-        """The color associated with this item's `Part`.
-
-        Returns:
-            str: hex representation of Color, e.g. `#0066cc`.
-        """
-        return self._model_part.getProperty('color')
-    # end def
-
-    def partCrossoverSpanAngle(self):
-        """The angle span, centered at each base, within which crossovers
-        will be allowed by the interface. The span is drawn by the WedgeGizmo.
-
-        Returns:
-            int: The span angle (default is set in NucleicAcidPart init)
-        """
-        return float(self._model_part.getProperty('crossover_span_angle'))
-    # end def
-
-    ### SIGNALS ###
 
     ### SLOTS ###
     def mousePressEvent(self, event):
@@ -208,6 +141,7 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
             event (QMouseEvent): contains parameters that describe the mouse event
 
         """
+        #TODO:  This needs to be updated to support mouse events
         part = self._model_part
         part.setSelected(True)
         tool.selectOrSnap(part_item, self, event)
@@ -222,25 +156,10 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
         """
+        #TODO:  This needs to be updated to support mouse events
         part = self._model_part
         print("pencilToolMousePress", part)
         # tool.attemptToCreateStrand
-
-    def virtualHelixPropertyChangedSlot(self, keys, values):
-        """The event handler for when the a model virtual helix propety has
-        changed. See partVirtualHelixPropertyChangedSignal.
-
-        Calls updateAppearance(), which will refresh styles if needed.
-
-        Args:
-            keys (tuple): names of properties that changed
-            values (tuple): new values of properties that change
-
-        """
-        # for key, val in zip(keys, values):
-        #     pass
-        self.updateAppearance()
-    # end def
 
     def virtualHelixRemovedSlot(self):
         """The event handler for when a virtual helix is removed from the model.
@@ -257,60 +176,6 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         self.scene().removeItem(self._label)
         self._label = None
         self._part_item = None
-        self._model_part = None
         self.scene().removeItem(self)
-    # end def
-
-    def updateAppearance(self):
-        """Check item's current visibility, color and active state, and sets
-        pen, brush, text according to style defaults.
-        """
-        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
-        if is_visible:
-            self.show()
-        else:
-            self.hide()
-            return
-
-        pwidth = styles.SLICE_HELIX_STROKE_WIDTH if self.old_pen is None else SNAP_WIDTH
-
-        if self.is_active:
-            self._USE_PEN = getPenObj(styles.ACTIVE_STROKE, pwidth)
-        else:
-            self._USE_PEN = getPenObj(color, pwidth)
-
-        self._TEXT_BRUSH = getBrushObj(styles.SLICE_TEXT_COLOR)
-
-        self._BRUSH = _BRUSH_DEFAULT
-        self._USE_BRUSH = getBrushObj(color, alpha=150)
-
-        self._label.setBrush(self._TEXT_BRUSH)
-        self.setBrush(self._BRUSH)
-        self.setPen(self._USE_PEN)
-        self.setRect(_RECT)
-    # end def
-
-    def updatePosition(self):
-        """Queries the model virtual helix for latest x,y coodinates, and sets
-        them in the scene if necessary.
-
-        Note:
-            coordinates in the model are always in the part
-        """
-        part_item = self._part_item
-        # sf = part_item.scaleFactor()
-        x, y = self._model_part.locationQt(self._id_num, part_item.scaleFactor())
-        new_pos = QPointF(x - _RADIUS, y - _RADIUS)         # top left
-        tl_pos = part_item.mapFromScene(self.scenePos())    # top left
-
-        """
-        better to compare QPointF's since it handles difference
-        tolerances for you with !=
-        """
-        if new_pos != tl_pos:
-            parent_item = self.parentItem()
-            if parent_item != part_item:
-                new_pos = parent_item.mapFromItem(part_item, new_pos)
-            self.setPos(new_pos)
     # end def
 # end class
