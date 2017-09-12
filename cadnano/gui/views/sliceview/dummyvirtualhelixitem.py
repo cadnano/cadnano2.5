@@ -27,8 +27,8 @@ _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 SNAP_WIDTH = 3
 
 
-class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
-    """The VirtualHelixItem is an individual circle that gets drawn in the SliceView
+class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
+    """The DummySliceVirtualHelixItem is an individual circle that gets drawn in the SliceView
     as a child of the NucleicAcidPartItem. Taken as a group, many SliceHelix
     instances make up the crossection of the NucleicAcidPart. Clicking on a SliceHelix
     adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
@@ -40,35 +40,29 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         old_pen (QPen): temp storage for pen for easy restoration on appearance change.
         wedge_gizmos (dict): dictionary of `WedgeGizmo` objects.
     """
-    FILTER_NAME = 'virtual_helix'
+    FILTER_NAME = 'virtual_helix' #TODO:  Figure out how this should be modified for this class
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
-        QGraphicsEllipseItem.__init__(self, parent=part_item)
-        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
+        AbstractVirtualHelixItem.__init__(self)
+        QGraphicsEllipseItem.__init__(self)
 
-        self.hide()
+        self.hide() #FIXME:  This doesn't seem to do anything
         model_part = self._model_part
-        x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
-        # set position to offset for radius
-        # self.setTransformOriginPoint(_RADIUS, _RADIUS)
-        self.setCenterPos(x, y)
+        #FIXME:  part_item isn't defined here, and scaleFactor comes from nucleicacidpartitem.py
+        self.x, self.y = model_part.locationQt(self._id_num, part_item.scaleFactor())
+        self.setCenterPos(self.x, self.y)
 
+        #TODO:  Figure out what wedge_gizmos are.  They seem to have something to do with the wedges that show up to show which helices cross over
         self.wedge_gizmos = {}
         self._added_wedge_gizmos = set()
-        # self._prexo_gizmos = []
 
         self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
-
-        # handle the label specific stuff
-        self._label = self.createLabel()
-        self.setNumber()
 
         self.old_pen = None
         self.is_active = False
@@ -325,20 +319,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.setPos(new_pos)
     # end def
 
-    def createLabel(self):
-        """Creates a text label to display the ID number. Font and Z are set
-        in slicestyles.
-
-        Returns:
-            QGraphicsSimpleTextItem: the label
-        """
-        label = QGraphicsSimpleTextItem("%d" % self.idNum())
-        label.setFont(_FONT)
-        label.setZValue(_ZVALUE)
-        label.setParentItem(self)
-        return label
-    # end def
-
     def beginAddWedgeGizmos(self):
         """Resets the list of WedgeGizmos that will be processed by
         endAddWedgeGizmos.
@@ -401,29 +381,4 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._added_wedge_gizmos.add(neighbor_virtual_helix)
     # end def
 
-    def setNumber(self):
-        """Updates the associated QGraphicsSimpleTextItem label text to match
-        the id_num. Adjusts the label position so it is centered regardless
-        of number of digits in the label.
-        """
-        num = self.idNum()
-        label = self._label
-
-        if num is not None:
-            label.setText("%d" % num)
-        else:
-            return
-
-        y_val = _RADIUS / 3
-        if num < 10:
-            label.setPos(_RADIUS / 1.5, y_val)
-        elif num < 100:
-            label.setPos(_RADIUS / 3, y_val)
-        else:  # _number >= 100
-            label.setPos(0, y_val)
-        b_rect = label.boundingRect()
-        posx = b_rect.width()/2
-        posy = b_rect.height()/2
-        label.setPos(_RADIUS-posx, _RADIUS-posy)
-    # end def
 # end class
