@@ -38,7 +38,6 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         FILTER_NAME (str): Belongs to the filter class 'virtual_helix'.
         is_active (bool): Does the item have focus.
         old_pen (QPen): temp storage for pen for easy restoration on appearance change.
-        wedge_gizmos (dict): dictionary of `WedgeGizmo` objects.
     """
     FILTER_NAME = 'virtual_helix' #TODO:  Figure out how this should be modified for this class
 
@@ -56,10 +55,6 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         #FIXME:  part_item isn't defined here, and scaleFactor comes from nucleicacidpartitem.py
         self.x, self.y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         self.setCenterPos(self.x, self.y)
-
-        #TODO:  Figure out what wedge_gizmos are.  They seem to have something to do with the wedges that show up to show which helices cross over
-        self.wedge_gizmos = {}
-        self._added_wedge_gizmos = set()
 
         self.setAcceptHoverEvents(True)
         self.setZValue(_ZVALUE)
@@ -318,67 +313,4 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
                 new_pos = parent_item.mapFromItem(part_item, new_pos)
             self.setPos(new_pos)
     # end def
-
-    def beginAddWedgeGizmos(self):
-        """Resets the list of WedgeGizmos that will be processed by
-        endAddWedgeGizmos.
-
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos, before
-        setWedgeGizmo and endAddWedgeGizmos.
-        """
-        self._added_wedge_gizmos.clear()
-    # end def
-
-    def endAddWedgeGizmos(self):
-        """Removes beginAddWedgeGizmos that no longer point at a neighbor virtual helix.
-
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos in,
-        after beginAddWedgeGizmos and setWedgeGizmo.
-        """
-        remove_list = []
-        scene = self.scene()
-        wg_dict = self.wedge_gizmos
-        recently_added = self._added_wedge_gizmos
-        for neighbor_virtual_helix in wg_dict.keys():
-            if neighbor_virtual_helix not in recently_added:
-                remove_list.append(neighbor_virtual_helix)
-        for nvh in remove_list:
-            wg = wg_dict.get(nvh)
-            del wg_dict[nvh]
-            scene.removeItem(wg)
-    # end def
-
-    def setWedgeGizmo(self, neighbor_virtual_helix, neighbor_virtual_helix_item):
-        """Adds a WedgeGizmo to oriented toward the specified neighbor vhi.
-
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos, in between
-        with beginAddWedgeGizmos and endAddWedgeGizmos.
-
-        Args:
-            neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem):
-            the neighboring virtual helix item
-        """
-        wg_dict = self.wedge_gizmos
-        nvhi = neighbor_virtual_helix_item
-
-        nvhi_name = nvhi.cnModel().getProperty('name')
-        pos = self.scenePos()
-        line = QLineF(pos, nvhi.scenePos())
-        line.translate(_RADIUS, _RADIUS)
-        if line.length() > (_RADIUS*1.99):
-            color = '#5a8bff'
-        else:
-            color = '#cc0000'
-            nvhi_name = nvhi_name + '*'  # mark as invalid
-        line.setLength(_RADIUS)
-        if neighbor_virtual_helix in wg_dict:
-            wedge_item = wg_dict[neighbor_virtual_helix]
-        else:
-            wedge_item = WedgeGizmo(_RADIUS, WEDGE_RECT, self)
-            wg_dict[neighbor_virtual_helix] = wedge_item
-        wedge_item.showWedge(line.angle(), color, outline_only=False)
-        self._added_wedge_gizmos.add(neighbor_virtual_helix)
-    # end def
-
 # end class
