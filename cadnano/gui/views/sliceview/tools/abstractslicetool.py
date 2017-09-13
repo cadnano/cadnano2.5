@@ -171,8 +171,7 @@ class AbstractSliceTool(QGraphicsObject):
 
         # Check if the click happened on the origin VH
         if mouse_point_vec.length() < self._RADIUS:
-            # return part_item.mapFromScene(target_scenepos)
-            return None
+            return part_item.mapFromScene(target_scenepos)
 
         angle_min = 9999
         direction_min = None
