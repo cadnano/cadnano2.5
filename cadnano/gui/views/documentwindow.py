@@ -14,6 +14,7 @@ from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.gui.ui.mainwindow import ui_mainwindow
 
+
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
 # # for an example of the QOpenGlWidget added in Qt 5.4
@@ -27,6 +28,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     Attributes:
         controller (DocumentController):
     """
+
     def __init__(self, parent=None, doc_ctrlr=None):
         super(DocumentWindow, self).__init__(parent)
         self.controller = doc_ctrlr
@@ -47,19 +49,36 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.tool_managers = None  # initialize
 
         # Slice setup
-        self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
-        self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),
-                                       parent=None,
-                                       window=self,
-                                       document=doc)
-        self.sliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.slicescene.addItem(self.sliceroot)
-        self.slicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.sliceroot.scene() == self.slicescene
-        self.slice_graphics_view.setScene(self.slicescene)
-        self.slice_graphics_view.scene_root_item = self.sliceroot
-        self.slice_graphics_view.setName("SliceView")
-        self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
+        # TODO:  Uncomment this when the slice view is implemented
+        #        self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
+        #        self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),
+        #                                       parent=None,
+        #                                       window=self,
+        #                                       document=doc)
+        #        self.sliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
+        #        self.slicescene.addItem(self.sliceroot)
+        #        self.slicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        #        assert self.sliceroot.scene() == self.slicescene
+        #        self.slice_graphics_view.setScene(self.slicescene)
+        #        self.slice_graphics_view.scene_root_item = self.sliceroot
+        #        self.slice_graphics_view.setName("SliceView")
+        #        self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
+
+        # Advanced Slice setup
+        self.advancedslicescene = QGraphicsScene(parent=self.slice_graphics_view)
+        self.advancedsliceroot = SliceRootItem(rect=self.advancedslicescene.sceneRect(),
+                                               parent=None,
+                                               window=self,
+                                               document=doc)
+        self.advancedsliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
+        self.advancedslicescene.addItem(self.advancedsliceroot)
+        self.advancedslicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert self.advancedsliceroot.scene() == self.advancedslicescene
+        self.advanced_slice_graphics_view.setScene(self.advancedslicescene)
+        self.advanced_slice_graphics_view.scene_root_item = self.advancedsliceroot
+        self.advanced_slice_graphics_view.setName("SliceView")
+        self.slice_tool_manager = SliceToolManager(self, self.advancedsliceroot)
+
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
         self.pathroot = PathRootItem(rect=self.pathscene.sceneRect(),
@@ -104,16 +123,19 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.statusBar().showMessage("")
 
         doc.setViewNames(['slice', 'path'])
+
     # end def
 
     def document(self):
         return self.controller.document()
+
     # end def
 
     def destroyWin(self):
         for mgr in self.tool_managers:
             mgr.destroy()
         self.controller = None
+
     # end def
 
     ### ACCESSORS ###
@@ -126,6 +148,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def activateSelection(self, isActive):
         self.path_graphics_view.activateSelection(isActive)
         self.slice_graphics_view.activateSelection(isActive)
+
     # end def
 
     ### EVENT HANDLERS ###
@@ -147,6 +170,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def changeEvent(self, event):
         QWidget.changeEvent(self, event)
+
     # end def
 
     ### DRAWING RELATED ###
@@ -157,4 +181,5 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.resize(self.settings.value("size", QSize(1100, 800)))
         self.move(self.settings.value("pos", QPoint(200, 200)))
         self.settings.endGroup()
+
 # end class
