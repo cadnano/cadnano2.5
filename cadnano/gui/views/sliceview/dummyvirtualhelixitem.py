@@ -38,19 +38,20 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
     """
     FILTER_NAME = 'virtual_helix' #TODO:  Figure out how this should be modified for this class
 
-    def __init__(self, x, y):
+    def __init__(self, part_item, x, y):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
-        AbstractVirtualHelixItem.__init__(self)
-        QGraphicsEllipseItem.__init__(self)
+        AbstractVirtualHelixItem.__init__(self, parent=part_item)
+        QGraphicsEllipseItem.__init__(self, parent=part_item)
 
         self.hide() #FIXME:  This doesn't seem to do anything
 
         self.x = x
         self.y = y
+#        self.x, self.y = model_part.locationQt(self._id_num, part_item.scaleFactor())
 
         self.setCenterPos(self.x, self.y)
 
@@ -94,6 +95,8 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         if parent_item != part_item:
             pos = parent_item.mapFromItem(part_item, pos)
         self.setPos(pos)
+        self.x = x
+        self.y = y
     # end def
 
     def getCenterScenePos(self):
@@ -118,6 +121,9 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         Args:
             event (QMouseEvent): contains parameters that describe the mouse event.
         """
+        from cadnano.util import qtdb_trace
+        qtdb_trace()
+
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             return
         if event.button() == Qt.RightButton:
@@ -167,10 +173,7 @@ class DummySliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem)
         Disconnects signals, and sets  internal references to label, part_item,
         and model_part to None, and finally removes the item from the scene.
         """
-        self._controller.disconnectSignals()
-        self._controller = None
-        part_item = self._part_item
-        tool = part_item._getActiveTool()
+        tool = self.part_item._getActiveTool()
         if tool.methodPrefix() == "selectTool":
             tool.hideLineItem()
         self.scene().removeItem(self._label)
