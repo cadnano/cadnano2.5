@@ -50,22 +50,25 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         # Slice setup
         # TODO:  Uncomment this when the slice view is implemented
-        #        self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
-        #        self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),
-        #                                       parent=None,
-        #                                       window=self,
-        #                                       document=doc)
-        #        self.sliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
-        #        self.slicescene.addItem(self.sliceroot)
-        #        self.slicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        #        assert self.sliceroot.scene() == self.slicescene
-        #        self.slice_graphics_view.setScene(self.slicescene)
-        #        self.slice_graphics_view.scene_root_item = self.sliceroot
-        #        self.slice_graphics_view.setName("SliceView")
-        #        self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
+        # TODO:  Changes must also be made in documentcontroller.py to update this view
+        # TODO:  Changes must also be made below to add this to tool_managers etc.
+        #self.slicescene = QGraphicsScene(parent=self.slice_graphics_view)
+        #self.sliceroot = SliceRootItem(rect=self.slicescene.sceneRect(),
+        #                               parent=None,
+        #                               window=self,
+        #                               document=doc)
+        #self.sliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
+        #self.slicescene.addItem(self.sliceroot)
+        #self.slicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        #assert self.sliceroot.scene() == self.slicescene
+        #self.slice_graphics_view.setScene(self.slicescene)
+        #self.slice_graphics_view.scene_root_item = self.sliceroot
+        #self.slice_graphics_view.setName("SliceView")
+        #self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
+        #XXX: This is a problem
 
         # Advanced Slice setup
-        self.advancedslicescene = QGraphicsScene(parent=self.slice_graphics_view)
+        self.advancedslicescene = QGraphicsScene(parent=self.advanced_slice_graphics_view)
         self.advancedsliceroot = SliceRootItem(rect=self.advancedslicescene.sceneRect(),
                                                parent=None,
                                                window=self,
@@ -77,7 +80,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.advanced_slice_graphics_view.setScene(self.advancedslicescene)
         self.advanced_slice_graphics_view.scene_root_item = self.advancedsliceroot
         self.advanced_slice_graphics_view.setName("AdvancedSliceView")
-        self.slice_tool_manager = SliceToolManager(self, self.advancedsliceroot)
+        self.advanced_slice_tool_manager = SliceToolManager(self, self.advancedsliceroot)
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -99,9 +102,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
         self.pathscene.addItem(self.path_color_panel)
         self.path_tool_manager = PathToolManager(self, self.pathroot)
-        self.slice_tool_manager.path_tool_manager = self.path_tool_manager
-        self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
-        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
+        self.advanced_slice_tool_manager.path_tool_manager = self.path_tool_manager
+        self.path_tool_manager.slice_tool_manager = self.advanced_slice_tool_manager
+        self.tool_managers = (self.path_tool_manager, self.advanced_slice_tool_manager)
 
         self.insertToolBarBreak(self.main_toolbar)
 
