@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.7
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -52,6 +52,27 @@ class Ui_MainWindow(object):
         self.slice_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setObjectName("slice_graphics_view")
+        self.advanced_slice_graphics_view = CustomQGraphicsView(self.main_splitter)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.advanced_slice_graphics_view.sizePolicy().hasHeightForWidth())
+        self.advanced_slice_graphics_view.setSizePolicy(sizePolicy)
+        self.advanced_slice_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
+        self.advanced_slice_graphics_view.setBaseSize(QtCore.QSize(480, 0))
+        self.advanced_slice_graphics_view.setMouseTracking(True)
+        self.advanced_slice_graphics_view.setFocusPolicy(QtCore.Qt.WheelFocus)
+        self.advanced_slice_graphics_view.setStyleSheet("QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }")
+        self.advanced_slice_graphics_view.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.advanced_slice_graphics_view.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.advanced_slice_graphics_view.setLineWidth(0)
+        self.advanced_slice_graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.advanced_slice_graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.advanced_slice_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
+        self.advanced_slice_graphics_view.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+        self.advanced_slice_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.advanced_slice_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.advanced_slice_graphics_view.setObjectName("advanced_slice_graphics_view")
         self.path_graphics_view = CustomQGraphicsView(self.main_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
