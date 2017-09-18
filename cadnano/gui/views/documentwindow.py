@@ -76,7 +76,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         assert self.advancedsliceroot.scene() == self.advancedslicescene
         self.advanced_slice_graphics_view.setScene(self.advancedslicescene)
         self.advanced_slice_graphics_view.scene_root_item = self.advancedsliceroot
-        self.advanced_slice_graphics_view.setName("SliceView")
+        self.advanced_slice_graphics_view.setName("AdvancedSliceView")
         self.slice_tool_manager = SliceToolManager(self, self.advancedsliceroot)
 
         # Path setup
