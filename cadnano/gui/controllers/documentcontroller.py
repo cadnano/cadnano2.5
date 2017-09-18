@@ -658,7 +658,7 @@ class DocumentController():
         self._writeFileOpenPath(os.path.dirname(fname))
 
         self.win.path_graphics_view.setViewportUpdateOn(False)
-        self.win.slice_graphics_view.setViewportUpdateOn(False)
+        self.win.advanced_slice_graphics_view.setViewportUpdateOn(False)
 
         # NC commented out single document stuff
         if ONLY_ONE:
@@ -667,10 +667,10 @@ class DocumentController():
         self._document.readFile(fname)
 
         self.win.path_graphics_view.setViewportUpdateOn(True)
-        self.win.slice_graphics_view.setViewportUpdateOn(True)
+        self.win.advanced_slice_graphics_view.setViewportUpdateOn(True)
 
         self.win.path_graphics_view.update()
-        self.win.slice_graphics_view.update()
+        self.win.advanced_slice_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
