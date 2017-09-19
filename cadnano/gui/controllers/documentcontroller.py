@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 import os
 
-from PyQt5.QtCore import Qt, QFileInfo, QRect
-from PyQt5.QtCore import QSettings, QSize, QDir
-from PyQt5.QtGui import QPainter, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog
-from PyQt5.QtWidgets import QFileDialog, QActionGroup
-from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
-from PyQt5.QtWidgets import QStyleOptionGraphicsItem
+from PyQt5.QtCore import QDir, QFileInfo, QRect, QSettings, QSize, Qt
+from PyQt5.QtGui import QKeySequence, QPainter
 from PyQt5.QtSvg import QSvgGenerator
-from cadnano.gui.views.documentwindow import DocumentWindow
+from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
+                             QGraphicsItem, QMessageBox,
+                             QStyleOptionGraphicsItem)
+
+from cadnano import app, setReopen, util
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
-from cadnano import app, setReopen, util
+from cadnano.gui.views.documentwindow import DocumentWindow
 
 DEFAULT_VHELIX_FILTER = True
 ONLY_ONE = True
@@ -661,7 +660,6 @@ class DocumentController():
         self.win.slice_graphics_view.setViewportUpdateOn(False)
         self.win.advanced_slice_graphics_view.setViewportUpdateOn(False)
 
-        # NC commented out single document stuff
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
