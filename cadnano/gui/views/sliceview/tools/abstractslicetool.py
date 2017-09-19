@@ -1,12 +1,12 @@
 """Summary
 """
 import math
-from PyQt5.QtCore import QPointF, QLineF, QRectF
-from PyQt5.QtWidgets import QGraphicsObject
-from PyQt5.QtWidgets import QGraphicsLineItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+
+from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
 from cadnano.gui.views.sliceview import slicestyles as styles
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
+from PyQt5.QtCore import QLineF, QPointF, QRectF
+from PyQt5.QtWidgets import (QGraphicsEllipseItem, QGraphicsLineItem,
+                             QGraphicsObject)
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -44,7 +44,7 @@ class AbstractSliceTool(QGraphicsObject):
         super(AbstractSliceTool, self).__init__(parent=manager.viewroot)
         """ Pareting to viewroot to prevent orphan _line_item from occuring
         """
-        self.sgv = None
+        self.sgv = None # SGV is "Slice Graphics View"
         self.manager = manager
         self._active = False
         self._last_location = None
@@ -262,7 +262,7 @@ class AbstractSliceTool(QGraphicsObject):
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        self.sgv = self.manager.window.slice_graphics_view
+        self.sgv = self.manager.window.advanced_slice_graphics_view
         if hasattr(self, 'getCustomContextMenu'):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
