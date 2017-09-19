@@ -45,6 +45,7 @@ class AbstractSliceTool(QGraphicsObject):
         """ Pareting to viewroot to prevent orphan _line_item from occuring
         """
         self.sgv = None # SGV is "Slice Graphics View"
+        self.asgv = None # SGV is "Slice Graphics View"
         self.manager = manager
         self._active = False
         self._last_location = None
@@ -262,14 +263,17 @@ class AbstractSliceTool(QGraphicsObject):
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        self.sgv = self.manager.window.advanced_slice_graphics_view
+        self.sgv = self.manager.window.slice_graphics_view
+        self.asgv = self.manager.window.advanced_slice_graphics_view
         if hasattr(self, 'getCustomContextMenu'):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
                 self.sgv.customContextMenuRequested.disconnect()
+                self.asgv.customContextMenuRequested.disconnect()
             except:
                 pass
             self.sgv.customContextMenuRequested.connect(self.getCustomContextMenu)
+            self.asgv.customContextMenuRequested.connect(self.getCustomContextMenu)
     # end def
 
     def deactivate(self):
@@ -281,7 +285,9 @@ class AbstractSliceTool(QGraphicsObject):
         if hasattr(self, 'getCustomContextMenu'):
             # print("disconnecting ccm")
             self.sgv.customContextMenuRequested.disconnect(self.getCustomContextMenu)
+            self.asgv.customContextMenuRequested.disconnect(self.getCustomContextMenu)
         self.sgv = None
+        self.asgv = None
         self.is_started = False
         self.hideLineItem()
         self._vhi = None
