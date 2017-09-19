@@ -118,6 +118,8 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
         if part_item is not self.part_item:
             if self.sgv is not None:
                 # attempt to enforce good housekeeping, not required
@@ -133,9 +135,9 @@ class SelectSliceTool(AbstractSliceTool):
             self.group.setParentItem(part_item)
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
-            self.sgv.activateSelection(True)
-
-            self.sgv.rubberBandChanged.connect(self.selectRubberband)
+            if self.sgv is not None:
+                self.sgv.activateSelection(True)
+                self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
