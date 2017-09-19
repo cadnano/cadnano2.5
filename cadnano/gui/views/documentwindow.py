@@ -156,6 +156,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def activateSelection(self, isActive):
         self.path_graphics_view.activateSelection(isActive)
         self.slice_graphics_view.activateSelection(isActive)
+        self.advanced_slice_graphics_view.activateSelection(isActive)
 
     # end def
 
