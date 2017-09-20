@@ -128,6 +128,13 @@ class SelectSliceTool(AbstractSliceTool):
                 except:
                     # required for first call
                     pass
+            if self.asgv is not None:
+                # attempt to enforce good housekeeping, not required
+                try:
+                    self.asgv.rubberBandChanged.disconnect(self.selectRubberband)
+                except:
+                    # required for first call
+                    pass
             if self.part_item is not None:
                 # print("modelClear yikes")
                 self.modelClear()
@@ -135,9 +142,21 @@ class SelectSliceTool(AbstractSliceTool):
             self.group.setParentItem(part_item)
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
+            # TODO[NF]:  Determine why self.sgv is None when the dual-slice view is enabled
+            # TODO[NF]:  Now that SVG is being set properly, can the conditional be removed?
+            # TODO[NF]:  This might be better kept as an error condition logged to logger.error
             if self.sgv is not None:
                 self.sgv.activateSelection(True)
                 self.sgv.rubberBandChanged.connect(self.selectRubberband)
+            else:
+                # TODO[NF]:  Use logger.error here
+                print("SGV is still none")
+            if self.asgv is not None:
+                self.asgv.activateSelection(True)
+                self.asgv.rubberBandChanged.connect(self.selectRubberband)
+            else:
+                # TODO[NF]:  Use logger.error here
+                print("ASGV is still none")
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
@@ -389,6 +408,11 @@ class SelectSliceTool(AbstractSliceTool):
                 self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
             except:
                 pass    # required for first call
+        if self.asgv is not None:
+            try:
+                self.asgv.rubberBandChanged.disconnect(self.selectRubberband)
+            except:
+                pass    # required for first call
         self.modelClear()
         if self.snap_origin_item is not None:
             self.snap_origin_item.setSnapOrigin(False)
@@ -415,6 +439,19 @@ class SelectSliceTool(AbstractSliceTool):
                 copy_act.triggered.connect(self.pasteClipboard)
                 menu.addAction(copy_act)
             menu.exec_(sgv.mapToGlobal(point))
+
+            asgv = self.asgv
+            amenu = QMenu(asgv)
+            acopy_act = QAction("copy selection", asgv)
+            acopy_act.setStatusTip("copy selection")
+            acopy_act.triggered.connect(self.copySelection)
+            amenu.addAction(acopy_act)
+            if self.clip_board:
+                acopy_act = QAction("paste", asgv)
+                acopy_act.setStatusTip("paste from clip board")
+                acopy_act.triggered.connect(self.pasteClipboard)
+                amenu.addAction(acopy_act)
+            amenu.exec_(asgv.mapToGlobal(point))
     # end def
 # end class
 
@@ -518,6 +555,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             if tool.is_selection_active:
                 # print("clicking the box")
                 pos = event.scenePos()
+                # TODO[NF]: Figure out if SGV needs to be updated here to reflect ASGV
                 for item in tool.sgv.scene().items(pos):
                     if isinstance(item, SliceVirtualHelixItem):
                         doc = tool.manager.document
