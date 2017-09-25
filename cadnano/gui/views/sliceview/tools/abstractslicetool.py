@@ -59,9 +59,9 @@ class AbstractSliceTool(QGraphicsObject):
         self.vectors = self.setVectors()
         self.part_item = None
 
-        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
-        self.vhi_hint_item.setPen(_MOD_PEN)
-        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
+#        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
+#        self.vhi_hint_item.setPen(_MOD_PEN)
+#        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
     # end def
 
     ######################## Drawing #######################################
@@ -95,10 +95,11 @@ class AbstractSliceTool(QGraphicsObject):
     # end def
 
     def setSelectionFilter(self, filter_name_list):
-        if 'virtual_helix' in filter_name_list:
-            self.vhi_hint_item.setPen(_MOD_PEN)
-        else:
-            self.vhi_hint_item.setPen(_INACTIVE_PEN)
+        pass
+#        if 'virtual_helix' in filter_name_list:
+#            self.vhi_hint_item.setPen(_MOD_PEN)
+#        else:
+#            self.vhi_hint_item.setPen(_INACTIVE_PEN)
     # end def
 
     def resetTool(self):
@@ -127,7 +128,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        self.vhi_hint_item.setParentItem(part_item)
+#        self.vhi_hint_item.setParentItem(part_item)
         self.part_item = part_item
     # end def
 
@@ -148,14 +149,15 @@ class AbstractSliceTool(QGraphicsObject):
             pos = self.findNearestPoint(part_item, event.scenePos())
         else:
             pos =  event.pos()
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+#        self.vhi_hint_item.setPos(  pos -
+#                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
         return pos
     # end def
 
     def setHintPos(self, pos):
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        pass
+#        self.vhi_hint_item.setPos(  pos -
+#                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -212,7 +214,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        self.vhi_hint_item.hide()
+#        self.vhi_hint_item.hide()
         li = self._line_item
         li.hide()
         li.setParentItem(self)

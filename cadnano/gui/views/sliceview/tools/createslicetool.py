@@ -39,6 +39,6 @@ class CreateSliceTool(AbstractSliceTool):
             TYPE: Description
         """
         self._line_item.show()
-        self.vhi_hint_item.show()
+#        self.vhi_hint_item.show()
         self.is_started = True
     # end def
