@@ -49,8 +49,8 @@ class AbstractSliceTool(QGraphicsObject):
         self.manager = manager
         self._active = False
         self._last_location = None
-        self._line_item = QGraphicsLineItem(self)
-        self._line_item.hide()
+#        self._line_item = QGraphicsLineItem(self)
+#        self._line_item.hide()
         self._vhi = None
 
         self.hide()
@@ -88,9 +88,9 @@ class AbstractSliceTool(QGraphicsObject):
         """
         rad = self._RADIUS
         self._vhi = virtual_helix_item
-        li = self._line_item
-        li.setParentItem(virtual_helix_item)
-        li.setLine(rad, rad, rad, rad)
+#        li = self._line_item
+#        li.setParentItem(virtual_helix_item)
+#        li.setLine(rad, rad, rad, rad)
         # li.setLine(0., 0., 0., 0.)
     # end def
 
@@ -108,7 +108,8 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        self._line_item.setParentItem(self)
+        pass
+#        self._line_item.setParentItem(self)
 
     def idNum(self):
         """Summary
@@ -166,31 +167,32 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_scenepos (TYPE): Description
         """
-        li = self._line_item
-        pos = li.mapFromScene(target_scenepos)
+        pass
+#        li = self._line_item
+#        pos = li.mapFromScene(target_scenepos)
 
-        line = li.line()
-        mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
+#        line = li.line()
+#        mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
 
         # Check if the click happened on the origin VH
-        if mouse_point_vec.length() < self._RADIUS:
-            return part_item.mapFromScene(target_scenepos)
+#        if mouse_point_vec.length() < self._RADIUS:
+#            return part_item.mapFromScene(target_scenepos)
 
-        angle_min = 9999
-        direction_min = None
-        for vector in self.vectors:
-            angle_new = mouse_point_vec.angleTo(vector)
-            if angle_new < angle_min:
-                direction_min = vector
-                angle_min = angle_new
-        if direction_min is not None:
-            li.setLine(direction_min)
-            return part_item.mapFromItem(li, direction_min.p2())
-        else:
-            print("default point")
-            line.setP2(pos)
-            li.setLine(line)
-            return part_item.mapFromItem(li, pos)
+#        angle_min = 9999
+#        direction_min = None
+#        for vector in self.vectors:
+#            angle_new = mouse_point_vec.angleTo(vector)
+#            if angle_new < angle_min:
+#                direction_min = vector
+#                angle_min = angle_new
+#        if direction_min is not None:
+#            li.setLine(direction_min)
+#            return part_item.mapFromItem(li, direction_min.p2())
+#        else:
+#            print("default point")
+#            line.setP2(pos)
+#            li.setLine(line)
+#            return part_item.mapFromItem(li, pos)
     # end def
 
     def findNextPoint(self, part_item, target_part_pos):
@@ -199,13 +201,14 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_part_pos (TYPE): Description
         """
-        li = self._line_item
-        pos = li.mapFromItem(part_item, target_part_pos)
-        for i, vector in enumerate(self.vectors):
-            if vector.p2() == pos:
-                return part_item.mapFromItem(li, self.vectors[i - 1].p2())
-        # origin VirtualHelixItem is overlapping destination VirtualHelixItem
-        return part_item.mapFromItem(li, self.vectors[0].p2())
+        pass
+#        li = self._line_item
+#        pos = li.mapFromItem(part_item, target_part_pos)
+#        for i, vector in enumerate(self.vectors):
+#            if vector.p2() == pos:
+#                return part_item.mapFromItem(li, self.vectors[i - 1].p2())
+#        # origin VirtualHelixItem is overlapping destination VirtualHelixItem
+#        return part_item.mapFromItem(li, self.vectors[0].p2())
     # end def
 
     def hideLineItem(self):
@@ -214,15 +217,16 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
+        pass
 #        self.vhi_hint_item.hide()
-        li = self._line_item
-        li.hide()
-        li.setParentItem(self)
-        line = li.line()
-        line.setP2(self._CENTER_OF_HELIX)
-        li.setLine(line)
-        # li.hide()
-        self.is_started = False
+#        li = self._line_item
+#        li.hide()
+#        li.setParentItem(self)
+#        line = li.line()
+#        line.setP2(self._CENTER_OF_HELIX)
+#        li.setLine(line)
+#        # li.hide()
+#        self.is_started = False
     # end def
 
     # def hoverEnterEvent(self, event):

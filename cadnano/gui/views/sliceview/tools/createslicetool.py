@@ -15,6 +15,10 @@ class CreateSliceTool(AbstractSliceTool):
             manager (TYPE): Description
         """
         super(CreateSliceTool, self).__init__(manager)
+        try:
+            print('FILTER NAME IS %s' % self.FILTER_NAME)
+        except AttributeError:
+            print('FILTER NAME NOT SET IN INIT')
 
     def __repr__(self):
         """Summary
@@ -38,7 +42,7 @@ class CreateSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
-        self._line_item.show()
+#        self._line_item.show()
 #        self.vhi_hint_item.show()
         self.is_started = True
     # end def
