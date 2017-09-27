@@ -3,6 +3,8 @@
 Attributes:
     SNAP_WIDTH (int): Description
 """
+import logging
+
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
@@ -12,6 +14,9 @@ from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVir
 from cadnano.gui.palette import getPenObj, getBrushObj
 from . import slicestyles as styles
 from .sliceextras import WedgeGizmo, WEDGE_RECT
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -48,6 +53,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
+        logger.info("Creating SliceVirtualHelixItem")
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
@@ -234,7 +240,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             event (QMouseEvent): contains parameters that describe the mouse event
         """
         part = self._model_part
-        print("pencilToolMousePress", part)
+        logger.info("pencilToolMousePress", part)
         # tool.attemptToCreateStrand
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
