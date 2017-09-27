@@ -20,7 +20,8 @@ class GridItem(QGraphicsPathItem):
     Attributes:
         allow_snap (TYPE): Description
         bounds (TYPE): Description
-        dots (TYPE): Description
+        dots (tuple): Index 0 corresponds to the size of the dot, index 1
+        corresponds to half the size of the dot
         draw_lines (bool): Description
         grid_type (TYPE): Description
         part_item (TYPE): Description
@@ -120,7 +121,8 @@ class GridItem(QGraphicsPathItem):
 
         path = QPainterPath()
         is_pen_down = False
-        draw_lines = self.draw_lines
+        # TODO[NF]: REMOVE ME
+        draw_lines = False #self.draw_lines
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
@@ -134,10 +136,13 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
+                # TODO[NF]: REMOVE ME
+                dot_size = 2*15.
+                stroke_weight = 0.5
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
-                pt.setPen(getPenObj(Qt.blue, 1.0))
+                pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
             is_pen_down = False
         # end for i
@@ -248,6 +253,9 @@ class ClickArea(QGraphicsEllipseItem):
     # end def
 
     def mousePressEvent(self, event):
+        """Event that is triggered when the mouse is clicked anywhere on the
+        grid.
+        """
         return self.parent_obj.mousePressEvent(event)
 # end class
 
@@ -283,11 +291,14 @@ class GridPoint(QGraphicsEllipseItem):
             coordinates of the the event, and previous event.
 
         Returns:
-            TYPE: Description
+            None
         """
+        from cadnano.util import qtdb_trace
         if self.grid.allow_snap:
             part_item = self.grid.part_item
             tool = part_item._getActiveTool()
+            print(type(tool))
+            qtdb_trace()
             if tool.FILTER_NAME not in part_item.part().document().filter_set:
                 return
             tool_method_name = tool.methodPrefix() + "MousePress"
@@ -303,11 +314,14 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
-        self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
-        self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
+        return
+#        self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
+#        self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
         part_item = self.grid.part_item
-        tool = part_item._getActiveTool()
-        tool.setHintPos(self.scenePos())
+#        tool = part_item._getActiveTool()
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+#        tool.setHintPos(self.scenePos())
     # end def
 
     def hoverLeaveEvent(self, event):
@@ -316,6 +330,7 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
+        return
         self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.0))
     # end def
@@ -337,17 +352,20 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolMousePress(self, tool, part_item, event):
-        """Summary
+        """Called by mousePressEvent when clicking on the grid
 
         Args:
-            tool (TYPE): Description
-            part_item (TYPE): Description
-            event (TYPE): Description
+            tool (CreateSliceTool): The tool that is being used
+            part_item (TYPE):
+            event (QGraphicsSceneMouseEvent): The event that the mouseclick
+            triggered
         """
+        from cadnano.util import qtdb_trace
         part = part_item.part()
         part.setSelected(True)
         # print("paws")
         alt_event = GridEvent(self, self.offset)
+        qtdb_trace()
         part_item.createToolMousePress(tool, event, alt_event)
     # end def
 
