@@ -62,6 +62,12 @@ class SelectSliceTool(AbstractSliceTool):
         self.individual_pick = False
         self.snap_origin_item = None
         self.clip_board = None
+        #TODO[NF]:  REMOVE/add Logger
+        try:
+            print('FILTER NAME IS %s' % self.FILTER_NAME)
+        except AttributeError:
+            print('FILTER NAME NOT SET IN INIT')
+        print("A select SLICE tool was instantiated")
     # end def
 
     def __repr__(self):
