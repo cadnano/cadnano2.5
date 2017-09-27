@@ -615,7 +615,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def hoverLeaveEvent(self, event):
         tool = self._getActiveTool()
-        tool.hideLineItem()
+        #tool.hideLineItem()
 
     def getModelPos(self, pos):
         """Y-axis is inverted in Qt +y === DOWN
