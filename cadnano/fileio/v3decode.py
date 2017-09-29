@@ -77,7 +77,7 @@ def decodePart(document, part_dict, emit_signals=False):
                 low_idx, high_idx = idxs
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
                                                         use_undostack=False)
-        part.refreshSegments(id_num)   # update segments
+            part.refreshSegments(id_num)   # update segments
     # end def
 
     xovers = part_dict['xovers']
@@ -193,6 +193,3 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
 
     return new_vh_id_set
 # end def
-
-
-
