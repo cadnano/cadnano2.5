@@ -58,6 +58,10 @@ class GridItem(QGraphicsPathItem):
         part = part_item.part()
         radius = part.radius()
         self.bounds = bounds = part_item.bounds()
+        print("Bounds are %s", bounds)
+        print("Bounds are %s", part_item.bounds())
+        if bounds != part_item.bounds():
+            print("BOUNDS NOT EQUAL")
         self.removePoints()
         if self.grid_type == GridType.HONEYCOMB:
             self.doHoneycomb(part_item, radius, bounds)
@@ -371,7 +375,7 @@ class GridPoint(QGraphicsEllipseItem):
 
 
 class GridEvent(object):
-    """Summary
+    """Instantiated by selectToolMousePress or createToolMousePress.
 
     Attributes:
         grid_pt (TYPE): Description

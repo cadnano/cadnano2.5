@@ -92,7 +92,6 @@ class Ui_MainWindow(object):
         self.path_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.path_graphics_view.setObjectName("path_graphics_view")
         self.outliner_property_splitter = QtWidgets.QSplitter(self.main_splitter)
-        self.outliner_property_splitter.setBaseSize(QtCore.QSize(0, 0))
         self.outliner_property_splitter.setOrientation(QtCore.Qt.Vertical)
         self.outliner_property_splitter.setHandleWidth(0)
         self.outliner_property_splitter.setObjectName("outliner_property_splitter")

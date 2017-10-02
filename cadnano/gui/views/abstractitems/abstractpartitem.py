@@ -56,6 +56,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         view_name = self._viewroot.name
         self._model_part.changeInstanceProperty(self._model_instance,
                                         view_name, 'position', position)
+        print("finished Drag (abstract)")
     # end def
 
     def document(self):

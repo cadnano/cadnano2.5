@@ -162,16 +162,23 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     ### EVENT HANDLERS ###
     def focusInEvent(self):
+        """Handle an OS focus change into cadnano."""
         app().undoGroup.setActiveStack(self.controller.undoStack())
 
     def moveEvent(self, event):
-        """Reimplemented to save state on move."""
+        """Handle the moving of the cadnano window itself.
+
+        Reimplemented to save state on move.
+        """
         self.settings.beginGroup("MainWindow")
         self.settings.setValue("pos", self.pos())
         self.settings.endGroup()
 
     def resizeEvent(self, event):
-        """Reimplemented to save state on resize."""
+        """Handle the resizing of the cadnano window itself.
+
+        Reimplemented to save state on resize.
+        """
         self.settings.beginGroup("MainWindow")
         self.settings.setValue("size", self.size())
         self.settings.endGroup()

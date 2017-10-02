@@ -185,8 +185,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem = None
     # end def
 
-    def partVirtualHelicesTranslatedSlot(self, sender,
-                                         vh_set, left_overs,
+    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs,
                                          do_deselect):
         """
         left_overs are neighbors that need updating due to changes
@@ -449,16 +448,22 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
-        """Summary
+        """Reconfigures the rectangle that is the document.
 
         Args:
-            top_left (TYPE): Description
-            bottom_right (TYPE): Description
+            top_left (tuple): A tuple corresponding to the x-y coordinates of
+            top left corner of the document
+
+            bottom_right (tuple): A tuple corresponding to the x-y coordinates
+            of the bottom left corner of the document
 
         Returns:
             tuple: tuple of point tuples representing the top_left and
-                bottom_right as reconfigured with padding
+            bottom_right as reconfigured with padding
+
+        UPDATES
         """
+        print('reconfigureRect*************************8')
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
@@ -482,8 +487,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Enlarges Part Rectangle to fit the model bounds.  Call this
         when adding a SliceVirtualHelixItem.
         """
+        print("enlargeRectToFit")
         p = self._BOUNDING_RECT_PADDING
-        xTL, yTL, xBR, yBR = self.getModelBounds()
+        from cadnano.util import qtdb_trace
+        qtdb_trace()
+#        xTL, yTL, xBR, yBR = self.bounds()
+#        yTL, xTL, xBR, yBR = self.bounds()
+        #xTL, yTL, xBR, yBR = self.getModelBounds()
+        left, right, bottom, top = self.bounds()
+        xTL = left
+        xBR = right
+        yTL = top
+        yBR = bottom
         xTL = xTL - p
         yTL = yTL - p
         xBR = xBR + p
@@ -513,6 +528,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """update the boundaries to what's in the model with a minimum
         size
         """
+        # UPDATES
+        print("boundRectToModel#########################")
+        # Should this call setRect instead?
         xTL, yTL, xBR, yBR = self.getModelBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
