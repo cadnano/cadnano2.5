@@ -14,7 +14,6 @@ FILL_COLOR = '#ffffff'
 class GrabCornerItem(QGraphicsRectItem):
     """Provides the ability to resize the document."""
     def __init__(self, width, color, is_resizable, parent):
-        print("NEW GRABCORNERITEM")
         super(GrabCornerItem, self).__init__(parent)
         self.setRect(QRectF(0, 0, width, width))
         self.width = width
@@ -124,7 +123,6 @@ class GrabCornerItem(QGraphicsRectItem):
             parent.setMovable(False)
             QGraphicsItem.mouseReleaseEvent(parent, event)
             parent.finishDrag()
-        print("DONE WITH mouseRELEASE")
     # end def
 
     def focusWindowChangedSlot(self, focus_window):

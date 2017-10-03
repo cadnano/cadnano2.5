@@ -443,10 +443,12 @@ def qtdb_trace():
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
-    logger.info('No debug')
-    return
-    import pdb
-    from PyQt5.QtCore import pyqtRemoveInputHook
+    if False:
+        logger.info('No debug')
+        return
+    else:
+        import pdb
+        from PyQt5.QtCore import pyqtRemoveInputHook
 
     pyqtRemoveInputHook()
     pdb.set_trace()

@@ -31,9 +31,6 @@ class SelectionItemGroup(QGraphicsItemGroup):
             constraint (str, optional): Description
             parent (None, optional): Description
         """
-        from cadnano.util import qtdb_trace
-        #qtdb_trace()
-
         super(SelectionItemGroup, self).__init__(parent)
         self.viewroot = parent
         self.setFiltersChildEvents(True)

@@ -461,7 +461,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
         """
-        print('reconfigureRect*************************8')
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
@@ -524,12 +523,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def boundRectToModel(self):
-        """update the boundaries to what's in the model with a minimum
-        size
+        """Update the size of the rectangle corresponding to the grid to
+        the size of the model or a minimum size (whichever is greater).
+
+        :rtype: None
         """
-        # UPDATES
-        print("boundRectToModel#########################")
-        # Should this call setRect instead?
         xTL, yTL, xBR, yBR = self.getModelBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
@@ -539,6 +537,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             Tuple (top_left, bottom_right)
+
+        :rtype: Tuple where
         """
         xLL, yLL, xUR, yUR = self.part().boundDimensions(self.scale_factor)
         return xLL, -yUR, xUR, -yLL
