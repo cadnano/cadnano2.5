@@ -4,15 +4,17 @@ from PyQt5.QtCore import QPoint, QSize
 from PyQt5.QtWidgets import QGraphicsScene
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QApplication, QWidget, QAction
+from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
+from cadnano.gui.ui.mainwindow import ui_mainwindow
+from cadnano.gui.views.gridview.gridrootitem import GridRootItem
+from cadnano.gui.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
-from cadnano.gui.ui.mainwindow import ui_mainwindow
 
 
 # from PyQt5.QtOpenGL import QGLWidget
@@ -67,19 +69,19 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager = SliceToolManager(self, self.sliceroot)
 
         # Advanced Slice setup
-        self.advancedslicescene = QGraphicsScene(parent=self.advanced_slice_graphics_view)
-        self.advancedsliceroot = SliceRootItem(rect=self.advancedslicescene.sceneRect(),
-                                               parent=None,
-                                               window=self,
-                                               document=doc)
-        self.advancedsliceroot.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.advancedslicescene.addItem(self.advancedsliceroot)
-        self.advancedslicescene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.advancedsliceroot.scene() == self.advancedslicescene
-        self.advanced_slice_graphics_view.setScene(self.advancedslicescene)
-        self.advanced_slice_graphics_view.scene_root_item = self.advancedsliceroot
-        self.advanced_slice_graphics_view.setName("AdvancedSliceView")
-        self.advanced_slice_tool_manager = SliceToolManager(self, self.advancedsliceroot)
+        self.gridscene = QGraphicsScene(parent=self.grid_graphics_view)
+        self.gridroot = GridRootItem(rect=self.gridscene.sceneRect(),
+                                     parent=None,
+                                     window=self,
+                                     document=doc)
+        self.gridroot.setFlag(QGraphicsItem.ItemHasNoContents)
+        self.gridscene.addItem(self.gridroot)
+        self.gridscene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert self.gridroot.scene() == self.gridscene
+        self.grid_graphics_view.setScene(self.gridscene)
+        self.grid_graphics_view.scene_root_item = self.gridroot
+        self.grid_graphics_view.setName("GridView")
+        self.grid_tool_manager = GridToolManager(self, self.gridroot)
 
         # Path setup
         self.pathscene = QGraphicsScene(parent=self.path_graphics_view)
@@ -105,16 +107,16 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
 
-        self.advanced_slice_tool_manager.path_tool_manager = self.path_tool_manager
-        self.path_tool_manager.advanced_slice_tool_manager = self.advanced_slice_tool_manager
+        self.grid_tool_manager.path_tool_manager = self.path_tool_manager
+        self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
 
-        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.advanced_slice_tool_manager)
+        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
 
         self.insertToolBarBreak(self.main_toolbar)
 
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()
-        self.advanced_slice_graphics_view.setupGL()
+        self.grid_graphics_view.setupGL()
 
         # Edit menu setup
         self.actionUndo = doc_ctrlr.undoStack().createUndoAction(self)
@@ -156,7 +158,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def activateSelection(self, isActive):
         self.path_graphics_view.activateSelection(isActive)
         self.slice_graphics_view.activateSelection(isActive)
-        self.advanced_slice_graphics_view.activateSelection(isActive)
+        self.grid_graphics_view.activateSelection(isActive)
 
     # end def
 

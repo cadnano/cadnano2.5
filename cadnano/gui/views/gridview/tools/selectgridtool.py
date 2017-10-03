@@ -4,11 +4,11 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
-from cadnano.fileio import v3encode, v3decode
-from cadnano.gui.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
+from cadnano.gui.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
-from cadnano.gui.views.sliceview import slicestyles as styles
-from .abstractslicetool import AbstractSliceTool
+from cadnano.fileio import v3encode, v3decode
+from cadnano.gui.views.gridview import gridstyles as styles
+from .abstractgridtool import AbstractGridTool
 
 
 def normalizeRect(rect):
@@ -34,8 +34,8 @@ _SELECT_COLOR = "#ff0000"
 _TEST_COLOR = "#00ff00"
 
 
-class SelectSliceTool(AbstractSliceTool):
-    """Handles SelectTool operations in the Slice view
+class SelectGridTool(AbstractGridTool):
+    """Handles SelectTool operations in the Grid view
 
     Attributes:
         clip_board (TYPE): Description
@@ -53,21 +53,15 @@ class SelectSliceTool(AbstractSliceTool):
         Args:
             manager (TYPE): Description
         """
-        super(SelectSliceTool, self).__init__(manager)
+        super(SelectGridTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
-        self.group = SliceSelectionGroup(self)
+        self.group = GridSelectionGroup(self)
         self.group.hide()
         self.is_selection_active = False
         self.individual_pick = False
         self.snap_origin_item = None
         self.clip_board = None
-        #TODO[NF]:  REMOVE/add Logger
-        try:
-            print('FILTER NAME IS %s' % self.FILTER_NAME)
-        except AttributeError:
-            print('FILTER NAME NOT SET IN INIT')
-        print("A select SLICE tool was instantiated")
     # end def
 
     def __repr__(self):
@@ -124,8 +118,6 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
         if part_item is not self.part_item:
             if self.sgv is not None:
                 # attempt to enforce good housekeeping, not required
@@ -141,15 +133,9 @@ class SelectSliceTool(AbstractSliceTool):
             self.group.setParentItem(part_item)
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
-            # TODO[NF]:  Determine why self.sgv is None when the dual-slice view is enabled
-            # TODO[NF]:  Now that SVG is being set properly, can the conditional be removed?
-            # TODO[NF]:  This might be better kept as an error condition logged to logger.error
-            if self.sgv is not None:
-                self.sgv.activateSelection(True)
-                self.sgv.rubberBandChanged.connect(self.selectRubberband)
-            else:
-                # TODO[NF]:  Use logger.error here
-                print("SGV is still none")
+            self.sgv.activateSelection(True)
+
+            self.sgv.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
@@ -280,7 +266,7 @@ class SelectSliceTool(AbstractSliceTool):
             event (TYPE): Description
 
         Deleted Parameters:
-            snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
+            snap_to_item (GridVirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
         self.setPartItem(part_item)
@@ -291,7 +277,7 @@ class SelectSliceTool(AbstractSliceTool):
             if event.modifiers() != Qt.ShiftModifier:
                 self.modelClear()   # deselect if shift isn't held
 
-            if isinstance(target_item, SliceVirtualHelixItem):
+            if isinstance(target_item, GridVirtualHelixItem):
                 # NOTE: individual_pick seems not needed.
                 # it's supposed to allow for single item picking
                 # self.individual_pick = True
@@ -309,7 +295,7 @@ class SelectSliceTool(AbstractSliceTool):
         """
         Args:
             part_item (PartItem)
-            snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
+            snap_to_item (GridVirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
         # print("snapping")
@@ -320,7 +306,7 @@ class SelectSliceTool(AbstractSliceTool):
         # print("snapping from:", xy2.x(), xy2.y())
         # print("snapped to:", xy.x(), xy.y())
 
-        if isinstance(snap_to_item, SliceVirtualHelixItem):
+        if isinstance(snap_to_item, GridVirtualHelixItem):
             self.setVirtualHelixItem(snap_to_item)
             destination = self.findNearestPoint(part_item, origin)
         else:  # GridEvent
@@ -405,7 +391,7 @@ class SelectSliceTool(AbstractSliceTool):
         if self.snap_origin_item is not None:
             self.snap_origin_item.setSnapOrigin(False)
             self.snap_origin_item = None
-        AbstractSliceTool.deactivate(self)
+        AbstractGridTool.deactivate(self)
     # end def
 
     def getCustomContextMenu(self, point):
@@ -431,7 +417,7 @@ class SelectSliceTool(AbstractSliceTool):
 # end class
 
 
-class SliceSelectionGroup(QGraphicsItemGroup):
+class GridSelectionGroup(QGraphicsItemGroup):
     """Summary
 
     Attributes:
@@ -447,7 +433,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             tool (TYPE): Description
             parent (None, optional): Description
         """
-        super(SliceSelectionGroup, self).__init__(parent)
+        super(GridSelectionGroup, self).__init__(parent)
         self.tool = tool
         self.setFiltersChildEvents(True)
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
@@ -497,7 +483,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         Args:
             event (TYPE): Description
         """
-        # print("press", ord('g'))
+        print("press", ord('g'))
         if event.text() == 'g':
             print("hey het")
         return QGraphicsItem.keyPressEvent(self, event)
@@ -530,9 +516,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             if tool.is_selection_active:
                 # print("clicking the box")
                 pos = event.scenePos()
-                # TODO[NF]: Figure out if SGV needs to be updated here to reflect ASGV
                 for item in tool.sgv.scene().items(pos):
-                    if isinstance(item, SliceVirtualHelixItem):
+                    if isinstance(item, GridVirtualHelixItem):
                         doc = tool.manager.document
                         part = item.part()
                         if is_shift:
@@ -559,7 +544,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mouseMoveEvent(self, event):
-        """because SliceSelectionGroup has the flag
+        """because GridSelectionGroup has the flag
         QGraphicsItem.ItemIsMovable
         we need only get the position of the item to figure
         out what to submit to the model
@@ -581,7 +566,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def mouseReleaseEvent(self, event):
-        """because SliceSelectionGroup has the flag
+        """because GridSelectionGroup has the flag
         QGraphicsItem.ItemIsMovable
         we need only get the position of the item to figure
         out what to submit to the model

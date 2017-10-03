@@ -658,7 +658,7 @@ class DocumentController():
 
         self.win.path_graphics_view.setViewportUpdateOn(False)
         self.win.slice_graphics_view.setViewportUpdateOn(False)
-        self.win.advanced_slice_graphics_view.setViewportUpdateOn(False)
+        self.win.grid_graphics_view.setViewportUpdateOn(False)
 
         if ONLY_ONE:
             self.newDocument(fname=fname)
@@ -667,11 +667,11 @@ class DocumentController():
 
         self.win.path_graphics_view.setViewportUpdateOn(True)
         self.win.slice_graphics_view.setViewportUpdateOn(True)
-        self.win.advanced_slice_graphics_view.setViewportUpdateOn(True)
+        self.win.grid_graphics_view.setViewportUpdateOn(True)
 
         self.win.path_graphics_view.update()
         self.win.slice_graphics_view.update()
-        self.win.advanced_slice_graphics_view.update()
+        self.win.grid_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
