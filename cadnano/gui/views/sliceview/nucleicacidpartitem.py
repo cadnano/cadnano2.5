@@ -460,8 +460,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
-
-        UPDATES
         """
         print('reconfigureRect*************************8')
         rect = self._rect
@@ -484,21 +482,23 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def enlargeRectToFit(self):
-        """Enlarges Part Rectangle to fit the model bounds.  Call this
-        when adding a SliceVirtualHelixItem.
+        """Enlarges Part Rectangle to fit the model bounds.
+
+        This should be called when adding a SliceVirtualHelixItem.  This
+        method enlarges the rectangle to ensure that it fits the design.
+        This method needs to check the model size to do this, but also takes
+        into account any expansions the user has made to the rectangle as to
+        not shrink the rectangle after the user has expanded it.
+
+        :rtype: None
         """
-        print("enlargeRectToFit")
         p = self._BOUNDING_RECT_PADDING
-        from cadnano.util import qtdb_trace
-        qtdb_trace()
-#        xTL, yTL, xBR, yBR = self.bounds()
-#        yTL, xTL, xBR, yBR = self.bounds()
-        #xTL, yTL, xBR, yBR = self.getModelBounds()
-        left, right, bottom, top = self.bounds()
-        xTL = left
-        xBR = right
-        yTL = top
-        yBR = bottom
+        model_left, model_top, model_right, model_bottom = self.getModelBounds()
+        rect_left, rect_right, rect_bottom, rect_top = self.bounds()
+        xTL = min(rect_left, model_left)
+        xBR = max(rect_right, model_right)
+        yTL = min(rect_top, model_top)
+        yBR = max(rect_bottom, model_bottom)
         xTL = xTL - p
         yTL = yTL - p
         xBR = xBR + p
@@ -506,7 +506,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)
-    # end def
 
     ### PRIVATE SUPPORT METHODS ###
     def configureOutline(self, outline):
