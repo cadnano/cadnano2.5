@@ -50,15 +50,15 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.tool_managers = None  # initialize
 
-        self.slice_view_init(doc)
-        self.grid_view_init(doc)
-        self.path_view_init(doc)
-        self.path_view_toolbar_init()
-        self.edit_menu_setup()
+        self._slice_view_init(doc)
+        self._grid_view_init(doc)
+        self._path_view_init(doc)
+        self._path_view_toolbar_init()
+        self._edit_menu_setup()
 
         doc.setViewNames(['slice', 'path'])
 
-    def slice_view_init(self, doc):
+    def _slice_view_init(self, doc):
         """Initializes Slice View.
 
         Args:
@@ -82,7 +82,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
 
-    def grid_view_init(self, doc):
+    def _grid_view_init(self, doc):
         """Initializes Grid View.
 
         Args:
@@ -105,7 +105,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
 
-    def path_view_init(self, doc):
+    def _path_view_init(self, doc):
         """Initializes Path View.
 
         Args:
@@ -129,7 +129,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setName("PathView")
 
 
-    def path_view_toolbar_init(self):
+    def _path_view_toolbar_init(self):
         """Initializes Path View Toolbar.
 
         Returns: None
@@ -153,7 +153,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setupGL()
         self.grid_graphics_view.setupGL()
 
-    def edit_menu_setup(self):
+    def _edit_menu_setup(self):
         """Initializes the Edit menu
 
         Returns: None
@@ -170,9 +170,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
         self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")
-
-
-    # end def
 
     def document(self):
         return self.controller.document()
