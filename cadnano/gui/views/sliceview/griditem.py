@@ -37,10 +37,10 @@ class GridItem(QGraphicsPathItem):
         """
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
-        dot_size = 0.5
+        dot_size = 30
         self.dots = (dot_size, dot_size / 2)
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
-        self.draw_lines = True
+        self.draw_lines = False
         self.points = []
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -81,16 +81,15 @@ class GridItem(QGraphicsPathItem):
     # end def
 
     def setDrawlines(self, draw_lines):
-        """Summary
+        """Do nothing; lines should never be drawn in the Grid View.
 
         Args:
-            draw_lines (TYPE): Description
+            draw_lines (bool): Whether or not lines should be drawn
 
         Returns:
-            TYPE: Description
+            None
         """
-        self.draw_lines = draw_lines
-        self.updateGrid()
+        return
     # end def
 
     def doHoneycomb(self, part_item, radius, bounds):
@@ -121,8 +120,7 @@ class GridItem(QGraphicsPathItem):
 
         path = QPainterPath()
         is_pen_down = False
-        # TODO[NF]: REMOVE ME
-        draw_lines = False #self.draw_lines
+        draw_lines = self.draw_lines
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
@@ -136,8 +134,6 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                # TODO[NF]: REMOVE ME
-                dot_size = 2*15.
                 stroke_weight = 0.5
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
@@ -244,6 +240,7 @@ class ClickArea(QGraphicsEllipseItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, diameter, parent):
+        print("NEW CLICKAREA")
         nd = 2*self._RADIUS
         offset = -0.5*nd + diameter/2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
