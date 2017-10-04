@@ -491,17 +491,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        p = self._BOUNDING_RECT_PADDING
+        padding = self._BOUNDING_RECT_PADDING
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
-        xTL = min(rect_left, model_left)
-        xBR = max(rect_right, model_right)
-        yTL = min(rect_top, model_top)
-        yBR = max(rect_bottom, model_bottom)
-        xTL = xTL - p
-        yTL = yTL - p
-        xBR = xBR + p
-        yBR = yBR + p
+        xTL = min(rect_left, model_left) - padding
+        xBR = max(rect_right, model_right) + padding
+        yTL = min(rect_top, model_top) - padding
+        yBR = max(rect_bottom, model_bottom) + padding
         tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)

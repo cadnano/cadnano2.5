@@ -443,7 +443,7 @@ def qtdb_trace():
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
-    if False:
+    if True:
         logger.info('No debug')
         return
     else:

@@ -2337,7 +2337,7 @@ class NucleicAcidPart(Part):
 
     # end def
     def boundDimensions(self, scale_factor=1.0):
-        """Returns a tuple of rectangle definining the XY limits of a part"""
+        """Returns a tuple of rectangle defining the XY limits of a part"""
         DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
         if xLL > -DMIN:
