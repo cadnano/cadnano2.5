@@ -296,7 +296,7 @@ class DocumentController():
 
         if len(self._document.children()) == 0:
             return  # no parts
-        if self.maybeSave() is False:
+        elif self.maybeSave() is False:
             return  # user canceled in maybe save
         else:  # user did not cancel
             if self.filesavedialog is not None:
@@ -486,9 +486,12 @@ class DocumentController():
 
     def actionCreateNucleicAcidPart(self):
         if ONLY_ONE:
-            self.newDocument()  # only allow one part for now
+            if len(self._document.children()) is not 0:
+                if self.maybeSave() is False:
+                    return
+            self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart()
+        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
@@ -752,7 +755,21 @@ class DocumentController():
 
     ### FILE OUTPUT ###
     def maybeSave(self):
-        """Save on quit, check if document changes have occured."""
+        """Save on quit, check if document changes have occured.
+
+        Returns:
+            True, False, or None
+
+            True if dontAskAndJustDiscardUnsavedChanges is True
+                OR if the undoStack is clean (i.e. there have been no changes)
+                OR if the user clicks 'Discard'
+            False if the user clicks 'Cancel'
+            None if the user clicks 'Save'
+
+        TODO:  This method should probably be renamed to something more
+               descriptive, or refactored so that the value returned is more
+               easily parsed
+        """
         if app().dontAskAndJustDiscardUnsavedChanges:
             return True
         if not self.undoStack().isClean():    # document dirty?
