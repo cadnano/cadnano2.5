@@ -107,6 +107,10 @@ class GridItem(QGraphicsPathItem):
         doPosition = HoneycombDnaPart.positionToLatticeCoordRound
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
+        x_l = x_l + HoneycombDnaPart.PAD_GRID_XL
+        x_h = x_h + HoneycombDnaPart.PAD_GRID_XH
+        y_h = y_h + HoneycombDnaPart.PAD_GRID_YL
+        y_l = y_l + HoneycombDnaPart.PAD_GRID_YH
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points
@@ -301,7 +305,9 @@ class GridPoint(QGraphicsEllipseItem):
         """
         self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
-        self.grid.part_item.vhi_hint_item.setPos(self.scenePos()-QPointF(_RADIUS-DELTA, _RADIUS-DELTA))
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        #tool.setHintPos(self.scenePos())
     # end def
 
     def hoverLeaveEvent(self, event):

@@ -8,10 +8,9 @@ from ast import literal_eval
 from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
+from cadnano.gui.palette import getPenObj, getNoPen  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
@@ -20,22 +19,12 @@ from .prexovermanager import PreXoverManager
 from .griditem import GridItem
 from . import gridstyles as styles
 
-_RADIUS = styles.GRID_HELIX_RADIUS
-_DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
-DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
-_HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
-_MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
-
-_INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
 _SELECTED_COLOR = styles.SELECTED_COLOR
 _SELECTED_WIDTH = styles.SELECTED_PEN_WIDTH
 _SELECTED_ALPHA = styles.SELECTED_ALPHA
-
-# _BOUNDING_RECT_PADDING = 10
 
 
 class GridNucleicAcidPartItem(QAbstractPartItem):
@@ -46,15 +35,15 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
 
     Attributes:
         active_virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.GridVirtualHelixItem): Description
-        grab_cornerBR (TYPE): Description
-        grab_cornerTL (TYPE): Description
+        grab_cornerBR (TYPE): bottom right bounding box handle
+        grab_cornerTL (TYPE): top left bounding box handle
         griditem (TYPE): Description
         outline (TYPE): Description
         prexover_manager (TYPE): Description
         scale_factor (TYPE): Description
     """
     _RADIUS = styles.GRID_HELIX_RADIUS
-    _BOUNDING_RECT_PADDING = 10
+    _BOUNDING_RECT_PADDING = 80
 
     def __init__(self, model_part_instance, viewroot, parent=None):
         """Summary
@@ -70,18 +59,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
-
         self.active_virtual_helix_item = None
-
         self.prexover_manager = PreXoverManager(self)
-
         self.hide()  # hide while until after attemptResize() to avoid flicker
-
         self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
         self.boundRectToModel()
-
         self.setPen(getNoPen())
-
         self.setRect(self._rect)
         self.setAcceptHoverEvents(True)
 
@@ -91,7 +74,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
 
         # initialize the NucleicAcidPartItem with an empty set of old coords
         self.setZValue(styles.ZPARTITEM)
-
         self.outline = outline = QGraphicsRectItem(self)
         o_rect = self.configureOutline(outline)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
@@ -99,21 +81,15 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         model_color = m_p.getColor()
         self.outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
 
-        GC_SIZE = 20
+        GC_SIZE = 10
         self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, True, self)
         self.grab_cornerTL.setTopLeft(o_rect.topLeft())
         self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
         self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
-
         self.griditem = GridItem(self, self._model_props['grid_type'])
-
         self.griditem.setZValue(1)
         self.grab_cornerTL.setZValue(2)
         self.grab_cornerBR.setZValue(2)
-
-        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
-        self.vhi_hint_item.setPen(_MOD_PEN)
-        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
 
         # select upon creation
         for part in m_p.document().children():
@@ -176,8 +152,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                 self.outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
-                self.grab_cornerTL.setBrush(getBrushObj(new_value))
-                self.grab_cornerBR.setBrush(getBrushObj(new_value))
+                self.grab_cornerTL.setPen(getPenObj(new_value, 0))
+                self.grab_cornerBR.setPen(getPenObj(new_value, 0))
             elif property_key == 'is_visible':
                 if new_value:
                     self.show()
@@ -380,6 +356,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                 self.griditem.setDrawlines(True)
             elif value == 'points':
                 self.griditem.setDrawlines(False)
+            elif value == 'circles':
+                pass  # self.griditem.setDrawlines(False)
             else:
                 raise ValueError("unknown grid styling")
     # end def
@@ -454,12 +432,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                                       per_neighbor_hits, pairs)
     # end def
 
-    def setSelectionFilter(self, filter_name_list):
-        if 'virtual_helix' in filter_name_list:
-            self.vhi_hint_item.setPen(_MOD_PEN)
-        else:
-            self.vhi_hint_item.setPen(_INACTIVE_PEN)
-
     def removeVirtualHelixItem(self, id_num):
         """Summary
 
@@ -476,9 +448,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=_RADIUS):
+    def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
         """Summary
-        NOTE: we skip padding Bottom right Y dimension
 
         Args:
             top_left (TYPE): Description
@@ -494,24 +465,30 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         self._rect = new_rect = QRectF(ptTL, ptBR)
         self.setRect(new_rect)
         self.configureOutline(self.outline)
-        self.griditem.updateGrid()
+        if do_grid:
+            self.griditem.updateGrid()
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
     def padTL(self, padding, xTL, yTL):
-        return xTL - padding, yTL - padding
+        return xTL + padding, yTL + padding
     # end def
 
     def padBR(self, padding, xBR, yBR):
-        return xBR + padding, yBR
+        return xBR - padding, yBR - padding
     # end def
 
     def enlargeRectToFit(self):
         """Enlarges Part Rectangle to fit the model bounds.  Call this
-        when adding a GridVirtualHelixItem.  Pad
+        when adding a GridVirtualHelixItem.
         """
+        p = self._BOUNDING_RECT_PADDING
         xTL, yTL, xBR, yBR = self.getModelBounds()
-        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR))
+        xTL = xTL - p
+        yTL = yTL - p
+        xBR = xBR + p
+        yBR = yBR + p
+        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)
     # end def
@@ -564,7 +541,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             bool_val (TYPE): what the modifystate should be set to.
         """
         self._can_show_mod_circ = bool_val
-        if bool_val == False:
+        if bool_val is False:
             self._mod_circ.hide()
     # end def
 
@@ -617,17 +594,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def hoverEnterEvent(self, event):
-        self.vhi_hint_item.show()
-        #print("Grid VHI hoverEnterEvent")
-
-    # def hoverMoveEvent(self, event):
-        # print("Grid VHI hoverMoveEvent")
-
-    def hoverLeaveEvent(self, event):
-        self.vhi_hint_item.hide()
-        #print("Grid VHI hoverLeaveEvent")
-
     def hoverMoveEvent(self, event):
         """Summary
 
@@ -637,8 +603,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        # print("Grid VHI hoverMoveEvent")
-        self.vhi_hint_item.setPos(event.pos()-QPointF(_RADIUS-DELTA, _RADIUS-DELTA))
 
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
@@ -648,6 +612,10 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
     # end def
+
+    def hoverLeaveEvent(self, event):
+        tool = self._getActiveTool()
+        tool.hideLineItem()
 
     def getModelPos(self, pos):
         """Y-axis is inverted in Qt +y === DOWN

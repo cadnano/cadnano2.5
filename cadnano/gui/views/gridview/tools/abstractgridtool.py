@@ -4,8 +4,19 @@ import math
 from PyQt5.QtCore import QPointF, QLineF, QRectF
 from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.gui.views.gridview import gridstyles as styles
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 
+_RADIUS = styles.GRID_HELIX_RADIUS
+_DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
+HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
+_MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
+DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
+# _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
+
+
+_INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 class AbstractGridTool(QGraphicsObject):
     """Summary
@@ -46,6 +57,10 @@ class AbstractGridTool(QGraphicsObject):
         self.angles = [math.radians(x) for x in range(0, 360, 30)]
         self.vectors = self.setVectors()
         self.part_item = None
+
+        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
+        self.vhi_hint_item.setPen(_MOD_PEN)
+        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
     # end def
 
     ######################## Drawing #######################################
@@ -78,6 +93,13 @@ class AbstractGridTool(QGraphicsObject):
         # li.setLine(0., 0., 0., 0.)
     # end def
 
+    def setSelectionFilter(self, filter_name_list):
+        if 'virtual_helix' in filter_name_list:
+            self.vhi_hint_item.setPen(_MOD_PEN)
+        else:
+            self.vhi_hint_item.setPen(_INACTIVE_PEN)
+    # end def
+
     def resetTool(self):
         """Summary
 
@@ -104,6 +126,7 @@ class AbstractGridTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
+        self.vhi_hint_item.setParentItem(part_item)
         self.part_item = part_item
     # end def
 
@@ -121,9 +144,17 @@ class AbstractGridTool(QGraphicsObject):
             event (TYPE): Description
         """
         if self.is_started:
-            return self.findNearestPoint(part_item, event.scenePos())
+            pos = self.findNearestPoint(part_item, event.scenePos())
         else:
-            return event.pos()
+            pos =  event.pos()
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        return pos
+    # end def
+
+    def setHintPos(self, pos):
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -181,14 +212,28 @@ class AbstractGridTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
+        self.vhi_hint_item.hide()
         li = self._line_item
+        li.hide()
         li.setParentItem(self)
         line = li.line()
         line.setP2(self._CENTER_OF_HELIX)
         li.setLine(line)
-        li.hide()
+        # li.hide()
         self.is_started = False
     # end def
+
+    # def hoverEnterEvent(self, event):
+    #     self.vhi_hint_item.show()
+    #     #print("Grid VHI hoverEnterEvent")
+
+    # # def hoverMoveEvent(self, event):
+    #     # print("Grid VHI hoverMoveEvent")
+
+    # def hoverLeaveEvent(self, event):
+    #     # self.vhi_hint_item.hide()
+    #     #print("Grid VHI hoverLeaveEvent")
+
 
     def hoverMoveEvent(self, part_item, event):
         """Summary
@@ -200,7 +245,10 @@ class AbstractGridTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        return self.eventToPosition(part_item, event)
+        # self.vhi_hint_item.setPos(  event.pos()-
+        #                             QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        pos = self.eventToPosition(part_item, event)
+        return pos
     # end def
 
     def setActive(self, will_be_active, old_tool=None):
