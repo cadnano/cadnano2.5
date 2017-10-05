@@ -350,7 +350,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             ValueError: Description
         """
         if key == 'grid':
-            print("grid change", value)
             if value == 'lines and points':
                 self.griditem.setDrawlines(True)
             elif value == 'points':
@@ -359,24 +358,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 pass  # self.griditem.setDrawlines(False)
             else:
                 raise ValueError("unknown grid styling")
-        elif key == 'slice':
-            print('Slice view change:  %s' % value)
-            if value == 'legacy':
-                # Show this view
-                self.show()
-                print("I see legacy*********************")
-            elif value == 'grid':
-                # Hide this view
-                self.hide()
-                self._viewroot.hide()
-                print(type(self._viewroot))
-                print("I see grid*********************")
-            elif value == 'both':
-                # Show this view
-                self.show()
-                print("I see both*********************")
-            else:
-                raise ValueError('Unknown slice view')
+#        elif key == 'slice':
+#            print('Slice view change:  %s' % value)
+#            if value == 'legacy':
+#                # Show this view
+#                self.show()
+#                print("I see legacy*********************")
+#            elif value == 'grid':
+#                # Hide this view
+#                self.hide()
+#                self._viewroot.hide()
+#                print(type(self._viewroot))
+#                print("I see grid*********************")
+#            elif value == 'both':
+#                # Show this view
+#                self.show()
+#                print("I see both*********************")
+#            else:
+#                raise ValueError('Unknown slice view')
     # end def
 
     ### ACCESSORS ###
@@ -608,7 +607,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        print("NOT CALLED")
         if event.button() == Qt.RightButton:
             return
         part = self._model_part
@@ -619,26 +617,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if tool.FILTER_NAME not in part.document().filter_set:
             return
         tool_method_name = tool.methodPrefix() + "MousePress"
-        print(tool_method_name)
         if tool_method_name == 'createToolMousePress':
             return
         elif hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
         else:
-            event.setaccepted(false)
-            qgraphicsitem.mousepressevent(self, event)
+            event.setaccepted(False)
+            QGraphicsItem.mousepressevent(self, event)
     # end def
 
-    def hovermoveevent(self, event):
-        """summary
-
-        args:
-            event (type): description
-
-        args:
-            type: description
-        """
-
+    def hoverMoveEvent(self, event):
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -646,7 +634,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
-    # end def
 
     def hoverLeaveEvent(self, event):
         tool = self._getActiveTool()
@@ -687,10 +674,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         # 1. get point in model coordinates:
-        print("THIRD")
         part = self._model_part
         if alt_event is None:
-            # print()
             pt = tool.eventToPosition(self, event)
             # print("reg_event", pt)
         else:
