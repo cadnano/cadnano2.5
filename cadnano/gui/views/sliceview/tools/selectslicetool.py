@@ -380,7 +380,7 @@ class SelectSliceTool(AbstractSliceTool):
             finalize (TYPE): Description
             use_undostack (bool, optional): Description
         """
-        # print("moveSelection: {}, {}".format(dx, dy))
+        #print("moveSelection: {}, {}".format(dx, dy))
         part_item = self.part_item
         sf = part_item.scaleFactor()
         part = part_item.part()
@@ -568,6 +568,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
             event (TYPE): Description
         """
         # 1. call this super class method first to get the item position updated
+        return
         res = QGraphicsItemGroup.mouseMoveEvent(self, event)
         # watch out for bugs here?  everything seems OK for now, but
         # could be weird window switching edge cases
