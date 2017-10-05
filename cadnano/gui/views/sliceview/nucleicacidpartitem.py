@@ -359,6 +359,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 pass  # self.griditem.setDrawlines(False)
             else:
                 raise ValueError("unknown grid styling")
+        elif key == 'slice':
+            print('Slice view change:  %s' % value)
+            if value == 'legacy':
+                # Show this view
+                self.show()
+                print("I see legacy*********************")
+            elif value == 'grid':
+                # Hide this view
+                self.hide()
+                self._viewroot.hide()
+                print(type(self._viewroot))
+                print("I see grid*********************")
+            elif value == 'both':
+                # Show this view
+                self.show()
+                print("I see both*********************")
+            else:
+                raise ValueError('Unknown slice view')
     # end def
 
     ### ACCESSORS ###
@@ -590,6 +608,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
+        print("NOT CALLED")
         if event.button() == Qt.RightButton:
             return
         part = self._model_part
@@ -600,21 +619,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if tool.FILTER_NAME not in part.document().filter_set:
             return
         tool_method_name = tool.methodPrefix() + "MousePress"
-        if hasattr(self, tool_method_name):
+        print(tool_method_name)
+        if tool_method_name == 'createToolMousePress':
+            return
+        elif hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
         else:
-            event.setAccepted(False)
-            QGraphicsItem.mousePressEvent(self, event)
+            event.setaccepted(false)
+            qgraphicsitem.mousepressevent(self, event)
     # end def
 
-    def hoverMoveEvent(self, event):
-        """Summary
+    def hovermoveevent(self, event):
+        """summary
 
-        Args:
-            event (TYPE): Description
+        args:
+            event (type): description
 
-        Args:
-            TYPE: Description
+        args:
+            type: description
         """
 
         tool = self._getActiveTool()
@@ -665,6 +687,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         # 1. get point in model coordinates:
+        print("THIRD")
         part = self._model_part
         if alt_event is None:
             # print()
@@ -702,7 +725,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
-            # print("creating", part_pt_tuple)
+            #NF:  This creates a VH
             part.createVirtualHelix(*part_pt_tuple)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
             vhi = self._virtual_helix_item_hash[id_num]

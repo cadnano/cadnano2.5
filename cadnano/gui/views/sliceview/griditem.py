@@ -240,7 +240,7 @@ class ClickArea(QGraphicsEllipseItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, diameter, parent):
-        print("NEW CLICKAREA")
+#        print("NEW CLICKAREA")
         nd = 2*self._RADIUS
         offset = -0.5*nd + diameter/2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
@@ -290,12 +290,11 @@ class GridPoint(QGraphicsEllipseItem):
         Returns:
             None
         """
-        from cadnano.util import qtdb_trace
+        print("FIRST")
         if self.grid.allow_snap:
             part_item = self.grid.part_item
             tool = part_item._getActiveTool()
-            print(type(tool))
-            qtdb_trace()
+#            print(type(tool))
             if tool.FILTER_NAME not in part_item.part().document().filter_set:
                 return
             tool_method_name = tool.methodPrefix() + "MousePress"
@@ -312,14 +311,6 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         return
-#        self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
-#        self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
-        part_item = self.grid.part_item
-#        tool = part_item._getActiveTool()
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
-#        tool.setHintPos(self.scenePos())
-    # end def
 
     def hoverLeaveEvent(self, event):
         """Summary
@@ -357,12 +348,14 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneMouseEvent): The event that the mouseclick
             triggered
         """
-        from cadnano.util import qtdb_trace
+        print("SECOND")
+#        print('Coordinates:  %s:%s' % (event.scenePos().x(), event.scenePos().y()))
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
         part = part_item.part()
         part.setSelected(True)
         # print("paws")
         alt_event = GridEvent(self, self.offset)
-        qtdb_trace()
         part_item.createToolMousePress(tool, event, alt_event)
     # end def
 
