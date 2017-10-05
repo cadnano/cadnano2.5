@@ -1,7 +1,6 @@
 from PyQt5.QtGui import QFont
-from cadnano.gui.views.styles import THE_FONT, THE_FONT_SIZE
-from cadnano.gui.views.styles import BLUE_FILL, BLUE_STROKE
-from cadnano.gui.views.styles import GRAY_FILL, GRAY_STROKE
+
+from cadnano.gui.views.styles import BLUE_STROKE, THE_FONT
 
 
 # Slice Sizing
@@ -19,7 +18,7 @@ ZPXIGROUP = 150
 ZPARTITEM = 200
 # top
 
-# Part apperance
+# Part appearance
 SLICE_FILL = "#ffffff"
 
 DEFAULT_PEN_WIDTH = 0  # cosmetic
