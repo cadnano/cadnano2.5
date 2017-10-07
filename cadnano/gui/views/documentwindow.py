@@ -82,6 +82,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
 
+#        self.slice_graphics_view.hide()
+
     def _grid_view_init(self, doc):
         """Initializes Grid View.
 

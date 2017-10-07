@@ -19,9 +19,7 @@ ONLY_ONE = True
 
 
 class DocumentController():
-    """
-    Connects UI buttons to their corresponding actions in the model.
-    """
+    """Connects UI buttons to their corresponding actions in the model."""
     ### INIT METHODS ###
     def __init__(self, document):
         """docstring for __init__"""
@@ -503,10 +501,42 @@ class DocumentController():
     def actionToggleOutlinerSlot(self):
         outliner = self.win.outliner_property_splitter
         if outliner.isVisible():
+            print("HIDING")
             outliner.hide()
         else:
+            print("SHOWING")
             outliner.show()
     # end def
+
+    def action_slice_view(self, show):
+        """Hide or show the slice view based on the given parameter `show`
+
+        Args:
+            show (bool): Whether the slice view should be hidden or shown
+
+        Returns: None
+        """
+        print("Toggling slice view to %s" % show)
+        slice_view = self.win.slice_graphics_view
+        if show:
+            slice_view.show()
+        else:
+            slice_view.hide()
+
+    def action_grid_view(self, show):
+        """Hide or show the grid view based on the given parameter `show`
+
+        Args:
+            show (bool): Whether the grid view should be hidden or shown
+
+        Returns: None
+        """
+        print("Toggling grid view to %s" % show)
+        grid_view = self.win.grid_graphics_view
+        if show:
+            grid_view.show()
+        else:
+            grid_view.hide()
 
     ### ACCESSORS ###
     def document(self):
