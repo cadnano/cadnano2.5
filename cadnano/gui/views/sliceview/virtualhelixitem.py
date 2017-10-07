@@ -53,6 +53,8 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
+#        import traceback
+#        traceback.print_stack()
         logger.info("Creating SliceVirtualHelixItem")
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
@@ -202,6 +204,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         Args:
             event (QMouseEvent): contains parameters that describe the mouse event.
         """
+        print("VirtualHelixItem mousePressEvent")
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             return
         if event.button() == Qt.RightButton:

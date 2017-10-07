@@ -9,10 +9,8 @@ import os
 import platform
 import string
 import sys
-
 from os import path
 from traceback import extract_stack
-
 
 logger = logging.getLogger(__name__)
 

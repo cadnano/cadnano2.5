@@ -3,21 +3,20 @@
 
 from operator import itemgetter
 from uuid import uuid4
-from cadnano import app
-from cadnano import util
+
+from cadnano import app, setBatch, util
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import UndoStack
-from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
 from cadnano.cnenum import ModType
-from cadnano.part import Part
-from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
-from cadnano.part.nucleicacidpart import NucleicAcidPart
-from cadnano.strand import Strand
-from cadnano import setBatch
+from cadnano.cnobject import CNObject
+from cadnano.cnproxy import ProxySignal, UndoStack
+from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
+                                RemoveModCommand)
 from cadnano.fileio.nnodecode import decodeFile
 from cadnano.fileio.nnoencode import encodeToFile
+from cadnano.part import Part
+from cadnano.part.nucleicacidpart import NucleicAcidPart
+from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
+from cadnano.strand import Strand
 
 
 class Document(CNObject):

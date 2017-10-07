@@ -15,12 +15,15 @@
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 import os
-import sys
 import platform
+import sys
 from code import interact
-from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, QEventLoop, QSize
+
+from PyQt5.QtCore import (QCoreApplication, QEventLoop, QObject, QSize,
+                          pyqtSignal)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import qApp, QApplication
+from PyQt5.QtWidgets import QApplication, qApp
+
 from cadnano import util
 from cadnano.proxyconfigure import proxyConfigure
 

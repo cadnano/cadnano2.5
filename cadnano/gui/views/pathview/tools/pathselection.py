@@ -333,7 +333,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             change (GraphicsItemChange): see http://doc.qt.io/qt-5/qgraphicsitem.html#GraphicsItemChange-enum
             value (QVariant): resolves in Python as an integer
         """
-        logger.debug("ps itemChange")
+#        logger.debug("ps itemChange")
         if change == QGraphicsItem.ItemSelectedChange:
             logger.debug("isc", value)
             if value == False:  # noqa

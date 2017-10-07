@@ -1,7 +1,7 @@
-from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
-from cadnano.part import Part
+from cadnano.cnproxy import UndoCommand
 from cadnano.objectinstance import ObjectInstance
+from cadnano.part import Part
 
 
 class AddInstanceCommand(UndoCommand):
