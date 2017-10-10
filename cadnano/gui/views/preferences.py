@@ -74,8 +74,8 @@ class Preferences(object):
         self.qs.beginGroup(PreferencesConst.PREFERENCES)
         self.grid_appearance_type_index = self.qs.value(PreferencesConst.GRID_APPEARANCE_TYPE_INDEX,
                                                         styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
-        self.slice_apperance_type_index = self.qs.value(PreferencesConst.SLICE_APPEARANCE_TYPE_INDEX,
-                                                        styles.PREF_SLICE_VIEW_STYLE_INDEX)
+        self.slice_appearance_type_index = self.qs.value(PreferencesConst.SLICE_APPEARANCE_TYPE_INDEX,
+                                                         styles.PREF_SLICE_VIEW_STYLE_INDEX)
         self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
         self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
         self.qs.endGroup()
@@ -96,6 +96,7 @@ class Preferences(object):
         self.ui_prefs.grid_appearance_type_combo_box.setCurrentIndex(styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
         self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)
         self.ui_prefs.show_icon_labels.setChecked(styles.PREF_SHOW_ICON_LABELS)
+        self.ui_prefs.legacy_slice_view_combo_box.setCurrentIndex(styles.PREF_SLICE_VIEW_STYLE_INDEX)
     # end def
 
     def setGridAppearanceType(self, grid_appearance_type_index):

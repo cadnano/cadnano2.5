@@ -50,15 +50,15 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.tool_managers = None  # initialize
 
-        self._slice_view_init(doc)
-        self._grid_view_init(doc)
-        self._path_view_init(doc)
-        self._path_view_toolbar_init()
-        self._edit_menu_setup()
+        self._init_slice_view(doc)
+        self._init_grid_view(doc)
+        self._init_path_view(doc)
+        self._init_path_view_toolbar()
+        self._init_edit_menu()
 
         doc.setViewNames(['slice', 'path'])
 
-    def _slice_view_init(self, doc):
+    def _init_slice_view(self, doc):
         """Initializes Slice View.
 
         Args:
@@ -84,7 +84,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
 #        self.slice_graphics_view.hide()
 
-    def _grid_view_init(self, doc):
+    def _init_grid_view(self, doc):
         """Initializes Grid View.
 
         Args:
@@ -107,7 +107,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
 
-    def _path_view_init(self, doc):
+        self.grid_graphics_view.hide()
+
+    def _init_path_view(self, doc):
         """Initializes Path View.
 
         Args:
@@ -131,7 +133,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setName("PathView")
 
 
-    def _path_view_toolbar_init(self):
+    def _init_path_view_toolbar(self):
         """Initializes Path View Toolbar.
 
         Returns: None
@@ -155,7 +157,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setupGL()
         self.grid_graphics_view.setupGL()
 
-    def _edit_menu_setup(self):
+    def _init_edit_menu(self):
         """Initializes the Edit menu
 
         Returns: None
