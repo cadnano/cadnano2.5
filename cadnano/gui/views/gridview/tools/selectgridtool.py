@@ -512,6 +512,7 @@ class GridSelectionGroup(QGraphicsItemGroup):
             # print("the right event")
             modifiers = event.modifiers()
             is_shift = modifiers == Qt.ShiftModifier
+            print("Is_shift is %s" % is_shift)
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
                 # print("clicking the box")

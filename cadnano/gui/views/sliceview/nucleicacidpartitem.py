@@ -53,6 +53,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (None, optional): Description
         """
+        print("CREATING ONE")
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
@@ -67,6 +68,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.setPen(getNoPen())
         self.setRect(self._rect)
         self.setAcceptHoverEvents(True)
+
+        self.shortest_path_add_mode = False
 
         # Cache of VHs that were active as of last call to activeSliceChanged
         # If None, all slices will be redrawn and the cache will be filled.
@@ -632,6 +635,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
         else:
+            print("Ignoring hovermove")
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
 
@@ -691,8 +695,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part_pt_tuple = self.getModelPos(pt)
 
         mod = Qt.MetaModifier
-        if not (event.modifiers() & mod):
+        modifiers = event.modifiers()
+        if not (modifiers & mod):
             pass
+
+        is_shift = modifiers == Qt.ShiftModifier
+
+        if (is_shift):
+            print('**********************           Setting shortest path mode')
+            self.shortest_path_add_mode = True
+            #TODO[NF]:  Set this value
+            self.shortest_path_start = None
+        else:
+            print('**********************         Unsetting shortest path mode')
+            self.shortest_path_add_mode = False
+            self.shortest_path_start = None
 
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
@@ -728,9 +745,37 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
+#        print('*****************************************************')
+#        print('Raw pos x is %s and y is %s' % (event.pos().x(),
+#                                               event.pos().y()))
+#        print('Scene pos x is %s and y is %s' % (event.scenePos().x(),
+#                                                 event.scenePos().y()))
+#        print('Screen pos x is %s and y is %s' % (event.screenPos().x(),
+#                                                 event.screenPos().y()))
+#        print('*****************************************************')
+        self.griditem.nearest_point_coordinates(event.scenePos().x(),
+                                                event.scenePos().y())
+#        self.griditem.nearest_point_coordinates(event.pos().x(),
+#                                                event.pos().y())
+#        self.griditem.nearest_point_coordinates(event.screenPos().x(),
+#                                                event.screenPos().y())
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
+
+    def createToolHoverEnter(self, tool, event):
+        if self.shortest_path_add_mode:
+            shortest_path_start_ij = None
+            current_ij = None
+#        print('Entering nucleicacidpart w/create tool')
+#        print('Scene x is %s and y is %s' % (event.scenePos().x(),
+#                                            event.scenePos().y()))
+#        print('Raw pos x is %s and y is %s' % (event.pos().x(),
+#                                               event.pos().y()))
+#        self.griditem.nearest_point_coordinates(event.scenePos().x(),
+#                                                event.scenePos().y())
+#        self.griditem.nearest_point_coordinates(event.pos().x(),
+#                                                event.pos().y())
 
     def selectToolMousePress(self, tool, event):
         """

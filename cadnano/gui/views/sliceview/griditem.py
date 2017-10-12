@@ -31,6 +31,8 @@ class GridItem(QGraphicsPathItem):
     def __init__(self, part_item, grid_type):
         """Summary
 
+        point_map contains a mapping of i, j row-column coordinates to actual GridPoint items.  neihgbor_map contains a mapping of i, j row-column coordinates to a list of i, j row-column coordinates of neighbors
+
         Args:
             part_item (TYPE): Description
             grid_type (TYPE): Description
@@ -42,10 +44,13 @@ class GridItem(QGraphicsPathItem):
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = False
         self.points = []
+        self.point_map = dict()
+        self.neighbor_map = dict()
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
         self.setGridType(grid_type)
+
     # end def
 
     def updateGrid(self):
@@ -57,6 +62,7 @@ class GridItem(QGraphicsPathItem):
         part_item = self.part_item
         part = part_item.part()
         radius = part.radius()
+        print("RADIUS IS ORIGINALLY %s" % radius)
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
         if self.grid_type == GridType.HONEYCOMB:
@@ -118,12 +124,17 @@ class GridItem(QGraphicsPathItem):
         row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
         # print(row_l, row_h, col_l, col_h)
 
+        import sys
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
+        GridPoint(0-half_dot_size, 0-half_dot_size, 1, self)
+        GridPoint(0-half_dot_size, 0-half_dot_size, 29, self)
+#        GridPoint(0, 0, 29, self)
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
+#                sys.stdout.write('%s,%s ' % (x,y))
                 if draw_lines:
                     if is_pen_down:
                         path.lineTo(x, -y)
@@ -134,12 +145,39 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                stroke_weight = 0.5
+                stroke_weight = 0.25
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
+                GridPoint(x, -y, 1, self)
                 pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
+
+                # Handle neighbor mapping logic
+                self.point_map[(i,j)] = pt
+                sys.stdout.write('%s,%s (%s) ' % ((x, y, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
+#               sys.stdout.write('%s,%s (%s) ' % ((i, j, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
+
+                if HoneycombDnaPart.isEvenParity(i, j):
+                    self.neighbor_map[(i,j)] = [
+                        (i, j-1),
+                        (i, j+1),
+                        (i+1, j)
+                    ]
+                    self.point_map.setdefault((i, j-1))
+                    self.point_map.setdefault((i, j+1))
+                    self.point_map.setdefault((i+1, j))
+                else:
+                    self.neighbor_map[(i,j)] = [
+                        (i, j-1),
+                        (i, j+1),
+                        (i-1, j)
+                    ]
+                    self.point_map.setdefault((i, j-1))
+                    self.point_map.setdefault((i, j+1))
+                    self.point_map.setdefault((i-1, j))
+
+            sys.stdout.write('\n')
             is_pen_down = False
         # end for i
         # DO VERTICAL LINES
@@ -157,6 +195,8 @@ class GridItem(QGraphicsPathItem):
                 is_pen_down = False
             # end for j
         self.setPath(path)
+        print("Points size:  %s" % len(points))
+        print("Point map: %s" % self.point_map)
     # end def
 
     def doSquare(self, part_item, radius, bounds):
@@ -227,9 +267,6 @@ class GridItem(QGraphicsPathItem):
         scene = self.scene()
         while points:
             scene.removeItem(points.pop())
-    # end def
-# end class
-
 
 class ClickArea(QGraphicsEllipseItem):
     """Summary
@@ -254,6 +291,10 @@ class ClickArea(QGraphicsEllipseItem):
         grid.
         """
         return self.parent_obj.mousePressEvent(event)
+
+    def hoverMoveEvent(self, event):
+        self.parent_obj.hoverMoveEvent(event)
+#        print("HOVERMOVE")
 # end class
 
 
@@ -304,13 +345,33 @@ class GridPoint(QGraphicsEllipseItem):
             QGraphicsEllipseItem.mousePressEvent(self, event)
     # end def
 
+    def hoverMoveEvent(self, event):
+        """Summary
+
+        Args:
+            event (QGraphicsSceneHoverEvent): Description
+        """
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+            return
+        tool_method_name = tool.methodPrefix() + "HoverMoveEvent"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
+
     def hoverEnterEvent(self, event):
         """Summary
 
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
-        return
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+            return
+        tool_method_name = tool.methodPrefix() + "HoverEnterEvent"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
 
     def hoverLeaveEvent(self, event):
         """Summary
@@ -357,7 +418,13 @@ class GridPoint(QGraphicsEllipseItem):
         # print("paws")
         alt_event = GridEvent(self, self.offset)
         part_item.createToolMousePress(tool, event, alt_event)
-    # end def
+
+    def createToolHoverEnterEvent(self, tool, part_item, event):
+        part_item.createToolHoverEnter(tool, event)
+
+    def createToolHoverMoveEvent(self, tool, part_item, event):
+#        print("HM")
+        part_item.createToolHoverMove(tool, event)
 
 
 class GridEvent(object):
