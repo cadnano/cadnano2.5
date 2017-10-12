@@ -268,6 +268,55 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
+    def shortest_path(self, start, end):
+        """Return a path of coordinates that traverses from start to end.
+
+        Does a breadth-first search.  This could be further improved to do an A*
+        search.
+
+        Args:
+            start (tuple): The i-j coordinates corresponding to the start point
+            end (tuple):  The i-j coordinates corresponding to the end point
+
+        Returns:
+            A list of coordinates corresponding to a shortest path from start to
+            end
+        """
+        print(start)
+        assert isinstance(start, tuple) and len(start) is 2
+        assert isinstance(end, tuple) and len(end) is 2
+
+        if self.point_map.get(start) is None:
+            raise LookupError('Could not find a point corresponding to %s',
+                              start)
+        elif self.point_map.get(end) is None:
+            raise LookupError('Could not find a point corresponding to %s',
+                              start)
+
+        current_location = start
+
+        neighbors = self.neighbor_map.get(current_location)
+        queue = [neighbor for neighbor in neighbors]
+        parents = dict()
+        parents[start] = None
+
+        while queue:
+            current_location = queue.pop()
+
+            if current_location == end:
+                reversed_path = []
+                while parents[current_location] is not None:
+                    reversed_path.append(current_location)
+                    current_location = parents[current_location]
+                return reversed(reversed_path)
+            else:
+                neighbors = self.neighbor_map.get(current_location)
+                for neighbor in neighbors:
+                    if neighbor not in parents:
+                        parents[neighbor] = current_location
+                        queue.append(neighbor)
+
+
 class ClickArea(QGraphicsEllipseItem):
     """Summary
 
