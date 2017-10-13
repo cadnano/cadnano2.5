@@ -753,12 +753,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 #        print('Screen pos x is %s and y is %s' % (event.screenPos().x(),
 #                                                 event.screenPos().y()))
 #        print('*****************************************************')
-        self.griditem.nearest_point_coordinates(event.scenePos().x(),
-                                                event.scenePos().y())
-#        self.griditem.nearest_point_coordinates(event.pos().x(),
-#                                                event.pos().y())
-#        self.griditem.nearest_point_coordinates(event.screenPos().x(),
-#                                                event.screenPos().y())
+        from cadnano.fileio.lattice import HoneycombDnaPart
+        lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
+                                                radius=self._RADIUS,
+                                                x=event.scenePos().x(),
+                                                y=event.scenePos().y(),
+                                                scale_factor=1)
+        #TODO[NF]:  Determine why scale_factor only works as 1 here
+        print('X and Y are %s,%s (%s)' % (lattice_x, int(lattice_y), lattice_y))
+#        print('X/Y/Radius/SF:  %s/%s/%s/%s' % (event.scenePos().x(),
+#                                               event.scenePos().y(),
+#                                               self._RADIUS,
+#                                               self.scale_factor))
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
