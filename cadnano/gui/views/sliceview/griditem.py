@@ -299,37 +299,23 @@ class GridItem(QGraphicsPathItem):
         parents[start] = None
         queue = Queue()
         queue.put(start)
-#        print('Queue is: %s' % str(queue))
-        print('Start and end are: %s, and %s' % (str(start), str(end)))
 
         while queue:
             current_location = queue.get()
-            print('Visiting %s' % str(current_location))
-#            print('Now looking at %s' % str(current_location))
 
             if current_location == end:
-#                print('Found end')
                 reversed_path = []
                 while current_location is not start:
-#               while parents[current_location] is not None:
-#                    print('Current location is %s' % str(current_location))
-#                    print('path is %s' % str(reversed_path))
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
                 reversed_path.append(start)
-#                print('Returning')
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
-#                print('My neighbors are %s' % str(neighbors))
                 for neighbor in neighbors:
                     if neighbor not in parents:
                         parents[neighbor] = current_location
                         queue.put(neighbor)
-#            print('My queue is now: %s' % str(queue))
-#            print('And parents looks like: %s' % str(parents))
-#            print()
-
 
 class ClickArea(QGraphicsEllipseItem):
     """Summary
