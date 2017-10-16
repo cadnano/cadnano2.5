@@ -708,19 +708,22 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             print('**********************           Setting shortest path mode')
             self.shortest_path_add_mode = True
             #TODO[NF]:  Set this value
-            lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
+            current_coordinates = HoneycombDnaPart.legacy_position_to_lattice(
                 radius=self._RADIUS,
                 x=event.scenePos().x(),
                 y=event.scenePos().y(),
                 scale_factor=1)
             # Complete the path
             if self.shortest_path_start is not None:
+                path = self.griditem.shortest_path(self.shortest_path_start,
+                                                   current_coordinates)
                 # Actually make things happen here
                 print('************ WOULD START AT %s' %
                       str(self.shortest_path_start))
+                print('***** PATH IS %s' % str(path))
                 self.shortest_path_start = None
             else:
-                self.shortest_path_start = (lattice_x, lattice_y)
+                self.shortest_path_start = current_coordinates
                 print('************ SET START STARTED AT %s,%s' %  self.shortest_path_start)
         else:
             print('**********************         Unsetting shortest path mode')

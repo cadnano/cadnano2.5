@@ -197,6 +197,7 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
 #        print("Points size:  %s" % len(points))
 #        print("Point map: %s" % self.point_map)
+        print("Neighbor map: %s" % self.neighbor_map)
     # end def
 
     def doSquare(self, part_item, radius, bounds):
@@ -282,7 +283,7 @@ class GridItem(QGraphicsPathItem):
             A list of coordinates corresponding to a shortest path from start to
             end
         """
-        print(start)
+        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
         assert isinstance(start, tuple) and len(start) is 2
         assert isinstance(end, tuple) and len(end) is 2
 
@@ -293,28 +294,38 @@ class GridItem(QGraphicsPathItem):
             raise LookupError('Could not find a point corresponding to %s',
                               start)
 
-        current_location = start
-
-        neighbors = self.neighbor_map.get(current_location)
-        queue = [neighbor for neighbor in neighbors]
         parents = dict()
         parents[start] = None
+        queue = [start]
+#        print('Queue is: %s' % str(queue))
+        print('Start and end are: %s, and %s' % (str(start), str(end)))
 
         while queue:
             current_location = queue.pop()
+#            print('Now looking at %s' % str(current_location))
 
             if current_location == end:
+#                print('Found end')
                 reversed_path = []
-                while parents[current_location] is not None:
+                while current_location is not start:
+#               while parents[current_location] is not None:
+                    print('Current location is %s' % str(current_location))
+#                    print('path is %s' % str(reversed_path))
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
-                return reversed(reversed_path)
+                reversed_path.append(start)
+                print('Returning')
+                return [node for node in reversed(reversed_path)]
             else:
-                neighbors = self.neighbor_map.get(current_location)
+                neighbors = self.neighbor_map.get(current_location, [])
+                print('My neighbors are %s' % str(neighbors))
                 for neighbor in neighbors:
                     if neighbor not in parents:
                         parents[neighbor] = current_location
                         queue.append(neighbor)
+#            print('My queue is now: %s' % str(queue))
+#            print('And parents looks like: %s' % str(parents))
+#            print()
 
 
 class ClickArea(QGraphicsEllipseItem):
