@@ -61,6 +61,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
+        self.inverse_scale_factor = m_p.radius() / self._RADIUS
         self.active_virtual_helix_item = None
         self.prexover_manager = PreXoverManager(self)
         self.hide()  # hide while until after attemptResize() to avoid flicker
@@ -761,14 +762,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         """
         path = self.griditem.shortest_path(start, end)
-        reversed_path = [node for node in reversed(path)]
-        print(reversed_path)
-        for node in reversed_path:
+        for node in path:
             # radius, row, column, scale
+            #TODO[NF]:  These need to become constants
             node_pos = HoneycombDnaPart.latticeCoordToPositionXY(15,
                                                                  node[0],
                                                                  node[1],
-                                                                 0.075)
+                                                                 self.inverse_scale_factor) #0.075)
             before = set(self._virtual_helix_item_hash.keys())
             self._model_part.createVirtualHelix(node_pos[0], -node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
