@@ -708,11 +708,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         if (is_shift):
             self.shortest_path_add_mode = True
-            current_coordinates = HoneycombDnaPart.legacy_position_to_lattice(
+            current_coordinates = HoneycombDnaPart.positionToLatticeCoord(
                 radius=self._RADIUS,
                 x=event.scenePos().x(),
-                y=event.scenePos().y(),
+                y=-event.scenePos().y(),
                 scale_factor=1)
+            print('You just clicked on the equivalent of %s, %s' % (
+                current_coordinates[0], current_coordinates[1]))
             # Complete the path
             if self.shortest_path_start is not None:
                 self.create_tool_shortest_path(tool,
@@ -763,14 +765,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         path = self.griditem.shortest_path(start, end)
         for node in path:
+            row = node[0] if node[0] > 0 else node[0] - 1
+            column = node[1]
             # radius, row, column, scale
             #TODO[NF]:  These need to become constants
             node_pos = HoneycombDnaPart.latticeCoordToPositionXY(15,
-                                                                 node[0],
-                                                                 node[1],
+                                                                 row,
+                                                                 column,
                                                                  self.inverse_scale_factor) #0.075)
             before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(node_pos[0], -node_pos[1])
+            self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
             for id in id_nums:

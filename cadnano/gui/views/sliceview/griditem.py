@@ -310,6 +310,7 @@ class GridItem(QGraphicsPathItem):
                 while current_location is not start:
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
+                reversed_path.append(start)
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
