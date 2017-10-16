@@ -283,7 +283,8 @@ class GridItem(QGraphicsPathItem):
 
         Returns:
             A list of coordinates corresponding to a shortest path from start to
-            end
+            end.  This list omits the starting point as it's assumed that the
+            start point has already been clicked.
         """
         print('Finding shortest path from %s to %s...' % (str(start), str(end)))
         assert isinstance(start, tuple) and len(start) is 2
@@ -309,7 +310,6 @@ class GridItem(QGraphicsPathItem):
                 while current_location is not start:
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
-                reversed_path.append(start)
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
