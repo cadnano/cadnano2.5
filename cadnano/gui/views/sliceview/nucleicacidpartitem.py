@@ -681,6 +681,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         # 1. get point in model coordinates:
+        print(type(event))
         part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
@@ -705,9 +706,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_shift = modifiers == Qt.ShiftModifier
 
         if (is_shift):
-            print('**********************           Setting shortest path mode')
             self.shortest_path_add_mode = True
-            #TODO[NF]:  Set this value
             current_coordinates = HoneycombDnaPart.legacy_position_to_lattice(
                 radius=self._RADIUS,
                 x=event.scenePos().x(),
@@ -715,18 +714,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 scale_factor=1)
             # Complete the path
             if self.shortest_path_start is not None:
-                path = self.griditem.shortest_path(self.shortest_path_start,
-                                                   current_coordinates)
-                # Actually make things happen here
-                print('************ WOULD START AT %s' %
-                      str(self.shortest_path_start))
-                print('***** PATH IS %s' % str(path))
+                self.create_tool_shortest_path(tool,
+                                               self.shortest_path_start,
+                                               current_coordinates)
                 self.shortest_path_start = None
+                return
             else:
                 self.shortest_path_start = current_coordinates
-                print('************ SET START STARTED AT %s,%s' %  self.shortest_path_start)
         else:
-            print('**********************         Unsetting shortest path mode')
             self.shortest_path_add_mode = False
             self.shortest_path_start = None
 
@@ -748,11 +743,45 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             #NF:  This creates a VH
             part.createVirtualHelix(*part_pt_tuple)
+#            print('tuple is %s' % str(part_pt_tuple))
+#            print(self.scale_factor)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
             vhi = self._virtual_helix_item_hash[id_num]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
-    # end def
+
+    def create_tool_shortest_path(self, tool, start, end):
+        """
+
+        Args:
+            start ():
+            end ():
+
+        Returns:
+
+        """
+        path = self.griditem.shortest_path(start, end)
+        reversed_path = [node for node in reversed(path)]
+        print(reversed_path)
+        for node in reversed_path:
+            # radius, row, column, scale
+            node_pos = HoneycombDnaPart.latticeCoordToPositionXY(15,
+                                                                 node[0],
+                                                                 node[1],
+                                                                 0.075)
+            before = set(self._virtual_helix_item_hash.keys())
+            self._model_part.createVirtualHelix(node_pos[0], -node_pos[1])
+            after = set(self._virtual_helix_item_hash.keys())
+            id_nums = after - before
+            for id in id_nums:
+                pass
+
+            # What about the undo stack?
+
+            print(id)
+            vhi = self._virtual_helix_item_hash[id]
+            tool.setVirtualHelixItem(vhi)
+            tool.startCreation()
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -764,25 +793,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-#        print('*****************************************************')
-#        print('Raw pos x is %s and y is %s' % (event.pos().x(),
-#                                               event.pos().y()))
-#        print('Scene pos x is %s and y is %s' % (event.scenePos().x(),
-#                                                 event.scenePos().y()))
-#        print('Screen pos x is %s and y is %s' % (event.screenPos().x(),
-#                                                 event.screenPos().y()))
-#        print('*****************************************************')
-#        lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
-#                                                radius=self._RADIUS,
-#                                                x=event.scenePos().x(),
-#                                                y=event.scenePos().y(),
-#                                                scale_factor=1)
-        #TODO[NF]:  Determine why scale_factor only works as 1 here
-#        print('X and Y are %s,%s (%s)' % (lattice_x, int(lattice_y), lattice_y))
-#        print('X/Y/Radius/SF:  %s/%s/%s/%s' % (event.scenePos().x(),
-#                                               event.scenePos().y(),
-#                                               self._RADIUS,
-#                                               self.scale_factor))
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
@@ -791,15 +801,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self.shortest_path_add_mode:
             shortest_path_start_ij = None
             current_ij = None
-#        print('Entering nucleicacidpart w/create tool')
-#        print('Scene x is %s and y is %s' % (event.scenePos().x(),
-#                                            event.scenePos().y()))
-#        print('Raw pos x is %s and y is %s' % (event.pos().x(),
-#                                               event.pos().y()))
-#        self.griditem.nearest_point_coordinates(event.scenePos().x(),
-#                                                event.scenePos().y())
-#        self.griditem.nearest_point_coordinates(event.pos().x(),
-#                                                event.pos().y())
 
     def selectToolMousePress(self, tool, event):
         """

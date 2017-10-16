@@ -120,6 +120,7 @@ class GridItem(QGraphicsPathItem):
         y_l = y_l + HoneycombDnaPart.PAD_GRID_YH
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
+        print(sf)
         points = self.points
         row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
