@@ -9,6 +9,7 @@ from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 
+from cadnano.fileio.lattice import HoneycombDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getNoPen  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
@@ -53,7 +54,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (None, optional): Description
         """
-        print("CREATING ONE")
+        print("CREATING ONE ITEM")
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
@@ -93,6 +94,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem.setZValue(1)
         self.grab_cornerTL.setZValue(2)
         self.grab_cornerBR.setZValue(2)
+
+        self.shortest_path_start = None
 
         # select upon creation
         for part in m_p.document().children():
@@ -705,7 +708,20 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             print('**********************           Setting shortest path mode')
             self.shortest_path_add_mode = True
             #TODO[NF]:  Set this value
-            self.shortest_path_start = None
+            lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
+                radius=self._RADIUS,
+                x=event.scenePos().x(),
+                y=event.scenePos().y(),
+                scale_factor=1)
+            # Complete the path
+            if self.shortest_path_start is not None:
+                # Actually make things happen here
+                print('************ WOULD START AT %s' %
+                      str(self.shortest_path_start))
+                self.shortest_path_start = None
+            else:
+                self.shortest_path_start = (lattice_x, lattice_y)
+                print('************ SET START STARTED AT %s,%s' %  self.shortest_path_start)
         else:
             print('**********************         Unsetting shortest path mode')
             self.shortest_path_add_mode = False
@@ -753,14 +769,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 #        print('Screen pos x is %s and y is %s' % (event.screenPos().x(),
 #                                                 event.screenPos().y()))
 #        print('*****************************************************')
-        from cadnano.fileio.lattice import HoneycombDnaPart
-        lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
-                                                radius=self._RADIUS,
-                                                x=event.scenePos().x(),
-                                                y=event.scenePos().y(),
-                                                scale_factor=1)
+#        lattice_x, lattice_y = HoneycombDnaPart.legacy_position_to_lattice(
+#                                                radius=self._RADIUS,
+#                                                x=event.scenePos().x(),
+#                                                y=event.scenePos().y(),
+#                                                scale_factor=1)
         #TODO[NF]:  Determine why scale_factor only works as 1 here
-        print('X and Y are %s,%s (%s)' % (lattice_x, int(lattice_y), lattice_y))
+#        print('X and Y are %s,%s (%s)' % (lattice_x, int(lattice_y), lattice_y))
 #        print('X/Y/Radius/SF:  %s/%s/%s/%s' % (event.scenePos().x(),
 #                                               event.scenePos().y(),
 #                                               self._RADIUS,

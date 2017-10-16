@@ -155,7 +155,7 @@ class GridItem(QGraphicsPathItem):
 
                 # Handle neighbor mapping logic
                 self.point_map[(i,j)] = pt
-                sys.stdout.write('%s,%s (%s) ' % ((x, y, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
+#                sys.stdout.write('%s,%s (%s) ' % ((x, y, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
 #               sys.stdout.write('%s,%s (%s) ' % ((i, j, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
 
                 if HoneycombDnaPart.isEvenParity(i, j):
@@ -177,7 +177,7 @@ class GridItem(QGraphicsPathItem):
                     self.point_map.setdefault((i, j+1))
                     self.point_map.setdefault((i-1, j))
 
-            sys.stdout.write('\n')
+#            sys.stdout.write('\n')
             is_pen_down = False
         # end for i
         # DO VERTICAL LINES
@@ -195,8 +195,8 @@ class GridItem(QGraphicsPathItem):
                 is_pen_down = False
             # end for j
         self.setPath(path)
-        print("Points size:  %s" % len(points))
-        print("Point map: %s" % self.point_map)
+#        print("Points size:  %s" % len(points))
+#        print("Point map: %s" % self.point_map)
     # end def
 
     def doSquare(self, part_item, radius, bounds):
