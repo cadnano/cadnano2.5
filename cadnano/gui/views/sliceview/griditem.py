@@ -1,3 +1,4 @@
+from queue import Queue
 
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QPainterPath, QColor
@@ -197,7 +198,7 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
 #        print("Points size:  %s" % len(points))
 #        print("Point map: %s" % self.point_map)
-        print("Neighbor map: %s" % self.neighbor_map)
+#        print("Neighbor map: %s" % self.neighbor_map)
     # end def
 
     def doSquare(self, part_item, radius, bounds):
@@ -296,12 +297,14 @@ class GridItem(QGraphicsPathItem):
 
         parents = dict()
         parents[start] = None
-        queue = [start]
+        queue = Queue()
+        queue.put(start)
 #        print('Queue is: %s' % str(queue))
         print('Start and end are: %s, and %s' % (str(start), str(end)))
 
         while queue:
-            current_location = queue.pop()
+            current_location = queue.get()
+            print('Visiting %s' % str(current_location))
 #            print('Now looking at %s' % str(current_location))
 
             if current_location == end:
@@ -309,20 +312,20 @@ class GridItem(QGraphicsPathItem):
                 reversed_path = []
                 while current_location is not start:
 #               while parents[current_location] is not None:
-                    print('Current location is %s' % str(current_location))
+#                    print('Current location is %s' % str(current_location))
 #                    print('path is %s' % str(reversed_path))
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
                 reversed_path.append(start)
-                print('Returning')
+#                print('Returning')
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
-                print('My neighbors are %s' % str(neighbors))
+#                print('My neighbors are %s' % str(neighbors))
                 for neighbor in neighbors:
                     if neighbor not in parents:
                         parents[neighbor] = current_location
-                        queue.append(neighbor)
+                        queue.put(neighbor)
 #            print('My queue is now: %s' % str(queue))
 #            print('And parents looks like: %s' % str(parents))
 #            print()
