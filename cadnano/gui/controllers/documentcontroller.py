@@ -75,6 +75,8 @@ class DocumentController():
             ag.addAction(getattr(win, action_name))
 
         win.action_global_select.trigger()
+
+        self.win.outliner_property_splitter.hide()
     # end def
 
     def destroyDC(self):
@@ -501,10 +503,8 @@ class DocumentController():
     def actionToggleOutlinerSlot(self):
         outliner = self.win.outliner_property_splitter
         if outliner.isVisible():
-            print("HIDING")
             outliner.hide()
         else:
-            print("SHOWING")
             outliner.show()
     # end def
 
