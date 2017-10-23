@@ -694,7 +694,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self.create_tool_shortest_path(tool,
                                                self.shortest_path_start,
                                                position)
-                self.shortest_path_start = None
+                self.shortest_path_start = position
                 return
             else:
                 self.shortest_path_start = position
