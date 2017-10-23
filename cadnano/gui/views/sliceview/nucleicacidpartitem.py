@@ -54,7 +54,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (None, optional): Description
         """
-        print("CREATING ONE ITEM")
+#        print("CREATING ONE ITEM")
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
@@ -682,7 +682,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         # 1. get point in model coordinates:
-        print(type(event))
         part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
@@ -706,24 +705,20 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         is_shift = modifiers == Qt.ShiftModifier
 
+#        position = (event.scenePos().x(), event.scenePos().y())
+#        self.griditem.find_closest_point(position)
         if (is_shift):
             self.shortest_path_add_mode = True
-            current_coordinates = HoneycombDnaPart.positionToLatticeCoord(
-                radius=self._RADIUS,
-                x=event.scenePos().x(),
-                y=-event.scenePos().y(),
-                scale_factor=1)
-            print('You just clicked on the equivalent of %s, %s' % (
-                current_coordinates[0], current_coordinates[1]))
+            position = (event.scenePos().x(), event.scenePos().y())
             # Complete the path
             if self.shortest_path_start is not None:
                 self.create_tool_shortest_path(tool,
                                                self.shortest_path_start,
-                                               current_coordinates)
+                                               position)
                 self.shortest_path_start = None
                 return
             else:
-                self.shortest_path_start = current_coordinates
+                self.shortest_path_start = position
         else:
             self.shortest_path_add_mode = False
             self.shortest_path_start = None
@@ -744,10 +739,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
-            #NF:  This creates a VH
             part.createVirtualHelix(*part_pt_tuple)
-#            print('tuple is %s' % str(part_pt_tuple))
-#            print(self.scale_factor)
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
             vhi = self._virtual_helix_item_hash[id_num]
             tool.setVirtualHelixItem(vhi)
@@ -765,14 +757,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         path = self.griditem.shortest_path(start, end)
         for node in path:
-            row = node[0] if node[0] > 0 else node[0] - 1
+            row = -node[0]
+#            row = node[0] if node[0] > 0 else node[0] - 1
             column = node[1]
-            # radius, row, column, scale
-            #TODO[NF]:  These need to become constants
-            node_pos = HoneycombDnaPart.latticeCoordToPositionXY(15,
-                                                                 row,
-                                                                 column,
-                                                                 self.inverse_scale_factor) #0.075)
+            node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
+                                                                 row=row,
+                                                                 column=column,
+                                                                 scale_factor=self.inverse_scale_factor)
             before = set(self._virtual_helix_item_hash.keys())
             self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
@@ -782,7 +773,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
             # What about the undo stack?
 
-            print(id)
+#            print(id)
             vhi = self._virtual_helix_item_hash[id]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()

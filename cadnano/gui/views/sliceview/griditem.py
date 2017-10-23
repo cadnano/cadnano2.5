@@ -1,8 +1,9 @@
 from queue import Queue
 
 from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtGui import QPainterPath, QColor
+from PyQt5.QtGui import QPainterPath, QColor, QFont
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
+from PyQt5.uic.properties import QtGui
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
@@ -46,6 +47,7 @@ class GridItem(QGraphicsPathItem):
         self.draw_lines = False
         self.points = []
         self.point_map = dict()
+        self.point_coordinates = dict()
         self.neighbor_map = dict()
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -63,7 +65,7 @@ class GridItem(QGraphicsPathItem):
         part_item = self.part_item
         part = part_item.part()
         radius = part.radius()
-        print("RADIUS IS ORIGINALLY %s" % radius)
+#        print("RADIUS IS ORIGINALLY %s" % radius)
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
         if self.grid_type == GridType.HONEYCOMB:
@@ -120,7 +122,6 @@ class GridItem(QGraphicsPathItem):
         y_l = y_l + HoneycombDnaPart.PAD_GRID_YH
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
-        print(sf)
         points = self.points
         row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
@@ -152,32 +153,36 @@ class GridItem(QGraphicsPathItem):
                                -y - half_dot_size,
                                dot_size, self)
                 GridPoint(x, -y, 1, self)
+                self.point_coordinates[(-i, j)] = (x, -y)
+                font = QFont('Arial')
+                path.addText(x-10, -y+5, font, "%s,%s" % (j, -i))
                 pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
 
                 # Handle neighbor mapping logic
-                self.point_map[(i,j)] = pt
+                self.point_map[(-i,j)] = pt
 #                sys.stdout.write('%s,%s (%s) ' % ((x, y, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
 #               sys.stdout.write('%s,%s (%s) ' % ((i, j, 'T' if HoneycombDnaPart.isEvenParity(i,j) else 'F')))
 
-                if HoneycombDnaPart.isEvenParity(i, j):
-                    self.neighbor_map[(i,j)] = [
-                        (i, j-1),
-                        (i, j+1),
-                        (i+1, j)
+                # This is reversed since the Y is mirrored
+                if not HoneycombDnaPart.isEvenParity(i, j):
+                    self.neighbor_map[(-i,j)] = [
+                        (-i, j-1),
+                        (-i, j+1),
+                        (-i-1, j)
                     ]
-                    self.point_map.setdefault((i, j-1))
-                    self.point_map.setdefault((i, j+1))
-                    self.point_map.setdefault((i+1, j))
+                    self.point_map.setdefault((-i, j-1))
+                    self.point_map.setdefault((-i, j+1))
+                    self.point_map.setdefault((-i-1, j))
                 else:
-                    self.neighbor_map[(i,j)] = [
-                        (i, j-1),
-                        (i, j+1),
-                        (i-1, j)
+                    self.neighbor_map[(-i,j)] = [
+                        (-i, j-1),
+                        (-i, j+1),
+                        (-i+1, j)
                     ]
-                    self.point_map.setdefault((i, j-1))
-                    self.point_map.setdefault((i, j+1))
-                    self.point_map.setdefault((i-1, j))
+                    self.point_map.setdefault((-i, j-1))
+                    self.point_map.setdefault((-i, j+1))
+                    self.point_map.setdefault((-i+1, j))
 
 #            sys.stdout.write('\n')
             is_pen_down = False
@@ -197,6 +202,8 @@ class GridItem(QGraphicsPathItem):
                 is_pen_down = False
             # end for j
         self.setPath(path)
+        for key, value in self.neighbor_map.items():
+            print(key, value)
 #        print("Points size:  %s" % len(points))
 #        print("Point map: %s" % self.point_map)
 #        print("Neighbor map: %s" % self.neighbor_map)
@@ -271,6 +278,30 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
+    def find_closest_point(self, position):
+        """Find the closest point to a given position on the grid
+        Args:
+            position ():
+
+        Returns:
+
+        """
+        from math import sqrt
+        minimum = float('inf')
+        best = None
+        for coordinates, coordiante_position in self.point_coordinates.items():
+            distance = sqrt(
+                    (coordiante_position[0]-position[0])**2 +
+                    (coordiante_position[1]-position[1])**2)
+            if distance < minimum:
+                minimum = distance
+                best = coordinates
+            if minimum < _RADIUS:
+#                logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+                return best
+#        logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+        return best
+
     def shortest_path(self, start, end):
         """Return a path of coordinates that traverses from start to end.
 
@@ -286,31 +317,36 @@ class GridItem(QGraphicsPathItem):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
-        assert isinstance(start, tuple) and len(start) is 2
-        assert isinstance(end, tuple) and len(end) is 2
+        start_coordinates = self.find_closest_point(start)
+        end_coordinates = self.find_closest_point(end)
 
-        if self.point_map.get(start) is None:
+        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
+#        assert isinstance(start, tuple) and len(start) is 2
+#        assert isinstance(end, tuple) and len(end) is 2
+
+        if self.point_map.get(start_coordinates) is None:
             raise LookupError('Could not find a point corresponding to %s',
-                              start)
-        elif self.point_map.get(end) is None:
+                              start_coordinates)
+        elif self.point_map.get(end_coordinates) is None:
             raise LookupError('Could not find a point corresponding to %s',
-                              start)
+                              end_coordinates)
 
         parents = dict()
-        parents[start] = None
+        parents[start_coordinates] = None
         queue = Queue()
-        queue.put(start)
+        queue.put(start_coordinates)
 
         while queue:
             current_location = queue.get()
 
-            if current_location == end:
+            if current_location == end_coordinates:
                 reversed_path = []
-                while current_location is not start:
+                while current_location is not start_coordinates:
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
-                reversed_path.append(start)
+                reversed_path.append(start_coordinates)
+                for node in reversed(reversed_path):
+                    print(node)
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
@@ -382,7 +418,6 @@ class GridPoint(QGraphicsEllipseItem):
         Returns:
             None
         """
-        print("FIRST")
         if self.grid.allow_snap:
             part_item = self.grid.part_item
             tool = part_item._getActiveTool()
@@ -460,13 +495,8 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneMouseEvent): The event that the mouseclick
             triggered
         """
-        print("SECOND")
-#        print('Coordinates:  %s:%s' % (event.scenePos().x(), event.scenePos().y()))
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
         part = part_item.part()
         part.setSelected(True)
-        # print("paws")
         alt_event = GridEvent(self, self.offset)
         part_item.createToolMousePress(tool, event, alt_event)
 

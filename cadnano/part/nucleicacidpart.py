@@ -2270,7 +2270,6 @@ class NucleicAcidPart(Part):
         """
         radius = self._radius
         res = self.queryVirtualHelixOrigin(radius, point)
-        print("RES IS %s" % str(res))
         # res = set(res)
         if len(res) > 0:
             if id_num is None:
