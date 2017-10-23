@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.8.2
+# Created by: PyQt5 UI code generator 5.9
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -328,7 +328,7 @@ class Ui_MainWindow(object):
         self.action_new_dnapart.setObjectName("action_new_dnapart")
         self.action_outliner = QtWidgets.QAction(MainWindow)
         self.action_outliner.setCheckable(True)
-        self.action_outliner.setChecked(True)
+        self.action_outliner.setChecked(False)
         icon20 = QtGui.QIcon()
         icon20.addPixmap(QtGui.QPixmap(":/parttools/outliner"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_outliner.setIcon(icon20)
