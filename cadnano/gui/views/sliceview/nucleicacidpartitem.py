@@ -54,7 +54,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             viewroot (TYPE): Description
             parent (None, optional): Description
         """
-#        print("CREATING ONE ITEM")
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
@@ -365,25 +364,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 pass  # self.griditem.setDrawlines(False)
             else:
                 raise ValueError("unknown grid styling")
-#        elif key == 'slice':
-#            print('Slice view change:  %s' % value)
-#            if value == 'legacy':
-#                # Show this view
-#                self.show()
-#                print("I see legacy*********************")
-#            elif value == 'grid':
-#                # Hide this view
-#                self.hide()
-#                self._viewroot.hide()
-#                print(type(self._viewroot))
-#                print("I see grid*********************")
-#            elif value == 'both':
-#                # Show this view
-#                self.show()
-#                print("I see both*********************")
-#            else:
-#                raise ValueError('Unknown slice view')
-    # end def
 
     ### ACCESSORS ###
     def boundingRect(self):
@@ -421,7 +401,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         """
         current_vhi = self.active_virtual_helix_item
-        # print(current_vhi, new_active_vhi)
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
                 current_vhi.deactivate()
@@ -773,7 +752,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
             # What about the undo stack?
 
-#            print(id)
             vhi = self._virtual_helix_item_hash[id]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
