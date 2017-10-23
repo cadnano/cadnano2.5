@@ -74,7 +74,6 @@ class HoneycombDnaPart(object):
         else:
             # even parity
             row = int(row_temp/3 + 0.5)
-        print('Position is %s,%s' % (column, row))
         return row, column
     # end def
 
