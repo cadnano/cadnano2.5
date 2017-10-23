@@ -200,9 +200,6 @@ class GridItem(QGraphicsPathItem):
                 is_pen_down = False
             # end for j
         self.setPath(path)
-        for key, value in self.neighbor_map.items():
-            print(key, value)
-    # end def
 
     def doSquare(self, part_item, radius, bounds):
         """Summary
@@ -339,7 +336,6 @@ class GridItem(QGraphicsPathItem):
                 while current_location is not start_coordinates:
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
-                reversed_path.append(start_coordinates)
                 return [node for node in reversed(reversed_path)]
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
