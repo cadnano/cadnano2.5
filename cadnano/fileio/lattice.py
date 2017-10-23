@@ -74,25 +74,8 @@ class HoneycombDnaPart(object):
         else:
             # even parity
             row = int(row_temp/3 + 0.5)
+        print('Position is %s,%s' % (column, row))
         return row, column
-    # end def
-
-    @staticmethod
-    def legacy_position_to_lattice(radius, x, y, scale_factor=1.0):
-        float_column = (x / (radius*root3*scale_factor) + 0.5)
-        column = int(float_column) if float_column > 0 else int(float_column-1)
-
-        row_temp = -y / (radius*scale_factor)
-        if (row_temp % 3) + 0.5 > 1.0:
-            # odd parity
-            inverted_row = (row_temp - 1)/3 + 0.5
-        else:
-            # even parity
-            inverted_row = row_temp/3 + 0.5
-
-        row = int(inverted_row) if inverted_row > 0 else int(inverted_row - 1)
-
-        return -row, column
     # end def
 
     @staticmethod
