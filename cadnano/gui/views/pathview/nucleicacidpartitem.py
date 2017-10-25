@@ -68,6 +68,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
         GC_SIZE = 10
         self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
+        self.grab_corner.hide()
     # end def
 
     def proxy(self):
@@ -302,6 +303,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi_list.append(vhi)
         ztf = not getBatch()
         self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
+        if not self.grab_corner.isVisible():
+            self.grab_corner.show()
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
