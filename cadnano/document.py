@@ -931,4 +931,15 @@ class Document(CNObject):
         else:
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
+
+    def get_slice_view_type(self):
+        return self.controller().get_slice_view_type()
+
+    def get_grid_appearance(self):
+        """LINES/DOTS"""
+        return self.controller().get_grid_appearance()
+
+    def get_grid_type(self):
+        """NONE/HONEYCOMB/SQUARE"""
+        return self.controller().get_grid_type()
 # end class

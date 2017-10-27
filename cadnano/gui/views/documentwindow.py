@@ -82,8 +82,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
 
-#        self.slice_graphics_view.hide()
-
     def _init_grid_view(self, doc):
         """Initializes Grid View.
 
@@ -178,14 +176,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def document(self):
         return self.controller.document()
 
-    # end def
-
     def destroyWin(self):
         for mgr in self.tool_managers:
             mgr.destroy()
         self.controller = None
-
-    # end def
 
     ### ACCESSORS ###
     def undoStack(self):
@@ -198,8 +192,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.activateSelection(isActive)
         self.slice_graphics_view.activateSelection(isActive)
         self.grid_graphics_view.activateSelection(isActive)
-
-    # end def
 
     ### EVENT HANDLERS ###
     def focusInEvent(self):

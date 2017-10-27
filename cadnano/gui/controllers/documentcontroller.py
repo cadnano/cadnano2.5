@@ -40,6 +40,11 @@ class DocumentController():
         self._initWindow()
         app().document_controllers.add(self)
 
+        self.action_grid_view(show=False)
+
+        self.slice_view_showing = True
+        self.grid_view_showing = False
+
     def _initWindow(self):
         """docstring for initWindow"""
         # print("new window", app().qApp.allWindows())
@@ -519,8 +524,10 @@ class DocumentController():
         print("Toggling slice view to %s" % show)
         slice_view = self.win.slice_graphics_view
         if show:
+            self.slice_view_showing = True
             slice_view.show()
         else:
+            self.slice_view_showing = False
             slice_view.hide()
 
     def action_grid_view(self, show):
@@ -534,8 +541,10 @@ class DocumentController():
         print("Toggling grid view to %s" % show)
         grid_view = self.win.grid_graphics_view
         if show:
+            self.grid_view_showing = True
             grid_view.show()
         else:
+            self.grid_view_showing = False
             grid_view.hide()
 
     ### ACCESSORS ###
@@ -854,3 +863,33 @@ class DocumentController():
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
+
+    def get_slice_view_type(self):
+        # TODO[NF]:  Make these strings global constants
+        if self.slice_view_showing and self.grid_view_showing:
+            return 'Both'
+        elif self.slice_view_showing and not self.grid_view_showing:
+            return 'Slice'
+        elif not self.slice_view_showing and self.grid_view_showing:
+            return 'Grid'
+        else:
+            raise NotImplementedError
+
+    def set_slice_view_type(self, slice_view_type):
+        # TODO[NF]:  Make these strings global constants
+        if slice_view_type not in ('Both', 'Slice', 'Grid'):
+            #logger.error('slice_view_type is invalid:  %s' % slice_view_type)
+            print('slice_view_type is invalid:  %s' % slice_view_type)
+
+        if slice_view_type == 'Both' or slice_view_type == 'Grid':
+            self.grid_view_showing = True
+            self.action_grid_view(show=True)
+        if slice_view_type == 'Both' or slice_view_type == 'Slice':
+            self.slice_view_showing = True
+            self.action_slice_view(show=True)
+
+    def get_grid_type(self):
+        raise NotImplementedError
+
+    def get_grid_appearance(self):
+        raise NotImplementedError
