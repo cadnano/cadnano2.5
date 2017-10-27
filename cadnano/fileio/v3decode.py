@@ -40,6 +40,7 @@ def decodePart(document, part_dict, emit_signals=False):
     vh_id_list = part_dict['vh_list']
     vh_props = part_dict['virtual_helices']
     origins = part_dict['origins']
+    meta = part_dict['meta']
     keys = list(vh_props.keys())
 
     if part_dict.get('point_type') == PointType.ARBITRARY:
@@ -114,7 +115,9 @@ def decodePart(document, part_dict, emit_signals=False):
     if vh_order:
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
-# end def
+
+    slice_view_type = meta.get('slice_view_type')
+    dc.set_slice_view_type(slice_view_type)
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums

@@ -131,9 +131,6 @@ class GridItem(QGraphicsPathItem):
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
-#        GridPoint(0-half_dot_size, 0-half_dot_size, 1, self)
-#        GridPoint(0-half_dot_size, 0-half_dot_size, 29, self)
-#        GridPoint(0, 0, 29, self)
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
