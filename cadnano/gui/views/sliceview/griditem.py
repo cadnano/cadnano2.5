@@ -33,7 +33,8 @@ class GridItem(QGraphicsPathItem):
     def __init__(self, part_item, grid_type):
         """Summary
 
-        point_map contains a mapping of i, j row-column coordinates to actual GridPoint items.  neihgbor_map contains a mapping of i, j row-column coordinates to a list of i, j row-column coordinates of neighbors
+        neighbor_map contains a mapping of i, j row-column coordinates to a
+        list of i, j row-column coordinates of neighbors
 
         Args:
             part_item (TYPE): Description
@@ -46,9 +47,9 @@ class GridItem(QGraphicsPathItem):
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = False
         self.points = []
-        self.point_map = dict()
         self.point_coordinates = dict()
         self.neighbor_map = dict()
+        self.previous_grid_bounds = None
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
@@ -124,14 +125,14 @@ class GridItem(QGraphicsPathItem):
         points = self.points
         row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
-        # print(row_l, row_h, col_l, col_h)
 
-        import sys
+        redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds
+
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
-        GridPoint(0-half_dot_size, 0-half_dot_size, 1, self)
-        GridPoint(0-half_dot_size, 0-half_dot_size, 29, self)
+#        GridPoint(0-half_dot_size, 0-half_dot_size, 1, self)
+#        GridPoint(0-half_dot_size, 0-half_dot_size, 29, self)
 #        GridPoint(0, 0, 29, self)
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
@@ -151,38 +152,32 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
-                GridPoint(x, -y, 1, self)
-                self.point_coordinates[(-i, j)] = (x, -y)
 
                 # TODO[NF]:  Remove me
+                GridPoint(x, -y, 1, self)
                 font = QFont('Arial')
                 path.addText(x-10, -y+5, font, "%s,%s" % (j, -i))
 
                 pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
 
-                # Handle neighbor mapping logic
-                self.point_map[(-i,j)] = pt
+                if redo_neighbors:
+                    self.point_coordinates[(-i, j)] = (x, -y)
 
-                # This is reversed since the Y is mirrored
-                if not HoneycombDnaPart.isEvenParity(i, j):
-                    self.neighbor_map[(-i,j)] = [
-                        (-i, j-1),
-                        (-i, j+1),
-                        (-i-1, j)
-                    ]
-                    self.point_map.setdefault((-i, j-1))
-                    self.point_map.setdefault((-i, j+1))
-                    self.point_map.setdefault((-i-1, j))
-                else:
-                    self.neighbor_map[(-i,j)] = [
-                        (-i, j-1),
-                        (-i, j+1),
-                        (-i+1, j)
-                    ]
-                    self.point_map.setdefault((-i, j-1))
-                    self.point_map.setdefault((-i, j+1))
-                    self.point_map.setdefault((-i+1, j))
+                    # This is reversed since the Y is mirrored
+                    if not HoneycombDnaPart.isEvenParity(i, j):
+                        self.neighbor_map[(-i,j)] = [
+                            (-i, j-1),
+                            (-i, j+1),
+                            (-i-1, j)
+                        ]
+                    else:
+                        self.neighbor_map[(-i,j)] = [
+                            (-i, j-1),
+                            (-i, j+1),
+                            (-i+1, j)
+                        ]
+                    self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
 
@@ -278,21 +273,18 @@ class GridItem(QGraphicsPathItem):
         Returns:
 
         """
-        from math import sqrt
-        minimum = float('inf')
-        best = None
+#        minimum = float('inf')
+#        best = None
         for coordinates, coordiante_position in self.point_coordinates.items():
-            distance = sqrt(
-                    (coordiante_position[0]-position[0])**2 +
-                    (coordiante_position[1]-position[1])**2)
-            if distance < minimum:
-                minimum = distance
-                best = coordinates
-            if minimum < _RADIUS:
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
+            if distance < _RADIUS**2:
 #                logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-                return best
+                return coordinates
+#            elif distance < minimum:
+#                minimum = distance
+#                best = coordinates
 #        logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-        return best
+#        return best
 
     def shortest_path(self, start, end):
         """Return a path of coordinates that traverses from start to end.
@@ -309,17 +301,22 @@ class GridItem(QGraphicsPathItem):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
+        assert isinstance(start, tuple) and len(start) is 2
+        assert isinstance(end, tuple) and len(end) is 2
+
         start_coordinates = self.find_closest_point(start)
         end_coordinates = self.find_closest_point(end)
 
-        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
-#        assert isinstance(start, tuple) and len(start) is 2
-#        assert isinstance(end, tuple) and len(end) is 2
+        if start_coordinates is None or end_coordinates is None:
+            print('Could not find path from %s to %s' % (str(start), str(end)))
+            return []
 
-        if self.point_map.get(start_coordinates) is None:
+        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
+
+        if self.neighbor_map.get(start_coordinates) is None:
             raise LookupError('Could not find a point corresponding to %s',
                               start_coordinates)
-        elif self.point_map.get(end_coordinates) is None:
+        elif self.neighbor_map.get(end_coordinates) is None:
             raise LookupError('Could not find a point corresponding to %s',
                               end_coordinates)
 
