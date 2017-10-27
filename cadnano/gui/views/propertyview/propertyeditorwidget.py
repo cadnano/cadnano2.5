@@ -79,6 +79,7 @@ class PropertyEditorWidget(QTreeWidget):
         self.setItemDelegate(custom_delegate)
 
         self.model().dataChanged.connect(self.dataChangedSlot)
+        self.hide()
 
         # Add some dummy items
         # p1 = self.addDummyRow("sequence", "ATCGACTGATCG")
