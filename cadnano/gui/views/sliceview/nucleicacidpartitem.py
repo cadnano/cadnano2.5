@@ -685,9 +685,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
 #        position = (event.scenePos().x(), event.scenePos().y())
 #        self.griditem.find_closest_point(position)
+        position = (event.scenePos().x(), event.scenePos().y())
         if (is_shift):
             self.shortest_path_add_mode = True
-            position = (event.scenePos().x(), event.scenePos().y())
             # Complete the path
             if self.shortest_path_start is not None:
                 self.create_tool_shortest_path(tool,
@@ -723,7 +723,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
-#            self.griditem.added_virtual_helix((start, end))
+            coordinates = self.griditem.find_closest_point(position)
+            print('coordinates are %s' % str(coordinates))
+            self.griditem.added_virtual_helix(coordinates)
 
     def create_tool_shortest_path(self, tool, start, end):
         """
@@ -748,14 +750,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
-            # What about the undo stack?
 
             vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
-            # Todo:  Is this the right order?
-#            self.griditem.added_virtual_helix((column, row))
+            self.griditem.added_virtual_helix((-row, column))
 
     def createToolHoverMove(self, tool, event):
         """Summary
