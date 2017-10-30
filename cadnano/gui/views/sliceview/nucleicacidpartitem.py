@@ -653,7 +653,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            tool (TYPE): Description
             event (TYPE): Description
             alt_event (None, optional): Description
 
@@ -724,6 +723,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
+#            self.griditem.added_virtual_helix((start, end))
+
     def create_tool_shortest_path(self, tool, start, end):
         """
 
@@ -747,14 +748,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
-            for id in id_nums:
-                pass
-
             # What about the undo stack?
 
-            vhi = self._virtual_helix_item_hash[id]
+            vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
+
+            # Todo:  Is this the right order?
+#            self.griditem.added_virtual_helix((column, row))
 
     def createToolHoverMove(self, tool, event):
         """Summary

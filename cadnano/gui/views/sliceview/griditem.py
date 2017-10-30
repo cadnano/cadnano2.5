@@ -49,6 +49,7 @@ class GridItem(QGraphicsPathItem):
         self.points = []
         self.point_coordinates = dict()
         self.neighbor_map = dict()
+        self.virtual_helices = set()
         self.previous_grid_bounds = None
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -322,21 +323,48 @@ class GridItem(QGraphicsPathItem):
         queue = Queue()
         queue.put(start_coordinates)
 
-        while queue:
-            current_location = queue.get()
+        print('start:')
+        print(self.virtual_helices)
+
+        while not queue.empty():
+            print('looping')
+            try:
+                current_location = queue.get(block=False)
+            except Queue.Empty:
+                print('abort')
+                return []
 
             if current_location == end_coordinates:
+                print('blooping')
                 reversed_path = []
                 while current_location is not start_coordinates:
                     reversed_path.append(current_location)
                     current_location = parents[current_location]
+                [self.virtual_helices.add(helix) for helix in reversed_path]
                 return [node for node in reversed(reversed_path)]
+#            elif current_location in self.virtual_helices:
+#                print('clooping')
+#                continue
             else:
+                print('dlooping')
                 neighbors = self.neighbor_map.get(current_location, [])
                 for neighbor in neighbors:
-                    if neighbor not in parents:
+                    if neighbor not in parents and neighbor not in self.virtual_helices:
                         parents[neighbor] = current_location
                         queue.put(neighbor)
+                        print('%s/%s' % (neighbor, self.virtual_helices))
+                    if neighbor in self.virtual_helices:
+                        print('omitted')
+        return []
+#                    else:
+#                        print('%s/%s' % (neighbor, self.virtual_helices))
+
+    def added_virtual_helix(self, location):
+        self.virtual_helices.add(location)
+        print(self.virtual_helices)
+
+    def removed_virtual_helix(self, location):
+        self.virtual_helices.remove(location)
 
 class ClickArea(QGraphicsEllipseItem):
     """Summary
