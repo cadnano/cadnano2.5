@@ -204,7 +204,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         Args:
             event (QMouseEvent): contains parameters that describe the mouse event.
         """
-        print("VirtualHelixItem mousePressEvent")
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             return
         if event.button() == Qt.RightButton:

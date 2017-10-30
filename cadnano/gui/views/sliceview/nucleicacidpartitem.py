@@ -443,7 +443,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
+
         vhi = self._virtual_helix_item_hash[id_num]
+
+        center_point = vhi.getCenterScenePos()
+        location = self.griditem.find_closest_point((center_point.x(),
+                                                     center_point.y()))
+
+        self.griditem.removed_virtual_helix(location)
+
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
         vhi.virtualHelixRemovedSlot()

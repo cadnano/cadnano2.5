@@ -17,24 +17,17 @@ DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 
 
 class GridItem(QGraphicsPathItem):
-    """Summary
-
-    Attributes:
-        allow_snap (TYPE): Description
-        bounds (TYPE): Description
-        dots (tuple): Index 0 corresponds to the size of the dot, index 1
-        corresponds to half the size of the dot
-        draw_lines (bool): Description
-        grid_type (TYPE): Description
-        part_item (TYPE): Description
-        points (list): Description
-    """
-
     def __init__(self, part_item, grid_type):
         """Summary
 
-        neighbor_map contains a mapping of i, j row-column coordinates to a
-        list of i, j row-column coordinates of neighbors
+        neighbor_map (dict):  a mapping of i, j row-column coordinates to a
+        list of i, j row-column coordinates of neighbors to facilitate a BFS
+
+        virtual_helices (set):  a set of tuples corresponding to virtual
+        helices that exist on the Grid
+
+        previous_grid_bounds (tuple):  a tuple corresponding to the bounds of
+        the grid.
 
         Args:
             part_item (TYPE): Description
@@ -42,6 +35,7 @@ class GridItem(QGraphicsPathItem):
         """
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
+        #TODO[NF] Make this a constant
         dot_size = 30
         self.dots = (dot_size, dot_size / 2)
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
@@ -56,8 +50,6 @@ class GridItem(QGraphicsPathItem):
         self.setPen(color)
         self.setGridType(grid_type)
 
-    # end def
-
     def updateGrid(self):
         """Summary
 
@@ -70,9 +62,9 @@ class GridItem(QGraphicsPathItem):
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
         if self.grid_type == GridType.HONEYCOMB:
-            self.doHoneycomb(part_item, radius, bounds)
+            self.create_honeycomb(part_item, radius, bounds)
         elif self.grid_type == GridType.SQUARE:
-            self.doSquare(part_item, radius, bounds)
+            self.create_square(part_item, radius, bounds)
         else:
             self.setPath(QPainterPath())
     # end def
@@ -102,7 +94,7 @@ class GridItem(QGraphicsPathItem):
         return
     # end def
 
-    def doHoneycomb(self, part_item, radius, bounds):
+    def create_honeycomb(self, part_item, radius, bounds):
         """Summary
 
         Args:
@@ -194,7 +186,7 @@ class GridItem(QGraphicsPathItem):
             # end for j
         self.setPath(path)
 
-    def doSquare(self, part_item, radius, bounds):
+    def create_square(self, part_item, radius, bounds):
         """Summary
 
         Args:
@@ -327,6 +319,7 @@ class GridItem(QGraphicsPathItem):
             try:
                 current_location = queue.get(block=False)
             except Queue.Empty:
+                print('Could not find path from %s to %s' % (str(start), str(end)))
                 return []
 
             if current_location == end_coordinates:
@@ -341,13 +334,33 @@ class GridItem(QGraphicsPathItem):
                     if neighbor not in parents and neighbor not in self.virtual_helices:
                         parents[neighbor] = current_location
                         queue.put(neighbor)
+        print('Could not find path from %s to %s' % (str(start), str(end)))
         return []
 
     def added_virtual_helix(self, location):
+        """
+        Update the internal set of virtual helices to include the
+        virtualhelix that lives at `location`.
+
+        Args:
+            location (tuple):  The location that a VH is being added to
+
+        Returns: None
+        """
+        assert isinstance(location, tuple) and len(location) is 2
         self.virtual_helices.add(location)
-        print(self.virtual_helices)
 
     def removed_virtual_helix(self, location):
+        """
+        Update the internal set of virtual helices to no longer include the
+        virtualhelix that lives at `location`.
+
+        Args:
+            location (tuple):  The location that a VH is being removed from
+
+        Returns: None
+        """
+        assert isinstance(location, tuple) and len(location) is 2
         self.virtual_helices.remove(location)
 
 class ClickArea(QGraphicsEllipseItem):
