@@ -33,6 +33,7 @@ class GridItem(QGraphicsPathItem):
             part_item (TYPE): Description
             grid_type (TYPE): Description
         """
+        print("new griditem")
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
         #TODO[NF] Make this a constant
@@ -144,7 +145,8 @@ class GridItem(QGraphicsPathItem):
                                dot_size, self)
 
                 # TODO[NF]:  Remove me
-                GridPoint(x, -y, 1, self)
+#                GridPoint(x, -y, 1, self)
+#                print('making points')
                 font = QFont('Arial')
                 path.addText(x-10, -y+5, font, "%s,%s" % (j, -i))
 
@@ -205,11 +207,15 @@ class GridItem(QGraphicsPathItem):
         points = self.points
         row_l, col_l = doPosition(radius, x_l, -y_l, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
-        # print(row_l, row_h, col_l, col_h)
+
+        redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds
 
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
+
+        self.point_coordinates = dict()
+        self.neighbor_map = dict()
 
         for i in range(row_l, row_h + 1):
             for j in range(col_l, col_h + 1):
@@ -227,9 +233,24 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
-                pt.setPen(getPenObj(Qt.blue, 1.0))
+                stroke_weight = 0.25
+                pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
+
+#                if redo_neighbors:
+                self.point_coordinates[(-i, j)] = (x, -y)
+
+                self.neighbor_map[(-i, j)] = [
+                    (-i, j+1),
+                    (-i, j-1),
+                    (i, j+1),
+                    (i, j-1)
+                ]
+
+                self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
+
             is_pen_down = False  # pen up
+
         # DO VERTICAL LINES
         if draw_lines:
             for j in range(col_l, col_h + 1):

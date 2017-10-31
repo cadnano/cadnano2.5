@@ -8,8 +8,9 @@ from ast import literal_eval
 from PyQt5.QtCore import QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
+from cadnano.cnenum import GridType
 
-from cadnano.fileio.lattice import HoneycombDnaPart
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getNoPen  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
@@ -750,10 +751,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             row = -node[0]
 #            row = node[0] if node[0] > 0 else node[0] - 1
             column = node[1]
-            node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                 row=row,
-                                                                 column=column,
-                                                                 scale_factor=self.inverse_scale_factor)
+            if self.griditem.grid_type is GridType.HONEYCOMB:
+                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
+                                                                     row=row,
+                                                                     column=column,
+                                                                     scale_factor=self.inverse_scale_factor)
+            else:
+                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
+                                                                     row=row,
+                                                                     column=column,
+                                                                     scale_factor=self.inverse_scale_factor)
             before = set(self._virtual_helix_item_hash.keys())
             self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
