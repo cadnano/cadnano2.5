@@ -243,8 +243,8 @@ class GridItem(QGraphicsPathItem):
                 self.neighbor_map[(-i, j)] = [
                     (-i, j+1),
                     (-i, j-1),
-                    (i, j+1),
-                    (i, j-1)
+                    (-i-1, j),
+                    (-i+1, j)
                 ]
 
                 self.previous_grid_bounds = (row_l, col_l, row_h, col_h)

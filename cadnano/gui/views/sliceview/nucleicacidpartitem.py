@@ -692,8 +692,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         is_shift = modifiers == Qt.ShiftModifier
 
-#        position = (event.scenePos().x(), event.scenePos().y())
-#        self.griditem.find_closest_point(position)
         position = (event.scenePos().x(), event.scenePos().y())
         if (is_shift):
             self.shortest_path_add_mode = True
@@ -758,9 +756,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                      scale_factor=self.inverse_scale_factor)
             else:
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                     row=row,
-                                                                     column=column,
-                                                                     scale_factor=self.inverse_scale_factor)
+                                                                  row=row,
+                                                                  column=column,
+                                                                  scale_factor=self.inverse_scale_factor)
             before = set(self._virtual_helix_item_hash.keys())
             self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
             after = set(self._virtual_helix_item_hash.keys())
