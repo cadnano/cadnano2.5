@@ -693,20 +693,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_shift = modifiers == Qt.ShiftModifier
 
         position = (event.scenePos().x(), event.scenePos().y())
-        if (is_shift):
-            self.shortest_path_add_mode = True
-            # Complete the path
-            if self.shortest_path_start is not None:
-                self.create_tool_shortest_path(tool,
-                                               self.shortest_path_start,
-                                               position)
-                self.shortest_path_start = position
-                return
-            else:
-                self.shortest_path_start = position
-        else:
-            self.shortest_path_add_mode = False
-            self.shortest_path_start = None
+
+        if self._handle_spa_mouse_press(tool=tool, position=position,
+                                        is_shift=is_shift):
+            return
 
         # don't create a new VirtualHelix if the click overlaps with existing
         # VirtualHelix
@@ -733,6 +723,23 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             coordinates = self.griditem.find_closest_point(position)
             print('coordinates are %s' % str(coordinates))
             self.griditem.added_virtual_helix(coordinates)
+
+    def _handle_spa_mouse_press(self, tool, position, is_shift):
+        if (is_shift):
+            self.shortest_path_add_mode = True
+            # Complete the path
+            if self.shortest_path_start is not None:
+                self.create_tool_shortest_path(tool,
+                                               self.shortest_path_start,
+                                               position)
+                self.shortest_path_start = position
+                return True
+            else:
+                self.shortest_path_start = position
+        else:
+            self.shortest_path_add_mode = False
+            self.shortest_path_start = None
+        return False
 
     def create_tool_shortest_path(self, tool, start, end):
         """
