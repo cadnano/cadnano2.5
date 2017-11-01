@@ -685,15 +685,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         part_pt_tuple = self.getModelPos(pt)
 
-        mod = Qt.MetaModifier
+#        mod = Qt.MetaModifier
         modifiers = event.modifiers()
-        if not (modifiers & mod):
-            pass
+#        if not (modifiers & mod):
+#            pass
 
         is_shift = modifiers == Qt.ShiftModifier
-
         position = (event.scenePos().x(), event.scenePos().y())
-
         if self._handle_spa_mouse_press(tool=tool, position=position,
                                         is_shift=is_shift):
             return
