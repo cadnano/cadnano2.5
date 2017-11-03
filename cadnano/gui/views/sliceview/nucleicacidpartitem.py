@@ -459,7 +459,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
+    def reconfigureRect(self, top_left, bottom_right, padding=80,
+                        do_grid=False):
         """Reconfigures the rectangle that is the document.
 
         Args:
@@ -473,14 +474,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
         """
+        print('reconfig:  %s, %s, %s' % (padding, str(top_left), str(bottom_right)))
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
-        self._rect = new_rect = QRectF(ptTL, ptBR)
-        self.setRect(new_rect)
+        self._rect = QRectF(ptTL, ptBR)
+        self.setRect(self._rect)
         self.configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
+        print('rsetting: %s, %s, %s, %s' % (ptTL.x(), ptTL.y(), ptBR.x(),
+                                           ptBR.y()))
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
@@ -503,14 +507,22 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        padding = self._BOUNDING_RECT_PADDING
+        if self.griditem.grid_type is GridType.SQUARE:
+            padding = 1.5*self._RADIUS
+            print('padding is %s' % padding)
+        else:
+            padding = self._BOUNDING_RECT_PADDING
+
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
-        xTL = min(rect_left, model_left) - padding
-        xBR = max(rect_right, model_right) + padding
-        yTL = min(rect_top, model_top) - padding
-        yBR = max(rect_bottom, model_bottom) + padding
+        print('was: %s, %s, %s, %s' % (rect_left, rect_top, rect_right,
+                                       rect_bottom))
+        xTL = min(rect_left, model_left - padding)
+        xBR = max(rect_right, model_right + padding)
+        yTL = min(rect_top, model_top - padding)
+        yBR = max(rect_bottom, model_bottom + padding)
         tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
+        print('esetting: %s, %s, %s, %s' % (xTL, yTL, xBR, yBR))
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)
 
