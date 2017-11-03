@@ -99,6 +99,21 @@ class NucleicAcidPart(Part):
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
 
+    #TODO[NF]:  Change usages of these strings to constants throughought files
+    _FLOAT_PROPERTY_KEYS = [
+        'bases_per_repeat',
+        'bases_per_turn',
+        'eulerZ',
+        'helical_pitch',
+        'length',
+        'minor_groove_angle',
+        'neighbor_active_angle',
+        'scamZ',
+        'turns_per_repeat',
+        'twist_per_base',
+        'z'
+    ]
+
     @classmethod
     def _count(cls):
         NucleicAcidPart.__count += 1
@@ -1258,6 +1273,19 @@ class NucleicAcidPart(Part):
             # 1. Find insert indices
             if offset_and_size_tuple is None:
                 raise IndexError("id_num {} does not exists".format(id_num))
+
+        # Ensure that the values that are set are floats as appropriate
+        if not isinstance(keys, basestring):
+            # TODO[NF]:  Change this to logger
+            print('Encountered a non-basestring key:  %s' % keys)
+        # TODO[NF]:  If keys is somehow a list, values won't be cast properly
+        # TODO[NF]:  Add UI-side validation of inputs
+        if keys in self._FLOAT_PROPERTY_KEYS:
+            try:
+                values = float(values)
+            except ValueError:
+                print('Validation failed:  attempted to set %s to %s' % (keys,
+                                                                         values))
         self.vh_properties.loc[id_num, keys] = values
 
         if not isinstance(values, (tuple, list)):
