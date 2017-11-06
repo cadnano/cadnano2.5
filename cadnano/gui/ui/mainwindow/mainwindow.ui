@@ -354,7 +354,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_new_dnapart"/>
+   <addaction name="action_new_dnapart_honeycomb"/>
+   <addaction name="action_new_dnapart_square"/>
    <addaction name="action_global_select"/>
    <addaction name="action_global_pencil"/>
    <addaction name="action_path_nick"/>
@@ -576,6 +577,18 @@
    </property>
    <property name="toolTip">
     <string>Click to add new part with honeycomb lattice</string>
+   </property>
+  </action>
+  <action name="action_new_dna_part">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
+   </property>
+   <property name="text">
+    <string>Sq</string>
+   </property>
+   <property name="toolTip">
+    <string>Click to add new part with square lattice</string>
    </property>
   </action>
   <action name="action_path_nick">
@@ -870,22 +883,40 @@
     <string>M</string>
    </property>
   </action>
-  <action name="action_new_dnapart">
+  <action name="action_new_dnapart_honeycomb">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
    </property>
    <property name="text">
-    <string>New</string>
+    <string>New Honeycomb</string>
    </property>
    <property name="iconText">
     <string>New</string>
    </property>
    <property name="toolTip">
-    <string>Add DNAPart </string>
+    <string>Add Honeycomb DNAPart </string>
    </property>
    <property name="shortcut">
     <string>Ctrl+P</string>
+   </property>
+  </action>
+  <action name="action_new_dnapart_square">
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
+   </property>
+   <property name="text">
+    <string>New Square</string>
+   </property>
+   <property name="iconText">
+    <string>New</string>
+   </property>
+   <property name="toolTip">
+    <string>Add Square DNAPart </string>
+   </property>
+   <property name="shortcut">
+    <string/>
    </property>
   </action>
   <action name="action_outliner">
