@@ -7,6 +7,7 @@ from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QGraphicsItem, QMessageBox,
                              QStyleOptionGraphicsItem)
+from cadnano.cnenum import GridType
 
 from cadnano import app, setReopen, util
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
@@ -122,7 +123,7 @@ class DocumentController():
 #            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
             (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_pencil.trigger()),
-            (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_honey),
+            (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_square),
             (win.action_new_dnapart_square.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
@@ -497,7 +498,7 @@ class DocumentController():
         if ONLY_ONE:
             self.newDocument()  # only allow one part for now
         doc = self._document
-        part = doc.createNucleicAcidPart()
+        part = doc.createNucleicAcidPart(grid_type=GridType.HONEYCOMB)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
@@ -514,7 +515,7 @@ class DocumentController():
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE)
+        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE, grid_type=GridType.SQUARE)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
