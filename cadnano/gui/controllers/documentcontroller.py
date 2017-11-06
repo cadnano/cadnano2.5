@@ -494,28 +494,22 @@ class DocumentController():
         pass
 
     def action_create_nucleic_acid_part_honey(self):
-        print('in create')
-        if ONLY_ONE:
-            self.newDocument()  # only allow one part for now
-        doc = self._document
-        part = doc.createNucleicAcidPart(grid_type=GridType.HONEYCOMB)
-        active_part = doc.activePart()
-        if active_part is not None:
-            active_part.setActive(False)
-            doc.deactivateActivePart()
-        part.setActive(True)
-        doc.setActivePart(part)
-        return part
+        #TODO[NF]:  Docstring
+        self._action_create_nucleic_acid_part(grid_type=GridType.HONEYCOMB)
 
     def action_create_nucleic_acid_part_square(self):
-        print('in create')
+        #TODO[NF]:  Docstring
+        self._action_create_nucleic_acid_part(grid_type=GridType.SQUARE)
+
+    def _action_create_nucleic_acid_part(self, grid_type):
+        #TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.maybeSave() is False:
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE, grid_type=GridType.SQUARE)
+        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE, grid_type=grid_type)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
