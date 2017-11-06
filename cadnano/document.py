@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from cadnano import app, setBatch, util
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.cnenum import ModType
+from cadnano.cnenum import ModType, GridType
 from cadnano.cnobject import CNObject
 from cadnano.cnproxy import ProxySignal, UndoStack
 from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
@@ -672,15 +672,15 @@ class Document(CNObject):
     # end def
 
     # PUBLIC METHODS FOR EDITING THE MODEL #
-    def createNucleicAcidPart(self, use_undostack=True):
+    def createNucleicAcidPart(self, use_undostack=True, grid_type=GridType.HONEYCOMB):
         """ Create and store a new DnaPart and instance, and return the instance.
 
         Args:
             use_undostack (bool): optional, defaults to True
         """
-        dnapart = NucleicAcidPart(document=self)
-        self._addPart(dnapart, use_undostack=use_undostack)
-        return dnapart
+        dna_part = NucleicAcidPart(document=self, grid_type=grid_type)
+        self._addPart(dna_part, use_undostack=use_undostack)
+        return dna_part
     # end def
 
     def getParts(self):
@@ -937,7 +937,15 @@ class Document(CNObject):
         #TODO[NF]:  Docstring
         return self.controller().get_slice_view_type()
 
+    def set_slice_view_type(self, slice_view_type):
+        #TODO[NF]:  Docstring
+        return self.controller().set_slice_view_type(slice_view_type=slice_view_type)
+
     def get_grid_type(self):
         #TODO[NF]:  Docstring
         return self.activePart().get_grid_type()
+
+    def set_grid_type(self, grid_type):
+        #TODO[NF]:  Docstring
+        return self.activePart().set_grid_type(grid_type)
 # end class

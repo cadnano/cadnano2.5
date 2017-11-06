@@ -124,6 +124,7 @@ class NucleicAcidPart(Part):
         """
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
+        grid_type = kwargs.get('grid_type', GridType.HONEYCOMB)
         if do_copy:
             return
 
@@ -150,7 +151,7 @@ class NucleicAcidPart(Part):
         gps['crossover_span_angle'] = 45
         gps['max_vhelix_length'] = self._STEP_SIZE * 2
         gps['neighbor_active_angle'] = ''
-        gps['grid_type'] = GridType.HONEYCOMB
+        gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
 
@@ -213,12 +214,6 @@ class NucleicAcidPart(Part):
         self.recycle_bin = []
         self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
     # end def
-
-    def get_grid_type(self):
-        return self._group_properties.get('grid_type')
-
-    def set_grid_type(self, grid_type):
-        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 
     # B. Virtual Helix
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int, name='partActiveVirtualHelixChangedSignal')
@@ -3228,6 +3223,14 @@ class NucleicAcidPart(Part):
             id_num, is_fwd, idx = self._getModKeyTokens(key)
             yield (id_num, is_fwd, idx, mid)
     # end def
+
+    def get_grid_type(self):
+        #TODO[NF]:  Docstring
+        return self._group_properties.get('grid_type')
+
+    def set_grid_type(self, grid_type):
+        #TODO[NF]:  Docstring
+        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
 
 

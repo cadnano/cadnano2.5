@@ -11,9 +11,16 @@ def decode(document, obj, emit_signals=False):
         document (Document):
         obj (dict): deserialized file object
     """
-    name = obj['name']
+    name = obj.get('name')
+    meta = obj.get('meta')
+
+    slice_view_type = meta.get('slice_view_type')
+    grid_type = meta.get('grid_type')
+    document.set_slice_view_type(slice_view_type=slice_view_type)
+
     for part_dict in obj['parts']:
-        part_dict = decodePart(document, part_dict, emit_signals=emit_signals)
+        decodePart(document, part_dict, grid_type=grid_type,
+                   emit_signals=emit_signals)
 
     modifications = obj['modifications']
     for mod_id, item in modifications.items():
@@ -22,25 +29,20 @@ def decode(document, obj, emit_signals=False):
         for key in ext_locations:
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
-    return
-# end def
 
-def decodePart(document, part_dict, emit_signals=False):
+def decodePart(document, part_dict, grid_type, emit_signals=False):
     """ Decode a a deserialized Part dictionary
 
     Args:
         document (Document):
         part_dict (dict): deserialized dictionary describing the Part
     """
-    name = part_dict['name']
-    dc = document._controller
-    part = document.createNucleicAcidPart(use_undostack=False)
+    part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
     part.setActive(True)
 
     vh_id_list = part_dict['vh_list']
     vh_props = part_dict['virtual_helices']
     origins = part_dict['origins']
-    meta = part_dict['meta']
     keys = list(vh_props.keys())
 
     if part_dict.get('point_type') == PointType.ARBITRARY:
@@ -115,9 +117,6 @@ def decodePart(document, part_dict, emit_signals=False):
     if vh_order:
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
-
-    slice_view_type = meta.get('slice_view_type')
-    dc.set_slice_view_type(slice_view_type)
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
