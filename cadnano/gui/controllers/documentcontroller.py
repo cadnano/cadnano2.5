@@ -119,8 +119,6 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-#            (win.action_new_dnapart.triggered, self.action_create_nucleic_acid_part_honey),
-#            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
             (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_square),
@@ -894,9 +892,18 @@ class DocumentController():
             #logger.error('slice_view_type is invalid:  %s' % slice_view_type)
             print('slice_view_type is invalid:  %s' % slice_view_type)
 
-        if slice_view_type == 'Both' or slice_view_type == 'Grid':
+        if slice_view_type == 'Both':
             self.grid_view_showing = True
             self.action_grid_view(show=True)
-        if slice_view_type == 'Both' or slice_view_type == 'Slice':
             self.slice_view_showing = True
             self.action_slice_view(show=True)
+        elif slice_view_type == 'Slice':
+            self.grid_view_showing = False
+            self.action_grid_view(show=False)
+            self.slice_view_showing = True
+            self.action_slice_view(show=True)
+        elif slice_view_type == 'Grid':
+            self.grid_view_showing = True
+            self.action_grid_view(show=True)
+            self.slice_view_showing = False
+            self.action_slice_view(show=False)
