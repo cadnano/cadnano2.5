@@ -84,17 +84,9 @@ class GridItem(QGraphicsPathItem):
         self.updateGrid()
     # end def
 
-    def setDrawlines(self, draw_lines):
-        """Do nothing; lines should never be drawn in the Grid View.
-
-        Args:
-            draw_lines (bool): Whether or not lines should be drawn
-
-        Returns:
-            None
-        """
+    def set_drawlines(self, draw_lines):
+        #TODO[NF]:  Docstring
         return
-    # end def
 
     def create_honeycomb(self, part_item, radius, bounds):
         """Summary

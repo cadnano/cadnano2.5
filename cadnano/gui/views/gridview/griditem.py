@@ -79,18 +79,10 @@ class GridItem(QGraphicsPathItem):
         self.updateGrid()
     # end def
 
-    def setDrawlines(self, draw_lines):
-        """Summary
-
-        Args:
-            draw_lines (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
+    def set_drawlines(self, draw_lines):
+        #TODO[NF]:  Docstring
         self.draw_lines = draw_lines
         self.updateGrid()
-    # end def
 
     def doHoneycomb(self, part_item, radius, bounds):
         """Summary

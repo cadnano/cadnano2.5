@@ -19,7 +19,6 @@ def encodeDocument(document):
                 'name': '',
                 'meta': {
                     'slice_view_type'   :document.get_slice_view_type(),
-                    'grid_appearance'   :document.get_grid_appearance(),
                     'grid_type'         :document.get_grid_type()
                 },
                 'parts': [],

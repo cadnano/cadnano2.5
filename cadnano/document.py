@@ -934,14 +934,10 @@ class Document(CNObject):
         return seq, name
 
     def get_slice_view_type(self):
+        #TODO[NF]:  Docstring
         return self.controller().get_slice_view_type()
 
-    def get_grid_appearance(self):
-        """LINES/DOTS"""
-        return 'Dots'
-        raise NotImplementedError
-
     def get_grid_type(self):
-        """NONE/HONEYCOMB/SQUARE"""
+        #TODO[NF]:  Docstring
         return self.activePart().get_grid_type()
 # end class
