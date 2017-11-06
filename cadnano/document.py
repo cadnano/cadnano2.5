@@ -156,6 +156,7 @@ class Document(CNObject):
 
     def setActivePart(self, part):
         # print("DC setActivePart")
+        print('active part is' + str(part))
         self._active_part = part
     # end def
 
@@ -937,9 +938,10 @@ class Document(CNObject):
 
     def get_grid_appearance(self):
         """LINES/DOTS"""
-        return self.controller().get_grid_appearance()
+        return 'Dots'
+        raise NotImplementedError
 
     def get_grid_type(self):
         """NONE/HONEYCOMB/SQUARE"""
-        return self.controller().get_grid_type()
+        return self.activePart().get_grid_type()
 # end class

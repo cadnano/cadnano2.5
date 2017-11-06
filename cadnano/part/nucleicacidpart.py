@@ -214,6 +214,12 @@ class NucleicAcidPart(Part):
         self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
     # end def
 
+    def get_grid_type(self):
+        return self._group_properties.get('grid_type')
+
+    def set_grid_type(self, grid_type):
+        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
+
     # B. Virtual Helix
     partActiveVirtualHelixChangedSignal = ProxySignal(CNObject, int, name='partActiveVirtualHelixChangedSignal')
     """id_num"""

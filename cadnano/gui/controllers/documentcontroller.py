@@ -905,9 +905,3 @@ class DocumentController():
         if slice_view_type == 'Both' or slice_view_type == 'Slice':
             self.slice_view_showing = True
             self.action_slice_view(show=True)
-
-    def get_grid_type(self):
-        raise NotImplementedError
-
-    def get_grid_appearance(self):
-        raise NotImplementedError
