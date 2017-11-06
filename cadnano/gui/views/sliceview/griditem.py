@@ -142,12 +142,6 @@ class GridItem(QGraphicsPathItem):
                                -y - half_dot_size,
                                dot_size, self)
 
-                # TODO[NF]:  Remove me
-#                GridPoint(x, -y, 1, self)
-#                print('making points')
-                font = QFont('Arial')
-                path.addText(x-10, -y+5, font, "%s,%s" % (j, -i))
-
                 pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
 
@@ -207,8 +201,6 @@ class GridItem(QGraphicsPathItem):
         row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
 
         redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or self.previous_grid_type != self.grid_type
-        print('redo neighbors is %s' % redo_neighbors)
-        print(self.neighbor_map)
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
