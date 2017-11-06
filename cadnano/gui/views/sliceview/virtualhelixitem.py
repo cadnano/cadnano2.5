@@ -217,6 +217,9 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
+    def createToolMousePress(self, tool, part_item, event):
+        pass
+
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this
         item with the SelectTool active.
