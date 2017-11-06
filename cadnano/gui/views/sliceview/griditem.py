@@ -1,13 +1,12 @@
 from queue import Queue
 
-from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtGui import QPainterPath, QColor, QFont
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
-from PyQt5.uic.properties import QtGui
+from PyQt5.QtCore import QPointF, Qt
+from PyQt5.QtGui import QColor, QPainterPath
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.cnenum import GridType
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
 
 from . import slicestyles as styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -36,7 +35,7 @@ class GridItem(QGraphicsPathItem):
         print("new griditem")
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
-        #TODO[NF] Make this a constant
+        # TODO[NF] Make this a constant
         dot_size = 30
         self.dots = (dot_size, dot_size / 2)
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
@@ -85,7 +84,7 @@ class GridItem(QGraphicsPathItem):
     # end def
 
     def set_drawlines(self, draw_lines):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return
 
     def create_honeycomb(self, part_item, radius, bounds):
@@ -126,7 +125,7 @@ class GridItem(QGraphicsPathItem):
         for i in range(row_l, row_h):
             for j in range(col_l, col_h+1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
-#                sys.stdout.write('%s,%s ' % (x,y))
+                # sys.stdout.write('%s,%s ' % (x,y))
                 if draw_lines:
                     if is_pen_down:
                         path.lineTo(x, -y)
@@ -137,7 +136,7 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                stroke_weight = 0.25
+                stroke_weight = styles.EMPTY_HELIX_STROKE_WIDTH
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
@@ -150,13 +149,13 @@ class GridItem(QGraphicsPathItem):
 
                     # This is reversed since the Y is mirrored
                     if not HoneycombDnaPart.isEvenParity(i, j):
-                        self.neighbor_map[(-i,j)] = [
+                        self.neighbor_map[(-i, j)] = [
                             (-i, j-1),
                             (-i, j+1),
                             (-i-1, j)
                         ]
                     else:
-                        self.neighbor_map[(-i,j)] = [
+                        self.neighbor_map[(-i, j)] = [
                             (-i, j-1),
                             (-i, j+1),
                             (-i+1, j)
@@ -227,7 +226,7 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
-                stroke_weight = 0.25
+                stroke_weight = styles.EMPTY_HELIX_STROKE_WIDTH
                 pt.setPen(getPenObj(Qt.blue, stroke_weight))
                 points.append(pt)
 
@@ -281,7 +280,7 @@ class GridItem(QGraphicsPathItem):
         for coordinates, coordiante_position in self.point_coordinates.items():
             distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
             if distance < _RADIUS**2:
-#                logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
                 return coordinates
 
     def shortest_path(self, start, end):
@@ -372,6 +371,7 @@ class GridItem(QGraphicsPathItem):
         """
         assert isinstance(location, tuple) and len(location) is 2
         self.virtual_helices.remove(location)
+
 
 class ClickArea(QGraphicsEllipseItem):
     """Summary
@@ -479,9 +479,9 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
+        # self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
+        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, styles.EMPTY_HELIX_STROKE_WIDTH))
         return
-        self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
-        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.0))
     # end def
 
     def selectToolMousePress(self, tool, part_item, event):
@@ -514,6 +514,7 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
+        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.5))
         part_item.createToolHoverEnter(tool, event)
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
