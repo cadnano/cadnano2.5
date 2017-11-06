@@ -118,8 +118,12 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-            (win.action_new_dnapart.triggered, self.actionCreateNucleicAcidPart),
-            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
+#            (win.action_new_dnapart.triggered, self.action_create_nucleic_acid_part_honey),
+#            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
+            (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_honey),
+            (win.action_new_dnapart_square.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
             (win.action_feedback.triggered, self.actionFeedbackSlot),
@@ -488,7 +492,22 @@ class DocumentController():
         """
         pass
 
-    def actionCreateNucleicAcidPart(self):
+    def action_create_nucleic_acid_part_honey(self):
+        print('in create')
+        if ONLY_ONE:
+            self.newDocument()  # only allow one part for now
+        doc = self._document
+        part = doc.createNucleicAcidPart()
+        active_part = doc.activePart()
+        if active_part is not None:
+            active_part.setActive(False)
+            doc.deactivateActivePart()
+        part.setActive(True)
+        doc.setActivePart(part)
+        return part
+
+    def action_create_nucleic_acid_part_square(self):
+        print('in create')
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.maybeSave() is False:
@@ -503,7 +522,6 @@ class DocumentController():
         part.setActive(True)
         doc.setActivePart(part)
         return part
-    # end def
 
     def actionToggleOutlinerSlot(self):
         outliner = self.win.outliner_property_splitter
