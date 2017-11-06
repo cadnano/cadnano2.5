@@ -100,7 +100,7 @@ class CadnanoQt(QObject):
         doc = Document()
         self._document = self.createDocument(base_doc=doc)
 
-        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by Nick
+        # os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by NC
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()
