@@ -354,8 +354,6 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_new_dnapart_honeycomb"/>
-   <addaction name="action_new_dnapart_square"/>
    <addaction name="action_global_select"/>
    <addaction name="action_global_pencil"/>
    <addaction name="action_path_nick"/>
@@ -363,7 +361,9 @@
    <addaction name="action_path_insertion"/>
    <addaction name="action_path_skip"/>
    <addaction name="action_path_add_seq"/>
-   <addaction name="action_path_mods"/>
+   <addaction name="separator"/>
+   <addaction name="action_new_dnapart_honeycomb"/>
+   <addaction name="action_new_dnapart_square"/>
    <addaction name="separator"/>
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
@@ -418,10 +418,11 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_filter_handle"/>
-   <addaction name="action_filter_fwd"/>
    <addaction name="action_filter_rev"/>
-   <addaction name="action_filter_endpoint"/>
+   <addaction name="action_filter_fwd"/>
    <addaction name="action_filter_xover"/>
+   <addaction name="action_filter_endpoint"/>
+   <addaction name="actionSelectable"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -892,7 +893,7 @@
     <string>New Honeycomb</string>
    </property>
    <property name="iconText">
-    <string>New</string>
+    <string>Honeycomb</string>
    </property>
    <property name="toolTip">
     <string>Add Honeycomb DNAPart </string>
@@ -910,7 +911,7 @@
     <string>New Square</string>
    </property>
    <property name="iconText">
-    <string>New</string>
+    <string>Square</string>
    </property>
    <property name="toolTip">
     <string>Add Square DNAPart </string>
@@ -1250,6 +1251,14 @@
    </property>
    <property name="shortcut">
     <string>V</string>
+   </property>
+  </action>
+  <action name="actionSelectable">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Selectable:</string>
    </property>
   </action>
  </widget>
