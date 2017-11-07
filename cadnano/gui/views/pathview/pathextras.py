@@ -654,4 +654,3 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def mouseReleaseEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
-

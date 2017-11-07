@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj, getPenObj
+from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
@@ -307,16 +307,25 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         for i in range(canvas_size):
             x = round(bw * i) + .5
             if i % sub_step_size == 0:
-                path.moveTo(x - .5, 0)
-                path.lineTo(x - .5, bw2)
-                path.lineTo(x - .25, bw2)
+                # path.moveTo(x - .5, 0)
+                # path.lineTo(x - .5, bw2)
+                # path.lineTo(x - .25, bw2)
+                # path.lineTo(x - .25, 0)
+                # path.lineTo(x, 0)
+                # path.lineTo(x, bw2)
+                # path.lineTo(x + .25, bw2)
+                # path.lineTo(x + .25, 0)
+                # path.lineTo(x + .5, 0)
+                # path.lineTo(x + .5, bw2)
+
+                # path.moveTo(x - .5, 0)
+                # path.lineTo(x - .5, bw2)
+                path.moveTo(x - .25, bw2)
                 path.lineTo(x - .25, 0)
                 path.lineTo(x, 0)
                 path.lineTo(x, bw2)
                 path.lineTo(x + .25, bw2)
                 path.lineTo(x + .25, 0)
-                path.lineTo(x + .5, 0)
-                path.lineTo(x + .5, bw2)
 
                 # path.moveTo(x-.5, 0)
                 # path.lineTo(x-.5, 2 * bw)
