@@ -632,18 +632,19 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         """
-        Parses a mousePressEvent, calling the approproate tool method as
-        necessary. Stores _moveIdx for future comparison.
+        Parses a mousePressEvent. Stores _move_idx and _offset_idx for
+        future comparison.
         """
+        self.setCursor(Qt.ClosedHandCursor)
         if event.button() != Qt.LeftButton:
             event.ignore()
             QGraphicsItem.mousePressEvent(self, event)
             return
-        self._moveIdx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+        self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+        self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
 
     def mouseMoveEvent(self, event):
-        self.setCursor(Qt.ClosedHandCursor)
-        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
         x = int(idx * BASE_WIDTH)
         self.setPos(x, self.y())
@@ -652,4 +653,5 @@ class PathWorkplaneItem(QGraphicsRectItem):
         # self._partItem.updateStatusBar("%d" % self.part().activeBaseIndex())
 
     def mouseReleaseEvent(self, event):
-        self.setCursor(Qt.ArrowCursor)
+        self.setCursor(Qt.OpenHandCursor)
+
