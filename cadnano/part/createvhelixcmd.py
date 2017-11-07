@@ -6,7 +6,7 @@ from cadnano.cnproxy import UndoCommand
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(self, part, x, y, z, length,
                  id_num=None, properties=None,
-                 safe=True):
+                 safe=True, parity=None):
         """
         Args:
             safe (bool): safe must be True to update neighbors
@@ -15,9 +15,10 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            self.id_num = part._getNewIdNum()
+            print('id none')
+            self.id_num = part._get_new_id_num(parity=parity)
         else:
-            part._reserveIdNum(id_num)
+            part._reserve_id_num(id_num)
             self.id_num = id_num
         self.origin_pt = (x, y, z)
         self.length = length
