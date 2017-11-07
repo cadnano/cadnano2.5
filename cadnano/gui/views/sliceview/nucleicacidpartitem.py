@@ -744,8 +744,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
         else:
-            # TODO[NF]:  Change this to be true only when honeycomb AND slice
-            if True:
+            if self.griditem.grid_type is GridType.HONEYCOMB:
                 x, y = self.griditem.find_closest_point(position)
                 parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
             else:
@@ -795,18 +794,22 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             row = -node[0]
 #            row = node[0] if node[0] > 0 else node[0] - 1
             column = node[1]
+            before = set(self._virtual_helix_item_hash.keys())
             if self.griditem.grid_type is GridType.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
                                                                      row=row,
                                                                      column=column,
                                                                      scale_factor=self.inverse_scale_factor)
             else:
+                parity = None
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
                                                                   row=row,
                                                                   column=column,
                                                                   scale_factor=self.inverse_scale_factor)
-            before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
+            self._model_part.createVirtualHelix(x=node_pos[0],
+                                                y=node_pos[1],
+                                                parity=parity)
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
 
