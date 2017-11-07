@@ -32,8 +32,8 @@ class ColorPanel(QGraphicsItem):
         super(ColorPanel, self).__init__(parent)
         self.rect = QRectF(0, 0, 30, 30)
         self.setFlag(QGraphicsItem.ItemIgnoresTransformations)
-        print("A bug in Qt is about to cause a warning 'Layout still needs update after calling...'")
-        print("Please vote to fix here: https://bugreports.qt.io/browse/QTBUG-58699")
+        # print("A bug in Qt is about to cause a warning 'Layout still needs update after calling...'")
+        # print("Please vote to fix here: https://bugreports.qt.io/browse/QTBUG-58699")
         self.colordialog = QColorDialog()
         self._shift_color_index = -1  # init on -1, painttool will cycle to 0
         self._color_index = -1  # init on -1, painttool will cycle to 0

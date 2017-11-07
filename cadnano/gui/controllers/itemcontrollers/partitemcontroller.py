@@ -5,13 +5,13 @@ class PartItemController():
     # end def
 
     connections = [
-    ('partZDimensionsChangedSignal',        'partZDimensionsChangedSlot'),
-    ('partParentChangedSignal',             'partParentChangedSlot'),
-    ('partRemovedSignal',                   'partRemovedSlot'),
-    ('partPropertyChangedSignal',           'partPropertyChangedSlot'),
-    ('partSelectedChangedSignal',           'partSelectedChangedSlot'),
-
-    ('partDocumentSettingChangedSignal',    'partDocumentSettingChangedSlot')
+    ('partZDimensionsChangedSignal',      'partZDimensionsChangedSlot'),     # noqa
+    ('partParentChangedSignal',           'partParentChangedSlot'),          # noqa
+    ('partRemovedSignal',                 'partRemovedSlot'),                # noqa
+    ('partPropertyChangedSignal',         'partPropertyChangedSlot'),        # noqa
+    ('partSelectedChangedSignal',         'partSelectedChangedSlot'),        # noqa
+    ('partDocumentSettingChangedSignal',  'partDocumentSettingChangedSlot'), # noqa
+    ('partWorkplaneChangedSignal',        'partWorkplaneChangedSlot')        # noqa
     ]
 
     def connectSignals(self):

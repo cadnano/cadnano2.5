@@ -12,6 +12,7 @@ from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
 from . import pathstyles as styles
+from .pathextras import PathWorkplaneItem
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import PathVirtualHelixItem
@@ -69,6 +70,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         GC_SIZE = 10
         self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
         self.grab_corner.hide()
+        self.workplane = PathWorkplaneItem(m_p, self)
     # end def
 
     def proxy(self):
@@ -336,8 +338,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """ Step 2 of removing a VHI
         """
         ztf = not getBatch()
-        self._setVirtualHelixItemList(self._virtual_helix_item_list,
-            zoom_to_fit=ztf)
+        self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
@@ -510,6 +511,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         temp_rect = self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2)
         self.grab_corner.setTopLeft(temp_rect.topLeft())
         self.setRect(temp_rect)
+        self.workplane.updateDimensions()
     # end def
 
     ### PUBLIC METHODS ###
@@ -546,18 +548,16 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi_list = self._virtual_helix_item_list
         helix_numbers = [vhi.idNum() for vhi in vhi_list]
 
-
         first_index = helix_numbers.index(id_nums[0])
         last_index = helix_numbers.index(id_nums[-1]) + 1
 
-        insert_idxs = [helix_numbers.index(id_num) for id_num in id_nums]
         for id_num in id_nums:
             helix_numbers.remove(id_num)
 
         if index_delta < 0:  # move group earlier in the list
             new_index = max(0, index_delta + first_index) - len(id_nums)
         else:  # move group later in list
-            new_index = min(len(vhi_list), index_delta + last_index ) - len(id_nums)
+            new_index = min(len(vhi_list), index_delta + last_index) - len(id_nums)
         new_list = helix_numbers[:new_index] + id_nums + helix_numbers[new_index:]
         # call the method to move the items and store the list
         self._model_part.setImportedVHelixOrder(new_list, check_batch=False)

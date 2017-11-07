@@ -86,6 +86,9 @@ class Part(CNObject):
     partDocumentSettingChangedSignal = ProxySignal(object, str, object, name='partDocumentSettingChangedSignal')
     """self, key, value"""
 
+    partWorkplaneChangedSignal = ProxySignal(object, int, int, name='partWorkplaneChangedSignal')
+    """self, start_idx, end_idx"""
+
     ### SLOTS ###
 
     ### ACCESSORS ###

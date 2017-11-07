@@ -10,6 +10,8 @@ Attributes:
     T180 (TYPE): Description
     TRIANGLE (TYPE): Description
 """
+from math import floor
+
 from PyQt5.QtCore import QRectF, Qt, QObject, QPointF
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QColor, QPainterPath
@@ -18,7 +20,8 @@ from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano.gui.palette import getNoPen, getPenObj
+from cadnano import util
+from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
 from . import pathstyles as styles
 
@@ -588,3 +591,65 @@ class PreXoverItem(QGraphicsRectItem):
             self.setLabel(text=self._label_txt)
     # end def
 # end class
+
+
+class PathWorkplaneItem(QGraphicsRectItem):
+    """Draws the rectangle to indicate the current Workplane, i.e. the
+    region of part bases affected by certain actions in other views."""
+    def __init__(self, model_part, part_item):
+        super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
+        self._model_part = model_part
+        self._part_item = part_item
+        self._low_drag_bound = 0  # idx, not pos
+        self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
+        self._width = 3
+
+        self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
+        pen = newPenObj(styles.BLUE_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
+        pen.setCosmetic(True)
+        self.setPen(pen)
+        self.setPos(BASE_WIDTH*10, -BASE_WIDTH)
+        self.updateDimensions()
+        self.setAcceptHoverEvents(True)
+
+    def updateDimensions(self):
+        h = self._part_item._vh_rect.height() - BASE_WIDTH*2
+        self.setRect(QRectF(styles.MINOR_GRID_STROKE_WIDTH, 0, BASE_WIDTH*self._width, h))
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self._width
+
+    ### EVENT HANDLERS ###
+    def hoverEnterEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+        # self._part_item.updateStatusBar("%d-%d" % (self.pos())
+        QGraphicsItem.hoverEnterEvent(self, event)
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.setCursor(Qt.ArrowCursor)
+        # self._part_item.updateStatusBar("")
+        QGraphicsItem.hoverLeaveEvent(self, event)
+    # end def
+
+    def mousePressEvent(self, event):
+        """
+        Parses a mousePressEvent, calling the approproate tool method as
+        necessary. Stores _moveIdx for future comparison.
+        """
+        if event.button() != Qt.LeftButton:
+            event.ignore()
+            QGraphicsItem.mousePressEvent(self, event)
+            return
+        self._moveIdx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+
+    def mouseMoveEvent(self, event):
+        self.setCursor(Qt.ClosedHandCursor)
+        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+        idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
+        x = int(idx * BASE_WIDTH)
+        self.setPos(x, self.y())
+        # self.updateIndexSlot(None, idx)
+        # self._setActiveBaseIndex(idx)
+        # self._partItem.updateStatusBar("%d" % self.part().activeBaseIndex())
+
+    def mouseReleaseEvent(self, event):
+        self.setCursor(Qt.ArrowCursor)

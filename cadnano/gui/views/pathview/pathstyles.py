@@ -54,6 +54,7 @@ from PyQt5.QtGui import QFont, QFontMetricsF
 from cadnano.gui.views.styles import THE_FONT, THE_FONT_SIZE
 from cadnano.gui.views.styles import BLUE_FILL, BLUE_STROKE  # noqa
 from cadnano.gui.views.styles import GRAY_FILL, GRAY_STROKE  # noqa
+from cadnano.gui.views.styles import ORANGE_FILL, ORANGE_STROKE  # noqa
 
 # Path Sizing
 VIRTUALHELIXHANDLEITEM_RADIUS = 15

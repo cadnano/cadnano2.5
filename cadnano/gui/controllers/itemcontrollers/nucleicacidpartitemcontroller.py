@@ -1,5 +1,6 @@
 from .partitemcontroller import PartItemController
 
+
 class NucleicAcidPartItemController(PartItemController):
     def __init__(self, nucleicacid_part_item, model_na_part):
         super(NucleicAcidPartItemController, self).__init__(nucleicacid_part_item, model_na_part)
@@ -7,20 +8,20 @@ class NucleicAcidPartItemController(PartItemController):
     # end def
 
     connections = PartItemController.connections + [
-    ('partActiveVirtualHelixChangedSignal',     'partActiveVirtualHelixChangedSlot'),
-    ('partActiveBaseInfoSignal',                'partActiveBaseInfoSlot'),
-    ('partActiveChangedSignal',                 'partActiveChangedSlot'),
-    ('partInstancePropertySignal',              'partInstancePropertySlot'),
+    ('partActiveVirtualHelixChangedSignal',    'partActiveVirtualHelixChangedSlot'),   # noqa
+    ('partActiveBaseInfoSignal',               'partActiveBaseInfoSlot'),              # noqa
+    ('partActiveChangedSignal',                'partActiveChangedSlot'),               # noqa
+    ('partInstancePropertySignal',             'partInstancePropertySlot'),            # noqa
 
-    ('partVirtualHelixAddedSignal',             'partVirtualHelixAddedSlot'),
-    ('partVirtualHelixRemovingSignal',          'partVirtualHelixRemovingSlot'),
-    ('partVirtualHelixRemovedSignal',           'partVirtualHelixRemovedSlot'),
-    ('partVirtualHelixResizedSignal',           'partVirtualHelixResizedSlot'),
+    ('partVirtualHelixAddedSignal',            'partVirtualHelixAddedSlot'),           # noqa
+    ('partVirtualHelixRemovingSignal',         'partVirtualHelixRemovingSlot'),        # noqa
+    ('partVirtualHelixRemovedSignal',          'partVirtualHelixRemovedSlot'),         # noqa
+    ('partVirtualHelixResizedSignal',          'partVirtualHelixResizedSlot'),         # noqa
 
-    ('partVirtualHelicesTranslatedSignal',      'partVirtualHelicesTranslatedSlot'),
-    ('partVirtualHelicesSelectedSignal',        'partVirtualHelicesSelectedSlot'),
-    ('partVirtualHelixPropertyChangedSignal',   'partVirtualHelixPropertyChangedSlot'),
+    ('partVirtualHelicesTranslatedSignal',     'partVirtualHelicesTranslatedSlot'),    # noqa
+    ('partVirtualHelicesSelectedSignal',       'partVirtualHelicesSelectedSlot'),      # noqa
+    ('partVirtualHelixPropertyChangedSignal',  'partVirtualHelixPropertyChangedSlot'), # noqa
 
-    ('partOligoAddedSignal',                    'partOligoAddedSlot')
+    ('partOligoAddedSignal',                   'partOligoAddedSlot')                   # noqa
     ]
 # end class

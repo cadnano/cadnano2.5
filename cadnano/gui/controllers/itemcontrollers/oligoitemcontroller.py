@@ -6,9 +6,9 @@ class OligoItemController():
     # end def
 
     connections = [
-    ('oligoSequenceAddedSignal',    'oligoSequenceAddedSlot'),
-    ('oligoSequenceClearedSignal',  'oligoSequenceClearedSlot'),
-    ('oligoPropertyChangedSignal',  'oligoPropertyChangedSlot')
+    ('oligoSequenceAddedSignal',    'oligoSequenceAddedSlot'),      # noqa
+    ('oligoSequenceClearedSignal',  'oligoSequenceClearedSlot'),    # noqa
+    ('oligoPropertyChangedSignal',  'oligoPropertyChangedSlot')     # noqa
     ]
 
     def connectSignals(self):

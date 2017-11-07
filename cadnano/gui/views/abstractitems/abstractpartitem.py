@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
+
 class QAbstractPartItem(QGraphicsRectItem):
     """ Use for single inheritance
     QAbstractPartItem is a base class for partitems in all views.
@@ -55,7 +56,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         position = pos.x(), pos.y()
         view_name = self._viewroot.name
         self._model_part.changeInstanceProperty(self._model_instance,
-                                        view_name, 'position', position)
+                                                view_name, 'position', position)
     # end def
 
     def document(self):
@@ -97,6 +98,9 @@ class QAbstractPartItem(QGraphicsRectItem):
         pass
 
     def partSelectedChangedSlot(self, model_part, is_selected):
+        pass
+
+    def partWorkplaneChangedSlot(self, start_idx, end_idx):
         pass
 
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
@@ -212,6 +216,9 @@ class AbstractPartItem(object):
     def partSelectedChangedSlot(self, model_part, is_selected):
         pass
 
+    def partWorkplaneChangedSlot(self, start_idx, end_idx):
+        pass
+
     def partActiveVirtualHelixChangedSlot(self, sender, id_num):
         pass
 
@@ -235,7 +242,6 @@ class AbstractPartItem(object):
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         pass
-
 
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
         pass
