@@ -216,7 +216,6 @@ class NucleicAcidPart(Part):
             0:[],
             1:[]
         }
-        self._highest_id_num_used = -1
         self._highest_even_id_num_used = -1
         self._highest_odd_id_num_used = -1
     # end def
@@ -310,7 +309,8 @@ class NucleicAcidPart(Part):
         new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
 
         new_vhg.recycle_bin = self.recycle_bin
-        new_vhg._highest_id_num_used = self._highest_id_num_used
+        new_vhg._highest_even_id_num_used = self._highest_even_id_num_used
+        new_vhg._highest_odd_id_num_used = self._highest_odd_id_num_used
         return new_vhg
     # end def
 
@@ -1245,7 +1245,8 @@ class NucleicAcidPart(Part):
             ValueError:
         """
         if id_num_list is None:
-            lim = self._highest_id_num_used + 1
+            lim = max(self._highest_even_id_num_used + 2,
+                      self._highest_odd_id_num_used + 2)
             props = self.vh_properties.iloc[:lim]
             props = props.to_dict(orient='list')
             origins = self._origin_pts[:lim]
