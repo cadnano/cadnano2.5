@@ -362,7 +362,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             elif value == 'points':
                 self.griditem.setDrawlines(False)
             elif value == 'circles':
-                pass  # self.griditem.setDrawlines(False)
+                pass  # self.griditem.set_drawlines(False)
             else:
                 raise ValueError("unknown grid styling")
 
@@ -514,13 +514,34 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
+
+        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+        print('was: %s, %s, %s, %s' % (rect_left, rect_top, rect_right,
+                                       rect_bottom))
         xTL = min(rect_left, model_left - padding)
         xBR = max(rect_right, model_right + padding)
         yTL = min(rect_top, model_top - padding)
         yBR = max(rect_bottom, model_bottom + padding)
-        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
-        self.grab_cornerTL.alignPos(*tl)
-        self.grab_cornerBR.alignPos(*br)
+# This works to resize honeycomb
+#        xTL = min(rect_left - padding, model_left - padding)
+#        xBR = max(rect_right + padding, model_right + padding)
+#        yTL = min(rect_top - padding, model_top - padding)
+#        yBR = max(rect_bottom + padding, model_bottom + padding)
+        print("bottom is %s and bottom with padding is %s" % (model_bottom,
+                                                              model_bottom+
+                                                              padding))
+#        xTL = min(rect_left, model_left - padding)
+#        xBR = max(rect_right, model_right + padding)
+#        yTL = min(rect_top, model_top - padding)
+#        yBR = max(rect_bottom, model_bottom + padding)
+        top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
+                                                      bottom_right=(xBR, yBR),
+                                                      padding=80,
+                                                      do_grid=True)
+        print('esetting: %s, %s, %s, %s' % (xTL, yTL, xBR, yBR))
+        self.grab_cornerTL.alignPos(*top_left)
+        self.grab_cornerBR.alignPos(*bottom_right)
 
     ### PRIVATE SUPPORT METHODS ###
     def configureOutline(self, outline):
@@ -701,16 +722,42 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         is_shift = modifiers == Qt.ShiftModifier
         position = (event.scenePos().x(), event.scenePos().y())
-        if self._handle_spa_mouse_press(tool=tool, position=position,
+        if self._handle_spa_mouse_press(tool=tool,
+                                        position=position,
                                         is_shift=is_shift):
             return
 
         tool.setPartItem(self)
+<<<<<<< HEAD
         part.createVirtualHelix(*part_pt_tuple)
         id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
+=======
+        if check:
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            # print("got a check", id_num)
+            if id_num is not None:
+                # print("restart", id_num)
+                vhi = self._virtual_helix_item_hash[id_num]
+                tool.setVirtualHelixItem(vhi)
+                tool.startCreation()
+        else:
+            # TODO[NF]:  Change this to be true only when honeycomb AND slice
+            if True:
+                x, y = self.griditem.find_closest_point(position)
+                parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
+            else:
+                parity = None
+            part.createVirtualHelix(x=part_pt_tuple[0],
+                                    y=part_pt_tuple[1],
+                                    parity=parity)
+            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+            vhi = self._virtual_helix_item_hash[id_num]
+            tool.setVirtualHelixItem(vhi)
+            tool.startCreation()
+>>>>>>> 2.5.1:  Add parity argument to helix creation
 
         coordinates = self.griditem.find_closest_point(position)
         print('coordinates are %s' % str(coordinates))

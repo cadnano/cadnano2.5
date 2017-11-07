@@ -216,7 +216,7 @@ class NucleicAcidPart(Part):
             0:[],
             1:[]
         }
-        self._highest_even_id_num_used = -1
+        self._highest_even_id_num_used = -2
         self._highest_odd_id_num_used = -1
     # end def
 
@@ -381,8 +381,14 @@ class NucleicAcidPart(Part):
         Returns:
             int: a valid ID number
         """
+        print('Number status:')
+        print('Recycle Bin: %s' % self.recycle_bin)
+        print('Even: %s' % self._highest_even_id_num_used)
+        print('Odd: %s' % self._highest_odd_id_num_used)
         _even = 0
         _odd = 1
+        from cadnano.util import qtdb_trace
+#        qtdb_trace()
         if parity is None:
             merged_recycle_bin = self.recycle_bin.get(_even) + \
                                  self.recycle_bin.get(_odd)
