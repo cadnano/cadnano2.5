@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from cadnano import undostack
-from cadnano import undocommand
+from cadnano import undocommand, undostack
 
 
 class ProxyObject(object):

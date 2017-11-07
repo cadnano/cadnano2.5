@@ -3,8 +3,6 @@
 Attributes:
     SNAP_WIDTH (int): Description
 """
-import logging
-
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
@@ -12,18 +10,15 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
-from . import slicestyles as styles
-from .sliceextras import WedgeGizmo, WEDGE_RECT
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from . import gridstyles as styles
+from .gridextras import WedgeGizmo, WEDGE_RECT
 
 # set up default, hover, and active drawing styles
-_RADIUS = styles.SLICE_HELIX_RADIUS
+_RADIUS = styles.GRID_HELIX_RADIUS
 _RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-_FONT = styles.SLICE_NUM_FONT
-_ZVALUE = styles.ZSLICEHELIX
-_BRUSH_DEFAULT = getBrushObj(styles.SLICE_FILL)
+_FONT = styles.GRID_NUM_FONT
+_ZVALUE = styles.ZGRIDHELIX
+_BRUSH_DEFAULT = getBrushObj(styles.GRID_FILL)
 _USE_TEXT_BRUSH = getBrushObj(styles.USE_TEXT_COLOR)
 
 _HOVER_PEN = getPenObj('#ffffff', 128)
@@ -32,11 +27,11 @@ _HOVER_BRUSH = getBrushObj('#ffffff', alpha=5)
 SNAP_WIDTH = 3
 
 
-class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
-    """The VirtualHelixItem is an individual circle that gets drawn in the SliceView
-    as a child of the NucleicAcidPartItem. Taken as a group, many SliceHelix
-    instances make up the crossection of the NucleicAcidPart. Clicking on a SliceHelix
-    adds a VirtualHelix to the PlasmidPart. The SliceHelix then changes appearence
+class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
+    """The VirtualHelixItem is an individual circle that gets drawn in the GridView
+    as a child of the NucleicAcidPartItem. Taken as a group, many GridHelix
+    instances make up the crossection of the NucleicAcidPart. Clicking on a GridHelix
+    adds a VirtualHelix to the PlasmidPart. The GridHelix then changes appearence
     and paints its corresponding VirtualHelix number.
 
     Attributes:
@@ -51,14 +46,11 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
-#        import traceback
-#        traceback.print_stack()
-        logger.info("Creating SliceVirtualHelixItem")
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
-        self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
+        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         self.hide()
         model_part = self._model_part
@@ -98,7 +90,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def setSnapOrigin(self, is_snap):
-        """Used to toggle an item as the snap origin. See `SelectSliceTool`.
+        """Used to toggle an item as the snap origin. See `SelectGridTool`.
 
         Args:
             is_snap (bool): True if this should be the snap origin, False otherwise.
@@ -217,16 +209,13 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def createToolMousePress(self, tool, part_item, event):
-        pass
-
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this
         item with the SelectTool active.
 
         Args:
-            tool (SelectSliceTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
+            tool (SelectGridTool): reference to call tool-specific methods
+            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
 
         """
@@ -240,12 +229,12 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Summary
 
         Args:
-            tool (SelectSliceTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
+            tool (SelectGridTool): reference to call tool-specific methods
+            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
         """
         part = self._model_part
-        logger.info("pencilToolMousePress", part)
+        print("pencilToolMousePress", part)
         # tool.attemptToCreateStrand
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
@@ -294,14 +283,14 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.hide()
             return
 
-        pwidth = styles.SLICE_HELIX_STROKE_WIDTH if self.old_pen is None else SNAP_WIDTH
+        pwidth = styles.GRID_HELIX_STROKE_WIDTH if self.old_pen is None else SNAP_WIDTH
 
         if self.is_active:
             self._USE_PEN = getPenObj(styles.ACTIVE_STROKE, pwidth)
         else:
             self._USE_PEN = getPenObj(color, pwidth)
 
-        self._TEXT_BRUSH = getBrushObj(styles.SLICE_TEXT_COLOR)
+        self._TEXT_BRUSH = getBrushObj(styles.GRID_TEXT_COLOR)
 
         self._BRUSH = _BRUSH_DEFAULT
         self._USE_BRUSH = getBrushObj(color, alpha=150)
@@ -338,7 +327,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     def createLabel(self):
         """Creates a text label to display the ID number. Font and Z are set
-        in slicestyles.
+        in gridstyles.
 
         Returns:
             QGraphicsSimpleTextItem: the label
@@ -387,7 +376,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem):
+            neighbor_virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.VirtualHelixItem):
             the neighboring virtual helix item
         """
         wg_dict = self.wedge_gizmos

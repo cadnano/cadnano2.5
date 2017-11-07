@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 
+
 """
 For adding modifications from a document
 """

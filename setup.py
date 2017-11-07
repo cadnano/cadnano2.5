@@ -121,7 +121,7 @@ class CNINSTALL(_install):
                      msg="Running post install task")
 # end class
 
-if sys.argv[1] == 'install':
+if len(sys.argv) > 0 and sys.argv[1] == 'install':
     cmdclass = {'install': CNINSTALL}
 else:
     cmdclass = {'install': _install}
@@ -135,7 +135,7 @@ exclude_list = ['*.genbank', '*.fasta',
 cn_packages = find_packages(exclude=exclude_list)
 
 install_requires = ['sip>=4.19',
-                    'PyQt5>=5.8.2',
+                    'PyQt5>=5.9.1',
                     'numpy>=1.10.0',
                     'pandas>=0.18',
                     'pytz>=2011k',

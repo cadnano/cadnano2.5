@@ -12,6 +12,7 @@ FILL_COLOR = '#ffffff'
 
 
 class GrabCornerItem(QGraphicsRectItem):
+    """Provides the ability to resize the document."""
     def __init__(self, width, color, is_resizable, parent):
         super(GrabCornerItem, self).__init__(parent)
         self.setRect(QRectF(0, 0, width, width))

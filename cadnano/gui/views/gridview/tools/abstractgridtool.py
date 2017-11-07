@@ -1,24 +1,24 @@
 """Summary
 """
 import math
+from PyQt5.QtCore import QPointF, QLineF, QRectF
+from PyQt5.QtWidgets import QGraphicsObject
+from PyQt5.QtWidgets import QGraphicsLineItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
+from cadnano.gui.views.gridview import gridstyles as styles
+from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 
-from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
-from cadnano.gui.views.sliceview import slicestyles as styles
-from PyQt5.QtCore import QLineF, QPointF, QRectF
-from PyQt5.QtWidgets import (QGraphicsEllipseItem, QGraphicsLineItem,
-                             QGraphicsObject)
-
-_RADIUS = styles.SLICE_HELIX_RADIUS
+_RADIUS = styles.GRID_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
-HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
+HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
+DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
 # _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 
 
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
-class AbstractSliceTool(QGraphicsObject):
+class AbstractGridTool(QGraphicsObject):
     """Summary
 
     Attributes:
@@ -30,7 +30,7 @@ class AbstractSliceTool(QGraphicsObject):
         sgv (TYPE): Description
         vectors (TYPE): Description
     """
-    _RADIUS = styles.SLICE_HELIX_RADIUS
+    _RADIUS = styles.GRID_HELIX_RADIUS
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     FILTER_NAME = 'virtual_helix'
     # _CENTER_OF_HELIX = QPointF(0. 0.)
@@ -41,15 +41,15 @@ class AbstractSliceTool(QGraphicsObject):
         Args:
             manager (TYPE): Description
         """
-        super(AbstractSliceTool, self).__init__(parent=manager.viewroot)
+        super(AbstractGridTool, self).__init__(parent=manager.viewroot)
         """ Pareting to viewroot to prevent orphan _line_item from occuring
         """
-        self.sgv = None # SGV is "Slice Graphics View"
+        self.sgv = None
         self.manager = manager
         self._active = False
         self._last_location = None
-#        self._line_item = QGraphicsLineItem(self)
-#        self._line_item.hide()
+        self._line_item = QGraphicsLineItem(self)
+        self._line_item.hide()
         self._vhi = None
 
         self.hide()
@@ -58,9 +58,9 @@ class AbstractSliceTool(QGraphicsObject):
         self.vectors = self.setVectors()
         self.part_item = None
 
-#        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
-#        self.vhi_hint_item.setPen(_MOD_PEN)
-#        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
+        self.vhi_hint_item = QGraphicsEllipseItem(_DEFAULT_RECT, self)
+        self.vhi_hint_item.setPen(_MOD_PEN)
+        self.vhi_hint_item.setZValue(styles.ZPARTITEM)
     # end def
 
     ######################## Drawing #######################################
@@ -80,25 +80,24 @@ class AbstractSliceTool(QGraphicsObject):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description
         """
         rad = self._RADIUS
         self._vhi = virtual_helix_item
-#        li = self._line_item
-#        li.setParentItem(virtual_helix_item)
-#        li.setLine(rad, rad, rad, rad)
+        li = self._line_item
+        li.setParentItem(virtual_helix_item)
+        li.setLine(rad, rad, rad, rad)
         # li.setLine(0., 0., 0., 0.)
     # end def
 
     def setSelectionFilter(self, filter_name_list):
-        pass
-#        if 'virtual_helix' in filter_name_list:
-#            self.vhi_hint_item.setPen(_MOD_PEN)
-#        else:
-#            self.vhi_hint_item.setPen(_INACTIVE_PEN)
+        if 'virtual_helix' in filter_name_list:
+            self.vhi_hint_item.setPen(_MOD_PEN)
+        else:
+            self.vhi_hint_item.setPen(_INACTIVE_PEN)
     # end def
 
     def resetTool(self):
@@ -107,8 +106,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        pass
-#        self._line_item.setParentItem(self)
+        self._line_item.setParentItem(self)
 
     def idNum(self):
         """Summary
@@ -128,7 +126,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-#        self.vhi_hint_item.setParentItem(part_item)
+        self.vhi_hint_item.setParentItem(part_item)
         self.part_item = part_item
     # end def
 
@@ -149,15 +147,14 @@ class AbstractSliceTool(QGraphicsObject):
             pos = self.findNearestPoint(part_item, event.scenePos())
         else:
             pos =  event.pos()
-#        self.vhi_hint_item.setPos(  pos -
-#                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
         return pos
     # end def
 
     def setHintPos(self, pos):
-        pass
-#        self.vhi_hint_item.setPos(  pos -
-#                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        self.vhi_hint_item.setPos(  pos -
+                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -166,32 +163,32 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_scenepos (TYPE): Description
         """
-        pass
-#        li = self._line_item
-#        pos = li.mapFromScene(target_scenepos)
+        li = self._line_item
+        pos = li.mapFromScene(target_scenepos)
 
-#        line = li.line()
-#        mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
+        line = li.line()
+        mouse_point_vec = QLineF(self._CENTER_OF_HELIX, pos)
 
         # Check if the click happened on the origin VH
-#        if mouse_point_vec.length() < self._RADIUS:
-#            return part_item.mapFromScene(target_scenepos)
+        if mouse_point_vec.length() < self._RADIUS:
+            # return part_item.mapFromScene(target_scenepos)
+            return None
 
-#        angle_min = 9999
-#        direction_min = None
-#        for vector in self.vectors:
-#            angle_new = mouse_point_vec.angleTo(vector)
-#            if angle_new < angle_min:
-#                direction_min = vector
-#                angle_min = angle_new
-#        if direction_min is not None:
-#            li.setLine(direction_min)
-#            return part_item.mapFromItem(li, direction_min.p2())
-#        else:
-#            print("default point")
-#            line.setP2(pos)
-#            li.setLine(line)
-#            return part_item.mapFromItem(li, pos)
+        angle_min = 9999
+        direction_min = None
+        for vector in self.vectors:
+            angle_new = mouse_point_vec.angleTo(vector)
+            if angle_new < angle_min:
+                direction_min = vector
+                angle_min = angle_new
+        if direction_min is not None:
+            li.setLine(direction_min)
+            return part_item.mapFromItem(li, direction_min.p2())
+        else:
+            print("default point")
+            line.setP2(pos)
+            li.setLine(line)
+            return part_item.mapFromItem(li, pos)
     # end def
 
     def findNextPoint(self, part_item, target_part_pos):
@@ -200,14 +197,13 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_part_pos (TYPE): Description
         """
-        pass
-#        li = self._line_item
-#        pos = li.mapFromItem(part_item, target_part_pos)
-#        for i, vector in enumerate(self.vectors):
-#            if vector.p2() == pos:
-#                return part_item.mapFromItem(li, self.vectors[i - 1].p2())
-#        # origin VirtualHelixItem is overlapping destination VirtualHelixItem
-#        return part_item.mapFromItem(li, self.vectors[0].p2())
+        li = self._line_item
+        pos = li.mapFromItem(part_item, target_part_pos)
+        for i, vector in enumerate(self.vectors):
+            if vector.p2() == pos:
+                return part_item.mapFromItem(li, self.vectors[i - 1].p2())
+        # origin VirtualHelixItem is overlapping destination VirtualHelixItem
+        return part_item.mapFromItem(li, self.vectors[0].p2())
     # end def
 
     def hideLineItem(self):
@@ -216,28 +212,27 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        pass
-#        self.vhi_hint_item.hide()
-#        li = self._line_item
-#        li.hide()
-#        li.setParentItem(self)
-#        line = li.line()
-#        line.setP2(self._CENTER_OF_HELIX)
-#        li.setLine(line)
-#        # li.hide()
-#        self.is_started = False
+        self.vhi_hint_item.hide()
+        li = self._line_item
+        li.hide()
+        li.setParentItem(self)
+        line = li.line()
+        line.setP2(self._CENTER_OF_HELIX)
+        li.setLine(line)
+        # li.hide()
+        self.is_started = False
     # end def
 
     # def hoverEnterEvent(self, event):
     #     self.vhi_hint_item.show()
-    #     #print("Slice VHI hoverEnterEvent")
+    #     #print("Grid VHI hoverEnterEvent")
 
     # # def hoverMoveEvent(self, event):
-    #     # print("Slice VHI hoverMoveEvent")
+    #     # print("Grid VHI hoverMoveEvent")
 
     # def hoverLeaveEvent(self, event):
     #     # self.vhi_hint_item.hide()
-    #     #print("Slice VHI hoverLeaveEvent")
+    #     #print("Grid VHI hoverLeaveEvent")
 
 
     def hoverMoveEvent(self, part_item, event):
@@ -258,7 +253,7 @@ class AbstractSliceTool(QGraphicsObject):
 
     def setActive(self, will_be_active, old_tool=None):
         """
-        Called by SliceToolManager.setActiveTool when the tool becomes
+        Called by GridToolManager.setActiveTool when the tool becomes
         active. Used, for example, to show/hide tool-specific ui elements.
 
         Args:
@@ -268,7 +263,7 @@ class AbstractSliceTool(QGraphicsObject):
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        self.sgv = self.manager.window.slice_graphics_view
+        self.sgv = self.manager.window.grid_graphics_view
         if hasattr(self, 'getCustomContextMenu'):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections

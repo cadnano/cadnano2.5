@@ -9,10 +9,8 @@ import os
 import platform
 import string
 import sys
-
 from os import path
 from traceback import extract_stack
-
 
 logger = logging.getLogger(__name__)
 
@@ -443,8 +441,12 @@ def qtdb_trace():
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
-    import pdb
-    from PyQt5.QtCore import pyqtRemoveInputHook
+    if False:
+        logger.info('No debug')
+        return
+    else:
+        import pdb
+        from PyQt5.QtCore import pyqtRemoveInputHook
 
     pyqtRemoveInputHook()
     pdb.set_trace()

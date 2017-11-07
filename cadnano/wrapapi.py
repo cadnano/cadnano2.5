@@ -1,5 +1,5 @@
-from types import FunctionType
 import inspect
+from types import FunctionType
 
 
 def getPublicMethods(cls):

@@ -1,9 +1,9 @@
 """Summary
 """
-from .abstractslicetool import AbstractSliceTool
+from .abstractgridtool import AbstractGridTool
 
 
-class CreateSliceTool(AbstractSliceTool):
+class CreateGridTool(AbstractGridTool):
     """
     Attributes:
         is_started (bool): Description
@@ -14,11 +14,7 @@ class CreateSliceTool(AbstractSliceTool):
         Args:
             manager (TYPE): Description
         """
-        super(CreateSliceTool, self).__init__(manager)
-        try:
-            print('FILTER NAME IS %s' % self.FILTER_NAME)
-        except AttributeError:
-            print('FILTER NAME NOT SET IN INIT')
+        super(CreateGridTool, self).__init__(manager)
 
     def __repr__(self):
         """Summary
@@ -42,7 +38,7 @@ class CreateSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
-#        self._line_item.show()
-#        self.vhi_hint_item.show()
+        self._line_item.show()
+        self.vhi_hint_item.show()
         self.is_started = True
     # end def

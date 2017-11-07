@@ -2,7 +2,7 @@
 from datetime import datetime
 from cadnano.cnenum import PointType
 
-FORMAT_VERSION = "3.0"
+FORMAT_VERSION = '3.1'
 
 
 def encodeDocument(document):
@@ -16,7 +16,11 @@ def encodeDocument(document):
     """
     doc_dict = {'format': FORMAT_VERSION,
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                'name': "",
+                'name': '',
+                'meta': {
+                    'slice_view_type'   :document.get_slice_view_type(),
+                    'grid_type'         :document.get_grid_type()
+                },
                 'parts': [],
                 'modifications': document.modifications()
                 }

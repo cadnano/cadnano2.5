@@ -1,5 +1,5 @@
-from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
+from cadnano.cnproxy import UndoCommand
 from cadnano.part import Part
 
 

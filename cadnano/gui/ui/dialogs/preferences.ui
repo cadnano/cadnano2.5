@@ -41,14 +41,43 @@
          <property name="fieldGrowthPolicy">
           <enum>QFormLayout::FieldsStayAtSizeHint</enum>
          </property>
-         <item row="2" column="0">
+         <item row="1" column="0">
+          <widget class="QLabel" name="Grid">
+           <property name="text">
+            <string>Grid Appearance</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="grid_appearance_type_combo_box">
+           <item>
+            <property name="text">
+             <string>Points</string>
+            </property>
+            <property name="icon">
+             <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
+              <normaloff>:/part/grid_points</normaloff>:/part/grid_points</iconset>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Lines</string>
+            </property>
+            <property name="icon">
+             <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
+              <normaloff>:/part/grid_lines</normaloff>:/part/grid_lines</iconset>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
           <widget class="QLabel" name="zoom_speed_label">
            <property name="text">
             <string>Mousewheel zoom speed:</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QSlider" name="zoom_speed_slider">
            <property name="minimumSize">
             <size>
@@ -82,43 +111,14 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="Grid">
-           <property name="text">
-            <string>Grid Appearance</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="grid_appearance_type_combo_box">
-           <item>
-            <property name="text">
-             <string>Points</string>
-            </property>
-            <property name="icon">
-             <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
-              <normaloff>:/part/grid_points</normaloff>:/part/grid_points</iconset>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Lines</string>
-            </property>
-            <property name="icon">
-             <iconset resource="cadnano.gui.ui.dialogs.dialogicons.qrc">
-              <normaloff>:/part/grid_lines</normaloff>:/part/grid_lines</iconset>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="show_icon_label_text">
            <property name="text">
             <string>Show Icon Labels:</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QCheckBox" name="show_icon_labels">
            <property name="text">
             <string>(needs restart)</string>
@@ -126,6 +126,32 @@
            <property name="checked">
             <bool>true</bool>
            </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="legacy_slice_view_label">
+           <property name="text">
+            <string>Slice View</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="legacy_slice_view_combo_box">
+           <item>
+            <property name="text">
+             <string>Legacy Slice View</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Grid View</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Dual View</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>

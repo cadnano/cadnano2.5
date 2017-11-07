@@ -12,9 +12,9 @@ class AbstractVirtualHelixItem(object):
     def __init__(self, model_virtual_helix=None, parent=None):
         # super().__init__(**kwargs)
         self._model_vh = model_virtual_helix
-        self._id_num = model_virtual_helix.idNum()
+        self._id_num = model_virtual_helix.idNum() if model_virtual_helix is not None else None
         self._part_item = parent
-        self._model_part = model_virtual_helix.part()
+        self._model_part = model_virtual_helix.part() if model_virtual_helix is not None else None
         self.is_active = False
 
     def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):

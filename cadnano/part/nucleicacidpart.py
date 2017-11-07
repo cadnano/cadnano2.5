@@ -124,6 +124,7 @@ class NucleicAcidPart(Part):
         """
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
+        grid_type = kwargs.get('grid_type', GridType.HONEYCOMB)
         if do_copy:
             return
 
@@ -150,7 +151,7 @@ class NucleicAcidPart(Part):
         gps['crossover_span_angle'] = 45
         gps['max_vhelix_length'] = self._STEP_SIZE * 2
         gps['neighbor_active_angle'] = ''
-        gps['grid_type'] = GridType.HONEYCOMB
+        gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
 
@@ -1221,8 +1222,8 @@ class NucleicAcidPart(Part):
         out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_))
                    else (k, v) for k, v in zip(series.index, series.tolist()))
         if inject_extras:
-            bpr = out['bases_per_repeat']
-            tpr = out['turns_per_repeat']
+            bpr = float(out['bases_per_repeat'])
+            tpr = float(out['turns_per_repeat'])
             out['bases_per_turn'] = bpr / tpr
             out['twist_per_base'] = tpr*360. / bpr
         return out
@@ -2337,7 +2338,7 @@ class NucleicAcidPart(Part):
 
     # end def
     def boundDimensions(self, scale_factor=1.0):
-        """Returns a tuple of rectangle definining the XY limits of a part"""
+        """Returns a tuple of rectangle defining the XY limits of a part"""
         DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
         if xLL > -DMIN:
@@ -3222,6 +3223,14 @@ class NucleicAcidPart(Part):
             id_num, is_fwd, idx = self._getModKeyTokens(key)
             yield (id_num, is_fwd, idx, mid)
     # end def
+
+    def get_grid_type(self):
+        #TODO[NF]:  Docstring
+        return self._group_properties.get('grid_type')
+
+    def set_grid_type(self, grid_type):
+        #TODO[NF]:  Docstring
+        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
 
 

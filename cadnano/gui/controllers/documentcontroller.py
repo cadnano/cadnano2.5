@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 import os
 
-from PyQt5.QtCore import Qt, QFileInfo, QRect
-from PyQt5.QtCore import QSettings, QSize, QDir
-from PyQt5.QtGui import QPainter, QKeySequence
-from PyQt5.QtWidgets import QApplication, QDialog
-from PyQt5.QtWidgets import QFileDialog, QActionGroup
-from PyQt5.QtWidgets import QGraphicsItem, QMessageBox
-from PyQt5.QtWidgets import QStyleOptionGraphicsItem
+from PyQt5.QtCore import QDir, QFileInfo, QRect, QSettings, QSize, Qt
+from PyQt5.QtGui import QKeySequence, QPainter
 from PyQt5.QtSvg import QSvgGenerator
-from cadnano.gui.views.documentwindow import DocumentWindow
+from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
+                             QGraphicsItem, QMessageBox,
+                             QStyleOptionGraphicsItem)
+from cadnano.cnenum import GridType
+
+from cadnano import app, setReopen, util
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
-from cadnano import app, setReopen, util
+from cadnano.gui.views.documentwindow import DocumentWindow
 
 DEFAULT_VHELIX_FILTER = True
 ONLY_ONE = True
@@ -20,9 +20,7 @@ ONLY_ONE = True
 
 
 class DocumentController():
-    """
-    Connects UI buttons to their corresponding actions in the model.
-    """
+    """Connects UI buttons to their corresponding actions in the model."""
     ### INIT METHODS ###
     def __init__(self, document):
         """docstring for __init__"""
@@ -42,6 +40,11 @@ class DocumentController():
         # call other init methods
         self._initWindow()
         app().document_controllers.add(self)
+
+        self.action_grid_view(show=False)
+
+        self.slice_view_showing = True
+        self.grid_view_showing = False
 
     def _initWindow(self):
         """docstring for initWindow"""
@@ -78,6 +81,8 @@ class DocumentController():
             ag.addAction(getattr(win, action_name))
 
         win.action_global_select.trigger()
+
+        self.win.outliner_property_splitter.hide()
     # end def
 
     def destroyDC(self):
@@ -114,8 +119,10 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-            (win.action_new_dnapart.triggered, self.actionCreateNucleicAcidPart),
-            (win.action_new_dnapart.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
+            (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_square),
+            (win.action_new_dnapart_square.triggered, lambda: win.action_global_pencil.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
             (win.action_feedback.triggered, self.actionFeedbackSlot),
@@ -484,14 +491,23 @@ class DocumentController():
         """
         pass
 
-    def actionCreateNucleicAcidPart(self):
+    def action_create_nucleic_acid_part_honey(self):
+        #TODO[NF]:  Docstring
+        self._action_create_nucleic_acid_part(grid_type=GridType.HONEYCOMB)
+
+    def action_create_nucleic_acid_part_square(self):
+        #TODO[NF]:  Docstring
+        self._action_create_nucleic_acid_part(grid_type=GridType.SQUARE)
+
+    def _action_create_nucleic_acid_part(self, grid_type):
+        #TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.maybeSave() is False:
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE)
+        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE, grid_type=grid_type)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
@@ -499,7 +515,6 @@ class DocumentController():
         part.setActive(True)
         doc.setActivePart(part)
         return part
-    # end def
 
     def actionToggleOutlinerSlot(self):
         outliner = self.win.outliner_property_splitter
@@ -508,6 +523,40 @@ class DocumentController():
         else:
             outliner.show()
     # end def
+
+    def action_slice_view(self, show):
+        """Hide or show the slice view based on the given parameter `show`
+
+        Args:
+            show (bool): Whether the slice view should be hidden or shown
+
+        Returns: None
+        """
+        print("Toggling slice view to %s" % show)
+        slice_view = self.win.slice_graphics_view
+        if show:
+            self.slice_view_showing = True
+            slice_view.show()
+        else:
+            self.slice_view_showing = False
+            slice_view.hide()
+
+    def action_grid_view(self, show):
+        """Hide or show the grid view based on the given parameter `show`
+
+        Args:
+            show (bool): Whether the grid view should be hidden or shown
+
+        Returns: None
+        """
+        print("Toggling grid view to %s" % show)
+        grid_view = self.win.grid_graphics_view
+        if show:
+            self.grid_view_showing = True
+            grid_view.show()
+        else:
+            self.grid_view_showing = False
+            grid_view.hide()
 
     ### ACCESSORS ###
     def document(self):
@@ -659,8 +708,8 @@ class DocumentController():
 
         self.win.path_graphics_view.setViewportUpdateOn(False)
         self.win.slice_graphics_view.setViewportUpdateOn(False)
+        self.win.grid_graphics_view.setViewportUpdateOn(False)
 
-        # NC commented out single document stuff
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
@@ -668,9 +717,11 @@ class DocumentController():
 
         self.win.path_graphics_view.setViewportUpdateOn(True)
         self.win.slice_graphics_view.setViewportUpdateOn(True)
+        self.win.grid_graphics_view.setViewportUpdateOn(True)
 
         self.win.path_graphics_view.update()
         self.win.slice_graphics_view.update()
+        self.win.grid_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
@@ -823,3 +874,36 @@ class DocumentController():
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
+
+    def get_slice_view_type(self):
+        # TODO[NF]:  Make these strings global constants
+        if self.slice_view_showing and self.grid_view_showing:
+            return 'Both'
+        elif self.slice_view_showing and not self.grid_view_showing:
+            return 'Slice'
+        elif not self.slice_view_showing and self.grid_view_showing:
+            return 'Grid'
+        else:
+            raise NotImplementedError
+
+    def set_slice_view_type(self, slice_view_type):
+        # TODO[NF]:  Make these strings global constants
+        if slice_view_type not in ('Both', 'Slice', 'Grid'):
+            #logger.error('slice_view_type is invalid:  %s' % slice_view_type)
+            print('slice_view_type is invalid:  %s' % slice_view_type)
+
+        if slice_view_type == 'Both':
+            self.grid_view_showing = True
+            self.action_grid_view(show=True)
+            self.slice_view_showing = True
+            self.action_slice_view(show=True)
+        elif slice_view_type == 'Slice':
+            self.grid_view_showing = False
+            self.action_grid_view(show=False)
+            self.slice_view_showing = True
+            self.action_slice_view(show=True)
+        elif slice_view_type == 'Grid':
+            self.grid_view_showing = True
+            self.action_grid_view(show=True)
+            self.slice_view_showing = False
+            self.action_slice_view(show=False)

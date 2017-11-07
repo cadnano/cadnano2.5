@@ -19,6 +19,7 @@
 #
 import os
 import sys
+
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
