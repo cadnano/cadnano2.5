@@ -121,9 +121,9 @@ class GridItem(QGraphicsPathItem):
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
-        for i in range(row_l, row_h):
-            for j in range(col_l, col_h+1):
-                x, y = doLattice(radius, i, j, scale_factor=sf)
+        for row in range(row_l, row_h):
+            for column in range(col_l, col_h+1):
+                x, y = doLattice(radius, row, column, scale_factor=sf)
                 # sys.stdout.write('%s,%s ' % (x,y))
                 if draw_lines:
                     if is_pen_down:
@@ -144,31 +144,31 @@ class GridItem(QGraphicsPathItem):
                 points.append(pt)
 
                 if redo_neighbors:
-                    self.point_coordinates[(-i, j)] = (x, -y)
+                    self.point_coordinates[(-row, column)] = (x, -y)
 
                     # This is reversed since the Y is mirrored
-                    if not HoneycombDnaPart.isEvenParity(i, j):
-                        self.neighbor_map[(-i, j)] = [
-                            (-i, j-1),
-                            (-i, j+1),
-                            (-i-1, j)
+                    if not HoneycombDnaPart.isEvenParity(row, column):
+                        self.neighbor_map[(-row, column)] = [
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row-1, column)
                         ]
                     else:
-                        self.neighbor_map[(-i, j)] = [
-                            (-i, j-1),
-                            (-i, j+1),
-                            (-i+1, j)
+                        self.neighbor_map[(-row, column)] = [
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row+1, column)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
 
         if draw_lines:
-            for j in range(col_l, col_h+1):
+            for column in range(col_l, col_h+1):
                 # print("newcol")
-                for i in range(row_l, row_h):
-                    x, y = doLattice(radius, i, j, scale_factor=sf)
-                    if is_pen_down and isEven(i, j):
+                for row in range(row_l, row_h):
+                    x, y = doLattice(radius, row, column, scale_factor=sf)
+                    if is_pen_down and isEven(row, column):
                         path.lineTo(x, -y)
                         is_pen_down = False
                     else:
@@ -209,9 +209,9 @@ class GridItem(QGraphicsPathItem):
         is_pen_down = False
         draw_lines = self.draw_lines
 
-        for i in range(row_l, row_h + 1):
-            for j in range(col_l, col_h + 1):
-                x, y = doLattice(radius, i, j, scale_factor=sf)
+        for row in range(row_l, row_h + 1):
+            for column in range(col_l, col_h + 1):
+                x, y = doLattice(radius, row, column, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
                         path.lineTo(x, -y)
@@ -230,13 +230,13 @@ class GridItem(QGraphicsPathItem):
                 points.append(pt)
 
                 if redo_neighbors:
-                    self.point_coordinates[(-i, j)] = (x, -y)
+                    self.point_coordinates[(-row, column)] = (x, -y)
 
-                    self.neighbor_map[(-i, j)] = [
-                        (-i, j+1),
-                        (-i, j-1),
-                        (-i-1, j),
-                        (-i+1, j)
+                    self.neighbor_map[(-row, column)] = [
+                        (-row, column+1),
+                        (-row, column-1),
+                        (-row-1, column),
+                        (-row+1, column)
                     ]
 
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
@@ -245,9 +245,9 @@ class GridItem(QGraphicsPathItem):
 
         # DO VERTICAL LINES
         if draw_lines:
-            for j in range(col_l, col_h + 1):
-                for i in range(row_l, row_h + 1):
-                    x, y = doLattice(radius, i, j, scale_factor=sf)
+            for column in range(col_l, col_h + 1):
+                for row in range(row_l, row_h + 1):
+                    x, y = doLattice(radius, row, column, scale_factor=sf)
                     if is_pen_down:
                         path.lineTo(x, -y)
                     else:
