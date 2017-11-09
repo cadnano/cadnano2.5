@@ -26,6 +26,9 @@ from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 from cadnano.setpropertycmd import SetVHPropertyCommand
 from cadnano.removeinstancecmd import RemoveInstanceCommand
 
+# Demeter violation
+import cadnano.gui.views.sliceview.sliceextras as SliceExtras
+
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
 equivalent to np.sum(a*a, axis=1) but faster
@@ -185,7 +188,9 @@ class NucleicAcidPart(Part):
         """Bookkeeping for fast lookup of indices for insertions and deletions
         and coordinate points. The length of this is the max id_num used.
         """
-        self._virtual_helices_set = {}
+        self._virtual_helices_dict = {}
+        # Contains coordinates where VHs exist
+        self._virtual_helices_set = set()
 
         self.reserved_ids = set()
 
@@ -218,6 +223,7 @@ class NucleicAcidPart(Part):
         }
         self._highest_even_id_num_used = -2
         self._highest_odd_id_num_used = -1
+
     # end def
 
     # B. Virtual Helix
@@ -360,7 +366,7 @@ class NucleicAcidPart(Part):
         Returns:
             int: VirtualHelix
         """
-        return self._virtual_helices_set[id_num]
+        return self._virtual_helices_dict[id_num]
     # end def
 
     def _get_new_id_num(self, parity=None):
@@ -1130,7 +1136,12 @@ class NucleicAcidPart(Part):
         points = self._pointsFromDirection(id_num, origin, direction, num_points, 0)
         self._addCoordinates(id_num, points, is_right=False)
         self._group_properties['virtual_helix_order'].append(id_num)
-        self._virtual_helices_set[id_num] = vh = VirtualHelix(id_num, self)
+        self._virtual_helices_dict[id_num] = vh = VirtualHelix(id_num, self)
+        print("we are here ******************")
+
+        position = (origin[0], origin[1])
+        coorindates = SliceExtras.find_closest_point(position)
+        self._virtual_helices_set.add(coorindates)
         return vh
     # end def
 
@@ -1481,7 +1492,7 @@ class NucleicAcidPart(Part):
         # TODO if making 'virtual_helix_order' an instance property,
         # this needs to be changed
         self._group_properties['virtual_helix_order'].remove(id_num)
-        del self._virtual_helices_set[id_num]
+        del self._virtual_helices_dict[id_num]
     # end def
 
     def resetCoordinates(self, id_num):
@@ -3298,12 +3309,16 @@ class NucleicAcidPart(Part):
     # end def
 
     def get_grid_type(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self._group_properties.get('grid_type')
 
     def set_grid_type(self, grid_type):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
+
+    def get_virtual_helix_set(self):
+        # TODO[NF]:  Docstring
+        return self._virtual_helices_set
 # end class
 
 

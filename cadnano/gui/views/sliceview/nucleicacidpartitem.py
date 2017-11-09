@@ -59,6 +59,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
+        print('**********************')
+        print('model part is %s' % type(m_p))
+        print('model part instance is %s' % type(model_part_instance))
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
         self.inverse_scale_factor = m_p.radius() / self._RADIUS
@@ -447,11 +450,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         vhi = self._virtual_helix_item_hash[id_num]
 
-        center_point = vhi.getCenterScenePos()
-        location = self.griditem.find_closest_point((center_point.x(),
-                                                     center_point.y()))
+#        center_point = vhi.getCenterScenePos()
+#        location = self.griditem.find_closest_point((center_point.x(),
+#                                                     center_point.y()))
 
-        self.griditem.removed_virtual_helix(location)
+#        self.griditem.removed_virtual_helix(location)
 
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
@@ -728,35 +731,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return
 
         tool.setPartItem(self)
-<<<<<<< HEAD
         part.createVirtualHelix(*part_pt_tuple)
         id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
-=======
-        if check:
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            # print("got a check", id_num)
-            if id_num is not None:
-                # print("restart", id_num)
-                vhi = self._virtual_helix_item_hash[id_num]
-                tool.setVirtualHelixItem(vhi)
-                tool.startCreation()
-        else:
-            if self.griditem.grid_type is GridType.HONEYCOMB:
-                x, y = self.griditem.find_closest_point(position)
-                parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
-            else:
-                parity = None
-            part.createVirtualHelix(x=part_pt_tuple[0],
-                                    y=part_pt_tuple[1],
-                                    parity=parity)
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            vhi = self._virtual_helix_item_hash[id_num]
-            tool.setVirtualHelixItem(vhi)
-            tool.startCreation()
->>>>>>> 2.5.1:  Add parity argument to helix creation
 
         coordinates = self.griditem.find_closest_point(position)
         print('coordinates are %s' % str(coordinates))
@@ -817,7 +796,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
-            self.griditem.added_virtual_helix((-row, column))
+#            self.griditem.added_virtual_helix((-row, column))
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -863,4 +842,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    def get_virtual_helix_set(self):
+        # TODO[NF]:  Docstring
+        return self._model_part.get_virtual_helix_set()
 # end class
