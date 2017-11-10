@@ -5,19 +5,11 @@ matrix:
   include:
     - python: 3.5
       env:
-        - PYQT_VERSION=5.8.2
-
-    - python: 3.5
-      env:
-        - PYQT_VERSION=5.8
+        - PYQT_VERSION=5.9.1
 
     - python: 3.6
       env:
-        - PYQT_VERSION=5.8.2
-
-    - python: 3.6
-      env:
-        - PYQT_VERSION=5.8
+        - PYQT_VERSION=5.9.1
 
 # Command to install dependencies
 install:
