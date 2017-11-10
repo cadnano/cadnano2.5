@@ -34,15 +34,15 @@ DocumentController = None
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'ui', 'mainwindow', 'images')
-ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
-ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
-ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
+ICON_PATH1 = os.path.join(ICON_DIR, 'cadnano25-app-icon_512.png')
+ICON_PATH2 = os.path.join(ICON_DIR, 'cadnano25-app-icon_256.png')
+ICON_PATH3 = os.path.join(ICON_DIR, 'cadnano25-app-icon_48.png')
 
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
 if platform.system() == 'Windows':
     import ctypes
-    myappid = 'cadnano.cadnano.radnano.2.5.0'  # arbitrary string
+    myappid = 'org.cadnano.cadnano.2.5.1'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 

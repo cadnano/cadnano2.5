@@ -43,7 +43,7 @@ def post_install():
         import cadnano
         CN_PATH = os.path.dirname(os.path.abspath(cadnano.__file__))
         ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
-                    'mainwindow', 'images', 'radnano-app-icon.ico')
+                    'mainwindow', 'images', 'cadnano25-app-icon_512.ico')
         with winshell.shortcut(link_filepath) as link:
           link.path = new_cadnano_binary_fps[0]
           link.description = "Shortcut to cadnano"
@@ -58,7 +58,7 @@ def post_install():
         entry_path = pjoin(CN_BIN_PATH, 'radnano')
         shutil.copy2(pjoin(CN_BIN_PATH, 'main.py'), entry_path)
         ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
-                            'mainwindow', 'images', 'radnano-app-icon.icns')
+                            'mainwindow', 'images', 'cadnano25-app-icon_512.icns')
         appify.doAppify(entry_path, 'cadnano',
                             app_icon_path=ICON_PATH)
         print("...Installation Complete")
