@@ -46,7 +46,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _BOUNDING_RECT_PADDING = 80
-    _BOUNDING_RECT_PADDING_SQUARE = 100
 
     def __init__(self, model_part_instance, viewroot, parent=None):
         """Summary
@@ -505,10 +504,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        if self.griditem.grid_type is GridType.SQUARE:
-            padding = self._BOUNDING_RECT_PADDING_SQUARE
-        else:
-            padding = self._BOUNDING_RECT_PADDING
+        padding = self._BOUNDING_RECT_PADDING
 
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
@@ -535,7 +531,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 #        yBR = max(rect_bottom, model_bottom + padding)
         top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
                                                       bottom_right=(xBR, yBR),
-                                                      padding=self._BOUNDING_RECT_PADDING,
                                                       do_grid=True)
         self.grab_cornerTL.alignPos(*top_left)
         self.grab_cornerBR.alignPos(*bottom_right)
