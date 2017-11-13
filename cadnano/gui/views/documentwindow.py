@@ -67,7 +67,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         Returns: None
         """
-        print(type(doc))
         self.slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
         self.slice_root = SliceRootItem(rect=self.slice_scene.sceneRect(),
                                         parent=None,

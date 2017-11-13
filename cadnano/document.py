@@ -156,7 +156,6 @@ class Document(CNObject):
 
     def setActivePart(self, part):
         # print("DC setActivePart")
-        print('active part is' + str(part))
         self._active_part = part
     # end def
 

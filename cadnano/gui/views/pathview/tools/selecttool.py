@@ -31,14 +31,6 @@ class SelectTool(AbstractPathTool):
         self.strand_item_selection_group = SelectionItemGroup(boxtype=b_type,
                                                               constraint='x',
                                                               parent=viewroot)
-        #TODO[NF]: REMOVE ME
-        try:
-            print('FILTER NAME IS %s' % self.FILTER_NAME)
-        except AttributeError:
-            print('FILTER NAME NOT SET IN INIT OF SELECTTOOL')
-            import traceback
-#            traceback.print_stack()
-
         #TODO[NF]: LOGGER
         print("A select tool was instantiated")
     # end def

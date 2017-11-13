@@ -15,10 +15,6 @@ class CreateSliceTool(AbstractSliceTool):
             manager (TYPE): Description
         """
         super(CreateSliceTool, self).__init__(manager)
-        try:
-            print('FILTER NAME IS %s' % self.FILTER_NAME)
-        except AttributeError:
-            print('FILTER NAME NOT SET IN INIT')
 
     def __repr__(self):
         """Summary

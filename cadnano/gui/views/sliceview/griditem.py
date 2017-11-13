@@ -32,7 +32,6 @@ class GridItem(QGraphicsPathItem):
             part_item (TYPE): Description
             grid_type (TYPE): Description
         """
-        print("new griditem")
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
         # TODO[NF] Make this a constant
