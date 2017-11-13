@@ -140,6 +140,7 @@ class GridItem(QGraphicsPathItem):
 
                 if x == 0 and y == 0:
                     pt.setBrush(getBrushObj(Qt.gray))
+
                 points.append(pt)
 
                 if redo_neighbors:
@@ -225,6 +226,10 @@ class GridItem(QGraphicsPathItem):
                                -y - half_dot_size,
                                dot_size, self)
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
+
+                if x == 0 and y == 0:
+                    pt.setBrush(getBrushObj(Qt.gray))
+
                 points.append(pt)
 
                 if redo_neighbors:
