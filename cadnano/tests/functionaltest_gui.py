@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-import sys, os, io, time
+# revisit porting https://github.com/cadnano/cadnano2/blob/229dac07f6cefa9047d73fa4b904c913fb9fd8a8/tests/testrecorder.py
 
 import pytest
-
-from cnguitestcase import GUITestApp
-from PyQt5.QtCore import Qt, QPoint, QPointF
+from PyQt5.QtCore import QPoint, QPointF, Qt
 from PyQt5.QtTest import QTest
+from cnguitestcase import GUITestApp
+
 
 @pytest.fixture()
 def cnapp():
@@ -13,15 +13,15 @@ def cnapp():
     yield app
     app.tearDown()
 
-DELAY = 20 # milliseconds
+DELAY = 20  # milliseconds
+
 
 ####################### Standard Functional Tests ########################
 def testCreateVirtualHelix(cnapp):
     """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
     # Create a new Honeycomb part
     main_toolbar = cnapp.window.main_toolbar
-    new_dna_part_button = main_toolbar.widgetForAction(
-                                            cnapp.window.action_new_dnapart)
+    new_dna_part_button = main_toolbar.widgetForAction(cnapp.window.action_new_dnapart)
     QTest.mouseClick(new_dna_part_button, Qt.LeftButton, delay=DELAY)
     # Click each SliceHelix
     slicerootitem = cnapp.window.sliceroot
