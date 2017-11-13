@@ -5,21 +5,21 @@ Attributes:
     HIGHLIGHT_WIDTH (TYPE): Description
 """
 from ast import literal_eval
-from PyQt5.QtCore import QPointF, Qt, QRectF
+from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getPenObj, getNoPen  # getBrushObj
+from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
-from .virtualhelixitem import SliceVirtualHelixItem
-from .prexovermanager import PreXoverManager
-from .griditem import GridItem
 from . import slicestyles as styles
+from .griditem import GridItem
+from .prexovermanager import PreXoverManager
+from .virtualhelixitem import SliceVirtualHelixItem
 
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
@@ -474,7 +474,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
         """
-        print('reconfig:  %s, %s, %s' % (padding, str(top_left), str(bottom_right)))
+        # print('reconfig:  %s, %s, %s' % (padding, str(top_left), str(bottom_right)))
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
@@ -483,8 +483,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
-        print('rsetting: %s, %s, %s, %s' % (ptTL.x(), ptTL.y(), ptBR.x(),
-                                           ptBR.y()))
+        # print('rsetting: %s, %s, %s, %s' % (ptTL.x(), ptTL.y(), ptBR.x(), ptBR.y()))
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
@@ -509,20 +508,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         if self.griditem.grid_type is GridType.SQUARE:
             padding = 1.5*self._RADIUS
-            print('padding is %s' % padding)
+            # print('padding is %s' % padding)
         else:
             padding = self._BOUNDING_RECT_PADDING
 
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
-        print('was: %s, %s, %s, %s' % (rect_left, rect_top, rect_right,
-                                       rect_bottom))
         xTL = min(rect_left, model_left - padding)
         xBR = max(rect_right, model_right + padding)
         yTL = min(rect_top, model_top - padding)
         yBR = max(rect_bottom, model_bottom + padding)
         tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
-        print('esetting: %s, %s, %s, %s' % (xTL, yTL, xBR, yBR))
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)
 
@@ -643,9 +639,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
 
-    def hoverLeaveEvent(self, event):
-        tool = self._getActiveTool()
-        #tool.hideLineItem()
+    # def hoverLeaveEvent(self, event):
+    #     pass
+        # tool = self._getActiveTool()
+        # tool.hideLineItem()
 
     def getModelPos(self, pos):
         """Y-axis is inverted in Qt +y === DOWN
@@ -697,10 +694,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         part_pt_tuple = self.getModelPos(pt)
 
-#        mod = Qt.MetaModifier
+        # mod = Qt.MetaModifier
         modifiers = event.modifiers()
-#        if not (modifiers & mod):
-#            pass
+        # if not (modifiers & mod):
+        #     pass
 
         is_shift = modifiers == Qt.ShiftModifier
         position = (event.scenePos().x(), event.scenePos().y())
@@ -708,31 +705,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                         is_shift=is_shift):
             return
 
-        # don't create a new VirtualHelix if the click overlaps with existing
-        # VirtualHelix
-        current_id_num = tool.idNum()
-        check = part.isVirtualHelixNearPoint(part_pt_tuple, current_id_num)
-        # print("current_id_num", current_id_num, check)
-        # print(part_pt_tuple)
         tool.setPartItem(self)
-        if check:
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            # print("got a check", id_num)
-            if id_num is not None:
-                # print("restart", id_num)
-                vhi = self._virtual_helix_item_hash[id_num]
-                tool.setVirtualHelixItem(vhi)
-                tool.startCreation()
-        else:
-            part.createVirtualHelix(*part_pt_tuple)
-            id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            vhi = self._virtual_helix_item_hash[id_num]
-            tool.setVirtualHelixItem(vhi)
-            tool.startCreation()
+        part.createVirtualHelix(*part_pt_tuple)
+        id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
+        vhi = self._virtual_helix_item_hash[id_num]
+        tool.setVirtualHelixItem(vhi)
+        tool.startCreation()
 
-            coordinates = self.griditem.find_closest_point(position)
-            print('coordinates are %s' % str(coordinates))
-            self.griditem.added_virtual_helix(coordinates)
+        coordinates = self.griditem.find_closest_point(position)
+        print('coordinates are %s' % str(coordinates))
+        self.griditem.added_virtual_helix(coordinates)
 
     def _handle_spa_mouse_press(self, tool, position, is_shift):
         if (is_shift):
@@ -802,9 +784,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverEnter(self, tool, event):
-        if self.shortest_path_add_mode:
-            shortest_path_start_ij = None
-            current_ij = None
+        pass  # TODO: add code to show hint
+        # if self.shortest_path_add_mode:
+        #     shortest_path_start_ij = None
+        #     current_ij = None
 
     def selectToolMousePress(self, tool, event):
         """
