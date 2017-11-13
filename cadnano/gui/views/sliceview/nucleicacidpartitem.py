@@ -46,6 +46,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _BOUNDING_RECT_PADDING = 80
+    _BOUNDING_RECT_PADDING_SQUARE = 100
 
     def __init__(self, model_part_instance, viewroot, parent=None):
         """Summary
@@ -477,7 +478,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
         """
-        # print('reconfig:  %s, %s, %s' % (padding, str(top_left), str(bottom_right)))
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
@@ -486,7 +486,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
-        # print('rsetting: %s, %s, %s, %s' % (ptTL.x(), ptTL.y(), ptBR.x(), ptBR.y()))
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
@@ -510,8 +509,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         :rtype: None
         """
         if self.griditem.grid_type is GridType.SQUARE:
-            padding = 1.5*self._RADIUS
-            # print('padding is %s' % padding)
+            padding = self._BOUNDING_RECT_PADDING_SQUARE
         else:
             padding = self._BOUNDING_RECT_PADDING
 
@@ -540,9 +538,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 #        yBR = max(rect_bottom, model_bottom + padding)
         top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
                                                       bottom_right=(xBR, yBR),
-                                                      padding=80,
+                                                      padding=self._BOUNDING_RECT_PADDING,
                                                       do_grid=True)
-        print('esetting: %s, %s, %s, %s' % (xTL, yTL, xBR, yBR))
         self.grab_cornerTL.alignPos(*top_left)
         self.grab_cornerBR.alignPos(*bottom_right)
 
