@@ -1275,9 +1275,9 @@ class NucleicAcidPart(Part):
                 raise IndexError("id_num {} does not exists".format(id_num))
 
         # Ensure that the values that are set are floats as appropriate
-        if not isinstance(keys, basestring):
+        if not isinstance(keys, str):
             # TODO[NF]:  Change this to logger
-            print('Encountered a non-basestring key:  %s' % keys)
+            print('Encountered a non-string key:  %s' % keys)
         # TODO[NF]:  If keys is somehow a list, values won't be cast properly
         # TODO[NF]:  Add UI-side validation of inputs
         if keys in self._FLOAT_PROPERTY_KEYS:
