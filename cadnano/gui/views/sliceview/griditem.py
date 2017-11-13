@@ -31,7 +31,6 @@ class GridItem(QGraphicsPathItem):
         """
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
-        print('part item is a %s' % type(part_item))
         # TODO[NF] Make this a constant
         dot_size = 30
         self.dots = (dot_size, dot_size / 2)

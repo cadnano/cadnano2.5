@@ -60,9 +60,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
-        print('**********************')
-        print('model part is %s' % type(m_p))
-        print('model part instance is %s' % type(model_part_instance))
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
         self.inverse_scale_factor = m_p.radius() / self._RADIUS
