@@ -22,6 +22,9 @@ class GridItem(QGraphicsPathItem):
         neighbor_map (dict):  a mapping of i, j row-column coordinates to a
         list of i, j row-column coordinates of neighbors to facilitate a BFS
 
+        virtual_helices (set):  a set of tuples corresponding to virtual
+        helices that exist on the Grid
+
         previous_grid_bounds (tuple):  a tuple corresponding to the bounds of
         the grid.
 
@@ -39,6 +42,7 @@ class GridItem(QGraphicsPathItem):
         self.points = []
         self.point_coordinates = dict()
         self.neighbor_map = dict()
+        self.virtual_helices = set()
         self.previous_grid_bounds = None
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -131,6 +135,7 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
+                stroke_weight = styles.EMPTY_HELIX_STROKE_WIDTH
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
@@ -224,6 +229,7 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
+
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
 
                 if x == 0 and y == 0:
@@ -270,19 +276,19 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
-#    def find_closest_point(self, position):
-#        """Find the closest point to a given position on the grid
-#        Args:
-#            position ():
-#
-#        Returns:
-#
-#        """
-#        for coordinates, coordiante_position in self.point_coordinates.items():
-#            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-#            if distance < _RADIUS**2:
-#                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-#                return coordinates
+    def find_closest_point(self, position):
+        """Find the closest point to a given position on the grid
+        Args:
+            position ():
+
+        Returns:
+
+        """
+        for coordinates, coordiante_position in self.point_coordinates.items():
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
+            if distance < _RADIUS**2:
+                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+                return coordinates
 
     def shortest_path(self, start, end):
         """Return a path of coordinates that traverses from start to end.
@@ -341,38 +347,37 @@ class GridItem(QGraphicsPathItem):
             else:
                 neighbors = self.neighbor_map.get(current_location, [])
                 for neighbor in neighbors:
-                    if neighbor not in parents and neighbor not in self.part_item.get_virtual_helix_set():
+                    if neighbor not in parents and neighbor not in self.virtual_helices:
                         parents[neighbor] = current_location
                         queue.put(neighbor)
         print('Could not find path from %s to %s' % (str(start), str(end)))
         return []
 
-#    def added_virtual_helix(self, location):
-#        """
-#        Update the internal set of virtual helices to include the
-#        virtualhelix that lives at `location`.
-#
-#        Args:
-#            location (tuple):  The location that a VH is being added to
-#
-#        Returns: None
-#        """
-#        assert isinstance(location, tuple) and len(location) is 2
-#        self.virtual_helices.add(location)
-#
-#    def removed_virtual_helix(self, location):
-#        """
-#        Update the internal set of virtual helices to no longer include the
-#        virtualhelix that lives at `location`.
-#
-#        Args:
-#            location (tuple):  The location that a VH is being removed from
-#
-#        Returns: None
-#        """
-#        assert isinstance(location, tuple) and len(location) is 2
-#        print('removing virtual helix: %s' % self.virtual_helices)
-#        self.virtual_helices.remove(location)
+    def added_virtual_helix(self, location):
+        """
+        Update the internal set of virtual helices to include the
+        virtualhelix that lives at `location`.
+
+        Args:
+            location (tuple):  The location that a VH is being added to
+
+        Returns: None
+        """
+        assert isinstance(location, tuple) and len(location) is 2
+        self.virtual_helices.add(location)
+
+    def removed_virtual_helix(self, location):
+        """
+        Update the internal set of virtual helices to no longer include the
+        virtualhelix that lives at `location`.
+
+        Args:
+            location (tuple):  The location that a VH is being removed from
+
+        Returns: None
+        """
+        assert isinstance(location, tuple) and len(location) is 2
+        self.virtual_helices.remove(location)
 
 
 class ClickArea(QGraphicsEllipseItem):

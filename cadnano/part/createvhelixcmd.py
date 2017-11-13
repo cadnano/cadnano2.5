@@ -40,7 +40,6 @@ class CreateVirtualHelixCommand(UndoCommand):
     # end def
 
     def redo(self):
-        print('redoing')
         part = self.part
         id_num = self.id_num
         origin_pt = self.origin_pt

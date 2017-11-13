@@ -902,27 +902,3 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setRotation(pxig.rotation())
     # end def
 # end class
-
-def find_closest_point(position, position_map):
-    """Find the closest point to a given position on the grid
-    Args:
-        position (tuple): a length 2 tuple corresponding to the x and y
-        values of a point on the grid
-
-        position_map (dict): a dictionary mapping coordinates to positions on
-        the grid
-
-    Returns:
-        The coordinates that correspond to the closest GridItem
-
-    """
-    assert isinstance(position, tuple) and len(position) is 2,\
-        'Invalid position:  %s' % position
-    assert isinstance(position_map, dict), \
-        'Invalid position_map:  %s' % position_map
-
-    for coordinates, coordiante_position in position_map.items():
-        distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-        if distance < _RADIUS**2:
-            # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-            return coordinates

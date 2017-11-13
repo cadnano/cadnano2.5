@@ -448,11 +448,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         vhi = self._virtual_helix_item_hash[id_num]
 
-#        center_point = vhi.getCenterScenePos()
-#        location = self.griditem.find_closest_point((center_point.x(),
-#                                                     center_point.y()))
+        center_point = vhi.getCenterScenePos()
+        location = self.griditem.find_closest_point((center_point.x(),
+                                                     center_point.y()))
 
-#        self.griditem.removed_virtual_helix(location)
+        self.griditem.removed_virtual_helix(location)
 
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
@@ -790,7 +790,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
-#            self.griditem.added_virtual_helix((-row, column))
+            self.griditem.added_virtual_helix((-row, column))
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -836,8 +836,4 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
-
-    def get_virtual_helix_set(self):
-        # TODO[NF]:  Docstring
-        return self._model_part.get_virtual_helix_set()
 # end class
