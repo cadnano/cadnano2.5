@@ -41,7 +41,6 @@ def _defaultProperties(id_num):
              ('color', '#00000000'),
              # ('eulerZ', 17.143*2),    # 0.5*360/10.5
              ('eulerZ', 0.),
-             ('scamZ', 10.),
              ('neighbor_active_angle', 0.0),
              ('neighbors', '[]'),
              ('bases_per_repeat', 21),
@@ -54,9 +53,9 @@ def _defaultProperties(id_num):
              ]
     return tuple(zip(*props))
 # end def
+
+
 VH_PROPERTY_KEYS = set([x for x in _defaultProperties(0)[0]])
-
-
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
 
@@ -66,6 +65,7 @@ def _defaultDataFrame(size):
     df = pd.DataFrame([row for i in range(size)], columns=columns)
     return df
 # end def
+
 
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
@@ -100,7 +100,7 @@ class NucleicAcidPart(Part):
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
 
-    #TODO[NF]:  Change usages of these strings to constants throughought files
+    # TODO[NF]:  Change usages of these strings to constants throughought files
     _FLOAT_PROPERTY_KEYS = [
         'bases_per_repeat',
         'bases_per_turn',
@@ -109,7 +109,6 @@ class NucleicAcidPart(Part):
         'length',
         'minor_groove_angle',
         'neighbor_active_angle',
-        'scamZ',
         'turns_per_repeat',
         'twist_per_base',
         'z'
@@ -155,6 +154,7 @@ class NucleicAcidPart(Part):
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
+        gps['workplane_idx'] = 10
 
         ############################
         # Begin low level attributes
@@ -213,8 +213,8 @@ class NucleicAcidPart(Part):
 
         # ID assignment
         self.recycle_bin = {
-            0:[],
-            1:[]
+            0: [],
+            1: []
         }
         self._highest_even_id_num_used = -2
         self._highest_odd_id_num_used = -1
@@ -1442,6 +1442,7 @@ class NucleicAcidPart(Part):
         self.vh_properties.loc[id_num, 'length'] = final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
+        self._group_properties['max_vhelix_length'] = self.vh_properties['length'].max()
         # return 0, self.vh_properties['length'].idxmax()
         return self.zBoundsIds()
     # end def
