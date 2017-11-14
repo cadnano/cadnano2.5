@@ -593,7 +593,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def pencilToolHoverMove(self, is_fwd, idx_x, idx_y):
-        """Pencil the strand is possible.
+        """Create the strand is possible.
 
         Args:
             is_fwd (TYPE): Description

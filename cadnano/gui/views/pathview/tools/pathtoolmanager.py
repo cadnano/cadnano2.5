@@ -3,7 +3,7 @@
 from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
 
 from .selecttool import SelectTool
-from .penciltool import PencilTool
+from .penciltool import CreateTool
 from .breaktool import BreakTool
 from .insertiontool import InsertionTool
 from .skiptool import SkipTool
@@ -22,7 +22,7 @@ class PathToolManager(AbstractToolManager):
         mods_tool (ModsTool): Description
         nick_tool (BreakTool): Description
         paint_tool (PaintTool): Description
-        pencil_tool (PencilTool): Description
+        create_tool (CreateTool): Description
         select_tool (SelectTool): Description
         skip_tool (SkipTool): Description
         tool_names (tuple): Description
@@ -35,9 +35,9 @@ class PathToolManager(AbstractToolManager):
             viewroot (TYPE): Description
         """
         super(PathToolManager, self).__init__('path', window, viewroot)
-        self.tool_names = ('Select', 'Pencil', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
+        self.tool_names = ('Select', 'Create', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
         self.select_tool = SelectTool(self, viewroot)
-        self.pencil_tool = PencilTool(self)
+        self.create_tool = CreateTool(self)
         self.nick_tool = BreakTool(self)
         self.insertion_tool = InsertionTool(self)
         self.skip_tool = SkipTool(self)

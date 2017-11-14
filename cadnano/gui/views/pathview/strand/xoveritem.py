@@ -369,7 +369,7 @@ class XoverItem(QGraphicsPathItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def hideIt(self):
-        """Used by PencilTool
+        """Used by CreateTool
         """
         self.hide()
         if self._node3:
@@ -380,7 +380,7 @@ class XoverItem(QGraphicsPathItem):
     # end def
 
     def showIt(self):
-        """Used by PencilTool
+        """Used by CreateTool
         """
         self.show()
         if self._node3:

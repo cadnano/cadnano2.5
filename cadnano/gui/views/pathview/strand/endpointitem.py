@@ -325,7 +325,7 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     def pencilToolHoverMove(self, idx):
-        """Pencil the strand is possible."""
+        """Create the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
         active_tool = self._getActiveTool()

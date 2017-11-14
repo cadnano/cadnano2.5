@@ -34,9 +34,9 @@ _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _NO_PEN = QPen(Qt.NoPen)
 
 
-class PencilTool(AbstractPathTool):
+class CreateTool(AbstractPathTool):
     """
-    docstring for PencilTool
+    docstring for CreateTool
     """
     def __init__(self, manager):
         """Summary
@@ -44,7 +44,7 @@ class PencilTool(AbstractPathTool):
         Args:
             manager (TYPE): Description
         """
-        super(PencilTool, self).__init__(manager)
+        super(CreateTool, self).__init__(manager)
         self._temp_xover = ForcedXoverItem(self, None, None)
         self._temp_strand_item = ForcedStrandItem(self, None)
         self._temp_strand_item.hide()
@@ -58,7 +58,7 @@ class PencilTool(AbstractPathTool):
         Returns:
             TYPE: Description
         """
-        return "pencil_tool"  # first letter should be lowercase
+        return "create_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
         """Summary
@@ -243,7 +243,7 @@ class PencilTool(AbstractPathTool):
             event (TYPE): Description
         """
         a = event.key()
-        # print("PencilTool keypress", a)
+        # print("CreateTool keypress", a)
         if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             QGraphicsObject.keyPressEvent(self, event)
         else:

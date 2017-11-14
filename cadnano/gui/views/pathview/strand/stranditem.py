@@ -600,7 +600,7 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def pencilToolHoverMove(self, event, idx):
-        """Pencil the strand is possible."""
+        """Create the strand is possible."""
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
         active_tool = self._getActiveTool()

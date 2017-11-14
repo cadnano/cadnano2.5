@@ -31,8 +31,8 @@ class SelectTool(AbstractPathTool):
         self.strand_item_selection_group = SelectionItemGroup(boxtype=b_type,
                                                               constraint='x',
                                                               parent=viewroot)
-        #TODO[NF]: LOGGER
-        print("A select tool was instantiated")
+        # TODO[NF]: LOGGER
+        # print("A select tool was instantiated")
     # end def
 
     def resetSelections(self):

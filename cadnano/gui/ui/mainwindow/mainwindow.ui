@@ -355,7 +355,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_global_select"/>
-   <addaction name="action_global_pencil"/>
+   <addaction name="action_global_create"/>
    <addaction name="action_path_nick"/>
    <addaction name="action_path_paint"/>
    <addaction name="action_path_insertion"/>
@@ -367,8 +367,6 @@
    <addaction name="separator"/>
    <addaction name="action_export_staples"/>
    <addaction name="action_SVG"/>
-   <addaction name="separator"/>
-   <addaction name="action_outliner"/>
   </widget>
   <widget class="QToolBar" name="selection_toolbar">
    <property name="sizePolicy">
@@ -417,12 +415,14 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_filter_handle"/>
+   <addaction name="action_outliner"/>
+   <addaction name="action_toolbar_spacer"/>
+   <addaction name="action_filter_helix"/>
    <addaction name="action_filter_rev"/>
    <addaction name="action_filter_fwd"/>
    <addaction name="action_filter_xover"/>
    <addaction name="action_filter_endpoint"/>
-   <addaction name="actionSelectable"/>
+   <addaction name="action_selectable_label"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -643,10 +643,13 @@
      <normaloff>:/pathtools/force</normaloff>:/pathtools/force</iconset>
    </property>
    <property name="text">
-    <string>Pencil</string>
+    <string>Create</string>
    </property>
    <property name="toolTip">
-    <string>Pe(n)cil Tool</string>
+    <string>(C)reate Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>C</string>
    </property>
   </action>
   <action name="action_path_insertion">
@@ -843,7 +846,7 @@
     <string>D</string>
    </property>
   </action>
-  <action name="action_filter_handle">
+  <action name="action_filter_helix">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -855,7 +858,7 @@
      <normaloff>:/parttools/filter-handle</normaloff>:/parttools/filter-handle</iconset>
    </property>
    <property name="toolTip">
-    <string>(H)andles</string>
+    <string>(H)elix</string>
    </property>
    <property name="shortcut">
     <string>H</string>
@@ -962,21 +965,6 @@
     <string>Plasmid</string>
    </property>
   </action>
-  <action name="action_new_squarednapart">
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/sqpro</normaloff>:/parttools/sqpro</iconset>
-   </property>
-   <property name="text">
-    <string>Sq</string>
-   </property>
-   <property name="iconText">
-    <string>Sq</string>
-   </property>
-   <property name="toolTip">
-    <string>Add SquareDNAPart </string>
-   </property>
-  </action>
   <action name="action_filter_pre_axover">
    <property name="checkable">
     <bool>true</bool>
@@ -1014,48 +1002,6 @@
    </property>
    <property name="shortcut">
     <string>\</string>
-   </property>
-  </action>
-  <action name="action_filter_even">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-even</normaloff>:/parttools/filter-even</iconset>
-   </property>
-   <property name="text">
-    <string>filter-even</string>
-   </property>
-   <property name="toolTip">
-    <string>filter-even</string>
-   </property>
-   <property name="shortcut">
-    <string>0</string>
-   </property>
-  </action>
-  <action name="action_filter_odd">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-odd</normaloff>:/parttools/filter-odd</iconset>
-   </property>
-   <property name="text">
-    <string>filter-odd1</string>
-   </property>
-   <property name="toolTip">
-    <string>filter-odd</string>
-   </property>
-   <property name="shortcut">
-    <string>1</string>
    </property>
   </action>
   <action name="action_vhelix_create">
@@ -1148,73 +1094,7 @@
     <string>Snap Helix</string>
    </property>
   </action>
-  <action name="action_vhelix_set_angles">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/select-snap-angles</normaloff>:/slicetools/select-snap-angles</iconset>
-   </property>
-   <property name="text">
-    <string>angles</string>
-   </property>
-   <property name="toolTip">
-    <string>Helix angle</string>
-   </property>
-  </action>
-  <action name="actionGridLines">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/grid-lines</normaloff>:/slicetools/grid-lines</iconset>
-   </property>
-   <property name="text">
-    <string>gridLines</string>
-   </property>
-  </action>
-  <action name="actionGridCircles">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/grid-circles</normaloff>:/slicetools/grid-circles</iconset>
-   </property>
-   <property name="text">
-    <string>gridCircles</string>
-   </property>
-  </action>
-  <action name="actionGridPoints">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/grid-points</normaloff>:/slicetools/grid-points</iconset>
-   </property>
-   <property name="text">
-    <string>gridPoints</string>
-   </property>
-  </action>
-  <action name="action_vhelix_move">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/slicetools/move</normaloff>:/slicetools/move</iconset>
-   </property>
-   <property name="text">
-    <string>move</string>
-   </property>
-   <property name="shortcut">
-    <string>W</string>
-   </property>
-  </action>
-  <action name="action_global_pencil">
+  <action name="action_global_create">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1223,13 +1103,13 @@
      <normaloff>:/pathtools/force</normaloff>:/pathtools/force</iconset>
    </property>
    <property name="text">
-    <string>Pencil</string>
+    <string>Create</string>
    </property>
    <property name="toolTip">
-    <string>Pe(n)cil Tool</string>
+    <string>(C)reate Tool</string>
    </property>
    <property name="shortcut">
-    <string>N</string>
+    <string>C</string>
    </property>
   </action>
   <action name="action_global_select">
@@ -1253,12 +1133,26 @@
     <string>V</string>
    </property>
   </action>
-  <action name="actionSelectable">
+  <action name="action_selectable_label">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string>Selectable:</string>
+   </property>
+  </action>
+  <action name="action_toolbar_spacer">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="toolTip">
+    <string>Selection Filters</string>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
    </property>
   </action>
  </widget>

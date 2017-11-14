@@ -70,7 +70,7 @@ class DocumentController():
         # setup tool exclusivity
         self.actiongroup = ag = QActionGroup(win)
         action_group_list = ['action_global_select',
-                             'action_global_pencil',
+                             'action_global_create',
                              'action_path_nick',
                              'action_path_paint',
                              'action_path_insertion',
@@ -120,17 +120,17 @@ class DocumentController():
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
             (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
-            (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_create.trigger()),
             (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_square),
-            (win.action_new_dnapart_square.triggered, lambda: win.action_global_pencil.trigger()),
+            (win.action_new_dnapart_square.triggered, lambda: win.action_global_create.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
             (win.action_feedback.triggered, self.actionFeedbackSlot),
 
             # make it so select tool in slice view activation turns on vh filter
-            (win.action_filter_handle.triggered, self.actionFilterVirtualHelixSlot),
+            (win.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
             (win.action_global_select.triggered, self.actionSelectForkSlot),
-            (win.action_global_pencil.triggered, self.actionCreateForkSlot),
+            (win.action_global_create.triggered, self.actionCreateForkSlot),
 
             (win.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
             (win.action_filter_strand.triggered, self.actionFilterStrandSlot),
@@ -187,7 +187,7 @@ class DocumentController():
 
     def actionFilterVirtualHelixSlot(self):
         """Disables all other selection filters when active."""
-        fH = self.win.action_filter_handle
+        fH = self.win.action_filter_helix
         fE = self.win.action_filter_endpoint
         # fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
@@ -207,7 +207,7 @@ class DocumentController():
         Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
-        fH = self.win.action_filter_handle
+        fH = self.win.action_filter_helix
         fE = self.win.action_filter_endpoint
         fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
@@ -224,7 +224,7 @@ class DocumentController():
         Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
-        fH = self.win.action_filter_handle
+        fH = self.win.action_filter_helix
         fE = self.win.action_filter_endpoint
         fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
@@ -240,7 +240,7 @@ class DocumentController():
         Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
-        fH = self.win.action_filter_handle
+        fH = self.win.action_filter_helix
         fE = self.win.action_filter_endpoint
         fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
@@ -549,7 +549,7 @@ class DocumentController():
 
         Returns: None
         """
-        print("Toggling grid view to %s" % show)
+        # print("Toggling grid view to %s" % show)
         grid_view = self.win.grid_graphics_view
         if show:
             self.grid_view_showing = True

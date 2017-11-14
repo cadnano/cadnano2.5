@@ -677,7 +677,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def pencilToolHoverMove(self, pt):
-        """Pencil the strand is possible.
+        """Create the strand is possible.
 
         Args:
             pt (QPointF): mouse cursor location of pencil tool hover.
