@@ -525,26 +525,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
 
-        from cadnano.util import qtdb_trace
-#        qtdb_trace()
-        print('was: %s, %s, %s, %s' % (rect_left, rect_top, rect_right,
-                                       rect_bottom))
-        xTL = min(rect_left, model_left - padding)
-        xBR = max(rect_right, model_right + padding)
-        yTL = min(rect_top, model_top - padding)
-        yBR = max(rect_bottom, model_bottom + padding)
-# This works to resize honeycomb
-#        xTL = min(rect_left - padding, model_left - padding)
-#        xBR = max(rect_right + padding, model_right + padding)
-#        yTL = min(rect_top - padding, model_top - padding)
-#        yBR = max(rect_bottom + padding, model_bottom + padding)
-        print("bottom is %s and bottom with padding is %s" % (model_bottom,
-                                                              model_bottom+
-                                                              padding))
-#        xTL = min(rect_left, model_left - padding)
-#        xBR = max(rect_right, model_right + padding)
-#        yTL = min(rect_top, model_top - padding)
-#        yBR = max(rect_bottom, model_bottom + padding)
+        xTL = min(rect_left, model_left) - padding
+        xBR = max(rect_right, model_right) + padding
+        yTL = min(rect_top, model_top) - padding
+        yBR = max(rect_bottom, model_bottom) + padding
         top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
                                                       bottom_right=(xBR, yBR),
                                                       do_grid=True)
