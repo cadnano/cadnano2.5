@@ -719,10 +719,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                         is_shift=is_shift):
             return
 
+        x, y = ShortestPathHelper.find_closest_point(position=position,
+                                                     point_map=self.point_map)
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            x, y = ShortestPathHelper.find_closest_point(position=position,
-                                                         point_map = self.point_map)
             parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
+        elif self.griditem.grid_type is GridType.SQUARE:
+            parity = 0 if SquareDnaPart.isEvenParity(row=x, column=y) else 1
         else:
             parity = None
         part.createVirtualHelix(x=part_pt_tuple[0],
@@ -759,7 +761,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                    point_map=self.point_map,
                                                    grid_type=self.griditem.grid_type,
                                                    scale_factor=self.inverse_scale_factor,
-                                                   radius = self._RADIUS)
+                                                   radius=self._RADIUS)
         for x, y, parity in path:
             before = set(self._virtual_helix_item_hash.keys())
             self._model_part.createVirtualHelix(x=x,
