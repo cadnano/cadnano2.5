@@ -57,8 +57,8 @@ class GridRootItem(QGraphicsRectItem):
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
             na_part_item = GridNucleicAcidPartItem(model_part_instance,
-                                                    viewroot=self,
-                                                    parent=self)
+                                                   viewroot=self,
+                                                   parent=self)
             self.instance_items[na_part_item] = na_part_item
             self.select_tool.setPartItem(na_part_item)
             na_part_item.zoomToFit()
@@ -87,8 +87,8 @@ class GridRootItem(QGraphicsRectItem):
         # if 'virtual_helix' not in filter_name_list:
         #     self.manager.chooseCreateTool()
         pass
-        for nucleicacid_part_item in self.instance_items:
-            nucleicacid_part_item.setSelectionFilter(filter_name_list)
+        # for nucleicacid_part_item in self.instance_items:
+        #     nucleicacid_part_item.setSelectionFilter(filter_name_list)
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
