@@ -13,6 +13,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+
 class SelectionItemGroup(QGraphicsItemGroup):
     """
     SelectionItemGroup
@@ -151,17 +152,17 @@ class SelectionItemGroup(QGraphicsItemGroup):
         """
         doc = self.document()
         p2add = self._pending_to_add_dict
-        logger.debug("processPendingToAddList")
+        # logger.debug("processPendingToAddList")
         if len(p2add) > 0:
             plist = list(self._pending_to_add_dict.keys())
             for item in plist:
                 if p2add[item]:
                     p2add[item] = False
-                    logger.debug("just checking1", item, item.group(), item.parentItem())
+                    # logger.debug("just checking1", item, item.group(), item.parentItem())
                     self.addToGroup(item)
                     item.modelSelect(doc)
             # end for
-            logger.debug('finished')
+            # logger.debug('finished')
             self._pending_to_add_dict = {}
             doc.updateStrandSelection()
     # end def
@@ -262,7 +263,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
             else:
                 delta = self.selectionbox.delta(rf, self._r0)
                 self.translateR(delta)
-                logger.debug('mouse move path selectionbox', delta, rf, self._r0)
+                # logger.debug('mouse move path selectionbox', delta, rf, self._r0)
             # end else
             self._r = rf
         # end if
@@ -335,16 +336,16 @@ class SelectionItemGroup(QGraphicsItemGroup):
         """
 #        logger.debug("ps itemChange")
         if change == QGraphicsItem.ItemSelectedChange:
-            logger.debug("isc", value)
+            # logger.debug("isc", value)
             if value == False:  # noqa
                 self.clearSelection(False)
                 return False
             else:
                 return True
         elif change == QGraphicsItem.ItemChildAddedChange:
-            logger.debug("icac")
+            # logger.debug("icac")
             if self._added_to_press_list is False:
-                logger.debug("kid added")
+                # logger.debug("kid added")
                 self.setFocus()  # this is to get delete keyPressEvents
                 self.selectionbox.boxParent()
                 # self.setParentItem(self.selectionbox.boxParent())
@@ -658,7 +659,7 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         """
         temp_low, temp_high = self._item_group.viewroot.document().getSelectionBounds()
         self._bounds = (temp_low, temp_high)
-        logger.debug("rp:", self._bounds)
+        # logger.debug("rp:", self._bounds)
         self.prepareGeometryChange()
         self.setPath(self.painterPath())
         self._pos0 = self.pos()

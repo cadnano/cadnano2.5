@@ -648,7 +648,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
         else:
-            print("Ignoring hovermove")
+            # print("Ignoring hovermove")
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
 
@@ -805,9 +805,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if part.isVirtualHelixNearPoint(part_pt_tuple):
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
             if id_num is not None:
-                print(id_num)
-                loc = part.getCoordinate(id_num, 0)
-                print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))
+                pass
+                # loc = part.getCoordinate(id_num, 0)
+                # print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))
             else:
                 # tool.deselectItems()
                 tool.modelClear()

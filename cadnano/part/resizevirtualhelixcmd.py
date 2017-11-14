@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class ResizeVirtualHelixCommand(UndoCommand):
     """
     set the maximum and mininum base index in the helical direction

@@ -1,4 +1,4 @@
-from queue import Queue
+# from queue import Queue
 
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QColor, QPainterPath
@@ -133,8 +133,8 @@ class GridItem(QGraphicsPathItem):
 
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
 
-                if x == 0 and y == 0:
-                    pt.setBrush(getBrushObj(Qt.gray))
+                # if x == 0 and y == 0:
+                #     pt.setBrush(getBrushObj(Qt.gray))
 
                 points.append(pt)
 
@@ -201,7 +201,7 @@ class GridItem(QGraphicsPathItem):
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
-            point_map= dict()
+            point_map = dict()
             neighbor_map = dict()
 
         path = QPainterPath()
@@ -227,8 +227,8 @@ class GridItem(QGraphicsPathItem):
 
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
 
-                if x == 0 and y == 0:
-                    pt.setBrush(getBrushObj(Qt.gray))
+                # if x == 0 and y == 0:
+                #     pt.setBrush(getBrushObj(Qt.gray))
 
                 points.append(pt)
 

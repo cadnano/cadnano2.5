@@ -86,7 +86,6 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key
     # end def
 
-
     def key(self):
         """Summary
 
