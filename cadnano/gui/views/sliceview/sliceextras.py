@@ -6,6 +6,8 @@ Attributes:
     TRIANGLE (TYPE): Description
     WEDGE_RECT (TYPE): Description
 """
+from queue import Queue
+
 import numpy as np
 
 from PyQt5.QtCore import QLineF, QObject, QPointF, Qt, QRectF
@@ -902,3 +904,85 @@ class WedgeGizmo(QGraphicsPathItem):
         self.setRotation(pxig.rotation())
     # end def
 # end class
+
+class ShortestPathHelper(object):
+    @staticmethod
+    def find_closest_point(position, point_map):
+        """Find the closest point to a given position on the grid
+        Args:
+            position ():
+
+        Returns:
+
+        """
+        for coordinates, coordiante_position in point_map.items():
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
+            if distance < _RADIUS**2:
+                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+                return coordinates
+
+    @staticmethod
+    def shortest_path(start, end, neighbor_map, vh_set, point_map):
+        """Return a path of coordinates that traverses from start to end.
+
+        Does a breadth-first search.  This could be further improved to do an A*
+        search.
+
+        Args:
+            start (tuple): The i-j coordinates corresponding to the start point
+            end (tuple):  The i-j coordinates corresponding to the end point
+
+        Returns:
+            A list of coordinates corresponding to a shortest path from start to
+            end.  This list omits the starting point as it's assumed that the
+            start point has already been clicked.
+        """
+        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
+        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
+
+        start_coordinates = ShortestPathHelper.find_closest_point(position=start,
+                                                                  point_map=point_map)
+        end_coordinates = ShortestPathHelper.find_closest_point(position=end,
+                                                                point_map=point_map)
+
+        if start_coordinates is None or end_coordinates is None:
+            # TODO[NF]:  Change to logger
+            print('Could not find path from %s to %s' % (str(start), str(end)))
+            return []
+
+            # TODO[NF]:  Change to logger
+        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
+
+        if neighbor_map.get(start_coordinates) is None:
+            raise LookupError('Could not find a point corresponding to %s',
+                              start_coordinates)
+        elif neighbor_map.get(end_coordinates) is None:
+            raise LookupError('Could not find a point corresponding to %s',
+                              end_coordinates)
+
+        parents = dict()
+        parents[start_coordinates] = None
+        queue = Queue()
+        queue.put(start_coordinates)
+
+        while not queue.empty():
+            try:
+                current_location = queue.get(block=False)
+            except Queue.Empty:
+                print('Could not find path from %s to %s' % (str(start), str(end)))
+                return []
+
+            if current_location == end_coordinates:
+                reversed_path = []
+                while current_location is not start_coordinates:
+                    reversed_path.append(current_location)
+                    current_location = parents[current_location]
+                return [node for node in reversed(reversed_path)]
+            else:
+                neighbors = neighbor_map.get(current_location, [])
+                for neighbor in neighbors:
+                    if neighbor not in parents and neighbor not in vh_set:
+                        parents[neighbor] = current_location
+                        queue.put(neighbor)
+        print('Could not find path from %s to %s' % (str(start), str(end)))
+        return []
