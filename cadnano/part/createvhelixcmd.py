@@ -72,9 +72,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         # since we're hashing on the object in the views do this first
         for neighbor_id in self.neighbors:
-            nneighbors = literal_eval(
-                            part.getVirtualHelixProperties(neighbor_id, 'neighbors')
-                        )
+            nneighbors = literal_eval(part.getVirtualHelixProperties(neighbor_id, 'neighbors'))
             nneighbors.remove(id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
 
