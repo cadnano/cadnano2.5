@@ -126,6 +126,7 @@ class PropertyEditorWidget(QTreeWidget):
         item_types = set([item.itemType() for item in selected_items])
         num_types = len(item_types)
         if num_types != 1:  # assume no mixed types for now
+            print("outlinerItemSelectionChanged returning1")
             return
         item_type = item_types.pop()
         cn_model_list = [item.cnModel() for item in selected_items if item.isSelected()]
@@ -134,6 +135,7 @@ class PropertyEditorWidget(QTreeWidget):
         actually selected
         '''
         if len(cn_model_list) == 0:
+            print("outlinerItemSelectionChanged returning2")
             return
         self._cn_model_set = set(cn_model_list)
         self._cn_model_list = cn_model_list
@@ -146,6 +148,7 @@ class PropertyEditorWidget(QTreeWidget):
 
         item = selected_items[0]
         if item.FILTER_NAME not in self._document.filter_set:
+            print(item.FILTER_NAME, "not in self._document.filter_set")
             return
         if item_type is ItemType.OLIGO:
             pe_item = OligoSetItem(parent=self)
@@ -195,7 +198,7 @@ class PropertyEditorWidget(QTreeWidget):
         if c_i == self.itemFromIndex(top_left):
             c_i.updateCNModel()
 
-        # call this to prvent UNDO calls propagating through the Widget first
+        # call this to prevent UNDO calls propagating through the Widget first
         self.outlinerItemSelectionChanged()
     # end def
 
