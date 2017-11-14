@@ -109,7 +109,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             else:
                 part.setSelected(False)
         self.show()
-        print('done init')
     # end def
 
     ### SIGNALS ###
@@ -768,38 +767,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return False
 
     def create_tool_shortest_path(self, tool, start, end):
-        """TODO:  Extract this into a method in SliceExtras that returns only a list of coordinates to fill in
-
-        Args:
-            start ():
-            end ():
-
-        Returns:
-
-        """
-        path = ShortestPathHelper.shortest_path(start=start,
-                                                end=end,
-                                                neighbor_map=self.neighbor_map,
-                                                vh_set=self.vh_set,
-                                                point_map=self.point_map)
-        for node in path:
-            row = -node[0]
-            column = node[1]
+        # TODO[NF]:  Docstring
+        path = ShortestPathHelper.shortest_path_xy(start=start,
+                                                   end=end,
+                                                   neighbor_map=self.neighbor_map,
+                                                   vh_set=self.vh_set,
+                                                   point_map=self.point_map,
+                                                   grid_type=self.griditem.grid_type,
+                                                   scale_factor=self.inverse_scale_factor,
+                                                   radius = self._RADIUS)
+        for x, y, parity in path:
             before = set(self._virtual_helix_item_hash.keys())
-            if self.griditem.grid_type is GridType.HONEYCOMB:
-                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                     row=row,
-                                                                     column=column,
-                                                                     scale_factor=self.inverse_scale_factor)
-            else:
-                parity = None
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                  row=row,
-                                                                  column=column,
-                                                                  scale_factor=self.inverse_scale_factor)
-            self._model_part.createVirtualHelix(x=node_pos[0],
-                                                y=node_pos[1],
+            self._model_part.createVirtualHelix(x=x,
+                                                y=y,
                                                 parity=parity)
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
@@ -854,7 +834,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def set_neighbor_map(self, neighbor_map):
-        print('setting neighbor' % neighbor_map)
         assert isinstance(neighbor_map, dict)
         self.neighbor_map = neighbor_map
 

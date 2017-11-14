@@ -18,6 +18,9 @@ from PyQt5.QtGui import QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+
+from cadnano.cnenum import GridType
 
 from cadnano.gui.palette import getColorObj, getBrushObj
 from cadnano.gui.palette import getPenObj, getNoPen
@@ -986,3 +989,32 @@ class ShortestPathHelper(object):
                         queue.put(neighbor)
         print('Could not find path from %s to %s' % (str(start), str(end)))
         return []
+
+    @staticmethod
+    def shortest_path_xy(start, end, neighbor_map, vh_set, point_map,
+                         grid_type, scale_factor, radius):
+        # TODO[NF]:  Docstring
+        x_y_path = []
+        coordinate_path = ShortestPathHelper.shortest_path(start=start,
+                                                end=end,
+                                                neighbor_map=neighbor_map,
+                                                vh_set=vh_set,
+                                                point_map=point_map)
+        for node in coordinate_path:
+            row = -node[0]
+            column = node[1]
+            if grid_type is GridType.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius,
+                                                                     row=row,
+                                                                     column=column,
+                                                                     scale_factor=scale_factor)
+            else:
+                parity = None
+                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=radius,
+                                                                  row=row,
+                                                                  column=column,
+                                                                  scale_factor=scale_factor)
+            x_y_path.append((node_pos[0], node_pos[1], parity))
+
+        return x_y_path

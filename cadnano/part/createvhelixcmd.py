@@ -15,7 +15,6 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            print('id none')
             self.id_num = part._get_new_id_num(parity=parity)
         else:
             part._reserve_id_num(id_num)
