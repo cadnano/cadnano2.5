@@ -15,6 +15,7 @@ from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller impor
 from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
 
 from . import slicestyles as styles
 from .griditem import GridItem
@@ -57,6 +58,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
+        self.shortest_path_start = None
+        self.neighbor_map = dict()
+        self.vh_set = set()
+        self.point_map = dict()
+
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
@@ -95,8 +101,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem.setZValue(1)
         self.grab_cornerTL.setZValue(2)
         self.grab_cornerBR.setZValue(2)
-
-        self.shortest_path_start = None
 
         # select upon creation
         for part in m_p.document().children():
@@ -287,6 +291,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             if nvhi:
                 self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
         self.enlargeRectToFit()
+
+        position = sender.locationQt(id_num=id_num,
+                                     scale_factor=self.scale_factor)
+        coordinates = ShortestPathHelper.find_closest_point(position=position,
+                                                            point_map=self.point_map)
+        self.vh_set.add(coordinates)
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
@@ -306,6 +316,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for neighbor_id in neighbors:
             nvhi = self._virtual_helix_item_hash[neighbor_id]
             self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+
+        position = sender.locationQt(id_num=id_num,
+                                     scale_factor=self.scale_factor)
+        coordinates = ShortestPathHelper.find_closest_point(position=position,
+                                                            point_map=self.point_map)
+        self.vh_set.remove(coordinates)
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -362,7 +378,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             elif value == 'points':
                 self.griditem.setDrawlines(False)
             elif value == 'circles':
-                pass  # self.griditem.setDrawlines(False)
+                pass  # self.griditem.set_drawlines(False)
             else:
                 raise ValueError("unknown grid styling")
 
@@ -447,11 +463,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         vhi = self._virtual_helix_item_hash[id_num]
 
-        center_point = vhi.getCenterScenePos()
-        location = self.griditem.find_closest_point((center_point.x(),
-                                                     center_point.y()))
-
-        self.griditem.removed_virtual_helix(location)
+#        center_point = vhi.getCenterScenePos()
+#        location = ShortestPathHelper.find_closest_point(position=(center_point.x(),
+#                                                                   center_point.y()),
+#                                                         point_map=self.point_map)
+#        self.point_map.remove(location)
 
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
@@ -474,7 +490,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tuple: tuple of point tuples representing the top_left and
             bottom_right as reconfigured with padding
         """
-        # print('reconfig:  %s, %s, %s' % (padding, str(top_left), str(bottom_right)))
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
@@ -483,7 +498,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
-        # print('rsetting: %s, %s, %s, %s' % (ptTL.x(), ptTL.y(), ptBR.x(), ptBR.y()))
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
@@ -506,21 +520,20 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        if self.griditem.grid_type is GridType.SQUARE:
-            padding = 1.5*self._RADIUS
-            # print('padding is %s' % padding)
-        else:
-            padding = self._BOUNDING_RECT_PADDING
+        padding = self._BOUNDING_RECT_PADDING
 
         model_left, model_top, model_right, model_bottom = self.getModelBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
-        xTL = min(rect_left, model_left - padding)
-        xBR = max(rect_right, model_right + padding)
-        yTL = min(rect_top, model_top - padding)
-        yBR = max(rect_bottom, model_bottom + padding)
-        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
-        self.grab_cornerTL.alignPos(*tl)
-        self.grab_cornerBR.alignPos(*br)
+
+        xTL = min(rect_left, model_left) - padding
+        xBR = max(rect_right, model_right) + padding
+        yTL = min(rect_top, model_top) - padding
+        yBR = max(rect_bottom, model_bottom) + padding
+        top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
+                                                      bottom_right=(xBR, yBR),
+                                                      do_grid=True)
+        self.grab_cornerTL.alignPos(*top_left)
+        self.grab_cornerBR.alignPos(*bottom_right)
 
     ### PRIVATE SUPPORT METHODS ###
     def configureOutline(self, outline):
@@ -701,29 +714,33 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         is_shift = modifiers == Qt.ShiftModifier
         position = (event.scenePos().x(), event.scenePos().y())
-        if self._handle_spa_mouse_press(tool=tool, position=position,
+        if self._handle_spa_mouse_press(tool=tool,
+                                        position=position,
                                         is_shift=is_shift):
             return
 
-        tool.setPartItem(self)
-        part.createVirtualHelix(*part_pt_tuple)
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            x, y = ShortestPathHelper.find_closest_point(position=position,
+                                                         point_map = self.point_map)
+            parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
+        else:
+            parity = None
+        part.createVirtualHelix(x=part_pt_tuple[0],
+                                y=part_pt_tuple[1],
+                                parity=parity)
         id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
-
-        coordinates = self.griditem.find_closest_point(position)
-        print('coordinates are %s' % str(coordinates))
-        self.griditem.added_virtual_helix(coordinates)
 
     def _handle_spa_mouse_press(self, tool, position, is_shift):
         if (is_shift):
             self.shortest_path_add_mode = True
             # Complete the path
             if self.shortest_path_start is not None:
-                self.create_tool_shortest_path(tool,
-                                               self.shortest_path_start,
-                                               position)
+                self.create_tool_shortest_path(tool=tool,
+                                               start=self.shortest_path_start,
+                                               end=position)
                 self.shortest_path_start = position
                 return True
             else:
@@ -734,40 +751,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return False
 
     def create_tool_shortest_path(self, tool, start, end):
-        """
-
-        Args:
-            start ():
-            end ():
-
-        Returns:
-
-        """
-        path = self.griditem.shortest_path(start, end)
-        for node in path:
-            row = -node[0]
-#            row = node[0] if node[0] > 0 else node[0] - 1
-            column = node[1]
-            if self.griditem.grid_type is GridType.HONEYCOMB:
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                     row=row,
-                                                                     column=column,
-                                                                     scale_factor=self.inverse_scale_factor)
-            else:
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=self._RADIUS,
-                                                                  row=row,
-                                                                  column=column,
-                                                                  scale_factor=self.inverse_scale_factor)
+        # TODO[NF]:  Docstring
+        path = ShortestPathHelper.shortest_path_xy(start=start,
+                                                   end=end,
+                                                   neighbor_map=self.neighbor_map,
+                                                   vh_set=self.vh_set,
+                                                   point_map=self.point_map,
+                                                   grid_type=self.griditem.grid_type,
+                                                   scale_factor=self.inverse_scale_factor,
+                                                   radius = self._RADIUS)
+        for x, y, parity in path:
             before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(node_pos[0], node_pos[1])
+            self._model_part.createVirtualHelix(x=x,
+                                                y=y,
+                                                parity=parity)
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
 
             vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
-
-            self.griditem.added_virtual_helix((-row, column))
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -813,4 +816,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    def set_neighbor_map(self, neighbor_map):
+        assert isinstance(neighbor_map, dict)
+        self.neighbor_map = neighbor_map
+
+    def set_point_map(self, point_map):
+        assert isinstance(point_map, dict)
+        self.point_map = point_map
 # end class

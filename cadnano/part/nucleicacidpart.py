@@ -66,6 +66,7 @@ def _defaultDataFrame(size):
     df = pd.DataFrame([row for i in range(size)], columns=columns)
     return df
 # end def
+
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
 DEFAULT_RADIUS = 1.125  # nm
@@ -211,8 +212,12 @@ class NucleicAcidPart(Part):
         self.delta3D_scratch = np.empty((1,), dtype=float)
 
         # ID assignment
-        self.recycle_bin = []
-        self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
+        self.recycle_bin = {
+            0:[],
+            1:[]
+        }
+        self._highest_even_id_num_used = -2
+        self._highest_odd_id_num_used = -1
     # end def
 
     # B. Virtual Helix
@@ -304,7 +309,8 @@ class NucleicAcidPart(Part):
         new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
 
         new_vhg.recycle_bin = self.recycle_bin
-        new_vhg._highest_id_num_used = self._highest_id_num_used
+        new_vhg._highest_even_id_num_used = self._highest_even_id_num_used
+        new_vhg._highest_odd_id_num_used = self._highest_odd_id_num_used
         return new_vhg
     # end def
 
@@ -357,32 +363,69 @@ class NucleicAcidPart(Part):
         return self._virtual_helices_set[id_num]
     # end def
 
-    def _getNewIdNum(self):
-        """Query the lowest available (unused) id_num. Internally id numbers are
-        recycled when virtual helices are deleted.
+    def _get_new_id_num(self, parity=None):
+        """
+        Return the lowest id_num that is both currently available and that is
+        even or odd according to parity (if specified).
+
+        This method only returns an ID number; it does not take the ID number
+        from the pool of available ID numbers.  When an ID number is used,
+        _reserve_id_num must be called. Internally ID numbers are recycled when
+        virtual helices are deleted.
+
+        Args:
+            parity (int): 1 or 0 depending on if the parity of the ID should
+            be odd or even.  If this is None, the next available number will
+            be used
 
         Returns:
-            int: ID number
+            int: a valid ID number
         """
-        if len(self.recycle_bin):
-            return nsmallest(1, self.recycle_bin)[0]
+        _even = 0
+        _odd = 1
+        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+        if parity is None:
+            merged_recycle_bin = self.recycle_bin.get(_even) + \
+                                 self.recycle_bin.get(_odd)
+            if len(merged_recycle_bin):
+                return nsmallest(1, merged_recycle_bin)[0]
+            else:
+                return min(self._highest_odd_id_num_used + 2,
+                           self._highest_even_id_num_used + 2)
+        elif parity is _odd:
+            if len(self.recycle_bin.get(_odd)):
+                return nsmallest(1, self.recycle_bin.get(_odd))[0]
+            else:
+                return self._highest_odd_id_num_used + 2
+        elif parity is _even:
+            if len(self.recycle_bin.get(_even)):
+                return nsmallest(1, self.recycle_bin.get(_even))[0]
+            else:
+                return self._highest_even_id_num_used + 2
         else:
-            # use self._highest_id_num_used if the recycle bin is empty
-            # and _highest_id_num_used + 1 is not in the reserve bin
-            return self._highest_id_num_used + 1
+            raise AttributeError('Invalid parity passed to _get_new_id_num:  %s' % parity)
     # end def
 
-    def getIdNumMax(self):
-        """The max id number
+    def get_max_id_num(self, parity=None):
+        """
+        Return the highest ID number used so far.
 
         Returns:
             int: max virtual helix ID number used
         """
-        return self._highest_id_num_used
-    # end def
+        if parity is None:
+            return max(self._highest_even_id_num_used, self._highest_odd_id_num_used)
+        elif parity is 0:
+            return self._highest_even_id_num_used
+        elif parity is 1:
+            return self._highest_even_id_num_used
+        else:
+            raise AttributeError('Invalid parity passed to get_max_id_num:  %s' % parity)
 
-    def _reserveIdNum(self, requested_id_num):
-        """Reserves and returns a unique numerical id_num appropriate for a
+    def _reserve_id_num(self, requested_id_num):
+        """
+        Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
 
@@ -390,28 +433,52 @@ class NucleicAcidPart(Part):
             requested_id_num (int): virtual helix ID number
         """
         num = requested_id_num
+        parity = requested_id_num % 2
         assert num >= 0, int(num) == num
         # assert not num in self._number_to_virtual_helix
-        if num in self.recycle_bin:
-            self.recycle_bin.remove(num)
+        if num in self.recycle_bin.get(parity):
+            self.recycle_bin.get(parity, {}).remove(num)
             # rebuild the heap since we removed a specific item
-            heapify(self.recycle_bin)
-        if self._highest_id_num_used < num:
-            self._highest_id_num_used = num
+            heapify(self.recycle_bin.get(parity, {}))
+        if parity is 0 and self._highest_even_id_num_used < num:
+            self._highest_even_id_num_used = num
+        elif parity is 1 and self._highest_odd_id_num_used < num:
+            self._highest_odd_id_num_used = num
         self.reserved_ids.add(num)
     # end def
 
     def _recycleIdNum(self, id_num):
-        """The caller's contract is to ensure that id_num is not used in *any*
+        """
+        The caller's contract is to ensure that id_num is not used in *any*
         helix at the time of the calling of this function (or afterwards, unless
         `reserveIdNumForHelix` returns the id_num again).
 
         Args:
             id_num (int): virtual helix ID number
         """
-        heappush(self.recycle_bin, id_num)
+        parity = id_num % 2
+        if parity is 0:
+            heappush(self.recycle_bin.get(0), id_num)
+        else:
+            heappush(self.recycle_bin.get(1), id_num)
         self.reserved_ids.remove(id_num)
     # end def
+
+    def _sanity_check_id_numbers(self):
+        """
+        Run a sanity check to ensure that the data structures that hold ID
+        numbers make sense.
+
+        Returns:
+            None
+
+        """
+        # Recycle bin
+        assert 0 in self.recycle_bin
+        assert 1 in self.recycle_bin
+
+        assert all(x % 2 == 0 for x in self.recycle_bin.get(0))
+        assert all(x % 2 == 1 for x in self.recycle_bin.get(1))
 
     def getCoordinates(self, id_num):
         """Return a view onto the numpy array for a given id_num
@@ -994,7 +1061,7 @@ class NucleicAcidPart(Part):
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))
 
-        self._reserveIdNum(id_num)
+        self._reserve_id_num(id_num)
 
         offset_and_size = self._offset_and_size
 
@@ -1180,7 +1247,8 @@ class NucleicAcidPart(Part):
             ValueError:
         """
         if id_num_list is None:
-            lim = self._highest_id_num_used + 1
+            lim = max(self._highest_even_id_num_used + 2,
+                      self._highest_odd_id_num_used + 2)
             props = self.vh_properties.iloc[:lim]
             props = props.to_dict(orient='list')
             origins = self._origin_pts[:lim]
@@ -2535,7 +2603,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def createVirtualHelix(self, x, y, z=0.0, length=42, id_num=None,
-                           properties=None, safe=True, use_undostack=True):
+                           properties=None, safe=True, use_undostack=True,
+                           parity=None):
         """Create new VirtualHelix by calling CreateVirtualHelixCommand.
 
         Args:
@@ -2551,7 +2620,11 @@ class NucleicAcidPart(Part):
             use_undostack (bool): Set to False to disable undostack for bulk
                 operations such as file import.
         """
-        c = CreateVirtualHelixCommand(self, x, y, z, length, id_num=id_num, properties=properties, safe=safe)
+        c = CreateVirtualHelixCommand(self, x, y, z, length,
+                                      id_num=id_num,
+                                      properties=properties,
+                                      safe=safe,
+                                      parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 

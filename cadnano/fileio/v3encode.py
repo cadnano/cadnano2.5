@@ -40,7 +40,7 @@ def encodePart(part):
     Returns:
         dict:
     """
-    max_id_number_of_helices = part.getIdNumMax()
+    max_id_number_of_helices = part.get_max_id_num()
 
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
@@ -102,7 +102,7 @@ def encodePartList(part_instance, vh_group_list):
     """
     part = part_instance.reference()
     vh_group_list.sort()
-    # max_id_number_of_helices = part.getIdNumMax()
+    # max_id_number_of_helices = part.get_max_id_num()
     # vh_insertions = part.insertions()
 
     # iterate through virtualhelix list

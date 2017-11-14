@@ -19,12 +19,6 @@ class GridItem(QGraphicsPathItem):
     def __init__(self, part_item, grid_type):
         """Summary
 
-        neighbor_map (dict):  a mapping of i, j row-column coordinates to a
-        list of i, j row-column coordinates of neighbors to facilitate a BFS
-
-        virtual_helices (set):  a set of tuples corresponding to virtual
-        helices that exist on the Grid
-
         previous_grid_bounds (tuple):  a tuple corresponding to the bounds of
         the grid.
 
@@ -40,9 +34,6 @@ class GridItem(QGraphicsPathItem):
         self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = False
         self.points = []
-        self.point_coordinates = dict()
-        self.neighbor_map = dict()
-        self.virtual_helices = set()
         self.previous_grid_bounds = None
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -114,16 +105,17 @@ class GridItem(QGraphicsPathItem):
         redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or self.previous_grid_type != self.grid_type
         self.previous_grid_type = self.grid_type
 
-        if redo_neighbors:
-            self.point_coordinates = dict()
-            self.neighbor_map = dict()
-
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
-        for i in range(row_l, row_h):
-            for j in range(col_l, col_h+1):
-                x, y = doLattice(radius, i, j, scale_factor=sf)
+
+        if redo_neighbors:
+            point_coordinates = dict()
+            neighbor_map = dict()
+
+        for row in range(row_l, row_h):
+            for column in range(col_l, col_h+1):
+                x, y = doLattice(radius, row, column, scale_factor=sf)
                 # sys.stdout.write('%s,%s ' % (x,y))
                 if draw_lines:
                     if is_pen_down:
@@ -135,40 +127,43 @@ class GridItem(QGraphicsPathItem):
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
-                stroke_weight = styles.EMPTY_HELIX_STROKE_WIDTH
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
 
-                pt.setPen(getPenObj(Qt.blue, stroke_weight))
+                pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
+
+                if x == 0 and y == 0:
+                    pt.setBrush(getBrushObj(Qt.gray))
+
                 points.append(pt)
 
                 if redo_neighbors:
-                    self.point_coordinates[(-i, j)] = (x, -y)
+                    point_coordinates[(-row, column)] = (x, -y)
 
                     # This is reversed since the Y is mirrored
-                    if not HoneycombDnaPart.isEvenParity(i, j):
-                        self.neighbor_map[(-i, j)] = [
-                            (-i, j-1),
-                            (-i, j+1),
-                            (-i-1, j)
+                    if not HoneycombDnaPart.isEvenParity(row, column):
+                        neighbor_map[(-row, column)] = [
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row-1, column)
                         ]
                     else:
-                        self.neighbor_map[(-i, j)] = [
-                            (-i, j-1),
-                            (-i, j+1),
-                            (-i+1, j)
+                        neighbor_map[(-row, column)] = [
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row+1, column)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
 
         if draw_lines:
-            for j in range(col_l, col_h+1):
+            for column in range(col_l, col_h+1):
                 # print("newcol")
-                for i in range(row_l, row_h):
-                    x, y = doLattice(radius, i, j, scale_factor=sf)
-                    if is_pen_down and isEven(i, j):
+                for row in range(row_l, row_h):
+                    x, y = doLattice(radius, row, column, scale_factor=sf)
+                    if is_pen_down and isEven(row, column):
                         path.lineTo(x, -y)
                         is_pen_down = False
                     else:
@@ -177,6 +172,10 @@ class GridItem(QGraphicsPathItem):
                 is_pen_down = False
             # end for j
         self.setPath(path)
+
+        if redo_neighbors:
+            self.part_item.set_neighbor_map(neighbor_map=neighbor_map)
+            self.part_item.set_point_map(point_map=point_coordinates)
 
     def create_square(self, part_item, radius, bounds):
         """Summary
@@ -202,16 +201,16 @@ class GridItem(QGraphicsPathItem):
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
-            self.point_coordinates = dict()
-            self.neighbor_map = dict()
+            point_map= dict()
+            neighbor_map = dict()
 
         path = QPainterPath()
         is_pen_down = False
         draw_lines = self.draw_lines
 
-        for i in range(row_l, row_h + 1):
-            for j in range(col_l, col_h + 1):
-                x, y = doLattice(radius, i, j, scale_factor=sf)
+        for row in range(row_l, row_h + 1):
+            for column in range(col_l, col_h + 1):
+                x, y = doLattice(radius, row, column, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
                         path.lineTo(x, -y)
@@ -225,18 +224,22 @@ class GridItem(QGraphicsPathItem):
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
                                dot_size, self)
-                stroke_weight = styles.EMPTY_HELIX_STROKE_WIDTH
-                pt.setPen(getPenObj(Qt.blue, stroke_weight))
+
+                pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
+
+                if x == 0 and y == 0:
+                    pt.setBrush(getBrushObj(Qt.gray))
+
                 points.append(pt)
 
                 if redo_neighbors:
-                    self.point_coordinates[(-i, j)] = (x, -y)
+                    point_map[(-row, column)] = (x, -y)
 
-                    self.neighbor_map[(-i, j)] = [
-                        (-i, j+1),
-                        (-i, j-1),
-                        (-i-1, j),
-                        (-i+1, j)
+                    neighbor_map[(-row, column)] = [
+                        (-row, column+1),
+                        (-row, column-1),
+                        (-row-1, column),
+                        (-row+1, column)
                     ]
 
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
@@ -245,9 +248,9 @@ class GridItem(QGraphicsPathItem):
 
         # DO VERTICAL LINES
         if draw_lines:
-            for j in range(col_l, col_h + 1):
-                for i in range(row_l, row_h + 1):
-                    x, y = doLattice(radius, i, j, scale_factor=sf)
+            for column in range(col_l, col_h + 1):
+                for row in range(row_l, row_h + 1):
+                    x, y = doLattice(radius, row, column, scale_factor=sf)
                     if is_pen_down:
                         path.lineTo(x, -y)
                     else:
@@ -255,6 +258,10 @@ class GridItem(QGraphicsPathItem):
                         path.moveTo(x, -y)
                 is_pen_down = False  # pen up
         self.setPath(path)
+
+        if redo_neighbors:
+            self.part_item.set_neighbor_map(neighbor_map=neighbor_map)
+            self.part_item.set_point_map(point_map=point_map)
     # end def
 
     def removePoints(self):
@@ -268,108 +275,108 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
-    def find_closest_point(self, position):
-        """Find the closest point to a given position on the grid
-        Args:
-            position ():
+#    def find_closest_point(self, position):
+#        """Find the closest point to a given position on the grid
+#        Args:
+#            position ():
+#
+#        Returns:
+#
+#        """
+#        for coordinates, coordiante_position in self.point_coordinates.items():
+#            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
+#            if distance < _RADIUS**2:
+#                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+#                return coordinates
 
-        Returns:
+#    def shortest_path(self, start, end):
+#        """Return a path of coordinates that traverses from start to end.
+#
+#        Does a breadth-first search.  This could be further improved to do an A*
+#        search.
+#
+#        Args:
+#            start (tuple): The i-j coordinates corresponding to the start point
+#            end (tuple):  The i-j coordinates corresponding to the end point
+#
+#        Returns:
+#            A list of coordinates corresponding to a shortest path from start to
+#            end.  This list omits the starting point as it's assumed that the
+#            start point has already been clicked.
+#        """
+#        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
+#        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
+#
+#        start_coordinates = self.find_closest_point(start)
+#        end_coordinates = self.find_closest_point(end)
+#
+#        if start_coordinates is None or end_coordinates is None:
+#            # TODO[NF]:  Change to logger
+#            print('Could not find path from %s to %s' % (str(start), str(end)))
+#            return []
+#
+#            # TODO[NF]:  Change to logger
+#        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
+#
+#        if self.neighbor_map.get(start_coordinates) is None:
+#            raise LookupError('Could not find a point corresponding to %s',
+#                              start_coordinates)
+#        elif self.neighbor_map.get(end_coordinates) is None:
+#            raise LookupError('Could not find a point corresponding to %s',
+#                              end_coordinates)
+#
+#        parents = dict()
+#        parents[start_coordinates] = None
+#        queue = Queue()
+#        queue.put(start_coordinates)
+#
+#        while not queue.empty():
+#            try:
+#                current_location = queue.get(block=False)
+#            except Queue.Empty:
+#                print('Could not find path from %s to %s' % (str(start), str(end)))
+#                return []
+#
+#            if current_location == end_coordinates:
+#                reversed_path = []
+#                while current_location is not start_coordinates:
+#                    reversed_path.append(current_location)
+#                    current_location = parents[current_location]
+#                return [node for node in reversed(reversed_path)]
+#            else:
+#                neighbors = self.neighbor_map.get(current_location, [])
+#                for neighbor in neighbors:
+#                    if neighbor not in parents and neighbor not in self.virtual_helices:
+#                        parents[neighbor] = current_location
+#                        queue.put(neighbor)
+#        print('Could not find path from %s to %s' % (str(start), str(end)))
+#        return []
 
-        """
-        for coordinates, coordiante_position in self.point_coordinates.items():
-            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-            if distance < _RADIUS**2:
-                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-                return coordinates
+#    def added_virtual_helix(self, location):
+#        """
+#        Update the internal set of virtual helices to include the
+#        virtualhelix that lives at `location`.
+#
+#        Args:
+#            location (tuple):  The location that a VH is being added to
+#
+#        Returns: None
+#        """
+#        assert isinstance(location, tuple) and len(location) is 2
+#        self.virtual_helices.add(location)
 
-    def shortest_path(self, start, end):
-        """Return a path of coordinates that traverses from start to end.
-
-        Does a breadth-first search.  This could be further improved to do an A*
-        search.
-
-        Args:
-            start (tuple): The i-j coordinates corresponding to the start point
-            end (tuple):  The i-j coordinates corresponding to the end point
-
-        Returns:
-            A list of coordinates corresponding to a shortest path from start to
-            end.  This list omits the starting point as it's assumed that the
-            start point has already been clicked.
-        """
-        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
-        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
-
-        start_coordinates = self.find_closest_point(start)
-        end_coordinates = self.find_closest_point(end)
-
-        if start_coordinates is None or end_coordinates is None:
-            # TODO[NF]:  Change to logger
-            print('Could not find path from %s to %s' % (str(start), str(end)))
-            return []
-
-            # TODO[NF]:  Change to logger
-        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
-
-        if self.neighbor_map.get(start_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s',
-                              start_coordinates)
-        elif self.neighbor_map.get(end_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s',
-                              end_coordinates)
-
-        parents = dict()
-        parents[start_coordinates] = None
-        queue = Queue()
-        queue.put(start_coordinates)
-
-        while not queue.empty():
-            try:
-                current_location = queue.get(block=False)
-            except Queue.Empty:
-                print('Could not find path from %s to %s' % (str(start), str(end)))
-                return []
-
-            if current_location == end_coordinates:
-                reversed_path = []
-                while current_location is not start_coordinates:
-                    reversed_path.append(current_location)
-                    current_location = parents[current_location]
-                return [node for node in reversed(reversed_path)]
-            else:
-                neighbors = self.neighbor_map.get(current_location, [])
-                for neighbor in neighbors:
-                    if neighbor not in parents and neighbor not in self.virtual_helices:
-                        parents[neighbor] = current_location
-                        queue.put(neighbor)
-        print('Could not find path from %s to %s' % (str(start), str(end)))
-        return []
-
-    def added_virtual_helix(self, location):
-        """
-        Update the internal set of virtual helices to include the
-        virtualhelix that lives at `location`.
-
-        Args:
-            location (tuple):  The location that a VH is being added to
-
-        Returns: None
-        """
-        assert isinstance(location, tuple) and len(location) is 2
-        self.virtual_helices.add(location)
-
-    def removed_virtual_helix(self, location):
-        """
-        Update the internal set of virtual helices to no longer include the
-        virtualhelix that lives at `location`.
-
-        Args:
-            location (tuple):  The location that a VH is being removed from
-
-        Returns: None
-        """
-        assert isinstance(location, tuple) and len(location) is 2
-        self.virtual_helices.remove(location)
+#    def removed_virtual_helix(self, location):
+#        """
+#        Update the internal set of virtual helices to no longer include the
+#        virtualhelix that lives at `location`.
+#
+#        Args:
+#            location (tuple):  The location that a VH is being removed from
+#
+#        Returns: None
+#        """
+#        assert isinstance(location, tuple) and len(location) is 2
+#        self.virtual_helices.remove(location)
 
 
 class ClickArea(QGraphicsEllipseItem):
