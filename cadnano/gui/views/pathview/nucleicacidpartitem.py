@@ -238,6 +238,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 new_list = [vhi_dict[id_num] for id_num in new_value]
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
+            elif property_key == 'workplane_idx':
+                self.workplane.updatePositionAndBounds(new_idx=new_value)
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
@@ -511,7 +513,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         temp_rect = self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2)
         self.grab_corner.setTopLeft(temp_rect.topLeft())
         self.setRect(temp_rect)
-        self.workplane.updateDimensions()
+        self.workplane.updatePositionAndBounds()
     # end def
 
     ### PUBLIC METHODS ###

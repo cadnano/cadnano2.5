@@ -257,8 +257,8 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         else:
             self._outline.hide()
     # end def
-
 # end class
+
 
 PROX_ALPHA = 64
 
@@ -600,22 +600,30 @@ class PathWorkplaneItem(QGraphicsRectItem):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
         self._model_part = model_part
         self._part_item = part_item
+        self._idx = model_part.getProperty('workplane_idx')
+        self._width = 3
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
-        self._width = 3
-
         self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
         pen = newPenObj(styles.BLUE_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
         pen.setCosmetic(True)
         self.setPen(pen)
         self.setPos(BASE_WIDTH*10, -BASE_WIDTH)
-        self.updateDimensions()
         self.setAcceptHoverEvents(True)
+        self.updatePositionAndBounds()
 
-    def updateDimensions(self):
+    def updatePositionAndBounds(self, new_idx=None):
+        if new_idx is not None:
+            self._idx = int(new_idx)
+
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self._width
+
         h = self._part_item._vh_rect.height() - BASE_WIDTH*2
         self.setRect(QRectF(styles.MINOR_GRID_STROKE_WIDTH, 0, BASE_WIDTH*self._width, h))
-        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self._width
+
+        x = int(self._idx * BASE_WIDTH)
+        self.setPos(x, self.y())
+    # endef
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
@@ -653,4 +661,10 @@ class PathWorkplaneItem(QGraphicsRectItem):
         # self._partItem.updateStatusBar("%d" % self.part().activeBaseIndex())
 
     def mouseReleaseEvent(self, event):
+        old_idx = int(self._model_part.getProperty('workplane_idx'))
+        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
+        idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
+        if old_idx != idx:
+            self._idx = idx
+            self._model_part.setProperty('workplane_idx', idx)
         self.setCursor(Qt.OpenHandCursor)

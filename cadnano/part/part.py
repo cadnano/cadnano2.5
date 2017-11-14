@@ -25,7 +25,7 @@ class Part(CNObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color', 'is_visible', 'grid_type']
+    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idx']
 
     def __init__(self, *args, **kwargs):
         """Sets the parent document, sets bounds for part dimensions, and sets up
@@ -85,9 +85,6 @@ class Part(CNObject):
 
     partDocumentSettingChangedSignal = ProxySignal(object, str, object, name='partDocumentSettingChangedSignal')
     """self, key, value"""
-
-    partWorkplaneChangedSignal = ProxySignal(object, int, int, name='partWorkplaneChangedSignal')
-    """self, start_idx, end_idx"""
 
     ### SLOTS ###
 

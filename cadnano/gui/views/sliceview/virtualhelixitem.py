@@ -218,7 +218,16 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def createToolMousePress(self, tool, part_item, event):
-        pass
+        swap = event.modifiers() & Qt.ShiftModifier
+        idx_low = self._model_part.getProperty('workplane_idx')
+        idx_high = idx_low + 2
+        fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
+        if self._id_num % 2 == 0:
+            swap = not swap
+        if swap:
+            fwd_ss.createStrand(idx_low, idx_high)
+        else:
+            rev_ss.createStrand(idx_low, idx_high)
 
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this
