@@ -913,17 +913,39 @@ class ShortestPathHelper(object):
     @staticmethod
     def findClosestPoint(position, point_map):
         """Find the closest point to a given position on the grid
+
+        This method first attempts to do a naive search to determine which
+        point is within _RADIUS of the position in question.
+
+        In the case that no point is within _RADIUS of the position in
+        question (e.g. when the position is just outside the _RADIUS of every
+        point, as is the case when clicking on the outter edge of a
+        GridItem), do a brute force search of the points as a last resort and
+        return a best guess.
+
         Args:
-            position ():
+            position (tuple):  the X-Y position in question
+            point_map (dict):  a dictionary of coordinates to X-Y positions
 
         Returns:
-
+            tuple:  the coordinates of the closest point to position
         """
         for coordinates, coordiante_position in point_map.items():
             distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
             if distance < _RADIUS**2:
                 # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
                 return coordinates
+
+        best_coordinates = None
+        best_distance = float('inf')
+        for coordinates, coordiante_position in point_map.items():
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
+            if distance < best_distance:
+                best_distance = distance
+                best_coordinates = coordinates
+        return best_coordinates
+
+
 
     @staticmethod
     def shortestPath(start, end, neighbor_map, vh_set, point_map):
@@ -935,6 +957,10 @@ class ShortestPathHelper(object):
         Args:
             start (tuple): The i-j coordinates corresponding to the start point
             end (tuple):  The i-j coordinates corresponding to the end point
+            neighbor_map (dict):  A dictionary mapping i-j coordinates to
+            their neighbors
+            vh_set (set):  A set of points that currently have a VH
+            point_map (dict):  a dictionary of coordinates to X-Y positions
 
         Returns:
             A list of coordinates corresponding to a shortest path from start to
