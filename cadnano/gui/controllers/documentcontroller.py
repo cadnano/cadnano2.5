@@ -137,6 +137,8 @@ class DocumentController():
             (win.action_filter_xover.triggered, self.actionFilterXoverSlot),
             (win.action_filter_fwd.triggered, self.actionFilterFwdSlot),
             (win.action_filter_rev.triggered, self.actionFilterRevSlot),
+            (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
+            (win.action_filter_stap.triggered, self.actionFilterStapSlot),
 
             (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
@@ -156,7 +158,7 @@ class DocumentController():
     def actionCreateForkSlot(self):
         win = self.win
         win.action_vhelix_create.trigger()
-        win.action_path_pencil.trigger()
+        win.action_path_create.trigger()
     # end def
 
     def actionVhelixSnapSlot(self, state):
@@ -251,6 +253,23 @@ class DocumentController():
         self._strandFilterUpdate()
     # end def
 
+    def actionFilterScafSlot(self):
+        """Remains checked if no other strand-type filter is active."""
+        f_scaf = self.win.action_filter_scaf
+        f_stap = self.win.action_filter_stap
+        if not f_scaf.isChecked() and not f_stap.isChecked():
+            f_scaf.setChecked(True)
+        self._strandFilterUpdate()
+
+    def actionFilterStapSlot(self):
+        """Remains checked if no other strand-type filter is active."""
+        f_scaf = self.win.action_filter_scaf
+        f_stap = self.win.action_filter_stap
+        if not f_scaf.isChecked() and not f_stap.isChecked():
+            f_stap.setChecked(True)
+        self._strandFilterUpdate()
+    # end def
+
     def actionFilterFwdSlot(self):
         """Remains checked if no other strand-type filter is active."""
         f_fwd = self.win.action_filter_fwd
@@ -287,6 +306,12 @@ class DocumentController():
             add_oligo = True
         if win.action_filter_rev.isChecked():
             filter_list.append("reverse")
+            add_oligo = True
+        if win.action_filter_scaf.isChecked():
+            filter_list.append("scaffold")
+            add_oligo = True
+        if win.action_filter_stap.isChecked():
+            filter_list.append("staple")
             add_oligo = True
         if add_oligo:
             filter_list.append("oligo")
@@ -492,15 +517,15 @@ class DocumentController():
         pass
 
     def action_create_nucleic_acid_part_honey(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         self._action_create_nucleic_acid_part(grid_type=GridType.HONEYCOMB)
 
     def action_create_nucleic_acid_part_square(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         self._action_create_nucleic_acid_part(grid_type=GridType.SQUARE)
 
     def _action_create_nucleic_acid_part(self, grid_type):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.maybeSave() is False:
@@ -889,7 +914,7 @@ class DocumentController():
     def set_slice_view_type(self, slice_view_type):
         # TODO[NF]:  Make these strings global constants
         if slice_view_type not in ('Both', 'Slice', 'Grid'):
-            #logger.error('slice_view_type is invalid:  %s' % slice_view_type)
+            # logger.error('slice_view_type is invalid:  %s' % slice_view_type)
             print('slice_view_type is invalid:  %s' % slice_view_type)
 
         if slice_view_type == 'Both':

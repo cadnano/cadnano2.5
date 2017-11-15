@@ -416,12 +416,15 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_outliner"/>
-   <addaction name="action_toolbar_spacer"/>
-   <addaction name="action_filter_helix"/>
+   <addaction name="action_toolbar_spacer_2"/>
    <addaction name="action_filter_rev"/>
    <addaction name="action_filter_fwd"/>
+   <addaction name="action_filter_stap"/>
+   <addaction name="action_filter_scaf"/>
+   <addaction name="action_toolbar_spacer_1"/>
    <addaction name="action_filter_xover"/>
    <addaction name="action_filter_endpoint"/>
+   <addaction name="action_filter_helix"/>
    <addaction name="action_selectable_label"/>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -634,7 +637,7 @@
     <string>Select Tool (v)</string>
    </property>
   </action>
-  <action name="action_path_pencil">
+  <action name="action_path_create">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -1106,10 +1109,10 @@
     <string>Create</string>
    </property>
    <property name="toolTip">
-    <string>(C)reate Tool</string>
+    <string>Create (n)ew</string>
    </property>
    <property name="shortcut">
-    <string>C</string>
+    <string>N</string>
    </property>
   </action>
   <action name="action_global_select">
@@ -1141,15 +1144,65 @@
     <string>Selectable:</string>
    </property>
   </action>
-  <action name="action_toolbar_spacer">
+  <action name="action_toolbar_spacer_2">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string/>
    </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="action_filter_scaf">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-scaf</normaloff>:/parttools/filter-scaf</iconset>
+   </property>
+   <property name="text">
+    <string>filter-scaf</string>
+   </property>
    <property name="toolTip">
-    <string>Selection Filters</string>
+    <string>(S)caf</string>
+   </property>
+   <property name="shortcut">
+    <string>C</string>
+   </property>
+  </action>
+  <action name="action_filter_stap">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/filter-stap</normaloff>:/parttools/filter-stap</iconset>
+   </property>
+   <property name="text">
+    <string>filter-stap</string>
+   </property>
+   <property name="toolTip">
+    <string>S(t)ap</string>
+   </property>
+   <property name="shortcut">
+    <string>T</string>
+   </property>
+  </action>
+  <action name="action_toolbar_spacer_1">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string/>
    </property>
    <property name="visible">
     <bool>true</bool>

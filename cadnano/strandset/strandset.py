@@ -41,6 +41,7 @@ class StrandSet(CNObject):
         self._document = part.document()
         super(StrandSet, self).__init__(part)
         self._is_fwd = is_fwd
+        self._is_scaffold = is_fwd if (id_num % 2 == 0) else not is_fwd
         self._strand_type = StrandType.FWD if self._is_fwd else StrandType.REV
         self._id_num = id_num
         self._part = part
@@ -166,6 +167,22 @@ class StrandSet(CNObject):
         """
         return not self._is_fwd
     # end def
+
+    def isScaffold(self):
+        """Is the set (5' to 3' and even parity) or (3' to 5' and odd parity)
+
+        Returns:
+            bool: True if is scaffold, False otherwise
+        """
+        return self._is_scaffold
+
+    def isStaple(self):
+        """Is the set (5' to 3' and even parity) or (3' to 5' and odd parity)
+
+        Returns:
+            bool: True if is scaffold, False otherwise
+        """
+        return not self._is_scaffold
 
     def length(self):
         """ length of the :class:`StrandSet` and therefore also the associated
@@ -499,7 +516,7 @@ class StrandSet(CNObject):
         Returns:
             str: 'forward' if is_fwd else 'reverse'
         """
-        return "forward" if self._is_fwd else "reverse"
+        return ["forward" if self._is_fwd else "reverse"] + ["scaffold" if self._is_scaffold else "staple"]
     # end def
 
     def hasStrandAt(self, idx_low, idx_high):

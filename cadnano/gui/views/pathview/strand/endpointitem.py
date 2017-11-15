@@ -229,8 +229,8 @@ class EndpointItem(QGraphicsPathItem):
         self.partItem().updateStatusBar(msg)
 
         active_tool_str = self._getActiveTool().methodPrefix()
-        if active_tool_str == 'pencilTool':
-            return self._strand_item.pencilToolHoverMove(event, self.idx())
+        if active_tool_str == 'createTool':
+            return self._strand_item.createToolHoverMove(event, self.idx())
 
     def mouseMoveEvent(self, event):
         """
@@ -268,7 +268,7 @@ class EndpointItem(QGraphicsPathItem):
         s_i = self._strand_item
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
-        if (s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set):
+        if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
             olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
             if olgLen:
                 msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
@@ -324,7 +324,7 @@ class EndpointItem(QGraphicsPathItem):
         m_strand.oligo().applyColor(color)
     # end def
 
-    def pencilToolHoverMove(self, idx):
+    def createToolHoverMove(self, idx):
         """Create the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
@@ -335,7 +335,7 @@ class EndpointItem(QGraphicsPathItem):
             temp_xover.updateFloatingFromStrandItem(vhi, m_strand, idx)
     # end def
 
-    def pencilToolMousePress(self, modifiers, event, idx):
+    def createToolMousePress(self, modifiers, event, idx):
         """Break the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
@@ -363,7 +363,7 @@ class EndpointItem(QGraphicsPathItem):
         s_i = self._strand_item
         viewroot = s_i.viewroot()
         current_filter_set = viewroot.selectionFilterSet()
-        if (s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set):
+        if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
             selection_group = viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (modifiers & mod):
@@ -454,12 +454,11 @@ class EndpointItem(QGraphicsPathItem):
                 viewroot = s_i.viewroot()
                 current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
-
                 # only add if the selection_group is not locked out
                 if value == True and self.FILTER_NAME in current_filter_set:
                     # if (self.group() != selection_group and
                     #     s_i.strandFilter() in current_filter_set):
-                    if s_i.strandFilter() in current_filter_set:
+                    if all(f in current_filter_set for f in s_i.strandFilter()):
                         if self.group() != selection_group or not self.isSelected():
                             # print("select ep")
                             selection_group.pendToAdd(self)
@@ -490,7 +489,7 @@ class EndpointItem(QGraphicsPathItem):
                 s_i = self._strand_item
                 viewroot = s_i.viewroot()
                 current_filter_set = viewroot.selectionFilterSet()
-                if s_i.strandFilter() in current_filter_set:
+                if all(f in current_filter_set for f in s_i.strandFilter()):
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress(None, None, None)
