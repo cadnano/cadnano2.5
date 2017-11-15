@@ -31,6 +31,7 @@ class PropertyEditorWidget(QTreeWidget):
     PropertyEditorWidget enables direct editing attributes of an
     item that is selected in the Outliner.
     """
+
     def __init__(self, parent=None):
         """Summary
 
@@ -285,6 +286,7 @@ class PropertyEditorWidget(QTreeWidget):
 class CustomStyleItemDelegate(QStyledItemDelegate):
     """Summary
     """
+
     def createEditor(self, parent_QWidget, option, model_index):
         """Summary
 

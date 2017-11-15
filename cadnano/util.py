@@ -40,11 +40,12 @@ def trace(n):
     """Returns a stack trace n frames deep"""
     s = extract_stack()
     frames = []
-    for f in s[-n-1:-1]:
+    for f in s[-n - 1:-1]:
         # f is a stack frame like
         # ('/path/script.py', 42, 'funcname', 'current = line - of / code')
-        frames.append((path.basename(f[0])+':%i' % f[1])+'(%s)' % f[2])
+        frames.append((path.basename(f[0]) + ':%i' % f[1]) + '(%s)' % f[2])
     return " > ".join(frames)
+
 
 if IS_PY_3:
     complement = str.maketrans('ACGTacgt', 'TGCATGCA')
@@ -61,6 +62,7 @@ def comp(seqStr):
     """Returns the complement of the sequence in seqStr."""
     return seqStr.translate(complement)
 
+
 if IS_PY_3:
     whitetoQ = str.maketrans(' |', '??')
 else:
@@ -75,7 +77,8 @@ def nowhite(seqStr):
     """Gets rid of non-letters in a string."""
     return ''.join([c for c in seqStr if c in string.letters])
 
-nearest = lambda a, l: min(l, key=lambda x: abs(x - a))
+
+def nearest(a, l): return min(l, key=lambda x: abs(x - a))
 
 
 def isWindows():
@@ -166,6 +169,7 @@ def finalizeCommands(model_object, commands, desc=None):
 
 def this_path():
     return os.path.abspath(os.path.dirname(__file__))
+
 
 # maps plugin path (extension stripped) -> plugin module
 loadedPlugins = {}
@@ -349,10 +353,10 @@ def init_logging(args=None, logdir=None):
             elif sys.platform == 'darwin':
                 logdir = os.path.join(os.path.expanduser("~"), "Library", "Logs", appname)
             else:
-                logdir = os.path.join(os.path.expanduser("~"), "."+appname, "logs")
+                logdir = os.path.join(os.path.expanduser("~"), "." + appname, "logs")
     if not os.path.exists(logdir):
         os.makedirs(logdir)
-    logfilepath = os.path.join(logdir, appname+".log")
+    logfilepath = os.path.join(logdir, appname + ".log")
 
     # We want different output formatting for file vs console logging output.
     # File logs should be simple and easy to regex; console logs should be short and nice on the eyes
@@ -383,7 +387,7 @@ def init_logging(args=None, logdir=None):
         logging.root.setLevel(logging.DEBUG)
 
         # Add a rotating file handler:
-        logfilehandler = logging.handlers.RotatingFileHandler(logfilepath, maxBytes=2*2**20, backupCount=2)
+        logfilehandler = logging.handlers.RotatingFileHandler(logfilepath, maxBytes=2 * 2**20, backupCount=2)
         logfileformatter = logging.Formatter(fmt=logfilefmt, datefmt=logdatefmt)
         logfilehandler.setFormatter(logfileformatter)
         logging.root.addHandler(logfilehandler)

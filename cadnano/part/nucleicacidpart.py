@@ -996,9 +996,9 @@ class NucleicAcidPart(Part):
         """
         ax, ay, az = a
         bx, by, bz = b
-        c = [ay*bz - az*by,
-             az*bx - ax*bz,
-             ax*by - ay*bx]
+        c = [ay * bz - az * by,
+             az * bx - ax * bz,
+             ax * by - ay * bx]
         return c
     # end def
 
@@ -1041,7 +1041,7 @@ class NucleicAcidPart(Part):
         # self.eye3_scratch + m0 + np.dot(m0, m0)*((1 - cos_)/sin_squared)
         np.dot(m0, m0, out=m1)
         np.add(self.eye3_scratch, m0, out=m2)
-        np.add(m2, m1*((1 - cos_)/sin_squared), out=m0)
+        np.add(m2, m1 * ((1 - cos_) / sin_squared), out=m0)
         return m0
     # end def
 
@@ -1071,9 +1071,9 @@ class NucleicAcidPart(Part):
         len_offset_and_size = len(offset_and_size)
         number_of_new_elements = id_num - len_offset_and_size + 1
         if number_of_new_elements > 0:
-            offset_and_size += [None]*number_of_new_elements
-            self.fwd_strandsets += [None]*number_of_new_elements
-            self.rev_strandsets += [None]*number_of_new_elements
+            offset_and_size += [None] * number_of_new_elements
+            self.fwd_strandsets += [None] * number_of_new_elements
+            self.rev_strandsets += [None] * number_of_new_elements
         # find the next highest insertion offset
         next_o = self.total_points
         for next_o_and_s in offset_and_size[id_num + 1:]:
@@ -1089,7 +1089,7 @@ class NucleicAcidPart(Part):
         len_origin_pts = len(self._origin_pts)
         if id_num >= len_origin_pts:
             diff = id_num - len_origin_pts
-            number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
+            number_of_new_elements = math.ceil(diff / DEFAULT_SIZE) * DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
             self._origin_pts.resize((total_rows, 2))
@@ -1157,7 +1157,7 @@ class NucleicAcidPart(Part):
                                                                 'turns_per_repeat',
                                                                 'eulerZ',
                                                                 'minor_groove_angle']]
-        twist_per_base = tpr*360./bpr
+        twist_per_base = tpr * 360. / bpr
         """
         + angle is CCW
         - angle is CW
@@ -1167,24 +1167,24 @@ class NucleicAcidPart(Part):
         direction, hence the minus signs.  eulerZ
         """
         twist_per_base = math.radians(twist_per_base)
-        eulerZ_new = math.radians(eulerZ) + twist_per_base*index
+        eulerZ_new = math.radians(eulerZ) + twist_per_base * index
         mgroove = math.radians(mgroove)
 
         # right handed rotates clockwise with increasing index / z
-        fwd_angles = [-i*twist_per_base + eulerZ_new for i in range(num_points)]
+        fwd_angles = [-i * twist_per_base + eulerZ_new for i in range(num_points)]
         rev_angles = [a + mgroove for a in fwd_angles]
-        z_pts = BW*np.arange(index, num_points + index)
+        z_pts = BW * np.arange(index, num_points + index)
 
         # invert the X coordinate for Right handed DNA
-        fwd_pts = rad*np.column_stack((np.cos(fwd_angles),
-                                       np.sin(fwd_angles),
-                                       np.zeros(num_points)))
+        fwd_pts = rad * np.column_stack((np.cos(fwd_angles),
+                                         np.sin(fwd_angles),
+                                         np.zeros(num_points)))
         fwd_pts[:, 2] = z_pts
 
         # invert the X coordinate for Right handed DNA
-        rev_pts = rad*np.column_stack((np.cos(rev_angles),
-                                       np.sin(rev_angles),
-                                       np.zeros(num_points)))
+        rev_pts = rad * np.column_stack((np.cos(rev_angles),
+                                         np.sin(rev_angles),
+                                         np.zeros(num_points)))
         rev_pts[:, 2] = z_pts
 
         coord_pts = np.zeros((num_points, 3))
@@ -1292,7 +1292,7 @@ class NucleicAcidPart(Part):
             bpr = float(out['bases_per_repeat'])
             tpr = float(out['turns_per_repeat'])
             out['bases_per_turn'] = bpr / tpr
-            out['twist_per_base'] = tpr*360. / bpr
+            out['twist_per_base'] = tpr * 360. / bpr
         return out
     # end
 
@@ -1374,7 +1374,7 @@ class NucleicAcidPart(Part):
             tuple: of :obj:`float`, x, y coordinates
         """
         x, y = self.getVirtualHelixOrigin(id_num)
-        return scale_factor*x, -scale_factor*y
+        return scale_factor * x, -scale_factor * y
     # end def
 
     def _resizeHelix(self, id_num, is_right, delta):
@@ -1677,7 +1677,7 @@ class NucleicAcidPart(Part):
 
         # compute square of distance to point
         delta = inner1d(difference, difference, out=delta)
-        close_points, = np.where(delta < radius*radius)
+        close_points, = np.where(delta < radius * radius)
         # return list(zip(    np.take(self.id_nums, close_points),
         #                     np.take(self.indices, close_points) ))
         return (np.take(self.id_nums, close_points),
@@ -1736,7 +1736,7 @@ class NucleicAcidPart(Part):
 
         # compute square of distance to point
         inner1d(difference, difference, out=delta)
-        close_points, = np.where(delta <= radius*radius)
+        close_points, = np.where(delta <= radius * radius)
         # take then sort the indices of the points in range
         sorted_idxs = np.argsort(np.take(delta, close_points))
 
@@ -1808,7 +1808,7 @@ class NucleicAcidPart(Part):
         # for now just looks against everything
         fwd_hit_list = []
         rev_hit_list = []
-        rsquared = radius*radius
+        rsquared = radius * radius
         for i, point in enumerate(this_axis_pts):
             difference = fwd_pts - point
             ldiff = len(difference)
@@ -1914,13 +1914,13 @@ class NucleicAcidPart(Part):
         # for now just looks against everything
         # rsquared1 = RADIUS*RADIUS + BASE_WIDTH*BASE_WIDTH/4
         # print("THE search radius", radius, RADIUS)
-        rsquared2 = radius*radius
+        rsquared2 = radius * radius
         per_neighbor_hits = {}
         key_prop_list = ['eulerZ', 'bases_per_repeat',
                          'turns_per_repeat', 'minor_groove_angle']
         for neighbor_id in neighbors:
             eulerZ, bpr, tpr, mgroove = self.vh_properties.loc[neighbor_id, key_prop_list]
-            twist_per_base = tpr*360./bpr
+            twist_per_base = tpr * 360. / bpr
             half_period = math.floor(bpr / 2)
             tpb = math.radians(twist_per_base)
             eulerZ = math.radians(eulerZ)
@@ -1952,7 +1952,7 @@ class NucleicAcidPart(Part):
                     #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
-                    v1 = normalize(v1 - dot(v1, direction)*direction)
+                    v1 = normalize(v1 - dot(v1, direction) * direction)
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
@@ -1961,7 +1961,7 @@ class NucleicAcidPart(Part):
                     # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
                     # print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
+                    native_angle = angleNormalize(eulerZ + tpb * neighbor_min_delta_idx - relative_angle)
 
                     # print("FWD %d around %d relative_angle %0.2f, base_angle: %0.2f" %
                     #     (   id_num, neighbor_id,
@@ -1970,8 +1970,8 @@ class NucleicAcidPart(Part):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
-                                                                                         min(neighbor_min_delta_idx + half_period, size))]
+                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb * j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                           min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta)]
@@ -1989,7 +1989,7 @@ class NucleicAcidPart(Part):
                     #   and the vector from the neighbor axis at minimum delta to neighbor_fwds_pts
                     v1 = normalize(this_axis_pts[i] - neighbor_axis_pt)
                     # project point onto plane normal to axis
-                    v1 = normalize(v1 - dot(v1, direction)*direction)
+                    v1 = normalize(v1 - dot(v1, direction) * direction)
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
                     # relative_angle = math.acos(np.dot(v1, v2))  # angle
@@ -1997,7 +1997,7 @@ class NucleicAcidPart(Part):
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
                     # print(id_num, 'r', relative_angle, v1, v2)
                     # b. fwd pt angle relative to first base in virtual helix
-                    native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
+                    native_angle = angleNormalize(eulerZ + tpb * neighbor_min_delta_idx - relative_angle)
 
                     # print("REV %d around %d relative_angle %0.2f, base_angle: %0.2f" %
                     #     (   id_num, neighbor_id,
@@ -2006,8 +2006,8 @@ class NucleicAcidPart(Part):
                     #         ))
                     # print(math.degrees(native_angle), math.degrees(angleNormalize(tpb*neighbor_min_delta_idx + relative_angle)))
 
-                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb*j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
-                                                                                         min(neighbor_min_delta_idx + half_period, size))]
+                    all_fwd_angles = [(j, angleNormalize(eulerZ - tpb * j)) for j in range(max(neighbor_min_delta_idx - half_period, 0),
+                                                                                           min(neighbor_min_delta_idx + half_period, size))]
                     passing_fwd_angles_idxs = [j for j, x in all_fwd_angles if angleRangeCheck(x, native_angle, theta)]
                     all_rev_angles = [(j, angleNormalize(x + mgroove)) for j, x in all_fwd_angles]
                     passing_rev_angles_idxs = [j for j, x in all_rev_angles if angleRangeCheck(x, native_angle, theta)]
@@ -2088,7 +2088,7 @@ class NucleicAcidPart(Part):
         """
         # 1. compute generallized r squared values for an ideal crossover of
         # both types
-        half_twist_per_base = PI/bases_per_turn
+        half_twist_per_base = PI / bases_per_turn
         # r2_radial = (2.*RADIUS*(1. - math.cos(half_twist_per_base)))**2
         # r2_tangent = (2.*RADIUS*math.sin(half_twist_per_base))**2
         # r2_axial = BW*BW
@@ -2096,11 +2096,11 @@ class NucleicAcidPart(Part):
         # MISALIGNED by 27.5% twist per base so that's 1.55*half_twist_per_base
         # ma_f = 1.55 # NC should be this if we wanted to be strict
         ma_f = 2.55  # NC changed to this to show all xovers in legacy Honeycomb
-        r2_radial = (RADIUS*((1. - math.cos(half_twist_per_base)) +
-                             (1. - math.cos(ma_f*half_twist_per_base))))**2
-        r2_tangent = (RADIUS*(math.sin(half_twist_per_base) +
-                              math.sin(ma_f*half_twist_per_base)))**2
-        r2_axial = BW*BW
+        r2_radial = (RADIUS * ((1. - math.cos(half_twist_per_base)) +
+                               (1. - math.cos(ma_f * half_twist_per_base))))**2
+        r2_tangent = (RADIUS * (math.sin(half_twist_per_base) +
+                                math.sin(ma_f * half_twist_per_base)))**2
+        r2_axial = BW * BW
 
         # print("r2:", r2_radial, r2_tangent, r2_axial)
         # 2. ANTI-PARALLEL
@@ -2111,7 +2111,7 @@ class NucleicAcidPart(Part):
         # 3. PARALLEL
         rsquared_p = r2_tangent + r2_radial + r2_axial
         rsquared_p_min = r2_axial
-        rsquared_p_max = rsquared_p + 0.25*r2_axial
+        rsquared_p_max = rsquared_p + 0.25 * r2_axial
         per_neighbor_hits = {}
 
         fwd_axis_pairs = {}
@@ -2138,8 +2138,8 @@ class NucleicAcidPart(Part):
                 # assume there is only one possible index of intersection with the neighbor
                 f_idxs = np.where((delta > rsquared_p_min) &
                                   (delta < rsquared_p_max) &
-                                  (zdelta > 0.3*r2_axial) &
-                                  (zdelta < 1.1*r2_axial)
+                                  (zdelta > 0.3 * r2_axial) &
+                                  (zdelta < 1.1 * r2_axial)
                                   )[0].tolist()
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
@@ -2147,7 +2147,7 @@ class NucleicAcidPart(Part):
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_ap_min) &
                                   (delta < rsquared_ap_max) &
-                                  (zdelta < 0.3*r2_axial))[0].tolist()
+                                  (zdelta < 0.3 * r2_axial))[0].tolist()
                 if f_idxs or r_idxs:
                     fwd_axis_hits.append((start + i, f_idxs, r_idxs))
             # end for
@@ -2178,7 +2178,7 @@ class NucleicAcidPart(Part):
                 # assume there is only one possible index of intersection with the neighbor
                 f_idxs = np.where((delta > rsquared_ap_min) &
                                   (delta < rsquared_ap_max) &
-                                  (zdelta < 0.3*r2_axial))[0].tolist()
+                                  (zdelta < 0.3 * r2_axial))[0].tolist()
 
                 difference = nrev_pts - point
                 inner1d(difference, difference, out=delta)
@@ -2186,8 +2186,8 @@ class NucleicAcidPart(Part):
                 # assume there is only one possible index of intersection with the neighbor
                 r_idxs = np.where((delta > rsquared_p_min) &
                                   (delta < rsquared_p_max) &
-                                  (zdelta > 0.3*r2_axial) &
-                                  (zdelta < 1.1*r2_axial)
+                                  (zdelta > 0.3 * r2_axial) &
+                                  (zdelta < 1.1 * r2_axial)
                                   )[0].tolist()
                 if f_idxs or r_idxs:
                     rev_axis_hits.append((start + i, f_idxs, r_idxs))
@@ -2224,7 +2224,7 @@ class NucleicAcidPart(Part):
         Returns:
             float:
         """
-        TWOPI = 2*3.141592653589793
+        TWOPI = 2 * 3.141592653589793
         return ((angle % TWOPI) + TWOPI) % TWOPI
 
     @staticmethod
@@ -2242,7 +2242,7 @@ class NucleicAcidPart(Part):
             bool: True if in range, False otherwise
         """
         PI = 3.141592653589793
-        TWOPI = 2*PI
+        TWOPI = 2 * PI
         diff = (angle - target_angle + PI) % TWOPI - PI
         return -theta <= diff and diff <= theta
 
@@ -2266,10 +2266,10 @@ class NucleicAcidPart(Part):
             tuple: of :obj:`float`, angle and radius
         """
         theta = math.radians(angle) / 2
-        R = radius_in*math.sqrt(5 - 4*math.cos(theta))
-        x = base_width*(angle/2/360*bases_per_turn)
+        R = radius_in * math.sqrt(5 - 4 * math.cos(theta))
+        x = base_width * (angle / 2 / 360 * bases_per_turn)
         x = 0
-        return theta, math.sqrt(R*R + x*x)
+        return theta, math.sqrt(R * R + x * x)
     # end def
 
     def _projectionPointOnPlane(self, id_num, point):
@@ -2285,7 +2285,7 @@ class NucleicAcidPart(Part):
             array-like: length 3
         """
         direction = self.directions[id_num]
-        return point - np.dot(point, direction)*direction
+        return point - np.dot(point, direction) * direction
     # end
 
     def subStepSize(self):
@@ -2535,9 +2535,9 @@ class NucleicAcidPart(Part):
         """
         # Quick validation of len_list, need at least 2-base separation
         sorted_lens = [0] + sorted(len_list) + [oligo.length()]
-        for i in range(len(sorted_lens)-1):
-            j, k = sorted_lens[i], sorted_lens[i+1]
-            if (k-j) < 2:
+        for i in range(len(sorted_lens) - 1):
+            j, k = sorted_lens[i], sorted_lens[i + 1]
+            if (k - j) < 2:
                 return k
 
         # Convert lengths to absolute positions
@@ -2658,7 +2658,7 @@ class NucleicAcidPart(Part):
         """
         # test for reordering malformed input
         if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
-           strand3p.idx3Prime() == idx3p):
+                strand3p.idx3Prime() == idx3p):
             strand5p, strand3p = strand3p, strand5p
             idx5p, idx3p = idx3p, idx5p
 
@@ -2901,7 +2901,7 @@ class NucleicAcidPart(Part):
         undesirable Object parenting to make sure the translations are set
         correctly.  set to True when "undo-ing"
         """
-        threshold = 2.1*self._radius
+        threshold = 2.1 * self._radius
         # 1. get old neighbor list
         old_neighbors = set()
         for id_num in vh_set:
@@ -3325,11 +3325,11 @@ def distanceToPoint(origin, direction, point):
     # point behind the ray
     if direction_distance < 0:
         diff = origin - point
-        return diff*diff
+        return diff * diff
 
     v = (direction * direction_distance) + origin
     diff = v - point
-    return diff*diff
+    return diff * diff
 # end def
 
 

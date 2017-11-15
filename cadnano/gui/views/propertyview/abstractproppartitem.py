@@ -7,6 +7,7 @@ from .cnpropertyitem import CNPropertyItem
 class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
     """Summary
     """
+
     def __init__(self, **kwargs):
         """Summary
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cadnano.part.virtualhelix import VirtualHelix
 
+
 class AbstractVirtualHelixItem(object):
     """
     AbstractVirtualHelixItem is a base class for virtualhelixitem in all views.
@@ -9,6 +10,7 @@ class AbstractVirtualHelixItem(object):
 
     Slots that must be overridden should raise an exception.
     """
+
     def __init__(self, model_virtual_helix=None, parent=None):
         # super().__init__(**kwargs)
         self._model_vh = model_virtual_helix
@@ -34,6 +36,7 @@ class AbstractVirtualHelixItem(object):
         return self._part_item
     # end def
 # end class
+
 
 # ADD model methods to class
 from cadnano.wrapapi import copyWrapAPI

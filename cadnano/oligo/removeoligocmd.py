@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class RemoveOligoCommand(UndoCommand):
     def __init__(self, oligo):
         super(RemoveOligoCommand, self).__init__("remove oligo")

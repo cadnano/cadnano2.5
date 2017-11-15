@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Warning(object):
     def setupUi(self, Warning):
         Warning.setObjectName("Warning")
@@ -40,4 +41,3 @@ class Ui_Warning(object):
         Warning.setWindowTitle(_translate("Warning", "Dialog"))
         self.title.setText(_translate("Warning", "Warning"))
         self.message.setText(_translate("Warning", "Text here."))
-

@@ -6,6 +6,7 @@ class AbstractOligoItem(object):
 
     Slots that must be overridden should raise an exception.
     """
+
     def oligoSequenceAddedSlot(self, oligo):
         pass
 

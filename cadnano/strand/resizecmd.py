@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cadnano.cnproxy import UndoCommand
 
+
 class ResizeCommand(UndoCommand):
     def __init__(self, strand, new_idxs, update_segments=True):
         super(ResizeCommand, self).__init__("resize strand")

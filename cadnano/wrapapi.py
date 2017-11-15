@@ -54,6 +54,7 @@ def copyWrapAPI(cls_from, cls_to, attr_str='model'):
         setattr(cls_to, name, f_wrapper)
 # end def
 
+
 if __name__ == '__main__':
     class Foo(object):
 

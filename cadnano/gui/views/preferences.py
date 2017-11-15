@@ -15,8 +15,10 @@ from cadnano.gui.views import styles
 from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
 from cadnano.gui.views.preferences_const import PreferencesConst
 
+
 class Preferences(object):
     """Connect UI elements to the backend."""
+
     def __init__(self):
         self.qs = QSettings()
         self.ui_prefs = Ui_Preferences()
@@ -214,12 +216,12 @@ class Preferences(object):
     # end def
 
     def darwinAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
-        envirn = {"DST": util.this_path()+'/plugins'}
+        envirn = {"DST": util.this_path() + '/plugins'}
         srcstr = ''
         for i in range(len(files_in_zip)):
             file_name, file_path = files_in_zip[i]
             srcstr += ' \\"$SRC' + str(i) + '\\"'
-            envirn['SRC'+str(i)] = file_path
+            envirn['SRC' + str(i)] = file_path
         proc = subprocess.Popen(['osascript', '-e',
                                  'do shell script "cp -fR ' + srcstr +
                                  ' \\"$DST\\"" with administrator privileges'],
@@ -232,7 +234,7 @@ class Preferences(object):
     def linuxAuthedMvPluginsIntoPluginsFolder(self, files_in_zip):
         args = ['gksudo', 'cp', '-fR']
         args.extend(file_path for file_name, file_path in files_in_zip)
-        args.append(util.this_path()+'/plugins')
+        args.append(util.this_path() + '/plugins')
         proc = subprocess.Popen(args)
         retval = self.waitForProcExit(proc)
         if retval != 0:

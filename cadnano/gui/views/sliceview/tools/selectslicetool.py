@@ -29,6 +29,7 @@ def normalizeRect(rect):
         y1, y2 = y2, y1
     return (x1, y1, x2, y2)
 
+
 _SELECT_PEN_WIDTH = 2
 _SELECT_COLOR = "#ff0000"
 _TEST_COLOR = "#00ff00"
@@ -47,6 +48,7 @@ class SelectSliceTool(AbstractSliceTool):
         selection_set (TYPE): Description
         snap_origin_item (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 
@@ -434,6 +436,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         drag_start_position (TYPE): Description
         tool (TYPE): Description
     """
+
     def __init__(self, tool, parent=None):
         """Summary
 
@@ -475,6 +478,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
 
     """ reimplement boundingRect if you want to call resetGroupPos
     """
+
     def clearSelectionRect(self):
         """reset positions to zero to keep things in check
         """
@@ -536,7 +540,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
                         else:
                             origin_id_num = item.idNum()
                             is_alt = modifiers == Qt.AltModifier
-                            if (    doc.isVirtualHelixSelected(part, origin_id_num) and
+                            if (doc.isVirtualHelixSelected(part, origin_id_num) and
                                     not is_alt):
                                 print("origin", origin_id_num)
                                 if tool.snap_origin_item is not None:

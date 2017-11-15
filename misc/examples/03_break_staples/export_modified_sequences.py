@@ -125,6 +125,7 @@ def main():
     # printInfo("{0}".format(dest_file))
     doc.writeToFile(dest_file)
 
+
 # color_dict = dict((color, 'white', []) for color in CADNANO1_COLORS)
 color_dict = {'#cc0000': ('red', None, []),
               '#007200': ('green', None, ['bold']),

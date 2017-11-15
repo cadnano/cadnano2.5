@@ -16,6 +16,7 @@ class RemoveStrandCommand(UndoCommand):
         solo (:obj:`bool`, optional): set to True if only one strand is being
             removed to minimize signaling
     """
+
     def __init__(self, strandset, strand, solo=True):
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset

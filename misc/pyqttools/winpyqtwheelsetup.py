@@ -18,10 +18,10 @@ try:
 except ImportError:
     from distutils.core import setup, Extension
 
-PACKAGE_PATH =          os.path.abspath(os.path.dirname(__file__))
-MODULE_PATH =           pjoin(PACKAGE_PATH, 'PyQt5')
-Qt5_PATH =              pjoin(MODULE_PATH, 'Qt')
-UIC_PATH =              pjoin(MODULE_PATH, 'uic')
+PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
+MODULE_PATH = pjoin(PACKAGE_PATH, 'PyQt5')
+Qt5_PATH = pjoin(MODULE_PATH, 'Qt')
+UIC_PATH = pjoin(MODULE_PATH, 'uic')
 
 search_path = pjoin(MODULE_PATH, '*.pyd')
 filepath_list = glob.glob(search_path)
@@ -36,10 +36,10 @@ filepath_list = glob.glob(search_path)
 file_list += [os.path.basename(x) for x in filepath_list]
 
 package_files = [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(Qt5_PATH) for f in files]
+                 os.walk(Qt5_PATH) for f in files]
 
 package_files += [rpath(pjoin(root, f), MODULE_PATH) for root, _, files in
-                os.walk(UIC_PATH) for f in files]
+                  os.walk(UIC_PATH) for f in files]
 
 packages = find_packages()
 setup(

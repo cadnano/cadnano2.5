@@ -5,6 +5,7 @@ from cntestcase import cnapp
 
 from nucleicacidparttest import create3Helix
 
+
 def testStrandset(cnapp):
     doc = cnapp.document
     HELIX_LENGTH = 42
@@ -76,7 +77,6 @@ def testStrandset(cnapp):
     assert fwd_ss.strandCount() == 2
     fwd_ss.removeAllStrands()
     assert fwd_ss.strandCount() == 0
-
 
     # resize --> resize Part???
 # end def

@@ -10,6 +10,7 @@ class RemoveInstanceCommand(UndoCommand):
     Args:
         obj_instance (ObjectInstance): Object instance remove
     """
+
     def __init__(self, cnobj, obj_instance):
         super(RemoveInstanceCommand, self).__init__("remove instance")
         self._items = (cnobj, cnobj.document(), obj_instance)

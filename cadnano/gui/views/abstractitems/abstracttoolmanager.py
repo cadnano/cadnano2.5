@@ -1,5 +1,6 @@
 from PyQt5.QtCore import pyqtSignal, QObject
 
+
 class DummyTool(object):
     """ For use in place of None checks in the code
     reduces boilerplate
@@ -18,11 +19,13 @@ class DummyTool(object):
     def setSelectionFilter(self, filter_name_list):
         pass
 
+
 dummy_tool = DummyTool()
 
 
 class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""
+
     def __init__(self, tool_group_name, window, viewroot):
         """
         We store mainWindow because a controller's got to have

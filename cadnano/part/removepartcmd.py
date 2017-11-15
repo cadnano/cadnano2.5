@@ -1,9 +1,11 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class RemovePartCommand(UndoCommand):
     """
     RemovePartCommand deletes a part. Emits partRemovedSignal.
     """
+
     def __init__(self, part):
         super(RemovePartCommand, self).__init__("remove part")
         self._part = part

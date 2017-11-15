@@ -7,6 +7,7 @@ class EraseTool(AbstractPathTool):
     """
     docstring for EraseTool
     """
+
     def __init__(self, manager):
         """Summary
 

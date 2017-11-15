@@ -16,6 +16,7 @@ from .cnpropertyitem import CNPropertyItem
 KEY_COL = 0
 VAL_COL = 1
 
+
 class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """
@@ -124,14 +125,14 @@ class VirtualHelixSetItem(CNPropertyItem):
         elif key == 'length':
             editor = QSpinBox(parent_QWidget)
             bpr, length = cn_m.getProperty(['bases_per_repeat',
-                                                    'length'])
-            editor.setRange(length, 4*length)
+                                            'length'])
+            editor.setRange(length, 4 * length)
             editor.setSingleStep(bpr)
         elif key == 'z' and cn_m.part().isZEditable():
             editor = QDoubleSpinBox(parent_QWidget)
             bw = cn_m.part().baseWidth()
             editor.setSingleStep(bw)
-            editor.setRange(-bw*21, bw*21)
+            editor.setRange(-bw * 21, bw * 21)
         else:
             editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
         return editor

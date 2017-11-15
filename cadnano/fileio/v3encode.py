@@ -18,8 +18,8 @@ def encodeDocument(document):
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'name': '',
                 'meta': {
-                    'slice_view_type'   :document.get_slice_view_type(),
-                    'grid_type'         :document.get_grid_type()
+                    'slice_view_type': document.get_slice_view_type(),
+                    'grid_type': document.get_grid_type()
                 },
                 'parts': [],
                 'modifications': document.modifications()
@@ -121,9 +121,11 @@ def encodePartList(part_instance, vh_group_list):
     prop_list = []
     vh_list = []
     vh_group_set = set(vh_group_list)
-    filter_xovers = lambda x: (x[0] in vh_group_set and
-                               x[3] in vh_group_set)
-    filter_vh = lambda x: x[0] in vh_group_set
+
+    def filter_xovers(x): return (x[0] in vh_group_set and
+                                  x[3] in vh_group_set)
+
+    def filter_vh(x): return x[0] in vh_group_set
     for id_num in vh_group_list:
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:

@@ -4,8 +4,10 @@ from cadnano.cnproxy import UndoCommand
 # from cadnano.part.nucleicacidpart import Z_PROP_INDEX
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
+
 class TranslateVirtualHelicesCommand(UndoCommand):
     """ Move Virtual Helices around"""
+
     def __init__(self, part, virtual_helix_set, dx, dy, dz):
         super(TranslateVirtualHelicesCommand, self).__init__("translate virtual helices")
         self._part = part
@@ -37,7 +39,7 @@ class TranslateVirtualHelicesCommand(UndoCommand):
                 z_vals = (z_vals, )
             for id_num, z_val in zip(vh_list, z_vals):
                 part.partVirtualHelixPropertyChangedSignal.emit(
-                                        part, id_num, part.getVirtualHelix(id_num), ('z',), (z_val,))
+                    part, id_num, part.getVirtualHelix(id_num), ('z',), (z_val,))
             part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), False)
     # end def
 

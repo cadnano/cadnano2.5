@@ -35,6 +35,7 @@ def Usage():
     print("\n\tUsage: python " + sys.argv[0] + " <python script> [<project name>]\n")
     sys.exit()
 
+
 version = "1.0.0"
 bundleIdentifier = "org.test.test"
 
@@ -113,6 +114,7 @@ def doAppify(script, project, app_icon_path=None):
         shutil.rmtree(install_path)
     shutil.move(apppath, install_path)
 # end def
+
 
 if __name__ == '__main__':
     if not 2 <= len(sys.argv) <= 3:

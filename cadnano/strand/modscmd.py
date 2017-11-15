@@ -1,5 +1,6 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class AddModsCommand(UndoCommand):
     def __init__(self, document, strand, idx, mod_id):
         super(AddModsCommand, self).__init__()
@@ -28,6 +29,7 @@ class AddModsCommand(UndoCommand):
         strand.strandModsRemovedSignal.emit(strand, self.document, mid, idx)
     # end def
 # end class
+
 
 class RemoveModsCommand(UndoCommand):
     def __init__(self, document, strand, idx, mod_id):

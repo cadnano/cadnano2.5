@@ -1,8 +1,10 @@
 from cadnano.cnproxy import UndoCommand
 
+
 class RefreshSegmentsCommand(UndoCommand):
     """ Add an UndoCommand to the undostack calling Part.refreshSegments
     """
+
     def __init__(self, part, id_nums):
         super(RefreshSegmentsCommand, self).__init__("refresh segments")
         self.part = part

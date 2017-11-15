@@ -30,6 +30,7 @@ class ModsTool(AbstractPathTool):
         dialog (TYPE): Description
         uiDlg (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 

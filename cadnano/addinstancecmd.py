@@ -11,6 +11,7 @@ class AddInstanceCommand(UndoCommand):
         document (Document): m
         obj_instance (ObjectInstance): Object instance to add to Document
     """
+
     def __init__(self, document, cnobj):
         super(AddInstanceCommand, self).__init__("add instance")
         self._document = document

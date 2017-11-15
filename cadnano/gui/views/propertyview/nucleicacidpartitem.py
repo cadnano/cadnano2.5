@@ -11,6 +11,7 @@ VAL_COL = 1
 class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
     """NucleicAcidPartItem for the PropertyView.
     """
+
     def __init__(self, **kwargs):
         """Summary
 

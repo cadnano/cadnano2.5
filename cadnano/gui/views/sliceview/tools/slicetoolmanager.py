@@ -13,6 +13,7 @@ class SliceToolManager(AbstractToolManager):
         select_tool (SelectSliceTool): Description
         tool_names (tuple): `str` names of tools
     """
+
     def __init__(self, window, viewroot):
         """
         We store mainWindow because a controller's got to have

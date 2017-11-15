@@ -32,6 +32,7 @@ class Document(CNObject):
         view_names (list): views the document should support
         filter_set (set): filters that should be applied when selecting.
     """
+
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 
@@ -404,7 +405,8 @@ class Document(CNObject):
             list: of :obj: `Strand`
         """
         out_list = [x for x in self._selection_dict[strandset].items()]
-        getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))
+
+        def getLowIdx(x): return Strand.lowIdx(itemgetter(0)(x))
         out_list.sort(key=getLowIdx)
         return out_list
     # end def

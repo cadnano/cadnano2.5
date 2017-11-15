@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_About(object):
     def setupUi(self, About):
         About.setObjectName("About")
@@ -43,7 +44,7 @@ class Ui_About(object):
         self.info = QtWidgets.QLabel(self.frame)
         self.info.setGeometry(QtCore.QRect(0, 90, 441, 181))
         self.info.setTextFormat(QtCore.Qt.RichText)
-        self.info.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignTop)
+        self.info.setAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignLeft | QtCore.Qt.AlignTop)
         self.info.setWordWrap(True)
         self.info.setOpenExternalLinks(True)
         self.info.setObjectName("info")
@@ -58,15 +59,16 @@ class Ui_About(object):
         self.appname.setText(_translate("About", "cadnano"))
         self.version.setText(_translate("About", "version 2.5.0"))
         self.info.setText(_translate("About", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'Lucida Grande\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Copyright © 2009–2014 cadnano.org.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">cadnano is free and open-source. The source code is available under the MIT license.</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The development has been supported by Wyss Institute at Harvard University and the laboratory of George Church, and the laboratory of Shawn Douglas at the University of California at San Francisco</p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Send <a href=\"http://cadnano.org/feedback\"><span style=\" text-decoration: underline; color:#0000ff;\">feedback</span></a> or <a href=\"http://cadnano.org/join\"><span style=\" text-decoration: underline; color:#0000ff;\">join</span></a> our team.</p></body></html>"))
+                                     "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+                                     "p, li { white-space: pre-wrap; }\n"
+                                     "</style></head><body style=\" font-family:\'Lucida Grande\'; font-size:13pt; font-weight:400; font-style:normal;\">\n"
+                                     "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Copyright © 2009–2014 cadnano.org.</p>\n"
+                                     "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
+                                     "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">cadnano is free and open-source. The source code is available under the MIT license.</p>\n"
+                                     "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
+                                     "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The development has been supported by Wyss Institute at Harvard University and the laboratory of George Church, and the laboratory of Shawn Douglas at the University of California at San Francisco</p>\n"
+                                     "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"></p>\n"
+                                     "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Send <a href=\"http://cadnano.org/feedback\"><span style=\" text-decoration: underline; color:#0000ff;\">feedback</span></a> or <a href=\"http://cadnano.org/join\"><span style=\" text-decoration: underline; color:#0000ff;\">join</span></a> our team.</p></body></html>"))
+
 
 import cadnano.gui.ui.dialogs.dialogicons_rc as dialogicons_rc

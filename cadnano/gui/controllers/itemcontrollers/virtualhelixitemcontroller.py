@@ -2,6 +2,7 @@ class VirtualHelixItemController(object):
     """ Since there is no model VirtualHelix Object, we need
     a specialized controller for the property view
     """
+
     def __init__(self, virtualhelix_item, model_part, do_wire_part, do_wire_strands):
         """
         Args:
@@ -18,9 +19,9 @@ class VirtualHelixItemController(object):
     # end def
 
     part_connections = [
-    ('partVirtualHelixPropertyChangedSignal',   'partVirtualHelixPropertyChangedSlot'),
-    ('partVirtualHelixRemovedSignal',           'partVirtualHelixRemovedSlot'),
-    ('partVirtualHelixResizedSignal',           'partVirtualHelixResizedSlot')
+        ('partVirtualHelixPropertyChangedSignal',   'partVirtualHelixPropertyChangedSlot'),
+        ('partVirtualHelixRemovedSignal',           'partVirtualHelixRemovedSlot'),
+        ('partVirtualHelixResizedSignal',           'partVirtualHelixResizedSlot')
     ]
 
     strand_connections = [

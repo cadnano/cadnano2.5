@@ -407,7 +407,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)
-        if line.length() > (_RADIUS*1.99):
+        if line.length() > (_RADIUS * 1.99):
             color = '#5a8bff'
         else:
             color = '#cc0000'
@@ -443,8 +443,8 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         else:  # _number >= 100
             label.setPos(0, y_val)
         b_rect = label.boundingRect()
-        posx = b_rect.width()/2
-        posy = b_rect.height()/2
-        label.setPos(_RADIUS-posx, _RADIUS-posy)
+        posx = b_rect.width() / 2
+        posy = b_rect.height() / 2
+        label.setPos(_RADIUS - posx, _RADIUS - posy)
     # end def
 # end class
