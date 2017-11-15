@@ -275,7 +275,7 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
-#    def find_closest_point(self, position):
+#    def findClosestPoint(self, position):
 #        """Find the closest point to a given position on the grid
 #        Args:
 #            position ():
@@ -289,7 +289,7 @@ class GridItem(QGraphicsPathItem):
 #                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
 #                return coordinates
 
-#    def shortest_path(self, start, end):
+#    def shortestPath(self, start, end):
 #        """Return a path of coordinates that traverses from start to end.
 #
 #        Does a breadth-first search.  This could be further improved to do an A*
@@ -307,8 +307,8 @@ class GridItem(QGraphicsPathItem):
 #        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
 #        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
 #
-#        start_coordinates = self.find_closest_point(start)
-#        end_coordinates = self.find_closest_point(end)
+#        start_coordinates = self.findClosestPoint(start)
+#        end_coordinates = self.findClosestPoint(end)
 #
 #        if start_coordinates is None or end_coordinates is None:
 #            # TODO[NF]:  Change to logger

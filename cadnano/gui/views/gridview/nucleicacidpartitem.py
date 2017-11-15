@@ -75,7 +75,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         # initialize the NucleicAcidPartItem with an empty set of old coords
         self.setZValue(styles.ZPARTITEM)
         self.outline = outline = QGraphicsRectItem(self)
-        o_rect = self.configureOutline(outline)
+        o_rect = self._configureOutline(outline)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
         model_color = m_p.getColor()
@@ -464,7 +464,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = new_rect = QRectF(ptTL, ptBR)
         self.setRect(new_rect)
-        self.configureOutline(self.outline)
+        self._configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
@@ -494,7 +494,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def configureOutline(self, outline):
+    def _configureOutline(self, outline):
         """Adjusts `outline` size with default padding.
 
         Args:

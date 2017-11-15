@@ -9,7 +9,7 @@ Thank you for your interest in contributing to Cadnano.
 
 ### Styleguide
 
-- Lint with `flake8 --ignore=E226,E266,E731,E501`.
+- Lint with `flake8 --ignore=E226,E266,E731 --max-line-length=120`.
 - Use `camelCaseMethod` names.
 - Use `lowercase_underscore_separated_variable` names.
 - Use all caps for `PUBLIC_CLASS_VARIABLE` names.

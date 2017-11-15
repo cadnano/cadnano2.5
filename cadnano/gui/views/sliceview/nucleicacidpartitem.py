@@ -71,7 +71,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.active_virtual_helix_item = None
         self.prexover_manager = PreXoverManager(self)
         self.hide()  # hide while until after attemptResize() to avoid flicker
-        self._rect = QRectF(0., 0., 1000., 1000.)   # set this to a token value
+        self._rect = QRectF(0., 0., 1000., 1000.)  # set this to a token value
         self.boundRectToModel()
         self.setPen(getNoPen())
         self.setRect(self._rect)
@@ -86,7 +86,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # initialize the NucleicAcidPartItem with an empty set of old coords
         self.setZValue(styles.ZPARTITEM)
         self.outline = outline = QGraphicsRectItem(self)
-        o_rect = self.configureOutline(outline)
+        o_rect = self._configureOutline(outline)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
         model_color = m_p.getColor()
@@ -294,8 +294,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.find_closest_point(position=position,
-                                                            point_map=self.point_map)
+        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
         self.vh_set.add(coordinates)
     # end def
 
@@ -319,8 +318,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.find_closest_point(position=position,
-                                                            point_map=self.point_map)
+        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
         self.vh_set.remove(coordinates)
     # end def
 
@@ -462,13 +460,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
 
         vhi = self._virtual_helix_item_hash[id_num]
-
-#        center_point = vhi.getCenterScenePos()
-#        location = ShortestPathHelper.find_closest_point(position=(center_point.x(),
-#                                                                   center_point.y()),
-#                                                         point_map=self.point_map)
-#        self.point_map.remove(location)
-
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
         vhi.virtualHelixRemovedSlot()
@@ -495,7 +486,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = QRectF(ptTL, ptBR)
         self.setRect(self._rect)
-        self.configureOutline(self.outline)
+        self._configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
@@ -536,7 +527,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.grab_cornerBR.alignPos(*bottom_right)
 
     ### PRIVATE SUPPORT METHODS ###
-    def configureOutline(self, outline):
+    def _configureOutline(self, outline):
         """Adjusts `outline` size with default padding.
 
         Args:
@@ -714,13 +705,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         is_shift = modifiers == Qt.ShiftModifier
         position = (event.scenePos().x(), event.scenePos().y())
-        if self._handle_spa_mouse_press(tool=tool,
-                                        position=position,
-                                        is_shift=is_shift):
+        if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
             return
 
-        x, y = ShortestPathHelper.find_closest_point(position=position,
-                                                     point_map=self.point_map)
+        x, y = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
         if self.griditem.grid_type is GridType.HONEYCOMB:
             parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
@@ -735,14 +723,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
 
-    def _handle_spa_mouse_press(self, tool, position, is_shift):
+    def _handleShortestPathMousePress(self, tool, position, is_shift):
         if (is_shift):
             self.shortest_path_add_mode = True
             # Complete the path
             if self.shortest_path_start is not None:
-                self.create_tool_shortest_path(tool=tool,
-                                               start=self.shortest_path_start,
-                                               end=position)
+                self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
                 self.shortest_path_start = position
                 return True
             else:
@@ -752,24 +738,20 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.shortest_path_start = None
         return False
 
-    def create_tool_shortest_path(self, tool, start, end):
+    def createToolShortestPath(self, tool, start, end):
         # TODO[NF]:  Docstring
-        path = ShortestPathHelper.shortest_path_xy(start=start,
-                                                   end=end,
-                                                   neighbor_map=self.neighbor_map,
-                                                   vh_set=self.vh_set,
-                                                   point_map=self.point_map,
-                                                   grid_type=self.griditem.grid_type,
-                                                   scale_factor=self.inverse_scale_factor,
-                                                   radius=self._RADIUS)
+        path = ShortestPathHelper.shortestPathXY(start=start, end=end,
+                                                 neighbor_map=self.neighbor_map,
+                                                 vh_set=self.vh_set,
+                                                 point_map=self.point_map,
+                                                 grid_type=self.griditem.grid_type,
+                                                 scale_factor=self.inverse_scale_factor,
+                                                 radius=self._RADIUS)
         for x, y, parity in path:
             before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(x=x,
-                                                y=y,
-                                                parity=parity)
+            self._model_part.createVirtualHelix(x=x, y=y, parity=parity)
             after = set(self._virtual_helix_item_hash.keys())
             id_nums = after - before
-
             vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()

@@ -908,9 +908,10 @@ class WedgeGizmo(QGraphicsPathItem):
     # end def
 # end class
 
+
 class ShortestPathHelper(object):
     @staticmethod
-    def find_closest_point(position, point_map):
+    def findClosestPoint(position, point_map):
         """Find the closest point to a given position on the grid
         Args:
             position ():
@@ -925,7 +926,7 @@ class ShortestPathHelper(object):
                 return coordinates
 
     @staticmethod
-    def shortest_path(start, end, neighbor_map, vh_set, point_map):
+    def shortestPath(start, end, neighbor_map, vh_set, point_map):
         """Return a path of coordinates that traverses from start to end.
 
         Does a breadth-first search.  This could be further improved to do an A*
@@ -943,25 +944,21 @@ class ShortestPathHelper(object):
         assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
         assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
 
-        start_coordinates = ShortestPathHelper.find_closest_point(position=start,
-                                                                  point_map=point_map)
-        end_coordinates = ShortestPathHelper.find_closest_point(position=end,
-                                                                point_map=point_map)
+        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
+        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
 
         if start_coordinates is None or end_coordinates is None:
             # TODO[NF]:  Change to logger
             print('Could not find path from %s to %s' % (str(start), str(end)))
             return []
 
-            # TODO[NF]:  Change to logger
-        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
+        # TODO[NF]:  Change to logger
+        # print('Finding shortest path from %s to %s...' % (str(start), str(end)))
 
         if neighbor_map.get(start_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s',
-                              start_coordinates)
+            raise LookupError('Could not find a point corresponding to %s', start_coordinates)
         elif neighbor_map.get(end_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s',
-                              end_coordinates)
+            raise LookupError('Could not find a point corresponding to %s', end_coordinates)
 
         parents = dict()
         parents[start_coordinates] = None
@@ -991,29 +988,22 @@ class ShortestPathHelper(object):
         return []
 
     @staticmethod
-    def shortest_path_xy(start, end, neighbor_map, vh_set, point_map,
-                         grid_type, scale_factor, radius):
+    def shortestPathXY(start, end, neighbor_map, vh_set, point_map, grid_type,
+                       scale_factor, radius):
         # TODO[NF]:  Docstring
         x_y_path = []
-        coordinate_path = ShortestPathHelper.shortest_path(start=start,
-                                                end=end,
-                                                neighbor_map=neighbor_map,
-                                                vh_set=vh_set,
-                                                point_map=point_map)
+        coordinate_path = ShortestPathHelper.shortestPath(start=start, end=end, neighbor_map=neighbor_map,
+                                                          vh_set=vh_set, point_map=point_map)
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
             if grid_type is GridType.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius,
-                                                                     row=row,
-                                                                     column=column,
+                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
                                                                      scale_factor=scale_factor)
             else:
                 parity = None
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=radius,
-                                                                  row=row,
-                                                                  column=column,
+                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
                                                                   scale_factor=scale_factor)
             x_y_path.append((node_pos[0], node_pos[1], parity))
 
