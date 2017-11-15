@@ -225,7 +225,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def pencilToolMousePress(self, tool, part_item, event):
+    def createToolMousePress(self, tool, part_item, event):
         """Summary
 
         Args:
@@ -234,7 +234,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             event (QMouseEvent): contains parameters that describe the mouse event
         """
         part = self._model_part
-        print("pencilToolMousePress", part)
+        print("createToolMousePress", part)
         # tool.attemptToCreateStrand
 
     def virtualHelixPropertyChangedSlot(self, keys, values):

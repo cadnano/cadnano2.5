@@ -4,14 +4,17 @@ Attributes:
     SNAP_WIDTH (int): Description
 """
 import logging
+import random
 
 from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
+from cadnano import preferences as prefs
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
+
 from . import slicestyles as styles
 from .sliceextras import WedgeGizmo, WEDGE_RECT
 
@@ -205,6 +208,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             event (QMouseEvent): contains parameters that describe the mouse event.
         """
         if self.FILTER_NAME not in self._part_item.getFilterSet():
+            print(self.FILTER_NAME, "filter not enabled")
             return
         if event.button() == Qt.RightButton:
             return
@@ -218,16 +222,26 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def createToolMousePress(self, tool, part_item, event):
-        swap = event.modifiers() & Qt.ShiftModifier
+        shift = event.modifiers() & Qt.ShiftModifier
         idx_low = self._model_part.getProperty('workplane_idx')
         idx_high = idx_low + 2
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
-        if self._id_num % 2 == 0:
-            swap = not swap
-        if swap:
-            fwd_ss.createStrand(idx_low, idx_high)
+
+        parity = self._id_num % 2
+        c = random.choice(prefs.STAP_COLORS) if shift else None
+
+        if parity:
+            if shift:
+                fwd_ss.createStrand(idx_low, idx_high, color=c)
+            else:
+                rev_ss.createStrand(idx_low, idx_high, color=c)
         else:
-            rev_ss.createStrand(idx_low, idx_high)
+            if shift:
+                rev_ss.createStrand(idx_low, idx_high, color=c)
+            else:
+                fwd_ss.createStrand(idx_low, idx_high, color=c)
+
+
 
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this
@@ -244,18 +258,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         tool.selectOrSnap(part_item, self, event)
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
-
-    def pencilToolMousePress(self, tool, part_item, event):
-        """Summary
-
-        Args:
-            tool (SelectSliceTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
-            event (QMouseEvent): contains parameters that describe the mouse event
-        """
-        part = self._model_part
-        logger.info("pencilToolMousePress", part)
-        # tool.attemptToCreateStrand
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
         """The event handler for when the a model virtual helix propety has

@@ -3,7 +3,7 @@
 from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
 
 from .selecttool import SelectTool
-from .penciltool import CreateTool
+from .createtool import CreateTool
 from .breaktool import BreakTool
 from .insertiontool import InsertionTool
 from .skiptool import SkipTool

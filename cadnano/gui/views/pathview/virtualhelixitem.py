@@ -546,7 +546,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### TOOL METHODS ###
-    def pencilToolMousePress(self, strand_set, idx, modifiers):
+    def createToolMousePress(self, strand_set, idx, modifiers):
         """strand.getDragBounds
 
         Args:
@@ -565,7 +565,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.setIsDrawingStrand(True)
     # end def
 
-    def pencilToolMouseMove(self, strand_set, idx):
+    def createToolMouseMove(self, strand_set, idx):
         """strand.getDragBounds
 
         Args:
@@ -578,7 +578,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.updateStrandItemFromVHI(self, strand_set, idx)
     # end def
 
-    def pencilToolMouseRelease(self, strand_set, idx):
+    def createToolMouseRelease(self, strand_set, idx):
         """strand.getDragBounds
 
         Args:
@@ -592,7 +592,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.attemptToCreateStrand(self, strand_set, idx)
     # end def
 
-    def pencilToolHoverMove(self, is_fwd, idx_x, idx_y):
+    def createToolHoverMove(self, is_fwd, idx_x, idx_y):
         """Create the strand is possible.
 
         Args:

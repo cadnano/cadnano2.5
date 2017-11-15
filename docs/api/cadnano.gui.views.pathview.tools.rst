@@ -15,7 +15,7 @@ Submodules
    cadnano.gui.views.pathview.tools.painttool
    cadnano.gui.views.pathview.tools.pathselection
    cadnano.gui.views.pathview.tools.pathtoolmanager
-   cadnano.gui.views.pathview.tools.penciltool
+   cadnano.gui.views.pathview.tools.createtool
    cadnano.gui.views.pathview.tools.selecttool
    cadnano.gui.views.pathview.tools.skiptool
 

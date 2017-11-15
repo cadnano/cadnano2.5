@@ -676,11 +676,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             getattr(self, tool_method_name)(event.pos())
     # end def
 
-    def pencilToolHoverMove(self, pt):
+    def createToolHoverMove(self, pt):
         """Create the strand is possible.
 
         Args:
-            pt (QPointF): mouse cursor location of pencil tool hover.
+            pt (QPointF): mouse cursor location of create tool hover.
         """
         active_tool = self._getActiveTool()
         if not active_tool.isFloatingXoverBegin():

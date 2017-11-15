@@ -66,7 +66,7 @@ class CreateTool(AbstractPathTool):
         Returns:
             TYPE: Description
         """
-        return "pencilTool"  # first letter should be lowercase
+        return "createTool"  # first letter should be lowercase
 
     def strandItem(self):
         """Summary
@@ -105,7 +105,7 @@ class CreateTool(AbstractPathTool):
     # end def
 
     def initStrandItemFromVHI(self, virtual_helix_item, strand_set, idx):
-        """Called from VHI pencilToolMousePress. Stores the starting point
+        """Called from VHI createToolMousePress. Stores the starting point
         of the strand to be created.
 
         Args:
@@ -140,7 +140,7 @@ class CreateTool(AbstractPathTool):
     # end def
 
     def isDragLow(self, idx):
-        """Is the pencil tool being dragged to a lower idx than the start idx.
+        """Is the create tool being dragged to a lower idx than the start idx.
         Used to determine how the temp strand should be drawn.
 
         Args:
@@ -451,6 +451,7 @@ class ForcedStrandItem(QGraphicsLineItem):
         self._high_cap.setBrush(brush)
     # end def
 # end class
+
 
 _TO_HELIX_NUM_FONT = styles.XOVER_LABEL_FONT
 # precalculate the height of a number font.  Assumes a fixed font
@@ -1260,8 +1261,8 @@ class EndpointItem(QGraphicsPathItem):
         self._strand_item.setActiveEndpoint(self.cap_type)
         self._move_idx = self.idx()
         active_tool_str = self._getActiveTool().methodPrefix()
-        if active_tool_str == 'pencilTool':
-            return self._strand_item.pencilToolMousePress(self.idx())
+        if active_tool_str == 'createTool':
+            return self._strand_item.createToolMousePress(self.idx())
         tool_method_name = active_tool_str + "MousePress"
         if hasattr(self, tool_method_name):  # if the tool method exists
             modifiers = event.modifiers()
@@ -1276,8 +1277,8 @@ class EndpointItem(QGraphicsPathItem):
             event (TYPE): Description
         """
         active_tool_str = self._getActiveTool().methodPrefix()
-        if active_tool_str == 'pencilTool':
-            return self._strand_item.pencilToolHoverMove(event, self.idx())
+        if active_tool_str == 'createTool':
+            return self._strand_item.createToolHoverMove(event, self.idx())
 
     def mouseMoveEvent(self, event):
         """

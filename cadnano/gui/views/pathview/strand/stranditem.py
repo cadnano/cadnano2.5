@@ -599,7 +599,7 @@ class StrandItem(QGraphicsLineItem):
         m_strand.oligo().applyColor(color)
     # end def
 
-    def pencilToolHoverMove(self, event, idx):
+    def createToolHoverMove(self, event, idx):
         """Create the strand is possible."""
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
@@ -610,7 +610,7 @@ class StrandItem(QGraphicsLineItem):
             temp_xover.updateFloatingFromStrandItem(vhi, m_strand, idx)
     # end def
 
-    def pencilToolMousePress(self, event, idx):
+    def createToolMousePress(self, event, idx):
         """Break the strand is possible."""
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
