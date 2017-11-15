@@ -708,7 +708,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
             return
 
-        x, y = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
+        coords = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
+        if coords is None:
+            print("findClosestPoint returned None")
+            return
+        else:
+            print("findClosestPoint returned", coords)
+            x, y = coords
         if self.griditem.grid_type is GridType.HONEYCOMB:
             parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
