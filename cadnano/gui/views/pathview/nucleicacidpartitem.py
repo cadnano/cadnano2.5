@@ -1,12 +1,11 @@
-"""Summary
-"""
+"""Summary"""
 from __future__ import division
 
 from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
 from cadnano import getBatch, util
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
@@ -17,10 +16,17 @@ from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import PathVirtualHelixItem
 
+
+_DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
+_DEFAULT_ALPHA = styles.DEFAULT_ALPHA
+_SELECTED_COLOR = styles.SELECTED_COLOR
+_SELECTED_WIDTH = styles.SELECTED_PEN_WIDTH
+_SELECTED_ALPHA = styles.SELECTED_ALPHA
+
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
-_BOUNDING_RECT_PADDING = 20
+
 _VH_XOFFSET = styles.VH_XOFFSET
 
 
@@ -43,7 +49,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         prexover_manager (TYPE): Description
     """
     findChild = util.findChild  # for debug
-    _BOUNDING_RECT_PADDING = 0
+    _BOUNDING_RECT_PADDING = 20
+    _GC_SIZE = 10
 
     def __init__(self, model_part_instance, viewroot, parent):
         """parent should always be pathrootitem
@@ -60,17 +67,28 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.prexover_manager = PreXoverManager(self)
         self._virtual_helix_item_list = []
-        self._vh_rect = QRectF()
         self.setAcceptHoverEvents(True)
         self._initModifierRect()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
         self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
-        GC_SIZE = 10
-        self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
-        self.grab_corner.hide()
+
+        # self._rect = QRectF()
+        self._vh_rect = QRectF()
+        # self.setPen(getPenObj(styles.ORANGE_STROKE, 0))
+        self.setPen(getNoPen())
+        # self.setRect(self._rect)
+
+        self.outline = outline = QGraphicsRectItem(self)
+        outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
+        outline.setZValue(styles.ZDESELECTOR)
+        self.outline.setPen(getPenObj(m_p.getColor(), _DEFAULT_WIDTH))
+        self._configureOutline(outline)
+
+        self.grab_corner = GrabCornerItem(self._GC_SIZE, m_p.getColor(), False, self)
         self.workplane = PathWorkplaneItem(m_p, self)
+        self.hide()  # show on adding first vh
     # end def
 
     def proxy(self):
@@ -189,7 +207,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                                    vhi_min.x()))
         if ztf:
             self.scene().views()[0].zoomToFit()
-        self._updateBoundingRect()
+        self.reconfigureRect()
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -224,10 +242,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
             if property_key == 'color':
-                self._updateBoundingRect()
+                self.reconfigureRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
-                self.grab_corner.setBrush(getBrushObj(new_value))
+                self.grab_corner.setPen(getPenObj(new_value, 0))
+                self.workplane.grab_corner.setPen(getPenObj(new_value, 0))
             elif property_key == 'is_visible':
                 if new_value:
                     self.show()
@@ -296,19 +315,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi = PathVirtualHelixItem(virtual_helix, self, self._viewroot)
         self._virtual_helix_item_hash[id_num] = vhi
         vhi_list = self._virtual_helix_item_list
-        # reposition when first VH is added
-        if len(vhi_list) == 0:
-            view = self.window().path_graphics_view
-            p = view.scene_root_item.childrenBoundingRect().bottomLeft()
-            _p = _BOUNDING_RECT_PADDING
-            self.setPos(p.x() + _p*6 + styles.VIRTUALHELIXHANDLEITEM_RADIUS, p.y() + _p*3)
-            # self.setPos(p.x() + _VH_XOFFSET, p.y() + _p*3)
-
         vhi_list.append(vhi)
         ztf = not getBatch()
         self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
-        if not self.grab_corner.isVisible():
-            self.grab_corner.show()
+        if not self.isVisible():
+            self.show()
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
@@ -341,6 +352,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
+        if len(self._virtual_helix_item_list) == 0:
+            self.hide()
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
@@ -417,6 +430,20 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### PRIVATE METHODS ###
+    def _configureOutline(self, outline):
+        """Adjusts `outline` size with default padding.
+
+        Args:
+            outline (TYPE): Description
+
+        Returns:
+            o_rect (QRect): `outline` rect adjusted by _BOUNDING_RECT_PADDING
+        """
+        _p = self._BOUNDING_RECT_PADDING
+        o_rect = self.rect().adjusted(-_p, -_p, _p, _p)
+        outline.setRect(o_rect)
+        return o_rect
+
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):
         """
         Give me a list of VirtualHelixItems and I'll parent them to myself if
@@ -468,6 +495,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         # now update Z dimension (X in Qt space in the Path view)
         part = self.part()
         self.partZDimensionsChangedSlot(part, *part.zBoundsIds(), ztf=zoom_to_fit)
+        self.reconfigureRect()
     # end def
 
     def resetPen(self, color, width=0):
@@ -481,7 +509,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         pen = getPenObj(color, width)
-        self.setPen(pen)
+        self.outline.setPen(pen)
+        # self.setPen(pen)
     # end def
 
     def resetBrush(self, color, alpha):
@@ -498,21 +527,27 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.setBrush(brush)
     # end def
 
-    def _updateBoundingRect(self):
+    def reconfigureRect(self, padding=_BOUNDING_RECT_PADDING):
         """
-        Updates the bounding rect to the size of the childrenBoundingRect,
-        and refreshes the addBases and removeBases buttons accordingly.
+        Updates the bounding rect to the size of the childrenBoundingRect.
+        Refreshes the outline and grab_corner locations.
 
-        Called by partZDimensionsChangedSlot and partPropertyChangedSlot
+        Called by partZDimensionsChangedSlot and partPropertyChangedSlot.
         """
-        self.setPen(getPenObj(self.modelColor(), 0))
+        self.resetPen(self.modelColor(), 0)  # cosmetic
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
+        outline = self.outline
 
-        # self.setRect(self.childrenBoundingRect())
-        _p = _BOUNDING_RECT_PADDING
-        temp_rect = self._vh_rect.adjusted(-_p/2, -_p, _p, -_p/2)
-        self.grab_corner.setTopLeft(temp_rect.topLeft())
-        self.setRect(temp_rect)
+        # Temporarily remove children that shouldn't affect size
+        outline.setParentItem(None)
+        self.grab_corner.setParentItem(None)
+        self.setRect(self.childrenBoundingRect())  # vh_items only
+        outline.setParentItem(self)
+        self.grab_corner.setParentItem(self)
+
+        self._configureOutline(outline)
+        p = self._GC_SIZE/2
+        self.grab_corner.setTopLeft(outline.rect().adjusted(-p, -p, p, p).topLeft())
         self.workplane.updatePositionAndBounds()
     # end def
 
