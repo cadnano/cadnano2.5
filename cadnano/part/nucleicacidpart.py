@@ -386,8 +386,7 @@ class NucleicAcidPart(Part):
         from cadnano.util import qtdb_trace
 #        qtdb_trace()
         if parity is None:
-            merged_recycle_bin = self.recycle_bin.get(_even) + \
-                                 self.recycle_bin.get(_odd)
+            merged_recycle_bin = self.recycle_bin.get(_even) + self.recycle_bin.get(_odd)
             if len(merged_recycle_bin):
                 return nsmallest(1, merged_recycle_bin)[0]
             else:
@@ -3299,11 +3298,11 @@ class NucleicAcidPart(Part):
     # end def
 
     def get_grid_type(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self._group_properties.get('grid_type')
 
     def set_grid_type(self, grid_type):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
 

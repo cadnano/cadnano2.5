@@ -933,18 +933,18 @@ class Document(CNObject):
         return seq, name
 
     def get_slice_view_type(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self.controller().get_slice_view_type()
 
     def set_slice_view_type(self, slice_view_type):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self.controller().set_slice_view_type(slice_view_type=slice_view_type)
 
     def get_grid_type(self):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self.activePart().get_grid_type()
 
     def set_grid_type(self, grid_type):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         return self.activePart().set_grid_type(grid_type)
 # end class

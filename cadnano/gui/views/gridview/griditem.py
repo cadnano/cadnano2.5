@@ -80,7 +80,7 @@ class GridItem(QGraphicsPathItem):
     # end def
 
     def set_drawlines(self, draw_lines):
-        #TODO[NF]:  Docstring
+        # TODO[NF]:  Docstring
         self.draw_lines = draw_lines
         self.updateGrid()
 
