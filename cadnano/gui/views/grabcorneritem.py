@@ -73,6 +73,10 @@ class GrabCornerItem(QGraphicsRectItem):
                 new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
                 _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth))
                 self.alignPos(*br)
+            elif ct == TOP_RIGHT:
+                pass
+            elif ct == BOTTOM_LEFT:
+                pass
             else:
                 raise NotImplementedError("corner_type %d not supported" % (ct))
         else:
@@ -92,6 +96,10 @@ class GrabCornerItem(QGraphicsRectItem):
             new_x_BR = new_x - hwidth + ao
             new_y_BR = new_y - hwidth + ao
             self.setPos(new_x_BR, new_y_BR)
+        elif ct == TOP_RIGHT:
+            pass
+        elif ct == BOTTOM_LEFT:
+            pass
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -114,6 +122,10 @@ class GrabCornerItem(QGraphicsRectItem):
                 new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
                 _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth), do_grid=True)
                 self.alignPos(*br)
+            elif ct == TOP_RIGHT:
+                pass
+            elif ct == BOTTOM_LEFT:
+                pass
             else:
                 raise NotImplementedError("corner_type %d not supported" % (ct))
             self.model_bounds = ()

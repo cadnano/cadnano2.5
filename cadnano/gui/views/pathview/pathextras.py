@@ -23,6 +23,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 from cadnano import util
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
+from cadnano.gui.views.grabcorneritem import GrabCornerItem
 from . import pathstyles as styles
 
 
@@ -596,6 +597,9 @@ class PreXoverItem(QGraphicsRectItem):
 class PathWorkplaneItem(QGraphicsRectItem):
     """Draws the rectangle to indicate the current Workplane, i.e. the
     region of part bases affected by certain actions in other views."""
+    _BOUNDING_RECT_PADDING = 0
+    _GC_SIZE = 6
+
     def __init__(self, model_part, part_item):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
         self._model_part = model_part
@@ -610,7 +614,29 @@ class PathWorkplaneItem(QGraphicsRectItem):
         self.setPen(pen)
         self.setPos(BASE_WIDTH*10, -BASE_WIDTH)
         self.setAcceptHoverEvents(True)
+        self.grab_corner = GrabCornerItem(self._GC_SIZE, model_part.getColor(), True, self)
         self.updatePositionAndBounds()
+
+    def getModelBounds(self):
+        """Resize bounds in form of Qt position, scaled from model"""
+        xLL = int((self._idx+ 2) * BASE_WIDTH)
+        xUR = int(self._high_drag_bound * BASE_WIDTH)
+        return xLL, 0, xUR, 0
+    # end def
+
+    def setMovable(self, is_movable):
+        pass
+        # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
+    # end def
+
+    def finishDrag(self):
+        """Set the workplane size in the model"""
+        pass
+        # pos = self.pos()
+        # position = pos.x(), pos.y()
+        # view_name = self._viewroot.name
+        # self._model_part.changeInstanceProperty(self._model_instance, view_name, 'position', position)
+    # end def
 
     def updatePositionAndBounds(self, new_idx=None):
         if new_idx is not None:
@@ -623,6 +649,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
         x = int(self._idx * BASE_WIDTH)
         self.setPos(x, self.y())
+
+        p = self._GC_SIZE/2
+        self.grab_corner.setTopRight(self.rect().adjusted(-p, -p, p, p).topRight())
     # endef
 
     ### EVENT HANDLERS ###
