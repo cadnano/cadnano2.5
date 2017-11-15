@@ -930,6 +930,9 @@ class ShortestPathHelper(object):
         Returns:
             tuple:  the coordinates of the closest point to position
         """
+        assert isinstance(position, tuple) and len(position) is 2
+        assert isinstance(point_map, dict) and len(point_map)
+
         for coordinates, coordiante_position in point_map.items():
             distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
             if distance < _RADIUS**2:
@@ -943,6 +946,12 @@ class ShortestPathHelper(object):
             if distance < best_distance:
                 best_distance = distance
                 best_coordinates = coordinates
+
+        # TODO[NF]:  Remove once we determine why best_coordinates is
+        # sometimes None
+        if best_coordinates is None:
+            print('Could not find coordinates with position %s and point_map %s'
+                  % (position, point_map))
         return best_coordinates
 
 
