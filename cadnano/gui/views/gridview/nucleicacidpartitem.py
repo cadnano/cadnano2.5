@@ -353,11 +353,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         if key == 'grid':
             print("grid change", value)
             if value == 'lines and points':
-                self.griditem.set_drawlines(True)
+                self.griditem.setGridAppearance(True)
             elif value == 'points':
-                self.griditem.set_drawlines(False)
+                self.griditem.setGridAppearance(False)
             elif value == 'circles':
-                pass  # self.griditem.set_drawlines(False)
+                pass  # self.griditem.setGridAppearance(False)
             else:
                 raise ValueError("unknown grid styling")
     # end def

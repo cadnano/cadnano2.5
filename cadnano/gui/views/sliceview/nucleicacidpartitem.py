@@ -62,6 +62,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.neighbor_map = dict()
         self.vh_set = set()
         self.point_map = dict()
+        self._last_hovered_item = None
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -376,7 +377,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             elif value == 'points':
                 self.griditem.setDrawlines(False)
             elif value == 'circles':
-                pass  # self.griditem.set_drawlines(False)
+                pass  # self.griditem.setGridAppearance(False)
             else:
                 raise ValueError("unknown grid styling")
 
@@ -571,11 +572,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return (rect.left(), rect.right(), rect.bottom(), rect.top())
 
     ### PUBLIC SUPPORT METHODS ###
+    def setLastHoveredItem(self, gridpoint_item):
+        """Stores the last self-reported griditem to be hovered.
+
+        Args:
+            griditem (GridItem): the hoveree
+        """
+        self._last_hovered_item = gridpoint_item
+
     def setModifyState(self, bool_val):
         """Hides the mod_rect when modify state disabled.
 
         Args:
-            bool_val (TYPE): what the modifystate should be set to.
+            bool_val (boolean): what the modifystate should be set to.
         """
         self._can_show_mod_circ = bool_val
         if bool_val is False:
@@ -586,17 +595,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Shows status_str in the MainWindow's status bar.
 
         Args:
-            status_str (TYPE): Description
+            status_str (str): Description to display in status bar.
         """
         pass  # disabled for now.
         # self.window().statusBar().showMessage(status_str, timeout)
     # end def
 
     def zoomToFit(self):
-        """Summary
-
-        Args:
-            TYPE: Description
+        """Ask the view to zoom to fit.
         """
         thescene = self.scene()
         theview = thescene.views()[0]
@@ -612,7 +618,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             coordinates of the the event, and previous event.
 
         Args:
-            TYPE: Description
+            event (QMouseEvent): contains parameters that describe a mouse event.
         """
         if event.button() == Qt.RightButton:
             return
@@ -672,14 +678,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
-        """Summary
+        """Creates individual or groups of VHs in Part on user input.
+        Shift modifier enables multi-helix addition.
 
         Args:
             event (TYPE): Description
             alt_event (None, optional): Description
-
-        Returns:
-            TYPE: Description
         """
         # 1. get point in model coordinates:
         part = self._model_part
@@ -708,13 +712,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
             return
 
-        coords = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
-        if coords is None:
-            print("findClosestPoint returned None")
-            return
-        else:
-            print("findClosestPoint returned", coords)
-            x, y = coords
+        x, y = self._last_hovered_item.coord()
+
         if self.griditem.grid_type is GridType.HONEYCOMB:
             parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
@@ -807,11 +806,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def set_neighbor_map(self, neighbor_map):
+    def setNeighborMap(self, neighbor_map):
         assert isinstance(neighbor_map, dict)
         self.neighbor_map = neighbor_map
 
-    def set_point_map(self, point_map):
+    def setPointMap(self, point_map):
         assert isinstance(point_map, dict)
         self.point_map = point_map
 # end class

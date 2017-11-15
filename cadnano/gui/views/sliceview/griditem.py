@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
+from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
 
 from . import slicestyles as styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -53,32 +53,29 @@ class GridItem(QGraphicsPathItem):
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
         if self.grid_type == GridType.HONEYCOMB:
-            self.create_honeycomb(part_item, radius, bounds)
+            self.createHoneycombGrid(part_item, radius, bounds)
         elif self.grid_type == GridType.SQUARE:
-            self.create_square(part_item, radius, bounds)
+            self.createSquareGrid(part_item, radius, bounds)
         else:
             self.setPath(QPainterPath())
     # end def
 
     def setGridType(self, grid_type):
-        """Summary
+        """Sets the grid type. See cadnano.cnenum.GridType.
 
         Args:
-            grid_type (TYPE): Description
-
-        Args:
-            TYPE: Description
+            grid_type (GridType): NONE, HONEYCOMB, or SQUARE
         """
         self.grid_type = grid_type
         self.updateGrid()
     # end def
 
-    def set_drawlines(self, draw_lines):
+    def setAppearance(self, draw_lines):
         # TODO[NF]:  Docstring
         return
 
-    def create_honeycomb(self, part_item, radius, bounds):
-        """Summary
+    def createHoneycombGrid(self, part_item, radius, bounds):
+        """Instantiate an area of griditems arranged on a honeycomb lattice.
 
         Args:
             part_item (TYPE): Description
@@ -102,7 +99,8 @@ class GridItem(QGraphicsPathItem):
         row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
 
-        redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or self.previous_grid_type != self.grid_type
+        redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or\
+            self.previous_grid_type != self.grid_type
         self.previous_grid_type = self.grid_type
 
         path = QPainterPath()
@@ -116,20 +114,21 @@ class GridItem(QGraphicsPathItem):
         for row in range(row_l, row_h):
             for column in range(col_l, col_h+1):
                 x, y = doLattice(radius, row, column, scale_factor=sf)
-                # sys.stdout.write('%s,%s ' % (x,y))
                 if draw_lines:
                     if is_pen_down:
                         path.lineTo(x, -y)
                     else:
                         is_pen_down = True
                         path.moveTo(x, -y)
-                """ +x is Left and +y is down
-                origin of ellipse is Top Left corner so we subtract half in X
-                and subtract in y
+                """
+                +x is Left and +y is down
+                origin of ellipse is Top Left corner so we subtract half in X and subtract in y
                 """
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
-                               dot_size, self)
+                               dot_size,
+                               self,
+                               coord=(row, column))
 
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
 
@@ -174,11 +173,11 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
 
         if redo_neighbors:
-            self.part_item.set_neighbor_map(neighbor_map=neighbor_map)
-            self.part_item.set_point_map(point_map=point_coordinates)
+            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
+            self.part_item.setPointMap(point_map=point_coordinates)
 
-    def create_square(self, part_item, radius, bounds):
-        """Summary
+    def createSquareGrid(self, part_item, radius, bounds):
+        """Instantiate an area of griditems arranged on a square lattice.
 
         Args:
             part_item (TYPE): Description
@@ -197,7 +196,8 @@ class GridItem(QGraphicsPathItem):
         row_l, col_l = doPosition(radius, x_l, -y_l, scale_factor=sf)
         row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
 
-        redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or self.previous_grid_type != self.grid_type
+        redo_neighbors = (row_l, col_l, row_h, col_h) != \
+            self.previous_grid_bounds or self.previous_grid_type != self.grid_type
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
@@ -223,7 +223,9 @@ class GridItem(QGraphicsPathItem):
                 """
                 pt = GridPoint(x - half_dot_size,
                                -y - half_dot_size,
-                               dot_size, self)
+                               dot_size,
+                               self,
+                               coord=(row, column))
 
                 pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
 
@@ -260,130 +262,25 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
 
         if redo_neighbors:
-            self.part_item.set_neighbor_map(neighbor_map=neighbor_map)
-            self.part_item.set_point_map(point_map=point_map)
+            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
+            self.part_item.setPointMap(point_map=point_map)
     # end def
 
     def removePoints(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Remove all points from the grid.
         """
         points = self.points
         scene = self.scene()
         while points:
             scene.removeItem(points.pop())
 
-#    def findClosestPoint(self, position):
-#        """Find the closest point to a given position on the grid
-#        Args:
-#            position ():
-#
-#        Returns:
-#
-#        """
-#        for coordinates, coordiante_position in self.point_coordinates.items():
-#            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-#            if distance < _RADIUS**2:
-#                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-#                return coordinates
-
-#    def shortestPath(self, start, end):
-#        """Return a path of coordinates that traverses from start to end.
-#
-#        Does a breadth-first search.  This could be further improved to do an A*
-#        search.
-#
-#        Args:
-#            start (tuple): The i-j coordinates corresponding to the start point
-#            end (tuple):  The i-j coordinates corresponding to the end point
-#
-#        Returns:
-#            A list of coordinates corresponding to a shortest path from start to
-#            end.  This list omits the starting point as it's assumed that the
-#            start point has already been clicked.
-#        """
-#        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
-#        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
-#
-#        start_coordinates = self.findClosestPoint(start)
-#        end_coordinates = self.findClosestPoint(end)
-#
-#        if start_coordinates is None or end_coordinates is None:
-#            # TODO[NF]:  Change to logger
-#            print('Could not find path from %s to %s' % (str(start), str(end)))
-#            return []
-#
-#            # TODO[NF]:  Change to logger
-#        print('Finding shortest path from %s to %s...' % (str(start), str(end)))
-#
-#        if self.neighbor_map.get(start_coordinates) is None:
-#            raise LookupError('Could not find a point corresponding to %s',
-#                              start_coordinates)
-#        elif self.neighbor_map.get(end_coordinates) is None:
-#            raise LookupError('Could not find a point corresponding to %s',
-#                              end_coordinates)
-#
-#        parents = dict()
-#        parents[start_coordinates] = None
-#        queue = Queue()
-#        queue.put(start_coordinates)
-#
-#        while not queue.empty():
-#            try:
-#                current_location = queue.get(block=False)
-#            except Queue.Empty:
-#                print('Could not find path from %s to %s' % (str(start), str(end)))
-#                return []
-#
-#            if current_location == end_coordinates:
-#                reversed_path = []
-#                while current_location is not start_coordinates:
-#                    reversed_path.append(current_location)
-#                    current_location = parents[current_location]
-#                return [node for node in reversed(reversed_path)]
-#            else:
-#                neighbors = self.neighbor_map.get(current_location, [])
-#                for neighbor in neighbors:
-#                    if neighbor not in parents and neighbor not in self.virtual_helices:
-#                        parents[neighbor] = current_location
-#                        queue.put(neighbor)
-#        print('Could not find path from %s to %s' % (str(start), str(end)))
-#        return []
-
-#    def added_virtual_helix(self, location):
-#        """
-#        Update the internal set of virtual helices to include the
-#        virtualhelix that lives at `location`.
-#
-#        Args:
-#            location (tuple):  The location that a VH is being added to
-#
-#        Returns: None
-#        """
-#        assert isinstance(location, tuple) and len(location) is 2
-#        self.virtual_helices.add(location)
-
-#    def removed_virtual_helix(self, location):
-#        """
-#        Update the internal set of virtual helices to no longer include the
-#        virtualhelix that lives at `location`.
-#
-#        Args:
-#            location (tuple):  The location that a VH is being removed from
-#
-#        Returns: None
-#        """
-#        assert isinstance(location, tuple) and len(location) is 2
-#        self.virtual_helices.remove(location)
-
 
 class ClickArea(QGraphicsEllipseItem):
-    """Summary
+    """An extra ellipse with slightly.
 
-    Attributes:
-        parent_obj (TYPE): Description
+    Args:
+        diameter (float): defines the size of the clickarea.
+        parent (GridItem): the item.
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
@@ -416,11 +313,11 @@ class GridPoint(QGraphicsEllipseItem):
     """
     __slots__ = 'grid', 'offset'
 
-    def __init__(self, x, y, diameter, parent_grid):
-        super(GridPoint, self).__init__(0., 0.,
-                                        diameter, diameter, parent=parent_grid)
+    def __init__(self, x, y, diameter, parent_grid, coord=None):
+        super(GridPoint, self).__init__(0., 0., diameter, diameter, parent=parent_grid)
         self.offset = diameter / 2
         self.grid = parent_grid
+        self._coord = coord
 
         self.clickarea = ClickArea(diameter, parent=self)
 
@@ -428,6 +325,17 @@ class GridPoint(QGraphicsEllipseItem):
         self.setZValue(_ZVALUE)
         self.setAcceptHoverEvents(True)
     # end def
+
+    def coord(self):
+        """Lattice coordinates, if available.
+
+        Returns:
+            row (int): lattice row
+            column (int): lattice column
+        """
+        if self._coord:
+            row, column = self._coord
+            return row, column
 
     def mousePressEvent(self, event):
         """Handler for user mouse press.
@@ -521,6 +429,7 @@ class GridPoint(QGraphicsEllipseItem):
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
         self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.5))
+        part_item.setLastHoveredItem(self)
         part_item.createToolHoverEnter(tool, event)
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
