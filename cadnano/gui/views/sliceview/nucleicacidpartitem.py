@@ -459,12 +459,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-
         vhi = self._virtual_helix_item_hash[id_num]
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
         vhi.virtualHelixRemovedSlot()
         del self._virtual_helix_item_hash[id_num]
+
+        # When any VH is removed, turn SPA mode off
+        self.shortest_path_add_mode = False
+        self.shortest_path_start = None
     # end def
 
     def reconfigureRect(self, top_left, bottom_right, padding=80,
