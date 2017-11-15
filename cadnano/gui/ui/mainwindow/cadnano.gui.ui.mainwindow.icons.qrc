@@ -30,6 +30,7 @@
         <file alias="filter-even">images/part-filter-even.png</file>
         <file alias="filter-rev">images/part-filter-rev.png</file>
         <file alias="filter-fwd">images/part-filter-fwd.png</file>
+        <file alias="filter-handle-alt">images/part-filter-handle-alt.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

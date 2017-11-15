@@ -209,6 +209,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             print(self.FILTER_NAME, "filter not enabled")
+            # self._part_item.window().action_filter_helix.setEnabled(False)
             return
         if event.button() == Qt.RightButton:
             return
@@ -240,8 +241,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
                 rev_ss.createStrand(idx_low, idx_high, color=c)
             else:
                 fwd_ss.createStrand(idx_low, idx_high, color=c)
-
-
 
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this

@@ -856,9 +856,16 @@
    <property name="checked">
     <bool>false</bool>
    </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-handle</normaloff>:/parttools/filter-handle</iconset>
+     <normaloff>:/parttools/filter-handle</normaloff>
+     <disabledoff>:/parttools/filter-handle-alt</disabledoff>:/parttools/filter-handle</iconset>
+   </property>
+   <property name="text">
+    <string>Helix</string>
    </property>
    <property name="toolTip">
     <string>(H)elix</string>
