@@ -12,7 +12,7 @@ Synopsis:
     panning, and zooming.
 """
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal
+from PyQt5.QtCore import Qt, QTimer, pyqtSignal, qWarning
 from PyQt5.QtGui import QPaintEngine
 from PyQt5.QtWidgets import QGraphicsView, qApp
 
@@ -144,12 +144,12 @@ class CustomQGraphicsView(QGraphicsView):
     # end def
 
     def clearSelectionLockAndCallbacks(self):
-        self._selection_lock = None # a selection group to limit types of items selected
-        self._press_list = [] # bookkeeping to handle passing mouseReleaseEvents to QGraphicsItems that don't get them
+        self._selection_lock = None  # a selection group to limit types of items selected
+        self._press_list = []  # bookkeeping to handle passing mouseReleaseEvents to QGraphicsItems that don't get them
     # end def
 
     def _setGLView(self, boolval):
-        scene = self.scene()
+        # scene = self.scene()
         if boolval and self.is_GL is False:
             self.is_GL = True
             # scene.drawBackground = self._drawBackgroundGL
@@ -163,7 +163,7 @@ class CustomQGraphicsView(QGraphicsView):
     # end def
 
     def setupGL(self):
-        scene = self.scene()
+        # scene = self.scene()
         # win = self.scene_root_item.window()
         self.is_GL = True
         self.is_GL_switch_allowed = True
@@ -183,10 +183,10 @@ class CustomQGraphicsView(QGraphicsView):
         self.scene_root_item.window().statusBar().showMessage("%0.2f" % scale_factor)
         if scale_factor < 0.75:
             self._show_details = False
-            self.levelOfDetailChangedSignal.emit(False) # zoomed out
+            self.levelOfDetailChangedSignal.emit(False)  # zoomed out
         elif scale_factor > 0.8:
             self._show_details = True
-            self.levelOfDetailChangedSignal.emit(True) # zoomed in
+            self.levelOfDetailChangedSignal.emit(True)  # zoomed in
     # end def
 
     def _resetGL(self):
@@ -194,17 +194,17 @@ class CustomQGraphicsView(QGraphicsView):
         # print("scale_factor", scale_factor)
         self.scene_root_item.window().statusBar().showMessage("%0.2f" % scale_factor)
 
-        if scale_factor < .15:# and self.is_GL_switch_allowed:
+        if scale_factor < .15:  # and self.is_GL_switch_allowed:
             # self.is_GL_switch_allowed = False
             self._setGLView(True)
             self._show_details = False
-            self.levelOfDetailChangedSignal.emit(False) # zoomed out
+            self.levelOfDetailChangedSignal.emit(False)  # zoomed out
             self.qTimer.singleShot(500, self._allowGLSwitch)
-        elif scale_factor > .2:# and self.is_GL_switch_allowed:
+        elif scale_factor > .2:  # and self.is_GL_switch_allowed:
             # self.is_GL_switch_allowed = False
             self._setGLView(False)
             self._show_details = True
-            self.levelOfDetailChangedSignal.emit(True) # zoomed in
+            self.levelOfDetailChangedSignal.emit(True)  # zoomed in
             self.qTimer.singleShot(500, self._allowGLSwitch)
     # end def
 
@@ -221,13 +221,13 @@ class CustomQGraphicsView(QGraphicsView):
         This method is for overloading the QGraphicsScene.
         """
         if painter.paintEngine().type() != QPaintEngine.OpenGL and \
-            painter.paintEngine().type() != QPaintEngine.OpenGL2:
+           painter.paintEngine().type() != QPaintEngine.OpenGL2:
 
-            qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view");
+            qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view")
             return
         # end if
         painter.beginNativePainting()
-        GL.glDisable(GL.GL_DEPTH_TEST) # disable for 2D drawing
+        GL.glDisable(GL.GL_DEPTH_TEST)  # disable for 2D drawing
         GL.glClearColor(1.0, 1.0, 1.0, 1.0)
         GL.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT)
 
@@ -271,13 +271,12 @@ class CustomQGraphicsView(QGraphicsView):
     def keyPanDeltaX(self):
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
-        # PyQt isn't aware that QGraphicsObject isa QGraphicsItem and so
+        # PyQt isn't aware that QGraphicsObject is a QGraphicsItem and so
         # it returns a separate python object if, say, childItems() returns
-        # a QGraphicsObject casted to a QGraphicsItem. If this is the case,
+        # a QGraphicsObject cast to a QGraphicsItem. If this is the case,
         # we can still find the QGraphicsObject thusly:
         candidateDxDeciders = list(self.scene_root_item.childItems())
-        candidateDxDeciders = candidateDxDeciders +\
-                           [cd.toGraphicsObject() for cd in candidateDxDeciders]
+        candidateDxDeciders = candidateDxDeciders + [cd.toGraphicsObject() for cd in candidateDxDeciders]
         for cd in candidateDxDeciders:
             if cd is None:
                 continue
@@ -290,8 +289,7 @@ class CustomQGraphicsView(QGraphicsView):
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
         candidateDyDeciders = list(self.scene_root_item.childItems())
-        candidateDyDeciders = candidateDyDeciders +\
-                           [cd.toGraphicsObject() for cd in candidateDyDeciders]
+        candidateDyDeciders = candidateDyDeciders + [cd.toGraphicsObject() for cd in candidateDyDeciders]
         for cd in candidateDyDeciders:
             if cd is None:
                 continue
@@ -361,7 +359,7 @@ class CustomQGraphicsView(QGraphicsView):
         ScrollHandDrag due to the fact that events are intercepted
         breaks this feature.
         """
-        if self._transform_enable == True:
+        if self._transform_enable:
             if self.dragMode() == self._yes_drag:
                 # Add stuff to handle the pan event
                 posf = event.localPos()
@@ -371,13 +369,12 @@ class CustomQGraphicsView(QGraphicsView):
                 factor = self.transform().m11()
 
                 transform = self.scene_root_item.transform()
-                transform.translate((xf - self._x0)/factor,\
-                                             (yf - self._y0)/factor)
+                transform.translate((xf - self._x0)/factor,
+                                    (yf - self._y0)/factor)
                 self.scene_root_item.setTransform(transform)
-
                 self._x0 = xf
                 self._y0 = yf
-            elif self._dolly_zoom_enable == True:
+            elif self._dolly_zoom_enable:
                 self.dollyZoom(event)
         # adding this allows events to be passed to items underneath
         QGraphicsView.mouseMoveEvent(self, event)
@@ -385,7 +382,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def mousePressEvent(self, event):
         """docstring for mousePressEvent"""
-        if self._transform_enable == True and qApp.keyboardModifiers():
+        if self._transform_enable and qApp.keyboardModifiers():
             which_buttons = event.buttons()
             if which_buttons in [self._button_pan, self._button_pan_alt]:
                 self._panEnable()
@@ -406,7 +403,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def mouseReleaseEvent(self, event):
         """If panning, stop. If handles were pressed, release them."""
-        if self._transform_enable == True:
+        if self._transform_enable:
             # QMouseEvent.button() returns the button that triggered the event
             which_button = event.button()
             if which_button in [self._button_pan, self._button_pan_alt]:
@@ -418,14 +415,9 @@ class CustomQGraphicsView(QGraphicsView):
         # end if
         else:
             if len(self._press_list):  # Notify any pressed items to release
-                event_pos = event.pos()
+                # event_pos = event.pos()
                 for item in self._press_list:
-                    #try:
-                    # print("item release", item)
                     item.customMouseRelease(event)
-                    #except:
-                    #    item.mouseReleaseEvent(event)
-                #end for
                 self._press_list = []
             # end if
             if self._selection_lock:
@@ -456,16 +448,12 @@ class CustomQGraphicsView(QGraphicsView):
 
     def safeScale(self, delta):
         current_scale_level = self.transform().m11()
-        scale_factor = 1 + delta * \
-           (self._scale_down_rate if delta < 0 else self._scale_up_rate) * \
-           (app().prefs.zoom_speed/100.)
+        scale_factor = 1 + delta * (self._scale_down_rate if delta < 0 else self._scale_up_rate) * \
+            (app().prefs.zoom_speed/100.)
         new_scale_level = current_scale_level * scale_factor
-        new_scale_level = util.clamp(current_scale_level * scale_factor,\
-                              self._scale_limit_min,\
-                              self._scale_limit_max)
+        new_scale_level = util.clamp(current_scale_level * scale_factor, self._scale_limit_min, self._scale_limit_max)
         scale_change = new_scale_level / current_scale_level
         self.scale(scale_change, scale_change)
-
         self._resetLOD()
     # end def
 
@@ -523,16 +511,16 @@ class CustomQGraphicsView(QGraphicsView):
         # Auto zoom to center the scene
         thescene = self.scene_root_item.scene()
         # order matters?
-        self.scene_root_item.resetTransform() # zero out translations
-        self.resetTransform() # zero out scaling
+        self.scene_root_item.resetTransform()  # zero out translations
+        self.resetTransform()  # zero out scaling
         if self.toolbar:  # HACK: move toolbar so it doesn't affect sceneRect
             self.toolbar.setPos(0, 0)
         thescene.setSceneRect(thescene.itemsBoundingRect())
         scene_rect = thescene.sceneRect()
         if self.toolbar:  # HACK, pt2: move toolbar back
             self.toolbar.setPos(self.mapToScene(0, 0))
-        self.fitInView(scene_rect, Qt.KeepAspectRatio) # fit in view
-        self._resetScale() # adjust scaling so that translation works
+        self.fitInView(scene_rect, Qt.KeepAspectRatio)  # fit in view
+        self._resetScale()  # adjust scaling so that translation works
         # adjust scaling so that the items don't fill 100% of the view
         # this is good for selection
         self.scale(self._scale_fit_factor, self._scale_fit_factor)
@@ -544,4 +532,4 @@ class CustomQGraphicsView(QGraphicsView):
         if self.toolbar:
             self.toolbar.setPos(self.mapToScene(0, 0))
         QGraphicsView.paintEvent(self, event)
-#end class
+# end class
