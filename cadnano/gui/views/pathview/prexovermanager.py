@@ -51,6 +51,9 @@ class PreXoverManager(QGraphicsRectItem):
         self.active_pxis = {}
     # end def
 
+    def __repr__(self):
+        return "<{}>".format(self.__class__.__name__)
+
     ### ACCESSORS ###
     def window(self):
         """Summary
