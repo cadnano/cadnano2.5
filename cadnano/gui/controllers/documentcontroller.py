@@ -21,6 +21,10 @@ ONLY_ONE = True
 
 class DocumentController():
     """Connects UI buttons to their corresponding actions in the model."""
+
+    filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
+    """list: String names of enabled filter types."""
+
     ### INIT METHODS ###
     def __init__(self, document):
         """docstring for __init__"""
@@ -37,11 +41,18 @@ class DocumentController():
         self.settings = QSettings()
         self._readSettings()
 
+        self._hintable_tools = []  # filters that display alt icon when disabled
+        self._hintable_filters = []  # filters that display alt icon when disabled
+        self._hintable_tool_action_map = {}  # what buttons to hint for each filter
+        self._hintable_filter_action_map = {}  # what buttons to hint for each filter
+        self._tool_hints_visible = False
+        self._filter_hints_visible = False
+
         # call other init methods
         self._initWindow()
         app().document_controllers.add(self)
 
-        self.action_grid_view(show=False)
+        self.toggleGridView(show=False)
 
         self.slice_view_showing = True
         self.grid_view_showing = False
@@ -80,8 +91,22 @@ class DocumentController():
         for action_name in action_group_list:
             ag.addAction(getattr(win, action_name))
 
-        win.action_global_select.trigger()
+        # set up tool & filter hinting
+        self._hintable_tools = [win.action_global_create,
+                                win.action_global_select]
+        self._hintable_filters = [win.action_filter_helix,
+                                  win.action_filter_strand,
+                                  win.action_filter_endpoint,
+                                  win.action_filter_xover]
+        self._hintable_tool_action_map = {'create': [win.action_global_create],
+                                          'select': [win.action_global_select]}
 
+        self._hintable_filter_action_map = {'virtual_helix': [win.action_filter_helix],
+                                            'strand': [win.action_filter_strand],
+                                            'endpoint': [win.action_filter_endpoint],
+                                            'xover': [win.action_filter_xover]}
+
+        win.action_global_select.trigger()
         self.win.outliner_property_splitter.hide()
     # end def
 
@@ -119,19 +144,19 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-            (win.action_new_dnapart_honeycomb.triggered, self.action_create_nucleic_acid_part_honey),
+            (win.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
             (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_create.trigger()),
-            (win.action_new_dnapart_square.triggered, self.action_create_nucleic_acid_part_square),
+            (win.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
             (win.action_new_dnapart_square.triggered, lambda: win.action_global_create.trigger()),
             (win.action_about.triggered, self.actionAboutSlot),
             (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
             (win.action_feedback.triggered, self.actionFeedbackSlot),
 
             # make it so select tool in slice view activation turns on vh filter
-            (win.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
             (win.action_global_select.triggered, self.actionSelectForkSlot),
             (win.action_global_create.triggered, self.actionCreateForkSlot),
 
+            (win.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
             (win.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
             (win.action_filter_strand.triggered, self.actionFilterStrandSlot),
             (win.action_filter_xover.triggered, self.actionFilterXoverSlot),
@@ -184,20 +209,59 @@ class DocumentController():
         dialog_about.setupUi(dialog)
         dialog.exec_()
 
-    filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
-    """list: String names of enabled filter types."""
+    def showFilterHints(self, show_hints, filter_name=None):
+        """Changes the appearance of filter buttons in the toolbar to help user
+        realize they may not have the correct filters selected to perform a
+        desired action. Meant to avoid the case where user clicks and nothing happens.
+
+        Buttons (QActions) can automatically display different icons depending
+        on state. We use "enabled" state, temporarily disabling the QAction to
+        toggle its appearance.
+
+        View items should call this method once from a mousePressEvent with
+        show_hints=True, and again on mouseReleaseEvent with show_hints=False.
+
+        Args:
+            show_hints (bool): True to show hints, False to hide hints.
+            filter_name (str): What filter to hint from self._hintable_filter_action_map
+        """
+        if filter_name:
+            try:
+                for f in self._hintable_filter_action_map[filter_name]:
+                    if not f.isChecked():  # no need to hint when already checked
+                        f.setEnabled(False)  # disable to show hint icon
+                        self._filter_hints_visible = True
+            except KeyError as e:
+                pass
+        elif self._filter_hints_visible:
+            for f in self._hintable_filters:
+                if f.isEnabled() is False:
+                    f.setEnabled(True)  # enable to hide hint icon
+            self._filter_hints_visible = False
+
+    def showToolHints(self, show_hints, tool_name=None):
+        if tool_name:
+            try:
+                for t in self._hintable_tool_action_map[tool_name]:
+                    if not t.isChecked():  # no need to hint when already checked
+                        t.setEnabled(False)  # disable to show hint icon
+                        self._tool_hints_visible = True
+            except KeyError as e:
+                pass
+        elif self._tool_hints_visible:
+            for t in self._hintable_tools:
+                if t.isEnabled() is False:
+                    t.setEnabled(True)  # enable to hide hint icon
+            self._tool_hints_visible = False
 
     def actionFilterVirtualHelixSlot(self):
         """Disables all other selection filters when active."""
         fH = self.win.action_filter_helix
         fE = self.win.action_filter_endpoint
-        # fS = self.win.action_filter_strand
         fX = self.win.action_filter_xover
         fH.setChecked(True)
         if fE.isChecked():
             fE.setChecked(False)
-        # if fS.isChecked():
-        #     fS.setChecked(False)
         if fX.isChecked():
             fX.setChecked(False)
         types = ["virtual_helix"]
@@ -289,15 +353,16 @@ class DocumentController():
 
     def _strandFilterUpdate(self):
         win = self.win
+
+        if win.action_filter_helix.isChecked():
+            self._document.setFilterSet("virtual_helix")
+            return
+
         filter_list = []
         add_oligo = False
         if win.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
-            # filter_list.append("strand")
             add_oligo = True
-        # if win.action_filter_strand.isChecked():
-        #     filter_list.append("strand")
-        #     add_oligo = True
         if win.action_filter_xover.isChecked():
             filter_list.append("xover")
             add_oligo = True
@@ -459,11 +524,11 @@ class DocumentController():
             from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
             dialogWarning = Ui_Warning()  # reusing this dialog, should rename
-            dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
+            dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")  # noqa
             dialogWarning.setupUi(dialog)
 
             locs = ", ".join([o.locString() for o in circ_olgs])
-            msg = "Part contains staple loop(s) at %s.\n\nUse the break tool to introduce 5' & 3' ends before exporting. Loops have been colored red; use undo to revert." % locs
+            msg = "Part contains staple loop(s) at %s.\n\nUse the break tool to introduce 5' & 3' ends before exporting. Loops have been colored red; use undo to revert." % locs  # noqa
             dialogWarning.title.setText("Staple validation failed")
             dialogWarning.message.setText(msg)
             for o in circ_olgs:
@@ -516,15 +581,15 @@ class DocumentController():
         """
         pass
 
-    def action_create_nucleic_acid_part_honey(self):
+    def actionCreateNucleicAcidPartHoneycomb(self):
         # TODO[NF]:  Docstring
-        self._action_create_nucleic_acid_part(grid_type=GridType.HONEYCOMB)
+        self.actionCreateNucleicAcidPart(grid_type=GridType.HONEYCOMB)
 
-    def action_create_nucleic_acid_part_square(self):
+    def actionCreateNucleicAcidPartSquare(self):
         # TODO[NF]:  Docstring
-        self._action_create_nucleic_acid_part(grid_type=GridType.SQUARE)
+        self.actionCreateNucleicAcidPart(grid_type=GridType.SQUARE)
 
-    def _action_create_nucleic_acid_part(self, grid_type):
+    def actionCreateNucleicAcidPart(self, grid_type):
         # TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
@@ -549,7 +614,19 @@ class DocumentController():
             outliner.show()
     # end def
 
-    def action_slice_view(self, show):
+    def toggleNewPartButtons(self, is_enabled):
+        """Toggle the AddPart buttons when the active part changes.
+
+        Args:
+            show (bool): Whether the slice view should be hidden or shown
+
+        Returns: None
+        """
+        self.win.action_new_dnapart_honeycomb.setEnabled(is_enabled)
+        self.win.action_new_dnapart_square.setEnabled(is_enabled)
+    # end def
+
+    def toggleSliceView(self, show):
         """Hide or show the slice view based on the given parameter `show`
 
         Args:
@@ -566,7 +643,7 @@ class DocumentController():
             self.slice_view_showing = False
             slice_view.hide()
 
-    def action_grid_view(self, show):
+    def toggleGridView(self, show):
         """Hide or show the grid view based on the given parameter `show`
 
         Args:
@@ -876,7 +953,7 @@ class DocumentController():
             filename = self.fileName()
         try:
             self._document.writeToFile(filename)
-        except:
+        except Exception as e:
             flags = Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet
             errorbox = QMessageBox(QMessageBox.Critical,
                                    "cadnano",
@@ -919,16 +996,16 @@ class DocumentController():
 
         if slice_view_type == 'Both':
             self.grid_view_showing = True
-            self.action_grid_view(show=True)
+            self.toggleGridView(show=True)
             self.slice_view_showing = True
-            self.action_slice_view(show=True)
+            self.toggleSliceView(show=True)
         elif slice_view_type == 'Slice':
             self.grid_view_showing = False
-            self.action_grid_view(show=False)
+            self.toggleGridView(show=False)
             self.slice_view_showing = True
-            self.action_slice_view(show=True)
+            self.toggleSliceView(show=True)
         elif slice_view_type == 'Grid':
             self.grid_view_showing = True
-            self.action_grid_view(show=True)
+            self.toggleGridView(show=True)
             self.slice_view_showing = False
-            self.action_slice_view(show=False)
+            self.toggleSliceView(show=False)
