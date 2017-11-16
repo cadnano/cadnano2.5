@@ -76,7 +76,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         Returns:
             TYPE: Description
         """
-        pass
     # end def
 
     def part(self):

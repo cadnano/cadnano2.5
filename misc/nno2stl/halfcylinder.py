@@ -29,7 +29,6 @@ class HalfCylinder(Solid):
 
 
         # local vars
-        segment_length = length/height_segments
         half_length = length / 2.
         vertices = []
         uvs = []
@@ -81,9 +80,9 @@ class HalfCylinder(Solid):
                 v4 = vertices[ y ][ x + 1 ]
 
                 n1 = Vector3(*na)
-                n2 = Vector3(*na)
-                n3 = Vector3(*nb)
-                n4 = Vector3(*nb)
+                Vector3(*na)
+                Vector3(*nb)
+                Vector3(*nb)
 
                 uv1 = Vector2(*uvs[ y ][ x ])
                 uv2 = Vector2(*uvs[ y + 1 ][ x ])
@@ -115,9 +114,9 @@ class HalfCylinder(Solid):
             v2 = vertices[ 0 ][ x + 1 ]
             v3 = len(self.vertices) - 1
 
-            n1 = Vector3( 0, 0, 1. )
-            n2 = Vector3( 0, 0, 1.)
-            n3 = Vector3( 0, 0, 1. )
+            n1 = Vector3(0, 0, 1.)
+            Vector3(0, 0, 1.)
+            Vector3(0, 0, 1.)
 
             uv1 = Vector2(*uvs[ 0 ][ x ])
             uv2 = Vector2(*uvs[ 0 ][ x + 1 ])
@@ -140,9 +139,9 @@ class HalfCylinder(Solid):
             v2 = vertices[ y ][ x ]
             v3 = len(self.vertices) - 1
 
-            n1 = Vector3( 0, 0, -1.)
-            n2 = Vector3( 0, 0, -1.)
-            n3 = Vector3( 0, 0, -1.)
+            n1 = Vector3(0, 0, -1.)
+            Vector3(0, 0, -1.)
+            Vector3(0, 0, -1.)
 
             uv1 = Vector2(*uvs[ y ][ x + 1 ])
             uv2 = Vector2(*uvs[ y ][ x ])

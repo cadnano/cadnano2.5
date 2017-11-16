@@ -93,7 +93,6 @@ class VirtualHelixSetItem(CNPropertyItem):
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
-        pass
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):

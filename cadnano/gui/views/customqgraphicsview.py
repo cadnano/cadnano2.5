@@ -440,7 +440,6 @@ class CustomQGraphicsView(QGraphicsView):
 
     def fname(self):
         """docstring for fname"""
-        pass
 
     def wheelEvent(self, event):
         self.safeScale(event.angleDelta().y())

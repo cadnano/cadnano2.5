@@ -1,6 +1,6 @@
 import sys
 import os.path
-from subprocess import PIPE, Popen, check_output
+from subprocess import Popen
 import shutil
 import glob
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import time
 
 from PyQt5.QtCore import Qt, QEvent, QPoint, QPointF, QTimer
 from PyQt5.QtGui import QMouseEvent, QKeyEvent

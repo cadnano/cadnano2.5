@@ -652,7 +652,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def finishDrag(self):
         """Set the workplane size in the model"""
-        pass
         # pos = self.pos()
         # position = pos.x(), pos.y()
         # view_name = self._viewroot.name

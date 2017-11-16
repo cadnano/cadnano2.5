@@ -72,6 +72,5 @@ class RefreshOligosCommand(UndoCommand):
 
     def undo(self):
         """Doesn't reassign """
-        pass
     # end def
 # end class

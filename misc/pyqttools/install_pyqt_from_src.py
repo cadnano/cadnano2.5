@@ -315,7 +315,6 @@ def checker(do_clean_qt=False, is_static=False):
 
             print("the pypath is ", pyroot_path)
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:3]))
-            clean = False
             get_qt5(pyroot_path, qt5_path,
                     is_static=is_static,
                     clean=do_clean_qt,

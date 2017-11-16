@@ -581,7 +581,6 @@ class DocumentController():
         Notifies that part root items that parts should respond to modifier
         selection signals.
         """
-        pass
 
     def actionCreateNucleicAcidPartHoneycomb(self):
         # TODO[NF]:  Docstring

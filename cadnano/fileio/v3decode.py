@@ -11,7 +11,7 @@ def decode(document, obj, emit_signals=False):
         document (Document):
         obj (dict): deserialized file object
     """
-    name = obj.get('name')
+    obj.get('name')
     meta = obj.get('meta')
 
     slice_view_type = meta.get('slice_view_type')

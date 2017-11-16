@@ -284,7 +284,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         # if self.active_virtual_helix_item is not None:
         #     self.setPreXoverItemsVisible(self.active_virtual_helix_item)
-        pass
     # end def
 
     def partRemovedSlot(self, sender):

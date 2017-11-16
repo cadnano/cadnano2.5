@@ -51,7 +51,7 @@ def decode(document, obj, emit_signals=True):
     part = document.createNucleicAcidPart(use_undostack=False)
     part.setActive(True)
     setBatch(True)
-    delta = num_bases - 42
+    num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     property_dict = {}
