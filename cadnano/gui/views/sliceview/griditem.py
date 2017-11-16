@@ -280,7 +280,6 @@ class GridItem(QGraphicsPathItem):
 
         self.points_dict = dict()
 
-
     def changeGridPointColor(self, coordinates, color):
         point = self.points_dict.get(coordinates)
 
