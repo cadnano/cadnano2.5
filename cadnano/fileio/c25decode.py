@@ -291,7 +291,7 @@ def decode(document, obj, emit_signals=True):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except BaseException:
                 print(strand, idx)
                 raise
         for key in obj['modifications']['int_instances'].items():
@@ -299,7 +299,7 @@ def decode(document, obj, emit_signals=True):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except BaseException:
                 print(strand, idx)
                 raise
 # end def

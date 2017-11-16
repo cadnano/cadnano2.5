@@ -39,8 +39,8 @@ def makeRotationZ(theta):
     s = math.sin(theta)
     return Matrix4(
         c, - s, 0, 0,
-        s,  c, 0, 0,
-        0,  0, 1, 0,
-        0,  0, 0, 1
+        s, c, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
     )
 # end def

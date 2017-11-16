@@ -670,8 +670,7 @@ class NucleicAcidPart(Part):
         hi_endpoints.update([x - 1 for x in r_endpts_lo])
         hi_endpoints.update(f_endpts_hi)
         hi_endpoints.update(r_endpts_hi)
-        hi_endpoints = list(hi_endpoints)
-        hi_endpoints.sort()
+        hi_endpoints = sorted(hi_endpoints)
 
         """ 3. now iterate through the strands and
         convert to
@@ -780,7 +779,7 @@ class NucleicAcidPart(Part):
             # print("new origin", self.locationQt(id_num, 15./self.radius()))
         try:
             self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
-        except:
+        except BaseException:
             print(list(id_nums), Z_PROP_INDEX)
             raise
         self._setVirtualHelixOriginLimits()
@@ -1579,7 +1578,7 @@ class NucleicAcidPart(Part):
         axis_pts = self.axis_pts
         try:
             axis_pts[idx_start:relocate_idx_end] = axis_pts[idx_stop:total_points]
-        except:
+        except BaseException:
             err = "idx_start {}, relocate_idx_end {}, idx_stop {}, total_points {}, length {}"
             print(err.format(idx_start, relocate_idx_end, idx_stop, total_points, length))
             raise
@@ -2915,7 +2914,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except:
+            except BaseException:
                 print("neighbors", list(neighbors))
                 raise
             new_neighbors.update(neighbors)
@@ -2926,7 +2925,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except:
+            except BaseException:
                 print("neighbors", list(neighbors))
                 raise
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)

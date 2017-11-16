@@ -16,7 +16,7 @@ class CreateStrandCommand(UndoCommand):
     Oligos
     """
 
-    def __init__(self,  strandset,
+    def __init__(self, strandset,
                  base_idx_low, base_idx_high,
                  color,
                  update_segments=True):

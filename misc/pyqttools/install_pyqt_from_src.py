@@ -88,7 +88,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
     if clean:
         try:
             os.remove(os.path.join(pyroot_path, qt5_zip))
-        except:
+        except BaseException:
             pass
         shutil.rmtree(os.path.join(pyroot_path, qt5_src_path),
                       ignore_errors=True)
@@ -295,7 +295,7 @@ def checker(do_clean_qt=False, is_static=False):
             raise OSError("Just jumping out of this block for cleaning")
         import PyQt5
         print("Import success! No need to do anything")
-    except:
+    except BaseException:
         print("Need to install PyQt5")
         if not platform.system() in ['Linux', 'Darwin']:
             raise OSError("Download PyQt5 installer from Riverbank software")
@@ -308,7 +308,7 @@ def checker(do_clean_qt=False, is_static=False):
 
             try:
                 pyroot_path = distutils.sysconfig.BASE_PREFIX
-            except:
+            except BaseException:
                 vinfo = sys.version_info
                 print("Probably running python 2: {}.{}".format(vinfo[0], vinfo[1]))
                 pyroot_path = distutils.sysconfig.PREFIX
@@ -321,7 +321,7 @@ def checker(do_clean_qt=False, is_static=False):
                     use_wget=use_wget)
             try:
                 import sip
-            except:
+            except BaseException:
                 get_sip(pyroot_path,
                         is_static=is_static,
                         use_wget=use_wget)

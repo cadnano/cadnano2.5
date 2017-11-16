@@ -156,7 +156,7 @@ class StrandItem(QGraphicsLineItem):
                 return
         try:
             self._updateAppearance(strand)
-        except:
+        except BaseException:
             print(model_oligo, key, new_value)
             raise
         for insertion in self.insertionItems().values():

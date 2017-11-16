@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# revisit porting https://github.com/cadnano/cadnano2/blob/229dac07f6cefa9047d73fa4b904c913fb9fd8a8/tests/testrecorder.py
+# revisit porting
+# https://github.com/cadnano/cadnano2/blob/229dac07f6cefa9047d73fa4b904c913fb9fd8a8/tests/testrecorder.py
 
 import pytest
 from PyQt5.QtCore import QPoint, QPointF, Qt

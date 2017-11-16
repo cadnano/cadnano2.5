@@ -12,7 +12,7 @@ from cadnano.math.vector import Vector3, Vector2, normalizeV3
 from cadnano.math.solid import Solid
 
 class Cylinder(Solid):
-    def __init__(self, name, radius,  length, radial_segments=32):
+    def __init__(self, name, radius, length, radial_segments=32):
         """
         Order of vertices added changes normals calculation
         so whether cylinder is in the y or z direction changes

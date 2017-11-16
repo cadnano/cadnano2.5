@@ -23,7 +23,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 try:
     # from OpenGL import GL
     from PyQt5.QtWidgets import QOpenGLWidget
-except:
+except BaseException:
     GL = False
 
 GL = False
