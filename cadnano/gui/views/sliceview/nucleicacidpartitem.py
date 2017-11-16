@@ -784,35 +784,28 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
 
-        # Un-highlight things
-        print("Coming in , path looks like this: %s" % str(self._highlighted_path))
-        for node in self._highlighted_path:
-            print('removing %s' % str(node))
-            self.griditem.changeGridPointColor(coordinates=node,
-                                               color=styles.SLICE_FILL)
+        # Un-highlight GridItems if necessary by calling createToolHoverLeave
+        self.createToolHoverLeave(tool=tool, event=event)
 
+        # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
             start = self.shortest_path_start
             end = (event.scenePos().x(), event.scenePos().y())
 
-            print('going from %s to %s' % (str(start), str(end)))
             self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
                                                                      end=end,
                                                                      neighbor_map=self.neighbor_map,
                                                                      vh_set=self.vh_set,
                                                                      point_map=self.point_map)
-            print('now it looks like this %s' % str(self._highlighted_path))
             for node in self._highlighted_path:
                 self.griditem.changeGridPointColor(coordinates=node,
                                                    color=styles.DEFAULT_GRID_DOT_COLOR)
 
     def createToolHoverLeave(self, tool, event):
-        print('hle')
-        print("Coming in to leave  path looks like this: %s" % str(self._highlighted_path))
         for node in self._highlighted_path:
             self.griditem.changeGridPointColor(coordinates=node,
                                                color=styles.SLICE_FILL)
-#        self._highlighted_path = []
+        self._highlighted_path = []
 
     def selectToolMousePress(self, tool, event):
         """
