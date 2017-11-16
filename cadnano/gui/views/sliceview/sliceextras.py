@@ -1007,7 +1007,6 @@ class ShortestPathHelper(object):
             try:
                 current_location = queue.get(block=False)
             except Queue.Empty:
-                print('Could not find path from %s to %s' % (str(start), str(end)))
                 return []
 
             if current_location == end_coordinates:
@@ -1022,7 +1021,6 @@ class ShortestPathHelper(object):
                     if neighbor not in parents and neighbor not in vh_set:
                         parents[neighbor] = current_location
                         queue.put(neighbor)
-        print('Could not find path from %s to %s' % (str(start), str(end)))
         return []
 
     @staticmethod
