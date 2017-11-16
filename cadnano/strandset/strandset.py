@@ -37,7 +37,6 @@ class StrandSet(CNObject):
         part (Part):  Part object this is a child of
         initial_size (int): initial_size to allocate
     """
-
     def __init__(self, is_fwd, id_num, part, initial_size):
         self._document = part.document()
         super(StrandSet, self).__init__(part)
@@ -123,7 +122,7 @@ class StrandSet(CNObject):
         Args:
             initial_size (int): size to revert to
         """
-        self.strand_array = [None] * (initial_size)
+        self.strand_array = [None]*(initial_size)
         self.strand_heap = []
     # end def
 
@@ -139,7 +138,7 @@ class StrandSet(CNObject):
             self.strand_array = self.strand_array[delta_low:]
         if delta_high < 0:
             self.strand_array = self.strand_array[:delta_high]
-        self.strand_array = [None] * delta_low + self.strand_array + [None] * delta_high
+        self.strand_array = [None]*delta_low + self.strand_array + [None]*delta_high
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
@@ -220,11 +219,11 @@ class StrandSet(CNObject):
         if i == 0:
             low_strand = None
         else:
-            low_strand = sh[i - 1]
+            low_strand = sh[i-1]
         if i == len(sh) - 1:
             high_strand = None
         else:
-            high_strand = sh[i + 1]
+            high_strand = sh[i+1]
         return low_strand, high_strand
     # end def
 
@@ -688,7 +687,7 @@ class StrandSet(CNObject):
         """
         # print("Adding to strandlist")
         idx_low, idx_high = strand.idxs()
-        for i in range(idx_low, idx_high + 1):
+        for i in range(idx_low, idx_high+1):
             self.strand_array[i] = strand
         insort_left(self.strand_heap, strand)
         if update_segments:

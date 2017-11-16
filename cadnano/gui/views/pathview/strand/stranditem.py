@@ -396,7 +396,7 @@ class StrandItem(QGraphicsLineItem):
         # 4. Line drawing
         hy = ly = l_upper_left_y + half_base_width
         self.setLine(lx, ly, hx, hy)
-        rectf = QRectF(l_upper_left_x + bw, l_upper_left_y, bw * (high_idx - low_idx - 1), bw)
+        rectf = QRectF(l_upper_left_x + bw, l_upper_left_y, bw*(high_idx - low_idx - 1), bw)
         self._click_area.setRect(rectf)
         self._updateColor(strand)
     # end def
@@ -458,14 +458,14 @@ class StrandItem(QGraphicsLineItem):
         seq_lbl.setFont(styles.SEQUENCEFONT)
 
         # this will always draw from the 5 Prime end!
-        seqX = 2 * text_X_centering_offset + bw * strand.idx5Prime()
+        seqX = 2*text_X_centering_offset + bw*strand.idx5Prime()
         seqY = styles.SEQUENCETEXTYCENTERINGOFFSET
 
         if isDrawn3to5:
             # offset it towards the bottom
             seqY += bw * .8
             # offset X by the reverse centering offset and the string length
-            seqX += text_X_centering_offset * .75
+            seqX += text_X_centering_offset*.75
             # rotate the characters upside down this does not affect positioning
             # coordinate system, +Y is still Down, and +X is still Right
             seq_lbl.setRotation(180)
@@ -766,7 +766,7 @@ class StrandItem(QGraphicsLineItem):
             # perhaps change this to a direct call, but here are seeds of an
             # indirect way of doing selection checks
             if (document.isModelStrandSelected(con3p) and
-                    document.isModelStrandSelected(strand5p)):
+               document.isModelStrandSelected(strand5p)):
                 val3p = document.getSelectedStrandValue(con3p)
                 # print("xover idx", indices)
                 test3p = val3p[0] if con3p.isForward() else val3p[1]

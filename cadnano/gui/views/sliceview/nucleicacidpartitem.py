@@ -665,7 +665,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             pos (TYPE): Description
         """
         sf = self.scale_factor
-        x, y = pos.x() / sf, -1.0 * pos.y() / sf
+        x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def
 

@@ -16,7 +16,7 @@ def allClose(a, b):
 def v2Distance(a, b):
     dx = b[0] - a[0]
     dy = b[1] - a[1]
-    return sqrt(dx * dx + dy * dy)
+    return sqrt(dx*dx + dy*dy)
 
 
 class QuadtreeBase(object):
@@ -45,7 +45,7 @@ class QuadtreeBase(object):
         # quadtree = QuadtreeBase()
         new_children = []
         full_size = self.size
-        new_size = full_size * 2
+        new_size = full_size*2
         min_size = self.min_size
         x_center, y_center = self.center
         new_children = [QuadtreeBase(x_center - full_size,
@@ -136,7 +136,7 @@ class QuadtreeBase(object):
         x, y = self.center
         x *= scale_factor
         y *= scale_factor
-        half_size = scale_factor * (self.size / 2)
+        half_size = scale_factor*(self.size / 2)
         return x - half_size, y - half_size, x + half_size, y + half_size
     # end def
 
@@ -159,7 +159,7 @@ class QuadtreeBase(object):
         # multiply by sqrt(2) == 1.4142...-> 1.4143 rounded
         nloc = node.location()
         ctr = self.center
-        if v2Distance(nloc, ctr) < 1.4143 * node.radius():
+        if v2Distance(nloc, ctr) < 1.4143*node.radius():
             self.nodes.append(node)
             return node
         else:
@@ -437,7 +437,6 @@ class Quadtree(QuadtreeBase):
             yield item
     # end def
 # end class
-
 
 if __name__ == '__main__':
     class DummyNode(object):

@@ -34,7 +34,7 @@ def v2DistanceAndAngle(a, b):
     """
     dx = b[0] - a[0]
     dy = b[1] - a[1]
-    dist = sqrt(dx * dx + dy * dy)
+    dist = sqrt(dx*dx + dy*dy)
     angle = atan2(dy, dx)
     return dist, angle
 
@@ -419,7 +419,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             MOVE_THRESHOLD = 0.01   # ignore small moves
             new_pos = event.scenePos()
             delta = new_pos - self.drag_last_position
-            dx = int(floor(delta.x() / _BASE_WIDTH)) * _BASE_WIDTH
+            dx = int(floor(delta.x() / _BASE_WIDTH))*_BASE_WIDTH
             x = self.handle_start.x() + dx
             if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
                 old_x = self.x()

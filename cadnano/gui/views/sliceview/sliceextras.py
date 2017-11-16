@@ -30,11 +30,11 @@ from . import slicestyles as styles
 PXI_PP_ITEM_WIDTH = IW = 2.0  # 1.5
 TRIANGLE = QPolygonF()
 TRIANGLE.append(QPointF(0, 0))
-TRIANGLE.append(QPointF(0.75 * IW, 0.5 * IW))
+TRIANGLE.append(QPointF(0.75*IW, 0.5*IW))
 TRIANGLE.append(QPointF(0, IW))
 TRIANGLE.append(QPointF(0, 0))
 # TRIANGLE.translate(-0.75*IW, -0.5*IW)
-TRIANGLE.translate(-0.25 * IW, -0.5 * IW)
+TRIANGLE.translate(-0.25*IW, -0.5*IW)
 
 PXI_RECT = QRectF(0, 0, IW, IW)
 T90, T270 = QTransform(), QTransform()
@@ -78,7 +78,6 @@ class PropertyWrapperObject(QObject):
         pen_alpha (TYPE): Description
         rotation (TYPE): Description
     """
-
     def __init__(self, item):
         """Summary
 
@@ -202,7 +201,6 @@ class Triangle(QGraphicsPathItem):
     Attributes:
         adapter (TYPE): Description
     """
-
     def __init__(self, is_fwd, pre_xover_item):
         """
         Args:
@@ -226,7 +224,7 @@ class Triangle(QGraphicsPathItem):
             self.setBrush(getBrushObj(color, alpha=128))
             self.setPath(FWDPXI_PP)
             self.setPen(getNoPen())
-            self._click_area.setPos(-0.5 * IW, -0.75 * IW)
+            self._click_area.setPos(-0.5*IW, -0.75*IW)
         else:
             self.setPath(REVPXI_PP)
             self.setPen(getPenObj(color, 0.25, alpha=128))
@@ -235,7 +233,7 @@ class Triangle(QGraphicsPathItem):
             # grad.setColorAt(0, Qt.black)
             # self.setPen(getNoPen())
             # self.setBrush(grad)
-            self._click_area.setPos(-0.5 * IW, -0.25 * IW)
+            self._click_area.setPos(-0.5*IW, -0.25*IW)
         # self.setPos(TRIANGLE_OFFSET)
     # end def
 # end class
@@ -247,7 +245,6 @@ class PhosBond(QGraphicsLineItem):
     Attributes:
         adapter (TYPE): Description
     """
-
     def __init__(self, is_fwd, parent=None):
         """Summary
 
@@ -285,7 +282,6 @@ class PreXoverItem(QGraphicsRectItem):
         step_idx (int): the base index within the virtual helix
         theta0 (TYPE): Description
     """
-
     def __init__(self, step_idx, twist_per_base, bases_per_repeat,
                  color, pre_xover_item_group, is_fwd=True):
         """Summary
@@ -304,8 +300,8 @@ class PreXoverItem(QGraphicsRectItem):
         self.is_fwd = is_fwd
         self.pre_xover_item_group = pre_xover_item_group
         self.phos_item = Triangle(is_fwd, self)
-        self.phos_item.setScale((bases_per_repeat - step_idx) / (2 * bases_per_repeat) + 0.5)
-        self.theta0 = rot = twist_per_base / 2 if is_fwd else -twist_per_base / 2
+        self.phos_item.setScale((bases_per_repeat - step_idx)/(2*bases_per_repeat) + 0.5)
+        self.theta0 = rot = twist_per_base/2 if is_fwd else -twist_per_base/2
         self.phos_item.setRotation(rot)
         self.is_active5p = self.is_active3p = False
         self.item_5p = None
@@ -655,7 +651,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             TYPE: Description
         """
         step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
-        hue_scale = step_size * self.HUE_FACTOR
+        hue_scale = step_size*self.HUE_FACTOR
         return [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() for i in range(step_size)]
     # end def
 
@@ -678,15 +674,15 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         fwd_pxis = self.fwd_prexover_items
         rev_pxis = self.rev_prexover_items
         for i in range(step_size):
-            inset = i * spiral_factor  # spiral layout
+            inset = i*spiral_factor  # spiral layout
             fwd = PreXoverItem(i, tpb, step_size, colors[i], self, is_fwd=True)
             rev = PreXoverItem(i, tpb, step_size, colors[-1 - i], self, is_fwd=False)
             fwd.setPos(x - inset, y)
             rev.setPos(x - inset, y)
             fwd.setTransformOriginPoint((-radius + iw + inset), 0)
             rev.setTransformOriginPoint((-radius + iw + inset), 0)
-            fwd.setRotation(round(i * tpb % 360, 3))
-            rev.setRotation(round((i * tpb + mgroove) % 360, 3))
+            fwd.setRotation(round(i*tpb % 360, 3))
+            rev.setRotation(round((i*tpb + mgroove) % 360, 3))
             fwd.setBondLineLength(inset + iw)
             rev.setBondLineLength(inset + iw)
             fwd_pxis[i] = fwd
@@ -750,8 +746,8 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         for i in range(step_size):
             fwd = self.fwd_prexover_items[i]
             rev = self.rev_prexover_items[i]
-            fwd.setRotation(round((i * tpb) % 360, 3))
-            rev.setRotation(round((i * tpb + mgroove) % 360, 3))
+            fwd.setRotation(round((i*tpb) % 360, 3))
+            rev.setRotation(round((i*tpb + mgroove) % 360, 3))
         for i in range(step_size - 1):
             fwd, next_fwd = fpxis[i], fpxis[i + 1]
             j = (step_size - 1) - i
@@ -783,7 +779,6 @@ class WedgeGizmo(QGraphicsPathItem):
     Attributes:
         pre_xover_item_group (PreXoverItemGroup): usually the parent of WG.
     """
-
     def __init__(self, radius, rect, pre_xover_item_group):
         """parent could be a PreXoverItemGroup or a VirtualHelixItem
 
@@ -837,8 +832,8 @@ class WedgeGizmo(QGraphicsPathItem):
         line1 = QLineF(tip, QPointF(base_p2))
         line2 = QLineF(tip, QPointF(base_p2))
 
-        quad_scale = 1 + (.22 * (span - 5) / 55)  # lo+(hi-lo)*(val-min)/(max-min)
-        line0.setLength(radius_adjusted * EXT * quad_scale)  # for quadTo control point
+        quad_scale = 1 + (.22*(span - 5) / 55)  # lo+(hi-lo)*(val-min)/(max-min)
+        line0.setLength(radius_adjusted * EXT*quad_scale)  # for quadTo control point
         line1.setLength(radius_adjusted * EXT)
         line2.setLength(radius_adjusted * EXT)
         line0.setAngle(angle)
@@ -939,7 +934,7 @@ class ShortestPathHelper(object):
         assert isinstance(point_map, dict) and len(point_map)
 
         for coordinates, coordiante_position in point_map.items():
-            distance = (coordiante_position[0] - position[0])**2 + (coordiante_position[1] - position[1])**2
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
             if distance < _RADIUS**2:
                 # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
                 return coordinates
@@ -947,7 +942,7 @@ class ShortestPathHelper(object):
         best_coordinates = None
         best_distance = float('inf')
         for coordinates, coordiante_position in point_map.items():
-            distance = (coordiante_position[0] - position[0])**2 + (coordiante_position[1] - position[1])**2
+            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
             if distance < best_distance:
                 best_distance = distance
                 best_coordinates = coordinates
@@ -958,6 +953,8 @@ class ShortestPathHelper(object):
             print('Could not find coordinates with position %s and point_map %s'
                   % (position, point_map))
         return best_coordinates
+
+
 
     @staticmethod
     def shortestPath(start, end, neighbor_map, vh_set, point_map):

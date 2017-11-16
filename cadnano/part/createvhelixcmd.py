@@ -34,7 +34,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         else:
             self.neighbors = literal_eval(self.values[self.keys.index('neighbors')])
 
-        self.threshold = 2.1 * part.radius()
+        self.threshold = 2.1*part.radius()
         self.safe = safe
     # end def
 

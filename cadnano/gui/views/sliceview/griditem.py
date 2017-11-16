@@ -12,7 +12,7 @@ from . import slicestyles as styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _ZVALUE = styles.ZSLICEHELIX + 1
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH) / 2.
+DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 
 
 class GridItem(QGraphicsPathItem):
@@ -115,7 +115,7 @@ class GridItem(QGraphicsPathItem):
             self.points_dict = dict()
 
         for row in range(row_l, row_h):
-            for column in range(col_l, col_h + 1):
+            for column in range(col_l, col_h+1):
                 x, y = doLattice(radius, row, column, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
@@ -147,22 +147,22 @@ class GridItem(QGraphicsPathItem):
                     # This is reversed since the Y is mirrored
                     if not HoneycombDnaPart.isEvenParity(row, column):
                         neighbor_map[(-row, column)] = [
-                            (-row, column - 1),
-                            (-row, column + 1),
-                            (-row - 1, column)
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row-1, column)
                         ]
                     else:
                         neighbor_map[(-row, column)] = [
-                            (-row, column - 1),
-                            (-row, column + 1),
-                            (-row + 1, column)
+                            (-row, column-1),
+                            (-row, column+1),
+                            (-row+1, column)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
 
         if draw_lines:
-            for column in range(col_l, col_h + 1):
+            for column in range(col_l, col_h+1):
                 for row in range(row_l, row_h):
                     x, y = doLattice(radius, row, column, scale_factor=sf)
                     if is_pen_down and isEven(row, column):
@@ -242,10 +242,10 @@ class GridItem(QGraphicsPathItem):
                     point_map[(-row, column)] = (x, -y)
 
                     neighbor_map[(-row, column)] = [
-                        (-row, column + 1),
-                        (-row, column - 1),
-                        (-row - 1, column),
-                        (-row + 1, column)
+                        (-row, column+1),
+                        (-row, column-1),
+                        (-row-1, column),
+                        (-row+1, column)
                     ]
 
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
@@ -301,8 +301,8 @@ class ClickArea(QGraphicsEllipseItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, diameter, parent):
-        nd = 2 * self._RADIUS
-        offset = -0.5 * nd + diameter / 2
+        nd = 2*self._RADIUS
+        offset = -0.5*nd + diameter/2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
         self.parent_obj = parent
         self.setAcceptHoverEvents(True)

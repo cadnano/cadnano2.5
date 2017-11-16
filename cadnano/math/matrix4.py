@@ -2,14 +2,13 @@ from __future__ import division
 from collections import namedtuple
 import math
 
-Matrix4 = namedtuple('Matrix4', ['n11', 'n12', 'n13', 'n14',
-                                 'n21', 'n22', 'n23', 'n24',
-                                 'n31', 'n32', 'n33', 'n34',
-                                 'n41', 'n42', 'n43', 'n44'])
+Matrix4 = namedtuple('Matrix4', ['n11','n12', 'n13', 'n14',
+                                'n21', 'n22', 'n23', 'n24',
+                                'n31', 'n32', 'n33', 'n34',
+                                'n41', 'n42', 'n43', 'n44'])
 """
 namedtuple: 4 x 4 matrix
 """
-
 
 def makeTranslation(x, y, z):
     """ create a translation matrix given a displacement x, y, z
@@ -22,11 +21,10 @@ def makeTranslation(x, y, z):
     Returns:
         Matrix4: translation matrix
     """
-    return Matrix4(1., 0., 0., x,
-                   0., 1., 0., y,
-                   0., 0., 1., z,
-                   0., 0., 0., 1.)
-
+    return Matrix4( 1., 0., 0., x,
+                    0., 1., 0., y,
+                    0., 0., 1., z,
+                    0., 0., 0., 1.)
 
 def makeRotationZ(theta):
     """ Create a rotation matrix of angle `theta`

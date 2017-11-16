@@ -66,7 +66,7 @@ PP_35.addPolygon(POLY_35)
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _NO_PEN = QPen(Qt.NoPen)
 
-MOD_RECT = QRectF(.25 * _BASE_WIDTH, -.25 * _BASE_WIDTH, 0.5 * _BASE_WIDTH, 0.5 * _BASE_WIDTH)
+MOD_RECT = QRectF(.25*_BASE_WIDTH, -.25*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.5*_BASE_WIDTH)
 
 
 class EndpointItem(QGraphicsPathItem):

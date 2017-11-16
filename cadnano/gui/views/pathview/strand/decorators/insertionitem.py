@@ -10,8 +10,8 @@ from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
 
 from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QFontMetricsF, QPainterPath
 from PyQt5.QtGui import QTransform, QTextCursor
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsTextItem, QLabel
+from PyQt5.QtWidgets  import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets  import QGraphicsTextItem, QLabel
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _HALF_BASE_WIDTH = _HBW = _BASE_WIDTH / 2
@@ -20,7 +20,6 @@ _DEFAULT_RECT = QRectF(0, 0, _BW, _BW)
 _B_PEN = getPenObj(styles.BLUE_STROKE, styles.INSERTWIDTH)
 _R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH)
 _NO_PEN = getNoPen()
-
 
 def _insertGen(path, start, c1, p1, c2):
     path.moveTo(start)
@@ -37,13 +36,13 @@ _PATH_MID_DOWN = QPointF(_HBW, 2 * _BW)
 _PATH_DOWN_DOWN_CTRL_PT = QPointF(-_HBW, 2 * _BW)
 _PATH_DOWN_UP_CTRL_PT = QPointF(1.5 * _BW, 2 * _BW)
 _INSERT_PATH_UP = QPainterPath()
-_insertGen(_INSERT_PATH_UP, _PATH_START, _PATH_UP_UP_CTRL_PT,
-           _PATH_MID_UP, _PATH_UP_DOWN_CTRL_PT)
+_insertGen(_INSERT_PATH_UP, _PATH_START, _PATH_UP_UP_CTRL_PT,\
+         _PATH_MID_UP, _PATH_UP_DOWN_CTRL_PT)
 _INSERT_PATH_UP.translate(_OFFSET1, 0)
 _INSERT_PATH_UP_RECT = _INSERT_PATH_UP.boundingRect()
 _INSERT_PATH_DOWN = QPainterPath()
-_insertGen(_INSERT_PATH_DOWN, _PATH_START, _PATH_DOWN_DOWN_CTRL_PT,
-           _PATH_MID_DOWN, _PATH_DOWN_UP_CTRL_PT)
+_insertGen(_INSERT_PATH_DOWN, _PATH_START, _PATH_DOWN_DOWN_CTRL_PT,\
+         _PATH_MID_DOWN, _PATH_DOWN_UP_CTRL_PT)
 _INSERT_PATH_DOWN.translate(_OFFSET1, 0)
 _INSERT_PATH_DOWNRect = _INSERT_PATH_DOWN.boundingRect()
 
@@ -51,8 +50,8 @@ _INSERT_PATH_DOWNRect = _INSERT_PATH_DOWN.boundingRect()
 _BIG_RECT = _DEFAULT_RECT.united(_INSERT_PATH_UP_RECT)
 _BIG_RECT = _BIG_RECT.united(_INSERT_PATH_DOWNRect)
 _B_PEN2 = getPenObj(styles.BLUE_STROKE, 2)
-_OFFSET2 = _BW * 0.75
-_FONT = QFont(styles.THE_FONT, styles.THE_FONT_SIZE / 2, QFont.Bold)
+_OFFSET2   = _BW*0.75
+_FONT = QFont(styles.THE_FONT, styles.THE_FONT_SIZE/2, QFont.Bold)
 _BIG_RECT.adjust(-15, -15, 30, 30)
 # Bases are drawn along and above the insert path.
 # These calculations revolve around fixing the characters at a certain
@@ -60,7 +59,6 @@ _BIG_RECT.adjust(-15, -15, 30, 30)
 # The fraction of the insert that comes before the first character and
 # after the last character is the padding, and the rest is divided evenly.
 _FRACTION_INSERT_TO_PAD = .10
-
 
 class InsertionPath(object):
     """
@@ -83,7 +81,6 @@ class InsertionPath(object):
     # end def
 # end class
 
-
 def _xGen(path, p1, p2, p3, p4):
     path.moveTo(p1)
     path.lineTo(p2)
@@ -91,9 +88,7 @@ def _xGen(path, p1, p2, p3, p4):
     path.lineTo(p4)
 # end def
 
-
 _PATH_START = QPointF(_HBW, _HBW)
-
 
 class SkipPath(object):
     """
@@ -101,8 +96,8 @@ class SkipPath(object):
     """
 
     _skip_path = QPainterPath()
-    _xGen(_skip_path, _DEFAULT_RECT.bottomLeft(), _DEFAULT_RECT.topRight(),
-          _DEFAULT_RECT.topLeft(), _DEFAULT_RECT.bottomRight())
+    _xGen(_skip_path, _DEFAULT_RECT.bottomLeft(), _DEFAULT_RECT.topRight(), \
+                        _DEFAULT_RECT.topLeft(), _DEFAULT_RECT.bottomRight())
 
     def __init__(self):
         super(SkipPath, self).__init__()
@@ -117,16 +112,13 @@ class SkipPath(object):
     # end def
 # end class
 
-
 _insert_path = InsertionPath()
 _skip_path = SkipPath()
-
 
 class InsertionItem(QGraphicsPathItem):
     """
     This is just the shape of the Insert item
     """
-
     def __init__(self, virtual_helix_item, strand, insertion):
         super(InsertionItem, self).__init__(virtual_helix_item)
         self.hide()
@@ -135,7 +127,7 @@ class InsertionItem(QGraphicsPathItem):
         self._seq_item = QGraphicsPathItem(parent=self)
         self._is_on_top = is_on_top = strand.isForward()
         y = 0 if is_on_top else _BW
-        self.setPos(_BW * insertion.idx(), y)
+        self.setPos(_BW*insertion.idx(), y)
         self.setZValue(styles.ZINSERTHANDLE)
         self._initLabel()
         self._initClickArea()
@@ -235,27 +227,28 @@ class InsertionItem(QGraphicsPathItem):
             if len_BT > 20:
                 base_text = base_text[:17] + '...'
                 len_BT = len(base_text)
-            fraction_arc_len_per_char = (1.0 - 2.0 * _FRACTION_INSERT_TO_PAD) / (len_BT + 1)
+            fraction_arc_len_per_char = (1.0 - 2.0*_FRACTION_INSERT_TO_PAD) / (len_BT + 1)
             seq_item.setPen(QPen(Qt.NoPen))
             seq_item.setBrush(QBrush(Qt.black))
 
             seq_path = QPainterPath()
             loop_path = self.path()
             for i in range(len_BT):
-                frac = _FRACTION_INSERT_TO_PAD + (i + 1) * fraction_arc_len_per_char
+                frac = _FRACTION_INSERT_TO_PAD + (i+1)*fraction_arc_len_per_char
                 pt = loop_path.pointAtPercent(frac)
                 tang_ang = loop_path.angleAtPercent(frac)
 
                 temp_path = QPainterPath()
                 # 1. draw the text
-                temp_path.addText(0, 0, font, base_text[i if is_on_top else -i - 1])
+                temp_path.addText(0, 0, font, base_text[i if is_on_top else -i-1])
                 # 2. center it at the zero point different for top and bottom
                 # strands
                 if not is_on_top:
                     temp_path.translate(0, -seq_font_h - insert_w)
 
                 temp_path.translate(QPointF(-seq_font_char_w / 2.,
-                                            -2 if is_on_top else seq_font_h))
+                                          -2 if is_on_top else seq_font_h))
+
 
                 mat = QTransform()
                 # 3. rotate it
@@ -280,7 +273,6 @@ class InsertionItem(QGraphicsPathItem):
         pass
 
 # end class
-
 
 class InsertionLabel(QGraphicsTextItem):
     def __init__(self, parent):
@@ -353,10 +345,10 @@ class InsertionLabel(QGraphicsTextItem):
     # end class
 
     def event(self, event):
-        if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
-            # print("tab pressed")
-            return True
-        return QGraphicsTextItem.event(self, event)
+       if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
+           # print("tab pressed")
+           return True
+       return QGraphicsTextItem.event(self, event)
     # end def
 
     def focusOut(self):
@@ -373,9 +365,9 @@ class InsertionLabel(QGraphicsTextItem):
         parent = self.parentItem()
         if parent is None:
             return
-        txt_offset = self.boundingRect().width() / 2
+        txt_offset = self.boundingRect().width()/2
         insertion = parent._insertion
-        y = -1.1 * _BW if parent._is_on_top else 1.3 * _HBW
+        y = -1.1*_BW if parent._is_on_top else 1.3*_HBW
         self.setPos(_OFFSET2 - txt_offset, y)
         if insertion.length() > 0:
             self.show()

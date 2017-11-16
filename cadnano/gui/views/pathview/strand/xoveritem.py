@@ -27,7 +27,6 @@ class XoverNode3(QGraphicsRectItem):
     Attributes:
         is_forward (TYPE): Description
     """
-
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
         """Summary
 
@@ -215,20 +214,20 @@ class XoverNode3(QGraphicsRectItem):
                 bw = _BASE_WIDTH
                 num = self._partner_virtual_helix_id_num
                 tbr = _FM.tightBoundingRect(str(num))
-                half_label_h = tbr.height() / 2.0
-                half_label_w = tbr.width() / 2.0
+                half_label_h = tbr.height()/2.0
+                half_label_w = tbr.width()/2.0
                 # determine x and y positions
-                labelX = bw / 2.0 - half_label_w
+                labelX = bw/2.0 - half_label_w
                 if self.is_forward:
-                    labelY = -0.25 * half_label_h - 0.5 - 0.5 * bw
+                    labelY = -0.25*half_label_h - 0.5 - 0.5*bw
                 else:
-                    labelY = 2 * half_label_h + 0.5 + 0.5 * bw
+                    labelY = 2*half_label_h + 0.5 + 0.5*bw
                 # adjust x for left vs right
-                labelXoffset = 0.25 * bw if isLeft else -0.25 * bw
+                labelXoffset = 0.25*bw if isLeft else -0.25*bw
                 labelX += labelXoffset
                 # adjust x for numeral 1
                 if num == 1:
-                    labelX -= half_label_w / 2.0
+                    labelX -= half_label_w/2.0
                 # create text item
                 lbl = QGraphicsSimpleTextItem(str(num), self)
                 lbl.setPos(labelX, labelY)
@@ -254,7 +253,6 @@ class XoverNode5(XoverNode3):
         2. Notifying XoverStrands in the model when connectivity changes.
 
     """
-
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
         """Summary
 
@@ -489,15 +487,15 @@ class XoverItem(QGraphicsPathItem):
 
         # Enter/exit are relative to the direction that the path travels
         # overall.
-        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5) * bw
-        five_center_pt = pt5 + QPointF(.5, .5) * bw
+        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5)*bw
+        five_center_pt = pt5 + QPointF(.5, .5)*bw
         # five_exit_pt = pt5 + QPointF(.85 if n5_is_forward else .15, 0 if n5_is_forward else 1)*bw
-        five_exit_pt = pt5 + QPointF(.5 if n5_is_forward else .5, 0 if n5_is_forward else 1) * bw
+        five_exit_pt = pt5 + QPointF(.5 if n5_is_forward else .5, 0 if n5_is_forward else 1)*bw
 
         # three_enter_pt = pt3 + QPointF(.15 if n3_is_forward else .85, 0 if n3_is_forward else 1)*bw
-        three_enter_pt = pt3 + QPointF(.5 if n3_is_forward else .5, 0 if n3_is_forward else 1) * bw
-        three_center_pt = pt3 + QPointF(.5, .5) * bw
-        three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5) * bw
+        three_enter_pt = pt3 + QPointF(.5 if n3_is_forward else .5, 0 if n3_is_forward else 1)*bw
+        three_center_pt = pt3 + QPointF(.5, .5)*bw
+        three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5)*bw
 
         c1 = QPointF()
         # case 1: same strand
@@ -535,7 +533,7 @@ class XoverItem(QGraphicsPathItem):
         painterpath.lineTo(three_exit_pt)
 
         tempR = painterpath.boundingRect()
-        tempR.adjust(-bw / 2, 0, bw, 0)
+        tempR.adjust(-bw/2, 0, bw, 0)
         self._click_area.setRect(tempR)
         self.setPath(painterpath)
         node3.updatePositionAndAppearance()

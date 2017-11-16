@@ -5,7 +5,6 @@ from .abstractslicetool import AbstractSliceTool
 
 class MoveSliceTool(AbstractSliceTool):
     """MoveSliceTool description"""
-
     def __init__(self, manager):
         """Summary
 

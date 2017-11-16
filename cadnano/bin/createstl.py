@@ -31,10 +31,10 @@ if __name__ == "__main__":
         if not oligo.isStaple():
             strand5p = oligo.strand5p()
             for strand in strand5p.generator3pStrand():
-                length = BASE_LENGTH * strand.length()
+                length = BASE_LENGTH*strand.length()
 
                 idx_low, idx_high = strand.idxs()
-                z = BASE_LENGTH * ((idx_high + idx_low) / 2.0)
+                z = BASE_LENGTH*((idx_high + idx_low) / 2.0)
 
                 vh = strand.virtualHelix()
                 x, y = part.latticeCoordToPositionXY(*vh.coord())

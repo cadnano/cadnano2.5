@@ -29,7 +29,6 @@ def normalizeRect(rect):
         y1, y2 = y2, y1
     return (x1, y1, x2, y2)
 
-
 _SELECT_PEN_WIDTH = 2
 _SELECT_COLOR = "#ff0000"
 _TEST_COLOR = "#00ff00"
@@ -48,7 +47,6 @@ class SelectGridTool(AbstractGridTool):
         selection_set (TYPE): Description
         snap_origin_item (TYPE): Description
     """
-
     def __init__(self, manager):
         """Summary
 
@@ -428,7 +426,6 @@ class GridSelectionGroup(QGraphicsItemGroup):
         drag_start_position (TYPE): Description
         tool (TYPE): Description
     """
-
     def __init__(self, tool, parent=None):
         """Summary
 
@@ -470,7 +467,6 @@ class GridSelectionGroup(QGraphicsItemGroup):
 
     """ reimplement boundingRect if you want to call resetGroupPos
     """
-
     def clearSelectionRect(self):
         """reset positions to zero to keep things in check
         """

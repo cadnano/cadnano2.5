@@ -12,12 +12,11 @@ _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH) / 2.
+DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 # _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 
 
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
-
 
 class AbstractSliceTool(QGraphicsObject):
     """Summary
@@ -36,7 +35,6 @@ class AbstractSliceTool(QGraphicsObject):
     FILTER_NAME = 'virtual_helix'
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
-
     def __init__(self, manager):
         """Summary
 
@@ -46,7 +44,7 @@ class AbstractSliceTool(QGraphicsObject):
         super(AbstractSliceTool, self).__init__(parent=manager.viewroot)
         """ Pareting to viewroot to prevent orphan _line_item from occuring
         """
-        self.sgv = None  # SGV is "Slice Graphics View"
+        self.sgv = None # SGV is "Slice Graphics View"
         self.manager = manager
         self._active = False
         self._last_location = None
@@ -74,7 +72,7 @@ class AbstractSliceTool(QGraphicsObject):
         """
         rad = self._RADIUS
         return [QLineF(rad, rad,
-                       rad * (1. + 2. * math.cos(x)), rad * (1. + 2. * math.sin(x))
+                       rad*(1. + 2.*math.cos(x)), rad*(1. + 2.*math.sin(x))
                        ) for x in self.angles]
     # end def
 
@@ -150,7 +148,7 @@ class AbstractSliceTool(QGraphicsObject):
         if self.is_started:
             pos = self.findNearestPoint(part_item, event.scenePos())
         else:
-            pos = event.pos()
+            pos =  event.pos()
 #        self.vhi_hint_item.setPos(  pos -
 #                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
         return pos
@@ -240,6 +238,7 @@ class AbstractSliceTool(QGraphicsObject):
     # def hoverLeaveEvent(self, event):
     #     # self.vhi_hint_item.hide()
     #     #print("Slice VHI hoverLeaveEvent")
+
 
     def hoverMoveEvent(self, part_item, event):
         """Summary

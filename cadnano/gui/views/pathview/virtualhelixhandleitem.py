@@ -12,8 +12,8 @@ from . import pathstyles as styles
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS
 _RECT = QRectF(0,
                0,
-               2 * _RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,
-               2 * _RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
+               2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH,
+               2*_RADIUS + styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _DEF_BRUSH = getBrushObj(styles.GRAY_FILL)
 _DEF_PEN = getPenObj(styles.GRAY_STROKE, styles.VIRTUALHELIXHANDLEITEM_STROKE_WIDTH)
 _HOV_BRUSH = getBrushObj(styles.BLUE_FILL)
@@ -120,7 +120,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
                                                                     'turns_per_repeat',
                                                                     'minor_groove_angle'])
         bases_per_turn = bpr / tpr
-        return bpr, bases_per_turn, tpr * 360. / bpr, mga
+        return bpr, bases_per_turn, tpr*360./bpr, mga
 
     def setProperty(self, key, value):
         """Summary
@@ -224,9 +224,9 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         else:  # _number >= 100
             label.setPos(0, y_val)
         bRect = label.boundingRect()
-        posx = bRect.width() / 2
-        posy = bRect.height() / 2
-        label.setPos(radius - posx, radius - posy)
+        posx = bRect.width()/2
+        posy = bRect.height()/2
+        label.setPos(radius-posx, radius-posy)
     # end def
 
     def partItem(self):
@@ -320,7 +320,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         elif self._right_mouse_move:
             new_pos = event.scenePos()
             delta = new_pos - self.drag_last_position
-            dx = int(floor(delta.x() / _BASE_WIDTH)) * _BASE_WIDTH
+            dx = int(floor(delta.x() / _BASE_WIDTH))*_BASE_WIDTH
             x = self.handle_start.x() + dx
             if abs(dx) > MOVE_THRESHOLD or dx == 0.0:
                 old_x = self.x()

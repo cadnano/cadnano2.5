@@ -9,7 +9,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_ModsDialog(object):
     def setupUi(self, ModsDialog):
         ModsDialog.setObjectName("ModsDialog")
@@ -18,7 +17,7 @@ class Ui_ModsDialog(object):
         self.dialogGridLayout = QtWidgets.QGridLayout(ModsDialog)
         self.dialogGridLayout.setObjectName("dialogGridLayout")
         self.custom_button_box = QtWidgets.QDialogButtonBox(ModsDialog)
-        self.custom_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply | QtWidgets.QDialogButtonBox.Cancel)
+        self.custom_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
         self.custom_button_box.setCenterButtons(True)
         self.custom_button_box.setObjectName("custom_button_box")
         self.dialogGridLayout.addWidget(self.custom_button_box, 1, 0, 1, 1)
@@ -78,3 +77,4 @@ class Ui_ModsDialog(object):
         self.sequence3Label.setText(_translate("ModsDialog", "sequence 3\'"))
         self.sequenceInternalLabel.setText(_translate("ModsDialog", "sequence internal"))
         self.noteLabel.setText(_translate("ModsDialog", "Note"))
+
