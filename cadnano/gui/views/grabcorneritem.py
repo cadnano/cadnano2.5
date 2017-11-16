@@ -67,12 +67,12 @@ class GrabCornerItem(QGraphicsRectItem):
             if ct == TOP_LEFT:
                 new_x_TL = xTL - hwidth if new_x + hwidth > xTL else new_x
                 new_y_TL = yTL - hwidth if new_y + hwidth > yTL else new_y
-                tl, _ = parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), ())
+                tl, _ = parent.reconfigureRect((new_x_TL + hwidth, new_y_TL + hwidth), (), do_grid=True)
                 self.alignPos(*tl)
             elif ct == BOTTOM_RIGHT:
                 new_x_BR = xBR + hwidth if new_x + hwidth < xBR else new_x
                 new_y_BR = yBR + hwidth if new_y + hwidth < yBR else new_y
-                _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth))
+                _, br = parent.reconfigureRect((), (new_x_BR + hwidth, new_y_BR + hwidth), do_grid=True)
                 self.alignPos(*br)
             elif ct == TOP_RIGHT:
                 pass
