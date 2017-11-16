@@ -61,6 +61,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # logger.info("Creating SliceVirtualHelixItem")
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
+        self._doc_controller = part_item.document().controller()
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
 
         self.hide()
@@ -208,8 +209,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             event (QMouseEvent): contains parameters that describe the mouse event.
         """
         if self.FILTER_NAME not in self._part_item.getFilterSet():
-            print(self.FILTER_NAME, "filter not enabled")
-            # self._part_item.window().action_filter_helix.setEnabled(False)
+            self._doc_controller.showFilterHints(True, filter_name=self.FILTER_NAME)
             return
         if event.button() == Qt.RightButton:
             return
@@ -221,6 +221,9 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         else:
             QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    def mouseReleaseEvent(self, event):
+        self._doc_controller.showFilterHints(False)
 
     def createToolMousePress(self, tool, part_item, event):
         shift = event.modifiers() & Qt.ShiftModifier
