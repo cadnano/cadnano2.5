@@ -2,7 +2,8 @@
 """Summary
 """
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
+from PyQt5.QtGui import QPainterPath
+from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsPathItem,  # QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
 from cadnano.fileio import v3encode, v3decode
 from cadnano.gui.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
@@ -29,8 +30,9 @@ def normalizeRect(rect):
         y1, y2 = y2, y1
     return (x1, y1, x2, y2)
 
-_SELECT_PEN_WIDTH = 2
-_SELECT_COLOR = "#ff0000"
+
+_SELECT_PEN_WIDTH = styles.SELECTED_PEN_WIDTH
+_SELECT_COLOR = styles.SELECTED_COLOR  # "#ff0000"
 _TEST_COLOR = "#00ff00"
 
 
@@ -425,6 +427,39 @@ class SelectSliceTool(AbstractSliceTool):
 # end class
 
 
+class SliceSelectionBox(QGraphicsPathItem):
+    _RADIUS = styles.SLICE_HELIX_RADIUS
+
+    def __init__(self, parent=None):
+        super(QGraphicsPathItem, self).__init__(parent)
+        self._rect = None
+    # end def
+
+    def painterPath(self):
+        rect = self._rect
+        radius = self._RADIUS
+
+        path = QPainterPath()
+        path.addRoundedRect(rect, radius, radius)
+        return path
+    # end def
+
+    def refreshPath(self):
+        """Summary
+
+        Returns:
+            TYPE: Description
+        """
+        self.prepareGeometryChange()
+        self.setPath(self.painterPath())
+        self._pos0 = self.pos()
+    # end def
+
+    def setRect(self, rect):
+        self._rect = rect
+    # end def
+
+
 class SliceSelectionGroup(QGraphicsItemGroup):
     """Summary
 
@@ -447,7 +482,8 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.setFlag(QGraphicsItem.ItemIsFocusable)  # for keyPressEvents
         self.setFlag(QGraphicsItem.ItemIsMovable)
 
-        self.bounding_rect_item = bri = QGraphicsRectItem(tool)
+        # self.bounding_rect_item = bri = QGraphicsRectItem(tool)
+        self.bounding_rect_item = bri = SliceSelectionBox()
         bri.hide()
         bri.setPen(getPenObj(_SELECT_COLOR, _SELECT_PEN_WIDTH))
 
@@ -469,6 +505,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         bri.setPos(bri.mapFromScene(point))
         bri.setRect(bri.mapRectFromItem(self, rect))
         self.addToGroup(bri)
+        bri.refreshPath()
         bri.show()
         self.setFocus(True)
     # end def
@@ -507,49 +544,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         Returns:
             TYPE: Description
         """
-        tool = self.tool
-        if event.button() != Qt.LeftButton:
-            """ do context menu?
-            """
-            # sgv = self.tool.sgv
-            # print(sgv)
-            # self.getCustomContextMenu(event.screenPos())
-            tool.individual_pick = False
-            return QGraphicsItemGroup.mousePressEvent(self, event)
-        else:
-            # print("the right event")
-            modifiers = event.modifiers()
-            is_shift = modifiers == Qt.ShiftModifier
-            # check to see if we are clicking on a previously selected item
-            if tool.is_selection_active:
-                # print("clicking the box")
-                pos = event.scenePos()
-                # TODO[NF]: Figure out if SGV needs to be updated here to reflect ASGV
-                for item in tool.sgv.scene().items(pos):
-                    if isinstance(item, SliceVirtualHelixItem):
-                        doc = tool.manager.document
-                        part = item.part()
-                        if is_shift:
-                            id_num = item.idNum()
-                            if doc.isVirtualHelixSelected(part, id_num):    # maybe should ask the model?
-                                doc.removeVirtualHelicesFromSelection(part, [id_num])
-                        else:
-                            origin_id_num = item.idNum()
-                            is_alt = modifiers == Qt.AltModifier
-                            if (    doc.isVirtualHelixSelected(part, origin_id_num) and
-                                    not is_alt):
-                                print("origin", origin_id_num)
-                                if tool.snap_origin_item is not None:
-                                    tool.snap_origin_item.setSnapOrigin(False)
-                                tool.snap_origin_item = item
-                                item.setSnapOrigin(True)
-                                break
-                            else:
-                                item.mousePressEvent(event)
-            self.drag_start_position = sp = self.pos()
-            self.drag_last_position = sp
-
-            return QGraphicsItemGroup.mousePressEvent(self, event)
+        return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 
     def mouseMoveEvent(self, event):
