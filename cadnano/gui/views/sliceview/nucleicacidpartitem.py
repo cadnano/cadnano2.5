@@ -799,7 +799,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                      point_map=self.point_map)
             for node in self._highlighted_path:
                 self.griditem.changeGridPointColor(coordinates=node,
-                                                   color=styles.DEFAULT_GRID_DOT_COLOR)
+                                                   color=styles.MULTI_VHI_HINT_COLOR)
 
     def createToolHoverLeave(self, tool, event):
         for node in self._highlighted_path:
