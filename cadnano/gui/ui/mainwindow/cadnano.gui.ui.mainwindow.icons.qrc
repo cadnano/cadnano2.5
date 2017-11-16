@@ -10,7 +10,7 @@
         <file alias="filter-scaf">images/part-filter-scaf.png</file>
         <file alias="filter-stap">images/part-filter-stap.png</file>
         <file alias="filter-strand">images/part-filter-strand.png</file>
-        <file alias="filter-handle">images/part-filter-handle.png</file>
+        <file alias="filter-handle">images/part-filter-helix.png</file>
         <file alias="filter-part">images/part-filter-part.png</file>
         <file alias="filter-xover">images/part-filter-xover.png</file>
         <file alias="filter-endpoint">images/part-filter-endpoint.png</file>
@@ -30,7 +30,11 @@
         <file alias="filter-even">images/part-filter-even.png</file>
         <file alias="filter-rev">images/part-filter-rev.png</file>
         <file alias="filter-fwd">images/part-filter-fwd.png</file>
-        <file alias="filter-handle-alt">images/part-filter-handle-alt.png</file>
+        <file alias="filter-handle-alt">images/part-filter-helix-disabled.png</file>
+        <file alias="filter-xover-disabled">images/part-filter-xover-disabled.png</file>
+        <file alias="filter-endpoint-disabled">images/part-filter-endpoint-disabled.png</file>
+        <file alias="new-honeycomb-disabled">images/part-new-honeycomb-disabled.png</file>
+        <file alias="new-square-disabled">images/part-new-square-disabled.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>
@@ -59,12 +63,13 @@
         <file alias="move">images/path-move.png</file>
         <file alias="select">images/path-edit.png</file>
         <file alias="paint">images/path-paint.png</file>
-        <file alias="force">images/path-create.png</file>
+        <file alias="create">images/path-create.png</file>
         <file alias="nick">images/path-nick.png</file>
         <file alias="insert">images/path-insert.png</file>
         <file alias="skip">images/path-skip.png</file>
         <file alias="mod">images/path-mod.png</file>
         <file alias="autostaple">images/path-autostaple.png</file>
+        <file alias="create-disabled">images/path-create-disabled.png</file>
     </qresource>
     <qresource prefix="/outlinericons">
         <file alias="lock">images/outliner-lock.svg</file>
