@@ -595,14 +595,14 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         self.baseNearLine.setPen(getPenObj("#000000", 0.25, capstyle=Qt.RoundCap))
     # end def
 
-    def mousePressEvent(self, event):
-        print("PreXoverGroup press")
+    # def mousePressEvent(self, event):
+    #     print("PreXoverGroup press")
 
-    def mouseMoveEvent(self, event):
-        print("PreXoverGroup move")
+    # def mouseMoveEvent(self, event):
+    #     print("PreXoverGroup move")
 
-    def mouseReleaseEvent(self, event):
-        print("PreXoverGroup release")
+    # def mouseReleaseEvent(self, event):
+    #     print("PreXoverGroup release")
 
     ### ACCESSORS ###
     def partItem(self):
