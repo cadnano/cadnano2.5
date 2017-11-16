@@ -242,11 +242,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
             if property_key == 'color':
-                self.reconfigureRect()
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
                 self.grab_corner.setPen(getPenObj(new_value, 0))
                 self.workplane.grab_corner.setPen(getPenObj(new_value, 0))
+                self.reconfigureRect()
             elif property_key == 'is_visible':
                 if new_value:
                     self.show()

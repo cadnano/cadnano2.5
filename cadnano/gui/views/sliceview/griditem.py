@@ -39,6 +39,7 @@ class GridItem(QGraphicsPathItem):
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
+        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.setGridType(grid_type)
         self.previous_grid_type = grid_type
 
@@ -132,7 +133,7 @@ class GridItem(QGraphicsPathItem):
                                self,
                                coord=(row, column))
 
-                pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
+                pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
                 # if x == 0 and y == 0:
                 #     pt.setBrush(getBrushObj(Qt.gray))
@@ -229,7 +230,7 @@ class GridItem(QGraphicsPathItem):
                                self,
                                coord=(row, column))
 
-                pt.setPen(getPenObj(Qt.blue, styles.EMPTY_HELIX_STROKE_WIDTH))
+                pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
                 # if x == 0 and y == 0:
                 #     pt.setBrush(getBrushObj(Qt.gray))
@@ -432,7 +433,7 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, styles.EMPTY_HELIX_STROKE_WIDTH))
+        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
@@ -499,7 +500,7 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
-        self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.5))
+        self.setPen(getPenObj(styles.BLUE_STROKE, 1.5))
         part_item.setLastHoveredItem(self)
         part_item.createToolHoverEnter(tool, event)
 

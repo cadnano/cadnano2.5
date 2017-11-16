@@ -6,7 +6,6 @@ Attributes:
 """
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType
@@ -38,12 +37,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     Attributes:
         active_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
-        grab_cornerBR (TYPE): bottom right bounding box handle
-        grab_cornerTL (TYPE): top left bounding box handle
-        griditem (TYPE): Description
-        outline (TYPE): Description
-        prexover_manager (TYPE): Description
-        scale_factor (TYPE): Description
+        grab_cornerBR (GrabCornerItem): bottom right bounding box handle
+        grab_cornerTL (GrabCornerItem): top left bounding box handle
+        griditem (GridItem): Description
+        outline (QGraphicsRectItem): Description
+        prexover_manager (PreXoverManager): Description
+        scale_factor (float): Description
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _BOUNDING_RECT_PADDING = 80
