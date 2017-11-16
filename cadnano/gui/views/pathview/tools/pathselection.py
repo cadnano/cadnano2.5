@@ -24,6 +24,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
         translateR (TYPE): Description
         viewroot (TYPE): Description
     """
+
     def __init__(self, boxtype, constraint='y', parent=None):
         """Summary
 

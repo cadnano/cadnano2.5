@@ -43,6 +43,7 @@ class OutlinerTreeWidget(QTreeWidget):
     """ The there needs to always be a currentItem which defaults
     to row 0, column 0 at the root
     """
+
     def __init__(self, parent=None):
         super(OutlinerTreeWidget, self).__init__(parent)
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
@@ -497,7 +498,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if self.dragDropMode() == QAbstractItemView.InternalMove:
             drop_action = Qt.MoveAction
         if (event.source() == self and event.possibleActions() & Qt.MoveAction
-                              and drop_action == Qt.MoveAction):
+                and drop_action == Qt.MoveAction):
             selected_indexes = self.selectedIndexes()
             child = index
             while child.isValid() and child != root_index:

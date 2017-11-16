@@ -47,6 +47,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     For details on these and other miscellaneous methods, see below.
     """
+
     def __init__(self, parent=None):
         """
         On initialization, we need to bind the Ctrl/command key to
@@ -74,7 +75,7 @@ class CustomQGraphicsView(QGraphicsView):
         self.scene_root_item = None  # the item to transform
         # Keyboard panning
         self._key_pan_delta_x = styles.PATH_BASE_WIDTH * 21
-        self._key_pan_delta_y = styles.PATH_HELIX_HEIGHT + styles.PATH_HELIX_PADDING/2
+        self._key_pan_delta_y = styles.PATH_HELIX_HEIGHT + styles.PATH_HELIX_PADDING / 2
         # Modifier keys and buttons
         self._key_mod = Qt.Key_Control
         self._button_pan = Qt.LeftButton
@@ -369,8 +370,8 @@ class CustomQGraphicsView(QGraphicsView):
                 factor = self.transform().m11()
 
                 transform = self.scene_root_item.transform()
-                transform.translate((xf - self._x0)/factor,
-                                    (yf - self._y0)/factor)
+                transform.translate((xf - self._x0) / factor,
+                                    (yf - self._y0) / factor)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
                 self._y0 = yf
@@ -449,7 +450,7 @@ class CustomQGraphicsView(QGraphicsView):
     def safeScale(self, delta):
         current_scale_level = self.transform().m11()
         scale_factor = 1 + delta * (self._scale_down_rate if delta < 0 else self._scale_up_rate) * \
-            (app().prefs.zoom_speed/100.)
+            (app().prefs.zoom_speed / 100.)
         new_scale_level = current_scale_level * scale_factor
         new_scale_level = util.clamp(current_scale_level * scale_factor, self._scale_limit_min, self._scale_limit_max)
         scale_change = new_scale_level / current_scale_level
@@ -498,7 +499,7 @@ class CustomQGraphicsView(QGraphicsView):
         # self._scale_limit_min = 0.41*self._scale_size
         # make it so fitting in view is zoomed minimum
         # still gives you one zoom level out before violates limit
-        self._scale_limit_min = self._scale_size*self._scale_fit_factor
+        self._scale_limit_min = self._scale_size * self._scale_fit_factor
 
         # use this if you want to reset the zoom in limit
         # self._scale_limit_max = 3.0*self._scale_size

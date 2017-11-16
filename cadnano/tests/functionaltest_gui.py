@@ -13,6 +13,7 @@ def cnapp():
     yield app
     app.tearDown()
 
+
 DELAY = 20  # milliseconds
 
 

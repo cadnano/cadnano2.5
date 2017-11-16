@@ -6,6 +6,7 @@ from cadnano.cnproxy import UndoCommand
 from cadnano.oligo import Oligo
 from cadnano.strand import Strand
 
+
 class CreateStrandCommand(UndoCommand):
     """Create a new `Strand` based with bounds (base_idx_low, base_idx_high),
     and insert it into the strandset at position strandset_idx. Also,
@@ -15,10 +16,11 @@ class CreateStrandCommand(UndoCommand):
     `Strand` explicitly do not create `Oligo` as do to the 1 to many nature of
     Oligos
     """
+
     def __init__(self,  strandset,
-                        base_idx_low, base_idx_high,
-                        color,
-                        update_segments=True):
+                 base_idx_low, base_idx_high,
+                 color,
+                 update_segments=True):
         """ TODO: Now that parts have a UUID this could be instantiated via
         a document, uuid, id_num, is_fwd, base_idx_low, ... instead of an object
         to be independent of parts keeping strandsets live
@@ -51,8 +53,8 @@ class CreateStrandCommand(UndoCommand):
         # Emit a signal to notify on completion
         strandset.strandsetStrandAddedSignal.emit(strandset, strand)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(  strandset.part(),
-                                                        strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(),
+                                                      strandset.idNum())
     # end def
 
     def undo(self):
@@ -69,7 +71,7 @@ class CreateStrandCommand(UndoCommand):
         strand.strandRemovedSignal.emit(strand)
         strand.setOligo(None)
         # for updating the Slice View displayed helices
-        strandset.part().partStrandChangedSignal.emit(  strandset.part(),
-                                                        strandset.idNum())
+        strandset.part().partStrandChangedSignal.emit(strandset.part(),
+                                                      strandset.idNum())
     # end def
 # end class

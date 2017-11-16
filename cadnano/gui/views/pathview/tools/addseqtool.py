@@ -23,6 +23,7 @@ class DNAHighlighter(QSyntaxHighlighter):
         format (TYPE): Description
         parent (TYPE): Description
     """
+
     def __init__(self, parent):
         """Summary
 
@@ -68,6 +69,7 @@ class AddSeqTool(AbstractPathTool):
         use_abstract_sequence (bool): Description
         validated_sequence_to_apply (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 

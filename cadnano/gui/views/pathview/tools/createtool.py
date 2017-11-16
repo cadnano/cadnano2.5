@@ -38,6 +38,7 @@ class CreateTool(AbstractPathTool):
     """
     docstring for CreateTool
     """
+
     def __init__(self, manager):
         """Summary
 
@@ -259,6 +260,7 @@ class ForcedStrandItem(QGraphicsLineItem):
     Attributes:
         is_forward (bool): True if forward strand, False if reverse.
     """
+
     def __init__(self, tool, virtual_helix_item):
         """The parent should be a VirtualHelixItem.
 
@@ -287,10 +289,10 @@ class ForcedStrandItem(QGraphicsLineItem):
         c_a.setPen(_NO_PEN)
 
         # c_a.setBrush(QBrush(Qt.white))
-        self.setZValue(styles.ZENDPOINTITEM+1)
+        self.setZValue(styles.ZENDPOINTITEM + 1)
         c_a.setZValue(styles.ZENDPOINTITEM)
-        self._low_cap.setZValue(styles.ZENDPOINTITEM+2)
-        self._high_cap.setZValue(styles.ZENDPOINTITEM+2)
+        self._low_cap.setZValue(styles.ZENDPOINTITEM + 2)
+        self._high_cap.setZValue(styles.ZENDPOINTITEM + 2)
         c_a.setFlag(QGraphicsItem.ItemStacksBehindParent)
 
         self._updatePensAndBrushes()
@@ -391,12 +393,12 @@ class ForcedStrandItem(QGraphicsLineItem):
         p1 = line.p1()
         p2 = line.p2()
         if is_forward:
-            p1.setY(bw/2)
-            p2.setY(bw/2)
+            p1.setY(bw / 2)
+            p2.setY(bw / 2)
             self._click_area.setY(0)
         else:
-            p1.setY(3*bw/2)
-            p2.setY(3*bw/2)
+            p1.setY(3 * bw / 2)
+            p2.setY(3 * bw / 2)
             self._click_area.setY(bw)
         line.setP1(p1)
         line.setP2(p2)
@@ -422,7 +424,7 @@ class ForcedStrandItem(QGraphicsLineItem):
             p1.setX(newX)
             line.setP1(p1)
             temp = c_a.rect()
-            temp.setLeft(newX-bw)
+            temp.setLeft(newX - bw)
             c_a.setRect(temp)
         else:
             p2 = line.p2()
@@ -430,7 +432,7 @@ class ForcedStrandItem(QGraphicsLineItem):
             p2.setX(newX)
             line.setP2(p2)
             temp = c_a.rect()
-            temp.setRight(newX+bw)
+            temp.setRight(newX + bw)
             c_a.setRect(temp)
         self.setLine(line)
     # end def
@@ -464,7 +466,7 @@ _NO_BRUSH = QBrush(Qt.NoBrush)
 _xScale = styles.PATH_XOVER_LINE_SCALE_X  # control point x constant
 _yScale = styles.PATH_XOVER_LINE_SCALE_Y  # control point y constant
 _rect = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
-_blankRect = QRectF(0, 0, 2*_BASE_WIDTH, _BASE_WIDTH)
+_blankRect = QRectF(0, 0, 2 * _BASE_WIDTH, _BASE_WIDTH)
 
 PPL5 = QPainterPath()  # Left 5' PainterPath
 PPR5 = QPainterPath()  # Right 5' PainterPath
@@ -472,19 +474,19 @@ PPL3 = QPainterPath()  # Left 3' PainterPath
 PPR3 = QPainterPath()  # Right 3' PainterPath
 
 # set up PPL5 (left 5' blue square)
-PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPL5.addRect(0.25 * _BASE_WIDTH, 0.125 * _BASE_WIDTH, 0.75 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 # set up PPR5 (right 5' blue square)
-PPR5.addRect(0, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPR5.addRect(0, 0.125 * _BASE_WIDTH, 0.75 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 # set up PPL3 (left 3' blue triangle)
 L3_POLY = QPolygonF()
 L3_POLY.append(QPointF(_BASE_WIDTH, 0))
-L3_POLY.append(QPointF(0.25*_BASE_WIDTH, 0.5*_BASE_WIDTH))
+L3_POLY.append(QPointF(0.25 * _BASE_WIDTH, 0.5 * _BASE_WIDTH))
 L3_POLY.append(QPointF(_BASE_WIDTH, _BASE_WIDTH))
 PPL3.addPolygon(L3_POLY)
 # set up PPR3 (right 3' blue triangle)
 R3_POLY = QPolygonF()
 R3_POLY.append(QPointF(0, 0))
-R3_POLY.append(QPointF(0.75*_BASE_WIDTH, 0.5*_BASE_WIDTH))
+R3_POLY.append(QPointF(0.75 * _BASE_WIDTH, 0.5 * _BASE_WIDTH))
 R3_POLY.append(QPointF(0, _BASE_WIDTH))
 PPR3.addPolygon(R3_POLY)
 
@@ -497,6 +499,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     Attributes:
         is_forward (TYPE): Description
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
         """Summary
 
@@ -694,20 +697,20 @@ class ForcedXoverNode3(QGraphicsRectItem):
             bw = _BASE_WIDTH
             num = self._partner_virtual_helix.idNum()
             tBR = _FM.tightBoundingRect(str(num))
-            half_label_h = tBR.height()/2.0
-            half_label_w = tBR.width()/2.0
+            half_label_h = tBR.height() / 2.0
+            half_label_w = tBR.width() / 2.0
             # determine x and y positions
-            label_x = bw/2.0 - half_label_w
+            label_x = bw / 2.0 - half_label_w
             if self._is_on_top:
-                label_y = -0.25*half_label_h - 0.5 - 0.5*bw
+                label_y = -0.25 * half_label_h - 0.5 - 0.5 * bw
             else:
-                label_y = 2*half_label_h + 0.5 + 0.5*bw
+                label_y = 2 * half_label_h + 0.5 + 0.5 * bw
             # adjust x for left vs right
-            label_x_offset = 0.25*bw if is_left else -0.25*bw
+            label_x_offset = 0.25 * bw if is_left else -0.25 * bw
             label_x += label_x_offset
             # adjust x for numeral 1
             if num == 1:
-                label_x -= half_label_w/2.0
+                label_x -= half_label_w / 2.0
             # create text item
             if lbl is None:
                 lbl = QGraphicsSimpleTextItem(str(num), self)
@@ -748,6 +751,7 @@ class ForcedXoverNode5(ForcedXoverNode3):
         2. Notifying XoverStrands in the model when connectivity changes.
 
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
         """Summary
 
@@ -992,9 +996,9 @@ class ForcedXoverItem(QGraphicsPathItem):
 
         # Enter/exit are relative to the direction that the path travels
         # overall.
-        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5)*bw
-        five_center_pt = pt5 + QPointF(.5, .5)*bw
-        five_exit_pt = pt5 + QPointF(.5, 0 if n5_is_forward else 1)*bw
+        five_enter_pt = pt5 + QPointF(0 if n5_is_forward else 1, .5) * bw
+        five_center_pt = pt5 + QPointF(.5, .5) * bw
+        five_exit_pt = pt5 + QPointF(.5, 0 if n5_is_forward else 1) * bw
 
         vhi3 = node3.virtualHelixItem()
 
@@ -1010,9 +1014,9 @@ class ForcedXoverItem(QGraphicsPathItem):
             same_strand = (n5_is_forward == n3_is_forward) and vhi3 == vhi5
             same_parity = n5_is_forward == n3_is_forward
 
-            three_enter_pt = pt3 + QPointF(.5, 0 if n3_is_forward else 1)*bw
-            three_center_pt = pt3 + QPointF(.5, .5)*bw
-            three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5)*bw
+            three_enter_pt = pt3 + QPointF(.5, 0 if n3_is_forward else 1) * bw
+            three_center_pt = pt3 + QPointF(.5, .5) * bw
+            three_exit_pt = pt3 + QPointF(1 if n3_is_forward else 0, .5) * bw
 
         c1 = QPointF()
         # case 1: same strand
@@ -1076,6 +1080,7 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 # end class XoverItem
 
+
 PPL5 = QPainterPath()  # Left 5' PainterPath
 PPR5 = QPainterPath()  # Right 5' PainterPath
 PPL3 = QPainterPath()  # Left 3' PainterPath
@@ -1083,35 +1088,35 @@ PPR3 = QPainterPath()  # Right 3' PainterPath
 PP53 = QPainterPath()  # Left 5', Right 3' PainterPath
 PP35 = QPainterPath()  # Left 5', Right 3' PainterPath
 # set up PPL5 (left 5' blue square)
-PPL5.addRect(0.25*_BASE_WIDTH, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPL5.addRect(0.25 * _BASE_WIDTH, 0.125 * _BASE_WIDTH, 0.75 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 # set up PPR5 (right 5' blue square)
-PPR5.addRect(0, 0.125*_BASE_WIDTH, 0.75*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PPR5.addRect(0, 0.125 * _BASE_WIDTH, 0.75 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 # set up PPL3 (left 3' blue triangle)
 L3_POLY = QPolygonF()
 L3_POLY.append(QPointF(_BASE_WIDTH, 0))
-L3_POLY.append(QPointF(0.25*_BASE_WIDTH, 0.5*_BASE_WIDTH))
+L3_POLY.append(QPointF(0.25 * _BASE_WIDTH, 0.5 * _BASE_WIDTH))
 L3_POLY.append(QPointF(_BASE_WIDTH, _BASE_WIDTH))
 PPL3.addPolygon(L3_POLY)
 # set up PPR3 (right 3' blue triangle)
 R3_POLY = QPolygonF()
 R3_POLY.append(QPointF(0, 0))
-R3_POLY.append(QPointF(0.75*_BASE_WIDTH, 0.5*_BASE_WIDTH))
+R3_POLY.append(QPointF(0.75 * _BASE_WIDTH, 0.5 * _BASE_WIDTH))
 R3_POLY.append(QPointF(0, _BASE_WIDTH))
 PPR3.addPolygon(R3_POLY)
 
 # single base left 5'->3'
-PP53.addRect(0, 0.125*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PP53.addRect(0, 0.125 * _BASE_WIDTH, 0.5 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 POLY_53 = QPolygonF()
-POLY_53.append(QPointF(0.5*_BASE_WIDTH, 0))
-POLY_53.append(QPointF(_BASE_WIDTH, 0.5*_BASE_WIDTH))
-POLY_53.append(QPointF(0.5*_BASE_WIDTH, _BASE_WIDTH))
+POLY_53.append(QPointF(0.5 * _BASE_WIDTH, 0))
+POLY_53.append(QPointF(_BASE_WIDTH, 0.5 * _BASE_WIDTH))
+POLY_53.append(QPointF(0.5 * _BASE_WIDTH, _BASE_WIDTH))
 PP53.addPolygon(POLY_53)
 # single base left 3'<-5'
-PP35.addRect(0.50*_BASE_WIDTH, 0.125*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.75*_BASE_WIDTH)
+PP35.addRect(0.50 * _BASE_WIDTH, 0.125 * _BASE_WIDTH, 0.5 * _BASE_WIDTH, 0.75 * _BASE_WIDTH)
 POLY_35 = QPolygonF()
-POLY_35.append(QPointF(0.5*_BASE_WIDTH, 0))
-POLY_35.append(QPointF(0, 0.5*_BASE_WIDTH))
-POLY_35.append(QPointF(0.5*_BASE_WIDTH, _BASE_WIDTH))
+POLY_35.append(QPointF(0.5 * _BASE_WIDTH, 0))
+POLY_35.append(QPointF(0, 0.5 * _BASE_WIDTH))
+POLY_35.append(QPointF(0.5 * _BASE_WIDTH, _BASE_WIDTH))
 PP35.addPolygon(POLY_35)
 
 
@@ -1123,6 +1128,7 @@ class EndpointItem(QGraphicsPathItem):
         mouseMoveEvent (TYPE): Description
         mousePressEvent (TYPE): Description
     """
+
     def __init__(self, strand_item, cap_type, is_forward):
         """The parent should be a StrandItem.
 
@@ -1207,7 +1213,7 @@ class EndpointItem(QGraphicsPathItem):
         Args:
             idx (int): the base index within the virtual helix
         """
-        x = int(idx*_BASE_WIDTH)
+        x = int(idx * _BASE_WIDTH)
         if x != self.x():
             self.setPos(x, self.y())
             return True
@@ -1290,7 +1296,7 @@ class EndpointItem(QGraphicsPathItem):
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):  # if the tool method exists
-            idx = int(floor((self.x()+event.pos().x()) / _BASE_WIDTH))
+            idx = int(floor((self.x() + event.pos().x()) / _BASE_WIDTH))
             if idx != self._move_idx:  # did we actually move?
                 modifiers = event.modifiers()
                 self._move_idx = idx

@@ -16,8 +16,8 @@ design_name = 'Nature09_monolith'
 # Read design
 app = cadnano.app()
 doc = app.document = Document()
-doc.readFile(design_name+'.json')
+doc.readFile(design_name + '.json')
 part = doc.activePart()
 
-doc.writeToFile(design_name+'_c25.json')
-doc.writeToFile(design_name+'_legacy.json', legacy=True)
+doc.writeToFile(design_name + '_c25.json')
+doc.writeToFile(design_name + '_legacy.json', legacy=True)

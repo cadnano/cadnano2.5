@@ -8,6 +8,7 @@ from PyQt5.QtTest import QTest
 from cntestcase import CNTestApp
 from cadnano import initAppWithGui
 
+
 class GUITestApp(CNTestApp):
     def __init__(self):
         argv = None
@@ -43,7 +44,7 @@ class GUITestApp(CNTestApp):
     ############################ Mouse events ############################
     @staticmethod
     def graphicsItemClick(graphics_item, button,
-                                modifier=None, pos=None, delay=-1):
+                          modifier=None, pos=None, delay=-1):
         """ Convenience method for clicking in a QGraphicsItem to wrap a call
         to QTest.mouseClick
 
@@ -60,13 +61,13 @@ class GUITestApp(CNTestApp):
         pos = gview.mapFromScene(pos)
         if modifier is None:
             modifier = Qt.KeyboardModifiers()
-        QTest.mouseClick(   gview.viewport(), button,
-                            modifier=modifier, pos=pos, delay=100)
+        QTest.mouseClick(gview.viewport(), button,
+                         modifier=modifier, pos=pos, delay=100)
     # end def
 
     @staticmethod
-    def mouseDrag(  widget, press_on, release_on, button,
-                    modifier=None, delay=-1):
+    def mouseDrag(widget, press_on, release_on, button,
+                  modifier=None, delay=-1):
         """ Convenience helper for dragging a QWidget
         Makes a drag with the mouse.
 
@@ -83,8 +84,8 @@ class GUITestApp(CNTestApp):
     # end def
 
     @staticmethod
-    def graphicsItemDrag(   graphics_item, press_on, release_on, button,
-                            modifier=None, delay=-1):
+    def graphicsItemDrag(graphics_item, press_on, release_on, button,
+                         modifier=None, delay=-1):
         """ Convenience helper for dragging a QGraphicsItem
         Args:
             graphics_item (QGraphicsItem):
@@ -94,8 +95,8 @@ class GUITestApp(CNTestApp):
         gview = graphics_item.scene().views()[0]
         press_on = gview.mapFromScene(press_on)
         release_on = gview.mapFromScene(release_on)
-        GUITestApp.mouseDrag(   gview.viewport(), press_on, release_on, button,
-                            modifier=modifier, delay=delay)
+        GUITestApp.mouseDrag(gview.viewport(), press_on, release_on, button,
+                             modifier=modifier, delay=delay)
     # end def
 
     ########################## Keyboard events ############################

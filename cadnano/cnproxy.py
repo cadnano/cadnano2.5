@@ -20,7 +20,7 @@ class ProxyObject(object):
     # end def
 
     def connect(self, sender, bsignal, method):
-        f = lambda x, y: method(x, *y)
+        def f(x, y): return method(x, *y)
         bsignal.connect(method, sender=sender)
         self._signals[(sender, bsignal, method)] = f
 
@@ -59,6 +59,7 @@ class DummySignal(object):
             t(*args)
 # end class
 
+
 ProxySignal = DummySignal
 BaseObject = ProxyObject
 UndoCommand = undocommand.UndoCommand
@@ -68,5 +69,6 @@ UndoStack = undostack.UndoStack
 class TempApp(object):
     documentWasCreatedSignal = ProxySignal(name='documentWasCreatedSignal')
     is_temp_app = True
+
 
 tapp = TempApp()

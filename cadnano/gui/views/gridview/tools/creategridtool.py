@@ -8,6 +8,7 @@ class CreateGridTool(AbstractGridTool):
     Attributes:
         is_started (bool): Description
     """
+
     def __init__(self, manager):
         """Summary
 

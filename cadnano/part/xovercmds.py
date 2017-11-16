@@ -6,6 +6,7 @@ from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
+
 class CreateXoverCommand(UndoCommand):
     """
     Creates a Xover from the 3' end of strand5p to the 5' end of strand3p
@@ -14,6 +15,7 @@ class CreateXoverCommand(UndoCommand):
     2. install the crossover
     3. apply the strand5p oligo to the strand3p
     """
+
     def __init__(self, part, strand5p, strand5p_idx, strand3p, strand3p_idx, update_oligo=True):
         super(CreateXoverCommand, self).__init__("create xover")
         self._part = part
@@ -107,6 +109,7 @@ class CreateXoverCommand(UndoCommand):
     # end def
 # end class
 
+
 class RemoveXoverCommand(UndoCommand):
     """
     Removes a Xover from the 3' end of strand5p to the 5' end of strand3p
@@ -116,6 +119,7 @@ class RemoveXoverCommand(UndoCommand):
     3. update the oligo length
     4. apply the new strand3p oligo to the strand3p
     """
+
     def __init__(self, part, strand5p, strand3p):
         super(RemoveXoverCommand, self).__init__("remove xover")
         self._part = part

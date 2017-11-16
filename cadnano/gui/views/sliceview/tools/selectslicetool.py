@@ -31,6 +31,7 @@ def normalizeRect(rect):
     return (x1, y1, x2, y2)
 
 
+
 _SELECT_PEN_WIDTH = styles.SELECTED_PEN_WIDTH
 _SELECT_COLOR = styles.SELECTED_COLOR  # "#ff0000"
 _TEST_COLOR = "#00ff00"
@@ -49,6 +50,7 @@ class SelectSliceTool(AbstractSliceTool):
         selection_set (TYPE): Description
         snap_origin_item (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 
@@ -469,6 +471,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         drag_start_position (TYPE): Description
         tool (TYPE): Description
     """
+
     def __init__(self, tool, parent=None):
         """Summary
 
@@ -512,6 +515,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
 
     """ reimplement boundingRect if you want to call resetGroupPos
     """
+
     def clearSelectionRect(self):
         """reset positions to zero to keep things in check
         """

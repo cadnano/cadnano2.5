@@ -27,6 +27,7 @@ class BreakTool(AbstractPathTool):
     """
     docstring for BreakTool
     """
+
     def __init__(self, manager):
         """Summary
 

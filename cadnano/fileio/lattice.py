@@ -22,7 +22,7 @@ class HoneycombDnaPart(object):
     TURNS_PER_STEP = 2.0
     HELICAL_PITCH = STEP / TURNS_PER_STEP
     TWIST_PER_BASE = 360. / HELICAL_PITCH  # degrees
-    TWIST_OFFSET = -(360. / 10.5)*1.0  # degrees
+    TWIST_OFFSET = -(360. / 10.5) * 1.0  # degrees
     SUB_STEP_SIZE = STEP / 3.
 
     # Manually tuned grid offsets
@@ -44,36 +44,36 @@ class HoneycombDnaPart(object):
     @staticmethod
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """make sure radius is a float"""
-        x = (column-1)*radius*root3
+        x = (column - 1) * radius * root3
         if HoneycombDnaPart.isEvenParity(row, column):   # odd parity
-            y = -row*radius*3 + radius
+            y = -row * radius * 3 + radius
         else:                               # even parity
-            y = -row*radius*3
-        return scale_factor*x, scale_factor*y
+            y = -row * radius * 3
+        return scale_factor * x, scale_factor * y
     # end def
 
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """make sure radius is a float"""
-        x = column*radius*root3
+        x = column * radius * root3
         if HoneycombDnaPart.isOddParity(row, column):   # odd parity
-            y = row*radius*3 + radius
+            y = row * radius * 3 + radius
         else:                               # even parity
-            y = row*radius*3
-        return scale_factor*x, scale_factor*y
+            y = row * radius * 3
+        return scale_factor * x, scale_factor * y
     # end def
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
-        column = int(x / (radius*root3*scale_factor) + 0.5)
+        column = int(x / (radius * root3 * scale_factor) + 0.5)
 
-        row_temp = y / (radius*scale_factor)
+        row_temp = y / (radius * scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
             # odd parity
-            row = int((row_temp - 1)/3 + 0.5)
+            row = int((row_temp - 1) / 3 + 0.5)
         else:
             # even parity
-            row = int(row_temp/3 + 0.5)
+            row = int(row_temp / 3 + 0.5)
         return row, column
     # end def
 
@@ -82,15 +82,15 @@ class HoneycombDnaPart(object):
                                     scale_factor=1.0):
         roundRow = ceil if round_up_row else floor
         roundCol = ceil if round_up_col else floor
-        column = roundCol(x / (radius*root3*scale_factor))
+        column = roundCol(x / (radius * root3 * scale_factor))
 
-        row_temp = y / (radius*scale_factor)
+        row_temp = y / (radius * scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
             # odd parity
-            row = roundRow((row_temp - 1)/3.)
+            row = roundRow((row_temp - 1) / 3.)
         else:
             # even parity
-            row = roundRow(row_temp/3.)
+            row = roundRow(row_temp / 3.)
         return row, column
     # end def
 # end class
@@ -124,26 +124,26 @@ class SquareDnaPart(object):
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """
         """
-        y = -row*2*radius
-        x = column*2*radius
-        return scale_factor*x, scale_factor*y
+        y = -row * 2 * radius
+        x = column * 2 * radius
+        return scale_factor * x, scale_factor * y
     # end def
 
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """
         """
-        y = row*2*radius
-        x = column*2*radius
-        return scale_factor*x, scale_factor*y
+        y = row * 2 * radius
+        x = column * 2 * radius
+        return scale_factor * x, scale_factor * y
     # end def
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
         """
         """
-        row = int(y/(2.*radius*scale_factor) + 0.5)
-        column = int(x/(2.*radius*scale_factor) + 0.5)
+        row = int(y / (2. * radius * scale_factor) + 0.5)
+        column = int(x / (2. * radius * scale_factor) + 0.5)
         return row, column
     # end def
 
@@ -151,8 +151,8 @@ class SquareDnaPart(object):
     def positionToLatticeCoordRound(radius, x, y, scale_factor=1.0):
         """
         """
-        row = round(y/(2.*radius*scale_factor))
-        column = round(x/(2.*radius*scale_factor))
+        row = round(y / (2. * radius * scale_factor))
+        column = round(x / (2. * radius * scale_factor))
         return row, column
     # end def
 

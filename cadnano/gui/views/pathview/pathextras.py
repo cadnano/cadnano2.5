@@ -31,13 +31,13 @@ BASE_WIDTH = styles.PATH_BASE_WIDTH
 BASE_RECT = QRectF(0, 0, BASE_WIDTH, BASE_WIDTH)
 
 
-PHOS_ITEM_WIDTH = 0.25*BASE_WIDTH
+PHOS_ITEM_WIDTH = 0.25 * BASE_WIDTH
 TRIANGLE = QPolygonF()
 TRIANGLE.append(QPointF(0, 0))
 TRIANGLE.append(QPointF(0.75 * PHOS_ITEM_WIDTH, 0.5 * PHOS_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, PHOS_ITEM_WIDTH))
 TRIANGLE.append(QPointF(0, 0))
-TRIANGLE.translate(0, -0.5*PHOS_ITEM_WIDTH)
+TRIANGLE.translate(0, -0.5 * PHOS_ITEM_WIDTH)
 T180 = QTransform()
 T180.rotate(-180)
 FWDPHOS_PP, REVPHOS_PP = QPainterPath(), QPainterPath()
@@ -56,6 +56,7 @@ class PropertyWrapperObject(QObject):
         item (TYPE): Description
         rotation (TYPE): Description
     """
+
     def __init__(self, item):
         """Summary
 
@@ -163,6 +164,7 @@ class Triangle(QGraphicsPathItem):
     Attributes:
         adapter (TYPE): Description
     """
+
     def __init__(self, painter_path, parent=None):
         """Summary
 
@@ -232,11 +234,11 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         half_label_H = tBR.height() / 2.0
         half_label_W = tBR.width() / 2.0
 
-        labelX = BASE_WIDTH/2.0 - half_label_W
+        labelX = BASE_WIDTH / 2.0 - half_label_W
         if str_txt == '1':  # adjust for the number one
             labelX -= tBR.width()
 
-        labelY = half_label_H if self.is_fwd else (BASE_WIDTH - tBR.height())/2
+        labelY = half_label_H if self.is_fwd else (BASE_WIDTH - tBR.height()) / 2
 
         self.setPos(labelX, labelY)
         self.setText(str_txt)
@@ -253,7 +255,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
                                            half_label_W, half_label_H)
             self._outline.setRect(r)
             self._outline.setPen(getPenObj('#ff0000', 0.25))
-            self._outline.setY(2*half_label_H)
+            self._outline.setY(2 * half_label_H)
             self._outline.show()
         else:
             self._outline.hide()
@@ -275,6 +277,7 @@ class PreXoverItem(QGraphicsRectItem):
         prexoveritemgroup (TYPE): Description
         to_vh_id_num (TYPE): Description
     """
+
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
                  to_vh_id_num, prexoveritemgroup, color):
         """Summary
@@ -350,20 +353,20 @@ class PreXoverItem(QGraphicsRectItem):
         if is_fwd:
             phos.setPath(FWDPHOS_PP)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(0.5*BASE_WIDTH, BASE_WIDTH)
+            phos.setPos(0.5 * BASE_WIDTH, BASE_WIDTH)
             phos.setPen(getNoPen())
             phos.setBrush(getBrushObj(color))
             bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
-            self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
+            self.setPos(from_index * BASE_WIDTH, -BASE_WIDTH)
         else:
             phos.setPath(REVPHOS_PP)
             phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(0.5*BASE_WIDTH, 0)
+            phos.setPos(0.5 * BASE_WIDTH, 0)
             phos.setPen(getPenObj(color, 0.25))
             phos.setBrush(getNoBrush())
             bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
                                       penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
-            self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
+            self.setPos(from_index * BASE_WIDTH, 2 * BASE_WIDTH)
 
         if to_vh_id_num is not None:
             inactive_alpha = PROX_ALPHA
@@ -550,8 +553,8 @@ class PreXoverItem(QGraphicsRectItem):
         p1 = self._phos_item.scenePos()
         p2 = active_prexoveritem._phos_item.scenePos()
         scale = 3
-        delta1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
-        delta2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
+        delta1 = -BASE_WIDTH * scale if self.is_fwd else BASE_WIDTH * scale
+        delta2 = BASE_WIDTH * scale if active_prexoveritem.is_fwd else -BASE_WIDTH * scale
         c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
         c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
         pp = QPainterPath()
@@ -612,14 +615,14 @@ class PathWorkplaneItem(QGraphicsRectItem):
         pen = newPenObj(styles.BLUE_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
         pen.setCosmetic(True)
         self.setPen(pen)
-        self.setPos(BASE_WIDTH*10, -BASE_WIDTH)
+        self.setPos(BASE_WIDTH * 10, -BASE_WIDTH)
         self.setAcceptHoverEvents(True)
         self.grab_corner = GrabCornerItem(self._GC_SIZE, model_part.getColor(), True, self)
         self.updatePositionAndBounds()
 
     def getModelBounds(self):
         """Resize bounds in form of Qt position, scaled from model"""
-        xLL = int((self._idx+ 2) * BASE_WIDTH)
+        xLL = int((self._idx + 2) * BASE_WIDTH)
         xUR = int(self._high_drag_bound * BASE_WIDTH)
         return xLL, 0, xUR, 0
     # end def
@@ -644,13 +647,13 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
         self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self._width
 
-        h = self._part_item._vh_rect.height() - BASE_WIDTH*2
-        self.setRect(QRectF(styles.MINOR_GRID_STROKE_WIDTH, 0, BASE_WIDTH*self._width, h))
+        h = self._part_item._vh_rect.height() - BASE_WIDTH * 2
+        self.setRect(QRectF(styles.MINOR_GRID_STROKE_WIDTH, 0, BASE_WIDTH * self._width, h))
 
         x = int(self._idx * BASE_WIDTH)
         self.setPos(x, self.y())
 
-        p = self._GC_SIZE/2
+        p = self._GC_SIZE / 2
         self.grab_corner.setTopRight(self.rect().adjusted(-p, -p, p, p).topRight())
     # endef
 
@@ -677,11 +680,11 @@ class PathWorkplaneItem(QGraphicsRectItem):
             event.ignore()
             QGraphicsItem.mousePressEvent(self, event)
             return
-        self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+        self._move_idx = int(floor((self.x() + event.pos().x()) / BASE_WIDTH))
         self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
 
     def mouseMoveEvent(self, event):
-        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
+        idx = int(floor((self.x() + event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
         x = int(idx * BASE_WIDTH)
         self.setPos(x, self.y())
@@ -691,7 +694,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def mouseReleaseEvent(self, event):
         old_idx = int(self._model_part.getProperty('workplane_idx'))
-        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
+        idx = int(floor((self.x() + event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
         if old_idx != idx:
             self._idx = idx

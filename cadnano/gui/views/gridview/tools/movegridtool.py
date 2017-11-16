@@ -5,6 +5,7 @@ from .abstractgridtool import AbstractGridTool
 
 class MoveGridTool(AbstractGridTool):
     """MoveGridTool description"""
+
     def __init__(self, manager):
         """Summary
 

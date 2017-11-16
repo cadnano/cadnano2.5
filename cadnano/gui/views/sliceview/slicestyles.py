@@ -18,7 +18,7 @@ ZPARTITEM = 200
 # top
 
 # Part appearance
-SLICE_FILL = "#ffffff"
+SLICE_FILL = "#f6f6f6"
 
 DEFAULT_PEN_WIDTH = 0  # cosmetic
 DEFAULT_ALPHA = 2

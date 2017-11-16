@@ -23,6 +23,7 @@ class AbstractPathTool(QGraphicsObject):
     Attributes:
         manager (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 

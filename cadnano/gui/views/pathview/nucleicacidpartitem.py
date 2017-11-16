@@ -71,7 +71,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._initModifierRect()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-        self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
+        self._scale_2_model = m_p.baseWidth() / _BASE_WIDTH
         self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
 
         # self._rect = QRectF()
@@ -547,7 +547,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.grab_corner.setParentItem(self)
 
         self._configureOutline(outline)
-        p = self._GC_SIZE/2
+        p = self._GC_SIZE / 2
         self.grab_corner.setTopLeft(outline.rect().adjusted(-p, -p, p, p).topLeft())
     # end def
 

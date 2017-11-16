@@ -15,6 +15,7 @@ class SelectTool(AbstractPathTool):
         strand_item_selection_group (TYPE): Description
         vhi_h_selection_group (TYPE): Description
     """
+
     def __init__(self, manager, viewroot):
         """Summary
 

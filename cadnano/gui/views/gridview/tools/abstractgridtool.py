@@ -12,11 +12,12 @@ _RADIUS = styles.GRID_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
 HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, HIGHLIGHT_WIDTH)
-DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
+DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH) / 2.
 # _HOVER_RECT = _DEFAULT_RECT.adjusted(-DELTA, -DELTA, DELTA, DELTA)
 
 
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
+
 
 class AbstractGridTool(QGraphicsObject):
     """Summary
@@ -35,6 +36,7 @@ class AbstractGridTool(QGraphicsObject):
     FILTER_NAME = 'virtual_helix'
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
+
     def __init__(self, manager):
         """Summary
 
@@ -72,7 +74,7 @@ class AbstractGridTool(QGraphicsObject):
         """
         rad = self._RADIUS
         return [QLineF(rad, rad,
-                       rad*(1. + 2.*math.cos(x)), rad*(1. + 2.*math.sin(x))
+                       rad * (1. + 2. * math.cos(x)), rad * (1. + 2. * math.sin(x))
                        ) for x in self.angles]
     # end def
 
@@ -146,15 +148,15 @@ class AbstractGridTool(QGraphicsObject):
         if self.is_started:
             pos = self.findNearestPoint(part_item, event.scenePos())
         else:
-            pos =  event.pos()
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+            pos = event.pos()
+        self.vhi_hint_item.setPos(pos -
+                                  QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
         return pos
     # end def
 
     def setHintPos(self, pos):
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        self.vhi_hint_item.setPos(pos -
+                                  QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -233,7 +235,6 @@ class AbstractGridTool(QGraphicsObject):
     # def hoverLeaveEvent(self, event):
     #     # self.vhi_hint_item.hide()
     #     #print("Grid VHI hoverLeaveEvent")
-
 
     def hoverMoveEvent(self, part_item, event):
         """Summary

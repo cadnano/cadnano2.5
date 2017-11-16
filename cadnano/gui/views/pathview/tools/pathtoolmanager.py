@@ -27,6 +27,7 @@ class PathToolManager(AbstractToolManager):
         skip_tool (SkipTool): Description
         tool_names (tuple): Description
     """
+
     def __init__(self, window, viewroot):
         """Summary
 

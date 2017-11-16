@@ -26,6 +26,7 @@ except:
 
             Color('#rrggbb') for hex
         """
+
         def __init__(self, *args):
             largs = len(args)
             if largs == 1:

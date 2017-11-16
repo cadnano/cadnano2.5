@@ -38,8 +38,8 @@ class Box(object):
                 of this box False otherwise
         """
         if point.x < self.min_pt.x or point.x > self.max_pt.x or \
-             point.y < self.min_pt.y or point.y > self.max_pt.y or \
-             point.z < self.min_pt.z or point.z > self.max_pt.z:
+                point.y < self.min_pt.y or point.y > self.max_pt.y or \
+                point.z < self.min_pt.z or point.z > self.max_pt.z:
             return False
         else:
             return True
@@ -54,9 +54,9 @@ class Box(object):
         Returns:
             bool: True if `box` is in `self` otherwise False
         """
-        if (self.min_pt.x <= box.min_pt.x ) and ( box.max_pt.x <= self.max_pt.x ) and \
-             ( self.min_pt.y <= box.min_pt.y ) and ( box.max_pt.y <= self.max_pt.y ) and \
-             ( self.min_pt.z <= box.min_pt.z ) and ( box.max_pt.z <= self.max_pt.z ):
+        if (self.min_pt.x <= box.min_pt.x) and (box.max_pt.x <= self.max_pt.x) and \
+            (self.min_pt.y <= box.min_pt.y) and (box.max_pt.y <= self.max_pt.y) and \
+                (self.min_pt.z <= box.min_pt.z) and (box.max_pt.z <= self.max_pt.z):
             return True
         return False
     # end def
@@ -69,13 +69,12 @@ class Box(object):
         Returns:
             bool: True if `box` spans `self` otherwise False
         """
-        if (self.min_pt.x <= box.min_pt.x ) and ( box.max_pt.x <= self.max_pt.x ) and \
-             ( self.min_pt.y <= box.min_pt.y ) and ( box.max_pt.y <= self.max_pt.y ) and \
-             ( self.min_pt.z <= box.min_pt.z ) and ( box.max_pt.z <= self.max_pt.z ):
+        if (self.min_pt.x <= box.min_pt.x) and (box.max_pt.x <= self.max_pt.x) and \
+            (self.min_pt.y <= box.min_pt.y) and (box.max_pt.y <= self.max_pt.y) and \
+                (self.min_pt.z <= box.min_pt.z) and (box.max_pt.z <= self.max_pt.z):
             return True
         return False
     # end def
-
 
     def clone(self):
         """Clone this Box
@@ -92,7 +91,7 @@ class Box(object):
         Returns:
             Vector3: the center point of this box.
         """
-        return multiplyScalar(addVectors( self.min_pt, self.max_pt), 0.5 )
+        return multiplyScalar(addVectors(self.min_pt, self.max_pt), 0.5)
     # end def
 
     def size(self):
@@ -101,5 +100,5 @@ class Box(object):
         Returns:
             Tuple: the width, height, and depth of this box.
         """
-        return subVectors( self.max_pt, self.min_pt)
+        return subVectors(self.max_pt, self.min_pt)
 # end class

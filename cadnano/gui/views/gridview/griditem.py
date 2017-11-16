@@ -11,7 +11,7 @@ from . import gridstyles as styles
 _RADIUS = styles.GRID_HELIX_RADIUS
 _ZVALUE = styles.ZGRIDHELIX + 1
 HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
-DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
+DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH) / 2.
 
 
 class GridItem(QGraphicsPathItem):
@@ -114,7 +114,7 @@ class GridItem(QGraphicsPathItem):
         is_pen_down = False
         draw_lines = self.draw_lines
         for i in range(row_l, row_h):
-            for j in range(col_l, col_h+1):
+            for j in range(col_l, col_h + 1):
                 x, y = doLattice(radius, i, j, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
@@ -135,7 +135,7 @@ class GridItem(QGraphicsPathItem):
         # end for i
         # DO VERTICAL LINES
         if draw_lines:
-            for j in range(col_l, col_h+1):
+            for j in range(col_l, col_h + 1):
                 # print("newcol")
                 for i in range(row_l, row_h):
                     x, y = doLattice(radius, i, j, scale_factor=sf)
@@ -231,8 +231,8 @@ class ClickArea(QGraphicsEllipseItem):
     _RADIUS = styles.GRID_HELIX_RADIUS
 
     def __init__(self, diameter, parent):
-        nd = 2*self._RADIUS
-        offset = -0.5*nd + diameter/2
+        nd = 2 * self._RADIUS
+        offset = -0.5 * nd + diameter / 2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
         self.parent_obj = parent
         self.setAcceptHoverEvents(True)
@@ -299,7 +299,7 @@ class GridPoint(QGraphicsEllipseItem):
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
-        #tool.setHintPos(self.scenePos())
+        # tool.setHintPos(self.scenePos())
     # end def
 
     def hoverLeaveEvent(self, event):

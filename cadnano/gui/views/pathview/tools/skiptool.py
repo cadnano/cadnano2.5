@@ -7,6 +7,7 @@ class SkipTool(AbstractPathTool):
     """
     docstring for SkipTool
     """
+
     def __init__(self, manager):
         """Summary
 

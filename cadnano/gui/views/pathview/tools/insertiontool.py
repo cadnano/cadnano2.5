@@ -7,6 +7,7 @@ class InsertionTool(AbstractPathTool):
     """
     docstring for InsertionTool
     """
+
     def __init__(self, manager):
         """Summary
 

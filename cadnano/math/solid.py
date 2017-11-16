@@ -5,6 +5,7 @@ from cadnano.math.matrix3 import getNormalMatrix
 
 from cadnano.math.face import Face
 
+
 class Solid(object):
     def __init__(self, name):
         self.name = name
@@ -45,7 +46,7 @@ class Solid(object):
 
     def applyMatrix(self, matrix4):
 
-        normal_matrix = getNormalMatrix( matrix4 );
+        normal_matrix = getNormalMatrix(matrix4)
         verts = self.vertices
         for i in range(len(verts)):
             vertex = verts[i]
@@ -64,4 +65,3 @@ class Solid(object):
             self.faces[i] = Face(normal, face.v1, face.v2, face.v3)
         # end for
 # end class
-

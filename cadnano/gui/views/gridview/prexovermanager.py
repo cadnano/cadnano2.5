@@ -20,6 +20,7 @@ class PreXoverManager(QGraphicsRectItem):
         prexover_item_map (dict): Description
         virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.VirtualHelixItem): Description
     """
+
     def __init__(self, part_item):
         """Summary
 

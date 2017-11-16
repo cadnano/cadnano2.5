@@ -5,14 +5,17 @@ from PyQt5.QtCore import pyqtSlot
 
 class MyItemGroup(QGraphicsItemGroup):
     Type = QGraphicsItem.UserType + 3
+
     def __init__(self, parent=None):
         super(MyItemGroup, self).__init__(parent)
 
     def __repr__(self):
         return str(type(self).__name__)
 
+
 class MyRectItemNOIC(QGraphicsRectItem):
     Type = QGraphicsItem.UserType + 2
+
     def __init__(self, parent=None):
         super(MyRectItemNOIC, self).__init__(parent)
 
@@ -36,6 +39,7 @@ class MyRectItem(QGraphicsRectItem):
         # print("\nChange %s\n" % self, change, value)
         return super(MyRectItem, self).itemChange(change, value)
     # end def
+
 
 def testItemChangeRegression():
     """Make sure PyQt5 handles QGraphicsItem.itemChange correctly

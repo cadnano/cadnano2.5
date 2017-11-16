@@ -6,6 +6,7 @@ Attributes:
 """
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType
@@ -62,6 +63,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.vh_set = set()
         self.point_map = dict()
         self._last_hovered_item = None
+        self._highlighted_path = []
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -458,12 +460,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-
         vhi = self._virtual_helix_item_hash[id_num]
         if vhi == self.active_virtual_helix_item:
             self.active_virtual_helix_item = None
         vhi.virtualHelixRemovedSlot()
         del self._virtual_helix_item_hash[id_num]
+
+        # When any VH is removed, turn SPA mode off
+        self.shortest_path_add_mode = False
+        self.shortest_path_start = None
     # end def
 
     def reconfigureRect(self, top_left, bottom_right, padding=80,
@@ -661,7 +666,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             pos (TYPE): Description
         """
         sf = self.scale_factor
-        x, y = pos.x()/sf, -1.0*pos.y()/sf
+        x, y = pos.x() / sf, -1.0 * pos.y() / sf
         return x, y
     # end def
 
@@ -776,10 +781,31 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverEnter(self, tool, event):
-        pass  # TODO: add code to show hint
-        # if self.shortest_path_add_mode:
-        #     shortest_path_start_ij = None
-        #     current_ij = None
+        modifiers = event.modifiers()
+        is_shift = modifiers == Qt.ShiftModifier
+
+        # Un-highlight GridItems if necessary by calling createToolHoverLeave
+        self.createToolHoverLeave(tool=tool, event=event)
+
+        # Highlight GridItems if shift is being held down
+        if is_shift and self.shortest_path_add_mode:
+            start = self.shortest_path_start
+            end = (event.scenePos().x(), event.scenePos().y())
+
+            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
+                                                                     end=end,
+                                                                     neighbor_map=self.neighbor_map,
+                                                                     vh_set=self.vh_set,
+                                                                     point_map=self.point_map)
+            for node in self._highlighted_path:
+                self.griditem.changeGridPointColor(coordinates=node,
+                                                   color=styles.DEFAULT_GRID_DOT_COLOR)
+
+    def createToolHoverLeave(self, tool, event):
+        for node in self._highlighted_path:
+            self.griditem.changeGridPointColor(coordinates=node,
+                                               color=styles.SLICE_FILL)
+        self._highlighted_path = []
 
     def selectToolMousePress(self, tool, event):
         """

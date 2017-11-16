@@ -121,6 +121,7 @@ class CNINSTALL(_install):
                      msg="Running post install task")
 # end class
 
+
 if len(sys.argv) > 0 and sys.argv[1] == 'install':
     cmdclass = {'install': CNINSTALL}
 else:

@@ -6,13 +6,13 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
+from cadnano.gui.palette import getNoPen, getPenObj, getBrushObj  # getBrushObj
 
 from . import slicestyles as styles
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _ZVALUE = styles.ZSLICEHELIX + 1
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
-DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
+DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH) / 2.
 
 
 class GridItem(QGraphicsPathItem):
@@ -34,6 +34,7 @@ class GridItem(QGraphicsPathItem):
         # self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = False
         self.points = []
+        self.points_dict = dict()
         self.previous_grid_bounds = None
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
@@ -110,9 +111,10 @@ class GridItem(QGraphicsPathItem):
         if redo_neighbors:
             point_coordinates = dict()
             neighbor_map = dict()
+            self.points_dict = dict()
 
         for row in range(row_l, row_h):
-            for column in range(col_l, col_h+1):
+            for column in range(col_l, col_h + 1):
                 x, y = doLattice(radius, row, column, scale_factor=sf)
                 if draw_lines:
                     if is_pen_down:
@@ -136,6 +138,7 @@ class GridItem(QGraphicsPathItem):
                 #     pt.setBrush(getBrushObj(Qt.gray))
 
                 points.append(pt)
+                self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
                     point_coordinates[(-row, column)] = (x, -y)
@@ -143,22 +146,22 @@ class GridItem(QGraphicsPathItem):
                     # This is reversed since the Y is mirrored
                     if not HoneycombDnaPart.isEvenParity(row, column):
                         neighbor_map[(-row, column)] = [
-                            (-row, column-1),
-                            (-row, column+1),
-                            (-row-1, column)
+                            (-row, column - 1),
+                            (-row, column + 1),
+                            (-row - 1, column)
                         ]
                     else:
                         neighbor_map[(-row, column)] = [
-                            (-row, column-1),
-                            (-row, column+1),
-                            (-row+1, column)
+                            (-row, column - 1),
+                            (-row, column + 1),
+                            (-row + 1, column)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
 
         if draw_lines:
-            for column in range(col_l, col_h+1):
+            for column in range(col_l, col_h + 1):
                 for row in range(row_l, row_h):
                     x, y = doLattice(radius, row, column, scale_factor=sf)
                     if is_pen_down and isEven(row, column):
@@ -232,15 +235,16 @@ class GridItem(QGraphicsPathItem):
                 #     pt.setBrush(getBrushObj(Qt.gray))
 
                 points.append(pt)
+                self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
                     point_map[(-row, column)] = (x, -y)
 
                     neighbor_map[(-row, column)] = [
-                        (-row, column+1),
-                        (-row, column-1),
-                        (-row-1, column),
-                        (-row+1, column)
+                        (-row, column + 1),
+                        (-row, column - 1),
+                        (-row - 1, column),
+                        (-row + 1, column)
                     ]
 
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
@@ -273,6 +277,16 @@ class GridItem(QGraphicsPathItem):
         while points:
             scene.removeItem(points.pop())
 
+        self.points_dict = dict()
+
+    def changeGridPointColor(self, coordinates, color):
+        point = self.points_dict.get(coordinates)
+
+        if point is None:
+            print('Could not find')
+        else:
+            point.setBrush(getBrushObj(color))
+
 
 class ClickArea(QGraphicsEllipseItem):
     """An extra ellipse with slightly expanded real estate for receiving user
@@ -286,8 +300,8 @@ class ClickArea(QGraphicsEllipseItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
     def __init__(self, diameter, parent):
-        nd = 2*self._RADIUS
-        offset = -0.5*nd + diameter/2
+        nd = 2 * self._RADIUS
+        offset = -0.5 * nd + diameter / 2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
         self.parent_obj = parent
         self.setAcceptHoverEvents(True)
@@ -417,8 +431,16 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             event (QGraphicsSceneHoverEvent): Description
         """
-        # self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
+        # Turn the outline of the GridItem off
         self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, styles.EMPTY_HELIX_STROKE_WIDTH))
+
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+            return
+        tool_method_name = tool.methodPrefix() + "HoverLeaveEvent"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
         return
     # end def
 
@@ -483,6 +505,9 @@ class GridPoint(QGraphicsEllipseItem):
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
         part_item.createToolHoverMove(tool, event)
+
+    def createToolHoverLeaveEvent(self, tool, part_item, event):
+        part_item.createToolHoverLeave(tool, event)
 
 
 class GridEvent(object):

@@ -41,6 +41,7 @@ def getsitePackagesPath():
         return site.getsitepackages()[0]
 # end def
 
+
 QT_VERSION = "5.5"
 PY_VERSION = "%d.%d" % (sys.version_info[0], sys.version_info[1])
 python_root = os.path.abspath(sys.exec_prefix)
@@ -180,11 +181,12 @@ def createPyQt5Module(destination_path):
     return [os.path.splitext(x)[0] for x in file_list]
 # end def
 
+
 cn_packages = find_packages(exclude=exclude_list)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        in_path =  os.path.abspath(sys.argv[1])
+        in_path = os.path.abspath(sys.argv[1])
         if not os.path.exists(in_path):
             raise ValueError("Input path not found")
     else:

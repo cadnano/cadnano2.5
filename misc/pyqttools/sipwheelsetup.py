@@ -40,6 +40,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
     ],
     py_modules=['sipconfig', 'sipdistutils'],
-    data_files = [(rel_path , data_files)],
+    data_files=[(rel_path, data_files)],
     zip_safe=False,
 )

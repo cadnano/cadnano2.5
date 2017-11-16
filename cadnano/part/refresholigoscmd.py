@@ -1,6 +1,7 @@
 from cadnano.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
+
 class RefreshOligosCommand(UndoCommand):
     """
     RefreshOligosCommand is a post-processing step for AutoStaple.
@@ -15,6 +16,7 @@ class RefreshOligosCommand(UndoCommand):
 
     This command is meant for non-undoable steps, like file-io.
     """
+
     def __init__(self, part):
         super(RefreshOligosCommand, self).__init__("refresh oligos")
         self._part = part

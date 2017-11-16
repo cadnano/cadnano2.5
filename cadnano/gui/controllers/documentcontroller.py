@@ -26,6 +26,7 @@ class DocumentController():
     """list: String names of enabled filter types."""
 
     ### INIT METHODS ###
+
     def __init__(self, document):
         """docstring for __init__"""
         # initialize variables
@@ -524,7 +525,8 @@ class DocumentController():
             from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
             dialogWarning = Ui_Warning()  # reusing this dialog, should rename
-            dialog.setStyleSheet("QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")  # noqa
+            dialog.setStyleSheet(
+                "QDialog { background-image: url(ui/dialogs/images/cadnano2-about.png); background-repeat: none; }")
             dialogWarning.setupUi(dialog)
 
             locs = ", ".join([o.locString() for o in circ_olgs])

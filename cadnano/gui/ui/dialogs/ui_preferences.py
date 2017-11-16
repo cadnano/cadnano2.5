@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_Preferences(object):
     def setupUi(self, Preferences):
         Preferences.setObjectName("Preferences")
@@ -122,12 +123,13 @@ class Ui_Preferences(object):
         self.legacy_slice_view_combo_box.setItemText(2, _translate("Preferences", "Dual View"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.interface_tab), _translate("Preferences", "Interface"))
         self.label.setText(_translate("Preferences", "Plugins allow custom python code execution within cadnano.\n"
-"See github.com/cadnano/plugins for examples."))
+                                      "See github.com/cadnano/plugins for examples."))
         item = self.plugin_table_widget.horizontalHeaderItem(0)
         item.setText(_translate("Preferences", "Path"))
         self.add_plugin_button.setText(_translate("Preferences", "Add Plugin"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.plugins_tab), _translate("Preferences", "Plugins"))
         self.actionClose.setText(_translate("Preferences", "Close"))
         self.actionClose.setShortcut(_translate("Preferences", "Ctrl+W"))
+
 
 import cadnano.gui.ui.dialogs.dialogicons_rc

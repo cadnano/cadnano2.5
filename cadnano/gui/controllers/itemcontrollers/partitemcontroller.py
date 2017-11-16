@@ -10,7 +10,7 @@ class PartItemController():
     ('partRemovedSignal',                 'partRemovedSlot'),                # noqa
     ('partPropertyChangedSignal',         'partPropertyChangedSlot'),        # noqa
     ('partSelectedChangedSignal',         'partSelectedChangedSlot'),        # noqa
-    ('partDocumentSettingChangedSignal',  'partDocumentSettingChangedSlot'), # noqa
+    ('partDocumentSettingChangedSignal',  'partDocumentSettingChangedSlot'),  # noqa
     ]
 
     def connectSignals(self):

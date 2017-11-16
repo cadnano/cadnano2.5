@@ -8,6 +8,7 @@ class ResizeVirtualHelixCommand(UndoCommand):
     need to adjust all subelements in the event of a change in the
     minimum index
     """
+
     def __init__(self, part, id_num, is_right, delta):
         """
         Args:

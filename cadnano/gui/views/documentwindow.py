@@ -129,7 +129,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setScaleFitFactor(0.9)
         self.path_graphics_view.setName("PathView")
 
-
     def _init_path_view_toolbar(self):
         """Initializes Path View Toolbar.
 

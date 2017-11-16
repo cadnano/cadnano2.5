@@ -20,8 +20,8 @@ def encodeDocument(document):
     xLL, yLL, xUR, yUR = part.getVirtualHelixOriginLimits()
     rowLL, colLL = positionToLatticeCoord(radius, xLL, yLL, False, False)
     rowUR, colUR = positionToLatticeCoord(radius, xUR, yUR, True, True)
-    row_range = [i for i in range(rowUR+ROW_OFFSET, rowLL-1, -1)]
-    col_range = [i for i in range(colLL-COL_OFFSET, colUR+1)]
+    row_range = [i for i in range(rowUR + ROW_OFFSET, rowLL - 1, -1)]
+    col_range = [i for i in range(colLL - COL_OFFSET, colUR + 1)]
 
     # Attempt to shift the design to the center of the lattice
     # height = abs(rowLL-rowUR)

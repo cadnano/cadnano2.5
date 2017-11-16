@@ -263,7 +263,7 @@ class Oligo(CNObject):
             return None
         if temp.sequence():
             return ''.join([Strand.sequence(strand)
-                           for strand in self.strand5p().generator3pStrand()])
+                            for strand in self.strand5p().generator3pStrand()])
         else:
             return None
     # end def
@@ -416,7 +416,7 @@ class Oligo(CNObject):
         for strand in strand5p.generator3pStrand():
             if strand.connection3p():
                 i = i + strand.totalLength()
-                num_bases_to_xovers.append(i+offset)
+                num_bases_to_xovers.append(i + offset)
         return num_bases_to_xovers
 
     def splitAtAbsoluteLengths(self, len_list):

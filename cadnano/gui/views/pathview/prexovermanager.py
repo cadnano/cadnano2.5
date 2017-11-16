@@ -93,7 +93,7 @@ class PreXoverManager(QGraphicsRectItem):
         Args:
             step_size (TYPE): Description
         """
-        hue_scale = step_size*self.HUE_FACTOR
+        hue_scale = step_size * self.HUE_FACTOR
         self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name()
                         for i in range(step_size)]
         # self.removeRepeats()

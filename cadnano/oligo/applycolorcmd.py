@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from cadnano.cnproxy import UndoCommand
 
+
 class ApplyColorCommand(UndoCommand):
     def __init__(self, oligo, color):
         super(ApplyColorCommand, self).__init__("apply color")

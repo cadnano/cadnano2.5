@@ -3,7 +3,9 @@ from enum import Enum as _Enum
 
 def enumNames(cls):
     return [a for a, b in sorted(filter(lambda z: isinstance(z[1], int),
-            cls.__dict__.items()), key=lambda x: x[1])]
+                                        cls.__dict__.items()), key=lambda x: x[1])]
+
+
 ENUM_NAMES = {}
 
 
@@ -58,6 +60,8 @@ class PointType:
     """
     Z_ONLY = 0
     ARBITRARY = 1
+
+
 ENUM_NAMES['point_type'] = enumNames(PointType)
 
 
@@ -100,6 +104,8 @@ class GridType:
     NONE = 0
     SQUARE = 1
     HONEYCOMB = 2
+
+
 ENUM_NAMES['grid_type'] = enumNames(GridType)
 
 # class BreakType:
