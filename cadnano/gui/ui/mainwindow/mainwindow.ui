@@ -642,7 +642,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset>
      <normaloff>:/pathtools/force</normaloff>:/pathtools/force</iconset>
    </property>
    <property name="text">
@@ -793,7 +793,11 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-endpoint</normaloff>:/parttools/filter-endpoint</iconset>
+     <normaloff>:/parttools/filter-endpoint</normaloff>
+     <disabledoff>:/parttools/filter-endpoint-disabled</disabledoff>:/parttools/filter-endpoint</iconset>
+   </property>
+   <property name="text">
+    <string>Endpoints</string>
    </property>
    <property name="toolTip">
     <string>(E)ndpoints</string>
@@ -811,10 +815,11 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-xover</normaloff>:/parttools/filter-xover</iconset>
+     <normaloff>:/parttools/filter-xover</normaloff>
+     <disabledoff>:/parttools/filter-xover-disabled</disabledoff>:/parttools/filter-xover</iconset>
    </property>
    <property name="text">
-    <string/>
+    <string>(X)overs</string>
    </property>
    <property name="toolTip">
     <string>(X)overs</string>
@@ -900,7 +905,8 @@
   <action name="action_new_dnapart_honeycomb">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
+     <normaloff>:/parttools/new-honeycomb-disabled</normaloff>
+     <disabledoff>:/parttools/new-honeycomb</disabledoff>:/parttools/new-honeycomb-disabled</iconset>
    </property>
    <property name="text">
     <string>New Honeycomb</string>
@@ -918,7 +924,8 @@
   <action name="action_new_dnapart_square">
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
+     <normaloff>:/parttools/new-square-disabled</normaloff>
+     <disabledoff>:/parttools/new-square</disabledoff>:/parttools/new-square-disabled</iconset>
    </property>
    <property name="text">
     <string>New Square</string>
@@ -1110,7 +1117,8 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/force</normaloff>:/pathtools/force</iconset>
+     <normaloff>:/pathtools/create</normaloff>
+     <disabledoff>:/pathtools/create-disabled</disabledoff>:/pathtools/create</iconset>
    </property>
    <property name="text">
     <string>Create</string>

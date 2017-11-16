@@ -156,13 +156,15 @@ class Document(CNObject):
     # end def
 
     def setActivePart(self, part):
-        # print("DC setActivePart")
         self._active_part = part
+        if self._controller:
+            self._controller.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
-        # print("DC deactive Part")
         self._active_part = None
+        if self._controller:
+            self._controller.toggleNewPartButtons(True)
     # end def
 
     def fileName(self):
@@ -191,6 +193,7 @@ class Document(CNObject):
         Args:
             filename (str): full path file name
         """
+        print("reading file", filename)
         return decodeFile(filename, document=self, emit_signals=True)
     # end def
 

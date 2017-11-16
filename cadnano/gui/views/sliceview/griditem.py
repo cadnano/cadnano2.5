@@ -31,7 +31,7 @@ class GridItem(QGraphicsPathItem):
         # TODO[NF] Make this a constant
         dot_size = 30
         self.dots = (dot_size, dot_size / 2)
-        self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
+        # self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
         self.draw_lines = False
         self.points = []
         self.points_dict = dict()
@@ -162,7 +162,6 @@ class GridItem(QGraphicsPathItem):
 
         if draw_lines:
             for column in range(col_l, col_h + 1):
-                # print("newcol")
                 for row in range(row_l, row_h):
                     x, y = doLattice(radius, row, column, scale_factor=sf)
                     if is_pen_down and isEven(row, column):
@@ -290,7 +289,9 @@ class GridItem(QGraphicsPathItem):
 
 
 class ClickArea(QGraphicsEllipseItem):
-    """An extra ellipse with slightly.
+    """An extra ellipse with slightly expanded real estate for receiving user
+    mouse events. Displays no pen or brush, and directly invokes parent's
+    mouse events.
 
     Args:
         diameter (float): defines the size of the clickarea.
@@ -307,14 +308,22 @@ class ClickArea(QGraphicsEllipseItem):
         self.setPen(getNoPen())
     # end def
 
+    def hoverMoveEvent(self, event):
+        """Triggered when hovering mouse is moved on the grid."""
+        self.parent_obj.hoverMoveEvent(event)
+
     def mousePressEvent(self, event):
-        """Event that is triggered when the mouse is clicked anywhere on the
-        grid.
-        """
+        """Triggered when the mouse is pressed anywhere on the grid."""
         return self.parent_obj.mousePressEvent(event)
 
-    def hoverMoveEvent(self, event):
-        self.parent_obj.hoverMoveEvent(event)
+    def mouseMoveEvent(self, event):
+        """Triggered when the mouse is pressed anywhere on the grid."""
+        return self.parent_obj.mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        """Triggered when the mouse is released anywhere on the grid."""
+        return self.parent_obj.mouseReleaseEvent(event)
+# end class
 
 
 class GridPoint(QGraphicsEllipseItem):
@@ -361,16 +370,31 @@ class GridPoint(QGraphicsEllipseItem):
         Returns:
             None
         """
-        if self.grid.allow_snap:
-            part_item = self.grid.part_item
-            tool = part_item._getActiveTool()
-            if tool.FILTER_NAME not in part_item.part().document().filter_set:
-                return
-            tool_method_name = tool.methodPrefix() + "MousePress"
-            if hasattr(self, tool_method_name):
-                getattr(self, tool_method_name)(tool, part_item, event)
-        else:
-            QGraphicsEllipseItem.mousePressEvent(self, event)
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "MousePress"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
+    # end def
+
+    def mouseMoveEvent(self, event):
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "MouseMove"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
+    # end def
+
+    def mouseReleaseEvent(self, event):
+        controller = self.grid.part_item.document().controller()
+        controller.showFilterHints(False)
+        controller.showToolHints(False)
+
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        tool_method_name = tool.methodPrefix() + "MouseRelease"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(tool, part_item, event)
     # end def
 
     def hoverMoveEvent(self, event):
@@ -428,12 +452,30 @@ class GridPoint(QGraphicsEllipseItem):
             part_item (TYPE): Description
             event (TYPE): Description
         """
+        # return QGraphicsEllipseItem.mousePressEvent(self, event)
+        return self.grid.part_item.mousePressEvent(event)
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        controller = part_item.document().controller()
+
+        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+            controller.showFilterHints(True, filter_name='virtual_helix')
+            # return
+        else:  # the filter is correct, tool is wrong
+            controller.showToolHints(True, tool_name='create')
         part = part_item.part()
         part.setSelected(True)
         alt_event = GridEvent(self, self.offset)
         tool.selectOrSnap(part_item, alt_event, event)
-        return QGraphicsEllipseItem.mousePressEvent(self, event)
     # end def
+
+    def selectToolMouseMove(self, tool, part_item, event):
+        pass
+        # return QGraphicsEllipseItem.mouseReleaseEvent(self, event)
+
+    def selectToolMouseRelease(self, tool, part_item, event):
+        pass
+        # return QGraphicsEllipseItem.mouseReleaseEvent(self, event)
 
     def createToolMousePress(self, tool, part_item, event):
         """Called by mousePressEvent when clicking on the grid
@@ -444,9 +486,16 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneMouseEvent): The event that the mouseclick
             triggered
         """
+        part_item = self.grid.part_item
+        tool = part_item._getActiveTool()
+        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+            controller = part_item.document().controller()
+            controller.showFilterHints(True, filter_name='virtual_helix')
+            return
         part = part_item.part()
         part.setSelected(True)
         alt_event = GridEvent(self, self.offset)
+        part_item.setLastHoveredItem(self)
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):

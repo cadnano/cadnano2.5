@@ -495,7 +495,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         # now update Z dimension (X in Qt space in the Path view)
         part = self.part()
         self.partZDimensionsChangedSlot(part, *part.zBoundsIds(), ztf=zoom_to_fit)
-        self.reconfigureRect()
     # end def
 
     def resetPen(self, color, width=0):
@@ -534,6 +533,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         Called by partZDimensionsChangedSlot and partPropertyChangedSlot.
         """
+        self.workplane.updatePositionAndBounds()  # do first for correct sizing
+
         self.resetPen(self.modelColor(), 0)  # cosmetic
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
         outline = self.outline
@@ -548,7 +549,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._configureOutline(outline)
         p = self._GC_SIZE / 2
         self.grab_corner.setTopLeft(outline.rect().adjusted(-p, -p, p, p).topLeft())
-        self.workplane.updatePositionAndBounds()
     # end def
 
     ### PUBLIC METHODS ###

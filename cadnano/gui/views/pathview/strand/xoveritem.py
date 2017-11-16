@@ -581,10 +581,11 @@ class XoverItem(QGraphicsPathItem):
         """
         if self._getActiveTool().methodPrefix() == "selectTool":
             event.setAccepted(False)
-            sI = self._strand_item
-            viewroot = sI.viewroot()
+            s_i = self._strand_item
+            viewroot = s_i.viewroot()
             current_filter_set = viewroot.selectionFilterSet()
-            if sI.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
+            # if s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
+            if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
                 event.setAccepted(True)
                 selection_group = viewroot.strandItemSelectionGroup()
                 mod = Qt.MetaModifier
@@ -615,8 +616,8 @@ class XoverItem(QGraphicsPathItem):
         """Remove the xover.
         """
         # make sure the selection is clear
-        sI = self._strand_item
-        viewroot = sI.viewroot()
+        s_i = self._strand_item
+        viewroot = s_i.viewroot()
         selection_group = viewroot.strandItemSelectionGroup()
         selection_group.clearSelection(False)
 
@@ -692,13 +693,13 @@ class XoverItem(QGraphicsPathItem):
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
             active_tool = self._getActiveTool()
             if active_tool.methodPrefix() == "selectTool":
-                sI = self._strand_item
-                viewroot = sI.viewroot()
+                s_i = self._strand_item
+                viewroot = s_i.viewroot()
                 current_filter_set = viewroot.selectionFilterSet()
                 selection_group = viewroot.strandItemSelectionGroup()
                 # only add if the selection_group is not locked out
                 if value == True and (self.FILTER_NAME in current_filter_set or not selection_group.isNormalSelect()):    # noqa
-                    if sI.strandFilter() in current_filter_set:
+                    if all(f in current_filter_set for f in s_i.strandFilter()):
                         # print("might add a xoi")
                         if self.group() != selection_group and selection_group.isNormalSelect():
                             # print("adding an xoi")
@@ -726,10 +727,10 @@ class XoverItem(QGraphicsPathItem):
                 # end else
             # end if
             elif str(active_tool) == "paint_tool":
-                sI = self._strand_item
-                viewroot = sI.viewroot()
+                s_i = self._strand_item
+                viewroot = s_i.viewroot()
                 current_filter_set = viewroot.selectionFilterSet()
-                if sI.strandFilter() in current_filter_set:
+                if all(f in current_filter_set for f in s_i.strandFilter()):
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress()

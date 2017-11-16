@@ -560,7 +560,7 @@ class StrandItem(QGraphicsLineItem):
     def selectToolMousePress(self, event, idx):
         event.setAccepted(False)
         current_filter_set = self._viewroot.selectionFilterSet()
-        if self.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
+        if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
             selection_group = self._viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (event.modifiers() & mod):
@@ -644,7 +644,7 @@ class StrandItem(QGraphicsLineItem):
         """
         m_strand = self._model_strand
         current_filter_set = self._viewroot.selectionFilterSet()
-        if self.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
+        if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
             olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
             if olg_len:
                 msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)

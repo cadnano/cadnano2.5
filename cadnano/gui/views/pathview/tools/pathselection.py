@@ -279,6 +279,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
         Args:
             event (TYPE): Description
         """
+        self.selectionbox.setParentItem(self.viewroot)
         self.selectionbox.hide()
         self.selectionbox.resetTransform()
         self._drag_enable = False

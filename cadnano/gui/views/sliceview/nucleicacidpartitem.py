@@ -23,7 +23,6 @@ from .griditem import GridItem
 from .prexovermanager import PreXoverManager
 from .virtualhelixitem import SliceVirtualHelixItem
 
-
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
 _SELECTED_COLOR = styles.SELECTED_COLOR
@@ -625,6 +624,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             event (QMouseEvent): contains parameters that describe a mouse event.
         """
+        # print("napart: press")
         if event.button() == Qt.RightButton:
             return
         part = self._model_part
@@ -813,6 +813,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool (TYPE): Description
             event (TYPE): Description
         """
+        # print("napart select press")
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
