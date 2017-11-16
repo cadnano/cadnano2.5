@@ -121,14 +121,14 @@ class Preferences(object):
         value = self.get_slice_view()
 
         if value == PreferencesConst.LEGACY:
-            self.document.controller().action_slice_view(True)
-            self.document.controller().action_grid_view(False)
+            self.document.controller().toggleSliceView(True)
+            self.document.controller().toggleGridView(False)
         elif value == PreferencesConst.GRID:
-            self.document.controller().action_slice_view(False)
-            self.document.controller().action_grid_view(True)
+            self.document.controller().toggleSliceView(False)
+            self.document.controller().toggleGridView(True)
         elif value == PreferencesConst.DUAL:
-            self.document.controller().action_slice_view(True)
-            self.document.controller().action_grid_view(True)
+            self.document.controller().toggleSliceView(True)
+            self.document.controller().toggleGridView(True)
         else:
             raise ValueError('Invalid slice view value: %s' % value)
 

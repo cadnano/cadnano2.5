@@ -76,13 +76,10 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
-        """Summary
+        """Update active tool to respond to active filters.
 
         Args:
-            filter_name_list (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            filter_name_list (list): list of active filters
         """
         # if 'virtual_helix' not in filter_name_list:
         #     self.manager.chooseCreateTool()
