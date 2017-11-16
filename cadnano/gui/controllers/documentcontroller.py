@@ -598,7 +598,7 @@ class DocumentController():
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=not ONLY_ONE, grid_type=grid_type)
+        part = doc.createNucleicAcidPart(use_undostack=True, grid_type=grid_type)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
