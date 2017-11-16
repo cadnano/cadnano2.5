@@ -36,6 +36,14 @@ def overlap(x, y, a, b):
 # end def
 
 
+try:
+    from termcolor import colored
+except ImportError:
+    print("pip3 install termcolor")
+
+    def colored(s, color=None, **kwargs):
+        return s
+
 def trace(n):
     """Returns a stack trace n frames deep"""
     s = extract_stack()
@@ -43,8 +51,9 @@ def trace(n):
     for f in s[-n-1:-1]:
         # f is a stack frame like
         # ('/path/script.py', 42, 'funcname', 'current = line - of / code')
-        frames.append((path.basename(f[0])+':%i' % f[1])+'(%s)' % f[2])
-    return " > ".join(frames)
+        frames.append((colored(path.basename(f[0]) + ':%i' % f[1], 'blue') + '(' + colored(f[2], 'green') + ')'))
+    sep = colored(" > ", 'yellow')
+    return sep.join(frames)
 
 if IS_PY_3:
     complement = str.maketrans('ACGTacgt', 'TGCATGCA')
