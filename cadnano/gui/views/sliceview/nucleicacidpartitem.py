@@ -6,6 +6,7 @@ Attributes:
 """
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType
@@ -63,6 +64,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.vh_set = set()
         self.point_map = dict()
         self._last_hovered_item = None
+        self._highlighted_path = []
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -779,10 +781,38 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverEnter(self, tool, event):
-        pass  # TODO: add code to show hint
-        # if self.shortest_path_add_mode:
-        #     shortest_path_start_ij = None
-        #     current_ij = None
+        modifiers = event.modifiers()
+        is_shift = modifiers == Qt.ShiftModifier
+
+        # Un-highlight things
+        print("Coming in , path looks like this: %s" % str(self._highlighted_path))
+        for node in self._highlighted_path:
+            print('removing %s' % str(node))
+            self.griditem.changeGridPointColor(coordinates=node,
+                                               color=styles.SLICE_FILL)
+
+        if is_shift and self.shortest_path_add_mode:
+            start = self.shortest_path_start
+            end = (event.scenePos().x(), event.scenePos().y())
+
+            print('going from %s to %s' % (str(start), str(end)))
+            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
+                                                                     end=end,
+                                                                     neighbor_map=self.neighbor_map,
+                                                                     vh_set=self.vh_set,
+                                                                     point_map=self.point_map)
+            print('now it looks like this %s' % str(self._highlighted_path))
+            for node in self._highlighted_path:
+                self.griditem.changeGridPointColor(coordinates=node,
+                                                   color=styles.DEFAULT_GRID_DOT_COLOR)
+
+    def createToolHoverLeave(self, tool, event):
+        print('hle')
+        print("Coming in to leave  path looks like this: %s" % str(self._highlighted_path))
+        for node in self._highlighted_path:
+            self.griditem.changeGridPointColor(coordinates=node,
+                                               color=styles.SLICE_FILL)
+#        self._highlighted_path = []
 
     def selectToolMousePress(self, tool, event):
         """
