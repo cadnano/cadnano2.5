@@ -122,8 +122,6 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
         if part_item is not self.part_item:
             if self.sgv is not None:
                 # attempt to enforce good housekeeping, not required

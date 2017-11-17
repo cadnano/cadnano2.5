@@ -683,7 +683,7 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def setSelectedColor(self, value):
-        if value == True:
+        if value is True:
             color = getColorObj(SELECT_COLOR)
         else:
             oligo = self._model_strand.oligo()
@@ -726,7 +726,7 @@ class StrandItem(QGraphicsLineItem):
                     else:
                         return False
                 # end if
-                elif value == True:
+                elif value is True:
                     # Don't select
                     return False
                 # end elif
@@ -793,7 +793,7 @@ class StrandItem(QGraphicsLineItem):
         # Now check the endpoints
 
         low_cap = self._low_cap
-        if idx_l == True:
+        if idx_l is True:
             if not low_cap.isSelected() or not low_cap.group():
                 selection_group.addToGroup(low_cap)
                 low_cap.modelSelect(document)
@@ -801,7 +801,7 @@ class StrandItem(QGraphicsLineItem):
             if low_cap.isSelected() or low_cap.group():
                 low_cap.restoreParent()
         high_cap = self._high_cap
-        if idx_h == True:
+        if idx_h is True:
             if not high_cap.isSelected() or not high_cap.group():
                 selection_group.addToGroup(high_cap)
                 high_cap.modelSelect(document)
@@ -810,13 +810,13 @@ class StrandItem(QGraphicsLineItem):
                 high_cap.restoreParent()
 
         # now check the strand itself
-        if idx_l == True and idx_h == True:
+        if idx_l is True and idx_h is True:
             if not self.isSelected() or not self.group():
                 selection_group.setNormalSelect(False)
                 selection_group.addToGroup(self)
                 self.modelSelect(document)
                 selection_group.setNormalSelect(True)
-        elif idx_l == False and idx_h == False:
+        elif idx_l is False and idx_h is False:
             self.modelDeselect(document)
     # end def
 

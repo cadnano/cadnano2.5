@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.gui.views.gridview import gridstyles as styles
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
+from cadnano.gui.palette import getPenObj
 
 _RADIUS = styles.GRID_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
