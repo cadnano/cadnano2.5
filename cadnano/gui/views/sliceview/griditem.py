@@ -7,9 +7,11 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRe
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getNoPen, getPenObj, getBrushObj  # getBrushObj
+from cadnano.gui.palette import getNoPen, getPenObj, getBrushObj
 
-from . import slicestyles as styles
+from cadnano.gui.views.sliceview import slicestyles as styles
+
+
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _ZVALUE = styles.ZSLICEHELIX + 1
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
@@ -42,10 +44,14 @@ class GridItem(QGraphicsRectItem):
         self.points = []
         self.points_dict = dict()
         self.previous_grid_bounds = None
+        self.bounds = None
+        self.grid_type = None
+
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+
         self.setGridType(grid_type)
         self.previous_grid_type = grid_type
 
@@ -58,14 +64,14 @@ class GridItem(QGraphicsRectItem):
         part_item = self.part_item
         part = part_item.part()
         radius = part.radius()
-        self.bounds = bounds = part_item.bounds()
+        self.bounds = part_item.bounds()
         self.removePoints()
 
         self.setRect(self.part_item.outline.rect())
         if self.grid_type == GridType.HONEYCOMB:
-            self.createHoneycombGrid(part_item, radius, bounds)
+            self.createHoneycombGrid(part_item, radius, self.bounds)
         elif self.grid_type == GridType.SQUARE:
-            self.createSquareGrid(part_item, radius, bounds)
+            self.createSquareGrid(part_item, radius, self.bounds)
         else:
             self._path.setPath(QPainterPath())
     # end def
@@ -362,13 +368,6 @@ class ClickArea(QGraphicsEllipseItem):
 
 
 class GridPoint(QGraphicsEllipseItem):
-    """Summary
-
-    Attributes:
-        clickarea (TYPE): Description
-        grid (TYPE): Description
-        offset (TYPE): Description
-    """
     __slots__ = 'grid', 'offset'
 
     def __init__(self, x, y, diameter, parent_grid, coord=None):
@@ -377,7 +376,7 @@ class GridPoint(QGraphicsEllipseItem):
         self.grid = parent_grid
         self._coord = coord
 
-        self.clickarea = ClickArea(diameter, parent=self)
+        self.click_area = ClickArea(diameter, parent=self)
 
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
@@ -518,8 +517,7 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             tool (CreateSliceTool): The tool that is being used
             part_item (TYPE):
-            event (QGraphicsSceneMouseEvent): The event that the mouseclick
-            triggered
+            event (QGraphicsSceneMouseEvent): The event that the mouse click triggered
         """
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
@@ -534,7 +532,7 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
-        self.setPen(getPenObj(styles.BLUE_STROKE, 1.5))
+        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)
         part_item.createToolHoverEnter(tool, event)
 
@@ -543,6 +541,7 @@ class GridPoint(QGraphicsEllipseItem):
 
     def createToolHoverLeaveEvent(self, tool, part_item, event):
         part_item.createToolHoverLeave(tool, event)
+
 
 class GridEvent(object):
     """Instantiated by selectToolMousePress or createToolMousePress.
