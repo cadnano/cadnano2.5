@@ -791,6 +791,25 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
+        event_xy = (event.scenePos().x(), event.scenePos().y())
+        modifiers = event.modifiers()
+        is_shift = modifiers == Qt.ShiftModifier
+
+        # Un-highlight GridItems if necessary by calling createToolHoverLeave
+        self.createToolHoverLeave(tool=tool, event=event)
+
+        # Highlight GridItems if shift is being held down
+        if is_shift and self.shortest_path_add_mode:
+            start = self.shortest_path_start
+            end = event_xy
+            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
+                                                                     end=end,
+                                                                     neighbor_map=self.neighbor_map,
+                                                                     vh_set=self.vh_set,
+                                                                     point_map=self.point_map)
+            for node in self._highlighted_path:
+                self.griditem.changeGridPointColor(coordinates=node, color=styles.MULTI_VHI_HINT_COLOR)
+
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
@@ -814,23 +833,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             y = vh_coordinates[1]
             self.griditem.showNextIdNumber(id_number=next_id_number, x=x, y=y)
 
-        modifiers = event.modifiers()
-        is_shift = modifiers == Qt.ShiftModifier
-
-        # Un-highlight GridItems if necessary by calling createToolHoverLeave
-        self.createToolHoverLeave(tool=tool, event=event)
-
-        # Highlight GridItems if shift is being held down
-        if is_shift and self.shortest_path_add_mode:
-            start = self.shortest_path_start
-            end = event_xy
-            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
-                                                                     end=end,
-                                                                     neighbor_map=self.neighbor_map,
-                                                                     vh_set=self.vh_set,
-                                                                     point_map=self.point_map)
-            for node in self._highlighted_path:
-                self.griditem.changeGridPointColor(coordinates=node, color=styles.MULTI_VHI_HINT_COLOR)
 
     def createToolHoverLeave(self, tool, event):
         for node in self._highlighted_path:
