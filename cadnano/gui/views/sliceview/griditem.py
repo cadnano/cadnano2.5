@@ -1,9 +1,9 @@
 # from queue import Queue
 
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QColor, QPainterPath
+from PyQt5.QtGui import QColor, QPainterPath, QFont
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -30,6 +30,7 @@ class GridItem(QGraphicsRectItem):
         super(GridItem, self).__init__(parent=part_item)
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
 
+        self._path = None
         self.part_item = part_item
         self._path = QGraphicsPathItem(self)
 
@@ -300,6 +301,27 @@ class GridItem(QGraphicsRectItem):
         else:
             point.setBrush(getBrushObj(color))
 
+    def showNextIdNumber(self, id_number, x, y):
+        label = QGraphicsSimpleTextItem("%d" % id_number)
+        label.setFont(styles.SLICE_NUM_FONT)
+        label.setZValue(styles.ZSLICEHELIX)
+        label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR))
+        label.setPos(x, y)
+
+#        print((x, y))
+#        font = QFont('Arial')
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+
+#        self.path().addText(0, 0, font, "%s" % id_number)
+
+    def setPath(self, path):
+        assert isinstance(path, QPainterPath)
+        self._path = path
+
+    def path(self):
+        return self._path
+
 
 class ClickArea(QGraphicsEllipseItem):
     """An extra ellipse with slightly expanded real estate for receiving user
@@ -521,7 +543,6 @@ class GridPoint(QGraphicsEllipseItem):
 
     def createToolHoverLeaveEvent(self, tool, part_item, event):
         part_item.createToolHoverLeave(tool, event)
-
 
 class GridEvent(object):
     """Instantiated by selectToolMousePress or createToolMousePress.

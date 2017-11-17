@@ -796,6 +796,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverEnter(self, tool, event):
+
+        # Determine parity of the the VH being hovered over for next ID hinting
+        event_xy = (event.scenePos().x(), event.scenePos().y())
+        row, column = ShortestPathHelper.findClosestPoint(position=event_xy, point_map=self.point_map)
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+        elif self.griditem.grid_type is GridType.SQUARE:
+            parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
+        else:
+            parity = None
+        next_id_number = self.part()._get_new_id_num(parity=parity)
+        vh_coordinates = self.point_map.get((row, column))
+
+        if vh_coordinates:
+            x = vh_coordinates[0]
+            y = vh_coordinates[1]
+            self.griditem.showNextIdNumber(id_number=next_id_number, x=x, y=y)
+
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
 
@@ -805,16 +823,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
             start = self.shortest_path_start
-            end = (event.scenePos().x(), event.scenePos().y())
-
+            end = event_xy
             self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
                                                                      end=end,
                                                                      neighbor_map=self.neighbor_map,
                                                                      vh_set=self.vh_set,
                                                                      point_map=self.point_map)
             for node in self._highlighted_path:
-                self.griditem.changeGridPointColor(coordinates=node,
-                                                   color=styles.MULTI_VHI_HINT_COLOR)
+                self.griditem.changeGridPointColor(coordinates=node, color=styles.MULTI_VHI_HINT_COLOR)
 
     def createToolHoverLeave(self, tool, event):
         for node in self._highlighted_path:
