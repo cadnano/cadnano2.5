@@ -772,12 +772,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                  grid_type=self.griditem.grid_type,
                                                  scale_factor=self.inverse_scale_factor,
                                                  radius=self._RADIUS)
-        for x, y, parity in path:
-            before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(x=x, y=y, parity=parity)
-            after = set(self._virtual_helix_item_hash.keys())
-            id_nums = after - before
-            vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
+
+        x_list, y_list, parity_list = zip(*path)
+        id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
+                                                                y_list=y_list,
+                                                                parity=parity_list)
+        for id_number in id_numbers:
+            vhi = self._virtual_helix_item_hash[id_number]
             tool.setVirtualHelixItem(vhi)
             tool.startCreation()
 
@@ -815,6 +816,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverEnter(self, tool, event):
+        # TODO[NF]:  Docstring
 
         # Determine parity of the the VH being hovered over for next ID hinting
         event_xy = (event.scenePos().x(), event.scenePos().y())
