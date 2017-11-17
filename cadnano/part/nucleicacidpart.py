@@ -2609,12 +2609,12 @@ class NucleicAcidPart(Part):
             y (float): y coordinate
             z (float): z coordinate
             length (int): Size of VirtualHelix.
+            id_num (int): The id number that this VirtualHelix should correspond to
             properties (tuple): Tuple of two lists: `keys` and `values`, which
                 contain full set of properties for the VirualHelix.
             safe (bool): Update neighbors otherwise,
                 neighbors need to be explicitly updated
-
-            use_undostack (bool): Set to False to disable undostack for bulk
+            use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
         """
         c = CreateVirtualHelixCommand(self, x, y, z, length,
@@ -2623,6 +2623,91 @@ class NucleicAcidPart(Part):
                                       safe=safe,
                                       parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
+
+    def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
+                                  safe=None, use_undo_stack=True, parity=None):
+        """Create multiple helices at once.
+
+        This method requires that x_list and y_list be specified.  Otherwise,
+        other arguments are optional.  When other arguments are specified (with
+        the exception of use_undo_stack, which is always a bool), they must be
+        lists that have lengths equal to that of x_list and y_list (which must
+        also be lists with equal lengths).
+
+        For each element in the specified lists, a CreateVirtualHelixCommand is
+        created and queued in a list.  execCommandList is then called to batch
+        the creation of virtual helices in an undo stack macro.  This results in
+        one undo/redo operation for all the virtual helices created in this
+        batch
+
+        Args:
+            x_list (list):  A list of length N corresponding to the x
+                coordinates of the N Virtual Helices to be made
+            y_list (list):  A list of length N corresponding to the y
+                coordinates of the N Virtual Helices to be made
+            z_list (list):  A list of length N corresponding to the z
+                coordinates of the N Virtual Helices to be made
+            length (list):  A list of length N corresponding to the length of
+                each of the N Virtual Helices to be made
+            id_num (list):  a list of length N corresponding to the id numbers
+                being requested
+            properties (list):  a list of length N tuples; both tuples should be
+                lists corresponding to keys and values
+            safe (list):  a list of length N corresponding to whether or not
+                neighbors should be updated
+            use_undo_stack (bool):  whether or not the undo stack should be used
+                for this operation
+            parity (list):  a list of length N corresponding to the parity of
+                each Virtual Helix being created
+
+        Returns:
+            a list of id_numbers that were created during this batch operation
+        """
+        assert isinstance(x_list, (list, tuple))
+        assert isinstance(y_list, (list, tuple))
+        assert len(x_list) == len(y_list)
+        assert z_list is None or isinstance(z_list, (list, tuple))
+        assert z_list is None or len(z_list) == len(x_list)
+        assert length is None or isinstance(length, (list, tuple))
+        assert length is None or len(length) == len(x_list)
+        assert id_num is None or isinstance(id_num, (list, tuple))
+        assert id_num is None or len(id_num) == len(x_list)
+        assert properties is None or isinstance(properties, (list, tuple))
+        assert properties is None or len(properties) == len(x_list)
+        assert safe is None or isinstance(safe, (list, tuple))
+        assert safe is None or len(safe) == len(x_list)
+        assert isinstance(use_undo_stack, bool)
+        assert parity is None or isinstance(parity, (list, tuple))
+        assert parity is None or len(parity) == len(x_list)
+
+        commands = []
+        id_numbers = []
+
+        for i, x in enumerate(x_list):
+            y = y_list[i]
+            z = z_list[i] if z_list else 0.0
+            _length = length[i] if length else 42
+            _id_num = id_num[i] if id_num else None
+            _properties = properties[i] if properties else None
+            _safe = safe[i] if safe else True
+            _parity = parity[i] if parity else None
+
+            # Reserve the _id_num to prevent id_number collisions between VHs created in this loop
+            if _id_num is None:
+                _id_num = self._get_new_id_num(parity=_parity)
+                self._reserve_id_num(requested_id_num=_id_num)
+
+            command = CreateVirtualHelixCommand(self, x=x, y=y, z=z,
+                                                length=_length,
+                                                id_num=_id_num,
+                                                properties=_properties,
+                                                safe=_safe,
+                                                parity=_parity)
+            commands.append(command)
+            id_numbers.append(_id_num)
+
+        util.execCommandList(self, commands=commands, desc='SPA', use_undostack=use_undo_stack)
+        return id_numbers
     # end def
 
     def removeVirtualHelix(self, id_num, use_undostack=True):
