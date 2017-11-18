@@ -1,9 +1,3 @@
-"""Summary
-
-Attributes:
-    DELTA (TYPE): Description
-    HIGHLIGHT_WIDTH (TYPE): Description
-"""
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
@@ -129,11 +123,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            part (TYPE): Description
+            part (NucleicAcidPart): Description
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-
-        Args:
-            TYPE: Description
         """
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
