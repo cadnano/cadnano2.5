@@ -708,7 +708,7 @@ class StrandItem(QGraphicsLineItem):
                 # only add if the selection_group is not locked out
                 is_normal_select = selection_group.isNormalSelect()
                 if value == True and (self.FILTER_NAME in current_filter_set or not is_normal_select):
-                    if self._strand_filter in current_filter_set:
+                    if all(f in current_filter_set for f in self.strandFilter()):
                         if self.group() != selection_group:
                             self.setSelectedColor(True)
                             # This should always be the case, but...
@@ -743,7 +743,7 @@ class StrandItem(QGraphicsLineItem):
             elif active_tool.methodPrefix() == "paintTool":
                 viewroot = self._viewroot
                 current_filter_set = viewroot.selectionFilterSet()
-                if self._strand_filter in current_filter_set:
+                if all(f in current_filter_set for f in self.strandFilter()):
                     if not active_tool.isMacrod():
                         active_tool.setMacrod()
                     self.paintToolMousePress(None, None)

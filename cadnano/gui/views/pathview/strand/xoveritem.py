@@ -582,7 +582,6 @@ class XoverItem(QGraphicsPathItem):
             s_i = self._strand_item
             viewroot = s_i.viewroot()
             current_filter_set = viewroot.selectionFilterSet()
-            # if s_i.strandFilter() in current_filter_set and self.FILTER_NAME in current_filter_set:
             if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
                 event.setAccepted(True)
                 selection_group = viewroot.strandItemSelectionGroup()

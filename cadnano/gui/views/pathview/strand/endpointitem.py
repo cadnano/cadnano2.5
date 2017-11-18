@@ -456,15 +456,11 @@ class EndpointItem(QGraphicsPathItem):
                 selection_group = viewroot.strandItemSelectionGroup()
                 # only add if the selection_group is not locked out
                 if value == True and self.FILTER_NAME in current_filter_set:
-                    # if (self.group() != selection_group and
-                    #     s_i.strandFilter() in current_filter_set):
                     if all(f in current_filter_set for f in s_i.strandFilter()):
                         if self.group() != selection_group or not self.isSelected():
-                            # print("select ep")
                             selection_group.pendToAdd(self)
                             selection_group.setSelectionLock(selection_group)
                             self.setSelectedColor(True)
-                        # print("select2 ep")
                         return True
                     else:
                         return False
