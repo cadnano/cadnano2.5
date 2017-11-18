@@ -108,6 +108,20 @@ class GridType:
 
 ENUM_NAMES['grid_type'] = enumNames(GridType)
 
+
+class HandleType:
+    TOP = 1
+    BOTTOM = 2
+    LEFT = 3
+    RIGHT = 4
+    TOP_LEFT = 5
+    TOP_RIGHT = 6
+    BOTTOM_LEFT = 7
+    BOTTOM_RIGHT = 8
+
+
+ENUM_NAMES['handle_type'] = enumNames(HandleType)
+
 # class BreakType:
 #     LEFT5PRIME = 0
 #     LEFT3PRIME = 1

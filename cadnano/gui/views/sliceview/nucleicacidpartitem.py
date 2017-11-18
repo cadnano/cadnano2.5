@@ -8,13 +8,13 @@ from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
-from cadnano.cnenum import GridType
+from cadnano.cnenum import GridType, HandleType
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
-from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.gui.views.resizehandles import ResizeHandleGroup
 from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
 
 from . import slicestyles as styles
@@ -93,15 +93,43 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         model_color = m_p.getColor()
         self.outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
 
-        GC_SIZE = 10
-        self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, True, self)
-        self.grab_cornerTL.setTopLeft(o_rect.topLeft())
-        self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
-        self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
+        GC_SIZE = 8
+        self.resize_handle_group = ResizeHandleGroup(o_rect, GC_SIZE, model_color, True,
+                                                     HandleType.TOP |
+                                                     HandleType.BOTTOM |
+                                                     HandleType.LEFT |
+                                                     HandleType.RIGHT |
+                                                     HandleType.TOP_LEFT |
+                                                     HandleType.TOP_RIGHT |
+                                                     HandleType.BOTTOM_LEFT |
+                                                     HandleType.BOTTOM_RIGHT,
+                                                     self)
+
+        # self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerTL.setTopLeft(o_rect.topLeft())
+        # self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
+        # self.grab_cornerBL = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerBL.setBottomLeft(o_rect.bottomLeft())
+        # self.grab_cornerTR = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerTR.setTopRight(o_rect.topRight())
+        # self.grab_cornerT = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerT.setTop(QPointF(o_rect.center().x(), o_rect.top()))
+        # self.grab_cornerB = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerB.setBottom(QPointF(o_rect.center().x(), o_rect.bottom()))
+        # self.grab_cornerL = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerL.setLeft(QPointF(o_rect.left(), o_rect.center().y()))
+        # self.grab_cornerR = GrabCornerItem(GC_SIZE, model_color, True, self)
+        # self.grab_cornerR.setRight(QPointF(o_rect.right(), o_rect.center().y()))
+
         self.griditem = GridItem(self, self._model_props['grid_type'])
         self.griditem.setZValue(1)
-        self.grab_cornerTL.setZValue(2)
-        self.grab_cornerBR.setZValue(2)
+        # self.grab_cornerTL.setZValue(2)
+        # self.grab_cornerBR.setZValue(2)
+        # self.grab_cornerT.setZValue(2)
+        # self.grab_cornerB.setZValue(2)
+        # self.grab_cornerL.setZValue(2)
+        # self.grab_cornerR.setZValue(2)
 
         # select upon creation
         for part in m_p.document().children():
@@ -164,8 +192,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self.outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
-                self.grab_cornerTL.setPen(getPenObj(new_value, 0))
-                self.grab_cornerBR.setPen(getPenObj(new_value, 0))
+                self.resize_handle_group.setPens(getPenObj(new_value, 0))
             elif property_key == 'is_visible':
                 if new_value:
                     self.show()
@@ -192,8 +219,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self._controller.disconnectSignals()
         self._controller = None
-        self.grab_cornerTL = None
-        self.grab_cornerBR = None
+        self.resize_handle_group.removeHandles()
         self.griditem = None
     # end def
 
@@ -349,7 +375,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         select_tool = self._viewroot.select_tool
         if is_adding:
-            # print("got the adding slot in path")
             select_tool.selection_set.update(vh_set)
             select_tool.setPartItem(self)
             select_tool.getSelectionBoundingRect()
@@ -440,7 +465,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             pxom.hideGroups()
             return
 
-        # print("slice.setPreXoverItemsVisible", virtual_helix_item.idNum())
         part = self.part()
         info = part.active_base_info
         if info:
@@ -493,7 +517,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._configureOutline(self.outline)
         if do_grid:
             self.griditem.updateGrid()
-        return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
+        return self.outline.rect()
     # end def
 
     def padTL(self, padding, xTL, yTL):
@@ -524,11 +548,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         xBR = max(rect_right, model_right) + padding
         yTL = min(rect_top, model_top) - padding
         yBR = max(rect_bottom, model_bottom) + padding
-        top_left, bottom_right = self.reconfigureRect(top_left=(xTL, yTL),
-                                                      bottom_right=(xBR, yBR),
-                                                      do_grid=True)
-        self.grab_cornerTL.alignPos(*top_left)
-        self.grab_cornerBR.alignPos(*bottom_right)
+        new_outline_rect = self.reconfigureRect(top_left=(xTL, yTL), bottom_right=(xBR, yBR), do_grid=True)
+        self.resize_handle_group.alignHandles(new_outline_rect)
+        # self.grab_cornerTL.alignPos(*top_left)
+        # self.grab_cornerBR.alignPos(*bottom_right)
 
     ### PRIVATE SUPPORT METHODS ###
     def _configureOutline(self, outline):
@@ -623,7 +646,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             event (QMouseEvent): contains parameters that describe a mouse event.
         """
-        # print("napart: press")
         if event.button() == Qt.RightButton:
             return
         part = self._model_part
@@ -649,7 +671,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, event)
         else:
-            # print("Ignoring hovermove")
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
 
@@ -693,12 +714,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
-            # print("reg_event", pt)
         else:
             # pt = alt_event.scenePos()
             # pt = self.mapFromScene(pt)
             pt = alt_event.pos()
-            # print("alt_event", pt)
 
         if pt is None:
             tool.deactivate()
@@ -812,7 +831,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool (TYPE): Description
             event (TYPE): Description
         """
-        # print("napart select press")
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
