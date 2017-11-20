@@ -7,19 +7,23 @@ from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QGraphicsItem, QMessageBox,
                              QStyleOptionGraphicsItem)
-from cadnano.cnenum import GridType
 
 from cadnano import app, setReopen, util
+from cadnano.cnenum import GridType
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
 from cadnano.gui.views import styles
 from cadnano.gui.views.documentwindow import DocumentWindow
 
+
 DEFAULT_VHELIX_FILTER = True
-ONLY_ONE = True
-"""bool: Retricts Document to creating only one Part if True."""
+ONLY_ONE = True  # bool: Retricts Document to creating only one Part if True.
+SAVE_DIALOG_OPTIONS = {'SAVE': 0,
+                       'CANCEL': 1,
+                       'DISCARD': 2
+                       }
 
 
-class DocumentController():
+class DocumentController(object):
     """Connects UI buttons to their corresponding actions in the model."""
 
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
@@ -48,6 +52,8 @@ class DocumentController():
         self._hintable_filter_action_map = {}  # what buttons to hint for each filter
         self._tool_hints_visible = False
         self._filter_hints_visible = False
+
+        self.self_signals = []
 
         # call other init methods
         self._initWindow()
@@ -232,7 +238,7 @@ class DocumentController():
                     if not f.isChecked():  # no need to hint when already checked
                         f.setEnabled(False)  # disable to show hint icon
                         self._filter_hints_visible = True
-            except KeyError as e:
+            except KeyError:
                 pass
         elif self._filter_hints_visible:
             for f in self._hintable_filters:
@@ -247,7 +253,7 @@ class DocumentController():
                     if not t.isChecked():  # no need to hint when already checked
                         t.setEnabled(False)  # disable to show hint icon
                         self._tool_hints_visible = True
-            except KeyError as e:
+            except KeyError:
                 pass
         elif self._tool_hints_visible:
             for t in self._hintable_tools:
@@ -387,14 +393,14 @@ class DocumentController():
     def actionNewSlot(self):
         """
         1. If document is has no parts, do nothing.
-        2. If document is dirty, call maybeSave and continue if it succeeds.
+        2. If document is dirty, call promptSaveDialog and continue if it succeeds.
         3. Create a new document and swap it into the existing ctrlr/window.
         """
         # clear/reset the view!
 
         if len(self._document.children()) == 0:
             return  # no parts
-        elif self.maybeSave() is False:
+        elif self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
             return  # user canceled in maybe save
         else:  # user did not cancel
             if self.filesavedialog is not None:
@@ -409,7 +415,7 @@ class DocumentController():
         3. Downstream, the file is selected in openAfterMaybeSave, and the selected
            file is actually opened in openAfterMaybeSaveCallback.
         """
-        if self.maybeSave() is False:
+        if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
             return  # user canceled in maybe save
         else:  # user did not cancel
             if hasattr(self, "filesavedialog"):  # user did save
@@ -421,16 +427,15 @@ class DocumentController():
                 self.openAfterMaybeSave()  # finalize new
 
     def actionCloseSlot(self):
-        """Called when DocumentWindow is closed"""
-        # if util.isWindows():
-        # traceback.print_stack()
-        the_app = app()
-        self.destroyDC()
-        if the_app.document_controllers:    # check we haven't done this already
-            # print("App Closing")
-            the_app.destroyApp()
-            # print("App closed")
-    # end def
+        """Called when DocumentWindow is closed.
+
+        This method does not do anything as its functionality is implemented by
+        windowCloseEventHandler.  windowCloseEventHandler captures all close
+        events (including quit signals) while this method captures only close
+        window events (i.e. a strict subset of the events that the
+        windowCloseEventHandler captures.
+        """
+        pass
 
     def actionSaveSlot(self):
         """SaveAs if necessary, otherwise overwrite existing file."""
@@ -594,7 +599,7 @@ class DocumentController():
         # TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
-                if self.maybeSave() is False:
+                if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
                     return
             self.newDocument()
         doc = self._document
@@ -739,7 +744,7 @@ class DocumentController():
     def actionNewSlotCallback(self):
         """
         Gets called on completion of filesavedialog after newClicked's
-        maybeSave. Removes the dialog if necessary, but it was probably
+        promptSaveDialog. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
         if self.filesavedialog is not None:
@@ -780,7 +785,7 @@ class DocumentController():
     def newClickedCallback(self):
         """
         Gets called on completion of filesavedialog after newClicked's
-        maybeSave. Removes the dialog if necessary, but it was probably
+        promptSaveDialog. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
 
@@ -852,15 +857,17 @@ class DocumentController():
         self._writeFileOpenPath(os.path.dirname(fname))
 
     ### EVENT HANDLERS ###
-    def windowCloseEventHandler(self, event):
+    def windowCloseEventHandler(self, event=None):
         """Intercept close events when user attempts to close the window."""
-        if self.maybeSave():
-            event.accept()
-        else:
+        if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['DISCARD']:
+            if event is not None:
+                event.accept()
+            the_app = app()
+            self.destroyDC()
+            if the_app.document_controllers:
+                the_app.destroyApp()
+        elif event is not None:
             event.ignore()
-        self.actionCloseSlot()
-        # if self.win is not None:
-        #     QMainWindow.closeEvent(self.win, event)
     # end def
 
     ### FILE INPUT ##
@@ -908,24 +915,16 @@ class DocumentController():
     # end def
 
     ### FILE OUTPUT ###
-    def maybeSave(self):
-        """Save on quit, check if document changes have occured.
+    def promptSaveDialog(self):
+        """Save on quit, check if document changes have occurred.
 
         Returns:
-            True, False, or None
-
-            True if dontAskAndJustDiscardUnsavedChanges is True
-                OR if the undoStack is clean (i.e. there have been no changes)
-                OR if the user clicks 'Discard'
-            False if the user clicks 'Cancel'
-            None if the user clicks 'Save'
-
-        TODO:  This method should probably be renamed to something more
-               descriptive, or refactored so that the value returned is more
-               easily parsed
+            SAVE_DIALOG_OPTIONS['CANCEL'] or
+            SAVE_DIALOG_OPTIONS['DISCARD'] or
+            SAVE_DIALOG_OPTIONS['SAVE']
         """
         if app().dontAskAndJustDiscardUnsavedChanges:
-            return True
+            return SAVE_DIALOG_OPTIONS['DISCARD']
         if not self.undoStack().isClean():    # document dirty?
             savebox = QMessageBox(QMessageBox.Warning, "Application",
                                   "The document has been modified.\nDo you want to save your changes?",
@@ -944,8 +943,8 @@ class DocumentController():
             if ret == QMessageBox.Save:
                 return self.actionSaveAsSlot()
             elif ret == QMessageBox.Cancel:
-                return False
-        return True
+                return SAVE_DIALOG_OPTIONS['CANCEL']
+        return SAVE_DIALOG_OPTIONS['DISCARD']
 
     def writeDocumentToFile(self, filename=None):
         if filename is None or filename == '':
