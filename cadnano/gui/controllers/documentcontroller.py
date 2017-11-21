@@ -942,6 +942,8 @@ class DocumentController(object):
             save = savebox.button(QMessageBox.Save)
             discard = savebox.button(QMessageBox.Discard)
             cancel = savebox.button(QMessageBox.Cancel)
+            savebox.setDefaultButton(save)
+            savebox.setEscapeButton(cancel)
             save.setShortcut("Ctrl+S")
             discard.setShortcut(QKeySequence("D,Ctrl+D"))
             cancel.setShortcut(QKeySequence("C,Ctrl+C,.,Ctrl+."))
