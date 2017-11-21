@@ -856,10 +856,18 @@ class DocumentController(object):
         self.writeDocumentToFile(fname)
         self._writeFileOpenPath(os.path.dirname(fname))
 
+        if self.exit_when_done:
+            the_app = app()
+            self.destroyDC()
+            if the_app.document_controllers:
+                the_app.destroyApp()
+
     ### EVENT HANDLERS ###
     def windowCloseEventHandler(self, event=None):
         """Intercept close events when user attempts to close the window."""
-        if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['DISCARD']:
+        dialog_result = self.promptSaveDialog(exit_when_done=True)
+        if dialog_result is SAVE_DIALOG_OPTIONS['DISCARD']:
+            print(dialog_result)
             if event is not None:
                 event.accept()
             the_app = app()
@@ -915,7 +923,7 @@ class DocumentController(object):
     # end def
 
     ### FILE OUTPUT ###
-    def promptSaveDialog(self):
+    def promptSaveDialog(self, exit_when_done=False):
         """Save on quit, check if document changes have occurred.
 
         Returns:
@@ -941,7 +949,9 @@ class DocumentController(object):
             ret = savebox.exec_()
             del savebox  # manual garbage collection to prevent hang (in osx)
             if ret == QMessageBox.Save:
-                return self.actionSaveAsSlot()
+                self.exit_when_done = exit_when_done
+                self.actionSaveAsSlot()
+                return SAVE_DIALOG_OPTIONS['SAVE']
             elif ret == QMessageBox.Cancel:
                 return SAVE_DIALOG_OPTIONS['CANCEL']
         return SAVE_DIALOG_OPTIONS['DISCARD']
