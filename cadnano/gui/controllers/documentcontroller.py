@@ -867,7 +867,6 @@ class DocumentController(object):
         """Intercept close events when user attempts to close the window."""
         dialog_result = self.promptSaveDialog(exit_when_done=True)
         if dialog_result is SAVE_DIALOG_OPTIONS['DISCARD']:
-            print(dialog_result)
             if event is not None:
                 event.accept()
             the_app = app()
