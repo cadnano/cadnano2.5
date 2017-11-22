@@ -176,7 +176,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        print('change slot')
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
@@ -627,7 +626,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        print('making active')
         current_vhi = self.active_virtual_helix_item
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
@@ -719,14 +717,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
             coordinates of the the event, and previous event.
         """
-        print('napi mpe')
         self._viewroot.clearSelectionsIfActiveTool()
         self.unsetActiveVirtualHelixItem()
-
-        active_tool = self._getActiveTool()
-        tool_method_name = active_tool.methodPrefix() + "MousePress"
-        if hasattr(self, tool_method_name):
-            getattr(self, tool_method_name)(event.pos())
 
         return QGraphicsItem.mousePressEvent(self, event)
 
@@ -755,9 +747,3 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             temp_xover = active_tool.floatingXover()
             temp_xover.updateFloatingFromPartItem(self, pt)
     # end def
-
-    def createToolMousePress(self, event):
-        print('napi mpe create')
-
-    def selectToolMousePress(self, event):
-        print('napi mpe select')
