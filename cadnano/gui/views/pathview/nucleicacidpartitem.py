@@ -39,6 +39,21 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
+class PathRectItem(QGraphicsRectItem):
+    """The rectangle corresponding to the outline of the workable area in the
+    Path View.
+
+    This class overrides mousePressEvent so that clicking anywhere in the
+    rectangle will result in the active VHI being deselected.
+    """
+    def __init__(self, parent):
+        super(PathRectItem, self).__init__(parent)
+        self.parent = parent
+
+    def mousePressEvent(self, event):
+        self.parent.unsetActiveVirtualHelixItem()
+
+
 class PathNucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
@@ -81,7 +96,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.setPen(getNoPen())
         # self.setRect(self._rect)
 
-        self.outline = outline = QGraphicsRectItem(self)
+        self.outline = outline = PathRectItem(self)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
         self.outline.setPen(getPenObj(m_p.getColor(), _DEFAULT_WIDTH))
@@ -161,6 +176,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
+        print('change slot')
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
@@ -611,6 +627,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
+        print('making active')
         current_vhi = self.active_virtual_helix_item
         if new_active_vhi != current_vhi:
             if current_vhi is not None:
@@ -619,6 +636,12 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 new_active_vhi.activate()
             self.active_virtual_helix_item = new_active_vhi
     # end def
+
+    def unsetActiveVirtualHelixItem(self):
+        if self.active_virtual_helix_item is not None:
+            self.active_virtual_helix_item.deactivate()
+            self.active_virtual_helix_item = None
+        self.prexover_manager.reset()
 
     def setPreXoverItemsVisible(self, virtual_helix_item):
         """
@@ -696,7 +719,15 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
             coordinates of the the event, and previous event.
         """
+        print('napi mpe')
         self._viewroot.clearSelectionsIfActiveTool()
+        self.unsetActiveVirtualHelixItem()
+
+        active_tool = self._getActiveTool()
+        tool_method_name = active_tool.methodPrefix() + "MousePress"
+        if hasattr(self, tool_method_name):
+            getattr(self, tool_method_name)(event.pos())
+
         return QGraphicsItem.mousePressEvent(self, event)
 
     def hoverMoveEvent(self, event):
@@ -724,3 +755,9 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             temp_xover = active_tool.floatingXover()
             temp_xover.updateFloatingFromPartItem(self, pt)
     # end def
+
+    def createToolMousePress(self, event):
+        print('napi mpe create')
+
+    def selectToolMousePress(self, event):
+        print('napi mpe select')

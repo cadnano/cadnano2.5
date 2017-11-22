@@ -988,7 +988,7 @@ class DocumentController(object):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
 
-    def get_slice_view_type(self):
+    def getSliceViewType(self):
         # TODO[NF]:  Make these strings global constants
         if self.slice_view_showing and self.grid_view_showing:
             return 'Both'
@@ -999,7 +999,7 @@ class DocumentController(object):
         else:
             raise NotImplementedError
 
-    def set_slice_view_type(self, slice_view_type):
+    def setSliceViewType(self, slice_view_type):
         # TODO[NF]:  Make these strings global constants
         if slice_view_type not in ('Both', 'Slice', 'Grid'):
             # logger.error('slice_view_type is invalid:  %s' % slice_view_type)

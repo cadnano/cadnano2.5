@@ -735,6 +735,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
+        print('pwi mpe')
         self.setCursor(Qt.ClosedHandCursor)
         if event.button() != Qt.LeftButton:
             event.ignore()

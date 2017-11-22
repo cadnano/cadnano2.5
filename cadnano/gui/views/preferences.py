@@ -30,7 +30,7 @@ class Preferences(object):
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
         self.ui_prefs.add_plugin_button.clicked.connect(self.addPlugin)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
-        self.ui_prefs.legacy_slice_view_combo_box.currentIndexChanged.connect(self.set_slice_view)
+        self.ui_prefs.legacy_slice_view_combo_box.currentIndexChanged.connect(self.setSliceView)
 
         self.ui_prefs.grid_appearance_type_combo_box.activated.connect(self.updateGrid)
         self.document = None
@@ -108,7 +108,7 @@ class Preferences(object):
         self.qs.endGroup()
     # end def
 
-    def set_slice_view(self, slice_appearance_type_index):
+    def setSliceView(self, slice_appearance_type_index):
         """Select whether the slice view, grid view, or both should be
         displayed.
         """
@@ -118,7 +118,7 @@ class Preferences(object):
                          slice_appearance_type_index)
         self.qs.endGroup()
 
-        value = self.get_slice_view()
+        value = self.getSliceView()
 
         if value == PreferencesConst.LEGACY:
             self.document.controller().toggleSliceView(True)
@@ -132,7 +132,7 @@ class Preferences(object):
         else:
             raise ValueError('Invalid slice view value: %s' % value)
 
-    def get_slice_view(self):
+    def getSliceView(self):
         """Map the index of the drop-down in the preferences UI to the slice
         view that should be shown.
 

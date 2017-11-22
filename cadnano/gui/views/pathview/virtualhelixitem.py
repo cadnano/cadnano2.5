@@ -383,6 +383,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         Args:
             event (TYPE): Description
         """
+        print('vhi mpe')
         # 1. Check if we are doing a Z translation
         if event.button() == Qt.RightButton:
             viewroot = self._viewroot
@@ -564,6 +565,9 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.initStrandItemFromVHI(self, strand_set, idx)
             active_tool.setIsDrawingStrand(True)
     # end def
+
+    def selectToolMousePress(self, strand_set, idx, modifiers):
+        print('stmp vhi')
 
     def createToolMouseMove(self, strand_set, idx):
         """strand.getDragBounds
