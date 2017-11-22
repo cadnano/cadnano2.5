@@ -764,6 +764,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                  scale_factor=self.inverse_scale_factor,
                                                  radius=self._RADIUS)
 
+        # Abort if there is no path from start to end
+        if path == []:
+            return
+
         x_list, y_list, parity_list = zip(*path)
         id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
                                                                 y_list=y_list,
