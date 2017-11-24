@@ -47,14 +47,15 @@ class ResizeHandleGroup(QObject):
 
     def alignHandles(self, o_rect):
         self.parent_outline_rect = o_rect
+        print("alignHandles", o_rect)
         if self.handle_types & HandleType.TOP:
-            self._t.setPos(QPointF(o_rect.center().x(), o_rect.top()) - self.half_offset_y)
+            self._t.setPos(QPointF(o_rect.center().x(), o_rect.top()) - self.half_offset)
         if self.handle_types & HandleType.BOTTOM:
-            self._b.setPos(QPointF(o_rect.center().x(), o_rect.bottom()) - self.half_offset_y)
+            self._b.setPos(QPointF(o_rect.center().x(), o_rect.bottom()) - self.half_offset)
         if self.handle_types & HandleType.LEFT:
-            self._l.setPos(QPointF(o_rect.left(), o_rect.center().y()) - self.half_offset_x)
+            self._l.setPos(QPointF(o_rect.left(), o_rect.center().y()) - self.half_offset)
         if self.handle_types & HandleType.RIGHT:
-            self._r.setPos(QPointF(o_rect.right(), o_rect.center().y()) - self.half_offset_x)
+            self._r.setPos(QPointF(o_rect.right(), o_rect.center().y()) - self.half_offset)
         if self.handle_types & HandleType.TOP_LEFT:
             self._tl.setPos(o_rect.topLeft() - self.half_offset)
         if self.handle_types & HandleType.TOP_RIGHT:
