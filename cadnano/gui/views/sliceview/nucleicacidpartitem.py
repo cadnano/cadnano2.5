@@ -12,7 +12,7 @@ from cadnano.cnenum import GridType, HandleType
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getNoPen, getPenObj  # getBrushObj
+from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.resizehandles import ResizeHandleGroup
 from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
@@ -93,6 +93,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         model_color = m_p.getColor()
         self.outline.setPen(getPenObj(model_color, _DEFAULT_WIDTH))
 
+        self.model_bounds_hint = QGraphicsRectItem(self)
+        self.model_bounds_hint.setBrush(getBrushObj(model_color, alpha=12))
+        self.model_bounds_hint.setPen(getNoPen())
+
         GC_SIZE = 8
         self.resize_handle_group = ResizeHandleGroup(o_rect, GC_SIZE, model_color, True,
                                                      HandleType.TOP |
@@ -105,31 +109,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                      HandleType.BOTTOM_RIGHT,
                                                      self)
 
-        # self.grab_cornerTL = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerTL.setTopLeft(o_rect.topLeft())
-        # self.grab_cornerBR = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerBR.setBottomRight(o_rect.bottomRight())
-        # self.grab_cornerBL = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerBL.setBottomLeft(o_rect.bottomLeft())
-        # self.grab_cornerTR = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerTR.setTopRight(o_rect.topRight())
-        # self.grab_cornerT = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerT.setTop(QPointF(o_rect.center().x(), o_rect.top()))
-        # self.grab_cornerB = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerB.setBottom(QPointF(o_rect.center().x(), o_rect.bottom()))
-        # self.grab_cornerL = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerL.setLeft(QPointF(o_rect.left(), o_rect.center().y()))
-        # self.grab_cornerR = GrabCornerItem(GC_SIZE, model_color, True, self)
-        # self.grab_cornerR.setRight(QPointF(o_rect.right(), o_rect.center().y()))
-
         self.griditem = GridItem(self, self._model_props['grid_type'])
         self.griditem.setZValue(1)
         # self.grab_cornerTL.setZValue(2)
         # self.grab_cornerBR.setZValue(2)
-        # self.grab_cornerT.setZValue(2)
-        # self.grab_cornerB.setZValue(2)
-        # self.grab_cornerL.setZValue(2)
-        # self.grab_cornerR.setZValue(2)
 
         # select upon creation
         for part in m_p.document().children():
@@ -494,8 +477,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.shortest_path_start = None
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80,
-                        do_grid=False):
+    def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
         """Reconfigures the rectangle that is the document.
 
         Args:
@@ -616,6 +598,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if bool_val is False:
             self._mod_circ.hide()
     # end def
+
+    def showModelBoundsHint(self, show=True):
+        """Shows QGraphicsRectItem reflecting current model bounds.
+        ResizeHandleGroup should toggle this when resizing.
+
+        Args:
+            status_str (str): Description to display in status bar.
+        """
+        m_b_h = self.model_bounds_hint
+        if show:
+            xTL, yTL, xBR, yBR = self.getModelBounds()
+            m_b_h.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
+            m_b_h.show()
+        else:
+            m_b_h.hide()
 
     def updateStatusBar(self, status_str):
         """Shows status_str in the MainWindow's status bar.
