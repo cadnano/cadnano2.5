@@ -20,16 +20,16 @@ class HoneycombDnaPart(object):
     """
     STEP = 21  # 32 in square
     TURNS_PER_STEP = 2.0
-    HELICAL_PITCH = STEP / TURNS_PER_STEP
-    TWIST_PER_BASE = 360. / HELICAL_PITCH  # degrees
-    TWIST_OFFSET = -(360. / 10.5)*1.0  # degrees
-    SUB_STEP_SIZE = STEP / 3.
+    HELICAL_PITCH = STEP/TURNS_PER_STEP
+    TWIST_PER_BASE = 360./HELICAL_PITCH  # degrees
+    TWIST_OFFSET = -(360./10.5)*1.0  # degrees
+    SUB_STEP_SIZE = STEP/3.
 
     # Manually tuned grid offsets
-    PAD_GRID_XL = -20
-    PAD_GRID_XH = 20
-    PAD_GRID_YL = -50
-    PAD_GRID_YH = 5
+    PAD_GRID_XL = -70
+    PAD_GRID_XH = 70
+    PAD_GRID_YL = -150
+    PAD_GRID_YH = 105
 
     @staticmethod
     def isEvenParity(row, column):
@@ -65,9 +65,9 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
-        column = int(x / (radius*root3*scale_factor) + 0.5)
+        column = int(x/(radius*root3*scale_factor) + 0.5)
 
-        row_temp = y / (radius*scale_factor)
+        row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
             # odd parity
             row = int((row_temp - 1)/3 + 0.5)
@@ -82,9 +82,9 @@ class HoneycombDnaPart(object):
                                     scale_factor=1.0):
         roundRow = ceil if round_up_row else floor
         roundCol = ceil if round_up_col else floor
-        column = roundCol(x / (radius*root3*scale_factor))
+        column = roundCol(x/(radius*root3*scale_factor))
 
-        row_temp = y / (radius*scale_factor)
+        row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
             # odd parity
             row = roundRow((row_temp - 1)/3.)
@@ -104,11 +104,17 @@ class SquareDnaPart(object):
     STAP_HIGH = [[0], [24], [16], [8]]
     """
     STEP = 32  # 21 in honeycomb
-    SUB_STEP_SIZE = STEP / 4
+    SUB_STEP_SIZE = STEP/4
     TURNS_PER_STEP = 3.0
-    HELICAL_PITCH = STEP / TURNS_PER_STEP
-    TWIST_PER_BASE = 360. / HELICAL_PITCH  # degrees
-    TWIST_OFFSET = 180. + TWIST_PER_BASE / 2  # degrees
+    HELICAL_PITCH = STEP/TURNS_PER_STEP
+    TWIST_PER_BASE = 360./HELICAL_PITCH  # degrees
+    TWIST_OFFSET = 180. + TWIST_PER_BASE/2  # degrees
+
+    # Manually tuned grid offsets
+    PAD_GRID_XL = -80
+    PAD_GRID_XH = 80
+    PAD_GRID_YL = -80
+    PAD_GRID_YH = 80
 
     @staticmethod
     def isEvenParity(row, column):

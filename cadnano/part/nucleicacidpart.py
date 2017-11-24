@@ -383,8 +383,8 @@ class NucleicAcidPart(Part):
         """
         _even = 0
         _odd = 1
-        from cadnano.util import qtdb_trace
-#        qtdb_trace()
+        # from cadnano.util import qtdb_trace
+        # qtdb_trace()
         if parity is None:
             merged_recycle_bin = self.recycle_bin.get(_even) + self.recycle_bin.get(_odd)
             if len(merged_recycle_bin):

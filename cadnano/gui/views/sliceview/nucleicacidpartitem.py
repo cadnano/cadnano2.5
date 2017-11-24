@@ -27,6 +27,7 @@ _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
 _SELECTED_COLOR = styles.SELECTED_COLOR
 _SELECTED_WIDTH = styles.SELECTED_PEN_WIDTH
 _SELECTED_ALPHA = styles.SELECTED_ALPHA
+_HANDLE_SIZE = 8
 
 
 class SliceNucleicAcidPartItem(QAbstractPartItem):
@@ -97,8 +98,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.model_bounds_hint.setBrush(getBrushObj(model_color, alpha=12))
         self.model_bounds_hint.setPen(getNoPen())
 
-        GC_SIZE = 8
-        self.resize_handle_group = ResizeHandleGroup(o_rect, GC_SIZE, model_color, True,
+        self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
                                                      HandleType.TOP |
                                                      HandleType.BOTTOM |
                                                      HandleType.LEFT |
@@ -111,8 +111,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self.griditem = GridItem(self, self._model_props['grid_type'])
         self.griditem.setZValue(1)
-        # self.grab_cornerTL.setZValue(2)
-        # self.grab_cornerBR.setZValue(2)
+        self.resize_handle_group.setZValue(2)
 
         # select upon creation
         for part in m_p.document().children():
@@ -570,7 +569,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         :rtype: Tuple where
         """
         xLL, yLL, xUR, yUR = self.part().boundDimensions(self.scale_factor)
-        return xLL, -yUR, xUR, -yLL
+        # return xLL, -yUR, xUR, -yLL
+        r = self._RADIUS
+        return xLL-r, -yUR-r, xUR+r, -yLL+r
     # end def
 
     def bounds(self):

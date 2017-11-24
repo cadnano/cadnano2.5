@@ -2,7 +2,8 @@
 
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QColor, QPainterPath
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem
+from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -15,7 +16,7 @@ HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
 DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 
 
-class GridItem(QGraphicsPathItem):
+class GridItem(QGraphicsRectItem):
     def __init__(self, part_item, grid_type):
         """Summary
 
@@ -27,7 +28,11 @@ class GridItem(QGraphicsPathItem):
             grid_type (TYPE): Description
         """
         super(GridItem, self).__init__(parent=part_item)
+        self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
+
         self.part_item = part_item
+        self._path = QGraphicsPathItem(self)
+
         # TODO[NF] Make this a constant
         dot_size = 30
         self.dots = (dot_size, dot_size / 2)
@@ -54,12 +59,14 @@ class GridItem(QGraphicsPathItem):
         radius = part.radius()
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
+
+        self.setRect(self.part_item.outline.rect())
         if self.grid_type == GridType.HONEYCOMB:
             self.createHoneycombGrid(part_item, radius, bounds)
         elif self.grid_type == GridType.SQUARE:
             self.createSquareGrid(part_item, radius, bounds)
         else:
-            self.setPath(QPainterPath())
+            self._path.setPath(QPainterPath())
     # end def
 
     def setGridType(self, grid_type):
@@ -173,7 +180,7 @@ class GridItem(QGraphicsPathItem):
                         path.moveTo(x, -y)
                 is_pen_down = False
             # end for j
-        self.setPath(path)
+        self._path.setPath(path)
 
         if redo_neighbors:
             self.part_item.setNeighborMap(neighbor_map=neighbor_map)
@@ -193,6 +200,11 @@ class GridItem(QGraphicsPathItem):
         doLattice = SquareDnaPart.latticeCoordToPositionXY
         doPosition = SquareDnaPart.positionToLatticeCoordRound
         x_l, x_h, y_l, y_h = bounds
+        x_l = x_l + SquareDnaPart.PAD_GRID_XL
+        x_h = x_h + SquareDnaPart.PAD_GRID_XH
+        y_h = y_h + SquareDnaPart.PAD_GRID_YL
+        y_l = y_l + SquareDnaPart.PAD_GRID_YH
+
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points
@@ -263,7 +275,7 @@ class GridItem(QGraphicsPathItem):
                         is_pen_down = True
                         path.moveTo(x, -y)
                 is_pen_down = False  # pen up
-        self.setPath(path)
+        self._path.setPath(path)
 
         if redo_neighbors:
             self.part_item.setNeighborMap(neighbor_map=neighbor_map)
