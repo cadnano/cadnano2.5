@@ -117,12 +117,12 @@ class HandleType:
     """
     TOP_LEFT = 1
     TOP = 2
-    TOP_RIGHT = 3
-    RIGHT = 4
-    BOTTOM_RIGHT = 5
-    BOTTOM = 6
-    BOTTOM_LEFT = 7
-    LEFT = 8
+    TOP_RIGHT = 4
+    RIGHT = 8
+    BOTTOM_RIGHT = 16
+    BOTTOM = 32
+    BOTTOM_LEFT = 64
+    LEFT = 128
 
 
 ENUM_NAMES['handle_type'] = enumNames(HandleType)
