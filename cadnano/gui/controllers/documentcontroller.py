@@ -145,6 +145,7 @@ class DocumentController():
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
             (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
+            (win.action_sim.triggered, self.actionToggleSimSlot),
             (win.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
             (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_create.trigger()),
             (win.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
@@ -614,6 +615,14 @@ class DocumentController():
             outliner.hide()
         else:
             outliner.show()
+    # end def
+
+    def actionToggleSimSlot(self):
+        sim_view = self.win.sim_widget_view
+        if sim_view.isVisible():
+            sim_view.hide()
+        else:
+            sim_view.show()
     # end def
 
     def toggleNewPartButtons(self, is_enabled):

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -59,6 +59,27 @@ class Ui_MainWindow(object):
         self.slice_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setObjectName("slice_graphics_view")
+        self.sim_graphics_view = QtWidgets.QGraphicsView(self.slice_grid_splitter)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.sim_graphics_view.sizePolicy().hasHeightForWidth())
+        self.sim_graphics_view.setSizePolicy(sizePolicy)
+        self.sim_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
+        self.sim_graphics_view.setBaseSize(QtCore.QSize(480, 0))
+        self.sim_graphics_view.setMouseTracking(True)
+        self.sim_graphics_view.setFocusPolicy(QtCore.Qt.WheelFocus)
+        self.sim_graphics_view.setStyleSheet("QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }")
+        self.sim_graphics_view.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.sim_graphics_view.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.sim_graphics_view.setLineWidth(0)
+        self.sim_graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.sim_graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.sim_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
+        self.sim_graphics_view.setDragMode(QtWidgets.QGraphicsView.NoDrag)
+        self.sim_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.sim_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
+        self.sim_graphics_view.setObjectName("sim_graphics_view")
         self.grid_graphics_view = CustomQGraphicsView(self.slice_grid_splitter)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
@@ -443,6 +464,11 @@ class Ui_MainWindow(object):
         self.action_toolbar_spacer_1.setText("")
         self.action_toolbar_spacer_1.setVisible(True)
         self.action_toolbar_spacer_1.setObjectName("action_toolbar_spacer_1")
+        self.action_sim = QtWidgets.QAction(MainWindow)
+        self.action_sim.setCheckable(True)
+        self.action_sim.setChecked(False)
+        self.action_sim.setIcon(icon23)
+        self.action_sim.setObjectName("action_sim")
         self.main_toolbar.addAction(self.action_global_select)
         self.main_toolbar.addAction(self.action_global_create)
         self.main_toolbar.addAction(self.action_path_nick)
@@ -457,6 +483,7 @@ class Ui_MainWindow(object):
         self.main_toolbar.addAction(self.action_export_staples)
         self.main_toolbar.addAction(self.action_SVG)
         self.selection_toolbar.addAction(self.action_outliner)
+        self.selection_toolbar.addAction(self.action_sim)
         self.selection_toolbar.addAction(self.action_toolbar_spacer_2)
         self.selection_toolbar.addAction(self.action_filter_rev)
         self.selection_toolbar.addAction(self.action_filter_fwd)
@@ -611,6 +638,8 @@ class Ui_MainWindow(object):
         self.action_filter_stap.setText(_translate("MainWindow", "filter-stap"))
         self.action_filter_stap.setToolTip(_translate("MainWindow", "S(t)ap"))
         self.action_filter_stap.setShortcut(_translate("MainWindow", "T"))
+        self.action_sim.setText(_translate("MainWindow", "Simulation"))
+        self.action_sim.setToolTip(_translate("MainWindow", "Toggle Sim"))
 
 from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget

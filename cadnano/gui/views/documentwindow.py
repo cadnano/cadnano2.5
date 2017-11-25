@@ -13,6 +13,9 @@ from cadnano.gui.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
+from cadnano.gui.views.simview.simrootitem import SimRootItem
+from cadnano.gui.views.simview.simwidget import SimWidget
+from cadnano.gui.views.simview.tools.simtoolmanager import SimToolManager
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
 
@@ -54,32 +57,30 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._init_grid_view(doc)
         self._init_path_view(doc)
         self._init_path_view_toolbar()
+        self._init_sim_view(doc)
         self._init_edit_menu()
 
-        doc.setViewNames(['slice', 'path'])
+        doc.setViewNames(['slice', 'path', 'sim'])
+    # end def
 
-    def _init_slice_view(self, doc):
-        """Initializes Slice View.
-
-        Args:
-            doc (cadnano.document.Document): The Document corresponding to
-            the design
+    def _init_edit_menu(self):
+        """Initializes the Edit menu
 
         Returns: None
         """
-        self.slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
-        self.slice_root = SliceRootItem(rect=self.slice_scene.sceneRect(),
-                                        parent=None,
-                                        window=self,
-                                        document=doc)
-        self.slice_root.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.slice_scene.addItem(self.slice_root)
-        self.slice_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.slice_root.scene() == self.slice_scene
-        self.slice_graphics_view.setScene(self.slice_scene)
-        self.slice_graphics_view.scene_root_item = self.slice_root
-        self.slice_graphics_view.setName("SliceView")
-        self.slice_tool_manager = SliceToolManager(self, self.slice_root)
+        self.actionUndo = self.controller.undoStack().createUndoAction(self)
+        self.actionRedo = self.controller.undoStack().createRedoAction(self)
+        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
+        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
+        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
+        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
+        self.sep = QAction(self)
+        self.sep.setSeparator(True)
+        self.menu_edit.insertAction(self.sep, self.actionRedo)
+        self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
+        self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
+        self.statusBar().showMessage("")
+    # end def
 
     def _init_grid_view(self, doc):
         """Initializes Grid View.
@@ -103,8 +104,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.scene_root_item = self.grid_root
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
-
         self.grid_graphics_view.hide()
+    # end def
 
     def _init_path_view(self, doc):
         """Initializes Path View.
@@ -128,6 +129,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.scene_root_item = self.path_root
         self.path_graphics_view.setScaleFitFactor(0.9)
         self.path_graphics_view.setName("PathView")
+    # end def
 
     def _init_path_view_toolbar(self):
         """Initializes Path View Toolbar.
@@ -152,24 +154,43 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()
         self.grid_graphics_view.setupGL()
+    # end def
 
-    def _init_edit_menu(self):
-        """Initializes the Edit menu
+    def _init_sim_view(self, doc):
+        """Initializes Sim View.
 
         Returns: None
         """
-        self.actionUndo = self.controller.undoStack().createUndoAction(self)
-        self.actionRedo = self.controller.undoStack().createRedoAction(self)
-        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
-        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
-        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
-        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
-        self.sep = QAction(self)
-        self.sep.setSeparator(True)
-        self.menu_edit.insertAction(self.sep, self.actionRedo)
-        self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
-        self.statusBar().showMessage("")
+        self.simroot = SimRootItem(window=self, document=doc)
+        self.sim_tool_manager = SimToolManager(self, self.simroot)
+        self.sim_widget = SimWidget(self.simroot)
+        self.slice_grid_splitter.setSizes([100, 100, 100])  # balance main_splitter size
+        self.sim_graphics_view.setViewport(self.sim_widget)  #.setViewport(self.sim_widget)
+    # end def
+
+    def _init_slice_view(self, doc):
+        """Initializes Slice View.
+
+        Args:
+            doc (cadnano.document.Document): The Document corresponding to
+            the design
+
+        Returns: None
+        """
+        self.slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
+        self.slice_root = SliceRootItem(rect=self.slice_scene.sceneRect(),
+                                        parent=None,
+                                        window=self,
+                                        document=doc)
+        self.slice_root.setFlag(QGraphicsItem.ItemHasNoContents)
+        self.slice_scene.addItem(self.slice_root)
+        self.slice_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert self.slice_root.scene() == self.slice_scene
+        self.slice_graphics_view.setScene(self.slice_scene)
+        self.slice_graphics_view.scene_root_item = self.slice_root
+        self.slice_graphics_view.setName("SliceView")
+        self.slice_tool_manager = SliceToolManager(self, self.slice_root)
+    # end def
 
     def document(self):
         return self.controller.document()
