@@ -605,7 +605,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
     def __init__(self, model_part, part_item):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
         self.setAcceptHoverEvents(True)
-        self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
+        # self.setBrush(getNoBrush())
+        self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=12))
         self.setPen(getNoPen())
 
         self._model_part = model_part
@@ -616,19 +617,32 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
         self.outline = QGraphicsRectItem(self)
         self.outline.setPen(newPenObj(styles.BLUE_STROKE, 0))
-
         self.resize_handle_group = ResizeHandleGroup(self.rect(), self._HANDLE_SIZE, styles.BLUE_STROKE, True,
                                                      HandleType.LEFT | HandleType.RIGHT, self)
+        self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
+        m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=64))
+        m_b_h.setPen(getNoPen())
+        m_b_h.hide()
 
         TLx, TLy = self._idx_low*BASE_WIDTH, -BASE_WIDTH
         BRx, BRy = self._idx_high*BASE_WIDTH, self._part_item._vh_rect.height()-BASE_WIDTH*2
         self.reconfigureRect((TLx, TLy), (BRx, BRy))
 
-    def getModelMinSizeBounds(self):
+    def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""
-        xLL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
-        xUR = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
-        return xLL, 0, xUR, 0
+        if handle_type and handle_type & HandleType.LEFT:
+            xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
+            xBR = self._idx_high*BASE_WIDTH
+        elif handle_type and handle_type & HandleType.RIGHT:
+            xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
+            xBR = (self._idx_low)*BASE_WIDTH
+        else:  # default to HandleType.RIGHT behavior for all types
+            print("no ht??")
+            xTL = 0
+            xBR = self._high_drag_bound*BASE_WIDTH
+        yTL = self._part_item._vh_rect.top()
+        yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
+        return xTL, yTL, xBR, yBR
     # end def
 
     def setMovable(self, is_movable):
@@ -638,7 +652,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def finishDrag(self):
         """Set the workplane size in the model"""
-        print("workplane finishDrag")
         pass
         # pos = self.pos()
         # position = pos.x(), pos.y()
@@ -659,14 +672,16 @@ class PathWorkplaneItem(QGraphicsRectItem):
             QRectF: the new rect.
         """
         if top_left:
-            xTL = max(top_left[0], 0)
+            xTL = max(top_left[0], self._low_drag_bound)
             xTL = xTL - (xTL % BASE_WIDTH)  # snap to nearest base
             self._idx_low = xTL/BASE_WIDTH
         else:
             xTL = self._idx_low*BASE_WIDTH
 
         if bottom_right:
-            xBR = min(bottom_right[0], self._high_drag_bound*BASE_WIDTH)
+            xBR = util.clamp(bottom_right[0],
+                             (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH,
+                             (self._high_drag_bound)*BASE_WIDTH)
             xBR = xBR - (xBR % BASE_WIDTH)  # snap to nearest base
             self._idx_high = xBR/BASE_WIDTH
         else:
@@ -675,37 +690,28 @@ class PathWorkplaneItem(QGraphicsRectItem):
         yTL = self._part_item._vh_rect.top()
         yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
 
-        self.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
+        xoffset = styles.MINOR_GRID_STROKE_WIDTH
+
+        self.setRect(QRectF(QPointF(xTL+xoffset, yTL), QPointF(xBR+xoffset, yBR)))
         self.outline.setRect(self.rect())
         self.resize_handle_group.alignHandles(self.rect())
+        self._model_part.setProperty('workplane_idxs', (self._idx_low, self._idx_high))
         return self.rect()
 
-    def setIdxs(self, new_idxs=None):
-        """
-        Move and resize the workplane to match new_idxs.
-
-        Starting with the current workplane QRect, update the x coords of
-        topLeft (TL) and bottomRight (BR) points to new_idxs.
-        Make sure height is scaled for num of VHIs.
-
-        Calls reconfigureRect to update the item's rect, outline, and handles.
-        Args:
-            new_idxs (tuple): idx_low, idx_high
-        """
-        ptTL = self.rect().topLeft()
-        ptBR = self.rect().bottomRight()
-
-        if new_idxs:
+    def setIdxs(self, new_idxs):
+        if self._idx_low != new_idxs[0] or self._idx_high != new_idxs[1]:
             self._idx_low = new_idxs[0]
             self._idx_high = new_idxs[1]
-            ptTL.setX(self._idx_low*BASE_WIDTH)
-            ptBR.setX(self._idx_high*BASE_WIDTH)
+            self.reconfigureRect((), ())
 
-        self.reconfigureRect(top_left=(ptTL.x(), ptTL.y()), bottom_right=(ptBR.x(), ptBR.y()))
-    # end def
-
-    def showModelBoundsHint(self, show=True):
-        pass
+    def showModelMinBoundsHint(self, handle_type, show=True):
+        m_b_h = self.model_bounds_hint
+        if show:
+            xTL, yTL, xBR, yBR = self.getModelMinBounds(handle_type)
+            m_b_h.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
+            m_b_h.show()
+        else:
+            m_b_h.hide()
     # end def
 
     def width(self):
@@ -766,5 +772,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._idx_high = self._start_idx_high + delta
             self._delta = delta
             self.reconfigureRect((), ())
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length')  # reset for handles
         self.setCursor(Qt.OpenHandCursor)
     # end def

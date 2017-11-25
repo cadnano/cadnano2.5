@@ -61,13 +61,14 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             parent (TYPE): Description
         """
         super(PathNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        self.setAcceptHoverEvents(True)
+
         self._getActiveTool = viewroot.manager.activeToolGetter
         self.active_virtual_helix_item = None
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.prexover_manager = PreXoverManager(self)
         self._virtual_helix_item_list = []
-        self.setAcceptHoverEvents(True)
         self._initModifierRect()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
@@ -258,7 +259,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
             elif property_key == 'workplane_idxs':
-                self.workplane.setIdxs(new_idxs=new_value)
+                if hasattr(self, 'workplane'):
+                    self.workplane.setIdxs(new_idxs=new_value)
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,

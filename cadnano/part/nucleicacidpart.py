@@ -154,7 +154,7 @@ class NucleicAcidPart(Part):
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
-        gps['workplane_idxs'] = [10, 13]
+        gps['workplane_idxs'] = (10, 13)
 
         ############################
         # Begin low level attributes

@@ -37,7 +37,7 @@ class GrabCornerItem(QGraphicsRectItem):
         parent = self.parentItem()
 
         if self.is_resizable and event.modifiers() & Qt.ShiftModifier:
-            self.model_bounds = parent.getModelMinSizeBounds()
+            self.model_bounds = parent.getModelMinBounds()
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
             return

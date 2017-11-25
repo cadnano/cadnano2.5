@@ -122,11 +122,11 @@ class HandleItem(QGraphicsRectItem):
         parent = self.parentItem()
 
         if self._group.is_resizable and event.modifiers() & Qt.ShiftModifier:
-            self.model_bounds = parent.getModelMinSizeBounds()
+            self.model_bounds = parent.getModelMinBounds(handle_type=self._handle_type)
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
-            parent.showModelBoundsHint(True)
-            event.setAccepted(True)  # don't propagate to grid items
+            parent.showModelMinBoundsHint(self._handle_type, show=True)
+            event.setAccepted(True)  # don't propagate
             return
         else:
             parent = self.parentItem()
@@ -186,7 +186,6 @@ class HandleItem(QGraphicsRectItem):
                 self._group.alignHandles(r)
             elif ht == HandleType.LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
-                print("LEFT", new_x, new_x_TL, poTLy)
                 r = parent.reconfigureRect((new_x_TL, poTLy), ())
                 self._group.alignHandles(r)
             else:
@@ -247,7 +246,7 @@ class HandleItem(QGraphicsRectItem):
                 r = parent.reconfigureRect((new_x_TL, poTLy), ())
                 self._group.alignHandles(r)
             self.model_bounds = ()
-            parent.showModelBoundsHint(False)
+            parent.showModelMinBoundsHint(self._handle_type, show=False)
         if self._group.is_dragging:
             self._group.is_dragging = False
             parent = self.parentItem()

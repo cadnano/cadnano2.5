@@ -482,7 +482,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         when adding a GridVirtualHelixItem.
         """
         p = self._BOUNDING_RECT_PADDING
-        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinBounds()
         xTL = xTL - p
         yTL = yTL - p
         xBR = xBR + p
@@ -512,11 +512,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """update the boundaries to what's in the model with a minimum
         size
         """
-        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelMinSizeBounds(self):
+    def getModelMinBounds(self, handle_type=None):
         """Bounds in form of Qt scaled from model
 
         Args:

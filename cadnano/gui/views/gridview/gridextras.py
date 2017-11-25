@@ -401,13 +401,16 @@ class PreXoverItem(QGraphicsRectItem):
             item.adapter.saveRef(property_name, anim)
 
     def initStrandFromTriangle(self):
-        print('initStrandFromTriangle')
+        pass
+        # print('initStrandFromTriangle')
 
     def updateStrandFromTriangle(self):
-        print("updateStrandFromTriangle")
+        pass
+        # print("updateStrandFromTriangle")
 
     def attemptToCreateStrand(self):
-        print("attemptToCreateStrand")
+        pass
+        # print("attemptToCreateStrand")
 
     ### PUBLIC SUPPORT METHODS ###
     def setActive5p(self, is_active, neighbor_item=None):

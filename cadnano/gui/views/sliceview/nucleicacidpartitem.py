@@ -521,7 +521,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         padding = self._BOUNDING_RECT_PADDING
 
-        model_left, model_top, model_right, model_bottom = self.getModelMinSizeBounds()
+        model_left, model_top, model_right, model_bottom = self.getModelMinBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
 
         xTL = min(rect_left, model_left) - padding
@@ -555,11 +555,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelMinSizeBounds(self):
+    def getModelMinBounds(self, handle_type=None):
         """Bounds in form of Qt scaled from model
 
         Args:
@@ -599,7 +599,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._mod_circ.hide()
     # end def
 
-    def showModelBoundsHint(self, show=True):
+    def showModelMinBoundsHint(self, handle_type, show=True):
         """Shows QGraphicsRectItem reflecting current model bounds.
         ResizeHandleGroup should toggle this when resizing.
 
@@ -608,7 +608,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         m_b_h = self.model_bounds_hint
         if show:
-            xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
+            xTL, yTL, xBR, yBR = self.getModelMinBounds()
             m_b_h.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
             m_b_h.show()
         else:
