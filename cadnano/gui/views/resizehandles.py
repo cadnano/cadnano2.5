@@ -47,7 +47,6 @@ class ResizeHandleGroup(QObject):
 
     def alignHandles(self, o_rect):
         self.parent_outline_rect = o_rect
-        print("alignHandles", o_rect)
         if self.handle_types & HandleType.TOP:
             self._t.setPos(QPointF(o_rect.center().x(), o_rect.top()) - self.half_offset)
         if self.handle_types & HandleType.BOTTOM:
@@ -123,7 +122,7 @@ class HandleItem(QGraphicsRectItem):
         parent = self.parentItem()
 
         if self._group.is_resizable and event.modifiers() & Qt.ShiftModifier:
-            self.model_bounds = parent.getModelBounds()
+            self.model_bounds = parent.getModelMinSizeBounds()
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
             parent.showModelBoundsHint(True)
@@ -156,38 +155,39 @@ class HandleItem(QGraphicsRectItem):
             if ht == HandleType.TOP_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((new_x_TL, new_y_TL), (), do_grid=True)
+                r = parent.reconfigureRect((new_x_TL, new_y_TL), ())
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP:
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((poTLx, new_y_TL), (), do_grid=True)
+                r = parent.reconfigureRect((poTLx, new_y_TL), ())
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP_RIGHT:
                 new_y_TL = mTLy if new_y > mTLy else new_y
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy), do_grid=True)
+                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy))
                 self._group.alignHandles(r)
             elif ht == HandleType.RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((), (new_x_BR, poBRy), do_grid=True)
+                r = parent.reconfigureRect((), (new_x_BR, poBRy))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (new_x_BR, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((), (new_x_BR, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM:
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (poBRx, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((), (poBRx, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
-                r = parent.reconfigureRect((new_x_TL, poTLy), (), do_grid=True)
+                print("LEFT", new_x, new_x_TL, poTLy)
+                r = parent.reconfigureRect((new_x_TL, poTLy), ())
                 self._group.alignHandles(r)
             else:
                 raise NotImplementedError("handle_type %d not supported" % (ht))
@@ -213,38 +213,38 @@ class HandleItem(QGraphicsRectItem):
             if ht == HandleType.TOP_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((new_x_TL, new_y_TL), (), do_grid=True)
+                r = parent.reconfigureRect((new_x_TL, new_y_TL), ())
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP:
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((poTLx, new_y_TL), (), do_grid=True)
+                r = parent.reconfigureRect((poTLx, new_y_TL), ())
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP_RIGHT:
                 new_y_TL = mTLy if new_y > mTLy else new_y
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy), do_grid=True)
+                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy))
                 self._group.alignHandles(r)
             elif ht == HandleType.RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((), (new_x_BR, poBRy), do_grid=True)
+                r = parent.reconfigureRect((), (new_x_BR, poBRy))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (new_x_BR, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((), (new_x_BR, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM:
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (poBRx, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((), (poBRx, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR), do_grid=True)
+                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR))
                 self._group.alignHandles(r)
             elif ht == HandleType.LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
-                r = parent.reconfigureRect((new_x_TL, poTLy), (), do_grid=True)
+                r = parent.reconfigureRect((new_x_TL, poTLy), ())
                 self._group.alignHandles(r)
             self.model_bounds = ()
             parent.showModelBoundsHint(False)

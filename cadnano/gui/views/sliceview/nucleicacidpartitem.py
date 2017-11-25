@@ -476,7 +476,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.shortest_path_start = None
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
+    def reconfigureRect(self, top_left, bottom_right, padding=80):
         """Reconfigures the rectangle that is the document.
 
         Args:
@@ -496,8 +496,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._rect = QRectF(ptTL, ptBR)
         self.setRect(self._rect)
         self._configureOutline(self.outline)
-        if do_grid:
-            self.griditem.updateGrid()
+        self.griditem.updateGrid()
         return self.outline.rect()
     # end def
 
@@ -522,14 +521,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         padding = self._BOUNDING_RECT_PADDING
 
-        model_left, model_top, model_right, model_bottom = self.getModelBounds()
+        model_left, model_top, model_right, model_bottom = self.getModelMinSizeBounds()
         rect_left, rect_right, rect_bottom, rect_top = self.bounds()
 
         xTL = min(rect_left, model_left) - padding
         xBR = max(rect_right, model_right) + padding
         yTL = min(rect_top, model_top) - padding
         yBR = max(rect_bottom, model_bottom) + padding
-        new_outline_rect = self.reconfigureRect(top_left=(xTL, yTL), bottom_right=(xBR, yBR), do_grid=True)
+        new_outline_rect = self.reconfigureRect(top_left=(xTL, yTL), bottom_right=(xBR, yBR))
         self.resize_handle_group.alignHandles(new_outline_rect)
         # self.grab_cornerTL.alignPos(*top_left)
         # self.grab_cornerBR.alignPos(*bottom_right)
@@ -556,11 +555,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         :rtype: None
         """
-        xTL, yTL, xBR, yBR = self.getModelBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelBounds(self):
+    def getModelMinSizeBounds(self):
         """Bounds in form of Qt scaled from model
 
         Args:
@@ -609,7 +608,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         m_b_h = self.model_bounds_hint
         if show:
-            xTL, yTL, xBR, yBR = self.getModelBounds()
+            xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
             m_b_h.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
             m_b_h.show()
         else:

@@ -245,7 +245,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
                 self.grab_corner.setPen(getPenObj(new_value, 0))
-                self.workplane.grab_corner.setPen(getPenObj(new_value, 0))
+                self.workplane.outline.setPen(getPenObj(new_value, 0))
                 self.reconfigureRect()
             elif property_key == 'is_visible':
                 if new_value:
@@ -257,8 +257,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 new_list = [vhi_dict[id_num] for id_num in new_value]
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
-            elif property_key == 'workplane_idx':
-                self.workplane.updatePositionAndBounds(new_idx=new_value)
+            elif property_key == 'workplane_idxs':
+                self.workplane.setIdxs(new_idxs=new_value)
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
@@ -488,7 +488,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 vhi_h_selection_group.addToGroup(vhi_h)
         # end for
         # this need only adjust top and bottom edges of the bounding rectangle
-        self._vh_rect.setTop(-10)
+        # self._vh_rect.setTop()
         self._vh_rect.setBottom(y)
         self._virtual_helix_item_list = new_list
 
@@ -533,8 +533,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         Called by partZDimensionsChangedSlot and partPropertyChangedSlot.
         """
-        self.workplane.updatePositionAndBounds()  # do first for correct sizing
-
         self.resetPen(self.modelColor(), 0)  # cosmetic
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
         outline = self.outline
@@ -543,12 +541,15 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         outline.setParentItem(None)
         self.grab_corner.setParentItem(None)
         self.setRect(self.childrenBoundingRect())  # vh_items only
+
         outline.setParentItem(self)
         self.grab_corner.setParentItem(self)
 
         self._configureOutline(outline)
         p = self._GC_SIZE/2
         self.grab_corner.setTopLeft(outline.rect().adjusted(-p, -p, p, p).topLeft())
+
+        self.workplane.reconfigureRect((), ())
     # end def
 
     ### PUBLIC METHODS ###
