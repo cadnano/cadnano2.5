@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getPenObj, getNoPen, getBrushObj
+from cadnano.gui.palette import getPenObj, getNoPen  # , getBrushObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.grabcorneritem import GrabCornerItem
 
@@ -448,7 +448,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80, do_grid=False):
+    def reconfigureRect(self, top_left, bottom_right, padding=80):
         """Summary
 
         Args:
@@ -465,8 +465,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         self._rect = new_rect = QRectF(ptTL, ptBR)
         self.setRect(new_rect)
         self._configureOutline(self.outline)
-        if do_grid:
-            self.griditem.updateGrid()
+        self.griditem.updateGrid()
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
@@ -483,12 +482,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         when adding a GridVirtualHelixItem.
         """
         p = self._BOUNDING_RECT_PADDING
-        xTL, yTL, xBR, yBR = self.getModelBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
         xTL = xTL - p
         yTL = yTL - p
         xBR = xBR + p
         yBR = yBR + p
-        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR), do_grid=True)
+        tl, br = self.reconfigureRect((xTL, yTL), (xBR, yBR))
         self.grab_cornerTL.alignPos(*tl)
         self.grab_cornerBR.alignPos(*br)
     # end def
@@ -513,11 +512,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """update the boundaries to what's in the model with a minimum
         size
         """
-        xTL, yTL, xBR, yBR = self.getModelBounds()
+        xTL, yTL, xBR, yBR = self.getModelMinSizeBounds()
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelBounds(self):
+    def getModelMinSizeBounds(self):
         """Bounds in form of Qt scaled from model
 
         Args:

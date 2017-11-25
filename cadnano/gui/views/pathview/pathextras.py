@@ -21,9 +21,10 @@ from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
+from cadnano.cnenum import HandleType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
-from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.gui.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 
 
@@ -598,39 +599,46 @@ class PathWorkplaneItem(QGraphicsRectItem):
     """Draws the rectangle to indicate the current Workplane, i.e. the
     region of part bases affected by certain actions in other views."""
     _BOUNDING_RECT_PADDING = 0
-    _GC_SIZE = 6
+    _HANDLE_SIZE = 6
+    _MIN_WIDTH = 3
 
     def __init__(self, model_part, part_item):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
+        self.setAcceptHoverEvents(True)
+        self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
+        self.setPen(getNoPen())
+
         self._model_part = model_part
         self._part_item = part_item
-        self._idx = model_part.getProperty('workplane_idx')
-        self._width = 3
+        self._idx_low, self._idx_high = model_part.getProperty('workplane_idxs')
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
-        self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
-        pen = newPenObj(styles.BLUE_STROKE, styles.MINOR_GRID_STROKE_WIDTH)
-        pen.setCosmetic(True)
-        self.setPen(pen)
-        self.setPos(BASE_WIDTH*10, -BASE_WIDTH)
-        self.setAcceptHoverEvents(True)
-        self.grab_corner = GrabCornerItem(self._GC_SIZE, model_part.getColor(), True, self)
-        self.updatePositionAndBounds()
 
-    def getModelBounds(self):
-        """Resize bounds in form of Qt position, scaled from model"""
-        xLL = int((self._idx+ 2) * BASE_WIDTH)
-        xUR = int(self._high_drag_bound * BASE_WIDTH)
+        self.outline = QGraphicsRectItem(self)
+        self.outline.setPen(newPenObj(styles.BLUE_STROKE, 0))
+
+        self.resize_handle_group = ResizeHandleGroup(self.rect(), self._HANDLE_SIZE, styles.BLUE_STROKE, True,
+                                                     HandleType.LEFT | HandleType.RIGHT, self)
+
+        TLx, TLy = self._idx_low*BASE_WIDTH, -BASE_WIDTH
+        BRx, BRy = self._idx_high*BASE_WIDTH, self._part_item._vh_rect.height()-BASE_WIDTH*2
+        self.reconfigureRect((TLx, TLy), (BRx, BRy))
+
+    def getModelMinSizeBounds(self):
+        """Resize bounds in form of Qt position, scaled from model."""
+        xLL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
+        xUR = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
         return xLL, 0, xUR, 0
     # end def
 
     def setMovable(self, is_movable):
-        pass
         # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
+        pass
     # end def
 
     def finishDrag(self):
         """Set the workplane size in the model"""
+        print("workplane finishDrag")
         pass
         # pos = self.pos()
         # position = pos.x(), pos.y()
@@ -638,32 +646,82 @@ class PathWorkplaneItem(QGraphicsRectItem):
         # self._model_part.changeInstanceProperty(self._model_instance, view_name, 'position', position)
     # end def
 
-    def updatePositionAndBounds(self, new_idx=None):
-        if new_idx is not None:
-            self._idx = int(new_idx)
+    def reconfigureRect(self, top_left, bottom_right):
+        """Update the workplane rect to draw from top_left to bottom_right,
+        snapping the x values to the nearest base width. Updates the outline
+        and resize handles.
 
-        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self._width
+        Args:
+            top_left (tuple): topLeft (x, y)
+            bottom_right (tuple): bottomRight (x, y)
 
-        h = self._part_item._vh_rect.height() - BASE_WIDTH*2
-        self.setRect(QRectF(styles.MINOR_GRID_STROKE_WIDTH, 0, BASE_WIDTH*self._width, h))
+        Returns:
+            QRectF: the new rect.
+        """
+        if top_left:
+            xTL = max(top_left[0], 0)
+            xTL = xTL - (xTL % BASE_WIDTH)  # snap to nearest base
+            self._idx_low = xTL/BASE_WIDTH
+        else:
+            xTL = self._idx_low*BASE_WIDTH
 
-        x = int(self._idx * BASE_WIDTH)
-        self.setPos(x, self.y())
+        if bottom_right:
+            xBR = min(bottom_right[0], self._high_drag_bound*BASE_WIDTH)
+            xBR = xBR - (xBR % BASE_WIDTH)  # snap to nearest base
+            self._idx_high = xBR/BASE_WIDTH
+        else:
+            xBR = self._idx_high*BASE_WIDTH
 
-        p = self._GC_SIZE/2
-        self.grab_corner.setTopRight(self.rect().adjusted(-p, -p, p, p).topRight())
-    # endef
+        yTL = self._part_item._vh_rect.top()
+        yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
+
+        self.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
+        self.outline.setRect(self.rect())
+        self.resize_handle_group.alignHandles(self.rect())
+        return self.rect()
+
+    def setIdxs(self, new_idxs=None):
+        """
+        Move and resize the workplane to match new_idxs.
+
+        Starting with the current workplane QRect, update the x coords of
+        topLeft (TL) and bottomRight (BR) points to new_idxs.
+        Make sure height is scaled for num of VHIs.
+
+        Calls reconfigureRect to update the item's rect, outline, and handles.
+        Args:
+            new_idxs (tuple): idx_low, idx_high
+        """
+        ptTL = self.rect().topLeft()
+        ptBR = self.rect().bottomRight()
+
+        if new_idxs:
+            self._idx_low = new_idxs[0]
+            self._idx_high = new_idxs[1]
+            ptTL.setX(self._idx_low*BASE_WIDTH)
+            ptBR.setX(self._idx_high*BASE_WIDTH)
+
+        self.reconfigureRect(top_left=(ptTL.x(), ptTL.y()), bottom_right=(ptBR.x(), ptBR.y()))
+    # end def
+
+    def showModelBoundsHint(self, show=True):
+        pass
+    # end def
+
+    def width(self):
+        return self._idx_high - self._idx_low
+    # end def
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
-        # self._part_item.updateStatusBar("%d-%d" % (self.pos())
+        self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
         QGraphicsItem.hoverEnterEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):
         self.setCursor(Qt.ArrowCursor)
-        # self._part_item.updateStatusBar("")
+        self._part_item.updateStatusBar("")
         QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
 
@@ -677,23 +735,36 @@ class PathWorkplaneItem(QGraphicsRectItem):
             event.ignore()
             QGraphicsItem.mousePressEvent(self, event)
             return
+
+        self._start_idx_low = self._idx_low
+        self._start_idx_high = self._idx_high
+        self._delta = 0
         self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
         self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self.width()
+    # end def
 
     def mouseMoveEvent(self, event):
-        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
-        idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
-        x = int(idx * BASE_WIDTH)
-        self.setPos(x, self.y())
-        # self.updateIndexSlot(None, idx)
-        # self._setActiveBaseIndex(idx)
-        # self._partItem.updateStatusBar("%d" % self.part().activeBaseIndex())
+        delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
+        delta = util.clamp(delta,
+                           self._low_drag_bound-self._start_idx_low,
+                           self._high_drag_bound-self._start_idx_high+self.width())
+        if self._delta != delta:
+            self._idx_low = self._start_idx_low + delta
+            self._idx_high = self._start_idx_high + delta
+            self._delta = delta
+            self.reconfigureRect((), ())
+    # end def
 
     def mouseReleaseEvent(self, event):
-        old_idx = int(self._model_part.getProperty('workplane_idx'))
-        idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
-        idx = util.clamp(idx, self._low_drag_bound, self._high_drag_bound)
-        if old_idx != idx:
-            self._idx = idx
-            self._model_part.setProperty('workplane_idx', idx)
+        delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
+        delta = util.clamp(delta,
+                           self._low_drag_bound-self._start_idx_low,
+                           self._high_drag_bound-self._start_idx_high+self.width())
+        if self._delta != delta:
+            self._idx_low = self._start_idx_low + delta
+            self._idx_high = self._start_idx_high + delta
+            self._delta = delta
+            self.reconfigureRect((), ())
         self.setCursor(Qt.OpenHandCursor)
+    # end def

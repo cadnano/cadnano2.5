@@ -227,8 +227,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     def createToolMousePress(self, tool, part_item, event):
         shift = event.modifiers() & Qt.ShiftModifier
-        idx_low = self._model_part.getProperty('workplane_idx')
-        idx_high = idx_low + 2
+        idx_low, idx_high = self._model_part.getProperty('workplane_idxs')
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
 
         parity = self._id_num % 2

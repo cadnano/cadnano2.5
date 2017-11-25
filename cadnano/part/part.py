@@ -25,7 +25,7 @@ class Part(CNObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idx']
+    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idxs']
 
     def __init__(self, *args, **kwargs):
         """Sets the parent document, sets bounds for part dimensions, and sets up
