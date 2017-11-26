@@ -695,7 +695,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         self.setRect(QRectF(QPointF(xTL+xoffset, yTL), QPointF(xBR+xoffset, yBR)))
         self.outline.setRect(self.rect())
         self.resize_handle_group.alignHandles(self.rect())
-        self._model_part.setProperty('workplane_idxs', (self._idx_low, self._idx_high))
+        self._model_part.setProperty('workplane_idxs', (self._idx_low, self._idx_high), use_undostack=False)
         return self.rect()
 
     def setIdxs(self, new_idxs):

@@ -14,7 +14,6 @@ from cadnano.gui.views.pathview.colorpanel import ColorPanel
 from cadnano.gui.views.pathview.pathrootitem import PathRootItem
 from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.gui.views.simview.simrootitem import SimRootItem
-from cadnano.gui.views.simview.simwidget import SimWidget
 from cadnano.gui.views.simview.tools.simtoolmanager import SimToolManager
 from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
@@ -36,6 +35,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def __init__(self, parent=None, doc_ctrlr=None):
         super(DocumentWindow, self).__init__(parent)
+
         self.controller = doc_ctrlr
         doc = doc_ctrlr.document()
         self.setupUi(self)
@@ -57,10 +57,21 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._init_grid_view(doc)
         self._init_path_view(doc)
         self._init_path_view_toolbar()
-        self._init_sim_view(doc)
+        self._init_sim_graphics_view(doc)
         self._init_edit_menu()
 
+        self.sim_dock_widget.setTitleBarWidget(QWidget())
+        self.path_dock_widget.setTitleBarWidget(QWidget())
+        self.grid_dock_widget.setTitleBarWidget(QWidget())
+        self.slice_dock_widget.setTitleBarWidget(QWidget())
+        self.inspector_dock_widget.setTitleBarWidget(QWidget())
+
+        self.splitDockWidget(self.slice_dock_widget, self.grid_dock_widget, Qt.Horizontal)
+        self.splitDockWidget(self.path_dock_widget, self.inspector_dock_widget, Qt.Horizontal)
+        # self.splitDockWidget(self.slice_dock_widget, self.grid_dock_widget, Qt.Vertical)
+
         doc.setViewNames(['slice', 'path', 'sim'])
+        self.setCentralWidget(None)  # No central widget, just dock widgets. Do last.
     # end def
 
     def _init_edit_menu(self):
@@ -78,7 +89,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.sep.setSeparator(True)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
+        # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")
     # end def
 
@@ -104,7 +115,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.scene_root_item = self.grid_root
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
-        self.grid_graphics_view.hide()
+        self.grid_dock_widget.hide()
     # end def
 
     def _init_path_view(self, doc):
@@ -156,16 +167,16 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setupGL()
     # end def
 
-    def _init_sim_view(self, doc):
+    def _init_sim_graphics_view(self, doc):
         """Initializes Sim View.
 
         Returns: None
         """
         self.simroot = SimRootItem(window=self, document=doc)
         self.sim_tool_manager = SimToolManager(self, self.simroot)
-        self.sim_widget = SimWidget(self.simroot)
-        self.slice_grid_splitter.setSizes([100, 100, 100])  # balance main_splitter size
-        self.sim_graphics_view.setViewport(self.sim_widget)  #.setViewport(self.sim_widget)
+        self.sim_dock_widget.setup(self.simroot)
+        self.addDockWidget(Qt.DockWidgetArea(1), self.sim_dock_widget)
+        # self.setCentralWidget(self.sim_dock_widget)
     # end def
 
     def _init_slice_view(self, doc):

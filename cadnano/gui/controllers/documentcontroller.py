@@ -108,7 +108,7 @@ class DocumentController():
                                             'xover': [win.action_filter_xover]}
 
         win.action_global_select.trigger()
-        self.win.outliner_property_splitter.hide()
+        self.win.inspector_dock_widget.hide()
     # end def
 
     def destroyDC(self):
@@ -144,8 +144,6 @@ class DocumentController():
             (win.action_SVG.triggered, self.actionSVGSlot),
             (win.action_export_staples.triggered, self.actionExportSequencesSlot),
             (win.action_preferences.triggered, self.actionPrefsSlot),
-            (win.action_outliner.triggered, self.actionToggleOutlinerSlot),
-            (win.action_sim.triggered, self.actionToggleSimSlot),
             (win.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
             (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_create.trigger()),
             (win.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
@@ -166,6 +164,11 @@ class DocumentController():
             (win.action_filter_rev.triggered, self.actionFilterRevSlot),
             (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
             (win.action_filter_stap.triggered, self.actionFilterStapSlot),
+
+            (win.action_slice.triggered, self.actionToggleSliceViewSlot),
+            (win.action_path.triggered, self.actionTogglePathViewSlot),
+            (win.action_sim.triggered, self.actionToggleSimViewSlot),
+            (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
 
             (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
@@ -608,21 +611,38 @@ class DocumentController():
         part.setActive(True)
         doc.setActivePart(part)
         return part
-
-    def actionToggleOutlinerSlot(self):
-        outliner = self.win.outliner_property_splitter
-        if outliner.isVisible():
-            outliner.hide()
-        else:
-            outliner.show()
     # end def
 
-    def actionToggleSimSlot(self):
-        sim_view = self.win.sim_widget_view
-        if sim_view.isVisible():
-            sim_view.hide()
+    def actionToggleSliceViewSlot(self):
+        dock_window = self.win.slice_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
         else:
-            sim_view.show()
+            dock_window.show()
+    # end def
+
+    def actionTogglePathViewSlot(self):
+        dock_window = self.win.path_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
+    # end def
+
+    def actionToggleSimViewSlot(self):
+        dock_window = self.win.sim_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
+    # end def
+
+    def actionToggleInspectorViewSlot(self):
+        dock_window = self.win.inspector_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+        else:
+            dock_window.show()
     # end def
 
     def toggleNewPartButtons(self, is_enabled):

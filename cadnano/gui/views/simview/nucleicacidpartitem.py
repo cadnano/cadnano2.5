@@ -7,7 +7,7 @@ from PyQt5.QtCore import QRectF
 
 from PyQt5.QtGui import QVector3D  # , QQuaternion
 from PyQt5.Qt3DCore import QEntity, QTransform
-from PyQt5.Qt3DExtras import QCuboidMesh, QPhongAlphaMaterial
+from PyQt5.Qt3DExtras import QCuboidMesh, QGoochMaterial
 
 from cadnano import getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj, getColorObj
@@ -37,7 +37,7 @@ class Cube(QEntity):
         self._parent_entity = parent_entity
         self._mesh = mesh = QCuboidMesh()
         self._trans = trans = QTransform()
-        self._mat = mat = QPhongAlphaMaterial()
+        self._mat = mat = QGoochMaterial()
 
         mesh.setXExtent(l)
         mesh.setYExtent(w)
@@ -86,8 +86,8 @@ class SimNucleicAcidPartItem(AbstractPartItem):
 
         # 3D view
         xLL, yLL, xUR, yUR = m_p.boundDimensions()
-        l = xUR - xLL
-        w = yUR - yLL
+        # l = xUR - xLL
+        # w = yUR - yLL
         # id_z_min, id_z_max = m_p.zBoundsIds()
         # z_min = 0
         # if id_z_min != -1:
@@ -99,11 +99,11 @@ class SimNucleicAcidPartItem(AbstractPartItem):
         #     print(axis_max)
         # h = z_max - z_min
 
-        h = 42*.34
-        self.bounding_cube = Cube(0, 0, 0, l, w, h, '#ffffff', viewroot_entity)
-        self.bounding_cube.setAlpha(0.2)
-        self.grab1 = Cube(-l/2.,  w/2.,  h/2., 1., 1., 1., '#cc0000', viewroot_entity)
-        self.grab2 = Cube( l/2., -w/2., -h/2., 1., 1., 1., '#cc0000', viewroot_entity)
+        # h = 42*.34
+        # self.bounding_cube = Cube(0, 0, 0, l, w, h, '#ffffff', viewroot_entity)
+        # self.bounding_cube.setAlpha(0.2)
+        # self.grab1 = Cube(-l/2.,  w/2.,  h/2., 1., 1., 1., '#0066cc', viewroot_entity)
+        # self.grab2 = Cube( l/2., -w/2., -h/2., 1., 1., 1., '#0066cc', viewroot_entity)
 
         self.scale_factor = 1.
 
