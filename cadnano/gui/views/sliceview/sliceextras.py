@@ -6,7 +6,7 @@ Attributes:
     TRIANGLE (TYPE): Description
     WEDGE_RECT (TYPE): Description
 """
-from queue import Queue
+from queue import Queue, PriorityQueue
 
 import numpy as np
 
@@ -1022,6 +1022,53 @@ class ShortestPathHelper(object):
                         parents[neighbor] = current_location
                         queue.put(neighbor)
         return []
+
+
+    @staticmethod
+    def shortestPathAStar(start, end, neighbor_map, vh_set, point_map):
+        print('a*')
+        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
+        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
+
+        print('start is %s, %s' % (start_coordinates[0], start_coordinates[1]))
+
+        queue = PriorityQueue()
+        queue.put(start_coordinates, 0)
+        parents = dict()
+        cumulative_cost = dict()
+
+        parents[start_coordinates] = None
+        cumulative_cost[start_coordinates] = 0
+
+        while not queue.empty():
+            try:
+                current_location = queue.get(block=False)
+            except Queue.Empty:
+                return []
+
+            if current_location == end_coordinates:
+                reversed_path = []
+                while current_location is not start_coordinates:
+                    reversed_path.append(current_location)
+                    current_location = parents[current_location]
+                return [node for node in reversed(reversed_path)]
+            else:
+                neighbors = neighbor_map.get(current_location, [])
+                for neighbor in neighbors:
+                    new_cost = cumulative_cost[current_location] + 1
+                    if (neighbor not in parents or new_cost < cumulative_cost[neighbor]) and neighbor not in vh_set:
+                        cumulative_cost[neighbor] = new_cost
+                        priority = new_cost + ShortestPathHelper.shortestPathHeuristic(start_coordinates, neighbor)
+                        print('priority for %s, %s: %s' % (neighbor[0], neighbor[1], priority))
+                        queue.put(neighbor, priority)
+                        parents[neighbor] = current_location
+
+    @staticmethod
+    def shortestPathHeuristic(start, point):
+        difference_a = abs(start[0] - point[0])
+        difference_b = abs(start[1] - point[1])
+
+        return difference_b*0.01 #+ difference_b*0.01
 
     @staticmethod
     def shortestPathXY(start, end, neighbor_map, vh_set, point_map, grid_type,
