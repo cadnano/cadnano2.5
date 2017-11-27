@@ -740,14 +740,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         tool.startCreation()
 
     def _handleShortestPathMousePress(self, tool, position, is_shift):
-        if (is_shift):
-            self.shortest_path_add_mode = True
+        if is_shift:
             # Complete the path
             if self.shortest_path_start is not None:
-                self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
-                self.shortest_path_start = position
+                result = self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
+                if result:
+                    self.shortest_path_start = position
                 return True
             else:
+                self.shortest_path_add_mode = True
                 self.shortest_path_start = position
         else:
             self.shortest_path_add_mode = False
@@ -764,18 +765,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                  scale_factor=self.inverse_scale_factor,
                                                  radius=self._RADIUS)
 
-        # Abort if there is no path from start to end
+        # Abort and exit SPA if there is no path from start to end
         if path == []:
-            return
-
-        x_list, y_list, parity_list = zip(*path)
-        id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
-                                                                y_list=y_list,
-                                                                parity=parity_list)
-        for id_number in id_numbers:
-            vhi = self._virtual_helix_item_hash[id_number]
-            tool.setVirtualHelixItem(vhi)
-            tool.startCreation()
+            self.shortest_path_start = None
+            self.shortest_path_add_mode = False
+            return False
+        else:
+            x_list, y_list, parity_list = zip(*path)
+            id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
+                                                                    y_list=y_list,
+                                                                    parity=parity_list)
+            for id_number in id_numbers:
+                vhi = self._virtual_helix_item_hash[id_number]
+                tool.setVirtualHelixItem(vhi)
+                tool.startCreation()
+            return True
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -798,7 +802,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if is_shift and self.shortest_path_add_mode:
             start = self.shortest_path_start
             end = event_xy
-            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
+            self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start,
                                                                      end=end,
                                                                      neighbor_map=self.neighbor_map,
                                                                      vh_set=self.vh_set,
