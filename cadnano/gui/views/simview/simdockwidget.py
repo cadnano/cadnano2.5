@@ -61,10 +61,10 @@ class SimDockWidget(QDockWidget):
         framegraph = self.view.defaultFrameGraph()
         framegraph.setClearColor(getColorObj('#ffffff'))
         cam_entity = self.camera_entity
-        cam_entity.lens().setPerspectiveProjection(45.0, 16.0 / 9.0, 0.1, 1000.0)
-        cam_entity.setPosition(QVector3D(0.0, 0.0, 50.0))
+        cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
+        cam_entity.setPosition(QVector3D(0.0, 10.0, -500.0))
         cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))
-        cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
+        cam_entity.setViewCenter(QVector3D(0.0, 0.0, 50.0))
         self.cam_controller.setCamera(cam_entity)
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
