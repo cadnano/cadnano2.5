@@ -404,7 +404,7 @@ class NucleicAcidPart(Part):
             raise AttributeError('Invalid parity passed to _get_new_id_num:  %s' % parity)
     # end def
 
-    def get_max_id_num(self, parity=None):
+    def getMaxIdNum(self, parity=None):
         """
         Return the highest ID number used so far.
 
@@ -416,9 +416,9 @@ class NucleicAcidPart(Part):
         elif parity is 0:
             return self._highest_even_id_num_used
         elif parity is 1:
-            return self._highest_even_id_num_used
+            return self._highest_odd_id_num_used
         else:
-            raise AttributeError('Invalid parity passed to get_max_id_num:  %s' % parity)
+            raise AttributeError('Invalid parity passed to getMaxIdNum:  %s' % parity)
 
     def _reserve_id_num(self, requested_id_num):
         """

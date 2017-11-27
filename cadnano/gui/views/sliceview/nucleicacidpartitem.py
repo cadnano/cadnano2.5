@@ -796,19 +796,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_shift = modifiers == Qt.ShiftModifier
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
-        self.createToolHoverLeave(tool=tool, event=event)
+        # self.createToolHoverLeave(tool=tool, event=event)
 
         # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
-            start = self.shortest_path_start
-            end = event_xy
-            self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start,
-                                                                     end=end,
-                                                                     neighbor_map=self.neighbor_map,
-                                                                     vh_set=self.vh_set,
-                                                                     point_map=self.point_map)
-            for node in self._highlighted_path:
-                self.griditem.changeGridPointColor(coordinates=node, color=styles.MULTI_VHI_HINT_COLOR)
+            part = self._model_part
+            start_coord = self.shortest_path_start
+            end_coord = event_xy
+            self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
+                                                                          end=end_coord,
+                                                                          neighbor_map=self.neighbor_map,
+                                                                          vh_set=self.vh_set,
+                                                                          point_map=self.point_map)
+            even_id = part.getMaxIdNum(0)
+            odd_id = part.getMaxIdNum(1)
+            for coord in self._highlighted_path:
+                even_id += 2
+                odd_id += 2
+                self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
@@ -820,25 +825,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # Determine parity of the the VH being hovered over for next ID hinting
         event_xy = (event.scenePos().x(), event.scenePos().y())
         row, column = ShortestPathHelper.findClosestPoint(position=event_xy, point_map=self.point_map)
-        if self.griditem.grid_type is GridType.HONEYCOMB:
-            parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-        elif self.griditem.grid_type is GridType.SQUARE:
-            parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
-        else:
-            parity = None
-        next_id_number = self.part()._get_new_id_num(parity=parity)
-        vh_coordinates = self.point_map.get((row, column))
+        point_item = self.point_map.get((row, column))
 
-        if vh_coordinates:
-            x = vh_coordinates[0]
-            y = vh_coordinates[1]
-            self.griditem.showNextIdNumber(id_number=next_id_number, x=x, y=y)
-
+        if point_item:
+            part = self._model_part
+            next_idnums = (part.getMaxIdNum(0)+2, part.getMaxIdNum(1)+2)
+            self.griditem.showCreateHint((row, column), next_idnums=next_idnums)
+    # end def
 
     def createToolHoverLeave(self, tool, event):
-        for node in self._highlighted_path:
-            self.griditem.changeGridPointColor(coordinates=node,
-                                               color=styles.SLICE_FILL)
+        print("createToolHoverLeave:")
+        for coord in self._highlighted_path:
+            print("coord", coord)
+            self.griditem.showCreateHint(coord, show_hint=False)
+        # if self._last_hovered_item:
+        #     self._last_hovered_item.showCreateHint(show_hint=False)
         self._highlighted_path = []
 
     def selectToolMousePress(self, tool, event):

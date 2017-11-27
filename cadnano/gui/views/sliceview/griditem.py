@@ -1,13 +1,13 @@
 # from queue import Queue
 
 from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QColor, QPainterPath, QFont
+from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getNoPen, getPenObj, getBrushObj
+from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
 
 from cadnano.gui.views.sliceview import slicestyles as styles
 
@@ -296,37 +296,36 @@ class GridItem(QGraphicsRectItem):
         scene = self.scene()
         while points:
             scene.removeItem(points.pop())
-
         self.points_dict = dict()
+    # end def
 
-    def changeGridPointColor(self, coordinates, color):
-        point = self.points_dict.get(coordinates)
+    def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True):
+        point_item = self.points_dict.get(coord)
 
-        if point is None:
-            print('Could not find')
-        else:
-            point.setBrush(getBrushObj(color))
+        if show_hint is False:
+            print("hiding", coord)
+            point_item.showCreateHint(show_hint=False)
 
-    def showNextIdNumber(self, id_number, x, y):
-        label = QGraphicsSimpleTextItem("%d" % id_number)
-        label.setFont(styles.SLICE_NUM_FONT)
-        label.setZValue(styles.ZSLICEHELIX)
-        label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR))
-        label.setPos(x, y)
-
-#        print((x, y))
-#        font = QFont('Arial')
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
-
-#        self.path().addText(0, 0, font, "%s" % id_number)
+        if point_item:
+            row, column = coord
+            if self.grid_type is GridType.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+            elif self.grid_type is GridType.SQUARE:
+                parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
+            else:
+                return
+            id_num = next_idnums[1] if parity else next_idnums[0]
+            point_item.showCreateHint(id_num=id_num, show_hint=show_hint)
+    # end def
 
     def setPath(self, path):
         assert isinstance(path, QPainterPath)
         self._path = path
+    # end def
 
     def path(self):
         return self._path
+    # end def
 
 
 class ClickArea(QGraphicsEllipseItem):
@@ -375,6 +374,11 @@ class GridPoint(QGraphicsEllipseItem):
         self.offset = diameter / 2
         self.grid = parent_grid
         self._coord = coord
+        self._label = label = QGraphicsSimpleTextItem("", self)
+        label.setFont(styles.SLICE_NUM_FONT)
+        label.setZValue(styles.ZSLICEHELIX)
+        label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR, alpha=64))
+        label.setPos(_RADIUS-2.7, _RADIUS-6.0)
 
         self.click_area = ClickArea(diameter, parent=self)
 
@@ -382,6 +386,28 @@ class GridPoint(QGraphicsEllipseItem):
         self.setZValue(_ZVALUE)
         self.setAcceptHoverEvents(True)
     # end def
+
+    def showCreateHint(self, id_num=0, show_hint=True):
+        label = self._label
+        if show_hint:
+            label.setText("%d" % id_num)
+            y_val = _RADIUS / 3
+            if id_num < 10:
+                label.setPos(_RADIUS / 1.5, y_val)
+            elif id_num < 100:
+                label.setPos(_RADIUS / 3, y_val)
+            else:  # _number >= 100
+                label.setPos(0, y_val)
+            b_rect = label.boundingRect()
+            posx = b_rect.width()/2
+            posy = b_rect.height()/2
+            label.setPos(_RADIUS-posx, _RADIUS-posy)
+            self.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
+        else:
+            label.setText(":)")
+            self.setBrush(getBrushObj("#cccc00", alpha=64))
+            # self.setBrush(getNoBrush())
+            # label.setParentItem(None)
 
     def coord(self):
         """Lattice coordinates, if available.
@@ -466,7 +492,9 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
+        print("GP leave")
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+        self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
