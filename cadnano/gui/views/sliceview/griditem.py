@@ -161,15 +161,15 @@ class GridItem(QGraphicsRectItem):
                     # This is reversed since the Y is mirrored
                     if not HoneycombDnaPart.isEvenParity(row, column):
                         neighbor_map[(-row, column)] = [
-                            (-row, column-1),
+                            (-row-1, column),
                             (-row, column+1),
-                            (-row-1, column)
+                            (-row, column-1)
                         ]
                     else:
                         neighbor_map[(-row, column)] = [
+                            (-row+1, column),
                             (-row, column-1),
-                            (-row, column+1),
-                            (-row+1, column)
+                            (-row, column+1)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
