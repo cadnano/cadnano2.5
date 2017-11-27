@@ -6,7 +6,7 @@ Attributes:
     TRIANGLE (TYPE): Description
     WEDGE_RECT (TYPE): Description
 """
-from queue import Queue, PriorityQueue
+from queue import Queue, PriorityQueue, Empty
 
 import numpy as np
 
@@ -1033,7 +1033,7 @@ class ShortestPathHelper(object):
         print('start is %s, %s' % (start_coordinates[0], start_coordinates[1]))
 
         queue = PriorityQueue()
-        queue.put(start_coordinates, 0)
+        queue.put((0, start_coordinates))
         parents = dict()
         cumulative_cost = dict()
 
@@ -1042,8 +1042,11 @@ class ShortestPathHelper(object):
 
         while not queue.empty():
             try:
-                current_location = queue.get(block=False)
-            except Queue.Empty:
+                queue_tuple = queue.get(block=False)
+                current_location = queue_tuple[1]
+                print('current location is %s,%s' % (current_location[0], current_location[1]))
+            except Empty:
+                print('e1')
                 return []
 
             if current_location == end_coordinates:
@@ -1060,15 +1063,21 @@ class ShortestPathHelper(object):
                         cumulative_cost[neighbor] = new_cost
                         priority = new_cost + ShortestPathHelper.shortestPathHeuristic(start_coordinates, neighbor)
                         print('priority for %s, %s: %s' % (neighbor[0], neighbor[1], priority))
-                        queue.put(neighbor, priority)
+                        queue.put((priority, neighbor))
                         parents[neighbor] = current_location
+                    else:
+                        print('skipping')
+        print('e2')
+        return []
+
+
 
     @staticmethod
     def shortestPathHeuristic(start, point):
         difference_a = abs(start[0] - point[0])
         difference_b = abs(start[1] - point[1])
 
-        return difference_b*0.01 #+ difference_b*0.01
+        return difference_a*0.1 + difference_b*0.01
 
     @staticmethod
     def shortestPathXY(start, end, neighbor_map, vh_set, point_map, grid_type,
