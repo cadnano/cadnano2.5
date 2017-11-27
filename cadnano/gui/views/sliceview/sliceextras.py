@@ -1026,6 +1026,23 @@ class ShortestPathHelper(object):
 
     @staticmethod
     def shortestPathAStar(start, end, neighbor_map, vh_set, point_map):
+        """Return a path of coordinates that traverses from start to end.
+
+        Does an A* search.
+
+        Args:
+            start (tuple): The i-j coordinates corresponding to the start point
+            end (tuple):  The i-j coordinates corresponding to the end point
+            neighbor_map (dict):  A dictionary mapping i-j coordinates to
+            their neighbors
+            vh_set (set):  A set of points that currently have a VH
+            point_map (dict):  a dictionary of coordinates to X-Y positions
+
+        Returns:
+            A list of coordinates corresponding to a shortest path from start to
+            end.  This list omits the starting point as it's assumed that the
+            start point has already been clicked.
+        """
         start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
         end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
 
@@ -1063,6 +1080,21 @@ class ShortestPathHelper(object):
 
     @staticmethod
     def shortestPathHeuristic(start, point):
+        """A heuristic to encourage pathfinding in the same row or column as the
+        start point.
+
+        This heuristic penalizes paths that deviate from the row or column that
+        corresponds to start.  Coordinates that deviate further from the start
+        incur a greater penalty.
+
+        Args:
+            start (tuple):  The i-j coordinates corresponding to the start point
+            point (tuple):  The i-j coordinates corresponding to the point for
+                which a heuristic is desired
+
+        Returns:
+            An integer heuristic value
+        """
         difference_a = abs(start[0] - point[0])
         difference_b = abs(start[1] - point[1])
 
@@ -1073,8 +1105,8 @@ class ShortestPathHelper(object):
                        scale_factor, radius):
         # TODO[NF]:  Docstring
         x_y_path = []
-        coordinate_path = ShortestPathHelper.shortestPath(start=start, end=end, neighbor_map=neighbor_map,
-                                                          vh_set=vh_set, point_map=point_map)
+        coordinate_path = ShortestPathHelper.shortestPathAStar(start=start, end=end, neighbor_map=neighbor_map,
+                                                               vh_set=vh_set, point_map=point_map)
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
