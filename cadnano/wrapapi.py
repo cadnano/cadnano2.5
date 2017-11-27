@@ -4,7 +4,7 @@ from types import FunctionType
 
 def getPublicMethods(cls):
     return [(x, y) for x, y in cls.__dict__.items()
-            if (type(y) == FunctionType and not x.startswith('_'))
+            if (isinstance(y, FunctionType) and not x.startswith('_'))
             ]
 # end def
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import random
 
 from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
@@ -17,7 +16,7 @@ class CreateStrandCommand(UndoCommand):
     Oligos
     """
 
-    def __init__(self,  strandset,
+    def __init__(self, strandset,
                  base_idx_low, base_idx_high,
                  color,
                  update_segments=True):
@@ -27,7 +26,7 @@ class CreateStrandCommand(UndoCommand):
         """
         super(CreateStrandCommand, self).__init__("create strand")
         self._strandset = strandset
-        doc = strandset.document()
+        strandset.document()
         self._strand = Strand(strandset, base_idx_low, base_idx_high)
         self._new_oligo = Oligo(None, color, length=self._strand.totalLength())  # redo will set part
         self.update_segments = update_segments

@@ -39,6 +39,21 @@ class ProxyParentItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
 
 
+class PathRectItem(QGraphicsRectItem):
+    """The rectangle corresponding to the outline of the workable area in the
+    Path View.
+
+    This class overrides mousePressEvent so that clicking anywhere in the
+    rectangle will result in the active VHI being deselected.
+    """
+    def __init__(self, parent):
+        super(PathRectItem, self).__init__(parent)
+        self.parent = parent
+
+    def mousePressEvent(self, event):
+        self.parent.unsetActiveVirtualHelixItem()
+
+
 class PathNucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
@@ -81,7 +96,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.setPen(getNoPen())
         # self.setRect(self._rect)
 
-        self.outline = outline = QGraphicsRectItem(self)
+        self.outline = outline = PathRectItem(self)
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
         self.outline.setPen(getPenObj(m_p.getColor(), _DEFAULT_WIDTH))
@@ -284,7 +299,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         # if self.active_virtual_helix_item is not None:
         #     self.setPreXoverItemsVisible(self.active_virtual_helix_item)
-        pass
     # end def
 
     def partRemovedSlot(self, sender):
@@ -621,6 +635,12 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             self.active_virtual_helix_item = new_active_vhi
     # end def
 
+    def unsetActiveVirtualHelixItem(self):
+        if self.active_virtual_helix_item is not None:
+            self.active_virtual_helix_item.deactivate()
+            self.active_virtual_helix_item = None
+        self.prexover_manager.reset()
+
     def setPreXoverItemsVisible(self, virtual_helix_item):
         """
         self._pre_xover_items list references prexovers parented to other
@@ -698,6 +718,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             coordinates of the the event, and previous event.
         """
         self._viewroot.clearSelectionsIfActiveTool()
+        self.unsetActiveVirtualHelixItem()
+
         return QGraphicsItem.mousePressEvent(self, event)
 
     def hoverMoveEvent(self, event):

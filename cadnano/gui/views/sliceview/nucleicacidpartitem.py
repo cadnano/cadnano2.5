@@ -1,9 +1,3 @@
-"""Summary
-
-Attributes:
-    DELTA (TYPE): Description
-    HIGHLIGHT_WIDTH (TYPE): Description
-"""
 from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
@@ -129,11 +123,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            part (TYPE): Description
+            part (NucleicAcidPart): Description
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-
-        Args:
-            TYPE: Description
         """
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
@@ -749,14 +740,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         tool.startCreation()
 
     def _handleShortestPathMousePress(self, tool, position, is_shift):
-        if (is_shift):
-            self.shortest_path_add_mode = True
+        if is_shift:
             # Complete the path
             if self.shortest_path_start is not None:
-                self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
-                self.shortest_path_start = position
+                result = self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
+                if result:
+                    self.shortest_path_start = position
                 return True
             else:
+                self.shortest_path_add_mode = True
                 self.shortest_path_start = position
         else:
             self.shortest_path_add_mode = False
@@ -772,14 +764,22 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                  grid_type=self.griditem.grid_type,
                                                  scale_factor=self.inverse_scale_factor,
                                                  radius=self._RADIUS)
-        for x, y, parity in path:
-            before = set(self._virtual_helix_item_hash.keys())
-            self._model_part.createVirtualHelix(x=x, y=y, parity=parity)
-            after = set(self._virtual_helix_item_hash.keys())
-            id_nums = after - before
-            vhi = self._virtual_helix_item_hash[list(id_nums)[0]]
-            tool.setVirtualHelixItem(vhi)
-            tool.startCreation()
+
+        # Abort and exit SPA if there is no path from start to end
+        if path == []:
+            self.shortest_path_start = None
+            self.shortest_path_add_mode = False
+            return False
+        else:
+            x_list, y_list, parity_list = zip(*path)
+            id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
+                                                                    y_list=y_list,
+                                                                    parity=parity_list)
+            for id_number in id_numbers:
+                vhi = self._virtual_helix_item_hash[id_number]
+                tool.setVirtualHelixItem(vhi)
+                tool.startCreation()
+            return True
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -791,11 +791,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        tool.hoverMoveEvent(self, event)
-        return QGraphicsItem.hoverMoveEvent(self, event)
-    # end def
-
-    def createToolHoverEnter(self, tool, event):
+        event_xy = (event.scenePos().x(), event.scenePos().y())
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
 
@@ -805,16 +801,39 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
             start = self.shortest_path_start
-            end = (event.scenePos().x(), event.scenePos().y())
-
-            self._highlighted_path = ShortestPathHelper.shortestPath(start=start,
+            end = event_xy
+            self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start,
                                                                      end=end,
                                                                      neighbor_map=self.neighbor_map,
                                                                      vh_set=self.vh_set,
                                                                      point_map=self.point_map)
             for node in self._highlighted_path:
-                self.griditem.changeGridPointColor(coordinates=node,
-                                                   color=styles.MULTI_VHI_HINT_COLOR)
+                self.griditem.changeGridPointColor(coordinates=node, color=styles.MULTI_VHI_HINT_COLOR)
+
+        tool.hoverMoveEvent(self, event)
+        return QGraphicsItem.hoverMoveEvent(self, event)
+    # end def
+
+    def createToolHoverEnter(self, tool, event):
+        # TODO[NF]:  Docstring
+
+        # Determine parity of the the VH being hovered over for next ID hinting
+        event_xy = (event.scenePos().x(), event.scenePos().y())
+        row, column = ShortestPathHelper.findClosestPoint(position=event_xy, point_map=self.point_map)
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+        elif self.griditem.grid_type is GridType.SQUARE:
+            parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
+        else:
+            parity = None
+        next_id_number = self.part()._get_new_id_num(parity=parity)
+        vh_coordinates = self.point_map.get((row, column))
+
+        if vh_coordinates:
+            x = vh_coordinates[0]
+            y = vh_coordinates[1]
+            self.griditem.showNextIdNumber(id_number=next_id_number, x=x, y=y)
+
 
     def createToolHoverLeave(self, tool, event):
         for node in self._highlighted_path:

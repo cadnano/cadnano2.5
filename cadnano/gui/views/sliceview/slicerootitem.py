@@ -72,7 +72,6 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             item_dict (TYPE): Description
         """
-        pass
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
@@ -98,7 +97,6 @@ class SliceRootItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        pass
     # end def
 
     def clearSelectionsSlot(self, doc):

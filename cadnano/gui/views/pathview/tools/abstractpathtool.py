@@ -138,7 +138,6 @@ class AbstractPathTool(QGraphicsObject):
         """Called every time a widget representing self gets clicked,
         not just when changing tools.
         """
-        pass
 
     ####################### Coordinate Utilities ###########################
     def baseAtPoint(self, virtual_helix_item, pt):

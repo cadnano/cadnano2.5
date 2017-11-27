@@ -8,7 +8,6 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_Preferences(object):
     def setupUi(self, Preferences):
         Preferences.setObjectName("Preferences")
@@ -72,7 +71,6 @@ class Ui_Preferences(object):
         self.legacy_slice_view_combo_box.setObjectName("legacy_slice_view_combo_box")
         self.legacy_slice_view_combo_box.addItem("")
         self.legacy_slice_view_combo_box.addItem("")
-        self.legacy_slice_view_combo_box.addItem("")
         self.form_layout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.legacy_slice_view_combo_box)
         self.vertical_layout_4.addLayout(self.form_layout)
         self.button_box = QtWidgets.QDialogButtonBox(self.interface_tab)
@@ -120,16 +118,14 @@ class Ui_Preferences(object):
         self.legacy_slice_view_label.setText(_translate("Preferences", "Slice View"))
         self.legacy_slice_view_combo_box.setItemText(0, _translate("Preferences", "Legacy Slice View"))
         self.legacy_slice_view_combo_box.setItemText(1, _translate("Preferences", "Grid View"))
-        self.legacy_slice_view_combo_box.setItemText(2, _translate("Preferences", "Dual View"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.interface_tab), _translate("Preferences", "Interface"))
         self.label.setText(_translate("Preferences", "Plugins allow custom python code execution within cadnano.\n"
-                                      "See github.com/cadnano/plugins for examples."))
+"See github.com/cadnano/plugins for examples."))
         item = self.plugin_table_widget.horizontalHeaderItem(0)
         item.setText(_translate("Preferences", "Path"))
         self.add_plugin_button.setText(_translate("Preferences", "Add Plugin"))
         self.tab_widget.setTabText(self.tab_widget.indexOf(self.plugins_tab), _translate("Preferences", "Plugins"))
         self.actionClose.setText(_translate("Preferences", "Close"))
         self.actionClose.setShortcut(_translate("Preferences", "Ctrl+W"))
-
 
 import cadnano.gui.ui.dialogs.dialogicons_rc

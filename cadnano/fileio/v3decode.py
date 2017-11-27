@@ -11,12 +11,12 @@ def decode(document, obj, emit_signals=False):
         document (Document):
         obj (dict): deserialized file object
     """
-    name = obj.get('name')
+    obj.get('name')
     meta = obj.get('meta')
 
     slice_view_type = meta.get('slice_view_type')
     grid_type = meta.get('grid_type')
-    document.set_slice_view_type(slice_view_type=slice_view_type)
+    document.setSliceViewType(slice_view_type=slice_view_type)
 
     for part_dict in obj['parts']:
         decodePart(document, part_dict, grid_type=grid_type,

@@ -390,14 +390,12 @@ class Strand(CNObject):
         """Returns the absolute base_idx of the 3' end of the strand.
         overloaded in __init__
         """
-        pass
         # return self.idx3Prime
 
     def idx5Prime(self):
         """Returns the absolute base_idx of the 5' end of the strand.
         overloaded in __init__
         """
-        pass
         # return self.idx5Prime
 
     def dump5p(self):
@@ -812,12 +810,12 @@ class Strand(CNObject):
             idxL, idxH = cIdxL, nIdxL - 1
             insertions += self.insertionsOnStrand(idxL, idxH)
         else:
-            low_out = True
+            pass
         if cIdxL < nIdxH < cIdxH:
             idxL, idxH = nIdxH + 1, cIdxH
             insertions += self.insertionsOnStrand(idxL, idxH)
         else:
-            high_out = True
+            pass
         # this only called if both the above aren't true
         # if low_out and high_out:
         # if we move the whole strand, just clear the insertions out

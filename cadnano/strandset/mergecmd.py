@@ -65,7 +65,7 @@ class MergeCommand(UndoCommand):
 
     def redo(self):
         ss = self._s_set
-        doc = ss._document
+        ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
@@ -116,7 +116,7 @@ class MergeCommand(UndoCommand):
 
     def undo(self):
         ss = self._s_set
-        doc = ss._document
+        ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand

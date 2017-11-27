@@ -19,9 +19,9 @@ class VirtualHelixItemController(object):
     # end def
 
     part_connections = [
-        ('partVirtualHelixPropertyChangedSignal',   'partVirtualHelixPropertyChangedSlot'),
-        ('partVirtualHelixRemovedSignal',           'partVirtualHelixRemovedSlot'),
-        ('partVirtualHelixResizedSignal',           'partVirtualHelixResizedSlot')
+        ('partVirtualHelixPropertyChangedSignal', 'partVirtualHelixPropertyChangedSlot'),
+        ('partVirtualHelixRemovedSignal', 'partVirtualHelixRemovedSlot'),
+        ('partVirtualHelixResizedSignal', 'partVirtualHelixResizedSlot')
     ]
 
     strand_connections = [

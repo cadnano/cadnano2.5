@@ -83,7 +83,6 @@ class QAbstractPartItem(QGraphicsRectItem):
             min_id_num (int): id number of the least Z Virtual Helix
             max_id_num (int): id number of most Z Virtual Helix
         """
-        pass
 
     def partOligoAddedSlot(self, part, oligo):
         pass
@@ -137,7 +136,6 @@ class QAbstractPartItem(QGraphicsRectItem):
         """ is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
-        pass
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, new_value):
         pass
@@ -199,7 +197,6 @@ class AbstractPartItem(object):
             min_id_num (int): id number of the least Z Virtual Helix
             max_id_num (int): id number of most Z Virtual Helix
         """
-        pass
 
     def partOligoAddedSlot(self, part, oligo):
         pass
@@ -250,7 +247,6 @@ class AbstractPartItem(object):
         """is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
-        pass
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, new_value):
         pass

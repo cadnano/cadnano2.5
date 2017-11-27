@@ -96,7 +96,7 @@ def v2dot(a, b):
 def v2AngleBetween(a, b):
     a = normalizeV2(a)
     b = normalizeV2(b)
-    numerator = v2dot(a, b)
+    v2dot(a, b)
     xa, xa = a
     xb, yb = a
     maga = math.sqrt(xa**2 + ya**2)

@@ -1,5 +1,4 @@
 import pytest
-import math
 
 from cntestcase import cnapp
 

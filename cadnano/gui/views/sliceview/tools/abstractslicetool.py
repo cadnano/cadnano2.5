@@ -85,7 +85,7 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        rad = self._RADIUS
+        self._RADIUS
         self._vhi = virtual_helix_item
 #        li = self._line_item
 #        li.setParentItem(virtual_helix_item)
@@ -107,7 +107,6 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        pass
 #        self._line_item.setParentItem(self)
 
     def idNum(self):
@@ -166,7 +165,6 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_scenepos (TYPE): Description
         """
-        pass
 #        li = self._line_item
 #        pos = li.mapFromScene(target_scenepos)
 
@@ -200,7 +198,6 @@ class AbstractSliceTool(QGraphicsObject):
             part_item (TYPE): Description
             target_part_pos (TYPE): Description
         """
-        pass
 #        li = self._line_item
 #        pos = li.mapFromItem(part_item, target_part_pos)
 #        for i, vector in enumerate(self.vectors):
@@ -216,7 +213,6 @@ class AbstractSliceTool(QGraphicsObject):
         Returns:
             TYPE: Description
         """
-        pass
 #        self.vhi_hint_item.hide()
 #        li = self._line_item
 #        li.hide()
@@ -273,7 +269,7 @@ class AbstractSliceTool(QGraphicsObject):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
                 self.sgv.customContextMenuRequested.disconnect()
-            except:
+            except BaseException:
                 pass
             self.sgv.customContextMenuRequested.connect(self.getCustomContextMenu)
     # end def

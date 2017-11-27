@@ -72,7 +72,6 @@ class GridRootItem(QGraphicsRectItem):
         Args:
             item_dict (TYPE): Description
         """
-        pass
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_list):
@@ -86,7 +85,6 @@ class GridRootItem(QGraphicsRectItem):
         """
         # if 'virtual_helix' not in filter_name_list:
         #     self.manager.chooseCreateTool()
-        pass
         # for nucleicacid_part_item in self.instance_items:
         #     nucleicacid_part_item.setSelectionFilter(filter_name_list)
     # end def
@@ -100,7 +98,6 @@ class GridRootItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        pass
     # end def
 
     def clearSelectionsSlot(self, doc):

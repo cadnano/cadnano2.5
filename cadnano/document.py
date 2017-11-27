@@ -939,11 +939,11 @@ class Document(CNObject):
 
     def get_slice_view_type(self):
         # TODO[NF]:  Docstring
-        return self.controller().get_slice_view_type()
+        return self.controller().getSliceViewType()
 
     def set_slice_view_type(self, slice_view_type):
         # TODO[NF]:  Docstring
-        return self.controller().set_slice_view_type(slice_view_type=slice_view_type)
+        return self.controller().setSliceViewType(slice_view_type=slice_view_type)
 
     def get_grid_type(self):
         # TODO[NF]:  Docstring

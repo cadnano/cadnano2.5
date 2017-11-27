@@ -28,11 +28,11 @@ class CreateXoverCommand(UndoCommand):
     # end def
 
     def redo(self):
-        part = self._part
+        self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         olg5p = strand5p.oligo()
         old_olg3p = self._old_oligo3p
 
@@ -74,9 +74,9 @@ class CreateXoverCommand(UndoCommand):
     def undo(self):
         part = self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         old_olg3p = self._old_oligo3p
         olg5p = strand5p.oligo()
 
@@ -143,9 +143,9 @@ class RemoveXoverCommand(UndoCommand):
     def redo(self):
         part = self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         new_olg3p = self._new_oligo3p
         olg5p = self._strand5p.oligo()
 
@@ -177,11 +177,11 @@ class RemoveXoverCommand(UndoCommand):
     # end def
 
     def undo(self):
-        part = self._part
+        self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         olg5p = strand5p.oligo()
         new_olg3p = self._new_oligo3p
 

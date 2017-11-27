@@ -40,7 +40,6 @@ def testVirtualHelixResize(cnapp):
 def testRemove(cnapp):
     doc = cnapp.document
     start_length = 42
-    end_length = 84
     part = create3Helix(doc, (0, 0, 1), start_length)
     assert len(doc.children()) == 1
     us = part.undoStack()
