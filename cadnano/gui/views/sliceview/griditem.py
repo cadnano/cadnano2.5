@@ -374,11 +374,14 @@ class GridPoint(QGraphicsEllipseItem):
         self.offset = diameter / 2
         self.grid = parent_grid
         self._coord = coord
-        self._label = label = QGraphicsSimpleTextItem("", self)
+        self._label = label = QGraphicsSimpleTextItem(">: (", self)
         label.setFont(styles.SLICE_NUM_FONT)
         label.setZValue(styles.ZSLICEHELIX)
         label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR, alpha=64))
-        label.setPos(_RADIUS-2.7, _RADIUS-6.0)
+        b_rect = label.boundingRect()
+        posx = b_rect.width()/2
+        posy = b_rect.height()/2
+        label.setPos(_RADIUS-posx, _RADIUS-posy)
 
         self.click_area = ClickArea(diameter, parent=self)
 
@@ -391,21 +394,14 @@ class GridPoint(QGraphicsEllipseItem):
         label = self._label
         if show_hint:
             label.setText("%d" % id_num)
-            y_val = _RADIUS / 3
-            if id_num < 10:
-                label.setPos(_RADIUS / 1.5, y_val)
-            elif id_num < 100:
-                label.setPos(_RADIUS / 3, y_val)
-            else:  # _number >= 100
-                label.setPos(0, y_val)
             b_rect = label.boundingRect()
             posx = b_rect.width()/2
             posy = b_rect.height()/2
             label.setPos(_RADIUS-posx, _RADIUS-posy)
             self.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
         else:
-            label.setText(":)")
-            self.setBrush(getBrushObj("#cccc00", alpha=64))
+            label.setText(": )")
+            self.setBrush(getBrushObj("#ffef00", alpha=200))
             # self.setBrush(getNoBrush())
             # label.setParentItem(None)
 
@@ -492,7 +488,6 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-        print("GP leave")
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.showCreateHint(show_hint=False)
 

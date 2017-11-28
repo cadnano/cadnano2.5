@@ -834,9 +834,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def createToolHoverLeave(self, tool, event):
-        print("createToolHoverLeave:")
         for coord in self._highlighted_path:
-            print("coord", coord)
             self.griditem.showCreateHint(coord, show_hint=False)
         # if self._last_hovered_item:
         #     self._last_hovered_item.showCreateHint(show_hint=False)
