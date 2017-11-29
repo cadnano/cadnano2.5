@@ -427,6 +427,9 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Updates the associated QGraphicsSimpleTextItem label text to match
         the id_num. Adjusts the label position so it is centered regardless
         of number of digits in the label.
+
+
+        use me
         """
         num = self.idNum()
         label = self._label

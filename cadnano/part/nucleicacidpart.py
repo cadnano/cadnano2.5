@@ -585,7 +585,13 @@ class NucleicAcidPart(Part):
         yLL = np.amin(ys)
         yUR = np.amax(ys)
         self.origin_limits = (xLL, yLL, xUR, yUR)
+        print('setting origin limits')
     # end def
+
+    def setVirtualHelixOriginLimits(self, limits):
+        # TODO[NF]:  Docstring
+        assert len(limits) is 4
+        self.origin_limits = limits[0], limits[1], limits[2], limits[3]
 
     def getVirtualHelixOriginLimits(self):
         """Retuns a pair of coordinates bounding the lower-left and upper-right
@@ -1110,6 +1116,7 @@ class NucleicAcidPart(Part):
         if new_y > yUR:
             yUR = new_y
         self.origin_limits = (xLL, yLL, xUR, yUR)
+        print('setting ol')
         self.directions[id_num] = direction
         self.vh_properties.loc[id_num, ['name', 'color', 'length']] = "vh%d" % (id_num), color, num_points
 
@@ -2406,6 +2413,7 @@ class NucleicAcidPart(Part):
         """Returns a tuple of rectangle defining the XY limits of a part"""
         DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
+        print(str((xLL, yLL, xUR, yUR)))
         if xLL > -DMIN:
             xLL = -DMIN
         if yLL > -DMIN:
