@@ -792,11 +792,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         event_xy = (event.scenePos().x(), event.scenePos().y())
+        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
-        # self.createToolHoverLeave(tool=tool, event=event)
+        if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
+            self.createToolHoverLeave(tool=tool, event=event)
 
         # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
@@ -808,29 +810,28 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                           neighbor_map=self.neighbor_map,
                                                                           vh_set=self.vh_set,
                                                                           point_map=self.point_map)
-            even_id = part.getMaxIdNum(0)
-            odd_id = part.getMaxIdNum(1)
+            even_id = part.getMaxIdNum(0) + 2
+            odd_id = part.getMaxIdNum(1) + 2
             for coord in self._highlighted_path:
-                even_id += 2
-                odd_id += 2
-                self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
+                is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
+                if is_odd is True:
+                    odd_id += 2
+                elif is_odd is False:
+                    even_id += 2
+                else: # None
+                    pass
+        else:
+            point_item = self.point_map.get(event_coord)
+
+            if point_item is not None:
+                part = self._model_part
+                next_idnums = (part.getMaxIdNum(0)+2, part.getMaxIdNum(1)+2)
+                self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
+
+                self._highlighted_path.append(event_coord)
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
-    # end def
-
-    def createToolHoverEnter(self, tool, event):
-        # TODO[NF]:  Docstring
-
-        # Determine parity of the the VH being hovered over for next ID hinting
-        event_xy = (event.scenePos().x(), event.scenePos().y())
-        row, column = ShortestPathHelper.findClosestPoint(position=event_xy, point_map=self.point_map)
-        point_item = self.point_map.get((row, column))
-
-        if point_item:
-            part = self._model_part
-            next_idnums = (part.getMaxIdNum(0)+2, part.getMaxIdNum(1)+2)
-            self.griditem.showCreateHint((row, column), next_idnums=next_idnums)
     # end def
 
     def createToolHoverLeave(self, tool, event):
