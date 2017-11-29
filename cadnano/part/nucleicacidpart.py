@@ -363,14 +363,14 @@ class NucleicAcidPart(Part):
         return self._virtual_helices_set[id_num]
     # end def
 
-    def _get_new_id_num(self, parity=None):
+    def _getNewIdNum(self, parity=None):
         """
         Return the lowest id_num that is both currently available and that is
         even or odd according to parity (if specified).
 
         This method only returns an ID number; it does not take the ID number
         from the pool of available ID numbers.  When an ID number is used,
-        _reserve_id_num must be called. Internally ID numbers are recycled when
+        _reserveIdNum must be called. Internally ID numbers are recycled when
         virtual helices are deleted.
 
         Args:
@@ -401,7 +401,7 @@ class NucleicAcidPart(Part):
             else:
                 return self._highest_even_id_num_used + 2
         else:
-            raise AttributeError('Invalid parity passed to _get_new_id_num:  %s' % parity)
+            raise AttributeError('Invalid parity passed to _getNewIdNum:  %s' % parity)
     # end def
 
     def getMaxIdNum(self, parity=None):
@@ -420,7 +420,7 @@ class NucleicAcidPart(Part):
         else:
             raise AttributeError('Invalid parity passed to getMaxIdNum:  %s' % parity)
 
-    def _reserve_id_num(self, requested_id_num):
+    def _reserveIdNum(self, requested_id_num):
         """
         Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
@@ -1057,7 +1057,7 @@ class NucleicAcidPart(Part):
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))
 
-        self._reserve_id_num(id_num)
+        self._reserveIdNum(id_num)
 
         offset_and_size = self._offset_and_size
 
@@ -2694,8 +2694,8 @@ class NucleicAcidPart(Part):
 
             # Reserve the _id_num to prevent id_number collisions between VHs created in this loop
             if _id_num is None:
-                _id_num = self._get_new_id_num(parity=_parity)
-                self._reserve_id_num(requested_id_num=_id_num)
+                _id_num = self._getNewIdNum(parity=_parity)
+                self._reserveIdNum(requested_id_num=_id_num)
 
             command = CreateVirtualHelixCommand(self, x=x, y=y, z=z,
                                                 length=_length,

@@ -15,9 +15,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            self.id_num = part._get_new_id_num(parity=parity)
+            self.id_num = part._getNewIdNum(parity=parity)
         else:
-            part._reserve_id_num(id_num)
+            part._reserveIdNum(id_num)
             self.id_num = id_num
         self.origin_pt = (x, y, z)
         self.length = length

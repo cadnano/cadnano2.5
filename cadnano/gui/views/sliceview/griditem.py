@@ -86,10 +86,6 @@ class GridItem(QGraphicsRectItem):
         self.updateGrid()
     # end def
 
-    def setAppearance(self, draw_lines):
-        # TODO[NF]:  Docstring
-        return
-
     def createHoneycombGrid(self, part_item, radius, bounds):
         """Instantiate an area of griditems arranged on a honeycomb lattice.
 
