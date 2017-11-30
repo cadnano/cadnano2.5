@@ -9,7 +9,7 @@ from .nucleicacidpartitem import SliceNucleicAcidPartItem
 class SliceRootItem(QGraphicsRectItem):
     """
     SliceRootItem is the root item in the SliceView. It gets added directly
-    to the pathscene by DocumentWindow. It receives two signals
+    to the slicescene by DocumentWindow. It receives two signals
     (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
 
     SliceRootItem must instantiate its own controller to receive signals
