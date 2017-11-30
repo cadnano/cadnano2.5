@@ -86,10 +86,6 @@ class GridItem(QGraphicsRectItem):
         self.updateGrid()
     # end def
 
-    def setAppearance(self, draw_lines):
-        # TODO[NF]:  Docstring
-        return
-
     def createHoneycombGrid(self, part_item, radius, bounds):
         """Instantiate an area of griditems arranged on a honeycomb lattice.
 
@@ -303,7 +299,6 @@ class GridItem(QGraphicsRectItem):
         point_item = self.points_dict.get(coord)
 
         if show_hint is False:
-            print("hiding", coord)
             point_item.showCreateHint(show_hint=False)
 
         if point_item:
@@ -316,6 +311,7 @@ class GridItem(QGraphicsRectItem):
                 return
             id_num = next_idnums[1] if parity else next_idnums[0]
             point_item.showCreateHint(id_num=id_num, show_hint=show_hint)
+            return parity == 1
     # end def
 
     def setPath(self, path):
@@ -374,7 +370,7 @@ class GridPoint(QGraphicsEllipseItem):
         self.offset = diameter / 2
         self.grid = parent_grid
         self._coord = coord
-        self._label = label = QGraphicsSimpleTextItem(">: (", self)
+        self._label = label = QGraphicsSimpleTextItem("", self)
         label.setFont(styles.SLICE_NUM_FONT)
         label.setZValue(styles.ZSLICEHELIX)
         label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR, alpha=64))
@@ -400,9 +396,8 @@ class GridPoint(QGraphicsEllipseItem):
             label.setPos(_RADIUS-posx, _RADIUS-posy)
             self.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
         else:
-            label.setText(": )")
-            self.setBrush(getBrushObj("#ffef00", alpha=200))
-            # self.setBrush(getNoBrush())
+            label.setText("")
+            self.setBrush(getNoBrush())
             # label.setParentItem(None)
 
     def coord(self):
@@ -557,7 +552,6 @@ class GridPoint(QGraphicsEllipseItem):
     def createToolHoverEnterEvent(self, tool, part_item, event):
         self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)
-        part_item.createToolHoverEnter(tool, event)
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
         part_item.createToolHoverMove(tool, event)
