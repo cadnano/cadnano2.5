@@ -38,6 +38,7 @@
         <file alias="path">images/path-view.png</file>
         <file alias="slice">images/slice-view.png</file>
         <file alias="sim">images/sim-view.png</file>
+        <file alias="console">images/console.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

@@ -165,10 +165,12 @@ class DocumentController():
             (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
             (win.action_filter_stap.triggered, self.actionFilterStapSlot),
 
-            (win.action_slice.triggered, self.actionToggleSliceViewSlot),
+            (win.action_console.triggered, self.actionToggleConsoleSlot),
+            (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
             (win.action_path.triggered, self.actionTogglePathViewSlot),
             (win.action_sim.triggered, self.actionToggleSimViewSlot),
-            (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
+            (win.action_slice.triggered, self.actionToggleSliceViewSlot),
+
 
             (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
@@ -613,6 +615,19 @@ class DocumentController():
         return part
     # end def
 
+    def actionToggleConsoleSlot(self):
+        print("actionToggleConsoleSlot")
+        dock_window = self.win.console_dock_widget
+        if dock_window.isVisible():
+            dock_window.hide()
+            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.sim_dock_widget, Qt.Vertical)
+            self.win.splitDockWidget(self.win.path_dock_widget, self.win.inspector_dock_widget, Qt.Horizontal)
+        else:
+            dock_window.show()
+            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.path_dock_widget, Qt.Horizontal)
+            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.sim_dock_widget, Qt.Vertical)
+    # end def
+
     def actionToggleSliceViewSlot(self):
         dock_window = self.win.slice_dock_widget
         if dock_window.isVisible():
@@ -1008,7 +1023,7 @@ class DocumentController():
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
 
-    def get_slice_view_type(self):
+    def getSliceViewType(self):
         # TODO[NF]:  Make these strings global constants
         if self.slice_view_showing and self.grid_view_showing:
             return 'Both'
@@ -1019,7 +1034,7 @@ class DocumentController():
         else:
             raise NotImplementedError
 
-    def set_slice_view_type(self, slice_view_type):
+    def setSliceViewType(self, slice_view_type):
         # TODO[NF]:  Make these strings global constants
         if slice_view_type not in ('Both', 'Slice', 'Grid'):
             # logger.error('slice_view_type is invalid:  %s' % slice_view_type)
