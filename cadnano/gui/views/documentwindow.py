@@ -79,7 +79,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         console_visible = self.settings.value("console_visible", False)
         self.settings.endGroup()
 
-        print("restoring console", console_visible)
         if console_visible:
             self.setCentralWidget(self.console_dock_widget)
             self.action_console.setChecked(True)
@@ -91,7 +90,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.splitDockWidget(self.slice_dock_widget, self.sim_dock_widget, Qt.Vertical)
 
         if windowstate is not None:
-            print("restoring windowstate", windowstate)
             self.restoreState(windowstate)
     # end def
 
