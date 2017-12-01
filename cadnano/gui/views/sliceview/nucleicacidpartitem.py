@@ -810,8 +810,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                           neighbor_map=self.neighbor_map,
                                                                           vh_set=self.vh_set,
                                                                           point_map=self.point_map)
-            even_id = part.getMaxIdNum(0) + 2
-            odd_id = part.getMaxIdNum(1) + 2
+            even_id = part._getNewIdNum(0)
+            odd_id = part._getNewIdNum(1)
             for coord in self._highlighted_path:
                 is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
                 if is_odd is True:
@@ -825,7 +825,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
             if point_item is not None:
                 part = self._model_part
-                next_idnums = (part.getMaxIdNum(0)+2, part.getMaxIdNum(1)+2)
+                next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
 
                 self._highlighted_path.append(event_coord)
