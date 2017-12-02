@@ -114,7 +114,7 @@ class DocumentController(object):
                                             'xover': [win.action_filter_xover]}
 
         win.action_global_select.trigger()
-        self.win.inspector_dock_widget.hide()
+        # self.win.inspector_dock_widget.hide()
     # end def
 
     def destroyDC(self):
@@ -657,6 +657,7 @@ class DocumentController(object):
     # end def
 
     def actionToggleInspectorViewSlot(self):
+        print("actionToggleInspectorViewSlot")
         dock_window = self.win.inspector_dock_widget
         if dock_window.isVisible():
             dock_window.hide()

@@ -124,8 +124,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_inspector"/>
    <addaction name="action_console"/>
+   <addaction name="action_inspector"/>
    <addaction name="action_sim"/>
    <addaction name="action_path"/>
    <addaction name="action_slice"/>
@@ -177,6 +177,7 @@
     <addaction name="action_slice"/>
     <addaction name="action_path"/>
     <addaction name="action_sim"/>
+    <addaction name="action_inspector"/>
     <addaction name="action_console"/>
    </widget>
    <addaction name="menu_file"/>
@@ -186,7 +187,7 @@
   <widget class="QDockWidget" name="slice_dock_widget">
    <property name="minimumSize">
     <size>
-     <width>600</width>
+     <width>200</width>
      <height>200</height>
     </size>
    </property>
@@ -365,7 +366,7 @@
   <widget class="QDockWidget" name="path_dock_widget">
    <property name="minimumSize">
     <size>
-     <width>400</width>
+     <width>200</width>
      <height>200</height>
     </size>
    </property>
@@ -518,6 +519,9 @@
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
+        <property name="styleSheet">
+         <string notr="true">QTreeView {alternate-background-color:#f0f0f0;}</string>
+        </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
         </property>
@@ -565,14 +569,14 @@
   </widget>
   <widget class="SimDockWidget" name="sim_dock_widget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>600</width>
+     <width>200</width>
      <height>200</height>
     </size>
    </property>
@@ -609,14 +613,14 @@
    </property>
    <property name="minimumSize">
     <size>
-     <width>400</width>
-     <height>0</height>
+     <width>200</width>
+     <height>123</height>
     </size>
    </property>
-   <property name="maximumSize">
+   <property name="baseSize">
     <size>
-     <width>400</width>
-     <height>524287</height>
+     <width>250</width>
+     <height>0</height>
     </size>
    </property>
    <property name="windowTitle">
@@ -626,10 +630,10 @@
     <number>2</number>
    </attribute>
    <widget class="QWidget" name="console_dock_widget_contents">
-    <property name="maximumSize">
+    <property name="minimumSize">
      <size>
-      <width>400</width>
-      <height>16777215</height>
+      <width>200</width>
+      <height>0</height>
      </size>
     </property>
     <property name="styleSheet">
@@ -1187,17 +1191,17 @@
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
    </property>
    <property name="text">
-    <string>inspector</string>
+    <string>Inspector</string>
    </property>
    <property name="toolTip">
-    <string>Toggle Outliner</string>
+    <string>Toggle Inspector</string>
    </property>
   </action>
   <action name="action_new_part">

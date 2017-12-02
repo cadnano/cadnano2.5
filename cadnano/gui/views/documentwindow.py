@@ -41,8 +41,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         doc = doc_ctrlr.document()
         self.setupUi(self)
         self.settings = QSettings()
-        self._readSettings()
-        # self.setCentralWidget(self.slice_graphics_view)
         # Appearance pref
         if not app().prefs.show_icon_labels:
             self.main_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
@@ -54,13 +52,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.tool_managers = None  # initialize
 
+        self._initConsoleview(doc)
         self._initSliceview(doc)
         self._initGridview(doc)
         self._initPathview(doc)
         self._initPathviewToolbar()
         self._initSimGraphicsView(doc)
         self._initEditMenu()
-        self._initConsoleview(doc)
 
         self.console_dock_widget.setTitleBarWidget(QWidget())
         self.sim_dock_widget.setTitleBarWidget(QWidget())
@@ -69,28 +67,97 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_dock_widget.setTitleBarWidget(QWidget())
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
-        doc.setViewNames(['slice', 'path', 'sim', 'console'])
+        self._restoreGeometryandState()
+        self._finishInit()
+
+        doc.setViewNames(['slice', 'path', 'sim', 'console', 'inspector'])
+    # end def
+
+    def document(self):
+        return self.controller.document()
+
+    def destroyWin(self):
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("state", self.saveState())
+        self.settings.setValue("console_visible", self.console_dock_widget.isVisibleTo(self))
+        self.settings.endGroup()
+        for mgr in self.tool_managers:
+            mgr.destroy()
+        self.controller = None
+
+    ### ACCESSORS ###
+    def undoStack(self):
+        return self.controller.undoStack()
+
+    def selectedInstance(self):
+        return self.controller.document().selectedInstance()
+
+    def activateSelection(self, isActive):
+        self.path_graphics_view.activateSelection(isActive)
+        self.slice_graphics_view.activateSelection(isActive)
+        self.grid_graphics_view.activateSelection(isActive)
+
+    ### EVENT HANDLERS ###
+    def focusInEvent(self):
+        """Handle an OS focus change into cadnano."""
+        app().undoGroup.setActiveStack(self.controller.undoStack())
+
+    def moveEvent(self, event):
+        """Handle the moving of the cadnano window itself.
+
+        Reimplemented to save state on move.
+        """
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("pos", self.pos())
+        self.settings.endGroup()
+
+    def resizeEvent(self, event):
+        """Handle the resizing of the cadnano window itself.
+
+        Reimplemented to save state on resize.
+        """
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("size", self.size())
+        self.settings.endGroup()
+        QWidget.resizeEvent(self, event)
+
+    def changeEvent(self, event):
+        QWidget.changeEvent(self, event)
+
+    # end def
+
+    ### DRAWING RELATED ###
+
+    ### PRIVATE HELPER METHODS ###
+    def _restoreGeometryandState(self):
+        self.settings.beginGroup("MainWindow")
+        geometry = self.settings.value("geometry")
+        state = self.settings.value("geometry")
+        if geometry is not None:
+            result = self.restoreGeometry(geometry)
+            if result is False:
+                print("MainWindow.restoreGeometry() failed.")
+        else:
+            print("Setting default MainWindow size: 1100x800")
+            self.resize(self.settings.value("size", QSize(1100, 800)))
+            self.move(self.settings.value("pos", QPoint(200, 200)))
+
+        state = self.settings.value("state")
+        if state is not None:
+            result = self.restoreState(state)
+            if result is False:
+                print("MainWindow.restoreState() failed.")
+        self.settings.endGroup()
     # end def
 
     def _initConsoleview(self, doc):
+        """Initializes the Console.
+
+        Returns: None
+        """
         self.console_input_text.setConsoleOutput(self.console_output_text)
-        self.settings.beginGroup("MainWindow")
-        windowstate = self.settings.value("windowstate")
-        console_visible = self.settings.value("console_visible", False)
-        self.settings.endGroup()
-
-        if console_visible:
-            self.setCentralWidget(self.console_dock_widget)
-            self.action_console.setChecked(True)
-        else:
-            self.setCentralWidget(None)
-            self.action_console.setChecked(False)
-            self.console_dock_widget.hide()
-        self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
-        self.splitDockWidget(self.slice_dock_widget, self.sim_dock_widget, Qt.Vertical)
-
-        if windowstate is not None:
-            self.restoreState(windowstate)
     # end def
 
     def _initEditMenu(self):
@@ -222,66 +289,32 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
     # end def
 
-    def document(self):
-        return self.controller.document()
-
-    def destroyWin(self):
-        self.settings.beginGroup("MainWindow")
-        self.settings.setValue("windowstate", self.saveState(1))
-        self.settings.setValue("console_visible", self.console_dock_widget.isVisible())
-        self.settings.endGroup()
-        for mgr in self.tool_managers:
-            mgr.destroy()
-        self.controller = None
-
-    ### ACCESSORS ###
-    def undoStack(self):
-        return self.controller.undoStack()
-
-    def selectedInstance(self):
-        return self.controller.document().selectedInstance()
-
-    def activateSelection(self, isActive):
-        self.path_graphics_view.activateSelection(isActive)
-        self.slice_graphics_view.activateSelection(isActive)
-        self.grid_graphics_view.activateSelection(isActive)
-
-    ### EVENT HANDLERS ###
-    def focusInEvent(self):
-        """Handle an OS focus change into cadnano."""
-        app().undoGroup.setActiveStack(self.controller.undoStack())
-
-    def moveEvent(self, event):
-        """Handle the moving of the cadnano window itself.
-
-        Reimplemented to save state on move.
+    def _finishInit(self):
+        """
+        Handle the dockwindow visibility and action checked status.
+        The console visibility is explicitly stored in the settings file,
+        since it doesn't seem to work if we treat it like a normal dock widget.
         """
         self.settings.beginGroup("MainWindow")
-        self.settings.setValue("pos", self.pos())
+        console_visible = self.settings.value("console_visible", False)
         self.settings.endGroup()
-
-    def resizeEvent(self, event):
-        """Handle the resizing of the cadnano window itself.
-
-        Reimplemented to save state on resize.
-        """
-        self.settings.beginGroup("MainWindow")
-        self.settings.setValue("size", self.size())
-        self.settings.endGroup()
-        QWidget.resizeEvent(self, event)
-
-    def changeEvent(self, event):
-        QWidget.changeEvent(self, event)
-
+        if console_visible is True:
+            self.setCentralWidget(self.console_dock_widget)
+        else:
+            self.setCentralWidget(None)
+            self.console_dock_widget.hide()
+        self.action_console.setChecked(console_visible)
+        # grid_visible = self.slice_dock_widget.isVisible()
+        # self.action_grid.setChecked(console_visible)
+        inspector_visible = self.inspector_dock_widget.widget().isVisibleTo(self)
+        self.action_inspector.setChecked(inspector_visible)
+        path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
+        self.action_path.setChecked(path_visible)
+        sim_visible = self.slice_dock_widget.widget().isVisibleTo(self)
+        self.action_sim.setChecked(sim_visible)
+        slice_visible = self.slice_dock_widget.isVisibleTo(self)
+        self.action_slice.setChecked(slice_visible)
+        # self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        # self.splitDockWidget(self.slice_dock_widget, self.sim_dock_widget, Qt.Vertical)
     # end def
-
-    ### DRAWING RELATED ###
-
-    ### PRIVATE HELPER METHODS ###
-    def _readSettings(self):
-        self.settings.beginGroup("MainWindow")
-        self.resize(self.settings.value("size", QSize(1100, 800)))
-        self.move(self.settings.value("pos", QPoint(200, 200)))
-        self.settings.endGroup()
-
 # end class
