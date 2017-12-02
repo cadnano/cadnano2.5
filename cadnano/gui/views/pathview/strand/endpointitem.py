@@ -380,7 +380,6 @@ class EndpointItem(QGraphicsPathItem):
         calculate the new x coordinate for self, move there, and notify the
         parent strandItem to redraw its horizontal line.
         """
-        pass
     # end def
 
     def selectToolMouseRelease(self, modifiers, x):

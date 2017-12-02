@@ -11,7 +11,7 @@ def decode(document, obj, emit_signals=False):
         document (Document):
         obj (dict): deserialized file object
     """
-    name = obj.get('name')
+    obj.get('name')
     meta = obj.get('meta')
 
     slice_view_type = meta.get('slice_view_type')
@@ -120,7 +120,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
-    will start numbering `part.get_max_id_num()` rather than the lowest available
+    will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
 
     Args:
@@ -128,7 +128,7 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
         copy_dict (dict):
     """
     part = part_instance.reference()
-    id_num_offset = part.get_max_id_num() + 1
+    id_num_offset = part.getMaxIdNum() + 1
     print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']

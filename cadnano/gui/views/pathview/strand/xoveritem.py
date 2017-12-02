@@ -77,7 +77,6 @@ class XoverNode3(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        pass
     # end def
 
     def refreshXover(self):

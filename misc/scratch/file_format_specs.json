@@ -55,7 +55,6 @@
                 "is_visible": true,
                 "color": "#00000000",
                 "eulerZ": 0.0,
-                "scamZ": 10.0,
                 "neighbor_active_angle": 0.0,
                 "neighbors": "[]",
                 "bases_per_repeat": 21,

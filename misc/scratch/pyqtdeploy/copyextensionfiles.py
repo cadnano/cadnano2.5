@@ -1,6 +1,5 @@
 import shutil
 import os
-import pathlib
 
 sysroot = os.environ['SYSROOT']
 INSTALL_DIR = 'C:\\Users\\Nick\\Documents\\GitHub\\cadnano2.5\\pyqtdeploy\\build\\release'

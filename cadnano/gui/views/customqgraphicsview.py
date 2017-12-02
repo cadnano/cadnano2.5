@@ -23,7 +23,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 try:
     # from OpenGL import GL
     from PyQt5.QtWidgets import QOpenGLWidget
-except:
+except BaseException:
     GL = False
 
 GL = False
@@ -440,7 +440,6 @@ class CustomQGraphicsView(QGraphicsView):
 
     def fname(self):
         """docstring for fname"""
-        pass
 
     def wheelEvent(self, event):
         self.safeScale(event.angleDelta().y())

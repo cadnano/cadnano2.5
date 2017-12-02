@@ -93,7 +93,6 @@ class VirtualHelixSetItem(CNPropertyItem):
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
-        pass
     # end def
 
     def configureEditor(self, parent_QWidget, option, model_index):
@@ -123,8 +122,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             editor.setRange(0, 359)
         elif key == 'length':
             editor = QSpinBox(parent_QWidget)
-            bpr, length = cn_m.getProperty(['bases_per_repeat',
-                                                    'length'])
+            bpr, length = cn_m.getProperty(['bases_per_repeat', 'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
         elif key == 'z' and cn_m.part().isZEditable():

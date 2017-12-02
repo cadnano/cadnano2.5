@@ -15,7 +15,6 @@ class AbstractStrandItem(QGraphicsPathItem):
     ### SLOTS ###
     def oligoAppeareanceChanged(self):
         """docstring for oligoAppeareanceChanged"""
-        pass
 
     def hasNewOligoSlot(self, oligo):
         """docstring for hasNewOligoSlot"""
@@ -24,7 +23,6 @@ class AbstractStrandItem(QGraphicsPathItem):
 
     def strandRemovedSlot(self, strand):
         """docstring for strandRemovedSlot"""
-        pass
 
     ### METHODS ###
     def connectSignals(self):

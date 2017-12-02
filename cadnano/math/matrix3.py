@@ -1,6 +1,5 @@
 from __future__ import division
 from collections import namedtuple
-import math
 
 Matrix3 = namedtuple('Matrix3', ['n11','n12', 'n13',
                                 'n21', 'n22', 'n23',

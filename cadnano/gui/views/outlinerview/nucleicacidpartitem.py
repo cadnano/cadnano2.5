@@ -103,7 +103,7 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             self.setValue(property_key, new_value)
             if property_key == 'virtual_helix_order':
                 vhi_dict = self._virtual_helix_item_hash
-                document = self.treeWidget().document()
+                self.treeWidget().document()
                 new_list = [vhi_dict[id_num] for id_num in new_value]
                 # 0. record what was selected
                 selected_list = [(x, x.isSelected()) for x in new_list]

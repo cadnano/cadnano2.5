@@ -42,5 +42,6 @@ class AddInstanceCommand(UndoCommand):
             else:
                 cnobj.assemblyRemovedSignal.emit(obji)
         cnobj._decrementInstance(obji)
+        self._document.deactivateActivePart()
     # end def
 # end class

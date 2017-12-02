@@ -3,13 +3,15 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtGui import QColor, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getNoPen, getPenObj, getBrushObj  # getBrushObj
+from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
 
-from . import slicestyles as styles
+from cadnano.gui.views.sliceview import slicestyles as styles
+
+
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _ZVALUE = styles.ZSLICEHELIX + 1
 HIGHLIGHT_WIDTH = styles.SLICE_HELIX_MOD_HILIGHT_WIDTH
@@ -30,6 +32,7 @@ class GridItem(QGraphicsRectItem):
         super(GridItem, self).__init__(parent=part_item)
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)
 
+        self._path = None
         self.part_item = part_item
         self._path = QGraphicsPathItem(self)
 
@@ -41,10 +44,14 @@ class GridItem(QGraphicsRectItem):
         self.points = []
         self.points_dict = dict()
         self.previous_grid_bounds = None
+        self.bounds = None
+        self.grid_type = None
+
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+
         self.setGridType(grid_type)
         self.previous_grid_type = grid_type
 
@@ -57,14 +64,14 @@ class GridItem(QGraphicsRectItem):
         part_item = self.part_item
         part = part_item.part()
         radius = part.radius()
-        self.bounds = bounds = part_item.bounds()
+        self.bounds = part_item.bounds()
         self.removePoints()
 
         self.setRect(self.part_item.outline.rect())
         if self.grid_type == GridType.HONEYCOMB:
-            self.createHoneycombGrid(part_item, radius, bounds)
+            self.createHoneycombGrid(part_item, radius, self.bounds)
         elif self.grid_type == GridType.SQUARE:
-            self.createSquareGrid(part_item, radius, bounds)
+            self.createSquareGrid(part_item, radius, self.bounds)
         else:
             self._path.setPath(QPainterPath())
     # end def
@@ -78,10 +85,6 @@ class GridItem(QGraphicsRectItem):
         self.grid_type = grid_type
         self.updateGrid()
     # end def
-
-    def setAppearance(self, draw_lines):
-        # TODO[NF]:  Docstring
-        return
 
     def createHoneycombGrid(self, part_item, radius, bounds):
         """Instantiate an area of griditems arranged on a honeycomb lattice.
@@ -154,15 +157,15 @@ class GridItem(QGraphicsRectItem):
                     # This is reversed since the Y is mirrored
                     if not HoneycombDnaPart.isEvenParity(row, column):
                         neighbor_map[(-row, column)] = [
-                            (-row, column-1),
+                            (-row-1, column),
                             (-row, column+1),
-                            (-row-1, column)
+                            (-row, column-1)
                         ]
                     else:
                         neighbor_map[(-row, column)] = [
+                            (-row+1, column),
                             (-row, column-1),
-                            (-row, column+1),
-                            (-row+1, column)
+                            (-row, column+1)
                         ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
@@ -289,16 +292,36 @@ class GridItem(QGraphicsRectItem):
         scene = self.scene()
         while points:
             scene.removeItem(points.pop())
-
         self.points_dict = dict()
+    # end def
 
-    def changeGridPointColor(self, coordinates, color):
-        point = self.points_dict.get(coordinates)
+    def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True):
+        point_item = self.points_dict.get(coord)
 
-        if point is None:
-            print('Could not find')
-        else:
-            point.setBrush(getBrushObj(color))
+        if show_hint is False:
+            point_item.showCreateHint(show_hint=False)
+
+        if point_item:
+            row, column = coord
+            if self.grid_type is GridType.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+            elif self.grid_type is GridType.SQUARE:
+                parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
+            else:
+                return
+            id_num = next_idnums[1] if parity else next_idnums[0]
+            point_item.showCreateHint(id_num=id_num, show_hint=show_hint)
+            return parity == 1
+    # end def
+
+    def setPath(self, path):
+        assert isinstance(path, QPainterPath)
+        self._path = path
+    # end def
+
+    def path(self):
+        return self._path
+    # end def
 
 
 class ClickArea(QGraphicsEllipseItem):
@@ -340,13 +363,6 @@ class ClickArea(QGraphicsEllipseItem):
 
 
 class GridPoint(QGraphicsEllipseItem):
-    """Summary
-
-    Attributes:
-        clickarea (TYPE): Description
-        grid (TYPE): Description
-        offset (TYPE): Description
-    """
     __slots__ = 'grid', 'offset'
 
     def __init__(self, x, y, diameter, parent_grid, coord=None):
@@ -354,13 +370,35 @@ class GridPoint(QGraphicsEllipseItem):
         self.offset = diameter / 2
         self.grid = parent_grid
         self._coord = coord
+        self._label = label = QGraphicsSimpleTextItem("", self)
+        label.setFont(styles.SLICE_NUM_FONT)
+        label.setZValue(styles.ZSLICEHELIX)
+        label.setBrush(getBrushObj(styles.SLICE_TEXT_COLOR, alpha=64))
+        b_rect = label.boundingRect()
+        posx = b_rect.width()/2
+        posy = b_rect.height()/2
+        label.setPos(_RADIUS-posx, _RADIUS-posy)
 
-        self.clickarea = ClickArea(diameter, parent=self)
+        self.click_area = ClickArea(diameter, parent=self)
 
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
         self.setAcceptHoverEvents(True)
     # end def
+
+    def showCreateHint(self, id_num=0, show_hint=True):
+        label = self._label
+        if show_hint:
+            label.setText("%d" % id_num)
+            b_rect = label.boundingRect()
+            posx = b_rect.width()/2
+            posy = b_rect.height()/2
+            label.setPos(_RADIUS-posx, _RADIUS-posy)
+            self.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
+        else:
+            label.setText("")
+            self.setBrush(getNoBrush())
+            # label.setParentItem(None)
 
     def coord(self):
         """Lattice coordinates, if available.
@@ -446,6 +484,7 @@ class GridPoint(QGraphicsEllipseItem):
         """
         # Turn the outline of the GridItem off
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+        self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
@@ -496,8 +535,7 @@ class GridPoint(QGraphicsEllipseItem):
         Args:
             tool (CreateSliceTool): The tool that is being used
             part_item (TYPE):
-            event (QGraphicsSceneMouseEvent): The event that the mouseclick
-            triggered
+            event (QGraphicsSceneMouseEvent): The event that the mouse click triggered
         """
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
@@ -512,9 +550,8 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
-        self.setPen(getPenObj(styles.BLUE_STROKE, 1.5))
+        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)
-        part_item.createToolHoverEnter(tool, event)
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
         part_item.createToolHoverMove(tool, event)

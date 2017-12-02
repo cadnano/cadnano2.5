@@ -211,7 +211,7 @@ class InsertionItem(QGraphicsPathItem):
     def _updateSequenceText(self):
         seq_item = self._seq_item
         is_on_top = self._is_on_top
-        index = self._insertion.idx()
+        self._insertion.idx()
         base_text = self._seq_text
         font = styles.SEQUENCEFONT
         seq_font_h = styles.SEQUENCEFONTH
@@ -270,7 +270,6 @@ class InsertionItem(QGraphicsPathItem):
 
     def mousePressEvent(self, event):
         """This needs to be present for mouseDoubleClickEvent to work."""
-        pass
 
 # end class
 
@@ -292,7 +291,7 @@ class InsertionLabel(QGraphicsTextItem):
         test = self.toPlainText()
         try:
             insertion_size = int(test)
-        except:
+        except BaseException:
             insertion_size = None
         insertion = parent._insertion
         length = insertion.length()

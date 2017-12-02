@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.gui.views.gridview import gridstyles as styles
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
+from cadnano.gui.palette import getPenObj
 
 _RADIUS = styles.GRID_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
@@ -18,18 +18,8 @@ DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
 
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
-class AbstractGridTool(QGraphicsObject):
-    """Summary
 
-    Attributes:
-        angles (TYPE): Description
-        FILTER_NAME (str): Description
-        is_started (bool): Description
-        manager (TYPE): Description
-        part_item (TYPE): Description
-        sgv (TYPE): Description
-        vectors (TYPE): Description
-    """
+class AbstractGridTool(QGraphicsObject):
     _RADIUS = styles.GRID_HELIX_RADIUS
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     FILTER_NAME = 'virtual_helix'
@@ -41,9 +31,8 @@ class AbstractGridTool(QGraphicsObject):
         Args:
             manager (TYPE): Description
         """
+        # Setting parent to viewroot to prevent orphan _line_item from occurring
         super(AbstractGridTool, self).__init__(parent=manager.viewroot)
-        """ Pareting to viewroot to prevent orphan _line_item from occuring
-        """
         self.sgv = None
         self.manager = manager
         self._active = False
@@ -146,15 +135,13 @@ class AbstractGridTool(QGraphicsObject):
         if self.is_started:
             pos = self.findNearestPoint(part_item, event.scenePos())
         else:
-            pos =  event.pos()
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+            pos = event.pos()
+        self.vhi_hint_item.setPos(pos - QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
         return pos
     # end def
 
     def setHintPos(self, pos):
-        self.vhi_hint_item.setPos(  pos -
-                                    QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
+        self.vhi_hint_item.setPos(pos - QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
     def findNearestPoint(self, part_item, target_scenepos):
@@ -268,7 +255,7 @@ class AbstractGridTool(QGraphicsObject):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
                 self.sgv.customContextMenuRequested.disconnect()
-            except:
+            except BaseException:
                 pass
             self.sgv.customContextMenuRequested.connect(self.getCustomContextMenu)
     # end def

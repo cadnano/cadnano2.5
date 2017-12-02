@@ -15,9 +15,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            self.id_num = part._get_new_id_num(parity=parity)
+            self.id_num = part._getNewIdNum(parity=parity)
         else:
-            part._reserve_id_num(id_num)
+            part._reserveIdNum(id_num)
             self.id_num = id_num
         self.origin_pt = (x, y, z)
         self.length = length
@@ -36,13 +36,14 @@ class CreateVirtualHelixCommand(UndoCommand):
 
         self.threshold = 2.1*part.radius()
         self.safe = safe
+        self.old_limits = None
     # end def
 
     def redo(self):
         part = self.part
         id_num = self.id_num
         origin_pt = self.origin_pt
-        # need to always reserve an id
+        self.old_limits = part.getVirtualHelixOriginLimits()
         vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
         if self.safe:   # update all neighbors
@@ -82,6 +83,7 @@ class CreateVirtualHelixCommand(UndoCommand):
             part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         # clear out part references
         part._removeHelix(id_num)
+        part.setVirtualHelixOriginLimits(self.old_limits)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def
 # end class

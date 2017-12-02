@@ -99,7 +99,7 @@ def isMac():
     """Returns True if platform is detected as Darwin, otherwise False"""
     try:
         return platform.system() == 'Darwin'
-    except:
+    except BaseException:
         return path.exists('/System/Library/CoreServices/Finder.app')
 
 

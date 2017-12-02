@@ -147,11 +147,6 @@
              <string>Grid View</string>
             </property>
            </item>
-           <item>
-            <property name="text">
-             <string>Dual View</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>

@@ -43,7 +43,7 @@ class RemoveModsCommand(UndoCommand):
 
     def redo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
+        strand.isStaple()
         mid = self._mod_id
         part = strand.part()
         idx = self._idx
@@ -53,7 +53,7 @@ class RemoveModsCommand(UndoCommand):
 
     def undo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
+        strand.isStaple()
         mid = self._mod_id
         part = strand.part()
         idx = self._idx

@@ -4,7 +4,6 @@ Create wheel with
 python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35
 """
 
-import sys
 import os.path
 import glob
 
@@ -16,7 +15,7 @@ from setuptools import find_packages
 try:
     from setuptools import setup, Extension
 except ImportError:
-    from distutils.core import setup, Extension
+    from distutils.core import setup
 
 PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH = pjoin(PACKAGE_PATH, 'PyQt5')

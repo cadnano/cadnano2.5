@@ -273,7 +273,7 @@ class ModsTool(AbstractPathTool):
             if idx:
                 try:
                     combobox.setItemText(idx, item['name'])
-                except:
+                except BaseException:
                     print(local_item)
                     print(item)
                     raise

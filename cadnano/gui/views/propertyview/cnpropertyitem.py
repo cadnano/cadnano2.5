@@ -173,7 +173,7 @@ class CNPropertyItem(QTreeWidgetItem):
                 editor.setRange(-359, 359)
             elif data_type is bool:
                 editor = QCheckBox(parent_QWidget)
-            elif data_type is type(None):
+            elif isinstance(None, data_type):
                 return None
             else:
                 raise NotImplementedError

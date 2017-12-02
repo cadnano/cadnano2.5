@@ -565,6 +565,9 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.setIsDrawingStrand(True)
     # end def
 
+    def selectToolMousePress(self, strand_set, idx, modifiers):
+        pass
+
     def createToolMouseMove(self, strand_set, idx):
         """strand.getDragBounds
 
