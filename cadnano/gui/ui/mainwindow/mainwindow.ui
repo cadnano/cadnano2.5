@@ -629,7 +629,7 @@
    <attribute name="dockWidgetArea">
     <number>2</number>
    </attribute>
-   <widget class="QWidget" name="console_dock_widget_contents">
+   <widget class="ConsoleRootWidget" name="console_root_widget">
     <property name="minimumSize">
      <size>
       <width>200</width>
@@ -656,7 +656,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="ConsoleOutput" name="console_output_text">
+      <widget class="ConsoleOutput" name="console_output_textedit">
        <property name="styleSheet">
         <string notr="true">QPlainTextEdit { background-color: &quot;#fefefe&quot;; color: &quot;#0066cc&quot;; }</string>
        </property>
@@ -669,7 +669,7 @@
       </widget>
      </item>
      <item>
-      <widget class="ConsoleInput" name="console_input_text">
+      <widget class="ConsoleInput" name="console_input_textedit">
        <property name="maximumSize">
         <size>
          <width>16777215</width>
@@ -1597,6 +1597,12 @@
    <class>ConsoleInput</class>
    <extends>QPlainTextEdit</extends>
    <header>cadnano.gui.views.consoleview.consoleinput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ConsoleRootWidget</class>
+   <extends>QWidget</extends>
+   <header>cadnano.gui.views.consoleview.consolerootwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

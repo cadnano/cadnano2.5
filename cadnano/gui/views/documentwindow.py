@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.ui.mainwindow import ui_mainwindow
+from cadnano.gui.views.consoleview.consolerootwidget import ConsoleRootWidget
 from cadnano.gui.views.gridview.gridrootitem import GridRootItem
 from cadnano.gui.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.gui.views.pathview.colorpanel import ColorPanel
@@ -157,26 +158,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         Returns: None
         """
-        self.console_input_text.setConsoleOutput(self.console_output_text)
-    # end def
-
-    def _initEditMenu(self):
-        """Initializes the Edit menu
-
-        Returns: None
-        """
-        self.actionUndo = self.controller.undoStack().createUndoAction(self)
-        self.actionRedo = self.controller.undoStack().createRedoAction(self)
-        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
-        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
-        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
-        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
-        self.sep = QAction(self)
-        self.sep.setSeparator(True)
-        self.menu_edit.insertAction(self.sep, self.actionRedo)
-        self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
-        # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
-        self.statusBar().showMessage("")
+        self.console_input_textedit.setConsoleOutput(self.console_output_textedit)
+        self.console_root_widget.finishInit(window=self,
+                                            document=doc,
+                                            input_textedit=self.console_input_textedit,
+                                            output_textedit=self.console_output_textedit)
     # end def
 
     def _initGridview(self, doc):
@@ -287,6 +273,25 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.scene_root_item = self.slice_root
         self.slice_graphics_view.setName("SliceView")
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
+    # end def
+
+    def _initEditMenu(self):
+        """Initializes the Edit menu
+
+        Returns: None
+        """
+        self.actionUndo = self.controller.undoStack().createUndoAction(self)
+        self.actionRedo = self.controller.undoStack().createRedoAction(self)
+        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
+        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
+        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
+        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
+        self.sep = QAction(self)
+        self.sep.setSeparator(True)
+        self.menu_edit.insertAction(self.sep, self.actionRedo)
+        self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
+        # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
+        self.statusBar().showMessage("")
     # end def
 
     def _finishInit(self):
