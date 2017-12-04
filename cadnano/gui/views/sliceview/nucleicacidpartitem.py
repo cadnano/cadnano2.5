@@ -732,7 +732,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             parity = None
 
-        event_coord = ShortestPathHelper.findClosestPoint(event.scenePos().x(), event.scenePos().y(), self.point_map)
+        event_coord = ShortestPathHelper.findClosestPoint((event.scenePos().x(), event.scenePos().y()), self.point_map)
         if event_coord in self.vh_set:
             return
 
