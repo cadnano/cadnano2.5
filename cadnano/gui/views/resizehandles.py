@@ -99,6 +99,26 @@ class ResizeHandleGroup(QObject):
             self._br.setZValue(z)
     # end def
 
+    def setParentItemAll(self, new_parent):
+        if self.handle_types & HandleType.TOP:
+            self._t.setParentItem(new_parent)
+        if self.handle_types & HandleType.BOTTOM:
+            self._b.setParentItem(new_parent)
+        if self.handle_types & HandleType.LEFT:
+            self._l.setParentItem(new_parent)
+        if self.handle_types & HandleType.RIGHT:
+            self._r.setParentItem(new_parent)
+        if self.handle_types & HandleType.TOP_LEFT:
+            self._tl.setParentItem(new_parent)
+        if self.handle_types & HandleType.TOP_RIGHT:
+            self._tr.setParentItem(new_parent)
+        if self.handle_types & HandleType.BOTTOM_LEFT:
+            self._bl.setParentItem(new_parent)
+        if self.handle_types & HandleType.BOTTOM_RIGHT:
+            self._br.setParentItem(new_parent)
+    # end def
+# end class
+
 
 class HandleItem(QGraphicsRectItem):
     """Provides the ability to resize the document."""

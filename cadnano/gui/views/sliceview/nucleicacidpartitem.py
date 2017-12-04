@@ -2,8 +2,8 @@ from ast import literal_eval
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
-from cadnano.cnenum import GridType, HandleType
 
+from cadnano.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
@@ -818,7 +818,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                     odd_id += 2
                 elif is_odd is False:
                     even_id += 2
-                else: # None
+                else:  # None
                     pass
         else:
             point_item = self.point_map.get(event_coord)

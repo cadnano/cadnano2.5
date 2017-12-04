@@ -1,14 +1,16 @@
 """Summary"""
 from __future__ import division
 
-from PyQt5.QtCore import QRectF
+from PyQt5.QtCore import QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
 from cadnano import getBatch, util
+from cadnano.cnenum import HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
-from cadnano.gui.views.grabcorneritem import GrabCornerItem
+# from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.gui.views.resizehandles import ResizeHandleGroup
 
 from . import pathstyles as styles
 from .pathextras import PathWorkplaneItem
@@ -28,6 +30,7 @@ _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 
 _VH_XOFFSET = styles.VH_XOFFSET
+_HANDLE_SIZE = 8
 
 
 class ProxyParentItem(QGraphicsRectItem):
@@ -100,9 +103,28 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         outline.setFlag(QGraphicsItem.ItemStacksBehindParent)
         outline.setZValue(styles.ZDESELECTOR)
         self.outline.setPen(getPenObj(m_p.getColor(), _DEFAULT_WIDTH))
-        self._configureOutline(outline)
+        o_rect = self._configureOutline(outline)
+        model_color = m_p.getColor()
 
-        self.grab_corner = GrabCornerItem(self._GC_SIZE, m_p.getColor(), False, self)
+        # self.grab_corner = GrabCornerItem(self._GC_SIZE, model_color, False, self)
+
+        self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
+                                                     # HandleType.TOP |
+                                                     # HandleType.BOTTOM |
+                                                     HandleType.LEFT |
+                                                     HandleType.RIGHT,
+                                                     # HandleType.TOP_LEFT |
+                                                     # HandleType.TOP_RIGHT |
+                                                     # HandleType.BOTTOM_LEFT |
+                                                     # HandleType.BOTTOM_RIGHT,
+                                                     self)
+        self.resize_handle_group.setZValue(2)
+
+        self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
+        m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
+        m_b_h.setPen(getNoPen())
+        m_b_h.hide()
+
         self.workplane = PathWorkplaneItem(m_p, self)
         self.hide()  # show on adding first vh
     # end def
@@ -223,7 +245,9 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                                    vhi_min.x()))
         if ztf:
             self.scene().views()[0].zoomToFit()
-        self.reconfigureRect()
+
+        TLx, TLy, BRx, BRy = self._getVHRectCorners()
+        self.reconfigureRect((TLx, TLy), (BRx, BRy))
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -260,9 +284,10 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             if property_key == 'color':
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
-                self.grab_corner.setPen(getPenObj(new_value, 0))
+                # self.grab_corner.setPen(getPenObj(new_value, 0))
                 self.workplane.outline.setPen(getPenObj(new_value, 0))
-                self.reconfigureRect()
+                TLx, TLy, BRx, BRy = self._getVHRectasPoints()
+                self.reconfigureRect((TLx, TLy), (BRx, BRy))
             elif property_key == 'is_visible':
                 if new_value:
                     self.show()
@@ -299,6 +324,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         # if self.active_virtual_helix_item is not None:
         #     self.setPreXoverItemsVisible(self.active_virtual_helix_item)
+        pass
     # end def
 
     def partRemovedSlot(self, sender):
@@ -315,7 +341,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._virtual_helix_item_list = None
         self._controller.disconnectSignals()
         self._controller = None
-        self.grab_corner = None
+        # self.grab_corner = None
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
@@ -459,6 +485,15 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         o_rect = self.rect().adjusted(-_p, -_p, _p, _p)
         outline.setRect(o_rect)
         return o_rect
+    # end def
+
+    def _getVHRectCorners(self):
+        vhTL = self._vh_rect.topLeft()
+        vhBR = self._vh_rect.bottomRight()
+        # vhTLx, vhTLy = vhTL.x(), vhTL.y()
+        # vhBRx, vhBRy = vhBR.x(), vhBR.y()
+        return vhTL.x(), vhTL.y(), vhBR.x(), vhBR.y()
+    # end def
 
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):
         """
@@ -542,33 +577,91 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.setBrush(brush)
     # end def
 
-    def reconfigureRect(self, padding=_BOUNDING_RECT_PADDING):
+    def reconfigureRect(self, top_left, bottom_right, padding=80):
         """
         Updates the bounding rect to the size of the childrenBoundingRect.
         Refreshes the outline and grab_corner locations.
 
         Called by partZDimensionsChangedSlot and partPropertyChangedSlot.
         """
-        self.resetPen(self.modelColor(), 0)  # cosmetic
-        self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
         outline = self.outline
 
-        # Temporarily remove children that shouldn't affect size
-        outline.setParentItem(None)
-        self.grab_corner.setParentItem(None)
-        self.setRect(self.childrenBoundingRect())  # vh_items only
+        hasTL = True if top_left else False
+        hasBR = True if bottom_right else False
 
-        outline.setParentItem(self)
-        self.grab_corner.setParentItem(self)
+        if hasTL ^ hasBR:  # called via resizeHandle mouseMove?
+            ptTL = QPointF(*top_left) if top_left else outline.rect().topLeft()
+            ptBR = QPointF(*bottom_right) if bottom_right else outline.rect().bottomRight()
+            o_rect = QRectF(ptTL, ptBR)
+            self.outline.setRect(o_rect)
+        else:
+            # 1. Temporarily remove children that shouldn't affect size
+            outline.setParentItem(None)
+            self.model_bounds_hint.setParentItem(None)
+            self.resize_handle_group.setParentItemAll(None)
+            # 2. Get the tight bounding rect
+            self.setRect(self.childrenBoundingRect())  # vh_items only
+            # 3. Restore children like nothing happened
+            outline.setParentItem(self)
+            self.model_bounds_hint.setParentItem(self)
+            self.resize_handle_group.setParentItemAll(self)
+            self._configureOutline(outline)
 
-        self._configureOutline(outline)
-        p = self._GC_SIZE/2
-        self.grab_corner.setTopLeft(outline.rect().adjusted(-p, -p, p, p).topLeft())
-
+        self.resetPen(self.modelColor(), 0)  # cosmetic
+        self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
         self.workplane.reconfigureRect((), ())
+        self.resize_handle_group.alignHandles(outline.rect())
+        return outline.rect()
     # end def
 
     ### PUBLIC METHODS ###
+    def getModelMinBounds(self, handle_type=None):
+        """Bounds in form of Qt scaled from model
+
+        Args:
+            Tuple (top_left, bottom_right)
+
+        :rtype: Tuple where
+        """
+        _p = self._BOUNDING_RECT_PADDING
+        min_rect = self.rect().adjusted(-_p, -_p, _p, _p)
+        oTL = min_rect.topLeft()
+        oBR = min_rect.bottomRight()
+        return oTL.x(), oTL.y(), oBR.x(), oBR.y()
+    # end def
+
+    # def getModelMinBounds(self, handle_type=None):
+    #     """Resize bounds in form of Qt position, scaled from model."""
+    #     if handle_type and handle_type & HandleType.LEFT:
+    #         xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
+    #         xBR = self._idx_high*BASE_WIDTH
+    #     elif handle_type and handle_type & HandleType.RIGHT:
+    #         xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
+    #         xBR = (self._idx_low)*BASE_WIDTH
+    #     else:  # default to HandleType.RIGHT behavior for all types
+    #         print("no ht??")
+    #         xTL = 0
+    #         xBR = self._high_drag_bound*BASE_WIDTH
+    #     yTL = self._part_item._vh_rect.top()
+    #     yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
+    #     return xTL, yTL, xBR, yBR
+
+    def showModelMinBoundsHint(self, handle_type, show=True):
+        """Shows QGraphicsRectItem reflecting current model bounds.
+        ResizeHandleGroup should toggle this when resizing.
+
+        Args:
+            status_str (str): Description to display in status bar.
+        """
+        m_b_h = self.model_bounds_hint
+        if show:
+            xTL, yTL, xBR, yBR = self.getModelMinBounds()
+            m_b_h.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
+            m_b_h.show()
+        else:
+            m_b_h.hide()
+    # end def
+
     def setModifyState(self, bool):
         """Hides the modRect when modify state disabled.
 
