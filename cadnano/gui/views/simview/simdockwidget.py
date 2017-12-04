@@ -6,6 +6,8 @@ from PyQt5.Qt3DInput import QInputAspect
 
 from cadnano.gui.palette import getColorObj
 
+from .virtualhelixitem import Sphere
+
 
 class SceneModifier(QObject):
     def __init__(self, root_entity):
@@ -62,10 +64,25 @@ class SimDockWidget(QDockWidget):
         framegraph.setClearColor(getColorObj('#ffffff'))
         cam_entity = self.camera_entity
         cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
-        cam_entity.setPosition(QVector3D(0.0, 10.0, -500.0))
-        cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))
-        cam_entity.setViewCenter(QVector3D(0.0, 0.0, 50.0))
+        # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
+
+        cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))  # default
+        cam_entity.setPosition(QVector3D(0.0, 0.0, 100.0))
+        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
+        cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
         self.cam_controller.setCamera(cam_entity)
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
+
+
+        Sphere(1, 0, 0, '#0000cc', self.root_entity)
+        Sphere(2, 0, 0, '#0000cc', self.root_entity)
+        Sphere(3, 0, 0, '#0000cc', self.root_entity)
+        Sphere(0, 1, 0, '#007200', self.root_entity)
+        Sphere(0, 2, 0, '#007200', self.root_entity)
+        Sphere(0, 3, 0, '#007200', self.root_entity)
+        Sphere(0, 0, 1, '#cc0000', self.root_entity)
+        Sphere(0, 0, 2, '#cc0000', self.root_entity)
+        Sphere(0, 0, 3, '#cc0000', self.root_entity)
     # end def
+

@@ -5,7 +5,8 @@ from math import atan2, sqrt
 from PyQt5.QtGui import QVector3D, QQuaternion
 from PyQt5.Qt3DCore import QEntity, QTransform
 from PyQt5.Qt3DExtras import QCylinderMesh, QSphereMesh
-from PyQt5.Qt3DExtras import QPhongAlphaMaterial, QGoochMaterial
+from PyQt5.Qt3DExtras import QGoochMaterial
+from PyQt5.Qt3DExtras import QPhongAlphaMaterial
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
@@ -13,13 +14,13 @@ from cadnano.gui.palette import getColorObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 
 
-_CYLINDER_RADIUS = 1.1
-_CYLINDER_RINGS = 100
-_CYLINDER_SLICES = 20
+_CYLINDER_RADIUS = 1.0
+_CYLINDER_RINGS = 20
+_CYLINDER_SLICES = 10
 
-_SPHERE_RADIUS = 0.5
-_SPHERE_RINGS = 4
-_SPHERE_SLICES = 4
+_SPHERE_RADIUS = 0.25
+_SPHERE_RINGS = 8
+_SPHERE_SLICES = 8
 
 
 def v2DistanceAndAngle(a, b):
@@ -45,25 +46,26 @@ class Cylinder(QEntity):
         super(Cylinder, self).__init__(parent_entity)
         self._x = x
         self._y = y
-        self._z = z
+        self._z = -z
         self._length = length
         self._color = color
         self._parent_entity = parent_entity
         self._mesh = mesh = QCylinderMesh()
         self._trans = trans = QTransform()
-        self._mat = mat = QPhongAlphaMaterial()
-        mat.setAlpha(0.05)
+        self._mat = mat = QGoochMaterial()
+        # self._mat = mat = QPhongAlphaMaterial()
+        # mat.setAlpha(0.1)
 
-        # mat.setCool(getColorObj("#0000cc"))
-        # mat.setWarm(getColorObj("#cccc00"))
+        mat.setCool(getColorObj("#0000cc"))
+        mat.setWarm(getColorObj("#cccc00"))
 
         mesh.setRadius(_CYLINDER_RADIUS)
         mesh.setRings(_CYLINDER_RINGS)
         mesh.setSlices(_CYLINDER_SLICES)
         mesh.setLength(length)
 
-        trans.setTranslation(QVector3D(x, y, z))
-        trans.setRotation(QQuaternion.fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), -90.0))
+        trans.setTranslation(QVector3D(x, y, -z))
+        trans.setRotation(QQuaternion.fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), 90.0))
 
         # print(mat.cool().name(), mat.warm().name())
         # mat.setDiffuse(getColorObj(color))
@@ -79,7 +81,7 @@ class Sphere(QEntity):
         super(Sphere, self).__init__(parent_entity)
         self._x = x
         self._y = y
-        self._z = z
+        self._z = -z
         self._parent_entity = parent_entity
 
         self._mesh = mesh = QSphereMesh()
@@ -94,7 +96,7 @@ class Sphere(QEntity):
         mesh.setSlices(_SPHERE_SLICES)
         mesh.setRadius(_SPHERE_RADIUS)
 
-        trans.setTranslation(QVector3D(x, y, z))
+        trans.setTranslation(QVector3D(x, y, -z))
 
         self.addComponent(mesh)
         self.addComponent(trans)
@@ -129,20 +131,20 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        # m_p = self._model_part
         id_num = m_vh.idNum()
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(id_num)
 
         x, y, z = axis_pts[0]
         length = axis_pts[-1][2] - axis_pts[0][2]
 
+        # m_p = self._model_part
         # x, y = m_p.locationQt(self._id_num, part_item.scaleFactor())
         # z = 0
         # length = 42.*0.34  # hard coding for now
         # vh_z, vh_length = m_p.getVirtualHelixProperties(self._id_num, ['z', 'length'])
         # length = vh_length * m_p.baseWidth()
 
-        # self.cylinder = Cylinder(x, y, z, length, '#f7931e', p_e)
+        self.cylinder = Cylinder(x, y, z+length/2., length, '#cccc00', p_e)
 
     # end def
 
@@ -184,9 +186,10 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(id_num)
         pts = fwd_pts if sender.isForward() else rev_pts
 
-        for idx in range(*strand.idxs()):
+        idx_low, idx_high = strand.idxs()
+        for idx in range(idx_low, idx_high+1):
             print(idx, pts[idx])
-            x, y, z = pts[idx] + axis_pts[idx]
+            x, y, z = pts[idx]  # + axis_pts[idx]
             Sphere(x, y, z, strand.getColor(), self._part_entity)
         # StrandItem(strand, self, self._viewroot)
     # end def
