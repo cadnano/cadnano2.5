@@ -65,7 +65,7 @@ class ConsoleRootWidget(QWidget):
         """
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
-            msg = "Part added {}".format(model_part_instance)
+            msg = "Part added"
             self.log(msg)
         else:
             raise NotImplementedError
