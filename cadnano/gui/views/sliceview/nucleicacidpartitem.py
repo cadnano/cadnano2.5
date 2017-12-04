@@ -731,6 +731,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             parity = 0 if SquareDnaPart.isEvenParity(row=x, column=y) else 1
         else:
             parity = None
+
+        event_coord = ShortestPathHelper.findClosestPoint(event.scenePos().x(), event.scenePos().y(), self.point_map)
+        if event_coord in self.vh_set:
+            return
+
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
                                 parity=parity)
