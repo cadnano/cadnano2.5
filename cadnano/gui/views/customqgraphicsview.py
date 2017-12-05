@@ -277,7 +277,6 @@ class CustomQGraphicsView(QGraphicsView):
         # it returns a separate python object if, say, childItems() returns
         # a QGraphicsObject cast to a QGraphicsItem. If this is the case,
         # we can still find the QGraphicsObject thusly:
-        print('pan x')
         candidateDxDeciders = list(self.scene_root_item.childItems())
         candidateDxDeciders = candidateDxDeciders + [cd.toGraphicsObject() for cd in candidateDxDeciders]
         for cd in candidateDxDeciders:
@@ -291,7 +290,6 @@ class CustomQGraphicsView(QGraphicsView):
     def keyPanDeltaY(self):
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
-        print('pan y')
         candidateDyDeciders = list(self.scene_root_item.childItems())
         candidateDyDeciders = candidateDyDeciders + [cd.toGraphicsObject() for cd in candidateDyDeciders]
         for cd in candidateDyDeciders:
@@ -367,7 +365,6 @@ class CustomQGraphicsView(QGraphicsView):
         """
         if self._transform_enable:
             if self.dragMode() == self._yes_drag:
-                print('dragging')
                 # Add stuff to handle the pan event
                 posf = event.localPos()
                 xf = posf.x()
@@ -383,9 +380,6 @@ class CustomQGraphicsView(QGraphicsView):
                 self._transform_x += x_translate
                 self._transform_y += y_translate
 
-                print('translating:  %s, %s' % (x_translate, y_translate))
-                print('total:  %s, %s' % (self._transform_x, self._transform_y))
-
                 transform.translate(x_translate, y_translate)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
@@ -395,7 +389,6 @@ class CustomQGraphicsView(QGraphicsView):
                     getattr(self.scene_root_item, 'updateTranslatedOffsets')(self._transform_x, self._transform_y)
 
             elif self._dolly_zoom_enable:
-                print('zooming')
                 self.dollyZoom(event)
         # adding this allows events to be passed to items underneath
         QGraphicsView.mouseMoveEvent(self, event)
