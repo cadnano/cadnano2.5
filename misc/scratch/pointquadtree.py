@@ -438,6 +438,7 @@ class Quadtree(QuadtreeBase):
     # end def
 # end class
 
+
 if __name__ == '__main__':
     class DummyNode(object):
         def __init__(self, x, y, radius):

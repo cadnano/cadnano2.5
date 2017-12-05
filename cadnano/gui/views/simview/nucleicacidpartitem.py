@@ -25,6 +25,7 @@ _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 
 class Cube(QEntity):
     """docstring for Cube"""
+
     def __init__(self, x, y, z, l, w, h, color, parent_entity):
         super(Cube, self).__init__(parent_entity)
         self._x = x

@@ -9,6 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_LatticeType(object):
     def setupUi(self, LatticeType):
         LatticeType.setObjectName("LatticeType")
@@ -26,7 +27,7 @@ class Ui_LatticeType(object):
         self.verticalLayout.addWidget(self.label)
         self.buttonBox = QtWidgets.QDialogButtonBox(LatticeType)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.No|QtWidgets.QDialogButtonBox.Yes)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.No | QtWidgets.QDialogButtonBox.Yes)
         self.buttonBox.setCenterButtons(True)
         self.buttonBox.setObjectName("buttonBox")
         self.verticalLayout.addWidget(self.buttonBox)
@@ -40,4 +41,3 @@ class Ui_LatticeType(object):
         _translate = QtCore.QCoreApplication.translate
         LatticeType.setWindowTitle(_translate("LatticeType", "Import"))
         self.label.setText(_translate("LatticeType", "Is this a square lattice design?"))
-

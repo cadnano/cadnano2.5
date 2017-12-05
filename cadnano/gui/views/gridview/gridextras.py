@@ -73,6 +73,7 @@ class PropertyWrapperObject(QObject):
         pen_alpha (TYPE): Description
         rotation (TYPE): Description
     """
+
     def __init__(self, item):
         """Summary
 
@@ -196,6 +197,7 @@ class Triangle(QGraphicsPathItem):
     Attributes:
         adapter (TYPE): Description
     """
+
     def __init__(self, is_fwd, pre_xover_item):
         """
         Args:
@@ -240,6 +242,7 @@ class PhosBond(QGraphicsLineItem):
     Attributes:
         adapter (TYPE): Description
     """
+
     def __init__(self, is_fwd, parent=None):
         """Summary
 
@@ -277,6 +280,7 @@ class PreXoverItem(QGraphicsRectItem):
         step_idx (int): the base index within the virtual helix
         theta0 (TYPE): Description
     """
+
     def __init__(self, step_idx, twist_per_base, bases_per_repeat,
                  color, pre_xover_item_group, is_fwd=True):
         """Summary
@@ -777,6 +781,7 @@ class WedgeGizmo(QGraphicsPathItem):
     Attributes:
         pre_xover_item_group (PreXoverItemGroup): usually the parent of WG.
     """
+
     def __init__(self, radius, rect, pre_xover_item_group):
         """parent could be a PreXoverItemGroup or a VirtualHelixItem
 

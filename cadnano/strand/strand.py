@@ -9,9 +9,14 @@ from .insertioncmd import ChangeInsertionCommand
 from .modscmd import AddModsCommand, RemoveModsCommand
 from .resizecmd import ResizeCommand
 
-sixb = lambda x: x.encode('utf-8')
+
+def sixb(x): return x.encode('utf-8')
+
+
 ARRAY_TYPE = 'B'
-tostring = lambda x: x.tobytes().decode('utf-8')
+
+
+def tostring(x): return x.tobytes().decode('utf-8')
 
 
 class Strand(CNObject):
@@ -39,6 +44,7 @@ class Strand(CNObject):
         oligo (cadnano.oligo.Oligo): optional, defaults to None.
 
     """
+
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
         super(Strand, self).__init__(strandset)
@@ -849,7 +855,7 @@ class Strand(CNObject):
                 # print "keeping %s insertion at %d" % (self, key)
         # end for
 
-        ### ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
+        # ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
         return commands
     # end def
 

@@ -37,6 +37,7 @@ class StrandSet(CNObject):
         part (Part):  Part object this is a child of
         initial_size (int): initial_size to allocate
     """
+
     def __init__(self, is_fwd, id_num, part, initial_size):
         self._document = part.document()
         super(StrandSet, self).__init__(part)

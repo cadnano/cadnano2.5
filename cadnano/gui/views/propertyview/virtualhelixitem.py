@@ -16,6 +16,7 @@ from .cnpropertyitem import CNPropertyItem
 KEY_COL = 0
 VAL_COL = 1
 
+
 class VirtualHelixSetItem(CNPropertyItem):
     """VirtualHelixItem class for the PropertyView.
     """

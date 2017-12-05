@@ -263,7 +263,7 @@ class Oligo(CNObject):
             return None
         if temp.sequence():
             return ''.join([Strand.sequence(strand)
-                           for strand in self.strand5p().generator3pStrand()])
+                            for strand in self.strand5p().generator3pStrand()])
         else:
             return None
     # end def

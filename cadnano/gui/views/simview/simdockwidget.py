@@ -74,7 +74,6 @@ class SimDockWidget(QDockWidget):
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
 
-
         Sphere(1, 0, 0, '#0000cc', self.root_entity)
         Sphere(2, 0, 0, '#0000cc', self.root_entity)
         Sphere(3, 0, 0, '#0000cc', self.root_entity)
@@ -85,4 +84,3 @@ class SimDockWidget(QDockWidget):
         Sphere(0, 0, 2, '#cc0000', self.root_entity)
         Sphere(0, 0, 3, '#cc0000', self.root_entity)
     # end def
-

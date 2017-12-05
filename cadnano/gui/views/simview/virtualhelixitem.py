@@ -42,6 +42,7 @@ def v2DistanceAndAngle(a, b):
 
 class Cylinder(QEntity):
     """docstring for Cube"""
+
     def __init__(self, x, y, z, length, color, parent_entity):
         super(Cylinder, self).__init__(parent_entity)
         self._x = x
@@ -77,6 +78,7 @@ class Cylinder(QEntity):
 
 class Sphere(QEntity):
     """docstring for Cube"""
+
     def __init__(self, x, y, z, color, parent_entity):
         super(Sphere, self).__init__(parent_entity)
         self._x = x

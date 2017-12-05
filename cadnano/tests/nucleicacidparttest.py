@@ -6,6 +6,7 @@ from cntestcase import cnapp
 
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 
+
 def create3Helix(doc, direction, length):
     part = doc.createNucleicAcidPart()
     assert len(part.getidNums()) == 0
@@ -19,12 +20,14 @@ def create3Helix(doc, direction, length):
     part.createVirtualHelix(*origin_pt90, id_num=2, length=length)
     return part
 
+
 @pytest.mark.parametrize('direction', [(0, 0, 1), (0, 1, 0)])
 def testVirtualHelixCreate(cnapp, direction):
     doc = cnapp.document
     part = create3Helix(doc, direction, 42)
     id_nums = part.getidNums()
     assert len(id_nums) == 3
+
 
 def testVirtualHelixResize(cnapp):
     doc = cnapp.document
@@ -37,6 +40,7 @@ def testVirtualHelixResize(cnapp):
     with pytest.raises(NotImplementedError):
         part.setVirtualHelixSize(1, start_length)
 
+
 def testRemove(cnapp):
     doc = cnapp.document
     start_length = 42
@@ -47,7 +51,3 @@ def testRemove(cnapp):
     assert len(doc.children()) == 0
     us.undo()
     assert len(doc.children()) == 1
-
-
-
-

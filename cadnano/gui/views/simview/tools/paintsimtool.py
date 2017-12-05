@@ -7,6 +7,7 @@ class PaintTool(AbstractSimTool):
     """
     Handles visibility and color cycling for the paint tool.
     """
+
     def __init__(self, manager):
         """Summary
 
