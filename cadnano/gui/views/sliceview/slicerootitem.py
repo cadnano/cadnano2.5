@@ -185,3 +185,20 @@ class SliceRootItem(QGraphicsRectItem):
         self.manager = manager
         self.select_tool = manager.select_tool
     # end def
+
+    def updateTranslatedOffsets(self, delta_x, delta_y):
+        """
+        Pass updated offsets to each NucleicAcidPartItem
+
+        Args:
+            delta_x (float):  the new value for which we've translated in the x
+                direction
+            delta_y (float):  the new value for which we've translated in the y
+                direction
+
+        Returns:
+            None
+        """
+#        print('received %s %s' % (delta_x, delta_y))
+        for na_part_item in self.instance_items:
+            na_part_item.updateTranslatedOffsets(delta_x, delta_y)

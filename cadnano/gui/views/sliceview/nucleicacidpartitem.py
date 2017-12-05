@@ -59,6 +59,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._last_hovered_item = None
         self._highlighted_path = []
 
+        self._translated_x = 0.0
+        self._translated_y = 0.0
+
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
@@ -719,7 +722,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         #     pass
 
         is_shift = modifiers == Qt.ShiftModifier
-        position = (event.scenePos().x(), event.scenePos().y())
+        position = self.translateEventCoordinates(event)
         if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
             return
 
@@ -732,7 +735,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             parity = None
 
-        event_coord = ShortestPathHelper.findClosestPoint((event.scenePos().x(), event.scenePos().y()), self.point_map)
+        event_coord = ShortestPathHelper.findClosestPoint(position, self.point_map)
         if event_coord in self.vh_set:
             return
 
@@ -796,7 +799,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        event_xy = (event.scenePos().x(), event.scenePos().y())
+        event_xy = self.translateEventCoordinates(event)
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
@@ -842,8 +845,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def createToolHoverLeave(self, tool, event):
         for coord in self._highlighted_path:
             self.griditem.showCreateHint(coord, show_hint=False)
-        # if self._last_hovered_item:
-        #     self._last_hovered_item.showCreateHint(show_hint=False)
         self._highlighted_path = []
 
     def selectToolMousePress(self, tool, event):
@@ -872,10 +873,61 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def setNeighborMap(self, neighbor_map):
+        """
+        Update the internal mapping of coordinates to their neighbors.
+
+        Args:
+            neighbor_map (dict):  the new mapping of coordinates to their
+                neighbors
+
+        Returns:
+            None
+        """
         assert isinstance(neighbor_map, dict)
         self.neighbor_map = neighbor_map
 
     def setPointMap(self, point_map):
+        """
+        Update the internal mapping of coordinates to x-y positions.
+
+        Args:
+            point_map (dict):  the new mapping of coordinates to their x-y
+                position
+
+        Returns:
+            None
+
+        """
         assert isinstance(point_map, dict)
         self.point_map = point_map
+
+    def updateTranslatedOffsets(self, delta_x, delta_y):
+        """
+        Update the values used to calculate translational offsets.
+
+        Args:
+            delta_x (float):  the new value for which we've translated in the x
+                direction
+            delta_y (float):  the new value for which we've translated in the y
+                direction
+
+        Returns:
+            None
+        """
+        self._translated_x = delta_x
+        self._translated_y = delta_y
+
+    def translateEventCoordinates(self, event):
+        """
+        Given an event, return the x-y coordinates of the event accounting for
+        any translations that may have happened
+
+        Args:
+            event (MousePressEvent):  the event for which x-y coordinates should
+                be returned
+
+        Returns:
+            A tuple of x-y coordinates of the event
+        """
+        return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
 # end class

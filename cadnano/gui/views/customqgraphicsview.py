@@ -23,7 +23,7 @@ from cadnano.gui.views.pathview import pathstyles as styles
 try:
     # from OpenGL import GL
     from PyQt5.QtWidgets import QOpenGLWidget
-except BaseException:
+except ImportError:
     GL = False
 
 GL = False
@@ -71,6 +71,8 @@ class CustomQGraphicsView(QGraphicsView):
         self._scale_fit_factor = .5  # sets initial zoom level
         self._show_details = True
         self._last_scale_factor = 0.0
+        self._transform_x = 0.0
+        self._transform_y = 0.0
         self.scene_root_item = None  # the item to transform
         # Keyboard panning
         self._key_pan_delta_x = styles.PATH_BASE_WIDTH * 21
@@ -275,6 +277,7 @@ class CustomQGraphicsView(QGraphicsView):
         # it returns a separate python object if, say, childItems() returns
         # a QGraphicsObject cast to a QGraphicsItem. If this is the case,
         # we can still find the QGraphicsObject thusly:
+        print('pan x')
         candidateDxDeciders = list(self.scene_root_item.childItems())
         candidateDxDeciders = candidateDxDeciders + [cd.toGraphicsObject() for cd in candidateDxDeciders]
         for cd in candidateDxDeciders:
@@ -288,6 +291,7 @@ class CustomQGraphicsView(QGraphicsView):
     def keyPanDeltaY(self):
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
+        print('pan y')
         candidateDyDeciders = list(self.scene_root_item.childItems())
         candidateDyDeciders = candidateDyDeciders + [cd.toGraphicsObject() for cd in candidateDyDeciders]
         for cd in candidateDyDeciders:
@@ -301,6 +305,8 @@ class CustomQGraphicsView(QGraphicsView):
     def keyPressEvent(self, event):
         """
         Handle key presses for mouse-drag transforms and arrow-key panning.
+
+        TODO[NF]:  Handle top-level escape from SPA here
         """
         if not self._has_focus:  # we don't have focus -> ignore keypress
             return
@@ -355,12 +361,13 @@ class CustomQGraphicsView(QGraphicsView):
 
     def mouseMoveEvent(self, event):
         """
-        Must reimplement mouseMoveEvent of QGraphicsView to allow
+        Must override mouseMoveEvent of QGraphicsView to allow
         ScrollHandDrag due to the fact that events are intercepted
         breaks this feature.
         """
         if self._transform_enable:
             if self.dragMode() == self._yes_drag:
+                print('dragging')
                 # Add stuff to handle the pan event
                 posf = event.localPos()
                 xf = posf.x()
@@ -369,12 +376,26 @@ class CustomQGraphicsView(QGraphicsView):
                 factor = self.transform().m11()
 
                 transform = self.scene_root_item.transform()
-                transform.translate((xf - self._x0)/factor,
-                                    (yf - self._y0)/factor)
+
+                x_translate = (xf - self._x0)/factor
+                y_translate = (yf - self._y0)/factor
+
+                self._transform_x += x_translate
+                self._transform_y += y_translate
+
+                print('translating:  %s, %s' % (x_translate, y_translate))
+                print('total:  %s, %s' % (self._transform_x, self._transform_y))
+
+                transform.translate(x_translate, y_translate)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
                 self._y0 = yf
+
+                if hasattr(self.scene_root_item, 'updateTranslatedOffsets'):
+                    getattr(self.scene_root_item, 'updateTranslatedOffsets')(self._transform_x, self._transform_y)
+
             elif self._dolly_zoom_enable:
+                print('zooming')
                 self.dollyZoom(event)
         # adding this allows events to be passed to items underneath
         QGraphicsView.mouseMoveEvent(self, event)
