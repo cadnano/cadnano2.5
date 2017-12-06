@@ -199,6 +199,15 @@ class SliceRootItem(QGraphicsRectItem):
         Returns:
             None
         """
-#        print('received %s %s' % (delta_x, delta_y))
         for na_part_item in self.instance_items:
             na_part_item.updateTranslatedOffsets(delta_x, delta_y)
+
+    def keyPressEvent(self, event):
+        for na_part_item in self.instance_items:
+            if hasattr(na_part_item, 'keyPressEvent'):
+                getattr(na_part_item, 'keyPressEvent')(event)
+
+    def keyReleaseEvent(self, event):
+        for na_part_item in self.instance_items:
+            if hasattr(na_part_item, 'keyReleaseEvent'):
+                getattr(na_part_item, 'keyReleaseEvent')(event)

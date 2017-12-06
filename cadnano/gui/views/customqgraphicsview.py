@@ -29,6 +29,11 @@ except ImportError:
 GL = False
 
 
+KEY_PRESS_EVENT = 'keyPressEvent'
+KEY_RELEASE_EVENT = 'keyReleaseEvent'
+UPDATE_TRANSLATED_OFFSETS = 'updateTranslatedOffsets'
+
+
 class CustomQGraphicsView(QGraphicsView):
     """
     Base class for QGraphicsViews with Mouse Zoom and Pan support via the
@@ -303,8 +308,6 @@ class CustomQGraphicsView(QGraphicsView):
     def keyPressEvent(self, event):
         """
         Handle key presses for mouse-drag transforms and arrow-key panning.
-
-        TODO[NF]:  Handle top-level escape from SPA here
         """
         if not self._has_focus:  # we don't have focus -> ignore keypress
             return
@@ -332,20 +335,18 @@ class CustomQGraphicsView(QGraphicsView):
         elif event.key() == Qt.Key_Minus:
             self.zoomIn(0.03)
         else:
-            return QGraphicsView.keyPressEvent(self, event)
-        # end else
+            if hasattr(self.scene_root_item, KEY_PRESS_EVENT):
+                getattr(self.scene_root_item, KEY_PRESS_EVENT)(event)
     # end def
 
     def keyReleaseEvent(self, event):
-        """docstring for keyReleaseEvent"""
         if event.key() == self._key_mod:
             self._transform_enable = False
             self._dolly_zoom_enable = False
             self._panDisable()
-        # end if
         else:
-            QGraphicsView.keyReleaseEvent(self, event)
-        # end else
+            if hasattr(self.scene_root_item, KEY_RELEASE_EVENT):
+                getattr(self.scene_root_item, KEY_RELEASE_EVENT)(event)
     # end def
 
     def enterEvent(self, event):
@@ -385,8 +386,8 @@ class CustomQGraphicsView(QGraphicsView):
                 self._x0 = xf
                 self._y0 = yf
 
-                if hasattr(self.scene_root_item, 'updateTranslatedOffsets'):
-                    getattr(self.scene_root_item, 'updateTranslatedOffsets')(self._transform_x, self._transform_y)
+                if hasattr(self.scene_root_item, UPDATE_TRANSLATED_OFFSETS):
+                    getattr(self.scene_root_item, UPDATE_TRANSLATED_OFFSETS)(self._transform_x, self._transform_y)
 
             elif self._dolly_zoom_enable:
                 self.dollyZoom(event)
