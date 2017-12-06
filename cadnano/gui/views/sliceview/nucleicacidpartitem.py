@@ -694,24 +694,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def keyPressEvent(self, event):
-        coordinates = self.getLastHoveredCoordinates()
-        x, y = self.point_map.get(coordinates)
         if event.key() == Qt.Key_Escape:
             self.shortest_path_start = None
             self.shortest_path_add_mode = False
             self.removeAllCreateHints()
-            self.highlightOneGridPoint(coordinates)
-
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
 
         elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
+            x, y = self.point_map.get(self.getLastHoveredCoordinates())
             self._preview_spa((x, y))
     # end def
 
     def keyReleaseEvent(self, event):
-        coordinates = self.getLastHoveredCoordinates()
-        if event.key() == Qt.Key_Shift:
+        if event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
             self.removeAllCreateHints()
-            self.highlightOneGridPoint(coordinates)
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -981,14 +978,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
-        point_item = self.point_map.get(coordinates)
-
-        if point_item is not None:
-            self.highlightOneGridPoint(point_item)
+        if self.point_map.get(coordinates) is not None:
             part = self._model_part
             next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
             self.griditem.showCreateHint(coordinates, next_idnums=next_idnums)
-
             self._highlighted_path.append(coordinates)
     # end def
 
