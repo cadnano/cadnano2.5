@@ -372,8 +372,8 @@ class CustomQGraphicsView(QGraphicsView):
 
                 transform = self.scene_root_item.transform()
 
-                transform.translate((xf - self._x0) / factor,
-                                    (yf - self._y0) / factor)
+                transform.translate((xf - self._x0)/factor,
+                                    (yf - self._y0)/factor)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
                 self._y0 = yf
