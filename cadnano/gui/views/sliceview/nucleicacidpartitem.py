@@ -59,6 +59,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._last_hovered_item = None
         self._highlighted_path = []
 
+        self._translated_x = 0.0
+        self._translated_y = 0.0
+
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
@@ -690,6 +693,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return self._virtual_helix_item_hash.get(id_num)
     # end def
 
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.shortest_path_start = None
+            self.shortest_path_add_mode = False
+            self.removeAllCreateHints()
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+
+        elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
+            x, y = self.point_map.get(self.getLastHoveredCoordinates())
+            self._preview_spa((x, y))
+    # end def
+
+    def keyReleaseEvent(self, event):
+        if event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
+            self.removeAllCreateHints()
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+    # end def
+
     def createToolMousePress(self, tool, event, alt_event=None):
         """Creates individual or groups of VHs in Part on user input.
         Shift modifier enables multi-helix addition.
@@ -719,18 +740,23 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         #     pass
 
         is_shift = modifiers == Qt.ShiftModifier
-        position = (event.scenePos().x(), event.scenePos().y())
+        position = self.translateEventCoordinates(event)
         if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
             return
 
-        x, y = self._last_hovered_item.coord()
+        row, column = self.getLastHoveredCoordinates()
 
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            parity = 0 if HoneycombDnaPart.isOddParity(row=x, column=y) else 1
+            parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
-            parity = 0 if SquareDnaPart.isEvenParity(row=x, column=y) else 1
+            parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:
             parity = None
+
+        event_coord = ShortestPathHelper.findClosestPoint(position, self.point_map)
+        if event_coord in self.vh_set:
+            return
+
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
                                 parity=parity)
@@ -738,6 +764,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
+    # end def
 
     def _handleShortestPathMousePress(self, tool, position, is_shift):
         if is_shift:
@@ -791,7 +818,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        event_xy = (event.scenePos().x(), event.scenePos().y())
+        event_xy = self.translateEventCoordinates(event)
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
@@ -802,30 +829,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         # Highlight GridItems if shift is being held down
         if is_shift and self.shortest_path_add_mode:
-            part = self._model_part
-            start_coord = self.shortest_path_start
-            end_coord = event_xy
-            self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
-                                                                          end=end_coord,
-                                                                          neighbor_map=self.neighbor_map,
-                                                                          vh_set=self.vh_set,
-                                                                          point_map=self.point_map)
-            even_id = part.getMaxIdNum(0) + 2
-            odd_id = part.getMaxIdNum(1) + 2
-            for coord in self._highlighted_path:
-                is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
-                if is_odd is True:
-                    odd_id += 2
-                elif is_odd is False:
-                    even_id += 2
-                else:  # None
-                    pass
+            self._preview_spa(event_xy)
         else:
             point_item = self.point_map.get(event_coord)
 
             if point_item is not None:
                 part = self._model_part
-                next_idnums = (part.getMaxIdNum(0)+2, part.getMaxIdNum(1)+2)
+                next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
 
                 self._highlighted_path.append(event_coord)
@@ -834,12 +844,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
-    def createToolHoverLeave(self, tool, event):
+    def _preview_spa(self, event_xy):
+        part = self._model_part
+        start_coord = self.shortest_path_start
+        end_coord = event_xy
+        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
+                                                                      end=end_coord,
+                                                                      neighbor_map=self.neighbor_map,
+                                                                      vh_set=self.vh_set,
+                                                                      point_map=self.point_map)
+        even_id = part._getNewIdNum(0)
+        odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
-            self.griditem.showCreateHint(coord, show_hint=False)
-        # if self._last_hovered_item:
-        #     self._last_hovered_item.showCreateHint(show_hint=False)
-        self._highlighted_path = []
+            is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
+            if is_odd is True:
+                odd_id += 2
+            elif is_odd is False:
+                even_id += 2
+
+    def createToolHoverLeave(self, tool, event):
+        self.removeAllCreateHints()
 
     def selectToolMousePress(self, tool, event):
         """
@@ -867,10 +891,115 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def setNeighborMap(self, neighbor_map):
+        """
+        Update the internal mapping of coordinates to their neighbors.
+
+        Args:
+            neighbor_map (dict):  the new mapping of coordinates to their
+                neighbors
+
+        Returns:
+            None
+        """
         assert isinstance(neighbor_map, dict)
         self.neighbor_map = neighbor_map
+    # end def
 
     def setPointMap(self, point_map):
+        """
+        Update the internal mapping of coordinates to x-y positions.
+
+        Args:
+            point_map (dict):  the new mapping of coordinates to their x-y
+                position
+
+        Returns:
+            None
+
+        """
         assert isinstance(point_map, dict)
         self.point_map = point_map
+    # end def
+
+    def updateTranslatedOffsets(self, delta_x, delta_y):
+        """
+        Update the values used to calculate translational offsets.
+
+        Args:
+            delta_x (float):  the new value for which we've translated in the x
+                direction
+            delta_y (float):  the new value for which we've translated in the y
+                direction
+
+        Returns:
+            None
+        """
+        self._translated_x = delta_x
+        self._translated_y = delta_y
+    # end def
+
+    def translateEventCoordinates(self, event):
+        """
+        Given an event, return the x-y coordinates of the event accounting for
+        any translations that may have happened
+
+        Args:
+            event (MousePressEvent):  the event for which x-y coordinates should
+                be returned
+
+        Returns:
+            A tuple of x-y coordinates of the event
+        """
+        return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
+    # end def
+
+    def removeAllCreateHints(self):
+        """
+        Remove the create hints from each currently hinted GridItem.
+
+        Iterates over all coordinates in self._highlighted_path.
+
+        Returns:
+            None
+        """
+        for coord in self._highlighted_path:
+            self.griditem.showCreateHint(coord, show_hint=False)
+        self._highlighted_path = []
+    # end def
+
+    def highlightOneGridPoint(self, coordinates):
+        """
+        Add a hint to one GridPoint.
+
+        Args:
+            coordinates (tuple):  the row-column coordinates of the gridPoint to
+                be highlighted
+
+        Returns:
+            None
+        """
+        if self.point_map.get(coordinates) is not None:
+            part = self._model_part
+            next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
+            self.griditem.showCreateHint(coordinates, next_idnums=next_idnums)
+            self._highlighted_path.append(coordinates)
+    # end def
+
+    def getLastHoveredCoordinates(self):
+        """
+        Get the row and column corresponding to the GridPoint that was most
+        recently hovered over.
+
+        This accounts for the fact that the rows are inverted (i.e. the result
+        returned by this method will match the coordinate system stored in this
+        class' internal records of coordinates)
+
+        Returns:
+            A tuple corresponding to the row and column of the most recently
+                hovered GridPoint.
+
+        """
+        row, column = self._last_hovered_item.coord()
+        return -row, column
+    # end def
 # end class

@@ -23,10 +23,14 @@ from cadnano.gui.views.pathview import pathstyles as styles
 try:
     # from OpenGL import GL
     from PyQt5.QtWidgets import QOpenGLWidget
-except BaseException:
+except ImportError:
     GL = False
 
 GL = False
+
+
+KEY_PRESS_EVENT = 'keyPressEvent'
+KEY_RELEASE_EVENT = 'keyReleaseEvent'
 
 
 class CustomQGraphicsView(QGraphicsView):
@@ -328,20 +332,18 @@ class CustomQGraphicsView(QGraphicsView):
         elif event.key() == Qt.Key_Minus:
             self.zoomIn(0.03)
         else:
-            return QGraphicsView.keyPressEvent(self, event)
-        # end else
+            if hasattr(self.scene_root_item, KEY_PRESS_EVENT):
+                getattr(self.scene_root_item, KEY_PRESS_EVENT)(event)
     # end def
 
     def keyReleaseEvent(self, event):
-        """docstring for keyReleaseEvent"""
         if event.key() == self._key_mod:
             self._transform_enable = False
             self._dolly_zoom_enable = False
             self._panDisable()
-        # end if
         else:
-            QGraphicsView.keyReleaseEvent(self, event)
-        # end else
+            if hasattr(self.scene_root_item, KEY_RELEASE_EVENT):
+                getattr(self.scene_root_item, KEY_RELEASE_EVENT)(event)
     # end def
 
     def enterEvent(self, event):
@@ -355,7 +357,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     def mouseMoveEvent(self, event):
         """
-        Must reimplement mouseMoveEvent of QGraphicsView to allow
+        Must override mouseMoveEvent of QGraphicsView to allow
         ScrollHandDrag due to the fact that events are intercepted
         breaks this feature.
         """
@@ -369,6 +371,7 @@ class CustomQGraphicsView(QGraphicsView):
                 factor = self.transform().m11()
 
                 transform = self.scene_root_item.transform()
+
                 transform.translate((xf - self._x0)/factor,
                                     (yf - self._y0)/factor)
                 self.scene_root_item.setTransform(transform)
