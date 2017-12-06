@@ -372,14 +372,11 @@ class CustomQGraphicsView(QGraphicsView):
 
                 transform = self.scene_root_item.transform()
 
-                x_translate = (xf - self._x0)/factor
-                y_translate = (yf - self._y0)/factor
-
-                transform.translate(x_translate, y_translate)
+                transform.translate((xf - self._x0) / factor,
+                                    (yf - self._y0) / factor)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
                 self._y0 = yf
-
             elif self._dolly_zoom_enable:
                 self.dollyZoom(event)
         # adding this allows events to be passed to items underneath
