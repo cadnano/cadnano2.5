@@ -31,7 +31,6 @@ GL = False
 
 KEY_PRESS_EVENT = 'keyPressEvent'
 KEY_RELEASE_EVENT = 'keyReleaseEvent'
-UPDATE_TRANSLATED_OFFSETS = 'updateTranslatedOffsets'
 
 
 class CustomQGraphicsView(QGraphicsView):
@@ -76,8 +75,6 @@ class CustomQGraphicsView(QGraphicsView):
         self._scale_fit_factor = .5  # sets initial zoom level
         self._show_details = True
         self._last_scale_factor = 0.0
-        self._transform_x = 0.0
-        self._transform_y = 0.0
         self.scene_root_item = None  # the item to transform
         # Keyboard panning
         self._key_pan_delta_x = styles.PATH_BASE_WIDTH * 21
@@ -378,16 +375,10 @@ class CustomQGraphicsView(QGraphicsView):
                 x_translate = (xf - self._x0)/factor
                 y_translate = (yf - self._y0)/factor
 
-                self._transform_x += x_translate
-                self._transform_y += y_translate
-
                 transform.translate(x_translate, y_translate)
                 self.scene_root_item.setTransform(transform)
                 self._x0 = xf
                 self._y0 = yf
-
-                if hasattr(self.scene_root_item, UPDATE_TRANSLATED_OFFSETS):
-                    getattr(self.scene_root_item, UPDATE_TRANSLATED_OFFSETS)(self._transform_x, self._transform_y)
 
             elif self._dolly_zoom_enable:
                 self.dollyZoom(event)

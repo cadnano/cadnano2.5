@@ -186,22 +186,6 @@ class SliceRootItem(QGraphicsRectItem):
         self.select_tool = manager.select_tool
     # end def
 
-    def updateTranslatedOffsets(self, delta_x, delta_y):
-        """
-        Pass updated offsets to each NucleicAcidPartItem
-
-        Args:
-            delta_x (float):  the new value for which we've translated in the x
-                direction
-            delta_y (float):  the new value for which we've translated in the y
-                direction
-
-        Returns:
-            None
-        """
-        for na_part_item in self.instance_items:
-            na_part_item.updateTranslatedOffsets(delta_x, delta_y)
-
     def keyPressEvent(self, event):
         for na_part_item in self.instance_items:
             if hasattr(na_part_item, 'keyPressEvent'):
@@ -211,3 +195,10 @@ class SliceRootItem(QGraphicsRectItem):
         for na_part_item in self.instance_items:
             if hasattr(na_part_item, 'keyReleaseEvent'):
                 getattr(na_part_item, 'keyReleaseEvent')(event)
+
+    def setTransform(self, QTransform, combine=False):
+        super(SliceRootItem, self).setTransform(QTransform, combine=False)
+        delta_x = QTransform.m31()
+        delta_y = QTransform.m32()
+        for na_part_item in self.instance_items:
+            na_part_item.updateTranslatedOffsets(delta_x, delta_y)
