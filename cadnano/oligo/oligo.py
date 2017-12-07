@@ -47,7 +47,7 @@ class Oligo(CNObject):
         self._is_circular = False
         self._props = {'name': "oligo%s" % str(id(self))[-4:],
                        'color': "#cc0000" if color is None else color,
-                       'length': 0,
+                       'length': length,
                        'is_visible': True
                        }
     # end def
