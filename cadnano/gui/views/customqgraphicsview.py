@@ -446,6 +446,7 @@ class CustomQGraphicsView(QGraphicsView):
         """docstring for fname"""
 
     def wheelEvent(self, event):
+        print('wheel')
         self.safeScale(event.angleDelta().y())
     # end def
 
@@ -458,15 +459,18 @@ class CustomQGraphicsView(QGraphicsView):
         scale_change = new_scale_level / current_scale_level
         self.scale(scale_change, scale_change)
         self._resetLOD()
+        print('Scaling from %s to %s' % (current_scale_level, new_scale_level))
     # end def
 
     def zoomIn(self, fraction_of_max=0.5):
+        print('in')
         current_scale_level = self.transform().m11()
         scale_change = (fraction_of_max * self._scale_limit_max) / current_scale_level
         self.scale(scale_change, scale_change)
     # end def
 
     def zoomOut(self, fraction_of_min=1):
+        print('out')
         current_scale_level = self.transform().m11()
         scale_change = (fraction_of_min * self._scale_limit_min) / current_scale_level
         self.scale(scale_change, scale_change)
@@ -476,6 +480,7 @@ class CustomQGraphicsView(QGraphicsView):
         """docstring for dollyZoom"""
         # QMouseEvent.y() returns the position of the mouse cursor relative
         # to the widget
+        print('dolly')
         yf = event.y()
         denom = abs(yf - self._y0)
         if denom > 0:
