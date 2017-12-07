@@ -202,6 +202,3 @@ class SliceRootItem(QGraphicsRectItem):
         delta_y = QTransform.m32()
         for na_part_item in self.instance_items:
             na_part_item.updateTranslatedOffsets(delta_x, delta_y)
-
-        print(QTransform.m11())
-        print(QTransform.m22())

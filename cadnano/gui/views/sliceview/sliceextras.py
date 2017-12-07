@@ -919,7 +919,7 @@ class WedgeGizmo(QGraphicsPathItem):
 
 class ShortestPathHelper(object):
     @staticmethod
-    def findClosestPoint(position, point_map, strict=False):
+    def findClosestPoint(position, point_map):
         """Find the closest point to a given position on the grid
 
         This method first attempts to do a naive search to determine which
@@ -947,9 +947,6 @@ class ShortestPathHelper(object):
                 # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
                 return coordinates
 
-        if strict is True:
-            return ()
-
         best_coordinates = None
         best_distance = float('inf')
         for coordinates, coordiante_position in point_map.items():
@@ -958,6 +955,8 @@ class ShortestPathHelper(object):
                 best_distance = distance
                 best_coordinates = coordinates
 
+        # TODO[NF]:  Remove once we determine why best_coordinates is
+        # sometimes None
         if best_coordinates is None:
             print('Could not find coordinates with position %s and point_map %s'
                   % (position, point_map))
@@ -1046,8 +1045,8 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map, strict=True)
-        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map, strict=True)
+        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
+        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
 
         queue = PriorityQueue()
         queue.put((0, start_coordinates))

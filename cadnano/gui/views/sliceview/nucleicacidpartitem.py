@@ -297,7 +297,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
-        print('sf is %s' % self.scale_factor)
         coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
         self.vh_set.add(coordinates)
     # end def
@@ -658,7 +657,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
-        print('hme')
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -666,11 +664,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             event.setAccepted(False)
             QGraphicsItem.hoverMoveEvent(self, event)
-
-        self.current_grid_point_coords = ShortestPathHelper.findClosestPoint(self.translateEventCoordinates(event),
-                                                                             self.point_map,
-                                                                             strict=True)
-        print('setting %s' % str(self.current_grid_point_coords))
 
     # def hoverLeaveEvent(self, event):
     #     pass
@@ -705,22 +698,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.shortest_path_start = None
             self.shortest_path_add_mode = False
             self.removeAllCreateHints()
-            if self.current_grid_point_coords:
-                self.highlightOneGridPoint(self.current_grid_point_coords)
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
 
         elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
-            if self.current_grid_point_coords:
-                x, y = self.point_map.get(self.getLastHoveredCoordinates())
-                self._preview_spa((x, y))
-            else:
-                print('nope!')
+            x, y = self.point_map.get(self.getLastHoveredCoordinates())
+            self._preview_spa((x, y))
     # end def
 
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
             self.removeAllCreateHints()
-            if self.current_grid_point_coords:
-                self.highlightOneGridPoint(self.current_grid_point_coords)
+            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -831,7 +819,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         event_xy = self.translateEventCoordinates(event)
-        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map, strict=True)
+        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
 

@@ -459,7 +459,6 @@ class SimNucleicAcidPartItem(AbstractPartItem):
         vhi.virtualHelixRemovedSlot()
         self._virtual_helix_item_list.remove(vhi)
         del self._virtual_helix_item_hash[id_num]
-        print('removed')
     # end def
 
     def window(self):
