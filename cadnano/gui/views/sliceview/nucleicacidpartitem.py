@@ -61,8 +61,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self._translated_x = 0.0
         self._translated_y = 0.0
-        self._scale_x = 1.0
-        self._scale_y = 1.0
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -658,7 +656,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
-        print('setting...')
         self.last_mouse_position = self.translateEventCoordinates(event)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
@@ -702,20 +699,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.shortest_path_add_mode = False
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                print('hl1')
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-            else:
-                print('nhl1')
-                print(self.last_mouse_position, self.getLastHoveredCoordinates())
-
         elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                print('hl2')
                 x, y = self.point_map.get(self.getLastHoveredCoordinates())
                 self._preview_spa((x, y))
-            else:
-                print('nhl2')
-                print(self.last_mouse_position, self.getLastHoveredCoordinates())
     # end def
 
     def keyReleaseEvent(self, event):
@@ -943,7 +931,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.point_map = point_map
     # end def
 
-    def updateTranslatedOffsets(self, delta_x, delta_y, scale_x, scale_y):
+    def updateTranslatedOffsets(self, delta_x, delta_y):
         """
         Update the values used to calculate translational offsets.
 
@@ -958,8 +946,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         self._translated_x = delta_x
         self._translated_y = delta_y
-        self._scale_x = scale_x
-        self._scale_y = scale_y
     # end def
 
     def translateEventCoordinates(self, event):
@@ -974,8 +960,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             A tuple of x-y coordinates of the event
         """
-        return ((event.scenePos().x() - self._translated_x)/self._scale_x,
-                (event.scenePos().y() - self._translated_y)/self._scale_y)
+        return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
     # end def
 
     def removeAllCreateHints(self):
