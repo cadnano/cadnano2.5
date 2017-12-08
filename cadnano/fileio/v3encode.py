@@ -19,7 +19,7 @@ def encodeDocument(document):
                 'name': '',
                 'meta': {
                     'slice_view_type': document.getSliceViewType(),
-                    'grid_type': document.get_grid_type()
+                    'grid_type': document.getGridType()
                 },
                 'parts': [],
                 'modifications': document.modifications()

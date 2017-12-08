@@ -937,19 +937,19 @@ class Document(CNObject):
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
 
-    def get_slice_view_type(self):
+    def getSliceViewType(self):
         # TODO[NF]:  Docstring
         return self.controller().getSliceViewType()
 
-    def set_slice_view_type(self, slice_view_type):
+    def setSliceViewType(self, slice_view_type):
         # TODO[NF]:  Docstring
         return self.controller().setSliceViewType(slice_view_type=slice_view_type)
 
-    def get_grid_type(self):
+    def getGridType(self):
         # TODO[NF]:  Docstring
-        return self.activePart().get_grid_type()
+        return self.activePart().getGridType()
 
-    def set_grid_type(self, grid_type):
+    def setGridType(self, grid_type):
         # TODO[NF]:  Docstring
-        return self.activePart().set_grid_type(grid_type)
+        return self.activePart().setGridType(grid_type)
 # end class
