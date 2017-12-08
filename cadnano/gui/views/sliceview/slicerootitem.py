@@ -200,5 +200,7 @@ class SliceRootItem(QGraphicsRectItem):
         super(SliceRootItem, self).setTransform(QTransform, combine=False)
         delta_x = QTransform.m31()
         delta_y = QTransform.m32()
+        scale_x = QTransform.m11()
+        scale_y = QTransform.m22()
         for na_part_item in self.instance_items:
-            na_part_item.updateTranslatedOffsets(delta_x, delta_y)
+            na_part_item.updateTranslatedOffsets(delta_x, delta_y, scale_x, scale_y)

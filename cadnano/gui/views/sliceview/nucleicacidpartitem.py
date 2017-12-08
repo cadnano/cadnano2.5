@@ -61,6 +61,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self._translated_x = 0.0
         self._translated_y = 0.0
+        self._scale_x = 1.0
+        self._scale_y = 1.0
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -199,8 +201,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem = None
     # end def
 
-    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs,
-                                         do_deselect):
+    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs, do_deselect):
         """
         left_overs are neighbors that need updating due to changes
 
@@ -657,6 +658,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
+        print('setting...')
+        self.last_mouse_position = self.translateEventCoordinates(event)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -698,17 +701,28 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.shortest_path_start = None
             self.shortest_path_add_mode = False
             self.removeAllCreateHints()
-            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+                print('hl1')
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            else:
+                print('nhl1')
+                print(self.last_mouse_position, self.getLastHoveredCoordinates())
 
         elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
-            x, y = self.point_map.get(self.getLastHoveredCoordinates())
-            self._preview_spa((x, y))
+            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+                print('hl2')
+                x, y = self.point_map.get(self.getLastHoveredCoordinates())
+                self._preview_spa((x, y))
+            else:
+                print('nhl2')
+                print(self.last_mouse_position, self.getLastHoveredCoordinates())
     # end def
 
     def keyReleaseEvent(self, event):
         if event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
             self.removeAllCreateHints()
-            self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates())
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -822,18 +836,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
+        self.last_mouse_position = event_xy
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
         if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
             self.createToolHoverLeave(tool=tool, event=event)
 
         # Highlight GridItems if shift is being held down
-        if is_shift and self.shortest_path_add_mode:
+        if is_shift and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._preview_spa(event_xy)
         else:
             point_item = self.point_map.get(event_coord)
 
-            if point_item is not None:
+            if point_item is not None and self._inPointItem(event_xy, event_coord):
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
@@ -842,6 +857,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
+    # end def
+
+    def _inPointItem(self, event_xy, event_coord):
+        point_x, point_y = self.point_map.get(event_coord)
+        event_x, event_y = event_xy
+
+        return (point_x - event_x)**2 + (point_y - event_y)**2 <= self._RADIUS**2
     # end def
 
     def _preview_spa(self, event_xy):
@@ -921,7 +943,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.point_map = point_map
     # end def
 
-    def updateTranslatedOffsets(self, delta_x, delta_y):
+    def updateTranslatedOffsets(self, delta_x, delta_y, scale_x, scale_y):
         """
         Update the values used to calculate translational offsets.
 
@@ -936,6 +958,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         self._translated_x = delta_x
         self._translated_y = delta_y
+        self._scale_x = scale_x
+        self._scale_y = scale_y
     # end def
 
     def translateEventCoordinates(self, event):
@@ -950,7 +974,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             A tuple of x-y coordinates of the event
         """
-        return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
+        return ((event.scenePos().x() - self._translated_x)/self._scale_x,
+                (event.scenePos().y() - self._translated_y)/self._scale_y)
     # end def
 
     def removeAllCreateHints(self):
