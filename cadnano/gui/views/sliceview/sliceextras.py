@@ -958,7 +958,7 @@ class ShortestPathHelper(object):
         # TODO[NF]:  Remove once we determine why best_coordinates is
         # sometimes None
         if best_coordinates is None:
-            print('Could not find coordinates with position %s and point_map %s'
+            print('Could not find coordinates with position %s and coordinates_to_xy %s'
                   % (position, point_map))
         return best_coordinates
 

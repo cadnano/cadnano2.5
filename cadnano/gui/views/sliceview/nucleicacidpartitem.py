@@ -1,4 +1,5 @@
 from ast import literal_eval
+
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsRectItem
@@ -6,11 +7,10 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
+from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj, getNoBrush
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.resizehandles import ResizeHandleGroup
 from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
-
 from . import slicestyles as styles
 from .griditem import GridItem
 from .prexovermanager import PreXoverManager
@@ -54,10 +54,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self.shortest_path_start = None
         self.neighbor_map = dict()
-        self.vh_set = set()
-        self.point_map = dict()
+        self.coordinates_to_vhid = dict()
+        self.coordinates_to_xy = dict()
         self._last_hovered_item = None
         self._highlighted_path = []
+        self.spa_start_vhi = None
 
         self._translated_x = 0.0
         self._translated_y = 0.0
@@ -129,7 +130,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             part (NucleicAcidPart): Description
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
-        vhi = self._virtual_helix_item_hash.get(id_num, None)
+        vhi = self._virtual_helix_item_hash.get(id_num)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
     # end def
@@ -296,8 +297,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
-        self.vh_set.add(coordinates)
+        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
+
+        assert id_num not in self.coordinates_to_vhid.values()
+
+        self.coordinates_to_vhid[coordinates] = id_num
+
+        assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
+        assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
@@ -320,8 +327,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.point_map)
-        self.vh_set.remove(coordinates)
+
+        print('Removing %s from %s' % (id_num, str(self.coordinates_to_vhid)))
+
+        for coordinates, current_id in self.coordinates_to_vhid.items():
+            if current_id == id_num:
+                del self.coordinates_to_vhid[coordinates]
+                break
+
+        assert id_num not in self.coordinates_to_vhid.values()
+        assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
+        assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -695,14 +711,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            self.shortest_path_start = None
-            self.shortest_path_add_mode = False
+            self._setShortestPathStart(None)
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
         elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                x, y = self.point_map.get(self.getLastHoveredCoordinates())
+                x, y = self.coordinates_to_xy.get(self.getLastHoveredCoordinates())
                 self._preview_spa((x, y))
     # end def
 
@@ -721,13 +736,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event (TYPE): Description
             alt_event (None, optional): Description
         """
+        # Abort if a VH already exists here
+        position = self.translateEventCoordinates(event)
+        event_coord = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
+        if event_coord in self.coordinates_to_vhid.keys():
+            return
+
         # 1. get point in model coordinates:
         part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
         else:
-            # pt = alt_event.scenePos()
-            # pt = self.mapFromScene(pt)
             pt = alt_event.pos()
 
         if pt is None:
@@ -735,29 +754,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return QGraphicsItem.mousePressEvent(self, event)
 
         part_pt_tuple = self.getModelPos(pt)
-
-        # mod = Qt.MetaModifier
         modifiers = event.modifiers()
-        # if not (modifiers & mod):
-        #     pass
 
-        is_shift = modifiers == Qt.ShiftModifier
-        position = self.translateEventCoordinates(event)
-        if self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_shift):
+        is_spa_mode = modifiers == Qt.ShiftModifier
+        last_added_spa_vhi_id = self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_spa_mode)
+        if last_added_spa_vhi_id is not None:
             return
 
         row, column = self.getLastHoveredCoordinates()
-
-        if self.griditem.grid_type is GridType.HONEYCOMB:
-            parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-        elif self.griditem.grid_type is GridType.SQUARE:
-            parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
-        else:
-            parity = None
-
-        event_coord = ShortestPathHelper.findClosestPoint(position, self.point_map)
-        if event_coord in self.vh_set:
-            return
+        parity = self._getCoordianteParity(row, column)
 
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
@@ -766,30 +771,97 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
         tool.startCreation()
+
+        if is_spa_mode:
+            self._highlightSpaVH(id_num)
+#        else:
+#            self._highlightSpaVH(None)
     # end def
 
+    def _getCoordianteParity(self, row, column):
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+        elif self.griditem.grid_type is GridType.SQUARE:
+            return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
+        else:
+            return None
+
     def _handleShortestPathMousePress(self, tool, position, is_shift):
+        """
+        Handles logic for determining if SPA mode should be activated or
+        continued.
+
+        Args:
+            tool ():
+            position (tuple):  the xy coordinates of the mouse press
+            is_shift (bool):  whether or not this event is a SPA event
+
+        Returns:
+            True if nothing needs to be done by the caller (i.e. this method
+            and its callees added VHs as necessary, False otherwise
+        """
         if is_shift:
             # Complete the path
             if self.shortest_path_start is not None:
-                result = self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
-                if result:
-                    self.shortest_path_start = position
-                return True
+                last_vhi_id = self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
+                if last_vhi_id is not None:
+                    self._setShortestPathStart(position)
+                    self._highlightSpaVH(last_vhi_id)
+                    return last_vhi_id
+            # Initialize SPA
             else:
-                self.shortest_path_add_mode = True
-                self.shortest_path_start = position
+                self._setShortestPathStart(position)
+        else:
+            self._setShortestPathStart(None)
+
+    def _setShortestPathStart(self, position):
+        if position is not None:
+            self.shortest_path_add_mode = True
+            self.shortest_path_start = position
+#
+#            coordinates = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
+#            start_vhi_id = self.coordinates_to_vhid.get(coordinates)
+#            if not start_vhi_id:
+#                print('could not find coordinates %s in %s' % (str(coordinates), str(self.coordinates_to_vhid)))
+#            self.spa_start_vhi = self._virtual_helix_item_hash[start_vhi_id]
+#            self.spa_start_vhi.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
         else:
             self.shortest_path_add_mode = False
             self.shortest_path_start = None
-        return False
+            self._highlightSpaVH(None)
+
+#            if self.spa_start_vhi:
+#                self.spa_start_vhi.setBrush(getNoBrush())
+#            self.spa_start_vhi = None
+
+    def _highlightSpaVH(self, vh_id):
+        if self.spa_start_vhi:
+            self.spa_start_vhi.setBrush(getNoBrush())
+            print('unset the thing')
+
+        if vh_id is None:
+            self.spa_start_vhi = None
+        else:
+            self.spa_start_vhi = self._virtual_helix_item_hash[vh_id]
+            self.spa_start_vhi.setBrush(getBrushObj(styles.SPA_START_HINT_COLOR, alpha=32))
+    # end def
 
     def createToolShortestPath(self, tool, start, end):
-        # TODO[NF]:  Docstring
+        """
+        Handle the creation of VHIs for SPA mode.
+
+        Args:
+            tool ():
+            start (tuple):  the x-y coordinates of the start point
+            end (tuple):  the x-y coordinates of the end point
+
+        Returns:
+            The ID of the last VHI created
+        """
         path = ShortestPathHelper.shortestPathXY(start=start, end=end,
                                                  neighbor_map=self.neighbor_map,
-                                                 vh_set=self.vh_set,
-                                                 point_map=self.point_map,
+                                                 vh_set=self.coordinates_to_vhid.keys(),
+                                                 point_map=self.coordinates_to_xy,
                                                  grid_type=self.griditem.grid_type,
                                                  scale_factor=self.inverse_scale_factor,
                                                  radius=self._RADIUS)
@@ -798,7 +870,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if path == []:
             self.shortest_path_start = None
             self.shortest_path_add_mode = False
-            return False
+            return None
         else:
             x_list, y_list, parity_list = zip(*path)
             id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
@@ -808,7 +880,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 vhi = self._virtual_helix_item_hash[id_number]
                 tool.setVirtualHelixItem(vhi)
                 tool.startCreation()
-            return True
+            return id_number
+    # end def
 
     def createToolHoverMove(self, tool, event):
         """Summary
@@ -821,7 +894,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         event_xy = self.translateEventCoordinates(event)
-        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.point_map)
+        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.coordinates_to_xy)
         modifiers = event.modifiers()
         is_shift = modifiers == Qt.ShiftModifier
         self.last_mouse_position = event_xy
@@ -834,7 +907,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if is_shift and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._preview_spa(event_xy)
         else:
-            point_item = self.point_map.get(event_coord)
+            point_item = self.coordinates_to_xy.get(event_coord)
 
             if point_item is not None and self._inPointItem(event_xy, event_coord):
                 part = self._model_part
@@ -848,21 +921,44 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def _inPointItem(self, event_xy, event_coord):
-        point_x, point_y = self.point_map.get(event_coord)
+        """
+        Determine if x-y coordinates are inside the given GridPoint.
+
+        Args:
+            event_xy (tuple):  the x-y coordinates corresponding to the
+                position of the mouse
+            event_coord (tuple):  the i-j coordinates corresponding to the
+                location of the GridPoint
+
+        Returns:
+            True if the mouse is in the given GridPoint, False otherwise
+        """
+        point_x, point_y = self.coordinates_to_xy.get(event_coord)
         event_x, event_y = event_xy
 
         return (point_x - event_x)**2 + (point_y - event_y)**2 <= self._RADIUS**2
     # end def
 
     def _preview_spa(self, event_xy):
+        """
+        Highlight and add VH ID numbers to the GridPoints that the SPA would
+        use.
+
+        Args:
+            event_xy (tuple):  the x-y coordinates corresponding to the
+                position of the mouse
+
+        Returns:
+            None
+        """
         part = self._model_part
         start_coord = self.shortest_path_start
         end_coord = event_xy
         self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
                                                                       end=end_coord,
                                                                       neighbor_map=self.neighbor_map,
-                                                                      vh_set=self.vh_set,
-                                                                      point_map=self.point_map)
+                                                                      vh_set=self.coordinates_to_vhid.keys(),
+                                                                      point_map=self.coordinates_to_xy)
         even_id = part._getNewIdNum(0)
         odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
@@ -871,6 +967,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 odd_id += 2
             elif is_odd is False:
                 even_id += 2
+    # end def
 
     def createToolHoverLeave(self, tool, event):
         self.removeAllCreateHints()
@@ -928,7 +1025,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         """
         assert isinstance(point_map, dict)
-        self.point_map = point_map
+        self.coordinates_to_xy = point_map
     # end def
 
     def updateTranslatedOffsets(self, delta_x, delta_y):
@@ -988,7 +1085,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
-        if self.point_map.get(coordinates) is not None:
+        if self.coordinates_to_xy.get(coordinates) is not None:
             part = self._model_part
             next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
             self.griditem.showCreateHint(coordinates, next_idnums=next_idnums)

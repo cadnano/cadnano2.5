@@ -33,6 +33,7 @@ ORANGE_STROKE = '#cc6633'
 GRAY_FILL = '#eeeeee'  # (was #a1a1a1)
 # MIDGRAY_FILL = '#9a9a9a'
 GRAY_STROKE = '#666666'  # (was 424242)
+BLACK_STROKE = '#000000'
 
 
 # PARTCOLORS = [QColor() for i in range(12)]

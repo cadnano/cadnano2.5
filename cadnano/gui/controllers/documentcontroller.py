@@ -64,6 +64,8 @@ class DocumentController(object):
         self.slice_view_showing = True
         self.grid_view_showing = False
 
+        self.exit_when_done = False
+
     def _initWindow(self):
         """docstring for initWindow"""
         # print("new window", app().qApp.allWindows())
