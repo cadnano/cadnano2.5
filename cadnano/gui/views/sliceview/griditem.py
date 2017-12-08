@@ -8,9 +8,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRe
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-
 from cadnano.gui.views.sliceview import slicestyles as styles
-from cadnano.gui.views.styles import BLUE_STROKE, GRAY_STROKE, ORANGE_STROKE, BLACK_STROKE
 
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
@@ -52,7 +50,6 @@ class GridItem(QGraphicsRectItem):
 
         self.setGridType(grid_type)
         self.previous_grid_type = grid_type
-        self._shortest_path_start = None
 
     def updateGrid(self):
         """Summary
@@ -83,23 +80,6 @@ class GridItem(QGraphicsRectItem):
         """
         self.grid_type = grid_type
         self.updateGrid()
-    # end def
-
-    def setShortestPathStart(self, position):
-        print('setting start')
-        if position is not None and position in self.points_dict:
-            print('yep')
-            self._shortest_path_start = self.points_dict[position]
-#            self._shortest_path_start.setPen(getPenObj(BLACK_STROKE, 3))
-            self._shortest_path_start.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
-            self._shortest_path_start.is_spa_start = True
-        elif self._shortest_path_start is not None:
-#            self._shortest_path_start.setPen(getPenObj(GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
-            self._shortest_path_start.setBrush(getNoBrush())
-            self._shortest_path_start.is_spa_start = False
-            self._shortest_path_start = None
-        else:
-            print('couldnt find it %s' % str(position))
     # end def
 
     def createHoneycombGrid(self, part_item, radius, bounds):
@@ -383,7 +363,6 @@ class GridPoint(QGraphicsEllipseItem):
 
     def __init__(self, x, y, diameter, parent_grid, coord=None):
         super(GridPoint, self).__init__(0., 0., diameter, diameter, parent=parent_grid)
-        self.is_spa_start = False
         self.offset = diameter / 2
         self.grid = parent_grid
         self._coord = coord
@@ -500,8 +479,7 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-        if not self.is_spa_start:
-            self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
@@ -568,8 +546,7 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
-        if not self.is_spa_start:
-            self.setPen(getPenObj(styles.BLUE_STROKE, 2))
+        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)
 
     def createToolHoverMoveEvent(self, tool, part_item, event):

@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj, getNoBrush
+from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
 from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.gui.views.resizehandles import ResizeHandleGroup
 from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
@@ -324,11 +324,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for neighbor_id in neighbors:
             nvhi = self._virtual_helix_item_hash[neighbor_id]
             self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-
-        position = sender.locationQt(id_num=id_num,
-                                     scale_factor=self.scale_factor)
-
-        print('Removing %s from %s' % (id_num, str(self.coordinates_to_vhid)))
 
         for coordinates, current_id in self.coordinates_to_vhid.items():
             if current_id == id_num:
@@ -774,8 +769,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         if is_spa_mode:
             self._highlightSpaVH(id_num)
-#        else:
-#            self._highlightSpaVH(None)
     # end def
 
     def _getCoordianteParity(self, row, column):
@@ -815,29 +808,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._setShortestPathStart(None)
 
     def _setShortestPathStart(self, position):
+        # TODO[NF]:  Docstring
         if position is not None:
             self.shortest_path_add_mode = True
             self.shortest_path_start = position
-#
-#            coordinates = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
-#            start_vhi_id = self.coordinates_to_vhid.get(coordinates)
-#            if not start_vhi_id:
-#                print('could not find coordinates %s in %s' % (str(coordinates), str(self.coordinates_to_vhid)))
-#            self.spa_start_vhi = self._virtual_helix_item_hash[start_vhi_id]
-#            self.spa_start_vhi.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
         else:
             self.shortest_path_add_mode = False
             self.shortest_path_start = None
             self._highlightSpaVH(None)
 
-#            if self.spa_start_vhi:
-#                self.spa_start_vhi.setBrush(getNoBrush())
-#            self.spa_start_vhi = None
-
     def _highlightSpaVH(self, vh_id):
+        # TODO[NF]:  Docstring
         if self.spa_start_vhi:
             self.spa_start_vhi.setBrush(getNoBrush())
-            print('unset the thing')
 
         if vh_id is None:
             self.spa_start_vhi = None
