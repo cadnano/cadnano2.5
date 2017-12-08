@@ -3384,11 +3384,11 @@ class NucleicAcidPart(Part):
             yield (id_num, is_fwd, idx, mid)
     # end def
 
-    def get_grid_type(self):
+    def getGridType(self):
         # TODO[NF]:  Docstring
         return self._group_properties.get('grid_type')
 
-    def set_grid_type(self, grid_type):
+    def setGridType(self, grid_type):
         # TODO[NF]:  Docstring
         self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
