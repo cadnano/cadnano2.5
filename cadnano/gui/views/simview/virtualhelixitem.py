@@ -180,7 +180,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
             sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
-        print("strandAddedSlot", sender, strand)
+        # print("strandAddedSlot", sender, strand)
 
         id_num = sender.idNum()
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(id_num)
@@ -188,7 +188,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
 
         idx_low, idx_high = strand.idxs()
         for idx in range(idx_low, idx_high+1):
-            print(idx, pts[idx])
+            # print(idx, pts[idx])
             x, y, z = pts[idx]  # + axis_pts[idx]
             Sphere(x, y, z, strand.getColor(), self._part_entity)
         # StrandItem(strand, self, self._viewroot)

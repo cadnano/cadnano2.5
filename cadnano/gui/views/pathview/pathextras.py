@@ -719,13 +719,11 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        self.setCursor(Qt.OpenHandCursor)
         self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
         QGraphicsItem.hoverEnterEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):
-        self.setCursor(Qt.ArrowCursor)
         self._part_item.updateStatusBar("")
         QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
@@ -735,8 +733,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
-        self.setCursor(Qt.ClosedHandCursor)
-        if event.button() != Qt.LeftButton:
+        # self.setCursor(Qt.ClosedHandCursor)
+        if event.modifiers() != Qt.ShiftModifier:            
+        # if event.button() != Qt.LeftButton:
             event.ignore()
             QGraphicsItem.mousePressEvent(self, event)
             return
@@ -772,5 +771,4 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._delta = delta
             self.reconfigureRect((), ())
         self._high_drag_bound = self._model_part.getProperty('max_vhelix_length')  # reset for handles
-        self.setCursor(Qt.OpenHandCursor)
     # end def

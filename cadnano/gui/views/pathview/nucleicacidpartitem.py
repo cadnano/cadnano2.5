@@ -118,7 +118,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                                                      # HandleType.BOTTOM_LEFT |
                                                      # HandleType.BOTTOM_RIGHT,
                                                      self)
-        self.resize_handle_group.setZValue(2)
 
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
         m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))

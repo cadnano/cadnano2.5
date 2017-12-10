@@ -124,6 +124,7 @@ class HandleItem(QGraphicsRectItem):
     """Provides the ability to resize the document."""
     def __init__(self, handle_type, width, color, handle_group, parent):
         super(HandleItem, self).__init__(parent)
+        self.setAcceptHoverEvents(True)
         self._handle_type = handle_type
         self._group = handle_group
         self.width = w = width
@@ -134,14 +135,41 @@ class HandleItem(QGraphicsRectItem):
         self.setBrush(getBrushObj(FILL_COLOR))
         self.setPen(getPenObj(color, 0))
         self.setRect(QRectF(0, 0, w, w))
+
+        if handle_type & (HandleType.LEFT | HandleType.RIGHT):
+            self._resize_cursor = Qt.SizeHorCursor
+        elif handle_type & (HandleType.TOP | HandleType.BOTTOM):
+            self._resize_cursor = Qt.SizeVerCursor
+        elif handle_type & (HandleType.TOP_LEFT | HandleType.BOTTOM_RIGHT):
+            self._resize_cursor = Qt.SizeFDiagCursor
+        elif handle_type & (HandleType.TOP_RIGHT | HandleType.BOTTOM_LEFT):
+            self._resize_cursor = Qt.SizeBDiagCursor
+        else:
+            self._resize_cursor = Qt.ClosedHandCursor
+    # end def
+
+    def function():
+        pass
+
+
+
+    def hoverEnterEvent(self, event):
+        self.setCursor(Qt.OpenHandCursor)
+        # self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
+        # QGraphicsItem.hoverEnterEvent(self, event)
+    # end def
+
+    def hoverLeaveEvent(self, event):
+        self.setCursor(Qt.ArrowCursor)
     # end def
 
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             return
-        parent = self.parentItem()
 
+        parent = self.parentItem()
         if self._group.is_resizable and event.modifiers() & Qt.ShiftModifier:
+            self.setCursor(self._resize_cursor)
             self.model_bounds = parent.getModelMinBounds(handle_type=self._handle_type)
             self.event_start_position = event.scenePos()
             self.item_start = self.pos()
@@ -149,6 +177,7 @@ class HandleItem(QGraphicsRectItem):
             event.setAccepted(True)  # don't propagate
             return
         else:
+            self.setCursor(Qt.ClosedHandCursor)
             parent = self.parentItem()
             self._group.is_dragging = True
             self.event_start_position = event.pos()
@@ -273,6 +302,7 @@ class HandleItem(QGraphicsRectItem):
             parent.setMovable(False)
             QGraphicsItem.mouseReleaseEvent(parent, event)
             parent.finishDrag()
+        self.setCursor(Qt.OpenHandCursor)
     # end def
 
     def focusWindowChangedSlot(self, focus_window):

@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getNoBrush, getColorObj
+from cadnano.gui.palette import newPenObj, getBrushObj, getNoBrush, getColorObj
 from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
@@ -71,7 +71,8 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._last_idx = None
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
         self.setCacheMode(QGraphicsItem.DeviceCoordinateCache)
-        self.setBrush(getNoBrush())
+        # self.setBrush(getNoBrush())
+        # self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=32))
 
         view = self.view()
         view.levelOfDetailChangedSignal.connect(self.levelOfDetailChangedSlot)

@@ -18,7 +18,7 @@ class ConsoleOutput(QPlainTextEdit):
         self._text = QTextDocument()
         self._cursor = QTextCursor(self._text)
         self.setReadOnly(True)
-        self.appendPlainText("Console loaded.")
+        self.appendPlainText("Console loaded")
 
     ### PUBLIC SUPPORT METHODS ###
     def append(self, msg):
