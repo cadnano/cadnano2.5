@@ -370,7 +370,7 @@ class DocumentController(object):
         win = self.win
 
         if win.action_filter_helix.isChecked():
-            self._document.setFilterSet("virtual_helix")
+            self._document.setFilterSet(["virtual_helix"])
             return
 
         filter_list = []

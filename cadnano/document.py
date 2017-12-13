@@ -131,6 +131,8 @@ class Document(CNObject):
         Args:
             filter_list (list): list of filter key names
         """
+        assert isinstance(filter_list, list)
+
         vhkey = 'virtual_helix'
         fs = self.filter_set
         if vhkey in filter_list and vhkey not in fs:
