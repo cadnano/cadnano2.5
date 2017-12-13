@@ -3,6 +3,7 @@
 from PyQt5.QtWidgets import QWidget
 from cadnano.cnenum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano.gui.views.consoleview.nucleicacidpartitem import ConsoleNucleicAcidPartItem
 
 
 class ConsoleRootWidget(QWidget):
@@ -63,10 +64,17 @@ class ConsoleRootWidget(QWidget):
         Raises:
             NotImplementedError: partAddedSlot should always be overridden.
         """
+        from cadnano.util import qtdb_trace
+#        qtdb_trace()
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
             msg = "Part added"
             self.log(msg)
+
+            na_part_item = ConsoleNucleicAcidPartItem(model_part_instance.reference(),
+                                                      viewroot=self,
+                                                      parent=self)
+            self.instance_items[na_part_item] = na_part_item
         else:
             raise NotImplementedError
     # end def

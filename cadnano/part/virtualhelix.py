@@ -12,6 +12,10 @@ class VirtualHelix(CNObject):
         self._part = part
     # end def
 
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        return "%s %s" % (class_name, self._id_num)
+
     @property
     def editable_properties(self):
         return self._part.vh_editable_properties

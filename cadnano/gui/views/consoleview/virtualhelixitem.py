@@ -9,6 +9,7 @@ class ConsoleVirtualHelixItem(AbstractVirtualHelixItem):
     def __init__(self, model_virtual_helix, part_item):
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         self._controller = VirtualHelixItemController(self, model_virtual_helix.part(), False, False)
+        self._part_item = part_item
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -35,6 +36,9 @@ class ConsoleVirtualHelixItem(AbstractVirtualHelixItem):
         """
         return document.isVirtualHelixSelected(self._model_part, self._id_num)
     # end def
+
+    def log(self, message):
+        self._part_item.log(message)
 
     ### SLOTS ###
 

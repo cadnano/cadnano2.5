@@ -38,7 +38,7 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     def updateCNModel(self):
         """
         """
-        # cn_model = self._cn_model
+        # cn_model = self._model_part
         new_name = self.data(NAME_COL, Qt.DisplayRole)
         new_is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
         new_color = self.data(COLOR_COL, Qt.DisplayRole)
