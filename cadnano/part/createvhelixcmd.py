@@ -45,6 +45,9 @@ class CreateVirtualHelixCommand(UndoCommand):
         origin_pt = self.origin_pt
         self.old_limits = part.getVirtualHelixOriginLimits()
         vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
+#
+#        if vh is None:
+#            return
 
         if self.safe:   # update all neighbors
             if not self.neighbors:

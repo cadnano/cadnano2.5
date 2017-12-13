@@ -1,7 +1,5 @@
-# from queue import Queue
-
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtGui import QColor, QPainterPath
+from PyQt5.QtCore import QPointF
+from PyQt5.QtGui import QFont, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
@@ -35,10 +33,9 @@ class GridItem(QGraphicsRectItem):
         self.part_item = part_item
         self._path = QGraphicsPathItem(self)
 
-        # TODO[NF] Make this a constant
-        dot_size = 30
-        self.dots = (dot_size, dot_size / 2)
+        self.dots = (styles.DOT_SIZE, styles.DOT_SIZE / 2)
         # self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
+        self._draw_gridpoint_coordinates = False
         self.draw_lines = False
         self.points = []
         self.points_dict = dict()
@@ -50,6 +47,7 @@ class GridItem(QGraphicsRectItem):
 
         self.setGridType(grid_type)
         self.previous_grid_type = grid_type
+    # end def
 
     def updateGrid(self):
         """Summary
@@ -139,6 +137,10 @@ class GridItem(QGraphicsRectItem):
                                self,
                                coord=(row, column))
 
+                if self._draw_gridpoint_coordinates:
+                    font = QFont('Arial')
+                    path.addText(x - 10, -y + 5, font, "%s,%s" % (-row, column))
+
                 pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
                 # if x == 0 and y == 0:
@@ -184,6 +186,7 @@ class GridItem(QGraphicsRectItem):
         if redo_neighbors:
             self.part_item.setNeighborMap(neighbor_map=neighbor_map)
             self.part_item.setPointMap(point_map=point_coordinates)
+    # end def
 
     def createSquareGrid(self, part_item, radius, bounds):
         """Instantiate an area of griditems arranged on a square lattice.
@@ -240,6 +243,10 @@ class GridItem(QGraphicsRectItem):
                                dot_size,
                                self,
                                coord=(row, column))
+
+                if self._draw_gridpoint_coordinates:
+                    font = QFont('Arial')
+                    path.addText(x - 10, -y + 5, font, "%s,%s" % (-row, column))
 
                 pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
@@ -343,18 +350,22 @@ class ClickArea(QGraphicsEllipseItem):
     def hoverMoveEvent(self, event):
         """Triggered when hovering mouse is moved on the grid."""
         self.parent_obj.hoverMoveEvent(event)
+    # end def
 
     def mousePressEvent(self, event):
         """Triggered when the mouse is pressed anywhere on the grid."""
         return self.parent_obj.mousePressEvent(event)
+    # end def
 
     def mouseMoveEvent(self, event):
         """Triggered when the mouse is pressed anywhere on the grid."""
         return self.parent_obj.mouseMoveEvent(event)
+    # end def
 
     def mouseReleaseEvent(self, event):
         """Triggered when the mouse is released anywhere on the grid."""
         return self.parent_obj.mouseReleaseEvent(event)
+    # end def
 # end class
 
 
@@ -395,6 +406,7 @@ class GridPoint(QGraphicsEllipseItem):
             label.setText("")
             self.setBrush(getNoBrush())
             # label.setParentItem(None)
+    # end def
 
     def coord(self):
         """Lattice coordinates, if available.
@@ -406,6 +418,7 @@ class GridPoint(QGraphicsEllipseItem):
         if self._coord:
             row, column = self._coord
             return row, column
+    # end def
 
     def mousePressEvent(self, event):
         """Handler for user mouse press.
@@ -457,6 +470,7 @@ class GridPoint(QGraphicsEllipseItem):
         tool_method_name = tool.methodPrefix() + "HoverMoveEvent"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, part_item, event)
+    # end def
 
     def hoverEnterEvent(self, event):
         """Summary
@@ -471,6 +485,7 @@ class GridPoint(QGraphicsEllipseItem):
         tool_method_name = tool.methodPrefix() + "HoverEnterEvent"
         if hasattr(self, tool_method_name):
             getattr(self, tool_method_name)(tool, part_item, event)
+    # end def
 
     def hoverLeaveEvent(self, event):
         """Summary
@@ -520,10 +535,12 @@ class GridPoint(QGraphicsEllipseItem):
     def selectToolMouseMove(self, tool, part_item, event):
         pass
         # return QGraphicsEllipseItem.mouseReleaseEvent(self, event)
+    # end def
 
     def selectToolMouseRelease(self, tool, part_item, event):
         pass
         # return QGraphicsEllipseItem.mouseReleaseEvent(self, event)
+    # end def
 
     def createToolMousePress(self, tool, part_item, event):
         """Called by mousePressEvent when clicking on the grid
@@ -544,16 +561,21 @@ class GridPoint(QGraphicsEllipseItem):
         alt_event = GridEvent(self, self.offset)
         part_item.setLastHoveredItem(self)
         part_item.createToolMousePress(tool, event, alt_event)
+    # end def
 
     def createToolHoverEnterEvent(self, tool, part_item, event):
         self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)
+    # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
         part_item.createToolHoverMove(tool, event)
+    # end def
 
     def createToolHoverLeaveEvent(self, tool, part_item, event):
         part_item.createToolHoverLeave(tool, event)
+    # end def
+# end class
 
 
 class GridEvent(object):
@@ -574,6 +596,7 @@ class GridEvent(object):
         """
         self.grid_pt = grid_pt
         self.offset = QPointF(offset, offset)
+    # end def
 
     def scenePos(self):
         """Scene position, with offset.
@@ -582,6 +605,7 @@ class GridEvent(object):
             QPointF: Description
         """
         return self.grid_pt.scenePos() + self.offset
+    # end def
 
     def pos(self):
         """Local position, with offset.
@@ -590,3 +614,5 @@ class GridEvent(object):
             QPointF: Description
         """
         return self.grid_pt.pos() + self.offset
+    # end def
+# end class
