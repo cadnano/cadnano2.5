@@ -14,7 +14,6 @@ class QAbstractPartItem(QGraphicsRectItem):
     """
 
     def __init__(self, model_part_instance, viewroot, parent):
-        print('parent is the ', type(parent))
         super(QAbstractPartItem, self).__init__(parent)
         self._model_instance = model_part_instance
         self._model_part = m_p = model_part_instance.reference()
@@ -158,12 +157,11 @@ class AbstractPartItem(object):
     all views.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self):
         self._oligo_item_hash = {}
         self._virtual_helix_item_hash = {}
         self.active_virtual_helix_item = None
         self.is_active = False
-        self.parent = parent
     # end def
 
     def part(self):
@@ -188,7 +186,6 @@ class AbstractPartItem(object):
     # end def
 
     def setActive(self):
-        print("AbstractPartItem setActive", self._model_part)
         self._model_part.setActive(True)
     # end def
 

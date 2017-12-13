@@ -1,8 +1,6 @@
 class ViewRootController():
     def __init__(self, view_root, model_document):
         self._view_root = view_root
-        print(type(model_document))
-        print(type(view_root))
         self._model_document = model_document
         self.connectSignals()
     # end def

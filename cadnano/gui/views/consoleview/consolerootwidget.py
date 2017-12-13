@@ -64,7 +64,6 @@ class ConsoleRootWidget(QWidget):
         Raises:
             NotImplementedError: partAddedSlot should always be overridden.
         """
-        print('added')
         from cadnano.util import qtdb_trace
 #        qtdb_trace()
         part_type = model_part_instance.reference().partType()
@@ -72,7 +71,6 @@ class ConsoleRootWidget(QWidget):
             msg = "Part added"
             self.log(msg)
 
-            print('prior type', type(model_part_instance))
             na_part_item = ConsoleNucleicAcidPartItem(model_part_instance.reference(),
                                                       viewroot=self,
                                                       parent=self)

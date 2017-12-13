@@ -58,22 +58,16 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     def partOligoAddedSlot(self, model_part, model_oligo):
         model_oligo.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
         self.log('Added oligo %s' % model_oligo)
-#        m_o = model_oligo
-#        o_i = ConsoleOligoItem(m_o, self._root_items['OligoList'])
-#        self._oligo_item_hash[m_o] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
         self.log('Removed oligo %s' % model_oligo)
-#        m_o = model_oligo
-#        o_i = self._oligo_item_hash[m_o]
-#        o_i.parent().removeChild(o_i)
-#        del self._oligo_item_hash[m_o]
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
         self._virtual_helix_item_hash[id_num] = virtual_helix
         self.log('%s added' % virtual_helix)
+    # end def
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
         self.log('%s removed' % virtual_helix)
