@@ -1,8 +1,7 @@
 from ast import literal_eval
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
 
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -305,6 +304,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
         coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
+#        print('Just added to %s, %s' % coordinates)
+
+        if coordinates in self.coordinates_to_vhid:
+            print('Dup added...')
 
         assert id_num not in self.coordinates_to_vhid.values()
 
@@ -740,9 +743,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         # Abort if a VH already exists here
         position = self.translateEventCoordinates(event)
-        event_coord = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
-        if event_coord in self.coordinates_to_vhid.keys():
-            return
+#        event_coord = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
+#        if event_coord in self.coordinates_to_vhid.keys():
+#            print('Primary aborting add to %s,%s' % event_coord)
+#            return
+#        elif not self._inPointItem(position, event_coord):
+#            print('Secondary aborting add to %s,%s' % event_coord)
+#            return
+#        else:
+#            print('Adding to %s,%s where keys is %s' % (event_coord[0], event_coord[1],
+#                                                        self.coordinates_to_vhid.keys()))
+
 
         # 1. get point in model coordinates:
         part = self._model_part
@@ -771,6 +782,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
                                 parity=parity)
+#        print('          %s,%s is the closest to pt' % ShortestPathHelper.findClosestPoint((part_pt_tuple[0],
+#                                                                                            part_pt_tuple[1]),
+#                                                                                           self.coordinates_to_xy))
+#        print('%s,%s is point' % (part_pt_tuple[0], part_pt_tuple[1]))
+#        print('%s,%s is position' % position)
         id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
@@ -1032,6 +1048,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        assert isinstance(delta_x, float)
+        assert isinstance(delta_y, float)
+
         self._translated_x = delta_x
         self._translated_y = delta_y
     # end def
@@ -1048,6 +1067,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             A tuple of x-y coordinates of the event
         """
+        assert isinstance(event, QGraphicsSceneEvent)
         return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
     # end def
 
@@ -1076,6 +1096,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        assert isinstance(coordinates, tuple) and len(coordinates) is 2
+        assert isinstance(coordinates[0], int) and isinstance(coordinates[1], int)
+
         if self.coordinates_to_xy.get(coordinates) is not None:
             part = self._model_part
             next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
