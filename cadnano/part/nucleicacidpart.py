@@ -2747,7 +2747,7 @@ class NucleicAcidPart(Part):
         """
         # test for reordering malformed input
         if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
-           strand3p.idx3Prime() == idx3p):
+                strand3p.idx3Prime() == idx3p):
             strand5p, strand3p = strand3p, strand5p
             idx5p, idx3p = idx3p, idx5p
 

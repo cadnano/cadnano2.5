@@ -25,6 +25,7 @@ class AbstractGridTool(QGraphicsObject):
     FILTER_NAME = 'virtual_helix'
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
+
     def __init__(self, manager):
         """Summary
 
@@ -220,7 +221,6 @@ class AbstractGridTool(QGraphicsObject):
     # def hoverLeaveEvent(self, event):
     #     # self.vhi_hint_item.hide()
     #     #print("Grid VHI hoverLeaveEvent")
-
 
     def hoverMoveEvent(self, part_item, event):
         """Summary

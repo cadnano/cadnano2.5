@@ -49,6 +49,7 @@ class PathRectItem(QGraphicsRectItem):
     This class overrides mousePressEvent so that clicking anywhere in the
     rectangle will result in the active VHI being deselected.
     """
+
     def __init__(self, parent):
         super(PathRectItem, self).__init__(parent)
         self.parent = parent

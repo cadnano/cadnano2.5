@@ -15,8 +15,10 @@ from cadnano.gui.views import styles
 from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
 from cadnano.gui.views.preferences_const import PreferencesConst
 
+
 class Preferences(object):
     """Connect UI elements to the backend."""
+
     def __init__(self):
         self.qs = QSettings()
         self.ui_prefs = Ui_Preferences()

@@ -9,6 +9,7 @@ class AbstractSimTool(QObject):
     Attributes:
         manager (TYPE): Description
     """
+
     def __init__(self, manager):
         """Summary
 

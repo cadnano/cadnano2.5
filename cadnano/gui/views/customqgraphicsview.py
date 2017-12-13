@@ -51,6 +51,7 @@ class CustomQGraphicsView(QGraphicsView):
 
     For details on these and other miscellaneous methods, see below.
     """
+
     def __init__(self, parent=None):
         """
         On initialization, we need to bind the Ctrl/command key to

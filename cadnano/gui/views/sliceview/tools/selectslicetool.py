@@ -31,7 +31,6 @@ def normalizeRect(rect):
     return (x1, y1, x2, y2)
 
 
-
 _SELECT_PEN_WIDTH = styles.SELECTED_PEN_WIDTH
 _SELECT_COLOR = styles.SELECTED_COLOR  # "#ff0000"
 _TEST_COLOR = "#00ff00"

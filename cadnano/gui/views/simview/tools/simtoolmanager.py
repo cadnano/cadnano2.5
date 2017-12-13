@@ -12,6 +12,7 @@ class SimToolManager(AbstractToolManager):
     Attributes:
         select_tool (SelectTool): Description
     """
+
     def __init__(self, window, viewroot):
         """Summary
 

@@ -936,20 +936,45 @@ class Document(CNObject):
         else:
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
+    # end def
 
     def getSliceViewType(self):
-        # TODO[NF]:  Docstring
+        """
+        Get the current SliceView type
+
+        Returns:
+            The current SliceView type
+        """
         return self.controller().getSliceViewType()
+    # end def
 
     def setSliceViewType(self, slice_view_type):
-        # TODO[NF]:  Docstring
+        """
+        Set the current SliceView type
+
+        Returns:
+            None
+        """
         return self.controller().setSliceViewType(slice_view_type=slice_view_type)
+    # end def
 
     def getGridType(self):
-        # TODO[NF]:  Docstring
+        """
+        Get the current Grid type
+
+        Returns:
+            The current Grid type
+        """
         return self.activePart().getGridType()
+    # end def
 
     def setGridType(self, grid_type):
-        # TODO[NF]:  Docstring
+        """
+        Set the current Grid type
+
+        Returns:
+            None
+        """
         return self.activePart().setGridType(grid_type)
+    # end def
 # end class

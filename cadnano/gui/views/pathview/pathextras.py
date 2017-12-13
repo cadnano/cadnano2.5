@@ -57,6 +57,7 @@ class PropertyWrapperObject(QObject):
         item (TYPE): Description
         rotation (TYPE): Description
     """
+
     def __init__(self, item):
         """Summary
 
@@ -164,6 +165,7 @@ class Triangle(QGraphicsPathItem):
     Attributes:
         adapter (TYPE): Description
     """
+
     def __init__(self, painter_path, parent=None):
         """Summary
 
@@ -276,6 +278,7 @@ class PreXoverItem(QGraphicsRectItem):
         prexoveritemgroup (TYPE): Description
         to_vh_id_num (TYPE): Description
     """
+
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
                  to_vh_id_num, prexoveritemgroup, color):
         """Summary

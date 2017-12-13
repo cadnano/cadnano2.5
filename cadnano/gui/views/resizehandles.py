@@ -10,6 +10,7 @@ FILL_COLOR = '#ffffff'
 
 class ResizeHandleGroup(QObject):
     """Provides the ability to move and resize the parent."""
+
     def __init__(self, parent_outline_rect, width, color, is_resizable, handle_types, parent_item):
         super(ResizeHandleGroup, self).__init__()
         # self.parent_outline_rect = parent_outline_rect  # set by call to alignHandles
@@ -122,6 +123,7 @@ class ResizeHandleGroup(QObject):
 
 class HandleItem(QGraphicsRectItem):
     """Provides the ability to resize the document."""
+
     def __init__(self, handle_type, width, color, handle_group, parent):
         super(HandleItem, self).__init__(parent)
         self.setAcceptHoverEvents(True)

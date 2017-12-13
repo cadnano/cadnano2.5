@@ -27,6 +27,7 @@ class XoverNode3(QGraphicsRectItem):
     Attributes:
         is_forward (TYPE): Description
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
         """Summary
 
@@ -252,6 +253,7 @@ class XoverNode5(XoverNode3):
         2. Notifying XoverStrands in the model when connectivity changes.
 
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
         """Summary
 

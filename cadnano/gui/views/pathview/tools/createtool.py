@@ -38,6 +38,7 @@ class CreateTool(AbstractPathTool):
     """
     docstring for CreateTool
     """
+
     def __init__(self, manager):
         """Summary
 
@@ -259,6 +260,7 @@ class ForcedStrandItem(QGraphicsLineItem):
     Attributes:
         is_forward (bool): True if forward strand, False if reverse.
     """
+
     def __init__(self, tool, virtual_helix_item):
         """The parent should be a VirtualHelixItem.
 
@@ -497,6 +499,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     Attributes:
         is_forward (TYPE): Description
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
         """Summary
 
@@ -748,6 +751,7 @@ class ForcedXoverNode5(ForcedXoverNode3):
         2. Notifying XoverStrands in the model when connectivity changes.
 
     """
+
     def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
         """Summary
 
@@ -1076,6 +1080,7 @@ class ForcedXoverItem(QGraphicsPathItem):
     # end def
 # end class XoverItem
 
+
 PPL5 = QPainterPath()  # Left 5' PainterPath
 PPR5 = QPainterPath()  # Right 5' PainterPath
 PPL3 = QPainterPath()  # Left 3' PainterPath
@@ -1123,6 +1128,7 @@ class EndpointItem(QGraphicsPathItem):
         mouseMoveEvent (TYPE): Description
         mousePressEvent (TYPE): Description
     """
+
     def __init__(self, strand_item, cap_type, is_forward):
         """The parent should be a StrandItem.
 

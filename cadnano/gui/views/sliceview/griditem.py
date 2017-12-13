@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRe
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-
 from cadnano.gui.views.sliceview import slicestyles as styles
 
 
@@ -47,9 +46,6 @@ class GridItem(QGraphicsRectItem):
         self.bounds = None
         self.grid_type = None
 
-        color = QColor(Qt.blue)
-        color.setAlphaF(0.1)
-        self.setPen(color)
         self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
         self.setGridType(grid_type)

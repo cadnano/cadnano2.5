@@ -8,6 +8,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -18,7 +19,7 @@ class Ui_MainWindow(object):
         MainWindow.setIconSize(QtCore.QSize(32, 32))
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
         MainWindow.setDockNestingEnabled(True)
-        MainWindow.setDockOptions(QtWidgets.QMainWindow.AllowNestedDocks|QtWidgets.QMainWindow.AllowTabbedDocks|QtWidgets.QMainWindow.AnimatedDocks)
+        MainWindow.setDockOptions(QtWidgets.QMainWindow.AllowNestedDocks | QtWidgets.QMainWindow.AllowTabbedDocks | QtWidgets.QMainWindow.AnimatedDocks)
         MainWindow.setUnifiedTitleAndToolBarOnMac(True)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setAutoFillBackground(False)
@@ -42,7 +43,7 @@ class Ui_MainWindow(object):
         self.filter_view_toolbar = QtWidgets.QToolBar(MainWindow)
         self.filter_view_toolbar.setLayoutDirection(QtCore.Qt.RightToLeft)
         self.filter_view_toolbar.setMovable(True)
-        self.filter_view_toolbar.setAllowedAreas(QtCore.Qt.LeftToolBarArea|QtCore.Qt.RightToolBarArea|QtCore.Qt.TopToolBarArea)
+        self.filter_view_toolbar.setAllowedAreas(QtCore.Qt.LeftToolBarArea | QtCore.Qt.RightToolBarArea | QtCore.Qt.TopToolBarArea)
         self.filter_view_toolbar.setIconSize(QtCore.QSize(20, 20))
         self.filter_view_toolbar.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         self.filter_view_toolbar.setFloatable(False)
@@ -78,7 +79,7 @@ class Ui_MainWindow(object):
         self.slice_graphics_view.setLineWidth(0)
         self.slice_graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.slice_graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.slice_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
+        self.slice_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing | QtGui.QPainter.TextAntialiasing)
         self.slice_graphics_view.setDragMode(QtWidgets.QGraphicsView.NoDrag)
         self.slice_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.slice_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
@@ -112,7 +113,7 @@ class Ui_MainWindow(object):
         self.grid_graphics_view.setLineWidth(0)
         self.grid_graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.grid_graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.grid_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
+        self.grid_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing | QtGui.QPainter.TextAntialiasing)
         self.grid_graphics_view.setDragMode(QtWidgets.QGraphicsView.NoDrag)
         self.grid_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.grid_graphics_view.setResizeAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
@@ -144,7 +145,7 @@ class Ui_MainWindow(object):
         self.path_graphics_view.setLineWidth(0)
         self.path_graphics_view.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.path_graphics_view.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.path_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing|QtGui.QPainter.HighQualityAntialiasing|QtGui.QPainter.TextAntialiasing)
+        self.path_graphics_view.setRenderHints(QtGui.QPainter.Antialiasing | QtGui.QPainter.HighQualityAntialiasing | QtGui.QPainter.TextAntialiasing)
         self.path_graphics_view.setTransformationAnchor(QtWidgets.QGraphicsView.AnchorUnderMouse)
         self.path_graphics_view.setObjectName("path_graphics_view")
         self.path_horizontal_layout.addWidget(self.path_graphics_view)
@@ -167,10 +168,10 @@ class Ui_MainWindow(object):
         self.outliner_widget.setMinimumSize(QtCore.QSize(290, 0))
         self.outliner_widget.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.outliner_widget.setStyleSheet("OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }\n"
-"\n"
-"")
+                                           "\n"
+                                           "")
         self.outliner_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.outliner_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
+        self.outliner_widget.setEditTriggers(QtWidgets.QAbstractItemView.EditKeyPressed | QtWidgets.QAbstractItemView.SelectedClicked)
         self.outliner_widget.setDragEnabled(True)
         self.outliner_widget.setObjectName("outliner_widget")
         self.outliner_widget.headerItem().setText(0, "1")
@@ -182,7 +183,7 @@ class Ui_MainWindow(object):
         self.property_widget.setStyleSheet("QTreeView {alternate-background-color:#f0f0f0;}")
         self.property_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.property_widget.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
-        self.property_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
+        self.property_widget.setEditTriggers(QtWidgets.QAbstractItemView.DoubleClicked | QtWidgets.QAbstractItemView.EditKeyPressed | QtWidgets.QAbstractItemView.SelectedClicked)
         self.property_widget.setAlternatingRowColors(True)
         self.property_widget.setUniformRowHeights(True)
         self.property_widget.setColumnCount(2)
@@ -191,7 +192,7 @@ class Ui_MainWindow(object):
         self.property_widget.headerItem().setText(1, "2")
         self.property_buttonbox = QtWidgets.QDialogButtonBox(self.outliner_property_splitter)
         self.property_buttonbox.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.property_buttonbox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
+        self.property_buttonbox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply | QtWidgets.QDialogButtonBox.Cancel)
         self.property_buttonbox.setCenterButtons(True)
         self.property_buttonbox.setObjectName("property_buttonbox")
         self.inspector_vertical_layout.addWidget(self.outliner_property_splitter)
@@ -755,6 +756,7 @@ class Ui_MainWindow(object):
         self.action_console.setText(_translate("MainWindow", "Console"))
         self.action_console.setToolTip(_translate("MainWindow", "Toggle Console"))
         self.action_console.setShortcut(_translate("MainWindow", "Meta+`"))
+
 
 from cadnano.gui.views.consoleview.consoleinput import ConsoleInput
 from cadnano.gui.views.consoleview.consoleoutput import ConsoleOutput
