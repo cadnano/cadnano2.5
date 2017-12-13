@@ -20,7 +20,7 @@ class NucleicAcidPartItemController(PartItemController):
 
     ('partVirtualHelicesTranslatedSignal',     'partVirtualHelicesTranslatedSlot'),    # noqa
     ('partVirtualHelicesSelectedSignal',       'partVirtualHelicesSelectedSlot'),      # noqa
-    ('partVirtualHelixPropertyChangedSignal',  'partVirtualHelixPropertyChangedSlot'),  # noqa
+    ('partVirtualHelixPropertyChangedSignal',  'partVirtualHelixPropertyChangedSlot'), # noqa
 
     ('partOligoAddedSignal',                   'partOligoAddedSlot')                   # noqa
     ]

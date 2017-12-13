@@ -73,7 +73,7 @@ class CNOutlinerItem(QTreeWidgetItem):
     # end def
 
     def setValue(self, key, value):
-        # cn_model = self._cn_model
+        # cn_model = self._model_part
         if key == 'name':
             name = self.data(NAME_COL, Qt.DisplayRole)
             if name != value:
