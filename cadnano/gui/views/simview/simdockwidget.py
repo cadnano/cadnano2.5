@@ -6,9 +6,9 @@ from PyQt5.Qt3DInput import QInputAspect
 
 from cadnano.gui.palette import getColorObj
 
-from .customgeometry import TetrahedronMesh
-from .nucleicacidpartitem import Cube
-from .virtualhelixitem import Sphere
+from .customshapes import Line  # , Cube
+# from .customshapes import TetrahedronMesh
+# from .virtualhelixitem import Sphere
 
 
 class SceneModifier(QObject):
@@ -68,25 +68,24 @@ class SimDockWidget(QDockWidget):
         cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
         # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
         # cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))  # default
-        cam_entity.setPosition(QVector3D(0.0, 0.0, 20.0))
+        cam_entity.setPosition(QVector3D(0.0, 0.0, 10.0))
         cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
         # cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
-        self.cam_controller.setLinearSpeed(200.0)
+        self.cam_controller.setLinearSpeed(100.0)
         self.cam_controller.setLookSpeed(360.0)
         self.cam_controller.setCamera(cam_entity)
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
 
-        TetrahedronMesh(0, 0, 0, self.root_entity)
+        Line(self.root_entity)
+        # t = TetrahedronMesh(0, 0, 0, self.root_entity)
+        # c = Cube(0, 0, 0, 1, 1, 1, '#cc00cc', self.root_entity)
 
-        Cube(0, 0, 0, 1, 1, 1, '#cc00cc', self.root_entity)
-
-        # Sphere(-1.0, 0.0, -1.0, '#ff0000', self.root_entity)
         # Sphere(1.0, 0.0, -1.0, '#00ff00', self.root_entity)
         # Sphere(0.0, 1.0, 0.0, '#0000ff', self.root_entity)
         # Sphere(0.0, 0.0, 1.0, '#ffffff', self.root_entity)
 
-        Sphere(1, 0, 0, '#0000cc', self.root_entity)
+        # Sphere(1, 0, 0, '#0000cc', self.root_entity)
         # Sphere(2, 0, 0, '#0000cc', self.root_entity)
         # Sphere(3, 0, 0, '#0000cc', self.root_entity)
         # Sphere(0, 1, 0, '#007200', self.root_entity)

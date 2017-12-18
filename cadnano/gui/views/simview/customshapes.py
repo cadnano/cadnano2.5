@@ -4,10 +4,137 @@ from PyQt5.QtCore import QByteArray
 from PyQt5.QtGui import QVector3D
 
 from PyQt5.Qt3DCore import QEntity, QTransform
+from PyQt5.Qt3DExtras import QCuboidMesh
+from PyQt5.Qt3DExtras import QPhongAlphaMaterial
+# from PyQt5.Qt3DExtras import QGoochMaterial
 from PyQt5.Qt3DExtras import QPerVertexColorMaterial
 from PyQt5.Qt3DRender import QAttribute
 from PyQt5.Qt3DRender import QBuffer
 from PyQt5.Qt3DRender import QGeometry, QGeometryRenderer
+
+from cadnano.gui.palette import getColorObj
+
+
+class Cube(QEntity):
+    """docstring for Cube"""
+
+    def __init__(self, x, y, z, l, w, h, color, parent_entity):
+        super(Cube, self).__init__(parent_entity)
+        self._x = x
+        self._y = y
+        self._z = z
+        self._l = l
+        self._w = w
+        self._h = h
+        self._color = color
+        self._parent_entity = parent_entity
+        self._mesh = mesh = QCuboidMesh()
+        self._trans = trans = QTransform()
+        self._mat = mat = QPhongAlphaMaterial()
+
+        mesh.setXExtent(l)
+        mesh.setYExtent(w)
+        mesh.setZExtent(h)
+
+        trans.setTranslation(QVector3D(x, y, z))
+
+        mat.setDiffuse(getColorObj(color))
+        mat.setAlpha(0.25)
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
+
+    def setAlpha(self, value):
+        self._mat.setAlpha(value)
+
+
+class Line(QEntity):
+    def __init__(self, parent_entity):
+        super(Line, self).__init__(parent_entity)
+
+        v0 = QVector3D(0.0, 0.0, 0.0)
+        v1 = QVector3D(1.0, 0.0, 0.0)
+        v2 = QVector3D(0.0, 0.0, 2.0)
+        v3 = QVector3D(0.0, 1.0, 1.0)
+
+        self._mesh = mesh = QGeometryRenderer(parent_entity)
+        self._geometry = geo = QGeometry(mesh)
+
+        vertexDataBuffer = QBuffer(QBuffer.VertexBuffer, geo)
+
+        vertices = [v0, v1, v2, v3]
+        # vertices = [v3]
+        vert_bytes = bytes()
+        for v in vertices:
+            vert_bytes += struct.pack('!f', v.x())
+            vert_bytes += struct.pack('!f', v.y())
+            vert_bytes += struct.pack('!f', v.z())
+
+        # See if we can unpack our stored values
+        i = 0
+        vals = []
+        for val in struct.iter_unpack('!f', vert_bytes):
+            vals.append(val[0])
+            i += 1
+            if i % 3 == 0:
+                print(vals)
+                vals = []
+
+        vertexBufferData = QByteArray(vert_bytes)
+        vertexDataBuffer.setData(vertexBufferData)
+
+        float_size = len(struct.pack('!f', 1.0))  # 4
+
+        # Attributes
+        positionAttribute = QAttribute()
+        positionAttribute.setAttributeType(QAttribute.VertexAttribute)
+        positionAttribute.setBuffer(vertexDataBuffer)
+        positionAttribute.setVertexBaseType(QAttribute.Float)
+        positionAttribute.setVertexSize(3)
+        positionAttribute.setByteOffset(0)
+        positionAttribute.setByteStride(3)
+        # positionAttribute.setCount(4)
+        positionAttribute.setName(QAttribute.defaultPositionAttributeName())
+
+        colorAttribute = QAttribute()
+        colorAttribute.setAttributeType(QAttribute.VertexAttribute)
+        colorAttribute.setBuffer(vertexDataBuffer)
+        colorAttribute.setVertexBaseType(QAttribute.Float)
+        colorAttribute.setVertexSize(3)
+        colorAttribute.setByteOffset(3 * float_size)
+        colorAttribute.setByteStride(9 * float_size)
+        colorAttribute.setCount(4)
+        colorAttribute.setName(QAttribute.defaultColorAttributeName())
+        # See if we can unpack our stored values
+        # i = 0
+        # vals = []
+        # for val in struct.iter_unpack('!f', positionAttribute.buffer().data()):
+        #     vals.append(val[0])
+        #     i += 1
+        #     if i % 9 == 0:
+        #         print(vals)
+        #         vals = []
+
+        geo.addAttribute(positionAttribute)
+        # geo.addAttribute(normalAttribute)
+        geo.addAttribute(colorAttribute)
+        # geo.addAttribute(indexAttribute)
+
+        mesh.setFirstInstance(0)
+        mesh.setFirstVertex(0)
+        mesh.setInstanceCount(4)
+        mesh.setPrimitiveType(QGeometryRenderer.LineStrip)
+        # mesh.setVertexCount(4)
+        mesh.setGeometry(geo)
+
+        trans = QTransform()
+        # trans.setTranslation(QVector3D(x, y, -z))
+        mat = QPerVertexColorMaterial(parent_entity)
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
 
 
 class TetrahedronMesh(QEntity):
@@ -103,7 +230,8 @@ class TetrahedronMesh(QEntity):
         positionAttribute.setVertexBaseType(QAttribute.Float)
         positionAttribute.setVertexSize(3)
         positionAttribute.setByteOffset(0)
-        positionAttribute.setByteStride(9 * float_size)
+        positionAttribute.setByteStride(9)
+        # positionAttribute.setByteStride(9 * float_size)
         positionAttribute.setCount(4)
         positionAttribute.setName(QAttribute.defaultPositionAttributeName())
 
@@ -113,7 +241,8 @@ class TetrahedronMesh(QEntity):
         normalAttribute.setVertexBaseType(QAttribute.Float)
         normalAttribute.setVertexSize(3)
         normalAttribute.setByteOffset(3 * float_size)
-        normalAttribute.setByteStride(9 * float_size)
+        normalAttribute.setByteStride(9)
+        # normalAttribute.setByteStride(9 * float_size)
         normalAttribute.setCount(4)
         normalAttribute.setName(QAttribute.defaultNormalAttributeName())
 
@@ -123,7 +252,8 @@ class TetrahedronMesh(QEntity):
         colorAttribute.setVertexBaseType(QAttribute.Float)
         colorAttribute.setVertexSize(3)
         colorAttribute.setByteOffset(6 * float_size)
-        colorAttribute.setByteStride(9 * float_size)
+        colorAttribute.setByteStride(9)
+        # colorAttribute.setByteStride(9 * float_size)
         colorAttribute.setCount(4)
         colorAttribute.setName(QAttribute.defaultColorAttributeName())
 

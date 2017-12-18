@@ -4,13 +4,11 @@ from __future__ import division
 
 from PyQt5.QtCore import QRectF
 # from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-
-from PyQt5.QtGui import QVector3D  # , QQuaternion
-from PyQt5.Qt3DCore import QEntity, QTransform
-from PyQt5.Qt3DExtras import QCuboidMesh, QGoochMaterial
+# from PyQt5.QtGui import QVector3D  # , QQuaternion
+from PyQt5.Qt3DCore import QEntity  # , QTransform
 
 from cadnano import getBatch, util
-from cadnano.gui.palette import getPenObj, getBrushObj, getColorObj
+from cadnano.gui.palette import getPenObj, getBrushObj  # , getColorObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
 # from cadnano.gui.views.grabcorneritem import GrabCornerItem
@@ -21,39 +19,6 @@ from . import simstyles as styles
 from .virtualhelixitem import SimVirtualHelixItem
 
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
-
-
-class Cube(QEntity):
-    """docstring for Cube"""
-
-    def __init__(self, x, y, z, l, w, h, color, parent_entity):
-        super(Cube, self).__init__(parent_entity)
-        self._x = x
-        self._y = y
-        self._z = z
-        self._l = l
-        self._w = w
-        self._h = h
-        self._color = color
-        self._parent_entity = parent_entity
-        self._mesh = mesh = QCuboidMesh()
-        self._trans = trans = QTransform()
-        self._mat = mat = QGoochMaterial()
-
-        mesh.setXExtent(l)
-        mesh.setYExtent(w)
-        mesh.setZExtent(h)
-
-        trans.setTranslation(QVector3D(x, y, z))
-
-        mat.setDiffuse(getColorObj(color))
-
-        self.addComponent(mesh)
-        self.addComponent(trans)
-        self.addComponent(mat)
-
-    def setAlpha(self, value):
-        self._mat.setAlpha(value)
 
 
 class SimNucleicAcidPartItem(AbstractPartItem):
