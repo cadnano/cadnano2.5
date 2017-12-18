@@ -21,7 +21,9 @@ class ConsoleVirtualHelixItem(AbstractVirtualHelixItem):
         return hash((self._id_num, self._model_part))
 
     def __repr__(self):
-        return "Console VHI %d" % self._id_num
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
+        return '%s_%s_%s' % (_name, self._id_num, _id)
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):

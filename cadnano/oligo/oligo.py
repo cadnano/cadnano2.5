@@ -53,8 +53,8 @@ class Oligo(CNObject):
     # end def
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
-        olg_id = str(id(self))[-4:]
+        _name = self.__class__.__name__
+        _id = str(id(self))[-4:]
         if self._strand5p is not None:
             vh_num = self._strand5p.idNum()
             idx = self._strand5p.idx5Prime()
@@ -63,7 +63,8 @@ class Oligo(CNObject):
             vh_num = -1
             idx = -1
             ss_type = -1
-        return "<%s %s>(%d.%d[%d])" % (cls_name, olg_id, vh_num, ss_type, idx)
+        oligo_identifier = '(%d.%d[%d])' % (vh_num, ss_type, idx)
+        return '%s_%s_%s' % (_name, oligo_identifier, _id)
     # end def
 
     def __lt__(self, other):
