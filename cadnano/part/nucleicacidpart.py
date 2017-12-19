@@ -258,8 +258,9 @@ class NucleicAcidPart(Part):
     """self, virtual_helix"""
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
-        return "<%s %s>" % (cls_name, str(id(self))[-4:])
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
+        return '%s_%s_%s' % (_name, -1, _id)
 
     def _resetOriginCache(self):
         self._origin_cache = {}

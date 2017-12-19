@@ -20,10 +20,12 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
 
     ### PRIVATE SUPPORT METHODS ###
     def __repr__(self):
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
         try:
-            return 'ConsoleNucleicAcidPartItem %s' % self._model_part.getProperty('name')
+            return '%s_%s_%s' % (_name, self._model_part.getProperty('name'), _id)
         except AttributeError:
-            return 'ConsoleNucleicAcidPartItem'
+            return '%s_%s_%s' % (_name, '', _id)
 
     ### PUBLIC SUPPORT METHODS ###
     def log(self, message):
@@ -49,7 +51,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
 
     ### SLOTS ###
     def partRemovedSlot(self, sender):
-        self.log('Part removed')
+        self.log('%s removed' % self._model_part)
         self._controller.disconnectSignals()
         self._model_part = None
         self._controller = None
@@ -57,11 +59,11 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
 
     def partOligoAddedSlot(self, model_part, model_oligo):
         model_oligo.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        self.log('Added oligo %s' % model_oligo)
+        self.log('%s added' % model_oligo)
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
-        self.log('Removed oligo %s' % model_oligo)
+        self.log('%s removed' % model_oligo)
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
@@ -70,6 +72,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
+        print(type(virtual_helix))
         self.log('%s removed' % virtual_helix)
 
         if self._virtual_helix_item_hash.get(id_num) is not None:
@@ -82,7 +85,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
-        self.log('%s is selected' % model_part) if is_selected else self.log('%s is deselected' % model_part)
+        self.log('%s selected' % model_part) if is_selected else self.log('%s is deselected' % model_part)
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
@@ -91,7 +94,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
         if self._model_part == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
             for key, val in zip(keys, values):
-                self.log('%s:  Changing %s to %s' % (vh_i, key, val))
+                self.log('%s changed %s-%s' % (vh_i, key, val))
 #                if key in CNConsoleItem.PROPERTIES:
 #                    vh_i.setValue(key, val)
     # end def
