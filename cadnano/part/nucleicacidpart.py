@@ -782,9 +782,7 @@ class NucleicAcidPart(Part):
             coord_pts += delta  # use += to modify the view
             fwd_pts += delta  # use += to modify the view
             rev_pts += delta  # use += to modify the view
-            # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
-            # print("new origin", self.locationQt(id_num, 15./self.radius()))
         try:
             self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
         except BaseException:
@@ -1063,7 +1061,6 @@ class NucleicAcidPart(Part):
             num_points (int): number of bases in Virtual Helix
             color (str): hexadecimal color code in the form: `#RRGGBB`
         """
-#        print('Origin is %s,%s,%s' % origin)
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))
@@ -1490,8 +1487,6 @@ class NucleicAcidPart(Part):
         # this needs to be changed
         self._group_properties['virtual_helix_order'].remove(id_num)
         del self._virtual_helices_set[id_num]
-
-        print('Removing from _remove')
         del self._in_use_vh_origins[id_num]
     # end def
 
@@ -2632,7 +2627,6 @@ class NucleicAcidPart(Part):
                 operations such as file import.
         """
         if (x, y) in self._in_use_vh_origins.values():
-#            print('CreateHelix Abort')
             return
 
         c = CreateVirtualHelixCommand(self, x, y, z, length,
@@ -2642,7 +2636,6 @@ class NucleicAcidPart(Part):
                                       parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
         self._in_use_vh_origins[c.id_num] = (x, y)
-#        print(self._in_use_vh_origins)
 
     def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
                                   safe=None, use_undo_stack=True, parity=None):
@@ -2745,9 +2738,6 @@ class NucleicAcidPart(Part):
             self.undoStack().endMacro()
         else:
             c.redo()
-#
-#        print('Removing from in-use')
-#        del self._in_use_vh_origins[id_num]
     # end def
 
     def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True,
