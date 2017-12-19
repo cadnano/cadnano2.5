@@ -297,10 +297,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
         coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
-#        print('Just added to %s, %s' % coordinates)
-
-        if coordinates in self.coordinates_to_vhid:
-            print('Dup added...')
 
         assert id_num not in self.coordinates_to_vhid.values()
 
@@ -736,17 +732,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         # Abort if a VH already exists here
         position = self.translateEventCoordinates(event)
-#        event_coord = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
-#        if event_coord in self.coordinates_to_vhid.keys():
-#            print('Primary aborting add to %s,%s' % event_coord)
-#            return
-#        elif not self._inPointItem(position, event_coord):
-#            print('Secondary aborting add to %s,%s' % event_coord)
-#            return
-#        else:
-#            print('Adding to %s,%s where keys is %s' % (event_coord[0], event_coord[1],
-#                                                        self.coordinates_to_vhid.keys()))
-
 
         # 1. get point in model coordinates:
         part = self._model_part
@@ -773,11 +758,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
                                 parity=parity)
-#        print('          %s,%s is the closest to pt' % ShortestPathHelper.findClosestPoint((part_pt_tuple[0],
-#                                                                                            part_pt_tuple[1]),
-#                                                                                           self.coordinates_to_xy))
-#        print('%s,%s is point' % (part_pt_tuple[0], part_pt_tuple[1]))
-#        print('%s,%s is position' % position)
         id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
         vhi = self._virtual_helix_item_hash[id_num]
         tool.setVirtualHelixItem(vhi)
