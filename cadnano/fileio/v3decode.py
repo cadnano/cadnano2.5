@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano import preferences as prefs
-from cadnano import setBatch, getReopen, setReopen
+# from cadnano import setBatch, getReopen, setReopen
 from cadnano.cnenum import PointType
 
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from cadnano import preferences as prefs
 from cadnano.cnproxy import UndoCommand
 from cadnano.oligo import Oligo
 from cadnano.strand import Strand
