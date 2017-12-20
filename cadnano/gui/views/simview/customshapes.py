@@ -25,14 +25,27 @@ class Line(QEntity):
         vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
         color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
 
+        # Lines
         v0 = QVector3D(0.0, 0.0, 0.0)  # from origin white
         v1 = QVector3D(2.0, 0.0, 0.0)  # to x blue
         v2 = QVector3D(0.0, 0.0, 0.0)  # from x blue
         v3 = QVector3D(0.0, 2.0, 0.0)  # to y green
         v4 = QVector3D(0.0, 0.0, 0.0)  # from y green
-        v5 = QVector3D(0.0, 0.0, -2.0)  # to z red
+        v5 = QVector3D(0.0, 0.0, 2.0)  # to z red
         v6 = QVector3D(0.0, 0.0, 0.0)  # from y green
-        v7 = QVector3D(2.0, 2.0, -2.0)  # to z red
+        v7 = QVector3D(2.0, 2.0, 2.0)  # to z red
+        vertices = [v0, v1, v2, v3, v4, v5, v6, v7]
+        # vertices = [v3, v6, v7]
+
+        # LineStrip
+        # v0 = QVector3D(0.0, 0.0, 0.0)  # from origin white
+        # v1 = QVector3D(2.0, 0.0, 0.0)  # to x blue
+        # v3 = QVector3D(0.0, 2.0, 0.0)  # to y green
+        # v5 = QVector3D(0.0, 0.0, -2.0)  # to z red
+        # v7 = QVector3D(2.0, 2.0, -2.0)  # to z red
+        # v8 = QVector3D(-2.0, 2.0, -2.0)  # to z red
+        # v9 = QVector3D(-2.0, 2.0, 2.0)  # to z red
+        # vertices = [v0, v1, v3, v5, v7, v8, v9]
 
         # Vector Normals
         # x = QVector3D(-0.5, 0.5, 0.0)
@@ -41,9 +54,6 @@ class Line(QEntity):
         # n45 = QVector3D.normal(v4, v5, x)  # 0.0, 1.0, 0.0
         # print(n01, n23, n45)
 
-        vertices = [v0, v1, v2, v3, v4, v5, v6, v7]
-        # vertices = [v0, v1]
-        # colors = [c0, c1]
         # interleave = [v0, v1, n01, c0, v2, v3, n23, c1, v4, v5, n45, c2]
         # interleave = [v0, n01, c0, v1, n01, c0, v2, n23, c1, v3, n23, c1, v4, n45, c2, v5, n45, c2]
         # vertices = interleave
@@ -54,7 +64,7 @@ class Line(QEntity):
         for v in vertices:
             vertex_bytes += struct.pack('!f', v.x())
             vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', v.z())
+            vertex_bytes += struct.pack('!f', -v.z())
             # if isinstance(v, QVector4D):
             #     print("Color", v)
             #     vertex_bytes += struct.pack('!f', v.w())
@@ -62,18 +72,25 @@ class Line(QEntity):
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
 
-        c0 = QVector4D(1.0, 0.0, 0.0, 1.0)  # yellow
-        c1 = QVector4D(0.0, 1.0, 0.0, 1.0)  # green
-        c2 = QVector4D(0.0, 0.0, 1.0, 1.0)  # magenta
-        c3 = QVector4D(1.0, 1.0, 1.0, 1.0)  # red
+        c0 = QVector3D(0.0, 0.0, 1.0)  # blue
+        c1 = QVector3D(0.0, 0.0, 1.0)  # blue
+        c2 = QVector3D(0.0, 1.0, 0.0)  # green
+        c3 = QVector3D(0.0, 1.0, 0.0)  # green
+        c4 = QVector3D(0.0, 0.0, 1.0)  # blue
+        c5 = QVector3D(0.0, 0.0, 1.0)  # blue
+        c6 = QVector3D(1.0, 0.0, 1.0)  # magenta
+        c7 = QVector3D(1.0, 0.0, 1.0)  # magenta
+        # c8 = QVector3D(1.0, 0.0, 1.0)  # yellow
 
-        colors = [c0, c0, c1, c1, c2, c2, c3, c3]
+        colors = [c0, c1, c2, c3, c4, c5, c6, c7]
+        # colors = [c0, c2, c4, c6]
+
         color_bytes = bytes()
         for c in colors:
             color_bytes += struct.pack('!f', c.x())
             color_bytes += struct.pack('!f', c.y())
             color_bytes += struct.pack('!f', c.z())
-            color_bytes += struct.pack('!f', c.w())
+            # color_bytes += struct.pack('!f', c.w())
         color_bytearray = QByteArray(color_bytes)
         color_buffer.setData(color_bytearray)
 
@@ -105,7 +122,7 @@ class Line(QEntity):
         col_attr.setAttributeType(QAttribute.VertexAttribute)
         col_attr.setBuffer(vertex_buffer)
         col_attr.setVertexBaseType(QAttribute.Float)
-        col_attr.setVertexSize(4)
+        col_attr.setVertexSize(3)
         col_attr.setByteOffset(0)
         col_attr.setByteStride(3)
         col_attr.setCount(28)
@@ -138,10 +155,10 @@ class Line(QEntity):
         mesh.setFirstInstance(0)
         mesh.setFirstVertex(0)
         mesh.setInstanceCount(1)
-        mesh.setPrimitiveType(QGeometryRenderer.Lines)
         # mesh.setVerticesPerPatch(3)
         # mesh.setVertexCount(6)
         mesh.setGeometry(geo)
+        mesh.setPrimitiveType(QGeometryRenderer.Lines)
 
         trans = QTransform()
         mat = QPerVertexColorMaterial(parent_entity)
