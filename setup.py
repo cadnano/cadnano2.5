@@ -58,7 +58,7 @@ LONG_DESCRIPTION = __doc__
 
 PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH = pjoin(PACKAGE_PATH, 'cadnano')
-INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'install_exe')
+INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'extras', 'install_exe')
 TESTS_PATH = pjoin(MODULE_PATH, 'tests')
 TEST_DATA_PATH = pjoin(TESTS_PATH, 'data')
 IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
@@ -78,7 +78,7 @@ cn_files += test_files + test_data_files
 
 entry_points = {'console_scripts': [
                 'cadnano = cadnano.bin.main:main',
-                'cadnanoinstall = cadnano.install_exe.cadnanoinstall:post_install'
+                'cadnanoinstall = cadnano.extras.install_exe.cadnanoinstall:post_install'
                 ]}
 
 if sys.platform == 'win32':
@@ -86,7 +86,7 @@ if sys.platform == 'win32':
         'scripts': 'Scripts',
     }
     cadnano_binaries = ['cadnano.exe']
-    cn_files += [pjoin('install_exe', 'cadnano.exe')]
+    cn_files += [pjoin('extras', 'install_exe', 'cadnano.exe')]
 else:
     cadnano_binaries = []
     path_scheme = {'scripts': 'bin'}

@@ -7,7 +7,7 @@ import re
 from PyQt5.QtCore import Qt, QSignalMapper
 from PyQt5.QtGui import QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
-from cadnano.data.dnasequences import sequences
+from cadnano.extras.dnasequences import sequences
 from cadnano.gui.ui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getColorObj, getBrushObj

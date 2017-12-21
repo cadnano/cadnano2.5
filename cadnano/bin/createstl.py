@@ -1,7 +1,7 @@
 import os
 import sys
 from cadnano.fileio import nnodecode
-from cadnano.math.matrix4 import makeTranslation
+from cadnano.extras.math.matrix4 import makeTranslation
 from nno2stl import stlwriter
 from nno2stl.cylinder import Cylinder
 # from nno2stl.halfcylinder import HalfCylinder

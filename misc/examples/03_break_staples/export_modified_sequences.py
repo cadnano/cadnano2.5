@@ -10,7 +10,7 @@ import sys
 # sys.path.append(getcwd())  # temporary
 import cadnano
 from cadnano.document import Document
-from cadnano.data.dnasequences import sequences
+from cadnano.extras.dnasequences import sequences
 # from cadnano.views.styles import CADNANO1_COLORS
 
 

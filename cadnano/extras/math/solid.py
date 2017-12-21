@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from cadnano.math.vector import normalToPlane, normalizeV3, applyMatrix3, applyMatrix4
-from cadnano.math.matrix3 import getNormalMatrix
+from cadnano.extras.math.vector import normalToPlane, normalizeV3, applyMatrix3, applyMatrix4
+from cadnano.extras.math.matrix3 import getNormalMatrix
 
-from cadnano.math.face import Face
+from cadnano.extras.math.face import Face
 
 
 class Solid(object):
