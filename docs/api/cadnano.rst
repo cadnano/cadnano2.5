@@ -24,16 +24,14 @@ Submodules
    cadnano.addinstancecmd
    cadnano.assembly
    cadnano.cadnanoqt
-   cadnano.cnenum
-   cadnano.cnobject
-   cadnano.cnproxy
+   cadnano.proxies
    cadnano.color
    cadnano.docmodscmd
    cadnano.document
    cadnano.objectinstance
    cadnano.pointquadtree
    cadnano.preferences
-   cadnano.proxyconfigure
+   from cadnano.proxies.proxyconfigure
    cadnano.removeinstancecmd
    cadnano.setpropertycmd
    cadnano.undocommand

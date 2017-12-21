@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
 from cadnano import getBatch, util
-from cadnano.cnenum import HandleType
+from cadnano.proxies.cnenum import HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem

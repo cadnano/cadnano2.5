@@ -1,4 +1,4 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 # prevent circular imports
 # from cadnano.part.nucleicacidpart import Z_PROP_INDEX

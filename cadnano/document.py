@@ -6,9 +6,9 @@ from uuid import uuid4
 
 from cadnano import app, setBatch, util
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.cnenum import ModType, GridType
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import ProxySignal, UndoStack
+from cadnano.proxies.cnenum import ModType, GridType
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal, UndoStack
 from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
                                 RemoveModCommand)
 from cadnano.fileio.nnodecode import decodeFile

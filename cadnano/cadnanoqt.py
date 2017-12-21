@@ -25,7 +25,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, qApp
 
 from cadnano import util
-from cadnano.proxyconfigure import proxyConfigure
+from cadnano.proxies.proxyconfigure import proxyConfigure
 
 proxyConfigure('PyQt')
 decodeFile = None

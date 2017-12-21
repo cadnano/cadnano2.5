@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
-from cadnano.cnenum import HandleType
+from cadnano.proxies.cnenum import HandleType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
 from cadnano.views.resizehandles import ResizeHandleGroup

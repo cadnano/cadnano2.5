@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 from bisect import bisect_left, insort_left
 import cadnano.util as util
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
-from cadnano.cnenum import StrandType
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnenum import StrandType
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .mergecmd import MergeCommand

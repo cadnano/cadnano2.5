@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import qApp
-from cadnano.cnenum import HandleType
+from cadnano.proxies.cnenum import HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj
 
 FILL_COLOR = '#ffffff'

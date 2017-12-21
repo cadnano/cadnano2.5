@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnproxy import BaseObject
+from cadnano.proxies.cnproxy import BaseObject
 
 
 class CNObject(BaseObject):

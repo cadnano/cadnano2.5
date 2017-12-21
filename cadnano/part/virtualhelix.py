@@ -1,4 +1,4 @@
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnobject import CNObject
 
 
 class VirtualHelix(CNObject):

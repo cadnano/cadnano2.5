@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 # from cadnano import setBatch, getReopen, setReopen
-from cadnano.cnenum import PointType
+from cadnano.proxies.cnenum import PointType
 
 
 def decode(document, obj, emit_signals=False):

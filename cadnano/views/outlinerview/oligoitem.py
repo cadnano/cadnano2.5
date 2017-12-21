@@ -1,4 +1,4 @@
-from cadnano.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemType
 from .cnoutlineritem import (CNOutlinerItem, LEAF_FLAGS)
 from cadnano.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController

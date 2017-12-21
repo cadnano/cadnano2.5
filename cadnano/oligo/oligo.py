@@ -3,9 +3,9 @@ import sys
 import traceback
 
 from cadnano import util
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnenum import ModType
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnenum import ModType
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand

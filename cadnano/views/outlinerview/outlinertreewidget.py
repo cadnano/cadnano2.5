@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QToolTip
 
-from cadnano.cnenum import PartType
+from cadnano.proxies.cnenum import PartType
 from cadnano.gui.palette import getBrushObj
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController

@@ -20,7 +20,7 @@ from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 
-from cadnano.cnenum import GridType
+from cadnano.proxies.cnenum import GridType
 
 from cadnano.gui.palette import getColorObj, getBrushObj
 from cadnano.gui.palette import getPenObj, getNoPen

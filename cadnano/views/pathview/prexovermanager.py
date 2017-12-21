@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
 from .pathextras import PreXoverItem
 from cadnano.gui.palette import getNoPen
-from cadnano.cnenum import StrandType
+from cadnano.proxies.cnenum import StrandType
 
 
 class PreXoverManager(QGraphicsRectItem):

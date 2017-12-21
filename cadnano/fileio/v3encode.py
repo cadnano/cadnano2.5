@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from cadnano.cnenum import PointType
+from cadnano.proxies.cnenum import PointType
 
 FORMAT_VERSION = '3.1'
 

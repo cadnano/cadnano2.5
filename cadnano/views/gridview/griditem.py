@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
-from cadnano.cnenum import GridType
+from cadnano.proxies.cnenum import GridType
 
 from . import gridstyles as styles
 _RADIUS = styles.GRID_HELIX_RADIUS

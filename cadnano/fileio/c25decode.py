@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import StrandType, LatticeType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import setBatch, getReopen, setReopen

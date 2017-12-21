@@ -1,4 +1,4 @@
-import cadnano.cnproxy as cnp
+import cadnano.proxies.cnproxy as cnp
 
 
 def proxyConfigure(signal_type=None):

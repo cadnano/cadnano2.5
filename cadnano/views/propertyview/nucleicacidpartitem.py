@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemType
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .abstractproppartitem import AbstractPropertyPartSetItem
 

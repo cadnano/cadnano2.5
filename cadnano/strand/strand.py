@@ -2,8 +2,8 @@
 from array import array
 from operator import attrgetter
 from cadnano import util
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import ProxySignal
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
 from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
 from .insertioncmd import ChangeInsertionCommand
 from .modscmd import AddModsCommand, RemoveModsCommand

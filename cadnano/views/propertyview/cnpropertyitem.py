@@ -4,14 +4,14 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
                              QLineEdit, QCheckBox, QComboBox)
-from cadnano.cnenum import ENUM_NAMES
+from cadnano.proxies.cnenum import ENUM_NAMES
 
 KEY_COL = 0
 VAL_COL = 1
 
 
 class CNPropertyItem(QTreeWidgetItem):
-    """enum types from cadnano.cnenum are supported by the convention that
+    """enum types from cadnano.proxies.cnenum are supported by the convention that
     the key will end with the string '_type' and the list of ENUM_NAMES
     is fetched by key to populate the QComboBox
 
