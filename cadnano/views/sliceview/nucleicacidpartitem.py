@@ -710,14 +710,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-        elif event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
+        elif event.key() == Qt.Key_Alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 x, y = self.coordinates_to_xy.get(self.getLastHoveredCoordinates())
                 self._preview_spa((x, y))
     # end def
 
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Shift and self.shortest_path_add_mode is True:
+        if event.key() == Qt.Key_Alt and self.shortest_path_add_mode is True:
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
@@ -751,8 +751,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part_pt_tuple = self.getModelPos(pt)
         modifiers = event.modifiers()
 
-        is_spa_mode = modifiers == Qt.ShiftModifier
-        last_added_spa_vhi_id = self._handleShortestPathMousePress(tool=tool, position=position, is_shift=is_spa_mode)
+        is_spa_mode = modifiers == Qt.AltModifier
+        last_added_spa_vhi_id = self._handleShortestPathMousePress(tool=tool,
+                                                                   position=position,
+                                                                   is_spa_mode=is_spa_mode)
         if last_added_spa_vhi_id is not None:
             return
 
@@ -779,7 +781,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             return None
 
-    def _handleShortestPathMousePress(self, tool, position, is_shift):
+    def _handleShortestPathMousePress(self, tool, position, is_spa_mode):
         """
         Handles logic for determining if SPA mode should be activated or
         continued.
@@ -787,13 +789,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             tool ():
             position (tuple):  the xy coordinates of the mouse press
-            is_shift (bool):  whether or not this event is a SPA event
+            is_spa_mode (bool):  whether or not this event is a SPA event
 
         Returns:
             True if nothing needs to be done by the caller (i.e. this method
             and its callees added VHs as necessary, False otherwise
         """
-        if is_shift:
+        if is_spa_mode:
             # Complete the path
             if self.shortest_path_start is not None:
                 last_vhi_id = self.createToolShortestPath(tool=tool, start=self.shortest_path_start, end=position)
@@ -878,8 +880,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         event_xy = self.translateEventCoordinates(event)
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.coordinates_to_xy)
-        modifiers = event.modifiers()
-        is_shift = modifiers == Qt.ShiftModifier
+        is_alt = True if event.modifiers() & Qt.AltModifier else False
         self.last_mouse_position = event_xy
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
@@ -887,7 +888,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.createToolHoverLeave(tool=tool, event=event)
 
         # Highlight GridItems if shift is being held down
-        if is_shift and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
+        if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._preview_spa(event_xy)
         else:
             point_item = self.coordinates_to_xy.get(event_coord)
