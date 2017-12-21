@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
 from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.views.resizehandles import ResizeHandleGroup

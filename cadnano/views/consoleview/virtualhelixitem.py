@@ -1,6 +1,6 @@
 from cadnano.proxies.cnenum import ItemType
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
 class ConsoleVirtualHelixItem(AbstractVirtualHelixItem):

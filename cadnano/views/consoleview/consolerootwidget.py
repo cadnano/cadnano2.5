@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QWidget
 
 from cadnano.proxies.cnenum import PartType
-from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers.viewrootcontroller import ViewRootController
 from cadnano.views.consoleview.nucleicacidpartitem import ConsoleNucleicAcidPartItem
 
 

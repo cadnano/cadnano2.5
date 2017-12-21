@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import QToolTip
 from cadnano.proxies.cnenum import PartType
 from cadnano.gui.palette import getBrushObj
 from cadnano.views.pathview import pathstyles as styles
-from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
 
 from .cnoutlineritem import NAME_COL, LOCKED_COL, VISIBLE_COL, COLOR_COL

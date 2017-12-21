@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QGraphicsRectItem
 from cadnano import util
 from cadnano.proxies.cnenum import PartType
-from cadnano.gui.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import PathNucleicAcidPartItem
 
 

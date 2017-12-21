@@ -10,7 +10,7 @@ Subpackages
     cadnano.decorators
     cadnano.fileio
     cadnano.gui
-    cadnano.math
+    cadnano.extras
     cadnano.oligo
     cadnano.part
     cadnano.strand
@@ -29,10 +29,8 @@ Submodules
    cadnano.document
    cadnano.extras
    cadnano.objectinstance
-   cadnano.pointquadtree
    cadnano.preferences
    cadnano.proxies
-   from cadnano.proxies.proxyconfigure
    cadnano.removeinstancecmd
    cadnano.setpropertycmd
    cadnano.undocommand

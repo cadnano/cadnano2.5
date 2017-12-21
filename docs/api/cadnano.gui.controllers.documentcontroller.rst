@@ -1,7 +1,7 @@
 cadnano\.gui\.controllers\.documentcontroller module
 ====================================================
 
-.. automodule:: cadnano.gui.controllers.documentcontroller
+.. automodule:: cadnano.controllers.documentcontroller
     :members:
     :undoc-members:
     :show-inheritance:

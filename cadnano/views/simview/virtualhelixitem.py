@@ -9,7 +9,7 @@ from PyQt5.Qt3DExtras import QGoochMaterial
 from PyQt5.Qt3DExtras import QPhongAlphaMaterial
 
 from cadnano import util
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.palette import getColorObj
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 

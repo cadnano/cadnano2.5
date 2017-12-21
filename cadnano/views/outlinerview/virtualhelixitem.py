@@ -5,7 +5,7 @@ from cadnano.proxies.cnenum import ItemType
 from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LEAF_FLAGS
 
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 
 
 class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):

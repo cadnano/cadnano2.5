@@ -6,14 +6,14 @@ Submodules
 
 .. toctree::
 
-   cadnano.gui.controllers.itemcontrollers.strand.abstractstranditemcontroller
-   cadnano.gui.controllers.itemcontrollers.strand.endpointitemcontroller
-   cadnano.gui.controllers.itemcontrollers.strand.stranditemcontroller
+   cadnano.controllers.itemcontrollers.strand.abstractstranditemcontroller
+   cadnano.controllers.itemcontrollers.strand.endpointitemcontroller
+   cadnano.controllers.itemcontrollers.strand.stranditemcontroller
 
 Module contents
 ---------------
 
-.. automodule:: cadnano.gui.controllers.itemcontrollers.strand
+.. automodule:: cadnano.controllers.itemcontrollers.strand
     :members:
     :undoc-members:
     :show-inheritance:

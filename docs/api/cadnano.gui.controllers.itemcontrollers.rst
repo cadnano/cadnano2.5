@@ -6,22 +6,22 @@ Subpackages
 
 .. toctree::
 
-    cadnano.gui.controllers.itemcontrollers.strand
+    cadnano.controllers.itemcontrollers.strand
 
 Submodules
 ----------
 
 .. toctree::
 
-   cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller
-   cadnano.gui.controllers.itemcontrollers.oligoitemcontroller
-   cadnano.gui.controllers.itemcontrollers.partitemcontroller
-   cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller
+   cadnano.controllers.itemcontrollers.nucleicacidpartitemcontroller
+   cadnano.controllers.itemcontrollers.oligoitemcontroller
+   cadnano.controllers.itemcontrollers.partitemcontroller
+   cadnano.controllers.itemcontrollers.virtualhelixitemcontroller
 
 Module contents
 ---------------
 
-.. automodule:: cadnano.gui.controllers.itemcontrollers
+.. automodule:: cadnano.controllers.itemcontrollers
     :members:
     :undoc-members:
     :show-inheritance:

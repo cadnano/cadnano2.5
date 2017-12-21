@@ -9,7 +9,7 @@ from PyQt5.Qt3DCore import QEntity  # , QTransform
 
 from cadnano import getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj  # , getColorObj
-from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
 # from cadnano.views.grabcorneritem import GrabCornerItem
 

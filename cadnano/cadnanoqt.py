@@ -92,7 +92,7 @@ class CadnanoQt(QObject):
         global DocumentController
         from cadnano.document import Document
         from cadnano.fileio.nnodecode import decodeFile
-        from cadnano.gui.controllers.documentcontroller import DocumentController
+        from cadnano.controllers.documentcontroller import DocumentController
         from cadnano.views.pathview import pathstyles as styles
 
         styles.setFontMetrics()

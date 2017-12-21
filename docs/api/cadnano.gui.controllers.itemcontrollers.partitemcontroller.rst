@@ -1,7 +1,7 @@
 cadnano\.gui\.controllers\.itemcontrollers\.partitemcontroller module
 =====================================================================
 
-.. automodule:: cadnano.gui.controllers.itemcontrollers.partitemcontroller
+.. automodule:: cadnano.controllers.itemcontrollers.partitemcontroller
     :members:
     :undoc-members:
     :show-inheritance:
