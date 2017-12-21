@@ -8,7 +8,7 @@ Subpackages
 
     cadnano.controllers
     cadnano.gui.plugins
-    cadnano.gui.ui
+    cadnano.gui
     cadnano.gui.views
 
 Submodules

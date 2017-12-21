@@ -10,7 +10,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
 
 from cadnano import app, setReopen, util
 from cadnano.proxies.cnenum import GridType
-from cadnano.gui.ui.dialogs.ui_about import Ui_About
+from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
 
@@ -536,7 +536,7 @@ class DocumentController(object):
             return
         circ_olgs = part.getCircularOligos()
         if circ_olgs:
-            from cadnano.gui.ui.dialogs.ui_warning import Ui_Warning
+            from cadnano.gui.dialogs.ui_warning import Ui_Warning
             dialog = QDialog()
             dialogWarning = Ui_Warning()  # reusing this dialog, should rename
             dialog.setStyleSheet(

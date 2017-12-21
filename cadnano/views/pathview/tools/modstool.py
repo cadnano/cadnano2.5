@@ -3,7 +3,7 @@
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QPushButton
 
 from cadnano.extras.sequencemods import mods
-from cadnano.gui.ui.dialogs.ui_mods import Ui_ModsDialog
+from cadnano.gui.dialogs.ui_mods import Ui_ModsDialog
 
 from .abstractpathtool import AbstractPathTool
 

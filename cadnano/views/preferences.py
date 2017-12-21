@@ -2,7 +2,7 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 
 from cadnano.views import styles
-from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
+from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 from cadnano.views.preferences_const import PreferencesConst
 
 

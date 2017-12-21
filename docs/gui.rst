@@ -11,7 +11,7 @@ Packages
 
    api/cadnano.controllers
    api/cadnano.gui.plugins
-   api/cadnano.gui.ui
+   api/cadnano.gui
    api/cadnano.gui.views
 
 

@@ -116,7 +116,7 @@ p, li { white-space: pre-wrap; }
   </layout>
  </widget>
  <resources>
-  <include location="cadnano.gui.ui.dialogs.dialogicons.qrc"/>
+  <include location="cadnano.gui.dialogs.dialogicons.qrc"/>
  </resources>
  <connections/>
 </ui>

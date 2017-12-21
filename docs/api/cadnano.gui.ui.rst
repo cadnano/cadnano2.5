@@ -6,13 +6,13 @@ Subpackages
 
 .. toctree::
 
-    cadnano.gui.ui.dialogs
-    cadnano.gui.ui.mainwindow
+    cadnano.gui.dialogs
+    cadnano.gui.mainwindow
 
 Module contents
 ---------------
 
-.. automodule:: cadnano.gui.ui
+.. automodule:: cadnano.gui
     :members:
     :undoc-members:
     :show-inheritance:

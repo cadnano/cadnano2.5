@@ -710,7 +710,7 @@
   </widget>
   <action name="action_new">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/new</normaloff>:/filetools/new</iconset>
    </property>
    <property name="text">
@@ -722,7 +722,7 @@
   </action>
   <action name="action_open">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/open</normaloff>:/filetools/open</iconset>
    </property>
    <property name="text">
@@ -742,7 +742,7 @@
   </action>
   <action name="action_save">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/save</normaloff>:/filetools/save</iconset>
    </property>
    <property name="text">
@@ -754,7 +754,7 @@
   </action>
   <action name="action_save_as">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/save</normaloff>:/filetools/save</iconset>
    </property>
    <property name="text">
@@ -776,7 +776,7 @@
   </action>
   <action name="action_SVG">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/svg</normaloff>:/filetools/svg</iconset>
    </property>
    <property name="text">
@@ -822,7 +822,7 @@
   </action>
   <action name="action_new_honeycomb_part">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-honeycomb</normaloff>:/parttools/new-honeycomb</iconset>
    </property>
    <property name="text">
@@ -834,7 +834,7 @@
   </action>
   <action name="action_new_dna_part">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
    </property>
    <property name="text">
@@ -852,7 +852,7 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/nick</normaloff>:/pathtools/nick</iconset>
    </property>
    <property name="text">
@@ -873,7 +873,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/select</normaloff>:/pathtools/select</iconset>
    </property>
    <property name="text">
@@ -909,7 +909,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/insert</normaloff>:/pathtools/insert</iconset>
    </property>
    <property name="text">
@@ -924,7 +924,7 @@
   </action>
   <action name="action_new_square_part">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-square</normaloff>:/parttools/new-square</iconset>
    </property>
    <property name="text">
@@ -939,7 +939,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/skip</normaloff>:/pathtools/skip</iconset>
    </property>
    <property name="text">
@@ -957,7 +957,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/paint</normaloff>:/pathtools/paint</iconset>
    </property>
    <property name="text">
@@ -975,7 +975,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/addseq</normaloff>:/pathtools/addseq</iconset>
    </property>
    <property name="text">
@@ -990,7 +990,7 @@
   </action>
   <action name="action_export_staples">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/filetools/export</normaloff>:/filetools/export</iconset>
    </property>
    <property name="text">
@@ -1023,7 +1023,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-part</normaloff>:/parttools/filter-part</iconset>
    </property>
    <property name="text">
@@ -1041,7 +1041,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-endpoint</normaloff>
      <disabledoff>:/parttools/filter-endpoint-disabled</disabledoff>:/parttools/filter-endpoint</iconset>
    </property>
@@ -1063,7 +1063,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-xover</normaloff>
      <disabledoff>:/parttools/filter-xover-disabled</disabledoff>:/parttools/filter-xover</iconset>
    </property>
@@ -1090,7 +1090,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-strand</normaloff>:/parttools/filter-strand</iconset>
    </property>
    <property name="toolTip">
@@ -1111,7 +1111,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-handle</normaloff>
      <disabledoff>:/parttools/filter-handle-alt</disabledoff>:/parttools/filter-handle</iconset>
    </property>
@@ -1135,7 +1135,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/mod</normaloff>:/pathtools/mod</iconset>
    </property>
    <property name="text">
@@ -1150,7 +1150,7 @@
   </action>
   <action name="action_new_dnapart_honeycomb">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-honeycomb-disabled</normaloff>
      <disabledoff>:/parttools/new-honeycomb</disabledoff>:/parttools/new-honeycomb-disabled</iconset>
    </property>
@@ -1169,7 +1169,7 @@
   </action>
   <action name="action_new_dnapart_square">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-square-disabled</normaloff>
      <disabledoff>:/parttools/new-square</disabledoff>:/parttools/new-square-disabled</iconset>
    </property>
@@ -1194,7 +1194,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
    </property>
    <property name="text">
@@ -1206,7 +1206,7 @@
   </action>
   <action name="action_new_part">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-origami</normaloff>:/parttools/new-origami</iconset>
    </property>
    <property name="text">
@@ -1218,7 +1218,7 @@
   </action>
   <action name="action_new_plasmidpart">
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/new-dna</normaloff>:/parttools/new-dna</iconset>
    </property>
    <property name="text">
@@ -1236,7 +1236,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-pre-axover</normaloff>:/parttools/filter-pre-axover</iconset>
    </property>
    <property name="text">
@@ -1254,7 +1254,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-pre-pxover</normaloff>:/parttools/filter-pre-pxover</iconset>
    </property>
    <property name="text">
@@ -1272,7 +1272,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/create-helix</normaloff>:/slicetools/create-helix</iconset>
    </property>
    <property name="text">
@@ -1290,7 +1290,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-fwd</normaloff>:/parttools/filter-fwd</iconset>
    </property>
    <property name="text">
@@ -1311,7 +1311,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-rev</normaloff>:/parttools/filter-rev</iconset>
    </property>
    <property name="text">
@@ -1329,7 +1329,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/select-helix</normaloff>:/slicetools/select-helix</iconset>
    </property>
    <property name="text">
@@ -1347,7 +1347,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/slicetools/snap-helix</normaloff>:/slicetools/snap-helix</iconset>
    </property>
    <property name="text">
@@ -1362,7 +1362,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/create</normaloff>
      <disabledoff>:/pathtools/create-disabled</disabledoff>:/pathtools/create</iconset>
    </property>
@@ -1381,7 +1381,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/pathtools/select</normaloff>:/pathtools/select</iconset>
    </property>
    <property name="text">
@@ -1424,7 +1424,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-scaf</normaloff>:/parttools/filter-scaf</iconset>
    </property>
    <property name="text">
@@ -1445,7 +1445,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/filter-stap</normaloff>:/parttools/filter-stap</iconset>
    </property>
    <property name="text">
@@ -1498,7 +1498,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/sim</normaloff>:/parttools/sim</iconset>
    </property>
    <property name="text">
@@ -1516,7 +1516,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/slice</normaloff>:/parttools/slice</iconset>
    </property>
    <property name="text">
@@ -1534,7 +1534,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/path</normaloff>:/parttools/path</iconset>
    </property>
    <property name="text">
@@ -1552,7 +1552,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
      <normaloff>:/parttools/console</normaloff>:/parttools/console</iconset>
    </property>
    <property name="text">
@@ -1606,7 +1606,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="cadnano.gui.ui.mainwindow.icons.qrc"/>
+  <include location="cadnano.gui.mainwindow.icons.qrc"/>
  </resources>
  <connections>
   <connection>

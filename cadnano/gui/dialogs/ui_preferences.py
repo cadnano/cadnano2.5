@@ -90,4 +90,4 @@ class Ui_Preferences(object):
         self.actionClose.setText(_translate("Preferences", "Close"))
         self.actionClose.setShortcut(_translate("Preferences", "Ctrl+W"))
 
-import cadnano.gui.ui.dialogs.dialogicons_rc
+import cadnano.gui.dialogs.dialogicons_rc

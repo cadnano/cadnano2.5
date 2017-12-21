@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 
 from cadnano import app
-from cadnano.gui.ui.mainwindow import ui_mainwindow
+from cadnano.gui.mainwindow import ui_mainwindow
 from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager

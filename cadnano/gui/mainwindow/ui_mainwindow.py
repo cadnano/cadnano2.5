@@ -765,4 +765,4 @@ from cadnano.views.customqgraphicsview import CustomQGraphicsView
 from cadnano.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.views.propertyview.propertyeditorwidget import PropertyEditorWidget
 from cadnano.views.simview.simdockwidget import SimDockWidget
-import cadnano.gui.ui.mainwindow.icons_rc
+import cadnano.gui.mainwindow.icons_rc

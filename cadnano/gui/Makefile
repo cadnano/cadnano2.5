@@ -10,7 +10,7 @@ $(eval PYRCC_VERSION = -v $(shell pyrcc5 -version 2> /dev/null):/output)
 
 all: mainwindow/ui_mainwindow.py mainwindow/icons_rc.py dialogs/dialogicons_rc.py dialogs/ui_preferences.py dialogs/ui_latticetype.py dialogs/ui_addseq.py dialogs/ui_about.py dialogs/ui_warning.py
 
-mainwindow/icons_rc.py : mainwindow/cadnano.gui.ui.mainwindow.icons.qrc $(IMAGES)
+mainwindow/icons_rc.py : mainwindow/cadnano.gui.mainwindow.icons.qrc $(IMAGES)
 ifdef PYRCC_VERSION
 	pyrcc5 -o $@ $<
 else
@@ -18,7 +18,7 @@ else
 	pyrcc5 -o $@ $<
 endif
 
-dialogs/dialogicons_rc.py : dialogs/cadnano.gui.ui.dialogs.dialogicons.qrc $(DIALOGIMAGES)
+dialogs/dialogicons_rc.py : dialogs/cadnano.gui.dialogs.dialogicons.qrc $(DIALOGIMAGES)
 ifdef PYRCC_VERSION
 	pyrcc5 -o $@ $<
 else

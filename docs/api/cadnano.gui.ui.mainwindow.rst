@@ -6,14 +6,14 @@ Submodules
 
 .. toctree::
 
-   cadnano.gui.ui.mainwindow.icons_rc
-   cadnano.gui.ui.mainwindow.svgbutton
-   cadnano.gui.ui.mainwindow.ui_mainwindow
+   cadnano.gui.mainwindow.icons_rc
+   cadnano.gui.mainwindow.svgbutton
+   cadnano.gui.mainwindow.ui_mainwindow
 
 Module contents
 ---------------
 
-.. automodule:: cadnano.gui.ui.mainwindow
+.. automodule:: cadnano.gui.mainwindow
     :members:
     :undoc-members:
     :show-inheritance:
