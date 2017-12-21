@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from cadnano.extras.wrapapi import copyWrapAPI
 from cadnano.part.virtualhelix import VirtualHelix
 
 
@@ -39,5 +40,4 @@ class AbstractVirtualHelixItem(object):
 
 
 # ADD model methods to class
-from cadnano.wrapapi import copyWrapAPI
 copyWrapAPI(VirtualHelix, AbstractVirtualHelixItem, attr_str='_model_vh')
