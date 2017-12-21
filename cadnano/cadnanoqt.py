@@ -33,7 +33,7 @@ Document = None
 DocumentController = None
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
-ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'ui', 'mainwindow', 'images')
+ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'mainwindow', 'images')
 ICON_PATH1 = os.path.join(ICON_DIR, 'cadnano25-app-icon_512.png')
 ICON_PATH2 = os.path.join(ICON_DIR, 'cadnano25-app-icon_256.png')
 ICON_PATH3 = os.path.join(ICON_DIR, 'cadnano25-app-icon_48.png')

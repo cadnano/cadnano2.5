@@ -45,7 +45,7 @@ def post_install():
         link_filepath = os.path.join(winshell.programs(), "cadnano.lnk")
         import cadnano
         CN_PATH = os.path.dirname(os.path.abspath(cadnano.__file__))
-        ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
+        ICON_PATH = pjoin(CN_PATH, 'gui',
                           'mainwindow', 'images', 'cadnano25-app-icon_512.ico')
         with winshell.shortcut(link_filepath) as link:
             link.path = new_cadnano_binary_fps[0]
@@ -60,7 +60,7 @@ def post_install():
         # rename script to fix Mac About menu text
         entry_path = pjoin(CN_BIN_PATH, 'radnano')
         shutil.copy2(pjoin(CN_BIN_PATH, 'main.py'), entry_path)
-        ICON_PATH = pjoin(CN_PATH, 'gui', 'ui',
+        ICON_PATH = pjoin(CN_PATH, 'gui',
                           'mainwindow', 'images', 'cadnano25-app-icon_512.icns')
         appify.doAppify(entry_path, 'cadnano',
                         app_icon_path=ICON_PATH)

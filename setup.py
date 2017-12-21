@@ -61,8 +61,8 @@ MODULE_PATH = pjoin(PACKAGE_PATH, 'cadnano')
 INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'extras', 'install_exe')
 TESTS_PATH = pjoin(MODULE_PATH, 'tests')
 TEST_DATA_PATH = pjoin(TESTS_PATH, 'data')
-IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
-IMAGES_PATH2 = pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
+IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'mainwindow', 'images')
+IMAGES_PATH2 = pjoin(MODULE_PATH, 'gui', 'dialogs', 'images')
 
 # batch files and launch scripts
 
