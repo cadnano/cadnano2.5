@@ -1,19 +1,20 @@
 from PyQt5.QtCore import QObject, Qt
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QVector3D
 from PyQt5.QtWidgets import QHBoxLayout, QVBoxLayout, QWidget, QDockWidget
+from PyQt5.QtWidgets import QLabel, QSpinBox
+from PyQt5.QtWidgets import QCheckBox, QSlider
 from PyQt5.Qt3DExtras import Qt3DWindow, QOrbitCameraController
 from PyQt5.Qt3DInput import QInputAspect
+from PyQt5.Qt3DRender import QDirectionalLight
 
 from cadnano.gui.palette import getColorObj
 
 from .customshapes import Line
+# from .customshapes import TriStrip
 from .customshapes import Sphere
-# from .customshapes import LineSegment  # , Cube
+# from .customshapes import LineSegment
 # from .customshapes import TetrahedronMesh
-# from .virtualhelixitem import Sphere
-
-from PyQt5.QtWidgets import QLabel, QSpinBox
-from PyQt5.QtCore import pyqtSlot
 
 
 class SceneModifier(QObject):
@@ -113,6 +114,28 @@ class SimDockWidget(QDockWidget):
     # end def
 
     @pyqtSlot(int)
+    def enableLight(self, enabled):
+        self.m_lightEntity.setParent(self.root_entity if enabled else None)
+
+    @pyqtSlot(int)
+    def changeLightX(self, value):
+        v = QVector3D(self.light.worldDirection())
+        v.setX(2*(value/100.-1)+1)
+        self.light.setWorldDirection(v)
+
+    @pyqtSlot(int)
+    def changeLightY(self, value):
+        v = QVector3D(self.light.worldDirection())
+        v.setY(2*(value/100.-1)+1)
+        self.light.setWorldDirection(v)
+
+    @pyqtSlot(int)
+    def changeLightZ(self, value):
+        v = QVector3D(self.light.worldDirection())
+        v.setZ(2*(value/100.-1)+1)
+        self.light.setWorldDirection(v)
+
+    @pyqtSlot(int)
     def setStep(self, size):
         self.posvertexsize_spinbox.setSingleStep(size)
         self.posbyteoffset_spinbox.setSingleStep(size)
@@ -210,6 +233,19 @@ class SimDockWidget(QDockWidget):
         v_layout.addWidget(stepsize_spinbox)
         stepsize_spinbox.valueChanged.connect(self.setStep)
 
+
+        lightCB = QCheckBox(checked=True, text="Light")
+        lightSliderX = QSlider(Qt.Horizontal)
+        lightSliderY = QSlider(Qt.Horizontal)
+        lightSliderZ = QSlider(Qt.Horizontal)
+        v_layout.addWidget(lightCB)
+        v_layout.addWidget(lightSliderX)
+        v_layout.addWidget(lightSliderY)
+        v_layout.addWidget(lightSliderZ)
+        lightCB.stateChanged.connect(self.enableLight)
+        lightSliderX.valueChanged.connect(self.changeLightX)
+        lightSliderY.valueChanged.connect(self.changeLightY)
+        lightSliderZ.valueChanged.connect(self.changeLightZ)
     # end def
 
     def _initUI(self):
@@ -233,9 +269,9 @@ class SimDockWidget(QDockWidget):
         cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
         # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
         # cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))  # default
-        cam_entity.setPosition(QVector3D(0.0, 0.0, 20.0))
-        cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
-        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
+        cam_entity.setPosition(QVector3D(0.0, 0.0, 30.0))
+        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
+        cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
         self.cam_controller.setLinearSpeed(100.0)
         self.cam_controller.setLookSpeed(360.0)
         self.cam_controller.setCamera(cam_entity)
@@ -244,11 +280,13 @@ class SimDockWidget(QDockWidget):
 
         line = Line(self.root_entity)
         self.shapes.append(line)
+        # ts = TriStrip(self.root_entity)
+        # self.shapes.append(ts)
 
-        Sphere(0, 0, 0, '#cccccc', self.root_entity, radius=0.1)
-        Sphere(2, 0, 0, '#0000cc', self.root_entity, radius=0.2)
-        Sphere(0, 2, 0, '#007200', self.root_entity, radius=0.2)
-        Sphere(0, 0, 2, '#cc0000', self.root_entity, radius=0.2)
+        # Sphere(0, 0, 0, '#cccccc', self.root_entity, radius=0.1)
+        # Sphere(2, 0, 0, '#0000cc', self.root_entity, radius=0.2)
+        # Sphere(0, 2, 0, '#007200', self.root_entity, radius=0.2)
+        # Sphere(0, 0, 2, '#cc0000', self.root_entity, radius=0.2)
 
         Sphere(2, 2, 2, '#cccc00', self.root_entity, radius=0.1)
 
@@ -269,4 +307,13 @@ class SimDockWidget(QDockWidget):
         # Sphere(0, 0, 1, '#cc0000', self.root_entity)
         # Sphere(0, 0, 2, '#cc0000', self.root_entity)
         # Sphere(0, 0, 3, '#cc0000', self.root_entity)
+
+        # Light 1
+        self.light = light = QDirectionalLight()
+        light.setColor(getColorObj('#ffffff'))
+        light.setIntensity(1.0)
+        light.setWorldDirection(QVector3D(0, 1, -1))
+        self.root_entity.addComponent(light)
+
+
     # end def

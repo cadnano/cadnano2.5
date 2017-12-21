@@ -13,6 +13,7 @@ from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import Virtu
 from cadnano.gui.palette import getColorObj
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 
+from .customshapes import Points
 
 _CYLINDER_RADIUS = 1.0
 _CYLINDER_RINGS = 20
@@ -54,11 +55,11 @@ class Cylinder(QEntity):
         self._mesh = mesh = QCylinderMesh()
         self._trans = trans = QTransform()
         self._mat = mat = QGoochMaterial()
-        # self._mat = mat = QPhongAlphaMaterial()
-        # mat.setAlpha(0.1)
+        self._mat = mat = QPhongAlphaMaterial()
+        mat.setAlpha(0.5)
 
-        mat.setCool(getColorObj("#0000cc"))
-        mat.setWarm(getColorObj("#cccc00"))
+        # mat.setCool(getColorObj("#0000cc"))
+        # mat.setWarm(getColorObj("#cccc00"))
 
         mesh.setRadius(_CYLINDER_RADIUS)
         mesh.setRings(_CYLINDER_RINGS)
@@ -69,7 +70,7 @@ class Cylinder(QEntity):
         trans.setRotation(QQuaternion.fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), 90.0))
 
         # print(mat.cool().name(), mat.warm().name())
-        # mat.setDiffuse(getColorObj(color))
+        mat.setDiffuse(getColorObj(color))
 
         self.addComponent(mesh)
         self.addComponent(trans)
@@ -128,7 +129,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         """
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         self._model_vh = m_vh = model_virtual_helix
-        self._part_entity = p_e = part_item.entity()
+        self._part_entity = part_item.entity()
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
@@ -146,7 +147,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         # vh_z, vh_length = m_p.getVirtualHelixProperties(self._id_num, ['z', 'length'])
         # length = vh_length * m_p.baseWidth()
 
-        self.cylinder = Cylinder(x, y, z+length/2., length, '#cccc00', p_e)
+        self.cylinder = Cylinder(x, y, z+length/2., length, '#cccc00', self._part_entity)
 
     # end def
 
@@ -185,14 +186,17 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         # print("strandAddedSlot", sender, strand)
 
         id_num = sender.idNum()
+        color = strand.getColor()
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(id_num)
         pts = fwd_pts if sender.isForward() else rev_pts
 
-        idx_low, idx_high = strand.idxs()
-        for idx in range(idx_low, idx_high+1):
-            # print(idx, pts[idx])
-            x, y, z = pts[idx]  # + axis_pts[idx]
-            Sphere(x, y, z, strand.getColor(), self._part_entity)
+        Points(axis_pts, color, self._part_entity)
+
+        # idx_low, idx_high = strand.idxs()
+        # for idx in range(idx_low, idx_high+1):
+        #     # print(idx, pts[idx])
+        #     x, y, z = pts[idx]  # + axis_pts[idx]
+        #     Sphere(x, y, z, strand.getColor(), self._part_entity)
         # StrandItem(strand, self, self._viewroot)
     # end def
 

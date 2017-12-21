@@ -16,6 +16,175 @@ from PyQt5.Qt3DRender import QGeometry, QGeometryRenderer
 from cadnano.gui.palette import getColorObj
 
 
+class TriStrip(QEntity):
+    def __init__(self, parent_entity):
+        super(TriStrip, self).__init__(parent_entity)
+        self._mesh = mesh = QGeometryRenderer(parent_entity)
+        self._geometry = geo = QGeometry(mesh)
+
+        vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+        normal_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+        color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+
+        # Vertices
+        v0 = QVector3D(0.0, 0.0, 0.0)
+        v1 = QVector3D(2.0, 0.0, 0.0)
+        v2 = QVector3D(0.0, 2.0, 0.0)
+        v3 = QVector3D(2.0, 2.0, 0.0)
+        vertices = [v0, v1, v2, v3]
+        vertex_bytes = bytes()
+        for v in vertices:
+            vertex_bytes += struct.pack('!f', v.x())
+            vertex_bytes += struct.pack('!f', v.y())
+            vertex_bytes += struct.pack('!f', -v.z())
+        vertex_bytearray = QByteArray(vertex_bytes)
+        vertex_buffer.setData(vertex_bytearray)
+
+        # Faces Normals
+        n012 = QVector3D.normal(v0, v1, v2)
+        n123 = QVector3D.normal(v1, v2, v3)
+        # print(n012, n123)
+        # Vertex Normals
+        # n0 = QVector3D(n012 + n123).normalized()
+        # n1 = QVector3D(n012 + n123).normalized()
+        # n2 = QVector3D(n012 + n123).normalized()
+        # n3 = QVector3D(n012 + n123).normalized()
+        normals = [n012, n012, n123, n123]
+        # print(n0, n1, n2, n3)
+        normal_bytes = bytes()
+        for n in normals:
+            normal_bytes += struct.pack('!f', n.x())
+            normal_bytes += struct.pack('!f', n.y())
+            normal_bytes += struct.pack('!f', n.z())
+
+        normal_bytearray = QByteArray(normal_bytes)
+        normal_buffer.setData(normal_bytearray)
+
+        c0 = QVector3D(1.0, 0.0, 0.0)
+        c1 = QVector3D(0.0, 1.0, 0.0)
+        c2 = QVector3D(0.0, 0.0, 1.0)
+        c3 = QVector3D(1.0, 1.0, 0.0)
+        colors = [c0, c1, c2, c3]
+
+        color_bytes = bytes()
+        for c in colors:
+            color_bytes += struct.pack('!f', c.x())
+            color_bytes += struct.pack('!f', c.y())
+            color_bytes += struct.pack('!f', c.z())
+            # color_bytes += struct.pack('!f', c.w())
+        color_bytearray = QByteArray(color_bytes)
+        color_buffer.setData(color_bytearray)
+
+        # interleave = [v0, v1, n01, c0, v2, v3, n23, c1, v4, v5, n45, c2]
+        # interleave = [v0, n01, c0, v1, n01, c0, v2, n23, c1, v3, n23, c1, v4, n45, c2, v5, n45, c2]
+        # vertices = interleave
+
+        # element_size = 3 + 4  # vec3 pos, vec4 col
+        # float_size = 1  # len(struct.pack('!f', 1.0))  # 4
+        # stride = element_size * float_size
+        # Attributes
+        self._pos_attr = pos_attr = QAttribute()
+        pos_attr.setAttributeType(QAttribute.VertexAttribute)
+        pos_attr.setBuffer(vertex_buffer)
+        pos_attr.setVertexBaseType(QAttribute.Float)
+        pos_attr.setVertexSize(3)
+        pos_attr.setByteOffset(0)
+        pos_attr.setByteStride(3)
+        pos_attr.setCount(28)
+        pos_attr.setName(QAttribute.defaultPositionAttributeName())
+
+        self._norm_attr = norm_attr = QAttribute()
+        norm_attr.setAttributeType(QAttribute.VertexAttribute)
+        norm_attr.setBuffer(normal_buffer)
+        norm_attr.setVertexBaseType(QAttribute.Float)
+        norm_attr.setVertexSize(3)
+        norm_attr.setByteOffset(0)
+        norm_attr.setByteStride(3)
+        norm_attr.setCount(28)
+        norm_attr.setName(QAttribute.defaultNormalAttributeName())
+
+        self._col_attr = col_attr = QAttribute()
+        col_attr.setAttributeType(QAttribute.VertexAttribute)
+        col_attr.setBuffer(vertex_buffer)
+        col_attr.setVertexBaseType(QAttribute.Float)
+        col_attr.setVertexSize(3)
+        col_attr.setByteOffset(0)
+        col_attr.setByteStride(3)
+        col_attr.setCount(28)
+        col_attr.setName(QAttribute.defaultColorAttributeName())
+
+        # idx_buffer = QBuffer(QBuffer.IndexBuffer, geo)
+        # idx_bytes = bytes()
+        # idx_bytes += struct.pack('!H', 0)
+        # idx_bytes += struct.pack('!H', 1)
+        # idx_bytes += struct.pack('!H', 2)
+        # idx_bytes += struct.pack('!H', 3)
+        # idx_bytearray = QByteArray(idx_bytes)
+        # idx_buffer.setData(idx_bytearray)
+        # idx_attr = QAttribute()
+        # idx_attr.setAttributeType(QAttribute.IndexAttribute)
+        # idx_attr.setBuffer(idx_buffer)
+        # idx_attr.setVertexBaseType(QAttribute.UnsignedShort)
+        # idx_attr.setVertexSize(1)
+        # idx_attr.setByteOffset(0)
+        # idx_attr.setByteStride(2)
+        # idx_attr.setCount(4)
+
+        geo.addAttribute(pos_attr)
+        geo.addAttribute(norm_attr)
+        geo.addAttribute(col_attr)
+        # geo.addAttribute(idx_attr)
+
+        # mesh.setPrimitiveRestartEnabled(True)
+
+        mesh.setFirstInstance(0)
+        mesh.setFirstVertex(0)
+        mesh.setInstanceCount(1)
+        # mesh.setVerticesPerPatch(3)
+        # mesh.setVertexCount(6)
+        mesh.setGeometry(geo)
+        mesh.setPrimitiveType(QGeometryRenderer.Points)
+
+        trans = QTransform()
+        mat = QPerVertexColorMaterial(parent_entity)
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
+    # end def
+
+    def setPosVertexSize(self, val):
+        self._pos_attr.setVertexSize(val)
+
+    def setPosByteOffset(self, val):
+        self._pos_attr.setByteOffset(val)
+
+    def setPosByteStride(self, val):
+        self._pos_attr.setByteStride(val)
+
+    def setPosCount(self, val):
+        self._pos_attr.setPosCount(val)
+
+    def setColVertexSize(self, val):
+        self._col_attr.setVertexSize(val)
+
+    def setColByteOffset(self, val):
+        self._col_attr.setByteOffset(val)
+
+    def setColByteStride(self, val):
+        self._col_attr.setByteStride(val)
+
+    def setColCount(self, val):
+        self._col_attr.setCount(val)
+
+    def setByteStride(self, val):
+        self._pos_attr.setByteStride(val)
+        # self._norm_attr.setByteStride(val)
+        self._col_attr.setByteStride(val)
+
+# end class
+
+
 class Line(QEntity):
     def __init__(self, parent_entity):
         super(Line, self).__init__(parent_entity)
@@ -25,7 +194,7 @@ class Line(QEntity):
         vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
         color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
 
-        # Lines
+        # 
         v0 = QVector3D(0.0, 0.0, 0.0)  # from origin white
         v1 = QVector3D(2.0, 0.0, 0.0)  # to x blue
         v2 = QVector3D(0.0, 0.0, 0.0)  # from x blue
@@ -64,7 +233,7 @@ class Line(QEntity):
         for v in vertices:
             vertex_bytes += struct.pack('!f', v.x())
             vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', -v.z())
+            vertex_bytes += struct.pack('!f', v.z())
             # if isinstance(v, QVector4D):
             #     print("Color", v)
             #     vertex_bytes += struct.pack('!f', v.w())
@@ -592,4 +761,107 @@ class Sphere(QEntity):
         self.addComponent(trans)
         self.addComponent(mat)
     # end def
+# end class
+
+
+class Points(QEntity):
+    def __init__(self, points, color_str, parent_entity):
+        super(Points, self).__init__(parent_entity)
+
+        color_obj = getColorObj(color_str)
+        self._mesh = mesh = QGeometryRenderer(parent_entity)
+        self._geometry = geo = QGeometry(mesh)
+
+        vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+        color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+
+        vertices = []
+        for p in points:
+            vertices.append(QVector3D(p[0], p[1], p[2]))
+
+        vertex_bytes = bytes()
+        for v in vertices:
+            vertex_bytes += struct.pack('!f', v.x())
+            vertex_bytes += struct.pack('!f', v.y())
+            vertex_bytes += struct.pack('!f', -v.z())
+
+        vertex_bytearray = QByteArray(vertex_bytes)
+        vertex_buffer.setData(vertex_bytearray)
+
+        color_bytes = bytes()
+        cr, cg, cb, calpha = color_obj.getRgbF()
+        for c in range(len(vertices)):
+            color_bytes += struct.pack('!f', cr)
+            color_bytes += struct.pack('!f', cg)
+            color_bytes += struct.pack('!f', cb)
+            # color_bytes += struct.pack('!f', c.w())
+        color_bytearray = QByteArray(color_bytes)
+        color_buffer.setData(color_bytearray)
+
+        self._pos_attr = pos_attr = QAttribute()
+        pos_attr.setAttributeType(QAttribute.VertexAttribute)
+        pos_attr.setBuffer(vertex_buffer)
+        pos_attr.setVertexBaseType(QAttribute.Float)
+        pos_attr.setVertexSize(3)
+        pos_attr.setByteOffset(0)
+        pos_attr.setByteStride(3)
+        pos_attr.setCount(len(vertices))
+        pos_attr.setName(QAttribute.defaultPositionAttributeName())
+
+        self._col_attr = col_attr = QAttribute()
+        col_attr.setAttributeType(QAttribute.VertexAttribute)
+        col_attr.setBuffer(color_buffer)
+        col_attr.setVertexBaseType(QAttribute.Float)
+        col_attr.setVertexSize(3)
+        col_attr.setByteOffset(0)
+        col_attr.setByteStride(3)
+        col_attr.setCount(len(vertices))
+        col_attr.setName(QAttribute.defaultColorAttributeName())
+
+        geo.addAttribute(pos_attr)
+        geo.addAttribute(col_attr)
+
+        mesh.setFirstInstance(0)
+        mesh.setFirstVertex(0)
+        mesh.setInstanceCount(1)
+        mesh.setGeometry(geo)
+        mesh.setPrimitiveType(QGeometryRenderer.Points)
+
+        trans = QTransform()
+        mat = QPerVertexColorMaterial(parent_entity)
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
+    # end def
+
+    def setPosVertexSize(self, val):
+        self._pos_attr.setVertexSize(val)
+
+    def setPosByteOffset(self, val):
+        self._pos_attr.setByteOffset(val)
+
+    def setPosByteStride(self, val):
+        self._pos_attr.setByteStride(val)
+
+    def setPosCount(self, val):
+        self._pos_attr.setPosCount(val)
+
+    def setColVertexSize(self, val):
+        self._col_attr.setVertexSize(val)
+
+    def setColByteOffset(self, val):
+        self._col_attr.setByteOffset(val)
+
+    def setColByteStride(self, val):
+        self._col_attr.setByteStride(val)
+
+    def setColCount(self, val):
+        self._col_attr.setCount(val)
+
+    def setByteStride(self, val):
+        self._pos_attr.setByteStride(val)
+        # self._norm_attr.setByteStride(val)
+        self._col_attr.setByteStride(val)
+
 # end class
