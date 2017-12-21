@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1075</width>
-    <height>792</height>
+    <width>1255</width>
+    <height>873</height>
    </rect>
   </property>
   <property name="contextMenuPolicy">
@@ -18,6 +18,9 @@
   </property>
   <property name="statusTip">
    <string/>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow::separator {background: #cccccc; width: 1px; height: 1px;}</string>
   </property>
   <property name="iconSize">
    <size>
@@ -41,153 +44,356 @@
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout">
-    <property name="leftMargin">
-     <number>0</number>
+  </widget>
+  <widget class="QToolBar" name="main_toolbar">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>8</pointsize>
+     <stylestrategy>PreferAntialias</stylestrategy>
+    </font>
+   </property>
+   <property name="windowTitle">
+    <string>Main Toolbar</string>
+   </property>
+   <property name="movable">
+    <bool>false</bool>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextUnderIcon</enum>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_global_select"/>
+   <addaction name="action_global_create"/>
+   <addaction name="action_path_nick"/>
+   <addaction name="action_path_paint"/>
+   <addaction name="action_path_insertion"/>
+   <addaction name="action_path_skip"/>
+   <addaction name="action_path_add_seq"/>
+   <addaction name="separator"/>
+   <addaction name="action_new_dnapart_honeycomb"/>
+   <addaction name="action_new_dnapart_square"/>
+   <addaction name="separator"/>
+   <addaction name="action_export_staples"/>
+   <addaction name="action_SVG"/>
+  </widget>
+  <widget class="QToolBar" name="filter_view_toolbar">
+   <property name="windowTitle">
+    <string>Filters</string>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="movable">
+    <bool>true</bool>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>20</width>
+     <height>20</height>
+    </size>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonIconOnly</enum>
+   </property>
+   <property name="floatable">
+    <bool>false</bool>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="action_console"/>
+   <addaction name="action_inspector"/>
+   <addaction name="action_sim"/>
+   <addaction name="action_path"/>
+   <addaction name="action_slice"/>
+   <addaction name="action_views_label"/>
+   <addaction name="action_toolbar_spacer_2"/>
+   <addaction name="action_filter_rev"/>
+   <addaction name="action_filter_fwd"/>
+   <addaction name="action_filter_stap"/>
+   <addaction name="action_filter_scaf"/>
+   <addaction name="action_toolbar_spacer_1"/>
+   <addaction name="action_filter_xover"/>
+   <addaction name="action_filter_endpoint"/>
+   <addaction name="action_filter_helix"/>
+   <addaction name="action_filters_label"/>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1255</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu_file">
+    <property name="title">
+     <string>File</string>
     </property>
-    <property name="topMargin">
-     <number>0</number>
+    <addaction name="action_about"/>
+    <addaction name="action_preferences"/>
+    <addaction name="action_new"/>
+    <addaction name="action_open"/>
+    <addaction name="separator"/>
+    <addaction name="action_close"/>
+    <addaction name="action_save"/>
+    <addaction name="action_save_as"/>
+   </widget>
+   <widget class="QMenu" name="menu_edit">
+    <property name="title">
+     <string>Edit</string>
     </property>
-    <property name="rightMargin">
-     <number>0</number>
+    <addaction name="action_copy"/>
+    <addaction name="action_paste"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
     </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
-    <item row="0" column="0">
-     <widget class="QSplitter" name="main_splitter">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="handleWidth">
-       <number>0</number>
-      </property>
-      <widget class="QSplitter" name="slice_grid_splitter">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+    <addaction name="action_slice"/>
+    <addaction name="action_path"/>
+    <addaction name="action_sim"/>
+    <addaction name="action_inspector"/>
+    <addaction name="action_console"/>
+   </widget>
+   <addaction name="menu_file"/>
+   <addaction name="menu_edit"/>
+   <addaction name="menuView"/>
+  </widget>
+  <widget class="QDockWidget" name="slice_dock_widget">
+   <property name="minimumSize">
+    <size>
+     <width>200</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #00cccc;</string>
+   </property>
+   <property name="windowTitle">
+    <string>Slice</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="slice_dock_widget_contents">
+    <layout class="QHBoxLayout" name="slice_horizontal_layout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="CustomQGraphicsView" name="slice_graphics_view">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
        </property>
-       <property name="handleWidth">
+       <property name="baseSize">
+        <size>
+         <width>400</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
         <number>0</number>
        </property>
-       <widget class="CustomQGraphicsView" name="slice_graphics_view">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>480</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="renderHints">
-         <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::TextAntialiasing</set>
-        </property>
-        <property name="dragMode">
-         <enum>QGraphicsView::NoDrag</enum>
-        </property>
-        <property name="transformationAnchor">
-         <enum>QGraphicsView::AnchorUnderMouse</enum>
-        </property>
-        <property name="resizeAnchor">
-         <enum>QGraphicsView::AnchorUnderMouse</enum>
-        </property>
-       </widget>
-       <widget class="CustomQGraphicsView" name="grid_graphics_view">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>480</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::WheelFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="renderHints">
-         <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::TextAntialiasing</set>
-        </property>
-        <property name="dragMode">
-         <enum>QGraphicsView::NoDrag</enum>
-        </property>
-        <property name="transformationAnchor">
-         <enum>QGraphicsView::AnchorUnderMouse</enum>
-        </property>
-        <property name="resizeAnchor">
-         <enum>QGraphicsView::AnchorUnderMouse</enum>
-        </property>
-       </widget>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="renderHints">
+        <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::TextAntialiasing</set>
+       </property>
+       <property name="dragMode">
+        <enum>QGraphicsView::NoDrag</enum>
+       </property>
+       <property name="transformationAnchor">
+        <enum>QGraphicsView::AnchorUnderMouse</enum>
+       </property>
+       <property name="resizeAnchor">
+        <enum>QGraphicsView::AnchorUnderMouse</enum>
+       </property>
       </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="grid_dock_widget">
+   <property name="minimumSize">
+    <size>
+     <width>400</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #f5f5f5;</string>
+   </property>
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle">
+    <string>Grid</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="grid_dock_widget_contents">
+    <layout class="QHBoxLayout" name="grid_horizontal_layout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="CustomQGraphicsView" name="grid_graphics_view">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="baseSize">
+        <size>
+         <width>480</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="mouseTracking">
+        <bool>true</bool>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::WheelFocus</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>0</number>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="renderHints">
+        <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::TextAntialiasing</set>
+       </property>
+       <property name="dragMode">
+        <enum>QGraphicsView::NoDrag</enum>
+       </property>
+       <property name="transformationAnchor">
+        <enum>QGraphicsView::AnchorUnderMouse</enum>
+       </property>
+       <property name="resizeAnchor">
+        <enum>QGraphicsView::AnchorUnderMouse</enum>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="path_dock_widget">
+   <property name="minimumSize">
+    <size>
+     <width>200</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #f5f5f5;</string>
+   </property>
+   <property name="windowTitle">
+    <string>Path</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="path_dock_widget_contents">
+    <layout class="QHBoxLayout" name="path_horizontal_layout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
       <widget class="CustomQGraphicsView" name="path_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -232,6 +438,41 @@
         <enum>QGraphicsView::AnchorUnderMouse</enum>
        </property>
       </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="inspector_dock_widget">
+   <property name="maximumSize">
+    <size>
+     <width>400</width>
+     <height>524287</height>
+    </size>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: #f5f5f5;</string>
+   </property>
+   <property name="windowTitle">
+    <string>Inspector</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="inspector_dock_widget_contents">
+    <layout class="QVBoxLayout" name="inspector_vertical_layout">
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
       <widget class="QSplitter" name="outliner_property_splitter">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -242,7 +483,7 @@
        <widget class="OutlinerTreeWidget" name="outliner_widget">
         <property name="minimumSize">
          <size>
-          <width>240</width>
+          <width>290</width>
           <height>0</height>
          </size>
         </property>
@@ -277,6 +518,9 @@
         </property>
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QTreeView {alternate-background-color:#f0f0f0;}</string>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -319,145 +563,150 @@
         </property>
        </widget>
       </widget>
-     </widget>
-    </item>
-   </layout>
+     </item>
+    </layout>
+   </widget>
   </widget>
-  <widget class="QToolBar" name="main_toolbar">
+  <widget class="SimDockWidget" name="sim_dock_widget">
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <stylestrategy>PreferAntialias</stylestrategy>
-    </font>
-   </property>
-   <property name="windowTitle">
-    <string>Main Toolbar</string>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>20</width>
-     <height>20</height>
-    </size>
-   </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonTextUnderIcon</enum>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="action_global_select"/>
-   <addaction name="action_global_create"/>
-   <addaction name="action_path_nick"/>
-   <addaction name="action_path_paint"/>
-   <addaction name="action_path_insertion"/>
-   <addaction name="action_path_skip"/>
-   <addaction name="action_path_add_seq"/>
-   <addaction name="separator"/>
-   <addaction name="action_new_dnapart_honeycomb"/>
-   <addaction name="action_new_dnapart_square"/>
-   <addaction name="separator"/>
-   <addaction name="action_export_staples"/>
-   <addaction name="action_SVG"/>
-  </widget>
-  <widget class="QToolBar" name="selection_toolbar">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
    <property name="minimumSize">
     <size>
-     <width>0</width>
+     <width>200</width>
+     <height>200</height>
+    </size>
+   </property>
+   <property name="baseSize">
+    <size>
+     <width>400</width>
      <height>0</height>
     </size>
    </property>
-   <property name="font">
-    <font>
-     <pointsize>10</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
+   <property name="styleSheet">
+    <string notr="true">background-color: #f5f5f5;</string>
    </property>
    <property name="windowTitle">
-    <string>Path Tools</string>
+    <string>Sim</string>
    </property>
-   <property name="layoutDirection">
-    <enum>Qt::RightToLeft</enum>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="sim_dock_widget_contents">
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="console_dock_widget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="allowedAreas">
-    <set>Qt::LeftToolBarArea|Qt::RightToolBarArea|Qt::TopToolBarArea</set>
-   </property>
-   <property name="iconSize">
+   <property name="minimumSize">
     <size>
-     <width>20</width>
-     <height>20</height>
+     <width>200</width>
+     <height>123</height>
     </size>
    </property>
-   <property name="toolButtonStyle">
-    <enum>Qt::ToolButtonIconOnly</enum>
+   <property name="baseSize">
+    <size>
+     <width>250</width>
+     <height>0</height>
+    </size>
    </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="action_outliner"/>
-   <addaction name="action_toolbar_spacer_2"/>
-   <addaction name="action_filter_rev"/>
-   <addaction name="action_filter_fwd"/>
-   <addaction name="action_filter_stap"/>
-   <addaction name="action_filter_scaf"/>
-   <addaction name="action_toolbar_spacer_1"/>
-   <addaction name="action_filter_xover"/>
-   <addaction name="action_filter_endpoint"/>
-   <addaction name="action_filter_helix"/>
-   <addaction name="action_selectable_label"/>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1075</width>
-     <height>22</height>
-    </rect>
+   <property name="windowTitle">
+    <string>Console</string>
    </property>
-   <widget class="QMenu" name="menu_file">
-    <property name="title">
-     <string>File</string>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="ConsoleRootWidget" name="console_root_widget">
+    <property name="minimumSize">
+     <size>
+      <width>200</width>
+      <height>0</height>
+     </size>
     </property>
-    <addaction name="action_about"/>
-    <addaction name="action_preferences"/>
-    <addaction name="action_new"/>
-    <addaction name="action_open"/>
-    <addaction name="separator"/>
-    <addaction name="action_close"/>
-    <addaction name="action_save"/>
-    <addaction name="action_save_as"/>
-   </widget>
-   <widget class="QMenu" name="menu_edit">
-    <property name="title">
-     <string>Edit</string>
+    <property name="styleSheet">
+     <string notr="true">QWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
     </property>
-    <addaction name="action_copy"/>
-    <addaction name="action_paste"/>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
+     <property name="leftMargin">
+      <number>0</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="ConsoleOutput" name="console_output_textedit">
+       <property name="styleSheet">
+        <string notr="true">QPlainTextEdit { background-color: &quot;#fefefe&quot;; color: &quot;#0066cc&quot;; }</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="ConsoleInput" name="console_input_textedit">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPlainTextEdit { background-color: &quot;#eeeeee&quot;;}</string>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::NoFrame</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Plain</enum>
+       </property>
+       <property name="lineWidth">
+        <number>0</number>
+       </property>
+       <property name="midLineWidth">
+        <number>0</number>
+       </property>
+       <property name="verticalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="tabStopWidth">
+        <number>80</number>
+       </property>
+       <property name="backgroundVisible">
+        <bool>false</bool>
+       </property>
+       <property name="placeholderText">
+        <string>Enter command or type &quot;help&quot;</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
-   <addaction name="menu_file"/>
-   <addaction name="menu_edit"/>
   </widget>
   <action name="action_new">
    <property name="icon">
@@ -828,15 +1077,12 @@
     <string>X</string>
    </property>
   </action>
-  <action name="action_filters_label">
+  <action name="action_views_label">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Selectable:</string>
-   </property>
-   <property name="toolTip">
-    <string>Selection Filters</string>
+    <string>Views:</string>
    </property>
   </action>
   <action name="action_filter_strand">
@@ -940,22 +1186,22 @@
     <string/>
    </property>
   </action>
-  <action name="action_outliner">
+  <action name="action_inspector">
    <property name="checkable">
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
      <normaloff>:/parttools/outliner</normaloff>:/parttools/outliner</iconset>
    </property>
    <property name="text">
-    <string>inspector</string>
+    <string>Inspector</string>
    </property>
    <property name="toolTip">
-    <string>Toggle Outliner</string>
+    <string>Toggle Inspector</string>
    </property>
   </action>
   <action name="action_new_part">
@@ -1151,12 +1397,12 @@
     <string>V</string>
    </property>
   </action>
-  <action name="action_selectable_label">
+  <action name="action_filters_label">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Selectable:</string>
+    <string>Filters:</string>
    </property>
   </action>
   <action name="action_toolbar_spacer_2">
@@ -1219,8 +1465,104 @@
    <property name="text">
     <string/>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
    <property name="visible">
     <bool>true</bool>
+   </property>
+  </action>
+  <action name="action_toolbar_spacer_2">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="visible">
+    <bool>true</bool>
+   </property>
+  </action>
+  <action name="action_sim">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/sim</normaloff>:/parttools/sim</iconset>
+   </property>
+   <property name="text">
+    <string>Simulation</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Sim</string>
+   </property>
+  </action>
+  <action name="action_slice">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/slice</normaloff>:/parttools/slice</iconset>
+   </property>
+   <property name="text">
+    <string>Slice</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Slice</string>
+   </property>
+  </action>
+  <action name="action_path">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/path</normaloff>:/parttools/path</iconset>
+   </property>
+   <property name="text">
+    <string>Path</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Path</string>
+   </property>
+  </action>
+  <action name="action_console">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.ui.mainwindow.icons.qrc">
+     <normaloff>:/parttools/console</normaloff>:/parttools/console</iconset>
+   </property>
+   <property name="text">
+    <string>Console</string>
+   </property>
+   <property name="toolTip">
+    <string>Toggle Console</string>
+   </property>
+   <property name="shortcut">
+    <string>Meta+`</string>
    </property>
   </action>
  </widget>
@@ -1239,6 +1581,28 @@
    <class>PropertyEditorWidget</class>
    <extends>QTreeWidget</extends>
    <header>cadnano.gui.views.propertyview.propertyeditorwidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SimDockWidget</class>
+   <extends>QDockWidget</extends>
+   <header>cadnano.gui.views.simview.simdockwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ConsoleOutput</class>
+   <extends>QPlainTextEdit</extends>
+   <header>cadnano.gui.views.consoleview.consoleoutput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ConsoleInput</class>
+   <extends>QPlainTextEdit</extends>
+   <header>cadnano.gui.views.consoleview.consoleinput.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ConsoleRootWidget</class>
+   <extends>QWidget</extends>
+   <header>cadnano.gui.views.consoleview.consolerootwidget.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

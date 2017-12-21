@@ -44,6 +44,7 @@ except ImportError:
     def colored(s, color=None, **kwargs):
         return s
 
+
 def trace(n):
     """Returns a stack trace n frames deep"""
     s = extract_stack()
@@ -54,6 +55,7 @@ def trace(n):
         frames.append((colored(path.basename(f[0]) + ':%i' % f[1], 'blue') + '(' + colored(f[2], 'green') + ')'))
     sep = colored(" > ", 'yellow')
     return sep.join(frames)
+
 
 if IS_PY_3:
     complement = str.maketrans('ACGTacgt', 'TGCATGCA')
@@ -70,6 +72,7 @@ def comp(seqStr):
     """Returns the complement of the sequence in seqStr."""
     return seqStr.translate(complement)
 
+
 if IS_PY_3:
     whitetoQ = str.maketrans(' |', '??')
 else:
@@ -84,7 +87,8 @@ def nowhite(seqStr):
     """Gets rid of non-letters in a string."""
     return ''.join([c for c in seqStr if c in string.letters])
 
-nearest = lambda a, l: min(l, key=lambda x: abs(x - a))
+
+def nearest(a, l): return min(l, key=lambda x: abs(x - a))
 
 
 def isWindows():
@@ -175,6 +179,7 @@ def finalizeCommands(model_object, commands, desc=None):
 
 def this_path():
     return os.path.abspath(os.path.dirname(__file__))
+
 
 # maps plugin path (extension stripped) -> plugin module
 loadedPlugins = {}

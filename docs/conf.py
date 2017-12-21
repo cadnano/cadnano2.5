@@ -34,7 +34,7 @@ sys.path.insert(0, CADNANO_PATH)
 
 
 """ Run in docs folder
-sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe ../cadnano/gui
+sphinx-apidoc -e -E -T -d 5 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/extras/install_exe ../cadnano/gui
 """
 
 # -- General configuration ------------------------------------------------
@@ -110,7 +110,7 @@ exclude_patterns = ['_build',
                     '.DS_Store',
                     # Added by SD, temporary fix to avoid import errors
                     # QPixmap: Must construct a QGuiApplication before a QPixmap
-                    'api/cadnano.gui.controllers.documentcontroller.rst',
+                    'api/cadnano.controllers.documentcontroller.rst',
                     'api/cadnano.gui.ui.mainwindow.ui_mainwindow.rst',
                     'api/cadnano.gui.views.documentwindow.rst',
                     'api/cadnano.gui.views.outlinerview.outlinertreewidget.rst'

@@ -1,7 +1,7 @@
 cadnano\.proxyconfigure module
 ==============================
 
-.. automodule:: cadnano.proxyconfigure
+.. automodule:: from cadnano.proxies.proxyconfigure
     :members:
     :undoc-members:
     :show-inheritance:

@@ -10,10 +10,10 @@ import numpy as np
 import pandas as pd
 
 from cadnano import util
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnobject import CNObject
 from .virtualhelix import VirtualHelix
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnenum import GridType, PartType, PointType
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnenum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
 from cadnano.strandset import StrandSet
@@ -154,7 +154,7 @@ class NucleicAcidPart(Part):
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
-        gps['workplane_idxs'] = (10, 13)
+        gps['workplane_idxs'] = (3, 35)
 
         ############################
         # Begin low level attributes
@@ -258,8 +258,9 @@ class NucleicAcidPart(Part):
     """self, virtual_helix"""
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
-        return "<%s %s>" % (cls_name, str(id(self))[-4:])
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
+        return '%s_%s_%s' % (_name, -1, _id)
 
     def _resetOriginCache(self):
         self._origin_cache = {}
@@ -456,8 +457,10 @@ class NucleicAcidPart(Part):
         parity = id_num % 2
         if parity is 0:
             heappush(self.recycle_bin.get(0), id_num)
+            self._highest_even_id_num_used = id_num-2
         else:
             heappush(self.recycle_bin.get(1), id_num)
+            self._highest_odd_id_num_used = id_num-2
         self.reserved_ids.remove(id_num)
     # end def
 
@@ -1464,7 +1467,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def _removeHelix(self, id_num):
-        """Remove a helix and recycle it's `id_num`
+        """Remove a helix and recycle its `id_num`
 
         Args:
             id_num (int): virtual helix ID number
@@ -2745,7 +2748,7 @@ class NucleicAcidPart(Part):
         """
         # test for reordering malformed input
         if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
-           strand3p.idx3Prime() == idx3p):
+                strand3p.idx3Prime() == idx3p):
             strand5p, strand3p = strand3p, strand5p
             idx5p, idx3p = idx3p, idx5p
 

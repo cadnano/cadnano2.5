@@ -1,7 +1,7 @@
 cadnano\.cnproxy module
 =======================
 
-.. automodule:: cadnano.cnproxy
+.. automodule:: cadnano.proxies.cnproxy
     :members:
     :undoc-members:
     :show-inheritance:

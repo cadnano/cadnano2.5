@@ -1,7 +1,7 @@
 cadnano\.gui\.controllers\.itemcontrollers\.oligoitemcontroller module
 ======================================================================
 
-.. automodule:: cadnano.gui.controllers.itemcontrollers.oligoitemcontroller
+.. automodule:: cadnano.controllers.itemcontrollers.oligoitemcontroller
     :members:
     :undoc-members:
     :show-inheritance:

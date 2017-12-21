@@ -2,8 +2,8 @@
 from uuid import uuid4
 
 from cadnano import util
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnobject import CNObject
 from .changeinstancepropertycmd import ChangeInstancePropertyCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 # from cadnano.addinstancecmd import AddInstanceCommand

@@ -25,7 +25,7 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QApplication, qApp
 
 from cadnano import util
-from cadnano.proxyconfigure import proxyConfigure
+from cadnano.proxies.proxyconfigure import proxyConfigure
 
 proxyConfigure('PyQt')
 decodeFile = None
@@ -69,7 +69,7 @@ class CadnanoQt(QObject):
             self.qApp = qApp
         super(CadnanoQt, self).__init__()
         # print("initialized new CadnanoQt")
-        from cadnano.gui.views.preferences import Preferences
+        from cadnano.views.preferences import Preferences
         self.prefs = Preferences()
         self.icon = icon = QIcon(ICON_PATH1)
         icon.addFile(ICON_PATH2, QSize(256, 256))
@@ -92,8 +92,8 @@ class CadnanoQt(QObject):
         global DocumentController
         from cadnano.document import Document
         from cadnano.fileio.nnodecode import decodeFile
-        from cadnano.gui.controllers.documentcontroller import DocumentController
-        from cadnano.gui.views.pathview import pathstyles as styles
+        from cadnano.controllers.documentcontroller import DocumentController
+        from cadnano.views.pathview import pathstyles as styles
 
         styles.setFontMetrics()
 

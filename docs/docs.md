@@ -78,7 +78,7 @@ For the sake of consistency and leveraging core sphinx features, we initially ju
 When building the docs, you may see warnings like:
 
 ```
-WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.controllers.documentcontroller'
+WARNING: toctree contains reference to nonexisting document 'api/cadnano.controllers.documentcontroller'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.ui.mainwindow.ui_mainwindow'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.views.documentwindow'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.views.outlinerview.outlinertreewidget'

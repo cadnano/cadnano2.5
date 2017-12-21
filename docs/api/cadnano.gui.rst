@@ -6,7 +6,7 @@ Subpackages
 
 .. toctree::
 
-    cadnano.gui.controllers
+    cadnano.controllers
     cadnano.gui.plugins
     cadnano.gui.ui
     cadnano.gui.views

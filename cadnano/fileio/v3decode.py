@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano import preferences as prefs
-from cadnano import setBatch, getReopen, setReopen
-from cadnano.cnenum import PointType
+# from cadnano import setBatch, getReopen, setReopen
+from cadnano.proxies.cnenum import PointType
+
 
 def decode(document, obj, emit_signals=False):
     """ Decode a a deserialized Document dictionary
@@ -29,6 +29,7 @@ def decode(document, obj, emit_signals=False):
         for key in ext_locations:
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
+
 
 def decodePart(document, part_dict, grid_type, emit_signals=False):
     """ Decode a a deserialized Part dictionary
@@ -87,10 +88,10 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
         from_strand = part.getStrand(from_is_fwd, from_id, from_idx)
         to_strand = part.getStrand(to_is_fwd, to_id, to_idx)
-        part.createXover(   from_strand, from_idx,
-                            to_strand, to_idx,
-                            update_oligo=False,
-                            use_undostack=False)
+        part.createXover(from_strand, from_idx,
+                         to_strand, to_idx,
+                         update_oligo=False,
+                         use_undostack=False)
 
     RefreshOligosCommand(part).redo()
     for oligo in part_dict['oligos']:
@@ -117,6 +118,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     if vh_order:
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
+
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
@@ -158,28 +160,28 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
             fwd_strand_set, rev_strand_set = part.getStrandSets(
-                                                        id_num + id_num_offset)
+                id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
             fwd_colors, rev_colors = color_list[id_num]
             for idxs, color in zip(fwd_idxs, fwd_colors):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
-                                                    use_undostack=use_undostack)
+                                                        use_undostack=use_undostack)
 
             for idxs, color in zip(rev_idxs, rev_colors):
                 low_idx, high_idx = idxs
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
-                                                    use_undostack=use_undostack)
+                                                        use_undostack=use_undostack)
     # end def
 
     xovers = copy_dict['xovers']
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
         from_strand = part.getStrand(from_is_fwd, from_id + id_num_offset, from_idx)
         to_strand = part.getStrand(to_is_fwd, to_id + id_num_offset, to_idx)
-        part.createXover(   from_strand, from_idx,
-                            to_strand, to_idx,
-                            update_oligo=use_undostack,
-                            use_undostack=use_undostack)
+        part.createXover(from_strand, from_idx,
+                         to_strand, to_idx,
+                         update_oligo=use_undostack,
+                         use_undostack=use_undostack)
     if not use_undostack:
         RefreshOligosCommand(part).redo()
 
@@ -187,7 +189,6 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     for id_num, idx, length in copy_dict['insertions']:
         strand = part.getStrand(True, id_num + id_num_offset, idx)
         strand.addInsertion(idx, length, use_undostack=use_undostack)
-
 
     """
     TODO: figure out copy_dict['view_properties'] handling here

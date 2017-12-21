@@ -56,7 +56,7 @@ clean:
 
 .PHONY: api
 api:
-	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/install_exe
+	sphinx-apidoc -e -d 1 -f -o api ../cadnano ../cadnano/bin ../cadnano/tests ../cadnano/extras/install_exe
 	@echo "Auto-generation of API documentation finished. " \
 	      "The generated files are in 'api/'"
 
@@ -83,7 +83,7 @@ livehtml:
 
 # .PHONY: buildgui
 # buildgui:
-# 	sphinx-apidoc -e -d 1 -f -o gui ../cadnano ../cadnano/bin ../cadnano/data ../cadnano/decorators ../cadnano/fileio ../cadnano/install_exe ../cadnano/math ../cadnano/oligo ../cadnano/part ../cadnano/strand ../cadnano/strandset ../cadnano/tests
+# 	sphinx-apidoc -e -d 1 -f -o gui ../cadnano ../cadnano/bin ../cadnano/data ../cadnano/decorators ../cadnano/fileio ../cadnano/extras/install_exe ../cadnano/math ../cadnano/oligo ../cadnano/part ../cadnano/strand ../cadnano/strandset ../cadnano/tests
 # 	@echo "Auto-generation of GUI documentation finished. " \
 # 	      "The generated files are in 'gui/'"
 

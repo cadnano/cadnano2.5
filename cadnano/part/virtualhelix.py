@@ -1,14 +1,21 @@
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnobject import CNObject
+
 
 class VirtualHelix(CNObject):
     """lightweight convenience class whose properties are still stored in the
     `NucleicAcidPart`.  Having this makes it easier to write views.
     """
+
     def __init__(self, id_num, part):
         super(VirtualHelix, self).__init__(part)
         self._id_num = id_num
         self._part = part
     # end def
+
+    def __repr__(self):
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
+        return '%s_%s_%s' % (_name, self._id_num, _id)
 
     @property
     def editable_properties(self):
@@ -78,7 +85,7 @@ class VirtualHelix(CNObject):
             Tuple: twist per base in degrees, eulerZ
         """
         bpr, tpr, eulerZ = self._part.getVirtualHelixProperties(self._id_num,
-                        ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
+                                                                ['bases_per_repeat', 'turns_per_repeat', 'eulerZ'])
         return tpr*360./bpr, eulerZ
 
     def getAngularProperties(self):
@@ -88,7 +95,7 @@ class VirtualHelix(CNObject):
                     'twist_per_base', 'minor_groove_angle'
         """
         bpr, tpr, mga = self._part.getVirtualHelixProperties(self._id_num,
-                ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
+                                                             ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
         bases_per_turn = bpr / tpr
         return bpr, bases_per_turn, tpr*360./bpr, mga
     # end def
@@ -116,7 +123,7 @@ class VirtualHelix(CNObject):
             assert isinstance(id_num, int) or id_num is None
 
         return self._part.getVirtualHelixProperties(id_num if id_num is not None
-                else self._id_num, 'z')
+                                                    else self._id_num, 'z')
 
     def getAxisPoint(self, idx):
         return self._part.getCoordinate(self._id_num, idx)

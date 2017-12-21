@@ -1,7 +1,7 @@
 cadnano\.gui\.controllers\.viewrootcontroller module
 ====================================================
 
-.. automodule:: cadnano.gui.controllers.viewrootcontroller
+.. automodule:: cadnano.controllers.viewrootcontroller
     :members:
     :undoc-members:
     :show-inheritance:

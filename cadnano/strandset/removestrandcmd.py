@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
-import cadnano.preferences as prefs
+from cadnano.views.pathview import pathstyles
 import random
 
 
@@ -40,8 +40,8 @@ class RemoveStrandCommand(UndoCommand):
         else:
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
-            # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-            color_list = prefs.STAP_COLORS
+            # color_list = styles.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
+            color_list = pathstyles.STAP_COLORS
             color = random.choice(color_list)
             olg3p._setColor(color)
             olg3p.refreshLength(emit_signals=True)

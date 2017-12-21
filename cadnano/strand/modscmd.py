@@ -1,4 +1,4 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 
 class AddModsCommand(UndoCommand):

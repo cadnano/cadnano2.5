@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import StrandType, LatticeType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
-from cadnano.color import intToColorHex
+# from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
@@ -51,7 +50,6 @@ def decode(document, obj, emit_signals=True):
     part = document.createNucleicAcidPart(use_undostack=False)
     part.setActive(True)
     setBatch(True)
-    num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     property_dict = {}

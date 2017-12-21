@@ -32,12 +32,12 @@ Modules
    api/cadnano.addinstancecmd
    api/cadnano.color
    api/cadnano.cnenum
-   api/cadnano.cnobject
-   api/cadnano.cnproxy
+   api/cadnano.proxies.cnobject
+   api/cadnano.proxies.cnproxy
    api/cadnano.document
    api/cadnano.objectinstance
    api/cadnano.preferences
-   api/cadnano.proxyconfigure
+   api/from cadnano.proxies.proxyconfigure
    api/cadnano.undocommand
    api/cadnano.undostack
    api/cadnano.util

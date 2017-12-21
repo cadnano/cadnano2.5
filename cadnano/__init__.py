@@ -1,5 +1,5 @@
 import sys
-from .cnproxy import tapp
+from .proxies.cnproxy import tapp
 
 __version__ = '2.5.1.11'
 

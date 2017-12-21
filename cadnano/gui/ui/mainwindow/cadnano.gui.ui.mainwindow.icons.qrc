@@ -21,7 +21,7 @@
         <file alias="renum">images/part-renum.png</file>
         <file alias="new-origami">images/part-new-origami.png</file>
         <file alias="new-dna">images/part-new-dna.png</file>
-        <file alias="outliner">images/part-outliner.png</file>
+        <file alias="outliner">images/inspector-view.png</file>
         <file alias="hcpro">images/part-new-hcpro.png</file>
         <file alias="sqpro">images/part-new-sqpro.png</file>
         <file alias="filter-pre-pxover">images/part-filter-pre-pxover.png</file>
@@ -35,6 +35,10 @@
         <file alias="filter-endpoint-disabled">images/part-filter-endpoint-disabled.png</file>
         <file alias="new-honeycomb-disabled">images/part-new-honeycomb-disabled.png</file>
         <file alias="new-square-disabled">images/part-new-square-disabled.png</file>
+        <file alias="path">images/path-view.png</file>
+        <file alias="slice">images/slice-view.png</file>
+        <file alias="sim">images/sim-view.png</file>
+        <file alias="console">images/console-view.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>

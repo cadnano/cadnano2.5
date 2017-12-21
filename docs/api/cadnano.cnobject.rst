@@ -1,7 +1,7 @@
 cadnano\.cnobject module
 ========================
 
-.. automodule:: cadnano.cnobject
+.. automodule:: cadnano.proxies.cnobject
     :members:
     :undoc-members:
     :show-inheritance:

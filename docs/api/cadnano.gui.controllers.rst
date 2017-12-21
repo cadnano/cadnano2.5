@@ -6,20 +6,20 @@ Subpackages
 
 .. toctree::
 
-    cadnano.gui.controllers.itemcontrollers
+    cadnano.controllers.itemcontrollers
 
 Submodules
 ----------
 
 .. toctree::
 
-   cadnano.gui.controllers.documentcontroller
-   cadnano.gui.controllers.viewrootcontroller
+   cadnano.controllers.documentcontroller
+   cadnano.controllers.viewrootcontroller
 
 Module contents
 ---------------
 
-.. automodule:: cadnano.gui.controllers
+.. automodule:: cadnano.controllers
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
-from cadnano import preferences as prefs
-from cadnano.cnproxy import UndoCommand
+from cadnano.views.pathview import pathstyles
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
 
@@ -37,7 +37,7 @@ class SplitCommand(UndoCommand):
             self._l_oligo = l_oligo = oligo.shallowCopy()
             self._h_oligo = h_oligo = oligo.shallowCopy()
 
-        color_list = prefs.STAP_COLORS
+        color_list = pathstyles.STAP_COLORS
 
         # Determine oligo retention based on strand priority
         if is5to3:  # strand_low has priority

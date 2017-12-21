@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import random
 
-from cadnano import getBatch
-from cadnano import preferences as prefs
-from cadnano.cnproxy import UndoCommand
+# from cadnano import getBatch
+from cadnano.views.pathview import pathstyles
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
 
@@ -129,7 +129,7 @@ class RemoveXoverCommand(UndoCommand):
         self._strand3p_idx = strand3p.idx5Prime()
         n_o3p = self._new_oligo3p = strand3p.oligo().shallowCopy()
 
-        color_list = prefs.STAP_COLORS
+        color_list = pathstyles.STAP_COLORS
         n_o3p._setColor(random.choice(color_list))
         n_o3p._setLength(0, emit_signals=True)
         for strand in strand3p.generator3pStrand():

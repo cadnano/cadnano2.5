@@ -1,7 +1,7 @@
 from ast import literal_eval
 import bisect
 
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 
 class RemoveVirtualHelixCommand(UndoCommand):

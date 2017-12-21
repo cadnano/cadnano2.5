@@ -6,7 +6,7 @@ pjoin = os.path.join
 import pytest
 
 from pathsetup import TEST_PATH
-from cadnano.data.dnasequences import sequences
+from cadnano.extras.dnasequences import sequences
 
 
 @pytest.fixture()
