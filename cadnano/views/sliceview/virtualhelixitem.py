@@ -10,7 +10,7 @@ from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano import preferences as prefs
+from cadnano.views.pathview import pathstyles
 from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
@@ -230,7 +230,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
 
         parity = self._id_num % 2
-        c = random.choice(prefs.STAP_COLORS) if shift else None
+        c = random.choice(pathstyles.STAP_COLORS) if shift else None
 
         if parity:
             if shift:
