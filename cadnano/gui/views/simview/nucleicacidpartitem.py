@@ -10,8 +10,8 @@ from PyQt5.Qt3DCore import QEntity  # , QTransform
 from cadnano import getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj  # , getColorObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
-# from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
+# from cadnano.views.grabcorneritem import GrabCornerItem
 
 from . import simstyles as styles
 # from .prexovermanager import PreXoverManager

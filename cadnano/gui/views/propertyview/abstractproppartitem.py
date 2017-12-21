@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
 from .cnpropertyitem import CNPropertyItem
 
 

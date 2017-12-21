@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
 
 from cadnano.gui.palette import getColorObj
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 

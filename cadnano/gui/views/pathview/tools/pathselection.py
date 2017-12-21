@@ -8,7 +8,7 @@ from PyQt5.QtGui import QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
 
 from cadnano.gui.palette import getPenObj
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)

@@ -4,7 +4,7 @@ from PyQt5.QtCore import QRectF, QPointF
 from PyQt5.QtWidgets import QGraphicsObject
 
 from cadnano import util
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj, getNoBrush
 
 _BW = styles.PATH_BASE_WIDTH

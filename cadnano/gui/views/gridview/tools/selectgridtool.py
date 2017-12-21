@@ -4,10 +4,10 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
-from cadnano.gui.views.gridview.virtualhelixitem import GridVirtualHelixItem
+from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
-from cadnano.gui.views.gridview import gridstyles as styles
+from cadnano.views.gridview import gridstyles as styles
 from .abstractgridtool import AbstractGridTool
 
 

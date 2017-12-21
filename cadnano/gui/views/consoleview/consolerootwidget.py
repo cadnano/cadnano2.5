@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget
 
 from cadnano.cnenum import PartType
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from cadnano.gui.views.consoleview.nucleicacidpartitem import ConsoleNucleicAcidPartItem
+from cadnano.views.consoleview.nucleicacidpartitem import ConsoleNucleicAcidPartItem
 
 
 class ConsoleRootWidget(QWidget):

@@ -24,7 +24,7 @@ from cadnano import util
 from cadnano.cnenum import HandleType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
-from cadnano.gui.views.resizehandles import ResizeHandleGroup
+from cadnano.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 
 

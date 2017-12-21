@@ -11,9 +11,9 @@ from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from PyQt5.QtWidgets import QFileDialog, QTableWidgetItem, QMessageBox
 
 from cadnano import util
-from cadnano.gui.views import styles
+from cadnano.views import styles
 from cadnano.gui.ui.dialogs.ui_preferences import Ui_Preferences
-from cadnano.gui.views.preferences_const import PreferencesConst
+from cadnano.views.preferences_const import PreferencesConst
 
 
 class Preferences(object):

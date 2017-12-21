@@ -1,6 +1,6 @@
 from cadnano.cnenum import ItemType
 # from .cnconsoleitem import (CNConsoleItem, LEAF_FLAGS)
-from cadnano.gui.views.abstractitems.abstractoligoitem import AbstractOligoItem
+from cadnano.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.gui.controllers.itemcontrollers.oligoitemcontroller import OligoItemController
 
 

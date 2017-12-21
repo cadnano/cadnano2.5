@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 from cadnano.cnenum import ItemType
 from cadnano.gui.palette import getBrushObj
 from cadnano.gui.controllers.viewrootcontroller import ViewRootController
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 
 from .oligoitem import OligoSetItem
 from .nucleicacidpartitem import NucleicAcidPartSetItem

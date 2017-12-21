@@ -8,9 +8,9 @@ from cadnano.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
-from cadnano.gui.views.resizehandles import ResizeHandleGroup
-from cadnano.gui.views.sliceview.sliceextras import ShortestPathHelper
+from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.resizehandles import ResizeHandleGroup
+from cadnano.views.sliceview.sliceextras import ShortestPathHelper
 from . import slicestyles as styles
 from .griditem import GridItem
 from .prexovermanager import PreXoverManager

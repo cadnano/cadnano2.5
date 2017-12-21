@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 from . import gridstyles as styles
 from .gridextras import WedgeGizmo, WEDGE_RECT

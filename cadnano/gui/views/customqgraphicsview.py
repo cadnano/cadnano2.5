@@ -17,7 +17,7 @@ from PyQt5.QtGui import QPaintEngine
 from PyQt5.QtWidgets import QGraphicsView, qApp
 
 from cadnano import app, util
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 
 # for OpenGL mode
 try:

@@ -758,11 +758,11 @@ class Ui_MainWindow(object):
         self.action_console.setShortcut(_translate("MainWindow", "Meta+`"))
 
 
-from cadnano.gui.views.consoleview.consoleinput import ConsoleInput
-from cadnano.gui.views.consoleview.consoleoutput import ConsoleOutput
-from cadnano.gui.views.consoleview.consolerootwidget import ConsoleRootWidget
-from cadnano.gui.views.customqgraphicsview import CustomQGraphicsView
-from cadnano.gui.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
-from cadnano.gui.views.propertyview.propertyeditorwidget import PropertyEditorWidget
-from cadnano.gui.views.simview.simdockwidget import SimDockWidget
+from cadnano.views.consoleview.consoleinput import ConsoleInput
+from cadnano.views.consoleview.consoleoutput import ConsoleOutput
+from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
+from cadnano.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
+from cadnano.views.propertyview.propertyeditorwidget import PropertyEditorWidget
+from cadnano.views.simview.simdockwidget import SimDockWidget
 import cadnano.gui.ui.mainwindow.icons_rc

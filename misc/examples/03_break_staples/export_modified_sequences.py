@@ -11,7 +11,7 @@ import sys
 import cadnano
 from cadnano.document import Document
 from cadnano.data.dnasequences import sequences
-# from cadnano.gui.views.styles import CADNANO1_COLORS
+# from cadnano.views.styles import CADNANO1_COLORS
 
 
 try:

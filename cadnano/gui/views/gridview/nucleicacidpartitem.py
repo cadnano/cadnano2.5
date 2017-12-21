@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getNoPen  # , getBrushObj
-from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
-from cadnano.gui.views.grabcorneritem import GrabCornerItem
+from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.grabcorneritem import GrabCornerItem
 
 from .virtualhelixitem import GridVirtualHelixItem
 from .prexovermanager import PreXoverManager

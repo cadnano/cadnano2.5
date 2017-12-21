@@ -1,5 +1,5 @@
 from PyQt5.QtGui import QFont
-from cadnano.gui.views.styles import BLUE_STROKE, GRAY_STROKE, THE_FONT
+from cadnano.views.styles import BLUE_STROKE, GRAY_STROKE, THE_FONT
 
 # Slice Sizing
 SLICE_HELIX_RADIUS = 15.

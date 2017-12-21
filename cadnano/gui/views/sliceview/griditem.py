@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRe
 from cadnano.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-from cadnano.gui.views.sliceview import slicestyles as styles
+from cadnano.views.sliceview import slicestyles as styles
 
 
 _RADIUS = styles.SLICE_HELIX_RADIUS

@@ -1,7 +1,7 @@
 from cadnano.cnenum import ItemType
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.views.abstractitems.abstractpartitem import AbstractPartItem
-#from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
+#from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
 
 
 #class ConsoleNucleicAcidPartItem(QAbstractPartItem):

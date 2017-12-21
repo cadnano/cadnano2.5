@@ -8,9 +8,9 @@ from cadnano import getBatch, util
 from cadnano.cnenum import HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.gui.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.gui.views.abstractitems.abstractpartitem import QAbstractPartItem
-# from cadnano.gui.views.grabcorneritem import GrabCornerItem
-from cadnano.gui.views.resizehandles import ResizeHandleGroup
+from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+# from cadnano.views.grabcorneritem import GrabCornerItem
+from cadnano.views.resizehandles import ResizeHandleGroup
 
 from . import pathstyles as styles
 from .pathextras import PathWorkplaneItem

@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import preferences as prefs
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 
 from . import slicestyles as styles

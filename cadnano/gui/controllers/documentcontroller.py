@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
 from cadnano import app, setReopen, util
 from cadnano.cnenum import GridType
 from cadnano.gui.ui.dialogs.ui_about import Ui_About
-from cadnano.gui.views import styles
-from cadnano.gui.views.documentwindow import DocumentWindow
+from cadnano.views import styles
+from cadnano.views.documentwindow import DocumentWindow
 
 
 DEFAULT_VHELIX_FILTER = True

@@ -3,7 +3,7 @@
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtGui import QFontMetrics, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getColorObj, getPenObj, getNoPen, getNoBrush, getSolidBrush
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH

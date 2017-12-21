@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano import util
 from cadnano.gui.palette import getPenObj, getBrushObj
-from cadnano.gui.views.pathview import pathstyles as styles
+from cadnano.views.pathview import pathstyles as styles
 
 from .abstractpathtool import AbstractPathTool
 

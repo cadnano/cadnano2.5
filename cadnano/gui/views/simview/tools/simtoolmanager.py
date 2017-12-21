@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
 from .selectsimtool import SelectTool
 from .paintsimtool import PaintTool
 

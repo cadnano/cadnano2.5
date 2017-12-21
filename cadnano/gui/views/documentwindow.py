@@ -9,16 +9,16 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.ui.mainwindow import ui_mainwindow
-from cadnano.gui.views.consoleview.consolerootwidget import ConsoleRootWidget
-from cadnano.gui.views.gridview.gridrootitem import GridRootItem
-from cadnano.gui.views.gridview.tools.gridtoolmanager import GridToolManager
-from cadnano.gui.views.pathview.colorpanel import ColorPanel
-from cadnano.gui.views.pathview.pathrootitem import PathRootItem
-from cadnano.gui.views.pathview.tools.pathtoolmanager import PathToolManager
-from cadnano.gui.views.simview.simrootitem import SimRootItem
-from cadnano.gui.views.simview.tools.simtoolmanager import SimToolManager
-from cadnano.gui.views.sliceview.slicerootitem import SliceRootItem
-from cadnano.gui.views.sliceview.tools.slicetoolmanager import SliceToolManager
+from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
+from cadnano.views.gridview.gridrootitem import GridRootItem
+from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
+from cadnano.views.pathview.colorpanel import ColorPanel
+from cadnano.views.pathview.pathrootitem import PathRootItem
+from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
+from cadnano.views.simview.simrootitem import SimRootItem
+from cadnano.views.simview.tools.simtoolmanager import SimToolManager
+from cadnano.views.sliceview.slicerootitem import SliceRootItem
+from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 
 
 # from PyQt5.QtOpenGL import QGLWidget

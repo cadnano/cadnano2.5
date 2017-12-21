@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.gui.views.abstractitems.abstracttoolmanager import AbstractToolManager
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
 from .selectslicetool import SelectSliceTool
 from .createslicetool import CreateSliceTool
 

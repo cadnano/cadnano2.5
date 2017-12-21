@@ -6,9 +6,9 @@ from PyQt5.QtGui import QPainterPath
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsPathItem,  # QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
 from cadnano.fileio import v3encode, v3decode
-from cadnano.gui.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
+from cadnano.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
 from cadnano.gui.palette import getPenObj
-from cadnano.gui.views.sliceview import slicestyles as styles
+from cadnano.views.sliceview import slicestyles as styles
 from .abstractslicetool import AbstractSliceTool
 
 

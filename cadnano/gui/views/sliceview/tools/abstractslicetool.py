@@ -3,7 +3,7 @@
 import math
 
 from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
-from cadnano.gui.views.sliceview import slicestyles as styles
+from cadnano.views.sliceview import slicestyles as styles
 from PyQt5.QtCore import QLineF, QPointF, QRectF
 from PyQt5.QtWidgets import (QGraphicsEllipseItem, QGraphicsLineItem,
                              QGraphicsObject)

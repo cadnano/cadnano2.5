@@ -11,7 +11,7 @@ from PyQt5.Qt3DExtras import QPhongAlphaMaterial
 from cadnano import util
 from cadnano.gui.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.palette import getColorObj
-from cadnano.gui.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 
 
 _CYLINDER_RADIUS = 1.0
