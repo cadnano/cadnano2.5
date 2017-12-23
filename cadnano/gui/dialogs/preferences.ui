@@ -26,14 +26,14 @@
       <enum>QFormLayout::FieldsStayAtSizeHint</enum>
      </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="legacy_slice_view_label">
+      <widget class="QLabel" name="enabled_sliceview_label">
        <property name="text">
         <string>Slice View</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="legacy_slice_view_combo_box">
+      <widget class="QComboBox" name="enabled_sliceview_combo_box">
        <item>
         <property name="text">
          <string>Legacy Slice View</string>
@@ -54,7 +54,7 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="grid_appearance_type_combo_box">
+      <widget class="QComboBox" name="gridview_style_combo_box">
        <item>
         <property name="text">
          <string>Points</string>

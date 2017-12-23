@@ -1,9 +1,20 @@
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox
-
-from cadnano.views import styles
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
-from cadnano.views.preferences_const import PreferencesConst
+
+
+PREFS_GROUP_NAME = 'Preferences'
+SLICEVIEW_KEY = 'EnabledSliceview'
+SLICEVIEW_VALUES = ('legacy', 'grid', 'dual')
+SLICEVIEW_DEFAULT = SLICEVIEW_VALUES[0]
+GRIDVIEW_STYLE_KEY = 'GridviewStyle'
+GRIDVIEW_STYLE_VALUES = ('points', 'points and lines')
+GRIDVIEW_STYLE_DEFAULT = GRIDVIEW_STYLE_VALUES[0]
+GRID_APPEARANCE_NAME = GRIDVIEW_STYLE_VALUES[0]
+ZOOM_SPEED_KEY = 'ZoomSpeed'
+ZOOM_SPEED_DEFAULT = 20
+SHOW_ICON_LABELS_KEY = 'ShowIconLabels'
+SHOW_ICON_LABELS_DEFAULT = True
 
 
 class Preferences(object):
@@ -16,19 +27,50 @@ class Preferences(object):
         self.ui_prefs.setupUi(self.widget)
         self.readPreferences()
         self.widget.addAction(self.ui_prefs.actionClose)
-        self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
-        self.ui_prefs.grid_appearance_type_combo_box.currentIndexChanged.connect(self.setGridAppearanceType)
-        self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
-        self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
-        self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
-        self.ui_prefs.legacy_slice_view_combo_box.currentIndexChanged.connect(self.setSliceView)
-
-        self.ui_prefs.grid_appearance_type_combo_box.activated.connect(self.updateGrid)
+        self.connectSignals()
         self.document = None
+    # end def
+
+    ### SUPPORT METHODS ###
+    def connectSignals(self):
+        self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
+        self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
+        self.ui_prefs.enabled_sliceview_combo_box.currentIndexChanged.connect(self.setSliceView)
+        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.setGridAppearanceType)
+        self.ui_prefs.gridview_style_combo_box.activated.connect(self.updateGrid)
+        self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
+        self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
+    # end def
+
+    def readPreferences(self):
+        """Read the preferences from self.qs (a QSettings object) and set the
+        preferences accordingly in the UI popup.
+
+        Returns: None
+        """
+        self.qs.beginGroup(PREFS_GROUP_NAME)
+        self.gridview_style = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
+        self.sliceview = self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT)
+        self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
+        self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
+        self.qs.endGroup()
+        gridview_style_idx = GRIDVIEW_STYLE_VALUES.index(self.gridview_style)
+        sliceview_idx = SLICEVIEW_VALUES.index(self.sliceview)
+        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
+        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
+        self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
+        self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
+    # end def
+
+    ### SLOTS ###
+    def hideDialog(self):
+        self.widget.hide()
+    # end def
 
     def showDialog(self):
         self.readPreferences()
         self.widget.show()  # launch prefs in mode-less dialog
+    # end def
 
     def updateGrid(self, index):
         """Update the grid when the type of grid is changed.
@@ -37,13 +79,9 @@ class Preferences(object):
         accordingly.
         """
         self.setGridAppearanceType(index)
-        value = self.getGridAppearanceType()
+        value = GRIDVIEW_STYLE_VALUES[self.gridview_style]
         for part in self.document.getParts():
             part.partDocumentSettingChangedSignal.emit(part, 'grid', value)
-    # end def
-
-    def hideDialog(self):
-        self.widget.hide()
     # end def
 
     def handleButtonClick(self, button):
@@ -56,89 +94,56 @@ class Preferences(object):
             self.restoreDefaults()
     # end def
 
-    def readPreferences(self):
-        """Read the preferences from self.qs (a QSettings object) and set the
-        preferences accordingly in the UI popup.
-
-        Returns: None
-        """
-        self.qs.beginGroup(PreferencesConst.PREFERENCES)
-        self.grid_appearance_type_index = self.qs.value(PreferencesConst.GRID_APPEARANCE_TYPE_INDEX,
-                                                        styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
-        self.slice_appearance_type_index = self.qs.value(PreferencesConst.SLICE_APPEARANCE_TYPE_INDEX,
-                                                         styles.PREF_SLICE_VIEW_STYLE_INDEX)
-        self.zoom_speed = self.qs.value("zoom_speed", styles.PREF_ZOOM_SPEED)
-        self.show_icon_labels = self.qs.value("ui_icons_labels", styles.PREF_SHOW_ICON_LABELS)
-        self.qs.endGroup()
-        self.ui_prefs.grid_appearance_type_combo_box.setCurrentIndex(self.grid_appearance_type_index)
-        self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
-        self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
-    # end def
-
     def restoreDefaults(self):
         """Restore the default settings."""
-        self.ui_prefs.grid_appearance_type_combo_box.setCurrentIndex(styles.PREF_GRID_APPEARANCE_TYPE_INDEX)
-        self.ui_prefs.zoom_speed_slider.setProperty("value", styles.PREF_ZOOM_SPEED)
-        self.ui_prefs.show_icon_labels.setChecked(styles.PREF_SHOW_ICON_LABELS)
-        self.ui_prefs.legacy_slice_view_combo_box.setCurrentIndex(styles.PREF_SLICE_VIEW_STYLE_INDEX)
+        gridview_style_idx = GRIDVIEW_STYLE_VALUES.index(GRIDVIEW_STYLE_DEFAULT)
+        sliceview_idx = GRIDVIEW_STYLE_VALUES.index(SLICEVIEW_DEFAULT)
+        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
+        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
+        self.ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
+        self.ui_prefs.show_icon_labels.setChecked(SHOW_ICON_LABELS_DEFAULT)
     # end def
 
-    def setGridAppearanceType(self, grid_appearance_type_index):
+    def setGridAppearanceType(self, value):
         """Select the type of grid that should be displayed."""
-        self.grid_appearance_type_index = grid_appearance_type_index
-        self.qs.beginGroup(PreferencesConst.PREFERENCES)
-        self.qs.setValue(PreferencesConst.GRID_APPEARANCE_TYPE_INDEX,
-                         grid_appearance_type_index)
+        self.gridview_style = value
+        self.qs.beginGroup(PREFS_GROUP_NAME)
+        self.qs.setValue(GRIDVIEW_STYLE_KEY, value)
         self.qs.endGroup()
     # end def
 
-    def setSliceView(self, slice_appearance_type_index):
+    def setSliceView(self, value):
         """Select whether the slice view, grid view, or both should be
         displayed.
         """
-        self.slice_appearance_type_index = slice_appearance_type_index
-        self.qs.beginGroup(PreferencesConst.PREFERENCES)
-        self.qs.setValue(PreferencesConst.SLICE_APPEARANCE_TYPE_INDEX,
-                         slice_appearance_type_index)
+        self.sliceview = value
+        self.qs.beginGroup(PREFS_GROUP_NAME)
+        self.qs.setValue(SLICEVIEW_KEY, value)
         self.qs.endGroup()
 
-        value = self.getSliceView()
-
-        if value == PreferencesConst.LEGACY:
+        value = SLICEVIEW_VALUES[self.sliceview]
+        if value == 'legacy':
             self.document.controller().toggleSliceView(True)
             self.document.controller().toggleGridView(False)
-        elif value == PreferencesConst.GRID:
+        elif value == 'grid':
             self.document.controller().toggleSliceView(False)
             self.document.controller().toggleGridView(True)
-        elif value == PreferencesConst.DUAL:
+        elif value == 'dual':
             self.document.controller().toggleSliceView(True)
             self.document.controller().toggleGridView(True)
         else:
             raise ValueError('Invalid slice view value: %s' % value)
 
-    def getSliceView(self):
-        """Map the index of the drop-down in the preferences UI to the slice
-        view that should be shown.
-
-        Returns: The string corresponding to the view that should be shown
-        """
-        return PreferencesConst.SLICE_VIEWS[self.slice_appearance_type_index]
-
-    def getGridAppearanceType(self):
-        return PreferencesConst.GRID_VIEWS[self.grid_appearance_type_index]
-        # return ['circles', 'lines and points', 'points'][self.grid_appearance_type_index]
-    # end def
-
-    def setZoomSpeed(self, speed):
-        self.zoom_speed = speed
-        self.qs.beginGroup(PreferencesConst.PREFERENCES)
-        self.qs.setValue("zoom_speed", self.zoom_speed)
+    def setShowIconLabels(self, value):
+        self.show_icon_labels = value
+        self.qs.beginGroup(PREFS_GROUP_NAME)
+        self.qs.setValue(SHOW_ICON_LABELS_KEY, value)
         self.qs.endGroup()
     # end def
 
-    def setShowIconLabels(self, checked):
-        self.show_icon_labels = checked
-        self.qs.beginGroup(PreferencesConst.PREFERENCES)
-        self.qs.setValue("ui_icons_labels", self.show_icon_labels)
+    def setZoomSpeed(self, value):
+        self.zoom_speed = value
+        self.qs.beginGroup(PREFS_GROUP_NAME)
+        self.qs.setValue(ZOOM_SPEED_KEY, value)
         self.qs.endGroup()
     # end def
