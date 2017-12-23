@@ -1,5 +1,5 @@
 cadnano\.views\.pathview\.pathrootitem module
-==================================================
+=============================================
 
 .. automodule:: cadnano.views.pathview.pathrootitem
     :members:

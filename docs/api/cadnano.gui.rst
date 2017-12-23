@@ -6,9 +6,8 @@ Subpackages
 
 .. toctree::
 
-    cadnano.controllers
-    cadnano.gui.plugins
-    cadnano.gui
+    cadnano.gui.dialogs
+    cadnano.gui.mainwindow
 
 Submodules
 ----------

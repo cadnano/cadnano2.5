@@ -1,5 +1,5 @@
 cadnano\.views\.styles module
-==================================
+=============================
 
 .. automodule:: cadnano.views.styles
     :members:

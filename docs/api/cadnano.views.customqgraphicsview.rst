@@ -1,5 +1,5 @@
 cadnano\.views\.customqgraphicsview module
-===============================================
+==========================================
 
 .. automodule:: cadnano.views.customqgraphicsview
     :members:

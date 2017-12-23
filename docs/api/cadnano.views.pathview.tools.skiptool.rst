@@ -1,5 +1,5 @@
 cadnano\.views\.pathview\.tools\.skiptool module
-=====================================================
+================================================
 
 .. automodule:: cadnano.views.pathview.tools.skiptool
     :members:

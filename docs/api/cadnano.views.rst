@@ -1,5 +1,5 @@
-cadnano\.gui\.views package
-===========================
+cadnano\.views package
+======================
 
 Subpackages
 -----------
@@ -7,9 +7,12 @@ Subpackages
 .. toctree::
 
     cadnano.views.abstractitems
+    cadnano.views.consoleview
+    cadnano.views.gridview
     cadnano.views.outlinerview
     cadnano.views.pathview
     cadnano.views.propertyview
+    cadnano.views.simview
     cadnano.views.sliceview
 
 Submodules
@@ -21,6 +24,7 @@ Submodules
    cadnano.views.documentwindow
    cadnano.views.grabcorneritem
    cadnano.views.preferences
+   cadnano.views.resizehandles
    cadnano.views.styles
 
 Module contents

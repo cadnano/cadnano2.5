@@ -1,5 +1,5 @@
 cadnano\.views\.sliceview\.nucleicacidpartitem module
-==========================================================
+=====================================================
 
 .. automodule:: cadnano.views.sliceview.nucleicacidpartitem
     :members:

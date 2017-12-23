@@ -6,15 +6,16 @@ Subpackages
 
 .. toctree::
 
-    cadnano.data
+    cadnano.controllers
     cadnano.decorators
+    cadnano.extras
     cadnano.fileio
     cadnano.gui
-    cadnano.extras
     cadnano.oligo
     cadnano.part
     cadnano.strand
     cadnano.strandset
+    cadnano.views
 
 Submodules
 ----------
@@ -27,10 +28,7 @@ Submodules
    cadnano.color
    cadnano.docmodscmd
    cadnano.document
-   cadnano.extras
    cadnano.objectinstance
-   cadnano.preferences
-   cadnano.proxies
    cadnano.removeinstancecmd
    cadnano.setpropertycmd
    cadnano.undocommand

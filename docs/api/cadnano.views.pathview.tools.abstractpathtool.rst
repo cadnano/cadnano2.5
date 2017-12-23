@@ -1,5 +1,5 @@
 cadnano\.views\.pathview\.tools\.abstractpathtool module
-=============================================================
+========================================================
 
 .. automodule:: cadnano.views.pathview.tools.abstractpathtool
     :members:
