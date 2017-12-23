@@ -1570,38 +1570,38 @@
   <customwidget>
    <class>CustomQGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>cadnano.gui.views.customqgraphicsview.h</header>
+   <header>cadnano.views.customqgraphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>OutlinerTreeWidget</class>
    <extends>QTreeWidget</extends>
-   <header>cadnano.gui.views.outlinerview.outlinertreewidget.h</header>
+   <header>cadnano.views.outlinerview.outlinertreewidget.h</header>
   </customwidget>
   <customwidget>
    <class>PropertyEditorWidget</class>
    <extends>QTreeWidget</extends>
-   <header>cadnano.gui.views.propertyview.propertyeditorwidget.h</header>
+   <header>cadnano.views.propertyview.propertyeditorwidget.h</header>
   </customwidget>
   <customwidget>
    <class>SimDockWidget</class>
    <extends>QDockWidget</extends>
-   <header>cadnano.gui.views.simview.simdockwidget.h</header>
+   <header>cadnano.views.simview.simdockwidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>ConsoleOutput</class>
    <extends>QPlainTextEdit</extends>
-   <header>cadnano.gui.views.consoleview.consoleoutput.h</header>
+   <header>cadnano.views.consoleview.consoleoutput.h</header>
   </customwidget>
   <customwidget>
    <class>ConsoleInput</class>
    <extends>QPlainTextEdit</extends>
-   <header>cadnano.gui.views.consoleview.consoleinput.h</header>
+   <header>cadnano.views.consoleview.consoleinput.h</header>
   </customwidget>
   <customwidget>
    <class>ConsoleRootWidget</class>
    <extends>QWidget</extends>
-   <header>cadnano.gui.views.consoleview.consolerootwidget.h</header>
+   <header>cadnano.views.consoleview.consolerootwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

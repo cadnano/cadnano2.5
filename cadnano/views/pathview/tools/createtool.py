@@ -110,7 +110,7 @@ class CreateTool(AbstractPathTool):
         of the strand to be created.
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
             strand_set (StrandSet): reference to the clicked strand_set
             idx (int): index where clicked
         """
@@ -127,7 +127,7 @@ class CreateTool(AbstractPathTool):
         most recent index.
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
             strand_set (StrandSet): reference to the clicked strand_set
             idx (int): index of cursor from last mousemove
         """
@@ -175,7 +175,7 @@ class CreateTool(AbstractPathTool):
         and the mouse release index `idx`.
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
             strand_set (StrandSet): Description
             idx (int): mouse release index
         """
@@ -223,7 +223,7 @@ class CreateTool(AbstractPathTool):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): the VHI
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): the VHI
             strand3p (Strand): reference to the 3' strand
             idx (int): the base index within the virtual helix
 
@@ -266,7 +266,7 @@ class ForcedStrandItem(QGraphicsLineItem):
 
         Args:
             tool (TYPE): Description
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         super(ForcedStrandItem, self).__init__(virtual_helix_item)
         self._virtual_helix_item = virtual_helix_item
@@ -371,7 +371,7 @@ class ForcedStrandItem(QGraphicsLineItem):
         """Summary
 
         Args:
-            virtualHelixItem (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtualHelixItem (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             is_forward (bool): Description
         """
         self.setParentItem(virtualHelixItem)
@@ -504,7 +504,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
             xover_item (TYPE): Description
             strand3p (Strand): reference to the 3' strand
             idx (int): the base index within the virtual helix
@@ -535,7 +535,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     def updateForFloatFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
         """
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             is_forward (TYPE): Description
             idx_x (TYPE): Description
             idx_y (TYPE): Description
@@ -550,7 +550,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     def updateForFloatFromStrand(self, virtual_helix_item, strand3p, idx):
         """
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             strand3p (Strand): reference to the 3' strand
             idx (int): the base index within the virtual helix
         """
@@ -594,7 +594,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description
@@ -756,7 +756,7 @@ class ForcedXoverNode5(ForcedXoverNode3):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             xover_item (TYPE): Description
             strand5p (TYPE): Description
             idx (int): the base index within the virtual helix
@@ -815,7 +815,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         Args:
             tool (TYPE): Description
             nucleicacid_part_item (TYPE): Description
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         super(ForcedXoverItem, self).__init__(nucleicacid_part_item)
         self._tool = tool
@@ -901,7 +901,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             strand5p (TYPE): Description
             idx (int): the base index within the virtual helix
 
@@ -923,7 +923,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             is_forward (TYPE): Description
             idx_x (TYPE): Description
             idx_y (TYPE): Description
@@ -943,7 +943,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             strand3p (Strand): reference to the 3' strand
             idx (int): the base index within the virtual helix
 

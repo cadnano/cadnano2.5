@@ -62,7 +62,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     """Summary
 
     Attributes:
-        active_virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+        active_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         findChild (TYPE): Description
         grab_corner (TYPE): Description
         prexover_manager (TYPE): Description
@@ -741,7 +741,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         vhi = virtual_helix_item
 
@@ -763,7 +763,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description

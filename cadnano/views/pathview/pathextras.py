@@ -284,7 +284,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            from_virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description
@@ -325,7 +325,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            from_virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description

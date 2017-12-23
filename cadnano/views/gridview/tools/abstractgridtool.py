@@ -70,7 +70,7 @@ class AbstractGridTool(QGraphicsObject):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.gridview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description

@@ -30,7 +30,7 @@ class AbstractSimTool(QObject):
         left hand corner of the base the user is mousing over.
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             scene_pos (TYPE): Description
             *args (TYPE): Description
         """
@@ -92,7 +92,7 @@ class AbstractSimTool(QObject):
     #     to pt in virtual_helix_item.
 
     #     Args:
-    #         virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+    #         virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
     #         pt (TYPE): Description
     #     """
     #     x, strand_idx = self.helixIndex(pt)

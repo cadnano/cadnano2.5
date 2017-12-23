@@ -31,7 +31,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     where x is the cartesian product.
 
     Attributes:
-        active_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
+        active_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
         grab_cornerBR (GrabCornerItem): bottom right bounding box handle
         grab_cornerTL (GrabCornerItem): top left bounding box handle
         griditem (GridItem): Description
@@ -245,7 +245,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            vhi (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): the item associated with id_num
+            vhi (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): the item associated with id_num
         """
         neighbors = vhi.cnModel().getProperty('neighbors')
         neighbors = literal_eval(neighbors)
@@ -443,7 +443,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
         """
         vhi = virtual_helix_item
         pxom = self.prexover_manager

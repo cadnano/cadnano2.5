@@ -46,7 +46,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
@@ -215,7 +215,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             tool (SelectGridTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
+            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
 
         """
@@ -230,7 +230,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             tool (SelectGridTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
+            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
         """
         part = self._model_part
@@ -376,7 +376,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.gui.views.gridview.virtualhelixitem.VirtualHelixItem):
+            neighbor_virtual_helix_item (cadnano.views.gridview.virtualhelixitem.VirtualHelixItem):
             the neighboring virtual helix item
         """
         wg_dict = self.wedge_gizmos

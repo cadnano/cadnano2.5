@@ -233,7 +233,6 @@ class SimDockWidget(QDockWidget):
         v_layout.addWidget(stepsize_spinbox)
         stepsize_spinbox.valueChanged.connect(self.setStep)
 
-
         lightCB = QCheckBox(checked=True, text="Light")
         lightSliderX = QSlider(Qt.Horizontal)
         lightSliderY = QSlider(Qt.Horizontal)

@@ -80,8 +80,8 @@ When building the docs, you may see warnings like:
 ```
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.controllers.documentcontroller'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.mainwindow.ui_mainwindow'
-WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.views.documentwindow'
-WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.views.outlinerview.outlinertreewidget'
+WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.documentwindow'
+WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.outlinerview.outlinertreewidget'
 ```
 
 These modules import the PyQt5 classes in a way that doesn't play nicely with sphinx, so they are specifically excluded in `docs/conf.py`. Consequently, the documentation for these modules will be missing until someone tracks down the root cause of this issue and figures out a workaround. Possible starting point: [stackoverflow.com/questions/25960309/](http://stackoverflow.com/questions/25960309/)

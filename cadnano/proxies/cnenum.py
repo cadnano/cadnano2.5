@@ -110,11 +110,6 @@ ENUM_NAMES['grid_type'] = enumNames(GridType)
 
 
 class HandleType:
-    """
-        1-2-3
-        8   4
-        7-6-5
-    """
     TOP_LEFT = 1
     TOP = 2
     TOP_RIGHT = 4

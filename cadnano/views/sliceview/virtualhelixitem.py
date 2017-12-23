@@ -54,7 +54,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            part_item (cadnano.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
         """
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
@@ -249,7 +249,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             tool (SelectSliceTool): reference to call tool-specific methods
-            part_item (cadnano.gui.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
+            part_item (cadnano.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
 
         """
@@ -398,7 +398,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
         Args:
             neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem):
+            neighbor_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.VirtualHelixItem):
             the neighboring virtual helix item
         """
         wg_dict = self.wedge_gizmos

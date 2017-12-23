@@ -258,7 +258,7 @@ class XoverNode5(XoverNode3):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
             xover_item (TYPE): Description
             strand5p (TYPE): Description
             idx (int): the base index within the virtual helix
@@ -314,7 +314,7 @@ class XoverItem(QGraphicsPathItem):
 
         Args:
             strand_item (TYPE): Description
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         super(XoverItem, self).__init__(virtual_helix_item.partItem())
         self._strand_item = strand_item

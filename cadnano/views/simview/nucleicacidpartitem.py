@@ -25,7 +25,7 @@ class SimNucleicAcidPartItem(AbstractPartItem):
     """Summary
 
     Attributes:
-        active_virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+        active_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         findChild (TYPE): Description
         grab_corner (TYPE): Description
         prexover_manager (TYPE): Description
@@ -616,7 +616,7 @@ class SimNucleicAcidPartItem(AbstractPartItem):
         visible prexovers
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
         """
         return
         # vhi = virtual_helix_item
@@ -638,7 +638,7 @@ class SimNucleicAcidPartItem(AbstractPartItem):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.gui.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
 
         Returns:
             TYPE: Description

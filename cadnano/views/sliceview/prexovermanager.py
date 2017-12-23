@@ -18,7 +18,7 @@ class PreXoverManager(QGraphicsRectItem):
         neighbor_prexover_items (dict): Description
         part_item (TYPE): Description
         prexover_item_map (dict): Description
-        virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
+        virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
     """
 
     def __init__(self, part_item):
@@ -91,7 +91,7 @@ class PreXoverManager(QGraphicsRectItem):
         neighbors and connect the neighboring bases
 
         Args:
-            virtual_helix_item (cadnano.gui.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.VirtualHelixItem): Description
             idx (int): the base index within the virtual helix
             per_neighbor_hits (TYPE): Description
             pairs (TYPE): Description
