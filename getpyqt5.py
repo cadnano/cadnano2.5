@@ -103,9 +103,6 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
         wget_str = ''
     else:
         if use_wget:
-            # http://download.qt.io/official_releases/qt/5.10/5.10.0/single/qt-everywhere-src-5.10.0.tar.xz
-            # http://download.qt.io/official_releases/qt/5.10/5.10.0/single/qt-everywhere-src-5.10.0.tar.xz
-            # http://download.qt.io/official_releases/qt/5.10/5.10.0/single/qt-everywhere-src-5.10.0.tar.gz"
             wget_str = 'wget --output-document=%s \"http://download.qt.io/official_releases/qt/%s/%s/single/%s\";' %\
                        (qt5_zip, QT_VERSION[0:4], QT_VERSION, qt5_zip)
         else:
@@ -145,12 +142,11 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
 
         # config_str = '../configure %s ' % (static_str) +\
         config_str = '../configure %s ' % (static_str) +\
+            '-xplatform macx-ios-clang -release ' +\
             '-opensource -prefix %s -confirm-license ' % (qt5_path) +\
-            '-xplatform macx-ios-clang -release '
-            # '-optimized-qmake -c++std c++11 -system-sqlite %s ' % (macsdk_str) +\
-            # '-no-glib -no-alsa -no-gtkstyle -no-pulseaudio -no-xcb-xlib ' +\
-            # '-no-xinput2 -nomake examples '
-        # removed no debus for os x
+            '-optimized-qmake -c++std c++11 -system-sqlite %s ' % (macsdk_str) +\
+            '-no-glib -no-xcb-xlib ' +\
+            '-no-xinput2 -nomake examples '
 
     config_str += \
         '-skip qtactiveqt -skip qtandroidextras -skip qtconnectivity ' +\
@@ -197,12 +193,13 @@ def get_sip(pyroot_path, is_static=False, dev=False, use_wget=False):
         # https://www.riverbankcomputing.com/static/Downloads/sip/sip-4.19.7.dev1712162258.tar.gz
         sip_str = "sip-4.19.7.dev1712162258"
         sip_zip = '%s.tar.gz' % (sip_str)
-        sip_url = "https://www.riverbankcomputing.com/static/Downloads/sip4/%s" % (sip_zip)
+        sip_url = "https://www.riverbankcomputing.com/static/Downloads/sip/%s" % (sip_zip)
     else:
         sip_str = 'sip-%s' % (SIP_VERSION)
         sip_zip = '%s.tar.gz' % (sip_str)
 
     if os.path.exists(os.path.join(pyroot_path, sip_zip)):
+        print("Found", os.path.join(pyroot_path, sip_zip))
         wget_str = ''
     else:
         if dev:
@@ -241,9 +238,8 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False, dev=False, use_wget=False)
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     static_str = '--static' if is_static else ''
     if dev:
-        # https://www.riverbankcomputing.com/static/Downloads/PyQt5/PyQt5_gpl-5.9.3.dev1712202212.tar.gz
         dev_str = "5.9.3.dev1712202212"
-        pyqt5_str = 'PyQt-gpl-%s' % (dev_str)
+        pyqt5_str = 'PyQt5_gpl-%s' % (dev_str)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
         pyqturl = "https://www.riverbankcomputing.com/static/Downloads/PyQt5/%s" % (pyqt5_zip)
     else:
@@ -293,7 +289,7 @@ http://qt-project.org/doc/qt-5/qt-conf.html
 """
 
 
-def checker(do_clean_qt=False, is_static=False):
+def checker(dev=False, do_clean_qt=False, is_static=False):
     try:
         if do_clean_qt:
             raise OSError("Just jumping out of this block for cleaning")
@@ -321,9 +317,11 @@ def checker(do_clean_qt=False, is_static=False):
                 import sip  # noqa
             except BaseException:
                 get_sip(pyroot_path,
+                        dev=dev,
                         is_static=is_static,
                         use_wget=use_wget)
             get_pyqt5(pyroot_path, qt5_path,
+                      dev=dev,
                       is_static=is_static,
                       use_wget=use_wget)
 # end def
@@ -342,8 +340,10 @@ if __name__ == '__main__':
                         help="use development versions of PyQt5 and SIP hardcoded here",
                         action="store_true")
     args = parser.parse_args()
+    if args.dev:
+        print("Building in dev mode")
     if args.cleanqt:
         print("Removing Qt5 files and redownloading if necessary")
     if args.static:
         print("Doing a static Qt5/PyQt5 build")
-    checker(do_clean_qt=args.cleanqt, is_static=args.static)
+    checker(dev=args.dev, do_clean_qt=args.cleanqt, is_static=args.static)
