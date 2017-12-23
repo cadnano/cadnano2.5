@@ -4,13 +4,12 @@ from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 
 
 PREFS_GROUP_NAME = 'Preferences'
+SLICEVIEWS = ('legacy', 'grid', 'dual')
 SLICEVIEW_KEY = 'EnabledSliceview'
-SLICEVIEW_VALUES = ('legacy', 'grid', 'dual')
-SLICEVIEW_DEFAULT = SLICEVIEW_VALUES[0]
+SLICEVIEW_DEFAULT = 0  # legacy idx
+GRIDVIEW_STYLES = ('points', 'points and lines')
 GRIDVIEW_STYLE_KEY = 'GridviewStyle'
-GRIDVIEW_STYLE_VALUES = ('points', 'points and lines')
-GRIDVIEW_STYLE_DEFAULT = GRIDVIEW_STYLE_VALUES[0]
-GRID_APPEARANCE_NAME = GRIDVIEW_STYLE_VALUES[0]
+GRIDVIEW_STYLE_DEFAULT = 0  # points idx
 ZOOM_SPEED_KEY = 'ZoomSpeed'
 ZOOM_SPEED_DEFAULT = 20
 SHOW_ICON_LABELS_KEY = 'ShowIconLabels'
@@ -35,9 +34,9 @@ class Preferences(object):
     def connectSignals(self):
         self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
-        self.ui_prefs.enabled_sliceview_combo_box.currentIndexChanged.connect(self.setSliceView)
-        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.setGridAppearanceType)
-        self.ui_prefs.gridview_style_combo_box.activated.connect(self.updateGrid)
+        self.ui_prefs.enabled_sliceview_combo_box.currentIndexChanged.connect(self.updateEnabledSliceview)
+        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.updateGridviewStyle)
+        # self.ui_prefs.gridview_style_combo_box.activated.connect(self.updateGridviewStyle)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
         self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
     # end def
@@ -49,15 +48,13 @@ class Preferences(object):
         Returns: None
         """
         self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.gridview_style = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
-        self.sliceview = self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT)
+        self.gridview_style_idx = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
+        self.sliceview_idx = self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT)
         self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
         self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
         self.qs.endGroup()
-        gridview_style_idx = GRIDVIEW_STYLE_VALUES.index(self.gridview_style)
-        sliceview_idx = SLICEVIEW_VALUES.index(self.sliceview)
-        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
-        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
+        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
+        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(self.sliceview_idx)
         self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
     # end def
@@ -72,16 +69,15 @@ class Preferences(object):
         self.widget.show()  # launch prefs in mode-less dialog
     # end def
 
-    def updateGrid(self, index):
+    def updateGridviewStyle(self, index):
         """Update the grid when the type of grid is changed.
 
-        Calls setGridAppearanceType and updates each part of the document
+        Calls setGridviewStyleIdx and updates each part of the document
         accordingly.
         """
-        self.setGridAppearanceType(index)
-        value = GRIDVIEW_STYLE_VALUES[self.gridview_style]
+        gridview_style = GRIDVIEW_STYLES[self.gridview_style_idx]
         for part in self.document.getParts():
-            part.partDocumentSettingChangedSignal.emit(part, 'grid', value)
+            part.partDocumentSettingChangedSignal.emit(part, 'grid', gridview_style)
     # end def
 
     def handleButtonClick(self, button):
@@ -96,32 +92,32 @@ class Preferences(object):
 
     def restoreDefaults(self):
         """Restore the default settings."""
-        gridview_style_idx = GRIDVIEW_STYLE_VALUES.index(GRIDVIEW_STYLE_DEFAULT)
-        sliceview_idx = GRIDVIEW_STYLE_VALUES.index(SLICEVIEW_DEFAULT)
+        gridview_style_idx = GRIDVIEW_STYLES.index(GRIDVIEW_STYLE_DEFAULT)
+        sliceview_idx = GRIDVIEW_STYLES.index(SLICEVIEW_DEFAULT)
         self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
         self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
         self.ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
         self.ui_prefs.show_icon_labels.setChecked(SHOW_ICON_LABELS_DEFAULT)
     # end def
 
-    def setGridAppearanceType(self, value):
+    def setGridviewStyleIdx(self, value):
         """Select the type of grid that should be displayed."""
-        self.gridview_style = value
+        self.gridview_style_idx = value
         self.qs.beginGroup(PREFS_GROUP_NAME)
         self.qs.setValue(GRIDVIEW_STYLE_KEY, value)
         self.qs.endGroup()
     # end def
 
-    def setSliceView(self, value):
+    def updateEnabledSliceview(self, value):
         """Select whether the slice view, grid view, or both should be
         displayed.
         """
-        self.sliceview = value
+        self.sliceview_idx = value
         self.qs.beginGroup(PREFS_GROUP_NAME)
         self.qs.setValue(SLICEVIEW_KEY, value)
         self.qs.endGroup()
 
-        value = SLICEVIEW_VALUES[self.sliceview]
+        value = SLICEVIEWS[self.sliceview_idx]
         if value == 'legacy':
             self.document.controller().toggleSliceView(True)
             self.document.controller().toggleGridView(False)

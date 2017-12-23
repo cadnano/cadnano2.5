@@ -688,7 +688,7 @@ class DocumentController(object):
 
         Returns: None
         """
-        print("Toggling slice view to %s" % show)
+        # print("Toggling slice view to %s" % show)
         slice_view = self.win.slice_graphics_view
         if show:
             self.slice_view_showing = True
