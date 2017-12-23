@@ -125,9 +125,9 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
             '-no-pulseaudio -nomake examples -qt-xcb -no-xcb-xlib '
     else:
         # Get the OS X SDK
-        macsdk = "xcodebuild -showsdks | awk '/^$/{p=0};p; /OS X SDKs:/{p=1}' | tail -1 | cut -f3"
+        # macsdk = "xcodebuild -showsdks | awk '/^$/{p=0};p; /macOS SDKs:/{p=1}' | tail -1 | cut -f3"
         xcb_proc = Popen(['xcodebuild', '-showsdks'], stdout=PIPE)
-        awk_proc = Popen(['awk', '/^$/{p=0};p; /OS X SDKs:/{p=1}'], stdin=xcb_proc.stdout, stdout=PIPE)
+        awk_proc = Popen(['awk', '/^$/{p=0};p; /macOS SDKs:/{p=1}'], stdin=xcb_proc.stdout, stdout=PIPE)
         tail_proc = Popen(['tail', '-1'], stdin=awk_proc.stdout, stdout=PIPE)
         cut_proc = Popen(['cut', '-f3'], stdin=tail_proc.stdout, stdout=PIPE)
         xcb_proc.stdout.close()  # enable write error
@@ -142,9 +142,8 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
 
         # config_str = '../configure %s ' % (static_str) +\
         config_str = '../configure %s ' % (static_str) +\
-            '-xplatform macx-ios-clang -release ' +\
-            '-opensource -prefix %s -confirm-license ' % (qt5_path) +\
-            '-optimized-qmake -c++std c++11 -system-sqlite %s ' % (macsdk_str) +\
+            '-release -opensource -prefix %s -confirm-license ' % (qt5_path) +\
+            '-c++std c++11 -sqlite  %s ' % (macsdk_str) +\
             '-no-glib -no-xcb-xlib ' +\
             '-no-xinput2 -nomake examples '
 
@@ -160,8 +159,6 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
         config_str += '-skip qtmacextras;'
     else:
         config_str += '-skip qtx11extras;'
-
-    print(config_str)
 
     def qt5Build():
         print("Building qt5")
@@ -271,6 +268,7 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False, dev=False, use_wget=False)
 
     def pyqt5Build():
         print("Building PyQt5")
+        print('\n'.join([wget_str, extract_str, cd_str, config_str]))
         qt_cmds = ['%s %s %s %s make -j2; make install;' %
                    (wget_str,
                     extract_str,
@@ -304,7 +302,7 @@ def checker(dev=False, do_clean_qt=False, is_static=False):
                 print("OS is Linux")
                 use_wget = True    # use wget on Linux
             else:
-                print("OS is Mac")
+                print("OS is macOS")
                 use_wget = False    # use curl on OS X
             pyroot_path = distutils.sysconfig.BASE_PREFIX
             qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:4]))
