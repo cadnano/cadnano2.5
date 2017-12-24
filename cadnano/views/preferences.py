@@ -2,7 +2,6 @@ from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 
-
 PREFS_GROUP_NAME = 'Preferences'
 SLICEVIEWS = ('legacy', 'grid', 'dual')
 SLICEVIEW_KEY = 'EnabledSliceview'

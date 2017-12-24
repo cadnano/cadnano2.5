@@ -16,15 +16,15 @@ from PyQt5.Qt3DRender import QGeometry, QGeometryRenderer
 from cadnano.gui.palette import getColorObj
 
 
-class TriStrip(QEntity):
+class Triangle(QEntity):
     def __init__(self, parent_entity):
-        super(TriStrip, self).__init__(parent_entity)
+        super(Triangle, self).__init__(parent_entity)
         self._mesh = mesh = QGeometryRenderer(parent_entity)
         self._geometry = geo = QGeometry(mesh)
 
-        vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
-        normal_buffer = QBuffer(QBuffer.VertexBuffer, geo)
-        color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+        vertex_buffer = QBuffer(QBuffer.VertexBuffer)
+        normal_buffer = QBuffer(QBuffer.VertexBuffer)
+        color_buffer = QBuffer(QBuffer.VertexBuffer)
 
         # Vertices
         v0 = QVector3D(0.0, 0.0, 0.0)
@@ -40,25 +40,33 @@ class TriStrip(QEntity):
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
 
-        # Faces Normals
-        n012 = QVector3D.normal(v0, v1, v2)
-        n123 = QVector3D.normal(v1, v2, v3)
-        # print(n012, n123)
-        # Vertex Normals
-        # n0 = QVector3D(n012 + n123).normalized()
-        # n1 = QVector3D(n012 + n123).normalized()
-        # n2 = QVector3D(n012 + n123).normalized()
-        # n3 = QVector3D(n012 + n123).normalized()
-        normals = [n012, n012, n123, n123]
-        # print(n0, n1, n2, n3)
-        normal_bytes = bytes()
-        for n in normals:
-            normal_bytes += struct.pack('!f', n.x())
-            normal_bytes += struct.pack('!f', n.y())
-            normal_bytes += struct.pack('!f', n.z())
-
-        normal_bytearray = QByteArray(normal_bytes)
-        normal_buffer.setData(normal_bytearray)
+        # n0 = QVector3D(0.0, 1.0, 0.0)
+        # n1 = QVector3D(0.0, 1.0, 0.0)
+        # n2 = QVector3D(0.0, 1.0, 0.0)
+        # n3 = QVector3D(0.0, 0.0, 1.0)
+        # n4 = QVector3D(0.0, 0.0, 1.0)
+        # n5 = QVector3D(1.0, 0.0, 0.0)
+        # n6 = QVector3D(0.0, 1.0, 0.0)
+        # n7 = QVector3D(1.0, 0.0, 0.0)
+        # normals = [n0, n1, n2, n3, n4, n5, n6, n7]
+        # normal_bytes = bytes()
+        # for n in normals:
+        #     normal_bytes += struct.pack('!f', n.x())
+        #     normal_bytes += struct.pack('!f', n.y())
+        #     normal_bytes += struct.pack('!f', -n.z())
+        # normal_bytearray = QByteArray(normal_bytes)
+        # normal_buffer = QBuffer(QBuffer.VertexBuffer)
+        # normal_buffer.setData(normal_bytearray)
+        # self._norm_attr = norm_attr = QAttribute()
+        # norm_attr.setAttributeType(QAttribute.VertexAttribute)
+        # norm_attr.setBuffer(normal_buffer)
+        # norm_attr.setVertexBaseType(QAttribute.Float)
+        # norm_attr.setVertexSize(3)
+        # norm_attr.setByteOffset(0)
+        # norm_attr.setByteStride(3)
+        # norm_attr.setCount(28)
+        # norm_attr.setName(QAttribute.defaultNormalAttributeName())
+        # geo.addAttribute(norm_attr)
 
         c0 = QVector3D(1.0, 0.0, 0.0)
         c1 = QVector3D(0.0, 1.0, 0.0)
@@ -105,7 +113,7 @@ class TriStrip(QEntity):
 
         self._col_attr = col_attr = QAttribute()
         col_attr.setAttributeType(QAttribute.VertexAttribute)
-        col_attr.setBuffer(vertex_buffer)
+        col_attr.setBuffer(color_buffer)
         col_attr.setVertexBaseType(QAttribute.Float)
         col_attr.setVertexSize(3)
         col_attr.setByteOffset(0)
@@ -185,74 +193,55 @@ class TriStrip(QEntity):
 # end class
 
 
-class Line(QEntity):
+class TriStrip(QEntity):
     def __init__(self, parent_entity):
-        super(Line, self).__init__(parent_entity)
+        super(TriStrip, self).__init__(parent_entity)
         self._mesh = mesh = QGeometryRenderer(parent_entity)
         self._geometry = geo = QGeometry(mesh)
 
         vertex_buffer = QBuffer(QBuffer.VertexBuffer, geo)
+        normal_buffer = QBuffer(QBuffer.VertexBuffer, geo)
         color_buffer = QBuffer(QBuffer.VertexBuffer, geo)
 
-        # 
-        v0 = QVector3D(0.0, 0.0, 0.0)  # from origin white
-        v1 = QVector3D(2.0, 0.0, 0.0)  # to x blue
-        v2 = QVector3D(0.0, 0.0, 0.0)  # from x blue
-        v3 = QVector3D(0.0, 2.0, 0.0)  # to y green
-        v4 = QVector3D(0.0, 0.0, 0.0)  # from y green
-        v5 = QVector3D(0.0, 0.0, 2.0)  # to z red
-        v6 = QVector3D(0.0, 0.0, 0.0)  # from y green
-        v7 = QVector3D(2.0, 2.0, 2.0)  # to z red
-        vertices = [v0, v1, v2, v3, v4, v5, v6, v7]
-        # vertices = [v3, v6, v7]
-
-        # LineStrip
-        # v0 = QVector3D(0.0, 0.0, 0.0)  # from origin white
-        # v1 = QVector3D(2.0, 0.0, 0.0)  # to x blue
-        # v3 = QVector3D(0.0, 2.0, 0.0)  # to y green
-        # v5 = QVector3D(0.0, 0.0, -2.0)  # to z red
-        # v7 = QVector3D(2.0, 2.0, -2.0)  # to z red
-        # v8 = QVector3D(-2.0, 2.0, -2.0)  # to z red
-        # v9 = QVector3D(-2.0, 2.0, 2.0)  # to z red
-        # vertices = [v0, v1, v3, v5, v7, v8, v9]
-
-        # Vector Normals
-        # x = QVector3D(-0.5, 0.5, 0.0)
-        # n01 = QVector3D.normal(v0, v1, x)
-        # n23 = QVector3D.normal(v2, v3, x)  # 0.0, -0.707,  0.707
-        # n45 = QVector3D.normal(v4, v5, x)  # 0.0, 1.0, 0.0
-        # print(n01, n23, n45)
-
-        # interleave = [v0, v1, n01, c0, v2, v3, n23, c1, v4, v5, n45, c2]
-        # interleave = [v0, n01, c0, v1, n01, c0, v2, n23, c1, v3, n23, c1, v4, n45, c2, v5, n45, c2]
-        # vertices = interleave
-        # sequential = [v0, v1, v2, v3, c2, c2, c1, c1]
-        # vertices = sequential
-
+        # Vertices
+        v0 = QVector3D(0.0, 0.0, 0.0)
+        v1 = QVector3D(2.0, 0.0, 0.0)
+        v2 = QVector3D(0.0, 2.0, 0.0)
+        v3 = QVector3D(2.0, 2.0, 0.0)
+        vertices = [v0, v1, v2, v3]
         vertex_bytes = bytes()
         for v in vertices:
             vertex_bytes += struct.pack('!f', v.x())
             vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', v.z())
-            # if isinstance(v, QVector4D):
-            #     print("Color", v)
-            #     vertex_bytes += struct.pack('!f', v.w())
-
+            vertex_bytes += struct.pack('!f', -v.z())
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
 
-        c0 = QVector3D(0.0, 0.0, 1.0)  # blue
-        c1 = QVector3D(0.0, 0.0, 1.0)  # blue
-        c2 = QVector3D(0.0, 1.0, 0.0)  # green
-        c3 = QVector3D(0.0, 1.0, 0.0)  # green
-        c4 = QVector3D(0.0, 0.0, 1.0)  # blue
-        c5 = QVector3D(0.0, 0.0, 1.0)  # blue
-        c6 = QVector3D(1.0, 0.0, 1.0)  # magenta
-        c7 = QVector3D(1.0, 0.0, 1.0)  # magenta
-        # c8 = QVector3D(1.0, 0.0, 1.0)  # yellow
+        # Faces Normals
+        n012 = QVector3D.normal(v0, v1, v2)
+        # n123 = QVector3D.normal(v1, v2, v3)
+        # print(n012, n123)
+        # Vertex Normals
+        # n0 = QVector3D(n012 + n123).normalized()
+        # n1 = QVector3D(n012 + n123).normalized()
+        # n2 = QVector3D(n012 + n123).normalized()
+        # n3 = QVector3D(n012 + n123).normalized()
+        # normals = [n012, n012, n123, n123]
+        # print(n0, n1, n2, n3)
+        normals = [n012, n012, n012]
+        normal_bytes = bytes()
+        for n in normals:
+            normal_bytes += struct.pack('!f', n.x())
+            normal_bytes += struct.pack('!f', n.y())
+            normal_bytes += struct.pack('!f', n.z())
 
-        colors = [c0, c1, c2, c3, c4, c5, c6, c7]
-        # colors = [c0, c2, c4, c6]
+        normal_bytearray = QByteArray(normal_bytes)
+        normal_buffer.setData(normal_bytearray)
+
+        c0 = QVector3D(1.0, 0.0, 0.0)
+        c1 = QVector3D(0.0, 1.0, 0.0)
+        c2 = QVector3D(0.0, 0.0, 1.0)
+        colors = [c0, c1, c2]
 
         color_bytes = bytes()
         for c in colors:
@@ -262,6 +251,10 @@ class Line(QEntity):
             # color_bytes += struct.pack('!f', c.w())
         color_bytearray = QByteArray(color_bytes)
         color_buffer.setData(color_bytearray)
+
+        # interleave = [v0, v1, n01, c0, v2, v3, n23, c1, v4, v5, n45, c2]
+        # interleave = [v0, n01, c0, v1, n01, c0, v2, n23, c1, v3, n23, c1, v4, n45, c2, v5, n45, c2]
+        # vertices = interleave
 
         # element_size = 3 + 4  # vec3 pos, vec4 col
         # float_size = 1  # len(struct.pack('!f', 1.0))  # 4
@@ -277,19 +270,19 @@ class Line(QEntity):
         pos_attr.setCount(28)
         pos_attr.setName(QAttribute.defaultPositionAttributeName())
 
-        # self._norm_attr = norm_attr = QAttribute()
-        # norm_attr.setAttributeType(QAttribute.VertexAttribute)
-        # norm_attr.setBuffer(color_buffer)
-        # norm_attr.setVertexBaseType(QAttribute.Float)
-        # norm_attr.setVertexSize(3)
-        # norm_attr.setByteOffset(3)
-        # norm_attr.setByteStride(1)
-        # norm_attr.setCount(3)
-        # norm_attr.setName(QAttribute.defaultNormalAttributeName())
+        self._norm_attr = norm_attr = QAttribute()
+        norm_attr.setAttributeType(QAttribute.VertexAttribute)
+        norm_attr.setBuffer(normal_buffer)
+        norm_attr.setVertexBaseType(QAttribute.Float)
+        norm_attr.setVertexSize(3)
+        norm_attr.setByteOffset(0)
+        norm_attr.setByteStride(3)
+        norm_attr.setCount(28)
+        norm_attr.setName(QAttribute.defaultNormalAttributeName())
 
         self._col_attr = col_attr = QAttribute()
         col_attr.setAttributeType(QAttribute.VertexAttribute)
-        col_attr.setBuffer(vertex_buffer)
+        col_attr.setBuffer(color_buffer)
         col_attr.setVertexBaseType(QAttribute.Float)
         col_attr.setVertexSize(3)
         col_attr.setByteOffset(0)
@@ -315,7 +308,7 @@ class Line(QEntity):
         # idx_attr.setCount(4)
 
         geo.addAttribute(pos_attr)
-        # geo.addAttribute(norm_attr)
+        geo.addAttribute(norm_attr)
         geo.addAttribute(col_attr)
         # geo.addAttribute(idx_attr)
 
@@ -327,7 +320,7 @@ class Line(QEntity):
         # mesh.setVerticesPerPatch(3)
         # mesh.setVertexCount(6)
         mesh.setGeometry(geo)
-        mesh.setPrimitiveType(QGeometryRenderer.Lines)
+        mesh.setPrimitiveType(QGeometryRenderer.Points)
 
         trans = QTransform()
         mat = QPerVertexColorMaterial(parent_entity)
@@ -365,7 +358,6 @@ class Line(QEntity):
         self._pos_attr.setByteStride(val)
         # self._norm_attr.setByteStride(val)
         self._col_attr.setByteStride(val)
-
 # end class
 
 

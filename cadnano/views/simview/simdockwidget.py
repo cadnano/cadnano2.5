@@ -10,11 +10,8 @@ from PyQt5.Qt3DRender import QDirectionalLight
 
 from cadnano.gui.palette import getColorObj
 
-from .customshapes import Line
-# from .customshapes import TriStrip
 from .customshapes import Sphere
-# from .customshapes import LineSegment
-# from .customshapes import TetrahedronMesh
+from .customlines import Line
 
 
 class SceneModifier(QObject):
@@ -269,8 +266,8 @@ class SimDockWidget(QDockWidget):
         # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
         # cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))  # default
         cam_entity.setPosition(QVector3D(0.0, 0.0, 30.0))
-        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
-        cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
+        cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
+        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
         self.cam_controller.setLinearSpeed(100.0)
         self.cam_controller.setLookSpeed(360.0)
         self.cam_controller.setCamera(cam_entity)
@@ -279,13 +276,14 @@ class SimDockWidget(QDockWidget):
 
         line = Line(self.root_entity)
         self.shapes.append(line)
+
         # ts = TriStrip(self.root_entity)
         # self.shapes.append(ts)
 
-        # Sphere(0, 0, 0, '#cccccc', self.root_entity, radius=0.1)
-        # Sphere(2, 0, 0, '#0000cc', self.root_entity, radius=0.2)
-        # Sphere(0, 2, 0, '#007200', self.root_entity, radius=0.2)
-        # Sphere(0, 0, 2, '#cc0000', self.root_entity, radius=0.2)
+        Sphere(0, 0, 0, '#cccccc', self.root_entity, radius=0.1)
+        Sphere(2, 0, 0, '#0000cc', self.root_entity, radius=0.2)
+        Sphere(0, 2, 0, '#007200', self.root_entity, radius=0.2)
+        Sphere(0, 0, 2, '#cc0000', self.root_entity, radius=0.2)
 
         Sphere(2, 2, 2, '#cccc00', self.root_entity, radius=0.1)
 
@@ -313,6 +311,4 @@ class SimDockWidget(QDockWidget):
         light.setIntensity(1.0)
         light.setWorldDirection(QVector3D(0, 1, -1))
         self.root_entity.addComponent(light)
-
-
     # end def
