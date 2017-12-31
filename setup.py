@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # make Wheels with:
-# python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35.cp36
+# python setup.py bdist_wheel --plat-name macosx_10_12_x86_64 --python-tag cp36
 # python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35.cp36
 # twine upload dist/*
 
@@ -136,8 +136,8 @@ exclude_list = ['*.genbank', '*.fasta',
 cn_packages = find_packages(exclude=exclude_list)
 
 install_requires = ['sip>=4.19',
-                    'PyQt5>=5.9.2',
-                    'PyQt3D>=5.9.2'
+                    'PyQt5>=5.9.3',
+                    'PyQt3D>=5.9.2',
                     'numpy>=1.10.0',
                     'pandas>=0.18',
                     'pytz>=2011k',
