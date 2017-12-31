@@ -234,7 +234,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.setSpacing(1)
         self.verticalLayout.setObjectName("verticalLayout")
         self.console_output_textedit = ConsoleOutput(self.console_root_widget)
-        self.console_output_textedit.setStyleSheet("QPlainTextEdit { background-color: \"#fefefe\"; color: \"#0066cc\"; }")
+        self.console_output_textedit.setStyleSheet("QPlainTextEdit { background-color: \"#f6f6f6\"; color: \"#0066cc\"; }")
         self.console_output_textedit.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.console_output_textedit.setFrameShadow(QtWidgets.QFrame.Plain)
         self.console_output_textedit.setObjectName("console_output_textedit")

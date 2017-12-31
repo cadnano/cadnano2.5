@@ -658,7 +658,7 @@
      <item>
       <widget class="ConsoleOutput" name="console_output_textedit">
        <property name="styleSheet">
-        <string notr="true">QPlainTextEdit { background-color: &quot;#fefefe&quot;; color: &quot;#0066cc&quot;; }</string>
+        <string notr="true">QPlainTextEdit { background-color: &quot;#f6f6f6&quot;; color: &quot;#0066cc&quot;; }</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
