@@ -34,9 +34,9 @@ class Triangle(QEntity):
         vertices = [v0, v1, v2, v3]
         vertex_bytes = bytes()
         for v in vertices:
-            vertex_bytes += struct.pack('!f', v.x())
-            vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', -v.z())
+            vertex_bytes += struct.pack('f', v.x())
+            vertex_bytes += struct.pack('f', v.y())
+            vertex_bytes += struct.pack('f', -v.z())
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
 
@@ -211,9 +211,9 @@ class TriStrip(QEntity):
         vertices = [v0, v1, v2, v3]
         vertex_bytes = bytes()
         for v in vertices:
-            vertex_bytes += struct.pack('!f', v.x())
-            vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', -v.z())
+            vertex_bytes += struct.pack('f', v.x())
+            vertex_bytes += struct.pack('f', v.y())
+            vertex_bytes += struct.pack('f', -v.z())
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
 
@@ -231,9 +231,9 @@ class TriStrip(QEntity):
         normals = [n012, n012, n012]
         normal_bytes = bytes()
         for n in normals:
-            normal_bytes += struct.pack('!f', n.x())
-            normal_bytes += struct.pack('!f', n.y())
-            normal_bytes += struct.pack('!f', n.z())
+            normal_bytes += struct.pack('f', n.x())
+            normal_bytes += struct.pack('f', n.y())
+            normal_bytes += struct.pack('f', n.z())
 
         normal_bytearray = QByteArray(normal_bytes)
         normal_buffer.setData(normal_bytearray)
@@ -245,9 +245,9 @@ class TriStrip(QEntity):
 
         color_bytes = bytes()
         for c in colors:
-            color_bytes += struct.pack('!f', c.x())
-            color_bytes += struct.pack('!f', c.y())
-            color_bytes += struct.pack('!f', c.z())
+            color_bytes += struct.pack('f', c.x())
+            color_bytes += struct.pack('f', c.y())
+            color_bytes += struct.pack('f', c.z())
             # color_bytes += struct.pack('!f', c.w())
         color_bytearray = QByteArray(color_bytes)
         color_buffer.setData(color_bytearray)
@@ -441,12 +441,12 @@ class TetrahedronMesh(QEntity):
 
         vert_bytes = bytes()
         for v in vertices:
-            vert_bytes += struct.pack('!f', v.x())
-            vert_bytes += struct.pack('!f', v.y())
-            vert_bytes += struct.pack('!f', v.z())
+            vert_bytes += struct.pack('f', v.x())
+            vert_bytes += struct.pack('f', v.y())
+            vert_bytes += struct.pack('f', v.z())
             if isinstance(v, QVector4D):
                 print("Color", v)
-                vert_bytes += struct.pack('!f', v.w())
+                vert_bytes += struct.pack('f', v.w())
 
         # See if we can unpack our stored values
         # i = 0
@@ -464,28 +464,28 @@ class TetrahedronMesh(QEntity):
 
         idx_bytes = bytes()
         # Front
-        idx_bytes += struct.pack('!H', 0)
-        idx_bytes += struct.pack('!H', 1)
-        idx_bytes += struct.pack('!H', 2)
+        idx_bytes += struct.pack('H', 0)
+        idx_bytes += struct.pack('H', 1)
+        idx_bytes += struct.pack('H', 2)
         # Bottom
-        idx_bytes += struct.pack('!H', 3)
-        idx_bytes += struct.pack('!H', 1)
-        idx_bytes += struct.pack('!H', 0)
+        idx_bytes += struct.pack('H', 3)
+        idx_bytes += struct.pack('H', 1)
+        idx_bytes += struct.pack('H', 0)
         # Left
-        idx_bytes += struct.pack('!H', 0)
-        idx_bytes += struct.pack('!H', 2)
-        idx_bytes += struct.pack('!H', 3)
+        idx_bytes += struct.pack('H', 0)
+        idx_bytes += struct.pack('H', 2)
+        idx_bytes += struct.pack('H', 3)
         # Right
-        idx_bytes += struct.pack('!H', 1)
-        idx_bytes += struct.pack('!H', 3)
-        idx_bytes += struct.pack('!H', 2)
+        idx_bytes += struct.pack('H', 1)
+        idx_bytes += struct.pack('H', 3)
+        idx_bytes += struct.pack('H', 2)
 
         idx_bytearray = QByteArray(idx_bytes)
         print("idx_bytearray size", idx_bytearray.size())
         idx_buffer.setData(idx_bytearray)
 
-        float_size = len(struct.pack('!f', 1.0))  # 4
-        ushort_size = len(struct.pack('!H', 1))  # 2
+        float_size = len(struct.pack('f', 1.0))  # 4
+        ushort_size = len(struct.pack('H', 1))  # 2
 
         # Attributes
         pos_attr = QAttribute()
@@ -671,9 +671,9 @@ class LineSegment(QEntity):
         # vertices = [v3]
         vert_bytes = bytes()
         for v in vertices:
-            vert_bytes += struct.pack('!f', v.x())
-            vert_bytes += struct.pack('!f', v.y())
-            vert_bytes += struct.pack('!f', v.z())
+            vert_bytes += struct.pack('f', v.x())
+            vert_bytes += struct.pack('f', v.y())
+            vert_bytes += struct.pack('f', v.z())
 
         vertex_bytearray = QByteArray(vert_bytes)
         vertex_buffer.setData(vertex_bytearray)
@@ -773,9 +773,9 @@ class Points(QEntity):
 
         vertex_bytes = bytes()
         for v in vertices:
-            vertex_bytes += struct.pack('!f', v.x())
-            vertex_bytes += struct.pack('!f', v.y())
-            vertex_bytes += struct.pack('!f', -v.z())
+            vertex_bytes += struct.pack('f', v.x())
+            vertex_bytes += struct.pack('f', v.y())
+            vertex_bytes += struct.pack('f', -v.z())
 
         vertex_bytearray = QByteArray(vertex_bytes)
         vertex_buffer.setData(vertex_bytearray)
@@ -783,9 +783,9 @@ class Points(QEntity):
         color_bytes = bytes()
         cr, cg, cb, calpha = color_obj.getRgbF()
         for c in range(len(vertices)):
-            color_bytes += struct.pack('!f', cr)
-            color_bytes += struct.pack('!f', cg)
-            color_bytes += struct.pack('!f', cb)
+            color_bytes += struct.pack('f', cr)
+            color_bytes += struct.pack('f', cg)
+            color_bytes += struct.pack('f', cb)
             # color_bytes += struct.pack('!f', c.w())
         color_bytearray = QByteArray(color_bytes)
         color_buffer.setData(color_bytearray)
