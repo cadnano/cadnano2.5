@@ -6,11 +6,11 @@ from PyQt5.QtWidgets import QLabel, QSpinBox
 from PyQt5.QtWidgets import QCheckBox, QSlider
 from PyQt5.Qt3DExtras import Qt3DWindow, QOrbitCameraController
 from PyQt5.Qt3DInput import QInputAspect
-from PyQt5.Qt3DRender import QDirectionalLight
+# from PyQt5.Qt3DRender import QDirectionalLight
 
 from cadnano.gui.palette import getColorObj
 
-from .customshapes import Sphere
+# from .customshapes import Sphere
 from .customlines import Line
 
 
@@ -51,7 +51,7 @@ class SimDockWidget(QDockWidget):
         self.spinboxes = []
         self._initUI()
         self._init3D()
-        self._initControls()
+        # self._initControls()
 
     @pyqtSlot(int)
     def setPosVertexSize(self, value):
@@ -196,8 +196,8 @@ class SimDockWidget(QDockWidget):
         colbyteoffset_spinbox.valueChanged.connect(self.setColByteOffset)
         colcount_spinbox.valueChanged.connect(self.setColCount)
 
-        colvertexsize_spinbox.setValue(s._col_attr.vertexSize())
-        colbyteoffset_spinbox.setValue(s._col_attr.byteOffset())
+        colvertexsize_spinbox.setValue(3)
+        colbyteoffset_spinbox.setValue(12)
         colcount_spinbox.setValue(s._col_attr.count())
 
         stride_label = QLabel("Stride")
@@ -252,7 +252,7 @@ class SimDockWidget(QDockWidget):
         self._v_layout = v_layout = QVBoxLayout()
         v_layout.setAlignment(Qt.AlignTop)
         h_layout.addWidget(container, 1)
-        h_layout.addLayout(v_layout)
+        # h_layout.addLayout(v_layout)
         h_layout.setContentsMargins(0, 1, 0, 1)
         v_layout.setContentsMargins(0, 0, 0, 0)
     # end def
@@ -260,7 +260,7 @@ class SimDockWidget(QDockWidget):
     def _init3D(self):
         """Configure the camera and register the view aspect and root entity."""
         framegraph = self.view.defaultFrameGraph()
-        framegraph.setClearColor(getColorObj('#ffffff'))
+        framegraph.setClearColor(getColorObj('#f6f6f6'))
         cam_entity = self.camera_entity
         cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
         # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
@@ -274,41 +274,14 @@ class SimDockWidget(QDockWidget):
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
 
-        line = Line(self.root_entity)
-        self.shapes.append(line)
-
-        # ts = TriStrip(self.root_entity)
-        # self.shapes.append(ts)
-
-        Sphere(0, 0, 0, '#cccccc', self.root_entity, radius=0.1)
-        Sphere(2, 0, 0, '#0000cc', self.root_entity, radius=0.2)
-        Sphere(0, 2, 0, '#007200', self.root_entity, radius=0.2)
-        Sphere(0, 0, 2, '#cc0000', self.root_entity, radius=0.2)
-
-        Sphere(2, 2, 2, '#cccc00', self.root_entity, radius=0.1)
-
-        # LineSegment(self.root_entity)
-        # TetrahedronMesh(0, 0, 0, self.root_entity)
-        # c = Cube(0, 0, 0, 1, 1, 1, '#cc00cc', self.root_entity)
-
-        # Sphere(1.0, 0.0, -1.0, '#00ff00', self.root_entity)
-        # Sphere(0.0, 1.0, 0.0, '#0000ff', self.root_entity)
-        # Sphere(0.0, 0.0, 1.0, '#ffffff', self.root_entity)
-
-        # Sphere(1, 0, 0, '#0000cc', self.root_entity)
-        # Sphere(2, 0, 0, '#0000cc', self.root_entity)
-        # Sphere(3, 0, 0, '#0000cc', self.root_entity)
-        # Sphere(0, 1, 0, '#007200', self.root_entity)
-        # Sphere(0, 2, 0, '#007200', self.root_entity)
-        # Sphere(0, 3, 0, '#007200', self.root_entity)
-        # Sphere(0, 0, 1, '#cc0000', self.root_entity)
-        # Sphere(0, 0, 2, '#cc0000', self.root_entity)
-        # Sphere(0, 0, 3, '#cc0000', self.root_entity)
+        Line((0, 0, 0), (1, 0, 0), '#0000cc', self.root_entity)
+        Line((0, 0, 0), (0, 1, 0), '#007200', self.root_entity)
+        Line((0, 0, 0), (0, 0, 1), '#cc0000', self.root_entity)
 
         # Light 1
-        self.light = light = QDirectionalLight()
-        light.setColor(getColorObj('#ffffff'))
-        light.setIntensity(1.0)
-        light.setWorldDirection(QVector3D(0, 1, -1))
-        self.root_entity.addComponent(light)
+        # self.light = light = QDirectionalLight()
+        # light.setColor(getColorObj('#ffffff'))
+        # light.setIntensity(1.0)
+        # light.setWorldDirection(QVector3D(0, 1, -1))
+        # self.root_entity.addComponent(light)
     # end def
