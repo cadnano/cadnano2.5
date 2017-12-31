@@ -8,6 +8,7 @@ Submodules
 
    cadnano.views.abstractitems.abstractoligoitem
    cadnano.views.abstractitems.abstractpartitem
+   cadnano.views.abstractitems.abstractstranditem
    cadnano.views.abstractitems.abstracttoolmanager
    cadnano.views.abstractitems.abstractvirtualhelixitem
 

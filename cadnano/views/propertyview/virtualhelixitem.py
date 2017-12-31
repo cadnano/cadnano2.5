@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 
 from cadnano.proxies.cnenum import ItemType
-from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
 
 

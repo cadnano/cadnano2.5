@@ -22,7 +22,7 @@ def copyWrapAPI(cls_from, cls_to, attr_str='model'):
     module = cls_to.__module__
     self_attr_str = 'self.%s' % (attr_str)
     for name, f in getPublicMethods(cls_from):
-        # 1. Copy call signature Python 3.5 only use getargspec, formatargspec for 2.7
+        # 1. Copy call signature Python 3 only use getargspec, formatargspec for 2.7
         argspec_1 = inspect.signature(f)
         formatted_args_1 = str(argspec_1)
         # print(formatted_args_1)

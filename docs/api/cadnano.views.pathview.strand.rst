@@ -13,7 +13,6 @@ Submodules
 
 .. toctree::
 
-   cadnano.views.pathview.strand.abstractstranditem
    cadnano.views.pathview.strand.endpointitem
    cadnano.views.pathview.strand.stranditem
    cadnano.views.pathview.strand.xoveritem

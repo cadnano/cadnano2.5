@@ -73,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'cadnano'
-copyright = '2016 NJ Conway, SM Douglas'
+copyright = '2018 NJ Conway, SM Douglas'
 author = 'NJ Conway, SM Douglas'
 
 # The version info for the project you're documenting, acts as replacement for

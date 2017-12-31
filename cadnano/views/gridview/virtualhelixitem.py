@@ -7,7 +7,7 @@ from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 from . import gridstyles as styles

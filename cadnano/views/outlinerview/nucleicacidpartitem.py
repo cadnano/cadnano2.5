@@ -3,7 +3,7 @@ from cadnano.proxies.cnenum import ItemType
 from cadnano.views import styles
 from .cnoutlineritem import CNOutlinerItem
 from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
-from cadnano.controllers.itemcontrollers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OutlineOligoItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 

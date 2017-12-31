@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano.views.pathview import pathstyles
-from cadnano.controllers.itemcontrollers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 
