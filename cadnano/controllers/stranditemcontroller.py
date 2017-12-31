@@ -1,52 +1,66 @@
-from cadnano import util
-from .abstractstranditemcontroller import AbstractStrandItemController
-
-
-class StrandItemController(AbstractStrandItemController):
-    def __init__(self, strand_item, model_strand):
-        super(StrandItemController, self).__init__(strand_item, model_strand)
+class StrandItemController():
+    def __init__(self, model_strand, strand_item):
+        self._model_strand = model_strand
+        self._model_oligo = model_strand.oligo()
+        self._strand_item = strand_item
         self.connectSignals()
     # end def
 
-    def reconnectOligoSignals(self):
-        """
-        use this for whenever a strands oligo changes
-        """
-        AbstractStrandItemController.disconnectOligoSignals(self)
-        self.disconnectOligoSignals()
-        AbstractStrandItemController.connectOligoSignals(self)
-        self.connectOligoSignals()
-    # end def
+    connections = [
+        ('strandHasNewOligoSignal', 'strandHasNewOligoSlot'),
+        ('strandRemovedSignal', 'strandRemovedSlot'),
+        ('strandResizedSignal', 'strandResizedSlot'),
+        # ('strandXover5pRemovedSignal', 'strandXover5pRemovedSlot'),
+        ('strandUpdateSignal', 'strandUpdateSlot'),
+        ('strandInsertionAddedSignal', 'strandInsertionAddedSlot'),
+        ('strandInsertionChangedSignal', 'strandInsertionChangedSlot'),
+        ('strandInsertionRemovedSignal', 'strandInsertionRemovedSlot'),
+        ('strandModsAddedSignal', 'strandModsAddedSlot'),
+        ('strandModsChangedSignal', 'strandModsChangedSlot'),
+        ('strandModsRemovedSignal', 'strandModsRemovedSlot'),
+        ('strandSelectedChangedSignal', 'strandSelectedChangedSlot'),
+    ]
+
+    oligoconnections = [
+        ('oligoPropertyChangedSignal', 'oligoPropertyChangedSlot'),
+        # ('oligoRemovedSignal', 'oligoRemovedSlot'),
+        ('oligoSequenceAddedSignal', 'oligoSequenceAddedSlot'),
+        ('oligoSequenceClearedSignal', 'oligoSequenceClearedSlot')
+    ]
 
     def connectSignals(self):
-        AbstractStrandItemController.connectSignals(self)
+        StrandItemController.connectOligoSignals(self)
         m_s = self._model_strand
         s_i = self._strand_item
-        m_s.strandResizedSignal.connect(s_i.strandResizedSlot)
-        m_s.strandUpdateSignal.connect(s_i.strandUpdateSlot)
-        self.connectOligoSignals()
+        for signal, slot in self.connections:
+            getattr(m_s, signal).connect(getattr(s_i, slot))
+    # end def
+
+    def disconnectSignals(self):
+        StrandItemController.disconnectOligoSignals(self)
+        m_s = self._model_strand
+        s_i = self._strand_item
+        for signal, slot in self.connections:
+            getattr(m_s, signal).disconnect(getattr(s_i, slot))
     # end def
 
     def connectOligoSignals(self):
         m_o = self._model_strand.oligo()
+        s_i = self._strand_item
         self._model_oligo = m_o
-        s_i = self._strand_item
-        m_o.oligoSequenceAddedSignal.connect(s_i.oligoSequenceAddedSlot)
-        m_o.oligoSequenceClearedSignal.connect(s_i.oligoSequenceClearedSlot)
-    # end def
-
-    def disconnectSignals(self):
-        AbstractStrandItemController.disconnectSignals(self)
-        m_s = self._model_strand
-        s_i = self._strand_item
-        m_s.strandResizedSignal.disconnect(s_i.strandResizedSlot)
-        m_s.strandUpdateSignal.disconnect(s_i.strandUpdateSlot)
-        self.disconnectOligoSignals()
+        for signal, slot in self.oligoconnections:
+            getattr(m_o, signal).connect(getattr(s_i, slot))
     # end def
 
     def disconnectOligoSignals(self):
         m_o = self._model_oligo
         s_i = self._strand_item
-        m_o.oligoSequenceAddedSignal.disconnect(s_i.oligoSequenceAddedSlot)
-        m_o.oligoSequenceClearedSignal.disconnect(s_i.oligoSequenceClearedSlot)
+        for signal, slot in self.oligoconnections:
+            getattr(m_o, signal).disconnect(getattr(s_i, slot))
     # end def
+
+    def reconnectOligoSignals(self):
+        self.disconnectOligoSignals()
+        self.connectOligoSignals()
+    # end def
+# end class

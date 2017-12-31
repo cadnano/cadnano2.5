@@ -26,7 +26,6 @@ class Line(QEntity):
 
         color_obj = getColorObj(color)
         cr, cg, cb, calpha = color_obj.getRgbF()
-        print(cr, cg, cb, calpha)
 
         vertex_color_list = [p1x, p1y, -p1z, cr, cg, cb,
                              p2x, p2y, -p2z, cr, cg, cb]
@@ -35,7 +34,6 @@ class Line(QEntity):
         vertex_color_bytearray = QByteArray(vertex_color_bytes)
         vertex_color_buffer = QBuffer(QBuffer.VertexBuffer)
         vertex_color_buffer.setData(vertex_color_bytearray)
-        print("vertex_color_bytes size", vertex_color_bytearray.size())
 
         sizeof_float = len(struct.pack('f', 1.0))  # 4
         stride = (3 + 3)*sizeof_float  # 24

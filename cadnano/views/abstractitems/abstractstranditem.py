@@ -1,32 +1,72 @@
-from cadnano.extras.wrapapi import copyWrapAPI
-from cadnano.strand.strand import Strand
 
 
 class AbstractStrandItem(object):
-    def __init__(self, model_strand=None, parent=None):
+    def __init__(self, model_strand=None, virtual_helix_item=None):
         """The parent should be a VirtualHelixItem."""
         if self.__class__ == AbstractStrandItem:
             raise NotImplementedError("AbstractStrandItem should be subclassed.")
-        super(AbstractStrandItem, self).__init__(parent)
-        self._model_strand = model_strand
-        self._oligo = None
+        self._model_strand = None
+        self._model_vh = None
+        self._model_oligo = None
 
     ### SIGNALS ###
 
-    # ### SLOTS ###
-    # def oligoAppeareanceChanged(self):
-    #     """docstring for oligoAppeareanceChanged"""
-    #     pass
+    def strandHasNewOligoSlot(self, strand):
+        pass
+    # end def
 
-    # def hasNewOligoSlot(self, oligo):
-    #     """docstring for hasNewOligoSlot"""
-    #     self._oligo = oligo
-    #     # redraw
+    def strandRemovedSlot(self, strand):
+        pass
+    # end def
 
-    # def strandRemovedSlot(self, strand):
-    #     """docstring for strandRemovedSlot"""
-    #     pass
+    def strandResizedSlot(self, strand, indices):
+        pass
+    # end def
 
+    def strandXover5pRemovedSlot(self, strand3p, strand5p):
+        pass
+    # end def
 
-# Add model methods to class
-copyWrapAPI(Strand, AbstractStrandItem, attr_str='_model_strand')
+    def strandUpdateSlot(self, strand):
+        pass
+    # end def
+
+    def strandInsertionAddedSlot(self, strand, insertion):
+        pass
+    # end def
+
+    def strandInsertionChangedSlot(self, strand, insertion):
+        pass
+    # end def
+
+    def strandInsertionRemovedSlot(self, strand, index):
+        pass
+    # end def
+
+    def strandModsAddedSlot(self, strand, document, mod_id, idx):
+        pass
+    # end def
+
+    def strandModsChangedSlot(self, strand, document, mod_id, idx):
+        pass
+    # end def
+
+    def strandModsRemovedSlot(self, strand, document, mod_id, idx):
+        pass
+    # end def
+
+    def strandSelectedChangedSlot(self, strand, indices):
+        pass
+    # end def
+
+    def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
+        pass
+    # end def
+
+    def oligoSequenceAddedSlot(self, oligo):
+        pass
+    # end def
+
+    def oligoSequenceClearedSlot(self, oligo):
+        pass
+    # end def

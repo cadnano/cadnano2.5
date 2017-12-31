@@ -39,7 +39,7 @@ class StrandItem(QGraphicsLineItem):
         self._viewroot = viewroot
         self._getActiveTool = viewroot.manager.activeToolGetter
 
-        self._controller = StrandItemController(self, model_strand)
+        self._controller = StrandItemController(model_strand, self)
         is_forward = model_strand.strandSet().isForward()
 
         self._strand_filter = model_strand.strandFilter()
