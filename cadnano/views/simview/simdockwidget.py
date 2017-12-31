@@ -13,6 +13,8 @@ from cadnano.gui.palette import getColorObj
 # from .customshapes import Sphere
 from .customlines import Line
 
+from .strandlines import StrandLines
+
 
 class SceneModifier(QObject):
     def __init__(self, root_entity):
@@ -277,6 +279,8 @@ class SimDockWidget(QDockWidget):
         Line((0, 0, 0), (1, 0, 0), '#0000cc', self.root_entity)
         Line((0, 0, 0), (0, 1, 0), '#007200', self.root_entity)
         Line((0, 0, 0), (0, 0, 1), '#cc0000', self.root_entity)
+
+        StrandLines(self.root_entity)
 
         # Light 1
         # self.light = light = QDirectionalLight()

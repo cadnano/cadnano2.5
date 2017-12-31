@@ -1,10 +1,12 @@
 import struct
 
 from PyQt5.QtCore import QByteArray
+from PyQt5.QtGui import QQuaternion
 from PyQt5.QtGui import QVector3D, QVector4D
 
 from PyQt5.Qt3DCore import QEntity, QTransform
 from PyQt5.Qt3DExtras import QCuboidMesh
+from PyQt5.Qt3DExtras import QCylinderMesh
 from PyQt5.Qt3DExtras import QPhongAlphaMaterial
 from PyQt5.Qt3DExtras import QGoochMaterial
 from PyQt5.Qt3DExtras import QPerVertexColorMaterial
@@ -76,9 +78,9 @@ class Triangle(QEntity):
 
         color_bytes = bytes()
         for c in colors:
-            color_bytes += struct.pack('!f', c.x())
-            color_bytes += struct.pack('!f', c.y())
-            color_bytes += struct.pack('!f', c.z())
+            color_bytes += struct.pack('f', c.x())
+            color_bytes += struct.pack('f', c.y())
+            color_bytes += struct.pack('f', c.z())
             # color_bytes += struct.pack('!f', c.w())
         color_bytearray = QByteArray(color_bytes)
         color_buffer.setData(color_bytearray)
@@ -123,10 +125,10 @@ class Triangle(QEntity):
 
         # idx_buffer = QBuffer(QBuffer.IndexBuffer, geo)
         # idx_bytes = bytes()
-        # idx_bytes += struct.pack('!H', 0)
-        # idx_bytes += struct.pack('!H', 1)
-        # idx_bytes += struct.pack('!H', 2)
-        # idx_bytes += struct.pack('!H', 3)
+        # idx_bytes += struct.pack('H', 0)
+        # idx_bytes += struct.pack('H', 1)
+        # idx_bytes += struct.pack('H', 2)
+        # idx_bytes += struct.pack('H', 3)
         # idx_bytearray = QByteArray(idx_bytes)
         # idx_buffer.setData(idx_bytearray)
         # idx_attr = QAttribute()
@@ -292,10 +294,10 @@ class TriStrip(QEntity):
 
         # idx_buffer = QBuffer(QBuffer.IndexBuffer, geo)
         # idx_bytes = bytes()
-        # idx_bytes += struct.pack('!H', 0)
-        # idx_bytes += struct.pack('!H', 1)
-        # idx_bytes += struct.pack('!H', 2)
-        # idx_bytes += struct.pack('!H', 3)
+        # idx_bytes += struct.pack('H', 0)
+        # idx_bytes += struct.pack('H', 1)
+        # idx_bytes += struct.pack('H', 2)
+        # idx_bytes += struct.pack('H', 3)
         # idx_bytearray = QByteArray(idx_bytes)
         # idx_buffer.setData(idx_bytearray)
         # idx_attr = QAttribute()
@@ -563,98 +565,6 @@ class TetrahedronMesh(QEntity):
 # end class
 
 
-# bool LayerMesh::initialize(Qt3DCore::QEntity *parent)
-# {
-#     meshRenderer = new Qt3DRender::QGeometryRenderer;
-#     geometry = new Qt3DRender::QGeometry(meshRenderer);
-
-#     vertex_buffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, geometry);
-#     idx_buffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer, geometry);
-
-#     int lineSize = 4;
-#     int hLineSize = ((qAbs(netX1 - netX0) / netMajorStep) + 1) * lineSize * 3;
-#     int vLineSize = ((qAbs(netZ1 - netZ0) / netMajorStep) + 1) * lineSize * 3;
-#     int vertexNum = hLineSize + vLineSize;
-
-#     float* vertexRawData = new float[vertexNum];
-#     int idx = 0;
-#     QColor majorColor = QColor(220,220,220);
-#     QColor minorColor = QColor(243,243,243);
-#     for(float x = netX0; x <= netX1; x += netMajorStep)
-#     {
-#         vertexRawData[idx++] = x; vertexRawData[idx++] = netY; vertexRawData[idx++] = netZ0;
-#         vertexRawData[idx++] = majorColor.redF(); vertexRawData[idx++] = majorColor.greenF();
-#         vertexRawData[idx++] = majorColor.blueF();
-#         vertexRawData[idx++] = x; vertexRawData[idx++] = netY; vertexRawData[idx++] = netZ1;
-#         vertexRawData[idx++] = majorColor.redF(); vertexRawData[idx++] = majorColor.greenF();
-#         vertexRawData[idx++] = majorColor.blueF();
-#     }
-
-#     for(float z = netZ0; z <= netZ1; z += netMajorStep)
-#     {
-#         vertexRawData[idx++] = netX0; vertexRawData[idx++] = netY; vertexRawData[idx++] = z;
-#         vertexRawData[idx++] = majorColor.redF(); vertexRawData[idx++] = majorColor.greenF();
-#         vertexRawData[idx++] = majorColor.blueF();
-#         vertexRawData[idx++] = netX1; vertexRawData[idx++] = netY; vertexRawData[idx++] = z;
-#         vertexRawData[idx++] = majorColor.redF(); vertexRawData[idx++] = majorColor.greenF();
-#         vertexRawData[idx++] = majorColor.blueF();
-#     }
-
-#     QByteArray ba;
-#     int bufferSize = vertexNum * sizeof(float);
-#     ba.resize(bufferSize);
-#     memcpy(ba.data(), reinterpret_cast<const char*>(vertexRawData), bufferSize);
-#     vertex_buffer->setData(ba);
-
-#     int stride = 6 * sizeof(float);
-
-#     // Attributes
-#     Qt3DRender::QAttribute *pos_attr = new Qt3DRender::QAttribute();
-#     pos_attr->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-#     pos_attr->setBuffer(vertex_buffer);
-#     pos_attr->setDataType(Qt3DRender::QAttribute::Float);
-#     pos_attr->setDataSize(3);
-#     pos_attr->setByteOffset(0);
-#     pos_attr->setByteStride(stride);
-#     pos_attr->setCount(vertexNum / 2);
-#     pos_attr->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
-
-
-#     Qt3DRender::QAttribute *col_attr = new Qt3DRender::QAttribute();
-#     col_attr->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-#     col_attr->setBuffer(vertex_buffer);
-#     col_attr->setDataType(Qt3DRender::QAttribute::Float);
-#     col_attr->setDataSize(3);
-#     col_attr->setByteOffset(3 * sizeof(float));
-#     col_attr->setByteStride(stride);
-#     col_attr->setCount(vertexNum / 2);
-#     col_attr->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
-
-#     geometry->addAttribute(pos_attr);
-#     geometry->addAttribute(col_attr);
-
-#     meshRenderer->setInstanceCount(1);
-#     meshRenderer->setIndexOffset(0);
-#     meshRenderer->setFirstInstance(0);
-#     meshRenderer->setPrimitiveType(Qt3DRender::QGeometryRenderer::Lines);
-#     meshRenderer->setGeometry(geometry);
-#     meshRenderer->setVertexCount(vertexNum / 2);
-
-#     material = new Qt3DExtras::QPerVertexColorMaterial(parentEntity);
-#     transform = new Qt3DCore::QTransform;
-#     transform->setScale(1.0f);
-
-#     Qt3DCore::QEntity *entity = new Qt3DCore::QEntity(parentEntity);
-#     entity->addComponent(meshRenderer);
-#     entity->addComponent(transform);
-#     entity->addComponent(material);
-
-#     entity->setParent(parentEntity);
-
-#     return true;
-# }
-
-
 class LineSegment(QEntity):
     def __init__(self, parent_entity):
         super(LineSegment, self).__init__(parent_entity)
@@ -719,6 +629,47 @@ class LineSegment(QEntity):
         self.addComponent(mat)
     # end def
 # end class
+
+
+_CYLINDER_RADIUS = 1.0
+_CYLINDER_RINGS = 20
+_CYLINDER_SLICES = 10
+
+
+class Cylinder(QEntity):
+    """docstring for Cube"""
+
+    def __init__(self, x, y, z, length, color, parent_entity):
+        super(Cylinder, self).__init__(parent_entity)
+        self._x = x
+        self._y = y
+        self._z = -z
+        self._length = length
+        self._color = color
+        self._parent_entity = parent_entity
+        self._mesh = mesh = QCylinderMesh()
+        self._trans = trans = QTransform()
+        self._mat = mat = QGoochMaterial()
+        self._mat = mat = QPhongAlphaMaterial()
+        mat.setAlpha(0.5)
+
+        # mat.setCool(getColorObj("#0000cc"))
+        # mat.setWarm(getColorObj("#cccc00"))
+
+        mesh.setRadius(_CYLINDER_RADIUS)
+        mesh.setRings(_CYLINDER_RINGS)
+        mesh.setSlices(_CYLINDER_SLICES)
+        mesh.setLength(length)
+
+        trans.setTranslation(QVector3D(x, y, -z))
+        trans.setRotation(QQuaternion.fromAxisAndAngle(QVector3D(1.0, 0.0, 0.0), 90.0))
+
+        # print(mat.cool().name(), mat.warm().name())
+        mat.setDiffuse(getColorObj(color))
+
+        self.addComponent(mesh)
+        self.addComponent(trans)
+        self.addComponent(mat)
 
 
 _SPHERE_RINGS = 16

@@ -21,7 +21,6 @@ Submodules
    cadnano.views.simview.simrootitem
    cadnano.views.simview.simstyles
    cadnano.views.simview.strandlines
-   cadnano.views.simview.strandlinesgeometry
    cadnano.views.simview.virtualhelixitem
 
 Module contents
