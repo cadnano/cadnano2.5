@@ -107,7 +107,7 @@ DEFAULT_ALPHA = 2
 SELECTIONBOX_PEN_WIDTH = 0  # cosmetic
 
 # Loop/Insertion path details
-INSERTWIDTH = 2
+INSERTWIDTH = 1.5
 SKIPWIDTH = 2
 
 # Add Sequence Tool
