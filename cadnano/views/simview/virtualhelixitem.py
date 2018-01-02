@@ -81,7 +81,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
             sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
-        print("[simview] vhi: strandAdded slot")
+        # print("[simview] vhi: strandAdded slot")
         StrandItem(strand, self)
     # end def
 
