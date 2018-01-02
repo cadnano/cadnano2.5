@@ -4,6 +4,7 @@ from cadnano.views.abstractitems.abstractstranditem import AbstractStrandItem
 
 
 class StrandItem(AbstractStrandItem):
+
     def __init__(self, model_strand, virtual_helix_item):
         AbstractStrandItem.__init__(self, model_strand, virtual_helix_item)
         self._model_strand = model_strand
@@ -12,29 +13,38 @@ class StrandItem(AbstractStrandItem):
     # end def
 
     def strandResizedSlot(self, strand, indices):
-        print("[simview] strandResizedSlot")
-        self._vh_item.strandResized(strand, indices)
+        print("[simview] strand: strandResizedSlot", strand, indices)
+        # self._vh_item.strandResized(strand, indices)
     # end def
 
     def strandRemovedSlot(self, strand):
-        print("[simview] strandRemovedSlot")
-        self._vh_item.strandRemoved(strand)
+        print("[simview] strandRemovedSlot", strand)
+        # self._vh_item.strandRemoved(strand)
+        # self._controller.disconnectSignals()
+        # self._controller = None
+        # self._model_strand = None
+        # self._vh_item = None
     # end def
 
-    def strandUpdateSlot(self, strand):
-        print("[simview] strandUpdateSlot")
-        self._vh_item.strandUpdate(strand)
+    def strandUpdatedSlot(self, strand):
+        print("[simview] strandUpdatedSlot")
+        # self._vh_item.strandUpdate(strand)
     # end def
 
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
-        print("[simview] oligoPropertyChangedSlot", key, new_value)
+        # print("[simview] oligoPropertyChangedSlot", key, new_value)
+        pass
     # end def
 
     def strandHasNewOligoSlot(self, strand):
-        strand = self._model_strand
         self._controller.reconnectOligoSignals()
+        # strand = self._model_strand
         # self._updateColor(strand)
-        print("[simview] strandHasNewOligoSlot", strand)
+        # if strand.connection3p():
+        #     self.xover_3p_end._updateColor(strand)
+        # for insertion in self.insertionItems().values():
+        #     insertion.updateItem()
+        pass
     # end def
 
     def strandInsertionAddedSlot(self, strand, insertion):
@@ -50,5 +60,6 @@ class StrandItem(AbstractStrandItem):
     # end def
 
     def strandSelectedChangedSlot(self, strand, indices):
-        print("[simview] strandSelectedChangedSlot", strand, indices)
+        # print("[simview] strandSelectedChangedSlot", strand, indices)
+        pass
     # end def

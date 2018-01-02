@@ -57,7 +57,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         self._part_entity = part_item.entity()
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
-        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
+        self._controller = VirtualHelixItemController(self, self._model_part, True, True)
 
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(self._id_num)
         self.strand_lines = StrandLines(fwd_pts, rev_pts, self._part_entity)
@@ -81,41 +81,34 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
             sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
+        print("[simview] vhi: strandAdded slot")
         StrandItem(strand, self)
     # end def
 
-    def virtualHelixRemovedSlot(self):
+    def partVirtualHelixRemovedSlot(self):
         """Summary
 
         Returns:
             TYPE: Description
         """
         # self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
-        self._controller.disconnectSignals()
+        print("[simview] vhi: partVirtualHelixRemovedSlot")
+        # todo: remove StrandLines components and entity
+        # self._controller.disconnectSignals()
         self._controller = None
-        # self.removeComponent(self.cylinder_3d)
-        # self.removeComponent(self.material_3d)
-        # self.removeComponent(self.transform_3d)
         self._part_entity = None
         self._model_part = None
         self._getActiveTool = None
-        self._handle = None
+        self._viewroot = None
     # end def
 
-    def virtualHelixPropertyChangedSlot(self, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
+        print("[simview] vhi: partVirtualHelixPropertyChangedSlot")
         pass
     # end def
 
-    ### PUBLIC METHODS ###
-    def strandResized(self, strand, indices):
-        pass
-    # end def
-
-    def strandRemoved(self, strand):
-        pass
-    # end def
-
-    def strandUpdate(self, strand):
+    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
+        print("[simview] vhi: partVirtualHelixResizedSlot")
         pass
     # end def
 
@@ -218,7 +211,7 @@ class StrandLinesGeometry(QGeometry):
         num_verts = num_fwd_pts+num_rev_pts
 
         fwd_rev_pts = np.concatenate((fwd_pts, rev_pts))
-        zcorrected_pts = fwd_rev_pts * (1, 1, -1)  # correct for GL -z
+        zcorrected_pts = fwd_rev_pts  # * (1, 1, -1)  # correct for GL -z
 
         fr, fg, fb, falpha = getColorObj('#0066cc').getRgbF()
         rr, rg, rb, falpha = getColorObj('#cc0000').getRgbF()

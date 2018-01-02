@@ -27,8 +27,8 @@ class Line(QEntity):
         color_obj = getColorObj(color)
         cr, cg, cb, calpha = color_obj.getRgbF()
 
-        vertex_color_list = [p1x, p1y, -p1z, cr, cg, cb,
-                             p2x, p2y, -p2z, cr, cg, cb]
+        vertex_color_list = [p1x, p1y, p1z, cr, cg, cb,
+                             p2x, p2y, p2z, cr, cg, cb]
 
         vertex_color_bytes = struct.pack('%sf' % len(vertex_color_list), *vertex_color_list)
         vertex_color_bytearray = QByteArray(vertex_color_bytes)
