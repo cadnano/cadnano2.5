@@ -67,8 +67,8 @@ class CreateXoverCommand(UndoCommand):
         # st3p = ss3.strandType()
 
         if self._update_oligo:
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand5p.strandUpdatedSignal.emit(strand5p)
+            strand3p.strandUpdatedSignal.emit(strand3p)
     # end def
 
     def undo(self):
@@ -104,8 +104,8 @@ class CreateXoverCommand(UndoCommand):
                     fSetOligo(strand, old_olg3p, emit_signals=True)
 
         if self._update_oligo:
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand5p.strandUpdatedSignal.emit(strand5p)
+            strand3p.strandUpdatedSignal.emit(strand3p)
     # end def
 # end class
 
@@ -172,8 +172,8 @@ class RemoveXoverCommand(UndoCommand):
                 # emits strandHasNewOligoSignal
                 fSetOligo(strand, new_olg3p, emit_signals=True)
 
-        strand5p.strandUpdateSignal.emit(strand5p)
-        strand3p.strandUpdateSignal.emit(strand3p)
+        strand5p.strandUpdatedSignal.emit(strand5p)
+        strand3p.strandUpdatedSignal.emit(strand3p)
     # end def
 
     def undo(self):
@@ -209,7 +209,7 @@ class RemoveXoverCommand(UndoCommand):
         strand5p.setConnection3p(strand3p)
         strand3p.setConnection5p(strand5p)
 
-        strand5p.strandUpdateSignal.emit(strand5p)
-        strand3p.strandUpdateSignal.emit(strand3p)
+        strand5p.strandUpdatedSignal.emit(strand5p)
+        strand3p.strandUpdatedSignal.emit(strand3p)
     # end def
 # end class

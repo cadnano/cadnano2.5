@@ -27,7 +27,7 @@ class AbstractStrandItem(object):
         pass
     # end def
 
-    def strandUpdateSlot(self, strand):
+    def strandUpdatedSlot(self, strand):
         pass
     # end def
 

@@ -67,7 +67,7 @@ class RefreshOligosCommand(UndoCommand):
         # end for
 
         for strand in visited.keys():
-            strand.strandUpdateSignal.emit(strand)
+            strand.strandUpdatedSignal.emit(strand)
     # end def
 
     def undo(self):

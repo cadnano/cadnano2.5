@@ -81,7 +81,7 @@ class RemoveStrandCommand(UndoCommand):
                 id_num = strandset.idNum()
                 # Why is this signal emitted here?
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand5p.strandUpdateSignal.emit(strand5p)
+            strand5p.strandUpdatedSignal.emit(strand5p)
         # end if
         if strand3p is not None:
             if not oligo.isCircular():
@@ -93,7 +93,7 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand3p.strandUpdatedSignal.emit(strand3p)
         # end if
         # Emit a signal to notify on completion
         strand.strandRemovedSignal.emit(strand)
@@ -158,15 +158,15 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand.strandUpdateSignal.emit(strand)
+            strand5p.strandUpdatedSignal.emit(strand5p)
+            strand.strandUpdatedSignal.emit(strand)
 
         if strand3p is not None:
             if self._solo:
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand3p.strandUpdateSignal.emit(strand3p)
-            strand.strandUpdateSignal.emit(strand)
+            strand3p.strandUpdatedSignal.emit(strand3p)
+            strand.strandUpdatedSignal.emit(strand)
     # end def
 # end class

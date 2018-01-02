@@ -147,7 +147,7 @@ class Strand(CNObject):
     strandXover5pRemovedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pRemovedSignal')
     """pyqtSignal(QObject, QObject): (strand3p, strand5p)"""
 
-    strandUpdateSignal = ProxySignal(CNObject, name='strandUpdateSignal')
+    strandUpdatedSignal = ProxySignal(CNObject, name='strandUpdatedSignal')
     """pyqtSignal(QObject): strand"""
 
     strandInsertionAddedSignal = ProxySignal(CNObject, object, name='strandInsertionAddedSignal')
