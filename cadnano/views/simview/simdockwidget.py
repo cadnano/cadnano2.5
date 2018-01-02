@@ -9,11 +9,7 @@ from PyQt5.Qt3DInput import QInputAspect
 # from PyQt5.Qt3DRender import QDirectionalLight
 
 from cadnano.gui.palette import getColorObj
-
-# from .customshapes import Sphere
 from .customlines import Line
-
-from .strandlines import StrandLines
 
 
 class SceneModifier(QObject):
@@ -48,7 +44,8 @@ class SimDockWidget(QDockWidget):
         self.camera_entity = view.camera()
         self.cam_controller = QOrbitCameraController(root_entity)
         self.modifier = SceneModifier(root_entity)
-        self.aspect = QInputAspect()
+        self.aspect = ia = QInputAspect()
+        print(ia.availablePhysicalDevices())
         self.shapes = []
         self.spinboxes = []
         self._initUI()
@@ -264,23 +261,23 @@ class SimDockWidget(QDockWidget):
         framegraph = self.view.defaultFrameGraph()
         framegraph.setClearColor(getColorObj('#f6f6f6'))
         cam_entity = self.camera_entity
-        cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
+        # cam_entity.lens().setPerspectiveProjection(15.0, 16.0 / 9.0, 0.1, 1000.0)
         # cam_entity.lens().setOrthographicProjection(-20, 20, -20, 20, 0.1, 1000.0)
-        # cam_entity.setUpVector(QVector3D(0.0, 1.0, 0.0))  # default
-        cam_entity.setPosition(QVector3D(0.0, 0.0, 30.0))
+        cam_entity.lens().setOrthographicProjection(-16.0, 16.0, -9.0, 9.0, 0.0, 1000.0)
+        cam_entity.setPosition(QVector3D(0.0, 0.0, 50.0))
         cam_entity.setViewCenter(QVector3D(0.0, 0.0, 0.0))
-        # cam_entity.setViewCenter(QVector3D(0.0, 0.0, -6.97))
         self.cam_controller.setLinearSpeed(100.0)
         self.cam_controller.setLookSpeed(360.0)
         self.cam_controller.setCamera(cam_entity)
         self.view.registerAspect(self.aspect)
         self.view.setRootEntity(self.root_entity)
 
-        Line((0, 0, 0), (1, 0, 0), '#0000cc', self.root_entity)
+        Line((0, 0, 0), (1, 0, 0), '#cc0000', self.root_entity)
         Line((0, 0, 0), (0, 1, 0), '#007200', self.root_entity)
-        Line((0, 0, 0), (0, 0, 1), '#cc0000', self.root_entity)
+        Line((0, 0, 0), (0, 0, 1), '#0000cc', self.root_entity)
+        # Line((0, 0, 0), (1, 1, 1), '#cc00cc', self.root_entity)
 
-        StrandLines(self.root_entity)
+        # StrandLines(self.root_entity)
 
         # Light 1
         # self.light = light = QDirectionalLight()

@@ -13,16 +13,17 @@ class StrandItem(AbstractStrandItem):
 
     def strandResizedSlot(self, strand, indices):
         print("[simview] strandResizedSlot")
-        self._part_item.strandResized(strand, indices)
+        self._vh_item.strandResized(strand, indices)
     # end def
 
     def strandRemovedSlot(self, strand):
         print("[simview] strandRemovedSlot")
-        self._part_item.strandRemoved(strand)
+        self._vh_item.strandRemoved(strand)
     # end def
 
     def strandUpdateSlot(self, strand):
         print("[simview] strandUpdateSlot")
+        self._vh_item.strandUpdate(strand)
     # end def
 
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):

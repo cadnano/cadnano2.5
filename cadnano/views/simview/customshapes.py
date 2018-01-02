@@ -331,35 +331,6 @@ class TriStrip(QEntity):
         self.addComponent(trans)
         self.addComponent(mat)
     # end def
-
-    def setPosVertexSize(self, val):
-        self._pos_attr.setVertexSize(val)
-
-    def setPosByteOffset(self, val):
-        self._pos_attr.setByteOffset(val)
-
-    def setPosByteStride(self, val):
-        self._pos_attr.setByteStride(val)
-
-    def setPosCount(self, val):
-        self._pos_attr.setPosCount(val)
-
-    def setColVertexSize(self, val):
-        self._col_attr.setVertexSize(val)
-
-    def setColByteOffset(self, val):
-        self._col_attr.setByteOffset(val)
-
-    def setColByteStride(self, val):
-        self._col_attr.setByteStride(val)
-
-    def setColCount(self, val):
-        self._col_attr.setCount(val)
-
-    def setByteStride(self, val):
-        self._pos_attr.setByteStride(val)
-        # self._norm_attr.setByteStride(val)
-        self._col_attr.setByteStride(val)
 # end class
 
 
@@ -777,34 +748,4 @@ class Points(QEntity):
         self.addComponent(trans)
         self.addComponent(mat)
     # end def
-
-    def setPosVertexSize(self, val):
-        self._pos_attr.setVertexSize(val)
-
-    def setPosByteOffset(self, val):
-        self._pos_attr.setByteOffset(val)
-
-    def setPosByteStride(self, val):
-        self._pos_attr.setByteStride(val)
-
-    def setPosCount(self, val):
-        self._pos_attr.setPosCount(val)
-
-    def setColVertexSize(self, val):
-        self._col_attr.setVertexSize(val)
-
-    def setColByteOffset(self, val):
-        self._col_attr.setByteOffset(val)
-
-    def setColByteStride(self, val):
-        self._col_attr.setByteStride(val)
-
-    def setColCount(self, val):
-        self._col_attr.setCount(val)
-
-    def setByteStride(self, val):
-        self._pos_attr.setByteStride(val)
-        # self._norm_attr.setByteStride(val)
-        self._col_attr.setByteStride(val)
-
 # end class
