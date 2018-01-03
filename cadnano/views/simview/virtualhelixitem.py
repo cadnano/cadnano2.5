@@ -53,11 +53,11 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         # self._part_item = parent
         # self._model_part = model_virtual_helix.part() if model_virtual_helix is not None else None
         # self.is_active = False
-
+        self._strands = set()
         self._part_entity = part_item.entity()
         self._viewroot = viewroot
         self._getActiveTool = part_item._getActiveTool
-        self._controller = VirtualHelixItemController(self, self._model_part, True, True)
+        self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(self._id_num)
         self.strand_lines = StrandLines(fwd_pts, rev_pts, self._part_entity)
@@ -82,7 +82,8 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
             strand (TYPE): Description
         """
         # print("[simview] vhi: strandAdded slot")
-        StrandItem(strand, self)
+        strand = StrandItem(strand, self)
+        self._strands.add(strand)
     # end def
 
     def partVirtualHelixRemovedSlot(self):
@@ -120,6 +121,10 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
     def window(self):
         return self._part_entity.window()
     # end def
+
+    ### PUBLIC METHODS ###
+    def removeStrand(self, strand):
+        self._strands.remove(strand)
 # end class
 
 

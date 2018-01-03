@@ -1,10 +1,8 @@
-
 from cadnano.controllers.stranditemcontroller import StrandItemController
 from cadnano.views.abstractitems.abstractstranditem import AbstractStrandItem
 
 
 class StrandItem(AbstractStrandItem):
-
     def __init__(self, model_strand, virtual_helix_item):
         AbstractStrandItem.__init__(self, model_strand, virtual_helix_item)
         self._model_strand = model_strand
@@ -14,16 +12,15 @@ class StrandItem(AbstractStrandItem):
 
     def strandResizedSlot(self, strand, indices):
         print("[simview] strand: strandResizedSlot", strand, indices)
-        # self._vh_item.strandResized(strand, indices)
     # end def
 
     def strandRemovedSlot(self, strand):
         print("[simview] strandRemovedSlot", strand)
-        # self._vh_item.strandRemoved(strand)
-        # self._controller.disconnectSignals()
-        # self._controller = None
-        # self._model_strand = None
-        # self._vh_item = None
+        self._controller.disconnectSignals()
+        self._controller = None
+        self._model_strand = None
+        self._vh_item.removeStrand(self)
+        self._vh_item = None
     # end def
 
     def strandUpdatedSlot(self, strand):
