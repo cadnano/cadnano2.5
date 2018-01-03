@@ -12,7 +12,7 @@ class StrandItem(AbstractStrandItem):
 
     def strandResizedSlot(self, strand, indices):
         print("[simview] strand: strandResizedSlot", strand, indices)
-        self._vh_item.resizeStrand(strand, indices)
+        self._vh_item.resizeStrand3D(strand, indices)
     # end def
 
     def strandRemovedSlot(self, strand):
@@ -20,13 +20,13 @@ class StrandItem(AbstractStrandItem):
         self._controller.disconnectSignals()
         self._controller = None
         self._model_strand = None
-        self._vh_item.removeStrand(self)
+        self._vh_item.removeStrand3D(self)
         self._vh_item = None
     # end def
 
     def strandConnectionChangedSlot(self, strand):
         print("[simview] strandConnectionChangedSlot")
-        self._vh_item.updateStrandConnections(strand)
+        self._vh_item.updateStrandConnections3D(strand)
     # end def
 
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):

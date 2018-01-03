@@ -3,11 +3,8 @@
 import struct
 
 import numpy as np
-from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtCore import QByteArray
-from PyQt5.QtGui import QVector3D
 from PyQt5.Qt3DCore import QEntity
-from PyQt5.Qt3DCore import QTransform
 from PyQt5.Qt3DExtras import QPerVertexColorMaterial
 from PyQt5.Qt3DRender import QAttribute
 from PyQt5.Qt3DRender import QBuffer
@@ -18,14 +15,10 @@ from cadnano import util
 from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
 from cadnano.gui.palette import getColorObj
 from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-
 from .strand.stranditem import StrandItem
 
-# from .customshapes import Points
-# from .strandlines import StrandLines
 
-
-class SimVirtualHelixItem(AbstractVirtualHelixItem):
+class SimVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
     """VirtualHelixItem for PathView
 
     Attributes:
@@ -38,29 +31,28 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, model_virtual_helix, part_item, viewroot):
+    def __init__(self, model_virtual_helix, part_item_entity):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_entity (TYPE): Description
-            viewroot (TYPE): Description
+            model_virtual_helix (VirtualHelix):
+            part_item_entity (QEntity): Description
+            viewroot_entity (QEntity): Description
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
-        # Done in AbstractVirtualHelixItem init
-        # self._model_vh = model_virtual_helix
-        # self._id_num = model_virtual_helix.idNum() if model_virtual_helix is not None else None
-        # self._part_item = parent
-        # self._model_part = model_virtual_helix.part() if model_virtual_helix is not None else None
-        # self.is_active = False
-        self._strands = set()
-        self._part_entity = part_item.entity()
-        self._viewroot = viewroot
-        self._getActiveTool = part_item._getActiveTool
+        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item_entity)
+        QEntity.__init__(self, part_item_entity)
+        # _id_num, _model_part, _model_vh, _part_item, is_active
+        self._getActiveTool = part_item_entity._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
+        self._strand_items = set()
+
         axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(self._id_num)
-        self.strand_lines = StrandLines(fwd_pts, rev_pts, self._part_entity)
+        self._geometry = geom = StrandLines3DGeometry(fwd_pts, rev_pts, self)
+        self._mesh = mesh = StrandLines3DMesh(geom, self)
+        self._material = mat = QPerVertexColorMaterial(self)
+        self.addComponent(mesh)
+        self.addComponent(mat)
     # end def
 
     ### SIGNALS ###
@@ -82,8 +74,8 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
             strand (TYPE): Description
         """
         # print("[simview] vhi: strandAdded slot")
-        strand = StrandItem(strand, self)
-        self._strands.add(strand)
+        strand_item = StrandItem(strand, self)
+        self.addStrand3D(strand, strand_item)
     # end def
 
     def partVirtualHelixRemovedSlot(self):
@@ -94,13 +86,13 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
         """
         # self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
         print("[simview] vhi: partVirtualHelixRemovedSlot")
-        # todo: remove StrandLines components and entity
-        # self._controller.disconnectSignals()
+        # todo: remove StrandLines3D components and entity
+        self._controller.disconnectSignals()
         self._controller = None
-        self._part_entity = None
         self._model_part = None
+        self._model_vh = None
+        self._part_item = None
         self._getActiveTool = None
-        self._viewroot = None
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
@@ -114,66 +106,57 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem):
     # end def
 
     ### ACCESSORS ###
-    def viewroot(self):
-        return self._viewroot
-    # end def
-
     def window(self):
-        return self._part_entity.window()
+        return self._part_item.window()
     # end def
 
     ### PUBLIC METHODS ###
-    def removeStrand(self, strand):
-        self._strands.remove(strand)
-# end class
-
-
-class StrandLines(QEntity):
-    def __init__(self, fwd_pts, rev_pts, parent_entity):
-        super(StrandLines, self).__init__(parent_entity)
-        self._geometry = geom = StrandLinesGeometry(fwd_pts, rev_pts, parent_entity)
-        self._mesh = mesh = StrandLinesMesh(geom, parent_entity)
-        self.addComponent(mesh)
-        self._material = mat = QPerVertexColorMaterial(self)
-        self.addComponent(mat)
-        trans = QTransform()
-        trans.setTranslation(QVector3D(1, 1, -1))
-        # self.addComponent(trans)
+    def addStrand3D(self, strand, strand_item):
+        self._strand_items.add(strand_item)
+        if strand.isForward():
+            pass
     # end def
 
-    ### SLOTS ###
-    @pyqtSlot(int)
-    def setStrandLinesAndColors(self, strand_vertex_lists, strand_color_list):
-        self._geometry.updateBufferData(strand_vertex_lists, strand_color_list)
+    def removeStrand3D(self, strand_item):
+        self._strand_items.remove(strand_item)
+    # end def
+
+    def resizeStrand3D(self, strand, indices):
+        pass
+    # end def
+
+    def updateStrandColor3D(self, strand):
+        pass
+    # end def
+
+    def updateStrandConnections3D(self, strand):
+        pass
+    # end def
+# end class
 
 
 # https://www.khronos.org/opengl/wiki/Vertex_Rendering#Primitive_Restart
 GL_PRIMITIVE_RESTART_INDEX = 65535
-
-
-class StrandLinesMesh(QGeometryRenderer):
-    def __init__(self, geometry, parent_entity):
-        super(StrandLinesMesh, self).__init__(parent_entity)
-        self.setGeometry(geometry)
-
-        self.setPrimitiveRestartEnabled(True)
-        self.setRestartIndexValue(GL_PRIMITIVE_RESTART_INDEX)
-
-        self.setFirstInstance(0)
-        self.setFirstVertex(0)
-        self.setInstanceCount(1)
-        # self.setVerticesPerPatch(3)
-        # self.setVertexCount(4)
-        # self.setPrimitiveType(QGeometryRenderer.Lines)
-        self.setPrimitiveType(QGeometryRenderer.LineStrip)
-
-
 SIZEOF_FLOAT = len(struct.pack('f', 1.0))  # 4
 
 
-class StrandLinesGeometry(QGeometry):
+class StrandLines3DMesh(QGeometryRenderer):
+    def __init__(self, geometry, parent_entity):
+        super(StrandLines3DMesh, self).__init__(parent_entity)
+        self.setGeometry(geometry)
+        self.setPrimitiveRestartEnabled(True)
+        self.setRestartIndexValue(GL_PRIMITIVE_RESTART_INDEX)
+        self.setFirstInstance(0)
+        self.setFirstVertex(0)
+        self.setInstanceCount(1)
+        self.setPrimitiveType(QGeometryRenderer.LineStrip)
+    # end def
+# end class
+
+
+class StrandLines3DGeometry(QGeometry):
     def __init__(self, fwd_pts, rev_pts, parent_entity=None):
-        super(StrandLinesGeometry, self).__init__(parent_entity)
+        super(StrandLines3DGeometry, self).__init__(parent_entity)
         self.position_attribute = pos_attr = QAttribute()
         self.color_attribute = col_attr = QAttribute()
         self.index_attribute = idx_attr = QAttribute()

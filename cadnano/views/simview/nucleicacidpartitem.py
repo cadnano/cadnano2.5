@@ -21,7 +21,7 @@ from .virtualhelixitem import SimVirtualHelixItem
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
 
 
-class SimNucleicAcidPartItem(AbstractPartItem):
+class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
     """Summary
 
     Attributes:
@@ -32,56 +32,23 @@ class SimNucleicAcidPartItem(AbstractPartItem):
     """
     findChild = util.findChild  # for debug
 
-    def __init__(self, model_part_instance, viewroot_entity, parent):
+    def __init__(self, model_part_instance, parent):
         """parent should always be pathrootitem
 
         Args:
             model_part_instance (TYPE): Description
-            viewroot_entity (TYPE): Description
-            parent (TYPE): Description
+            parent (QEntity): The viewroot_entity
         """
         super(SimNucleicAcidPartItem, self).__init__()
-        self._entity = QEntity(viewroot_entity)
-        self._getActiveTool = viewroot_entity.manager.activeToolGetter
+        super(QEntity, self).__init__(parent)
+        self._getActiveTool = parent.manager.activeToolGetter
         self.active_virtual_helix_item = None
         self._model_part = m_p = model_part_instance.reference()
         self._model_props = m_p.getModelProperties()
         self._controller = NucleicAcidPartItemController(self, m_p)
-        self._viewroot_entity = viewroot_entity
+        self._viewroot_entity = parent
         self._virtual_helix_item_list = []
-
-        # 3D view
-        xLL, yLL, xUR, yUR = m_p.boundDimensions()
-        # l = xUR - xLL
-        # w = yUR - yLL
-        # id_z_min, id_z_max = m_p.zBoundsIds()
-        # z_min = 0
-        # if id_z_min != -1:
-        #     axis_min, fwd_min, rev_min = m_p.getCoordinates(id_z_min)
-        #     print(axis_min)
-        # z_max = w
-        # if id_z_max != -1:
-        #     axis_max, fwd_max, rev_max = m_p.getCoordinates(id_z_max)
-        #     print(axis_max)
-        # h = z_max - z_min
-
-        # h = 42*.34
-        # self.bounding_cube = Cube(0, 0, 0, l, w, h, '#ffffff', viewroot_entity)
-        # self.bounding_cube.setAlpha(0.2)
-        # self.grab1 = Cube(-l/2.,  w/2.,  h/2., 1., 1., 1., '#0066cc', viewroot_entity)
-        # self.grab2 = Cube( l/2., -w/2., -h/2., 1., 1., 1., '#0066cc', viewroot_entity)
-
-        self.scale_factor = 1.
-
-        # self._vh_rect = QRectF()
-        # self.setAcceptHoverEvents(True)
-        # self._initModifierRect()
-        # self._proxy_parent = ProxyParentItem(self)
-        # self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-        # self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
-        # self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
-        # GC_SIZE = 20
-        # self.grab_corner = GrabCornerItem(GC_SIZE, m_p.getColor(), False, self)
+        # self._initBoundingbox()
     # end def
 
     def proxy(self):
@@ -100,10 +67,6 @@ class SimNucleicAcidPartItem(AbstractPartItem):
             TYPE: Description
         """
         return self._model_part.getProperty('color')
-    # end def
-
-    def entity(self):
-        return self._entity
     # end def
 
     # def convertToModelZ(self, z):
@@ -313,7 +276,7 @@ class SimNucleicAcidPartItem(AbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vhi = SimVirtualHelixItem(virtual_helix, self, self._viewroot_entity)
+        vhi = SimVirtualHelixItem(virtual_helix, self)
         self._virtual_helix_item_hash[id_num] = vhi
         vhi_list = self._virtual_helix_item_list
         # # reposition when first VH is added
@@ -436,6 +399,28 @@ class SimNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     ### PRIVATE METHODS ###
+    def _initBoundingbox(self):
+        # 3D view
+        # xLL, yLL, xUR, yUR = self._model_part.boundDimensions()
+        # l = xUR - xLL
+        # w = yUR - yLL
+        # id_z_min, id_z_max = m_p.zBoundsIds()
+        # z_min = 0
+        # if id_z_min != -1:
+        #     axis_min, fwd_min, rev_min = m_p.getCoordinates(id_z_min)
+        #     print(axis_min)
+        # z_max = w
+        # if id_z_max != -1:
+        #     axis_max, fwd_max, rev_max = m_p.getCoordinates(id_z_max)
+        #     print(axis_max)
+        # h = z_max - z_min
+        # h = 42*.34
+        # self.bounding_cube = Cube(0, 0, 0, l, w, h, '#ffffff', viewroot_entity)
+        # self.bounding_cube.setAlpha(0.2)
+        # self.grab1 = Cube(-l/2.,  w/2.,  h/2., 1., 1., 1., '#0066cc', viewroot_entity)
+        # self.grab2 = Cube( l/2., -w/2., -h/2., 1., 1., 1., '#0066cc', viewroot_entity)
+        pass
+
     def _setVirtualHelixItemList(self, new_list, zoom_to_fit=True):
         """
         Give me a list of VirtualHelixItems and I'll parent them to myself if

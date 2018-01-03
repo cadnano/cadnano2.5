@@ -56,9 +56,7 @@ class SimRootItem(QEntity):
         """
         part_type = model_part_instance.reference().partType()
         if part_type == PartType.NUCLEICACIDPART:
-            na_part_item = SimNucleicAcidPartItem(model_part_instance,
-                                                  viewroot_entity=self,
-                                                  parent=self)
+            na_part_item = SimNucleicAcidPartItem(model_part_instance, parent=self)
             self.instance_items[na_part_item] = na_part_item
             # self.select_tool.setPartItem(na_part_item)
             # na_part_item.zoomToFit()
