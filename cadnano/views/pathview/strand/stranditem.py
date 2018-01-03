@@ -132,7 +132,7 @@ class StrandItem(QGraphicsLineItem):
         scene.removeItem(self)
     # end def
 
-    def strandUpdatedSlot(self, strand):
+    def strandConnectionChangedSlot(self, strand):
         """
         Slot for just updating connectivity and color, and endpoint showing
         """

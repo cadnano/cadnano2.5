@@ -11,7 +11,7 @@ class StrandItemController():
         ('strandRemovedSignal', 'strandRemovedSlot'),
         ('strandResizedSignal', 'strandResizedSlot'),
         # ('strandXover5pRemovedSignal', 'strandXover5pRemovedSlot'),
-        ('strandUpdatedSignal', 'strandUpdatedSlot'),
+        ('strandConnectionChangedSignal', 'strandConnectionChangedSlot'),
         ('strandInsertionAddedSignal', 'strandInsertionAddedSlot'),
         ('strandInsertionChangedSignal', 'strandInsertionChangedSlot'),
         ('strandInsertionRemovedSignal', 'strandInsertionRemovedSlot'),
