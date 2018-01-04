@@ -298,7 +298,7 @@ class GridItem(QGraphicsRectItem):
         self.points_dict = dict()
     # end def
 
-    def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True):
+    def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True, color=None):
         point_item = self.points_dict.get(coord)
 
         if show_hint is False:
@@ -313,7 +313,7 @@ class GridItem(QGraphicsRectItem):
             else:
                 return
             id_num = next_idnums[1] if parity else next_idnums[0]
-            point_item.showCreateHint(id_num=id_num, show_hint=show_hint)
+            point_item.showCreateHint(id_num=id_num, show_hint=show_hint, color=color)
             return parity == 1
     # end def
 
@@ -393,7 +393,7 @@ class GridPoint(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
     # end def
 
-    def showCreateHint(self, id_num=0, show_hint=True):
+    def showCreateHint(self, id_num=0, show_hint=True, color=None):
         label = self._label
         if show_hint:
             label.setText("%d" % id_num)
@@ -401,7 +401,7 @@ class GridPoint(QGraphicsEllipseItem):
             posx = b_rect.width()/2
             posy = b_rect.height()/2
             label.setPos(_RADIUS-posx, _RADIUS-posy)
-            self.setBrush(getBrushObj(styles.MULTI_VHI_HINT_COLOR, alpha=64))
+            self.setBrush(getBrushObj(color if color else styles.MULTI_VHI_HINT_COLOR, alpha=64))
         else:
             label.setText("")
             self.setBrush(getNoBrush())
@@ -430,6 +430,7 @@ class GridPoint(QGraphicsEllipseItem):
         Returns:
             None
         """
+        print('griditem mpe at %s,%s' % (event.pos().x(), event.pos().y()))
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
