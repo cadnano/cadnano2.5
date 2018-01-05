@@ -16,6 +16,7 @@ from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
 from . import simstyles as styles
 # from .prexovermanager import PreXoverManager
 # from .strand.xoveritem import XoverNode3
+from .customlines import Line
 from .virtualhelixitem import SimVirtualHelixItem
 
 _MOD_PEN = getPenObj(styles.BLUE_STROKE, 0)
@@ -49,6 +50,11 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
         self._viewroot_entity = parent
         self._virtual_helix_item_list = []
         # self._initBoundingbox()
+
+        # Draw axes at origin
+        Line((0, 0, 0), (1, 0, 0), '#cc0000', parent)
+        Line((0, 0, 0), (0, 1, 0), '#007200', parent)
+        Line((0, 0, 0), (0, 0, 1), '#0000cc', parent)
     # end def
 
     def proxy(self):

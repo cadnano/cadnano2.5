@@ -1,20 +1,15 @@
-# from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QVector3D
-
 from PyQt5.Qt3DCore import QTransform
 from PyQt5.Qt3DExtras import Qt3DWindow
-# from PyQt5.Qt3DExtras import QOrbitCameraController
 from PyQt5.Qt3DInput import QAction, QActionInput
 from PyQt5.Qt3DInput import QAnalogAxisInput, QAxis
-# from PyQt5.Qt3DInput import QInputAspect
 from PyQt5.Qt3DInput import QLogicalDevice
 from PyQt5.Qt3DInput import QMouseDevice, QMouseEvent
 from PyQt5.Qt3DLogic import QFrameAction
 
 from cadnano import util
 from cadnano.gui.palette import getColorObj
-from .customlines import Line
-
+from cadnano.views import styles
 
 LOOK_SPEED = 360
 MIN_SCALE = 0.2
@@ -30,7 +25,7 @@ class CustomQt3DWindow(Qt3DWindow):
         self.root_entity = root_entity
         self.setRootEntity(self.root_entity)
 
-        self.defaultFrameGraph().setClearColor(getColorObj('#f6f6f6'))
+        self.defaultFrameGraph().setClearColor(getColorObj(styles.VIEW_BG_COLOR))
         self.camera().setPosition(QVector3D(0.0, 0.0, 100.0))
         self.camera().setViewCenter(QVector3D(0.0, 0.0, 0.0))
 
@@ -43,12 +38,6 @@ class CustomQt3DWindow(Qt3DWindow):
 
         self.trans = QTransform()
         root_entity.addComponent(self.trans)
-
-        # Draw axes at origin
-        Line((0, 0, 0), (1, 0, 0), '#cc0000', root_entity)
-        Line((0, 0, 0), (0, 1, 0), '#007200', root_entity)
-        Line((0, 0, 0), (0, 0, 1), '#0000cc', root_entity)
-        # Line((0, 0, 0), (5, 5, 5), '#cc00cc', root_entity)
     # end def
 
     def _initMouseControls(self):

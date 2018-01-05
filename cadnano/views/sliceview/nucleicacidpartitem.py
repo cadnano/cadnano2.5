@@ -1,7 +1,7 @@
 from ast import literal_eval
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.proxies.cnenum import GridType, HandleType
@@ -110,6 +110,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.griditem = GridItem(self, self._model_props['grid_type'])
         self.griditem.setZValue(1)
         self.resize_handle_group.setZValue(2)
+
+        self.x_axis_line = QGraphicsLineItem(0, 0, self._RADIUS, 0, self)
+        self.x_axis_line.setPen(getPenObj('#cc0000', _DEFAULT_WIDTH))
+        self.x_axis_line.setZValue(styles.ZAXIS)
+        self.y_axis_line = QGraphicsLineItem(0, 0, 0, -self._RADIUS, self)
+        self.y_axis_line.setPen(getPenObj('#007200', _DEFAULT_WIDTH))
+        self.y_axis_line.setZValue(styles.ZAXIS)
 
         # select upon creation
         for part in m_p.document().children():

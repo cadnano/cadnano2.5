@@ -16,6 +16,8 @@ else:  # linux
     THE_FONT = "DejaVu Sans"
     THE_FONT_SIZE = 9
 
+VIEW_BG_COLOR = '#f6f6f6'
+
 BLUE_FILL = '#99ccff'
 BLUE_STROKE = '#0066cc'
 # BLUISH_STROKE = '#00b6fa'
