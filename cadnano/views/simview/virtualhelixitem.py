@@ -18,6 +18,11 @@ from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtual
 from .strand.stranditem import StrandItem
 
 
+# https://www.khronos.org/opengl/wiki/Vertex_Rendering#Primitive_Restart
+GL_PRIMITIVE_RESTART_INDEX = 65535
+SIZEOF_FLOAT = len(struct.pack('f', 1.0))  # 4
+
+
 class SimVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
     """VirtualHelixItem for PathView
 
@@ -110,34 +115,56 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
         return self._part_item.window()
     # end def
 
+    ### PRIVATE METHODS ###
+    def _updateGeometry(self):
+        fwd_strandset, rev_strandset = self._model_part.getStrandSets(self._id_num)
+        length = fwd_strandset.length()
+
+        axis_pts, fwd_pts, rev_pts = self._model_part.getCoordinates(self._id_num)
+        fwd_rev_pts = np.concatenate((fwd_pts, rev_pts))
+        color_array = np.zeros((length*2, 3))
+        idx_list = []
+
+        for fwd_strand in fwd_strandset:
+            idx_low, idx_high = fwd_strand.idxs()
+            idx_list += [i for i in range(idx_low, idx_high+1)]
+            idx_list.append(GL_PRIMITIVE_RESTART_INDEX)
+            r, g, b, alpha = getColorObj(fwd_strand.getColor()).getRgbF()
+            color_array[idx_low:(idx_high+1)] = [r, g, b]
+
+        for rev_strand in rev_strandset:
+            idx_low, idx_high = rev_strand.idxs()
+            idx_list += [length+i for i in range(idx_low, idx_high+1)]
+            idx_list.append(GL_PRIMITIVE_RESTART_INDEX)
+            r, g, b, alpha = getColorObj(rev_strand.getColor()).getRgbF()
+            color_array[length+idx_low:length+idx_high+1] = [r, g, b]
+
+        pos_color_array = np.block([fwd_rev_pts, color_array]).flatten()
+        self._geometry.updateBuffers(pos_color_array, idx_list)
+
     ### PUBLIC METHODS ###
     def addStrand3D(self, strand, strand_item):
         self._strand_items.add(strand_item)
-        if strand.isForward():
-            pass
+        self._updateGeometry()
     # end def
 
     def removeStrand3D(self, strand_item):
         self._strand_items.remove(strand_item)
+        self._updateGeometry()
     # end def
 
     def resizeStrand3D(self, strand, indices):
-        pass
+        self._updateGeometry()
     # end def
 
     def updateStrandColor3D(self, strand):
-        pass
+        self._updateGeometry()
     # end def
 
     def updateStrandConnections3D(self, strand):
         pass
     # end def
 # end class
-
-
-# https://www.khronos.org/opengl/wiki/Vertex_Rendering#Primitive_Restart
-GL_PRIMITIVE_RESTART_INDEX = 65535
-SIZEOF_FLOAT = len(struct.pack('f', 1.0))  # 4
 
 
 class StrandLines3DMesh(QGeometryRenderer):
@@ -186,11 +213,25 @@ class StrandLines3DGeometry(QGeometry):
         idx_attr.setVertexBaseType(QAttribute.UnsignedShort)
         idx_attr.setBuffer(idx_buf)
 
-        self.updateBufferData(fwd_pts, rev_pts)
+        # self.updateBufferData(fwd_pts, rev_pts)
 
         self.addAttribute(pos_attr)
         self.addAttribute(col_attr)
         self.addAttribute(idx_attr)
+    # end def
+
+    def updateBuffers(self, pos_color_array, idx_list):
+        pos_color_bytearray = QByteArray(pos_color_array.astype('f').tostring())
+        self.pos_color_buffer.setData(pos_color_bytearray)
+        idx_bytes = struct.pack('%sH' % len(idx_list), *idx_list)
+        idx_bytearray = QByteArray(idx_bytes)
+        self.idx_buffer.setData(idx_bytearray)
+
+        # setCount is always required
+        num_verts = len(idx_list)
+        self.position_attribute.setCount(num_verts)
+        self.color_attribute.setCount(num_verts)
+        self.index_attribute.setCount(num_verts)
     # end def
 
     def updateBufferData(self, fwd_pts, rev_pts):
@@ -199,7 +240,7 @@ class StrandLines3DGeometry(QGeometry):
         num_verts = num_fwd_pts+num_rev_pts
 
         fwd_rev_pts = np.concatenate((fwd_pts, rev_pts))
-        zcorrected_pts = fwd_rev_pts  # * (1, 1, -1)  # correct for GL -z
+        # zcorrected_pts = fwd_rev_pts * (1, 1, -1)  # correct for GL -z
 
         fr, fg, fb, falpha = getColorObj('#0066cc').getRgbF()
         rr, rg, rb, falpha = getColorObj('#cc0000').getRgbF()
@@ -207,7 +248,7 @@ class StrandLines3DGeometry(QGeometry):
         rev_colors = [[rr, rg, rb] for i in range(num_rev_pts)]
         col_array = np.array(fwd_colors+rev_colors)
 
-        pos_color_array = np.block([zcorrected_pts, col_array]).flatten()
+        pos_color_array = np.block([fwd_rev_pts, col_array]).flatten()
         pos_color_bytearray = QByteArray(pos_color_array.astype('f').tostring())
         self.pos_color_buffer.setData(pos_color_bytearray)
 
@@ -216,9 +257,6 @@ class StrandLines3DGeometry(QGeometry):
         idx_bytearray = QByteArray(idx_bytes)
         self.idx_buffer.setData(idx_bytearray)
 
-        # setCount is always required
-        self.position_attribute.setCount(num_verts)
-        self.color_attribute.setCount(num_verts)
-        self.index_attribute.setCount(len(idx_list))
+
     # end def
 # end class
