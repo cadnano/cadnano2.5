@@ -11,12 +11,10 @@ class StrandItem(AbstractStrandItem):
     # end def
 
     def strandResizedSlot(self, strand, indices):
-        print("[simview] strand: strandResizedSlot", strand, indices)
         self._vh_item.resizeStrand3D(strand, indices)
     # end def
 
     def strandRemovedSlot(self, strand):
-        print("[simview] strandRemovedSlot", strand)
         self._controller.disconnectSignals()
         self._controller = None
         self._model_strand = None

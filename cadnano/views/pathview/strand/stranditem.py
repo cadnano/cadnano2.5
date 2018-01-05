@@ -85,7 +85,6 @@ class StrandItem(QGraphicsLineItem):
     ### SLOTS ###
     def strandResizedSlot(self, strand, indices):
         """docstring for strandResizedSlot"""
-        print("[pathview] strandResizedSlot", strand, indices)
         low_moved, group_low = self._low_cap.updatePosIfNecessary(self.idxs()[0])
         high_moved, group_high = self._high_cap.updatePosIfNecessary(self.idxs()[1])
         group = self.group()
@@ -108,7 +107,6 @@ class StrandItem(QGraphicsLineItem):
 
     def strandRemovedSlot(self, strand):
         # self._model_strand = None
-        print("[pathview] strandRemovedSlot", strand)
         self._controller.disconnectSignals()
         self._controller = None
         scene = self.scene()
