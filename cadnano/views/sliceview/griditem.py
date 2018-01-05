@@ -430,7 +430,6 @@ class GridPoint(QGraphicsEllipseItem):
         Returns:
             None
         """
-        print('griditem mpe at %s,%s' % (event.pos().x(), event.pos().y()))
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
