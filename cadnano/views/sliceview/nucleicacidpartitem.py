@@ -724,9 +724,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.GRAY_STROKE)
-
-        if isinstance(self.test_recorder, TestRecorder):
-            self.test_recorder.sliceSceneEvent(event, self)
     # end def
 
     def keyReleaseEvent(self, event):
@@ -735,9 +732,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-
-        if isinstance(self.test_recorder, TestRecorder):
-            self.test_recorder.sliceSceneEvent(event, self)
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
