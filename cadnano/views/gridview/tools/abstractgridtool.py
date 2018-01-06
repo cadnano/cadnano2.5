@@ -34,7 +34,7 @@ class AbstractGridTool(QGraphicsObject):
         """
         # Setting parent to viewroot to prevent orphan _line_item from occurring
         super(AbstractGridTool, self).__init__(parent=manager.viewroot)
-        self.sgv = None
+        self.slice_graphics_view = None
         self.manager = manager
         self._active = False
         self._last_location = None
@@ -250,14 +250,14 @@ class AbstractGridTool(QGraphicsObject):
         if self._active and not will_be_active:
             self.deactivate()
         self._active = will_be_active
-        self.sgv = self.manager.window.grid_graphics_view
+        self.slice_graphics_view = self.manager.window.grid_graphics_view
         if hasattr(self, 'getCustomContextMenu'):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
-                self.sgv.customContextMenuRequested.disconnect()
-            except Exception:
+                self.slice_graphics_view.customContextMenuRequested.disconnect()
+            except AttributeError:
                 pass
-            self.sgv.customContextMenuRequested.connect(self.getCustomContextMenu)
+            self.slice_graphics_view.customContextMenuRequested.connect(self.getCustomContextMenu)
     # end def
 
     def deactivate(self):
@@ -268,8 +268,8 @@ class AbstractGridTool(QGraphicsObject):
         """
         if hasattr(self, 'getCustomContextMenu'):
             # print("disconnecting ccm")
-            self.sgv.customContextMenuRequested.disconnect(self.getCustomContextMenu)
-        self.sgv = None
+            self.slice_graphics_view.customContextMenuRequested.disconnect(self.getCustomContextMenu)
+        self.slice_graphics_view = None
         self.is_started = False
         self.hideLineItem()
         self._vhi = None

@@ -58,7 +58,8 @@ class SelectGridTool(AbstractGridTool):
         super(SelectGridTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
-        self.group = GridSelectionGroup(self)
+        self.part_item = None
+        self.group = GridSelectionGroup(self, parent=None)
         self.group.hide()
         self.is_selection_active = False
         self.individual_pick = False
@@ -121,23 +122,29 @@ class SelectGridTool(AbstractGridTool):
             TYPE: Description
         """
         if part_item is not self.part_item:
-            if self.sgv is not None:
+            if self.slice_graphics_view is not None:
                 # attempt to enforce good housekeeping, not required
                 try:
-                    self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-                except Exception:
-                    # required for first call
+                    self.slice_graphics_view.rubberBandChanged.disconnect(self.selectRubberband)
+                except TypeError:
                     pass
             if self.part_item is not None:
-                # print("modelClear yikes")
                 self.modelClear()
             self.part_item = part_item
-            self.group.setParentItem(part_item)
 
-            # required for whatever reason to renable QGraphicsView.RubberBandDrag
-            self.sgv.activateSelection(True)
+            # In the event that the old part_item was deleted (and garbage
+            # collected), self.group (whose parent was the old part_item) is
+            # also garbage collected.  Therefore, create a new
+            # GridSelectionGroup when this is the case
+            try:
+                self.group.setParentItem(part_item)
+            except RuntimeError:
+                self.group = GridSelectionGroup(self, parent=part_item)
 
-            self.sgv.rubberBandChanged.connect(self.selectRubberband)
+            # required for whatever reason to re-enable QGraphicsView.RubberBandDrag
+            self.slice_graphics_view.activateSelection(True)
+
+            self.slice_graphics_view.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
     def selectRubberband(self, rect, from_pt, to_point):
@@ -384,10 +391,10 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
-        if self.sgv is not None:
+        if self.slice_graphics_view is not None:
             try:
-                self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-            except Exception:
+                self.slice_graphics_view.rubberBandChanged.disconnect(self.selectRubberband)
+            except AttributeError:
                 pass    # required for first call
         self.modelClear()
         if self.snap_origin_item is not None:
@@ -403,7 +410,7 @@ class SelectGridTool(AbstractGridTool):
             point (TYPE): Description
         """
         if len(self.selection_set) > 0:
-            sgv = self.sgv
+            sgv = self.slice_graphics_view
             menu = QMenu(sgv)
             copy_act = QAction("copy selection", sgv)
             copy_act.setStatusTip("copy selection")
@@ -507,8 +514,8 @@ class GridSelectionGroup(QGraphicsItemGroup):
         if event.button() != Qt.LeftButton:
             """ do context menu?
             """
-            # sgv = self.tool.sgv
-            # print(sgv)
+            # slice_graphics_view = self.tool.slice_graphics_view
+            # print(slice_graphics_view)
             # self.getCustomContextMenu(event.screenPos())
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)

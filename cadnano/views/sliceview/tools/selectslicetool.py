@@ -136,7 +136,7 @@ class SelectSliceTool(AbstractSliceTool):
             self.group.setParentItem(part_item)
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
-            # TODO[NF]:  Determine why self.sgv is None when the dual-slice view is enabled
+            # TODO[NF]:  Determine why self.slice_graphics_view is None when the dual-slice view is enabled
             # TODO[NF]:  Now that SVG is being set properly, can the conditional be removed?
             # TODO[NF]:  This might be better kept as an error condition logged to logger.error
             if self.sgv is not None:
