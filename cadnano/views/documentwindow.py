@@ -55,7 +55,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self._initConsoleview(doc)
         self._initSliceview(doc)
-        self._initGridview(doc)
+        # self._initGridview(doc)
         self._initPathview(doc)
         self._initPathviewToolbar()
         self._initSimGraphicsView(doc)
@@ -210,7 +210,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         assert self.path_root.scene() == self.path_scene
         self.path_graphics_view.setScene(self.path_scene)
         self.path_graphics_view.scene_root_item = self.path_root
-        self.path_graphics_view.setScaleFitFactor(0.9)
+        self.path_graphics_view.setScaleFitFactor(0.5)
         self.path_graphics_view.setName("PathView")
     # end def
 
@@ -227,10 +227,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
 
-        self.grid_tool_manager.path_tool_manager = self.path_tool_manager
-        self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
+        # self.grid_tool_manager.path_tool_manager = self.path_tool_manager
+        # self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
 
-        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
+        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
+        # self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
 
         self.insertToolBarBreak(self.main_toolbar)
 
@@ -272,6 +273,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setScene(self.slice_scene)
         self.slice_graphics_view.scene_root_item = self.slice_root
         self.slice_graphics_view.setName("SliceView")
+        self.slice_graphics_view.setScaleFitFactor(0.9)
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
     # end def
 
