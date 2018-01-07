@@ -711,19 +711,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def keyPressEvent(self, event):
+        is_alt = bool(event.modifiers() & Qt.AltModifier)
         if event.key() == Qt.Key_Escape:
             self._setShortestPathStart(None)
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-        elif event.key() == Qt.Key_Alt and self.shortest_path_add_mode is True:
+        elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 x, y = self.coordinates_to_xy.get(self.getLastHoveredCoordinates())
                 self._preview_spa((x, y))
+        elif is_alt:
+            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.GRAY_STROKE)
     # end def
 
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Alt and self.shortest_path_add_mode is True:
+        is_alt = bool(event.modifiers() & Qt.AltModifier)
+        if not is_alt:
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
@@ -762,7 +767,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return
 
         row, column = self.getLastHoveredCoordinates()
-        parity = self._getCoordianteParity(row, column)
+        parity = self._getCoordinateParity(row, column)
 
         part.createVirtualHelix(x=part_pt_tuple[0],
                                 y=part_pt_tuple[1],
@@ -776,7 +781,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlightSpaVH(id_num)
     # end def
 
-    def _getCoordianteParity(self, row, column):
+    def _getCoordinateParity(self, row, column):
         if self.griditem.grid_type is GridType.HONEYCOMB:
             return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
@@ -890,13 +895,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
             self.createToolHoverLeave(tool=tool, event=event)
 
-        # Highlight GridItems if shift is being held down
+        # Highlight GridItems if alt is being held down
         if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._preview_spa(event_xy)
         else:
             point_item = self.coordinates_to_xy.get(event_coord)
 
-            if point_item is not None and self._inPointItem(event_xy, event_coord):
+            if point_item is not None and self._inPointItem(event_xy, event_coord) and is_alt:
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.GRAY_STROKE)
+            elif point_item is not None and self._inPointItem(event_xy, event_coord) and not is_alt:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
@@ -1065,13 +1072,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._highlighted_path = []
     # end def
 
-    def highlightOneGridPoint(self, coordinates):
+    def highlightOneGridPoint(self, coordinates, color=None):
         """
         Add a hint to one GridPoint.
 
         Args:
             coordinates (tuple):  the row-column coordinates of the gridPoint to
                 be highlighted
+            color ():  the color that the gridPoint should be changed to
 
         Returns:
             None
@@ -1082,7 +1090,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self.coordinates_to_xy.get(coordinates) is not None:
             part = self._model_part
             next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
-            self.griditem.showCreateHint(coordinates, next_idnums=next_idnums)
+            self.griditem.showCreateHint(coordinates, next_idnums=next_idnums, color=color)
             self._highlighted_path.append(coordinates)
     # end def
 
