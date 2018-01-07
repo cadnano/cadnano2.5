@@ -70,6 +70,8 @@ def _defaultDataFrame(size):
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
 DEFAULT_RADIUS = 1.125  # nm
+HONEYCOMB_SUB_STEP_SIZE = 7
+SQUARE_SUB_STEP_SIZE = 8
 
 
 class NucleicAcidPart(Part):
@@ -91,12 +93,6 @@ class NucleicAcidPart(Part):
         `*args`: Variable length argument list.
         `**kwargs`: Arbitrary keyword arguments.
     """
-    _STEP_SIZE = 21  # this is the period (in bases) of the part lattice
-    _TURNS_PER_STEP = 2
-    _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
-    _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
-    _BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
-    _SUB_STEP_SIZE = _STEP_SIZE / 3
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
 
@@ -120,8 +116,6 @@ class NucleicAcidPart(Part):
         return NucleicAcidPart.__count
 
     def __init__(self, *args, **kwargs):
-        """
-        """
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
         grid_type = kwargs.get('grid_type', GridType.HONEYCOMB)
@@ -133,6 +127,20 @@ class NucleicAcidPart(Part):
         self._mods = {'int_instances': {},
                       'ext_instances': {}}
         self._oligos = set()
+
+        # Helix parameters
+        if grid_type == GridType.HONEYCOMB:
+            self._STEP_SIZE = 21
+            self._SUB_STEP_SIZE = 7
+        elif grid_type == GridType.SQUARE:
+            self._STEP_SIZE = 32
+            self._SUB_STEP_SIZE = 8
+        else:
+            raise NotImplementedError("Unrecognized GridType")
+        self._TURNS_PER_STEP = 2
+        self._HELICAL_PITCH = self._STEP_SIZE / self._TURNS_PER_STEP
+        self._TWIST_PER_BASE = 360 / self._HELICAL_PITCH  # degrees
+        self._BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
 
         # Runtime state
         self._active_base_index = self._STEP_SIZE
@@ -259,7 +267,7 @@ class NucleicAcidPart(Part):
 
     def __repr__(self):
         _id = str(id(self))[-4:]
-        _name  = self.__class__.__name__
+        _name = self.__class__.__name__
         return '%s_%s_%s' % (_name, -1, _id)
 
     def _resetOriginCache(self):
@@ -2294,10 +2302,10 @@ class NucleicAcidPart(Part):
     # end
 
     def subStepSize(self):
-        """Get the substep size
+        """Get the substep size. Used for major grid line spacing.
 
         Returns:
-            int:
+            int: The substep size.
         """
         return self._SUB_STEP_SIZE
     # end def
@@ -2456,7 +2464,7 @@ class NucleicAcidPart(Part):
 
     def maxBaseIdx(self, id_num):
         o_and_s = self.getOffsetAndSize(id_num)
-        size = 42 if o_and_s is None else o_and_s[1]
+        size = self._STEP_SIZE*2 if o_and_s is None else o_and_s[1]
         return size
     # end def
 
@@ -2625,6 +2633,7 @@ class NucleicAcidPart(Part):
             use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
         """
+        length = self._STEP_SIZE*3
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
                                       properties=properties,
