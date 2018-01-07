@@ -133,12 +133,13 @@ class NucleicAcidPart(Part):
         if grid_type == GridType.HONEYCOMB:
             self._STEP_SIZE = 21
             self._SUB_STEP_SIZE = 7
+            self._TURNS_PER_STEP = 2
         elif grid_type == GridType.SQUARE:
             self._STEP_SIZE = 32
             self._SUB_STEP_SIZE = 8
+            self._TURNS_PER_STEP = 3
         else:
             raise NotImplementedError("Unrecognized GridType")
-        self._TURNS_PER_STEP = 2
         self._HELICAL_PITCH = self._STEP_SIZE / self._TURNS_PER_STEP
         self._TWIST_PER_BASE = 360 / self._HELICAL_PITCH  # degrees
         self._BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
@@ -2635,7 +2636,6 @@ class NucleicAcidPart(Part):
         """
         if (x, y) in self._in_use_vh_origins.values():
             return
-        length = self._STEP_SIZE*2
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
                                       properties=properties,

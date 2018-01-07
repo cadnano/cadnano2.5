@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import GridType, LatticeType, StrandType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import setBatch, getReopen, setReopen
@@ -17,8 +17,10 @@ def decode(document, obj, emit_signals=False):
     num_bases = len(obj['vstrands'][0]['scaf'])
     if num_bases % 32 == 0:
         lattice_type = LatticeType.SQUARE
+        grid_type = GridType.SQUARE
     elif num_bases % 21 == 0:
         lattice_type = LatticeType.HONEYCOMB
+        grid_type = GridType.HONEYCOMB
     else:
         raise IOError("error decoding number of bases")
 
@@ -38,10 +40,9 @@ def decode(document, obj, emit_signals=False):
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")
-    part = document.createNucleicAcidPart(use_undostack=False)
+    part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
     part.setActive(True)
     setBatch(True)
-    num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     vh_num_to_coord = {}
