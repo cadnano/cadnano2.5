@@ -110,14 +110,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         # self.grab_corner = GrabCornerItem(self._GC_SIZE, model_color, False, self)
 
         self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
-                                                     # HandleType.TOP |
-                                                     # HandleType.BOTTOM |
-                                                     HandleType.LEFT |
+                                                     # HandleType.LEFT |
                                                      HandleType.RIGHT,
-                                                     # HandleType.TOP_LEFT |
-                                                     # HandleType.TOP_RIGHT |
-                                                     # HandleType.BOTTOM_LEFT |
-                                                     # HandleType.BOTTOM_RIGHT,
                                                      self)
 
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
@@ -577,7 +571,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.setBrush(brush)
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80):
+    def reconfigureRect(self, top_left, bottom_right, finish=False, padding=80):
         """
         Updates the bounding rect to the size of the childrenBoundingRect.
         Refreshes the outline and grab_corner locations.
@@ -593,6 +587,14 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             ptTL = QPointF(*top_left) if top_left else outline.rect().topLeft()
             ptBR = QPointF(*bottom_right) if bottom_right else outline.rect().bottomRight()
             o_rect = QRectF(ptTL, ptBR)
+            if finish:
+                vh_size = self._virtual_helix_item_list[0].getSize()
+                pad_xoffset = self._BOUNDING_RECT_PADDING*2
+                new_size = int((o_rect.width()-_VH_XOFFSET-pad_xoffset)/_BASE_WIDTH)
+                # Get VH size
+                # Snap to closest
+                # Notify all VHs of new size
+                print("finish", vh_size)
             self.outline.setRect(o_rect)
         else:
             # 1. Temporarily remove children that shouldn't affect size

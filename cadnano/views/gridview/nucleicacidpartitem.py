@@ -448,7 +448,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80):
+    def reconfigureRect(self, top_left, bottom_right, finish=False, padding=80):
         """Summary
 
         Args:

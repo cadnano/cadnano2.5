@@ -661,7 +661,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         # self._model_part.changeInstanceProperty(self._model_instance, view_name, 'position', position)
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right):
+    def reconfigureRect(self, top_left, bottom_right, finish=False):
         """Update the workplane rect to draw from top_left to bottom_right,
         snapping the x values to the nearest base width. Updates the outline
         and resize handles.
@@ -737,8 +737,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
         future comparison.
         """
         # self.setCursor(Qt.ClosedHandCursor)
-        if event.modifiers() != Qt.ShiftModifier:            
         # if event.button() != Qt.LeftButton:
+        if event.modifiers() != Qt.ShiftModifier:
             event.ignore()
             QGraphicsItem.mousePressEvent(self, event)
             return

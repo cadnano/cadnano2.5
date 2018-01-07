@@ -150,11 +150,6 @@ class HandleItem(QGraphicsRectItem):
             self._resize_cursor = Qt.ClosedHandCursor
     # end def
 
-    def function():
-        pass
-
-
-
     def hoverEnterEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
         # self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
@@ -263,38 +258,38 @@ class HandleItem(QGraphicsRectItem):
             if ht == HandleType.TOP_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((new_x_TL, new_y_TL), ())
+                r = parent.reconfigureRect((new_x_TL, new_y_TL), (), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP:
                 new_y_TL = mTLy if new_y > mTLy else new_y
-                r = parent.reconfigureRect((poTLx, new_y_TL), ())
+                r = parent.reconfigureRect((poTLx, new_y_TL), (), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.TOP_RIGHT:
                 new_y_TL = mTLy if new_y > mTLy else new_y
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy))
+                r = parent.reconfigureRect((poTLx, new_y_TL), (new_x_BR, poBRy), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
-                r = parent.reconfigureRect((), (new_x_BR, poBRy))
+                r = parent.reconfigureRect((), (new_x_BR, poBRy), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_RIGHT:
                 new_x_BR = mBRx if new_x < mBRx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (new_x_BR, new_y_BR))
+                r = parent.reconfigureRect((), (new_x_BR, new_y_BR), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM:
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((), (poBRx, new_y_BR))
+                r = parent.reconfigureRect((), (poBRx, new_y_BR), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.BOTTOM_LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
                 new_y_BR = mBRy if new_y < mBRy else new_y
-                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR))
+                r = parent.reconfigureRect((new_x_TL, poTLy), (poBRx, new_y_BR), finish=True)
                 self._group.alignHandles(r)
             elif ht == HandleType.LEFT:
                 new_x_TL = mTLx if new_x > mTLx else new_x
-                r = parent.reconfigureRect((new_x_TL, poTLy), ())
+                r = parent.reconfigureRect((new_x_TL, poTLy), (), finish=True)
                 self._group.alignHandles(r)
             self.model_bounds = ()
             parent.showModelMinBoundsHint(self._handle_type, show=False)

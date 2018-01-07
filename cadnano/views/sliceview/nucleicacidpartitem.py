@@ -487,7 +487,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.shortest_path_start = None
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, padding=80):
+    def reconfigureRect(self, top_left, bottom_right, finish=False, padding=80):
         """Reconfigures the rectangle that is the document.
 
         Args:
