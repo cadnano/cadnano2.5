@@ -127,6 +127,7 @@ class NucleicAcidPart(Part):
         self._mods = {'int_instances': {},
                       'ext_instances': {}}
         self._oligos = set()
+        self._in_use_vh_origins = dict()
 
         # Helix parameters
         if grid_type == GridType.HONEYCOMB:
@@ -788,9 +789,7 @@ class NucleicAcidPart(Part):
             coord_pts += delta  # use += to modify the view
             fwd_pts += delta  # use += to modify the view
             rev_pts += delta  # use += to modify the view
-            # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
-            # print("new origin", self.locationQt(id_num, 15./self.radius()))
         try:
             self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
         except BaseException:
@@ -1495,6 +1494,7 @@ class NucleicAcidPart(Part):
         # this needs to be changed
         self._group_properties['virtual_helix_order'].remove(id_num)
         del self._virtual_helices_set[id_num]
+        del self._in_use_vh_origins[id_num]
     # end def
 
     def resetCoordinates(self, id_num):
@@ -2633,6 +2633,8 @@ class NucleicAcidPart(Part):
             use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
         """
+        if (x, y) in self._in_use_vh_origins.values():
+            return
         length = self._STEP_SIZE*3
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
@@ -2640,6 +2642,7 @@ class NucleicAcidPart(Part):
                                       safe=safe,
                                       parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
+        self._in_use_vh_origins[c.id_num] = (x, y)
 
     def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
                                   safe=None, use_undo_stack=True, parity=None):

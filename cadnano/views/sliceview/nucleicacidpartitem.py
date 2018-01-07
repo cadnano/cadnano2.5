@@ -1,8 +1,7 @@
 from ast import literal_eval
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
 
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -740,9 +739,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         # Abort if a VH already exists here
         position = self.translateEventCoordinates(event)
-        event_coord = ShortestPathHelper.findClosestPoint(position, self.coordinates_to_xy)
-        if event_coord in self.coordinates_to_vhid.keys():
-            return
 
         # 1. get point in model coordinates:
         part = self._model_part
@@ -1032,6 +1028,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        assert isinstance(delta_x, float)
+        assert isinstance(delta_y, float)
+
         self._translated_x = delta_x
         self._translated_y = delta_y
     # end def
@@ -1048,6 +1047,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             A tuple of x-y coordinates of the event
         """
+        assert isinstance(event, QGraphicsSceneEvent)
         return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
     # end def
 
@@ -1076,6 +1076,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        assert isinstance(coordinates, tuple) and len(coordinates) is 2
+        assert isinstance(coordinates[0], int) and isinstance(coordinates[1], int)
+
         if self.coordinates_to_xy.get(coordinates) is not None:
             part = self._model_part
             next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
