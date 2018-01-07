@@ -213,7 +213,7 @@ class StrandLines3DGeometry(QGeometry):
         idx_attr.setVertexBaseType(QAttribute.UnsignedShort)
         idx_attr.setBuffer(idx_buf)
 
-        # self.updateBufferData(fwd_pts, rev_pts)
+        # self.showAllPts(fwd_pts, rev_pts)
 
         self.addAttribute(pos_attr)
         self.addAttribute(col_attr)
@@ -234,7 +234,7 @@ class StrandLines3DGeometry(QGeometry):
         self.index_attribute.setCount(num_verts)
     # end def
 
-    def updateBufferData(self, fwd_pts, rev_pts):
+    def showAllPts(self, fwd_pts, rev_pts):
         num_fwd_pts = len(fwd_pts)
         num_rev_pts = len(rev_pts)
         num_verts = num_fwd_pts+num_rev_pts
@@ -257,6 +257,10 @@ class StrandLines3DGeometry(QGeometry):
         idx_bytearray = QByteArray(idx_bytes)
         self.idx_buffer.setData(idx_bytearray)
 
+        # setCount is always required
+        self.position_attribute.setCount(num_verts)
+        self.color_attribute.setCount(num_verts)
+        self.index_attribute.setCount(len(idx_list))
 
     # end def
 # end class

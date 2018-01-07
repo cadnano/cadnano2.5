@@ -4,8 +4,10 @@ from __future__ import division
 
 from PyQt5.QtCore import QRectF
 # from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-# from PyQt5.QtGui import QVector3D  # , QQuaternion
+from PyQt5.QtGui import QVector3D
+# from PyQt5.QtGui import QQuaternion
 from PyQt5.Qt3DCore import QEntity  # , QTransform
+from PyQt5.Qt3DCore import QTransform
 
 from cadnano import getBatch, util
 from cadnano.gui.palette import getPenObj, getBrushObj  # , getColorObj
@@ -50,6 +52,9 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
         self._viewroot_entity = parent
         self._virtual_helix_item_list = []
         # self._initBoundingbox()
+
+        self.trans = QTransform()
+        self.addComponent(self.trans)
 
         # Draw axes at origin
         Line((0, 0, 0), (1, 0, 0), '#cc0000', parent)
@@ -161,7 +166,6 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
         Returns:
             TYPE: Description
         """
-        return
         # if len(self._virtual_helix_item_list) > 0:
         #     vhi_hash = self._virtual_helix_item_hash
         #     vhi_max = vhi_hash[max_id_num]
@@ -173,9 +177,17 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
         #     self._vh_rect.setLeft((vhi_h_rect.left() -
         #                            styles.VH_XOFFSET +
         #                            vhi_min.x()))
+        # print("partZDimensionsChangedSlot", ztf)
         # if ztf:
-        #     self.scene().views()[0].zoomToFit()
+        #     xLL, yLL, xUR, yUR = self._model_part.getVirtualHelixOriginLimits()
+        #     print(xLL, yLL, xUR, yUR)
+        #     xoffset = -(xUR - xLL)/2
+        #     yoffset = -(yUR - yLL)/2
+        #     zoffset = -42*0.34/2
+        #     print(xoffset, yoffset, zoffset)
+        #     self.trans.setTranslation(QVector3D(xoffset, yoffset, zoffset))
         # self._updateBoundingRect()
+        pass
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):
@@ -257,10 +269,9 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
         Args:
             sender (obj): Model object that emitted the signal.
         """
-        entity = self._entity
-        components = entity.components()
+        components = self.components()
         for c in components:
-            entity.removeComponent(c)
+            self.removeComponent(c)
         self.mesh_3d = None
         self.transform_3d = None
         self.material3d = None
@@ -437,49 +448,9 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
             new_list (TYPE): Description
             zoom_to_fit (bool, optional): Description
         """
-        # print("_setVirtualHelixItemList")
-        return
-        # y = 0  # How far down from the top the next PH should be
-        # vhi_rect = None
-        # vhi_h_rect = None
-        # vhi_h_selection_group = self._viewroot_entity.vhiHandleSelectionGroup()
-        # for vhi in new_list:
-        #     _, _, _z = vhi.cnModel().getAxisPoint(0)
-        #     _z *= self._scale_2_Qt
-        #     vhi.setPos(_z, y)
-        #     if vhi_rect is None:
-        #         vhi_rect = vhi.boundingRect()
-        #         step = vhi_rect.height() + styles.PATH_HELIX_PADDING
-        #     # end if
-
-        #     # get the VirtualHelixHandleItem
-        #     vhi_h = vhi.handle()
-        #     do_reselect = False
-        #     if vhi_h.parentItem() == vhi_h_selection_group:
-        #         do_reselect = True
-
-        #     vhi_h.tempReparent()    # so positioning works
-
-        #     if vhi_h_rect is None:
-        #         vhi_h_rect = vhi_h.boundingRect()
-
-        #     vhi_h_x = _z - _VH_XOFFSET
-        #     vhi_h_y = y + (vhi_rect.height() - vhi_h_rect.height()) / 2
-        #     vhi_h.setPos(vhi_h_x, vhi_h_y)
-
-        #     y += step
-        #     self.updateXoverItems(vhi)
-        #     if do_reselect:
-        #         vhi_h_selection_group.addToGroup(vhi_h)
-        # # end for
-        # # this need only adjust top and bottom edges of the bounding rectangle
-        # self._vh_rect.setTop(-10)
-        # self._vh_rect.setBottom(y)
-        # self._virtual_helix_item_list = new_list
-
-        # # now update Z dimension (X in Qt space in the Path view)
-        # part = self.part()
-        # self.partZDimensionsChangedSlot(part, *part.zBoundsIds(), ztf=zoom_to_fit)
+        # now update Z dimension (X in Qt space in the Path view)
+        part = self.part()
+        self.partZDimensionsChangedSlot(part, *part.zBoundsIds(), ztf=zoom_to_fit)
     # end def
 
     def resetPen(self, color, width=0):
