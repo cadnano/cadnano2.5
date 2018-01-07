@@ -588,13 +588,14 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             ptBR = QPointF(*bottom_right) if bottom_right else outline.rect().bottomRight()
             o_rect = QRectF(ptTL, ptBR)
             if finish:
-                vh_size = self._virtual_helix_item_list[0].getSize()
                 pad_xoffset = self._BOUNDING_RECT_PADDING*2
                 new_size = int((o_rect.width()-_VH_XOFFSET-pad_xoffset)/_BASE_WIDTH)
-                # Get VH size
-                # Snap to closest
-                # Notify all VHs of new size
-                print("finish", vh_size)
+                substep = self._model_part.subStepSize()
+                snap_size = new_size - new_size % substep
+                snap_offset = -(new_size % substep)*_BASE_WIDTH
+                self._model_part.setAllVirtualHelixSizes(snap_size)
+                o_rect = o_rect.adjusted(0, 0, snap_offset, 0)
+                # print("finish", vh_size, new_size, substep, snap_size)
             self.outline.setRect(o_rect)
         else:
             # 1. Temporarily remove children that shouldn't affect size

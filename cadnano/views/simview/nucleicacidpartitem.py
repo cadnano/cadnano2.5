@@ -316,9 +316,10 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
-        vhi = self._virtual_helix_item_hash[id_num]
+        pass
+        # vhi = self._virtual_helix_item_hash[id_num]
         # print("resize:", id_num, virtual_helix.getSize())
-        vhi.resize()
+        # vhi.resize()
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):

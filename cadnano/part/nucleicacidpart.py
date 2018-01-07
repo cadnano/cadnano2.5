@@ -2706,7 +2706,7 @@ class NucleicAcidPart(Part):
         for i, x in enumerate(x_list):
             y = y_list[i]
             z = z_list[i] if z_list else 0.0
-            _length = length[i] if length else 42
+            _length = length[i] if length else self._STEP_SIZE*3
             _id_num = id_num[i] if id_num else None
             _properties = properties[i] if properties else None
             _safe = safe[i] if safe else True
@@ -2971,6 +2971,18 @@ class NucleicAcidPart(Part):
 
     def newPart(self):
         return Part(self._document)
+    # end def
+
+    def setAllVirtualHelixSizes(self, new_size, use_undostack=True):
+        print(self._virtual_helices_set)
+        if use_undostack:
+            self.undoStack().beginMacro("Resize all VHs")
+        for id_num in self._virtual_helices_set:
+            _, size = self.getOffsetAndSize(id_num)
+            if size != new_size:
+                self.setVirtualHelixSize(id_num, new_size, use_undostack)
+        if use_undostack:
+            self.undoStack().endMacro()
     # end def
 
     def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):
