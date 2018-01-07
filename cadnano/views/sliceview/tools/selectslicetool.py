@@ -126,7 +126,7 @@ class SelectSliceTool(AbstractSliceTool):
                 # attempt to enforce good housekeeping, not required
                 try:
                     self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-                except BaseException:
+                except Exception:
                     # required for first call
                     pass
             if self.part_item is not None:
@@ -394,7 +394,7 @@ class SelectSliceTool(AbstractSliceTool):
         if self.sgv is not None:
             try:
                 self.sgv.rubberBandChanged.disconnect(self.selectRubberband)
-            except BaseException:
+            except Exception:
                 pass    # required for first call
         self.modelClear()
         if self.snap_origin_item is not None:

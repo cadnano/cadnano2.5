@@ -792,7 +792,7 @@ class NucleicAcidPart(Part):
             origin_pts[id_num, :] += delta_origin
         try:
             self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
-        except BaseException:
+        except Exception:
             print(list(id_nums), Z_PROP_INDEX)
             raise
         self._setVirtualHelixOriginLimits()
@@ -1592,7 +1592,7 @@ class NucleicAcidPart(Part):
         axis_pts = self.axis_pts
         try:
             axis_pts[idx_start:relocate_idx_end] = axis_pts[idx_stop:total_points]
-        except BaseException:
+        except Exception:
             err = "idx_start {}, relocate_idx_end {}, idx_stop {}, total_points {}, length {}"
             print(err.format(idx_start, relocate_idx_end, idx_stop, total_points, length))
             raise
@@ -2635,7 +2635,7 @@ class NucleicAcidPart(Part):
         """
         if (x, y) in self._in_use_vh_origins.values():
             return
-        length = self._STEP_SIZE*3
+        length = self._STEP_SIZE*2
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
                                       properties=properties,
@@ -2706,7 +2706,7 @@ class NucleicAcidPart(Part):
         for i, x in enumerate(x_list):
             y = y_list[i]
             z = z_list[i] if z_list else 0.0
-            _length = length[i] if length else self._STEP_SIZE*3
+            _length = length[i] if length else self._STEP_SIZE*2
             _id_num = id_num[i] if id_num else None
             _properties = properties[i] if properties else None
             _safe = safe[i] if safe else True
@@ -3029,7 +3029,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except BaseException:
+            except Exception:
                 print("neighbors", list(neighbors))
                 raise
             new_neighbors.update(neighbors)
@@ -3040,7 +3040,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except BaseException:
+            except Exception:
                 print("neighbors", list(neighbors))
                 raise
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)

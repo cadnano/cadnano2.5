@@ -80,8 +80,9 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        if self._model_part == model_part:
-            print('partPropertyChanged', model_part, property_key, new_value)
+        # if self._model_part == model_part:
+        #     print('partPropertyChanged', model_part, property_key, new_value)
+        pass
     # end def
 
     def partSelectedChangedSlot(self, model_part, is_selected):

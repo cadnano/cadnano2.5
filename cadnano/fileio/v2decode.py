@@ -186,7 +186,7 @@ def decode(document, obj, emit_signals=False):
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
             try:
                 strand5p = scaf_strand_set.getStrand(idx5p)
-            except BaseException:
+            except Exception:
                 print(vh_num, idx5p)
                 print(scaf_strand_set.strand_heap)
                 print(stap_strand_set.strand_heap)
@@ -275,7 +275,7 @@ def decode(document, obj, emit_signals=False):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except BaseException:
+            except Exception:
                 print(strand, idx)
                 raise
         for key, mid in obj['modifications']['int_instances'].items():
@@ -283,7 +283,7 @@ def decode(document, obj, emit_signals=False):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except BaseException:
+            except Exception:
                 print(strand, idx)
                 raise
 # end def

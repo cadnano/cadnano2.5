@@ -299,7 +299,7 @@ class InsertionLabel(QGraphicsTextItem):
         test = self.toPlainText()
         try:
             insertion_size = int(test)
-        except BaseException:
+        except Exception:
             insertion_size = None
         insertion = parent._insertion
         length = insertion.length()

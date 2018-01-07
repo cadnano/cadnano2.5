@@ -649,7 +649,7 @@ class StrandSet(CNObject):
         """
         try:
             return self.strand_array[base_idx]
-        except BaseException:
+        except Exception:
             print(self.strand_array)
             raise
     # end def

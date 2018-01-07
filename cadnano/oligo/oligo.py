@@ -160,7 +160,7 @@ class Oligo(CNObject):
             if color is None:
                 print(self._props)
                 raise ValueError("Whhat Got None???")
-        except BaseException:
+        except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback, limit=5, file=sys.stdout)
             traceback.print_stack()

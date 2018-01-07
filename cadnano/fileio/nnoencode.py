@@ -56,7 +56,7 @@ class EncoderforPandas(json.JSONEncoder):
         else:
             try:
                 return super(EncoderforPandas, self).default(obj)
-            except BaseException:
+            except Exception:
                 print(type(obj))
                 raise
 # end class

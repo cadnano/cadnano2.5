@@ -1012,7 +1012,7 @@ class DocumentController(object):
             filename = self.fileName()
         try:
             self._document.writeToFile(filename)
-        except BaseException:
+        except Exception:
             flags = Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet
             errorbox = QMessageBox(QMessageBox.Critical,
                                    "cadnano",
