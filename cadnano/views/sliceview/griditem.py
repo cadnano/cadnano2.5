@@ -245,7 +245,7 @@ class GridItem(QGraphicsRectItem):
                                coord=(row, column))
 
                 if self._draw_gridpoint_coordinates:
-                    font = QFont('Arial')
+                    font = QFont(styles.THE_FONT)
                     path.addText(x - 10, -y + 5, font, "%s,%s" % (-row, column))
 
                 pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
