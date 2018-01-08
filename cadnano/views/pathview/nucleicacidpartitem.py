@@ -387,6 +387,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
         if len(self._virtual_helix_item_list) == 0:
             self.hide()
+        self.reconfigureRect((), ())
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
