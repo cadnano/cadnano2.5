@@ -72,7 +72,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
-        print(type(virtual_helix))
+        # print(type(virtual_helix))
         self.log('%s removed' % virtual_helix)
 
         if self._virtual_helix_item_hash.get(id_num) is not None:
@@ -90,8 +90,7 @@ class ConsoleNucleicAcidPartItem(AbstractPartItem):
     # end def
 
     def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
-        print(self._model_part)
-        print(sender)
+        print("partVirtualHelixPropertyChangedSlot", self._model_part, sender)
         if self._model_part == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
             for key, val in zip(keys, values):
