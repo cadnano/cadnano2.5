@@ -626,10 +626,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=64))
         m_b_h.setPen(getNoPen())
         m_b_h.hide()
-
-        TLx, TLy = self._idx_low*BASE_WIDTH, -BASE_WIDTH
-        BRx, BRy = self._idx_high*BASE_WIDTH, self._part_item._vh_rect.height()-BASE_WIDTH*2
-        self.reconfigureRect((TLx, TLy), (BRx, BRy))
+    # end def
 
     def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""

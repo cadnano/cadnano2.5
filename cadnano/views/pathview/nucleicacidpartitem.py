@@ -9,7 +9,6 @@ from cadnano.proxies.cnenum import HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
-# from cadnano.views.grabcorneritem import GrabCornerItem
 from cadnano.views.resizehandles import ResizeHandleGroup
 
 from . import pathstyles as styles
@@ -106,8 +105,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.outline.setPen(getPenObj(m_p.getColor(), _DEFAULT_WIDTH))
         o_rect = self._configureOutline(outline)
         model_color = m_p.getColor()
-
-        # self.grab_corner = GrabCornerItem(self._GC_SIZE, model_color, False, self)
 
         self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
                                                      # HandleType.LEFT |
