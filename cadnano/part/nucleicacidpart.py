@@ -96,7 +96,7 @@ class NucleicAcidPart(Part):
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
 
-    # TODO[NF]:  Change usages of these strings to constants throughought files
+    # TODO[NF]:  Change usages of these strings to constants throughout files
     _FLOAT_PROPERTY_KEYS = [
         'bases_per_repeat',
         'bases_per_turn',
