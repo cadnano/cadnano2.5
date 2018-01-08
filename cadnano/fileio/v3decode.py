@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 # from cadnano import setBatch, getReopen, setReopen
-from cadnano.proxies.cnenum import PointType
+from cadnano.proxies.cnenum import PointType, GridType
 
 
 def decode(document, obj, emit_signals=False):
@@ -12,23 +14,51 @@ def decode(document, obj, emit_signals=False):
         obj (dict): deserialized file object
     """
     obj.get('name')
-    meta = obj.get('meta')
+    meta = obj.get('meta', {})
 
+    # TODO[NF]:  Use a constant here
     slice_view_type = meta.get('slice_view_type')
-    grid_type = meta.get('grid_type')
-    document.setSliceViewType(slice_view_type=slice_view_type)
+    from cadnano.util import qtdb_trace
+    qtdb_trace()
+
+    # This assumes that the lattice without a specified grid type is a honeycomb lattice
+    grid_type = meta.get('grid_type', GridType.HONEYCOMB)
 
     for part_dict in obj['parts']:
         decodePart(document, part_dict, grid_type=grid_type,
                    emit_signals=emit_signals)
 
+        if slice_view_type is None:
+            slice_view_type = determineSliceViewType(document, part_dict, grid_type)
+
     modifications = obj['modifications']
+
     for mod_id, item in modifications.items():
         document.createMod(item['props'], mod_id)
         ext_locations = item['ext_locations']
         for key in ext_locations:
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
+
+    document.setSliceViewType(slice_view_type=slice_view_type)
+
+def determineSliceViewType(document, part_dict, grid_type):
+    THRESHOLD = 5
+    vh_id_list = part_dict.get('vh_list')
+    origins = part_dict.get('origins')
+
+    for vh_id, size in vh_id_list:
+        vh_x, vh_y = origins[vh_id]
+
+        radius = 30
+
+        if grid_type is GridType.HONEYCOMB:
+            if HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius) > THRESHOLD:
+                return 'Grid'
+        elif grid_type is GridType.SQUARE:
+            if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius) > THRESHOLD:
+                return 'Grid'
+    return 'Slice'
 
 
 def decodePart(document, part_dict, grid_type, emit_signals=False):
@@ -41,9 +71,9 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
     part.setActive(True)
 
-    vh_id_list = part_dict['vh_list']
-    vh_props = part_dict['virtual_helices']
-    origins = part_dict['origins']
+    vh_id_list = part_dict.get('vh_list')
+    vh_props = part_dict.get('virtual_helices')
+    origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
     if part_dict.get('point_type') == PointType.ARBITRARY:

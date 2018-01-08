@@ -57,6 +57,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._last_hovered_item = None
         self._highlighted_path = []
         self.spa_start_vhi = None
+        self.last_mouse_position = None
 
         self._translated_x = 0.0
         self._translated_y = 0.0

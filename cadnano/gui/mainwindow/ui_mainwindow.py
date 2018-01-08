@@ -534,7 +534,7 @@ class Ui_MainWindow(object):
         self.action_toolbar_spacer_21.setObjectName("action_toolbar_spacer_21")
         self.action_sim = QtWidgets.QAction(MainWindow)
         self.action_sim.setCheckable(True)
-        self.action_sim.setChecked(True)
+        self.action_sim.setChecked(False)
         icon35 = QtGui.QIcon()
         icon35.addPixmap(QtGui.QPixmap(":/parttools/sim"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_sim.setIcon(icon35)

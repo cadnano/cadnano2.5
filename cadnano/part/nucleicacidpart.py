@@ -1355,24 +1355,24 @@ class NucleicAcidPart(Part):
                 raise IndexError("id_num {} does not exists".format(id_num))
 
         # Ensure that the values that are set are floats as appropriate
-        if not isinstance(keys, str):
-            # TODO[NF]:  Change this to logger
-            print('Encountered a non-string key:  %s' % keys)
-        # TODO[NF]:  If keys is somehow a list, values won't be cast properly
-        # TODO[NF]:  Add UI-side validation of inputs
-        if keys in self._FLOAT_PROPERTY_KEYS:
-            try:
-                values = float(values)
-            except ValueError:
-                print('Validation failed:  attempted to set %s to %s' % (keys,
-                                                                         values))
-        self.vh_properties.loc[id_num, keys] = values
+        keys_list = [keys] if isinstance(keys, str) else keys
+        values_list = [values] if isinstance(values, str) else values
 
-        if not isinstance(values, (tuple, list)):
-            keys, values = (keys,), (values,)
+        for key, index in enumerate(keys_list):
+            if key in self._FLOAT_PROPERTY_KEYS:
+                try:
+                    values_list[index] = float(values_list[index])
+                except ValueError:
+                    print('Validation failed:  attempted to set %s to %s' % (key,
+                                                                             values_list[index]))
+
+        from cadnano.util import qtdb_trace
+        qtdb_trace()
+        self.vh_properties.loc[id_num, keys_list] = values_list
+
         if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(
-                self, id_num, self.getVirtualHelix(id_num), keys, values)
+                self, id_num, self.getVirtualHelix(id_num), keys_list, values_list)
     # end
 
     def locationQt(self, id_num, scale_factor=1.0):
