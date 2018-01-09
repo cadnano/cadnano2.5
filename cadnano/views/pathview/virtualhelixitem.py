@@ -306,7 +306,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks
         for i in range(canvas_size):
-            x = round(bw * i) + .5
+            x = round(bw * i)
             if i % sub_step_size == 0:
                 # path.moveTo(x - .5, 0)
                 # path.lineTo(x - .5, bw2)
