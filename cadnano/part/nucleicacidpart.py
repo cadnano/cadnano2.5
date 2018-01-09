@@ -1358,7 +1358,7 @@ class NucleicAcidPart(Part):
         keys_list = [keys] if isinstance(keys, str) else keys
         values_list = [values] if isinstance(values, str) else values
 
-        for key, index in enumerate(keys_list):
+        for index, key in enumerate(keys_list):
             if key in self._FLOAT_PROPERTY_KEYS:
                 try:
                     values_list[index] = float(values_list[index])
@@ -1367,8 +1367,14 @@ class NucleicAcidPart(Part):
                                                                              values_list[index]))
 
         from cadnano.util import qtdb_trace
-        qtdb_trace()
-        self.vh_properties.loc[id_num, keys_list] = values_list
+#        qtdb_trace()
+
+        for index, key in enumerate(keys_list):
+            try:
+                self.vh_properties.loc[id_num, (key)] = values_list[index]
+            except KeyError:
+                pass
+#        self.vh_properties.loc[id_num, keys_list] = values_list
 
         if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(

@@ -53,10 +53,10 @@ def determineSliceViewType(document, part_dict, grid_type):
         radius = 30
 
         if grid_type is GridType.HONEYCOMB:
-            if HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius) > THRESHOLD:
+            if HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius)[0] > THRESHOLD:
                 return 'Grid'
         elif grid_type is GridType.SQUARE:
-            if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius) > THRESHOLD:
+            if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, radius)[0] > THRESHOLD:
                 return 'Grid'
     return 'Slice'
 
