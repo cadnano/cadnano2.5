@@ -170,6 +170,34 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
+    def distanceFromClosestLatticeCoord(x, y, radius, scale_factor=1.0):
+        column_guess = x/(2*radius)
+        row_guess = y/(2*radius)
+
+        possible_columns = (floor(column_guess), ceil(column_guess))
+        possible_rows = (floor(row_guess), ceil(row_guess))
+
+        best_guess = None
+        shortest_distance = float('inf')
+
+        for row in possible_rows:
+            for column in possible_columns:
+                guess_x, guess_y = SquareDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+
+                import math
+                print('Distance: %s' % math.sqrt(squared_distance))
+
+                if squared_distance < shortest_distance:
+                    best_guess = (row, column)
+                    shortest_distance = squared_distance
+                    print('New Best Distance: %s' % math.sqrt(squared_distance))
+
+        print(shortest_distance)
+        return (shortest_distance, best_guess)
+    # end def
+
+    @staticmethod
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """
         """
