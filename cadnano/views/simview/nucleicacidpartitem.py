@@ -147,11 +147,11 @@ class SimNucleicAcidPartItem(AbstractPartItem, QEntity):
             TYPE: Description
         """
         return
-        # pxoig = self.prexover_manager
-        # pxoig.deactivateNeighbors()
+        # pxi_m = self.prexover_manager
+        # pxi_m.deactivateNeighbors()
         # if info and info is not None:
         #     id_num, is_fwd, idx, to_vh_id_num = info
-        #     pxoig.activateNeighbors(id_num, is_fwd, idx)
+        #     pxi_m.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
     def partZDimensionsChangedSlot(self, model_part, min_id_num, max_id_num, ztf=False):
