@@ -204,7 +204,7 @@ class StrandSet(CNObject):
     # end def
 
     def getNeighbors(self, strand):
-        """Given a :class:`Strand` in this :class:`StrandSet` find it's internal
+        """Given a :class:`Strand` in this :class:`StrandSet` find its internal
         neighbors
 
         Args:

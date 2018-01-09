@@ -343,7 +343,7 @@ class Strand(CNObject):
     # end def
 
     def applyAbstractSequence(self):
-        """Assigns virtual index from 5' to 3' on strand and it's complement
+        """Assigns virtual index from 5' to 3' on strand and its complement
         location.
         """
         abstract_seq = []

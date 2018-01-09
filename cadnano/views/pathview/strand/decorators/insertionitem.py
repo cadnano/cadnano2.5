@@ -262,7 +262,7 @@ class InsertionItem(QGraphicsPathItem):
                 mat.rotate(-tang_ang + angle_offset)
 
                 rotated_path = mat.map(temp_path)
-                # 4. translate the rotate object to it's position on the part
+                # 4. translate the rotate object to its position on the part
                 rotated_path.translate(pt)
                 seq_path.addPath(rotated_path)
             # end for

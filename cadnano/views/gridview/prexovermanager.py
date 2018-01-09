@@ -90,7 +90,7 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits, pairs):
-        """Create PreXoverItemGroups for the active virtual_helix_item and it's
+        """Create PreXoverItemGroups for the active virtual_helix_item and its
         neighbors and connect the neighboring bases
 
         Args:
