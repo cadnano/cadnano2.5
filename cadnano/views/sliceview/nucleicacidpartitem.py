@@ -31,8 +31,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     Attributes:
         active_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
-        grab_cornerBR (GrabCornerItem): bottom right bounding box handle
-        grab_cornerTL (GrabCornerItem): top left bounding box handle
+        resize_handle_group (ResizeHandleGroup): handles for dragging and resizing
         griditem (GridItem): Description
         outline (QGraphicsRectItem): Description
         prexover_manager (PreXoverManager): Description
@@ -723,7 +722,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self._preview_spa((x, y))
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.GRAY_STROKE)
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
     # end def
 
     def keyReleaseEvent(self, event):
@@ -902,7 +901,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             point_item = self.coordinates_to_xy.get(event_coord)
 
             if point_item is not None and self._inPointItem(event_xy, event_coord) and is_alt:
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.GRAY_STROKE)
+                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
             elif point_item is not None and self._inPointItem(event_xy, event_coord) and not is_alt:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
