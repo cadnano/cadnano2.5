@@ -50,10 +50,7 @@ class GridItem(QGraphicsRectItem):
     # end def
 
     def updateGrid(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Recreates the grid according to the latest part_item outline rect.
         """
         part_item = self.part_item
         part = part_item.part()
@@ -299,7 +296,9 @@ class GridItem(QGraphicsRectItem):
     # end def
 
     def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True, color=None):
-        point_item = self.points_dict.get(coord)
+        point_item = self.points_dict.get(coord, None)
+        if point_item is None:
+            return
 
         if show_hint is False:
             point_item.showCreateHint(show_hint=False)
