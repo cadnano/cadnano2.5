@@ -598,14 +598,18 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         else:
             # 1. Temporarily remove children that shouldn't affect size
             outline.setParentItem(None)
+            self.workplane.setParentItem(None)
             self.model_bounds_hint.setParentItem(None)
             self.resize_handle_group.setParentItemAll(None)
+            self.prexover_manager.setParentItem(None)
             # 2. Get the tight bounding rect
             self.setRect(self.childrenBoundingRect())  # vh_items only
             # 3. Restore children like nothing happened
             outline.setParentItem(self)
+            self.workplane.setParentItem(self)
             self.model_bounds_hint.setParentItem(self)
             self.resize_handle_group.setParentItemAll(self)
+            self.prexover_manager.setParentItem(self)
             self._configureOutline(outline)
 
         self.resetPen(self.modelColor(), 0)  # cosmetic

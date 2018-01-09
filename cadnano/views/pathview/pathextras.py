@@ -267,6 +267,25 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 PROX_ALPHA = 64
 
 
+def _createPreXoverPainterPath(p1, p2, p3):
+    path = QPainterPath()
+    path.moveTo(p1)
+    path.lineTo(p2)
+    path.lineTo(p3)
+    return path
+# end def
+
+
+# create hash marks QPainterPaths only once
+TOP_PT = QPointF(BASE_RECT.center().x(), 0)
+BOT_PT = QPointF(BASE_RECT.center().x(), BASE_RECT.bottom())
+CENTER = BASE_RECT.center()
+_RD_PATH = _createPreXoverPainterPath(BASE_RECT.topRight(), TOP_PT, CENTER)
+_RU_PATH = _createPreXoverPainterPath(BASE_RECT.bottomRight(), BOT_PT, CENTER)
+_LD_PATH = _createPreXoverPainterPath(BASE_RECT.topLeft(), TOP_PT, CENTER)
+_LU_PATH = _createPreXoverPainterPath(BASE_RECT.bottomLeft(), BOT_PT, CENTER)
+
+
 class PreXoverItem(QGraphicsRectItem):
     """A PreXoverItem exists between a single 'from' VirtualHelixItem index
     and zero or more 'to' VirtualHelixItem Indices
@@ -275,12 +294,12 @@ class PreXoverItem(QGraphicsRectItem):
         adapter (TYPE): Description
         idx (int): the base index within the virtual helix
         is_fwd (TYPE): Description
-        prexoveritemgroup (TYPE): Description
+        prexoveritem_manager (TYPE): Description
         to_vh_id_num (TYPE): Description
     """
 
     def __init__(self, from_virtual_helix_item, is_fwd, from_index,
-                 to_vh_id_num, prexoveritemgroup, color):
+                 to_vh_id_num, prexoveritem_manager, color):
         """Summary
 
         Args:
@@ -288,7 +307,7 @@ class PreXoverItem(QGraphicsRectItem):
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description
-            prexoveritemgroup (TYPE): Description
+            prexoveritem_manager (TYPE): Description
             color (TYPE): Description
         """
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
@@ -296,10 +315,11 @@ class PreXoverItem(QGraphicsRectItem):
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
         self._label = PreXoverLabel(is_fwd, color, self)
+        self._path = QGraphicsPathItem()
         self._phos_item = Triangle(FWDPHOS_PP, self)
         self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index,
-                       to_vh_id_num, prexoveritemgroup, color)
+                       to_vh_id_num, prexoveritem_manager, color)
     # end def
 
     def shutdown(self):
@@ -320,8 +340,23 @@ class PreXoverItem(QGraphicsRectItem):
         self.hide()
     # end def
 
+    def setPathAppearance(self, from_virtual_helix_item, is_fwd, color):
+            """
+            Sets the PainterPath according to the index (low = Left, high = Right)
+            and strand position (top = Up, bottom = Down).
+            """
+            self._ppi.setPen(getPenObj(color,
+                                       styles.PREXOVER_STROKE_WIDTH,
+                                       # capstyle=Qt.RoundCap,
+                                       joinstyle=Qt.RoundJoin))
+            PP_LUT = (_LD_PATH, _RD_PATH, _LU_PATH, _RU_PATH)  # Lookup table
+            path = PP_LUT[2*int(is_fwd)]
+            self._ppi.setPath(path)
+            self._ppi.show()
+    # end def
+
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
-                  to_vh_id_num, prexoveritemgroup, color):
+                  to_vh_id_num, prexoveritem_manager, color):
         """Summary
 
         Args:
@@ -329,7 +364,7 @@ class PreXoverItem(QGraphicsRectItem):
             is_fwd (TYPE): Description
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description
-            prexoveritemgroup (TYPE): Description
+            prexoveritem_manager (TYPE): Description
             color (TYPE): Description
 
         Returns:
@@ -342,12 +377,14 @@ class PreXoverItem(QGraphicsRectItem):
         self.is_fwd = is_fwd
         self.to_vh_id_num = to_vh_id_num
         self._color = color
-        self.prexoveritemgroup = prexoveritemgroup
+        self.prexoveritem_manager = prexoveritem_manager
         self._bond_item.hide()
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self.setLabel(text=lbt)
         self._label.resetItem(is_fwd, color)
 
+        self._ppi = QGraphicsPathItem(self)
+        self._ppi.hide()
         phos = self._phos_item
         bonditem = self._bond_item
 
@@ -372,6 +409,7 @@ class PreXoverItem(QGraphicsRectItem):
         if to_vh_id_num is not None:
             inactive_alpha = PROX_ALPHA
             self.setBrush(getBrushObj(color, alpha=inactive_alpha))
+            self.setPathAppearance(from_virtual_helix_item, is_fwd, color)
         else:
             self.setBrush(getBrushObj(color, alpha=0))
         self.show()
@@ -424,7 +462,7 @@ class PreXoverItem(QGraphicsRectItem):
             event (TYPE): Description
         """
         self.setFocus(Qt.MouseFocusReason)
-        self.prexoveritemgroup.updateModelActiveBaseInfo(self.getInfo())
+        self.prexoveritem_manager.updateModelActiveBaseInfo(self.getInfo())
         self.setActiveHovered(True)
         status_string = "%d[%d]" % (self._id_num, self.idx)
         self.parentItem().window().statusBar().showMessage(status_string)
@@ -439,7 +477,7 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        self.prexoveritemgroup.updateModelActiveBaseInfo(None)
+        self.prexoveritem_manager.updateModelActiveBaseInfo(None)
         self.setActiveHovered(False)
         self.clearFocus()
         self.parentItem().window().statusBar().showMessage("")
@@ -454,7 +492,7 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        self.prexoveritemgroup.handlePreXoverKeyPress(event.key())
+        self.prexoveritem_manager.handlePreXoverKeyPress(event.key())
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -598,6 +636,42 @@ class PreXoverItem(QGraphicsRectItem):
 # end class
 
 
+class PathWorkplaneOutline(QGraphicsRectItem):
+    def __init__(self, parent=None):
+        super(PathWorkplaneOutline, self).__init__(parent)
+        self.setPen(getNoPen())
+        self._path = QGraphicsPathItem(self)
+        self._path.setBrush(getNoBrush())
+        self._path.setPen(newPenObj(styles.BLUE_STROKE, 0))
+    # end def
+
+    def updateAppearance(self):
+        tl = self.rect().topLeft()
+        tl1 = tl + QPointF(0, -BASE_WIDTH/2)
+        tl2 = tl + QPointF(-BASE_WIDTH/2, 0)
+        bl = self.rect().bottomLeft()
+        bl1 = bl + QPointF(0, BASE_WIDTH/2)
+        bl2 = bl + QPointF(-BASE_WIDTH/2, 0)
+        tr = self.rect().topRight()
+        tr1 = tr + QPointF(0, -BASE_WIDTH/2)
+        tr2 = tr + QPointF(BASE_WIDTH/2, 0)
+        br = self.rect().bottomRight()
+        br1 = br + QPointF(0, BASE_WIDTH/2)
+        br2 = br + QPointF(BASE_WIDTH/2, 0)
+        pp = QPainterPath()
+        pp.moveTo(tl2)
+        pp.lineTo(tl1)
+        pp.lineTo(bl1)
+        pp.lineTo(bl2)
+        pp.moveTo(tr2)
+        pp.lineTo(tr1)
+        pp.lineTo(br1)
+        pp.lineTo(br2)
+        self._path.setPath(pp)
+    # end def
+# end class
+
+
 class PathWorkplaneItem(QGraphicsRectItem):
     """Draws the rectangle to indicate the current Workplane, i.e. the
     region of part bases affected by certain actions in other views."""
@@ -607,10 +681,12 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def __init__(self, model_part, part_item):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
-        self.setAcceptHoverEvents(True)
+        # self.setAcceptHoverEvents(True)
         # self.setBrush(getNoBrush())
         self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=12))
         self.setPen(getNoPen())
+
+        self.setZValue(styles.ZWORKPLANE)
 
         self._model_part = model_part
         self._part_item = part_item
@@ -618,10 +694,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
 
-        self.outline = QGraphicsRectItem(self)
-        self.outline.setPen(newPenObj(styles.BLUE_STROKE, 0))
-        self.resize_handle_group = ResizeHandleGroup(self.rect(), self._HANDLE_SIZE, styles.BLUE_STROKE, True,
-                                                     HandleType.LEFT | HandleType.RIGHT, self)
+        self.outline = PathWorkplaneOutline(self)
+        self.resize_handle_group = ResizeHandleGroup(self.rect(), self._HANDLE_SIZE, styles.BLUE_STROKE,
+                                                     True, HandleType.LEFT | HandleType.RIGHT, self)
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
         m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=64))
         m_b_h.setPen(getNoPen())
@@ -652,6 +727,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def finishDrag(self):
         """Set the workplane size in the model"""
+        pass
         # pos = self.pos()
         # position = pos.x(), pos.y()
         # view_name = self._viewroot.name
@@ -689,10 +765,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
         yTL = self._part_item._vh_rect.top()
         yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
 
-        xoffset = styles.MINOR_GRID_STROKE_WIDTH
-
-        self.setRect(QRectF(QPointF(xTL+xoffset, yTL), QPointF(xBR+xoffset, yBR)))
+        self.setRect(QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR)))
         self.outline.setRect(self.rect())
+        self.outline.updateAppearance()
         self.resize_handle_group.alignHandles(self.rect())
         self._model_part.setProperty('workplane_idxs', (self._idx_low, self._idx_high), use_undostack=False)
         return self.rect()
@@ -711,6 +786,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
             m_b_h.show()
         else:
             m_b_h.hide()
+            self._part_item.update()  # m_b_h hangs around unless force repaint
     # end def
 
     def width(self):
@@ -721,6 +797,10 @@ class PathWorkplaneItem(QGraphicsRectItem):
     def hoverEnterEvent(self, event):
         self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
         QGraphicsItem.hoverEnterEvent(self, event)
+    # end def
+
+    def hoverMoveEvent(self, event):
+        QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):

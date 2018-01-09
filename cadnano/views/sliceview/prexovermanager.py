@@ -169,7 +169,7 @@ class PreXoverManager(QGraphicsRectItem):
 
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            is_fwd (TYPE): Description
+            is_fwd (bool): True if fwd (top) strand, False if rev (bottom) strand
             idx (int): the base index within the virtual helix
 
         Returns:
@@ -183,8 +183,7 @@ class PreXoverManager(QGraphicsRectItem):
             return
         agroup = self.active_group
         if id_num != agroup.id_num:
-            raise ValueError("not active id_num {} != {}".format(id_num,
-                                                                 agroup.id_num))
+            raise ValueError("not active id_num {} != {}".format(id_num, agroup.id_num))
         active_items = self._active_items
 
         item = self.prexover_item_map.get((id_num, is_fwd, idx))

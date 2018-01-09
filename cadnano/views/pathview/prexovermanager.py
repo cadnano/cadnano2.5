@@ -257,7 +257,7 @@ class PreXoverManager(QGraphicsRectItem):
         # print("ACTIVATING VH", virtual_helix_item.idNum())
         # print(per_neighbor_hits[1])
 
-        # 1. clear all PreXoverItems
+        # 1. Clear all PreXoverItems
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items  # for avoiding duplicates
@@ -276,23 +276,23 @@ class PreXoverManager(QGraphicsRectItem):
         id_num = virtual_helix_item.idNum()
         fwd_st_type, rev_st_type = True, False  # for clarity in the call to constructors
 
-        start, length = part_item.part().normalizedRange(id_num, this_idx)
+        # start, length = part_item.part().normalizedRange(id_num, this_idx)
         active_pxis = self.active_pxis
-        for idx in range(start, start + length):
-            apxi = getPoolItem(pxi_pool,
-                               PreXoverItem,
-                               virtual_helix_item, fwd_st_type, idx,
-                               None, self, colors[idx % bpr]
-                               )
-            apxi.enableActive(True, None)
-            active_pxis[(fwd_st_type, idx)] = apxi
-            apxi = getPoolItem(pxi_pool,
-                               PreXoverItem,
-                               virtual_helix_item, rev_st_type, idx,
-                               None, self, colors[-1 - (idx % bpr)]
-                               )
-            apxi.enableActive(True, None)
-            active_pxis[(rev_st_type, idx)] = apxi
+        # for idx in range(start, start + length):
+        #     apxi = getPoolItem(pxi_pool,
+        #                        PreXoverItem,
+        #                        virtual_helix_item, fwd_st_type, idx,
+        #                        None, self, colors[idx % bpr]
+        #                        )
+        #     # apxi.enableActive(True, None)
+        #     active_pxis[(fwd_st_type, idx)] = apxi
+        #     apxi = getPoolItem(pxi_pool,
+        #                        PreXoverItem,
+        #                        virtual_helix_item, rev_st_type, idx,
+        #                        None, self, colors[-1 - (idx % bpr)]
+        #                        )
+        #     # apxi.enableActive(True, None)
+        #     active_pxis[(rev_st_type, idx)] = apxi
 
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
@@ -301,9 +301,14 @@ class PreXoverManager(QGraphicsRectItem):
             n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
                 neighbor_pxis = []
-                # print((id_num, fwd_st_type, idx))
-                apxi = active_pxis[(fwd_st_type, idx)]
+                apxi = getPoolItem(pxi_pool,
+                                   PreXoverItem,
+                                   virtual_helix_item, fwd_st_type, idx,
+                                   neighbor_id, self, colors[idx % bpr]
+                                   )
+                # apxi = active_pxis[(fwd_st_type, idx)]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
+                active_pxis[(fwd_st_type, idx)] = apxi
                 pxis[(id_num, fwd_st_type, idx)] = (apxi, neighbor_pxis)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
@@ -330,9 +335,14 @@ class PreXoverManager(QGraphicsRectItem):
 
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
                 neighbor_pxis = []
-                # print((id_num, rev_st_type, idx))
-                apxi = active_pxis[(rev_st_type, idx)]
+                apxi = getPoolItem(pxi_pool,
+                                   PreXoverItem,
+                                   virtual_helix_item, rev_st_type, idx,
+                                   neighbor_id, self, colors[-1 - (idx % bpr)]
+                                   )
+                # apxi = active_pxis[(rev_st_type, idx)]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
+                active_pxis[(rev_st_type, idx)] = apxi
                 pxis[(id_num, rev_st_type, idx)] = (apxi, neighbor_pxis)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
