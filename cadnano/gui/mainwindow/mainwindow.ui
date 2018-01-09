@@ -946,10 +946,10 @@
     <string>Skip</string>
    </property>
    <property name="toolTip">
-    <string>(S)kip Tool</string>
+    <string>S(k)ip Tool</string>
    </property>
    <property name="shortcut">
-    <string>S</string>
+    <string>K</string>
    </property>
   </action>
   <action name="action_path_paint">
@@ -1297,10 +1297,10 @@
     <string>filter-fwd</string>
    </property>
    <property name="toolTip">
-    <string>(F)wd</string>
+    <string>F(w)d</string>
    </property>
    <property name="shortcut">
-    <string>F</string>
+    <string>W</string>
    </property>
   </action>
   <action name="action_filter_rev">
@@ -1370,10 +1370,10 @@
     <string>Create</string>
    </property>
    <property name="toolTip">
-    <string>Create (n)ew</string>
+    <string>(C)reate</string>
    </property>
    <property name="shortcut">
-    <string>N</string>
+    <string>C</string>
    </property>
   </action>
   <action name="action_global_select">
@@ -1434,7 +1434,7 @@
     <string>(S)caf</string>
    </property>
    <property name="shortcut">
-    <string>C</string>
+    <string>S</string>
    </property>
   </action>
   <action name="action_filter_stap">
