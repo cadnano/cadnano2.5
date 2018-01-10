@@ -2633,9 +2633,10 @@ class NucleicAcidPart(Part):
                 operations such as file import.
         """
         valid_pts = np.where(self._origin_pts != np.inf)
-        vps = self._origin_pts[valid_pts]
-        if [x, y] in vps.reshape((len(vps) // 2, 2)).tolist():
-            print("VH already present at", x, y)
+        x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
+        vps = np.around(self._origin_pts[valid_pts], decimals=9)
+        if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
+            print("vh already present at coords ({}, {})".format(x9, y9))
             print(util.trace(5))
             return
         c = CreateVirtualHelixCommand(self, x, y, z, length,
