@@ -789,6 +789,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""
+        # todo: fix bug preventing dragging in imported files
         if handle_type and handle_type & HandleType.LEFT:
             xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
             xBR = self._idx_high*BASE_WIDTH

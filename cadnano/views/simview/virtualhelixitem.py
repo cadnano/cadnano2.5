@@ -162,6 +162,7 @@ class SimVirtualHelixItem(AbstractVirtualHelixItem, QEntity):
     # end def
 
     def updateStrandConnections3D(self, strand):
+        # todo: add xover connections in strands
         pass
     # end def
 # end class

@@ -23,7 +23,7 @@ class StrandItem(AbstractStrandItem):
     # end def
 
     def strandConnectionChangedSlot(self, strand):
-        print("[simview] strandConnectionChangedSlot")
+        # print("[simview] strandConnectionChangedSlot")
         self._vh_item.updateStrandConnections3D(strand)
     # end def
 

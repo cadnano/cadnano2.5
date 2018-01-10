@@ -13,7 +13,7 @@ from .removeoligocmd import RemoveOligoCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
-OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 60
 MAX_HIGHLIGHT_LENGTH = 800
 
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
