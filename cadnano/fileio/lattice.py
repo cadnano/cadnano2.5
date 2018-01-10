@@ -1,6 +1,6 @@
 """
 """
-from math import ceil, floor
+from math import ceil, floor, sqrt
 
 root3 = 1.732051
 
@@ -56,16 +56,16 @@ class HoneycombDnaPart(object):
             for column in possible_columns:
                 guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
                 squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                distance = sqrt(squared_distance)
 
-                import math
-                print('Distance: %s' % math.sqrt(squared_distance))
+#                print('Distance: %s' % sqrt(distance))
 
-                if squared_distance < shortest_distance:
+                if distance < shortest_distance:
                     best_guess = (row, column)
-                    shortest_distance = squared_distance
-                    print('New Best Distance: %s' % math.sqrt(squared_distance))
+                    shortest_distance = distance
+#                    print('New Best Distance: %s' % distance)
 
-        print(shortest_distance)
+#        print(shortest_distance)
         return (shortest_distance, best_guess)
     # end def
 
