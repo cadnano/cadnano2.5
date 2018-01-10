@@ -260,7 +260,6 @@ class PreXoverManager(QGraphicsRectItem):
         self.clearPreXoverItems()
         pxis = self.prexover_item_map
         neighbor_pxis_dict = self.neighbor_prexover_items  # for avoiding duplicates
-        # neighbor_pairs_dict = self.neighbor_pairs_dict
         part_item = self.part_item
         pxi_pool = self.pxi_pool
         getPoolItem = self.getPoolItem
@@ -276,95 +275,120 @@ class PreXoverManager(QGraphicsRectItem):
 
         # start, length = part_item.part().normalizedRange(id_num, this_idx)
         active_pxis = self.active_pxis
-        # for idx in range(start, start + length):
-        #     apxi = getPoolItem(pxi_pool,
-        #                        PreXoverItem,
-        #                        virtual_helix_item, fwd_st_type, idx,
-        #                        None, self, colors[idx % bpr]
-        #                        )
-        #     # apxi.enableActive(True, None)
-        #     active_pxis[(fwd_st_type, idx)] = apxi
-        #     apxi = getPoolItem(pxi_pool,
-        #                        PreXoverItem,
-        #                        virtual_helix_item, rev_st_type, idx,
-        #                        None, self, colors[-1 - (idx % bpr)]
-        #                        )
-        #     # apxi.enableActive(True, None)
-        #     active_pxis[(rev_st_type, idx)] = apxi
 
         # 1. Construct PXIs for the active virtual_helix_item
         for neighbor_id, hits in per_neighbor_hits.items():
             fwd_axis_hits, rev_axis_hits = hits
-            # fwd_axis_idxs = [i[0] for i in fwd_axis_hits]
-            # rev_axis_idxs = [i[0] for i in rev_axis_hits]
 
-            print(neighbor_id, "fwd_axis_hits", fwd_axis_hits, "rev_axis_hits", rev_axis_hits)
+            # Track active and neighbor idxs in flat list
+            # so we can look for idx pairs
+            fwd_active_idxs = [i[0] for i in fwd_axis_hits]
+            rev_active_idxs = [i[0] for i in rev_axis_hits]
+            fwd_neighbor_idxs = [j for k in [i[2] for i in fwd_axis_hits] for j in k]
+            rev_neighbor_idxs = [j for k in [i[1] for i in rev_axis_hits] for j in k]
+
             nvhi = part_item.idToVirtualHelixItem(neighbor_id)
             # n_step_size = nvhi.getProperty('bases_per_repeat')
             for idx, fwd_idxs, rev_idxs in fwd_axis_hits:
+                # print("f fwd_active_idxs", fwd_active_idxs)
+                nearby_idxs = []
+                if idx-1 in fwd_active_idxs:
+                    nearby_idxs.append(idx-1)
+                if idx+1 in fwd_active_idxs:
+                    nearby_idxs.append(idx+1)
                 apxi = getPoolItem(pxi_pool,
                                    PreXoverItem,
                                    virtual_helix_item, fwd_st_type, idx,
-                                   neighbor_id, self
+                                   nearby_idxs, neighbor_id, self
                                    )
                 # apxi = active_pxis[(fwd_st_type, idx)]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
                 active_pxis[(fwd_st_type, idx)] = apxi
                 neighbor_pxis = []
                 pxis[(id_num, fwd_st_type, idx)] = (apxi, neighbor_pxis)
+                # print("f fwd_neighbor_idxs", fwd_neighbor_idxs)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
+                        nearby_idxs = []
+                        if j-1 in rev_neighbor_idxs:
+                            nearby_idxs.append(j-1)
+                        if j+1 in rev_neighbor_idxs:
+                            nearby_idxs.append(j+1)
                         npxi = getPoolItem(pxi_pool,
                                            PreXoverItem,
                                            nvhi, fwd_st_type, j,
-                                           id_num, self
+                                           nearby_idxs, id_num, self
                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(npxi)
+                # print("f rev_neighbor_idxs", rev_neighbor_idxs)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
+                        nearby_idxs = []
+                        if j-1 in fwd_neighbor_idxs:
+                            nearby_idxs.append(j-1)
+                        if j+1 in fwd_neighbor_idxs:
+                            nearby_idxs.append(j+1)
                         npxi = getPoolItem(pxi_pool,
                                            PreXoverItem,
                                            nvhi, rev_st_type, j,
-                                           id_num, self
+                                           nearby_idxs, id_num, self
                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(npxi)
 
             for idx, fwd_idxs, rev_idxs in rev_axis_hits:
+                # print("r rev_active_idxs", rev_active_idxs)
+                nearby_idxs = []
+                if idx-1 in rev_active_idxs:
+                    nearby_idxs.append(idx-1)
+                if idx+1 in rev_active_idxs:
+                    nearby_idxs.append(idx+1)
                 apxi = getPoolItem(pxi_pool,
                                    PreXoverItem,
                                    virtual_helix_item, rev_st_type, idx,
-                                   neighbor_id, self
+                                   nearby_idxs, neighbor_id, self
                                    )
                 # apxi = active_pxis[(rev_st_type, idx)]
                 apxi.enableActive(True, to_vh_id_num=neighbor_id)
                 active_pxis[(rev_st_type, idx)] = apxi
                 neighbor_pxis = []
                 pxis[(id_num, rev_st_type, idx)] = (apxi, neighbor_pxis)
+                # print("r fwd_neighbor_idxs", fwd_neighbor_idxs)
                 for j in fwd_idxs:
                     nkey = (neighbor_id, fwd_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
+                        nearby_idxs = []
+                        if j-1 in rev_neighbor_idxs:
+                            nearby_idxs.append(j-1)
+                        if j+1 in rev_neighbor_idxs:
+                            nearby_idxs.append(j+1)
                         npxi = getPoolItem(pxi_pool,
                                            PreXoverItem,
                                            nvhi, fwd_st_type, j,
-                                           id_num, self
+                                           nearby_idxs, id_num, self
                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(npxi)
+                # print("r rev_neighbor_idxs", rev_neighbor_idxs)
                 for j in rev_idxs:
                     nkey = (neighbor_id, rev_st_type, j)
                     npxi = neighbor_pxis_dict.get(nkey)
                     if npxi is None:
+                        nearby_idxs = []
+                        if j-1 in fwd_neighbor_idxs:
+                            nearby_idxs.append(j-1)
+                        if j+1 in fwd_neighbor_idxs:
+                            nearby_idxs.append(j+1)
                         npxi = getPoolItem(pxi_pool,
                                            PreXoverItem,
                                            nvhi, rev_st_type, j,
-                                           id_num, self
+                                           nearby_idxs, id_num, self
                                            )
                         neighbor_pxis_dict[nkey] = npxi
                     neighbor_pxis.append(npxi)

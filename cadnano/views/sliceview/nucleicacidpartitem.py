@@ -668,7 +668,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             getattr(self, tool_method_name)(tool, event)
         else:
             event.setaccepted(False)
-            QGraphicsItem.mousepressevent(self, event)
+            QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def hoverMoveEvent(self, event):

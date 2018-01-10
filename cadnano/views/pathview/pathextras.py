@@ -18,6 +18,7 @@ from PyQt5.QtGui import QBrush, QColor, QPainterPath
 from PyQt5.QtGui import QPolygonF, QTransform
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
@@ -189,7 +190,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
     _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
     _FM = QFontMetrics(_XO_FONT)
 
-    def __init__(self, is_fwd, color, pre_xover_item):
+    def __init__(self, is_fwd, pre_xover_item):
         """Summary
 
         Args:
@@ -199,7 +200,6 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         """
         super(QGraphicsSimpleTextItem, self).__init__(pre_xover_item)
         self.is_fwd = is_fwd
-        self._color = color
         self._tbr = None
         self._outline = QGraphicsRectItem(self)
         self.setFont(self._XO_FONT)
@@ -267,23 +267,85 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 PROX_ALPHA = 64
 
 
-def _createPreXoverPainterPath(p1, p2, p3):
+def _createPreXoverPainterPath(p1, p2, p3, end_poly=None, is_fwd=True):
     path = QPainterPath()
     path.moveTo(p1)
     path.lineTo(p2)
     path.lineTo(p3)
+    if end_poly:
+        poly_width = end_poly.boundingRect().height()/2
+        xoffset = -poly_width if is_fwd else poly_width
+        angle = -90 if is_fwd else 90
+        T = QTransform()
+        T.translate(p3.x()+xoffset, p3.y())
+        T.rotate(angle)
+        path.addPolygon(T.map(end_poly))
+    return path
+# end def
+
+
+def _createDualPreXoverPainterPath(p1, p2, p3, p4, p5, p6, end_poly=None, is_fwd=True):
+    path = QPainterPath()
+    path.moveTo(p1)
+    path.lineTo(p2)
+    path.lineTo(p3)
+    path.moveTo(p4)
+    path.lineTo(p5)
+    path.lineTo(p6)
+    if end_poly is not None:
+        h = end_poly.boundingRect().height()/2
+        xoffset = -h if is_fwd else h
+        w = end_poly.boundingRect().width()
+        yoffset = w if is_fwd else -w
+        angle = -90 if is_fwd else 90
+        T = QTransform()
+        T.translate(p6.x()+xoffset, p6.y()+yoffset)
+        T.rotate(angle)
+        path.addPolygon(T.map(end_poly))
     return path
 # end def
 
 
 # create hash marks QPainterPaths only once
-TOP_PT = QPointF(BASE_RECT.center().x(), 0)
-BOT_PT = QPointF(BASE_RECT.center().x(), BASE_RECT.bottom())
-CENTER = BASE_RECT.center()
-_RD_PATH = _createPreXoverPainterPath(BASE_RECT.topRight(), TOP_PT, CENTER)
-_RU_PATH = _createPreXoverPainterPath(BASE_RECT.bottomRight(), BOT_PT, CENTER)
-_LD_PATH = _createPreXoverPainterPath(BASE_RECT.topLeft(), TOP_PT, CENTER)
-_LU_PATH = _createPreXoverPainterPath(BASE_RECT.bottomLeft(), BOT_PT, CENTER)
+CENTER_X = BASE_RECT.center().x()
+CENTER_Y = BASE_RECT.center().y()
+LO_X = BASE_RECT.left()
+HI_X = BASE_RECT.right()
+BOT_Y = BASE_RECT.bottom()+BASE_WIDTH/5
+TOP_Y = BASE_RECT.top()-BASE_WIDTH/5
+WIDTH_X = BASE_WIDTH/3
+HEIGHT_Y = BASE_WIDTH/3
+
+FWD_L1 = QPointF(LO_X, BOT_Y)
+FWD_L2 = QPointF(LO_X+WIDTH_X, BOT_Y)
+FWD_L3 = QPointF(LO_X+WIDTH_X, BOT_Y-HEIGHT_Y)
+FWD_H1 = QPointF(HI_X, BOT_Y)
+FWD_H2 = QPointF(HI_X-WIDTH_X, BOT_Y)
+FWD_H3 = QPointF(HI_X-WIDTH_X, BOT_Y-HEIGHT_Y)
+REV_L1 = QPointF(LO_X, TOP_Y)
+REV_L2 = QPointF(LO_X+WIDTH_X, TOP_Y)
+REV_L3 = QPointF(LO_X+WIDTH_X, TOP_Y+HEIGHT_Y)
+REV_H1 = QPointF(HI_X, TOP_Y)
+REV_H2 = QPointF(HI_X-WIDTH_X, TOP_Y)
+REV_H3 = QPointF(HI_X-WIDTH_X, TOP_Y+HEIGHT_Y)
+
+END_3P_WIDTH = styles.PREXOVER_STROKE_WIDTH*2
+END_3P = QPolygonF()
+END_3P.append(QPointF(0, 0))
+END_3P.append(QPointF(0.75 * END_3P_WIDTH, 0.5 * END_3P_WIDTH))
+END_3P.append(QPointF(0, END_3P_WIDTH))
+END_3P.append(QPointF(0, 0))
+
+_FWD_LO_PATH = _createPreXoverPainterPath(FWD_L1, FWD_L2, FWD_L3, end_poly=END_3P, is_fwd=True)
+_FWD_HI_PATH = _createPreXoverPainterPath(FWD_H1, FWD_H2, FWD_H3)
+_REV_LO_PATH = _createPreXoverPainterPath(REV_L1, REV_L2, REV_L3)
+_REV_HI_PATH = _createPreXoverPainterPath(REV_H1, REV_H2, REV_H3, end_poly=END_3P, is_fwd=False)
+_FWD_DUAL_PATH = _createDualPreXoverPainterPath(FWD_H1, FWD_H2, FWD_H3,
+                                                FWD_L1, FWD_L2, FWD_L3, end_poly=END_3P, is_fwd=True)
+_REV_DUAL_PATH = _createDualPreXoverPainterPath(REV_H1, REV_H2, REV_H3,
+                                                REV_L1, REV_L2, REV_L3, end_poly=END_3P, is_fwd=False)
+
+EMPTY_COL = '#cccccc'
 
 
 class PreXoverItem(QGraphicsRectItem):
@@ -298,8 +360,8 @@ class PreXoverItem(QGraphicsRectItem):
         to_vh_id_num (TYPE): Description
     """
 
-    def __init__(self, from_virtual_helix_item, is_fwd, from_index,
-                 to_vh_id_num, prexoveritem_manager, color):
+    def __init__(self, from_virtual_helix_item, is_fwd, from_index, nearby_idxs,
+                 to_vh_id_num, prexoveritem_manager):
         """Summary
 
         Args:
@@ -308,18 +370,48 @@ class PreXoverItem(QGraphicsRectItem):
             from_index (TYPE): Description
             to_vh_id_num (TYPE): Description
             prexoveritem_manager (TYPE): Description
-            color (TYPE): Description
         """
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
+        self._tick_marks = QGraphicsPathItem(self)
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
-        self._label = PreXoverLabel(is_fwd, color, self)
+
+        self.p1 = p1 = QGraphicsEllipseItem(0, 0, 5, 5, self)
+        self.p2 = p2 = QGraphicsEllipseItem(0, 0, 5, 5, self)
+        self.c1 = c1 = QGraphicsEllipseItem(0, 0, 5, 5, self)
+        self.c2 = c2 = QGraphicsEllipseItem(0, 0, 5, 5, self)
+        p1.setBrush(getBrushObj('#007200'))
+        p2.setBrush(getBrushObj('#cc0000'))
+        c1.setBrush(getBrushObj('#0000cc'))
+        c2.setBrush(getBrushObj('#cc00cc'))
+        p1.setPen(getNoPen())
+        p2.setPen(getNoPen())
+        c1.setPen(getNoPen())
+        c2.setPen(getNoPen())
+        p1.hide()
+        p2.hide()
+        c1.hide()
+        c2.hide()
+
+        self._label = PreXoverLabel(is_fwd, self)
         self._path = QGraphicsPathItem()
-        self._phos_item = Triangle(FWDPHOS_PP, self)
         self.setPen(getNoPen())
-        self.resetItem(from_virtual_helix_item, is_fwd, from_index,
-                       to_vh_id_num, prexoveritem_manager, color)
+        self.resetItem(from_virtual_helix_item, is_fwd, from_index, nearby_idxs, to_vh_id_num, prexoveritem_manager)
+        self._color = self.getStrandColor()
+    # end def
+
+    def getStrandColor(self):
+        part = self._model_vh.part()
+        id_num = self._id_num
+        idx = self.idx
+        is_fwd = self.is_fwd
+        if part.hasStrandAtIdx(id_num, idx)[int(is_fwd)]:
+            strand = part.getStrand(is_fwd, id_num, idx)
+            color = strand.getColor() if strand is not None else EMPTY_COL
+        else:
+            color = EMPTY_COL
+        return color
     # end def
 
     def shutdown(self):
@@ -331,12 +423,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.setBrush(getBrushObj(self._color, alpha=0))
         self.to_vh_id_num = None
         self.adapter.resetAnimations()
-        phos = self._phos_item
-        phos.adapter.resetAnimations()
-        phos.resetTransform()
-        phos.setPos(0, 0)
         self.setAcceptHoverEvents(False)
-        self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
         self.hide()
     # end def
 
@@ -345,74 +432,71 @@ class PreXoverItem(QGraphicsRectItem):
             Sets the PainterPath according to the index (low = Left, high = Right)
             and strand position (top = Up, bottom = Down).
             """
-            self._ppi.setPen(getPenObj(color,
-                                       styles.PREXOVER_STROKE_WIDTH,
-                                       # capstyle=Qt.RoundCap,
-                                       joinstyle=Qt.RoundJoin))
-            PP_LUT = (_LD_PATH, _RD_PATH, _LU_PATH, _RU_PATH)  # Lookup table
-            path = PP_LUT[2*int(is_fwd)]
-            self._ppi.setPath(path)
-            self._ppi.show()
+            idx = self.idx
+            bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
+            is_low = idx+1 in self.nearby_idxs or (idx+1) % bpr in self.nearby_idxs
+            is_high = idx-1 in self.nearby_idxs or (idx-1) % bpr in self.nearby_idxs
+            if is_low and is_high:
+                print("dual xover")
+                path = (_REV_DUAL_PATH, _FWD_DUAL_PATH)[int(is_fwd)]
+            elif is_low:
+                path = (_REV_LO_PATH, _FWD_LO_PATH)[int(is_fwd)]
+                self.is3p = True if is_fwd else False
+            elif is_high:
+                path = (_REV_HI_PATH, _FWD_HI_PATH)[int(is_fwd)]
+                self.is3p = False if is_fwd else True
+            else:
+                print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
+                return False
+            self._tick_marks.setPen(getPenObj(self._color, styles.PREXOVER_STROKE_WIDTH,
+                                              capstyle=Qt.FlatCap, joinstyle=Qt.RoundJoin))
+            self._tick_marks.setPath(path)
+            self._tick_marks.show()
+            return True
     # end def
 
-    def resetItem(self, from_virtual_helix_item, is_fwd, from_index,
-                  to_vh_id_num, prexoveritem_manager, color):
-        """Summary
+    def resetItem(self, from_virtual_helix_item, is_fwd, from_index, nearby_idxs,
+                  to_vh_id_num, prexoveritem_manager):
+        """Update this pooled PreXoverItem with current info.
+        Called by PreXoverManager.
 
         Args:
-            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            is_fwd (TYPE): Description
-            from_index (TYPE): Description
-            to_vh_id_num (TYPE): Description
-            prexoveritem_manager (TYPE): Description
-            color (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): the associated vh_item
+            is_fwd (bool): True if associated with fwd strand, False if rev strand
+            from_index (int): idx of associated vh
+            to_vh_id_num (int): id_num of the other vh
+            prexoveritem_manager (cadnano.views.pathview.prexoermanager.PreXoverManager): the manager
         """
         self.setParentItem(from_virtual_helix_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
+        self._model_vh = from_virtual_helix_item.cnModel()
         self.idx = from_index
+        self.nearby_idxs = nearby_idxs
         self.is_fwd = is_fwd
+        self.is3p = None
         self.to_vh_id_num = to_vh_id_num
-        self._color = color
+        self._color = color = self.getStrandColor()
         self.prexoveritem_manager = prexoveritem_manager
         self._bond_item.hide()
         self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
         self.setLabel(text=lbt)
         self._label.resetItem(is_fwd, color)
-
-        self._ppi = QGraphicsPathItem(self)
-        self._ppi.hide()
-        phos = self._phos_item
         bonditem = self._bond_item
+        bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
 
         if is_fwd:
-            phos.setPath(FWDPHOS_PP)
-            phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(0.5*BASE_WIDTH, BASE_WIDTH)
-            phos.setPen(getNoPen())
-            phos.setBrush(getBrushObj(color))
-            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
             self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
         else:
-            phos.setPath(REVPHOS_PP)
-            phos.setTransformOriginPoint(0, phos.boundingRect().center().y())
-            phos.setPos(0.5*BASE_WIDTH, 0)
-            phos.setPen(getPenObj(color, 0.25))
-            phos.setBrush(getNoBrush())
-            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH,
-                                      penstyle=Qt.DotLine, capstyle=Qt.RoundCap))
             self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
 
-        if to_vh_id_num is not None:
-            inactive_alpha = PROX_ALPHA
-            self.setBrush(getBrushObj(color, alpha=inactive_alpha))
-            self.setPathAppearance(from_virtual_helix_item, is_fwd, color)
-        else:
-            self.setBrush(getBrushObj(color, alpha=0))
-        self.show()
+        self.setBrush(getNoBrush())
+        result = self.setPathAppearance(from_virtual_helix_item, is_fwd, color)
+
+        # todo: check here if xover present and disable
+
+        if result:
+            self.show()
     # end def
 
     def getInfo(self):
@@ -424,28 +508,21 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### ACCESSORS ###
     def color(self):
-        """Summary
+        """The PreXoverItem's color, derived from the associated strand's oligo.
 
         Returns:
-            TYPE: Description
+            str: color in hex code
         """
         return self._color
 
     def remove(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Removes animation adapter, label, bond_item, and this item from scene.
         """
         scene = self.scene()
         self.adapter.destroy()
         if scene:
             scene.removeItem(self._label)
             self._label = None
-            self._phos_item.adapter.resetAnimations()
-            self._phos_item.adapter = None
-            scene.removeItem(self._phos_item)
-            self._phos_item = None
             scene.removeItem(self._bond_item)
             self._bond_item = None
             self.adapter.resetAnimations()
@@ -455,11 +532,10 @@ class PreXoverItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
-        """Only if enableActive(True) is called
-        hover and key events disabled by default
+        """Only if enableActive(True) is called hover and key events disabled by default
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): the hover event
         """
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritem_manager.updateModelActiveBaseInfo(self.getInfo())
@@ -472,7 +548,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            event (TYPE): Description
+            event (QGraphicsSceneHoverEvent): the hover event
 
         Returns:
             TYPE: Description
@@ -482,6 +558,25 @@ class PreXoverItem(QGraphicsRectItem):
         self.clearFocus()
         self.parentItem().window().statusBar().showMessage("")
     # end def
+
+    def mousePressEvent(self, event):
+        print("clicked yo", self.idx)
+        part = self._model_vh.part()
+        if self.is3p:
+            strand5p = part.getStrand(self.is_fwd, self._id_num, self.idx)
+            strand3p = part.getStrand(not self.is_fwd, self.to_vh_id_num, self.idx)
+        else:
+            strand5p = part.getStrand(self.is_fwd, self.to_vh_id_num, self.idx)
+            strand3p = part.getStrand(not self.is_fwd, self._id_num, self.idx)
+        part.createXover(strand5p, self.idx, strand3p, self.idx)
+
+        nkey = (self.to_vh_id_num, not self.is_fwd, self.idx)
+        npxi = self.prexoveritem_manager.neighbor_prexover_items.get(nkey, None)
+        if npxi:
+            print("shutdown", nkey)
+            npxi.shutdown()
+        self.shutdown()
+        # self.prexoveritem_manager.handlePreXoverClick(self)
 
     def keyPressEvent(self, event):
         """Summary
@@ -544,16 +639,7 @@ class PreXoverItem(QGraphicsRectItem):
             is_active (bool): whether or not the PreXoverItem is parented to the
                 active VirtualHelixItem
         """
-        if is_active:
-            self.setBrush(getBrushObj(self._color, alpha=128))
-            self.animate(self, 'brush_alpha', 1, 0, 128)  # overwrite running anim
-            # if self.to_vh_id_num is not None:
-            self.animate(self._phos_item, 'rotation', 500, 0, -90)
-        else:
-            inactive_alpha = 0 if self.to_vh_id_num is None else PROX_ALPHA
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+        pass
     # end def
 
     def enableActive(self, is_active, to_vh_id_num=None):
@@ -568,54 +654,52 @@ class PreXoverItem(QGraphicsRectItem):
             self.setAcceptHoverEvents(True)
             if to_vh_id_num is None:
                 self.setLabel(text=None)
-                self.setBrush(getBrushObj(self._color, alpha=0))
             else:
                 self.setLabel(text=str(to_vh_id_num))
-                inactive_alpha = PROX_ALPHA
-                self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-                self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-                self.setFlag(KEYINPUT_ACTIVE_FLAG, True)
         else:
             self.setBrush(getNoBrush())
-            # self.setLabel(text=None)
             self.setAcceptHoverEvents(False)
-            self.setFlag(KEYINPUT_ACTIVE_FLAG, False)
 
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
-        """To be called with whatever the active_prexoveritem
-        is for the parts `active_base`
+        """
+        Draws a cubic line starting from the neighbor pxi (self) back to the active pxi
+        To be called with whatever the active_prexoveritem is for the parts `active_base`.
 
         Args:
             active_prexoveritem (TYPE): Description
             shortcut (None, optional): Description
         """
-        p1 = self._phos_item.scenePos()
-        p2 = active_prexoveritem._phos_item.scenePos()
-        scale = 3
-        delta1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
-        delta2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
-        c1 = self.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
-        c2 = self.mapFromScene(QPointF(p2.x(), p2.y() - delta2))
+        p1 = self._tick_marks.scenePos()
+        p2 = active_prexoveritem._tick_marks.scenePos()
+        scale = 1
+
+        deltax1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
+        deltay1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
+        deltax2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
+        deltay2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
+        # c1 = self._bond_item.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
+        # c2 = QPointF(p2.x(), p2.y() - delta2)
+
+        c1 = self._bond_item.mapFromScene(QPointF(p1.x()+deltax1, p1.y()+deltay1))
+        c2 = self._bond_item.mapFromScene(QPointF(p2.x()+deltax2, p2.y()+deltay2))
+
+        # print("p1({},{}), c1({},{}), c2({},{}), p2({},{})".format(p1.x(), p1.y(),
+        #                                                           c1.x(), c1.y(),
+        #                                                           c2.x(), c2.y(),
+        #                                                           p2.x(), p2.y()))
+        # self.p1.setPos(self._bond_item.mapFromScene(p1))  # green
+        # self.p2.setPos(self._bond_item.mapFromScene(p2))  # red
+        # self.c1.setPos(c1)  # blue
+        # self.c2.setPos(c2)  # magenta
+        # self.p1.show()
+        # self.p2.show()
+        # self.c1.show()
+        # self.c2.show()
         pp = QPainterPath()
-        pp.moveTo(self._phos_item.pos())
+        pp.moveTo(self._bond_item.mapFromScene(p1))
         pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
         self._bond_item.setPath(pp)
         self._bond_item.show()
-
-        alpha = 32
-        idx, active_idx = self.idx, active_prexoveritem.idx
-        if self.is_fwd != active_prexoveritem.is_fwd:
-            if idx == active_idx:
-                alpha = 255
-        elif idx == active_idx + 1:
-            alpha = 255
-        elif idx == active_idx - 1:
-            alpha = 255
-
-        inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
-        self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-        self.animate(self, 'brush_alpha', 500, inactive_alpha, alpha)
-        self.animate(self._phos_item, 'rotation', 500, 0, -90)
         self.setLabel(text=shortcut, outline=True)
     # end def
 
@@ -626,10 +710,10 @@ class PreXoverItem(QGraphicsRectItem):
             TYPE: Description
         """
         if self.isVisible():
-            inactive_alpha = PROX_ALPHA if self.to_vh_id_num is not None else 0
-            self.setBrush(getBrushObj(self._color, alpha=inactive_alpha))
-            self.animate(self, 'brush_alpha', 1000, 128, inactive_alpha)
-            self.animate(self._phos_item, 'rotation', 500, -90, 0)
+            self.p1.hide()
+            self.p2.hide()
+            self.c1.hide()
+            self.c2.hide()
             self._bond_item.hide()
             self.setLabel(text=self._label_txt)
     # end def
@@ -648,16 +732,16 @@ class PathWorkplaneOutline(QGraphicsRectItem):
     def updateAppearance(self):
         tl = self.rect().topLeft()
         tl1 = tl + QPointF(0, -BASE_WIDTH/2)
-        tl2 = tl + QPointF(-BASE_WIDTH/2, 0)
+        tl2 = tl + QPointF(BASE_WIDTH/2, -BASE_WIDTH/2)
         bl = self.rect().bottomLeft()
         bl1 = bl + QPointF(0, BASE_WIDTH/2)
-        bl2 = bl + QPointF(-BASE_WIDTH/2, 0)
+        bl2 = bl + QPointF(BASE_WIDTH/2, BASE_WIDTH/2)
         tr = self.rect().topRight()
         tr1 = tr + QPointF(0, -BASE_WIDTH/2)
-        tr2 = tr + QPointF(BASE_WIDTH/2, 0)
+        tr2 = tr + QPointF(-BASE_WIDTH/2, -BASE_WIDTH/2)
         br = self.rect().bottomRight()
         br1 = br + QPointF(0, BASE_WIDTH/2)
-        br2 = br + QPointF(BASE_WIDTH/2, 0)
+        br2 = br + QPointF(-BASE_WIDTH/2, BASE_WIDTH/2)
         pp = QPainterPath()
         pp.moveTo(tl2)
         pp.lineTo(tl1)
