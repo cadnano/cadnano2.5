@@ -58,14 +58,10 @@ class HoneycombDnaPart(object):
                 squared_distance = (guess_x-x)**2 + (guess_y-y)**2
                 distance = sqrt(squared_distance)
 
-#                print('Distance: %s' % sqrt(distance))
-
                 if distance < shortest_distance:
                     best_guess = (row, column)
                     shortest_distance = distance
-#                    print('New Best Distance: %s' % distance)
 
-#        print(shortest_distance)
         return (shortest_distance, best_guess)
     # end def
 
@@ -182,18 +178,14 @@ class SquareDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = SquareDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
                 squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                distance = sqrt(squared_distance)
 
-                import math
-                print('Distance: %s' % math.sqrt(squared_distance))
-
-                if squared_distance < shortest_distance:
+                if distance < shortest_distance:
                     best_guess = (row, column)
-                    shortest_distance = squared_distance
-                    print('New Best Distance: %s' % math.sqrt(squared_distance))
+                    shortest_distance = distance
 
-        print(shortest_distance)
         return (shortest_distance, best_guess)
     # end def
 
