@@ -1,6 +1,6 @@
 """
 """
-from math import ceil, floor
+from math import ceil, floor, sqrt
 
 root3 = 1.732051
 
@@ -39,6 +39,30 @@ class HoneycombDnaPart(object):
     @staticmethod
     def isOddParity(row, column):
         return (row % 2) ^ (column % 2)
+    # end def
+
+    @staticmethod
+    def distanceFromClosestLatticeCoord(x, y, radius, scale_factor=1.0):
+        column_guess = x/(radius*root3) - 1
+        row_guess = (y - radius*2)/(radius*3)
+
+        possible_columns = (floor(column_guess), ceil(column_guess))
+        possible_rows = (floor(row_guess), ceil(row_guess))
+
+        best_guess = None
+        shortest_distance = float('inf')
+
+        for row in possible_rows:
+            for column in possible_columns:
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                distance = sqrt(squared_distance)
+
+                if distance < shortest_distance:
+                    best_guess = (row, column)
+                    shortest_distance = distance
+
+        return (shortest_distance, best_guess)
     # end def
 
     @staticmethod
@@ -139,6 +163,30 @@ class SquareDnaPart(object):
     @staticmethod
     def isOddParity(row, column):
         return (row % 2) ^ (column % 2)
+    # end def
+
+    @staticmethod
+    def distanceFromClosestLatticeCoord(x, y, radius, scale_factor=1.0):
+        column_guess = x/(2*radius)
+        row_guess = y/(2*radius)
+
+        possible_columns = (floor(column_guess), ceil(column_guess))
+        possible_rows = (floor(row_guess), ceil(row_guess))
+
+        best_guess = None
+        shortest_distance = float('inf')
+
+        for row in possible_rows:
+            for column in possible_columns:
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                distance = sqrt(squared_distance)
+
+                if distance < shortest_distance:
+                    best_guess = (row, column)
+                    shortest_distance = distance
+
+        return (shortest_distance, best_guess)
     # end def
 
     @staticmethod

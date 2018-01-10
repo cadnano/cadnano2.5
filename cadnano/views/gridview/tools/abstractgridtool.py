@@ -255,7 +255,7 @@ class AbstractGridTool(QGraphicsObject):
             # print("connecting ccm")
             try:    # Hack to prevent multiple connections
                 self.slice_graphics_view.customContextMenuRequested.disconnect()
-            except AttributeError:
+            except (AttributeError, TypeError):
                 pass
             self.slice_graphics_view.customContextMenuRequested.connect(self.getCustomContextMenu)
     # end def

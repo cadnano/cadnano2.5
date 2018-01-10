@@ -57,6 +57,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._last_hovered_item = None
         self._highlighted_path = []
         self.spa_start_vhi = None
+        self.last_mouse_position = None
 
         self._translated_x = 0.0
         self._translated_y = 0.0
@@ -926,6 +927,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             True if the mouse is in the given GridPoint, False otherwise
         """
+        if event_xy is None or event_coord is None:
+            return False
+
         point_x, point_y = self.coordinates_to_xy.get(event_coord)
         event_x, event_y = event_xy
 
@@ -1083,6 +1087,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        if coordinates is None:
+            return
+
         assert isinstance(coordinates, tuple) and len(coordinates) is 2
         assert isinstance(coordinates[0], int) and isinstance(coordinates[1], int)
 
@@ -1107,7 +1114,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 hovered GridPoint.
 
         """
-        row, column = self._last_hovered_item.coord()
-        return -row, column
+        if self._last_hovered_item:
+            row, column = self._last_hovered_item.coord()
+            return -row, column
     # end def
 # end class

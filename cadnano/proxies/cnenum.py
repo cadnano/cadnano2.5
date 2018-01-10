@@ -105,6 +105,11 @@ class GridType:
     SQUARE = 1
     HONEYCOMB = 2
 
+class SliceViewType:
+    SLICE = 0
+    GRID = 1
+    BOTH = 2
+
 
 ENUM_NAMES['grid_type'] = enumNames(GridType)
 

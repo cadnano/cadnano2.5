@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridType
+from cadnano.proxies.cnenum import GridType, SliceViewType
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -1039,31 +1039,30 @@ class DocumentController(object):
     def getSliceViewType(self):
         # TODO[NF]:  Make these strings global constants
         if self.slice_view_showing and self.grid_view_showing:
-            return 'Both'
+            return SliceViewType.BOTH
         elif self.slice_view_showing and not self.grid_view_showing:
-            return 'Slice'
+            return SliceViewType.SLICE
         elif not self.slice_view_showing and self.grid_view_showing:
-            return 'Grid'
+            return SliceViewType.GRID
         else:
             raise NotImplementedError
 
     def setSliceViewType(self, slice_view_type):
-        # TODO[NF]:  Make these strings global constants
-        if slice_view_type not in ('Both', 'Slice', 'Grid'):
+        if slice_view_type not in (SliceViewType.BOTH, SliceViewType.SLICE, SliceViewType.GRID):
             # logger.error('slice_view_type is invalid:  %s' % slice_view_type)
             print('slice_view_type is invalid:  %s' % slice_view_type)
 
-        if slice_view_type == 'Both':
+        if slice_view_type == SliceViewType.BOTH:
             self.grid_view_showing = True
             self.toggleGridView(show=True)
             self.slice_view_showing = True
             self.toggleSliceView(show=True)
-        elif slice_view_type == 'Slice':
+        elif slice_view_type == SliceViewType.SLICE:
             self.grid_view_showing = False
             self.toggleGridView(show=False)
             self.slice_view_showing = True
             self.toggleSliceView(show=True)
-        elif slice_view_type == 'Grid':
+        elif slice_view_type == SliceViewType.GRID:
             self.grid_view_showing = True
             self.toggleGridView(show=True)
             self.slice_view_showing = False

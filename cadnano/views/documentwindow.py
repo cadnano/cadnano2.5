@@ -55,7 +55,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self._initConsoleview(doc)
         self._initSliceview(doc)
-        # self._initGridview(doc)
+        self._initGridview(doc)
         self._initPathview(doc)
         self._initPathviewToolbar()
         self._initSimGraphicsView(doc)
@@ -227,11 +227,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
 
-        # self.grid_tool_manager.path_tool_manager = self.path_tool_manager
-        # self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
+        self.grid_tool_manager.path_tool_manager = self.path_tool_manager
+        self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
 
-        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager)
-        # self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
+        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
 
         self.insertToolBarBreak(self.main_toolbar)
 
@@ -318,7 +317,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
         self.action_path.setChecked(path_visible)
         sim_visible = self.slice_dock_widget.widget().isVisibleTo(self)
+        print(sim_visible)
+        print(self.slice_dock_widget.widget().isVisible())
         self.action_sim.setChecked(sim_visible)
+
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
         # self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
