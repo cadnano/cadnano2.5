@@ -22,7 +22,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
-from cadnano.proxies.cnenum import HandleType
+from cadnano.proxies.cnenum import HandleType, StrandType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
 from cadnano.views.resizehandles import ResizeHandleGroup
@@ -405,9 +405,9 @@ class PreXoverItem(QGraphicsRectItem):
         part = self._model_vh.part()
         id_num = self._id_num
         idx = self.idx
-        is_fwd = self.is_fwd
-        if part.hasStrandAtIdx(id_num, idx)[int(is_fwd)]:
-            strand = part.getStrand(is_fwd, id_num, idx)
+        strand_type = StrandType.FWD if self.is_fwd else StrandType.REV
+        if part.hasStrandAtIdx(id_num, idx)[strand_type]:
+            strand = part.getStrand(self.is_fwd, id_num, idx)
             color = strand.getColor() if strand is not None else EMPTY_COL
         else:
             color = EMPTY_COL
@@ -427,7 +427,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.hide()
     # end def
 
-    def setPathAppearance(self, from_virtual_helix_item, is_fwd, color):
+    def setPathAppearance(self, from_virtual_helix_item):
             """
             Sets the PainterPath according to the index (low = Left, high = Right)
             and strand position (top = Up, bottom = Down).
@@ -436,15 +436,16 @@ class PreXoverItem(QGraphicsRectItem):
             bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
             is_low = idx+1 in self.nearby_idxs or (idx+1) % bpr in self.nearby_idxs
             is_high = idx-1 in self.nearby_idxs or (idx-1) % bpr in self.nearby_idxs
+            strand_type = StrandType.FWD if self.is_fwd else StrandType.REV
             if is_low and is_high:
                 print("dual xover")
-                path = (_REV_DUAL_PATH, _FWD_DUAL_PATH)[int(is_fwd)]
+                path = (_FWD_DUAL_PATH, _REV_DUAL_PATH)[strand_type]
             elif is_low:
-                path = (_REV_LO_PATH, _FWD_LO_PATH)[int(is_fwd)]
-                self.is3p = True if is_fwd else False
+                path = (_FWD_LO_PATH, _REV_LO_PATH)[strand_type]
+                self.is3p = True if self.is_fwd else False
             elif is_high:
-                path = (_REV_HI_PATH, _FWD_HI_PATH)[int(is_fwd)]
-                self.is3p = False if is_fwd else True
+                path = (_FWD_HI_PATH, _REV_HI_PATH)[strand_type]
+                self.is3p = False if self.is_fwd else True
             else:
                 print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
                 return False
@@ -474,29 +475,31 @@ class PreXoverItem(QGraphicsRectItem):
         self.idx = from_index
         self.nearby_idxs = nearby_idxs
         self.is_fwd = is_fwd
+        self._color = color = self.getStrandColor()
         self.is3p = None
         self.to_vh_id_num = to_vh_id_num
-        self._color = color = self.getStrandColor()
         self.prexoveritem_manager = prexoveritem_manager
-        self._bond_item.hide()
-        self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
-        self.setLabel(text=lbt)
-        self._label.resetItem(is_fwd, color)
-        bonditem = self._bond_item
-        bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
-
-        if is_fwd:
-            self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
-        else:
-            self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
-
-        self.setBrush(getNoBrush())
-        result = self.setPathAppearance(from_virtual_helix_item, is_fwd, color)
 
         # todo: check here if xover present and disable
+        result = self.setPathAppearance(from_virtual_helix_item)
 
         if result:
+            self.setBrush(getNoBrush())
+            if is_fwd:
+                self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
+            else:
+                self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
             self.show()
+            # label
+            self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
+            self.setLabel(text=lbt)
+            self._label.resetItem(is_fwd, color)
+
+            # bond line
+            bonditem = self._bond_item
+            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
+            bonditem.hide()
+
     # end def
 
     def getInfo(self):
