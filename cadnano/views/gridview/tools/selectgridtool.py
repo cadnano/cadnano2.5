@@ -394,7 +394,7 @@ class SelectGridTool(AbstractGridTool):
         if self.slice_graphics_view is not None:
             try:
                 self.slice_graphics_view.rubberBandChanged.disconnect(self.selectRubberband)
-            except AttributeError:
+            except (AttributeError, TypeError):
                 pass    # required for first call
         self.modelClear()
         if self.snap_origin_item is not None:
