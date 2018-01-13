@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.mainwindow import ui_mainwindow
-from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
+# from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -317,8 +317,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
         self.action_path.setChecked(path_visible)
         sim_visible = self.slice_dock_widget.widget().isVisibleTo(self)
-        print(sim_visible)
-        print(self.slice_dock_widget.widget().isVisible())
         self.action_sim.setChecked(sim_visible)
 
         slice_visible = self.slice_dock_widget.isVisibleTo(self)

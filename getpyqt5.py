@@ -25,7 +25,7 @@ since sip needs to copy sip.h to your includes directory
 
 Running:
 
-    python pyqt5_check.py
+    python getpyqt5.py
 
 Should be all you need to do.
 
@@ -34,7 +34,7 @@ so you might try deleting the '*.tar.gz' files and extracted folders and trying
 again if you don't have write permissions correct and are installing at the
 system level and say need to run:
 
-    sudo python pyqt5_check.py
+    sudo python getpyqt5.py
 
 
 Advanced stuff Moving Qt installs around
@@ -70,16 +70,17 @@ from subprocess import PIPE, Popen
 import platform
 import shutil
 
-# QT_VERSION = '5.5.0'
 QT_VERSION = '5.10.0'
-# SIP_VERSION = '4.16.4'
 SIP_VERSION = '4.19.7'
 PYQT5_VERSION = '5.9.3'
-# PYQT5_VERSION = '5.5.1'
+SIP_DEV_VERSION = '4.19.7.dev1801091416'
+PYQT5_DEV_VERSION = '5.10.dev1801101803'
+PYQT3D_VERSION = '5.9.2'
 
 
 def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False):
     """
+    http://qt-project.org/doc/qt-5/qt-conf.html
     """
 
     qt5_zip = 'qt-everywhere-src-%s.tar.xz' % (QT_VERSION)
@@ -143,7 +144,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
         # config_str = '../configure %s ' % (static_str) +\
         config_str = '../configure %s ' % (static_str) +\
             '-release -opensource -prefix %s -confirm-license ' % (qt5_path) +\
-            '-c++std c++11 -sqlite  %s ' % (macsdk_str) +\
+            '-c++std c++11 -sql-sqlite %s ' % (macsdk_str) +\
             '-no-glib -no-xcb-xlib ' +\
             '-no-xinput2 -nomake examples '
 
@@ -175,7 +176,7 @@ def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False)
 # end def
 
 
-def get_sip(pyroot_path, is_static=False, dev=False, use_wget=False):
+def get_sip(pyroot_path, dev=False, is_static=False, use_wget=False):
     """
     sip copies sip.h to your python include path
     distutils.sysconfig.get_python_inc(prefix=sys.prefix))
@@ -188,7 +189,7 @@ def get_sip(pyroot_path, is_static=False, dev=False, use_wget=False):
     static_str = '--static' if is_static else ''
     if dev:
         # https://www.riverbankcomputing.com/static/Downloads/sip/sip-4.19.7.dev1712162258.tar.gz
-        sip_str = "sip-4.19.7.dev1712162258"
+        sip_str = 'sip-%s' % (SIP_DEV_VERSION)
         sip_zip = '%s.tar.gz' % (sip_str)
         sip_url = "https://www.riverbankcomputing.com/static/Downloads/sip/%s" % (sip_zip)
     else:
@@ -235,23 +236,22 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False, dev=False, use_wget=False)
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     static_str = '--static' if is_static else ''
     if dev:
-        dev_str = "5.9.3.dev1712202212"
+        dev_str = PYQT5_DEV_VERSION
         pyqt5_str = 'PyQt5_gpl-%s' % (dev_str)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = "https://www.riverbankcomputing.com/static/Downloads/PyQt5/%s" % (pyqt5_zip)
+        pyqt5_url = "https://www.riverbankcomputing.com/static/Downloads/PyQt5/%s" % (pyqt5_zip)
     else:
         pyqt5_str = 'PyQt-gpl-%s' % (PYQT5_VERSION)
         pyqt5_zip = '%s.tar.gz' % (pyqt5_str)
-        pyqturl = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' %\
-                  (PYQT5_VERSION, pyqt5_zip)
+        pyqt5_url = 'http://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-%s/%s' % (PYQT5_VERSION, pyqt5_zip)
 
     if os.path.exists(os.path.join(pyroot_path, pyqt5_zip)):
         wget_str = ''
     else:
         if use_wget:
-            wget_str = 'wget %s;' % (pyqturl)
+            wget_str = 'wget %s;' % (pyqt5_url)
         else:
-            wget_str = 'curl -L -O %s;' % (pyqturl)
+            wget_str = 'curl -L -O %s;' % (pyqt5_url)
 
     extract_str = 'tar -xzf %s;' % (pyqt5_zip)
     cd_str = 'cd %s;' % pyqt5_str
@@ -282,9 +282,40 @@ def get_pyqt5(pyroot_path, qt5_path, is_static=False, dev=False, use_wget=False)
 # end def
 
 
-"""
-http://qt-project.org/doc/qt-5/qt-conf.html
-"""
+def get_pyqt3d(pyroot_path, qt5_path, use_wget=False):
+    qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
+    pyqt3d_str = 'PyQt3D_gpl-%s' % (PYQT3D_VERSION)
+    pyqt3d_zip = '%s.tar.gz' % (pyqt3d_str)
+    pyqt3d_url = "https://sourceforge.net/projects/pyqt/files/PyQt3D/PyQt3D-%s/%s" % (PYQT3D_VERSION, pyqt3d_zip)
+
+    if os.path.exists(os.path.join(pyroot_path, pyqt3d_str)):
+        wget_str = ''
+    else:
+        if use_wget:
+            wget_str = 'wget %s;' % (pyqt3d_url)
+        else:
+            wget_str = 'curl -L -O %s;' % (pyqt3d_url)
+
+    extract_str = 'tar -xzf %s;' % (pyqt3d_zip)
+    cd_str = 'cd %s;' % pyqt3d_str
+
+    config_str = 'python configure.py ' +\
+        '--qmake=%s ' % (qmake_path)  # '--sipdir %s ' %
+
+    def pyqt3dBuild():
+        print("Building PyQt3D")
+        print('\n'.join([wget_str, extract_str, cd_str, config_str]))
+        qt_cmds = ['%s %s %s %s; make -j2; make install;' %
+                   (wget_str,
+                    extract_str,
+                    cd_str,
+                    config_str
+                    )]
+        print(qt_cmds)
+        pyqt5build = subprocess.Popen(qt_cmds, shell=True, cwd=pyroot_path)
+        pyqt5build.wait()
+    pyqt3dBuild()
+# end def
 
 
 def checker(dev=False, do_clean_qt=False, is_static=False):
@@ -292,8 +323,8 @@ def checker(dev=False, do_clean_qt=False, is_static=False):
         if do_clean_qt:
             raise OSError("Just jumping out of this block for cleaning")
         import PyQt5  # noqa
-        print("Import success! No need to do anything")
-    except Exception:
+        print("PyQt5 import success. No need to do anything.")
+    except ImportError:
         print("Need to install PyQt5")
         if not platform.system() in ['Linux', 'Darwin']:
             raise OSError("Download PyQt5 installer from Riverbank software")
@@ -311,17 +342,31 @@ def checker(dev=False, do_clean_qt=False, is_static=False):
                     is_static=is_static,
                     clean=do_clean_qt,
                     use_wget=use_wget)
-            try:
-                import sip  # noqa
-            except Exception:
-                get_sip(pyroot_path,
-                        dev=dev,
-                        is_static=is_static,
-                        use_wget=use_wget)
+            get_sip(pyroot_path,
+                    dev=dev,
+                    is_static=is_static,
+                    use_wget=use_wget)
             get_pyqt5(pyroot_path, qt5_path,
                       dev=dev,
                       is_static=is_static,
                       use_wget=use_wget)
+    try:
+        import PyQt5.Qt3DCore  # noqa
+        print("PyQt3D import success. No need to do anything.")
+    except ImportError:
+        if not platform.system() in ['Linux', 'Darwin']:
+            raise OSError("Download PyQt3D installer from Riverbank software")
+        else:
+            if sys.platform in ['linux', 'Linux']:
+                print("OS is Linux")
+                use_wget = True    # use wget on Linux
+            else:
+                print("OS is macOS")
+                use_wget = False    # use curl on OS X
+            pyroot_path = distutils.sysconfig.BASE_PREFIX
+            qt5_path = os.path.join(pyroot_path, 'Qt%s' % (QT_VERSION[0:4]))
+            get_pyqt3d(pyroot_path, qt5_path,
+                       use_wget=use_wget)
 # end def
 
 
