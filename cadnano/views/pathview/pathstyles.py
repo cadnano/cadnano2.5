@@ -108,7 +108,7 @@ SELECTIONBOX_PEN_WIDTH = 0  # cosmetic
 
 # Loop/Insertion path details
 INSERTWIDTH = 1.5
-SKIPWIDTH = 2
+SKIPWIDTH = 1.5
 
 # Add Sequence Tool
 INVALID_DNA_COLOR = '#ff0000'

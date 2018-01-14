@@ -1,24 +1,20 @@
 #!/usr/bin/env python
 # encoding: utf-8
-from cadnano.views.pathview import pathstyles as styles
-from cadnano.proxies.cnenum import StrandType
-
-from cadnano import util
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
-
 from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
-
-from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QFontMetricsF, QPainterPath
+from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QPainterPath
 from PyQt5.QtGui import QTransform, QTextCursor
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsTextItem, QLabel
+from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsTextItem
+
+from cadnano.gui.palette import getPenObj, getNoPen
+from cadnano.views.pathview import pathstyles as styles
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _HALF_BASE_WIDTH = _HBW = _BASE_WIDTH / 2
 _OFFSET1 = _BASE_WIDTH / 4
 _DEFAULT_RECT = QRectF(0, 0, _BW, _BW)
 _B_PEN = getPenObj(styles.BLUE_STROKE, styles.INSERTWIDTH)
-_R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH)
+_R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH, capstyle=Qt.RoundCap)
 _NO_PEN = getNoPen()
 
 
@@ -84,7 +80,7 @@ class InsertionPath(object):
 # end class
 
 
-def _xGen(path, p1, p2, p3, p4):
+def _addLinesToPainterPath(path, p1, p2, p3, p4):
     path.moveTo(p1)
     path.lineTo(p2)
     path.moveTo(p3)
@@ -101,8 +97,13 @@ class SkipPath(object):
     """
 
     _skip_path = QPainterPath()
-    _xGen(_skip_path, _DEFAULT_RECT.bottomLeft(), _DEFAULT_RECT.topRight(),
-          _DEFAULT_RECT.topLeft(), _DEFAULT_RECT.bottomRight())
+    d = styles.SKIPWIDTH
+    _skip_rect = _DEFAULT_RECT.adjusted(d, d, -d, -d)
+    _addLinesToPainterPath(_skip_path,
+                           _skip_rect.bottomLeft(),
+                           _skip_rect.topRight(),
+                           _skip_rect.topLeft(),
+                           _skip_rect.bottomRight())
 
     def __init__(self):
         super(SkipPath, self).__init__()
