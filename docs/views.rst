@@ -10,12 +10,10 @@ Packages
    :maxdepth: 1
 
    api/cadnano.views.abstractitems
-   api/cadnano.views.consoleview
    api/cadnano.views.gridview
    api/cadnano.views.outlinerview
    api/cadnano.views.pathview
    api/cadnano.views.propertyview
-   api/cadnano.views.simview
    api/cadnano.views.sliceview
 
 Modules 

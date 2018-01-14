@@ -174,12 +174,9 @@ class DocumentController(object):
             (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
             (win.action_filter_stap.triggered, self.actionFilterStapSlot),
 
-            (win.action_console.triggered, self.actionToggleConsoleSlot),
             (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
             (win.action_path.triggered, self.actionTogglePathViewSlot),
-            (win.action_sim.triggered, self.actionToggleSimViewSlot),
             (win.action_slice.triggered, self.actionToggleSliceViewSlot),
-
 
             (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
@@ -622,19 +619,6 @@ class DocumentController(object):
         return part
     # end def
 
-    def actionToggleConsoleSlot(self):
-        print("actionToggleConsoleSlot")
-        dock_window = self.win.console_dock_widget
-        if dock_window.isVisible():
-            dock_window.hide()
-            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.sim_dock_widget, Qt.Vertical)
-            self.win.splitDockWidget(self.win.path_dock_widget, self.win.inspector_dock_widget, Qt.Horizontal)
-        else:
-            dock_window.show()
-            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.path_dock_widget, Qt.Horizontal)
-            self.win.splitDockWidget(self.win.slice_dock_widget, self.win.sim_dock_widget, Qt.Vertical)
-    # end def
-
     def actionToggleSliceViewSlot(self):
         dock_window = self.win.slice_dock_widget
         if dock_window.isVisible():
@@ -645,14 +629,6 @@ class DocumentController(object):
 
     def actionTogglePathViewSlot(self):
         dock_window = self.win.path_dock_widget
-        if dock_window.isVisible():
-            dock_window.hide()
-        else:
-            dock_window.show()
-    # end def
-
-    def actionToggleSimViewSlot(self):
-        dock_window = self.win.sim_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
         else:

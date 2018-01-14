@@ -124,9 +124,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="action_console"/>
    <addaction name="action_inspector"/>
-   <addaction name="action_sim"/>
    <addaction name="action_path"/>
    <addaction name="action_slice"/>
    <addaction name="action_views_label"/>
@@ -176,9 +174,7 @@
     </property>
     <addaction name="action_slice"/>
     <addaction name="action_path"/>
-    <addaction name="action_sim"/>
     <addaction name="action_inspector"/>
-    <addaction name="action_console"/>
    </widget>
    <addaction name="menu_file"/>
    <addaction name="menu_edit"/>
@@ -562,147 +558,6 @@
          <bool>true</bool>
         </property>
        </widget>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="SimDockWidget" name="sim_dock_widget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>200</width>
-     <height>200</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>400</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: #f5f5f5;</string>
-   </property>
-   <property name="windowTitle">
-    <string>Sim</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>1</number>
-   </attribute>
-   <widget class="QWidget" name="sim_dock_widget_contents">
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QDockWidget" name="console_dock_widget">
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="minimumSize">
-    <size>
-     <width>200</width>
-     <height>123</height>
-    </size>
-   </property>
-   <property name="baseSize">
-    <size>
-     <width>250</width>
-     <height>0</height>
-    </size>
-   </property>
-   <property name="windowTitle">
-    <string>Console</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="ConsoleRootWidget" name="console_root_widget">
-    <property name="minimumSize">
-     <size>
-      <width>200</width>
-      <height>0</height>
-     </size>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">QWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>1</number>
-     </property>
-     <property name="leftMargin">
-      <number>0</number>
-     </property>
-     <property name="topMargin">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="ConsoleOutput" name="console_output_textedit">
-       <property name="styleSheet">
-        <string notr="true">QPlainTextEdit { background-color: &quot;#f6f6f6&quot;; color: &quot;#0066cc&quot;; }</string>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="ConsoleInput" name="console_input_textedit">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>24</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPlainTextEdit { background-color: &quot;#eeeeee&quot;;}</string>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::NoFrame</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Plain</enum>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
-       </property>
-       <property name="midLineWidth">
-        <number>0</number>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="tabStopWidth">
-        <number>80</number>
-       </property>
-       <property name="backgroundVisible">
-        <bool>false</bool>
-       </property>
-       <property name="placeholderText">
-        <string>Enter command or type &quot;help&quot;</string>
-       </property>
       </widget>
      </item>
     </layout>
@@ -1490,24 +1345,6 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="action_sim">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/sim</normaloff>:/parttools/sim</iconset>
-   </property>
-   <property name="text">
-    <string>Simulation</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle Sim</string>
-   </property>
-  </action>
   <action name="action_slice">
    <property name="checkable">
     <bool>true</bool>
@@ -1544,27 +1381,6 @@
     <string>Toggle Path</string>
    </property>
   </action>
-  <action name="action_console">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/console</normaloff>:/parttools/console</iconset>
-   </property>
-   <property name="text">
-    <string>Console</string>
-   </property>
-   <property name="toolTip">
-    <string>Toggle Console</string>
-   </property>
-   <property name="shortcut">
-    <string>Meta+`</string>
-   </property>
-  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -1581,28 +1397,6 @@
    <class>PropertyEditorWidget</class>
    <extends>QTreeWidget</extends>
    <header>cadnano.views.propertyview.propertyeditorwidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>SimDockWidget</class>
-   <extends>QDockWidget</extends>
-   <header>cadnano.views.simview.simdockwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ConsoleOutput</class>
-   <extends>QPlainTextEdit</extends>
-   <header>cadnano.views.consoleview.consoleoutput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ConsoleInput</class>
-   <extends>QPlainTextEdit</extends>
-   <header>cadnano.views.consoleview.consoleinput.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ConsoleRootWidget</class>
-   <extends>QWidget</extends>
-   <header>cadnano.views.consoleview.consolerootwidget.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

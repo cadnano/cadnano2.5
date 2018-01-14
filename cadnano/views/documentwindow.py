@@ -9,14 +9,11 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.mainwindow import ui_mainwindow
-# from cadnano.views.consoleview.consolerootwidget import ConsoleRootWidget
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
 from cadnano.views.pathview.pathrootitem import PathRootItem
 from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
-from cadnano.views.simview.simrootitem import SimRootItem
-from cadnano.views.simview.tools.simtoolmanager import SimToolManager
 from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 
@@ -53,16 +50,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.tool_managers = None  # initialize
 
-        self._initConsoleview(doc)
         self._initSliceview(doc)
         self._initGridview(doc)
         self._initPathview(doc)
         self._initPathviewToolbar()
-        self._initSimGraphicsView(doc)
         self._initEditMenu()
 
-        self.console_dock_widget.setTitleBarWidget(QWidget())
-        self.sim_dock_widget.setTitleBarWidget(QWidget())
         self.path_dock_widget.setTitleBarWidget(QWidget())
         self.grid_dock_widget.setTitleBarWidget(QWidget())
         self.slice_dock_widget.setTitleBarWidget(QWidget())
@@ -71,7 +64,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._restoreGeometryandState()
         self._finishInit()
 
-        doc.setViewNames(['slice', 'path', 'sim', 'console', 'inspector'])
+        doc.setViewNames(['slice', 'path', 'inspector'])
     # end def
 
     def document(self):
@@ -80,7 +73,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def destroyWin(self):
         self.settings.beginGroup("MainWindow")
         self.settings.setValue("state", self.saveState())
-        self.settings.setValue("console_visible", self.console_dock_widget.isVisibleTo(self))
         self.settings.endGroup()
         for mgr in self.tool_managers:
             mgr.destroy()
@@ -153,18 +145,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.endGroup()
     # end def
 
-    def _initConsoleview(self, doc):
-        """Initializes the Console.
-
-        Returns: None
-        """
-        self.console_input_textedit.setConsoleOutput(self.console_output_textedit)
-        self.console_root_widget.finishInit(window=self,
-                                            document=doc,
-                                            input_textedit=self.console_input_textedit,
-                                            output_textedit=self.console_output_textedit)
-    # end def
-
     def _initGridview(self, doc):
         """Initializes Grid View.
 
@@ -210,7 +190,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         assert self.path_root.scene() == self.path_scene
         self.path_graphics_view.setScene(self.path_scene)
         self.path_graphics_view.scene_root_item = self.path_root
-        self.path_graphics_view.setScaleFitFactor(0.5)
+        self.path_graphics_view.setScaleFitFactor(0.7)
         self.path_graphics_view.setName("PathView")
     # end def
 
@@ -237,18 +217,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.path_graphics_view.setupGL()
         self.slice_graphics_view.setupGL()
         self.grid_graphics_view.setupGL()
-    # end def
-
-    def _initSimGraphicsView(self, doc):
-        """Initializes Sim View.
-
-        Returns: None
-        """
-        self.simroot = SimRootItem(window=self, document=doc)
-        self.sim_tool_manager = SimToolManager(self, self.simroot)
-        self.sim_dock_widget.setup(self.simroot)
-        # self.addDockWidget(Qt.DockWidgetArea(1), self.sim_dock_widget)
-        # self.setCentralWidget(self.sim_dock_widget)
     # end def
 
     def _initSliceview(self, doc):
@@ -301,27 +269,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         The console visibility is explicitly stored in the settings file,
         since it doesn't seem to work if we treat it like a normal dock widget.
         """
-        self.settings.beginGroup("MainWindow")
-        console_visible = self.settings.value("console_visible", False)
-        self.settings.endGroup()
-        if console_visible is True:
-            self.setCentralWidget(self.console_dock_widget)
-        else:
-            self.setCentralWidget(None)
-            self.console_dock_widget.hide()
-        self.action_console.setChecked(console_visible)
         # grid_visible = self.slice_dock_widget.isVisible()
         # self.action_grid.setChecked(console_visible)
         inspector_visible = self.inspector_dock_widget.widget().isVisibleTo(self)
         self.action_inspector.setChecked(inspector_visible)
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
         self.action_path.setChecked(path_visible)
-        sim_visible = self.slice_dock_widget.widget().isVisibleTo(self)
-        self.action_sim.setChecked(sim_visible)
-
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
-        # self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
-        # self.splitDockWidget(self.slice_dock_widget, self.sim_dock_widget, Qt.Vertical)
     # end def
 # end class
