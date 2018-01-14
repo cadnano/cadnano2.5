@@ -1460,6 +1460,7 @@ class NucleicAcidPart(Part):
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
         self._group_properties['max_vhelix_length'] = self.vh_properties['length'].max()
+        print("max_vhelix_length now", self._group_properties['max_vhelix_length'])
         # return 0, self.vh_properties['length'].idxmax()
         return self.zBoundsIds()
     # end def
@@ -2642,8 +2643,6 @@ class NucleicAcidPart(Part):
         x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
         vps = np.around(self._origin_pts[valid_pts], decimals=9)
         if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
-            print("vh already present at coords ({}, {})".format(x9, y9))
-            print(util.trace(5))
             return
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
