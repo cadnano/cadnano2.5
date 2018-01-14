@@ -3230,11 +3230,13 @@ class NucleicAcidPart(Part):
             info (Tuple): id_num, is_fwd, idx, to_vh_num
 
         """
-        if info != self.active_base_info:
-            # keep the info the same but let views know it's not fresh
-            if info is not None:
-                self.active_base_info = info
-            self.partActiveBaseInfoSignal.emit(self, info)
+        # if info != self.active_base_info:
+        #     # keep the info the same but let views know it's not fresh ()
+        #     if info is not None:
+        #         self.active_base_info = info
+
+        # just emit every time so 2nd hover on active base works
+        self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
     def isVirtualHelixActive(self, id_num):

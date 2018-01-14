@@ -18,7 +18,7 @@ from PyQt5.QtGui import QBrush, QColor, QPainterPath
 from PyQt5.QtGui import QPolygonF, QTransform
 from PyQt5.QtGui import QFontMetrics
 from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+# from PyQt5.QtWidgets import QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
@@ -217,7 +217,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
             TYPE: Description
         """
         self.is_fwd = is_fwd
-        self._color = color
+        self.color = color
     # end def
 
     def setTextAndStyle(self, text, outline=False):
@@ -267,31 +267,33 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
 PROX_ALPHA = 64
 
 
-def _createPreXoverPainterPath(p1, p2, p3, end_poly=None, is_fwd=True):
-    path = QPainterPath()
-    path.moveTo(p1)
-    path.lineTo(p2)
-    path.lineTo(p3)
-    if end_poly:
-        poly_width = end_poly.boundingRect().height()/2
-        xoffset = -poly_width if is_fwd else poly_width
-        angle = -90 if is_fwd else 90
-        T = QTransform()
-        T.translate(p3.x()+xoffset, p3.y())
-        T.rotate(angle)
-        path.addPolygon(T.map(end_poly))
-    return path
-# end def
+# def _createPreXoverPainterPath(p1, p2, p3, end_poly=None, is_fwd=True):
+#     path = QPainterPath()
+#     path.moveTo(p1)
+#     path.lineTo(p2)
+#     path.lineTo(p3)
+#     if end_poly:
+#         poly_width = end_poly.boundingRect().height()/2
+#         xoffset = -poly_width if is_fwd else poly_width
+#         angle = -90 if is_fwd else 90
+#         T = QTransform()
+#         T.translate(p3.x()+xoffset, p3.y())
+#         T.rotate(angle)
+#         path.addPolygon(T.map(end_poly))
+#     return path
+# # end def
 
 
-def _createDualPreXoverPainterPath(p1, p2, p3, p4, p5, p6, end_poly=None, is_fwd=True):
+def _createPreXoverPainterPath(elements, end_poly=None, is_fwd=True):
     path = QPainterPath()
-    path.moveTo(p1)
-    path.lineTo(p2)
-    path.lineTo(p3)
-    path.moveTo(p4)
-    path.lineTo(p5)
-    path.lineTo(p6)
+
+    next_pt = None
+    for element in elements:
+        start_pt = element[0]
+        path.moveTo(start_pt)
+        for next_pt in element[1:]:
+            path.lineTo(next_pt)
+
     if end_poly is not None:
         h = end_poly.boundingRect().height()/2
         xoffset = -h if is_fwd else h
@@ -299,7 +301,7 @@ def _createDualPreXoverPainterPath(p1, p2, p3, p4, p5, p6, end_poly=None, is_fwd
         yoffset = w if is_fwd else -w
         angle = -90 if is_fwd else 90
         T = QTransform()
-        T.translate(p6.x()+xoffset, p6.y()+yoffset)
+        T.translate(next_pt.x()+xoffset, next_pt.y()+yoffset)
         T.rotate(angle)
         path.addPolygon(T.map(end_poly))
     return path
@@ -307,8 +309,6 @@ def _createDualPreXoverPainterPath(p1, p2, p3, p4, p5, p6, end_poly=None, is_fwd
 
 
 # create hash marks QPainterPaths only once
-CENTER_X = BASE_RECT.center().x()
-CENTER_Y = BASE_RECT.center().y()
 LO_X = BASE_RECT.left()
 HI_X = BASE_RECT.right()
 BOT_Y = BASE_RECT.bottom()+BASE_WIDTH/5
@@ -329,6 +329,13 @@ REV_H1 = QPointF(HI_X, TOP_Y)
 REV_H2 = QPointF(HI_X-WIDTH_X, TOP_Y)
 REV_H3 = QPointF(HI_X-WIDTH_X, TOP_Y+HEIGHT_Y)
 
+_FWD_LO_PTS = [[FWD_L1, FWD_L2, FWD_L3]]
+_FWD_HI_PTS = [[FWD_H1, FWD_H2, FWD_H3]]
+_REV_LO_PTS = [[REV_L1, REV_L2, REV_L3]]
+_REV_HI_PTS = [[REV_H1, REV_H2, REV_H3]]
+_FWD_DUAL_PTS = [[FWD_H1, FWD_H2, FWD_H3], [FWD_L1, FWD_L2, FWD_L3]]
+_REV_DUAL_PTS = [[REV_H1, REV_H2, REV_H3], [REV_L1, REV_L2, REV_L3]]
+
 END_3P_WIDTH = styles.PREXOVER_STROKE_WIDTH*2
 END_3P = QPolygonF()
 END_3P.append(QPointF(0, 0))
@@ -336,16 +343,17 @@ END_3P.append(QPointF(0.75 * END_3P_WIDTH, 0.5 * END_3P_WIDTH))
 END_3P.append(QPointF(0, END_3P_WIDTH))
 END_3P.append(QPointF(0, 0))
 
-_FWD_LO_PATH = _createPreXoverPainterPath(FWD_L1, FWD_L2, FWD_L3, end_poly=END_3P, is_fwd=True)
-_FWD_HI_PATH = _createPreXoverPainterPath(FWD_H1, FWD_H2, FWD_H3)
-_REV_LO_PATH = _createPreXoverPainterPath(REV_L1, REV_L2, REV_L3)
-_REV_HI_PATH = _createPreXoverPainterPath(REV_H1, REV_H2, REV_H3, end_poly=END_3P, is_fwd=False)
-_FWD_DUAL_PATH = _createDualPreXoverPainterPath(FWD_H1, FWD_H2, FWD_H3,
-                                                FWD_L1, FWD_L2, FWD_L3, end_poly=END_3P, is_fwd=True)
-_REV_DUAL_PATH = _createDualPreXoverPainterPath(REV_H1, REV_H2, REV_H3,
-                                                REV_L1, REV_L2, REV_L3, end_poly=END_3P, is_fwd=False)
+_FWD_LO_PATH = _createPreXoverPainterPath(_FWD_LO_PTS, end_poly=END_3P, is_fwd=True)
+_FWD_HI_PATH = _createPreXoverPainterPath(_FWD_HI_PTS)
+_REV_LO_PATH = _createPreXoverPainterPath(_REV_LO_PTS)
+_REV_HI_PATH = _createPreXoverPainterPath(_REV_HI_PTS, end_poly=END_3P, is_fwd=False)
+_FWD_DUAL_PATH = _createPreXoverPainterPath(_FWD_DUAL_PTS, end_poly=END_3P, is_fwd=True)
+_REV_DUAL_PATH = _createPreXoverPainterPath(_REV_DUAL_PTS, end_poly=END_3P, is_fwd=False)
 
 EMPTY_COL = '#cccccc'
+
+_X_SCALE = styles.PATH_XOVER_LINE_SCALE_X  # control point x constant
+_Y_SCALE = styles.PATH_XOVER_LINE_SCALE_Y  # control point y constant
 
 
 class PreXoverItem(QGraphicsRectItem):
@@ -374,44 +382,14 @@ class PreXoverItem(QGraphicsRectItem):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
         self._tick_marks = QGraphicsPathItem(self)
+        self._tick_marks.setAcceptHoverEvents(True)
         self._bond_item = QGraphicsPathItem(self)
         self._bond_item.hide()
-
-        self.p1 = p1 = QGraphicsEllipseItem(0, 0, 5, 5, self)
-        self.p2 = p2 = QGraphicsEllipseItem(0, 0, 5, 5, self)
-        self.c1 = c1 = QGraphicsEllipseItem(0, 0, 5, 5, self)
-        self.c2 = c2 = QGraphicsEllipseItem(0, 0, 5, 5, self)
-        p1.setBrush(getBrushObj('#007200'))
-        p2.setBrush(getBrushObj('#cc0000'))
-        c1.setBrush(getBrushObj('#0000cc'))
-        c2.setBrush(getBrushObj('#cc00cc'))
-        p1.setPen(getNoPen())
-        p2.setPen(getNoPen())
-        c1.setPen(getNoPen())
-        c2.setPen(getNoPen())
-        p1.hide()
-        p2.hide()
-        c1.hide()
-        c2.hide()
-
         self._label = PreXoverLabel(is_fwd, self)
         self._path = QGraphicsPathItem()
+        self.setZValue(styles.ZPREXOVERITEM)
         self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index, nearby_idxs, to_vh_id_num, prexoveritem_manager)
-        self._color = self.getStrandColor()
-    # end def
-
-    def getStrandColor(self):
-        part = self._model_vh.part()
-        id_num = self._id_num
-        idx = self.idx
-        strand_type = StrandType.FWD if self.is_fwd else StrandType.REV
-        if part.hasStrandAtIdx(id_num, idx)[strand_type]:
-            strand = part.getStrand(self.is_fwd, id_num, idx)
-            color = strand.getColor() if strand is not None else EMPTY_COL
-        else:
-            color = EMPTY_COL
-        return color
     # end def
 
     def shutdown(self):
@@ -420,40 +398,11 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        self.setBrush(getBrushObj(self._color, alpha=0))
+        self.setBrush(getNoBrush())
         self.to_vh_id_num = None
         self.adapter.resetAnimations()
         self.setAcceptHoverEvents(False)
         self.hide()
-    # end def
-
-    def setPathAppearance(self, from_virtual_helix_item):
-            """
-            Sets the PainterPath according to the index (low = Left, high = Right)
-            and strand position (top = Up, bottom = Down).
-            """
-            idx = self.idx
-            bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
-            is_low = idx+1 in self.nearby_idxs or (idx+1) % bpr in self.nearby_idxs
-            is_high = idx-1 in self.nearby_idxs or (idx-1) % bpr in self.nearby_idxs
-            strand_type = StrandType.FWD if self.is_fwd else StrandType.REV
-            if is_low and is_high:
-                print("dual xover")
-                path = (_FWD_DUAL_PATH, _REV_DUAL_PATH)[strand_type]
-            elif is_low:
-                path = (_FWD_LO_PATH, _REV_LO_PATH)[strand_type]
-                self.is3p = True if self.is_fwd else False
-            elif is_high:
-                path = (_FWD_HI_PATH, _REV_HI_PATH)[strand_type]
-                self.is3p = False if self.is_fwd else True
-            else:
-                print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
-                return False
-            self._tick_marks.setPen(getPenObj(self._color, styles.PREXOVER_STROKE_WIDTH,
-                                              capstyle=Qt.FlatCap, joinstyle=Qt.RoundJoin))
-            self._tick_marks.setPath(path)
-            self._tick_marks.show()
-            return True
     # end def
 
     def resetItem(self, from_virtual_helix_item, is_fwd, from_index, nearby_idxs,
@@ -473,10 +422,14 @@ class PreXoverItem(QGraphicsRectItem):
         self._id_num = from_virtual_helix_item.idNum()
         self._model_vh = from_virtual_helix_item.cnModel()
         self.idx = from_index
+        self.is_low = False
+        self.is_high = False
         self.nearby_idxs = nearby_idxs
         self.is_fwd = is_fwd
-        self._color = color = self.getStrandColor()
+        self.color = None
         self.is3p = None
+        self.enter_pos = None
+        self.exit_pos = None
         self.to_vh_id_num = to_vh_id_num
         self.prexoveritem_manager = prexoveritem_manager
 
@@ -493,21 +446,61 @@ class PreXoverItem(QGraphicsRectItem):
             # label
             self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
             self.setLabel(text=lbt)
-            self._label.resetItem(is_fwd, color)
+            self._label.resetItem(is_fwd, self.color)
 
             # bond line
             bonditem = self._bond_item
-            bonditem.setPen(getPenObj(color, styles.PREXOVER_STROKE_WIDTH))
+            bonditem.setPen(getPenObj(self.color, styles.PREXOVER_STROKE_WIDTH))
             bonditem.hide()
-
     # end def
 
-    def getInfo(self):
-        """
-        Returns:
-            Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
-        """
-        return (self._id_num, self.is_fwd, self.idx, self.to_vh_id_num)
+    def setPathAppearance(self, from_virtual_helix_item):
+            """
+            Sets the PainterPath according to the index (low = Left, high = Right)
+            and strand position (top = Up, bottom = Down).
+            """
+            part = self._model_vh.part()
+            idx = self.idx
+            is_fwd = self.is_fwd
+            id_num = self._id_num
+            strand_type = StrandType.FWD if is_fwd else StrandType.REV
+
+            # relative position info
+            bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
+            self.is_low = is_low = idx+1 in self.nearby_idxs or (idx+1) % bpr in self.nearby_idxs
+            self.is_high = is_high = idx-1 in self.nearby_idxs or (idx-1) % bpr in self.nearby_idxs
+
+            # check strand for xover and color
+            if part.hasStrandAtIdx(id_num, idx)[strand_type]:
+                strand = part.getStrand(self.is_fwd, id_num, idx)
+                if strand.hasXoverAt(idx):
+                    return False
+                self.color = strand.getColor() if strand is not None else EMPTY_COL
+            else:
+                self.color = EMPTY_COL
+
+            if is_low and is_high:
+                print("dual xover")
+                path = (_FWD_DUAL_PATH, _REV_DUAL_PATH)[strand_type]
+            elif is_low:
+                path = (_FWD_LO_PATH, _REV_LO_PATH)[strand_type]
+                self.is3p = True if is_fwd else False
+                self.enter_pos = _FWD_LO_PTS[0][-1] if is_fwd else _REV_LO_PTS[0][-1]
+                self.exit_pos = _FWD_LO_PTS[0][-1] if is_fwd else _REV_LO_PTS[0][-1]
+            elif is_high:
+                path = (_FWD_HI_PATH, _REV_HI_PATH)[strand_type]
+                self.is3p = False if is_fwd else True
+                self.enter_pos = _FWD_HI_PTS[0][-1] if is_fwd else _REV_HI_PTS[0][-1]
+                self.exit_pos = _FWD_HI_PTS[0][-1] if is_fwd else _REV_HI_PTS[0][-1]
+            else:
+                # print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
+                return False
+            self._tick_marks.setPen(getPenObj(self.color, styles.PREXOVER_STROKE_WIDTH,
+                                              capstyle=Qt.FlatCap, joinstyle=Qt.RoundJoin))
+            self._tick_marks.setPath(path)
+            self._tick_marks.show()
+            return True
+    # end def
 
     ### ACCESSORS ###
     def color(self):
@@ -516,7 +509,14 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             str: color in hex code
         """
-        return self._color
+        return self.color
+
+    def getInfo(self):
+        """
+        Returns:
+            Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
+        """
+        return (self._id_num, self.is_fwd, self.idx, self.to_vh_id_num)
 
     def remove(self):
         """Removes animation adapter, label, bond_item, and this item from scene.
@@ -563,22 +563,28 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
-        print("clicked yo", self.idx)
         part = self._model_vh.part()
+        is_fwd = self.is_fwd
+
         if self.is3p:
-            strand5p = part.getStrand(self.is_fwd, self._id_num, self.idx)
-            strand3p = part.getStrand(not self.is_fwd, self.to_vh_id_num, self.idx)
+            strand5p = part.getStrand(is_fwd, self._id_num, self.idx)
+            strand3p = part.getStrand(not is_fwd, self.to_vh_id_num, self.idx)
         else:
-            strand5p = part.getStrand(self.is_fwd, self.to_vh_id_num, self.idx)
-            strand3p = part.getStrand(not self.is_fwd, self._id_num, self.idx)
+            strand5p = part.getStrand(not is_fwd, self.to_vh_id_num, self.idx)
+            strand3p = part.getStrand(is_fwd, self._id_num, self.idx)
+
+        if strand5p is None or strand3p is None:
+            return
+
         part.createXover(strand5p, self.idx, strand3p, self.idx)
 
-        nkey = (self.to_vh_id_num, not self.is_fwd, self.idx)
+        nkey = (self.to_vh_id_num, not is_fwd, self.idx)
         npxi = self.prexoveritem_manager.neighbor_prexover_items.get(nkey, None)
         if npxi:
-            print("shutdown", nkey)
             npxi.shutdown()
         self.shutdown()
+
+        part.setActiveVirtualHelix(self._id_num, is_fwd, self.idx)
         # self.prexoveritem_manager.handlePreXoverClick(self)
 
     def keyPressEvent(self, event):
@@ -665,45 +671,49 @@ class PreXoverItem(QGraphicsRectItem):
 
     def activateNeighbor(self, active_prexoveritem, shortcut=None):
         """
-        Draws a cubic line starting from the neighbor pxi (self) back to the active pxi
+        Draws a quad line starting from the item5p to the item3p.
         To be called with whatever the active_prexoveritem is for the parts `active_base`.
 
         Args:
             active_prexoveritem (TYPE): Description
             shortcut (None, optional): Description
         """
-        p1 = self._tick_marks.scenePos()
-        p2 = active_prexoveritem._tick_marks.scenePos()
-        scale = 1
+        if self.is3p and not active_prexoveritem.is3p:
+            item5p = active_prexoveritem
+            item3p = self
+        elif not self.is3p and active_prexoveritem.is3p:
+            item5p = self
+            item3p = active_prexoveritem
+        else:
+            return
 
-        deltax1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
-        deltay1 = -BASE_WIDTH*scale if self.is_fwd else BASE_WIDTH*scale
-        deltax2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
-        deltay2 = BASE_WIDTH*scale if active_prexoveritem.is_fwd else -BASE_WIDTH*scale
-        # c1 = self._bond_item.mapFromScene(QPointF(p1.x(), p1.y() + delta1))
-        # c2 = QPointF(p2.x(), p2.y() - delta2)
+        same_parity = self.is_fwd == active_prexoveritem.is_fwd
 
-        c1 = self._bond_item.mapFromScene(QPointF(p1.x()+deltax1, p1.y()+deltay1))
-        c2 = self._bond_item.mapFromScene(QPointF(p2.x()+deltax2, p2.y()+deltay2))
+        p1 = item5p._tick_marks.scenePos() + item5p.exit_pos
+        p2 = item3p._tick_marks.scenePos() + item3p.exit_pos
 
-        # print("p1({},{}), c1({},{}), c2({},{}), p2({},{})".format(p1.x(), p1.y(),
-        #                                                           c1.x(), c1.y(),
-        #                                                           c2.x(), c2.y(),
-        #                                                           p2.x(), p2.y()))
-        # self.p1.setPos(self._bond_item.mapFromScene(p1))  # green
-        # self.p2.setPos(self._bond_item.mapFromScene(p2))  # red
-        # self.c1.setPos(c1)  # blue
-        # self.c2.setPos(c2)  # magenta
-        # self.p1.show()
-        # self.p2.show()
-        # self.c1.show()
-        # self.c2.show()
+        c1 = QPointF()
+
+        # case 1: same parity
+        if same_parity:
+            dy = abs(p2.y() - p1.y())
+            c1.setX(p1.x() + _X_SCALE * dy)
+            c1.setY(0.5 * (p1.y() + p2.y()))
+        # case 2: different parity
+        else:
+            if item3p.is_fwd:
+                c1.setX(p1.x() - _X_SCALE * abs(p2.y() - p1.y()))
+            else:
+                c1.setX(p1.x() + _X_SCALE * abs(p2.y() - p1.y()))
+            c1.setY(0.5 * (p1.y() + p2.y()))
+
         pp = QPainterPath()
-        pp.moveTo(self._bond_item.mapFromScene(p1))
-        pp.cubicTo(c1, c2, self._bond_item.mapFromScene(p2))
+        pp.moveTo(self._tick_marks.mapFromScene(p1))
+        pp.quadTo(self._tick_marks.mapFromScene(c1),
+                  self._tick_marks.mapFromScene(p2))
+        # pp.cubicTo(c1, c2, self._tick_marks.mapFromScene(p2))
         self._bond_item.setPath(pp)
         self._bond_item.show()
-        self.setLabel(text=shortcut, outline=True)
     # end def
 
     def deactivateNeighbor(self):
@@ -713,10 +723,6 @@ class PreXoverItem(QGraphicsRectItem):
             TYPE: Description
         """
         if self.isVisible():
-            self.p1.hide()
-            self.p2.hide()
-            self.c1.hide()
-            self.c2.hide()
             self._bond_item.hide()
             self.setLabel(text=self._label_txt)
     # end def
