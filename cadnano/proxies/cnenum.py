@@ -65,6 +65,12 @@ class PointType:
 ENUM_NAMES['point_type'] = enumNames(PointType)
 
 
+class Axis:
+    X = 1
+    Y = 2
+    Z = 4
+
+
 class ItemType(_Enum):
     # DNA = 0
     # PLASMID = 1
@@ -104,6 +110,7 @@ class GridType:
     NONE = 0
     SQUARE = 1
     HONEYCOMB = 2
+
 
 class SliceViewType:
     SLICE = 0

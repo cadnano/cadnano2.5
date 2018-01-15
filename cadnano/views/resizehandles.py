@@ -2,7 +2,7 @@
 from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import qApp
-from cadnano.proxies.cnenum import HandleType
+from cadnano.proxies.cnenum import Axis, HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj
 
 FILL_COLOR = '#ffffff'
@@ -10,7 +10,8 @@ FILL_COLOR = '#ffffff'
 
 class ResizeHandleGroup(QObject):
     """Provides the ability to move and resize the parent."""
-    def __init__(self, parent_outline_rect, width, color, is_resizable, handle_types, parent_item):
+    def __init__(self, parent_outline_rect, width, color, is_resizable,
+                 handle_types, parent_item, translates_in=None):
         super(ResizeHandleGroup, self).__init__()
         # self.parent_outline_rect = parent_outline_rect  # set by call to alignHandles
         self.width = w = width
@@ -23,6 +24,10 @@ class ResizeHandleGroup(QObject):
         self.half_offset_y = QPointF(0, h_w)
         self.is_resizable = is_resizable
         self.is_dragging = False
+        if translates_in is None:
+            self.translates_in = Axis.X | Axis.Y
+        else:
+            self.translates_in = translates_in
 
         self.handle_types = handle_types
         self._t = HandleItem(HandleType.TOP, w, color, self, parent_item) \
@@ -132,10 +137,15 @@ class HandleItem(QGraphicsRectItem):
         self.half_width = w/2
         self.align_offset = parent._BOUNDING_RECT_PADDING
         self.model_bounds = ()
+        self.can_move_x = handle_group.translates_in & Axis.X
+        self.can_move_y = handle_group.translates_in & Axis.Y
 
         self.setBrush(getBrushObj(FILL_COLOR))
         self.setPen(getPenObj(color, 0))
         self.setRect(QRectF(0, 0, w, w))
+
+        self.event_start_position = QPointF(0, 0)
+        self.event_scene_start_position = QPointF(0, 0)
 
         if handle_type & (HandleType.LEFT | HandleType.RIGHT):
             self._resize_cursor = Qt.SizeHorCursor
@@ -162,13 +172,13 @@ class HandleItem(QGraphicsRectItem):
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             return
-
         parent = self.parentItem()
+
         if self._group.is_resizable and event.modifiers() & Qt.ShiftModifier:
             self.setCursor(self._resize_cursor)
+            self.item_start = self.pos()
             self.model_bounds = parent.getModelMinBounds(handle_type=self._handle_type)
             self.event_start_position = event.scenePos()
-            self.item_start = self.pos()
             parent.showModelMinBoundsHint(self._handle_type, show=True)
             event.setAccepted(True)  # don't propagate
             return
@@ -176,24 +186,28 @@ class HandleItem(QGraphicsRectItem):
             self.setCursor(Qt.ClosedHandCursor)
             parent = self.parentItem()
             self._group.is_dragging = True
-            self.event_start_position = event.pos()
+            self.event_scene_start_position = event.scenePos()
+            self._move_offset = parent.mapFromScene(event.scenePos())
             parent.setMovable(True)
             # ensure we handle window toggling during moves
             qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-            res = QGraphicsItem.mousePressEvent(parent, event)
+            # res = QGraphicsItem.mousePressEvent(parent, event)
+            res = parent.mousePressEvent(event)
+            event.setAccepted(True)
             return res
 
     def mouseMoveEvent(self, event):
         parent = self.parentItem()
+        epos = event.scenePos()
+        h_w = self.half_width
+
         if self.model_bounds:
             mTLx, mTLy, mBRx, mBRy = self.model_bounds
             poTL = parent.outline.rect().topLeft()
             poBR = parent.outline.rect().bottomRight()
             poTLx, poTLy = poTL.x(), poTL.y()
             poBRx, poBRy = poBR.x(), poBR.y()
-            epos = event.scenePos()
             new_pos = self.item_start + epos - self.event_start_position
-            h_w = self.half_width
             new_x = new_pos.x()+h_w
             new_y = new_pos.y()+h_w
             ht = self._handle_type
@@ -236,8 +250,16 @@ class HandleItem(QGraphicsRectItem):
             else:
                 raise NotImplementedError("handle_type %d not supported" % (ht))
         else:
-            res = QGraphicsItem.mouseMoveEvent(parent, event)
+            # new_pos = event.scenePos()
+            # new_x = new_pos.x()+h_w if self.can_move_x else self.event_scene_start_position.x()
+            # new_y = new_pos.y()+h_w if self.can_move_y else self.event_scene_start_position.y()
+            # pt = QPointF(new_x, new_y) - self._move_offset
+            # parent.setPos(pt)
+            res = parent.mouseMoveEvent(event)
+            event.setAccepted(True)
+
             return res
+        event.setAccepted(True)  # don't propagate
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -296,8 +318,12 @@ class HandleItem(QGraphicsRectItem):
             self._group.is_dragging = False
             parent = self.parentItem()
             parent.setMovable(False)
-            QGraphicsItem.mouseReleaseEvent(parent, event)
+            # QGraphicsItem.mouseReleaseEvent(parent, event)
+            res = parent.mouseReleaseEvent(event)
+            event.setAccepted(True)
             parent.finishDrag()
+            return res
+
         self.setCursor(Qt.OpenHandCursor)
     # end def
 

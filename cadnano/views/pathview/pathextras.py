@@ -22,7 +22,7 @@ from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
-from cadnano.proxies.cnenum import HandleType, StrandType
+from cadnano.proxies.cnenum import Axis, HandleType, StrandType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
 from cadnano.views.resizehandles import ResizeHandleGroup
@@ -788,8 +788,13 @@ class PathWorkplaneItem(QGraphicsRectItem):
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
 
         self.outline = PathWorkplaneOutline(self)
-        self.resize_handle_group = ResizeHandleGroup(self.rect(), self._HANDLE_SIZE, styles.BLUE_STROKE,
-                                                     True, HandleType.LEFT | HandleType.RIGHT, self)
+        self.resize_handle_group = ResizeHandleGroup(self.rect(),
+                                                     self._HANDLE_SIZE,
+                                                     styles.BLUE_STROKE,
+                                                     True,
+                                                     HandleType.LEFT | HandleType.RIGHT,
+                                                     self,
+                                                     translates_in=Axis.X)
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
         m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=64))
         m_b_h.setPen(getNoPen())
@@ -815,8 +820,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def setMovable(self, is_movable):
-        # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
-        pass
+        self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
 
     def finishDrag(self):
@@ -907,13 +911,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
-        # self.setCursor(Qt.ClosedHandCursor)
-        # if event.button() != Qt.LeftButton:
-        if event.modifiers() != Qt.ShiftModifier:
-            event.ignore()
-            QGraphicsItem.mousePressEvent(self, event)
-            return
-
         self._start_idx_low = self._idx_low
         self._start_idx_high = self._idx_high
         self._delta = 0
@@ -932,6 +929,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._idx_high = self._start_idx_high + delta
             self._delta = delta
             self.reconfigureRect((), ())
+            self._start_idx_low = self._idx_low
+            self._start_idx_high = self._idx_high
     # end def
 
     def mouseReleaseEvent(self, event):
