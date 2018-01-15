@@ -42,7 +42,7 @@ ROOTDIR = os.path.dirname(LOCAL_DIR)
 
 if platform.system() == 'Windows':
     import ctypes
-    myappid = 'org.cadnano.cadnano.2.5.1'  # arbitrary string
+    myappid = 'org.cadnano.cadnano.2.5.2'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 

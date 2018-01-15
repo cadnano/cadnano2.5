@@ -137,8 +137,15 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in part_dict['insertions']:
-        strand = part.getStrand(True, id_num, idx)
-        strand.addInsertion(idx, length, use_undostack=False)
+        fwd_strand = part.getStrand(True, id_num, idx)
+        rev_strand = part.getStrand(False, id_num, idx)
+        if fwd_strand:
+            fwd_strand.addInsertion(idx, length, use_undostack=False)
+        elif rev_strand:
+            rev_strand.addInsertion(idx, length, use_undostack=False)
+        else:
+            ins = 'Insertion' if length > 0 else 'Skip'
+            print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
 
     # TODO fix this to set position
     instance_props = part_dict['instance_properties']    # list
