@@ -8,7 +8,7 @@ Cadnano2.5 documentation is built with [sphinx] and hosted at [readthedocs.io].
 **Summary**
 
 ```
-pip3 install sphinx sphinx_rtd_theme recommonmark sphinx-autobuild
+pip3 install sphinx sphinx_rtd_theme==0.2.5b2 recommonmark sphinx-autobuild
 cd cadnano/docs
 make clean
 make api
@@ -25,7 +25,7 @@ Try setting up your own separate test [sphinx] project using `sphinx-quickstart`
 From the terminal, use pip to install sphinx and cadnano docs dependencies.
 
 ```
-pip3 install sphinx sphinx_rtd_theme recommonmark sphinx-autobuild
+pip3 install sphinx sphinx_rtd_theme==0.2.5b2 recommonmark sphinx-autobuild
 ```
 
 **Building**

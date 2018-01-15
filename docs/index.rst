@@ -7,11 +7,6 @@ Welcome to cadnano's documentation!
 
 .. _cadnano: http://cadnano.org
 
-.. warning::
-   These docs are under development as part of the upcoming cadnano 2.5 release.
-   Some information, such as installation steps, may not be useful prior to the
-   official release.
-
 .. toctree::
    :maxdepth: 2
    :caption: User Documentation
@@ -20,6 +15,7 @@ Welcome to cadnano's documentation!
    installation
    tutorial
    scripting
+   virtualenv
 
 .. _dev-docs:
 

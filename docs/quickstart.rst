@@ -5,9 +5,11 @@ Quickstart
 
 **Installation**
 
-Install `Python 3.5`_ , followed by :doc:`cadnano <installation>`.
+Install `Python 3.6`_ , then download cadnano from pypi:
 
-.. _`Python 3.5`: https://www.python.org/downloads/
+    ``pip3 install cadnano``
+
+.. _`Python 3.6`: https://www.python.org/downloads/
 
 **Usage**
 
