@@ -81,25 +81,34 @@ class ResizeHandleGroup(QObject):
             self._br.setPos(br_pt - self.half_offset)
 
         if self.show_coords:
+            # t_x, t_y = self.parent_item.getModelPos(t_pt)
+            # b_x, b_y = self.parent_item.getModelPos(b_pt)
+            # l_x, l_y = self.parent_item.getModelPos(l_pt)
+            # r_x, r_y = self.parent_item.getModelPos(r_pt)
+            # tl_x, tl_y = self.parent_item.getModelPos(tl_pt)
+            # bl_x, bl_y = self.parent_item.getModelPos(bl_pt)
+            # tr_x, tr_y = self.parent_item.getModelPos(tr_pt)
+            # br_x, br_y = self.parent_item.getModelPos(br_pt)
+            # xy_html = "<font color='#cc0000'>{:.2f}</font>, " +\
+            #           "<font color='#007200'>{:.2f}</font>"
+            # self._t.label.updateText(xy_html.format(t_x, t_y))
+            # self._b.label.updateText(xy_html.format(b_x, b_y))
+            # self._l.label.updateText(xy_html.format(l_x, l_y))
+            # self._r.label.updateText(xy_html.format(r_x, r_y))
+            # self._tl.label.updateText(xy_html.format(tl_x, tl_y))
+            # self._tr.label.updateText(xy_html.format(tr_x, tr_y))
+            # self._bl.label.updateText(xy_html.format(bl_x, bl_y))
+            # self._br.label.updateText(xy_html.format(br_x, br_y))
             t_x, t_y = self.parent_item.getModelPos(t_pt)
             b_x, b_y = self.parent_item.getModelPos(b_pt)
             l_x, l_y = self.parent_item.getModelPos(l_pt)
             r_x, r_y = self.parent_item.getModelPos(r_pt)
-            tl_x, tl_y = self.parent_item.getModelPos(tl_pt)
-            bl_x, bl_y = self.parent_item.getModelPos(bl_pt)
-            tr_x, tr_y = self.parent_item.getModelPos(tr_pt)
-            br_x, br_y = self.parent_item.getModelPos(br_pt)
-            xy_html = "<font color='#cc0000'>{:.2f}</font>, " +\
-                      "<font color='#007200'>{:.2f}</font>"
-            self._t.label.updateText(xy_html.format(t_x, t_y))
-            self._b.label.updateText(xy_html.format(b_x, b_y))
-            self._l.label.updateText(xy_html.format(l_x, l_y))
-            self._r.label.updateText(xy_html.format(r_x, r_y))
-            self._tl.label.updateText(xy_html.format(tl_x, tl_y))
-            self._tr.label.updateText(xy_html.format(tr_x, tr_y))
-            self._bl.label.updateText(xy_html.format(bl_x, bl_y))
-            self._br.label.updateText(xy_html.format(br_x, br_y))
-
+            x_html = "<font color='#cc0000'>{:.2f}</font>"
+            y_html = "<font color='#007200'>{:.2f}</font>"
+            self._t.label.updateText(y_html.format(t_y))
+            self._b.label.updateText(y_html.format(b_y))
+            self._l.label.updateText(x_html.format(l_x))
+            self._r.label.updateText(x_html.format(r_x))
     # end def
 
     def removeHandles(self):
