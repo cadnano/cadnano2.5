@@ -585,12 +585,13 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             ptTL = QPointF(*top_left) if top_left else outline.rect().topLeft()
             ptBR = QPointF(*bottom_right) if bottom_right else outline.rect().bottomRight()
             o_rect = QRectF(ptTL, ptBR)
+            pad_xoffset = self._BOUNDING_RECT_PADDING*2
+            new_size = int((o_rect.width()-_VH_XOFFSET-pad_xoffset)/_BASE_WIDTH)
+            substep = self._model_part.subStepSize()
+            snap_size = new_size - new_size % substep
+            snap_offset = -(new_size % substep)*_BASE_WIDTH
+            self.resize_handle_group.updateText(HandleType.RIGHT, snap_size)
             if finish:
-                pad_xoffset = self._BOUNDING_RECT_PADDING*2
-                new_size = int((o_rect.width()-_VH_XOFFSET-pad_xoffset)/_BASE_WIDTH)
-                substep = self._model_part.subStepSize()
-                snap_size = new_size - new_size % substep
-                snap_offset = -(new_size % substep)*_BASE_WIDTH
                 self._model_part.setAllVirtualHelixSizes(snap_size)
                 o_rect = o_rect.adjusted(0, 0, snap_offset, 0)
                 # print("finish", vh_size, new_size, substep, snap_size)

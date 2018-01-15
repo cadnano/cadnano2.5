@@ -2985,22 +2985,22 @@ class NucleicAcidPart(Part):
         return Part(self._document)
     # end def
 
-    def setAllVirtualHelixSizes(self, new_size, use_undostack=True):
+    def setAllVirtualHelixSizes(self, new_size, use_undostack=True, zoom_to_fit=False):
         if use_undostack:
             self.undoStack().beginMacro("Resize all VHs")
         for id_num in self._virtual_helices_set:
             _, size = self.getOffsetAndSize(id_num)
             if size != new_size:
-                self.setVirtualHelixSize(id_num, new_size, use_undostack)
+                self.setVirtualHelixSize(id_num, new_size, use_undostack, zoom_to_fit)
         if use_undostack:
             self.undoStack().endMacro()
     # end def
 
-    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):
+    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True, zoom_to_fit=False):
         old_size = self.vh_properties.loc[id_num, 'length']
         delta = new_size - old_size
         if delta > 0:
-            c = ResizeVirtualHelixCommand(self, id_num, True, delta)
+            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
             util.doCmd(self, c, use_undostack=use_undostack)
         else:
             err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
