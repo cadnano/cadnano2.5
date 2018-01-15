@@ -104,7 +104,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                      HandleType.TOP_RIGHT |
                                                      HandleType.BOTTOM_LEFT |
                                                      HandleType.BOTTOM_RIGHT,
-                                                     self)
+                                                     self, show_coords=True)
 
         self.griditem = GridItem(self, self._model_props['grid_type'])
         self.griditem.setZValue(1)

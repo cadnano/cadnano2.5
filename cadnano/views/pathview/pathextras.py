@@ -794,10 +794,16 @@ class PathWorkplaneItem(QGraphicsRectItem):
                                                      HandleType.LEFT | HandleType.RIGHT,
                                                      self,
                                                      translates_in=Axis.X)
+
+        # Minimum size hint (darker internal rect, visible during resizing)
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
         m_b_h.setBrush(getBrushObj(styles.BLUE_FILL, alpha=64))
         m_b_h.setPen(getNoPen())
         m_b_h.hide()
+
+        # Low and high idx labels
+        self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
+        self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
     # end def
 
     def getModelMinBounds(self, handle_type=None):
@@ -819,7 +825,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def setMovable(self, is_movable):
-        self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
+        pass
+        # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
 
     def finishDrag(self):
@@ -846,7 +853,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
         if top_left:
             xTL = max(top_left[0], self._low_drag_bound)
             xTL = xTL - (xTL % BASE_WIDTH)  # snap to nearest base
-            self._idx_low = xTL/BASE_WIDTH
+            self._idx_low = int(xTL/BASE_WIDTH)
+            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
         else:
             xTL = self._idx_low*BASE_WIDTH
 
@@ -855,7 +863,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
                              (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH,
                              (self._high_drag_bound)*BASE_WIDTH)
             xBR = xBR - (xBR % BASE_WIDTH)  # snap to nearest base
-            self._idx_high = xBR/BASE_WIDTH
+            self._idx_high = int(xBR/BASE_WIDTH)
+            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
         else:
             xBR = self._idx_high*BASE_WIDTH
 
@@ -870,6 +879,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         return self.rect()
 
     def setIdxs(self, new_idxs):
+        print("setIdxs called")
         if self._idx_low != new_idxs[0] or self._idx_high != new_idxs[1]:
             self._idx_low = new_idxs[0]
             self._idx_high = new_idxs[1]
@@ -910,6 +920,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
+        self.setCursor(Qt.ClosedHandCursor)
         self._start_idx_low = self._idx_low
         self._start_idx_high = self._idx_high
         self._delta = 0
@@ -920,37 +931,33 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def mouseMoveEvent(self, event):
         """
-        Handles mousePressEvent, which can come via a direct click or via
-        the ResizeHandle which will call this method and pass it the event.
-        When called via the handle we update the start idxs to avoid fighting
-        with a second event that fires.
+        Converts event coords into an idx delta and updates if changed.
         """
         delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         delta = util.clamp(delta,
                            self._low_drag_bound-self._start_idx_low,
                            self._high_drag_bound-self._start_idx_high+self.width())
         if self._delta != delta:
-            self._idx_low = self._start_idx_low + delta
-            self._idx_high = self._start_idx_high + delta
+            self._idx_low = int(self._start_idx_low + delta)
+            self._idx_high = int(self._start_idx_high + delta)
             self._delta = delta
             self.reconfigureRect((), ())
-            # update the start idxs if mousePress was on the resize handle
-            if event.buttonDownPos(Qt.LeftButton).x() < self._HANDLE_SIZE/2:
-                self._start_idx_low = self._idx_low
-                self._start_idx_high = self._idx_high
+            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
+            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
     # end def
 
     def mouseReleaseEvent(self, event):
         """
-        Call reconfigRect if we've moved since the last mouseMoveEvent.
+        Repeates mouseMove calculation in case any new movement.
         """
+        self.setCursor(Qt.ArrowCursor)
         delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         delta = util.clamp(delta,
                            self._low_drag_bound-self._start_idx_low,
                            self._high_drag_bound-self._start_idx_high+self.width())
         if self._delta != delta:
-            self._idx_low = self._start_idx_low + delta
-            self._idx_high = self._start_idx_high + delta
+            self._idx_low = int(self._start_idx_low + delta)
+            self._idx_high = int(self._start_idx_high + delta)
             self._delta = delta
             self.reconfigureRect((), ())
         self._high_drag_bound = self._model_part.getProperty('max_vhelix_length')  # reset for handles

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtGui import QFont
 from cadnano import util
 
 THE_FONT = None
@@ -45,3 +46,7 @@ CADNANO1_COLORS = ['#cc0000',
                    '#888888']
 
 PARTCOLORS = CADNANO1_COLORS
+
+RESIZEHANDLE_FILL_COLOR = '#ffffff'
+RESIZEHANDLE_LABEL_COLOR = '#666666'
+RESIZEHANDLE_LABEL_FONT = QFont(THE_FONT, THE_FONT_SIZE/2, QFont.Light)

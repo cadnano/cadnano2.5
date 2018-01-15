@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtWidgets import qApp
+from PyQt5.QtGui import QFontMetrics
+from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsTextItem
 from cadnano.proxies.cnenum import Axis, HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj
-
-FILL_COLOR = '#ffffff'
+from . import styles
 
 
 class ResizeHandleGroup(QObject):
     """Provides the ability to move and resize the parent."""
     def __init__(self, parent_outline_rect, width, color, is_resizable,
-                 handle_types, parent_item, translates_in=None):
+                 handle_types, parent_item, translates_in=None, show_coords=False):
         super(ResizeHandleGroup, self).__init__()
         # self.parent_outline_rect = parent_outline_rect  # set by call to alignHandles
         self.width = w = width
@@ -24,10 +24,12 @@ class ResizeHandleGroup(QObject):
         self.half_offset_y = QPointF(0, h_w)
         self.is_resizable = is_resizable
         self.is_dragging = False
+        self.parent_item = parent_item
         if translates_in is None:
             self.translates_in = Axis.X | Axis.Y
         else:
             self.translates_in = translates_in
+        self.show_coords = show_coords
 
         self.handle_types = handle_types
         self._t = HandleItem(HandleType.TOP, w, color, self, parent_item) \
@@ -52,22 +54,53 @@ class ResizeHandleGroup(QObject):
 
     def alignHandles(self, o_rect):
         self.parent_outline_rect = o_rect
+
         if self.handle_types & HandleType.TOP:
-            self._t.setPos(QPointF(o_rect.center().x(), o_rect.top()) - self.half_offset)
+            t_pt = QPointF(o_rect.center().x(), o_rect.top())
+            self._t.setPos(t_pt - self.half_offset)
         if self.handle_types & HandleType.BOTTOM:
-            self._b.setPos(QPointF(o_rect.center().x(), o_rect.bottom()) - self.half_offset)
+            b_pt = QPointF(o_rect.center().x(), o_rect.bottom())
+            self._b.setPos(b_pt - self.half_offset)
         if self.handle_types & HandleType.LEFT:
-            self._l.setPos(QPointF(o_rect.left(), o_rect.center().y()) - self.half_offset)
+            l_pt = QPointF(o_rect.left(), o_rect.center().y())
+            self._l.setPos(l_pt - self.half_offset)
         if self.handle_types & HandleType.RIGHT:
-            self._r.setPos(QPointF(o_rect.right(), o_rect.center().y()) - self.half_offset)
+            r_pt = QPointF(o_rect.right(), o_rect.center().y())
+            self._r.setPos(r_pt - self.half_offset)
         if self.handle_types & HandleType.TOP_LEFT:
-            self._tl.setPos(o_rect.topLeft() - self.half_offset)
+            tl_pt = o_rect.topLeft()
+            self._tl.setPos(tl_pt - self.half_offset)
         if self.handle_types & HandleType.TOP_RIGHT:
-            self._tr.setPos(o_rect.topRight() - self.half_offset)
+            tr_pt = o_rect.topRight()
+            self._tr.setPos(tr_pt - self.half_offset)
         if self.handle_types & HandleType.BOTTOM_LEFT:
-            self._bl.setPos(o_rect.bottomLeft() - self.half_offset)
+            bl_pt = o_rect.bottomLeft()
+            self._bl.setPos(bl_pt - self.half_offset)
         if self.handle_types & HandleType.BOTTOM_RIGHT:
-            self._br.setPos(o_rect.bottomRight() - self.half_offset)
+            br_pt = o_rect.bottomRight()
+            self._br.setPos(br_pt - self.half_offset)
+
+        if self.show_coords:
+            t_x, t_y = self.parent_item.getModelPos(t_pt)
+            b_x, b_y = self.parent_item.getModelPos(b_pt)
+            l_x, l_y = self.parent_item.getModelPos(l_pt)
+            r_x, r_y = self.parent_item.getModelPos(r_pt)
+            tl_x, tl_y = self.parent_item.getModelPos(tl_pt)
+            bl_x, bl_y = self.parent_item.getModelPos(bl_pt)
+            tr_x, tr_y = self.parent_item.getModelPos(tr_pt)
+            br_x, br_y = self.parent_item.getModelPos(br_pt)
+            xy_html = "<font color='#cc0000'>{:.2f}</font>, " +\
+                      "<font color='#007200'>{:.2f}</font>"
+            self._t.label.updateText(xy_html.format(t_x, t_y))
+            self._b.label.updateText(xy_html.format(b_x, b_y))
+            self._l.label.updateText(xy_html.format(l_x, l_y))
+            self._r.label.updateText(xy_html.format(r_x, r_y))
+            self._tl.label.updateText(xy_html.format(tl_x, tl_y))
+            self._tr.label.updateText(xy_html.format(tr_x, tr_y))
+            self._bl.label.updateText(xy_html.format(bl_x, bl_y))
+            self._br.label.updateText(xy_html.format(br_x, br_y))
+
+    # end def
 
     def removeHandles(self):
         self._t = None
@@ -122,6 +155,44 @@ class ResizeHandleGroup(QObject):
         if self.handle_types & HandleType.BOTTOM_RIGHT:
             self._br.setParentItem(new_parent)
     # end def
+
+    def getHandle(self, handle_type):
+        if handle_type == HandleType.TOP:
+            return self._t
+        elif handle_type == HandleType.BOTTOM:
+            return self._b
+        elif handle_type == HandleType.LEFT:
+            return self._l
+        elif handle_type == HandleType.RIGHT:
+            return self._r
+        elif handle_type == HandleType.TOP_LEFT:
+            return self._tl
+        elif handle_type == HandleType.TOP_RIGHT:
+            return self._tr
+        elif handle_type == HandleType.BOTTOM_LEFT:
+            return self._bl
+        elif handle_type == HandleType.BOTTOM_RIGHT:
+            return self._br
+        else:
+            raise LookupError("HandleType not found", handle_type)
+
+    def updateText(self, handle_types, text):
+        if handle_types & HandleType.TOP and self._t:
+            self._t.label.updateText(text)
+        if handle_types & HandleType.BOTTOM and self._b:
+            self._b.label.updateText(text)
+        if handle_types & HandleType.LEFT and self._l:
+            self._l.label.updateText(text)
+        if handle_types & HandleType.RIGHT and self._r:
+            self._r.label.updateText(text)
+        if handle_types & HandleType.TOP_LEFT and self._tl:
+            self._tl.label.updateText(text)
+        if handle_types & HandleType.TOP_RIGHT and self._tr:
+            self._tr.label.updateText(text)
+        if handle_types & HandleType.BOTTOM_LEFT and self._bl:
+            self._bl.label.updateText(text)
+        if handle_types & HandleType.BOTTOM_RIGHT and self._br:
+            self._br.label.updateText(text)
 # end class
 
 
@@ -140,9 +211,11 @@ class HandleItem(QGraphicsRectItem):
         self.can_move_x = handle_group.translates_in & Axis.X
         self.can_move_y = handle_group.translates_in & Axis.Y
 
-        self.setBrush(getBrushObj(FILL_COLOR))
+        self.setBrush(getBrushObj(styles.RESIZEHANDLE_FILL_COLOR))
         self.setPen(getPenObj(color, 0))
         self.setRect(QRectF(0, 0, w, w))
+
+        self.label = HandleItemLabel(self)
 
         self.event_start_position = QPointF(0, 0)
         self.event_scene_start_position = QPointF(0, 0)
@@ -159,6 +232,14 @@ class HandleItem(QGraphicsRectItem):
             self._resize_cursor = Qt.ClosedHandCursor
     # end def
 
+    def handleGroup(self):
+        return self._group
+    # end def
+
+    def handleType(self):
+        return self._handle_type
+    # end def
+
     def hoverEnterEvent(self, event):
         self.setCursor(Qt.OpenHandCursor)
         # self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
@@ -172,13 +253,13 @@ class HandleItem(QGraphicsRectItem):
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             return
-        parent = self.parentItem()
 
+        parent = self.parentItem()
         if self._group.is_resizable and event.modifiers() & Qt.ShiftModifier:
             self.setCursor(self._resize_cursor)
-            self.item_start = self.pos()
             self.model_bounds = parent.getModelMinBounds(handle_type=self._handle_type)
             self.event_start_position = event.scenePos()
+            self.item_start = self.pos()
             parent.showModelMinBoundsHint(self._handle_type, show=True)
             event.setAccepted(True)  # don't propagate
             return
@@ -186,14 +267,11 @@ class HandleItem(QGraphicsRectItem):
             self.setCursor(Qt.ClosedHandCursor)
             parent = self.parentItem()
             self._group.is_dragging = True
-            self.event_scene_start_position = event.scenePos()
-            self._move_offset = parent.mapFromScene(event.scenePos())
+            self.event_start_position = event.pos()
             parent.setMovable(True)
             # ensure we handle window toggling during moves
             qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
-            # res = QGraphicsItem.mousePressEvent(parent, event)
-            res = parent.mousePressEvent(event)
-            event.setAccepted(True)
+            res = QGraphicsItem.mousePressEvent(parent, event)
             return res
 
     def mouseMoveEvent(self, event):
@@ -250,11 +328,8 @@ class HandleItem(QGraphicsRectItem):
             else:
                 raise NotImplementedError("handle_type %d not supported" % (ht))
         else:
-            res = parent.mouseMoveEvent(event)
-            event.setAccepted(True)
-
+            res = QGraphicsItem.mouseMoveEvent(parent, event)
             return res
-        event.setAccepted(True)  # don't propagate
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -313,12 +388,8 @@ class HandleItem(QGraphicsRectItem):
             self._group.is_dragging = False
             parent = self.parentItem()
             parent.setMovable(False)
-            # QGraphicsItem.mouseReleaseEvent(parent, event)
-            res = parent.mouseReleaseEvent(event)
-            event.setAccepted(True)
+            QGraphicsItem.mouseReleaseEvent(parent, event)
             parent.finishDrag()
-            return res
-
         self.setCursor(Qt.OpenHandCursor)
     # end def
 
@@ -334,10 +405,66 @@ class HandleItem(QGraphicsRectItem):
         if self.model_bounds:
             self.model_bounds = ()
         if self._group.is_dragging:
-            print(message)
+            # print(message)
             parent = self.parentItem()
             parent.setMovable(False)
             qApp.focusWindowChanged.disconnect(self.focusWindowChangedSlot)
             parent.finishDrag()
+    # end def
+# end class
+
+
+class HandleItemLabel(QGraphicsTextItem):
+    """Text label for HandleItems. Manages its position based
+    on handle type, a bit further past the handle position.
+
+    Attributes:
+        is_fwd (TYPE): Description
+    """
+    _COLOR = styles.RESIZEHANDLE_LABEL_COLOR
+    _FONT = styles.RESIZEHANDLE_LABEL_FONT
+    _FM = QFontMetrics(_FONT)
+
+    def __init__(self, handle):
+        super(QGraphicsTextItem, self).__init__(handle)
+        self._handle = handle
+        self.setFont(self._FONT)
+        # self.setBrush(getBrushObj(self._COLOR))
+    # end def
+
+    def updateText(self, text):
+        str_txt = str(text)
+        self.setHtml(str_txt)
+
+        # tBR = self._FM.tightBoundingRect(str_txt)
+        br = self.boundingRect()
+        text_width = br.width()
+        text_height = br.height()
+        handle_type = self._handle.handleType()
+        if handle_type & (HandleType.LEFT |
+                          HandleType.TOP_LEFT |
+                          HandleType.BOTTOM_LEFT):
+            x = -self._handle.half_width - text_width
+        elif handle_type & (HandleType.RIGHT |
+                            HandleType.TOP_RIGHT |
+                            HandleType.BOTTOM_RIGHT):
+            x = self._handle.width*1.5
+        elif handle_type & (HandleType.TOP | HandleType.BOTTOM):
+            x = self._handle.half_width-text_width/2
+        else:
+            x = self.pos().x()
+        if handle_type & (HandleType.TOP |
+                          HandleType.TOP_LEFT |
+                          HandleType.TOP_RIGHT):
+            y = -self._handle.half_width-text_height
+        elif handle_type & (HandleType.BOTTOM |
+                            HandleType.BOTTOM_LEFT |
+                            HandleType.BOTTOM_RIGHT):
+            y = self._handle.half_width + text_height/2
+        elif handle_type & (HandleType.LEFT | HandleType.RIGHT):
+            y = self._handle.half_width-text_height/2
+        else:
+            y = self.pos().y()
+        self.setPos(QPointF(x, y))
     # end def
 # end class
