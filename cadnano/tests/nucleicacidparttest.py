@@ -37,8 +37,8 @@ def testVirtualHelixResize(cnapp):
     assert part.getVirtualHelixProperties(1, 'length') == start_length
     part.setVirtualHelixSize(1, end_length)
     assert part.getVirtualHelixProperties(1, 'length') == end_length
-    with pytest.raises(NotImplementedError):
-        part.setVirtualHelixSize(1, start_length)
+    part.setVirtualHelixSize(1, start_length)
+    assert part.getVirtualHelixProperties(1, 'length') == start_length
 
 
 def testRemove(cnapp):
