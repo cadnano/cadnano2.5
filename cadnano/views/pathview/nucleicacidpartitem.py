@@ -623,34 +623,25 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     ### PUBLIC METHODS ###
     def getModelMinBounds(self, handle_type=None):
         """Bounds in form of Qt scaled from model
+        Absolute min should be 2*stepsize.
+        Round up from indexOfRightmostNonemptyBase to nearest substep.
 
-        Args:
-            Tuple (top_left, bottom_right)
-
-        :rtype: Tuple where
+        Returns:
+            Tuple (xTL, yTL, xBR, yBR)
         """
         _p = self._BOUNDING_RECT_PADDING
+        default_idx = self._model_part.stepSize()*2
+        nonempty_idx = self._model_part.indexOfRightmostNonemptyBase()
+        right_bound_idx = max(default_idx, nonempty_idx)
+        substep = self._model_part.subStepSize()
+        snap_idx = (right_bound_idx/substep+1)*substep
+        xTL = 0
+        xBR = snap_idx*_BASE_WIDTH + _p
         min_rect = self.rect().adjusted(-_p, -_p, _p, _p)
-        oTL = min_rect.topLeft()
-        oBR = min_rect.bottomRight()
-        return oTL.x(), oTL.y(), oBR.x(), oBR.y()
+        yTL = min_rect.top()
+        yBR = min_rect.bottom()
+        return xTL, yTL, xBR, yBR
     # end def
-
-    # def getModelMinBounds(self, handle_type=None):
-    #     """Resize bounds in form of Qt position, scaled from model."""
-    #     if handle_type and handle_type & HandleType.LEFT:
-    #         xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
-    #         xBR = self._idx_high*BASE_WIDTH
-    #     elif handle_type and handle_type & HandleType.RIGHT:
-    #         xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
-    #         xBR = (self._idx_low)*BASE_WIDTH
-    #     else:  # default to HandleType.RIGHT behavior for all types
-    #         print("no ht??")
-    #         xTL = 0
-    #         xBR = self._high_drag_bound*BASE_WIDTH
-    #     yTL = self._part_item._vh_rect.top()
-    #     yBR = self._part_item._vh_rect.bottom()-BASE_WIDTH*3
-    #     return xTL, yTL, xBR, yBR
 
     def showModelMinBoundsHint(self, handle_type, show=True):
         """Shows QGraphicsRectItem reflecting current model bounds.

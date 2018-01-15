@@ -762,7 +762,7 @@ class NucleicAcidPart(Part):
         Returns:
             int: index of right most base in all :class:`StrandSets`
         """
-        ret = self._STEP - 1
+        ret = self._STEP_SIZE - 1
         fwd_strandsets = self.fwd_strandsets
         rev_strandsets = self.rev_strandsets
         for id_num in self.reserved_ids:
@@ -1366,8 +1366,8 @@ class NucleicAcidPart(Part):
                     print('Validation failed:  attempted to set %s to %s' % (key,
                                                                              values_list[index]))
 
-        from cadnano.util import qtdb_trace
-#        qtdb_trace()
+        # from cadnano.util import qtdb_trace
+        # qtdb_trace()
 
         for index, key in enumerate(keys_list):
             try:
@@ -3003,8 +3003,10 @@ class NucleicAcidPart(Part):
             c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
             util.doCmd(self, c, use_undostack=use_undostack)
         else:
-            err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
-            raise NotImplementedError(err)
+            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
+            util.doCmd(self, c, use_undostack=use_undostack)
+            # err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
+            # raise NotImplementedError(err)
     # end def
 
     def translateVirtualHelices(self, vh_set, dx, dy, dz, finalize,
