@@ -6,9 +6,7 @@ Submodules
 
 .. toctree::
 
-   cadnano.controllers.abstractstranditemcontroller
    cadnano.controllers.documentcontroller
-   cadnano.controllers.endpointitemcontroller
    cadnano.controllers.nucleicacidpartitemcontroller
    cadnano.controllers.oligoitemcontroller
    cadnano.controllers.partitemcontroller

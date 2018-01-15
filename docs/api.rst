@@ -22,7 +22,6 @@ Packages
    api/cadnano.removeinstancecmd
    api/cadnano.strand
    api/cadnano.strandset
-   api/cadnano.tests
    api/cadnano.views
 
 Modules
