@@ -2645,7 +2645,9 @@ class NucleicAcidPart(Part):
             print("vh already present at coords ({}, {})".format(x9, y9))
             print(util.trace(5))
             return
-        length = self.getProperty('max_vhelix_length')
+        max_len = self.getProperty('max_vhelix_length')
+        if length < max_len:
+            length = max_len
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
                                       properties=properties,
