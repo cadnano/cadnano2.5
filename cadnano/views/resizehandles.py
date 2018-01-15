@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtWidgets import qApp
 from cadnano.proxies.cnenum import Axis, HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj
@@ -250,11 +250,6 @@ class HandleItem(QGraphicsRectItem):
             else:
                 raise NotImplementedError("handle_type %d not supported" % (ht))
         else:
-            # new_pos = event.scenePos()
-            # new_x = new_pos.x()+h_w if self.can_move_x else self.event_scene_start_position.x()
-            # new_y = new_pos.y()+h_w if self.can_move_y else self.event_scene_start_position.y()
-            # pt = QPointF(new_x, new_y) - self._move_offset
-            # parent.setPos(pt)
             res = parent.mouseMoveEvent(event)
             event.setAccepted(True)
 

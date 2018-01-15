@@ -778,7 +778,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
         # self.setBrush(getNoBrush())
         self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=12))
         self.setPen(getNoPen())
-
         self.setZValue(styles.ZWORKPLANE)
 
         self._model_part = model_part
@@ -920,6 +919,12 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def mouseMoveEvent(self, event):
+        """
+        Handles mousePressEvent, which can come via a direct click or via
+        the ResizeHandle which will call this method and pass it the event.
+        When called via the handle we update the start idxs to avoid fighting
+        with a second event that fires.
+        """
         delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         delta = util.clamp(delta,
                            self._low_drag_bound-self._start_idx_low,
@@ -929,11 +934,16 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._idx_high = self._start_idx_high + delta
             self._delta = delta
             self.reconfigureRect((), ())
-            self._start_idx_low = self._idx_low
-            self._start_idx_high = self._idx_high
+            # update the start idxs if mousePress was on the resize handle
+            if event.buttonDownPos(Qt.LeftButton).x() < self._HANDLE_SIZE/2:
+                self._start_idx_low = self._idx_low
+                self._start_idx_high = self._idx_high
     # end def
 
     def mouseReleaseEvent(self, event):
+        """
+        Call reconfigRect if we've moved since the last mouseMoveEvent.
+        """
         delta = int(floor((self.x()+event.pos().x()) / BASE_WIDTH)) - self._offset_idx
         delta = util.clamp(delta,
                            self._low_drag_bound-self._start_idx_low,
