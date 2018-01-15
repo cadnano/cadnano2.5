@@ -2,8 +2,8 @@
 from uuid import uuid4
 
 from cadnano import util
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnobject import CNObject
 from .changeinstancepropertycmd import ChangeInstancePropertyCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 # from cadnano.addinstancecmd import AddInstanceCommand
@@ -25,7 +25,7 @@ class Part(CNObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color', 'is_visible', 'grid_type']
+    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idxs']
 
     def __init__(self, *args, **kwargs):
         """Sets the parent document, sets bounds for part dimensions, and sets up

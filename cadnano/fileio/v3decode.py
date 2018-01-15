@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano import preferences as prefs
-from cadnano import setBatch, getReopen, setReopen
-from cadnano.cnenum import PointType
+# from cadnano import setBatch, getReopen, setReopen
+from cadnano.proxies.cnenum import GridType, PointType, SliceViewType
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
+
 
 def decode(document, obj, emit_signals=False):
     """ Decode a a deserialized Document dictionary
@@ -11,35 +14,65 @@ def decode(document, obj, emit_signals=False):
         document (Document):
         obj (dict): deserialized file object
     """
-    name = obj['name']
+    obj.get('name')
+    meta = obj.get('meta', {})
+
+    # TODO[NF]:  Use a constant here
+    slice_view_type = meta.get('slice_view_type')
+    from cadnano.util import qtdb_trace
+#    qtdb_trace()
+
+    # This assumes that the lattice without a specified grid type is a honeycomb lattice
+    grid_type = meta.get('grid_type', GridType.HONEYCOMB)
+
     for part_dict in obj['parts']:
-        part_dict = decodePart(document, part_dict, emit_signals=emit_signals)
+        decodePart(document, part_dict, grid_type=grid_type,
+                   emit_signals=emit_signals)
+
+        if slice_view_type is None:
+            slice_view_type = determineSliceViewType(document, part_dict, grid_type)
 
     modifications = obj['modifications']
+
     for mod_id, item in modifications.items():
         document.createMod(item['props'], mod_id)
         ext_locations = item['ext_locations']
         for key in ext_locations:
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
-    return
-# end def
 
-def decodePart(document, part_dict, emit_signals=False):
+    document.setSliceViewType(slice_view_type=slice_view_type)
+
+def determineSliceViewType(document, part_dict, grid_type):
+    THRESHOLD = 0.0005
+    vh_id_list = part_dict.get('vh_list')
+    origins = part_dict.get('origins')
+
+    for vh_id, size in vh_id_list:
+        vh_x, vh_y = origins[vh_id]
+
+        if grid_type is GridType.HONEYCOMB:
+            distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)
+            if distance > THRESHOLD:
+                return SliceViewType.GRID
+        elif grid_type is GridType.SQUARE:
+            if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
+                return SliceViewType.GRID
+    return SliceViewType.SLICE
+
+def decodePart(document, part_dict, grid_type, emit_signals=False):
     """ Decode a a deserialized Part dictionary
 
     Args:
         document (Document):
         part_dict (dict): deserialized dictionary describing the Part
     """
-    name = part_dict['name']
-    dc = document._controller
-    part = document.createNucleicAcidPart(use_undostack=False)
+    part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
     part.setActive(True)
 
-    vh_id_list = part_dict['vh_list']
-    vh_props = part_dict['virtual_helices']
-    origins = part_dict['origins']
+    vh_id_list = part_dict.get('vh_list')
+    vh_props = part_dict.get('virtual_helices')
+    origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
     if part_dict.get('point_type') == PointType.ARBITRARY:
@@ -84,10 +117,10 @@ def decodePart(document, part_dict, emit_signals=False):
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
         from_strand = part.getStrand(from_is_fwd, from_id, from_idx)
         to_strand = part.getStrand(to_is_fwd, to_id, to_idx)
-        part.createXover(   from_strand, from_idx,
-                            to_strand, to_idx,
-                            update_oligo=False,
-                            use_undostack=False)
+        part.createXover(from_strand, from_idx,
+                         to_strand, to_idx,
+                         update_oligo=False,
+                         use_undostack=False)
 
     RefreshOligosCommand(part).redo()
     for oligo in part_dict['oligos']:
@@ -114,11 +147,11 @@ def decodePart(document, part_dict, emit_signals=False):
     if vh_order:
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
-# end def
+
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
-    will start numbering `part.getIdNumMax()` rather than the lowest available
+    will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
 
     Args:
@@ -126,7 +159,7 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
         copy_dict (dict):
     """
     part = part_instance.reference()
-    id_num_offset = part.getIdNumMax() + 1
+    id_num_offset = part.getMaxIdNum() + 1
     print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
@@ -156,28 +189,28 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
             fwd_strand_set, rev_strand_set = part.getStrandSets(
-                                                        id_num + id_num_offset)
+                id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
             fwd_colors, rev_colors = color_list[id_num]
             for idxs, color in zip(fwd_idxs, fwd_colors):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
-                                                    use_undostack=use_undostack)
+                                                        use_undostack=use_undostack)
 
             for idxs, color in zip(rev_idxs, rev_colors):
                 low_idx, high_idx = idxs
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
-                                                    use_undostack=use_undostack)
+                                                        use_undostack=use_undostack)
     # end def
 
     xovers = copy_dict['xovers']
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
         from_strand = part.getStrand(from_is_fwd, from_id + id_num_offset, from_idx)
         to_strand = part.getStrand(to_is_fwd, to_id + id_num_offset, to_idx)
-        part.createXover(   from_strand, from_idx,
-                            to_strand, to_idx,
-                            update_oligo=use_undostack,
-                            use_undostack=use_undostack)
+        part.createXover(from_strand, from_idx,
+                         to_strand, to_idx,
+                         update_oligo=use_undostack,
+                         use_undostack=use_undostack)
     if not use_undostack:
         RefreshOligosCommand(part).redo()
 
@@ -185,7 +218,6 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     for id_num, idx, length in copy_dict['insertions']:
         strand = part.getStrand(True, id_num + id_num_offset, idx)
         strand.addInsertion(idx, length, use_undostack=use_undostack)
-
 
     """
     TODO: figure out copy_dict['view_properties'] handling here

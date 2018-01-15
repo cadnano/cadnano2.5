@@ -27,3 +27,11 @@ Creating a new design
 
 We are also planning an updated version of Tutorial 2, which will be a step-by-step
 design, start to finish.
+
+
+Making a publication-quality figure
+-----------------------------------
+
+Some video tutorials for creating a figure in Maya and Photoshop are `here`_ .
+
+.. _here: https://sdouglas.github.io/lr-notebook/projects/tutorials/2016-11-29/

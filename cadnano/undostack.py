@@ -46,7 +46,7 @@ class UndoStack(object):
         self.macro_count -= 1
         try:
             self.current_macro = self.macro_stack.pop()
-        except:
+        except Exception:
             self.current_macro = None
         # print('e', self.current_macro self.macro_count)
         if self.macro_count == 0:

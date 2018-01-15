@@ -1,5 +1,5 @@
-from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.part import Part
 
 
@@ -10,6 +10,7 @@ class RemoveInstanceCommand(UndoCommand):
     Args:
         obj_instance (ObjectInstance): Object instance remove
     """
+
     def __init__(self, cnobj, obj_instance):
         super(RemoveInstanceCommand, self).__init__("remove instance")
         self._items = (cnobj, cnobj.document(), obj_instance)

@@ -9,10 +9,8 @@ import os
 import platform
 import string
 import sys
-
 from os import path
 from traceback import extract_stack
-
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +36,15 @@ def overlap(x, y, a, b):
 # end def
 
 
+try:
+    from termcolor import colored
+except ImportError:
+    print("pip3 install termcolor")
+
+    def colored(s, color=None, **kwargs):
+        return s
+
+
 def trace(n):
     """Returns a stack trace n frames deep"""
     s = extract_stack()
@@ -45,8 +52,10 @@ def trace(n):
     for f in s[-n-1:-1]:
         # f is a stack frame like
         # ('/path/script.py', 42, 'funcname', 'current = line - of / code')
-        frames.append((path.basename(f[0])+':%i' % f[1])+'(%s)' % f[2])
-    return " > ".join(frames)
+        frames.append((colored(path.basename(f[0]) + ':%i' % f[1], 'blue') + '(' + colored(f[2], 'green') + ')'))
+    sep = colored(" > ", 'yellow')
+    return sep.join(frames)
+
 
 if IS_PY_3:
     complement = str.maketrans('ACGTacgt', 'TGCATGCA')
@@ -63,6 +72,7 @@ def comp(seqStr):
     """Returns the complement of the sequence in seqStr."""
     return seqStr.translate(complement)
 
+
 if IS_PY_3:
     whitetoQ = str.maketrans(' |', '??')
 else:
@@ -77,7 +87,8 @@ def nowhite(seqStr):
     """Gets rid of non-letters in a string."""
     return ''.join([c for c in seqStr if c in string.letters])
 
-nearest = lambda a, l: min(l, key=lambda x: abs(x - a))
+
+def nearest(a, l): return min(l, key=lambda x: abs(x - a))
 
 
 def isWindows():
@@ -92,7 +103,7 @@ def isMac():
     """Returns True if platform is detected as Darwin, otherwise False"""
     try:
         return platform.system() == 'Darwin'
-    except:
+    except Exception:
         return path.exists('/System/Library/CoreServices/Finder.app')
 
 
@@ -168,6 +179,7 @@ def finalizeCommands(model_object, commands, desc=None):
 
 def this_path():
     return os.path.abspath(os.path.dirname(__file__))
+
 
 # maps plugin path (extension stripped) -> plugin module
 loadedPlugins = {}
@@ -443,8 +455,12 @@ def qtdb_trace():
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
-    import pdb
-    from PyQt5.QtCore import pyqtRemoveInputHook
+    if False:
+        logger.info('No debug')
+        return
+    else:
+        import pdb
+        from PyQt5.QtCore import pyqtRemoveInputHook
 
     pyqtRemoveInputHook()
     pdb.set_trace()

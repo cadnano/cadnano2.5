@@ -14,7 +14,7 @@ try:
     # from cadnano import app
     # if not app().is_temp_app:
     from PyQt5.QtGui import QColor as Color
-except:
+except Exception:
     class Color(object):
         """ Overloaded constructor using *args to be compatible with :class:`QColor`
 
@@ -26,6 +26,7 @@ except:
 
             Color('#rrggbb') for hex
         """
+
         def __init__(self, *args):
             largs = len(args)
             if largs == 1:

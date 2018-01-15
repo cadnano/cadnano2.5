@@ -3,9 +3,9 @@ import sys
 import traceback
 
 from cadnano import util
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnenum import ModType
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnenum import ModType
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
@@ -13,7 +13,7 @@ from .removeoligocmd import RemoveOligoCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
-OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 50
+OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 60
 MAX_HIGHLIGHT_LENGTH = 800
 
 PROPERTY_KEYS = ['name', 'color', 'length', 'is_visible']
@@ -47,14 +47,14 @@ class Oligo(CNObject):
         self._is_circular = False
         self._props = {'name': "oligo%s" % str(id(self))[-4:],
                        'color': "#cc0000" if color is None else color,
-                       'length': 0,
+                       'length': length,
                        'is_visible': True
                        }
     # end def
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
-        olg_id = str(id(self))[-4:]
+        _name = self.__class__.__name__
+        _id = str(id(self))[-4:]
         if self._strand5p is not None:
             vh_num = self._strand5p.idNum()
             idx = self._strand5p.idx5Prime()
@@ -63,7 +63,8 @@ class Oligo(CNObject):
             vh_num = -1
             idx = -1
             ss_type = -1
-        return "<%s %s>(%d.%d[%d])" % (cls_name, olg_id, vh_num, ss_type, idx)
+        oligo_identifier = '(%d.%d[%d])' % (vh_num, ss_type, idx)
+        return '%s_%s_%s' % (_name, oligo_identifier, _id)
     # end def
 
     def __lt__(self, other):
@@ -159,7 +160,7 @@ class Oligo(CNObject):
             if color is None:
                 print(self._props)
                 raise ValueError("Whhat Got None???")
-        except:
+        except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback, limit=5, file=sys.stdout)
             traceback.print_stack()
@@ -263,7 +264,7 @@ class Oligo(CNObject):
             return None
         if temp.sequence():
             return ''.join([Strand.sequence(strand)
-                           for strand in self.strand5p().generator3pStrand()])
+                            for strand in self.strand5p().generator3pStrand()])
         else:
             return None
     # end def

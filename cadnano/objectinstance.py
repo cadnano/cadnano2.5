@@ -1,5 +1,5 @@
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
 
 
 class ObjectInstance(CNObject):

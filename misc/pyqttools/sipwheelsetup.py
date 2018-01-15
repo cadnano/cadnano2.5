@@ -6,17 +6,14 @@ python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35
 
 import sys
 import os.path
-import glob
 
 from os.path import join as pjoin
-from os.path import relpath as rpath
 
-import distutils.sysconfig
 
 try:
     from setuptools import setup, Extension
 except ImportError:
-    from distutils.core import setup, Extension
+    from distutils.core import setup
 
 PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
 
@@ -40,6 +37,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
     ],
     py_modules=['sipconfig', 'sipdistutils'],
-    data_files = [(rel_path , data_files)],
+    data_files=[(rel_path, data_files)],
     zip_safe=False,
 )

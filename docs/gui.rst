@@ -9,10 +9,8 @@ Packages
 .. toctree::
    :maxdepth: 1
 
-   api/cadnano.gui.controllers
-   api/cadnano.gui.plugins
-   api/cadnano.gui.ui
-   api/cadnano.gui.views
+   api/cadnano.controllers
+   api/cadnano.gui
 
 
 Modules 

@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import random
 
-from cadnano import getBatch
-from cadnano import preferences as prefs
-from cadnano.cnproxy import UndoCommand
+# from cadnano import getBatch
+from cadnano.views.pathview import pathstyles
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
+
 
 class CreateXoverCommand(UndoCommand):
     """
@@ -14,6 +15,7 @@ class CreateXoverCommand(UndoCommand):
     2. install the crossover
     3. apply the strand5p oligo to the strand3p
     """
+
     def __init__(self, part, strand5p, strand5p_idx, strand3p, strand3p_idx, update_oligo=True):
         super(CreateXoverCommand, self).__init__("create xover")
         self._part = part
@@ -26,11 +28,11 @@ class CreateXoverCommand(UndoCommand):
     # end def
 
     def redo(self):
-        part = self._part
+        self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         olg5p = strand5p.oligo()
         old_olg3p = self._old_oligo3p
 
@@ -65,16 +67,16 @@ class CreateXoverCommand(UndoCommand):
         # st3p = ss3.strandType()
 
         if self._update_oligo:
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand5p.strandConnectionChangedSignal.emit(strand5p)
+            strand3p.strandConnectionChangedSignal.emit(strand3p)
     # end def
 
     def undo(self):
         part = self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         old_olg3p = self._old_oligo3p
         olg5p = strand5p.oligo()
 
@@ -102,10 +104,11 @@ class CreateXoverCommand(UndoCommand):
                     fSetOligo(strand, old_olg3p, emit_signals=True)
 
         if self._update_oligo:
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand5p.strandConnectionChangedSignal.emit(strand5p)
+            strand3p.strandConnectionChangedSignal.emit(strand3p)
     # end def
 # end class
+
 
 class RemoveXoverCommand(UndoCommand):
     """
@@ -116,6 +119,7 @@ class RemoveXoverCommand(UndoCommand):
     3. update the oligo length
     4. apply the new strand3p oligo to the strand3p
     """
+
     def __init__(self, part, strand5p, strand3p):
         super(RemoveXoverCommand, self).__init__("remove xover")
         self._part = part
@@ -125,7 +129,7 @@ class RemoveXoverCommand(UndoCommand):
         self._strand3p_idx = strand3p.idx5Prime()
         n_o3p = self._new_oligo3p = strand3p.oligo().shallowCopy()
 
-        color_list = prefs.STAP_COLORS
+        color_list = pathstyles.STAP_COLORS
         n_o3p._setColor(random.choice(color_list))
         n_o3p._setLength(0, emit_signals=True)
         for strand in strand3p.generator3pStrand():
@@ -139,9 +143,9 @@ class RemoveXoverCommand(UndoCommand):
     def redo(self):
         part = self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         new_olg3p = self._new_oligo3p
         olg5p = self._strand5p.oligo()
 
@@ -168,16 +172,16 @@ class RemoveXoverCommand(UndoCommand):
                 # emits strandHasNewOligoSignal
                 fSetOligo(strand, new_olg3p, emit_signals=True)
 
-        strand5p.strandUpdateSignal.emit(strand5p)
-        strand3p.strandUpdateSignal.emit(strand3p)
+        strand5p.strandConnectionChangedSignal.emit(strand5p)
+        strand3p.strandConnectionChangedSignal.emit(strand3p)
     # end def
 
     def undo(self):
-        part = self._part
+        self._part
         strand5p = self._strand5p
-        strand5p_idx = self._strand5p_idx
+        self._strand5p_idx
         strand3p = self._strand3p
-        strand3p_idx = self._strand3p_idx
+        self._strand3p_idx
         olg5p = strand5p.oligo()
         new_olg3p = self._new_oligo3p
 
@@ -205,7 +209,7 @@ class RemoveXoverCommand(UndoCommand):
         strand5p.setConnection3p(strand3p)
         strand3p.setConnection5p(strand5p)
 
-        strand5p.strandUpdateSignal.emit(strand5p)
-        strand3p.strandUpdateSignal.emit(strand3p)
+        strand5p.strandConnectionChangedSignal.emit(strand5p)
+        strand3p.strandConnectionChangedSignal.emit(strand3p)
     # end def
 # end class

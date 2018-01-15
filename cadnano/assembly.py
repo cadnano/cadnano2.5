@@ -2,10 +2,11 @@ from collections import defaultdict
 # from operator import attrgetter
 from operator import methodcaller
 
+from cadnano.proxies.cnobject import CNObject
 # from cadnano.part import Part
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
-# from cadnano.cnproxy import UndoCommand, UndoStack
+from cadnano.proxies.cnproxy import ProxySignal
+
+# from cadnano.proxies.cnproxy import UndoCommand, UndoStack
 
 
 class Assembly(CNObject):

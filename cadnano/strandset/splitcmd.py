@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
-from cadnano import preferences as prefs
-from cadnano.cnproxy import UndoCommand
+from cadnano.views.pathview import pathstyles
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
 
 
@@ -17,6 +17,7 @@ class SplitCommand(UndoCommand):
     original strand, resizes each and modifies their connections.
     On undo, the new copies are removed and the original is restored.
     """
+
     def __init__(self, strand, base_idx, update_sequence=True):
         super(SplitCommand, self).__init__("split strand")
         # Store inputs
@@ -36,7 +37,7 @@ class SplitCommand(UndoCommand):
             self._l_oligo = l_oligo = oligo.shallowCopy()
             self._h_oligo = h_oligo = oligo.shallowCopy()
 
-        color_list = prefs.STAP_COLORS
+        color_list = pathstyles.STAP_COLORS
 
         # Determine oligo retention based on strand priority
         if is5to3:  # strand_low has priority
@@ -112,15 +113,15 @@ class SplitCommand(UndoCommand):
         # update connectivity of strands
         sLcL = s_low.connectionLow()
         if sLcL:
-            if ( (o_strand.isForward() and sLcL.isForward()) or
-                 (not o_strand.isForward() and not sLcL.isForward()) ):
+            if ((o_strand.isForward() and sLcL.isForward()) or
+                    (not o_strand.isForward() and not sLcL.isForward())):
                 sLcL.setConnectionHigh(s_low)
             else:
                 sLcL.setConnectionLow(s_low)
         sHcH = s_high.connectionHigh()
         if sHcH:
-            if ( (o_strand.isForward() and sHcH.isForward()) or
-                 (not o_strand.isForward() and not sHcH.isForward()) ):
+            if ((o_strand.isForward() and sHcH.isForward()) or
+                    (not o_strand.isForward() and not sHcH.isForward())):
                 sHcH.setConnectionLow(s_high)
             else:
                 sHcH.setConnectionHigh(s_high)
@@ -165,15 +166,15 @@ class SplitCommand(UndoCommand):
         # update connectivity of strands
         oScL = o_strand.connectionLow()
         if oScL:
-            if ( (o_strand.isForward() and oScL.isForward()) or
-                 (not o_strand.isForward() and not oScL.isForward()) ):
+            if ((o_strand.isForward() and oScL.isForward()) or
+                    (not o_strand.isForward() and not oScL.isForward())):
                 oScL.setConnectionHigh(o_strand)
             else:
                 oScL.setConnectionLow(o_strand)
         oScH = o_strand.connectionHigh()
         if oScH:
-            if ( (o_strand.isForward() and oScH.isForward()) or
-                 (not o_strand.isForward() and not oScH.isForward()) ):
+            if ((o_strand.isForward() and oScH.isForward()) or
+                    (not o_strand.isForward() and not oScH.isForward())):
                 oScH.setConnectionLow(o_strand)
             else:
                 oScH.setConnectionHigh(o_strand)

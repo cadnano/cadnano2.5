@@ -1,5 +1,6 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano import util
+
 
 class ApplySequenceCommand(UndoCommand):
     def __init__(self, oligo, sequence):
@@ -19,7 +20,7 @@ class ApplySequenceCommand(UndoCommand):
             # get the compliment ahead of time
             used_seq = util.comp(used_seq) if used_seq else None
             for comp_strand in strand.getComplementStrands():
-                sub_used_seq = comp_strand.setComplementSequence(used_seq, strand)
+                comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())
             # end for
             # as long as the new Applied Sequence is not None
@@ -42,7 +43,7 @@ class ApplySequenceCommand(UndoCommand):
             # get the compliment ahead of time
             used_seq = util.comp(used_seq) if used_seq else None
             for comp_strand in strand.getComplementStrands():
-                sub_used_seq = comp_strand.setComplementSequence(used_seq, strand)
+                comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())
             # end for
         # for

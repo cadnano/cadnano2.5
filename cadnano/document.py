@@ -3,21 +3,20 @@
 
 from operator import itemgetter
 from uuid import uuid4
-from cadnano import app
-from cadnano import util
+
+from cadnano import app, setBatch, util
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import UndoStack
-from cadnano.docmodscmd import AddModCommand, RemoveModCommand, ModifyModCommand
-from cadnano.cnenum import ModType
-from cadnano.part import Part
-from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
-from cadnano.part.nucleicacidpart import NucleicAcidPart
-from cadnano.strand import Strand
-from cadnano import setBatch
+from cadnano.proxies.cnenum import ModType, GridType
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal, UndoStack
+from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
+                                RemoveModCommand)
 from cadnano.fileio.nnodecode import decodeFile
 from cadnano.fileio.nnoencode import encodeToFile
+from cadnano.part import Part
+from cadnano.part.nucleicacidpart import NucleicAcidPart
+from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
+from cadnano.strand import Strand
 
 
 class Document(CNObject):
@@ -33,6 +32,7 @@ class Document(CNObject):
         view_names (list): views the document should support
         filter_set (set): filters that should be applied when selecting.
     """
+
     def __init__(self, parent=None):
         super(Document, self).__init__(parent)
 
@@ -131,6 +131,8 @@ class Document(CNObject):
         Args:
             filter_list (list): list of filter key names
         """
+        assert isinstance(filter_list, list)
+
         vhkey = 'virtual_helix'
         fs = self.filter_set
         if vhkey in filter_list and vhkey not in fs:
@@ -156,13 +158,15 @@ class Document(CNObject):
     # end def
 
     def setActivePart(self, part):
-        # print("DC setActivePart")
         self._active_part = part
+        if self._controller:
+            self._controller.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
-        # print("DC deactive Part")
         self._active_part = None
+        if self._controller:
+            self._controller.toggleNewPartButtons(True)
     # end def
 
     def fileName(self):
@@ -191,6 +195,7 @@ class Document(CNObject):
         Args:
             filename (str): full path file name
         """
+        print("reading file", filename)
         return decodeFile(filename, document=self, emit_signals=True)
     # end def
 
@@ -405,7 +410,8 @@ class Document(CNObject):
             list: of :obj: `Strand`
         """
         out_list = [x for x in self._selection_dict[strandset].items()]
-        getLowIdx = lambda x: Strand.lowIdx(itemgetter(0)(x))
+
+        def getLowIdx(x): return Strand.lowIdx(itemgetter(0)(x))
         out_list.sort(key=getLowIdx)
         return out_list
     # end def
@@ -672,15 +678,15 @@ class Document(CNObject):
     # end def
 
     # PUBLIC METHODS FOR EDITING THE MODEL #
-    def createNucleicAcidPart(self, use_undostack=True):
+    def createNucleicAcidPart(self, use_undostack=True, grid_type=GridType.HONEYCOMB):
         """ Create and store a new DnaPart and instance, and return the instance.
 
         Args:
             use_undostack (bool): optional, defaults to True
         """
-        dnapart = NucleicAcidPart(document=self)
-        self._addPart(dnapart, use_undostack=use_undostack)
-        return dnapart
+        dna_part = NucleicAcidPart(document=self, grid_type=grid_type)
+        self._addPart(dna_part, use_undostack=use_undostack)
+        return dna_part
     # end def
 
     def getParts(self):
@@ -932,4 +938,45 @@ class Document(CNObject):
         else:
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
+    # end def
+
+    def getSliceViewType(self):
+        """
+        Get the current SliceView type
+
+        Returns:
+            The current SliceView type
+        """
+        return self.controller().getSliceViewType()
+    # end def
+
+    def setSliceViewType(self, slice_view_type):
+        """
+        Set the current SliceView type
+
+        Returns:
+            None
+        """
+        return self.controller().setSliceViewType(slice_view_type=slice_view_type)
+    # end def
+
+    def getGridType(self):
+        """
+        Get the current Grid type
+
+        Returns:
+            The current Grid type
+        """
+        return self.activePart().getGridType()
+    # end def
+
+    def setGridType(self, grid_type):
+        """
+        Set the current Grid type
+
+        Returns:
+            None
+        """
+        return self.activePart().setGridType(grid_type)
+    # end def
 # end class

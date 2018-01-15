@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Preferences</class>
+ <widget class="QWidget" name="Preferences">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>374</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Preferences</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="form_layout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::FieldsStayAtSizeHint</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QLabel" name="enabled_sliceview_label">
+       <property name="text">
+        <string>Slice View</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QComboBox" name="enabled_sliceview_combo_box">
+       <item>
+        <property name="text">
+         <string>Legacy Slice View</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Grid View</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="Grid">
+       <property name="text">
+        <string>Grid Appearance</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="gridview_style_combo_box">
+       <item>
+        <property name="text">
+         <string>Points</string>
+        </property>
+        <property name="icon">
+         <iconset resource="cadnano.gui.dialogs.dialogicons.qrc">
+          <normaloff>:/part/grid_points</normaloff>:/part/grid_points</iconset>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Lines</string>
+        </property>
+        <property name="icon">
+         <iconset resource="cadnano.gui.dialogs.dialogicons.qrc">
+          <normaloff>:/part/grid_lines</normaloff>:/part/grid_lines</iconset>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="zoom_speed_label">
+       <property name="text">
+        <string>Mousewheel zoom speed:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSlider" name="zoom_speed_slider">
+       <property name="minimumSize">
+        <size>
+         <width>140</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="value">
+        <number>50</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="invertedControls">
+        <bool>false</bool>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="show_icon_label_text">
+       <property name="text">
+        <string>Show Icon Labels:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QCheckBox" name="show_icon_labels">
+       <property name="text">
+        <string>(needs restart)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="button_box">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::RestoreDefaults</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
+   </property>
+  </action>
+ </widget>
+ <resources>
+  <include location="cadnano.gui.dialogs.dialogicons.qrc"/>
+ </resources>
+ <connections/>
+ <slots>
+  <slot>addPlugin()</slot>
+  <slot>handleButtonClick(QAbstractButton*)</slot>
+  <slot>setHoneycombRows(int)</slot>
+  <slot>setHoneycombCols(int)</slot>
+  <slot>setHoneycombSteps(int)</slot>
+  <slot>setSquareRows(int)</slot>
+  <slot>setSquareCols(int)</slot>
+  <slot>setSquareSteps(int)</slot>
+  <slot>setAutoScaf(int)</slot>
+  <slot>setStartupTool(int)</slot>
+  <slot>setZoomSpeed(int)</slot>
+ </slots>
+</ui>

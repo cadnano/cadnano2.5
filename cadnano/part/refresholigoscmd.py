@@ -1,5 +1,6 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
+
 
 class RefreshOligosCommand(UndoCommand):
     """
@@ -15,6 +16,7 @@ class RefreshOligosCommand(UndoCommand):
 
     This command is meant for non-undoable steps, like file-io.
     """
+
     def __init__(self, part):
         super(RefreshOligosCommand, self).__init__("refresh oligos")
         self._part = part
@@ -65,11 +67,10 @@ class RefreshOligosCommand(UndoCommand):
         # end for
 
         for strand in visited.keys():
-            strand.strandUpdateSignal.emit(strand)
+            strand.strandConnectionChangedSignal.emit(strand)
     # end def
 
     def undo(self):
         """Doesn't reassign """
-        pass
     # end def
 # end class

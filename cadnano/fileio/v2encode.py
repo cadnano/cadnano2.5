@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnenum import LatticeType
+from cadnano.proxies.cnenum import LatticeType
 from cadnano.fileio.lattice import HoneycombDnaPart
 
 FORMAT_VERSION = "2.0"

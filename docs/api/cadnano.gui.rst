@@ -1,16 +1,6 @@
 cadnano\.gui package
 ====================
 
-Subpackages
------------
-
-.. toctree::
-
-    cadnano.gui.controllers
-    cadnano.gui.plugins
-    cadnano.gui.ui
-    cadnano.gui.views
-
 Submodules
 ----------
 

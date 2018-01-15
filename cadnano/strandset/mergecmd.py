@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
+
 
 class MergeCommand(UndoCommand):
     """
@@ -19,6 +20,7 @@ class MergeCommand(UndoCommand):
     low_strandset_idx should be known ahead of time as a result of selection
     """
     # def __init__(self, strand_low, strand_high, low_strandset_idx, priority_strand):
+
     def __init__(self, strand_low, strand_high, priority_strand):
         super(MergeCommand, self).__init__("merge strands")
         # Store strands
@@ -36,7 +38,7 @@ class MergeCommand(UndoCommand):
         # update the new oligo length if it's not a loop
         if s_low_olg != s_high_olg:
             self._new_oligo._setLength(s_low_olg.length() + s_high_olg.length(),
-                                        emit_signals=True)
+                                       emit_signals=True)
 
         # Create the new_strand by copying the priority strand to
         # preserve its properties
@@ -63,7 +65,7 @@ class MergeCommand(UndoCommand):
 
     def redo(self):
         ss = self._s_set
-        doc = ss._document
+        ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
@@ -84,14 +86,14 @@ class MergeCommand(UndoCommand):
         nScL = new_strand.connectionLow()
         if nScL:
             if (new_strand.isForward() and nScL.isForward()) or \
-                (not new_strand.isForward() and not nScL.isForward()):
+                    (not new_strand.isForward() and not nScL.isForward()):
                 nScL.setConnectionHigh(new_strand)
             else:
                 nScL.setConnectionLow(new_strand)
         nScH = new_strand.connectionHigh()
         if nScH:
             if (new_strand.isForward() and nScH.isForward()) or \
-                (not new_strand.isForward() and not nScH.isForward()):
+                    (not new_strand.isForward() and not nScH.isForward()):
                 nScH.setConnectionLow(new_strand)
             else:
                 nScH.setConnectionHigh(new_strand)
@@ -114,7 +116,7 @@ class MergeCommand(UndoCommand):
 
     def undo(self):
         ss = self._s_set
-        doc = ss._document
+        ss._document
         s_low = self._strand_low
         s_high = self._strand_high
         new_strand = self._new_strand
@@ -134,14 +136,14 @@ class MergeCommand(UndoCommand):
         sLcL = s_low.connectionLow()
         if sLcL:
             if (s_low.isForward() and sLcL.isForward()) or \
-                (not s_low.isForward() and not sLcL.isForward()):
+                    (not s_low.isForward() and not sLcL.isForward()):
                 sLcL.setConnectionHigh(s_low)
             else:
                 sLcL.setConnectionLow(s_low)
         sHcH = s_high.connectionHigh()
         if sHcH:
             if (s_high.isForward() and sHcH.isForward()) or \
-                (not s_high.isForward() and not sHcH.isForward()):
+                    (not s_high.isForward() and not sHcH.isForward()):
                 sHcH.setConnectionLow(s_high)
             else:
                 sHcH.setConnectionHigh(s_high)

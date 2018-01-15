@@ -1,16 +1,24 @@
+v2.5.2
+------
+
+* Code: Reorganized to flatten module structure
+* Code: Bugfixes for issues #107, #108, #112
+* GUI: Legacy-style Sliceview for lattice designs
+* Installer: Update to PyQt 5.9.3 
+
 v2.5.1
 ------
 
-* API: Oligo.isLoop() -> isCircular()
-* I/O: v3 oligo property "is_loop" -> "is_circular"
+* API: Oligo.isLoop() → isCircular()
 * Code: flake8 linting (ignoring E226,E266,E731,E501)
+* Code: Bugfixes for issues #94, #95, #105
 * Docs: Scripting examples
 * Docs: How to build sphinx docs
-* Installer: Update to PyQt 5.8.2 
 * GUI: Updated styles to better match cadnano2
 * GUI: Improvements to sliceview grid
-* Code: Bugfixes for issues #94, #95, #105
+* Installer: Update to PyQt 5.8.2 
 * Installer: Windows shortcut icon
+* I/O: v3 oligo property "is_loop" → "is_circular"
 
 v2.5
 ----

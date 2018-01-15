@@ -2,16 +2,21 @@
 from array import array
 from operator import attrgetter
 from cadnano import util
-from cadnano.cnobject import CNObject
-from cadnano.cnproxy import ProxySignal
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
 from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
 from .insertioncmd import ChangeInsertionCommand
 from .modscmd import AddModsCommand, RemoveModsCommand
 from .resizecmd import ResizeCommand
 
-sixb = lambda x: x.encode('utf-8')
+
+def sixb(x): return x.encode('utf-8')
+
+
 ARRAY_TYPE = 'B'
-tostring = lambda x: x.tobytes().decode('utf-8')
+
+
+def tostring(x): return x.tobytes().decode('utf-8')
 
 
 class Strand(CNObject):
@@ -39,6 +44,7 @@ class Strand(CNObject):
         oligo (cadnano.oligo.Oligo): optional, defaults to None.
 
     """
+
     def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
         self._document = strandset.document()
         super(Strand, self).__init__(strandset)
@@ -141,7 +147,7 @@ class Strand(CNObject):
     strandXover5pRemovedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pRemovedSignal')
     """pyqtSignal(QObject, QObject): (strand3p, strand5p)"""
 
-    strandUpdateSignal = ProxySignal(CNObject, name='strandUpdateSignal')
+    strandConnectionChangedSignal = ProxySignal(CNObject, name='strandConnectionChangedSignal')
     """pyqtSignal(QObject): strand"""
 
     strandInsertionAddedSignal = ProxySignal(CNObject, object, name='strandInsertionAddedSignal')
@@ -337,7 +343,7 @@ class Strand(CNObject):
     # end def
 
     def applyAbstractSequence(self):
-        """Assigns virtual index from 5' to 3' on strand and it's complement
+        """Assigns virtual index from 5' to 3' on strand and its complement
         location.
         """
         abstract_seq = []
@@ -390,14 +396,12 @@ class Strand(CNObject):
         """Returns the absolute base_idx of the 3' end of the strand.
         overloaded in __init__
         """
-        pass
         # return self.idx3Prime
 
     def idx5Prime(self):
         """Returns the absolute base_idx of the 5' end of the strand.
         overloaded in __init__
         """
-        pass
         # return self.idx5Prime
 
     def dump5p(self):
@@ -560,7 +564,7 @@ class Strand(CNObject):
                 else:
                     return False
             else:
-                print("default", index_diff_H, index_diff_L)
+                # print("default", index_diff_H, index_diff_L)
                 return False
     # end def
 
@@ -812,12 +816,12 @@ class Strand(CNObject):
             idxL, idxH = cIdxL, nIdxL - 1
             insertions += self.insertionsOnStrand(idxL, idxH)
         else:
-            low_out = True
+            pass
         if cIdxL < nIdxH < cIdxH:
             idxL, idxH = nIdxH + 1, cIdxH
             insertions += self.insertionsOnStrand(idxL, idxH)
         else:
-            high_out = True
+            pass
         # this only called if both the above aren't true
         # if low_out and high_out:
         # if we move the whole strand, just clear the insertions out
@@ -851,7 +855,7 @@ class Strand(CNObject):
                 # print "keeping %s insertion at %d" % (self, key)
         # end for
 
-        ### ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
+        # ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
         return commands
     # end def
 

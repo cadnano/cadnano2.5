@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import GridType, LatticeType, StrandType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
 from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
+
 
 def decode(document, obj, emit_signals=False):
     """Parses a dictionary (obj) created from reading a json file and uses it
@@ -17,8 +17,10 @@ def decode(document, obj, emit_signals=False):
     num_bases = len(obj['vstrands'][0]['scaf'])
     if num_bases % 32 == 0:
         lattice_type = LatticeType.SQUARE
+        grid_type = GridType.SQUARE
     elif num_bases % 21 == 0:
         lattice_type = LatticeType.HONEYCOMB
+        grid_type = GridType.HONEYCOMB
     else:
         raise IOError("error decoding number of bases")
 
@@ -38,10 +40,9 @@ def decode(document, obj, emit_signals=False):
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")
-    part = document.createNucleicAcidPart(use_undostack=False)
+    part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
     part.setActive(True)
     setBatch(True)
-    delta = num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     vh_num_to_coord = {}
@@ -78,9 +79,9 @@ def decode(document, obj, emit_signals=False):
         vh_num = helix['num']
         row = helix['row']
         col = helix['col']
-        scaf= helix['scaf']
+        scaf = helix['scaf']
         # align row and columns to the center 0, 0
-        coord = (row -  delta_row, col - delta_column)
+        coord = (row - delta_row, col - delta_column)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
     # end for
@@ -122,16 +123,16 @@ def decode(document, obj, emit_signals=False):
                 stap_strand_set, scaf_strand_set = part.getStrandSets(vh_num)
 
             # validate file serialization of lists
-            assert( len(scaf) == len(stap) and
-                    len(scaf) == len(insertions) and
-                    len(insertions) == len(skips) )
+            assert(len(scaf) == len(stap) and
+                   len(scaf) == len(insertions) and
+                   len(insertions) == len(skips))
 
             # read scaffold segments and xovers
             for i in range(len(scaf)):
                 five_vh, five_idx, three_vh, three_idx = scaf[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i, five_vh,\
+                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i, five_vh,
                                        five_idx, three_vh, three_idx):
                     scaf_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
@@ -151,7 +152,7 @@ def decode(document, obj, emit_signals=False):
                 five_vh, five_idx, three_vh, three_idx = stap[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i, five_vh,\
+                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i, five_vh,
                                        five_idx, three_vh, three_idx):
                     stap_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
@@ -186,7 +187,7 @@ def decode(document, obj, emit_signals=False):
             # idx3p is 3' end of strand5p, idx5p is 5' end of strand3p
             try:
                 strand5p = scaf_strand_set.getStrand(idx5p)
-            except:
+            except Exception:
                 print(vh_num, idx5p)
                 print(scaf_strand_set.strand_heap)
                 print(stap_strand_set.strand_heap)
@@ -197,11 +198,11 @@ def decode(document, obj, emit_signals=False):
             else:
                 to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
             strand3p = to_scaf_strand_set.getStrand(idx3p)
-            part.createXover(   strand5p, idx5p,
-                                strand3p, idx3p,
-                                allow_reordering=True,
-                                update_oligo=False,
-                                use_undostack=False)
+            part.createXover(strand5p, idx5p,
+                             strand3p, idx3p,
+                             allow_reordering=True,
+                             update_oligo=False,
+                             use_undostack=False)
 
         # install staple xovers
         for (idx5p, to_vh_num, idx3p) in stap_xo[vh_num]:
@@ -213,11 +214,11 @@ def decode(document, obj, emit_signals=False):
             else:
                 to_stap_strand_set, to_scaf_strand_set = part.getStrandSets(to_vh_num)
             strand3p = to_stap_strand_set.getStrand(idx3p)
-            part.createXover(   strand5p, idx5p,
-                                strand3p, idx3p,
-                                allow_reordering=True,
-                                update_oligo=False,
-                                use_undostack=False)
+            part.createXover(strand5p, idx5p,
+                             strand3p, idx3p,
+                             allow_reordering=True,
+                             update_oligo=False,
+                             use_undostack=False)
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
@@ -275,7 +276,7 @@ def decode(document, obj, emit_signals=False):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except Exception:
                 print(strand, idx)
                 raise
         for key, mid in obj['modifications']['int_instances'].items():
@@ -283,10 +284,11 @@ def decode(document, obj, emit_signals=False):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except Exception:
                 print(strand, idx)
                 raise
 # end def
+
 
 def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
                         five_vh, five_idx,
@@ -304,16 +306,16 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
     if five_vh != vh_num and three_vh == vh_num:
         return True
     if (vh_num % 2 == 0 and five_vh == vh_num and
-        five_idx != base_idx - offset):
+            five_idx != base_idx - offset):
         return True
     if (vh_num % 2 == 0 and three_vh == vh_num and
-        three_idx != base_idx + offset):
+            three_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and five_vh == vh_num and
-        five_idx != base_idx + offset):
+            five_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and three_vh == vh_num and
-        three_idx != base_idx - offset):
+            three_idx != base_idx - offset):
         return True
     if five_vh == -1 and three_vh != -1:
         return True
@@ -321,6 +323,7 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
         return True
     return False
 # end def
+
 
 def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
     """
@@ -337,9 +340,9 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
     else:
         offset = -1
     if (vh_num % 2 == 0 and three_vh == vh_num and
-        three_idx != base_idx + offset):
+            three_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and three_vh == vh_num and
-        three_idx != base_idx - offset):
+            three_idx != base_idx - offset):
         return True
 # end def

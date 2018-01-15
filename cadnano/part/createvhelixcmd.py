@@ -1,12 +1,12 @@
 from ast import literal_eval
 import bisect
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(self, part, x, y, z, length,
                  id_num=None, properties=None,
-                 safe=True):
+                 safe=True, parity=None):
         """
         Args:
             safe (bool): safe must be True to update neighbors
@@ -15,7 +15,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
         self.part = part
         if id_num is None:
-            self.id_num = part._getNewIdNum()
+            self.id_num = part._getNewIdNum(parity=parity)
         else:
             part._reserveIdNum(id_num)
             self.id_num = id_num
@@ -36,13 +36,14 @@ class CreateVirtualHelixCommand(UndoCommand):
 
         self.threshold = 2.1*part.radius()
         self.safe = safe
+        self.old_limits = None
     # end def
 
     def redo(self):
         part = self.part
         id_num = self.id_num
         origin_pt = self.origin_pt
-        # need to always reserve an id
+        self.old_limits = part.getVirtualHelixOriginLimits()
         vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
 
         if self.safe:   # update all neighbors
@@ -72,9 +73,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         # since we're hashing on the object in the views do this first
         for neighbor_id in self.neighbors:
-            nneighbors = literal_eval(
-                            part.getVirtualHelixProperties(neighbor_id, 'neighbors')
-                        )
+            nneighbors = literal_eval(part.getVirtualHelixProperties(neighbor_id, 'neighbors'))
             nneighbors.remove(id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
 
@@ -84,6 +83,7 @@ class CreateVirtualHelixCommand(UndoCommand):
             part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         # clear out part references
         part._removeHelix(id_num)
+        part.setVirtualHelixOriginLimits(self.old_limits)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def
 # end class

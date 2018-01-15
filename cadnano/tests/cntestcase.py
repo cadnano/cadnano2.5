@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
-import os, io
+import os
+import io
 pjoin = os.path.join
 
 import pytest
 
 from pathsetup import TEST_PATH
-from cadnano.data.dnasequences import sequences
+from cadnano.extras.dnasequences import sequences
+
 
 @pytest.fixture()
 def cnapp():
     app = CNTestApp()
     yield app
     app.tearDown()
+
 
 class CNTestApp(object):
 
@@ -30,7 +33,7 @@ class CNTestApp(object):
         the set of staple sequences."""
         # set up the document
         inputfile = pjoin(TEST_PATH,
-                            "data", designname)
+                          "data", designname)
         document = self.document
         document.readFile(inputfile)
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 # make Wheels with:
-# python setup.py bdist_wheel --plat-name macosx_10_10_x86_64 --python-tag cp35.cp36
+# python setup.py bdist_wheel --plat-name macosx_10_12_x86_64 --python-tag cp36
 # python setup.py bdist_wheel --plat-name win_amd64 --python-tag cp35.cp36
 # twine upload dist/*
 
@@ -58,11 +58,11 @@ LONG_DESCRIPTION = __doc__
 
 PACKAGE_PATH = os.path.abspath(os.path.dirname(__file__))
 MODULE_PATH = pjoin(PACKAGE_PATH, 'cadnano')
-INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'install_exe')
+INSTALL_EXE_PATH = pjoin(MODULE_PATH, 'extras', 'install_exe')
 TESTS_PATH = pjoin(MODULE_PATH, 'tests')
 TEST_DATA_PATH = pjoin(TESTS_PATH, 'data')
-IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'ui', 'mainwindow', 'images')
-IMAGES_PATH2 = pjoin(MODULE_PATH, 'gui', 'ui', 'dialogs', 'images')
+IMAGES_PATH1 = pjoin(MODULE_PATH, 'gui', 'mainwindow', 'images')
+IMAGES_PATH2 = pjoin(MODULE_PATH, 'gui', 'dialogs', 'images')
 
 # batch files and launch scripts
 
@@ -78,7 +78,7 @@ cn_files += test_files + test_data_files
 
 entry_points = {'console_scripts': [
                 'cadnano = cadnano.bin.main:main',
-                'cadnanoinstall = cadnano.install_exe.cadnanoinstall:post_install'
+                'cadnanoinstall = cadnano.extras.install_exe.cadnanoinstall:post_install'
                 ]}
 
 if sys.platform == 'win32':
@@ -86,7 +86,7 @@ if sys.platform == 'win32':
         'scripts': 'Scripts',
     }
     cadnano_binaries = ['cadnano.exe']
-    cn_files += [pjoin('install_exe', 'cadnano.exe')]
+    cn_files += [pjoin('extras', 'install_exe', 'cadnano.exe')]
 else:
     cadnano_binaries = []
     path_scheme = {'scripts': 'bin'}
@@ -121,7 +121,8 @@ class CNINSTALL(_install):
                      msg="Running post install task")
 # end class
 
-if sys.argv[1] == 'install':
+
+if len(sys.argv) > 0 and sys.argv[1] == 'install':
     cmdclass = {'install': CNINSTALL}
 else:
     cmdclass = {'install': _install}
@@ -135,7 +136,8 @@ exclude_list = ['*.genbank', '*.fasta',
 cn_packages = find_packages(exclude=exclude_list)
 
 install_requires = ['sip>=4.19',
-                    'PyQt5>=5.8.2',
+                    'PyQt5>=5.9.2',
+                    'PyQt3D>=5.9.2',
                     'numpy>=1.10.0',
                     'pandas>=0.18',
                     'pytz>=2011k',

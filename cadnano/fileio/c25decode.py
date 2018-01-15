@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import StrandType, LatticeType
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import preferences as prefs
 from cadnano import setBatch, getReopen, setReopen
-from cadnano.color import intToColorHex
+# from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 
 from .lattice import HoneycombDnaPart, SquareDnaPart
 
 # hard code these for version changes
 PATH_BASE_WIDTH = 10
-PART_BASE_WIDTH = 0.34 # nanometers, distance between bases, pith
-SCALE_2_MODEL =  PART_BASE_WIDTH/PATH_BASE_WIDTH
+PART_BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
+SCALE_2_MODEL = PART_BASE_WIDTH / PATH_BASE_WIDTH
+
+
 def convertToModelZ(z):
     """ scale Z-axis coordinate to the model
     """
     return z * SCALE_2_MODEL
 # end def
+
 
 def decode(document, obj, emit_signals=True):
     """
@@ -48,7 +50,6 @@ def decode(document, obj, emit_signals=True):
     part = document.createNucleicAcidPart(use_undostack=False)
     part.setActive(True)
     setBatch(True)
-    delta = num_bases - 42
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
     property_dict = {}
@@ -84,13 +85,13 @@ def decode(document, obj, emit_signals=True):
     encoded_keys = ['eulerZ', 'repeats', 'bases_per_repeat',
                     'turns_per_repeat', 'z']
     model_keys = ['eulerZ', 'repeat_hint', 'bases_per_repeat',
-                    'turns_per_repeat', 'z']
+                  'turns_per_repeat', 'z']
     for helix in obj['vstrands']:
         vh_num = helix['num']
         row = helix['row']
         col = helix['col']
         # align row and columns to the center 0, 0
-        coord = (row -  delta_row, col - delta_column)
+        coord = (row - delta_row, col - delta_column)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
         property_dict[vh_num] = [helix[key] for key in encoded_keys]
@@ -142,9 +143,9 @@ def decode(document, obj, emit_signals=True):
                 fwd_ss = helix['rev_ss']
 
             # validate file serialization of lists
-            assert( len(fwd_ss) == len(rev_ss) and
-                    len(fwd_ss) == len(insertions) and
-                    len(insertions) == len(deletions) )
+            assert(len(fwd_ss) == len(rev_ss) and
+                   len(fwd_ss) == len(insertions) and
+                   len(insertions) == len(deletions))
 
             # read fwd_strandset segments and xovers
             for i in range(len(fwd_ss)):
@@ -153,7 +154,7 @@ def decode(document, obj, emit_signals=True):
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
                 if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i,
-                                        five_vh, five_idx, three_vh, three_idx):
+                                       five_vh, five_idx, three_vh, three_idx):
                     fwd_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     fwd_ss_seg[vh_num].append(i)  # end segment on a double crossover
@@ -173,7 +174,7 @@ def decode(document, obj, emit_signals=True):
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
                 if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i,
-                                        five_vh, five_idx, three_vh, three_idx):
+                                       five_vh, five_idx, three_vh, three_idx):
                     rev_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     rev_ss_seg[vh_num].append(i)  # end segment on a double crossover
@@ -214,11 +215,11 @@ def decode(document, obj, emit_signals=True):
                 strand3p = to_fwd_strandset.getStrand(idx3p)
             else:
                 strand3p = to_rev_strandset.getStrand(idx3p)
-            part.createXover(   strand5p, idx5p,
-                                strand3p, idx3p,
-                                allow_reordering=True,
-                                update_oligo=False,
-                                use_undostack=False)
+            part.createXover(strand5p, idx5p,
+                             strand3p, idx3p,
+                             allow_reordering=True,
+                             update_oligo=False,
+                             use_undostack=False)
 
         # install rev_strandset xovers
         for (idx5p, to_vh_num, to_strand3p, idx3p) in rev_ss_xo[vh_num]:
@@ -231,11 +232,11 @@ def decode(document, obj, emit_signals=True):
                 strand3p = to_fwd_strandset.getStrand(idx3p)
             else:
                 strand3p = to_rev_strandset.getStrand(idx3p)
-            part.createXover(   strand5p, idx5p,
-                                strand3p, idx3p,
-                                allow_reordering=True,
-                                update_oligo=False,
-                                use_undostack=False)
+            part.createXover(strand5p, idx5p,
+                             strand3p, idx3p,
+                             allow_reordering=True,
+                             update_oligo=False,
+                             use_undostack=False)
 
     # need to heal all oligo connections into a continuous
     # oligo for the next steps
@@ -288,7 +289,7 @@ def decode(document, obj, emit_signals=True):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except Exception:
                 print(strand, idx)
                 raise
         for key in obj['modifications']['int_instances'].items():
@@ -296,10 +297,11 @@ def decode(document, obj, emit_signals=True):
             strand, idx = part.getModStrandIdx(key)
             try:
                 strand.addMods(document, mid, idx, use_undostack=False)
-            except:
+            except Exception:
                 print(strand, idx)
                 raise
 # end def
+
 
 def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
                         five_vh, five_idx,
@@ -317,16 +319,16 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
     if five_vh != vh_num and three_vh == vh_num:
         return True
     if (vh_num % 2 == 0 and five_vh == vh_num and
-        five_idx != base_idx - offset):
+            five_idx != base_idx - offset):
         return True
     if (vh_num % 2 == 0 and three_vh == vh_num and
-        three_idx != base_idx + offset):
+            three_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and five_vh == vh_num and
-        five_idx != base_idx + offset):
+            five_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and three_vh == vh_num and
-        three_idx != base_idx - offset):
+            three_idx != base_idx - offset):
         return True
     if five_vh == -1 and three_vh != -1:
         return True
@@ -334,6 +336,7 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
         return True
     return False
 # end def
+
 
 def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
     """
@@ -350,9 +353,9 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
     else:
         offset = -1
     if (vh_num % 2 == 0 and three_vh == vh_num and
-        three_idx != base_idx + offset):
+            three_idx != base_idx + offset):
         return True
     if (vh_num % 2 == 1 and three_vh == vh_num and
-        three_idx != base_idx - offset):
+            three_idx != base_idx - offset):
         return True
 # end def

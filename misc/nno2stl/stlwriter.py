@@ -5,6 +5,7 @@
 import io
 import struct
 
+
 def write(filename, solids, format="binary"):
     if format == "binary":
         write_binary(filename, solids)
@@ -15,31 +16,34 @@ def write(filename, solids, format="binary"):
 # derived from stl.py in visvis
 # Copyright (C) 2012, Almar Klein
 # Visvis is distributed under the terms of the (new) BSD License.
+
+
 def write_binary(filename, solids):
     def write_vertex(vid, d_list, solid):
         v = solid.vertices[vid]
         for val in v:
-            d_list.append( struct.pack('<f', val) ) # 4 byte float
+            d_list.append(struct.pack('<f', val))  # 4 byte float
     # end def
 
     with io.open(filename, "wb") as fd:
         fd.write(struct.pack('<B', 0)*80)   # 80 bytes header
-        fd.write(struct.pack('<I', sum([len(s.faces) for s in solids]))) # 4 bytes
+        fd.write(struct.pack('<I', sum([len(s.faces) for s in solids])))  # 4 bytes
 
         data_list = []
         for solid in solids:
             for face in solid.faces:
                 for val in face.normal:
-                    data_list.append( struct.pack('<f', val) )  # 4 byte float
+                    data_list.append(struct.pack('<f', val))  # 4 byte float
                 write_vertex(face.v1, data_list, solid)
                 write_vertex(face.v2, data_list, solid)
                 write_vertex(face.v3, data_list, solid)
-                data_list.append( struct.pack('<H', 0) )            # attribute byte count, set to 0
+                data_list.append(struct.pack('<H', 0))            # attribute byte count, set to 0
         # end for solid
         data = ''.encode('ascii').join(data_list)
         fd.write(data)
     # end with
 # end def
+
 
 def write_ascii(filename, solids):
     def write_vertex(vid, fd, solid):

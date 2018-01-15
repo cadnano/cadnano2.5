@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
-import cadnano.preferences as prefs
+from cadnano.views.pathview import pathstyles
 import random
 
 
@@ -16,6 +16,7 @@ class RemoveStrandCommand(UndoCommand):
         solo (:obj:`bool`, optional): set to True if only one strand is being
             removed to minimize signaling
     """
+
     def __init__(self, strandset, strand, solo=True):
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
@@ -39,8 +40,8 @@ class RemoveStrandCommand(UndoCommand):
         else:
             self._new_oligo3p = olg3p = olg.shallowCopy()
             olg3p.setStrand5p(self._old_strand3p)
-            # color_list = prefs.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
-            color_list = prefs.STAP_COLORS
+            # color_list = styles.STAP_COLORS if strandset.isStaple() else prefs.SCAF_COLORS
+            color_list = pathstyles.STAP_COLORS
             color = random.choice(color_list)
             olg3p._setColor(color)
             olg3p.refreshLength(emit_signals=True)
@@ -80,7 +81,7 @@ class RemoveStrandCommand(UndoCommand):
                 id_num = strandset.idNum()
                 # Why is this signal emitted here?
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand5p.strandUpdateSignal.emit(strand5p)
+            strand5p.strandConnectionChangedSignal.emit(strand5p)
         # end if
         if strand3p is not None:
             if not oligo.isCircular():
@@ -92,7 +93,7 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand3p.strandUpdateSignal.emit(strand3p)
+            strand3p.strandConnectionChangedSignal.emit(strand3p)
         # end if
         # Emit a signal to notify on completion
         strand.strandRemovedSignal.emit(strand)
@@ -157,15 +158,15 @@ class RemoveStrandCommand(UndoCommand):
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand5p.strandUpdateSignal.emit(strand5p)
-            strand.strandUpdateSignal.emit(strand)
+            strand5p.strandConnectionChangedSignal.emit(strand5p)
+            strand.strandConnectionChangedSignal.emit(strand)
 
         if strand3p is not None:
             if self._solo:
                 part = strandset.part()
                 id_num = strandset.idNum()
                 part.partActiveVirtualHelixChangedSignal.emit(part, id_num)
-            strand3p.strandUpdateSignal.emit(strand3p)
-            strand.strandUpdateSignal.emit(strand)
+            strand3p.strandConnectionChangedSignal.emit(strand3p)
+            strand.strandConnectionChangedSignal.emit(strand)
     # end def
 # end class

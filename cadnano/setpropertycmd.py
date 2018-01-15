@@ -1,4 +1,4 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 
 class SetPropertyCommand(UndoCommand):
@@ -10,6 +10,7 @@ class SetPropertyCommand(UndoCommand):
         key (str): property key
         value (any): new value
     """
+
     def __init__(self, objs, key, value):
         super(SetPropertyCommand, self).__init__("change property")
         self._objs = objs
@@ -42,6 +43,7 @@ class SetVHPropertyCommand(UndoCommand):
         key (str): property key
         value (any): new value
     """
+
     def __init__(self, part, id_nums, keys, values, safe):
         super(SetVHPropertyCommand, self).__init__("change VirtualHelix property")
         self._part = part

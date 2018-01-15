@@ -23,6 +23,6 @@ for vh_id in vhs[:3]:         # display first 3 vhs
     fwd_ss, rev_ss = part.getStrandSets(vh_id)
     print('VH{0}'.format(vh_id))
     print('\t', fwd_ss, '\t', [s.idxs() for s in fwd_ss.strands()], '\n\t\t\t\t',
-                              [s.getColor() for s in fwd_ss.strands()])
+          [s.getColor() for s in fwd_ss.strands()])
     print('\t', rev_ss, '\t', [s.idxs() for s in rev_ss.strands()], '\n\t\t\t\t',
-                              [s.getColor() for s in rev_ss.strands()])
+          [s.getColor() for s in rev_ss.strands()])

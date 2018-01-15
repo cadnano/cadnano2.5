@@ -43,6 +43,7 @@ class EncoderforPandas(json.JSONEncoder):
     """
     Special encoder to coerce numpy number types into python types.
     """
+
     def default(self, obj):
         if isinstance(obj, (np.integer, np.floating, np.bool_)):
             return obj.item()
@@ -55,7 +56,7 @@ class EncoderforPandas(json.JSONEncoder):
         else:
             try:
                 return super(EncoderforPandas, self).default(obj)
-            except:
+            except Exception:
                 print(type(obj))
                 raise
 # end class

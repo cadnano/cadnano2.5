@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/pathtools">
+        <file alias="dlg_addseq">images/path-addseq.svg</file>
+        <file alias="dlg_select">images/path-edit_32.png</file>
+        <file alias="dlg_create">images/path-force-xover.png</file>
+        <file alias="dlg_paint">images/path-paint_48.png</file>
+    </qresource>
+    <qresource prefix="/part">
+        <file alias="dlg_honeycomb">images/part-honeycomb.png</file>
+        <file alias="dlg_square">images/part-square.png</file>
+        <file alias="grid_circles">images/grid-circles.png</file>
+        <file alias="grid_lines">images/grid-lines.png</file>
+        <file alias="grid_points">images/grid-points.png</file>
+    </qresource>
+</RCC>

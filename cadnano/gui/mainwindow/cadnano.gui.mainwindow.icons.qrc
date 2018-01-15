@@ -1,0 +1,82 @@
+<RCC>
+    <qresource prefix="/filetools">
+        <file alias="svg">images/data-svg.png</file>
+        <file alias="new">images/data-new_32.png</file>
+        <file alias="open">images/data-open_32.png</file>
+        <file alias="save">images/data-save_32.png</file>
+        <file alias="export">images/data-export.png</file>
+    </qresource>
+    <qresource prefix="/parttools">
+        <file alias="filter-scaf">images/part-filter-scaf.png</file>
+        <file alias="filter-stap">images/part-filter-stap.png</file>
+        <file alias="filter-strand">images/part-filter-strand.png</file>
+        <file alias="filter-handle">images/part-filter-helix.png</file>
+        <file alias="filter-part">images/part-filter-part.png</file>
+        <file alias="filter-xover">images/part-filter-xover.png</file>
+        <file alias="filter-endpoint">images/part-filter-endpoint.png</file>
+        <file alias="new-honeycomb">images/part-new-honeycomb.png</file>
+        <file alias="new-square">images/part-new-square.png</file>
+        <file alias="new-hpx">images/part-new-hpx.png</file>
+        <file alias="new-spx">images/part-new-spx.png</file>
+        <file alias="renum">images/part-renum.png</file>
+        <file alias="new-origami">images/part-new-origami.png</file>
+        <file alias="new-dna">images/part-new-dna.png</file>
+        <file alias="outliner">images/inspector-view.png</file>
+        <file alias="hcpro">images/part-new-hcpro.png</file>
+        <file alias="sqpro">images/part-new-sqpro.png</file>
+        <file alias="filter-pre-pxover">images/part-filter-pre-pxover.png</file>
+        <file alias="filter-pre-axover">images/part-filter-pre-axover.png</file>
+        <file alias="filter-odd">images/part-filter-odd.png</file>
+        <file alias="filter-even">images/part-filter-even.png</file>
+        <file alias="filter-rev">images/part-filter-rev.png</file>
+        <file alias="filter-fwd">images/part-filter-fwd.png</file>
+        <file alias="filter-handle-alt">images/part-filter-helix-disabled.png</file>
+        <file alias="filter-xover-disabled">images/part-filter-xover-disabled.png</file>
+        <file alias="filter-endpoint-disabled">images/part-filter-endpoint-disabled.png</file>
+        <file alias="new-honeycomb-disabled">images/part-new-honeycomb-disabled.png</file>
+        <file alias="new-square-disabled">images/part-new-square-disabled.png</file>
+        <file alias="path">images/path-view.png</file>
+        <file alias="slice">images/slice-view.png</file>
+        <file alias="sim">images/sim-view.png</file>
+        <file alias="console">images/console-view.png</file>
+    </qresource>
+    <qresource prefix="/slicetools">
+        <file alias="del-last">images/slice-delete-last.png</file>
+        <file alias="move">images/slice-move.png</file>
+        <file alias="renumber">images/slice-renumber.png</file>
+        <file alias="select">images/slice-edit.png</file>
+        <file alias="go-last">images/slice-go-last.png</file>
+        <file alias="go-first">images/slice-go-first.png</file>
+        <file alias="create-helix">images/slice-create-helix.png</file>
+        <file alias="move-helix">images/slice-move-helix.png</file>
+        <file alias="snap-helix">images/slice-snap-helix.png</file>
+        <file alias="select-snap-angles">images/slice-snap-angles.png</file>
+        <file alias="new-dna-part">images/slice-new-part.png</file>
+        <file alias="select-helix">images/slice-select-helix.png</file>
+        <file alias="grid-circles">images/grid-circles.png</file>
+        <file alias="grid-lines">images/grid-lines.png</file>
+        <file alias="grid-points">images/grid-points.png</file>
+    </qresource>
+    <qresource prefix="/pathtools">
+        <file alias="autobreak">images/path-autobreak.png</file>
+        <file alias="modify">images/path-modify.png</file>
+        <file alias="add-bases">images/add-bases.svg</file>
+        <file alias="addseq">images/path-addseq.png</file>
+        <file alias="remove-bases">images/remove-bases.svg</file>
+        <file alias="frame">images/path-frame.png</file>
+        <file alias="move">images/path-move.png</file>
+        <file alias="select">images/path-edit.png</file>
+        <file alias="paint">images/path-paint.png</file>
+        <file alias="create">images/path-create.png</file>
+        <file alias="nick">images/path-nick.png</file>
+        <file alias="insert">images/path-insert.png</file>
+        <file alias="skip">images/path-skip.png</file>
+        <file alias="mod">images/path-mod.png</file>
+        <file alias="autostaple">images/path-autostaple.png</file>
+        <file alias="create-disabled">images/path-create-disabled.png</file>
+    </qresource>
+    <qresource prefix="/outlinericons">
+        <file alias="lock">images/outliner-lock.svg</file>
+        <file alias="eye">images/outliner-eye.svg</file>
+    </qresource>
+</RCC>

@@ -1,4 +1,5 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
+
 
 class AddModsCommand(UndoCommand):
     def __init__(self, document, strand, idx, mod_id):
@@ -29,6 +30,7 @@ class AddModsCommand(UndoCommand):
     # end def
 # end class
 
+
 class RemoveModsCommand(UndoCommand):
     def __init__(self, document, strand, idx, mod_id):
         super(RemoveModsCommand, self).__init__()
@@ -41,7 +43,7 @@ class RemoveModsCommand(UndoCommand):
 
     def redo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
+        strand.isStaple()
         mid = self._mod_id
         part = strand.part()
         idx = self._idx
@@ -51,7 +53,7 @@ class RemoveModsCommand(UndoCommand):
 
     def undo(self):
         strand = self._strand
-        isstaple = strand.isStaple()
+        strand.isStaple()
         mid = self._mod_id
         part = strand.part()
         idx = self._idx

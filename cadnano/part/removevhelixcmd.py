@@ -1,7 +1,7 @@
 from ast import literal_eval
 import bisect
 
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 
 
 class RemoveVirtualHelixCommand(UndoCommand):
@@ -9,6 +9,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
     RemoveVirtualHelixCommand. redo clears the active vh, removes vh from
     neighbors, emits appropriate signals.
     """
+
     def __init__(self, part, id_num):
         super(RemoveVirtualHelixCommand, self).__init__("remove virtual helix")
         self.part = part
@@ -31,8 +32,8 @@ class RemoveVirtualHelixCommand(UndoCommand):
         part.clearActiveVirtualHelix()
         for neighbor_id in self.neighbors:
             nneighbors = literal_eval(
-                            part.getVirtualHelixProperties(neighbor_id, 'neighbors')
-                        )
+                part.getVirtualHelixProperties(neighbor_id, 'neighbors')
+            )
             nneighbors.remove(id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
         # signaling the view is two parts to clean up signals properly
@@ -48,8 +49,8 @@ class RemoveVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         for neighbor_id in self.neighbors:
             nneighbors = literal_eval(
-                            part.getVirtualHelixProperties(neighbor_id, 'neighbors')
-                        )
+                part.getVirtualHelixProperties(neighbor_id, 'neighbors')
+            )
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
         vh = part._createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)

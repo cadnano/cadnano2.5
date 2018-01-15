@@ -10,10 +10,10 @@ import numpy as np
 import pandas as pd
 
 from cadnano import util
-from cadnano.cnobject import CNObject
+from cadnano.proxies.cnobject import CNObject
 from .virtualhelix import VirtualHelix
-from cadnano.cnproxy import ProxySignal
-from cadnano.cnenum import GridType, PartType, PointType
+from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnenum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
 from cadnano.part.part import Part
 from cadnano.strandset import StrandSet
@@ -41,7 +41,6 @@ def _defaultProperties(id_num):
              ('color', '#00000000'),
              # ('eulerZ', 17.143*2),    # 0.5*360/10.5
              ('eulerZ', 0.),
-             ('scamZ', 10.),
              ('neighbor_active_angle', 0.0),
              ('neighbors', '[]'),
              ('bases_per_repeat', 21),
@@ -54,9 +53,9 @@ def _defaultProperties(id_num):
              ]
     return tuple(zip(*props))
 # end def
+
+
 VH_PROPERTY_KEYS = set([x for x in _defaultProperties(0)[0]])
-
-
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
 
@@ -66,9 +65,13 @@ def _defaultDataFrame(size):
     df = pd.DataFrame([row for i in range(size)], columns=columns)
     return df
 # end def
+
+
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
 DEFAULT_RADIUS = 1.125  # nm
+HONEYCOMB_SUB_STEP_SIZE = 7
+SQUARE_SUB_STEP_SIZE = 8
 
 
 class NucleicAcidPart(Part):
@@ -90,16 +93,10 @@ class NucleicAcidPart(Part):
         `*args`: Variable length argument list.
         `**kwargs`: Arbitrary keyword arguments.
     """
-    _STEP_SIZE = 21  # this is the period (in bases) of the part lattice
-    _TURNS_PER_STEP = 2
-    _HELICAL_PITCH = _STEP_SIZE / _TURNS_PER_STEP
-    _TWIST_PER_BASE = 360 / _HELICAL_PITCH  # degrees
-    _BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
-    _SUB_STEP_SIZE = _STEP_SIZE / 3
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
 
-    #TODO[NF]:  Change usages of these strings to constants throughought files
+    # TODO[NF]:  Change usages of these strings to constants throughout files
     _FLOAT_PROPERTY_KEYS = [
         'bases_per_repeat',
         'bases_per_turn',
@@ -108,7 +105,6 @@ class NucleicAcidPart(Part):
         'length',
         'minor_groove_angle',
         'neighbor_active_angle',
-        'scamZ',
         'turns_per_repeat',
         'twist_per_base',
         'z'
@@ -120,10 +116,9 @@ class NucleicAcidPart(Part):
         return NucleicAcidPart.__count
 
     def __init__(self, *args, **kwargs):
-        """
-        """
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
+        grid_type = kwargs.get('grid_type', GridType.HONEYCOMB)
         if do_copy:
             return
 
@@ -132,6 +127,21 @@ class NucleicAcidPart(Part):
         self._mods = {'int_instances': {},
                       'ext_instances': {}}
         self._oligos = set()
+
+        # Helix parameters
+        if grid_type == GridType.HONEYCOMB:
+            self._STEP_SIZE = 21
+            self._SUB_STEP_SIZE = 7
+            self._TURNS_PER_STEP = 2
+        elif grid_type == GridType.SQUARE:
+            self._STEP_SIZE = 32
+            self._SUB_STEP_SIZE = 8
+            self._TURNS_PER_STEP = 3
+        else:
+            raise NotImplementedError("Unrecognized GridType")
+        self._HELICAL_PITCH = self._STEP_SIZE / self._TURNS_PER_STEP
+        self._TWIST_PER_BASE = 360 / self._HELICAL_PITCH  # degrees
+        self._BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
 
         # Runtime state
         self._active_base_index = self._STEP_SIZE
@@ -150,9 +160,10 @@ class NucleicAcidPart(Part):
         gps['crossover_span_angle'] = 45
         gps['max_vhelix_length'] = self._STEP_SIZE * 2
         gps['neighbor_active_angle'] = ''
-        gps['grid_type'] = GridType.HONEYCOMB
+        gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
         gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
+        gps['workplane_idxs'] = (3, 35)
 
         ############################
         # Begin low level attributes
@@ -210,8 +221,12 @@ class NucleicAcidPart(Part):
         self.delta3D_scratch = np.empty((1,), dtype=float)
 
         # ID assignment
-        self.recycle_bin = []
-        self._highest_id_num_used = -1  # Used in _reserveHelixIDNumber
+        self.recycle_bin = {
+            0: [],
+            1: []
+        }
+        self._highest_even_id_num_used = -2
+        self._highest_odd_id_num_used = -1
     # end def
 
     # B. Virtual Helix
@@ -252,8 +267,9 @@ class NucleicAcidPart(Part):
     """self, virtual_helix"""
 
     def __repr__(self):
-        cls_name = self.__class__.__name__
-        return "<%s %s>" % (cls_name, str(id(self))[-4:])
+        _id = str(id(self))[-4:]
+        _name = self.__class__.__name__
+        return '%s_%s_%s' % (_name, -1, _id)
 
     def _resetOriginCache(self):
         self._origin_cache = {}
@@ -303,7 +319,8 @@ class NucleicAcidPart(Part):
         new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
 
         new_vhg.recycle_bin = self.recycle_bin
-        new_vhg._highest_id_num_used = self._highest_id_num_used
+        new_vhg._highest_even_id_num_used = self._highest_even_id_num_used
+        new_vhg._highest_odd_id_num_used = self._highest_odd_id_num_used
         return new_vhg
     # end def
 
@@ -356,32 +373,66 @@ class NucleicAcidPart(Part):
         return self._virtual_helices_set[id_num]
     # end def
 
-    def _getNewIdNum(self):
-        """Query the lowest available (unused) id_num. Internally id numbers are
-        recycled when virtual helices are deleted.
+    def _getNewIdNum(self, parity=None):
+        """
+        Return the lowest id_num that is both currently available and that is
+        even or odd according to parity (if specified).
+
+        This method only returns an ID number; it does not take the ID number
+        from the pool of available ID numbers.  When an ID number is used,
+        _reserveIdNum must be called. Internally ID numbers are recycled when
+        virtual helices are deleted.
+
+        Args:
+            parity (int): 1 or 0 depending on if the parity of the ID should
+            be odd or even.  If this is None, the next available number will
+            be used
 
         Returns:
-            int: ID number
+            int: a valid ID number
         """
-        if len(self.recycle_bin):
-            return nsmallest(1, self.recycle_bin)[0]
+        _even = 0
+        _odd = 1
+        if parity is None:
+            merged_recycle_bin = self.recycle_bin.get(_even) + self.recycle_bin.get(_odd)
+            if len(merged_recycle_bin):
+                return nsmallest(1, merged_recycle_bin)[0]
+            else:
+                return min(self._highest_odd_id_num_used + 2,
+                           self._highest_even_id_num_used + 2)
+        elif parity is _odd:
+            if len(self.recycle_bin.get(_odd)):
+                return nsmallest(1, self.recycle_bin.get(_odd))[0]
+            else:
+                return self._highest_odd_id_num_used + 2
+        elif parity is _even:
+            if len(self.recycle_bin.get(_even)):
+                return nsmallest(1, self.recycle_bin.get(_even))[0]
+            else:
+                return self._highest_even_id_num_used + 2
         else:
-            # use self._highest_id_num_used if the recycle bin is empty
-            # and _highest_id_num_used + 1 is not in the reserve bin
-            return self._highest_id_num_used + 1
+            raise AttributeError('Invalid parity passed to _getNewIdNum:  %s' % parity)
     # end def
 
-    def getIdNumMax(self):
-        """The max id number
+    def getMaxIdNum(self, parity=None):
+        """
+        Return the highest ID number used so far.
 
         Returns:
             int: max virtual helix ID number used
         """
-        return self._highest_id_num_used
-    # end def
+        if parity is None:
+            return max(self._highest_even_id_num_used, self._highest_odd_id_num_used)
+        elif parity is 0:
+            return self._highest_even_id_num_used
+        elif parity is 1:
+            return self._highest_odd_id_num_used
+        else:
+            raise AttributeError('Invalid parity passed to getMaxIdNum:  %s' % parity)
 
     def _reserveIdNum(self, requested_id_num):
-        """Reserves and returns a unique numerical id_num appropriate for a
+        """
+        Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
 
@@ -389,28 +440,54 @@ class NucleicAcidPart(Part):
             requested_id_num (int): virtual helix ID number
         """
         num = requested_id_num
+        parity = requested_id_num % 2
         assert num >= 0, int(num) == num
         # assert not num in self._number_to_virtual_helix
-        if num in self.recycle_bin:
-            self.recycle_bin.remove(num)
+        if num in self.recycle_bin.get(parity):
+            self.recycle_bin.get(parity, {}).remove(num)
             # rebuild the heap since we removed a specific item
-            heapify(self.recycle_bin)
-        if self._highest_id_num_used < num:
-            self._highest_id_num_used = num
+            heapify(self.recycle_bin.get(parity, {}))
+        if parity is 0 and self._highest_even_id_num_used < num:
+            self._highest_even_id_num_used = num
+        elif parity is 1 and self._highest_odd_id_num_used < num:
+            self._highest_odd_id_num_used = num
         self.reserved_ids.add(num)
     # end def
 
     def _recycleIdNum(self, id_num):
-        """The caller's contract is to ensure that id_num is not used in *any*
+        """
+        The caller's contract is to ensure that id_num is not used in *any*
         helix at the time of the calling of this function (or afterwards, unless
         `reserveIdNumForHelix` returns the id_num again).
 
         Args:
             id_num (int): virtual helix ID number
         """
-        heappush(self.recycle_bin, id_num)
+        parity = id_num % 2
+        if parity is 0:
+            heappush(self.recycle_bin.get(0), id_num)
+            self._highest_even_id_num_used = id_num-2
+        else:
+            heappush(self.recycle_bin.get(1), id_num)
+            self._highest_odd_id_num_used = id_num-2
         self.reserved_ids.remove(id_num)
     # end def
+
+    def _sanity_check_id_numbers(self):
+        """
+        Run a sanity check to ensure that the data structures that hold ID
+        numbers make sense.
+
+        Returns:
+            None
+
+        """
+        # Recycle bin
+        assert 0 in self.recycle_bin
+        assert 1 in self.recycle_bin
+
+        assert all(x % 2 == 0 for x in self.recycle_bin.get(0))
+        assert all(x % 2 == 1 for x in self.recycle_bin.get(1))
 
     def getCoordinates(self, id_num):
         """Return a view onto the numpy array for a given id_num
@@ -522,6 +599,11 @@ class NucleicAcidPart(Part):
         self.origin_limits = (xLL, yLL, xUR, yUR)
     # end def
 
+    def setVirtualHelixOriginLimits(self, limits):
+        # TODO[NF]:  Docstring
+        assert len(limits) is 4
+        self.origin_limits = limits[0], limits[1], limits[2], limits[3]
+
     def getVirtualHelixOriginLimits(self):
         """Retuns a pair of coordinates bounding the lower-left and upper-right
         coordinates of the part.
@@ -603,8 +685,7 @@ class NucleicAcidPart(Part):
         hi_endpoints.update([x - 1 for x in r_endpts_lo])
         hi_endpoints.update(f_endpts_hi)
         hi_endpoints.update(r_endpts_hi)
-        hi_endpoints = list(hi_endpoints)
-        hi_endpoints.sort()
+        hi_endpoints = sorted(hi_endpoints)
 
         """ 3. now iterate through the strands and
         convert to
@@ -681,7 +762,7 @@ class NucleicAcidPart(Part):
         Returns:
             int: index of right most base in all :class:`StrandSets`
         """
-        ret = self._STEP - 1
+        ret = self._STEP_SIZE - 1
         fwd_strandsets = self.fwd_strandsets
         rev_strandsets = self.rev_strandsets
         for id_num in self.reserved_ids:
@@ -708,12 +789,10 @@ class NucleicAcidPart(Part):
             coord_pts += delta  # use += to modify the view
             fwd_pts += delta  # use += to modify the view
             rev_pts += delta  # use += to modify the view
-            # print("old origin", self.locationQt(id_num, 15./self.radius()))
             origin_pts[id_num, :] += delta_origin
-            # print("new origin", self.locationQt(id_num, 15./self.radius()))
         try:
             self.vh_properties.iloc[list(id_nums), Z_PROP_INDEX] += delta[2]
-        except:
+        except Exception:
             print(list(id_nums), Z_PROP_INDEX)
             raise
         self._setVirtualHelixOriginLimits()
@@ -1104,7 +1183,7 @@ class NucleicAcidPart(Part):
         mgroove = math.radians(mgroove)
 
         # right handed rotates clockwise with increasing index / z
-        fwd_angles = [-i*twist_per_base + eulerZ_new for i in range(num_points)]
+        fwd_angles = [-i*twist_per_base + eulerZ_new for i in range(int(num_points))]
         rev_angles = [a + mgroove for a in fwd_angles]
         z_pts = BW*np.arange(index, num_points + index)
 
@@ -1179,7 +1258,8 @@ class NucleicAcidPart(Part):
             ValueError:
         """
         if id_num_list is None:
-            lim = self._highest_id_num_used + 1
+            lim = max(self._highest_even_id_num_used + 2,
+                      self._highest_odd_id_num_used + 2)
             props = self.vh_properties.iloc[:lim]
             props = props.to_dict(orient='list')
             origins = self._origin_pts[:lim]
@@ -1221,8 +1301,8 @@ class NucleicAcidPart(Part):
         out = dict((k, v.item()) if isinstance(v, (np.float64, np.int64, np.bool_))
                    else (k, v) for k, v in zip(series.index, series.tolist()))
         if inject_extras:
-            bpr = out['bases_per_repeat']
-            tpr = out['turns_per_repeat']
+            bpr = float(out['bases_per_repeat'])
+            tpr = float(out['turns_per_repeat'])
             out['bases_per_turn'] = bpr / tpr
             out['twist_per_base'] = tpr*360. / bpr
         return out
@@ -1275,25 +1355,27 @@ class NucleicAcidPart(Part):
                 raise IndexError("id_num {} does not exists".format(id_num))
 
         # Ensure that the values that are set are floats as appropriate
-        if not isinstance(keys, str):
-            # TODO[NF]:  Change this to logger
-            print('Encountered a non-string key:  %s' % keys)
-        # TODO[NF]:  If keys is somehow a list, values won't be cast properly
-        # TODO[NF]:  Add UI-side validation of inputs
-        if keys in self._FLOAT_PROPERTY_KEYS:
-            try:
-                values = float(values)
-            except ValueError:
-                print('Validation failed:  attempted to set %s to %s' % (keys,
-                                                                         values))
-        self.vh_properties.loc[id_num, keys] = values
+        keys_list = [keys] if isinstance(keys, str) else keys
+        values_list = [values] if isinstance(values, str) else values
 
-        if not isinstance(values, (tuple, list)):
-            keys, values = (keys,), (values,)
+        for index, key in enumerate(keys_list):
+            if key in self._FLOAT_PROPERTY_KEYS:
+                try:
+                    values_list[index] = float(values_list[index])
+                except ValueError:
+                    print('Validation failed:  attempted to set %s to %s' % (key,
+                                                                             values_list[index]))
+
+        for index, key in enumerate(keys_list):
+            try:
+                self.vh_properties.loc[id_num, (key)] = values_list[index]
+            except KeyError:
+                pass
+
         if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(
-                self, id_num, self.getVirtualHelix(id_num), keys, values)
-    # end
+                self, id_num, self.getVirtualHelix(id_num), keys_list, values_list)
+    # end def
 
     def locationQt(self, id_num, scale_factor=1.0):
         """ Y-axis is inverted in Qt +y === DOWN
@@ -1373,6 +1455,7 @@ class NucleicAcidPart(Part):
         self.vh_properties.loc[id_num, 'length'] = final_size
         # print("New max:", self.vh_properties['length'].idxmax(),
         #         self.vh_properties['length'].max())
+        self._group_properties['max_vhelix_length'] = self.vh_properties['length'].max()
         # return 0, self.vh_properties['length'].idxmax()
         return self.zBoundsIds()
     # end def
@@ -1393,7 +1476,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def _removeHelix(self, id_num):
-        """Remove a helix and recycle it's `id_num`
+        """Remove a helix and recycle its `id_num`
 
         Args:
             id_num (int): virtual helix ID number
@@ -1510,7 +1593,7 @@ class NucleicAcidPart(Part):
         axis_pts = self.axis_pts
         try:
             axis_pts[idx_start:relocate_idx_end] = axis_pts[idx_stop:total_points]
-        except:
+        except Exception:
             err = "idx_start {}, relocate_idx_end {}, idx_stop {}, total_points {}, length {}"
             print(err.format(idx_start, relocate_idx_end, idx_stop, total_points, length))
             raise
@@ -2220,10 +2303,10 @@ class NucleicAcidPart(Part):
     # end
 
     def subStepSize(self):
-        """Get the substep size
+        """Get the substep size. Used for major grid line spacing.
 
         Returns:
-            int:
+            int: The substep size.
         """
         return self._SUB_STEP_SIZE
     # end def
@@ -2337,7 +2420,7 @@ class NucleicAcidPart(Part):
 
     # end def
     def boundDimensions(self, scale_factor=1.0):
-        """Returns a tuple of rectangle definining the XY limits of a part"""
+        """Returns a tuple of rectangle defining the XY limits of a part"""
         DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
         if xLL > -DMIN:
@@ -2382,7 +2465,7 @@ class NucleicAcidPart(Part):
 
     def maxBaseIdx(self, id_num):
         o_and_s = self.getOffsetAndSize(id_num)
-        size = 42 if o_and_s is None else o_and_s[1]
+        size = self._STEP_SIZE*2 if o_and_s is None else o_and_s[1]
         return size
     # end def
 
@@ -2534,7 +2617,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def createVirtualHelix(self, x, y, z=0.0, length=42, id_num=None,
-                           properties=None, safe=True, use_undostack=True):
+                           properties=None, safe=True, use_undostack=True,
+                           parity=None):
         """Create new VirtualHelix by calling CreateVirtualHelixCommand.
 
         Args:
@@ -2542,16 +2626,116 @@ class NucleicAcidPart(Part):
             y (float): y coordinate
             z (float): z coordinate
             length (int): Size of VirtualHelix.
+            id_num (int): The id number that this VirtualHelix should correspond to
             properties (tuple): Tuple of two lists: `keys` and `values`, which
                 contain full set of properties for the VirualHelix.
             safe (bool): Update neighbors otherwise,
                 neighbors need to be explicitly updated
-
-            use_undostack (bool): Set to False to disable undostack for bulk
+            use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
         """
-        c = CreateVirtualHelixCommand(self, x, y, z, length, id_num=id_num, properties=properties, safe=safe)
+        valid_pts = np.where(self._origin_pts != np.inf)
+        x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
+        vps = np.around(self._origin_pts[valid_pts], decimals=9)
+        if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
+            print("vh already present at coords ({}, {})".format(x9, y9))
+            print(util.trace(5))
+            return
+        max_len = self.getProperty('max_vhelix_length')
+        if length < max_len:
+            length = max_len
+        c = CreateVirtualHelixCommand(self, x, y, z, length,
+                                      id_num=id_num,
+                                      properties=properties,
+                                      safe=safe,
+                                      parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
+    # end def
+
+    def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
+                                  safe=None, use_undo_stack=True, parity=None):
+        """Create multiple helices at once.
+
+        This method requires that x_list and y_list be specified.  Otherwise,
+        other arguments are optional.  When other arguments are specified (with
+        the exception of use_undo_stack, which is always a bool), they must be
+        lists that have lengths equal to that of x_list and y_list (which must
+        also be lists with equal lengths).
+
+        For each element in the specified lists, a CreateVirtualHelixCommand is
+        created and queued in a list.  execCommandList is then called to batch
+        the creation of virtual helices in an undo stack macro.  This results in
+        one undo/redo operation for all the virtual helices created in this
+        batch
+
+        Args:
+            x_list (list):  A list of length N corresponding to the x
+                coordinates of the N Virtual Helices to be made
+            y_list (list):  A list of length N corresponding to the y
+                coordinates of the N Virtual Helices to be made
+            z_list (list):  A list of length N corresponding to the z
+                coordinates of the N Virtual Helices to be made
+            length (list):  A list of length N corresponding to the length of
+                each of the N Virtual Helices to be made
+            id_num (list):  a list of length N corresponding to the id numbers
+                being requested
+            properties (list):  a list of length N tuples; both tuples should be
+                lists corresponding to keys and values
+            safe (list):  a list of length N corresponding to whether or not
+                neighbors should be updated
+            use_undo_stack (bool):  whether or not the undo stack should be used
+                for this operation
+            parity (list):  a list of length N corresponding to the parity of
+                each Virtual Helix being created
+
+        Returns:
+            a list of id_numbers that were created during this batch operation
+        """
+        assert isinstance(x_list, (list, tuple))
+        assert isinstance(y_list, (list, tuple))
+        assert len(x_list) == len(y_list)
+        assert z_list is None or isinstance(z_list, (list, tuple))
+        assert z_list is None or len(z_list) == len(x_list)
+        assert length is None or isinstance(length, (list, tuple))
+        assert length is None or len(length) == len(x_list)
+        assert id_num is None or isinstance(id_num, (list, tuple))
+        assert id_num is None or len(id_num) == len(x_list)
+        assert properties is None or isinstance(properties, (list, tuple))
+        assert properties is None or len(properties) == len(x_list)
+        assert safe is None or isinstance(safe, (list, tuple))
+        assert safe is None or len(safe) == len(x_list)
+        assert isinstance(use_undo_stack, bool)
+        assert parity is None or isinstance(parity, (list, tuple))
+        assert parity is None or len(parity) == len(x_list)
+
+        commands = []
+        id_numbers = []
+
+        for i, x in enumerate(x_list):
+            y = y_list[i]
+            z = z_list[i] if z_list else 0.0
+            _length = length[i] if length else self._STEP_SIZE*2
+            _id_num = id_num[i] if id_num else None
+            _properties = properties[i] if properties else None
+            _safe = safe[i] if safe else True
+            _parity = parity[i] if parity else None
+
+            # Reserve the _id_num to prevent id_number collisions between VHs created in this loop
+            if _id_num is None:
+                _id_num = self._getNewIdNum(parity=_parity)
+                self._reserveIdNum(requested_id_num=_id_num)
+
+            command = CreateVirtualHelixCommand(self, x=x, y=y, z=z,
+                                                length=_length,
+                                                id_num=_id_num,
+                                                properties=_properties,
+                                                safe=_safe,
+                                                parity=_parity)
+            commands.append(command)
+            id_numbers.append(_id_num)
+
+        util.execCommandList(self, commands=commands, desc='SPA', use_undostack=use_undo_stack)
+        return id_numbers
     # end def
 
     def removeVirtualHelix(self, id_num, use_undostack=True):
@@ -2584,7 +2768,7 @@ class NucleicAcidPart(Part):
         """
         # test for reordering malformed input
         if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
-           strand3p.idx3Prime() == idx3p):
+                strand3p.idx3Prime() == idx3p):
             strand5p, strand3p = strand3p, strand5p
             idx5p, idx3p = idx3p, idx5p
 
@@ -2797,15 +2981,28 @@ class NucleicAcidPart(Part):
         return Part(self._document)
     # end def
 
-    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True):
+    def setAllVirtualHelixSizes(self, new_size, use_undostack=True, zoom_to_fit=False):
+        if use_undostack:
+            self.undoStack().beginMacro("Resize all VHs")
+        for id_num in self._virtual_helices_set:
+            _, size = self.getOffsetAndSize(id_num)
+            if size != new_size:
+                self.setVirtualHelixSize(id_num, new_size, use_undostack, zoom_to_fit)
+        if use_undostack:
+            self.undoStack().endMacro()
+    # end def
+
+    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True, zoom_to_fit=False):
         old_size = self.vh_properties.loc[id_num, 'length']
         delta = new_size - old_size
         if delta > 0:
-            c = ResizeVirtualHelixCommand(self, id_num, True, delta)
+            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
             util.doCmd(self, c, use_undostack=use_undostack)
         else:
-            err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
-            raise NotImplementedError(err)
+            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
+            util.doCmd(self, c, use_undostack=use_undostack)
+            # err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
+            # raise NotImplementedError(err)
     # end def
 
     def translateVirtualHelices(self, vh_set, dx, dy, dz, finalize,
@@ -2841,7 +3038,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except:
+            except Exception:
                 print("neighbors", list(neighbors))
                 raise
             new_neighbors.update(neighbors)
@@ -2852,7 +3049,7 @@ class NucleicAcidPart(Part):
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
                 self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
-            except:
+            except Exception:
                 print("neighbors", list(neighbors))
                 raise
         self.partVirtualHelicesTranslatedSignal.emit(self, vh_set, left_overs, do_deselect)
@@ -3034,11 +3231,13 @@ class NucleicAcidPart(Part):
             info (Tuple): id_num, is_fwd, idx, to_vh_num
 
         """
-        if info != self.active_base_info:
-            # keep the info the same but let views know it's not fresh
-            if info is not None:
-                self.active_base_info = info
-            self.partActiveBaseInfoSignal.emit(self, info)
+        # if info != self.active_base_info:
+        #     # keep the info the same but let views know it's not fresh ()
+        #     if info is not None:
+        #         self.active_base_info = info
+
+        # just emit every time so 2nd hover on active base works
+        self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
     def isVirtualHelixActive(self, id_num):
@@ -3222,6 +3421,14 @@ class NucleicAcidPart(Part):
             id_num, is_fwd, idx = self._getModKeyTokens(key)
             yield (id_num, is_fwd, idx, mid)
     # end def
+
+    def getGridType(self):
+        # TODO[NF]:  Docstring
+        return self._group_properties.get('grid_type')
+
+    def setGridType(self, grid_type):
+        # TODO[NF]:  Docstring
+        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
 
 

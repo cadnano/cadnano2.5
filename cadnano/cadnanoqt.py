@@ -15,14 +15,17 @@
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 import os
-import sys
 import platform
+import sys
 from code import interact
-from PyQt5.QtCore import QObject, QCoreApplication, pyqtSignal, QEventLoop, QSize
+
+from PyQt5.QtCore import (QCoreApplication, QEventLoop, QObject, QSize,
+                          pyqtSignal)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import qApp, QApplication
+from PyQt5.QtWidgets import QApplication, qApp
+
 from cadnano import util
-from cadnano.proxyconfigure import proxyConfigure
+from cadnano.proxies.proxyconfigure import proxyConfigure
 
 proxyConfigure('PyQt')
 decodeFile = None
@@ -30,16 +33,16 @@ Document = None
 DocumentController = None
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
-ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'ui', 'mainwindow', 'images')
-ICON_PATH1 = os.path.join(ICON_DIR, 'radnano-app-icon.png')
-ICON_PATH2 = os.path.join(ICON_DIR, 'radnano-app-icon256x256.png')
-ICON_PATH3 = os.path.join(ICON_DIR, 'radnano-app-icon48x48.png')
+ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'mainwindow', 'images')
+ICON_PATH1 = os.path.join(ICON_DIR, 'cadnano25-app-icon_512.png')
+ICON_PATH2 = os.path.join(ICON_DIR, 'cadnano25-app-icon_256.png')
+ICON_PATH3 = os.path.join(ICON_DIR, 'cadnano25-app-icon_48.png')
 
 ROOTDIR = os.path.dirname(LOCAL_DIR)
 
 if platform.system() == 'Windows':
     import ctypes
-    myappid = 'cadnano.cadnano.radnano.2.5.0'  # arbitrary string
+    myappid = 'org.cadnano.cadnano.2.5.1'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 
@@ -66,7 +69,7 @@ class CadnanoQt(QObject):
             self.qApp = qApp
         super(CadnanoQt, self).__init__()
         # print("initialized new CadnanoQt")
-        from cadnano.gui.views.preferences import Preferences
+        from cadnano.views.preferences import Preferences
         self.prefs = Preferences()
         self.icon = icon = QIcon(ICON_PATH1)
         icon.addFile(ICON_PATH2, QSize(256, 256))
@@ -89,15 +92,14 @@ class CadnanoQt(QObject):
         global DocumentController
         from cadnano.document import Document
         from cadnano.fileio.nnodecode import decodeFile
-        from cadnano.gui.controllers.documentcontroller import DocumentController
-        from cadnano.gui.views.pathview import pathstyles as styles
+        from cadnano.controllers.documentcontroller import DocumentController
+        from cadnano.views.pathview import pathstyles as styles
 
         styles.setFontMetrics()
 
         doc = Document()
         self._document = self.createDocument(base_doc=doc)
 
-        os.environ['CADNANO_DISCARD_UNSAVED'] = 'True'  # added by Nick
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()

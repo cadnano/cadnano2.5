@@ -1,6 +1,6 @@
 import sys
 import os.path
-from subprocess import PIPE, Popen, check_output
+from subprocess import Popen
 import shutil
 import glob
 
@@ -20,6 +20,7 @@ https://hu-my.sharepoint.com/personal/nick_conway_wyss_harvard_edu/_layouts/15/g
 
 """
 
+
 def getsitePackagesPath():
     if hasattr(sys, 'real_prefix'):
         # virtualenv
@@ -36,7 +37,9 @@ def getsitePackagesPath():
             return sp_paths[-1]
 # end def
 
+
 site_packages_path = getsitePackagesPath()
+
 
 def installRename(file_list, in_path, out_path=""):
     """ For renaming PyQt5 *.so rpaths such that the Qt5 libraries will
@@ -60,13 +63,14 @@ def installRename(file_list, in_path, out_path=""):
 
     for file_name in file_list:
         cmd_add_rpath = ["windeployqt.exe",
-                        os.path.join(out_path, file_name)
-                        ]
+                         os.path.join(out_path, file_name)
+                         ]
         cmd_add_rpath = ' '.join(cmd_add_rpath)
         renameproc = Popen(cmd_add_rpath, shell=True,
-                                        cwd=out_path)
+                           cwd=out_path)
         renameproc.wait()
 # end for
+
 
 def moveExtras(destination_path):
     """
@@ -80,21 +84,21 @@ def moveExtras(destination_path):
         shutil.rmtree(dst_path)
     plugin_path = os.path.join(dst_path, 'plugins')
     os.makedirs(plugin_path)
-    folder_list = [ 'audio',
-                    'bearer',
-                    'generic',
-                    'geoservices',
-                    'iconengines',
-                    'imageformats',
-                    'mediaservice',
-                    'platforms',
-                    'playlistformats',
-                    'position',
-                    'printsupport',
-                    'sceneparsers',
-                    'sensorgestures',
-                    'sensors',
-                    'sqldrivers']
+    folder_list = ['audio',
+                   'bearer',
+                   'generic',
+                   'geoservices',
+                   'iconengines',
+                   'imageformats',
+                   'mediaservice',
+                   'platforms',
+                   'playlistformats',
+                   'position',
+                   'printsupport',
+                   'sceneparsers',
+                   'sensorgestures',
+                   'sensors',
+                   'sqldrivers']
     for folder in folder_list:
         src = os.path.join(local_path, folder)
         if os.path.exists(src):
@@ -107,6 +111,7 @@ def moveExtras(destination_path):
             shutil.move(src, dst)
     # end for
 # end def
+
 
 def copyPyQt5(destination_path):
     """ Location to put a folder called PyQt5
@@ -128,6 +133,7 @@ def copyPyQt5(destination_path):
     return dst_path, file_list
 # end def
 
+
 def createPyQt5Module(destination_path):
     if not os.path.exists(destination_path):
         raise ValueError("%s must exist" % (destination_path))
@@ -137,9 +143,10 @@ def createPyQt5Module(destination_path):
     return [os.path.splitext(x)[0] for x in file_list]
 # end def
 
+
 if __name__ == '__main__':
     if len(sys.argv) > 1:
-        in_path =  os.path.abspath(sys.argv[1])
+        in_path = os.path.abspath(sys.argv[1])
         if not os.path.exists(in_path):
             raise ValueError("Input path not found")
     else:

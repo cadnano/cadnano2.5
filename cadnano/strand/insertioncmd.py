@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.decorators.insertion import Insertion
+
 
 class AddInsertionCommand(UndoCommand):
     def __init__(self, strand, idx, length):
@@ -12,7 +13,7 @@ class AddInsertionCommand(UndoCommand):
         self._length = length
         self._insertion = Insertion(idx, length)
         self._comp_strand = \
-                    strand.strandSet().complementStrandSet().getStrand(idx)
+            strand.strandSet().complementStrandSet().getStrand(idx)
     # end def
 
     def redo(self):
@@ -41,6 +42,7 @@ class AddInsertionCommand(UndoCommand):
             c_strand.strandInsertionRemovedSignal.emit(c_strand, idx)
     # end def
 # end class
+
 
 class RemoveInsertionCommand(UndoCommand):
     def __init__(self, strand, idx):
@@ -51,7 +53,7 @@ class RemoveInsertionCommand(UndoCommand):
         self._insertions = strand.part().insertions()[id_num]
         self._insertion = self._insertions[idx]
         self._comp_strand = \
-                    strand.strandSet().complementStrandSet().getStrand(idx)
+            strand.strandSet().complementStrandSet().getStrand(idx)
     # end def
 
     def redo(self):
@@ -81,12 +83,14 @@ class RemoveInsertionCommand(UndoCommand):
     # end def
 # end class
 
+
 class ChangeInsertionCommand(UndoCommand):
     """
     Changes the length of an insertion to a non-zero value
     the caller of this needs to handle the case where a zero length
     is required and call RemoveInsertionCommand
     """
+
     def __init__(self, strand, idx, new_length):
         super(ChangeInsertionCommand, self).__init__("change insertion")
         self._strand = strand
@@ -96,7 +100,7 @@ class ChangeInsertionCommand(UndoCommand):
         self._new_length = new_length
         self._old_length = self._insertions[idx].length()
         self._comp_strand = \
-                    strand.strandSet().complementStrandSet().getStrand(idx)
+            strand.strandSet().complementStrandSet().getStrand(idx)
     # end def
 
     def redo(self):
@@ -109,8 +113,8 @@ class ChangeInsertionCommand(UndoCommand):
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo()._incrementLength(
-                                        self._new_length - self._old_length,
-                                        emit_signals=True)
+                self._new_length - self._old_length,
+                emit_signals=True)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 
@@ -124,8 +128,8 @@ class ChangeInsertionCommand(UndoCommand):
         strand.strandInsertionChangedSignal.emit(strand, inst)
         if c_strand:
             c_strand.oligo()._decrementLength(
-                                        self._new_length - self._old_length,
-                                        emit_signals=True)
+                self._new_length - self._old_length,
+                emit_signals=True)
             c_strand.strandInsertionChangedSignal.emit(c_strand, inst)
     # end def
 # end class

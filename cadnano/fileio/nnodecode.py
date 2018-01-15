@@ -31,5 +31,6 @@ def loadtest():
     test_path = os.path.join(root_path, 'tests', 'super_barcode_hex.json')
     return decodeFile(test_path)
 
+
 if __name__ == '__main__':
     loadtest()

@@ -10,8 +10,8 @@ import sys
 # sys.path.append(getcwd())  # temporary
 import cadnano
 from cadnano.document import Document
-from cadnano.data.dnasequences import sequences
-# from cadnano.gui.views.styles import CADNANO1_COLORS
+from cadnano.extras.dnasequences import sequences
+# from cadnano.views.styles import CADNANO1_COLORS
 
 
 try:
@@ -124,6 +124,7 @@ def main():
     print("Saving modified document as", colored("{0}".format(dest_file), 'yellow'))
     # printInfo("{0}".format(dest_file))
     doc.writeToFile(dest_file)
+
 
 # color_dict = dict((color, 'white', []) for color in CADNANO1_COLORS)
 color_dict = {'#cc0000': ('red', None, []),

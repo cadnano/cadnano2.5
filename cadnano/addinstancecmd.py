@@ -1,7 +1,7 @@
-from cadnano.cnproxy import UndoCommand
 from cadnano.assembly import Assembly
-from cadnano.part import Part
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.objectinstance import ObjectInstance
+from cadnano.part import Part
 
 
 class AddInstanceCommand(UndoCommand):
@@ -11,6 +11,7 @@ class AddInstanceCommand(UndoCommand):
         document (Document): m
         obj_instance (ObjectInstance): Object instance to add to Document
     """
+
     def __init__(self, document, cnobj):
         super(AddInstanceCommand, self).__init__("add instance")
         self._document = document
@@ -41,5 +42,6 @@ class AddInstanceCommand(UndoCommand):
             else:
                 cnobj.assemblyRemovedSignal.emit(obji)
         cnobj._decrementInstance(obji)
+        self._document.deactivateActivePart()
     # end def
 # end class

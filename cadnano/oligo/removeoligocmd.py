@@ -1,4 +1,5 @@
-from cadnano.cnproxy import UndoCommand
+from cadnano.proxies.cnproxy import UndoCommand
+
 
 class RemoveOligoCommand(UndoCommand):
     def __init__(self, oligo):
@@ -44,7 +45,7 @@ class RemoveOligoCommand(UndoCommand):
             # Emit a signal to notify on completion
             strandset.strandsetStrandAddedSignal.emit(strandset, strand)
             # for updating the Slice View displayed helices
-            part.partStrandChangedSignal.emit(strandset.part(),  strandset.idNum())
+            part.partStrandChangedSignal.emit(strandset.part(), strandset.idNum())
         # end def
 
         # add Oligo to part but don't set parent to None?
