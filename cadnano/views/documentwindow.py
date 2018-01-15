@@ -240,7 +240,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_graphics_view.setScene(self.slice_scene)
         self.slice_graphics_view.scene_root_item = self.slice_root
         self.slice_graphics_view.setName("SliceView")
-        self.slice_graphics_view.setScaleFitFactor(0.9)
+        self.slice_graphics_view.setScaleFitFactor(0.7)
         self.slice_tool_manager = SliceToolManager(self, self.slice_root)
     # end def
 
