@@ -133,7 +133,15 @@ class SelectSliceTool(AbstractSliceTool):
                 # print("modelClear yikes")
                 self.modelClear()
             self.part_item = part_item
-            self.group.setParentItem(part_item)
+
+            # In the event that the old part_item was deleted (and garbage
+            # collected), self.group (whose parent was the old part_item) is
+            # also garbage collected.  Therefore, create a new
+            # SliceSelectionGroup when this is the case
+            try:
+                self.group.setParentItem(part_item)
+            except RuntimeError:
+                self.group = SliceSelectionGroup(self, parent=part_item)
 
             # required for whatever reason to renable QGraphicsView.RubberBandDrag
             # TODO[NF]:  Determine why self.slice_graphics_view is None when the dual-slice view is enabled
