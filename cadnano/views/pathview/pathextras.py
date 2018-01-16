@@ -480,8 +480,8 @@ class PreXoverItem(QGraphicsRectItem):
                 self.color = EMPTY_COL
 
             if is_low and is_high:
-                print("dual xover")
                 path = (_FWD_DUAL_PATH, _REV_DUAL_PATH)[strand_type]
+                raise NotImplementedError("Dual xovers not yet supported")
             elif is_low:
                 path = (_FWD_LO_PATH, _REV_LO_PATH)[strand_type]
                 self.is3p = True if is_fwd else False
@@ -816,7 +816,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
             xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
             xBR = (self._idx_low)*BASE_WIDTH
         else:  # default to HandleType.RIGHT behavior for all types
-            print("no ht??")
+            print("No HandleType?")
             xTL = 0
             xBR = self._high_drag_bound*BASE_WIDTH
         yTL = self._part_item._vh_rect.top()

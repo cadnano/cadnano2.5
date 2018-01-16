@@ -69,7 +69,6 @@ class DocumentController(object):
 
     def _initWindow(self):
         """docstring for initWindow"""
-        # print("new window", app().qApp.allWindows())
         self.win = win = DocumentWindow(doc_ctrlr=self)
         app().documentWindowWasCreatedSignal.emit(self._document, win)
         self._connectWindowSignalsToSelf()
@@ -134,7 +133,6 @@ class DocumentController(object):
             p_e = win.property_widget
             o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
         for signal_obj, slot_method in self.self_signals:
-            # print("dSS", slot_method.__name__)
             signal_obj.disconnect(slot_method)
         self.self_signals = []
     # end def
@@ -485,7 +483,6 @@ class DocumentController(object):
             fname = selected[0]
         else:
             fname = selected
-        print("da fname", fname)
         if fname is None or os.path.isdir(fname):
             return False
         if not fname.lower().endswith(".svg"):
@@ -636,7 +633,6 @@ class DocumentController(object):
     # end def
 
     def actionToggleInspectorViewSlot(self):
-        print("actionToggleInspectorViewSlot")
         dock_window = self.win.inspector_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
@@ -664,7 +660,6 @@ class DocumentController(object):
 
         Returns: None
         """
-        # print("Toggling slice view to %s" % show)
         slice_view = self.win.slice_graphics_view
         if show:
             self.slice_view_showing = True
@@ -681,7 +676,6 @@ class DocumentController(object):
 
         Returns: None
         """
-        # print("Toggling grid view to %s" % show)
         grid_view = self.win.grid_graphics_view
         if show:
             self.grid_view_showing = True

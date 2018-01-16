@@ -1095,7 +1095,6 @@ class NucleicAcidPart(Part):
                 next_o, next_s = next_o_and_s
                 break
         # this_offset = num_points
-        # print("total points", self.total_points, next_o, id_num)
         offset_and_size[id_num] = (next_o, 0)
         # the other offsets will be adjusted later
 
@@ -1209,7 +1208,6 @@ class NucleicAcidPart(Part):
 
         # rotate about 0 index and then translate
         m = self.makeRotation((0, 0, 1), direction)
-        # print(m)
 
         np.add(np.dot(m, fwd_pts.T, out=scratch).T, origin, out=fwd_pts)
         np.add(np.dot(m, rev_pts.T, out=scratch).T, origin, out=rev_pts)
@@ -1365,8 +1363,8 @@ class NucleicAcidPart(Part):
                 try:
                     values_list[index] = float(values_list[index])
                 except ValueError:
-                    print('Validation failed:  attempted to set %s to %s' % (key,
-                                                                             values_list[index]))
+                    print('Validation failed: attempted to set %s to %s' % (key,
+                                                                            values_list[index]))
 
         for index, key in enumerate(keys_list):
             try:
@@ -1453,10 +1451,7 @@ class NucleicAcidPart(Part):
         else:  # delta == 0
             return
         _, final_size = self.getOffsetAndSize(id_num)
-        # print("final_size", final_size)
         self.vh_properties.loc[id_num, 'length'] = final_size
-        # print("New max:", self.vh_properties['length'].idxmax(),
-        #         self.vh_properties['length'].max())
         self._group_properties['max_vhelix_length'] = self.vh_properties['length'].max()
         # return 0, self.vh_properties['length'].idxmax()
         return self.zBoundsIds()

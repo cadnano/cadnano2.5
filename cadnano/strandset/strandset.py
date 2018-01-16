@@ -311,7 +311,6 @@ class StrandSet(CNObject):
         Returns:
             object: Strand if successful, None otherwise
         """
-        # print("sss creating strand")
         part = self._part
 
         # NOTE: this color defaulting thing is problematic for tests
@@ -326,11 +325,9 @@ class StrandSet(CNObject):
                                     update_segments=use_undostack)
             x, y = part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
-            # print("strand", d)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return c.strand()
         else:
-            # print("could not create strand", bounds_low, bounds_high, base_idx_low, base_idx_high)
             return None
     # end def
 
@@ -345,7 +342,6 @@ class StrandSet(CNObject):
                                 update_segments=use_undostack)
         x, y = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
-        # print("strand", d)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
         return 0
     # end def
@@ -686,7 +682,6 @@ class StrandSet(CNObject):
             strand (Strand): the strand to add
             update_segments (:obj:`bool`, optional): whether to signal default=True
         """
-        # print("Adding to strandlist")
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
             self.strand_array[i] = strand
