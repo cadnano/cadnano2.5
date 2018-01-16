@@ -231,7 +231,7 @@
         <enum>Qt::WheelFocus</enum>
        </property>
        <property name="styleSheet">
-        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+        <string notr="true">QGraphicsView { background-color: #f6f6f6; }</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -273,7 +273,7 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #f5f5f5;</string>
+    <string notr="true">background-color: #f6f6f6;</string>
    </property>
    <property name="features">
     <set>QDockWidget::AllDockWidgetFeatures</set>
@@ -328,7 +328,7 @@
         <enum>Qt::WheelFocus</enum>
        </property>
        <property name="styleSheet">
-        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+        <string notr="true">QGraphicsView { background-color: #f6f6f6; }</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -370,7 +370,7 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #f5f5f5;</string>
+    <string notr="true">background-color: #f6f6f6;</string>
    </property>
    <property name="windowTitle">
     <string>Path</string>
@@ -416,7 +416,7 @@
         <enum>Qt::WheelFocus</enum>
        </property>
        <property name="styleSheet">
-        <string notr="true">QGraphicsView { background-color: rgb(96.5%, 96.5%, 96.5%); }</string>
+        <string notr="true">QGraphicsView { background-color: #f6f6f6; }</string>
        </property>
        <property name="frameShape">
         <enum>QFrame::NoFrame</enum>
@@ -452,7 +452,7 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: #f5f5f5;</string>
+    <string notr="true">background-color: #f6f6f6;</string>
    </property>
    <property name="windowTitle">
     <string>Inspector</string>
@@ -496,7 +496,7 @@
          <enum>Qt::StrongFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">OutlinerTreeWidget { background-color: rgb(96.5%, 96.5%, 96.5%); }
+         <string notr="true">OutlinerTreeWidget { background-color: #f6f6f6; }
 
 </string>
         </property>
