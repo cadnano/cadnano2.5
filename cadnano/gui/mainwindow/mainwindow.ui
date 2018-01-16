@@ -187,9 +187,6 @@
      <height>200</height>
     </size>
    </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: #00cccc;</string>
-   </property>
    <property name="windowTitle">
     <string>Slice</string>
    </property>
@@ -198,17 +195,20 @@
    </attribute>
    <widget class="QWidget" name="slice_dock_widget_contents">
     <layout class="QHBoxLayout" name="slice_horizontal_layout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <property name="leftMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="rightMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <item>
       <widget class="CustomQGraphicsView" name="slice_graphics_view">
@@ -286,6 +286,9 @@
    </attribute>
    <widget class="QWidget" name="grid_dock_widget_contents">
     <layout class="QHBoxLayout" name="grid_horizontal_layout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <property name="leftMargin">
       <number>0</number>
      </property>
@@ -377,17 +380,20 @@
    </attribute>
    <widget class="QWidget" name="path_dock_widget_contents">
     <layout class="QHBoxLayout" name="path_horizontal_layout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <property name="leftMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="rightMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <item>
       <widget class="CustomQGraphicsView" name="path_graphics_view">
@@ -456,6 +462,9 @@
    </attribute>
    <widget class="QWidget" name="inspector_dock_widget_contents">
     <layout class="QVBoxLayout" name="inspector_vertical_layout">
+     <property name="spacing">
+      <number>1</number>
+     </property>
      <property name="leftMargin">
       <number>0</number>
      </property>

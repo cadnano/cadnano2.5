@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.1
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -60,12 +60,12 @@ class Ui_MainWindow(object):
         MainWindow.setMenuBar(self.menubar)
         self.slice_dock_widget = QtWidgets.QDockWidget(MainWindow)
         self.slice_dock_widget.setMinimumSize(QtCore.QSize(200, 200))
-        self.slice_dock_widget.setStyleSheet("background-color: #00cccc;")
         self.slice_dock_widget.setObjectName("slice_dock_widget")
         self.slice_dock_widget_contents = QtWidgets.QWidget()
         self.slice_dock_widget_contents.setObjectName("slice_dock_widget_contents")
         self.slice_horizontal_layout = QtWidgets.QHBoxLayout(self.slice_dock_widget_contents)
-        self.slice_horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        self.slice_horizontal_layout.setContentsMargins(1, 1, 1, 1)
+        self.slice_horizontal_layout.setSpacing(1)
         self.slice_horizontal_layout.setObjectName("slice_horizontal_layout")
         self.slice_graphics_view = CustomQGraphicsView(self.slice_dock_widget_contents)
         self.slice_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
@@ -95,6 +95,7 @@ class Ui_MainWindow(object):
         self.grid_dock_widget_contents.setObjectName("grid_dock_widget_contents")
         self.grid_horizontal_layout = QtWidgets.QHBoxLayout(self.grid_dock_widget_contents)
         self.grid_horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        self.grid_horizontal_layout.setSpacing(1)
         self.grid_horizontal_layout.setObjectName("grid_horizontal_layout")
         self.grid_graphics_view = CustomQGraphicsView(self.grid_dock_widget_contents)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -127,7 +128,8 @@ class Ui_MainWindow(object):
         self.path_dock_widget_contents = QtWidgets.QWidget()
         self.path_dock_widget_contents.setObjectName("path_dock_widget_contents")
         self.path_horizontal_layout = QtWidgets.QHBoxLayout(self.path_dock_widget_contents)
-        self.path_horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        self.path_horizontal_layout.setContentsMargins(1, 1, 1, 1)
+        self.path_horizontal_layout.setSpacing(1)
         self.path_horizontal_layout.setObjectName("path_horizontal_layout")
         self.path_graphics_view = CustomQGraphicsView(self.path_dock_widget_contents)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
@@ -158,6 +160,7 @@ class Ui_MainWindow(object):
         self.inspector_dock_widget_contents.setObjectName("inspector_dock_widget_contents")
         self.inspector_vertical_layout = QtWidgets.QVBoxLayout(self.inspector_dock_widget_contents)
         self.inspector_vertical_layout.setContentsMargins(0, 0, 0, 0)
+        self.inspector_vertical_layout.setSpacing(1)
         self.inspector_vertical_layout.setObjectName("inspector_vertical_layout")
         self.outliner_property_splitter = QtWidgets.QSplitter(self.inspector_dock_widget_contents)
         self.outliner_property_splitter.setOrientation(QtCore.Qt.Vertical)
