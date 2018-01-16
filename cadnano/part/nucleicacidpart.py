@@ -2994,15 +2994,9 @@ class NucleicAcidPart(Part):
 
     def setVirtualHelixSize(self, id_num, new_size, use_undostack=True, zoom_to_fit=False):
         old_size = self.vh_properties.loc[id_num, 'length']
-        delta = new_size - old_size
-        if delta > 0:
-            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
-            util.doCmd(self, c, use_undostack=use_undostack)
-        else:
-            c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
-            util.doCmd(self, c, use_undostack=use_undostack)
-            # err = "shrinking VirtualHelices not supported yet: %d --> %d" % (old_size, new_size)
-            # raise NotImplementedError(err)
+        delta = int(new_size - old_size)
+        c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
+        util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
     def translateVirtualHelices(self, vh_set, dx, dy, dz, finalize,
