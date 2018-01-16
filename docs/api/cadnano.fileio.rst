@@ -7,9 +7,9 @@ Submodules
 .. toctree::
 
    cadnano.fileio.c25decode
+   cadnano.fileio.decode
+   cadnano.fileio.encode
    cadnano.fileio.lattice
-   cadnano.fileio.nnodecode
-   cadnano.fileio.nnoencode
    cadnano.fileio.v2decode
    cadnano.fileio.v2encode
    cadnano.fileio.v3decode

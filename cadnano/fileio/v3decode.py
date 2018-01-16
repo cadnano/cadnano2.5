@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-
-from cadnano.part.refresholigoscmd import RefreshOligosCommand
-# from cadnano import setBatch, getReopen, setReopen
-from cadnano.proxies.cnenum import GridType, PointType, SliceViewType
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
+from cadnano.part.refresholigoscmd import RefreshOligosCommand
+from cadnano.proxies.cnenum import GridType, PointType, SliceViewType
 
 
 def decode(document, obj, emit_signals=False):
@@ -19,8 +17,6 @@ def decode(document, obj, emit_signals=False):
 
     # TODO[NF]:  Use a constant here
     slice_view_type = meta.get('slice_view_type')
-    from cadnano.util import qtdb_trace
-#    qtdb_trace()
 
     # This assumes that the lattice without a specified grid type is a honeycomb lattice
     grid_type = meta.get('grid_type', GridType.HONEYCOMB)
@@ -43,6 +39,7 @@ def decode(document, obj, emit_signals=False):
 
     document.setSliceViewType(slice_view_type=slice_view_type)
 
+
 def determineSliceViewType(document, part_dict, grid_type):
     THRESHOLD = 0.0005
     vh_id_list = part_dict.get('vh_list')
@@ -59,6 +56,7 @@ def determineSliceViewType(document, part_dict, grid_type):
             if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
                 return SliceViewType.GRID
     return SliceViewType.SLICE
+
 
 def decodePart(document, part_dict, grid_type, emit_signals=False):
     """ Decode a a deserialized Part dictionary
@@ -148,7 +146,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
             print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
 
     # TODO fix this to set position
-    instance_props = part_dict['instance_properties']    # list
+    # instance_props = part_dict['instance_properties']    # list
 
     vh_order = part_dict['virtual_helix_order']
     if vh_order:
@@ -229,6 +227,5 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     """
     TODO: figure out copy_dict['view_properties'] handling here
     """
-
     return new_vh_id_set
 # end def

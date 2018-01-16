@@ -336,7 +336,7 @@ def parse_args(argv=None, gui=None):
                         help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
     parser.add_argument("--debug-modules", nargs='*', metavar="MODULE-STR",
                         help="Debug modules whose names start with any of the given strings. For instance, to "
-                             "debug the cadnano file decoder, use --debug-modules cadnano.fileio.nnodecode ."
+                             "debug the cadnano file decoder, use --debug-modules cadnano.fileio.decode ."
                              "To debug all gui modules, use --debug-modules cadnano.gui .")
     parser.add_argument("--file", "-f", metavar="designfile.json", help="cadnano design to load upon start up.")
     if gui and (gui is True or gui.lower() == "qt"):

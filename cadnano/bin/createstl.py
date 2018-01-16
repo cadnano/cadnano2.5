@@ -1,6 +1,6 @@
 import os
 import sys
-from cadnano.fileio import nnodecode
+from cadnano.fileio import decode
 from cadnano.extras.math.matrix4 import makeTranslation
 from nno2stl import stlwriter
 from nno2stl.cylinder import Cylinder
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     test_path = os.path.join(root_path, 'tests', test2)
-    doc = nnodecode.decodeFile(test_path)
+    doc = decode.decodeFile(test_path)
 
     solids = []
     part = doc.children()[0]

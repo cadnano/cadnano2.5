@@ -11,8 +11,8 @@ from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal, UndoStack
 from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
                                 RemoveModCommand)
-from cadnano.fileio.nnodecode import decodeFile
-from cadnano.fileio.nnoencode import encodeToFile
+from cadnano.fileio.decode import decodeFile
+from cadnano.fileio.encode import encodeToFile
 from cadnano.part import Part
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
