@@ -42,6 +42,7 @@ def decode(document, obj, emit_signals=False):
         raise TypeError("Lattice type not recognized")
     part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
     part.setActive(True)
+    document.setGridType(grid_type)
     setBatch(True)
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
