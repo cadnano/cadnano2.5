@@ -290,6 +290,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
             elif property_key == 'workplane_idxs':
+                print("partPropertyChangedSlot", property_key)
                 if hasattr(self, 'workplane'):
                     self.workplane.setIdxs(new_idxs=new_value)
     # end def
@@ -634,7 +635,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         nonempty_idx = self._model_part.indexOfRightmostNonemptyBase()
         right_bound_idx = max(default_idx, nonempty_idx)
         substep = self._model_part.subStepSize()
-        snap_idx = (right_bound_idx/substep+1)*substep
+        snap_idx = (right_bound_idx/substep)*substep
         xTL = 0
         xBR = snap_idx*_BASE_WIDTH + _p
         min_rect = self.rect().adjusted(-_p, -_p, _p, _p)
