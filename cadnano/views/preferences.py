@@ -19,7 +19,7 @@ class Preferences(object):
     """Connect UI elements to the backend."""
 
     def __init__(self):
-        self.qs = QSettings()
+        self.qs = QSettings("cadnano.org", "cadnano2.5")
         self.ui_prefs = Ui_Preferences()
         self.widget = QWidget()
         self.ui_prefs.setupUi(self.widget)

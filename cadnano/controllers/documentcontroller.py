@@ -43,7 +43,7 @@ class DocumentController(object):
         self.fileopendialog = None
         self.filesavedialog = None
 
-        self.settings = QSettings()
+        self.settings = QSettings("cadnano.org", "cadnano2.5")
         self._readSettings()
 
         self._hintable_tools = []  # filters that display alt icon when disabled
