@@ -1068,6 +1068,8 @@ class NucleicAcidPart(Part):
             num_points (int): number of bases in Virtual Helix
             color (str): hexadecimal color code in the form: `#RRGGBB`
         """
+        num_points = int(num_points)  # re-cast to int to avoid numpy errors
+
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
         if offset_and_size_tuple is not None:
             raise IndexError("id_num {} already exists".format(id_num))

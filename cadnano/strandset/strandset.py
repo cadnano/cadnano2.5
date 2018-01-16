@@ -47,7 +47,7 @@ class StrandSet(CNObject):
         self._id_num = id_num
         self._part = part
 
-        self._reset(initial_size)
+        self._reset(int(initial_size))
 
         self._undo_stack = None
     # end def
