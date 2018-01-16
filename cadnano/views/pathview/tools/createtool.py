@@ -244,7 +244,6 @@ class CreateTool(AbstractPathTool):
             event (TYPE): Description
         """
         a = event.key()
-        # print("CreateTool keypress", a)
         if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             QGraphicsObject.keyPressEvent(self, event)
         else:
@@ -888,13 +887,10 @@ class ForcedXoverItem(QGraphicsPathItem):
         Args:
             event (TYPE): Description
         """
-        a = event.key()
-        # print("ForcedXoverItem keypress", a)
-        if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
+        if event.key() in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
             QGraphicsPathItem.keyPressEvent(self, event)
-        else:
-            # reset the tool
-            self._tool.setFloatingXoverBegin(True)
+        elif event.key() == Qt.Key_Escape:
+            self._tool.setFloatingXoverBegin(True)  # reset the tool
     # end def
 
     def updateBase(self, virtual_helix_item, strand5p, idx):

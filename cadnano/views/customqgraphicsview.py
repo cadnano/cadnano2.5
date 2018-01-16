@@ -332,6 +332,8 @@ class CustomQGraphicsView(QGraphicsView):
             self.zoomIn(0.3)
         elif event.key() == Qt.Key_Minus:
             self.zoomIn(0.03)
+        elif event.key() == Qt.Key_Escape:
+            QGraphicsView.keyPressEvent(self, event)
         else:
             if hasattr(self.scene_root_item, KEY_PRESS_EVENT):
                 getattr(self.scene_root_item, KEY_PRESS_EVENT)(event)
