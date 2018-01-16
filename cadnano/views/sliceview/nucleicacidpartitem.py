@@ -927,7 +927,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             True if the mouse is in the given GridPoint, False otherwise
         """
-        if event_xy is None or event_coord is None:
+        if event_xy is None or event_coord is None or self.coordinates_to_xy.get(event_coord) is None:
             return False
 
         point_x, point_y = self.coordinates_to_xy.get(event_coord)
