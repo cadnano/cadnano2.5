@@ -16,6 +16,7 @@ Welcome to cadnano's documentation!
    tutorial
    scripting
    virtualenv
+   shortcuts
 
 .. _dev-docs:
 
