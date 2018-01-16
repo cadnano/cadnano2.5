@@ -123,8 +123,10 @@ class ResizeHandleGroup(QObject):
     # end def
 
     def setPens(self, pen):
-        for handle in self._list:
-            handle.setPen(pen)
+        for handle in [self._t, self._b, self._l, self._r,
+                       self._tl, self._tr, self._bl, self._br]:
+            if handle:
+                handle.setPen(pen)
     # end def
 
     def setZValue(self, z):

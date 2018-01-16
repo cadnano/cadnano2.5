@@ -38,6 +38,7 @@ def decode(document, obj, emit_signals=False):
             part.addModStrandInstance(strand, idx, mod_id)
 
     document.setSliceViewType(slice_view_type=slice_view_type)
+# end def
 
 
 def determineSliceViewType(document, part_dict, grid_type):
@@ -56,6 +57,7 @@ def determineSliceViewType(document, part_dict, grid_type):
             if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
                 return SliceViewType.GRID
     return SliceViewType.SLICE
+# end def
 
 
 def decodePart(document, part_dict, grid_type, emit_signals=False):
@@ -153,6 +155,17 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
         # print("import order", vh_order)
         part.setImportedVHelixOrder(vh_order)
 
+    # Restore additional Part properties
+    for key in ['name',
+                'color',
+                'crossover_span_angle',
+                'max_vhelix_length',
+                'workplane_idxs']:
+        value = part_dict[key]
+        part.setProperty(key, value, use_undostack=False)
+        part.partPropertyChangedSignal.emit(part, key, value)
+# end def
+
 
 def importToPart(part_instance, copy_dict, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
@@ -221,8 +234,15 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in copy_dict['insertions']:
-        strand = part.getStrand(True, id_num + id_num_offset, idx)
-        strand.addInsertion(idx, length, use_undostack=use_undostack)
+        fwd_strand = part.getStrand(True, id_num, idx)
+        rev_strand = part.getStrand(False, id_num, idx)
+        if fwd_strand:
+            fwd_strand.addInsertion(idx, length, use_undostack=use_undostack)
+        elif rev_strand:
+            rev_strand.addInsertion(idx, length, use_undostack=use_undostack)
+        else:
+            ins = 'Insertion' if length > 0 else 'Skip'
+            print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
 
     """
     TODO: figure out copy_dict['view_properties'] handling here

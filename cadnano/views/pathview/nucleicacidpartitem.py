@@ -277,7 +277,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                     vhi.handle().refreshColor()
                 # self.grab_corner.setPen(getPenObj(new_value, 0))
                 self.workplane.outline.setPen(getPenObj(new_value, 0))
-                TLx, TLy, BRx, BRy = self._getVHRectasPoints()
+                TLx, TLy, BRx, BRy = self._getVHRectCorners()
                 self.reconfigureRect((TLx, TLy), (BRx, BRy))
             elif property_key == 'is_visible':
                 if new_value:

@@ -879,11 +879,12 @@ class PathWorkplaneItem(QGraphicsRectItem):
         return self.rect()
 
     def setIdxs(self, new_idxs):
-        print("setIdxs called")
         if self._idx_low != new_idxs[0] or self._idx_high != new_idxs[1]:
             self._idx_low = new_idxs[0]
             self._idx_high = new_idxs[1]
             self.reconfigureRect((), ())
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length')
+    # end def
 
     def showModelMinBoundsHint(self, handle_type, show=True):
         m_b_h = self.model_bounds_hint
