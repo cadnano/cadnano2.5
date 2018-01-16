@@ -1,6 +1,8 @@
 """Summary
 """
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
+
 from cadnano.proxies.cnenum import PartType
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import SliceNucleicAcidPartItem
@@ -187,6 +189,9 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     def keyPressEvent(self, event):
+        if event.key() == Qt.Key_F:
+            self.scene().views()[0].zoomToFit()
+
         for na_part_item in self.instance_items:
             if hasattr(na_part_item, 'keyPressEvent'):
                 getattr(na_part_item, 'keyPressEvent')(event)

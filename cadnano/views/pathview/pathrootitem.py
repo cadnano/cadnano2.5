@@ -1,6 +1,8 @@
 """Summary
 """
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem
+
 from cadnano import util
 from cadnano.proxies.cnenum import PartType
 from cadnano.controllers.viewrootcontroller import ViewRootController
@@ -166,6 +168,11 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     ### PUBLIC METHODS ###
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_F:
+            self.scene().views()[0].zoomToFit()
+    # end def
+
     def removePartItem(self, part_item):
         """Summary
 
