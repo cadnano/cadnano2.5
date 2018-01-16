@@ -278,6 +278,5 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
         self.setCentralWidget(None)
-        self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
     # end def
 # end class
