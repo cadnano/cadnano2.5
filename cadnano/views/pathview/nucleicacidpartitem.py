@@ -275,8 +275,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             if property_key == 'color':
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
-                # self.grab_corner.setPen(getPenObj(new_value, 0))
-                self.workplane.outline.setPen(getPenObj(new_value, 0))
+                # self.workplane.outline.setPen(getPenObj(new_value, 0))
                 TLx, TLy, BRx, BRy = self._getVHRectCorners()
                 self.reconfigureRect((TLx, TLy), (BRx, BRy))
             elif property_key == 'is_visible':
@@ -290,7 +289,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
             elif property_key == 'workplane_idxs':
-                print("partPropertyChangedSlot", property_key)
                 if hasattr(self, 'workplane'):
                     self.workplane.setIdxs(new_idxs=new_value)
     # end def
