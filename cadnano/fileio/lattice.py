@@ -102,16 +102,24 @@ class HoneycombDnaPart(object):
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
         # column = int(x/(radius*root3*scale_factor) + 0.5)
-        column = int(x/(radius*root3*scale_factor) - 0.5)
+#        column = int(x/(radius*root3*scale_factor) - 0.5)
+#        column = int(x/(radius*root3) - 1)
+        column = int(x/(radius*root3*scale_factor) - 1)
 
         row_temp = y/(radius*scale_factor)
         # if (row_temp % 3) + 0.5 > 1.0:
         if (row_temp % 3) - 0.5 > 1.0:
             # odd parity
-            row = int((row_temp - 1)/3 + 0.5)
+#            row = int((row_temp - 1)/3 + 0.5)
+#            row = int((y-radius*2)/(scale_factor*radius*3))
+#            row = int((y/scale_factor - radius*2)/(radius*3))
+            row = int((y/scale_factor - radius*2)/(radius*3)) + 1
         else:
             # even parity
-            row = int(row_temp/3 + 0.5)
+#            row = int(row_temp/3 + 0.5)
+#            row = int((y-radius)/(scale_factor*radius*3))
+#            row = int((y/scale_factor - radius)/(radius*3))
+            row = int((y/scale_factor - radius)/(radius*3)) + 1
         return row, column
     # end def
 
