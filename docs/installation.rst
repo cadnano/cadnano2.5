@@ -74,7 +74,7 @@ These instructions can work 10.10 Yosemite and 10.11 El Capitan under
 Xcode 7.0.1 and 6.5. It has also been tested on Debian 7.9 Wheezy Please
 provide feedback if you have problems running this in issues.
 
-You can run the included ``pyqt5_check.py`` which will grab, build and
+You can run the included ``getpyqt5.py`` which will grab, build and
 install ``Qt5``, ``SIP`` and ``PyQt5`` in your python environment. It is
 cleanest using ``virtualenv`` and ``virtualenvwrapper`` creating a
 virtualenv with:
@@ -91,11 +91,8 @@ system python if you run:
 
     sudo python pyqttools/install_pyqt_from_src.py
 
-This script only builds required parts of ``Qt5`` and ``PyQt5`` in the
-interest of time.
-
-Manual installation of ``PyQt5`` is fine too, but you'll need to trouble
-shoot on your own
+This script only builds required parts of ``Qt5`` and ``PyQt5``. 
+Manual installation of ``PyQt5`` is fine too, but you'll need to troubleshoot on your own.
 
 1. Install ``Qt5``. download the `online
    installer <http://www.qt.io/download-open-source/>`__

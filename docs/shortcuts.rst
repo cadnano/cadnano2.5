@@ -3,8 +3,6 @@
 Keyboard Shortcuts
 ==================
 
-Cadnano uses has several keyboard shortcuts.
-
 ::
 
   Document:
