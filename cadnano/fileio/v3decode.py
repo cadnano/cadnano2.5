@@ -160,10 +160,11 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
         part.setImportedVHelixOrder(vh_order)
 
     # Restore additional Part properties
-    for key in ['name',
+    for key in ('name',
                 'color',
                 'crossover_span_angle',
                 'max_vhelix_length',
+                'workplane_idxs'):
                 'workplane_idxs']:
         value = part_dict.get(key)
         if value is not None:
@@ -172,8 +173,9 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, use_undostack=True):
-    """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
+def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, ignore_neighbors=False):
+    """
+    Use this to duplicate virtual_helices within a Part. Duplicate id_nums
     will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
 
@@ -181,13 +183,22 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
         part_instance (ObjectInstance):
         copy_dict (dict):
     """
+    assert isinstance(offset, (tuple, list)) or offset is None
+    assert isinstance(use_undostack, bool)
+
+    print('Importing to part where use_undostack is %s' % use_undostack)
+
     part = part_instance.reference()
     id_num_offset = part.getMaxIdNum() + 1
-    print("Starting from", id_num_offset)
+    if id_num_offset % 2 == 1:
+        id_num_offset += 1
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
-    name_suffix = ".%d"
+    # name_suffix = ".%d"
+
+    xoffset = offset[0] if offset else 0
+    yoffset = offset[1] if offset else 0
 
     keys = list(vh_props.keys())
     name_index = keys.index('name')
@@ -195,13 +206,22 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
-        z = vh_props['z'][id_num]
+
+        z = vh_props['z'][i]
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
-        vals[name_index] += (name_suffix % new_id_num)
-        part.createVirtualHelix(x, y, z, size,
+        vals[name_index] = 'vh%s' % new_id_num
+        if ignore_neighbors:
+            try:
+                ignore_index = keys.index('neighbors')
+                fixed_keys = keys[:ignore_index] + keys[ignore_index + 1:]
+                fixed_vals = vals[:ignore_index] + vals[ignore_index + 1:]
+            except ValueError:
+                fixed_keys = keys
+                fixed_vals = vals
+        part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
-                                properties=(keys, vals),
+                                properties=(fixed_keys, fixed_vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
         new_vh_id_set.add(new_id_num)
@@ -211,8 +231,7 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     color_list = strands['properties']
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
-            fwd_strand_set, rev_strand_set = part.getStrandSets(
-                id_num + id_num_offset)
+            fwd_strand_set, rev_strand_set = part.getStrandSets(id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
             fwd_colors, rev_colors = color_list[id_num]
             for idxs, color in zip(fwd_idxs, fwd_colors):
@@ -239,8 +258,8 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in copy_dict['insertions']:
-        fwd_strand = part.getStrand(True, id_num, idx)
-        rev_strand = part.getStrand(False, id_num, idx)
+        fwd_strand = part.getStrand(True, id_num + id_num_offset, idx)
+        rev_strand = part.getStrand(False, id_num + id_num_offset, idx)
         if fwd_strand:
             fwd_strand.addInsertion(idx, length, use_undostack=use_undostack)
         elif rev_strand:
