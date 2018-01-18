@@ -137,6 +137,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.resize(self.settings.value("size", QSize(1100, 800)))
             self.move(self.settings.value("pos", QPoint(200, 200)))
             self.inspector_dock_widget.close()
+            self.action_inspector.setChecked(False)
         state = self.settings.value("state")
         if state is not None:
             result = self.restoreState(state)
@@ -271,7 +272,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """
         # grid_visible = self.slice_dock_widget.isVisible()
         # self.action_grid.setChecked(console_visible)
-        inspector_visible = self.inspector_dock_widget.widget().isVisibleTo(self)
+        inspector_visible = self.inspector_dock_widget.isVisible()
         self.action_inspector.setChecked(inspector_visible)
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
         self.action_path.setChecked(path_visible)
