@@ -1027,7 +1027,7 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        print('start, end going in', start, end)
+#        print('start, end going in', start, end)
         start_coordinates = ShortestPathHelper.findClosestPoint(position=start,
                                                                 grid_type=grid_type,
                                                                 scale_factor=scale_factor)
@@ -1035,7 +1035,7 @@ class ShortestPathHelper(object):
                                                               grid_type=grid_type,
                                                               scale_factor=scale_factor)
 
-        print('from to', start_coordinates, end_coordinates)
+#        print('from to', start_coordinates, end_coordinates)
 
         queue = PriorityQueue()
         queue.put((0, start_coordinates))
@@ -1050,7 +1050,7 @@ class ShortestPathHelper(object):
                 queue_tuple = queue.get(block=False)
                 current_location = queue_tuple[1]
             except Empty:
-                print('aborting')
+#                print('aborting')
                 return []
 
             if current_location == end_coordinates:
@@ -1068,7 +1068,7 @@ class ShortestPathHelper(object):
                         priority = new_cost + ShortestPathHelper.shortestPathHeuristic(start_coordinates, neighbor)
                         queue.put((priority, neighbor))
                         parents[neighbor] = current_location
-        print('parents %s' % parents)
+#        print('parents %s' % parents)
         return []
 
     @staticmethod
@@ -1094,8 +1094,8 @@ class ShortestPathHelper(object):
         return difference_a*0.01 + difference_b*0.01
 
     @staticmethod
-    def shortestPathXY(start, end, neighbor_map, vh_set, point_map, grid_type,
-                       scale_factor, radius, inverse_scale_factor):
+    def shortestPathXY(start, end, neighbor_map, vh_set, grid_type,
+                       scale_factor, radius):
         # TODO[NF]:  Docstring
         x_y_path = []
         coordinate_path = ShortestPathHelper.shortestPathAStar(start=start,
@@ -1104,8 +1104,6 @@ class ShortestPathHelper(object):
                                                                vh_set=vh_set,
                                                                grid_type=grid_type,
                                                                scale_factor=scale_factor)
-
-        print('coord path is %s' % coordinate_path)
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
@@ -1113,17 +1111,11 @@ class ShortestPathHelper(object):
                 parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
                                                                      row=row,
-                                                                     column=column) #,
-#                                                                     scale_factor=scale_factor)
+                                                                     column=column)
             else:
                 parity = None
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
                                                                   row=row,
-                                                                  column=column,
-                                                                  scale_factor=scale_factor)
+                                                                  column=column)
             x_y_path.append((node_pos[0], node_pos[1], parity))
-        print('xy path is %s' % x_y_path)
-        from cadnano.util import qtdb_trace
-        qtdb_trace()
-
         return x_y_path
