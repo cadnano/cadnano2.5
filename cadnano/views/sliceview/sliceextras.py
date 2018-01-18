@@ -1,7 +1,7 @@
 from queue import Empty, Queue, PriorityQueue
 
 import numpy as np
-from PyQt5.QtCore import QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt, pyqtProperty
+from PyQt5.QtCore import pyqtProperty, QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt
 from PyQt5.QtGui import QBrush, QColor, QPen, QPainterPath, QPolygonF, QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
 
@@ -894,7 +894,7 @@ class WedgeGizmo(QGraphicsPathItem):
 
 class ShortestPathHelper(object):
     @staticmethod
-    def findClosestPoint(position, grid_type, scale_factor):
+    def findClosestPoint(position, radius, grid_type, scale_factor):
         if grid_type is GridType.HONEYCOMB:
             return HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS, position[0], position[1], scale_factor)
         elif grid_type is GridType.SQUARE:
@@ -1009,7 +1009,7 @@ class ShortestPathHelper(object):
 #        return []
 
     @staticmethod
-    def shortestPathAStar(start, end, neighbor_map, vh_set, grid_type, scale_factor):
+    def shortestPathAStar(start, end, neighbor_map, vh_set, grid_type, radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 
         Does an A* search.
@@ -1029,9 +1029,11 @@ class ShortestPathHelper(object):
         """
 #        print('start, end going in', start, end)
         start_coordinates = ShortestPathHelper.findClosestPoint(position=start,
+                                                                radius=radius,
                                                                 grid_type=grid_type,
                                                                 scale_factor=scale_factor)
         end_coordinates = ShortestPathHelper.findClosestPoint(position=end,
+                                                              radius=radius,
                                                               grid_type=grid_type,
                                                               scale_factor=scale_factor)
 
@@ -1102,6 +1104,7 @@ class ShortestPathHelper(object):
                                                                end=end,
                                                                neighbor_map=neighbor_map,
                                                                vh_set=vh_set,
+                                                               radius=radius,
                                                                grid_type=grid_type,
                                                                scale_factor=scale_factor)
         for node in coordinate_path:

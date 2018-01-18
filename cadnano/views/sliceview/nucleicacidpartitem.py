@@ -305,11 +305,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                               position[0],
                                                               position[1],
                                                               scale_factor=self.scale_factor)
-#        calculated_coordinates = lattice.HoneycombDnaPart.positionToLatticeCoordRound(DEFAULT_RADIUS, position[0],
-#                                                                                 position[1], True, True)
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
-#        print('actual to calculated', coordinates, calculated_coordinates)
 
         assert id_num not in self.coordinates_to_vhid.values()
 
@@ -995,8 +990,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         result = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2
 
         print('result is %s' % result, self._RADIUS**2)
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
 
         return result <= (self._RADIUS*self.scale_factor)**2
     # end def
@@ -1019,6 +1012,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
                                                                       end=end_coord,
                                                                       neighbor_map=self.neighbor_map,
+                                                                      radius=self._RADIUS,
                                                                       vh_set=self.coordinates_to_vhid.keys(),
                                                                       grid_type=self.griditem.grid_type,
                                                                       scale_factor=self.scale_factor)
