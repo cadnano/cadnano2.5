@@ -922,6 +922,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
+        self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self.width()
         if event.modifiers() & Qt.ShiftModifier or self._moving_via_handle:
             self.setCursor(Qt.ClosedHandCursor)
             self._start_idx_low = self._idx_low
@@ -929,7 +930,6 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._delta = 0
             self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
             self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
-            self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self.width()
         else:
             return QGraphicsItem.mousePressEvent(self, event)
     # end def
