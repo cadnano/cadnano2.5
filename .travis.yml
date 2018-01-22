@@ -13,7 +13,7 @@ install:
     - python setup.py install
 
 # Command to run tests
-script: pytest cadnano/tests
+script: pytest cadnano/tests; pytest -c cadnano/tests/pytestgui.ini cadnano/tests/
 
 # Slack integration
 notifications:
