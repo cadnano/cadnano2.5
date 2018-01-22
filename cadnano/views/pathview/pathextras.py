@@ -390,6 +390,8 @@ class PreXoverItem(QGraphicsRectItem):
         self.setZValue(styles.ZPREXOVERITEM)
         self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index, nearby_idxs, to_vh_id_num, prexoveritem_manager)
+
+        self._getActiveTool = from_virtual_helix_item.viewroot().manager.activeToolGetter
     # end def
 
     def shutdown(self):
@@ -540,6 +542,9 @@ class PreXoverItem(QGraphicsRectItem):
         Args:
             event (QGraphicsSceneHoverEvent): the hover event
         """
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritem_manager.updateModelActiveBaseInfo(self.getInfo())
         self.setActiveHovered(True)
@@ -563,6 +568,9 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         part = self._model_vh.part()
         is_fwd = self.is_fwd
 
