@@ -91,7 +91,7 @@ class DocumentController(object):
         self.actiongroup = ag = QActionGroup(win)
         action_group_list = ['action_global_select',
                              'action_global_create',
-                             'action_path_nick',
+                             'action_path_break',
                              'action_path_paint',
                              'action_path_insertion',
                              'action_path_skip',

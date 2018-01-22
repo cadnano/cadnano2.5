@@ -539,22 +539,22 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     ### TOOL METHODS ###
-    def nickToolMousePress(self, event, idx):
+    def breakToolMousePress(self, event, idx):
         """Break the strand is possible."""
         m_strand = self._model_strand
         m_strand.split(idx)
     # end def
 
-    def nickToolHoverMove(self, event, idx):
+    def breakToolHoverMove(self, event, idx):
         pass
         # m_strand = self._model_strand
         vhi = self._virtual_helix_item
-        nick_tool = self._getActiveTool()
-        nick_tool.hoverMove(vhi, event, flag=None)
-        # nick_tool.updateHoverRect(vhi, m_strand, idx, show=True)
+        break_tool = self._getActiveTool()
+        break_tool.hoverMove(vhi, event, flag=None)
+        # break_tool.updateHoverRect(vhi, m_strand, idx, show=True)
     # end def
 
-    def nickToolHoverLeave(self, event):
+    def breakToolHoverLeave(self, event):
         self._getActiveTool().hoverLeaveEvent(event)
     # end def
 

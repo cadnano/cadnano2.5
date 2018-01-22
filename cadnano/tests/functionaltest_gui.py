@@ -1,3 +1,6 @@
+# To run:
+# pytest -c cadnano/tests/pytestgui.ini cadnano/tests/
+
 import pytest
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtTest import QTest
