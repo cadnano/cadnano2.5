@@ -261,10 +261,6 @@ class AddSeqTool(AbstractPathTool):
                 if not self.buttons[i].isChecked():
                     # Select the corresponding radio button for known sequence
                     self.buttons[i].click()
-            else:
-                # Unrecognized, Custom type
-                if not self.buttons[1].isChecked():
-                    self.buttons[1].click()
 
     def applySequence(self, oligo):
         """Summary
