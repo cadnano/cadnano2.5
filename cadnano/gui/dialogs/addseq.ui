@@ -37,7 +37,11 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QTextEdit" name="seq_text_edit"/>
+       <widget class="QTextEdit" name="seq_text_edit">
+        <property name="placeholderText">
+         <string>Paste sequence here or select an option below</string>
+        </property>
+       </widget>
       </item>
       <item alignment="Qt::AlignVCenter">
        <widget class="QGroupBox" name="group_box">

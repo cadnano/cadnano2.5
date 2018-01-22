@@ -539,6 +539,23 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     ### TOOL METHODS ###
+    def addSeqToolMousePress(self, event, idx):
+        oligo = self._model_strand.oligo()
+        addSeq_tool = self._getActiveTool()
+        addSeq_tool.applySequence(oligo)
+    # end def
+
+    def addSeqToolHoverMove(self, event, idx):
+        # m_strand = self._model_strand
+        vhi = self._virtual_helix_item
+        addSeq_tool = self._getActiveTool()
+        addSeq_tool.hoverMove(vhi, event, flag=None)
+    # end def
+
+    def addSeqToolHoverLeave(self, event):
+        self._getActiveTool().hoverLeaveEvent(event)
+    # end def
+
     def breakToolMousePress(self, event, idx):
         """Break the strand is possible."""
         m_strand = self._model_strand
@@ -546,7 +563,6 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def breakToolHoverMove(self, event, idx):
-        pass
         # m_strand = self._model_strand
         vhi = self._virtual_helix_item
         break_tool = self._getActiveTool()
@@ -638,30 +654,30 @@ class StrandItem(QGraphicsLineItem):
         m_strand.addInsertion(idx, -1)
     # end def
 
-    def addSeqToolMousePress(self, event, idx):
-        """
-        Checks that a scaffold was clicked, and then calls apply sequence
-        to the clicked strand via its oligo.
-        """
-        m_strand = self._model_strand
-        current_filter_set = self._viewroot.selectionFilterSet()
-        if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
-            olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
-            if olg_len:
-                msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)
-                if olg_len > seq_len:
-                    d = olg_len - seq_len
-                    msg = msg + " Warning: %d bases have no sequence." % d
-                elif olg_len < seq_len:
-                    d = seq_len - olg_len
-                    msg = msg + " Warning: %d sequence bases unused." % d
-                self.partItem().updateStatusBar(msg)
-        else:
-            pass
-            # logger.info("The clicked strand %s does not match current selection filter %s. "\
-            #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-            #             self.strandFilter(), self.FILTER_NAME)
-    # end def
+    # def addSeqToolMousePress(self, event, idx):
+    #     """
+    #     Checks that a scaffold was clicked, and then calls apply sequence
+    #     to the clicked strand via its oligo.
+    #     """
+    #     m_strand = self._model_strand
+    #     current_filter_set = self._viewroot.selectionFilterSet()
+    #     if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
+    #         olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
+    #         if olg_len:
+    #             msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)
+    #             if olg_len > seq_len:
+    #                 d = olg_len - seq_len
+    #                 msg = msg + " Warning: %d bases have no sequence." % d
+    #             elif olg_len < seq_len:
+    #                 d = seq_len - olg_len
+    #                 msg = msg + " Warning: %d sequence bases unused." % d
+    #             self.partItem().updateStatusBar(msg)
+    #     else:
+    #         pass
+    #         # logger.info("The clicked strand %s does not match current selection filter %s. "\
+    #         #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+    #         #             self.strandFilter(), self.FILTER_NAME)
+    # # end def
 
     def restoreParent(self, pos=None):
         """

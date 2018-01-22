@@ -86,6 +86,7 @@ class EndpointItem(QGraphicsPathItem):
         self._low_drag_bound = None
         self._high_drag_bound = None
         self._mod_item = None
+        self._isdrawn5to3 = is_drawn5to3
         self._initCapSpecificState(is_drawn5to3)
         p = QPen()
         p.setCosmetic(True)
@@ -231,6 +232,8 @@ class EndpointItem(QGraphicsPathItem):
         active_tool_str = self._getActiveTool().methodPrefix()
         if active_tool_str == 'createTool':
             return self._strand_item.createToolHoverMove(event, self.idx())
+        elif active_tool_str == 'addSeqTool':
+            return self.addSeqToolHoverMove(event, self.idx())
 
     def mouseMoveEvent(self, event):
         """
@@ -259,32 +262,32 @@ class EndpointItem(QGraphicsPathItem):
             del self._move_idx
 
     ### TOOL METHODS ###
-    def addSeqToolMousePress(self, modifiers, event, idx):
-        """
-        Checks that a scaffold was clicked, and then calls apply sequence
-        to the clicked strand via its oligo.
-        """
-        m_strand = self._strand_item._model_strand
-        s_i = self._strand_item
-        viewroot = s_i.viewroot()
-        current_filter_set = viewroot.selectionFilterSet()
-        if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
-            olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
-            if olgLen:
-                msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
-                if olgLen > seqLen:
-                    d = olgLen - seqLen
-                    msg = msg + " Warning: %d bases have no sequence." % d
-                elif olgLen < seqLen:
-                    d = seqLen - olgLen
-                    msg = msg + " Warning: %d sequence bases unused." % d
-                self.partItem().updateStatusBar(msg)
-        else:
-            pass
-            # logger.info("The clicked strand %s does not match current selection filter %s. "\
-            #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-            #             s_i.strandFilter(), self.FILTER_NAME)
-    # end def
+    # def addSeqToolMousePress(self, modifiers, event, idx):
+    #     """
+    #     Checks that a scaffold was clicked, and then calls apply sequence
+    #     to the clicked strand via its oligo.
+    #     """
+    #     m_strand = self._strand_item._model_strand
+    #     s_i = self._strand_item
+    #     viewroot = s_i.viewroot()
+    #     current_filter_set = viewroot.selectionFilterSet()
+    #     if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
+    #         olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
+    #         if olgLen:
+    #             msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
+    #             if olgLen > seqLen:
+    #                 d = olgLen - seqLen
+    #                 msg = msg + " Warning: %d bases have no sequence." % d
+    #             elif olgLen < seqLen:
+    #                 d = seqLen - olgLen
+    #                 msg = msg + " Warning: %d sequence bases unused." % d
+    #             self.partItem().updateStatusBar(msg)
+    #     else:
+    #         pass
+    #         # logger.info("The clicked strand %s does not match current selection filter %s. "\
+    #         #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
+    #         #             s_i.strandFilter(), self.FILTER_NAME)
+    # # end def
 
     def modsToolMousePress(self, modifiers, event, idx):
         """
@@ -322,6 +325,23 @@ class EndpointItem(QGraphicsPathItem):
         else:
             color = self.window().path_color_panel.colorName()
         m_strand.oligo().applyColor(color)
+    # end def
+
+    def addSeqToolMousePress(self, modifiers, event, idx):
+        oligo = self._strand_item._model_strand.oligo()
+        addSeq_tool = self._getActiveTool()
+        addSeq_tool.applySequence(oligo)
+    # end def
+
+    def addSeqToolHoverMove(self, event, idx):
+        # m_strand = self._model_strand
+        # vhi = self._strand_item._virtual_helix_item
+        addSeq_tool = self._getActiveTool()
+        addSeq_tool.hoverMove(self, event, flag=self._isdrawn5to3)
+    # end def
+
+    def addSeqToolHoverLeave(self, event):
+        self._getActiveTool().hoverLeaveEvent(event)
     # end def
 
     def createToolHoverMove(self, idx):
