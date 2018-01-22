@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
-# revisit porting
-# https://github.com/cadnano/cadnano2/blob/229dac07f6cefa9047d73fa4b904c913fb9fd8a8/tests/testrecorder.py
-
 import pytest
-from PyQt5.QtCore import QPoint, QPointF, Qt
+from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtTest import QTest
+
+from cadnano.fileio.lattice import HoneycombDnaPart
+from cadnano.views.sliceview import slicestyles
 from cnguitestcase import GUITestApp
 
 
@@ -15,53 +14,50 @@ def cnapp():
     app.tearDown()
 
 
-DELAY = 20  # milliseconds
+DELAY = 5  # milliseconds
+RADIUS = slicestyles.SLICE_HELIX_RADIUS
 
 
 ####################### Standard Functional Tests ########################
-def testCreateVirtualHelix(cnapp):
-    """Alt+Click on a 5' or 3' endpoint extends it to its boundary."""
+def testCreateVirtualHelixGui(cnapp):
+    """Create some VHs"""
     # Create a new Honeycomb part
-    main_toolbar = cnapp.window.main_toolbar
-    new_dna_part_button = main_toolbar.widgetForAction(cnapp.window.action_new_dnapart)
-    QTest.mouseClick(new_dna_part_button, Qt.LeftButton, delay=DELAY)
-    # Click each SliceHelix
-    slicerootitem = cnapp.window.sliceroot
+    toolbar = cnapp.window.main_toolbar
+    action_new_honeycomb = toolbar.widgetForAction(cnapp.window.action_new_dnapart_honeycomb)
+    QTest.mouseClick(action_new_honeycomb, Qt.LeftButton, delay=DELAY)
+
+    slicerootitem = cnapp.window.slice_root
     assert len(slicerootitem.instance_items) == 1
     slice_part_item = list(slicerootitem.instance_items.values())[0]
     QTest.keyClick(cnapp.window, Qt.Key_H, delay=DELAY)
-    QTest.keyClick(cnapp.window, Qt.Key_N, delay=DELAY)
-    # could try different positions
-    cnapp.graphicsItemClick(slice_part_item, Qt.LeftButton, delay=DELAY)
+    QTest.keyClick(cnapp.window, Qt.Key_C, delay=DELAY)
     cnapp.processEvents()
+
+    cmd_count = 1  # already added the part
+    for row in range(-2, 2):
+        for col in range(-2, 2):
+            # print(row, col)
+            x, y = HoneycombDnaPart.latticeCoordToPositionXY(RADIUS, row, col)
+            pt = QPointF(x, y)
+            cnapp.graphicsItemClick(slice_part_item, Qt.LeftButton, pos=pt, delay=DELAY)
+            cmd_count += 1
+    cnapp.processEvents()
+
+    vh_count = len(cnapp.document.activePart().getidNums())
+
+    # undo and redo all
+    for i in range(cmd_count):
+        cnapp.document.undoStack().undo()
+    cnapp.processEvents()
+    for i in range(cmd_count):
+        cnapp.document.undoStack().redo()
+    cnapp.processEvents()
+
+    part = list(cnapp.document.children())[0]
+    vh_count_after_redo = len(part.getidNums())
+
+    assert vh_count == vh_count_after_redo
+    # import time
     # time.sleep(3)
 
-    # sliceGraphicsItem = self.document_controller.sliceGraphicsItem
-    # slicehelix1 = sliceGraphicsItem.getSliceHelixByCoord(0, 0)
-    # slicehelix2 = sliceGraphicsItem.getSliceHelixByCoord(0, 1)
-    # self.mousePress(slicehelix1, qgraphicsscene=self.mainWindow.slicescene)
-    # self.mousePress(slicehelix2, qgraphicsscene=self.mainWindow.slicescene)
-    # # Click the path helices with the ALT modifier
-    # pathHelixGroup = self.document_controller.pathHelixGroup
-    # ph0 = pathHelixGroup.getPathHelix(0)
-    # ph1 = pathHelixGroup.getPathHelix(1)
-    # self.mousePress(ph0, position=QPoint(410, 10),\
-    #                 modifiers=Qt.AltModifier,\
-    #                 qgraphicsscene=self.mainWindow.pathscene)
-    # self.mousePress(ph0, position=QPoint(450, 10),\
-    #                 modifiers=Qt.AltModifier,\
-    #                 qgraphicsscene=self.mainWindow.pathscene)
-    # self.mousePress(ph1, position=QPoint(410, 30),\
-    #                 modifiers=Qt.AltModifier,\
-    #                 qgraphicsscene=self.mainWindow.pathscene)
-    # self.mousePress(ph1, position=QPoint(450, 30),\
-    #                 modifiers=Qt.AltModifier,\
-    #                 qgraphicsscene=self.mainWindow.pathscene)
-    # # Check the model for correctness
-    # vh0 = self.app.v[0]
-    # vh1 = self.app.v[1]
-    # str0 = "0 Scaffold: _,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,_\n0 Staple:   _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_"
-    # str1 = "1 Scaffold: _,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,> <,_\n1 Staple:   _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_ _,_"
-    # self.assertEqual(repr(vh0), str0)
-    # self.assertEqual(repr(vh1), str1)
-    # self.debugHere()  # Stop simulation and give control to user
+# end def
