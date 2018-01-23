@@ -249,22 +249,16 @@ class AddSeqTool(AbstractPathTool):
         else:
             self.apply_button.setEnabled(False)
 
-        if len(user_sequence) == 0:
-            # A zero-length custom sequence defaults to Abstract type.
+        if user_sequence in self.sequence_radio_button_id:
+            # Handles case where the user might copy & paste in a known sequence
+            i = self.sequence_radio_button_id[user_sequence]
+            if not self.buttons[i].isChecked():
+                # Select the corresponding radio button for known sequence
+                self.buttons[i].click()
+        else:
+            # Unrecognized, select Custom type
             if not self.buttons[0].isChecked():
                 self.buttons[0].click()
-        else:
-            # Does this match a known sequence?
-            if user_sequence in self.sequence_radio_button_id:
-                # Handles case where the user might copy & paste in a known sequence
-                i = self.sequence_radio_button_id[user_sequence]
-                if not self.buttons[i].isChecked():
-                    # Select the corresponding radio button for known sequence
-                    self.buttons[i].click()
-            else:
-                # Unrecognized, Custom type
-                if not self.buttons[1].isChecked():
-                    self.buttons[1].click()
 
     def applySequence(self, oligo):
         """Summary
