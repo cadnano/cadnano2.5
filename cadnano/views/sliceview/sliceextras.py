@@ -1,31 +1,15 @@
-"""Summary
-
-Attributes:
-    PXI_PP_ITEM_WIDTH (TYPE): Description
-    PXI_RECT (TYPE): Description
-    TRIANGLE (TYPE): Description
-    WEDGE_RECT (TYPE): Description
-"""
-from queue import Queue, PriorityQueue, Empty
+from queue import Empty, Queue, PriorityQueue
 
 import numpy as np
+from PyQt5.QtCore import QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt, pyqtProperty
+from PyQt5.QtGui import QBrush, QColor, QPen, QPainterPath, QPolygonF, QRadialGradient, QTransform
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
 
-from PyQt5.QtCore import QLineF, QObject, QPointF, Qt, QRectF
-from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
-from PyQt5.QtGui import QBrush, QPen, QPainterPath, QColor, QPolygonF
-from PyQt5.QtGui import QRadialGradient, QTransform
-# from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-
+from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
 from cadnano.proxies.cnenum import GridType
-
-from cadnano.gui.palette import getColorObj, getBrushObj
-from cadnano.gui.palette import getPenObj, getNoPen
-# from cadnano import util
 from . import slicestyles as styles
+
 
 PXI_PP_ITEM_WIDTH = IW = 2.0  # 1.5
 TRIANGLE = QPolygonF()
@@ -69,16 +53,6 @@ _WEDGE_RECT_CENTERPT = WEDGE_RECT.center()
 
 
 class PropertyWrapperObject(QObject):
-    """Summary
-
-    Attributes:
-        animations (dict): Description
-        bondp2 (TYPE): Description
-        item (TYPE): Description
-        pen_alpha (TYPE): Description
-        rotation (TYPE): Description
-    """
-
     def __init__(self, item):
         """Summary
 
@@ -326,7 +300,7 @@ class PreXoverItem(QGraphicsRectItem):
         Returns:
             Tuple: (from_id_num, is_fwd, from_index, to_vh_id_num)
         """
-        return (self.pre_xover_item_group.id_num, self.is_fwd, self.step_idx, None)
+        return self.pre_xover_item_group.id_num, self.is_fwd, self.step_idx, None
 
     def name(self):
         """Summary
@@ -587,7 +561,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         # for baseNearestPoint
         fwd_pos, rev_pos = [], []
         step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
-        for i in range(step_size):
+        for i in range(int(step_size)):
             fwd_pos.append((fwd_pxis[i].scenePos().x(),
                             fwd_pxis[i].scenePos().y()))
             rev_pos.append((rev_pxis[i].scenePos().x(),
@@ -657,7 +631,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         Returns:
             TYPE: Description
         """
-        step_size = self.virtual_helix_item.getProperty('bases_per_repeat')
+        step_size = int(self.virtual_helix_item.getProperty('bases_per_repeat'))
         hue_scale = step_size*self.HUE_FACTOR
         return [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name() for i in range(step_size)]
     # end def
@@ -680,7 +654,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         mgroove = -mgroove
         fwd_pxis = self.fwd_prexover_items
         rev_pxis = self.rev_prexover_items
-        for i in range(step_size):
+        for i in range(int(step_size)):
             inset = i*spiral_factor  # spiral layout
             fwd = PreXoverItem(i, tpb, step_size, colors[i], self, is_fwd=True)
             rev = PreXoverItem(i, tpb, step_size, colors[-1 - i], self, is_fwd=False)
@@ -695,7 +669,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
             fwd_pxis[i] = fwd
             rev_pxis[i] = rev
 
-        for i in range(step_size - 1):
+        for i in range(int(step_size) - 1):
             fwd, next_fwd = fwd_pxis[i], fwd_pxis[i + 1]
             j = (step_size - 1) - i
             rev, next_rev = rev_pxis[j], rev_pxis[j - 1]
@@ -750,12 +724,12 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         mgroove = -mgroove
         fpxis = self.fwd_prexover_items
         rpxis = self.rev_prexover_items
-        for i in range(step_size):
+        for i in range(int(step_size)):
             fwd = self.fwd_prexover_items[i]
             rev = self.rev_prexover_items[i]
             fwd.setRotation(round((i*tpb) % 360, 3))
             rev.setRotation(round((i*tpb + mgroove) % 360, 3))
-        for i in range(step_size - 1):
+        for i in range(int(step_size) - 1):
             fwd, next_fwd = fpxis[i], fpxis[i + 1]
             j = (step_size - 1) - i
             rev, next_rev = rpxis[j], rpxis[j - 1]

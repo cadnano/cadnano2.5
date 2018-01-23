@@ -1,12 +1,12 @@
-"""Summary
-"""
 from collections import deque
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor
-from .pathextras import PreXoverItem
+from PyQt5.QtWidgets import QGraphicsRectItem
+
 from cadnano.gui.palette import getNoPen
 from cadnano.proxies.cnenum import StrandType
+from .pathextras import PreXoverItem
 
 
 class PreXoverManager(QGraphicsRectItem):
@@ -95,7 +95,7 @@ class PreXoverManager(QGraphicsRectItem):
         """
         hue_scale = step_size*self.HUE_FACTOR
         self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name()
-                        for i in range(step_size)]
+                        for i in range(int(step_size))]
         # self.removeRepeats()
         # self.addRepeats()
     # end def

@@ -10,21 +10,20 @@ import numpy as np
 import pandas as pd
 
 from cadnano import util
-from cadnano.proxies.cnobject import CNObject
-from .virtualhelix import VirtualHelix
-from cadnano.proxies.cnproxy import ProxySignal
-from cadnano.proxies.cnenum import GridType, PartType, PointType
 from cadnano.oligo import RemoveOligoCommand
+from cadnano.proxies.cnenum import GridType, PartType, PointType
+from cadnano.proxies.cnobject import CNObject
+from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.part.part import Part
-from cadnano.strandset import StrandSet
-from cadnano.strandset import SplitCommand
+from cadnano.removeinstancecmd import RemoveInstanceCommand
+from cadnano.setpropertycmd import SetVHPropertyCommand
+from cadnano.strandset import SplitCommand, StrandSet
 from .createvhelixcmd import CreateVirtualHelixCommand
 from .removevhelixcmd import RemoveVirtualHelixCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
+from .virtualhelix import VirtualHelix
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
-from cadnano.setpropertycmd import SetVHPropertyCommand
-from cadnano.removeinstancecmd import RemoveInstanceCommand
 
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
@@ -355,11 +354,13 @@ class NucleicAcidPart(Part):
 
                 (offset, size)
 
-            into the coordinate arrays for a given ID number or or :obj:`None`
-            if `id_num` if out of range
+            into the coordinate arrays for a given ID number
         """
         offset_and_size = self._offset_and_size
-        return offset_and_size[id_num] if id_num < len(offset_and_size) else None
+        if id_num > len(offset_and_size) - 1 or offset_and_size[id_num] is None:
+            raise KeyError('id_num %s not in NucleicAcidPart' % id_num)
+        else:
+            return offset_and_size[id_num]
     # end def
 
     def getVirtualHelix(self, id_num):
@@ -502,11 +503,7 @@ class NucleicAcidPart(Part):
 
             for a given virtual helix ID number
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         lo, hi = offset, offset + size
         return (self.axis_pts[lo:hi],
                 self.fwd_pts[lo:hi],
@@ -527,11 +524,8 @@ class NucleicAcidPart(Part):
             KeyError: id_num not in NucleicAcidPart
             IndexError: idx is greater than size
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
+        offset, size = self.getOffsetAndSize(id_num)
 
-        offset, size = offset_and_size_tuple
         if idx < size:
             return self.axis_pts[offset + idx]
         else:
@@ -567,10 +561,7 @@ class NucleicAcidPart(Part):
         Raises:
             KeyError: id_num not in NucleicAcidPart
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
+        _, _ = self.getOffsetAndSize(id_num)
         return self._origin_pts[id_num]
     # end def
 
@@ -625,10 +616,7 @@ class NucleicAcidPart(Part):
         Returns:
             tuple: (forward :class:`StrandSet`, reverse :class:`StrandSet`)
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
+        _, _ = self.getOffsetAndSize(id_num)
         return (self.fwd_strandsets[id_num], self.rev_strandsets[id_num])
     # end def
 
@@ -640,9 +628,7 @@ class NucleicAcidPart(Part):
 
                 ( [ [(start, end),...], ...], [ [(start, end),...], ...])
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
+        _, _ = self.getOffsetAndSize(id_num)
         fwd_ss = self.fwd_strandsets[id_num]
         rev_ss = self.rev_strandsets[id_num]
 
@@ -807,11 +793,7 @@ class NucleicAcidPart(Part):
         Returns:
             ndarray: of :obj:`int` array of indices corresponding to points
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         lo, hi = offset, offset + size
         return self.indices[lo:hi]
     # end def
@@ -832,9 +814,7 @@ class NucleicAcidPart(Part):
 
             of type (:obj:`int`, :obj:`int`)
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
+        _, _ = self.getOffsetAndSize(id_num)
 
         coord = self.getCoordinate(id_num, idx)
         neighbors, indices = self.queryBasePoint(radius, *coord)
@@ -878,9 +858,6 @@ class NucleicAcidPart(Part):
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
 
         # 1. Find insert indices
-        if offset_and_size_tuple is None:
-            raise IndexError("id_num {} does not exists".format(id_num))
-
         offset_and_size = self._offset_and_size
         len_axis_pts = len(self.axis_pts)
 
@@ -1070,9 +1047,12 @@ class NucleicAcidPart(Part):
         """
         num_points = int(num_points)  # re-cast to int to avoid numpy errors
 
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is not None:
-            raise IndexError("id_num {} already exists".format(id_num))
+        try:
+            self.getOffsetAndSize(id_num)
+        except KeyError:
+            pass
+        else:
+            raise IndexError('id_num %s already exists' % id_num)
 
         self._reserveIdNum(id_num)
 
@@ -1231,10 +1211,8 @@ class NucleicAcidPart(Part):
             object: object or list depending on type of arg `keys`
         """
         if safe:
-            offset_and_size_tuple = self.getOffsetAndSize(id_num)
-            # 1. Find insert indices
-            if offset_and_size_tuple is None:
-                raise IndexError("id_num {} does not exists".format(id_num))
+            _, _ = self.getOffsetAndSize(id_num)
+        # 1. Find insert indices
         props = self.vh_properties.loc[id_num, keys]
         if isinstance(props, pd.Series):
             return [v.item() if isinstance(v, (np.float64, np.int64, np.bool_)) else v for v in props]
@@ -1291,10 +1269,8 @@ class NucleicAcidPart(Part):
             IndexError:
         """
         if safe:
-            offset_and_size_tuple = self.getOffsetAndSize(id_num)
-            # 1. Find insert indices
-            if offset_and_size_tuple is None:
-                raise IndexError("id_num {} does not exists".format(id_num))
+            _, _ = self.getOffsetAndSize(id_num)
+        # 1. Find insert indices
         series = self.vh_properties.loc[id_num]
         # to_dict doesn't promote to python native types needed by QVariant
         # leaves as numpy integers and floats
@@ -1324,10 +1300,8 @@ class NucleicAcidPart(Part):
             safe (bool): optionally echew signalling
         """
         if safe:
-            offset_and_size_tuple = self.getOffsetAndSize(id_num)
-            # 1. Find insert indices
-            if offset_and_size_tuple is None:
-                raise IndexError("id_num {} does not exists".format(id_num))
+            _, _ = self.getOffsetAndSize(id_num)
+        # 1. Find insert indices
         if use_undostack:
             c = SetVHPropertyCommand(self, [id_num], keys, values, safe)
             self.undoStack().push(c)
@@ -1349,10 +1323,7 @@ class NucleicAcidPart(Part):
             emit_signals (bool): optionally echew signaling
         """
         if emit_signals:
-            offset_and_size_tuple = self.getOffsetAndSize(id_num)
-            # 1. Find insert indices
-            if offset_and_size_tuple is None:
-                raise IndexError("id_num {} does not exists".format(id_num))
+            _, _ = self.getOffsetAndSize(id_num)
 
         # Ensure that the values that are set are floats as appropriate
         keys_list = [keys] if isinstance(keys, str) else keys
@@ -1409,11 +1380,8 @@ class NucleicAcidPart(Part):
             IndexError:
             ValueError:
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise IndexError("id_num {} does not exist")
+        offset, size = self.getOffsetAndSize(id_num)
 
-        offset, size = offset_and_size_tuple
         # len_axis_pts = len(self.axis_pts)
         direction = self.directions[id_num]
 
@@ -1481,10 +1449,7 @@ class NucleicAcidPart(Part):
         Raises:
             IndexError:
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise IndexError("id_num {} does not exist")
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         # print("the offset and size", offset_and_size_tuple)
         did_remove = self._removeCoordinates(id_num, size, is_right=False)
         self._recycleIdNum(id_num)
@@ -1506,10 +1471,7 @@ class NucleicAcidPart(Part):
         Raises:
             KeyError:
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         origin = self.axis_pts[offset]  # zero point of axis
         direction = self.directions[id_num]
         points = self._pointsFromDirection(id_num, origin, direction, size, 0)
@@ -1531,11 +1493,7 @@ class NucleicAcidPart(Part):
             KeyError:
             IndexError:
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         if idx_start + len(points) > size:
             err = ("Number of Points {} out of range for"
                    "start index {} given existing size {}")
@@ -1565,12 +1523,7 @@ class NucleicAcidPart(Part):
             KeyError:
             IndexError:
         """
-        offset_and_size_tuple = self.getOffsetAndSize(id_num)
-
-        if offset_and_size_tuple is None:
-            raise KeyError("id_num {} not in NucleicAcidPart".format(id_num))
-
-        offset, size = offset_and_size_tuple
+        offset, size = self.getOffsetAndSize(id_num)
         if length > size:
             raise IndexError("length longer {} than indices existing".format(length))
         lo, hi = offset, offset + size
@@ -2052,11 +2005,7 @@ class NucleicAcidPart(Part):
         Raises:
             ValueError:
         """
-        offset_and_size = self.getOffsetAndSize(id_num)
-        if offset_and_size is None:
-            raise ValueError("offset_and_size is None for {}".format(id_num))
-        else:
-            offset, size = offset_and_size
+        offset, size = self.getOffsetAndSize(id_num)
         bpr, tpr = self.vh_properties.loc[id_num,
                                           ['bases_per_repeat', 'turns_per_repeat']]
         bases_per_turn = bpr / tpr
@@ -2065,9 +2014,9 @@ class NucleicAcidPart(Part):
         else:
             half_period = bpr // 2
             if size - index < bpr:
-                start, length = size - bpr, bpr
+                start, length = int(size - bpr), int(bpr)
             else:
-                start, length = max(index - half_period, 0), bpr
+                start, length = int(max(index - half_period, 0)), int(bpr)
         # norm = np.linalg.norm
         # cross = np.cross
         # dot = np.dot
@@ -2461,8 +2410,10 @@ class NucleicAcidPart(Part):
         return circ_olgs
 
     def maxBaseIdx(self, id_num):
-        o_and_s = self.getOffsetAndSize(id_num)
-        size = self._STEP_SIZE*2 if o_and_s is None else o_and_s[1]
+        try:
+            _, size = self.getOffsetAndSize(id_num)
+        except KeyError:
+            size = self._STEP_SIZE*2
         return size
     # end def
 
