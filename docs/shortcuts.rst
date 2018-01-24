@@ -9,8 +9,8 @@ Keyboard Shortcuts
     New           ⌘N
     Open          ⌘O
     Close         ⌘W
-    Save          ⇧⌘S
-    SaveAs        ⌘W
+    Save          ⌘S
+    SaveAs        ⌘⇧S
   
   Tools:
     CreateTool    C
