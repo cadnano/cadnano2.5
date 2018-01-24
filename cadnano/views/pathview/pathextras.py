@@ -433,6 +433,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.enter_pos = None
         self.exit_pos = None
         self.to_vh_id_num = to_vh_id_num
+        self._label_txt = None
         self.prexoveritem_manager = prexoveritem_manager
 
         # todo: check here if xover present and disable
