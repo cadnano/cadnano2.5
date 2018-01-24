@@ -967,7 +967,8 @@ class Document(CNObject):
         Returns:
             The current Grid type
         """
-        return self.activePart().getGridType()
+        if self.activePart() is not None:
+            return self.activePart().getGridType()
     # end def
 
     def setGridType(self, grid_type):
@@ -977,6 +978,7 @@ class Document(CNObject):
         Returns:
             None
         """
-        return self.activePart().setGridType(grid_type)
+        if self.activePart() is not None:
+            return self.activePart().setGridType(grid_type)
     # end def
 # end class
