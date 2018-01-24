@@ -12,19 +12,18 @@ Attributes:
 """
 from math import floor
 
-from PyQt5.QtCore import QRectF, Qt, QObject, QPointF
+from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
 from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
 from PyQt5.QtGui import QBrush, QColor, QPainterPath
 from PyQt5.QtGui import QPolygonF, QTransform
 from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem, QGraphicsItem
-# from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano import util
-from cadnano.proxies.cnenum import Axis, HandleType, StrandType
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
+from cadnano.proxies.cnenum import Axis, HandleType, StrandType
 from cadnano.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 
@@ -786,7 +785,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def __init__(self, model_part, part_item):
         super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
-        # self.setAcceptHoverEvents(True)
+        self.setAcceptHoverEvents(True)
         # self.setBrush(getNoBrush())
         self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=12))
         self.setPen(getNoPen())
@@ -916,15 +915,24 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     ### EVENT HANDLERS ###
     def hoverEnterEvent(self, event):
+        if event.modifiers() & Qt.ShiftModifier:
+            self.setCursor(Qt.OpenHandCursor)
+        else:
+            self.setCursor(Qt.ArrowCursor)
         self._part_item.updateStatusBar("{}–{}".format(self._idx_low, self._idx_high))
         QGraphicsItem.hoverEnterEvent(self, event)
     # end def
 
     def hoverMoveEvent(self, event):
+        if event.modifiers() & Qt.ShiftModifier:
+            self.setCursor(Qt.OpenHandCursor)
+        else:
+            self.setCursor(Qt.ArrowCursor)
         QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):
+        self.setCursor(Qt.ArrowCursor)
         self._part_item.updateStatusBar("")
         QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
