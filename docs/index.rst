@@ -26,6 +26,7 @@ Welcome to cadnano's documentation!
 
    api
    docs
+   tests
    gui
    changelog
    authors
