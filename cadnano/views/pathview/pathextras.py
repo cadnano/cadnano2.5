@@ -687,6 +687,9 @@ class PreXoverItem(QGraphicsRectItem):
             active_prexoveritem (TYPE): Description
             shortcut (None, optional): Description
         """
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         if self.is3p and not active_prexoveritem.is3p:
             item5p = active_prexoveritem
             item3p = self
