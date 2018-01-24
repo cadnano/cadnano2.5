@@ -1,12 +1,11 @@
-"""Summary
-"""
 import math
 
-from cadnano.gui.palette import getBrushObj, getNoPen, getPenObj
-from cadnano.views.sliceview import slicestyles as styles
 from PyQt5.QtCore import QLineF, QPointF, QRectF
-from PyQt5.QtWidgets import (QGraphicsEllipseItem, QGraphicsLineItem,
-                             QGraphicsObject)
+from PyQt5.QtWidgets import QGraphicsObject
+
+from cadnano.gui.palette import getPenObj
+from cadnano.views.sliceview import slicestyles as styles
+
 
 _RADIUS = styles.SLICE_HELIX_RADIUS
 _DEFAULT_RECT = QRectF(0, 0, 2 * _RADIUS, 2 * _RADIUS)
