@@ -20,7 +20,7 @@ class PathToolManager(AbstractToolManager):
         add_seq_tool (AddSeqTool): Description
         insertion_tool (InsertionTool): Description
         mods_tool (ModsTool): Description
-        nick_tool (BreakTool): Description
+        break_tool (BreakTool): Description
         paint_tool (PaintTool): Description
         create_tool (CreateTool): Description
         select_tool (SelectTool): Description
@@ -36,10 +36,10 @@ class PathToolManager(AbstractToolManager):
             viewroot (TYPE): Description
         """
         super(PathToolManager, self).__init__('path', window, viewroot)
-        self.tool_names = ('Select', 'Create', 'Nick', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
+        self.tool_names = ('Select', 'Create', 'Break', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
         self.select_tool = SelectTool(self, viewroot)
         self.create_tool = CreateTool(self)
-        self.nick_tool = BreakTool(self)
+        self.break_tool = BreakTool(self)
         self.insertion_tool = InsertionTool(self)
         self.skip_tool = SkipTool(self)
         self.paint_tool = PaintTool(self)  # (self, win.path_graphics_view.toolbar)

@@ -5,12 +5,15 @@ Attributes:
 """
 import re
 from PyQt5.QtCore import Qt, QSignalMapper
+from PyQt5.QtCore import QRectF, QPointF
+from PyQt5.QtGui import QFont, QTransform
+from PyQt5.QtGui import QPainterPath, QPolygonF
 from PyQt5.QtGui import QTextCharFormat, QSyntaxHighlighter
 from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
 from cadnano.extras.dnasequences import sequences
 from cadnano.gui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getColorObj, getBrushObj
+from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
 from .abstractpathtool import AbstractPathTool
 
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
@@ -53,6 +56,35 @@ class DNAHighlighter(QSyntaxHighlighter):
             length = match.end() - index
             self.setFormat(index, length, self.format)
         self.setCurrentBlockState(0)
+
+
+_BW = styles.PATH_BASE_WIDTH
+_PEN = getPenObj(styles.BLUE_STROKE, 1, capstyle=Qt.FlatCap)
+
+_RECT = QRectF(0, 0, _BW, _BW)
+_PATH_ARROW_LEFT = QPainterPath()
+_L3_POLY = QPolygonF()
+_L3_POLY.append(QPointF(_BW, 0))
+_L3_POLY.append(QPointF(0.25 * _BW, 0.5 * _BW))
+_L3_POLY.append(QPointF(_BW, _BW))
+_PATH_ARROW_LEFT.addPolygon(_L3_POLY)
+_PATH_ARROW_RIGHT = QPainterPath()
+_R3_POLY = QPolygonF()  # right-hand 3' arr
+_R3_POLY.append(QPointF(0, 0))
+_R3_POLY.append(QPointF(0.75 * _BW, 0.5 * _BW))
+_R3_POLY.append(QPointF(0, _BW))
+_PATH_ARROW_RIGHT.addPolygon(_R3_POLY)
+
+T180 = QTransform()
+T180.rotate(180)
+
+_BRUSH = getBrushObj(styles.RED_STROKE)
+_FWD_A = QPainterPath()
+_FWD_A.addText(1, _BW, QFont(styles.THE_FONT), 'A')
+
+_REV_A = QPainterPath()
+_REV_A.addText(-_BW+1, 0, QFont(styles.THE_FONT), 'A')
+_REV_A = T180.map(_REV_A)
 
 
 class AddSeqTool(AbstractPathTool):
@@ -101,6 +133,58 @@ class AddSeqTool(AbstractPathTool):
         """
         return "addSeqTool"  # first letter should be lowercase
 
+    def paint(self, painter, option, widget=None):
+        """Summary
+
+        Args:
+            painter (TYPE): Description
+            option (TYPE): Description
+            widget (None, optional): Description
+
+        Returns:
+            TYPE: Description
+        """
+        AbstractPathTool.paint(self, painter, option, widget)
+        painter.setPen(getNoPen())
+        painter.setBrush(_BRUSH)
+        if self._is_top_strand:
+            painter.drawPath(_FWD_A)
+        else:
+            painter.drawPath(_REV_A)
+    # end def
+
+    def setTopStrand(self, is_top):
+        """
+        Called in hoverMovePathHelix to set whether breaktool is hovering
+        over a top strand (goes 5' to 3' left to right) or bottom strand.
+
+        Args:
+            is_top (TYPE): Description
+        """
+        self._is_top_strand = is_top
+
+    def hoverMove(self, item, event, flag=None):
+        """
+        flag is for the case where an item in the path also needs to
+        implement the hover method
+
+        Args:
+            item (TYPE): Description
+            event (TYPE): Description
+            flag (None, optional): Description
+        """
+        self.show()
+        self.updateLocation(item, item.mapToScene(QPointF(event.pos())))
+        pos_scene = item.mapToScene(QPointF(event.pos()))
+        pos_item = item.mapFromScene(pos_scene)
+        if flag is None:
+            self.setTopStrand(self.helixIndex(pos_item)[1] == 0)
+        else:
+            self.setTopStrand(flag)
+        new_position = self.helixPos(pos_item)
+        if new_position is not None:
+            self.setPos(new_position)
+
     def initDialog(self):
         """Creates buttons for each sequence option and add them to the dialog.
         Maps the clicked signal of those buttons to keep track of what sequence
@@ -110,7 +194,8 @@ class AddSeqTool(AbstractPathTool):
         ui_dlg.setupUi(self.dialog)
         self.signal_mapper = QSignalMapper(self)
         # set up the radio buttons
-        for i, name in enumerate(['Abstract', 'Custom'] + sorted(sequences.keys())):
+        # for i, name in enumerate(['Abstract', 'Custom'] + sorted(sequences.keys())):
+        for i, name in enumerate(['Custom'] + sorted(sequences.keys())):
             radio_button = QRadioButton(ui_dlg.group_box)
             radio_button.setObjectName(name + "Button")
             radio_button.setText(name)
@@ -149,6 +234,7 @@ class AddSeqTool(AbstractPathTool):
             user_sequence = sequences.get(option_name, None)
             if self.seq_box.toPlainText() != user_sequence:
                 self.seq_box.setText(user_sequence)
+                self.seq_box.viewport().repaint()
 
     def validateCustomSequence(self):
         """
@@ -163,22 +249,16 @@ class AddSeqTool(AbstractPathTool):
         else:
             self.apply_button.setEnabled(False)
 
-        if len(user_sequence) == 0:
-            # A zero-length custom sequence defaults to Abstract type.
+        if user_sequence in self.sequence_radio_button_id:
+            # Handles case where the user might copy & paste in a known sequence
+            i = self.sequence_radio_button_id[user_sequence]
+            if not self.buttons[i].isChecked():
+                # Select the corresponding radio button for known sequence
+                self.buttons[i].click()
+        else:
+            # Unrecognized, select Custom type
             if not self.buttons[0].isChecked():
                 self.buttons[0].click()
-        else:
-            # Does this match a known sequence?
-            if user_sequence in self.sequence_radio_button_id:
-                # Handles case where the user might copy & paste in a known sequence
-                i = self.sequence_radio_button_id[user_sequence]
-                if not self.buttons[i].isChecked():
-                    # Select the corresponding radio button for known sequence
-                    self.buttons[i].click()
-            else:
-                # Unrecognized, Custom type
-                if not self.buttons[1].isChecked():
-                    self.buttons[1].click()
 
     def applySequence(self, oligo):
         """Summary

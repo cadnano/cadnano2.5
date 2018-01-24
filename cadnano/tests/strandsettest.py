@@ -43,6 +43,9 @@ def testStrandset(cnapp):
     strand3_fwd = fwd_ss.createStrand(*idxs3)
     assert strand3_fwd is not None
 
+    strand3_rev = rev_ss.createStrand(*idxs3)
+    assert strand3_rev is not None
+
     # 5. more neighbor testing
     neighbors = fwd_ss.getNeighbors(strand1_fwd)
     assert neighbors == (None, strand2_fwd)
@@ -60,12 +63,23 @@ def testStrandset(cnapp):
 
     # 8. strandCanBeSplit
     assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0]) is False
-    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0] + 1) is False
-    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0] + 2) is True
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[0] + 1) is True
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[1] - 2) is True
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[1] - 1) is False
+    assert fwd_ss.strandCanBeSplit(strand3_fwd, idxs3[1]) is False
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[0]) is False
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[0] + 1) is False
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[0] + 2) is True
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[1] - 2) is True
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[1] - 1) is True
+    assert rev_ss.strandCanBeSplit(strand3_rev, idxs3[1]) is False
 
     # 9. Split strand
-    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0] + 1) is False
-    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0] + 2)
+    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0]) is False
+    assert fwd_ss.splitStrand(strand3_fwd, idxs3[0] + 1)
+    assert rev_ss.splitStrand(strand3_rev, idxs3[0] + 1) is False
+    assert rev_ss.splitStrand(strand3_rev, idxs3[0] + 2)
+
     overlapping = fwd_ss.getOverlappingStrands(*idxs3)
     assert len(overlapping) == 2
 

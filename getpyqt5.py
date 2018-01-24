@@ -72,10 +72,10 @@ import shutil
 
 QT_VERSION = '5.10.0'
 SIP_VERSION = '4.19.7'
-PYQT5_VERSION = '5.9.3'
-SIP_DEV_VERSION = '4.19.7.dev1801091416'
-PYQT5_DEV_VERSION = '5.10.dev1801101803'
-PYQT3D_VERSION = '5.9.2'
+PYQT5_VERSION = '5.10'
+SIP_DEV_VERSION = '4.19.7.dev1801161332'
+PYQT5_DEV_VERSION = '5.10.dev1801191340'
+PYQT3D_VERSION = '5.10.dev1801191735'
 
 
 def get_qt5(pyroot_path, qt5_path, is_static=False, clean=False, use_wget=False):
@@ -286,7 +286,7 @@ def get_pyqt3d(pyroot_path, qt5_path, use_wget=False):
     qmake_path = os.path.join(qt5_path, 'bin', 'qmake')
     pyqt3d_str = 'PyQt3D_gpl-%s' % (PYQT3D_VERSION)
     pyqt3d_zip = '%s.tar.gz' % (pyqt3d_str)
-    pyqt3d_url = "https://sourceforge.net/projects/pyqt/files/PyQt3D/PyQt3D-%s/%s" % (PYQT3D_VERSION, pyqt3d_zip)
+    pyqt3d_url = "https://www.riverbankcomputing.com/static/Downloads/PyQt3D/%s" % (pyqt3d_zip)
 
     if os.path.exists(os.path.join(pyroot_path, pyqt3d_str)):
         wget_str = ''

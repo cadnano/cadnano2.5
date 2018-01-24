@@ -43,7 +43,7 @@ class BreakTool(AbstractPathTool):
         Returns:
             TYPE: Description
         """
-        return "nick_tool"  # first letter should be lowercase
+        return "break_tool"  # first letter should be lowercase
 
     def methodPrefix(self):
         """Summary
@@ -51,7 +51,7 @@ class BreakTool(AbstractPathTool):
         Returns:
             TYPE: Description
         """
-        return "nickTool"  # first letter should be lowercase
+        return "breakTool"  # first letter should be lowercase
 
     def paint(self, painter, option, widget=None):
         """Summary

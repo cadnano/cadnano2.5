@@ -493,7 +493,12 @@ class StrandSet(CNObject):
         # make sure the base index within the strand
         elif lo > base_idx or base_idx > hi:
             return False
-        elif base_idx - lo > 1 and hi - base_idx > 1:
+        elif self._is_fwd:
+            if base_idx - lo > 0 and hi - base_idx > 1:
+                return True
+            else:
+                return False
+        elif base_idx - lo > 1 and hi - base_idx > 0:  # reverse
             return True
         else:
             return False

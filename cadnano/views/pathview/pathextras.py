@@ -390,6 +390,8 @@ class PreXoverItem(QGraphicsRectItem):
         self.setZValue(styles.ZPREXOVERITEM)
         self.setPen(getNoPen())
         self.resetItem(from_virtual_helix_item, is_fwd, from_index, nearby_idxs, to_vh_id_num, prexoveritem_manager)
+
+        self._getActiveTool = from_virtual_helix_item.viewroot().manager.activeToolGetter
     # end def
 
     def shutdown(self):
@@ -431,6 +433,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.enter_pos = None
         self.exit_pos = None
         self.to_vh_id_num = to_vh_id_num
+        self._label_txt = None
         self.prexoveritem_manager = prexoveritem_manager
 
         # todo: check here if xover present and disable
@@ -540,6 +543,9 @@ class PreXoverItem(QGraphicsRectItem):
         Args:
             event (QGraphicsSceneHoverEvent): the hover event
         """
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritem_manager.updateModelActiveBaseInfo(self.getInfo())
         self.setActiveHovered(True)
@@ -563,6 +569,9 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         part = self._model_vh.part()
         is_fwd = self.is_fwd
 
@@ -678,6 +687,9 @@ class PreXoverItem(QGraphicsRectItem):
             active_prexoveritem (TYPE): Description
             shortcut (None, optional): Description
         """
+        if self._getActiveTool().methodPrefix() != "selectTool":
+            return
+
         if self.is3p and not active_prexoveritem.is3p:
             item5p = active_prexoveritem
             item3p = self
@@ -785,6 +797,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
         self._idx_low, self._idx_high = model_part.getProperty('workplane_idxs')
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
+        self._moving_via_handle = False
 
         self.outline = PathWorkplaneOutline(self)
         self.resize_handle_group = ResizeHandleGroup(self.rect(),
@@ -825,7 +838,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def setMovable(self, is_movable):
-        pass
+        self._moving_via_handle = is_movable
         # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
 
@@ -921,13 +934,16 @@ class PathWorkplaneItem(QGraphicsRectItem):
         Parses a mousePressEvent. Stores _move_idx and _offset_idx for
         future comparison.
         """
-        self.setCursor(Qt.ClosedHandCursor)
-        self._start_idx_low = self._idx_low
-        self._start_idx_high = self._idx_high
-        self._delta = 0
-        self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
-        self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
         self._high_drag_bound = self._model_part.getProperty('max_vhelix_length') - self.width()
+        if event.modifiers() & Qt.ShiftModifier or self._moving_via_handle:
+            self.setCursor(Qt.ClosedHandCursor)
+            self._start_idx_low = self._idx_low
+            self._start_idx_high = self._idx_high
+            self._delta = 0
+            self._move_idx = int(floor((self.x()+event.pos().x()) / BASE_WIDTH))
+            self._offset_idx = int(floor(event.pos().x()) / BASE_WIDTH)
+        else:
+            return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
     def mouseMoveEvent(self, event):
@@ -945,6 +961,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self.reconfigureRect((), ())
             self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
             self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+        return QGraphicsItem.mouseMoveEvent(self, event)
     # end def
 
     def mouseReleaseEvent(self, event):
@@ -962,4 +979,5 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._delta = delta
             self.reconfigureRect((), ())
         self._high_drag_bound = self._model_part.getProperty('max_vhelix_length')  # reset for handles
+        return QGraphicsItem.mouseReleaseEvent(self, event)
     # end def

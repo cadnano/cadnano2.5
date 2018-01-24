@@ -61,8 +61,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.slice_dock_widget.setTitleBarWidget(QWidget())
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
-        self._restoreGeometryandState()
         self._finishInit()
+        self._restoreGeometryandState()
 
         doc.setViewNames(['slice', 'path', 'inspector'])
     # end def
@@ -137,6 +137,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.resize(self.settings.value("size", QSize(1100, 800)))
             self.move(self.settings.value("pos", QPoint(200, 200)))
             self.inspector_dock_widget.close()
+            self.action_inspector.setChecked(False)
         state = self.settings.value("state")
         if state is not None:
             result = self.restoreState(state)
@@ -271,12 +272,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """
         # grid_visible = self.slice_dock_widget.isVisible()
         # self.action_grid.setChecked(console_visible)
-        inspector_visible = self.inspector_dock_widget.widget().isVisibleTo(self)
+        inspector_visible = self.inspector_dock_widget.isVisible()
         self.action_inspector.setChecked(inspector_visible)
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
         self.action_path.setChecked(path_visible)
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
         self.setCentralWidget(None)
+        self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
     # end def
 # end class

@@ -68,7 +68,7 @@
         <file alias="select">images/path-edit.png</file>
         <file alias="paint">images/path-paint.png</file>
         <file alias="create">images/path-create.png</file>
-        <file alias="nick">images/path-nick.png</file>
+        <file alias="break">images/path-break.png</file>
         <file alias="insert">images/path-insert.png</file>
         <file alias="skip">images/path-skip.png</file>
         <file alias="mod">images/path-mod.png</file>

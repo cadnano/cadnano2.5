@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'dialogs/addseq.ui'
 #
-# Created by: PyQt5 UI code generator 5.6
+# Created by: PyQt5 UI code generator 5.10.dev1801191340
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_AddSeqDialog(object):
     def setupUi(self, AddSeqDialog):
@@ -17,7 +16,7 @@ class Ui_AddSeqDialog(object):
         self.dialogGridLayout = QtWidgets.QGridLayout(AddSeqDialog)
         self.dialogGridLayout.setObjectName("dialogGridLayout")
         self.custom_button_box = QtWidgets.QDialogButtonBox(AddSeqDialog)
-        self.custom_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply | QtWidgets.QDialogButtonBox.Cancel)
+        self.custom_button_box.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel)
         self.custom_button_box.setCenterButtons(True)
         self.custom_button_box.setObjectName("custom_button_box")
         self.dialogGridLayout.addWidget(self.custom_button_box, 1, 0, 1, 1)
@@ -46,3 +45,5 @@ class Ui_AddSeqDialog(object):
     def retranslateUi(self, AddSeqDialog):
         _translate = QtCore.QCoreApplication.translate
         AddSeqDialog.setWindowTitle(_translate("AddSeqDialog", "Choose a sequence"))
+        self.seq_text_edit.setPlaceholderText(_translate("AddSeqDialog", "Paste sequence here or select an option below"))
+

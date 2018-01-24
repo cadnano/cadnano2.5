@@ -2895,7 +2895,7 @@ class NucleicAcidPart(Part):
                         # unclear the applied sequence
                         if self.undoStack().canUndo() and ss5p.isScaffold():
                             self.undoStack().undo()
-                    raise ValueError("createXover: invalid call can't split abort 2")
+                    raise ValueError("createXover: invalid call can't split abort 1")
                     return
 
             # is the 3' end ready for xover installation?
