@@ -717,10 +717,10 @@
    </property>
    <property name="icon">
     <iconset resource="cadnano.gui.mainwindow.icons.qrc">
-     <normaloff>:/pathtools/nick</normaloff>:/pathtools/nick</iconset>
+     <normaloff>:/pathtools/break</normaloff>:/pathtools/break</iconset>
    </property>
    <property name="text">
-    <string>Nick</string>
+    <string>Break</string>
    </property>
    <property name="iconText">
     <string>Break</string>

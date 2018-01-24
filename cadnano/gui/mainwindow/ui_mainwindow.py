@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.10.dev1801191340
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -253,7 +253,7 @@ class Ui_MainWindow(object):
         self.action_path_break.setCheckable(True)
         self.action_path_break.setChecked(False)
         icon6 = QtGui.QIcon()
-        icon6.addPixmap(QtGui.QPixmap(":/pathtools/nick"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon6.addPixmap(QtGui.QPixmap(":/pathtools/break"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_path_break.setIcon(icon6)
         self.action_path_break.setObjectName("action_path_break")
         self.action_path_select = QtWidgets.QAction(MainWindow)
@@ -579,7 +579,7 @@ class Ui_MainWindow(object):
         self.action_new_honeycomb_part.setToolTip(_translate("MainWindow", "Click to add new part with honeycomb lattice"))
         self.action_new_dna_part.setText(_translate("MainWindow", "Sq"))
         self.action_new_dna_part.setToolTip(_translate("MainWindow", "Click to add new part with square lattice"))
-        self.action_path_break.setText(_translate("MainWindow", "Nick"))
+        self.action_path_break.setText(_translate("MainWindow", "Break"))
         self.action_path_break.setIconText(_translate("MainWindow", "Break"))
         self.action_path_break.setToolTip(_translate("MainWindow", "(B)reak Tool"))
         self.action_path_break.setShortcut(_translate("MainWindow", "B"))
