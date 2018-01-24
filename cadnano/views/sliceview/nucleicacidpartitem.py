@@ -673,7 +673,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
-        self.last_mouse_position = self.translateEventCoordinates(event)
+#        self.last_mouse_position = self.translateEventCoordinates(event)
+        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        self.last_mouse_position = (mapped_position.x(), mapped_position.y())
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -742,8 +744,25 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event (TYPE): Description
             alt_event (None, optional): Description
         """
+        print('NAPART')
+        print('My parent is %s' % self.parentItem())
+        print('Position:               ', event.pos())
+        print('self.mapToScene:        ', self.mapToScene(event.pos().x(), event.pos().y()))
+        print('self.mapFromScene:      ', self.mapFromScene(event.pos().x(), event.pos().y()))
+        print('parent.mapToScene:      ', self.parentItem().mapToScene(event.pos().x(), event.pos().y()))
+        print('parent.mapFromScene:    ', self.parentItem().mapFromScene(event.pos().x(), event.pos().y()))
+        print('child.mapToScene:       ', self.griditem.mapToScene(event.pos().x(), event.pos().y()))
+        print('child.mapFromScene:     ', self.griditem.mapFromScene(event.pos().x(), event.pos().y()))
+        print('child.mapToScene:       ', self.griditem.mapToScene(event.scenePos().x(), event.scenePos().y()))
+        print('child.mapFromScene:     ', self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y()))
+
         # Abort if a VH already exists here
-        position = self.translateEventCoordinates(event)
+#        position = self.translateEventCoordinates(event)
+#        print('manually calculated:                        ', position)
+
+        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        position = (mapped_position.x(), mapped_position.y())
+        print('manually calculated:                        ', (mapped_position.x(), mapped_position.y()))
 
         # 1. get point in model coordinates:
         part = self._model_part
@@ -886,7 +905,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        event_xy = self.translateEventCoordinates(event)
+#        event_xy = self.translateEventCoordinates(event)
+        mapped_position= self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        event_xy = (mapped_position.x(), mapped_position.y())
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.coordinates_to_xy)
         is_alt = True if event.modifiers() & Qt.AltModifier else False
         self.last_mouse_position = event_xy

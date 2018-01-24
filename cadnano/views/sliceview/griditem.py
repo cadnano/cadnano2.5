@@ -549,6 +549,16 @@ class GridPoint(QGraphicsEllipseItem):
             part_item (TYPE):
             event (QGraphicsSceneMouseEvent): The event that the mouse click triggered
         """
+        print('GRIDITEM')
+        print('My parent is %s' % self.parentItem())
+        print('My grandparent is %s' % self.parentItem().parentItem())
+        print('Position:                  ', event.pos())
+        print('self.mapToScene:           ', self.mapToScene(event.pos().x(), event.pos().y()))
+        print('self.mapFromScene:         ', self.mapFromScene(event.pos().x(), event.pos().y()))
+        print('parent.mapToScene:         ', self.parentItem().mapToScene(event.pos().x(), event.pos().y()))
+        print('parent.mapFromScene:       ', self.parentItem().mapFromScene(event.pos().x(), event.pos().y()))
+        print('grandparent.mapToScene:    ', self.parentItem().parentItem().mapToScene(event.pos().x(), event.pos().y()))
+        print('grandparent.mapFromScene:  ', self.parentItem().parentItem().mapFromScene(event.pos().x(), event.pos().y()))
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
         if tool.FILTER_NAME not in part_item.part().document().filter_set:
