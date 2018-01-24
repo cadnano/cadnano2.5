@@ -17,7 +17,7 @@ committed will always pass the test suite.
 A script to accomplish this when committing via the `git` command line is
 included in this repository.  To activate it, run
 ```
-ln -s "$(git rev-parse --show-toplevel)/misc/git-hooks/pre-commit" .git/hooks/
+ln -s "$(git rev-parse --show-toplevel)/misc/git-hooks/pre-commit" $(git rev-parse --show-toplevel)/.git/hooks/
 ```
 anywhere in the cadnano repository.  This will symlink the pre-commit hook to
 your `.git/hooks` directory.  Now, whenever you commit, the test suite will be
