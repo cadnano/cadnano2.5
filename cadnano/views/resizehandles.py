@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
 from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import qApp, QGraphicsItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem, qApp
 from PyQt5.QtWidgets import QGraphicsTextItem
-from cadnano.proxies.cnenum import Axis, HandleType
 from cadnano.gui.palette import getBrushObj, getPenObj
+from cadnano.proxies.cnenum import Axis, HandleType
 from . import styles
 
 
@@ -283,7 +283,9 @@ class HandleItem(QGraphicsRectItem):
             # ensure we handle window toggling during moves
             qApp.focusWindowChanged.connect(self.focusWindowChangedSlot)
             res = QGraphicsItem.mousePressEvent(parent, event)
+            event.setAccepted(True)  # don't propagate
             return res
+    # end def
 
     def mouseMoveEvent(self, event):
         parent = self.parentItem()
@@ -338,6 +340,7 @@ class HandleItem(QGraphicsRectItem):
                 self._group.alignHandles(r)
             else:
                 raise NotImplementedError("handle_type %d not supported" % (ht))
+            event.setAccepted(True)
         else:
             res = QGraphicsItem.mouseMoveEvent(parent, event)
             return res
@@ -399,9 +402,10 @@ class HandleItem(QGraphicsRectItem):
             self._group.is_dragging = False
             parent = self.parentItem()
             parent.setMovable(False)
-            QGraphicsItem.mouseReleaseEvent(parent, event)
             parent.finishDrag()
         self.setCursor(Qt.OpenHandCursor)
+        res = QGraphicsItem.mouseReleaseEvent(parent, event)
+        return res
     # end def
 
     def focusWindowChangedSlot(self, focus_window):
