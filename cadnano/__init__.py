@@ -1,7 +1,7 @@
 import sys
 from .proxies.cnproxy import tapp
 
-__version__ = '2.5.2.0'
+__version__ = '2.5.2.1'
 
 global shared_app
 shared_app = tapp
