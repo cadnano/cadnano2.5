@@ -894,7 +894,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         is_alt = True if event.modifiers() & Qt.AltModifier else False
-        event_xy = self.translateEventCoordinates(event)
+        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        event_xy = (mapped_position.x(), mapped_position.y())
         if self.griditem.grid_type is GridType.HONEYCOMB:
             event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                   event_xy[0],
