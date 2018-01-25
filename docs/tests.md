@@ -1,24 +1,51 @@
 # Tests
 
-## Running Tests Locally
+Cadnano has a handful of automated tests that get run automatically by
+[TravisCI](https://travis-ci.org/cadnano/cadnano2.5) on every commit pushed to
+Github. The tests help ensure the integrity of the our data model, or at least
+notify us quickly when we've broken something. We also test the GUI by recording
+and playing back user interactions with
+[QTest](http://doc.qt.io/qt-5/qtest-overview.html).
 
-To run tests locally, run
+If you'd like to modify cadnano, we recommend setting up automated testing in
+your local development environment. You'll first want to install
+[pytest](https://docs.pytest.org/).
+
+```
+pip install pytest
+```
+
+
+## Running Tests
+
+To run non-GUI tests:
+
 ```
 pytest cadnano/tests
 ```
-from the repository root.
+
+To run GUI tests:
+
+```
+pytest -c cadnano/tests/pytestgui.ini cadnano/tests/
+```
+
+Currently, we do not automate GUI tests on TravisCI, so they must be run locally.
+
 
 ## Automating Tests with a Pre-Commit Hook
 
-Pre-commit hooks are a great way to make sure that something is done (e.g. the
-test suite is run) before committing.  Doing this ensures that code that is
-committed will always pass the test suite.
+Pre-commit hooks are a great way to make sure that the test suite is run before
+committing. Doing this ensures that code that is committed will always pass
+the test suite.
 
 A script to accomplish this when committing via the `git` command line is
 included in this repository.  To activate it, run
+
 ```
 ln -s "$(git rev-parse --show-toplevel)/misc/git-hooks/pre-commit" $(git rev-parse --show-toplevel)/.git/hooks/
 ```
+
 anywhere in the cadnano repository.  This will symlink the pre-commit hook to
 your `.git/hooks` directory.  Now, whenever you commit, the test suite will be
 run before you commit:
