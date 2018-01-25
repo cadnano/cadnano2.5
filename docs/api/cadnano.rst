@@ -6,11 +6,17 @@ Subpackages
 
 .. toctree::
 
+    cadnano.controllers
+    cadnano.decorators
     cadnano.extras
+    cadnano.fileio
+    cadnano.gui
     cadnano.oligo
     cadnano.part
+    cadnano.proxies
     cadnano.strand
     cadnano.strandset
+    cadnano.views
 
 Submodules
 ----------

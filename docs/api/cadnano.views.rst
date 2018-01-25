@@ -1,6 +1,18 @@
 cadnano\.views package
 ======================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.views.abstractitems
+    cadnano.views.gridview
+    cadnano.views.outlinerview
+    cadnano.views.pathview
+    cadnano.views.propertyview
+    cadnano.views.sliceview
+
 Submodules
 ----------
 

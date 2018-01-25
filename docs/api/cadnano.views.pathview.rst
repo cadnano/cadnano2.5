@@ -1,6 +1,14 @@
 cadnano\.views\.pathview package
 ================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.views.pathview.strand
+    cadnano.views.pathview.tools
+
 Submodules
 ----------
 

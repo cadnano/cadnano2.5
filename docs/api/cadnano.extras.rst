@@ -8,6 +8,7 @@ Subpackages
 
     cadnano.extras.fasta
     cadnano.extras.genbank
+    cadnano.extras.math
 
 Submodules
 ----------

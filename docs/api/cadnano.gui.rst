@@ -1,6 +1,14 @@
 cadnano\.gui package
 ====================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.gui.dialogs
+    cadnano.gui.mainwindow
+
 Submodules
 ----------
 

@@ -1,6 +1,13 @@
 cadnano\.views\.sliceview package
 =================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.views.sliceview.tools
+
 Submodules
 ----------
 

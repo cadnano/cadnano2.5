@@ -1,6 +1,13 @@
 cadnano\.views\.gridview package
 ================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.views.gridview.tools
+
 Submodules
 ----------
 

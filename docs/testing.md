@@ -1,4 +1,4 @@
-# Tests
+# Testing
 
 Cadnano has a handful of automated tests that get run automatically by
 [TravisCI](https://travis-ci.org/cadnano/cadnano2.5) on every commit pushed to

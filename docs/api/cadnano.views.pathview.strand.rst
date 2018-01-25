@@ -1,6 +1,13 @@
 cadnano\.views\.pathview\.strand package
 ========================================
 
+Subpackages
+-----------
+
+.. toctree::
+
+    cadnano.views.pathview.strand.decorators
+
 Submodules
 ----------
 

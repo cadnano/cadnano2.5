@@ -15,7 +15,6 @@ Welcome to cadnano's documentation!
    installation
    tutorial
    scripting
-   virtualenv
    shortcuts
 
 .. _dev-docs:
@@ -25,8 +24,15 @@ Welcome to cadnano's documentation!
    :caption: Developer Documentation
 
    api
+   virtualenv
+   building
+   testing
    docs
-   tests
+
+.. toctree::
+   :maxdepth: 1
+   :caption: About
+
    changelog
    authors
    license
