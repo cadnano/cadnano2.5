@@ -200,10 +200,3 @@ class SliceRootItem(QGraphicsRectItem):
         for na_part_item in self.instance_items:
             if hasattr(na_part_item, 'keyReleaseEvent'):
                 getattr(na_part_item, 'keyReleaseEvent')(event)
-
-    def setTransform(self, QTransform, combine=False):
-        super(SliceRootItem, self).setTransform(QTransform, combine=False)
-        delta_x = QTransform.m31()
-        delta_y = QTransform.m32()
-        for na_part_item in self.instance_items:
-            na_part_item.updateTranslatedOffsets(delta_x, delta_y)

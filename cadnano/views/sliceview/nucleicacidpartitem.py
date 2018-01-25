@@ -59,9 +59,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.spa_start_vhi = None
         self.last_mouse_position = None
 
-        self._translated_x = 0.0
-        self._translated_y = 0.0
-
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
@@ -673,7 +670,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
-        self.last_mouse_position = self.translateEventCoordinates(event)
+        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        self.last_mouse_position = (mapped_position.x(), mapped_position.y())
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
         if hasattr(self, tool_method_name):
@@ -742,8 +740,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event (TYPE): Description
             alt_event (None, optional): Description
         """
-        # Abort if a VH already exists here
-        position = self.translateEventCoordinates(event)
+        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        position = (mapped_position.x(), mapped_position.y())
 
         # 1. get point in model coordinates:
         part = self._model_part
@@ -886,7 +884,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        event_xy = self.translateEventCoordinates(event)
+        mapped_position= self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        event_xy = (mapped_position.x(), mapped_position.y())
         event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.coordinates_to_xy)
         is_alt = True if event.modifiers() & Qt.AltModifier else False
         self.last_mouse_position = event_xy
@@ -1023,42 +1022,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         assert isinstance(point_map, dict)
         self.coordinates_to_xy = point_map
-    # end def
-
-    def updateTranslatedOffsets(self, delta_x, delta_y):
-        """
-        Update the values used to calculate translational offsets.
-
-        Args:
-            delta_x (float):  the new value for which we've translated in the x
-                direction
-            delta_y (float):  the new value for which we've translated in the y
-                direction
-
-        Returns:
-            None
-        """
-        assert isinstance(delta_x, float)
-        assert isinstance(delta_y, float)
-
-        self._translated_x = delta_x
-        self._translated_y = delta_y
-    # end def
-
-    def translateEventCoordinates(self, event):
-        """
-        Given an event, return the x-y coordinates of the event accounting for
-        any translations that may have happened
-
-        Args:
-            event (MousePressEvent):  the event for which x-y coordinates should
-                be returned
-
-        Returns:
-            A tuple of x-y coordinates of the event
-        """
-        assert isinstance(event, QGraphicsSceneEvent)
-        return event.scenePos().x() - self._translated_x, event.scenePos().y() - self._translated_y
     # end def
 
     def removeAllCreateHints(self):
