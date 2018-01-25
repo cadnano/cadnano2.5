@@ -75,6 +75,8 @@ For the sake of consistency and leveraging core sphinx features, we initially ju
 
 ## Known Issues
 
+**toctree Warnings**
+
 When building the docs, you may see warnings like:
 
 ```
@@ -85,6 +87,24 @@ WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.o
 ```
 
 These modules import the PyQt5 classes in a way that doesn't play nicely with sphinx, so they are specifically excluded in `docs/conf.py`. Consequently, the documentation for these modules will be missing until someone tracks down the root cause of this issue and figures out a workaround. Possible starting point: [stackoverflow.com/questions/25960309/](http://stackoverflow.com/questions/25960309/)
+
+**segfaults**
+
+You may see segfaults when trying to run `make html` or `make livehtml` that
+look like this:
+```
+...
+reading sources... [ 70%] api/cadnano.views.pathview.strand.stranditem
+reading sources... [ 71%] api/cadnano.views.pathview.strand.xoveritem
+reading sources... [ 71%] api/cadnano.views.pathview.tools
+reading sources... [ 72%] api/cadnano.views.pathview.tools.abstractpathtool
+reading sources... [ 72%] api/cadnano.views.pathview.tools.addseqtool
+make: *** [html] Segmentation fault: 11
+```
+
+If you encounter this, you may need to exclude the offending source from the
+build.  Add the last source read before the segfault to the `exclude_patterns`
+list in `conf.py`.  Ensure that you include the trailing `.rst` in the string.
 
 
 ## Contributing

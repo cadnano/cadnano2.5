@@ -113,7 +113,9 @@ exclude_patterns = ['_build',
                     'api/cadnano.controllers.documentcontroller.rst',
                     'api/cadnano.gui.mainwindow.ui_mainwindow.rst',
                     'api/cadnano.views.documentwindow.rst',
-                    'api/cadnano.views.outlinerview.outlinertreewidget.rst'
+                    'api/cadnano.views.outlinerview.outlinertreewidget.rst',
+                    'api/cadnano.views.pathview.tools.addseqtool.rst',
+                    'api/cadnano.views.pathview.tools.pathtoolmanager.rst'
                     ]
 
 # The reST default role (used for this markup: `text`) to use for all

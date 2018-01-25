@@ -1,0 +1,25 @@
+#!/bin/bash
+
+function abort() {
+    echo
+    echo $1
+    echo 'To commit without this hook running, pass the --no-verify argument'
+    exit 1
+}
+
+function success() {
+    echo 'Tests passed.'
+}
+
+BASE=$(git rev-parse --show-toplevel)
+
+echo "Running tests in $BASE/cadnano/tests..."
+echo
+
+pytest $BASE/cadnano/tests
+
+if [ $? -ne 0 ]; then
+    abort 'Tests failed; commit aborted'
+else
+    exit 0
+fi
