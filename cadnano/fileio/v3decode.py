@@ -181,19 +181,18 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     """
     part = part_instance.reference()
     id_num_offset = part.getMaxIdNum() + 1
+    if id_num_offset % 2 == 1:
+        print("Odd vh count. Skipping", id_num_offset)
+        id_num_offset += 1
     print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
     # name_suffix = ".%d"
 
+    print("using offset", offset)
     xoffset = offset[0] if offset else 0
     yoffset = offset[1] if offset else 0
-
-    print(vh_id_list)
-    print(offset)
-
-    return
 
     keys = list(vh_props.keys())
     name_index = keys.index('name')
@@ -205,6 +204,8 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] = new_id_num
+        print("copying {}({},{}) to {}({},{})".format(id_num, x, y,
+                                                      new_id_num, x+xoffset, y+yoffset))
         part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
@@ -244,8 +245,8 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in copy_dict['insertions']:
-        fwd_strand = part.getStrand(True, id_num, idx)
-        rev_strand = part.getStrand(False, id_num, idx)
+        fwd_strand = part.getStrand(True, id_num + id_num_offset, idx)
+        rev_strand = part.getStrand(False, id_num + id_num_offset, idx)
         if fwd_strand:
             fwd_strand.addInsertion(idx, length, use_undostack=use_undostack)
         elif rev_strand:

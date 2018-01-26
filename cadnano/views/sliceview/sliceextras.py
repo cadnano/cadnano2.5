@@ -919,6 +919,33 @@ class ShortestPathHelper(object):
         else:
             raise NotImplementedError('Could not determine neighbors for grid_type %s' % grid_type)
 
+        """
+        Returns:
+            tuple:  the coordinates of the closest point to position
+        assert isinstance(position, tuple) and len(position) is 2
+        assert isinstance(point_map, dict) and len(point_map)
+
+        for coordinates, coordinate_position in point_map.items():
+            distance = (coordinate_position[0]-position[0])**2 + (coordinate_position[1]-position[1])**2
+            if distance < _RADIUS**2:
+                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
+                return coordinates
+
+        best_coordinates = None
+        best_distance = float('inf')
+        for coordinates, coordinate_position in point_map.items():
+            distance = (coordinate_position[0]-position[0])**2 + (coordinate_position[1]-position[1])**2
+            if distance < best_distance:
+                best_distance = distance
+                best_coordinates = coordinates
+
+        # TODO[NF]:  Remove once we determine why best_coordinates is
+        # sometimes None
+        if best_coordinates is None:
+            print('Could not find coordinates with position %s and coordinates_to_xy %s'
+                  % (position, point_map))
+        return best_coordinates
+        """
 
     @staticmethod
     def findClosestPoint(position, radius, grid_type, scale_factor):
@@ -1040,6 +1067,11 @@ class ShortestPathHelper(object):
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
                                                                      row=row,
                                                                      column=column)
+#=======
+#                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
+#                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
+#                                                                     scale_factor=scale_factor)
+#>>>>>>> Broken snapshot
             else:
                 parity = None
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
