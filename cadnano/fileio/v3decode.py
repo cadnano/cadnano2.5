@@ -235,9 +235,10 @@ def decodePart( document: DocT,
                 'crossover_span_angle',
                 'max_vhelix_length'
                 ):
-        value = part_dict[key]
-        part.setProperty(key, value, use_undostack=False)
-        part.partPropertyChangedSignal.emit(part, key, value)
+        value = part_dict.get(key)
+        if value is not None:
+            part.setProperty(key, value, use_undostack=False)
+            part.partPropertyChangedSignal.emit(part, key, value)
 # end def
 
 
@@ -259,8 +260,6 @@ def importToPart(   part_instance : ObjectInstance,
     """
     assert isinstance(offset, (tuple, list)) or offset is None
     assert isinstance(use_undostack, bool)
-
-    # print('Importing to part where use_undostack is %s' % use_undostack)
 
     part = part_instance.reference()
     if use_undostack:
@@ -331,7 +330,6 @@ def importToPart(   part_instance : ObjectInstance,
         if i not in copied_vh_index_set:
             continue
         if idx_set is not None:
-            # print("getting", new_id_num)
             fwd_strand_set, rev_strand_set = part.getStrandSets(i + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
             fwd_colors, rev_colors = color_list[i]
