@@ -169,8 +169,9 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, use_undostack=True):
-    """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
+def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
+    """
+    Use this to duplicate virtual_helices within a Part. Duplicate id_nums
     will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
 
@@ -184,7 +185,15 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
-    name_suffix = ".%d"
+    # name_suffix = ".%d"
+
+    xoffset = offset[0] if offset else 0
+    yoffset = offset[1] if offset else 0
+
+    print(vh_id_list)
+    print(offset)
+
+    return
 
     keys = list(vh_props.keys())
     name_index = keys.index('name')
@@ -195,8 +204,8 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
         z = vh_props['z'][id_num]
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
-        vals[name_index] += (name_suffix % new_id_num)
-        part.createVirtualHelix(x, y, z, size,
+        vals[name_index] = new_id_num
+        part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
                                 safe=use_undostack,
@@ -208,8 +217,7 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     color_list = strands['properties']
     for id_num, idx_set in enumerate(strand_index_list):
         if idx_set is not None:
-            fwd_strand_set, rev_strand_set = part.getStrandSets(
-                id_num + id_num_offset)
+            fwd_strand_set, rev_strand_set = part.getStrandSets(id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
             fwd_colors, rev_colors = color_list[id_num]
             for idxs, color in zip(fwd_idxs, fwd_colors):

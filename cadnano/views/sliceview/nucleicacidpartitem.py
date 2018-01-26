@@ -50,11 +50,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             parent (None, optional): Description
         """
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        self.setFlag(QGraphicsItem.ItemIsFocusable)
 
         self.shortest_path_start = None
         self.coordinates_to_vhid = dict()
+        self._last_hovered_coord = None
         self._last_hovered_item = None
         self._highlighted_path = []
+        self._highlighted_copypaste = []
+        self.lock_hints = False
+        self.copypaste_origin_offset = ()
         self.spa_start_vhi = None
         self.last_mouse_position = None
 
@@ -722,10 +727,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def keyPressEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
         if event.key() == Qt.Key_Escape:
+            print("Esc here")
             self._setShortestPathStart(None)
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            tool = self._getActiveTool()
+            if tool.methodPrefix() == 'selectTool':
+                self.removeAllCopyPasteHints()
+                tool.clipboard = None
+                print("clipboad cleared")
         elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self._previewSpa(self.last_mouse_position)
@@ -789,6 +800,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlightSpaVH(id_num)
     # end def
 
+    def _getModelXYforCoord(self, row, column):
+        radius = self.part().radius()
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            return HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
+        elif self.griditem.grid_type is GridType.SQUARE:
+            return SquareDnaPart.latticeCoordToPositionXY(radius, row, column)
+        else:
+            return None
+    # end def
+
     def _getCoordinateParity(self, row, column):
         if self.griditem.grid_type is GridType.HONEYCOMB:
             return 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
@@ -796,6 +817,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:
             return None
+    # end def
 
     def _handleShortestPathMousePress(self, tool, position, is_spa_mode):
         """
@@ -1003,6 +1025,96 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def createToolHoverLeave(self, tool, event):
         self.removeAllCreateHints()
+    # end def
+
+    def selectToolHoverEnter(self, tool, event):
+        """
+        Hint vh coords that will be created if clipboard is pasted at hoverEnter
+        position.
+        """
+        if tool.clipboard is None:  # is there anything on the clipboard?
+            return
+
+        self.removeAllCopyPasteHints()
+        e_pos = self.griditem.mapFromScene(event.scenePos())
+        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
+        self._last_hovered_coord == (hov_row, hov_col)
+        parity = self._getCoordinateParity(hov_row, hov_col)
+
+        part = self._model_part
+        vh_id_list = tool.clipboard['vh_list']
+        try:
+            min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
+        except ValueError:  # no vhs match parity
+            return
+        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
+        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+        id_offset = max(part._getNewIdNum(0), part._getNewIdNum(1))
+
+        # placing clipboard's min_id_same_parity on the hovered_coord,
+        # hint neighboring coords with offsets corresponding to clipboard vhs
+        for i in range(len(vh_id_list)):
+            vh_id, vh_len = vh_id_list[i]
+            x, y = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
+            hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
+            self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
+            self._highlighted_copypaste.append(hint_coord)
+        # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
+
+        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+        min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+    # end def
+
+    def selectToolHoverMove(self, tool, event):
+        """
+        Hint vh coords that will be created if clipboard is pasted at hoverMove
+        position.
+        """
+        if tool.clipboard is None:  # is there anything on the clipboard?
+            return
+
+        e_pos = self.griditem.mapFromScene(event.scenePos())
+        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
+
+        if self._last_hovered_coord == (hov_row, hov_col) or\
+           not self._inPointItem((e_pos.x(), e_pos.y()), (hov_row, hov_col)):
+            return
+        else:
+            self._last_hovered_coord == (hov_row, hov_col)
+            self.removeAllCopyPasteHints()
+
+        parity = self._getCoordinateParity(hov_row, hov_col)
+        part = self._model_part
+        vh_id_list = tool.clipboard['vh_list']
+        try:
+            min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
+        except ValueError:
+            return
+        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
+        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+        id_offset = max(part._getNewIdNum(0), part._getNewIdNum(1))
+
+        # placing clipboard's min_id_same_parity on the hovered_coord,
+        # hint neighboring coords with offsets corresponding to clipboard vhs
+        for i in range(len(vh_id_list)):
+            vh_id, vh_len = vh_id_list[i]
+            x, y = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
+            hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
+            self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
+            self._highlighted_copypaste.append(hint_coord)
+        # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
+
+        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+        min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+    # end def
+
+    def selectToolHoverLeave(self, tool, event):
+        self.removeAllCopyPasteHints()
+    # end def
 
     def selectToolMousePress(self, tool, event):
         """
@@ -1029,6 +1141,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
+
+    def removeAllCopyPasteHints(self):
+        if self.lock_hints:
+            return
+        for coord in self._highlighted_copypaste:
+            self.griditem.showCreateHint(coord, show_hint=False)
+        self._highlighted_copypaste = []
+        self.copypaste_origin_offset = ()
+    # end def
+
     def removeAllCreateHints(self):
         """
         Remove the create hints from each currently hinted GridItem.
@@ -1038,6 +1160,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        if self.lock_hints:
+            return
         for coord in self._highlighted_path:
             self.griditem.showCreateHint(coord, show_hint=False)
         self._highlighted_path = []

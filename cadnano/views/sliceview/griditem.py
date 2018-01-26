@@ -527,6 +527,14 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
     # end def
 
+    def selectToolHoverEnterEvent(self, tool, part_item, event):
+        part_item.selectToolHoverEnter(tool, event)
+    # end def
+
+    def selectToolHoverLeaveEvent(self, tool, part_item, event):
+        part_item.selectToolHoverLeave(tool, event)
+    # end def
+
     def createToolHoverEnterEvent(self, tool, part_item, event):
         self.setPen(getPenObj(styles.BLUE_STROKE, 2))
         part_item.setLastHoveredItem(self)

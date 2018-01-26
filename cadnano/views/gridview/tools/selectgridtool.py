@@ -39,7 +39,7 @@ class SelectGridTool(AbstractGridTool):
     """Handles SelectTool operations in the Grid view
 
     Attributes:
-        clip_board (TYPE): Description
+        clipboard (TYPE): Description
         group (TYPE): Description
         individual_pick (bool): Description
         is_selection_active (bool): Description
@@ -64,7 +64,7 @@ class SelectGridTool(AbstractGridTool):
         self.is_selection_active = False
         self.individual_pick = False
         self.snap_origin_item = None
-        self.clip_board = None
+        self.clipboard = None
     # end def
 
     def __repr__(self):
@@ -347,7 +347,7 @@ class SelectGridTool(AbstractGridTool):
         """
         part_instance = self.part_item.partInstance()
         copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
-        self.clip_board = copy_dict
+        self.clipboard = copy_dict
     # end def
 
     def pasteClipboard(self):
@@ -360,7 +360,7 @@ class SelectGridTool(AbstractGridTool):
         part = self.part_item.part()
         part_instance = self.part_item.partInstance()
         doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part_instance, self.clip_board)
+        new_vh_set = v3decode.importToPart(part_instance, self.clipboard)
         doc.undoStack().endMacro()
         self.modelClear()
         doc.addVirtualHelicesToSelection(part, new_vh_set)
@@ -416,7 +416,7 @@ class SelectGridTool(AbstractGridTool):
             copy_act.setStatusTip("copy selection")
             copy_act.triggered.connect(self.copySelection)
             menu.addAction(copy_act)
-            if self.clip_board:
+            if self.clipboard:
                 copy_act = QAction("paste", sgv)
                 copy_act.setStatusTip("paste from clip board")
                 copy_act.triggered.connect(self.pasteClipboard)
