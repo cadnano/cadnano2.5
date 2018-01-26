@@ -812,7 +812,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def _getCoordinateParity(self, row, column):
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+            return 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
             return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:
@@ -1069,7 +1069,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
         print("({}, {})".format(hov_x, hov_y))
         min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(-hov_y-min_y, 9))
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
     # end def
 
     def selectToolHoverMove(self, tool, event):
@@ -1114,7 +1114,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
         min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(-hov_y-min_y, 9))
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
     # end def
 
     def selectToolHoverLeave(self, tool, event):

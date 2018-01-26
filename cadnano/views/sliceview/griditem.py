@@ -35,7 +35,7 @@ class GridItem(QGraphicsRectItem):
 
         self.dots = (styles.DOT_SIZE, styles.DOT_SIZE / 2)
         # self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
-        self._draw_gridpoint_coordinates = True
+        self._draw_gridpoint_coordinates = False
         self.draw_lines = False
         self.points = []
         self.points_dict = dict()
