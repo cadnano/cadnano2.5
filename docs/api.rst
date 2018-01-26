@@ -89,8 +89,8 @@ Signals and Slots
 ~~~~~~~~~~~~~~~~~
 
 We use Qt's `Signals and Slots <http://doc.qt.io/qt-5/signalsandslots.html>`__
-framework. The model is responsible for emitting relevant "signals" when modified, and
-the views can subscribe to those signals with local "slots" which
-are methods that then receive information the model change as argments and then
-decide what to do with that information (typically updating a graphical element
-to reflect the change).
+framework. The model is responsible for emitting relevant "signals" when modified,
+and the views can subscribe to those signals with local "slots" which are methods
+that receive model change information as argments and then decide what to do with
+it, for example updating a graphical element to reflect the change, or simply
+ignoring it.
