@@ -80,11 +80,7 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
-        """
-        Convert row, column coordinates to latticeXY.
-        To avoid having the origin in the center of a helix,
-        x is offset by radius*root3, y is offset by radius. -SD
-        """
+        """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3
         if HoneycombDnaPart.isOddParity(row, column):   # odd parity
             y = row*radius*3 + radius
@@ -97,17 +93,24 @@ class HoneycombDnaPart(object):
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
 #        column = int(x/(radius*root3*scale_factor) + 0.5)
-        column = int(x/(radius*root3*scale_factor))
+        float_column = x/(radius*root3*scale_factor) + 0.5
+        column = int(float_column) if float_column >= 0 else int(float_column - 1)
+#        if float_column < 0:
+#            column = int(float_column-1)
+#        else:
+#            column = int(float_column)
+        print('column is %s, scale factor is %s' % ((x/(radius*root3*scale_factor)), scale_factor))
 
         row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
+#        if (row_temp % 3) - 0.5 > 1.0:
             # odd parity
 #            row = int((row_temp - 1) / 3 + 0.5)
-            row = int((y-radius)/(scale_factor*radius*root3))
+            row = int((y-radius)/(scale_factor*radius*3))
         else:
             # even parity
 #            row = int(row_temp/3 + 0.5)
-            row = int(y/scale_factor*radius*root3)
+            row = int(y/scale_factor*radius*3)
         return row, column
     # end def
 

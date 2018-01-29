@@ -564,6 +564,13 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
+        coordinate_string = '(%s, %s)' % HoneycombDnaPart.positionToLatticeCoord(part_item.part().radius(),
+                                                                                event.scenePos().x(),
+                                                                                event.scenePos().y(),
+                                                                                scale_factor=part_item.scale_factor)
+        position_string = '(%s, %s)' % (event.scenePos().x(), event.scenePos().y())
+
+        part_item.updateStatusBar('%s - %s' % (coordinate_string, position_string))
         part_item.createToolHoverMove(tool, event)
     # end def
 

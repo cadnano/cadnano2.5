@@ -305,6 +305,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                               position[0],
                                                               position[1],
                                                               scale_factor=self.scale_factor)
+        print('NAPI:  VH added to %s, %s' % coordinates)
 
         assert id_num not in self.coordinates_to_vhid.values()
 
@@ -632,8 +633,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             status_str (str): Description to display in status bar.
         """
-        pass  # disabled for now.
-        # self.window().statusBar().showMessage(status_str, timeout)
+#        pass  # disabled for now.
+        self.window().statusBar().showMessage(status_str )
     # end def
 
     def zoomToFit(self):
@@ -727,7 +728,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                coordinates[0],
                                                                coordinates[1],
                                                                scale_factor=self.scale_factor)
-                print(x,y)
                 self._preview_spa((x, y))
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
@@ -921,7 +921,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._preview_spa(event_xy)
         else:
-            print('not alt')
 #            if self.griditem.grid_type is GridType.HONEYCOMB:
 #                xy_coordinates = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
 #                                                                           event_coord[0],
@@ -937,15 +936,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
             if self._inPointItem(event_xy, event_coord) and is_alt:
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
-                print('highlighting many')
             elif self._inPointItem(event_xy, event_coord) and not is_alt:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
                 self._highlighted_path.append(event_coord)
-                print('highlighting one')
-            else:
-                print('DOING NOTHING')
 
 
         tool.hoverMoveEvent(self, event)
@@ -985,12 +980,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return False
         event_x, event_y = event_xy
 
-        print(event_xy)
-        print(last_hovered_x, last_hovered_y)
-
         result = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2
-
-        print('result is %s' % result, self._RADIUS**2)
 
         return result <= (self._RADIUS*self.scale_factor)**2
     # end def
