@@ -731,6 +731,9 @@ class StrandItem(QGraphicsLineItem):
             selection_group.processPendingToAddList()
             event.setAccepted(True)
             return selection_group.mousePressEvent(event)
+        else:
+            # print("StrandItem.selectToolMousePress: rejection")
+            pass
     # end def
 
     def eraseToolMousePress(self, event, idx):

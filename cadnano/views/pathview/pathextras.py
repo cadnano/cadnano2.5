@@ -366,6 +366,7 @@ class PreXoverItem(QGraphicsRectItem):
         prexoveritem_manager (TYPE): Description
         to_vh_id_num (TYPE): Description
     """
+    FILTER_NAME = "xover"
 
     def __init__(self, from_virtual_helix_item, is_fwd, from_index, nearby_idxs,
                  to_vh_id_num, prexoveritem_manager):
@@ -568,7 +569,9 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
-        if self._getActiveTool().methodPrefix() != "selectTool":
+        viewroot = self.parentItem().viewroot()
+        current_filter_set = viewroot.selectionFilterSet()
+        if self._getActiveTool().methodPrefix() != "selectTool" or (self.FILTER_NAME not in current_filter_set):
             return
 
         part = self._model_vh.part()
