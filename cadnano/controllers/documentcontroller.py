@@ -1013,7 +1013,6 @@ class DocumentController(object):
         webbrowser.open("http://cadnano.org/feedback")
 
     def getSliceViewType(self):
-        # TODO[NF]:  Make these strings global constants
         if self.slice_view_showing and self.grid_view_showing:
             return SliceViewType.BOTH
         elif self.slice_view_showing and not self.grid_view_showing:
@@ -1021,7 +1020,8 @@ class DocumentController(object):
         elif not self.slice_view_showing and self.grid_view_showing:
             return SliceViewType.GRID
         else:
-            raise NotImplementedError
+            raise NotImplementedError('Slice view in illegal state:  slice_view_showing is %s and grid_view_showing is %s' % \
+                                      (self.slice_view_showing, self.grid_view_showing))
 
     def setSliceViewType(self, slice_view_type):
         if slice_view_type not in (SliceViewType.BOTH, SliceViewType.SLICE, SliceViewType.GRID):
@@ -1043,3 +1043,5 @@ class DocumentController(object):
             self.toggleGridView(show=True)
             self.slice_view_showing = False
             self.toggleSliceView(show=False)
+        else:
+            raise NotImplementedError('Slice view type %s is invalid' % slice_view_type)
