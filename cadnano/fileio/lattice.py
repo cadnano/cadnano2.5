@@ -92,18 +92,12 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
-#        column = int(x/(radius*root3*scale_factor) + 0.5)
+#        print('[lattice] Scaled input x and y are %s,%s' % (x*scale_factor, y*scale_factor))
         float_column = x/(radius*root3*scale_factor) + 0.5
         column = int(float_column) if float_column >= 0 else int(float_column - 1)
-#        if float_column < 0:
-#            column = int(float_column-1)
-#        else:
-#            column = int(float_column)
-        print('column is %s, scale factor is %s' % ((x/(radius*root3*scale_factor)), scale_factor))
 
         row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0:
-#        if (row_temp % 3) - 0.5 > 1.0:
             # odd parity
 #            row = int((row_temp - 1) / 3 + 0.5)
             float_row = (y-radius)/(scale_factor*radius*3) + 0.5
@@ -112,6 +106,8 @@ class HoneycombDnaPart(object):
 #            row = int(row_temp/3 + 0.5)
             float_row = y/scale_factor*radius*3
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
+
+        print('[lattice] Raw row and column are %s,%s' % (float_row, float_column))
         return row, column
     # end def
 
@@ -209,10 +205,12 @@ class SquareDnaPart(object):
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
-        """
-        """
-        row = int(y/(2.*radius*scale_factor) + 0.5)
-        column = int(x/(2.*radius*scale_factor) + 0.5)
+        float_row = y/(2.*radius*scale_factor) + 0.5
+        float_column = x/(2.*radius*scale_factor) + 0.5
+
+        row = int(float_row) if float_row >= 0 else int(float_row - 1)
+        column = int(float_column) if float_column >= 0 else int(float_column - 1)
+
         return row, column
     # end def
 

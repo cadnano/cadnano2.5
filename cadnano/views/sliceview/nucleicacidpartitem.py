@@ -1,7 +1,7 @@
 from ast import literal_eval
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem
 
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -301,10 +301,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         position = sender.locationQt(id_num=id_num,
                                      scale_factor=self.scale_factor)
 
-        coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                              position[0],
-                                                              position[1],
-                                                              scale_factor=self.scale_factor)
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+                                                                  position[0],
+                                                                  position[1],
+                                                                  scale_factor=self.scale_factor)
+        else:
+            coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+                                                               position[0],
+                                                               position[1],
+                                                               scale_factor=self.scale_factor)
         print('NAPI:  VH added to %s, %s' % coordinates)
 
         assert id_num not in self.coordinates_to_vhid.values()
@@ -965,7 +971,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if event_xy is None or event_coord is None:
             return False
 
-
         if self.griditem.grid_type is GridType.HONEYCOMB:
             last_hovered_x, last_hovered_y = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
                                                                                        event_coord[0],
@@ -978,11 +983,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                                     self.scale_factor)
         else:
             return False
+
         event_x, event_y = event_xy
-
         result = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2
-
-        return result <= (self._RADIUS*self.scale_factor)**2
+        return result <= (self._RADIUS)**2
     # end def
 
     def _preview_spa(self, event_xy):
@@ -1010,6 +1014,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         even_id = part._getNewIdNum(0)
         odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
+            # This can return True, False or None
             is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
             if is_odd is True:
                 odd_id += 2
