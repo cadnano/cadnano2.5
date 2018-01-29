@@ -46,6 +46,7 @@ class HoneycombDnaPart(object):
         column_guess = x/(radius*root3) - 1
         row_guess = (y - radius*2)/(radius*3)
 
+#        possible_columns = (floor(column_guess), ceil(column_guess), floor(column_guess+1), ceil(column_guess+1))
         possible_columns = (floor(column_guess), ceil(column_guess))
         possible_rows = (floor(row_guess), ceil(row_guess))
 
