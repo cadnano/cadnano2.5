@@ -37,7 +37,7 @@ def decode(document, obj, emit_signals=False):
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
 
-    document.setSliceViewType(slice_view_type=slice_view_type)
+    # document.setSliceViewType(slice_view_type=slice_view_type)
 # end def
 
 

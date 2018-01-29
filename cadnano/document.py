@@ -957,7 +957,8 @@ class Document(CNObject):
         Returns:
             None
         """
-        return self.controller().setSliceViewType(slice_view_type=slice_view_type)
+        pass
+        # return self.controller().setSliceViewType(slice_view_type=slice_view_type)
     # end def
 
     def getGridType(self):
