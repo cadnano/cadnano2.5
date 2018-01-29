@@ -106,11 +106,12 @@ class HoneycombDnaPart(object):
 #        if (row_temp % 3) - 0.5 > 1.0:
             # odd parity
 #            row = int((row_temp - 1) / 3 + 0.5)
-            row = int((y-radius)/(scale_factor*radius*3))
+            float_row = (y-radius)/(scale_factor*radius*3) + 0.5
         else:
             # even parity
 #            row = int(row_temp/3 + 0.5)
-            row = int(y/scale_factor*radius*3)
+            float_row = y/scale_factor*radius*3
+        row = int(float_row) if float_row >= 0 else int(float_row - 1)
         return row, column
     # end def
 
