@@ -366,9 +366,14 @@ class PreXoverItem(QGraphicsRectItem):
         prexoveritem_manager (TYPE): Description
         to_vh_id_num (TYPE): Description
     """
+    FILTER_NAME = "xover"
 
-    def __init__(self, from_virtual_helix_item, is_fwd, from_index, nearby_idxs,
-                 to_vh_id_num, prexoveritem_manager):
+    def __init__(self,  from_virtual_helix_item,
+                        is_fwd,
+                        from_index,
+                        nearby_idxs,
+                        to_vh_id_num,
+                        prexoveritem_manager):
         """Summary
 
         Args:
@@ -452,7 +457,9 @@ class PreXoverItem(QGraphicsRectItem):
 
             # bond line
             bonditem = self._bond_item
-            bonditem.setPen(getPenObj(self.color, styles.PREXOVER_STROKE_WIDTH))
+            bonditem.setPen(getPenObj(  self.color,
+                                        styles.PREXOVER_STROKE_WIDTH,
+                                        penstyle=Qt.DotLine))
             bonditem.hide()
     # end def
 
@@ -497,8 +504,10 @@ class PreXoverItem(QGraphicsRectItem):
             else:
                 # print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
                 return False
-            self._tick_marks.setPen(getPenObj(self.color, styles.PREXOVER_STROKE_WIDTH,
-                                              capstyle=Qt.FlatCap, joinstyle=Qt.RoundJoin))
+            self._tick_marks.setPen(getPenObj(  self.color,
+                                                styles.PREXOVER_STROKE_WIDTH,
+                                                capstyle=Qt.FlatCap,
+                                                joinstyle=Qt.RoundJoin))
             self._tick_marks.setPath(path)
             self._tick_marks.show()
             return True
@@ -568,7 +577,14 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def mousePressEvent(self, event):
-        if self._getActiveTool().methodPrefix() != "selectTool":
+        """
+
+        TODO: NEED TO ADD FILTER FOR A CLICK ON THE 3' MOST END OF THE XOVER TO DISALLOW OR HANDLE DIFFERENTLY
+        """
+        viewroot = self.parentItem().viewroot()
+        current_filter_set = viewroot.selectionFilterSet()
+        if  (self._getActiveTool().methodPrefix() != "selectTool" or
+            (self.FILTER_NAME not in current_filter_set) ):
             return
 
         part = self._model_vh.part()
@@ -584,6 +600,7 @@ class PreXoverItem(QGraphicsRectItem):
         if strand5p is None or strand3p is None:
             return
 
+        # print(strand3p, strand5p)
         part.createXover(strand5p, self.idx, strand3p, self.idx)
 
         nkey = (self.to_vh_id_num, not is_fwd, self.idx)
@@ -741,7 +758,13 @@ class PreXoverItem(QGraphicsRectItem):
 
 
 class PathWorkplaneOutline(QGraphicsRectItem):
+    """
+    """
     def __init__(self, parent=None):
+        """
+        Args:
+            parent (:obj:`QGraphicsItem`, optional): default None
+        """
         super(PathWorkplaneOutline, self).__init__(parent)
         self.setPen(getNoPen())
         self._path = QGraphicsPathItem(self)

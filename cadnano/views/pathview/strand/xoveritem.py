@@ -66,6 +66,7 @@ class XoverNode3(QGraphicsRectItem):
         xoi = self._xover_item
         tool_method_name = xoi._getActiveTool().methodPrefix() + "MousePress"
         if hasattr(xoi, tool_method_name):
+            print("Tool handler mousePress xovernode3")
             getattr(xoi, tool_method_name)()
     # end def
 
@@ -584,6 +585,7 @@ class XoverItem(QGraphicsPathItem):
             viewroot = s_i.viewroot()
             current_filter_set = viewroot.selectionFilterSet()
             if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
+                print("Accepter xoveritem")
                 event.setAccepted(True)
                 selection_group = viewroot.strandItemSelectionGroup()
                 mod = Qt.MetaModifier

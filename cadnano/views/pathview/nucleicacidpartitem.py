@@ -803,7 +803,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            event (:obj:`QGraphicsSceneMouseEvent`): Contains item, scene, and screen
             coordinates of the the event, and previous event.
         """
         self._viewroot.clearSelectionsIfActiveTool()
