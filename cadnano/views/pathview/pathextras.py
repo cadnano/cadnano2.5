@@ -504,8 +504,10 @@ class PreXoverItem(QGraphicsRectItem):
             else:
                 # print("unpaired PreXoverItem at {}[{}]".format(self._id_num, self.idx), self.nearby_idxs)
                 return False
-            self._tick_marks.setPen(getPenObj(self.color, styles.PREXOVER_STROKE_WIDTH,
-                                              capstyle=Qt.FlatCap, joinstyle=Qt.RoundJoin))
+            self._tick_marks.setPen(getPenObj(  self.color,
+                                                styles.PREXOVER_STROKE_WIDTH,
+                                                capstyle=Qt.FlatCap,
+                                                joinstyle=Qt.RoundJoin))
             self._tick_marks.setPath(path)
             self._tick_marks.show()
             return True
@@ -756,7 +758,13 @@ class PreXoverItem(QGraphicsRectItem):
 
 
 class PathWorkplaneOutline(QGraphicsRectItem):
+    """
+    """
     def __init__(self, parent=None):
+        """
+        Args:
+            parent (:obj:`QGraphicsItem`, optional): default None
+        """
         super(PathWorkplaneOutline, self).__init__(parent)
         self.setPen(getNoPen())
         self._path = QGraphicsPathItem(self)

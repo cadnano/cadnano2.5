@@ -404,8 +404,9 @@ class HandleItem(QGraphicsRectItem):
             parent.setMovable(False)
             parent.finishDrag()
         self.setCursor(Qt.OpenHandCursor)
-        res = QGraphicsItem.mouseReleaseEvent(parent, event)
-        return res
+        # NOTE was QGraphicsItem.mouseReleaseEvent(parent, event) but that errored
+        # NC 2018.01.29 so that seemd to fix the error
+        return QGraphicsItem.mouseReleaseEvent(self, event)
     # end def
 
     def focusWindowChangedSlot(self, focus_window):
