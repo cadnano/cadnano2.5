@@ -151,7 +151,6 @@ class StrandItem(QGraphicsLineItem):
         Args:
             strand (:obj:`cadnano.strand.Strand`):
         """
-        print("sCCS", strand)
         self._updateAppearance(strand)
     # end def
 

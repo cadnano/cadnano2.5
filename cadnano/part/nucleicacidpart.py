@@ -3158,8 +3158,8 @@ class NucleicAcidPart(Part):
     # end def
 
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
-        if id_num != self._active_id_num:
-            print("AVH change", id_num)
+        # if id_num != self._active_id_num:
+        #     print("AVH change", id_num)
         abi = (id_num, is_fwd, idx, -1)
         if self.active_base_info == abi:
             return

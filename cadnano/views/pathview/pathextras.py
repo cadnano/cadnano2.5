@@ -609,7 +609,6 @@ class PreXoverItem(QGraphicsRectItem):
             npxi.shutdown()
         self.shutdown()
 
-        print("PAthextras MPE", self._id_num)
         part.setActiveVirtualHelix(self._id_num, is_fwd, self.idx)
         # self.prexoveritem_manager.handlePreXoverClick(self)
 
