@@ -1326,8 +1326,8 @@ class NucleicAcidPart(Part):
             _, _ = self.getOffsetAndSize(id_num)
 
         # Ensure that the values that are set are floats as appropriate
-        keys_list = [keys] if isinstance(keys, str) else keys
-        values_list = [values] if isinstance(values, str) else values
+        keys_list =     keys if isinstance(keys, (list, tuple)) else [keys]
+        values_list =   values if isinstance(values, (list, tuple)) else [values]
 
         for index, key in enumerate(keys_list):
             if key in self._FLOAT_PROPERTY_KEYS:
@@ -1341,7 +1341,8 @@ class NucleicAcidPart(Part):
             try:
                 self.vh_properties.loc[id_num, (key)] = values_list[index]
             except KeyError:
-                pass
+                print("Key not in VH properties {}: {}, {}".format(key, id_num, values))
+                raise
 
         if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(
@@ -3157,12 +3158,21 @@ class NucleicAcidPart(Part):
     # end def
 
     def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
+        # if id_num != self._active_id_num:
+        #     print("AVH change", id_num)
         abi = (id_num, is_fwd, idx, -1)
         if self.active_base_info == abi:
             return
         else:
             self._active_id_num = id_num
             self.active_base_info = abi
+        self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
+        self.partActiveBaseInfoSignal.emit(self, abi)
+    # end def
+
+    def reemitActiveVirtualHelix(self):
+        id_num, abi = self._active_id_num, self.active_base_info
+        # print("reemit", self._active_id_num, self.active_base_info)
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
     # end def

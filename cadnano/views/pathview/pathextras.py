@@ -47,6 +47,7 @@ REVPHOS_PP.addPolygon(T180.map(TRIANGLE))
 
 KEYINPUT_ACTIVE_FLAG = QGraphicsItem.ItemIsFocusable
 
+PROX_ALPHA = 64
 
 class PropertyWrapperObject(QObject):
     """Summary
@@ -215,6 +216,7 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
         Returns:
             TYPE: Description
         """
+        self.resetTransform()
         self.is_fwd = is_fwd
         self.color = color
     # end def
@@ -261,27 +263,6 @@ class PreXoverLabel(QGraphicsSimpleTextItem):
             self._outline.hide()
     # end def
 # end class
-
-
-PROX_ALPHA = 64
-
-
-# def _createPreXoverPainterPath(p1, p2, p3, end_poly=None, is_fwd=True):
-#     path = QPainterPath()
-#     path.moveTo(p1)
-#     path.lineTo(p2)
-#     path.lineTo(p3)
-#     if end_poly:
-#         poly_width = end_poly.boundingRect().height()/2
-#         xoffset = -poly_width if is_fwd else poly_width
-#         angle = -90 if is_fwd else 90
-#         T = QTransform()
-#         T.translate(p3.x()+xoffset, p3.y())
-#         T.rotate(angle)
-#         path.addPolygon(T.map(end_poly))
-#     return path
-# # end def
-
 
 def _createPreXoverPainterPath(elements, end_poly=None, is_fwd=True):
     path = QPainterPath()
@@ -360,11 +341,11 @@ class PreXoverItem(QGraphicsRectItem):
     and zero or more 'to' VirtualHelixItem Indices
 
     Attributes:
-        adapter (TYPE): Description
+        adapter (:obj:`PropertyWrapperObject`): Description
         idx (int): the base index within the virtual helix
-        is_fwd (TYPE): Description
-        prexoveritem_manager (TYPE): Description
-        to_vh_id_num (TYPE): Description
+        is_fwd (bool): is this a forward strand?
+        prexoveritem_manager (:obj:`PreXoverManager`): Manager of the PreXoverItems
+        to_vh_id_num (int): Virtual Helix number this Xover point might connect to
     """
     FILTER_NAME = "xover"
 
@@ -378,10 +359,10 @@ class PreXoverItem(QGraphicsRectItem):
 
         Args:
             from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            is_fwd (TYPE): Description
-            from_index (TYPE): Description
-            to_vh_id_num (TYPE): Description
-            prexoveritem_manager (TYPE): Description
+            is_fwd (bool): is this a forward strand?
+            from_index (int): index of the Virtual Helix this xover is coming from
+            to_vh_id_num (int): Virtual Helix number this Xover point might connect to
+            prexoveritem_manager (:obj:`PreXoverManager`): Manager of the PreXoverItems
         """
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
@@ -400,9 +381,6 @@ class PreXoverItem(QGraphicsRectItem):
 
     def shutdown(self):
         """Summary
-
-        Returns:
-            TYPE: Description
         """
         self.setBrush(getNoBrush())
         self.to_vh_id_num = None
@@ -423,7 +401,9 @@ class PreXoverItem(QGraphicsRectItem):
             to_vh_id_num (int): id_num of the other vh
             prexoveritem_manager (cadnano.views.pathview.prexoermanager.PreXoverManager): the manager
         """
+        # to_vh_item = from_virtual_helix_item.partItem().idToVirtualHelixItem(to_vh_id_num)
         self.setParentItem(from_virtual_helix_item)
+        # self.setParentItem(to_vh_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
         self._model_vh = from_virtual_helix_item.cnModel()
@@ -446,14 +426,14 @@ class PreXoverItem(QGraphicsRectItem):
         if result:
             self.setBrush(getNoBrush())
             if is_fwd:
-                self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH)
+                self.setPos(from_index*BASE_WIDTH, -BASE_WIDTH - 0.1*BASE_WIDTH)
             else:
                 self.setPos(from_index*BASE_WIDTH, 2*BASE_WIDTH)
             self.show()
             # label
             self._label_txt = lbt = None if to_vh_id_num is None else str(to_vh_id_num)
-            self.setLabel(text=lbt)
             self._label.resetItem(is_fwd, self.color)
+            self.setLabel(text=lbt)
 
             # bond line
             bonditem = self._bond_item
@@ -464,9 +444,11 @@ class PreXoverItem(QGraphicsRectItem):
     # end def
 
     def setPathAppearance(self, from_virtual_helix_item):
-            """
-            Sets the PainterPath according to the index (low = Left, high = Right)
+            """Sets the PainterPath according to the index (low = Left, high = Right)
             and strand position (top = Up, bottom = Down).
+
+            Args:
+                from_virtual_helix_item (:obj:`VirtualHelixItem`):
             """
             part = self._model_vh.part()
             idx = self.idx
@@ -553,12 +535,12 @@ class PreXoverItem(QGraphicsRectItem):
         """
         if self._getActiveTool().methodPrefix() != "selectTool":
             return
-
         self.setFocus(Qt.MouseFocusReason)
         self.prexoveritem_manager.updateModelActiveBaseInfo(self.getInfo())
         self.setActiveHovered(True)
         status_string = "%d[%d]" % (self._id_num, self.idx)
         self.parentItem().window().statusBar().showMessage(status_string)
+        return QGraphicsItem.hoverEnterEvent(self, event)
     # end def
 
     def hoverLeaveEvent(self, event):
@@ -566,20 +548,16 @@ class PreXoverItem(QGraphicsRectItem):
 
         Args:
             event (QGraphicsSceneHoverEvent): the hover event
-
-        Returns:
-            TYPE: Description
         """
         self.prexoveritem_manager.updateModelActiveBaseInfo(None)
         self.setActiveHovered(False)
         self.clearFocus()
         self.parentItem().window().statusBar().showMessage("")
+        return QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
 
     def mousePressEvent(self, event):
-        """
-
-        TODO: NEED TO ADD FILTER FOR A CLICK ON THE 3' MOST END OF THE XOVER TO DISALLOW OR HANDLE DIFFERENTLY
+        """TODO: NEED TO ADD FILTER FOR A CLICK ON THE 3' MOST END OF THE XOVER TO DISALLOW OR HANDLE DIFFERENTLY
         """
         viewroot = self.parentItem().viewroot()
         current_filter_set = viewroot.selectionFilterSet()
@@ -617,9 +595,6 @@ class PreXoverItem(QGraphicsRectItem):
 
         Args:
             event (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         self.prexoveritem_manager.handlePreXoverKeyPress(event.key())
     # end def
@@ -631,9 +606,6 @@ class PreXoverItem(QGraphicsRectItem):
         Args:
             text (None, optional): Description
             outline (bool, optional): Description
-
-        Returns:
-            TYPE: Description
         """
         if text:
             self._label.setTextAndStyle(text=text, outline=outline)
@@ -651,9 +623,6 @@ class PreXoverItem(QGraphicsRectItem):
             duration (TYPE): Description
             start_value (TYPE): Description
             end_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         b_name = property_name.encode('ascii')
         anim = item.adapter.getRef(property_name)
@@ -746,9 +715,6 @@ class PreXoverItem(QGraphicsRectItem):
 
     def deactivateNeighbor(self):
         """Summary
-
-        Returns:
-            TYPE: Description
         """
         if self.isVisible():
             self._bond_item.hide()
@@ -807,9 +773,13 @@ class PathWorkplaneItem(QGraphicsRectItem):
     _MIN_WIDTH = 3
 
     def __init__(self, model_part, part_item):
-        super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item)
+        """
+        Args:
+            model_part (:obj:`Part`):
+            part_item (:obj:`AbstractPartItem`):
+        """
+        super(QGraphicsRectItem, self).__init__(BASE_RECT, part_item.proxy())
         self.setAcceptHoverEvents(True)
-        # self.setBrush(getNoBrush())
         self.setBrush(getBrushObj(styles.BLUE_FILL, alpha=12))
         self.setPen(getNoPen())
         self.setZValue(styles.ZWORKPLANE)
@@ -843,7 +813,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
     def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""
-        # todo: fix bug preventing dragging in imported files
+        # TODO: fix bug preventing dragging in imported files
         if handle_type and handle_type & HandleType.LEFT:
             xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
             xBR = self._idx_high*BASE_WIDTH
@@ -860,6 +830,10 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def setMovable(self, is_movable):
+        """
+        Args:
+            is_movable (bool): is this movable?
+        """
         self._moving_via_handle = is_movable
         # self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
@@ -933,6 +907,10 @@ class PathWorkplaneItem(QGraphicsRectItem):
     # end def
 
     def width(self):
+        """
+        Returns:
+            int: width of the PathWorkplaneItem in index distance
+        """
         return self._idx_high - self._idx_low
     # end def
 

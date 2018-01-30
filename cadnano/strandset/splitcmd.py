@@ -193,5 +193,6 @@ class SplitCommand(UndoCommand):
         s_low.strandRemovedSignal.emit(s_low)
         s_high.strandRemovedSignal.emit(s_high)
         ss.strandsetStrandAddedSignal.emit(ss, o_strand)
+        ss.part().reemitActiveVirtualHelix() # emit last to ensure colors of ticks are correct
     # end def
 # end class
