@@ -69,6 +69,7 @@ class CreateXoverCommand(UndoCommand):
         if self._update_oligo:
             strand5p.strandConnectionChangedSignal.emit(strand5p)
             strand3p.strandConnectionChangedSignal.emit(strand3p)
+            # self._part.reemitActiveVirtualHelix() # emit last to ensure colors of ticks are correct
     # end def
 
     def undo(self):
@@ -106,6 +107,7 @@ class CreateXoverCommand(UndoCommand):
         if self._update_oligo:
             strand5p.strandConnectionChangedSignal.emit(strand5p)
             strand3p.strandConnectionChangedSignal.emit(strand3p)
+            self._part.reemitActiveVirtualHelix() # emit last to ensure colors of ticks are correct
     # end def
 # end class
 
