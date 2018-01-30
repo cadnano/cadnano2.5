@@ -1326,8 +1326,8 @@ class NucleicAcidPart(Part):
             _, _ = self.getOffsetAndSize(id_num)
 
         # Ensure that the values that are set are floats as appropriate
-        keys_list = [keys] if isinstance(keys, str) else keys
-        values_list = values if isinstance(values, list) else [values]
+        keys_list =     keys if isinstance(keys, (list, tuple)) else [keys]
+        values_list =   values if isinstance(values, (list, tuple)) else [values]
 
         for index, key in enumerate(keys_list):
             if key in self._FLOAT_PROPERTY_KEYS:
