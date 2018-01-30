@@ -1327,7 +1327,7 @@ class NucleicAcidPart(Part):
 
         # Ensure that the values that are set are floats as appropriate
         keys_list = [keys] if isinstance(keys, str) else keys
-        values_list = [values] if isinstance(values, str) else values
+        values_list = values if isinstance(values, list) else [values]
 
         for index, key in enumerate(keys_list):
             if key in self._FLOAT_PROPERTY_KEYS:
@@ -1341,7 +1341,8 @@ class NucleicAcidPart(Part):
             try:
                 self.vh_properties.loc[id_num, (key)] = values_list[index]
             except KeyError:
-                pass
+                print("Key not in VH properties {}: {}, {}".format(key, id_num, values))
+                raise
 
         if emit_signals:
             self.partVirtualHelixPropertyChangedSignal.emit(
