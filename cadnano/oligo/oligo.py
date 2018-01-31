@@ -76,6 +76,8 @@ class Oligo(CNObject):
         olg._strand5p = self._strand5p
         olg._is_circular = self._is_circular
         olg._props = self._props.copy()
+        # update the name
+        olg._props['name'] = "oligo%s" % str(id(olg))[-4:]
         return olg
     # end def
 
