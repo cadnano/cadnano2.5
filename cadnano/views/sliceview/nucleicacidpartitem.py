@@ -304,23 +304,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self.griditem.grid_type is GridType.HONEYCOMB:
             coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                   position[0],
-                                                                  -position[1],
+                                                                  position[1],
                                                                   scale_factor=self.scale_factor)
         else:
             coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                position[0],
-                                                               -position[1],
+                                                               position[1],
                                                                scale_factor=self.scale_factor)
 
-        inverted_coordinates = (-coordinates[0], coordinates[1])
-        print('NAPI:  VH %s added to %s, %s' % (id_num, inverted_coordinates[0], coordinates[1]))
+        print('NAPI:  VH added to %s, %s' % coordinates)
 
         assert id_num not in self.coordinates_to_vhid.values()
-#        assert inverted_coordinates not in self.coordinates_to_vhid
 
-        self.coordinates_to_vhid[inverted_coordinates] = id_num
-
-        print('Coordinate mapping:  %s' % self.coordinates_to_vhid)
+        self.coordinates_to_vhid[coordinates] = id_num
 
         assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
         assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
@@ -871,29 +867,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             The ID of the last VHI created
         """
-        start_coordinates = self.getLatticeCoordinatesFromPosition(start)
-        end_coordinates = self.getLatticeCoordinatesFromPosition(end)
-#        if self.griditem.grid_type is GridType.HONEYCOMB:
-#            start_coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                        start[0],
-#                                                                        start[1],
-#                                                                        scale_factor=self.scale_factor)
-#            end_coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                      end[0],
-#                                                                      end[1],
-#                                                                      scale_factor=self.scale_factor)
-#        elif self.griditem.grid_type is GridType.SQUARE:
-#            start_coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                     start[0],
-#                                                                     start[1],
-#                                                                     scale_factor=self.scale_factor)
-#            end_coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                   end[0],
-#                                                                   end[1],
-#                                                                   scale_factor=self.scale_factor)
-
-        path = ShortestPathHelper.shortestPathXY(start=start_coordinates,
-                                                 end=end_coordinates,
+        path = ShortestPathHelper.shortestPathXY(start=start, end=end,
                                                  neighbor_map=self.neighbor_map,
                                                  vh_set=self.coordinates_to_vhid.keys(),
                                                  grid_type=self.griditem.grid_type,
@@ -917,23 +891,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return id_number
     # end def
 
-    def getLatticeCoordinatesFromPosition(self, position):
-        assert isinstance(position, (tuple, list))
-        assert len(position) is 2
-
-        if self.griditem.grid_type is GridType.HONEYCOMB:
-            return HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                           position[0],
-                                                           position[1],
-                                                           scale_factor=self.scale_factor)
-        elif self.griditem.grid_type is GridType.SQUARE:
-            return SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                        position[0],
-                                                        position[1],
-                                                        scale_factor=self.scale_factor)
-        else:
-            return None
-
     def createToolHoverMove(self, tool, event):
         """Summary
 
@@ -947,19 +904,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_alt = True if event.modifiers() & Qt.AltModifier else False
         mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
         event_xy = (mapped_position.x(), mapped_position.y())
-        event_coord = self.getLatticeCoordinatesFromPosition(event_xy)
-#        if self.griditem.grid_type is GridType.HONEYCOMB:
-#            event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                  event_xy[0],
-#                                                                  event_xy[1],
-#                                                                  scale_factor=self.scale_factor)
-#        elif self.griditem.grid_type is GridType.SQUARE:
-#            event_coord = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                               event_xy[0],
-#                                                               event_xy[1],
-#                                                               scale_factor=self.scale_factor)
-#        else:
-#            event_coord = None
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+                                                                  event_xy[0],
+                                                                  event_xy[1],
+                                                                  scale_factor=self.scale_factor)
+        elif self.griditem.grid_type is GridType.SQUARE:
+            event_coord = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+                                                               event_xy[0],
+                                                               event_xy[1],
+                                                               scale_factor=self.scale_factor)
+        else:
+            event_coord = None
 #        new_event_coord = ShortestPathHelper.findClosestPoint(event_xy,
 #                                                          grid_type=self.griditem.grid_type,
 #                                                          scale_factor=self.scale_factor)
@@ -1061,11 +1017,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             None
         """
         part = self._model_part
-
-        start_coordiantes = self.getLatticeCoordinatesFromPosition(self.shortest_path_start)
-        end_coordinates = self.getLatticeCoordinatesFromPosition(event_xy)
-        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start_coordinates=start_coordiantes,
-                                                                      end_coordinates=end_coordinates,
+        start_xy = self.shortest_path_start
+        end_xy = event_xy
+        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_xy ,
+                                                                      end=end_xy ,
                                                                       neighbor_map=self.neighbor_map,
                                                                       radius=self._RADIUS,
                                                                       vh_set=self.coordinates_to_vhid.keys(),
@@ -1125,21 +1080,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.neighbor_map = neighbor_map
     # end def
 
-#    def setPointMap(self, point_map):
-#        """
-#        Update the internal mapping of coordinates to x-y positions.
-#
-#        Args:
-#            point_map (dict):  the new mapping of coordinates to their x-y
-#                position
-#
-#        Returns:
-#            None
-#
-#        """
-#        assert isinstance(point_map, dict)
-#        self.coordinates_to_xy = point_map
-#    # end def
+    def setPointMap(self, point_map):
+        """
+        Update the internal mapping of coordinates to x-y positions.
+
+        Args:
+            point_map (dict):  the new mapping of coordinates to their x-y
+                position
+
+        Returns:
+            None
+
+        """
+        assert isinstance(point_map, dict)
+        self.coordinates_to_xy = point_map
+    # end def
 
     def removeAllCreateHints(self):
         """
