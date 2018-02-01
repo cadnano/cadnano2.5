@@ -1009,7 +1009,7 @@ class ShortestPathHelper(object):
 #        return []
 
     @staticmethod
-    def shortestPathAStar(start, end, neighbor_map, vh_set, grid_type, radius, scale_factor):
+    def shortestPathAStar(start_coordinates, end_coordinates, neighbor_map, vh_set, grid_type, radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 
         Does an A* search.
@@ -1027,18 +1027,6 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-#        print('start, end going in', start, end)
-        start_coordinates = ShortestPathHelper.findClosestPoint(position=start,
-                                                                radius=radius,
-                                                                grid_type=grid_type,
-                                                                scale_factor=scale_factor)
-        end_coordinates = ShortestPathHelper.findClosestPoint(position=end,
-                                                              radius=radius,
-                                                              grid_type=grid_type,
-                                                              scale_factor=scale_factor)
-
-#        print('from to', start_coordinates, end_coordinates)
-
         queue = PriorityQueue()
         queue.put((0, start_coordinates))
         parents = dict()
@@ -1100,8 +1088,8 @@ class ShortestPathHelper(object):
                        scale_factor, radius):
         # TODO[NF]:  Docstring
         x_y_path = []
-        coordinate_path = ShortestPathHelper.shortestPathAStar(start=start,
-                                                               end=end,
+        coordinate_path = ShortestPathHelper.shortestPathAStar(start_coordinates=start,
+                                                               end_coordinates=end,
                                                                neighbor_map=neighbor_map,
                                                                vh_set=vh_set,
                                                                radius=radius,
