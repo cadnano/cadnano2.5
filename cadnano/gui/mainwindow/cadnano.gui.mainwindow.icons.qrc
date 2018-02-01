@@ -39,6 +39,7 @@
         <file alias="slice">images/slice-view.png</file>
         <file alias="sim">images/sim-view.png</file>
         <file alias="console">images/console-view.png</file>
+        <file alias="filter-strand-disabled">images/part-filter-strand-disabled.png</file>
     </qresource>
     <qresource prefix="/slicetools">
         <file alias="del-last">images/slice-delete-last.png</file>
