@@ -104,10 +104,10 @@ class HoneycombDnaPart(object):
         else:
             # even parity
 #            row = int(row_temp/3 + 0.5)
-            float_row = y/scale_factor*radius*3
+            float_row = y/(scale_factor*radius*3)
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
 
-        print('[lattice] Raw row and column are %s,%s' % (float_row, float_column))
+        print('[lattice] Raw row and column are %s,%s and input x and y are %s,%s' % (float_row, float_column, x, y))
         return row, column
     # end def
 
@@ -222,5 +222,4 @@ class SquareDnaPart(object):
         column = round(x/(2.*radius*scale_factor))
         return row, column
     # end def
-
 # end class
