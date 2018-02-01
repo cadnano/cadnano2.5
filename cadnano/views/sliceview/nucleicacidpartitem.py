@@ -311,7 +311,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                position[0],
                                                                position[1],
                                                                scale_factor=self.scale_factor)
-        print('NAPI:  VH added to %s, %s' % coordinates)
 
         assert id_num not in self.coordinates_to_vhid.values()
 
@@ -730,11 +729,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 coordinates = self.getLastHoveredCoordinates()
-                x, y = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                               coordinates[0],
-                                                               coordinates[1],
-                                                               scale_factor=self.scale_factor)
-                self._preview_spa((x, y))
+                event_xy = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+                                                                   coordinates[0],
+                                                                   coordinates[1],
+                                                                   scale_factor=self.scale_factor)
+                self._previewSpa(event_xy)
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
@@ -924,9 +923,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.createToolHoverLeave(tool=tool, event=event)
 
         # Highlight GridItems if alt is being held down
+#        if is_alt:
+#            print('alt is true')
+#        if self.shortest_path_add_mode:
+#            print('spa true')
         if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
-            self._preview_spa(event_xy)
+#            print('previewing')
+            self._previewSpa(event_xy)
         else:
+#            print('not previewing, coords are %s' % str(event_coord))
 #            if self.griditem.grid_type is GridType.HONEYCOMB:
 #                xy_coordinates = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
 #                                                                           event_coord[0],
@@ -973,23 +978,30 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         if self.griditem.grid_type is GridType.HONEYCOMB:
             last_hovered_x, last_hovered_y = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
-                                                                                       event_coord[0],
+                                                                                       -event_coord[0],
                                                                                        event_coord[1],
                                                                                        self.scale_factor)
         elif self.griditem.grid_type is GridType.SQUARE:
             last_hovered_x, last_hovered_y = SquareDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
-                                                                                    event_coord[0],
+                                                                                    -event_coord[0],
                                                                                     event_coord[1],
                                                                                     self.scale_factor)
         else:
             return False
 
         event_x, event_y = event_xy
-        result = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2
+        result = (last_hovered_x - event_x)**2 + (-1*last_hovered_y - event_y)**2
+        print('\nResult is %s\nComparison is %s\nevent_xy is %s\nevent_coord is %s\nlast_hovered is %s' % (
+            result,
+            self._RADIUS**2,
+            str(event_xy),
+            str(event_coord),
+            str((last_hovered_x, last_hovered_y)))
+        )
         return result <= (self._RADIUS)**2
     # end def
 
-    def _preview_spa(self, event_xy):
+    def _previewSpa(self, event_xy):
         """
         Highlight and add VH ID numbers to the GridPoints that the SPA would
         use.
