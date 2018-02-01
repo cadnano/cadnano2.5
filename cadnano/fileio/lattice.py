@@ -54,8 +54,8 @@ class HoneycombDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
-                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (-guess_y-y)**2
                 distance = sqrt(squared_distance)
 
                 if distance < shortest_distance:
@@ -163,8 +163,8 @@ class SquareDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
-                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                guess_x, guess_y = SquareDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (-guess_y-y)**2
                 distance = sqrt(squared_distance)
 
                 if distance < shortest_distance:
