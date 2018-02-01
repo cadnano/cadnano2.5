@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.10.dev1801191340
+# Created by: PyQt5 UI code generator 5.9.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -333,8 +333,10 @@ class Ui_MainWindow(object):
         self.action_views_label.setObjectName("action_views_label")
         self.action_filter_strand = QtWidgets.QAction(MainWindow)
         self.action_filter_strand.setCheckable(True)
+        self.action_filter_strand.setChecked(True)
         icon17 = QtGui.QIcon()
         icon17.addPixmap(QtGui.QPixmap(":/parttools/filter-strand"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon17.addPixmap(QtGui.QPixmap(":/parttools/filter-strand-disabled"), QtGui.QIcon.Disabled, QtGui.QIcon.Off)
         self.action_filter_strand.setIcon(icon17)
         self.action_filter_strand.setObjectName("action_filter_strand")
         self.action_filter_helix = QtWidgets.QAction(MainWindow)
@@ -517,6 +519,7 @@ class Ui_MainWindow(object):
         self.filter_view_toolbar.addAction(self.action_filter_scaf)
         self.filter_view_toolbar.addAction(self.action_toolbar_spacer_1)
         self.filter_view_toolbar.addAction(self.action_filter_xover)
+        self.filter_view_toolbar.addAction(self.action_filter_strand)
         self.filter_view_toolbar.addAction(self.action_filter_endpoint)
         self.filter_view_toolbar.addAction(self.action_filter_helix)
         self.filter_view_toolbar.addAction(self.action_filters_label)
@@ -618,6 +621,7 @@ class Ui_MainWindow(object):
         self.action_filter_xover.setToolTip(_translate("MainWindow", "(X)overs"))
         self.action_filter_xover.setShortcut(_translate("MainWindow", "X"))
         self.action_views_label.setText(_translate("MainWindow", "Views:"))
+        self.action_filter_strand.setText(_translate("MainWindow", "filter-strand"))
         self.action_filter_strand.setToolTip(_translate("MainWindow", "stran(D)s"))
         self.action_filter_strand.setShortcut(_translate("MainWindow", "D"))
         self.action_filter_helix.setText(_translate("MainWindow", "Helix"))

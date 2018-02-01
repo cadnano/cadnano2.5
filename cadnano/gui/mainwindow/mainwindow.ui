@@ -135,6 +135,7 @@
    <addaction name="action_filter_scaf"/>
    <addaction name="action_toolbar_spacer_1"/>
    <addaction name="action_filter_xover"/>
+   <addaction name="action_filter_strand"/>
    <addaction name="action_filter_endpoint"/>
    <addaction name="action_filter_helix"/>
    <addaction name="action_filters_label"/>
@@ -953,9 +954,16 @@
    <property name="checkable">
     <bool>true</bool>
    </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="cadnano.gui.mainwindow.icons.qrc">
-     <normaloff>:/parttools/filter-strand</normaloff>:/parttools/filter-strand</iconset>
+     <normaloff>:/parttools/filter-strand</normaloff>
+     <disabledoff>:/parttools/filter-strand-disabled</disabledoff>:/parttools/filter-strand</iconset>
+   </property>
+   <property name="text">
+    <string>filter-strand</string>
    </property>
    <property name="toolTip">
     <string>stran(D)s</string>
