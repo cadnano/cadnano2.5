@@ -312,16 +312,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                position[1],
                                                                scale_factor=self.scale_factor)
 
-#        inverted_coordinates = (-coordinates[0], coordinates[1])
-#        print('\nNAPI:  VH %s added to %s, %s' % (id_num, inverted_coordinates[0], coordinates[1]))
-        print('\nNAPI:  VH %s added to %s, %s' % (id_num, coordinates[0], coordinates[1]))
-
         assert id_num not in self.coordinates_to_vhid.values()
-#        assert inverted_coordinates not in self.coordinates_to_vhid
-        if coordinates in self.coordinates_to_vhid:
-            print('\nCONFLICT FOR VH at %s:\nwas at %s\nnow at %s' % (coordinates,
-                                                                      self.coordinates_to_vhid[coordinates],
-                                                                      id_num))
+        assert coordinates not in self.coordinates_to_vhid
 
         self.coordinates_to_vhid[coordinates] = id_num
 
@@ -842,7 +834,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._setShortestPathStart(None)
 
     def _setShortestPathStart(self, position):
-        print('setting spa start to %s' % str(position))
         # TODO[NF]:  Docstring
         if position is not None:
             self.shortest_path_add_mode = True
@@ -983,15 +974,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return False
 
         event_x, event_y = event_xy
-        result = (last_hovered_x - event_x)**2 + (-1*last_hovered_y - event_y)**2
-#        print('\nResult is %s\nComparison is %s\nevent_xy is %s\nevent_coord is %s\nlast_hovered is %s' % (
-#            result,
-#            self._RADIUS**2,
-#            str(event_xy),
-#            str(event_coord),
-#            str((last_hovered_x, last_hovered_y)))
-#        )
-        return result <= (self._RADIUS)**2
+        return (last_hovered_x - event_x)**2 + (-1*last_hovered_y - event_y)**2 <= self._RADIUS**2
     # end def
 
     def _previewSpa(self, event_xy):
