@@ -46,7 +46,6 @@ class HoneycombDnaPart(object):
         column_guess = x/(radius*root3) - 1
         row_guess = (y - radius*2)/(radius*3)
 
-#        possible_columns = (floor(column_guess), ceil(column_guess), floor(column_guess+1), ceil(column_guess+1))
         possible_columns = (floor(column_guess), ceil(column_guess))
         possible_rows = (floor(row_guess), ceil(row_guess))
 
@@ -83,31 +82,24 @@ class HoneycombDnaPart(object):
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3
         if HoneycombDnaPart.isOddParity(row, column):   # odd parity
-            y = row*radius*3 + radius
-        else:                               # even parity
-            y = row*radius*3
-        # Make sure radius is a float
+            y = row*radius*3. + radius
+        else: # even parity
+            y = row*radius*3.
         return scale_factor*x, scale_factor*y
     # end def
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
-#        print('[lattice] Scaled input x and y are %s,%s' % (x*scale_factor, y*scale_factor))
         float_column = x/(radius*root3*scale_factor) + 0.5
         column = int(float_column) if float_column >= 0 else int(float_column - 1)
 
         row_temp = y/(radius*scale_factor)
-        if (row_temp % 3) + 0.5 > 1.0:
-            # odd parity
-#            row = int((row_temp - 1) / 3 + 0.5)
+        if (row_temp % 3) + 0.5 > 1.0: # odd parity
             float_row = (y-radius)/(scale_factor*radius*3) + 0.5
-        else:
-            # even parity
-#            row = int(row_temp/3 + 0.5)
+        else: # even parity
             float_row = y/(scale_factor*radius*3)
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
 
-        print('[lattice] Raw row and column are %s,%s and input x and y are %s,%s' % (float_row, float_column, x, y))
         return row, column
     # end def
 
@@ -119,12 +111,9 @@ class HoneycombDnaPart(object):
         column = roundCol(x/(radius*root3*scale_factor))
 
         row_temp = y/(radius*scale_factor)
-        if (row_temp % 3) + 0.5 > 1.0:
-#        if (row_temp % 3) - 0.5 > 1.0:
-            # odd parity
+        if (row_temp % 3) + 0.5 > 1.0: # odd parity
             row = roundRow((row_temp - 1)/3.)
-        else:
-            # even parity
+        else: # even parity
             row = roundRow(row_temp/3.)
         return row, column
     # end def
