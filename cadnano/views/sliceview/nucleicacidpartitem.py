@@ -312,6 +312,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                position[1],
                                                                scale_factor=self.scale_factor)
 
+        print('NAPI:  VH added to %s, %s' % coordinates)
+
         assert id_num not in self.coordinates_to_vhid.values()
 
         self.coordinates_to_vhid[coordinates] = id_num
@@ -831,6 +833,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._setShortestPathStart(None)
 
     def _setShortestPathStart(self, position):
+        print('setting spa start to %s' % str(position))
         # TODO[NF]:  Docstring
         if position is not None:
             self.shortest_path_add_mode = True
@@ -991,13 +994,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         event_x, event_y = event_xy
         result = (last_hovered_x - event_x)**2 + (-1*last_hovered_y - event_y)**2
-        print('\nResult is %s\nComparison is %s\nevent_xy is %s\nevent_coord is %s\nlast_hovered is %s' % (
-            result,
-            self._RADIUS**2,
-            str(event_xy),
-            str(event_coord),
-            str((last_hovered_x, last_hovered_y)))
-        )
+#        print('\nResult is %s\nComparison is %s\nevent_xy is %s\nevent_coord is %s\nlast_hovered is %s' % (
+#            result,
+#            self._RADIUS**2,
+#            str(event_xy),
+#            str(event_coord),
+#            str((last_hovered_x, last_hovered_y)))
+#        )
         return result <= (self._RADIUS)**2
     # end def
 
@@ -1014,10 +1017,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             None
         """
         part = self._model_part
-        start_coord = self.shortest_path_start
-        end_coord = event_xy
-        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
-                                                                      end=end_coord,
+        start_xy = self.shortest_path_start
+        end_xy = event_xy
+        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_xy ,
+                                                                      end=end_xy ,
                                                                       neighbor_map=self.neighbor_map,
                                                                       radius=self._RADIUS,
                                                                       vh_set=self.coordinates_to_vhid.keys(),
