@@ -304,25 +304,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self.griditem.grid_type is GridType.HONEYCOMB:
             coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                   position[0],
-                                                                  -position[1],
+                                                                  position[1],
                                                                   scale_factor=self.scale_factor)
         else:
             coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                position[0],
-                                                               -position[1],
+                                                               position[1],
                                                                scale_factor=self.scale_factor)
 
-        inverted_coordinates = (-coordinates[0], coordinates[1])
-        print('\nNAPI:  VH %s added to %s, %s' % (id_num, inverted_coordinates[0], coordinates[1]))
+#        inverted_coordinates = (-coordinates[0], coordinates[1])
+#        print('\nNAPI:  VH %s added to %s, %s' % (id_num, inverted_coordinates[0], coordinates[1]))
+        print('\nNAPI:  VH %s added to %s, %s' % (id_num, coordinates[0], coordinates[1]))
 
         assert id_num not in self.coordinates_to_vhid.values()
 #        assert inverted_coordinates not in self.coordinates_to_vhid
-        if inverted_coordinates in self.coordinates_to_vhid:
-            print('\nCONFLICT FOR VH at %s:\nwas at %s\nnow at %s' % (inverted_coordinates,
-                                                                      self.coordinates_to_vhid[inverted_coordinates],
+        if coordinates in self.coordinates_to_vhid:
+            print('\nCONFLICT FOR VH at %s:\nwas at %s\nnow at %s' % (coordinates,
+                                                                      self.coordinates_to_vhid[coordinates],
                                                                       id_num))
 
-        self.coordinates_to_vhid[inverted_coordinates] = id_num
+        self.coordinates_to_vhid[coordinates] = id_num
 
         assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
         assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
@@ -739,9 +740,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 position = self.getLastHoveredCoordinates()
                 # TODO RENAME THIS
                 coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                                   position[0],
-                                                                   -position[1],
-                                                                   scale_factor=self.scale_factor)
+                                                                      position[0],
+                                                                      -position[1],
+                                                                      scale_factor=self.scale_factor)
                 inverted_coordinates = (-coordinates[0], coordinates[1])
                 self._previewSpa(inverted_coordinates)
         elif is_alt:
