@@ -729,14 +729,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
         elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                position = self.getLastHoveredCoordinates()
-                # TODO RENAME THIS
-                coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                                      position[0],
-                                                                      -position[1],
-                                                                      scale_factor=self.scale_factor)
-                inverted_coordinates = (-coordinates[0], coordinates[1])
-                self._previewSpa(inverted_coordinates)
+#                coordinates = self.getLastHoveredCoordinates()
+#                coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
+#                                                                      position[0],
+#                                                                      position[1],
+#                                                                      scale_factor=self.scale_factor)
+#                inverted_coordinates = (-coordinates[0], coordinates[1])
+#                self._previewSpa(inverted_coordinates)
+#                print('activating for position %s,%s and coordinates %s,%s' % (position[0], position[1], coordinates[
+#                    0], coordinates[1]))
+#                print('prewviewing for %s,%s' % coordinates)
+#                self._previewSpa(coordinates)
+                self._previewSpa(self.last_mouse_position)
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
@@ -955,10 +959,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             True if the mouse is in the given GridPoint, False otherwise
         """
-        assert isinstance(event_coord, (tuple, list)) and len(event_coord) is 2
-
         if event_xy is None or event_coord is None:
             return False
+
+        assert isinstance(event_coord, (tuple, list)) and len(event_coord) is 2
 
         if self.griditem.grid_type is GridType.HONEYCOMB:
             last_hovered_x, last_hovered_y = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
