@@ -729,17 +729,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
         elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-#                coordinates = self.getLastHoveredCoordinates()
-#                coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-#                                                                      position[0],
-#                                                                      position[1],
-#                                                                      scale_factor=self.scale_factor)
-#                inverted_coordinates = (-coordinates[0], coordinates[1])
-#                self._previewSpa(inverted_coordinates)
-#                print('activating for position %s,%s and coordinates %s,%s' % (position[0], position[1], coordinates[
-#                    0], coordinates[1]))
-#                print('prewviewing for %s,%s' % coordinates)
-#                self._previewSpa(coordinates)
                 self._previewSpa(self.last_mouse_position)
         elif is_alt:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
