@@ -1041,7 +1041,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self.removeAllCopyPasteHints()
         e_pos = self.griditem.mapFromScene(event.scenePos())
-        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
+
+        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord \
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
+        hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  e_pos.x(),
+                                                  e_pos.y(),
+                                                  self.scale_factor)
+        print('hov is %s %s' %(hov_row, hov_col))
+#        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
         self._last_hovered_coord == (hov_row, hov_col)
         parity = self._getCoordinateParity(hov_row, hov_col)
 
@@ -1052,7 +1060,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         except ValueError:  # no vhs match parity
             return
         min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
-        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+#        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+        min_row, min_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  min_pos[0],
+                                                  min_pos[1],
+                                                  self.scale_factor)
         id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
 
         # placing clipboard's min_id_same_parity on the hovered_coord,
@@ -1060,7 +1072,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
             x, y = part.locationQt(vh_id, self.scaleFactor())
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
+#            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y),
+                                                                         DEFAULT_RADIUS,
+                                                                         self.griditem.grid_type,
+                                                                         self.scale_factor)
             hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
             self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
             self._highlighted_copypaste.append(hint_coord)
@@ -1081,7 +1097,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return
 
         e_pos = self.griditem.mapFromScene(event.scenePos())
-        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
+        event_position_xy = (e_pos.x(), e_pos.y())
+        hov_row, hov_col = ShortestPathHelper.findClosestPoint(event_position_xy,
+                                                               DEFAULT_RADIUS,
+                                                               self.griditem.grid_type,
+                                                               self.scale_factor)
 
         if self._last_hovered_coord == (hov_row, hov_col) or\
            not self._inPointItem((e_pos.x(), e_pos.y()), (hov_row, hov_col)):
@@ -1098,7 +1118,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         except ValueError:
             return
         min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
-        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+#        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
+
+        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos,
+                                                               DEFAULT_RADIUS,
+                                                               self.griditem.grid_type,
+                                                               self.scale_factor)
+
         id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
 
         # placing clipboard's min_id_same_parity on the hovered_coord,
@@ -1106,7 +1132,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
             x, y = part.locationQt(vh_id, self.scaleFactor())
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y),
+                                                                   DEFAULT_RADIUS,
+                                                                   self.griditem.grid_type,
+                                                                   self.scale_factor)
             hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
             self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
             self._highlighted_copypaste.append(hint_coord)
