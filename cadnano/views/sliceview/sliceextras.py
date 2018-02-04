@@ -1016,7 +1016,7 @@ class ShortestPathHelper(object):
             else:
                 parity = None
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
-                                                                  row=-row,
+                                                                  row=row,
                                                                   column=column)
             x_y_path.append((node_pos[0], node_pos[1], parity))
         return x_y_path
