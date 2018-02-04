@@ -893,20 +893,48 @@ class WedgeGizmo(QGraphicsPathItem):
 
 
 class ShortestPathHelper(object):
+    @staticmethod
+    def getNeighborsForCoordinate(grid_type, row, column):
+        # TODO[NF]:  Docstring
+        if grid_type is GridType.HONEYCOMB:
+            if not HoneycombDnaPart.isEvenParity(row, column):
+                return (
+                    (row-1, column),
+                    (row, column+1),
+                    (row, column-1)
+                )
+            else:
+                return (
+                    (row+1, column),
+                    (row, column-1),
+                    (row, column+1)
+                )
+        elif grid_type is GridType.SQUARE:
+            return(
+                (row, column+1),
+                (row, column-1),
+                (row-1, column),
+                (row+1, column)
+            )
+        else:
+            raise NotImplementedError('Could not determine neighbors for grid_type %s' % grid_type)
+
 
     @staticmethod
     def findClosestPoint(position, radius, grid_type, scale_factor):
+        # TODO[NF]:  Docstring
+        # TODO[NF]:  Radius is unused
         if grid_type is GridType.HONEYCOMB:
             coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                           position[0],
-                                                           -position[1],
-                                                           scale_factor)
+                                                                  position[0],
+                                                                  -position[1],
+                                                                  scale_factor)
             return (-coordinates[0], coordinates[1])
         elif grid_type is GridType.SQUARE:
             coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                        position[0],
-                                                        -position[1],
-                                                        scale_factor)
+                                                               position[0],
+                                                               -position[1],
+                                                               scale_factor)
             return (-coordinates[0], coordinates[1])
 
     @staticmethod
@@ -960,7 +988,18 @@ class ShortestPathHelper(object):
                     current_location = parents[current_location]
                 return [node for node in reversed(reversed_path)]
             else:
-                neighbors = neighbor_map.get(current_location, [])
+                old_neighbors = neighbor_map.get(current_location, [])
+                neighbors = ShortestPathHelper.getNeighborsForCoordinate(grid_type,
+                                                                         current_location[0],
+                                                                         current_location[1])
+
+#                if tuple(old_neighbors) != tuple(neighbors):
+#                    print('old %s' % str(old_neighbors))
+#                    print('new %s' % str(neighbors))
+#                    print()
+#                else:
+#                    print('ok')
+
                 for neighbor in neighbors:
                     new_cost = cumulative_cost[current_location] + 1
                     if (neighbor not in parents or new_cost < cumulative_cost[neighbor]) and neighbor not in vh_set:
