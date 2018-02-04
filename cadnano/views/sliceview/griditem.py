@@ -111,8 +111,6 @@ class GridItem(QGraphicsRectItem):
         draw_lines = self.draw_lines
 
         if redo_neighbors:
-            point_coordinates = dict()
-            neighbor_map = dict()
             self.points_dict = dict()
 
         for row in range(row_l, row_h):
@@ -147,21 +145,6 @@ class GridItem(QGraphicsRectItem):
                 self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
-                    point_coordinates[(-row, column)] = (x, -y)
-
-                    # This is reversed since the Y is mirrored
-                    if not HoneycombDnaPart.isEvenParity(row, column):
-                        neighbor_map[(-row, column)] = [
-                            (-row-1, column),
-                            (-row, column+1),
-                            (-row, column-1)
-                        ]
-                    else:
-                        neighbor_map[(-row, column)] = [
-                            (-row+1, column),
-                            (-row, column-1),
-                            (-row, column+1)
-                        ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
@@ -179,9 +162,6 @@ class GridItem(QGraphicsRectItem):
                 is_pen_down = False
             # end for j
         self._path.setPath(path)
-
-        if redo_neighbors:
-            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
     # end def
 
     def createSquareGrid(self, part_item, radius, bounds):
@@ -252,14 +232,6 @@ class GridItem(QGraphicsRectItem):
                 self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
-
-                    neighbor_map[(-row, column)] = [
-                        (-row, column+1),
-                        (-row, column-1),
-                        (-row-1, column),
-                        (-row+1, column)
-                    ]
-
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False  # pen up
@@ -276,9 +248,6 @@ class GridItem(QGraphicsRectItem):
                         path.moveTo(x, -y)
                 is_pen_down = False  # pen up
         self._path.setPath(path)
-
-        if redo_neighbors:
-            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
     # end def
 
     def removePoints(self):

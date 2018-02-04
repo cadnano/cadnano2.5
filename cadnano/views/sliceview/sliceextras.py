@@ -938,7 +938,7 @@ class ShortestPathHelper(object):
             return (-coordinates[0], coordinates[1])
 
     @staticmethod
-    def shortestPathAStar(start, end, neighbor_map, vh_set, grid_type, radius, scale_factor):
+    def shortestPathAStar(start, end, vh_set, grid_type, radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 
         Does an A* search.
@@ -946,10 +946,11 @@ class ShortestPathHelper(object):
         Args:
             start (tuple): The i-j coordinates corresponding to the start point
             end (tuple):  The i-j coordinates corresponding to the end point
-            neighbor_map (dict):  A dictionary mapping i-j coordinates to
-            their neighbors
             vh_set (set):  A set of points that currently have a VH
-            point_map (dict):  a dictionary of coordinates to X-Y positions
+            grid_type (object):  The current grid type in the design.
+                Either GridType.HONEYCOMB or GridType.SQUARE
+            radius (float):  the radius of the VH
+            scale_factor (float):  the ratio of part to view radius
 
         Returns:
             A list of coordinates corresponding to a shortest path from start to
@@ -978,7 +979,6 @@ class ShortestPathHelper(object):
                 queue_tuple = queue.get(block=False)
                 current_location = queue_tuple[1]
             except Empty:
-#                print('aborting')
                 return []
 
             if current_location == end_coordinates:
@@ -988,18 +988,9 @@ class ShortestPathHelper(object):
                     current_location = parents[current_location]
                 return [node for node in reversed(reversed_path)]
             else:
-                old_neighbors = neighbor_map.get(current_location, [])
                 neighbors = ShortestPathHelper.getNeighborsForCoordinate(grid_type,
                                                                          current_location[0],
                                                                          current_location[1])
-
-#                if tuple(old_neighbors) != tuple(neighbors):
-#                    print('old %s' % str(old_neighbors))
-#                    print('new %s' % str(neighbors))
-#                    print()
-#                else:
-#                    print('ok')
-
                 for neighbor in neighbors:
                     new_cost = cumulative_cost[current_location] + 1
                     if (neighbor not in parents or new_cost < cumulative_cost[neighbor]) and neighbor not in vh_set:
@@ -1007,7 +998,6 @@ class ShortestPathHelper(object):
                         priority = new_cost + ShortestPathHelper.shortestPathHeuristic(start_coordinates, neighbor)
                         queue.put((priority, neighbor))
                         parents[neighbor] = current_location
-#        print('parents %s' % parents)
         return []
 
     @staticmethod
@@ -1033,13 +1023,11 @@ class ShortestPathHelper(object):
         return difference_a*0.01 + difference_b*0.01
 
     @staticmethod
-    def shortestPathXY(start, end, neighbor_map, vh_set, grid_type,
-                       scale_factor, radius):
+    def shortestPathXY(start, end, vh_set, grid_type, scale_factor, radius):
         # TODO[NF]:  Docstring
         x_y_path = []
         coordinate_path = ShortestPathHelper.shortestPathAStar(start=start,
                                                                end=end,
-                                                               neighbor_map=neighbor_map,
                                                                vh_set=vh_set,
                                                                radius=radius,
                                                                grid_type=grid_type,

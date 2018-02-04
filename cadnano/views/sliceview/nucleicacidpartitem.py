@@ -52,7 +52,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
 
         self.shortest_path_start = None
-        self.neighbor_map = dict()
         self.coordinates_to_vhid = dict()
         self._last_hovered_item = None
         self._highlighted_path = []
@@ -860,8 +859,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             The ID of the last VHI created
         """
-        path = ShortestPathHelper.shortestPathXY(start=start, end=end,
-                                                 neighbor_map=self.neighbor_map,
+        path = ShortestPathHelper.shortestPathXY(start=start,
+                                                 end=end,
                                                  vh_set=self.coordinates_to_vhid.keys(),
                                                  grid_type=self.griditem.grid_type,
                                                  scale_factor=self.scale_factor,
@@ -987,7 +986,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         end_xy = event_xy
         self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_xy ,
                                                                       end=end_xy ,
-                                                                      neighbor_map=self.neighbor_map,
                                                                       radius=self._RADIUS,
                                                                       vh_set=self.coordinates_to_vhid.keys(),
                                                                       grid_type=self.griditem.grid_type,
@@ -1029,21 +1027,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             # tool.deselectItems()
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
-    # end def
-
-    def setNeighborMap(self, neighbor_map):
-        """
-        Update the internal mapping of coordinates to their neighbors.
-
-        Args:
-            neighbor_map (dict):  the new mapping of coordinates to their
-                neighbors
-
-        Returns:
-            None
-        """
-        assert isinstance(neighbor_map, dict)
-        self.neighbor_map = neighbor_map
     # end def
 
     def removeAllCreateHints(self):
