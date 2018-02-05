@@ -85,20 +85,6 @@ class HoneycombDnaPart(object):
             y = row*radius*3.
         else:   # odd parity
             y = row*radius*3. + radius
-#        """
-#        Convert row, column coordinates to latticeXY.
-#        To avoid having the origin in the center of a helix,
-#        x is offset by radius*root3, y is offset by radius. -SD
-#        """
-#        # x = column*radius*root3
-#        x = (column)*radius*root3
-#        if HoneycombDnaPart.isEvenParity(row, column):   # odd parity
-#            # y = row*radius*3 + radius
-#            y = row*radius*3 + radius*2
-#        else:                               # even parity
-#            # y = row*radius*3
-#            y = row*radius*3 + radius
-#        # Make sure radius is a float
         return scale_factor*x, scale_factor*y
     # end def
 

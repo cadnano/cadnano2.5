@@ -179,6 +179,9 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         part_instance (ObjectInstance):
         copy_dict (dict):
     """
+    assert isinstance(offset, (tuple, list)) or offset is None
+    assert isinstance(use_undostack, bool)
+
     part = part_instance.reference()
     id_num_offset = part.getMaxIdNum() + 1
     if id_num_offset % 2 == 1:
@@ -200,7 +203,8 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
-        z = vh_props['z'][id_num]
+
+        z = vh_props['z'][i]
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] = new_id_num

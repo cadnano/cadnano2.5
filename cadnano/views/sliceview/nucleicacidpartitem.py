@@ -1,7 +1,7 @@
 from ast import literal_eval
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneMouseEvent
 
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -317,7 +317,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                scale_factor=self.scale_factor)
 
         assert id_num not in self.coordinates_to_vhid.values()
-        assert coordinates not in self.coordinates_to_vhid
+#        assert coordinates not in self.coordinates_to_vhid
 
         self.coordinates_to_vhid[coordinates] = id_num
 
@@ -801,9 +801,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def _getModelXYforCoord(self, row, column):
         radius = self.part().radius()
+        print('radius is %s' % radius)
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            result = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
-            return result
+            result = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column)
+            return (result[0], -result[1])
         elif self.griditem.grid_type is GridType.SQUARE:
             return SquareDnaPart.latticeCoordToPositionXY(radius, row, column)
         else:
@@ -953,8 +954,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 self.griditem.showCreateHint(inverted_event_coord, next_idnums=next_idnums)
                 self._highlighted_path.append(inverted_event_coord)
 
-                model_pos = self._getModelXYforCoord(*event_coord)
-                self.updateStatusBar("({},{})".format(*model_pos))
+#                model_pos = self._getModelXYforCoord(*event_coord)
+#                self.updateStatusBar("({},{})".format(*model_pos))
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
@@ -1040,16 +1041,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return
 
         self.removeAllCopyPasteHints()
-        e_pos = self.griditem.mapFromScene(event.scenePos())
+        event_pos = self.griditem.mapFromScene(event.scenePos())
 
         positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord \
             if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
         hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
-                                                  e_pos.x(),
-                                                  e_pos.y(),
+                                                  event_pos.x(),
+                                                  event_pos.y(),
                                                   self.scale_factor)
         print('hov is %s %s' %(hov_row, hov_col))
-#        hov_row, hov_col = ShortestPathHelper.findClosestPoint((e_pos.x(), e_pos.y()), self.coordinates_to_xy)
         self._last_hovered_coord == (hov_row, hov_col)
         parity = self._getCoordinateParity(hov_row, hov_col)
 
@@ -1059,21 +1059,21 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
         except ValueError:  # no vhs match parity
             return
+
         min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
-#        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
         min_row, min_col = positionToLatticeCoord(DEFAULT_RADIUS,
                                                   min_pos[0],
                                                   min_pos[1],
                                                   self.scale_factor)
         id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
+        print('ID offset is %s' % id_offset)
 
         # placing clipboard's min_id_same_parity on the hovered_coord,
         # hint neighboring coords with offsets corresponding to clipboard vhs
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
-            x, y = part.locationQt(vh_id, self.scaleFactor())
-#            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y), self.coordinates_to_xy)
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y),
+            position_xy = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint(position_xy,
                                                                          DEFAULT_RADIUS,
                                                                          self.griditem.grid_type,
                                                                          self.scale_factor)
@@ -1083,9 +1083,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
         print("({}, {})".format(hov_x, hov_y))
         min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+#        self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
+        self.copypaste_origin_offset = (round(hov_x-min_pos[0], 9), -round(hov_y-min_pos[1], 9))
+        print('Offset is %s' % str(self.copypaste_origin_offset))
     # end def
 
     def selectToolHoverMove(self, tool, event):
@@ -1099,9 +1103,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         event_pos = self.griditem.mapFromScene(event.scenePos())
         event_position_xy = (event_pos.x(), event_pos.y())
         hover_coordinates = ShortestPathHelper.findClosestPoint(event_position_xy,
-                                                               DEFAULT_RADIUS,
-                                                               self.griditem.grid_type,
-                                                               self.scale_factor)
+                                                                DEFAULT_RADIUS,
+                                                                self.griditem.grid_type,
+                                                                self.scale_factor)
 
         if self._last_hovered_coord == hover_coordinates or not self._inPointItem(event_position_xy, hover_coordinates):
             return
@@ -1129,19 +1133,25 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # hint neighboring coords with offsets corresponding to clipboard vhs
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
-            x, y = part.locationQt(vh_id, self.scaleFactor())
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint((x, y),
-                                                                   DEFAULT_RADIUS,
-                                                                   self.griditem.grid_type,
-                                                                   self.scale_factor)
-            hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
+            position_xy = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = ShortestPathHelper.findClosestPoint(position_xy,
+                                                                         DEFAULT_RADIUS,
+                                                                         self.griditem.grid_type,
+                                                                         self.scale_factor)
+            hint_coord = (hover_coordinates[0]+(copied_row-min_row), hover_coordinates[1]+(copied_col-min_col))
             self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
             self._highlighted_copypaste.append(hint_coord)
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
+        # This is going to give us the difference between hovering and the min parity location.  We want the
+        # difference between the min parity's former and new location
         hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1])
-        min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+
+        min_x, min_y, _ = part.getCoordinate(min_id_same_parity, 0)
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
+        print('Offset is %s' % str(self.copypaste_origin_offset))
     # end def
 
     def selectToolHoverLeave(self, tool, event):
@@ -1154,6 +1164,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool (TYPE): Description
             event (TYPE): Description
         """
+        if tool.clipboard is not None:
+            self.pasteClipboard(tool, event)
+
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
@@ -1172,6 +1185,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.modelClear()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
+
+    def pasteClipboard(self, tool, event):
+        assert tool.clipboard is not None
+        assert isinstance(event, QGraphicsSceneMouseEvent)
+
+        tool.pasteClipboard()
+
+#        event_pos = self.griditem.mapFromScene(event.scenePos())
+#        event_position_xy = (event_pos.x(), event_pos.y())
+#        hover_coordinates = ShortestPathHelper.findClosestPoint(event_position_xy,
+#                                                                DEFAULT_RADIUS,
+#                                                                self.griditem.grid_type,
+#                                                                self.scale_factor)
+#        parity = self._getCoordinateParity(hover_coordinates[0], hover_coordinates[1])
+#        vh_id_list = tool.clipboard['vh_list']
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+
 
 
     def removeAllCopyPasteHints(self):

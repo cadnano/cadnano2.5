@@ -1039,11 +1039,6 @@ class ShortestPathHelper(object):
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
                                                                      row=row,
                                                                      column=column)
-#=======
-#                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
-#                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
-#                                                                     scale_factor=scale_factor)
-#>>>>>>> Broken snapshot
             else:
                 parity = None
                 node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,

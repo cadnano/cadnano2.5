@@ -3,9 +3,10 @@ from PyQt5.QtGui import QFont, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
-from cadnano.proxies.cnenum import GridType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
+from cadnano.proxies.cnenum import GridType
 from cadnano.views.sliceview import slicestyles as styles
 
 
@@ -541,13 +542,19 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
-        coordinate_string = '(%s, %s)' % HoneycombDnaPart.positionToLatticeCoord(part_item.part().radius(),
-                                                                                 event.scenePos().x(),
-                                                                                 event.scenePos().y(),
-                                                                                 scale_factor=part_item.scale_factor)
+        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.positionToLatticeCoord()
+        coordinates = positionToLatticeCoord(part_item.part().radius(),
+                                             event.scenePos().x(),
+                                             event.scenePos().y(),
+                                             scale_factor=part_item.scale_factor)
+        latticeCoordToXY = HoneycombDnaPart.latticeCoordToPositionXY if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.latticeCoordToPositionXY
+        coordinate_string = '(%s, %s)' % coordinates
+        coordiate_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1])
         position_string = '(%s, %s)' % (event.scenePos().x(), event.scenePos().y())
 
-        part_item.updateStatusBar('%s - %s' % (coordinate_string, position_string))
+        part_item.updateStatusBar('%s @ %s - %s' % (coordinate_string, coordiate_pos, position_string))
         part_item.createToolHoverMove(tool, event)
     # end def
 
