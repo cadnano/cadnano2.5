@@ -271,7 +271,7 @@ class GridItem(QGraphicsRectItem):
         if point_item:
             row, column = coord
             if self.grid_type is GridType.HONEYCOMB:
-                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
             elif self.grid_type is GridType.SQUARE:
                 parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
             else:

@@ -81,10 +81,10 @@ class HoneycombDnaPart(object):
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3
-        if HoneycombDnaPart.isOddParity(row, column):   # odd parity
-            y = row*radius*3. + radius
-        else: # even parity
+        if HoneycombDnaPart.isEvenParity(row, column): # even parity
             y = row*radius*3.
+        else:   # odd parity
+            y = row*radius*3. + radius
         return scale_factor*x, scale_factor*y
     # end def
 

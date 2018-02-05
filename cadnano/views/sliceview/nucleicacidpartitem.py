@@ -791,7 +791,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def _getCoordinateParity(self, row, column):
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+            return 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
         elif self.griditem.grid_type is GridType.SQUARE:
             return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:

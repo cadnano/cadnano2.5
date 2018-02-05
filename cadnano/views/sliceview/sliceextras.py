@@ -1036,7 +1036,7 @@ class ShortestPathHelper(object):
             row = -node[0]
             column = node[1]
             if grid_type is GridType.HONEYCOMB:
-                parity = 1 if HoneycombDnaPart.isOddParity(row=row, column=column) else 0
+                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
                                                                      row=row,
                                                                      column=column)
