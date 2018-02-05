@@ -1096,30 +1096,28 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if tool.clipboard is None:  # is there anything on the clipboard?
             return
 
-        e_pos = self.griditem.mapFromScene(event.scenePos())
-        event_position_xy = (e_pos.x(), e_pos.y())
-        hov_row, hov_col = ShortestPathHelper.findClosestPoint(event_position_xy,
+        event_pos = self.griditem.mapFromScene(event.scenePos())
+        event_position_xy = (event_pos.x(), event_pos.y())
+        hover_coordinates = ShortestPathHelper.findClosestPoint(event_position_xy,
                                                                DEFAULT_RADIUS,
                                                                self.griditem.grid_type,
                                                                self.scale_factor)
 
-        if self._last_hovered_coord == (hov_row, hov_col) or\
-           not self._inPointItem((e_pos.x(), e_pos.y()), (hov_row, hov_col)):
+        if self._last_hovered_coord == hover_coordinates or not self._inPointItem(event_position_xy, hover_coordinates):
             return
         else:
-            self._last_hovered_coord == (hov_row, hov_col)
+            self._last_hovered_coord == hover_coordinates
             self.removeAllCopyPasteHints()
 
-        parity = self._getCoordinateParity(hov_row, hov_col)
-        part = self._model_part
+        parity = self._getCoordinateParity(hover_coordinates[0], hover_coordinates[1])
         vh_id_list = tool.clipboard['vh_list']
         try:
             min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
         except ValueError:
             return
-        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
-#        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos, self.coordinates_to_xy)
 
+        part = self._model_part
+        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
         min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos,
                                                                DEFAULT_RADIUS,
                                                                self.griditem.grid_type,
@@ -1141,7 +1139,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlighted_copypaste.append(hint_coord)
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
-        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+        hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1])
         min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
         self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
     # end def
