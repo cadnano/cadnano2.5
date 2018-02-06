@@ -15,7 +15,7 @@ from PyQt5.QtGui import QColor, QFont, QPalette, QPixmap
 from PyQt5.QtWidgets import QAbstractItemView, QAction
 from PyQt5.QtWidgets import QColorDialog, QHeaderView
 from PyQt5.QtWidgets import QLineEdit, QMenu
-from PyQt5.QtWidgets import QTreeWidget, QTreeView
+from PyQt5.QtWidgets import QTreeWidget, QTreeView, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
@@ -28,6 +28,7 @@ from cadnano.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
 
 from .cnoutlineritem import NAME_COL, LOCKED_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import LEAF_FLAGS, DISABLE_FLAGS, ROOT_FLAGS
 from .nucleicacidpartitem import OutlineNucleicAcidPartItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 from .oligoitem import OutlineOligoItem
@@ -564,8 +565,37 @@ class OutlinerTreeWidget(QTreeWidget):
             raise NotImplementedError
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
-        pass
+    def selectionFilterChangedSlot(self, filter_name_set):
+        '''Disable or enable items if their features are represented
+
+        https://stackoverflow.com/questions/8961449/pyqt-qtreewidget-iterating#8961820
+        '''
+        print("match")
+        root_A = self.invisibleRootItem()
+        child_count_A = root_A.childCount()
+        for a in range(child_count_A):
+            root_B = root_A.child(a)
+            # print(root_B.text(0))
+            child_count_B = root_B.childCount()
+            for b in range(child_count_B):
+                root_C = root_B.child(b)
+                # print(root_C.text(0))
+                if root_C.text(0) == 'Virtual Helices':
+                    # print("disable?")
+                    if OutlineVirtualHelixItem.FILTER_NAME not in filter_name_set:
+                        if int(root_C.flags()) == int(ROOT_FLAGS):
+                            # print("do disable")
+                            root_C.setFlags(DISABLE_FLAGS)
+                        else:
+                            print("ADSAD", int(root_C.flags()), int(ROOT_FLAGS))
+                    else:
+                        if int(root_C.flags()) == int(DISABLE_FLAGS):
+                            # print("do enable")
+                            root_C.setFlags(ROOT_FLAGS)
+                # child_count_C = root_C.childCount()
+                # for c in range(child_count_C):
+                #     root_D = root_C.child(c)
+                #     print(root_D.text(0))
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):

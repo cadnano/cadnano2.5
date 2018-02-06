@@ -212,15 +212,16 @@ class PropertyEditorWidget(QTreeWidget):
         """
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
+    def selectionFilterChangedSlot(self, filter_name_set):
         """Summary
 
         Args:
-            filter_name_list (TYPE): Description
+            filter_name_set (set): Description
 
         Returns:
             TYPE: Description
         """
+        pass
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -232,6 +233,7 @@ class PropertyEditorWidget(QTreeWidget):
         Returns:
             TYPE: Description
         """
+        pass
     # end def
 
     def resetRootItemSlot(self, doc):
