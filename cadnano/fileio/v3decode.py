@@ -96,7 +96,6 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 
     strands = part_dict['strands']
     strand_index_list = strands['indices']
-    # print(vh_id_list, '\n\n', len(strand_index_list))
     color_list = strands['properties']
     for i in range(len(vh_id_list)):
         id_num = vh_id_list[i][0]
