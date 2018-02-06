@@ -1,7 +1,7 @@
 from PyQt5.QtCore import QItemSelectionModel
 from cadnano.proxies.cnenum import ItemType
 from cadnano.views import styles
-from .cnoutlineritem import CNOutlinerItem
+from .cnoutlineritem import CNOutlinerItem, DISABLE_FLAGS, LEAF_FLAGS
 from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .oligoitem import OutlineOligoItem
@@ -28,6 +28,11 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self._root_items = {}
         self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helices', self)
         self._root_items['OligoList'] = self.createRootPartItem('Oligos', self)
+        fs = model_part.document().filter_set
+        if OutlineVirtualHelixItem.FILTER_NAME in fs:
+            self._root_items['OligoList'].setFlags(DISABLE_FLAGS)
+        else:
+            self._root_items['VHelixList'].setFlags(DISABLE_FLAGS)
         # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
         if model_part.is_active:
             print("should be active")

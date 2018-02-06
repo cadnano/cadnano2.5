@@ -373,141 +373,11 @@ class OutlinerTreeWidget(QTreeWidget):
             if x.parent() != dest_parent:
                 return
 
-        # res = self.myDropEvent(event, dest_item)
+        res = QTreeWidget.dropEvent(self, event)
         if isinstance(dest_item, OutlineVirtualHelixItem):
             part = dest_item.part()
             vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
             part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
-    # end def
-
-    def myDropEvent(self, event, drop_item):
-        """Workaround for broken QTreeWidget::dropEvent
-        per https://bugreports.qt.io/browse/QTBUG-45320
-        doing reverse ordering of items on dropping. reimplementation in python
-        from C++
-
-        For this code we need dual GPL3 license instead of pure BSD3
-        """
-        if event.source() == self and (event.dropAction() == Qt.MoveAction or
-                                       self.dragDropMode() == QAbstractItemView.InternalMove):
-            droptuple = self.dropOn(event, drop_item)
-            if droptuple is not None:
-                (row, col, drop_index) = droptuple
-                # print("droptuple", droptuple[2].row())
-                idxs = self.selectedIndexes()
-                indexes = []
-                for idx in idxs:
-                    if idx.column() == 0:
-                        indexes.append(idx)
-                if drop_index in indexes:
-                    return
-                # When removing items the drop location could shift
-                new_drop_index = QPersistentModelIndex(self.model().index(row, col, drop_index))
-                # print("updatated drop_row", new_drop_index.row())
-                # Remove the items
-                taken = []
-                for i in range(len(indexes) - 1, -1, -1):
-                    # print("idx", indexes[i].row(), indexes[i].column())
-                    parent = self.itemFromIndex(indexes[i])
-                    if parent is None or parent.parent() is None:
-                        t_item = self.takeTopLevelItem(indexes[i].row())
-                        taken.append(t_item)
-                    else:
-                        t_item = parent.parent().takeChild(indexes[i].row())
-                        taken.append(t_item)
-                # end for
-                # insert them back in at their new positions
-                for i in range(len(indexes)):
-                    # Either at a specific point or appended
-                    if row == -1:
-                        if drop_index.isValid():
-                            parent = self.itemFromIndex(drop_index)
-                            parent.insertChild(parent.childCount(), taken.pop())
-                        else:
-                            self.insertTopLevelItem(self.topLevelItemCount(), taken.pop())
-                    else:
-                        r = new_drop_index.row() if new_drop_index.row() >= 0 else row
-                        if drop_index.isValid():
-                            parent = self.itemFromIndex(drop_index)
-                            parent.insertChild(min(r, parent.childCount()), taken.pop())
-                        else:
-                            self.insertTopLevelItem(min(r, self.topLevelItemCount()), taken.pop())
-                # end for
-
-                event.accept()
-                # Don't want QAbstractItemView to delete it because it was "moved" we already did it
-                event.setDropAction(Qt.CopyAction)
-        QTreeView.dropEvent(self, event)
-    # end def
-
-    def dropOn(self, event, drop_item):
-        """ reimplementation of QAbstractItemViewPrivate::dropOn
-        """
-        if event.isAccepted():
-            return False
-
-        index = self.indexFromItem(drop_item)
-        root = self.rootIndex()
-        # If we are allowed to do the drop
-        if self.model().supportedDropActions() and event.dropAction():
-            row = -1
-            col = -1
-            if index != root:
-                dip = self.dropPosition(event.pos(),
-                                        QTreeView.visualRect(self, index), index)
-                if dip is QAbstractItemView.AboveItem:
-                    row = index.row()
-                    col = index.column()
-                    index = index.parent()
-                elif dip is QAbstractItemView.BelowItem:
-                    row = index.row() + 1
-                    col = index.column()
-                    index = index.parent()
-            else:
-                dip = QAbstractItemView.OnViewport
-
-            drop_index = index
-            drop_row = row
-            drop_col = col
-            self.drop_indicator_position = dip
-            if not self.isDroppingOnItself(event, index, root):
-                return (drop_row, drop_col, drop_index)
-        return None
-    # end def
-
-    def dropPosition(self, pos, rect, index):
-        """ reimplementation of QAbstractItemViewPrivate::position
-        """
-        r = QAbstractItemView.OnViewport
-        margin = 2
-        if pos.y() - rect.top() < margin:
-            r = QAbstractItemView.AboveItem
-        elif rect.bottom() - pos.y() < margin:
-            r = QAbstractItemView.BelowItem
-        elif rect.contains(pos, True):
-            r = QAbstractItemView.OnItem
-
-        if r == QAbstractItemView.OnItem and (not (self.model().flags(index) & Qt.ItemIsDropEnabled)):
-            r = QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QAbstractItemView.BelowItem
-        return r
-    # end def
-
-    def isDroppingOnItself(self, event, index, root_index):
-        """ reimplementation of QAbstractItemViewPrivate::droppingOnItself
-        """
-        drop_action = event.dropAction()
-        if self.dragDropMode() == QAbstractItemView.InternalMove:
-            drop_action = Qt.MoveAction
-        if (event.source() == self and event.possibleActions() & Qt.MoveAction
-                and drop_action == Qt.MoveAction):
-            selected_indexes = self.selectedIndexes()
-            child = index
-            while child.isValid() and child != root_index:
-                if child in selected_indexes:
-                    return True
-                child = child.parent()
-        # end if
-        return False
     # end def
 
     def decodeMimeData(self, bytearray):
@@ -570,7 +440,13 @@ class OutlinerTreeWidget(QTreeWidget):
 
         https://stackoverflow.com/questions/8961449/pyqt-qtreewidget-iterating#8961820
         '''
-        print("match")
+        # print("match")
+        root_check = int(ROOT_FLAGS)
+        disable_check = int(DISABLE_FLAGS)
+        if OutlineVirtualHelixItem.FILTER_NAME in filter_name_set:
+            set_vh_on = True
+        else:
+            set_vh_on = False
         root_A = self.invisibleRootItem()
         child_count_A = root_A.childCount()
         for a in range(child_count_A):
@@ -579,19 +455,23 @@ class OutlinerTreeWidget(QTreeWidget):
             child_count_B = root_B.childCount()
             for b in range(child_count_B):
                 root_C = root_B.child(b)
-                # print(root_C.text(0))
-                if root_C.text(0) == 'Virtual Helices':
-                    # print("disable?")
-                    if OutlineVirtualHelixItem.FILTER_NAME not in filter_name_set:
-                        if int(root_C.flags()) == int(ROOT_FLAGS):
-                            # print("do disable")
-                            root_C.setFlags(DISABLE_FLAGS)
-                        else:
-                            print("ADSAD", int(root_C.flags()), int(ROOT_FLAGS))
-                    else:
-                        if int(root_C.flags()) == int(DISABLE_FLAGS):
+                root_C_txt = root_C.text(0)
+                root_C_flags = int(root_C.flags())
+                if root_C_txt == 'Virtual Helices':
+                    if not set_vh_on and root_C_flags == root_check:
+                        # print("do disable")
+                        root_C.setFlags(DISABLE_FLAGS)
+                    # else:
+                    #     print("ADSAD", int(root_C.flags()), int(ROOT_FLAGS))
+                    elif set_vh_on and root_C_flags == disable_check:
                             # print("do enable")
                             root_C.setFlags(ROOT_FLAGS)
+                elif root_C_txt == 'Oligos':
+                    if set_vh_on and root_C_flags == root_check:
+                        root_C.setFlags(DISABLE_FLAGS)
+                    elif not set_vh_on and root_C_flags == disable_check:
+                        root_C.setFlags(ROOT_FLAGS)
+
                 # child_count_C = root_C.childCount()
                 # for c in range(child_count_C):
                 #     root_D = root_C.child(c)

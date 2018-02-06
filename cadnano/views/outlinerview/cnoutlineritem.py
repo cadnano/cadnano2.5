@@ -10,7 +10,7 @@ COLOR_COL = 3
 
 
 LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEditable |
-              Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled |
+              Qt.ItemIsDragEnabled |
               Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)        # 55 + 8 = 63
 DISABLE_FLAGS = Qt.NoItemFlags                                  # 0
 ROOT_FLAGS =  ( Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled |
