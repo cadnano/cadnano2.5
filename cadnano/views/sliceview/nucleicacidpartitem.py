@@ -726,7 +726,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def keyPressEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
         if event.key() == Qt.Key_Escape:
-            print("Esc here")
+#            print("Esc here")
             self._setShortestPathStart(None)
             self.removeAllCreateHints()
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
@@ -735,7 +735,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             if tool.methodPrefix() == 'selectTool':
                 self.removeAllCopyPasteHints()
                 tool.clipboard = None
-                print("clipboad cleared")
+#                print("clipboad cleared")
         elif is_alt and self.shortest_path_add_mode is True:
             if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
                 self._previewSpa(self.last_mouse_position)
@@ -801,7 +801,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def _getModelXYforCoord(self, row, column):
         radius = self.part().radius()
-        print('radius is %s' % radius)
+#        print('radius is %s' % radius)
         if self.griditem.grid_type is GridType.HONEYCOMB:
             result = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column)
             return (result[0], -result[1])
@@ -1049,7 +1049,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                   event_pos.x(),
                                                   event_pos.y(),
                                                   self.scale_factor)
-        print('hov is %s %s' %(hov_row, hov_col))
+#        print('hov is %s %s' %(hov_row, hov_col))
         self._last_hovered_coord == (hov_row, hov_col)
         parity = self._getCoordinateParity(hov_row, hov_col)
 
@@ -1066,7 +1066,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                   min_pos[1],
                                                   self.scale_factor)
         id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
-        print('ID offset is %s' % id_offset)
+#        print('ID offset is %s' % id_offset)
 
         # placing clipboard's min_id_same_parity on the hovered_coord,
         # hint neighboring coords with offsets corresponding to clipboard vhs
@@ -1085,11 +1085,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
 #        from cadnano.util import qtdb_trace
 #        qtdb_trace()
-        print("({}, {})".format(hov_x, hov_y))
+#        print("({}, {})".format(hov_x, hov_y))
         min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
+        print(min_x, min_y)
 #        self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
-        self.copypaste_origin_offset = (round(hov_x-min_pos[0], 9), -round(hov_y-min_pos[1], 9))
-        print('Offset is %s' % str(self.copypaste_origin_offset))
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(min_y-hov_y, 9))
+
+#        original_position = [key for key, value in self.coordinates_to_vhid.items() if value is min_id_same_parity][0]
+#        print('Positions:')
+#        print('    Original ', original_position)
+#        print('    getCoord ', (min_x, min_y))
+#        self.copypaste_origin_offset = (round(hov_x-min_pos[0], 9), -round(hov_y-min_pos[1], 9))
+#        self.copypaste_origin_offset = (round(hov_x*self.inverse_scale_factor-min_x, 9), -round(hov_y*self.inverse_scale_factor-min_y, 9))
+#        print('Offset is %s' % str(self.copypaste_origin_offset))
     # end def
 
     def selectToolHoverMove(self, tool, event):
@@ -1151,7 +1159,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         min_x, min_y, _ = part.getCoordinate(min_id_same_parity, 0)
         self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
-        print('Offset is %s' % str(self.copypaste_origin_offset))
+#        print('Offset is %s' % str(self.copypaste_origin_offset))
     # end def
 
     def selectToolHoverLeave(self, tool, event):

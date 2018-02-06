@@ -412,7 +412,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             color = '#5a8bff'
         else:
             color = '#cc0000'
-            nvhi_name = nvhi_name + '*'  # mark as invalid
+#            nvhi_name = nvhi_name + '*'  # mark as invalid
         line.setLength(_RADIUS)
         if neighbor_virtual_helix in wg_dict:
             wedge_item = wg_dict[neighbor_virtual_helix]

@@ -2583,7 +2583,7 @@ class NucleicAcidPart(Part):
             use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
         """
-        print("createVH", x, y)
+        print("creating a VH at", x, y)
         valid_pts = np.where(self._origin_pts != np.inf)
         x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
         vps = np.around(self._origin_pts[valid_pts], decimals=9)
