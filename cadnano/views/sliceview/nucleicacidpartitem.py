@@ -929,12 +929,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                   event_xy[0],
                                                                   event_xy[1],
-                                                                  scale_factor=self.scale_factor)
+                                                                  scale_factor=self.scale_factor,
+                                                                  strict=True)
         elif self.griditem.grid_type is GridType.SQUARE:
             event_coord = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                event_xy[0],
                                                                event_xy[1],
-                                                               scale_factor=self.scale_factor)
+                                                               scale_factor=self.scale_factor,
+                                                               strict=True)
         else:
             event_coord = None
 
@@ -948,12 +950,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self.removeAllCreateHints()
 
         # Highlight GridItems if alt is being held down
-        if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
+        if is_alt and self.shortest_path_add_mode and event_coord is not None:
             self._previewSpa(event_xy)
         else:
-            if self._inPointItem(event_xy, event_coord) and is_alt:
+            if is_alt and event_coord is not None:
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
-            elif self._inPointItem(event_xy, event_coord) and not is_alt:
+            elif not is_alt and event_coord is not None:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
 
