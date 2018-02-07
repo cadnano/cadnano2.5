@@ -78,7 +78,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0, invert=False):
+    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3*scale_factor
         y_offset = radius
@@ -86,8 +86,13 @@ class HoneycombDnaPart(object):
             y = (row*radius*3. + radius + y_offset)*scale_factor  # even parity
         else:
             y = (row*radius*3. + y_offset)*scale_factor  # odd parity
-        return x, y if not invert else -y
+        return x, y
     # end def
+
+    @staticmethod
+    def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
+        x, y = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+        return x, -y
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
@@ -107,11 +112,10 @@ class HoneycombDnaPart(object):
             float_row = y/(scale_factor*radius*3) + radius
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
         # TODO:  should scale_factor be 1.0 here?  1/scale_factor?
-        gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius,
-                                                                                           row,
-                                                                                           column,
-                                                                                           scale_factor,
-                                                                                           invert=True)
+        gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius,
+                                                                                                   row,
+                                                                                                   column,
+                                                                                                   scale_factor)
         unscaled_gridpoint_center_x, unscaled_gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
         inverted_gridpoint_center_x, inverted_gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius,
                                                                                                              row,
