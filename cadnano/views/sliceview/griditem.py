@@ -262,7 +262,7 @@ class GridItem(QGraphicsRectItem):
     # end def
 
     def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True, color=None):
-        point_item = self.points_dict.get(coord, None)
+        point_item = self.points_dict.get(coord)
         if point_item is None:
             return
 
@@ -290,6 +290,12 @@ class GridItem(QGraphicsRectItem):
     def path(self):
         return self._path
     # end def
+
+    def highlightGridPoint(self, row, column, on=True):
+        grid_point = self.points_dict.get((row, column))
+
+        if grid_point:
+            grid_point.highlightGridPoint(on)
 
 
 class ClickArea(QGraphicsEllipseItem):
@@ -459,7 +465,7 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
+#        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
@@ -536,9 +542,17 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.selectToolHoverLeave(tool, event)
     # end def
 
-    def createToolHoverEnterEvent(self, tool, part_item, event):
-        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
-        part_item.setLastHoveredItem(self)
+#    def createToolHoverEnterEvent(self, tool, part_item, event):
+#        #TODO:  UPDATE HERE
+#        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
+#        part_item.setLastHoveredItem(self)
+    # end def
+
+    def highlightGridPoint(self, on=True):
+        if on:
+            self.setPen(getPenObj(styles.BLUE_STROKE, 2))
+        else:
+            self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):

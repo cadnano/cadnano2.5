@@ -62,6 +62,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.copypaste_origin_offset = ()
         self.spa_start_vhi = None
         self.last_mouse_position = None
+        self._highlighted_grid_point = None
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -316,12 +317,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                position[1],
                                                                scale_factor=self.scale_factor)
 
-        print('[NAPI] Added VH %s at coordinates %s,%s, position %s,%s' % (id_num,
-                                                                           coordinates[0],
-                                                                           coordinates[1],
-                                                                           position[0],
-                                                                           position[1]
-        ))
+#        print('[NAPI] Added VH %s at coordinates %s,%s, position %s,%s' % (id_num,
+#                                                                           coordinates[0],
+#                                                                           coordinates[1],
+#                                                                           position[0],
+#                                                                           position[1]
+#        ))
         assert id_num not in self.coordinates_to_vhid.values()
         assert coordinates not in self.coordinates_to_vhid
 
@@ -942,12 +943,27 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         self.last_mouse_position = event_xy
 
+        if event_coord:
+            try:
+                grid_point = self.griditem.points_dict[(event_coord)]
+                self.setLastHoveredItem(grid_point)
+            except KeyError:
+                pass
+
 #        inverted_event_coord = event_coord
 #        inverted_event_coord = (-event_coord[0], event_coord[1]) if event_coord is not None else None
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
         if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
             self.removeAllCreateHints()
+#            if self._highlighted_grid_point:
+#                self.griditem.highlightGridPoint(self._highlighted_grid_point[0],
+#                                                 self._highlighted_grid_point[1],
+#                                                 on=False)
+
+        self._highlighted_grid_point = event_coord
+        if event_coord:
+            self.griditem.highlightGridPoint(row=event_coord[0], column=event_coord[1], on=True)
 
         # Highlight GridItems if alt is being held down
         if is_alt and self.shortest_path_add_mode and event_coord is not None:
@@ -995,11 +1011,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                   self.scale_factor)
         event_x, event_y = event_xy
         value = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2 <= self._RADIUS**2
-        print('[NAPI] Returning %s; last hovered is %s,%s and event triggered at %s,%s' % (value,
-                                                                                           last_hovered_x,
-                                                                                           last_hovered_y,
-                                                                                           event_x,
-                                                                                           event_y))
+#        print('[NAPI] Returning %s; last hovered is %s,%s and event triggered at %s,%s' % (value,
+#                                                                                           last_hovered_x,
+#                                                                                           last_hovered_y,
+#                                                                                           event_x,
+#                                                                                           event_y))
         return value
 
     # end def
@@ -1025,7 +1041,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                       vh_set=self.coordinates_to_vhid.keys(),
                                                                       grid_type=self.griditem.grid_type,
                                                                       scale_factor=self.scale_factor)
-        print(self._highlighted_path)
         even_id = part._getNewIdNum(0)
         odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
@@ -1245,6 +1260,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             return
         for coord in self._highlighted_path:
             self.griditem.showCreateHint(coord, show_hint=False)
+            self.griditem.highlightGridPoint(coord[0],
+                                             coord[1],
+                                             on=False)
         self._highlighted_path = []
     # end def
 
@@ -1287,7 +1305,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         if self._last_hovered_item:
             row, column = self._last_hovered_item.coord()
-            print('[NAPI] row and column are %s, %s' % (-row, column))
+#            print('[NAPI] row and column are %s, %s' % (-row, column))
             return -row, column
     # end def
 # end class
