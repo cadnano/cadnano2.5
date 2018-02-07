@@ -80,6 +80,7 @@ class CNOutlinerItem(QTreeWidgetItem):
         if key == 'name':
             name = self.data(NAME_COL, Qt.DisplayRole)
             if name != value:
+                # print("setting name", self.isSelected())
                 self.setData(NAME_COL, Qt.EditRole, value)
         elif key == 'color':
             color = self.data(COLOR_COL, Qt.DisplayRole)

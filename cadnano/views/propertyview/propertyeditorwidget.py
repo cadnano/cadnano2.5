@@ -128,6 +128,7 @@ class PropertyEditorWidget(QTreeWidget):
         num_types = len(item_types)
         if num_types != 1:  # assume no mixed types for now
             print("outlinerItemSelectionChanged returning1")
+            # print(item_types)
             return
         item_type = item_types.pop()
         cn_model_list = [item.cnModel() for item in selected_items if item.isSelected()]

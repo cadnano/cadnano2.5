@@ -118,6 +118,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if self.selection_filter_disabled:
             return
         filter_set = self._document.filter_set
+        filter_set.add('part')
         out_deselection = []
         out_selection = []
         flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
@@ -487,7 +488,6 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def clearSelectionsSlot(self, doc):
-        # print("clearSelection OutlinerTreeWidget")
         self.selectionModel().clearSelection()
     # end def
 
