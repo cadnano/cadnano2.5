@@ -938,7 +938,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
         if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != inverted_event_coord):
-            self.createToolHoverLeave(tool=tool, event=event)
+            self.removeAllCreateHints()
 
         # Highlight GridItems if alt is being held down
         if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, inverted_event_coord):
@@ -1030,6 +1030,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def createToolHoverLeave(self, tool, event):
         self.removeAllCreateHints()
+        return QGraphicsItem.hoverLeaveEvent(self, event)
     # end def
 
     def selectToolHoverEnter(self, tool, event):
@@ -1083,14 +1084,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+        min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
+        print(min_x, min_y)
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(min_y-hov_y, 9))
+
 #        from cadnano.util import qtdb_trace
 #        qtdb_trace()
 #        print("({}, {})".format(hov_x, hov_y))
-        min_x, min_y, min_z = part.getCoordinate(min_id_same_parity, 0)
-        print(min_x, min_y)
 #        self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(min_y-hov_y, 9))
-
 #        original_position = [key for key, value in self.coordinates_to_vhid.items() if value is min_id_same_parity][0]
 #        print('Positions:')
 #        print('    Original ', original_position)

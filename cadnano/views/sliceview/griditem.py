@@ -36,7 +36,7 @@ class GridItem(QGraphicsRectItem):
 
         self.dots = (styles.DOT_SIZE, styles.DOT_SIZE / 2)
         # self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
-        self._draw_gridpoint_coordinates = False
+        self._draw_gridpoint_coordinates = True
         self.draw_lines = False
         self.points = []
         self.points_dict = dict()
@@ -90,7 +90,7 @@ class GridItem(QGraphicsRectItem):
             TYPE: Description
         """
         doLattice = HoneycombDnaPart.latticeCoordToPositionXY
-        doPosition = HoneycombDnaPart.positionToLatticeCoordRound
+        doPosition = HoneycombDnaPart.positionToLatticeCoord
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
         x_l = x_l + HoneycombDnaPart.PAD_GRID_XL
@@ -100,8 +100,8 @@ class GridItem(QGraphicsRectItem):
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points
-        row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
-        row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
+        row_l, col_l = doPosition(radius, x_l, -y_l, scale_factor=sf)
+        row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
 
         redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or\
             self.previous_grid_type != self.grid_type

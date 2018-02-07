@@ -80,13 +80,25 @@ class HoneycombDnaPart(object):
     @staticmethod
     def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """Convert row, column coordinates to latticeXY."""
-        x = column*radius*root3
-        if HoneycombDnaPart.isEvenParity(row, column): # even parity
-            y = row*radius*3.
-        else:   # odd parity
-            y = row*radius*3. + radius
-        return scale_factor*x, scale_factor*y
+        x = column*radius*root3*scale_factor
+        y_offset = radius
+        if HoneycombDnaPart.isEvenParity(row, column):
+            y = (row*radius*3. + radius + y_offset)*scale_factor  # even parity
+        else:
+            y = (row*radius*3. + y_offset)*scale_factor  # odd parity
+        return x, y
     # end def
+
+#    @staticmethod
+#    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+#        """Convert row, column coordinates to latticeXY."""
+#        x = column*radius*root3
+#        if HoneycombDnaPart.isEvenParity(row, column): # even parity
+#            y = row*radius*3.
+#        else:   # odd parity
+#            y = row*radius*3. + radius
+#        return scale_factor*x, scale_factor*y
+#    # end def
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
@@ -95,9 +107,13 @@ class HoneycombDnaPart(object):
 
         row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0: # odd parity
-            float_row = (y-radius)/(scale_factor*radius*3) + 0.5
+#            float_row = (y-radius)/(scale_factor*radius*3) + 0.5
+#            float_row = (y-radius)/(scale_factor*radius*3) + 0.5 + radius
+            float_row = (y-radius)/(scale_factor*radius*3) + radius
         else: # even parity
-            float_row = y/(scale_factor*radius*3) + 0.5
+#            float_row = y/(scale_factor*radius*3) + 0.5
+#            float_row = y/(scale_factor*radius*3) + 0.5 + radius
+            float_row = y/(scale_factor*radius*3) + radius
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
 
         return row, column
