@@ -316,8 +316,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                position[1],
                                                                scale_factor=self.scale_factor)
 
+        print('[NAPI] Added VH %s at coordinates %s,%s, position %s,%s' % (id_num,
+                                                                           coordinates[0],
+                                                                           coordinates[1],
+                                                                           position[0],
+                                                                           position[1]
+        ))
         assert id_num not in self.coordinates_to_vhid.values()
-#        assert coordinates not in self.coordinates_to_vhid
+        assert coordinates not in self.coordinates_to_vhid
 
         self.coordinates_to_vhid[coordinates] = id_num
 
@@ -922,40 +928,37 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if self.griditem.grid_type is GridType.HONEYCOMB:
             event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                   event_xy[0],
-                                                                  -event_xy[1],
+                                                                  event_xy[1],
                                                                   scale_factor=self.scale_factor)
         elif self.griditem.grid_type is GridType.SQUARE:
             event_coord = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
                                                                event_xy[0],
-                                                               -event_xy[1],
+                                                               event_xy[1],
                                                                scale_factor=self.scale_factor)
         else:
             event_coord = None
 
         self.last_mouse_position = event_xy
 
-        inverted_event_coord = (-event_coord[0], event_coord[1]) if event_coord is not None else None
+#        inverted_event_coord = event_coord
+#        inverted_event_coord = (-event_coord[0], event_coord[1]) if event_coord is not None else None
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
-        if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != inverted_event_coord):
+        if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
             self.removeAllCreateHints()
 
         # Highlight GridItems if alt is being held down
-        if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, inverted_event_coord):
+        if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
             self._previewSpa(event_xy)
         else:
-
-            if self._inPointItem(event_xy, inverted_event_coord) and is_alt:
+            if self._inPointItem(event_xy, event_coord) and is_alt:
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
-            elif self._inPointItem(event_xy, inverted_event_coord) and not is_alt:
+            elif self._inPointItem(event_xy, event_coord) and not is_alt:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
 
-                self.griditem.showCreateHint(inverted_event_coord, next_idnums=next_idnums)
-                self._highlighted_path.append(inverted_event_coord)
-
-#                model_pos = self._getModelXYforCoord(*event_coord)
-#                self.updateStatusBar("({},{})".format(*model_pos))
+                self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
+                self._highlighted_path.append(event_coord)
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
@@ -974,26 +977,29 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             True if the mouse is in the given GridPoint, False otherwise
         """
-        if event_xy is None or event_coord is None:
+        if event_xy is None or event_coord is None or self.griditem.grid_type not in (GridType.HONEYCOMB, GridType.SQUARE):
+#            print('[NAPI] Shortcutting False')
             return False
 
         assert isinstance(event_coord, (tuple, list)) and len(event_coord) is 2
 
-        if self.griditem.grid_type is GridType.HONEYCOMB:
-            last_hovered_x, last_hovered_y = HoneycombDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
-                                                                                       -event_coord[0],
-                                                                                       event_coord[1],
-                                                                                       self.scale_factor)
-        elif self.griditem.grid_type is GridType.SQUARE:
-            last_hovered_x, last_hovered_y = SquareDnaPart.latticeCoordToPositionXY(DEFAULT_RADIUS,
-                                                                                    -event_coord[0],
-                                                                                    event_coord[1],
-                                                                                    self.scale_factor)
-        else:
-            return False
+        latticeCoordToPositionXY = HoneycombDnaPart.latticeCoordToPositionXY if self.griditem.grid_type is \
+                                   GridType.HONEYCOMB else SquareDnaPart.latticeCoordToPositionXY
 
+
+        last_hovered_x, last_hovered_y = latticeCoordToPositionXY(DEFAULT_RADIUS,
+                                                                  event_coord[0],
+                                                                  event_coord[1],
+                                                                  self.scale_factor)
         event_x, event_y = event_xy
-        return (last_hovered_x - event_x)**2 + (-1*last_hovered_y - event_y)**2 <= self._RADIUS**2
+        value = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2 <= self._RADIUS**2
+        print('[NAPI] Returning %s; last hovered is %s,%s and event triggered at %s,%s' % (value,
+                                                                                           last_hovered_x,
+                                                                                           last_hovered_y,
+                                                                                           event_x,
+                                                                                           event_y))
+        return value
+
     # end def
 
     def _previewSpa(self, event_xy):
@@ -1278,6 +1284,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         if self._last_hovered_item:
             row, column = self._last_hovered_item.coord()
+            print('[NAPI] row and column are %s, %s' % (-row, column))
             return -row, column
     # end def
 # end class

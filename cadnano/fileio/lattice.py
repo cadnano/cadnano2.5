@@ -78,7 +78,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0, invert=False):
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3*scale_factor
         y_offset = radius
@@ -86,37 +86,84 @@ class HoneycombDnaPart(object):
             y = (row*radius*3. + radius + y_offset)*scale_factor  # even parity
         else:
             y = (row*radius*3. + y_offset)*scale_factor  # odd parity
-        return x, y
+        return x, y if not invert else -y
     # end def
 
-#    @staticmethod
-#    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
-#        """Convert row, column coordinates to latticeXY."""
-#        x = column*radius*root3
-#        if HoneycombDnaPart.isEvenParity(row, column): # even parity
-#            y = row*radius*3.
-#        else:   # odd parity
-#            y = row*radius*3. + radius
-#        return scale_factor*x, scale_factor*y
-#    # end def
-
     @staticmethod
-    def positionToLatticeCoord(radius, x, y, scale_factor=1.0):
+    def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+        assert isinstance(radius, float)
+        assert isinstance(x, float)
+        assert isinstance(y, float)
+        assert isinstance(scale_factor, float)
+        assert isinstance(strict, bool)
+
         float_column = x/(radius*root3*scale_factor) + 0.5
         column = int(float_column) if float_column >= 0 else int(float_column - 1)
 
         row_temp = y/(radius*scale_factor)
         if (row_temp % 3) + 0.5 > 1.0: # odd parity
-#            float_row = (y-radius)/(scale_factor*radius*3) + 0.5
-#            float_row = (y-radius)/(scale_factor*radius*3) + 0.5 + radius
             float_row = (y-radius)/(scale_factor*radius*3) + radius
         else: # even parity
-#            float_row = y/(scale_factor*radius*3) + 0.5
-#            float_row = y/(scale_factor*radius*3) + 0.5 + radius
             float_row = y/(scale_factor*radius*3) + radius
         row = int(float_row) if float_row >= 0 else int(float_row - 1)
+        # TODO:  should scale_factor be 1.0 here?  1/scale_factor?
+        gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius,
+                                                                                           row,
+                                                                                           column,
+                                                                                           scale_factor,
+                                                                                           invert=True)
+        unscaled_gridpoint_center_x, unscaled_gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
+        inverted_gridpoint_center_x, inverted_gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius,
+                                                                                                             row,
+                                                                                                             column,
+                                                                                                             1/scale_factor)
 
-        return row, column
+        model_radius = radius*scale_factor
+        x_difference = abs(x-gridpoint_center_x)
+        y_difference = abs(y-gridpoint_center_y)
+
+#        from cadnano.util import qtdb_trace
+#        qtdb_trace()
+
+        print('[LATT]  rad %s' % model_radius)
+        print('[LATT]  row %s' % row)
+        print('[LATT]  col %s' % column)
+        print('[LATT]  x   %s' % x)
+        print('[LATT]  y   %s' % y)
+#        print('[LATT]  sx  %s' % (x/scale_factor))
+#        print('[LATT]  xy  %s' % (y/scale_factor))
+        print('[LATT]  gpx %s' % gridpoint_center_x)
+        print('[LATT]  gpy %s' % gridpoint_center_y)
+        print('[LATT]  xdf %s' % x_difference)
+        print('[LATT]  ydf %s' % y_difference)
+        print('[LATT]  sum %s' % (x_difference**2 + y_difference**2))
+#        print('[LATT]  upx %s' % unscaled_gridpoint_center_x)
+#        print('[LATT]  upy %s' % unscaled_gridpoint_center_y)
+#        print('[LATT]  ipx %s' % inverted_gridpoint_center_x)
+#        print('[LATT]  ipy %s' % inverted_gridpoint_center_y)
+
+
+#        if abs(x-gridpoint_center_x)**2 + abs(y-gridpoint_center_y)**2 >= (radius*scale_factor)**2:
+#            print('[LATT] None')
+#        else:
+#            print('[LATT] %s, %s' % row, column)
+
+        if abs(x-gridpoint_center_x)**2 + abs(y-gridpoint_center_y)**2 >= (radius*scale_factor)**2:
+            print('[LATT] None')
+        else:
+            print('[LATT] %s, %s' % (row, column))
+        print('\n')
+#            from cadnano.util import qtdb_trace
+#            qtdb_trace()
+
+        if not strict:
+            return row, column
+        else:
+            gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
+            if (x-gridpoint_center_x)**2 + (y-gridpoint_center_y)**2 >= radius**2:
+                return None
+            else:
+                return row, column
     # end def
 
     @staticmethod
