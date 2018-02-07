@@ -150,15 +150,13 @@ class OutlinerTreeWidget(QTreeWidget):
             # print("could deselect?", self.itemFromIndex(idx))
             item = self.itemFromIndex(idx)
             if item not in tbd and item.isModelSelected(document):
-                # print("did deselect", item)
                 tbd.add(item)
+        self.processSelections(deselect_only=True)
     # end def
 
     def itemClickedHandler(self, tree_widget_item, column):
         # print("I'm click", tree_widget_item.__class__.__name__,
         #       tree_widget_item.isSelected())
-        document = self._document
-        model_to_be_selected, model_to_be_deselected = self.model_selection_changes
         # print("click column", column)
 
         # 1. handle clicks on check marks to speed things up over using an editor
@@ -178,32 +176,38 @@ class OutlinerTreeWidget(QTreeWidget):
            tree_widget_item.FILTER_NAME not in filter_set:
             rect = self.visualItemRect(tree_widget_item)
             QToolTip.showText(self.mapToGlobal(rect.center()), "Change filter to select")
+            return
+        self.processSelections()
+    # end def
 
+    def processSelections(self, deselect_only=False):
+        """ Process selections.  We need this because itemClicked doesn't get called
+        when clicking off of a QTreeWidgetItem in the QTreeWidget and triggers
+        a deselection
+        we may be able to call this in a mousePressEvent instead of in
+        selectionFilter at all.  That is a TODO or a TBD, to figure out signaling
+        order
+
+        Args:
+            deselect_only (bool, optional): default is False.  Allows a
+                deselection to occur when clicking off an item in the outlineview
+                since no itemClicked will occur
+        """
+        document = self._document
+        model_to_be_selected, model_to_be_deselected = self.model_selection_changes
         # 2. handle document selection
         # self.blockSignals(True)
-        if isinstance(tree_widget_item, OutlineNucleicAcidPartItem):
-            pass
-        elif isinstance(tree_widget_item, OutlineVirtualHelixItem):
+        if deselect_only:
             for item in model_to_be_selected:
-                if isinstance(item, OutlineVirtualHelixItem):
-                    id_num, part = item.idNum(), item.part()
-                    is_selected = document.isVirtualHelixSelected(part, id_num)
-                    # print("select id_num", id_num, is_selected)
-                    if not is_selected:
-                        # print("selecting vh", id_num)
-                        document.addVirtualHelicesToSelection(part, [id_num])
-            model_to_be_selected.clear()
-            for item in model_to_be_deselected:
-                if isinstance(item, OutlineVirtualHelixItem):
-                    id_num, part = item.idNum(), item.part()
-                    is_selected = document.isVirtualHelixSelected(part, id_num)
-                    # print("de id_num", id_num, is_selected)
-                    if is_selected:
-                        # print("deselecting vh", id_num)
-                        document.removeVirtualHelicesFromSelection(part, [id_num])
-            model_to_be_deselected.clear()
-        elif isinstance(tree_widget_item, OutlineOligoItem):
-            for item in model_to_be_selected:
+                if isinstance(item, OutlineNucleicAcidPartItem):
+                    pass
+                elif isinstance(item, OutlineVirtualHelixItem):
+                        id_num, part = item.idNum(), item.part()
+                        is_selected = document.isVirtualHelixSelected(part, id_num)
+                        # print("select id_num", id_num, is_selected)
+                        if not is_selected:
+                            # print("selecting vh", id_num)
+                            document.addVirtualHelicesToSelection(part, [id_num])
                 if isinstance(item, OutlineOligoItem):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
@@ -211,14 +215,23 @@ class OutlinerTreeWidget(QTreeWidget):
                         # print("selecting", m_oligo)
                         document.selectOligo(m_oligo)
             model_to_be_selected.clear()
-            for item in model_to_be_deselected:
-                if isinstance(item, OutlineOligoItem):
-                    m_oligo = item.cnModel()
-                    is_selected = document.isOligoSelected(m_oligo)
-                    if is_selected:
-                        # print("deselecting", m_oligo)
-                        document.deselectOligo(m_oligo)
-            model_to_be_deselected.clear()
+        for item in model_to_be_deselected:
+            if isinstance(item, OutlineNucleicAcidPartItem):
+                pass
+            elif isinstance(item, OutlineVirtualHelixItem):
+                id_num, part = item.idNum(), item.part()
+                is_selected = document.isVirtualHelixSelected(part, id_num)
+                # print("de id_num", id_num, is_selected)
+                if is_selected:
+                    # print("deselecting vh", id_num)
+                    document.removeVirtualHelicesFromSelection(part, [id_num])
+            elif isinstance(item, OutlineOligoItem):
+                m_oligo = item.cnModel()
+                is_selected = document.isOligoSelected(m_oligo)
+                if is_selected:
+                    # print("deselecting", m_oligo)
+                    document.deselectOligo(m_oligo)
+        model_to_be_deselected.clear()
         # end if
         # self.blockSignals(False)
     # end def

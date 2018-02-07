@@ -112,6 +112,8 @@ class Oligo(CNObject):
     oligoPropertyChangedSignal = ProxySignal(CNObject, object, object, name='oligoPropertyChangedSignal')
     """self, property_name, new_value"""
 
+    oligoSelectedChangedSignal = ProxySignal(CNObject, bool, name='oligoSelectedChangedSignal')
+    """pyqtSignal(QObject, bool): (oligo, bool)"""
     ### SLOTS ###
 
     ### ACCESSORS ###

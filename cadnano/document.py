@@ -631,9 +631,14 @@ class Document(CNObject):
         For now, individual objects need to emit signals
 
         """
+        oligo_set = set()
         for obj, value in self._strand_selected_changed_dict.items():
+            oligo_set.add(obj.oligo())
             obj.strandSelectedChangedSignal.emit(obj, value)
         # end for
+        for oligo in oligo_set:
+            oligo.oligoSelectedChangedSignal.emit(  oligo,
+                                                    self.isOligoSelected(oligo))
         self._strand_selected_changed_dict = {}
     # end def
 

@@ -8,7 +8,8 @@ class OligoItemController():
     connections = [
     ('oligoSequenceAddedSignal',    'oligoSequenceAddedSlot'),      # noqa
     ('oligoSequenceClearedSignal',  'oligoSequenceClearedSlot'),    # noqa
-    ('oligoPropertyChangedSignal',  'oligoPropertyChangedSlot')     # noqa
+    ('oligoPropertyChangedSignal',  'oligoPropertyChangedSlot'),    # noqa
+    ('oligoSelectedChangedSignal', 'oligoSelectedChangedSlot')
     ]
 
     def connectSignals(self):
