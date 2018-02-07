@@ -113,18 +113,22 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
+
+        # NOTE: prevent selection when select is not pressed
+        is_not_select_tool = not self._window.action_global_select.isChecked()
+
         document = self._document
         # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
         if self.selection_filter_disabled:
             return
-        filter_set = self._document.filter_set
+        filter_set = document.filter_set
         filter_set.add('part')
         out_deselection = []
         out_selection = []
         flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
         for index in selected_items.indexes():
             item = self.itemFromIndex(index)
-            if item.FILTER_NAME not in filter_set:
+            if is_not_select_tool or item.FILTER_NAME not in filter_set:
                 if index.column() == 0:
                     # print("deselect", item.FILTER_NAME, filter_set,
                     #                     index.row(), index.column())
