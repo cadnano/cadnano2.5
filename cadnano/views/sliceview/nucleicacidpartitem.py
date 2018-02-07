@@ -1025,6 +1025,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                       vh_set=self.coordinates_to_vhid.keys(),
                                                                       grid_type=self.griditem.grid_type,
                                                                       scale_factor=self.scale_factor)
+        print(self._highlighted_path)
         even_id = part._getNewIdNum(0)
         odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
