@@ -319,7 +319,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                scale_factor=self.scale_factor)
 
         assert id_num not in self.coordinates_to_vhid.values()
-        assert coordinates not in self.coordinates_to_vhid
+#        assert coordinates not in self.coordinates_to_vhid
+        if coordinates in self.coordinates_to_vhid.values():
+            print('COORDINATES DUPLICATE %s in %s' % (coordinates, self.coordinates_to_vhid.values()))
 
         self.coordinates_to_vhid[coordinates] = id_num
 
@@ -739,29 +741,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                 coordinate_tuple=self.getLastHoveredCoordinates(),
                                 scale_factor=self.scale_factor):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-            else:
             tool = self._getActiveTool()
             if tool.methodPrefix() == 'selectTool':
                 self.removeAllCopyPasteHints()
                 tool.clipboard = None
 #                print("clipboad cleared")
-        elif is_alt and self.shortest_path_add_mode is True:
+        elif is_alt and self.shortest_path_add_mode is True and isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                                                                 xy_tuple=self.last_mouse_position,
+                                                                                 coordinate_tuple=self.getLastHoveredCoordinates(),
+                                                                                 scale_factor=self.scale_factor):
+            self._previewSpa(self.last_mouse_position)
+        elif is_alt and self.getLastHoveredCoordinates() and self.last_mouse_position:
             if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
                                 xy_tuple=self.last_mouse_position,
                                 coordinate_tuple=self.getLastHoveredCoordinates(),
                                 scale_factor=self.scale_factor):
-                self._previewSpa(self.last_mouse_position)
-        elif is_alt:
-            if self.getLastHoveredCoordinates() and self.last_mouse_position:
-                if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
-                                    xy_tuple=self.last_mouse_position,
-                                    coordinate_tuple=self.getLastHoveredCoordinates(),
-                                    scale_factor=self.scale_factor):
-                    coord = self.getLastHoveredCoordinates()
-                    self.highlightOneGridPoint(coord, styles.SPA_START_HINT_COLOR)
-                    self.griditem.highlightGridPoint(coord[0],
-                                                     coord[1],
-                                                     on=True)
+                coord = self.getLastHoveredCoordinates()
+                self.highlightOneGridPoint(coord, styles.SPA_START_HINT_COLOR)
+                self.griditem.highlightGridPoint(coord[0], coord[1], on=True)
     # end def
 
     def keyReleaseEvent(self, event):
@@ -776,9 +773,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                 scale_factor=self.scale_factor):
                 coord = self.getLastHoveredCoordinates()
                 self.highlightOneGridPoint(coord)
-                self.griditem.highlightGridPoint(coord[0],
-                                                 coord[1],
-                                                 on=True)
+                self.griditem.highlightGridPoint(coord[0], coord[1], on=True)
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -831,9 +826,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def _getModelXYforCoord(self, row, column):
         radius = self.part().radius()
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            return HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
+            return HoneycombDnaPart.latticeCoordToPositionXY(radius, row, column)
         elif self.griditem.grid_type is GridType.SQUARE:
-            return SquareDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
+            return SquareDnaPart.latticeCoordToPositionXY(radius, row, column)
         else:
             return None
     # end def
@@ -1168,11 +1163,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # This is going to give us the difference between hovering and the min parity location.  We want the
         # difference between the min parity's former and new location
         hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1])
-#        from cadnano.util import qtdb_trace
-#        qtdb_trace()
 
         min_x, min_y, _ = part.getCoordinate(min_id_same_parity, 0)
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), -round(hov_y-min_y, 9))
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
 #        print('Offset is %s' % str(self.copypaste_origin_offset))
     # end def
 
