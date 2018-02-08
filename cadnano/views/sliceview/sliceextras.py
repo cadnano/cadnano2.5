@@ -920,23 +920,6 @@ class ShortestPathHelper(object):
             return ()
 
     @staticmethod
-    def findClosestPoint(position, radius, grid_type, scale_factor):
-        # TODO[NF]:  Docstring
-        # TODO[NF]:  Radius is unused
-        if grid_type is GridType.HONEYCOMB:
-            coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                                  position[0],
-                                                                  position[1],
-                                                                  scale_factor)
-            return (coordinates[0], coordinates[1])
-        elif grid_type is GridType.SQUARE:
-            coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                               position[0],
-                                                               position[1],
-                                                               scale_factor)
-            return (coordinates[0], coordinates[1])
-
-    @staticmethod
     def shortestPathAStar(start, end, vh_set, grid_type, radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 

@@ -1127,10 +1127,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
             position_xy = part.locationQt(vh_id, self.scaleFactor())
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint(position_xy,
-                                                                         DEFAULT_RADIUS,
-                                                                         self.griditem.grid_type,
-                                                                         self.scale_factor)
+            copied_row, copied_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                            position_xy[0],
+                                                            position_xy[1],
+                                                            self.scale_factor)
             hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
             self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
             self._highlighted_copypaste.append(hint_coord)
@@ -1162,15 +1162,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if tool.clipboard is None:  # is there anything on the clipboard?
             return
 
-        event_pos = self.griditem.mapFromScene(event.scenePos())
-        event_position_xy = (event_pos.x(), event_pos.y())
-        hover_coordinates = ShortestPathHelper.findClosestPoint(event_position_xy,
-                                                                DEFAULT_RADIUS,
-                                                                self.griditem.grid_type,
-                                                                self.scale_factor)
-
         isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
             else SquareDnaPart.isInLatticeCoord
+        event_pos = self.griditem.mapFromScene(event.scenePos())
+        event_position_xy = (event_pos.x(), event_pos.y())
+        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord \
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
+        hover_coordinates = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                   event_position_xy[0],
+                                                   event_position_xy[1],
+                                                   self.scale_factor)
+
         if self._last_hovered_coord == hover_coordinates or not isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
                                                                                  xy_tuple=self.last_mouse_position,
                                                                                  coordinate_tuple=self.getLastHoveredCoordinates(),
@@ -1189,10 +1191,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         part = self._model_part
         min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
-        min_row, min_col = ShortestPathHelper.findClosestPoint(min_pos,
-                                                               DEFAULT_RADIUS,
-                                                               self.griditem.grid_type,
-                                                               self.scale_factor)
+        min_row, min_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  min_pos[0],
+                                                  min_pos[1],
+                                                  self.scale_factor)
 
         id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
 
@@ -1201,10 +1203,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
             position_xy = part.locationQt(vh_id, self.scaleFactor())
-            copied_row, copied_col = ShortestPathHelper.findClosestPoint(position_xy,
-                                                                         DEFAULT_RADIUS,
-                                                                         self.griditem.grid_type,
-                                                                         self.scale_factor)
+            copied_row, copied_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                            position_xy[0],
+                                                            position_xy[1],
+                                                            self.scale_factor)
             hint_coord = (hover_coordinates[0]+(copied_row-min_row), hover_coordinates[1]+(copied_col-min_col))
             self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
             self._highlighted_copypaste.append(hint_coord)
