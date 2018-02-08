@@ -39,6 +39,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         scale_factor (float): Description
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
+    _RADIUS_TUPLE = (DEFAULT_RADIUS, _RADIUS)
     _BOUNDING_RECT_PADDING = 80
 
     def __init__(self, model_part_instance, viewroot, parent=None):
@@ -732,31 +733,66 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def keyPressEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+            else SquareDnaPart.isInLatticeCoord
+
         if event.key() == Qt.Key_Escape:
 #            print("Esc here")
             self._setShortestPathStart(None)
             self.removeAllCreateHints()
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+
+
+#            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
+                print('TRUE')
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            else:
+                print('FALSE')
             tool = self._getActiveTool()
             if tool.methodPrefix() == 'selectTool':
                 self.removeAllCopyPasteHints()
                 tool.clipboard = None
 #                print("clipboad cleared")
         elif is_alt and self.shortest_path_add_mode is True:
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+#            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
                 self._previewSpa(self.last_mouse_position)
         elif is_alt:
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
+            if self.getLastHoveredCoordinates() and self.last_mouse_position:
+                if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                    xy_tuple=self.last_mouse_position,
+                                    coordinate_tuple=self.getLastHoveredCoordinates(),
+                                    scale_factor=self.scale_factor):
+    #            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+                    coord = self.getLastHoveredCoordinates()
+                    self.highlightOneGridPoint(coord, styles.SPA_START_HINT_COLOR)
+                    self.griditem.highlightGridPoint(coord[0],
+                                                     coord[1],
+                                                     on=True)
     # end def
 
     def keyReleaseEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
         if not is_alt:
             self.removeAllCreateHints()
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+#            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+            isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.isInLatticeCoord
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
+                coord = self.getLastHoveredCoordinates()
+                self.highlightOneGridPoint(coord)
+                self.griditem.highlightGridPoint(coord[0],
+                                                 coord[1],
+                                                 on=True)
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -810,10 +846,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         radius = self.part().radius()
 #        print('radius is %s' % radius)
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            result = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column)
-            return (result[0], -result[1])
+            return HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
         elif self.griditem.grid_type is GridType.SQUARE:
-            return SquareDnaPart.latticeCoordToPositionXY(radius, row, column)
+            return SquareDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
         else:
             return None
     # end def
@@ -982,42 +1017,36 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
-    def _inPointItem(self, event_xy, event_coord):
-        """
-        Determine if x-y coordinates are inside the given GridPoint.
-
-        Args:
-            event_xy (tuple):  the x-y coordinates corresponding to the
-                position of the mouse
-            event_coord (tuple):  the i-j coordinates corresponding to the
-                location of the GridPoint
-
-        Returns:
-            True if the mouse is in the given GridPoint, False otherwise
-        """
-        if event_xy is None or event_coord is None or self.griditem.grid_type not in (GridType.HONEYCOMB, GridType.SQUARE):
-#            print('[NAPI] Shortcutting False')
-            return False
-
-        assert isinstance(event_coord, (tuple, list)) and len(event_coord) is 2
-
-        latticeCoordToPositionXY = HoneycombDnaPart.latticeCoordToPositionXY if self.griditem.grid_type is \
-                                   GridType.HONEYCOMB else SquareDnaPart.latticeCoordToPositionXY
-
-
-        last_hovered_x, last_hovered_y = latticeCoordToPositionXY(DEFAULT_RADIUS,
-                                                                  event_coord[0],
-                                                                  event_coord[1],
-                                                                  self.scale_factor)
-        event_x, event_y = event_xy
-        value = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2 <= self._RADIUS**2
-#        print('[NAPI] Returning %s; last hovered is %s,%s and event triggered at %s,%s' % (value,
-#                                                                                           last_hovered_x,
-#                                                                                           last_hovered_y,
-#                                                                                           event_x,
-#                                                                                           event_y))
-        return value
-
+#    def _inPointItem(self, event_xy, event_coord):
+#        """
+#        Determine if x-y coordinates are inside the given GridPoint.
+#
+#        Args:
+#            event_xy (tuple):  the x-y coordinates corresponding to the
+#                position of the mouse
+#            event_coord (tuple):  the i-j coordinates corresponding to the
+#                location of the GridPoint
+#
+#        Returns:
+#            True if the mouse is in the given GridPoint, False otherwise
+#        """
+#        if event_xy is None or event_coord is None or self.griditem.grid_type not in (GridType.HONEYCOMB, GridType.SQUARE):
+#            return False
+#
+#        assert isinstance(event_coord, (tuple, list)) and len(event_coord) is 2
+#        assert isinstance(event_xy, (tuple, list)) and len(event_coord) is 2
+#
+#        latticeCoordToPositionXY = HoneycombDnaPart.latticeCoordToPositionXY if self.griditem.grid_type is \
+#                                   GridType.HONEYCOMB else SquareDnaPart.latticeCoordToPositionXY
+#
+#
+#        last_hovered_x, last_hovered_y = latticeCoordToPositionXY(DEFAULT_RADIUS,
+#                                                                  event_coord[0],
+#                                                                  event_coord[1],
+#                                                                  self.scale_factor)
+#        event_x, event_y = event_xy
+#        value = (last_hovered_x - event_x)**2 + (last_hovered_y - event_y)**2 <= self._RADIUS**2
+#        return value
     # end def
 
     def _previewSpa(self, event_xy):
@@ -1140,7 +1169,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                 self.griditem.grid_type,
                                                                 self.scale_factor)
 
-        if self._last_hovered_coord == hover_coordinates or not self._inPointItem(event_position_xy, hover_coordinates):
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+            else SquareDnaPart.isInLatticeCoord
+        if self._last_hovered_coord == hover_coordinates or not isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                                                                 xy_tuple=self.last_mouse_position,
+                                                                                 coordinate_tuple=self.getLastHoveredCoordinates(),
+                                                                                 scale_factor=self.scale_factor):
             return
         else:
             self._last_hovered_coord == hover_coordinates

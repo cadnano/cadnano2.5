@@ -140,6 +140,28 @@ class HoneycombDnaPart(object):
             row = roundRow(row_temp/3.)
         return row, column
     # end def
+
+    @staticmethod
+    def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        assert isinstance(radius_tuple, tuple) and len(radius_tuple) is 2
+        assert isinstance(xy_tuple, tuple) and len(xy_tuple) is 2 and all(isinstance(i, float) for i in xy_tuple)
+        assert isinstance(coordinate_tuple, tuple) and len(coordinate_tuple) is 2 and all(isinstance(i, int) for i in coordinate_tuple)
+        assert isinstance(scale_factor, float)
+
+        part_radius, item_radius = radius_tuple
+        row, column = coordinate_tuple
+        x, y = xy_tuple
+
+        row_x, row_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(part_radius,
+                                                                         row,
+                                                                         column,
+                                                                         scale_factor)
+#        print('Row x        %s' % row_x)
+#        print('Row y        %s' % row_y)
+#        print('x            %s' % x)
+#        print('y            %s' % y)
+        return abs(row_x - x)**2 + abs(row_y  - y)**2 <= item_radius**2
+    # end def
 # end class
 
 
@@ -254,4 +276,22 @@ class SquareDnaPart(object):
         column = round(x/(2.*radius*scale_factor))
         return row, column
     # end def
+
+    @staticmethod
+    def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        assert isinstance(radius_tuple, tuple) and len(radius_tuple) is 2
+        assert isinstance(xy_tuple, tuple) and len(xy_tuple) is 2 and all(isinstance(i, float) for i in xy_tuple)
+        assert isinstance(coordinate_tuple, tuple) and len(coordinate_tuple) is 2 and all(isinstance(i, int) for i in coordinate_tuple)
+        assert isinstance(scale_factor, float)
+
+        part_radius, item_radius = radius_tuple
+        row, column = coordinate_tuple
+        x, y = xy_tuple
+
+        row_x, row_y = SquareDnaPart.latticeCoordToPositionXYInverted(part_radius,
+                                                                         row,
+                                                                         column,
+                                                                         scale_factor)
+        return abs(row_x - x)**2 + abs(row_y  - y)**2 <= item_radius**2
+        # end def
 # end class

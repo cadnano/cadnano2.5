@@ -563,7 +563,7 @@ class GridPoint(QGraphicsEllipseItem):
                                              event.scenePos().y(),
                                              scale_factor=part_item.scale_factor)
         latticeCoordToXY = HoneycombDnaPart.latticeCoordToPositionXYInverted if self.grid.grid_type is GridType.HONEYCOMB \
-                else SquareDnaPart.latticeCoordToPositionXY
+                else SquareDnaPart.latticeCoordToPositionXYInverted
         coordinate_string = '(%s, %s)' % coordinates
         coordiate_scaled_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1], part_item.scale_factor)
         coordiate_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1])
