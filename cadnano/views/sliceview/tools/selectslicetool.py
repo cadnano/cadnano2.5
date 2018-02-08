@@ -365,8 +365,11 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
+        if not self.part_item:
+            print('[SST ] Part item is none')
+            return
         doc = self.manager.document
-#        part = self.part_item.part()
+        part = self.part_item.part()
         part_instance = self.part_item.partInstance()
         offset = self.part_item.copypaste_origin_offset
         doc.undoStack().beginMacro("Paste VirtualHelices")
