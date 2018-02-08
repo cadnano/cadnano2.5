@@ -143,6 +143,9 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        if xy_tuple is None or coordinate_tuple is None:
+            return False
+
         assert isinstance(radius_tuple, tuple) and len(radius_tuple) is 2
         assert isinstance(xy_tuple, tuple) and len(xy_tuple) is 2 and all(isinstance(i, float) for i in xy_tuple)
         assert isinstance(coordinate_tuple, tuple) and len(coordinate_tuple) is 2 and all(isinstance(i, int) for i in coordinate_tuple)
@@ -279,6 +282,9 @@ class SquareDnaPart(object):
 
     @staticmethod
     def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        if xy_tuple is None or coordinate_tuple is None:
+            return False
+
         assert isinstance(radius_tuple, tuple) and len(radius_tuple) is 2
         assert isinstance(xy_tuple, tuple) and len(xy_tuple) is 2 and all(isinstance(i, float) for i in xy_tuple)
         assert isinstance(coordinate_tuple, tuple) and len(coordinate_tuple) is 2 and all(isinstance(i, int) for i in coordinate_tuple)
