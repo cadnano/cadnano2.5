@@ -920,7 +920,7 @@ class ShortestPathHelper(object):
             return ()
 
     @staticmethod
-    def shortestPathAStar(start, end, vh_set, grid_type, radius, scale_factor):
+    def shortestPathAStar(start, end, vh_set, grid_type, part_radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 
         Does an A* search.
@@ -939,14 +939,11 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        start_coordinates = ShortestPathHelper.findClosestPoint(position=start,
-                                                                radius=radius,
-                                                                grid_type=grid_type,
-                                                                scale_factor=scale_factor)
-        end_coordinates = ShortestPathHelper.findClosestPoint(position=end,
-                                                              radius=radius,
-                                                              grid_type=grid_type,
-                                                              scale_factor=scale_factor)
+        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord if grid_type is GridType.HONEYCOMB else \
+            SquareDnaPart.positionToLatticeCoord
+
+        start_coordinates = positionToLatticeCoord(part_radius, start[0], start[1], scale_factor=scale_factor)
+        end_coordinates = positionToLatticeCoord(part_radius, end[0], end[1], scale_factor=scale_factor)
 
         queue = PriorityQueue()
         queue.put((0, start_coordinates))
@@ -973,7 +970,6 @@ class ShortestPathHelper(object):
                 neighbors = ShortestPathHelper.getNeighborsForCoordinate(grid_type,
                                                                          current_location[0],
                                                                          current_location[1])
-#                print('Neighbors of %s,%s are %s' % (current_location[0], current_location[1], str(neighbors)))
                 for neighbor in neighbors:
                     new_cost = cumulative_cost[current_location] + 1
                     if (neighbor not in parents or new_cost < cumulative_cost[neighbor]) and neighbor not in vh_set:
@@ -1006,13 +1002,14 @@ class ShortestPathHelper(object):
         return difference_a*0.01 + difference_b*0.01
 
     @staticmethod
-    def shortestPathXY(start, end, vh_set, grid_type, scale_factor, radius):
+    def shortestPathXY(start, end, vh_set, grid_type, scale_factor, part_radius):
         # TODO[NF]:  Docstring
+        assert part_radius == DEFAULT_RADIUS
         x_y_path = []
         coordinate_path = ShortestPathHelper.shortestPathAStar(start=start,
                                                                end=end,
                                                                vh_set=vh_set,
-                                                               radius=radius,
+                                                               part_radius=part_radius,
                                                                grid_type=grid_type,
                                                                scale_factor=scale_factor)
         for node in coordinate_path:
@@ -1020,12 +1017,12 @@ class ShortestPathHelper(object):
             column = node[1]
             if grid_type is GridType.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
+                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=part_radius,
                                                                      row=row,
                                                                      column=column)
             else:
                 parity = None
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=DEFAULT_RADIUS,
+                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=part_radius,
                                                                   row=row,
                                                                   column=column)
             x_y_path.append((node_pos[0], node_pos[1], parity))
