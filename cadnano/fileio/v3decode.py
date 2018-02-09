@@ -97,11 +97,13 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     strands = part_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']
-    for id_num, idx_set in enumerate(strand_index_list):
+    for i in range(len(vh_id_list)):
+        id_num = vh_id_list[i][0]
+        idx_set = strand_index_list[i]
         if idx_set is not None:
             fwd_strand_set, rev_strand_set = part.getStrandSets(id_num)
             fwd_idxs, rev_idxs = idx_set
-            fwd_colors, rev_colors = color_list[id_num]
+            fwd_colors, rev_colors = color_list[i]
             for idxs, color in zip(fwd_idxs, fwd_colors):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
