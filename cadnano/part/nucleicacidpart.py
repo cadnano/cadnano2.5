@@ -2594,7 +2594,6 @@ class NucleicAcidPart(Part):
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len
-        print('MASTER Creating helix with x = %s and y = %s' % (x, y))
         c = CreateVirtualHelixCommand(self, x, y, z, length,
                                       id_num=id_num,
                                       properties=properties,

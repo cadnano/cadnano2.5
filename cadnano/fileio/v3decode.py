@@ -194,7 +194,6 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     vh_props = copy_dict['virtual_helices']
     # name_suffix = ".%d"
 
-    print("using offset", offset)
     xoffset = offset[0] if offset else 0
     yoffset = offset[1] if offset else 0
 
@@ -209,8 +208,8 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] = new_id_num
-        print("copying {}({},{}) to {}({},{})".format(id_num, x, y,
-                                                      new_id_num, x+xoffset, y+yoffset))
+#        print("copying {}({},{}) to {}({},{})".format(id_num, x, y,
+#                                                      new_id_num, x+xoffset, y+yoffset))
         part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
