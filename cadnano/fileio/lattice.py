@@ -164,11 +164,7 @@ class HoneycombDnaPart(object):
                                                                          row,
                                                                          column,
                                                                          scale_factor)
-#        print('Row x        %s' % row_x)
-#        print('Row y        %s' % row_y)
-#        print('x            %s' % x)
-#        print('y            %s' % y)
-        return abs(row_x - x)**2 + abs(row_y  - y)**2 <= item_radius**2
+        return abs(row_x - x)**2 + abs(row_y - y)**2 <= item_radius**2
     # end def
 
     @staticmethod
