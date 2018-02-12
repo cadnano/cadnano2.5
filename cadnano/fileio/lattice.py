@@ -1,6 +1,7 @@
 """
 """
 from math import ceil, floor, sqrt
+import random
 
 root3 = 1.732051
 
@@ -54,8 +55,8 @@ class HoneycombDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
-                squared_distance = (guess_x-x)**2 + (-guess_y-y)**2
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column, scale_factor)
+                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
                 distance = sqrt(squared_distance)
 
                 if distance < shortest_distance:
@@ -165,6 +166,37 @@ class HoneycombDnaPart(object):
 #        print('y            %s' % y)
         return abs(row_x - x)**2 + abs(row_y  - y)**2 <= item_radius**2
     # end def
+
+    @staticmethod
+    def sanityCheckCalculations(iterations=100000000):
+        for _ in range(iterations):
+#            radius = round(random.randint(0, 100) * random.random(), 1)
+#            scale_factor = round(random.randint(0, 100) * random.random(), 2)
+            radius = 1.125
+#            scale_factor = 13.333333333333334
+            scale_factor = 1.
+            row = random.randint(-1000, 1000)
+            col = random.randint(-1000, 1000)
+
+            x_position, y_position = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, col, scale_factor)
+            output_row, output_column = HoneycombDnaPart.positionToLatticeCoord(radius, x_position, y_position, scale_factor)
+
+            assert row == output_row, '''
+                Rows do not match:  %s != %s.
+                    Inputs:  
+                    radius          %s
+                    scale factor    %s
+                    row             %s
+                    column          %s
+            ''' % (row, output_row, radius, scale_factor, row, col)
+            assert col == output_column, '''
+                    Rows do not match:  %s != %s.
+                    Inputs:
+                    radius          %s
+                    scale factor    %s
+                    row             %s
+                    column          %s
+            ''' % (col, output_column, radius, scale_factor, row, col)
 # end class
 
 
