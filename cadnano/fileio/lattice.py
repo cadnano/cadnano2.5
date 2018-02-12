@@ -92,8 +92,7 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
-        x, y = HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
-        return x, -y
+        return HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
@@ -121,10 +120,15 @@ class HoneycombDnaPart(object):
                                                                                                        column,
                                                                                                        scale_factor)
 
-            if abs(x-gridpoint_center_x)**2 + abs(y-gridpoint_center_y)**2 >= (radius*scale_factor)**2:
+            if abs(x-gridpoint_center_x)**2 + abs(y+gridpoint_center_y)**2 >= (radius*scale_factor)**2:
                 return None
             else:
                 return row, column
+    # end def
+
+    @staticmethod
+    def positionToLatticeCoordInverted(radius, x, y, scale_factor=1., strict=False):
+        return HoneycombDnaPart.positionToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod
@@ -173,13 +177,14 @@ class HoneycombDnaPart(object):
 #            radius = round(random.randint(0, 100) * random.random(), 1)
 #            scale_factor = round(random.randint(0, 100) * random.random(), 2)
             radius = 1.125
-#            scale_factor = 13.333333333333334
-            scale_factor = 1.
+            scale_factor = 13.333333333333334
+#            scale_factor = 1.
             row = random.randint(-1000, 1000)
             col = random.randint(-1000, 1000)
 
             x_position, y_position = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, col, scale_factor)
-            output_row, output_column = HoneycombDnaPart.positionToLatticeCoord(radius, x_position, y_position, scale_factor)
+            output_row, output_column = HoneycombDnaPart.positionToLatticeCoordInverted(radius, x_position, y_position,
+                                                                                 scale_factor)
 
             assert row == output_row, '''
                 Rows do not match:  %s != %s.
@@ -276,8 +281,7 @@ class SquareDnaPart(object):
     def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
         """
         """
-        x, y = SquareDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
-        return x, -y
+        return SquareDnaPart.latticeCoordToPositionXY(radius, row, -column, scale_factor)
     # end def
 
     @staticmethod
@@ -300,7 +304,11 @@ class SquareDnaPart(object):
                 return None
             else:
                 return row, column
+    # end def
 
+    @staticmethod
+    def positionToLatticeCoordInverted(radius, x, y, scale_factor=1., strict=False):
+        return SquareDnaPart.positionToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod

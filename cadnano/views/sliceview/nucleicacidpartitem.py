@@ -328,7 +328,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
         assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
 
-        unscaled_position = self._getModelXYforCoord(coordinates[0], coordinates[1], 1.)
+        unscaled_position = self._getModelXYforCoord(coordinates[0], coordinates[1])
 #        unscaled_position = HoneycombDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS, coordinates[0],
 #                                                                            coordinates[1])
 
@@ -833,15 +833,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlightSpaVH(id_num)
     # end def
 
-    def _getModelXYforCoord(self, row, column, scale_factor):
+    def _getModelXYforCoord(self, row, column):
         radius = DEFAULT_RADIUS
-        print('radius is %s' % radius)
+#        print('radius is %s' % radius)
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            result = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column, scale_factor=scale_factor)
-            return (result[0], -result[1])
+            return HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
         elif self.griditem.grid_type is GridType.SQUARE:
-            result = SquareDnaPart.latticeCoordToPositionXYInverted(radius, row, column, scale_factor=scale_factor)
-            return (result[0], -result[1])
+            return SquareDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
         else:
             return None
     # end def
@@ -1059,13 +1057,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.removeAllCopyPasteHints()
         event_pos = self.griditem.mapFromScene(event.scenePos())
 
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord \
+        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord\
             if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
         hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
                                                   event_pos.x(),
                                                   event_pos.y(),
                                                   self.scale_factor)
 #        print('hov is %s %s' %(hov_row, hov_col))
+        print('Hovered coordinates      %s, %s' % (hov_row, hov_col))
         self._last_hovered_coord == (hov_row, hov_col)
         parity = self._getCoordinateParity(hov_row, hov_col)
 
@@ -1098,23 +1097,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlighted_copypaste.append(hint_coord)
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
-        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col, self.scale_factor)
+        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
         min_x, min_y = part.getVirtualHelixOrigin(min_id_same_parity)
+
+#        hov_y *= -1
 
         print('Copying VHs with base VHID %s' % min_id_same_parity)
 
-        print('scale factor is %s' % self.scale_factor)
+#        print('scale factor is %s' % self.scale_factor)
         print('Source position          %s, %s' % (min_x, min_y))
         print('Destination position     %s, %s' % (hov_x, hov_y))
 
-        source_loc = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS, min_x, min_y)
-        dest_loc = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS, hov_x, hov_y, scale_factor=self.scale_factor)
+        source_loc = positionToLatticeCoord(DEFAULT_RADIUS, min_x, min_y)
+        dest_loc = positionToLatticeCoord(DEFAULT_RADIUS, hov_x, hov_y)
 
         print('Source coordinates       %s, %s' % (source_loc[0], source_loc[1]))
         print('Destination coordinates  %s, %s' % (dest_loc[0], dest_loc[1]))
 
         print()
-        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(min_y-hov_y, 9))
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+#        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(min_y-hov_y, 9))
 
 #        from cadnano.util import qtdb_trace
 #        qtdb_trace()
@@ -1189,7 +1191,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         # This is going to give us the difference between hovering and the min parity location.  We want the
         # difference between the min parity's former and new location
-        hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1], 1)
+        hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1])
+#        hov_y *= -1
 
         min_x, min_y, _ = part.getCoordinate(min_id_same_parity, 0)
         self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
