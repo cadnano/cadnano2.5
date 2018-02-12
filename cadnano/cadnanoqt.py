@@ -100,6 +100,8 @@ class CadnanoQt(QObject):
         doc = Document()
         self._document = self.createDocument(base_doc=doc)
 
+        self._document.setSliceViewType(self.prefs.sliceview_idx)
+
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()

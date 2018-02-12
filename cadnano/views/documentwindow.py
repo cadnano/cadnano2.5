@@ -170,7 +170,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.scene_root_item = self.grid_root
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
-        self.grid_dock_widget.hide()
     # end def
 
     def _initPathview(self, doc):

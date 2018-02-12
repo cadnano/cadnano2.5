@@ -59,8 +59,6 @@ class DocumentController(object):
         self._initWindow()
         app().document_controllers.add(self)
 
-        self.toggleGridView(show=False)
-
         self.slice_view_showing = True
         self.grid_view_showing = False
         self.exit_when_done = False
@@ -666,12 +664,15 @@ class DocumentController(object):
 
         Returns: None
         """
+        slice_view_widget = self.win.slice_dock_widget
         slice_view = self.win.slice_graphics_view
         if show:
             self.slice_view_showing = True
+            slice_view_widget.show()
             slice_view.show()
         else:
             self.slice_view_showing = False
+            slice_view_widget.hide()
             slice_view.hide()
 
     def toggleGridView(self, show):
@@ -682,12 +683,15 @@ class DocumentController(object):
 
         Returns: None
         """
+        grid_view_widget = self.win.grid_dock_widget
         grid_view = self.win.grid_graphics_view
         if show:
             self.grid_view_showing = True
+            grid_view_widget.show()
             grid_view.show()
         else:
             self.grid_view_showing = False
+            grid_view_widget.hide()
             grid_view.hide()
 
     ### ACCESSORS ###

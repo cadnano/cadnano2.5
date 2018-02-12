@@ -91,8 +91,8 @@ class Preferences(object):
 
     def restoreDefaults(self):
         """Restore the default settings."""
-        gridview_style_idx = GRIDVIEW_STYLES.index(GRIDVIEW_STYLE_DEFAULT)
-        sliceview_idx = GRIDVIEW_STYLES.index(SLICEVIEW_DEFAULT)
+        gridview_style_idx = GRIDVIEW_STYLE_DEFAULT
+        sliceview_idx = SLICEVIEW_DEFAULT
         self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
         self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
         self.ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
