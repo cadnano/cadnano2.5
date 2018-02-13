@@ -674,8 +674,6 @@ class DocumentController(object):
             self.slice_view_showing = False
             slice_view.hide()
 
-        print('Is slice view visible?  %s' % slice_view.isVisible())
-
     def toggleGridView(self, show):
         """Hide or show the grid view based on the given parameter `show`
 
@@ -686,16 +684,11 @@ class DocumentController(object):
         """
         grid_view = self.win.grid_graphics_view
         if show:
-            print('Showing grid view')
             self.grid_view_showing = True
             grid_view.show()
-#            from cadnano.util import qtdb_trace
-#            qtdb_trace()
         else:
-            print('Hiding grid view')
             self.grid_view_showing = False
             grid_view.hide()
-        print('Is grid view visible?  %s' % grid_view.isVisible())
 
     ### ACCESSORS ###
     def document(self):

@@ -116,7 +116,6 @@ class Preferences(object):
         self.qs.setValue(SLICEVIEW_KEY, value)
         self.qs.endGroup()
 
-        print('[PREF] New sliceview is %s' % value)
         value = SLICEVIEWS[self.sliceview_idx]
         if value == 'legacy':
             self.document.controller().toggleSliceView(True)

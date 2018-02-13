@@ -170,11 +170,8 @@ class HoneycombDnaPart(object):
     @staticmethod
     def sanityCheckCalculations(iterations=100000000):
         for _ in range(iterations):
-#            radius = round(random.randint(0, 100) * random.random(), 1)
-#            scale_factor = round(random.randint(0, 100) * random.random(), 2)
             radius = 1.125
             scale_factor = 13.333333333333334
-#            scale_factor = 1.
             row = random.randint(-1000, 1000)
             col = random.randint(-1000, 1000)
 

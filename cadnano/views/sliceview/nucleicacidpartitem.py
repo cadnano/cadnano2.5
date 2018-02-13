@@ -319,7 +319,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                scale_factor=self.scale_factor)
 
         assert id_num not in self.coordinates_to_vhid.values()
-#        assert coordinates not in self.coordinates_to_vhid
         if coordinates in self.coordinates_to_vhid.values():
             print('COORDINATES DUPLICATE %s in %s' % (coordinates, self.coordinates_to_vhid.values()))
 
@@ -327,16 +326,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
         assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
-
-        unscaled_position = self._getModelXYforCoord(coordinates[0], coordinates[1])
-#        unscaled_position = HoneycombDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS, coordinates[0],
-#                                                                            coordinates[1])
-
-#        print('Added virtual helix %s to %s, %s, which maps to %s, %s' % (id_num,
-#                                                                          coordinates[0],
-#                                                                          coordinates[1],
-#                                                                          unscaled_position[0],
-#                                                                          unscaled_position[1]))
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
@@ -623,7 +612,6 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             griditem (GridItem): the hoveree
         """
         self._last_hovered_item = gridpoint_item
-        #TODO
 
     def setModifyState(self, bool_val):
         """Hides the mod_rect when modify state disabled.

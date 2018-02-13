@@ -465,7 +465,6 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-#        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
@@ -486,21 +485,7 @@ class GridPoint(QGraphicsEllipseItem):
             part_item (TYPE): Description
             event (TYPE): Description
         """
-        # return QGraphicsEllipseItem.mousePressEvent(self, event)
         return self.grid.part_item.mousePressEvent(event)
-#        part_item = self.grid.part_item
-#        tool = part_item._getActiveTool()
-#        controller = part_item.document().controller()
-#
-#        if tool.FILTER_NAME not in part_item.part().document().filter_set:
-#            controller.showFilterHints(True, filter_name='virtual_helix')
-#            # return
-#        else:  # the filter is correct, tool is wrong
-#            controller.showToolHints(True, tool_name='create')
-#        part = part_item.part()
-#        part.setSelected(True)
-#        alt_event = GridEvent(self, self.offset)
-#        tool.selectOrSnap(part_item, alt_event, event)
     # end def
 
     def selectToolMouseMove(self, tool, part_item, event):
@@ -540,12 +525,6 @@ class GridPoint(QGraphicsEllipseItem):
 
     def selectToolHoverLeaveEvent(self, tool, part_item, event):
         part_item.selectToolHoverLeave(tool, event)
-    # end def
-
-#    def createToolHoverEnterEvent(self, tool, part_item, event):
-#        #TODO:  UPDATE HERE
-#        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
-#        part_item.setLastHoveredItem(self)
     # end def
 
     def highlightGridPoint(self, on=True):

@@ -186,9 +186,7 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     part = part_instance.reference()
     id_num_offset = part.getMaxIdNum() + 1
     if id_num_offset % 2 == 1:
-        print("Odd vh count. Skipping", id_num_offset)
         id_num_offset += 1
-    print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
@@ -208,8 +206,6 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] = new_id_num
-#        print("copying {}({},{}) to {}({},{})".format(id_num, x, y,
-#                                                      new_id_num, x+xoffset, y+yoffset))
         part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),

@@ -404,7 +404,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.cnModel().getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)
@@ -412,7 +411,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             color = '#5a8bff'
         else:
             color = '#cc0000'
-#            nvhi_name = nvhi_name + '*'  # mark as invalid
         line.setLength(_RADIUS)
         if neighbor_virtual_helix in wg_dict:
             wedge_item = wg_dict[neighbor_virtual_helix]
