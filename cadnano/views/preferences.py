@@ -48,7 +48,7 @@ class Preferences(object):
         """
         self.qs.beginGroup(PREFS_GROUP_NAME)
         self.gridview_style_idx = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
-        self.sliceview_idx = self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT)
+        self.sliceview_idx = int(self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT))   # TODO[NF]:  Investigate QSettings `0` vs `'0'`
         self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
         self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
         self.qs.endGroup()

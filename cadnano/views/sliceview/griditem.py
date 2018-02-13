@@ -182,7 +182,6 @@ class GridItem(QGraphicsRectItem):
 
         if redo_neighbors:
             self.part_item.setNeighborMap(neighbor_map=neighbor_map)
-            self.part_item.setPointMap(point_map=point_coordinates)
     # end def
 
     def createSquareGrid(self, part_item, radius, bounds):
@@ -215,7 +214,6 @@ class GridItem(QGraphicsRectItem):
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
-            point_map = dict()
             neighbor_map = dict()
 
         path = QPainterPath()
@@ -254,7 +252,6 @@ class GridItem(QGraphicsRectItem):
                 self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
-                    point_map[(-row, column)] = (x, -y)
 
                     neighbor_map[(-row, column)] = [
                         (-row, column+1),
@@ -282,7 +279,6 @@ class GridItem(QGraphicsRectItem):
 
         if redo_neighbors:
             self.part_item.setNeighborMap(neighbor_map=neighbor_map)
-            self.part_item.setPointMap(point_map=point_map)
     # end def
 
     def removePoints(self):
@@ -516,19 +512,19 @@ class GridPoint(QGraphicsEllipseItem):
         """
         # return QGraphicsEllipseItem.mousePressEvent(self, event)
         return self.grid.part_item.mousePressEvent(event)
-        part_item = self.grid.part_item
-        tool = part_item._getActiveTool()
-        controller = part_item.document().controller()
-
-        if tool.FILTER_NAME not in part_item.part().document().filter_set:
-            controller.showFilterHints(True, filter_name='virtual_helix')
-            # return
-        else:  # the filter is correct, tool is wrong
-            controller.showToolHints(True, tool_name='create')
-        part = part_item.part()
-        part.setSelected(True)
-        alt_event = GridEvent(self, self.offset)
-        tool.selectOrSnap(part_item, alt_event, event)
+#        part_item = self.grid.part_item
+#        tool = part_item._getActiveTool()
+#        controller = part_item.document().controller()
+#
+#        if tool.FILTER_NAME not in part_item.part().document().filter_set:
+#            controller.showFilterHints(True, filter_name='virtual_helix')
+#            # return
+#        else:  # the filter is correct, tool is wrong
+#            controller.showToolHints(True, tool_name='create')
+#        part = part_item.part()
+#        part.setSelected(True)
+#        alt_event = GridEvent(self, self.offset)
+#        tool.selectOrSnap(part_item, alt_event, event)
     # end def
 
     def selectToolMouseMove(self, tool, part_item, event):
@@ -568,6 +564,13 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
+        coordinate_string = '(%s, %s)' % HoneycombDnaPart.positionToLatticeCoord(part_item.part().radius(),
+                                                                                 event.scenePos().x(),
+                                                                                 event.scenePos().y(),
+                                                                                 scale_factor=part_item.scale_factor)
+        position_string = '(%s, %s)' % (event.scenePos().x(), event.scenePos().y())
+
+        part_item.updateStatusBar('%s - %s' % (coordinate_string, position_string))
         part_item.createToolHoverMove(tool, event)
     # end def
 
