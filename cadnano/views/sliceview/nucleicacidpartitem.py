@@ -1069,7 +1069,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                             position_xy[1],
                                                             self.scale_factor)
             hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
-            self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
+            self.griditem.showCreateHint(hint_coord, next_idnums=(i+id_offset, i+id_offset))
             self._highlighted_copypaste.append(hint_coord)
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
@@ -1104,7 +1104,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                                                  scale_factor=self.scale_factor):
             return
         else:
-            self._last_hovered_coord == hover_coordinates
+            self._last_hovered_coord = hover_coordinates
             self.removeAllCopyPasteHints()
 
         parity = self._getCoordinateParity(hover_coordinates[0], hover_coordinates[1])
@@ -1133,7 +1133,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                             position_xy[1],
                                                             self.scale_factor)
             hint_coord = (hover_coordinates[0]+(copied_row-min_row), hover_coordinates[1]+(copied_col-min_col))
-            self.griditem.showCreateHint(hint_coord, next_idnums=(vh_id+id_offset, vh_id+id_offset))
+            self.griditem.showCreateHint(hint_coord, next_idnums=(i+id_offset, i+id_offset))
             self._highlighted_copypaste.append(hint_coord)
 
         # This is going to give us the difference between hovering and the min parity location.  We want the
