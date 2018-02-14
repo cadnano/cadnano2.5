@@ -170,7 +170,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
+def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, ignore_neighbors=False):
     """
     Use this to duplicate virtual_helices within a Part. Duplicate id_nums
     will start numbering `part.getMaxIdNum()` rather than the lowest available
@@ -206,9 +206,16 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
         vals[name_index] = new_id_num
+        if ignore_neighbors:
+            try:
+                ignore_index = keys.index('neighbors')
+                fixed_keys = keys[:ignore_index] + keys[ignore_index + 1:]
+                fixed_vals = vals[:ignore_index] + vals[ignore_index + 1:]
+            except ValueError:
+                pass
         part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
                                 id_num=new_id_num,
-                                properties=(keys, vals),
+                                properties=(fixed_keys, fixed_vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
         new_vh_id_set.add(new_id_num)
