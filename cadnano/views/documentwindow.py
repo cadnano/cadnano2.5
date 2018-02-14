@@ -276,7 +276,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         # self.action_grid.setChecked(console_visible)
         inspector_visible = self.inspector_dock_widget.isVisibleTo(self)
         self.action_inspector.setChecked(inspector_visible)
-        path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
+        path_visible = self.path_dock_widget.isVisibleTo(self)
         self.action_path.setChecked(path_visible)
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
