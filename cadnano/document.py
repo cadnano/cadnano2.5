@@ -954,18 +954,7 @@ class Document(CNObject):
         return seq, name
     # end def
 
-    def getOrthoViewType(self):
-        """
-        Get the current SliceView type
-
-        Returns:
-            The current SliceView type
-        """
-        if self.controller():
-            return self.controller().getOrthoViewType()
-    # end def
-
-    def setOrthoViewType(self, ortho_view_type):
+    def setSliceOrGridViewVisible(self, value):
         """
         Set the current SliceView type
 
@@ -973,8 +962,8 @@ class Document(CNObject):
             None
         """
         if self.controller():
-            return self.controller().setOrthoViewType(ortho_view_type=ortho_view_type)
-    # end def
+            return self.controller().setSliceOrGridViewVisible(value)
+#    # end def
 
     def getGridType(self):
         """

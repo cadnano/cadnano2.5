@@ -43,7 +43,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def distanceFromClosestLatticeCoord(x, y, radius, scale_factor=1.0):
+    def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
         column_guess = x/(radius*root3)
         row_guess = -(y - radius*2)/(radius*3)
 
@@ -56,24 +56,24 @@ class HoneycombDnaPart(object):
         for row in possible_rows:
             for column in possible_columns:
                 guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column, scale_factor)
-                squared_distance = (guess_x-x)**2 + (guess_y-y)**2
+                squared_distance = abs(guess_x-x)**2 + abs(guess_y-y)**2
                 distance = sqrt(squared_distance)
 
                 if distance < shortest_distance:
                     best_guess = (row, column)
                     shortest_distance = distance
-
         return (shortest_distance, best_guess)
     # end def
 
     @staticmethod
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
         """Convert legacy row,column coordinates to latticeXY."""
-        x = (column)*radius*root3
-        if HoneycombDnaPart.isEvenParity(row, column):   # odd parity
-            y = -row*radius*3 + radius
-        else:                               # even parity
-            y = -row*radius*3
+        x = column*radius*root3
+        y_offset = radius
+        if HoneycombDnaPart.isEvenParity(row, column):
+            y = -row*radius*3. + radius + y_offset
+        else:
+            y = -row*radius*3. + y_offset
         # Make sure radius is a float
         return scale_factor*x, scale_factor*y
     # end def
@@ -84,15 +84,16 @@ class HoneycombDnaPart(object):
         x = column*radius*root3*scale_factor
         y_offset = radius
         if HoneycombDnaPart.isEvenParity(row, column):
-            y = (row*radius*3. + radius + y_offset)*scale_factor  # even parity
+            y = (row*radius*3. + radius + y_offset)*scale_factor
         else:
-            y = (row*radius*3. + y_offset)*scale_factor  # odd parity
+            y = (row*radius*3. + y_offset)*scale_factor
         return x, y
     # end def
 
     @staticmethod
     def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
         return HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+    # end def
 
     @staticmethod
     def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
@@ -229,7 +230,7 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def distanceFromClosestLatticeCoord(x, y, radius, scale_factor=1.0):
+    def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
         column_guess = x/(2*radius)
         row_guess = y/(2*radius)
 

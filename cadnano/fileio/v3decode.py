@@ -13,20 +13,15 @@ def decode(document, obj, emit_signals=False):
         obj (dict): deserialized file object
     """
     obj.get('name')
-    meta = obj.get('meta', {})
-
-    # TODO[NF]:  Use a constant here
-    ortho_view_type = meta.get('ortho_view_type')
-
-    # This assumes that the lattice without a specified grid type is a honeycomb lattice
-    grid_type = meta.get('grid_type', GridType.HONEYCOMB)
 
     for part_dict in obj['parts']:
+        grid_type = determineLatticeType(part_dict)
+
+        ortho_view_type = determineOrthoViewType(part_dict, grid_type)
+        document.setSliceOrGridViewVisible(value=ortho_view_type)
+
         decodePart(document, part_dict, grid_type=grid_type,
                    emit_signals=emit_signals)
-
-        if ortho_view_type is None:
-            ortho_view_type = determineOrthoViewType(document, part_dict, grid_type)
 
     modifications = obj['modifications']
 
@@ -36,14 +31,10 @@ def decode(document, obj, emit_signals=False):
         for key in ext_locations:
             part, strand, idx = document.getModStrandIdx(key)
             part.addModStrandInstance(strand, idx, mod_id)
-
-    # This can be None if the encode did encode with a GUI
-    if ortho_view_type and ortho_view_type != 'None':
-        document.setOrthoViewType(ortho_view_type=ortho_view_type)
 # end def
 
 
-def determineOrthoViewType(document, part_dict, grid_type):
+def determineOrthoViewType(part_dict, grid_type):
     THRESHOLD = 0.0005
     vh_id_list = part_dict.get('vh_list')
     origins = part_dict.get('origins')
@@ -52,15 +43,62 @@ def determineOrthoViewType(document, part_dict, grid_type):
         vh_x, vh_y = origins[vh_id]
 
         if grid_type is GridType.HONEYCOMB:
-            distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)
+            distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)
             if distance > THRESHOLD:
                 return OrthoViewType.GRID
         elif grid_type is GridType.SQUARE:
-            if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
+            if SquareDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)[0] > THRESHOLD:
                 return OrthoViewType.GRID
     return OrthoViewType.SLICE
 # end def
 
+def determineLatticeType(part_dict):
+    """
+    Guess the lattice type based on the sum of the vector distances between
+    VHs and the closest lattice position.
+
+
+    Args:
+        part_dict (dict):  the dict corresponding to the part to be imported
+
+    Returns:
+        GridType.HONEYCOMB or GridType.SQUARE
+    """
+    vh_id_list = part_dict.get('vh_list')
+    origins = part_dict.get('origins')
+
+    square_delta_x = 0.
+    square_delta_y = 0.
+
+    honeycomb_delta_x = 0.
+    honeycomb_delta_y = 0.
+
+    for vh_id, _ in vh_id_list:
+        vh_x, vh_y = origins[vh_id]
+        hcd, honeycomb_guess_coordinates = HoneycombDnaPart.distanceFromClosestLatticeCoord(DEFAULT_RADIUS, vh_x, vh_y)
+        sqd, square_guess_coordinates = SquareDnaPart.distanceFromClosestLatticeCoord(DEFAULT_RADIUS, vh_x, vh_y)
+
+        honeycomb_guess_x, honeycomb_guess_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS,
+                                                                                                 honeycomb_guess_coordinates[0],
+                                                                                                 honeycomb_guess_coordinates[1])
+        square_guess_x, square_guess_y = SquareDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS,
+                                                                                        square_guess_coordinates[0],
+                                                                                        square_guess_coordinates[1])
+
+        honeycomb_delta_x += (vh_x - honeycomb_guess_x)
+        honeycomb_delta_y += (vh_y - honeycomb_guess_y)
+
+        square_delta_x += (vh_x - square_guess_x)
+        square_delta_y += (vh_y - square_guess_y)
+
+    sum_honeycomb_distance = (honeycomb_delta_x**2 + honeycomb_delta_y**2)**0.5
+    sum_square_distance = (square_delta_x**2 + square_delta_y**2)**0.5
+
+    if abs(sum_honeycomb_distance) < abs(sum_square_distance):
+        return GridType.HONEYCOMB
+    else:
+        return GridType.SQUARE
+# end def
 
 def decodePart(document, part_dict, grid_type, emit_signals=False):
     """ Decode a a deserialized Part dictionary
@@ -115,7 +153,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
                 rev_strand_set.createDeserializedStrand(low_idx, high_idx, color,
                                                         use_undostack=False)
             part.refreshSegments(id_num)   # update segments
-    # end def
+    # end for
 
     xovers = part_dict['xovers']
     for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
@@ -125,6 +163,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
                          to_strand, to_idx,
                          update_oligo=False,
                          use_undostack=False)
+    # end for
 
     RefreshOligosCommand(part).redo()
     for oligo in part_dict['oligos']:
@@ -138,6 +177,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
         # this_oligo.applyColor(color, use_undostack=False)
         if sequence is not None:
             this_oligo.applySequence(sequence, use_undostack=False)
+    # end for
 
     # INSERTIONS, SKIPS
     for id_num, idx, length in part_dict['insertions']:
@@ -150,6 +190,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
         else:
             ins = 'Insertion' if length > 0 else 'Skip'
             print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
+    # end for
 
     # TODO fix this to set position
     # instance_props = part_dict['instance_properties']    # list
