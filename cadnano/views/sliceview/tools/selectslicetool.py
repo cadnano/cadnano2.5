@@ -40,7 +40,7 @@ class SelectSliceTool(AbstractSliceTool):
     """Handles SelectTool operations in the Slice view
 
     Attributes:
-        clip_board (TYPE): Description
+        clipboard (TYPE): Description
         group (TYPE): Description
         individual_pick (bool): Description
         is_selection_active (bool): Description
@@ -64,7 +64,7 @@ class SelectSliceTool(AbstractSliceTool):
         self.is_selection_active = False
         self.individual_pick = False
         self.snap_origin_item = None
-        self.clip_board = None
+        self.clipboard = None
     # end def
 
     def __repr__(self):
@@ -355,7 +355,8 @@ class SelectSliceTool(AbstractSliceTool):
         """
         part_instance = self.part_item.partInstance()
         copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
-        self.clip_board = copy_dict
+        print(self.selection_set)
+        self.clipboard = copy_dict
     # end def
 
     def pasteClipboard(self):
@@ -364,14 +365,20 @@ class SelectSliceTool(AbstractSliceTool):
         Returns:
             TYPE: Description
         """
+        if not self.part_item:
+            print('[SST ] Part item is none')
+            return
         doc = self.manager.document
         part = self.part_item.part()
         part_instance = self.part_item.partInstance()
+        offset = self.part_item.copypaste_origin_offset
         doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part_instance, self.clip_board)
+        new_vh_set = v3decode.importToPart(part_instance, self.clipboard, offset, ignore_neighbors=True)
         doc.undoStack().endMacro()
         self.modelClear()
-        doc.addVirtualHelicesToSelection(part, new_vh_set)
+        self.clipboard = None
+        # doc.addVirtualHelicesToSelection(part, new_vh_set)
+        return new_vh_set
     # end def
 
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
@@ -383,7 +390,7 @@ class SelectSliceTool(AbstractSliceTool):
             finalize (TYPE): Description
             use_undostack (bool, optional): Description
         """
-        #print("moveSelection: {}, {}".format(dx, dy))
+        # print("moveSelection: {}, {}".format(dx, dy))
         part_item = self.part_item
         sf = part_item.scaleFactor()
         part = part_item.part()
@@ -420,16 +427,26 @@ class SelectSliceTool(AbstractSliceTool):
         if len(self.selection_set) > 0:
             sgv = self.sgv
             menu = QMenu(sgv)
-            copy_act = QAction("copy selection", sgv)
-            copy_act.setStatusTip("copy selection")
+            copy_act = QAction("Copy selection", sgv)
+            copy_act.setStatusTip("Copy selection")
             copy_act.triggered.connect(self.copySelection)
             menu.addAction(copy_act)
-            if self.clip_board:
-                copy_act = QAction("paste", sgv)
-                copy_act.setStatusTip("paste from clip board")
+            if self.clipboard:
+                copy_act = QAction("Paste", sgv)
+                copy_act.setStatusTip("Paste from clipboard")
                 copy_act.triggered.connect(self.pasteClipboard)
                 menu.addAction(copy_act)
+            menu.aboutToShow.connect(self.lockHints)
+            menu.aboutToHide.connect(self.unlockHints)
             menu.exec_(sgv.mapToGlobal(point))
+    # end def
+
+    def lockHints(self):
+        self.part_item.lock_hints = True
+    # end def
+
+    def unlockHints(self):
+        self.part_item.lock_hints = False
     # end def
 # end class
 
