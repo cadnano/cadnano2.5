@@ -43,8 +43,7 @@ class DocumentController(object):
         self.fileopendialog = None
         self.filesavedialog = None
 
-#        self.settings = QSettings("cadnano.org", "cadnano2.5")
-        self.settings = QSettings("69bfae41ee5e33c689fded70c89cc64c", "69bfae41ee5e33c689fded70c89cc64c")
+        self.settings = QSettings("cadnano.org", "cadnano2.5")
         self._readSettings()
 
         self._hintable_tools = []  # filters that display alt icon when disabled
@@ -678,7 +677,9 @@ class DocumentController(object):
         assert isinstance(show, bool)
 
         slice_view_widget = self.win.slice_dock_widget
+        path_view_widget = self.win.path_dock_widget
         if show:
+            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
             self.win.action_slice.setChecked(True)
             self.slice_view_showing = True
             slice_view_widget.show()
@@ -700,7 +701,9 @@ class DocumentController(object):
         assert isinstance(show, bool)
 
         grid_view_widget = self.win.grid_dock_widget
+        path_view_widget = self.win.path_dock_widget
         if show:
+            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
             self.win.action_slice.setChecked(True)
             self.grid_view_showing = True
             grid_view_widget.show()

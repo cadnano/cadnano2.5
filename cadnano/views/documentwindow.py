@@ -271,8 +271,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         The console visibility is explicitly stored in the settings file,
         since it doesn't seem to work if we treat it like a normal dock widget.
         """
-        # grid_visible = self.slice_dock_widget.isVisible()
-        # self.action_grid.setChecked(console_visible)
         inspector_visible = self.inspector_dock_widget.isVisibleTo(self)
         self.action_inspector.setChecked(inspector_visible)
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
