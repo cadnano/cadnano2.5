@@ -43,7 +43,8 @@ class DocumentController(object):
         self.fileopendialog = None
         self.filesavedialog = None
 
-        self.settings = QSettings("cadnano.org", "cadnano2.5")
+#        self.settings = QSettings("cadnano.org", "cadnano2.5")
+        self.settings = QSettings("69bfae41ee5e33c689fded70c89cc64c", "69bfae41ee5e33c689fded70c89cc64c")
         self._readSettings()
 
         self._hintable_tools = []  # filters that display alt icon when disabled
@@ -61,7 +62,6 @@ class DocumentController(object):
 
         self.slice_view_showing = True
         self.grid_view_showing = False
-        self.exit_when_done = False
 
         self.exit_when_done = False
 
@@ -621,11 +621,19 @@ class DocumentController(object):
     # end def
 
     def actionToggleSliceViewSlot(self):
-        dock_window = self.win.slice_dock_widget
-        if dock_window.isVisible():
-            dock_window.hide()
+        """Handle the action_slice button being clicked.
+
+        If either the slice or grid view are visible hide them.  Else, revert
+        to showing whichever view(s) are showing.
+        """
+        if self.win.slice_dock_widget.isVisible() or self.win.grid_dock_widget.isVisible():
+            self.win.slice_dock_widget.hide()
+            self.win.grid_dock_widget.hide()
         else:
-            dock_window.show()
+            if self.slice_view_showing:
+                self.win.slice_dock_widget.show()
+            if self.grid_view_showing:
+                self.win.grid_dock_widget.show()
     # end def
 
     def actionTogglePathViewSlot(self):
@@ -657,42 +665,48 @@ class DocumentController(object):
     # end def
 
     def toggleSliceView(self, show):
-        """Hide or show the slice view based on the given parameter `show`
+        """Hide or show the slice view based on the given parameter `show`.
+
+        Since calling this method where show=True will cause the SliceView to
+        show, ensure that the action_slice button is checked if applicable.
 
         Args:
             show (bool): Whether the slice view should be hidden or shown
 
         Returns: None
         """
+        assert isinstance(show, bool)
+
         slice_view_widget = self.win.slice_dock_widget
-        slice_view = self.win.slice_graphics_view
         if show:
+            self.win.action_slice.setChecked(True)
             self.slice_view_showing = True
             slice_view_widget.show()
-            slice_view.show()
         else:
             self.slice_view_showing = False
             slice_view_widget.hide()
-            slice_view.hide()
 
     def toggleGridView(self, show):
         """Hide or show the grid view based on the given parameter `show`
+
+        Since calling this method where show=True will cause the SliceView to
+        show, ensure that the action_slice button is checked if applicable.
 
         Args:
             show (bool): Whether the grid view should be hidden or shown
 
         Returns: None
         """
+        assert isinstance(show, bool)
+
         grid_view_widget = self.win.grid_dock_widget
-        grid_view = self.win.grid_graphics_view
         if show:
+            self.win.action_slice.setChecked(True)
             self.grid_view_showing = True
             grid_view_widget.show()
-            grid_view.show()
         else:
             self.grid_view_showing = False
             grid_view_widget.hide()
-            grid_view.hide()
 
     ### ACCESSORS ###
     def document(self):
