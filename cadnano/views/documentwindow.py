@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.mainwindow import ui_mainwindow
+from cadnano.proxies.cnenum import OrthoViewType
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -62,7 +63,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
         self.setCentralWidget(None)
-        self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        if app().prefs.orthoview_idx == OrthoViewType.SLICE:
+            self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        elif app().prefs.orthoview_idx == OrthoViewType.GRID:
+            self.splitDockWidget(self.grid_dock_widget, self.path_dock_widget, Qt.Horizontal)
         self._restoreGeometryandState()
         self._finishInit()
 

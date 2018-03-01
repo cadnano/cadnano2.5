@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridType, SliceViewType
+from cadnano.proxies.cnenum import GridType
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -58,9 +58,6 @@ class DocumentController(object):
         # call other init methods
         self._initWindow()
         app().document_controllers.add(self)
-
-        self.slice_view_showing = True
-        self.grid_view_showing = False
 
         self.exit_when_done = False
 
@@ -663,6 +660,17 @@ class DocumentController(object):
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
+    def setSliceOrGridViewVisible(self, value):
+        if value == 'legacy':
+            self.toggleSliceView(True)
+            self.toggleGridView(False)
+        elif value == 'grid':
+            self.toggleSliceView(False)
+            self.toggleGridView(True)
+        else:
+            raise ValueError('Invalid slice/grid view value: %s' % value)
+    # end def
+
     def toggleSliceView(self, show):
         """Hide or show the slice view based on the given parameter `show`.
 
@@ -686,6 +694,7 @@ class DocumentController(object):
         else:
             self.slice_view_showing = False
             slice_view_widget.hide()
+    # end def
 
     def toggleGridView(self, show):
         """Hide or show the grid view based on the given parameter `show`
@@ -710,6 +719,7 @@ class DocumentController(object):
         else:
             self.grid_view_showing = False
             grid_view_widget.hide()
+    # end def
 
     ### ACCESSORS ###
     def document(self):
@@ -1032,35 +1042,3 @@ class DocumentController(object):
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
-
-    def getSliceViewType(self):
-        # TODO[NF]:  Make these strings global constants
-        if self.slice_view_showing and self.grid_view_showing:
-            return SliceViewType.BOTH
-        elif self.slice_view_showing and not self.grid_view_showing:
-            return SliceViewType.SLICE
-        elif not self.slice_view_showing and self.grid_view_showing:
-            return SliceViewType.GRID
-        else:
-            raise NotImplementedError
-
-    def setSliceViewType(self, slice_view_type):
-        if slice_view_type not in (SliceViewType.BOTH, SliceViewType.SLICE, SliceViewType.GRID):
-            # logger.error('slice_view_type is invalid:  %s' % slice_view_type)
-            print('slice_view_type is invalid:  %s' % slice_view_type)
-
-        if slice_view_type == SliceViewType.BOTH:
-            self.grid_view_showing = True
-            self.toggleGridView(show=True)
-            self.slice_view_showing = True
-            self.toggleSliceView(show=True)
-        elif slice_view_type == SliceViewType.SLICE:
-            self.grid_view_showing = False
-            self.toggleGridView(show=False)
-            self.slice_view_showing = True
-            self.toggleSliceView(show=True)
-        elif slice_view_type == SliceViewType.GRID:
-            self.grid_view_showing = True
-            self.toggleGridView(show=True)
-            self.slice_view_showing = False
-            self.toggleSliceView(show=False)

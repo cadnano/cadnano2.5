@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 
 PREFS_GROUP_NAME = 'Preferences'
-SLICEVIEWS = ('legacy', 'grid', 'dual')
+ORTHOVIEWS = ('legacy', 'grid')
 ORTHOVIEW_KEY = 'EnabledOrthoView'
 ORTHOVIEW_DEFAULT = 0  # legacy idx
 GRIDVIEW_STYLES = ('points', 'points and lines')
@@ -118,18 +118,8 @@ class Preferences(object):
         self.qs.setValue(ORTHOVIEW_KEY, value)
         self.qs.endGroup()
 
-        value = SLICEVIEWS[self.sliceview_idx]
-        if value == 'legacy':
-            self.document.controller().toggleSliceView(True)
-            self.document.controller().toggleGridView(False)
-        elif value == 'grid':
-            self.document.controller().toggleSliceView(False)
-            self.document.controller().toggleGridView(True)
-        elif value == 'dual':
-            self.document.controller().toggleSliceView(True)
-            self.document.controller().toggleGridView(True)
-        else:
-            raise ValueError('Invalid slice view value: %s' % value)
+        value = ORTHOVIEWS[self.orthoview_idx]
+        self.document.controller().setSliceOrGridViewVisible(value)
 
     def setShowIconLabels(self, value):
         self.show_icon_labels = value
