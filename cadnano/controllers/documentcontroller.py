@@ -186,6 +186,7 @@ class DocumentController(object):
     # end def
 
     def actionCreateForkSlot(self):
+        self._document.clearAllSelected()
         win = self.win
         win.action_vhelix_create.trigger()
         win.action_path_create.trigger()

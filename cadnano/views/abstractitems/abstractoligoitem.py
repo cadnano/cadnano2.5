@@ -15,4 +15,7 @@ class AbstractOligoItem(object):
 
     def oligoPropertyChangedSlot(self, property_key, new_value):
         pass
+
+    def oligoSelectedChangedSlot(self, oligo, new_value):
+        pass
 # end class

@@ -22,6 +22,14 @@ class SplitCommand(UndoCommand):
         super(SplitCommand, self).__init__("split strand")
         # Store inputs
         self._old_strand = strand
+        # TODO possibly implement selection preserving
+        # doc = strand.document()
+        # self.was_selected = was_selected = doc.isModelStrandSelected(strand)
+        # if was_selected:
+        #     self.select_values = doc.getSelectedStrandValue(strand)
+        # else:
+        #     self.select_values = (None, None)
+
         old_sequence = strand._sequence
         is5to3 = strand.isForward()
 
@@ -145,6 +153,13 @@ class SplitCommand(UndoCommand):
         o_strand.strandRemovedSignal.emit(o_strand)
         ss.strandsetStrandAddedSignal.emit(ss, s_high)
         ss.strandsetStrandAddedSignal.emit(ss, s_low)
+        # if self.was_selected:
+        #     print("WAS SELECTED")
+        #     doc = ss.document()
+        #     select_values = self.select_values
+        #     doc.addStrandToSelection(s_low, select_values)
+        #     doc.addStrandToSelection(s_high, select_values)
+        #     doc.updateStrandSelection()
     # end def
 
     def undo(self):
@@ -194,5 +209,9 @@ class SplitCommand(UndoCommand):
         s_high.strandRemovedSignal.emit(s_high)
         ss.strandsetStrandAddedSignal.emit(ss, o_strand)
         ss.part().reemitActiveVirtualHelix() # emit last to ensure colors of ticks are correct
+        # if self.was_selected:
+        #     doc = ss.document()
+        #     doc.addStrandToSelection(o_strand, self.select_values)
+        #     doc.updateStrandSelection()
     # end def
 # end class

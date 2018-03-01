@@ -15,7 +15,7 @@ from PyQt5.QtGui import QColor, QFont, QPalette, QPixmap
 from PyQt5.QtWidgets import QAbstractItemView, QAction
 from PyQt5.QtWidgets import QColorDialog, QHeaderView
 from PyQt5.QtWidgets import QLineEdit, QMenu
-from PyQt5.QtWidgets import QTreeWidget, QTreeView
+from PyQt5.QtWidgets import QTreeWidget, QTreeView, QTreeWidgetItemIterator
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
@@ -28,6 +28,7 @@ from cadnano.controllers.viewrootcontroller import ViewRootController
 from cadnano import util
 
 from .cnoutlineritem import NAME_COL, LOCKED_COL, VISIBLE_COL, COLOR_COL
+from .cnoutlineritem import LEAF_FLAGS, DISABLE_FLAGS, ROOT_FLAGS
 from .nucleicacidpartitem import OutlineNucleicAcidPartItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 from .oligoitem import OutlineOligoItem
@@ -112,17 +113,22 @@ class OutlinerTreeWidget(QTreeWidget):
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
+
+        # NOTE: prevent selection when select is not pressed
+        is_not_select_tool = not self._window.action_global_select.isChecked()
+
         document = self._document
         # print("!!!!!!!!filter", len(selected_items), len(deselected_items))
         if self.selection_filter_disabled:
             return
-        filter_set = self._document.filter_set
+        filter_set = document.filter_set
+        filter_set.add('part')
         out_deselection = []
         out_selection = []
         flags = QItemSelectionModel.Current | QItemSelectionModel.Deselect
         for index in selected_items.indexes():
             item = self.itemFromIndex(index)
-            if item.FILTER_NAME not in filter_set:
+            if is_not_select_tool or item.FILTER_NAME not in filter_set:
                 if index.column() == 0:
                     # print("deselect", item.FILTER_NAME, filter_set,
                     #                     index.row(), index.column())
@@ -148,15 +154,13 @@ class OutlinerTreeWidget(QTreeWidget):
             # print("could deselect?", self.itemFromIndex(idx))
             item = self.itemFromIndex(idx)
             if item not in tbd and item.isModelSelected(document):
-                # print("did deselect", item)
                 tbd.add(item)
+        self.processSelections(deselect_only=True)
     # end def
 
     def itemClickedHandler(self, tree_widget_item, column):
         # print("I'm click", tree_widget_item.__class__.__name__,
         #       tree_widget_item.isSelected())
-        document = self._document
-        model_to_be_selected, model_to_be_deselected = self.model_selection_changes
         # print("click column", column)
 
         # 1. handle clicks on check marks to speed things up over using an editor
@@ -176,32 +180,38 @@ class OutlinerTreeWidget(QTreeWidget):
            tree_widget_item.FILTER_NAME not in filter_set:
             rect = self.visualItemRect(tree_widget_item)
             QToolTip.showText(self.mapToGlobal(rect.center()), "Change filter to select")
+            return
+        self.processSelections()
+    # end def
 
+    def processSelections(self, deselect_only=False):
+        """ Process selections.  We need this because itemClicked doesn't get called
+        when clicking off of a QTreeWidgetItem in the QTreeWidget and triggers
+        a deselection
+        we may be able to call this in a mousePressEvent instead of in
+        selectionFilter at all.  That is a TODO or a TBD, to figure out signaling
+        order
+
+        Args:
+            deselect_only (bool, optional): default is False.  Allows a
+                deselection to occur when clicking off an item in the outlineview
+                since no itemClicked will occur
+        """
+        document = self._document
+        model_to_be_selected, model_to_be_deselected = self.model_selection_changes
         # 2. handle document selection
         # self.blockSignals(True)
-        if isinstance(tree_widget_item, OutlineNucleicAcidPartItem):
-            pass
-        elif isinstance(tree_widget_item, OutlineVirtualHelixItem):
+        if deselect_only:
             for item in model_to_be_selected:
-                if isinstance(item, OutlineVirtualHelixItem):
-                    id_num, part = item.idNum(), item.part()
-                    is_selected = document.isVirtualHelixSelected(part, id_num)
-                    # print("select id_num", id_num, is_selected)
-                    if not is_selected:
-                        # print("selecting vh", id_num)
-                        document.addVirtualHelicesToSelection(part, [id_num])
-            model_to_be_selected.clear()
-            for item in model_to_be_deselected:
-                if isinstance(item, OutlineVirtualHelixItem):
-                    id_num, part = item.idNum(), item.part()
-                    is_selected = document.isVirtualHelixSelected(part, id_num)
-                    # print("de id_num", id_num, is_selected)
-                    if is_selected:
-                        # print("deselecting vh", id_num)
-                        document.removeVirtualHelicesFromSelection(part, [id_num])
-            model_to_be_deselected.clear()
-        elif isinstance(tree_widget_item, OutlineOligoItem):
-            for item in model_to_be_selected:
+                if isinstance(item, OutlineNucleicAcidPartItem):
+                    pass
+                elif isinstance(item, OutlineVirtualHelixItem):
+                        id_num, part = item.idNum(), item.part()
+                        is_selected = document.isVirtualHelixSelected(part, id_num)
+                        # print("select id_num", id_num, is_selected)
+                        if not is_selected:
+                            # print("selecting vh", id_num)
+                            document.addVirtualHelicesToSelection(part, [id_num])
                 if isinstance(item, OutlineOligoItem):
                     m_oligo = item.cnModel()
                     is_selected = document.isOligoSelected(m_oligo)
@@ -209,14 +219,23 @@ class OutlinerTreeWidget(QTreeWidget):
                         # print("selecting", m_oligo)
                         document.selectOligo(m_oligo)
             model_to_be_selected.clear()
-            for item in model_to_be_deselected:
-                if isinstance(item, OutlineOligoItem):
-                    m_oligo = item.cnModel()
-                    is_selected = document.isOligoSelected(m_oligo)
-                    if is_selected:
-                        # print("deselecting", m_oligo)
-                        document.deselectOligo(m_oligo)
-            model_to_be_deselected.clear()
+        for item in model_to_be_deselected:
+            if isinstance(item, OutlineNucleicAcidPartItem):
+                pass
+            elif isinstance(item, OutlineVirtualHelixItem):
+                id_num, part = item.idNum(), item.part()
+                is_selected = document.isVirtualHelixSelected(part, id_num)
+                # print("de id_num", id_num, is_selected)
+                if is_selected:
+                    # print("deselecting vh", id_num)
+                    document.removeVirtualHelicesFromSelection(part, [id_num])
+            elif isinstance(item, OutlineOligoItem):
+                m_oligo = item.cnModel()
+                is_selected = document.isOligoSelected(m_oligo)
+                if is_selected:
+                    # print("deselecting", m_oligo)
+                    document.deselectOligo(m_oligo)
+        model_to_be_deselected.clear()
         # end if
         # self.blockSignals(False)
     # end def
@@ -372,141 +391,11 @@ class OutlinerTreeWidget(QTreeWidget):
             if x.parent() != dest_parent:
                 return
 
-        # res = self.myDropEvent(event, dest_item)
+        res = QTreeWidget.dropEvent(self, event)
         if isinstance(dest_item, OutlineVirtualHelixItem):
             part = dest_item.part()
             vhi_list = [dest_parent.child(i) for i in range(dest_parent.childCount())]
             part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
-    # end def
-
-    def myDropEvent(self, event, drop_item):
-        """Workaround for broken QTreeWidget::dropEvent
-        per https://bugreports.qt.io/browse/QTBUG-45320
-        doing reverse ordering of items on dropping. reimplementation in python
-        from C++
-
-        For this code we need dual GPL3 license instead of pure BSD3
-        """
-        if event.source() == self and (event.dropAction() == Qt.MoveAction or
-                                       self.dragDropMode() == QAbstractItemView.InternalMove):
-            droptuple = self.dropOn(event, drop_item)
-            if droptuple is not None:
-                (row, col, drop_index) = droptuple
-                # print("droptuple", droptuple[2].row())
-                idxs = self.selectedIndexes()
-                indexes = []
-                for idx in idxs:
-                    if idx.column() == 0:
-                        indexes.append(idx)
-                if drop_index in indexes:
-                    return
-                # When removing items the drop location could shift
-                new_drop_index = QPersistentModelIndex(self.model().index(row, col, drop_index))
-                # print("updatated drop_row", new_drop_index.row())
-                # Remove the items
-                taken = []
-                for i in range(len(indexes) - 1, -1, -1):
-                    # print("idx", indexes[i].row(), indexes[i].column())
-                    parent = self.itemFromIndex(indexes[i])
-                    if parent is None or parent.parent() is None:
-                        t_item = self.takeTopLevelItem(indexes[i].row())
-                        taken.append(t_item)
-                    else:
-                        t_item = parent.parent().takeChild(indexes[i].row())
-                        taken.append(t_item)
-                # end for
-                # insert them back in at their new positions
-                for i in range(len(indexes)):
-                    # Either at a specific point or appended
-                    if row == -1:
-                        if drop_index.isValid():
-                            parent = self.itemFromIndex(drop_index)
-                            parent.insertChild(parent.childCount(), taken.pop())
-                        else:
-                            self.insertTopLevelItem(self.topLevelItemCount(), taken.pop())
-                    else:
-                        r = new_drop_index.row() if new_drop_index.row() >= 0 else row
-                        if drop_index.isValid():
-                            parent = self.itemFromIndex(drop_index)
-                            parent.insertChild(min(r, parent.childCount()), taken.pop())
-                        else:
-                            self.insertTopLevelItem(min(r, self.topLevelItemCount()), taken.pop())
-                # end for
-
-                event.accept()
-                # Don't want QAbstractItemView to delete it because it was "moved" we already did it
-                event.setDropAction(Qt.CopyAction)
-        QTreeView.dropEvent(self, event)
-    # end def
-
-    def dropOn(self, event, drop_item):
-        """ reimplementation of QAbstractItemViewPrivate::dropOn
-        """
-        if event.isAccepted():
-            return False
-
-        index = self.indexFromItem(drop_item)
-        root = self.rootIndex()
-        # If we are allowed to do the drop
-        if self.model().supportedDropActions() and event.dropAction():
-            row = -1
-            col = -1
-            if index != root:
-                dip = self.dropPosition(event.pos(),
-                                        QTreeView.visualRect(self, index), index)
-                if dip is QAbstractItemView.AboveItem:
-                    row = index.row()
-                    col = index.column()
-                    index = index.parent()
-                elif dip is QAbstractItemView.BelowItem:
-                    row = index.row() + 1
-                    col = index.column()
-                    index = index.parent()
-            else:
-                dip = QAbstractItemView.OnViewport
-
-            drop_index = index
-            drop_row = row
-            drop_col = col
-            self.drop_indicator_position = dip
-            if not self.isDroppingOnItself(event, index, root):
-                return (drop_row, drop_col, drop_index)
-        return None
-    # end def
-
-    def dropPosition(self, pos, rect, index):
-        """ reimplementation of QAbstractItemViewPrivate::position
-        """
-        r = QAbstractItemView.OnViewport
-        margin = 2
-        if pos.y() - rect.top() < margin:
-            r = QAbstractItemView.AboveItem
-        elif rect.bottom() - pos.y() < margin:
-            r = QAbstractItemView.BelowItem
-        elif rect.contains(pos, True):
-            r = QAbstractItemView.OnItem
-
-        if r == QAbstractItemView.OnItem and (not (self.model().flags(index) & Qt.ItemIsDropEnabled)):
-            r = QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QAbstractItemView.BelowItem
-        return r
-    # end def
-
-    def isDroppingOnItself(self, event, index, root_index):
-        """ reimplementation of QAbstractItemViewPrivate::droppingOnItself
-        """
-        drop_action = event.dropAction()
-        if self.dragDropMode() == QAbstractItemView.InternalMove:
-            drop_action = Qt.MoveAction
-        if (event.source() == self and event.possibleActions() & Qt.MoveAction
-                and drop_action == Qt.MoveAction):
-            selected_indexes = self.selectedIndexes()
-            child = index
-            while child.isValid() and child != root_index:
-                if child in selected_indexes:
-                    return True
-                child = child.parent()
-        # end if
-        return False
     # end def
 
     def decodeMimeData(self, bytearray):
@@ -564,8 +453,47 @@ class OutlinerTreeWidget(QTreeWidget):
             raise NotImplementedError
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
-        pass
+    def selectionFilterChangedSlot(self, filter_name_set):
+        '''Disable or enable items if their features are represented
+
+        https://stackoverflow.com/questions/8961449/pyqt-qtreewidget-iterating#8961820
+        '''
+        # print("match")
+        root_check = int(ROOT_FLAGS)
+        disable_check = int(DISABLE_FLAGS)
+        if OutlineVirtualHelixItem.FILTER_NAME in filter_name_set:
+            set_vh_on = True
+        else:
+            set_vh_on = False
+        root_A = self.invisibleRootItem()
+        child_count_A = root_A.childCount()
+        for a in range(child_count_A):
+            root_B = root_A.child(a)
+            # print(root_B.text(0))
+            child_count_B = root_B.childCount()
+            for b in range(child_count_B):
+                root_C = root_B.child(b)
+                root_C_txt = root_C.text(0)
+                root_C_flags = int(root_C.flags())
+                if root_C_txt == 'Virtual Helices':
+                    if not set_vh_on and root_C_flags == root_check:
+                        # print("do disable")
+                        root_C.setFlags(DISABLE_FLAGS)
+                    # else:
+                    #     print("ADSAD", int(root_C.flags()), int(ROOT_FLAGS))
+                    elif set_vh_on and root_C_flags == disable_check:
+                            # print("do enable")
+                            root_C.setFlags(ROOT_FLAGS)
+                elif root_C_txt == 'Oligos':
+                    if set_vh_on and root_C_flags == root_check:
+                        root_C.setFlags(DISABLE_FLAGS)
+                    elif not set_vh_on and root_C_flags == disable_check:
+                        root_C.setFlags(ROOT_FLAGS)
+
+                # child_count_C = root_C.childCount()
+                # for c in range(child_count_C):
+                #     root_D = root_C.child(c)
+                #     print(root_D.text(0))
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -577,7 +505,6 @@ class OutlinerTreeWidget(QTreeWidget):
     # end def
 
     def clearSelectionsSlot(self, doc):
-        # print("clearSelection OutlinerTreeWidget")
         self.selectionModel().clearSelection()
     # end def
 

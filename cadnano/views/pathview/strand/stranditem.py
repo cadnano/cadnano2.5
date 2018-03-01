@@ -206,6 +206,10 @@ class StrandItem(QGraphicsLineItem):
         self._updateSequenceText()
     # end def
 
+    def oligoSelectedChangedSlot(self, oligo, new_value):
+        pass
+    # end def
+
     def strandHasNewOligoSlot(self, strand):
         """Slot for changing the `Oligo` of the model `Strand`
 
