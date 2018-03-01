@@ -361,7 +361,10 @@ class Document(CNObject):
             bool: True if `oligo` is selected otherwise False
         """
         strand5p = oligo.strand5p()
-        return self.isModelStrandSelected(strand5p)
+        for strand in strand5p.generator3pStrand():
+            if self.isModelStrandSelected(strand):
+                return True
+        return False
     # end def
 
     def selectOligo(self, oligo):
@@ -631,14 +634,20 @@ class Document(CNObject):
         For now, individual objects need to emit signals
 
         """
-        oligo_set = set()
+        oligos_selected_set = set()
+        oligos_set = set()
         for obj, value in self._strand_selected_changed_dict.items():
-            oligo_set.add(obj.oligo())
+            oligo = obj.oligo()
+            oligos_set.add(oligo)
+            if True in value:
+                oligos_selected_set.add(oligo)
             obj.strandSelectedChangedSignal.emit(obj, value)
         # end for
-        for oligo in oligo_set:
-            oligo.oligoSelectedChangedSignal.emit(  oligo,
-                                                    self.isOligoSelected(oligo))
+        for oligo in oligos_selected_set:
+            oligo.oligoSelectedChangedSignal.emit(oligo, True)
+        oligos_deselected_set = oligos_set - oligos_selected_set
+        for oligo in oligos_deselected_set:
+            oligo.oligoSelectedChangedSignal.emit(oligo, False)
         self._strand_selected_changed_dict = {}
     # end def
 
