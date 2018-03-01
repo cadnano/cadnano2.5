@@ -3,9 +3,9 @@ from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 
 PREFS_GROUP_NAME = 'Preferences'
-SLICEVIEWS = ('legacy', 'grid', 'dual')
-SLICEVIEW_KEY = 'EnabledSliceview'
-SLICEVIEW_DEFAULT = 0  # legacy idx
+ORTHOVIEWS = ('legacy', 'grid')
+ORTHOVIEW_KEY = 'EnabledOrthoView'
+ORTHOVIEW_DEFAULT = 0  # legacy idx
 GRIDVIEW_STYLES = ('points', 'points and lines')
 GRIDVIEW_STYLE_KEY = 'GridviewStyle'
 GRIDVIEW_STYLE_DEFAULT = 0  # points idx
@@ -33,9 +33,8 @@ class Preferences(object):
     def connectSignals(self):
         self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
         self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
-        self.ui_prefs.enabled_sliceview_combo_box.currentIndexChanged.connect(self.updateEnabledSliceview)
-        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.updateGridviewStyle)
-        # self.ui_prefs.gridview_style_combo_box.activated.connect(self.updateGridviewStyle)
+        self.ui_prefs.enabled_orthoview_combo_box.currentIndexChanged.connect(self.orthoviewChangedSlot)
+        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.gridviewStyleChangedSlot)
         self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
         self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
     # end def
@@ -48,12 +47,13 @@ class Preferences(object):
         """
         self.qs.beginGroup(PREFS_GROUP_NAME)
         self.gridview_style_idx = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
-        self.sliceview_idx = int(self.qs.value(SLICEVIEW_KEY, SLICEVIEW_DEFAULT))   # TODO[NF]:  Investigate QSettings `0` vs `'0'`
+        # TODO[NF]:  Investigate QSettings `0` vs `'0'`
+        self.orthoview_idx = int(self.qs.value(ORTHOVIEW_KEY, ORTHOVIEW_DEFAULT))
         self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
         self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
         self.qs.endGroup()
         self.ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
-        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(self.sliceview_idx)
+        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_idx)
         self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
     # end def
@@ -68,7 +68,7 @@ class Preferences(object):
         self.widget.show()  # launch prefs in mode-less dialog
     # end def
 
-    def updateGridviewStyle(self, index):
+    def gridviewStyleChangedSlot(self, index):
         """Update the grid when the type of grid is changed.
 
         Calls setGridviewStyleIdx and updates each part of the document
@@ -91,10 +91,10 @@ class Preferences(object):
 
     def restoreDefaults(self):
         """Restore the default settings."""
-        gridview_style_idx = GRIDVIEW_STYLES.index(GRIDVIEW_STYLE_DEFAULT)
-        sliceview_idx = GRIDVIEW_STYLES.index(SLICEVIEW_DEFAULT)
+        gridview_style_idx = GRIDVIEW_STYLE_DEFAULT
+        orthoview_idx = ORTHOVIEW_DEFAULT
         self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
-        self.ui_prefs.enabled_sliceview_combo_box.setCurrentIndex(sliceview_idx)
+        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(orthoview_idx)
         self.ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
         self.ui_prefs.show_icon_labels.setChecked(SHOW_ICON_LABELS_DEFAULT)
     # end def
@@ -107,27 +107,19 @@ class Preferences(object):
         self.qs.endGroup()
     # end def
 
-    def updateEnabledSliceview(self, value):
-        """Select whether the slice view, grid view, or both should be
-        displayed.
+    def orthoviewChangedSlot(self, value):
         """
-        self.sliceview_idx = value
+        Handles index changes to enabled_orthoview_combo_box.
+        Saves the setting and notifies the doc controller to toggle
+        visibilty of appropriate 2D orthographic view (sliceview or gridview).
+        """
+        self.orthoview_idx = value
         self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.qs.setValue(SLICEVIEW_KEY, value)
+        self.qs.setValue(ORTHOVIEW_KEY, value)
         self.qs.endGroup()
 
-        value = SLICEVIEWS[self.sliceview_idx]
-        if value == 'legacy':
-            self.document.controller().toggleSliceView(True)
-            self.document.controller().toggleGridView(False)
-        elif value == 'grid':
-            self.document.controller().toggleSliceView(False)
-            self.document.controller().toggleGridView(True)
-        elif value == 'dual':
-            self.document.controller().toggleSliceView(True)
-            self.document.controller().toggleGridView(True)
-        else:
-            raise ValueError('Invalid slice view value: %s' % value)
+        value = ORTHOVIEWS[self.orthoview_idx]
+        self.document.controller().setSliceOrGridViewVisible(value)
 
     def setShowIconLabels(self, value):
         self.show_icon_labels = value

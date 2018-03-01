@@ -940,25 +940,26 @@ class Document(CNObject):
         return seq, name
     # end def
 
-    def getSliceViewType(self):
+    def getOrthoViewType(self):
         """
         Get the current SliceView type
 
         Returns:
             The current SliceView type
         """
-        return self.controller().getSliceViewType()
+        if self.controller():
+            return self.controller().getOrthoViewType()
     # end def
 
-    def setSliceViewType(self, slice_view_type):
+    def setOrthoViewType(self, ortho_view_type):
         """
         Set the current SliceView type
 
         Returns:
             None
         """
-        pass
-        # return self.controller().setSliceViewType(slice_view_type=slice_view_type)
+        if self.controller():
+            return self.controller().setOrthoViewType(ortho_view_type=ortho_view_type)
     # end def
 
     def getGridType(self):
@@ -968,7 +969,7 @@ class Document(CNObject):
         Returns:
             The current Grid type
         """
-        if self.activePart() is not None:
+        if self.activePart():
             return self.activePart().getGridType()
     # end def
 
@@ -979,7 +980,7 @@ class Document(CNObject):
         Returns:
             None
         """
-        if self.activePart() is not None:
+        if self.activePart():
             return self.activePart().setGridType(grid_type)
     # end def
 # end class

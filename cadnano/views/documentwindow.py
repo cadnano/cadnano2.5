@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.mainwindow import ui_mainwindow
+from cadnano.proxies.cnenum import OrthoViewType
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -62,7 +63,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
         self.setCentralWidget(None)
-        self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        if app().prefs.orthoview_idx == OrthoViewType.SLICE:
+            self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        elif app().prefs.orthoview_idx == OrthoViewType.GRID:
+            self.splitDockWidget(self.grid_dock_widget, self.path_dock_widget, Qt.Horizontal)
         self._restoreGeometryandState()
         self._finishInit()
 
@@ -170,7 +174,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.scene_root_item = self.grid_root
         self.grid_graphics_view.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, self.grid_root)
-        self.grid_dock_widget.hide()
     # end def
 
     def _initPathview(self, doc):
@@ -272,8 +275,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         The console visibility is explicitly stored in the settings file,
         since it doesn't seem to work if we treat it like a normal dock widget.
         """
-        # grid_visible = self.slice_dock_widget.isVisible()
-        # self.action_grid.setChecked(console_visible)
         inspector_visible = self.inspector_dock_widget.isVisibleTo(self)
         self.action_inspector.setChecked(inspector_visible)
         path_visible = self.slice_dock_widget.widget().isVisibleTo(self)
