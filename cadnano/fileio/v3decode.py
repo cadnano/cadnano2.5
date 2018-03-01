@@ -2,7 +2,7 @@
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano.proxies.cnenum import GridType, PointType, SliceViewType
+from cadnano.proxies.cnenum import GridType, PointType, OrthoViewType
 
 
 def decode(document, obj, emit_signals=False):
@@ -16,7 +16,7 @@ def decode(document, obj, emit_signals=False):
     meta = obj.get('meta', {})
 
     # TODO[NF]:  Use a constant here
-    slice_view_type = meta.get('slice_view_type')
+    ortho_view_type = meta.get('ortho_view_type')
 
     # This assumes that the lattice without a specified grid type is a honeycomb lattice
     grid_type = meta.get('grid_type', GridType.HONEYCOMB)
@@ -25,8 +25,8 @@ def decode(document, obj, emit_signals=False):
         decodePart(document, part_dict, grid_type=grid_type,
                    emit_signals=emit_signals)
 
-        if slice_view_type is None:
-            slice_view_type = determineSliceViewType(document, part_dict, grid_type)
+        if ortho_view_type is None:
+            ortho_view_type = determineOrthoViewType(document, part_dict, grid_type)
 
     modifications = obj['modifications']
 
@@ -38,12 +38,12 @@ def decode(document, obj, emit_signals=False):
             part.addModStrandInstance(strand, idx, mod_id)
 
     # This can be None if the encode did encode with a GUI
-    if slice_view_type and slice_view_type != 'None':
-        document.setSliceViewType(slice_view_type=slice_view_type)
+    if ortho_view_type and ortho_view_type != 'None':
+        document.setOrthoViewType(ortho_view_type=ortho_view_type)
 # end def
 
 
-def determineSliceViewType(document, part_dict, grid_type):
+def determineOrthoViewType(document, part_dict, grid_type):
     THRESHOLD = 0.0005
     vh_id_list = part_dict.get('vh_list')
     origins = part_dict.get('origins')
@@ -54,11 +54,11 @@ def determineSliceViewType(document, part_dict, grid_type):
         if grid_type is GridType.HONEYCOMB:
             distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)
             if distance > THRESHOLD:
-                return SliceViewType.GRID
+                return OrthoViewType.GRID
         elif grid_type is GridType.SQUARE:
             if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
-                return SliceViewType.GRID
-    return SliceViewType.SLICE
+                return OrthoViewType.GRID
+    return OrthoViewType.SLICE
 # end def
 
 

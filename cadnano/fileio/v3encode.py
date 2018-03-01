@@ -18,7 +18,7 @@ def encodeDocument(document):
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'name': '',
                 'meta': {
-                    'slice_view_type': document.getSliceViewType(),
+                    'ortho_view_type': document.getOrthoViewType(),
                     'grid_type': document.getGridType()
                 },
                 'parts': [],
