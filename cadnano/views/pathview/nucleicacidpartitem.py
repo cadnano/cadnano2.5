@@ -118,7 +118,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         m_b_h.setPen(getNoPen())
         m_b_h.hide()
 
-        self.workplane = PathWorkplaneItem(m_p, self)
         self.hide()  # show on adding first vh
     # end def
 
@@ -277,7 +276,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             if property_key == 'color':
                 for vhi in self._virtual_helix_item_list:
                     vhi.handle().refreshColor()
-                # self.workplane.outline.setPen(getPenObj(new_value, 0))
                 TLx, TLy, BRx, BRy = self._getVHRectCorners()
                 self.reconfigureRect((TLx, TLy), (BRx, BRy))
             elif property_key == 'is_visible':
@@ -290,9 +288,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                 new_list = [vhi_dict[id_num] for id_num in new_value]
                 ztf = False
                 self._setVirtualHelixItemList(new_list, zoom_to_fit=ztf)
-            elif property_key == 'workplane_idxs':
-                if hasattr(self, 'workplane'):
-                    self.workplane.setIdxs(new_idxs=new_value)
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
@@ -600,7 +595,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         else:
             # 1. Temporarily remove children that shouldn't affect size
             outline.setParentItem(None)
-            self.workplane.setParentItem(None)
             self.model_bounds_hint.setParentItem(None)
             self.resize_handle_group.setParentItemAll(None)
             self.prexover_manager.setParentItem(None)
@@ -608,7 +602,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             self.setRect(self.childrenBoundingRect())  # vh_items only
             # 3. Restore children like nothing happened
             outline.setParentItem(self)
-            self.workplane.setParentItem(self)
             self.model_bounds_hint.setParentItem(self)
             self.resize_handle_group.setParentItemAll(self)
             self.prexover_manager.setParentItem(self)
@@ -616,7 +609,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         self.resetPen(self.modelColor(), 0)  # cosmetic
         self.resetBrush(styles.DEFAULT_BRUSH_COLOR, styles.DEFAULT_ALPHA)
-        self.workplane.reconfigureRect((), ())
         self.resize_handle_group.alignHandles(outline.rect())
         return outline.rect()
     # end def

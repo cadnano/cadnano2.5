@@ -786,7 +786,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
         self._model_part = model_part
         self._part_item = part_item
-        self._idx_low, self._idx_high = model_part.getProperty('workplane_idxs')
+
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
         self._moving_via_handle = False

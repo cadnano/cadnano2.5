@@ -224,24 +224,22 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     def createToolMousePress(self, tool, part_item, event):
         shift = event.modifiers() & Qt.ShiftModifier
-        idx_low, idx_high = self._model_part.getProperty('workplane_idxs')
-        idx_low = int(idx_low)
-        idx_high = int(idx_high-1)
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
+        idx_high = fwd_ss.length() - 1
 
         parity = self._id_num % 2
         c = random.choice(pathstyles.STAP_COLORS) if shift else None
 
         if parity:
             if shift:
-                fwd_ss.createStrand(idx_low, idx_high, color=c)
+                fwd_ss.createStrand(0, idx_high, color=c)
             else:
-                rev_ss.createStrand(idx_low, idx_high, color=c)
+                rev_ss.createStrand(0, idx_high, color=c)
         else:
             if shift:
-                rev_ss.createStrand(idx_low, idx_high, color=c)
+                rev_ss.createStrand(0, idx_high, color=c)
             else:
-                fwd_ss.createStrand(idx_low, idx_high, color=c)
+                fwd_ss.createStrand(0, idx_high, color=c)
 
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this

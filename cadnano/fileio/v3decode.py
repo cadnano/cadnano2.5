@@ -163,8 +163,8 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     for key in ['name',
                 'color',
                 'crossover_span_angle',
-                'max_vhelix_length',
-                'workplane_idxs']:
+                'max_vhelix_length'
+                ]:
         value = part_dict[key]
         part.setProperty(key, value, use_undostack=False)
         part.partPropertyChangedSignal.emit(part, key, value)
