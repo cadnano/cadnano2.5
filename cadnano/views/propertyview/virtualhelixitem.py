@@ -31,7 +31,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(VirtualHelixSetItem, self).__init__(**kwargs)
         if self._key == "name":
             for vh in self.cnModelList():
                 self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))

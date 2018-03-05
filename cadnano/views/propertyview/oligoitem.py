@@ -21,7 +21,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(OligoSetItem, self).__init__(**kwargs)
         # print(util.trace(5), "in OligoItem init", cn_model_list)
         if self._key == "name":
             for model_oligo in self.cnModelList():

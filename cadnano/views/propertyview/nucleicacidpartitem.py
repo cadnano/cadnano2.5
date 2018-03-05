@@ -20,7 +20,7 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
             parent (PropertyEditorWidget): The property editor
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(NucleicAcidPartSetItem, self).__init__(**kwargs)
         if self._key == "name":
             for model_part in self.cnModelList():
                 self._controller_list.append(NucleicAcidPartItemController(self, model_part))

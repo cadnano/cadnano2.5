@@ -16,7 +16,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(AbstractPropertyPartSetItem, self).__init__(**kwargs)
     # end def
 
     # SLOTS

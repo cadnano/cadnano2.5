@@ -11,7 +11,7 @@ import pandas as pd
 
 from cadnano import util
 from cadnano.oligo import RemoveOligoCommand
-from cadnano.proxies.cnenum import GridType, PartType, PointType
+from cadnano.proxies.cnenum import GridType, PartType, PointType, EnumType
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.part.part import Part
@@ -3374,11 +3374,11 @@ class NucleicAcidPart(Part):
             yield (id_num, is_fwd, idx, mid)
     # end def
 
-    def getGridType(self):
+    def getGridType(self) -> EnumType:
         # TODO[NF]:  Docstring
         return self._group_properties.get('grid_type')
 
-    def setGridType(self, grid_type):
+    def setGridType(self, grid_type: EnumType):
         # TODO[NF]:  Docstring
         self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
 # end class
