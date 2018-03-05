@@ -222,8 +222,8 @@ class Document(CNObject):
         """ Add `Strand` object to Document selection
 
         Args:
-            strand):
-            value: of the form
+            strand:
+            value: of the form::
 
                 (is low index selected, is high index selected)
 
@@ -243,7 +243,7 @@ class Document(CNObject):
             strand:
 
         Returns:
-            True if successful, False otherwise
+            ``True`` if successful, ``False`` otherwise
         """
         ss = strand.strandSet()
         if ss in self._selection_dict:
@@ -265,8 +265,8 @@ class Document(CNObject):
         going to be in the changed_dict either, so go ahead and add
 
         Args:
-            part:
-            id_nums:
+            part: The Part
+            id_nums: List of virtual helix ID numbers
         """
         selection_dict = self._selection_dict
         if part not in selection_dict:
@@ -579,7 +579,7 @@ class Document(CNObject):
 
         Args:
             delta:
-            use_undostack: optional, default is True
+            use_undostack: optional, default is ``True``
         """
         resize_list = []
         vh_set = set()
@@ -641,7 +641,7 @@ class Document(CNObject):
     # end def
 
     def updateStrandSelection(self):
-        """ do it this way in the future when we have
+        """Do it this way in the future when we have
         a better signaling architecture between views
         For now, individual objects need to emit signals
 
@@ -664,7 +664,7 @@ class Document(CNObject):
     # end def
 
     def resetViews(self):
-        """ This is a fast way to clear selections and the views.
+        """This is a fast way to clear selections and the views.
         We could manually deselect each item from the Dict, but we'll just
         let them be garbage collect
         the dictionary maintains what is selected
@@ -693,7 +693,7 @@ class Document(CNObject):
     # end def
 
     def setViewNames(self, view_name_list: List[str], do_clear: bool = False):
-        """ Tell the model what views the document should support
+        """Tell the model what views the document should support
         Allows non-visible views to be used.
         Intended to be called at application launch only at present.
 
@@ -713,7 +713,7 @@ class Document(CNObject):
                                 use_undostack: bool = True,
                                 grid_type: EnumType = GridType.HONEYCOMB
                             ) -> NucleicAcidPart:
-        """ Create and store a new DnaPart and instance, and return the instance.
+        """Create and store a new DnaPart and instance, and return the instance.
 
         Args:
             use_undostack: optional, defaults to True
@@ -877,7 +877,7 @@ class Document(CNObject):
         return self._mods.get(mid)['props']
     # end def
 
-    def getModLocationsSet(self, mid: str, is_internal: bool) -> Optional[dict]:
+    def getModLocationsSet(self, mid: str, is_internal: bool) -> dict:
         """Get an existing modifications locations in a ``Document``
         (``Part``, Virtual Helix ID, ``Strand``)
 
@@ -886,7 +886,7 @@ class Document(CNObject):
             is_internal:
 
         Returns:
-            dict or None
+            dict
         """
         if is_internal:
             return self._mods[mid]['int_locations']
