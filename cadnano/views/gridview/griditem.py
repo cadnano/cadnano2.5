@@ -1,7 +1,7 @@
 
 from PyQt5.QtCore import Qt, QPointF
 from PyQt5.QtGui import QPainterPath, QColor
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
+from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem, QGraphicsItem
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
@@ -235,7 +235,6 @@ class ClickArea(QGraphicsEllipseItem):
         offset = -0.5*nd + diameter/2
         super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
         self.parent_obj = parent
-        self.setAcceptHoverEvents(True)
         self.setPen(getNoPen())
     # end def
 
@@ -264,7 +263,6 @@ class GridPoint(QGraphicsEllipseItem):
 
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
-        self.setAcceptHoverEvents(True)
     # end def
 
     def mousePressEvent(self, event):

@@ -653,7 +653,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         # 1. get point in model coordinates:
         part = self._model_part
         if alt_event is None:
-            # print()
             pt = tool.eventToPosition(self, event)
             # print("reg_event", pt)
         else:
