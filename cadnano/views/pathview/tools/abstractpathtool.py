@@ -1,9 +1,11 @@
 """Summary
 """
+from typing import Optional, Tuple
+
 from PyQt5.QtCore import QRectF, QPointF
-from PyQt5.QtWidgets import QGraphicsObject
 
 from cadnano import util
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj, getNoBrush
 
@@ -17,7 +19,7 @@ _PEN = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
 _BRUSH = getNoBrush()
 
 
-class AbstractPathTool(QGraphicsObject):
+class AbstractPathTool(AbstractTool):
     """Abstract base class to be subclassed by all other pathview tools.
 
     Attributes:
@@ -91,7 +93,7 @@ class AbstractPathTool(QGraphicsObject):
                 self.hide()
     # end def
 
-    def lastLocation(self):
+    def lastLocation(self) -> Optional[Tuple]:
         """A tool's last_location consists of a VirtualHelixItem and a ScenePos
         (QPoint) representing the last known location of the mouse.
 
@@ -100,7 +102,7 @@ class AbstractPathTool(QGraphicsObject):
         calling `updateLocation(*old_tool.lastLocation())`.
 
         Returns:
-            location (tuple): (virtual_helix_item, QPoint) representing the last
+            location: (virtual_helix_item, QPoint) representing the last
                 known location of the mouse for purposes of positioning
                 the graphic of a new tool on switching tools (the tool
                 will have called on it)

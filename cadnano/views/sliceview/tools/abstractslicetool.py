@@ -1,8 +1,8 @@
 import math
 
 from PyQt5.QtCore import QLineF, QPointF, QRectF
-from PyQt5.QtWidgets import QGraphicsObject
 
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
 from cadnano.gui.palette import getPenObj
 from cadnano.views.sliceview import slicestyles as styles
 
@@ -18,7 +18,7 @@ DELTA = (HIGHLIGHT_WIDTH - styles.SLICE_HELIX_STROKE_WIDTH)/2.
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 
-class AbstractSliceTool(QGraphicsObject):
+class AbstractSliceTool(AbstractTool):
     """Summary
 
     Attributes:

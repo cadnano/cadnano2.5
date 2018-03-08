@@ -1,32 +1,39 @@
+from typing import List, Optional, Tuple
+
 from PyQt5.QtCore import pyqtSignal, QObject
+from PyQt5.QtWidgets import (QGraphicsObject, QGraphicsItem, QAction)
 
-
-class DummyTool(object):
+class AbstractTool(QGraphicsObject):
     """ For use in place of None checks in the code
     reduces boilerplate
     """
-    action_name = 'action_dummy_tool'
+    action_name: str  = 'action_abstract_tool'
 
-    def methodPrefix(self):
-        return "dummyTool"  # first letter should be lowercase
+    def __init__(self, parent: QGraphicsItem):
+        super(AbstractTool, self).__init__(parent)
 
-    def setActive(self, bool):
+    def methodPrefix(self) -> str:
+        return "AbstractTool"  # first letter should be lowercase
+
+    def setActive(self, is_active: bool):
         pass
 
-    def lastLocation(self):
+    def lastLocation(self) -> Optional[Tuple]:
         return None
 
-    def setSelectionFilter(self, filter_name_list):
+    def setSelectionFilter(self, filter_name_list: List[str]):
         pass
 
 
-dummy_tool = DummyTool()
+abstract_tool = AbstractTool(None)
 
 
 class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""
 
-    def __init__(self, tool_group_name, window, viewroot):
+    def __init__(self,  tool_group_name: str,
+                        window: 'cadnano.views.documentwindow.DocumentWindow',
+                        viewroot: QGraphicsItem):
         """
         We store mainWindow because a controller's got to have
         references to both the layer above (UI) and the layer below (model)
@@ -36,7 +43,7 @@ class AbstractToolManager(QObject):
         self.viewroot = viewroot
         self.document = window.document()
         self.tool_group_name = tool_group_name
-        self._active_tool = dummy_tool
+        self._active_tool = abstract_tool
         self._active_part = None
         self.tool_names = None
     # end def
@@ -55,7 +62,7 @@ class AbstractToolManager(QObject):
             self.installTool(tool_name)
     # end def
 
-    def installTool(self, tool_name):
+    def installTool(self, tool_name: str) -> Optional[QAction]:
         window = self.window
         tgn = self.tool_group_name
 
@@ -99,7 +106,7 @@ class AbstractToolManager(QObject):
             action_name = 'action_%s_%s' % (tgn, l_tool_name)
             tool_widget = getattr(window, action_name)
             tool_widget.setChecked(False)
-        self._active_tool = dummy_tool
+        self._active_tool = abstract_tool
     # end def
 
     def destroy(self):
@@ -115,19 +122,19 @@ class AbstractToolManager(QObject):
             handler = getattr(self, set_active_tool_method_name)
             tool_widget.triggered.disconnect(handler)
             tool_widget.setChecked(False)
-        self._active_tool = dummy_tool
+        self._active_tool = abstract_tool
         self.window = None
     # end def
 
-    def activeToolGetter(self):
+    def activeToolGetter(self) -> AbstractTool:
         return self._active_tool
     # end def
 
-    def setActiveTool(self, new_active_tool):
+    def setActiveTool(self, new_active_tool: AbstractTool):
         if new_active_tool == self._active_tool:
             return
         if new_active_tool is None:
-            new_active_tool = dummy_tool
+            new_active_tool = abstract_tool
 
         if self._active_tool is not None:
             self._active_tool.setActive(False)
@@ -137,6 +144,6 @@ class AbstractToolManager(QObject):
         self.activeToolChangedSignal.emit(self._active_tool.action_name)
     # end def
 
-    def getFilterList(self):
+    def getFilterList(self) -> List[str]:
         return self.document.filter_list
 # end class

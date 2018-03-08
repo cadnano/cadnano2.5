@@ -2,9 +2,10 @@
 """
 import math
 from PyQt5.QtCore import QPointF, QLineF, QRectF
-from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.gui.palette import getPenObj
 
@@ -19,7 +20,7 @@ DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 
-class AbstractGridTool(QGraphicsObject):
+class AbstractGridTool(AbstractTool):
     _RADIUS = styles.GRID_HELIX_RADIUS
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     FILTER_NAME = 'virtual_helix'
@@ -278,7 +279,7 @@ class AbstractGridTool(QGraphicsObject):
         self._active = False
     # end def
 
-    def isActive(self):
+    def isActive(self) -> bool:
         """Returns isActive
         """
         return self._active

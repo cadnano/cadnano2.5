@@ -1,8 +1,10 @@
 from ast import literal_eval
+from warnings import warn
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
 
+from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.proxies.cnenum import GridType, HandleType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
@@ -371,29 +373,30 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             select_tool.deselectSet(vh_set)
     # end def
 
-    def partDocumentSettingChangedSlot(self, part, key, value):
-        """Summary
+    def partDocumentSettingChangedSlot(self, part: NucleicAcidPart, key: str, value: str):
+        """Slot for handling changes to Document settings
 
         Args:
-            part (TYPE): Description
-            key (TYPE): Description
-            value (TYPE): Description
-
-        Args:
-            TYPE: Description
+            part: the model :obj:`NucleicAcidPart`
+            key: key to the dictionary, must be `grid`
+            value: value
 
         Raises:
-            ValueError: Description
+            ValueError: Unknown grid styling
         """
+        warn(   "partDocumentSettingChangedSlot is not implemented GridItem.setDrawlines needs to be implemented")
+        return
         if key == 'grid':
             if value == 'lines and points':
                 self.griditem.setDrawlines(True)
             elif value == 'points':
                 self.griditem.setDrawlines(False)
             elif value == 'circles':
-                pass  # self.griditem.setGridAppearance(False)
+                NotImplementedError("not implented circles value")
             else:
-                raise ValueError("unknown grid styling")
+                raise ValueError("unknown grid styling: {}".format(value))
+        else:
+            raise NotImplementedError("unknown key {}".format(key))
 
     ### ACCESSORS ###
     def boundingRect(self):

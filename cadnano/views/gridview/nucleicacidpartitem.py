@@ -5,9 +5,9 @@ Attributes:
     HIGHLIGHT_WIDTH (TYPE): Description
 """
 from ast import literal_eval
-from PyQt5.QtCore import QPointF, Qt, QRectF
-from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtCore import (QPointF, Qt, QRectF)
+from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsRectItem,
+                            QGraphicsSceneMouseEvent)
 
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getNoPen  # , getBrushObj
@@ -566,7 +566,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
@@ -639,7 +639,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         return self._virtual_helix_item_hash.get(id_num)
     # end def
 
-    def createToolMousePress(self, tool, event, alt_event=None):
+    def createToolMousePress(self, tool, event: QGraphicsSceneMouseEvent, alt_event=None):
         """Summary
 
         Args:
