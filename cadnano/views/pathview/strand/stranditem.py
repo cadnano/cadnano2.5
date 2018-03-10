@@ -232,9 +232,10 @@ class StrandItem(QGraphicsLineItem):
             strand (:obj:`cadnano.strand.Strand`):
             insertion (int):
         """
-        self.insertionItems()[insertion.idx()] = InsertionItem(self._virtual_helix_item,
-                                                               strand,
-                                                               insertion)
+        if self._viewroot.are_signals_on:
+            self.insertionItems()[insertion.idx()] = InsertionItem(self._virtual_helix_item,
+                                                                   strand,
+                                                                   insertion)
     # end def
 
     def strandInsertionChangedSlot(self, strand, insertion):
@@ -268,12 +269,13 @@ class StrandItem(QGraphicsLineItem):
             mod_id (:obj:`str`):
             idx (int):
         """
-        idx_l, idx_h = strand.idxs()
-        color = document.getModProperties(mod_id)['color']
-        if idx == idx_h:
-            self._high_cap.showMod(mod_id, color)
-        else:
-            self._low_cap.showMod(mod_id, color)
+        if self._viewroot.are_signals_on:
+            idx_l, idx_h = strand.idxs()
+            color = document.getModProperties(mod_id)['color']
+            if idx == idx_h:
+                self._high_cap.showMod(mod_id, color)
+            else:
+                self._low_cap.showMod(mod_id, color)
     # end def
 
     def strandModsChangedSlot(self, strand, document, mod_id, idx):

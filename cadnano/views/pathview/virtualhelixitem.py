@@ -52,7 +52,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, model_virtual_helix, part_item, viewroot):
+    def __init__(self, model_virtual_helix, part_item):
         """Summary
 
         Args:
@@ -62,11 +62,11 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
         QGraphicsPathItem.__init__(self, parent=part_item.proxy())
-        self._viewroot = viewroot
+        self._viewroot = part_item._viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        self._handle = VirtualHelixHandleItem(self, part_item, viewroot)
+        self._handle = VirtualHelixHandleItem(self, part_item)
         self._last_strand_set = None
         self._last_idx = None
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
@@ -124,7 +124,8 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
-        StrandItem(strand, self, self._viewroot)
+        if self._viewroot.are_signals_on:
+            StrandItem(strand, self, self._viewroot)
     # end def
 
     def virtualHelixRemovedSlot(self):
@@ -144,6 +145,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._model_part = None
         self._getActiveTool = None
         self._handle = None
+        self._viewroot = None
     # end def
 
     def virtualHelixPropertyChangedSlot(self, keys, values):

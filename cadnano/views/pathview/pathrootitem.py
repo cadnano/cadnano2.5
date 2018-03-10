@@ -46,6 +46,7 @@ class PathRootItem(QGraphicsRectItem):
         self._prexover_filter = None
         self.manager = None
         self.select_tool = None
+        self.are_signals_on = True
     # end def
 
     ### SIGNALS ###
@@ -83,17 +84,18 @@ class PathRootItem(QGraphicsRectItem):
         Raises:
             NotImplementedError: Description
         """
-        win = self._window
-        part_type = model_part_instance.reference().partType()
+        if self.are_signals_on:
+            win = self._window
+            part_type = model_part_instance.reference().partType()
 
-        if part_type == PartType.PLASMIDPART:
-            pass
-        elif part_type == PartType.NUCLEICACIDPART:
-            na_part_item = PathNucleicAcidPartItem(model_part_instance, viewroot=self, parent=self)
-            self._part_item_for_part_instance[model_part_instance] = na_part_item
-            win.path_tool_manager.setActivePart(na_part_item)
-        else:
-            raise NotImplementedError
+            if part_type == PartType.PLASMIDPART:
+                pass
+            elif part_type == PartType.NUCLEICACIDPART:
+                na_part_item = PathNucleicAcidPartItem(model_part_instance, viewroot=self, parent=self)
+                self._part_item_for_part_instance[model_part_instance] = na_part_item
+                win.path_tool_manager.setActivePart(na_part_item)
+            else:
+                raise NotImplementedError
     # end def
 
     def clearSelectionsSlot(self, doc):

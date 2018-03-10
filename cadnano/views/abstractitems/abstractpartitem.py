@@ -32,6 +32,9 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partInstance(self):
         return self._model_instance
 
+    def viewRoot(self):
+        return self._viewroot
+
     def cnModel(self):
         return self._model_part
 

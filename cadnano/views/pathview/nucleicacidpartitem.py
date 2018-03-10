@@ -341,14 +341,15 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vhi = PathVirtualHelixItem(virtual_helix, self, self._viewroot)
-        self._virtual_helix_item_hash[id_num] = vhi
-        vhi_list = self._virtual_helix_item_list
-        vhi_list.append(vhi)
-        ztf = not getBatch()
-        self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
-        if not self.isVisible():
-            self.show()
+        if self._viewroot.are_signals_on:
+            vhi = PathVirtualHelixItem(virtual_helix, self)
+            self._virtual_helix_item_hash[id_num] = vhi
+            vhi_list = self._virtual_helix_item_list
+            vhi_list.append(vhi)
+            ztf = not getBatch()
+            self._setVirtualHelixItemList(vhi_list, zoom_to_fit=ztf)
+            if not self.isVisible():
+                self.show()
     # end def
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):

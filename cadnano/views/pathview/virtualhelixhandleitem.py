@@ -34,7 +34,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
     """
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, virtual_helix_item, part_item, viewroot):
+    def __init__(self, virtual_helix_item, part_item):
         """Summary
 
         Args:
@@ -47,7 +47,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self._id_num = virtual_helix_item.idNum()
         self._part_item = part_item
         self._model_part = part_item.part()
-        self._viewroot = viewroot
+        self._viewroot = part_item._viewroot
 
         self._right_mouse_move = False
         self.setAcceptHoverEvents(True)

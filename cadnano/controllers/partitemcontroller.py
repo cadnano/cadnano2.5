@@ -2,6 +2,7 @@ class PartItemController():
     def __init__(self, part_item, model_part):
         self._part_item = part_item
         self._model_part = model_part
+        self.is_enable = True
     # end def
 
     connections = [

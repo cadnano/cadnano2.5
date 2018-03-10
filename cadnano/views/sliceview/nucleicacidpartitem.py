@@ -291,25 +291,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        vhi = SliceVirtualHelixItem(virtual_helix, self)
-        self._virtual_helix_item_hash[id_num] = vhi
-        self._refreshVirtualHelixItemGizmos(id_num, vhi)
-        for neighbor_id in neighbors:
-            nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
-            if nvhi:
-                self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-        self.enlargeRectToFit()
+        if self._viewroot.are_signals_on:
+            vhi = SliceVirtualHelixItem(virtual_helix, self)
+            self._virtual_helix_item_hash[id_num] = vhi
+            self._refreshVirtualHelixItemGizmos(id_num, vhi)
+            for neighbor_id in neighbors:
+                nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
+                if nvhi:
+                    self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+            self.enlargeRectToFit()
 
-        position = sender.locationQt(id_num=id_num,
-                                     scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
+            position = sender.locationQt(id_num=id_num,
+                                         scale_factor=self.scale_factor)
+            coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
 
-        assert id_num not in self.coordinates_to_vhid.values()
+            assert id_num not in self.coordinates_to_vhid.values()
 
-        self.coordinates_to_vhid[coordinates] = id_num
+            self.coordinates_to_vhid[coordinates] = id_num
 
-        assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
-        assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
+            assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
+            assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):

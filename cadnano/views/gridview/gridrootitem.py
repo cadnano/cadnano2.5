@@ -39,6 +39,7 @@ class GridRootItem(QGraphicsRectItem):
         self.instance_items = {}
         self.manager = None
         self.select_tool = None
+        self.are_signals_on = True
 
     def __repr__(self):
         _id = str(id(self))[-4:]
@@ -60,16 +61,17 @@ class GridRootItem(QGraphicsRectItem):
         Raises:
             NotImplementedError: partAddedSlot should always be overridden.
         """
-        part_type = model_part_instance.reference().partType()
-        if part_type == PartType.NUCLEICACIDPART:
-            na_part_item = GridNucleicAcidPartItem(model_part_instance,
-                                                   viewroot=self,
-                                                   parent=self)
-            self.instance_items[na_part_item] = na_part_item
-            self.select_tool.setPartItem(na_part_item)
-            na_part_item.zoomToFit()
-        else:
-            raise NotImplementedError
+        if self.are_signals_on:
+            part_type = model_part_instance.reference().partType()
+            if part_type == PartType.NUCLEICACIDPART:
+                na_part_item = GridNucleicAcidPartItem(model_part_instance,
+                                                       viewroot=self,
+                                                       parent=self)
+                self.instance_items[na_part_item] = na_part_item
+                self.select_tool.setPartItem(na_part_item)
+                na_part_item.zoomToFit()
+            else:
+                raise NotImplementedError
     # end def
 
     def selectedChangedSlot(self, item_dict):

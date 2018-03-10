@@ -39,6 +39,7 @@ class AbstractVirtualHelixItem(object):
     def partItem(self):
         return self._part_item
     # end def
+
 # end class
 
 

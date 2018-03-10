@@ -62,6 +62,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
 
         self.hide()
+        self._viewroot = part_item._viewroot
         model_part = self._model_part
         x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         # set position to offset for radius
@@ -289,6 +290,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._label = None
         self._part_item = None
         self._model_part = None
+        self._viewroot = None
         self.scene().removeItem(self)
     # end def
 

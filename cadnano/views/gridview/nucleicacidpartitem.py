@@ -273,14 +273,15 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        vhi = GridVirtualHelixItem(virtual_helix, self)
-        self._virtual_helix_item_hash[id_num] = vhi
-        self._refreshVirtualHelixItemGizmos(id_num, vhi)
-        for neighbor_id in neighbors:
-            nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
-            if nvhi:
-                self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-        self.enlargeRectToFit()
+        if self._viewroot.are_signals_on:
+            vhi = GridVirtualHelixItem(virtual_helix, self)
+            self._virtual_helix_item_hash[id_num] = vhi
+            self._refreshVirtualHelixItemGizmos(id_num, vhi)
+            for neighbor_id in neighbors:
+                nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
+                if nvhi:
+                    self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+            self.enlargeRectToFit()
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):

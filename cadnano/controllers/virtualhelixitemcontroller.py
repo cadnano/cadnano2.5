@@ -15,6 +15,7 @@ class VirtualHelixItemController(object):
         self._model_part = model_part
         self._do_wire_part = do_wire_part
         self._do_wire_strands = do_wire_strands
+        self.is_enable = True
         self.connectSignals()
     # end def
 
