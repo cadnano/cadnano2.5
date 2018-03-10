@@ -2,7 +2,6 @@ class ViewRootController():
     def __init__(self, view_root, model_document):
         self._view_root = view_root
         self._model_document = model_document
-        self.is_enable = True
         self.connectSignals()
     # end def
 

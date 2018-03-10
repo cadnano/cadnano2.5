@@ -3,7 +3,6 @@ class StrandItemController():
         self._model_strand = model_strand
         self._model_oligo = model_strand.oligo()
         self._strand_item = strand_item
-        self.is_enable = True
         self.connectSignals()
     # end def
 
