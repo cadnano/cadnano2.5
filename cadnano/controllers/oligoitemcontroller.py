@@ -2,7 +2,6 @@ class OligoItemController():
     def __init__(self, oligo_item, model_oligo):
         self._oligo_item = oligo_item
         self._model_oligo = model_oligo
-        self.is_enable = True
         self.connectSignals()
     # end def
 
