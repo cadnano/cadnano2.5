@@ -41,6 +41,7 @@ class PropertyEditorWidget(QTreeWidget):
         super(PropertyEditorWidget, self).__init__(parent)
         self._cn_model_set = set()
         self._cn_model_list = []
+        self.are_signals_enabled = True
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
     # end def
 

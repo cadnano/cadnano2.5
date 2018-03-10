@@ -45,6 +45,10 @@ class CNOutlinerItem(QTreeWidgetItem):
         pass
     # end def
 
+    @property
+    def _viewroot(self):
+        return self.treeWidget()
+
     def cnModel(self):
         return self._cn_model
     # end def

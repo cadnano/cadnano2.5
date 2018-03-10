@@ -86,6 +86,10 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key
     # end def
 
+    @property
+    def _viewroot(self):
+        return self.treeWidget()
+
     def key(self):
         """Summary
 

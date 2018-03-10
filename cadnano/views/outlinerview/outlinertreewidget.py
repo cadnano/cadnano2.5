@@ -56,6 +56,7 @@ class OutlinerTreeWidget(QTreeWidget):
         self._controller = ViewRootController(self, document)
         self._root = self.invisibleRootItem()   # access to top level item
         self._instance_items = {}
+        self.are_signals_enabled = True
 
         # Appearance
         self.setFont(_FONT)
@@ -440,17 +441,18 @@ class OutlinerTreeWidget(QTreeWidget):
         Receives notification from the model that a part has been added.
         Parts should add themselves to the QTreeWidget by passing parent=self.
         """
-        model_part = model_part_instance.reference()
-        part_type = model_part.partType()
-        if part_type == PartType.NUCLEICACIDPART:
-            self.is_child_adding += 1
-            na_part_item = OutlineNucleicAcidPartItem(model_part, parent=self)
-            self._instance_items[model_part_instance] = na_part_item
-            self.setCurrentItem(na_part_item)
-            self.is_child_adding -= 1
-        else:
-            print("part type", part_type)
-            raise NotImplementedError
+        if self.are_signals_enabled:
+            model_part = model_part_instance.reference()
+            part_type = model_part.partType()
+            if part_type == PartType.NUCLEICACIDPART:
+                self.is_child_adding += 1
+                na_part_item = OutlineNucleicAcidPartItem(model_part, parent=self)
+                self._instance_items[model_part_instance] = na_part_item
+                self.setCurrentItem(na_part_item)
+                self.is_child_adding -= 1
+            else:
+                print("part type", part_type)
+                raise NotImplementedError
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_set):

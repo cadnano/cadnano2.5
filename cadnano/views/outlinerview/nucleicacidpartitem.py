@@ -74,10 +74,11 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partOligoAddedSlot(self, model_part, model_oligo):
-        m_o = model_oligo
-        m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
-        self._oligo_item_hash[m_o] = o_i
+        if self._viewroot.are_signals_enabled:
+            m_o = model_oligo
+            m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
+            o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
+            self._oligo_item_hash[m_o] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
@@ -89,11 +90,12 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
-        tw = self.treeWidget()
-        tw.is_child_adding += 1
-        vh_i = OutlineVirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
-        self._virtual_helix_item_hash[id_num] = vh_i
-        tw.is_child_adding -= 1
+        if self._viewroot.are_signals_enabled:
+            tw = self.treeWidget()
+            tw.is_child_adding += 1
+            vh_i = OutlineVirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
+            self._virtual_helix_item_hash[id_num] = vh_i
+            tw.is_child_adding -= 1
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
         vh_i = self._virtual_helix_item_hash.get(id_num)
