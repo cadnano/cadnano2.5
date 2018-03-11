@@ -144,11 +144,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            part (TYPE): Description
-            info (TYPE): Description
-
-        Args:
-            TYPE: Description
+            part (NucleicAcidPart): Description
+            info (tuple): Description
         """
         pxom = self.prexover_manager
         pxom.deactivateNeighbors()
@@ -158,15 +155,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        """Summary
+        """Slot for property chaing
 
         Args:
-            model_part (Part): The model part
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Args:
-            TYPE: Description
+            model_part (NucleicAcidPart): The model part
+            property_key (str): map key
+            new_value (Any): Description
         """
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
@@ -185,24 +179,26 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot
+        """Slot wrapper for ``destroy()``
 
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender (NucleicAcidPart): Model object that emitted the signal.
         """
-        self.parentItem().removePartItem(self)
+        return self.destroy()
+    # end def
 
-        scene = self.scene()
-
-        scene.removeItem(self)
-
-        self._model_part = None
-        self._mod_circ = None
-
-        self._controller.disconnectSignals()
-        self._controller = None
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        super(SliceNucleicAcidPartItem, self).destroy()
+        self.x_axis_line = None
+        self.y_axis_line = None
+        self.model_bounds_hint = None
+        self.outline = None
         self.resize_handle_group.removeHandles()
+        self.resize_handle_group = None
         self.griditem = None
+        self._mod_circ = None
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs, do_deselect):

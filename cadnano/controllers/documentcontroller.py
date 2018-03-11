@@ -649,7 +649,7 @@ class DocumentController(object):
             dock_window.show()
     # end def
 
-    def toggleNewPartButtons(self, is_enabled):
+    def toggleNewPartButtons(self, is_enabled: bool):
         """Toggle the AddPart buttons when the active part changes.
 
         Args:
@@ -661,27 +661,33 @@ class DocumentController(object):
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
-    def setSliceOrGridViewVisible(self, value):
-        if value == 'legacy':
+    def setSliceOrGridViewVisible(self, view_type: str):
+        """
+        Args:
+            view_type: type of view, ``grid`` or ``legacy``
+
+        Raises:
+            ValueError for unknown ``view_type``.
+        """
+        if view_type == 'legacy':
             self.toggleSliceView(True)
             self.toggleGridView(False)
-        elif value == 'grid':
+        elif view_type == 'grid':
             self.toggleSliceView(False)
             self.toggleGridView(True)
         else:
-            raise ValueError('Invalid slice/grid view value: %s' % value)
+            raise ValueError('Invalid slice/grid view value: %s' % view_type)
     # end def
 
-    def toggleSliceView(self, show):
+    def toggleSliceView(self, show: bool):
         """Hide or show the slice view based on the given parameter `show`.
 
         Since calling this method where show=True will cause the SliceView to
         show, ensure that the action_slice button is checked if applicable.
 
         Args:
-            show (bool): Whether the slice view should be hidden or shown
+            show: Whether the slice view should be hidden or shown
 
-        Returns: None
         """
         assert isinstance(show, bool)
 
@@ -697,16 +703,14 @@ class DocumentController(object):
             slice_view_widget.hide()
     # end def
 
-    def toggleGridView(self, show):
+    def toggleGridView(self, show: bool):
         """Hide or show the grid view based on the given parameter `show`
 
         Since calling this method where show=True will cause the SliceView to
         show, ensure that the action_slice button is checked if applicable.
 
         Args:
-            show (bool): Whether the grid view should be hidden or shown
-
-        Returns: None
+            show: Whether the grid view should be hidden or shown
         """
         assert isinstance(show, bool)
 

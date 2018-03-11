@@ -297,7 +297,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            vh_set (TYPE): Description
+            vh_set (set): Description
             left_overs (TYPE): Description
             do_deselect (TYPE): Description
 
@@ -315,25 +315,16 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot
+        """Slot wrapper for ``destroy()``
 
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender (Part): Model object that emitted the signal.
         """
-        self.parentItem().removePartItem(self)
-        scene = self.scene()
-        scene.removeItem(self)
-        self._model_part = None
-        self._virtual_helix_item_hash = None
-        self._virtual_helix_item_list = None
-        self._controller.disconnectSignals()
-        self._controller = None
-        # self.grab_corner = None
+        return self.destroy()
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
-        """
-        When a virtual helix is added to the model, this slot handles
+        """When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
 
         Args:

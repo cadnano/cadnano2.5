@@ -23,7 +23,26 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._virtual_helix_item_hash = {}
         self.active_virtual_helix_item = None
         self.is_active = False
+        self._controller = None
         m_p.setInstanceProperty(model_part_instance, '%s:position' % (viewroot.name), (0., 0.))
+    # end def
+
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        if self._controller is not None:
+            self._controller.disconnectSignals()
+            self._controller = None
+        self._model_part = None
+        self._model_instance = None
+        self._model_props = None
+        self._viewroot = None
+        self._oligo_item_hash = None
+        self._virtual_helix_item_hash = None
+        self.active_virtual_helix_item = None
+        self.parentItem().removePartItem(self)
+        scene = self.scene()
+        scene.removeItem(self)
     # end def
 
     def part(self):

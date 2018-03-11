@@ -437,9 +437,15 @@ class OutlinerTreeWidget(QTreeWidget):
 
     ### SLOTS ###
     def partAddedSlot(self, sender, model_part_instance):
-        """
-        Receives notification from the model that a part has been added.
+        """Receives notification from the model that a part has been added.
         Parts should add themselves to the QTreeWidget by passing parent=self.
+
+        Args:
+            sender (Part):
+            model_part_instance (ObjectInstance):
+
+        Raises:
+            NotImplementedError: for unknown ``part_type``
         """
         if self.are_signals_enabled:
             model_part = model_part_instance.reference()
@@ -451,8 +457,7 @@ class OutlinerTreeWidget(QTreeWidget):
                 self.setCurrentItem(na_part_item)
                 self.is_child_adding -= 1
             else:
-                print("part type", part_type)
-                raise NotImplementedError
+                raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_set):

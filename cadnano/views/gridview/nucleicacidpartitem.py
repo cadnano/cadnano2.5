@@ -5,6 +5,8 @@ Attributes:
     HIGHLIGHT_WIDTH (TYPE): Description
 """
 from ast import literal_eval
+from typing import Tuple
+
 from PyQt5.QtCore import (QPointF, Qt, QRectF)
 from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsRectItem,
                             QGraphicsSceneMouseEvent)
@@ -104,14 +106,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
 
     ### SLOTS ###
     def partActiveVirtualHelixChangedSlot(self, part, id_num):
-        """Summary
+        """Slot
 
         Args:
-            part (TYPE): Description
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-
-        Args:
-            TYPE: Description
+            part (Part): Description
+            id_num (int): VirtualHelix ID number. See ``NucleicAcidPart`` for
+                description and related methods.
         """
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         self.setActiveVirtualHelixItem(vhi)
@@ -136,15 +136,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        """Summary
+        """Slot
 
         Args:
             model_part (Part): The model part
-            property_key (TYPE): Description
+            property_key (str): Description
             new_value (TYPE): Description
-
-        Args:
-            TYPE: Description
         """
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
@@ -164,32 +161,29 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot
+        """Slot wrapper for ``destroy()``
 
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender (NucleicAcidPart): Model object that emitted the signal.
         """
-        self.parentItem().removePartItem(self)
+        return self.destroy()
+    # end def
 
-        scene = self.scene()
-
-        scene.removeItem(self)
-
-        self._model_part = None
-        self._mod_circ = None
-
-        self._controller.disconnectSignals()
-        self._controller = None
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        super(GridNucleicAcidPartItem, self).destroy()
+        self.outline = None
         self.grab_cornerTL = None
         self.grab_cornerBR = None
         self.griditem = None
+        self._mod_circ = None
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender,
                                          vh_set, left_overs,
                                          do_deselect):
-        """
-        left_overs are neighbors that need updating due to changes
+        """left_overs are neighbors that need updating due to changes
 
         Args:
             sender (obj): Model object that emitted the signal.
@@ -249,13 +243,10 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender (Part): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             keys (tuple): keys that changed
             values (tuple): new values for each key that changed
-
-        Args:
-            TYPE: Description
         """
         if self._model_part == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
@@ -263,15 +254,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, sender, id_num, virtual_helix, neighbors):
-        """Summary
+        """Slot
 
         Args:
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (TYPE): Description
-
-        Args:
-            TYPE: Description
         """
         if self._viewroot.are_signals_on:
             vhi = GridVirtualHelixItem(virtual_helix, self)
@@ -285,15 +273,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
-        """Summary
+        """Slot
 
         Args:
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (TYPE): Description
-
-        Args:
-            TYPE: Description
         """
         tm = self._viewroot.manager
         tm.resetTools()
@@ -303,12 +288,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
     # end def
 
-    def partSelectedChangedSlot(self, model_part, is_selected):
+    def partSelectedChangedSlot(self, model_part, is_selected: bool):
         """Set this Z to front, and return other Zs to default.
 
         Args:
             model_part (Part): The model part
-            is_selected (TYPE): Description
+            is_selected: Description
         """
         if is_selected:
             # self._drag_handle.resetAppearance(_SELECTED_COLOR, _SELECTED_WIDTH, _SELECTED_ALPHA)
@@ -318,14 +303,14 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             self.setZValue(styles.ZPARTITEM)
     # end def
 
-    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding: bool):
         """is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            vh_set (TYPE): Description
-            is_adding (TYPE): Description
+            sender (Part): Model object that emitted the signal.
+            vh_set (set): Description
+            is_adding (bool): Description
         """
         select_tool = self._viewroot.select_tool
         if is_adding:
@@ -341,15 +326,12 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            part (TYPE): Description
-            key (TYPE): Description
-            value (TYPE): Description
-
-        Args:
-            TYPE: Description
+            part (Part): Description
+            key (str): Description
+            value (str): Description
 
         Raises:
-            ValueError: Description
+            ValueError: unknown grid styling string in ``key``
         """
         if key == 'grid':
             print("grid change", value)
@@ -364,29 +346,22 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### ACCESSORS ###
-    def boundingRect(self):
-        """Summary
-
-        Args:
-            TYPE: Description
+    def boundingRect(self) -> QRectF:
+        """
         """
         return self._rect
     # end def
 
     def modelColor(self):
-        """Summary
-
-        Args:
-            TYPE: Description
+        """
         """
         return self._model_props['color']
     # end def
 
     def window(self):
-        """Summary
-
-        Args:
-            TYPE: Description
+        """
+        Returns:
+            DocumentWindow
         """
         return self.parentItem().window()
     # end def
@@ -395,8 +370,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            new_active_vhi (TYPE): Description
-
+            new_active_vhi (VirtualHelixItem): Description
         """
         current_vhi = self.active_virtual_helix_item
         # print(current_vhi, new_active_vhi)
@@ -409,8 +383,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def setPreXoverItemsVisible(self, virtual_helix_item):
-        """
-        self._pre_xover_items list references prexovers parented to other
+        """``self._pre_xover_items`` list references prexovers parented to other
         PathHelices such that only the activeHelix maintains the list of
         visible prexovers
 
@@ -433,14 +406,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                                       per_neighbor_hits, pairs)
     # end def
 
-    def removeVirtualHelixItem(self, id_num):
+    def removeVirtualHelixItem(self, id_num: int):
         """Summary
 
         Args:
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-
-        Args:
-            TYPE: Description
         """
         vhi = self._virtual_helix_item_hash[id_num]
         if vhi == self.active_virtual_helix_item:
@@ -449,16 +419,20 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self, top_left, bottom_right, finish=False, padding=80):
+    def reconfigureRect(self,   top_left: Tuple[float, float],
+                                bottom_right: Tuple[float, float],
+                                padding: int = 80
+                                ) -> Tuple[Tuple[float, float],Tuple[float, float]]:
         """Summary
 
         Args:
-            top_left (TYPE): Description
-            bottom_right (TYPE): Description
+            top_left: Description
+            bottom_right: Description
+            padding: padding of the rectagle in pixels points
 
         Returns:
-            tuple: tuple of point tuples representing the top_left and
-                bottom_right as reconfigured with padding
+            tuple of point tuples representing the ``top_left`` and
+                ``bottom_right`` as reconfigured with ``padding``
         """
         rect = self._rect
         ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
@@ -545,21 +519,18 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             self._mod_circ.hide()
     # end def
 
-    def updateStatusBar(self, status_str):
+    def updateStatusBar(self, status_str: str):
         """Shows status_str in the MainWindow's status bar.
+        Not implemented
 
         Args:
-            status_str (TYPE): Description
+            status_str: Description
         """
-        pass  # disabled for now.
         # self.window().statusBar().showMessage(status_str, timeout)
     # end def
 
     def zoomToFit(self):
-        """Summary
-
-        Args:
-            TYPE: Description
+        """Ask the view to zoom to fit this object
         """
         thescene = self.scene()
         theview = thescene.views()[0]
@@ -571,11 +542,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            event: Contains item, scene, and screen
             coordinates of the the event, and previous event.
-
-        Args:
-            TYPE: Description
         """
         if event.button() == Qt.RightButton:
             return
@@ -599,9 +567,6 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             event (TYPE): Description
-
-        Args:
-            TYPE: Description
         """
 
         tool = self._getActiveTool()
@@ -617,25 +582,29 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         tool = self._getActiveTool()
         tool.hideLineItem()
 
-    def getModelPos(self, pos):
+    def getModelPos(self, pos: QPointF) -> Tuple[float, float]:
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:
-            pos (TYPE): Description
+            pos: a position in this scene
+
+        Returns:
+            position in model coordinates
         """
         sf = self.scale_factor
         x, y = pos.x()/sf, -1.0*pos.y()/sf
         return x, y
     # end def
 
-    def getVirtualHelixItem(self, id_num):
+    def getVirtualHelixItem(self, id_num: int) -> 'cadnano.views.gridview.VirtualHelixItem':
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            id_num: VirtualHelix ID number. See ``NucleicAcidPart`` for
+                description and related methods.
 
         Returns:
-            TYPE: Description
+            VirtualHelixItem
         """
         return self._virtual_helix_item_hash.get(id_num)
     # end def

@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QSettings
 from PyQt5.QtCore import QPoint, QSize
@@ -22,7 +24,7 @@ from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
 # # for an example of the QOpenGlWidget added in Qt 5.4
-
+CNView = namedtuple('CNView', ['view', 'scene', 'root_item'])
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     """DocumentWindow subclasses QMainWindow and Ui_MainWindow. It performs
@@ -51,9 +53,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.tool_managers = None  # initialize
 
-        self._initSliceview(doc)
-        self._initGridview(doc)
-        self._initPathview(doc)
+        self.views = {}
+        self.views['slice'] = self._initSliceview(doc)
+        self.views['grid']  = self._initGridview(doc)
+        self.views['path']  = self._initPathview(doc)
+
         self._initPathviewToolbar()
         self._initEditMenu()
 
@@ -152,7 +156,22 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.endGroup()
     # end def
 
-    def _initGridview(self, doc):
+    def destroyView(self, view_name: str):
+        '''
+        Args:
+            view_name: the name of the view
+
+        Raises:
+            ValueError for ``view_name`` not existing
+        '''
+        cnview = self.views.get(view_name)
+        if cnview is not None:
+            cnview.root_item
+        else:
+            raise ValueError("view_name: %s does not exist" % (view_name))
+
+
+    def _initGridview(self, doc) -> CNView:
         """Initializes Grid View.
 
         Args:
@@ -161,43 +180,46 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         Returns: None
         """
-        self.grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
-        self.grid_root = GridRootItem(rect=self.grid_scene.sceneRect(),
-                                      parent=None,
-                                      window=self,
-                                      document=doc)
-        self.grid_root.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.grid_scene.addItem(self.grid_root)
-        self.grid_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.grid_root.scene() == self.grid_scene
-        self.grid_graphics_view.setScene(self.grid_scene)
-        self.grid_graphics_view.scene_root_item = self.grid_root
-        self.grid_graphics_view.setName("GridView")
-        self.grid_tool_manager = GridToolManager(self, self.grid_root)
+        grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
+        grid_root = GridRootItem(   rect=grid_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        grid_scene.addItem(grid_root)
+        grid_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert grid_root.scene() == grid_scene
+        ggv = self.grid_graphics_view
+        ggv.setScene(grid_scene)
+        ggv.scene_root_item = grid_root
+        ggv.setName("GridView")
+        self.grid_tool_manager = GridToolManager(self, grid_root)
+        return CNView(ggv, grid_scene, grid_root)
     # end def
 
-    def _initPathview(self, doc):
+    def _initPathview(self, doc) -> CNView:
         """Initializes Path View.
 
         Args:
             doc (cadnano.document.Document): The Document corresponding to
             the design
 
-        Returns: None
+        Returns:
+            CNView namedtuple
         """
-        self.path_scene = QGraphicsScene(parent=self.path_graphics_view)
-        self.path_root = PathRootItem(rect=self.path_scene.sceneRect(),
-                                      parent=None,
-                                      window=self,
-                                      document=doc)
-        self.path_root.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.path_scene.addItem(self.path_root)
-        self.path_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.path_root.scene() == self.path_scene
-        self.path_graphics_view.setScene(self.path_scene)
-        self.path_graphics_view.scene_root_item = self.path_root
-        self.path_graphics_view.setScaleFitFactor(0.7)
-        self.path_graphics_view.setName("PathView")
+        path_scene = QGraphicsScene(parent=self.path_graphics_view)
+        path_root = PathRootItem(   rect=path_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        path_scene.addItem(path_root)
+        path_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert path_root.scene() == path_scene
+        pgv = self.path_graphics_view
+        pgv.setScene(path_scene)
+        pgv.scene_root_item = path_root
+        pgv.setScaleFitFactor(0.7)
+        pgv.setName("PathView")
+        return CNView(pgv, path_scene, path_root)
     # end def
 
     def _initPathviewToolbar(self):
@@ -207,8 +229,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
-        self.path_scene.addItem(self.path_color_panel)
-        self.path_tool_manager = PathToolManager(self, self.path_root)
+        path_scene = self.views['path'].scene
+        path_scene.addItem(self.path_color_panel)
+        self.path_tool_manager = PathToolManager(self, self.views['path'].root_item)
 
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
@@ -225,29 +248,31 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setupGL()
     # end def
 
-    def _initSliceview(self, doc):
+    def _initSliceview(self, doc) -> CNView:
         """Initializes Slice View.
 
         Args:
             doc (cadnano.document.Document): The Document corresponding to
             the design
 
-        Returns: None
+        Returns:
+            CNView namedtuple
         """
-        self.slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
-        self.slice_root = SliceRootItem(rect=self.slice_scene.sceneRect(),
-                                        parent=None,
-                                        window=self,
-                                        document=doc)
-        self.slice_root.setFlag(QGraphicsItem.ItemHasNoContents)
-        self.slice_scene.addItem(self.slice_root)
-        self.slice_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
-        assert self.slice_root.scene() == self.slice_scene
-        self.slice_graphics_view.setScene(self.slice_scene)
-        self.slice_graphics_view.scene_root_item = self.slice_root
-        self.slice_graphics_view.setName("SliceView")
-        self.slice_graphics_view.setScaleFitFactor(0.7)
-        self.slice_tool_manager = SliceToolManager(self, self.slice_root)
+        slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
+        slice_root = SliceRootItem( rect=slice_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        slice_scene.addItem(slice_root)
+        slice_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert slice_root.scene() == slice_scene
+        sgv = self.slice_graphics_view
+        sgv.setScene(slice_scene)
+        sgv.scene_root_item = slice_root
+        sgv.setName("SliceView")
+        sgv.setScaleFitFactor(0.7)
+        self.slice_tool_manager = SliceToolManager(self, slice_root)
+        return CNView(sgv, slice_scene, slice_root)
     # end def
 
     def _initEditMenu(self):

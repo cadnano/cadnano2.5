@@ -1,7 +1,8 @@
 """Summary
 """
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtCore import QRectF
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
 from cadnano import util
 from cadnano.proxies.cnenum import PartType
@@ -28,14 +29,14 @@ class PathRootItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
     name = 'path'
 
-    def __init__(self, rect, parent, window, document):
+    def __init__(self, rect: QRectF, parent, window, document):
         """Summary
 
         Args:
-            rect (TYPE): Description
-            parent (TYPE): Description
-            window (TYPE): Description
-            document (TYPE): Description
+            rect (QRectF): Description
+            parent (QObject): Description
+            window (DocumentWindow): Description
+            document (Document): Description
         """
         super(PathRootItem, self).__init__(rect, parent)
         self._window = window
@@ -46,7 +47,8 @@ class PathRootItem(QGraphicsRectItem):
         self._prexover_filter = None
         self.manager = None
         self.select_tool = None
-        self.are_signals_on = True
+        self.are_signals_on: bool = True
+        self.setFlag(QGraphicsItem.ItemHasNoContents)
     # end def
 
     ### SIGNALS ###
@@ -79,10 +81,10 @@ class PathRootItem(QGraphicsRectItem):
 
         Args:
             sender (obj): Model object that emitted the signal.
-            model_part_instance (TYPE): Description
+            model_part_instance (ObjectInstance): Description
 
         Raises:
-            NotImplementedError: Description
+            NotImplementedError: for unknown ``part_type``
         """
         if self.are_signals_on:
             win = self._window
@@ -95,7 +97,7 @@ class PathRootItem(QGraphicsRectItem):
                 self._part_item_for_part_instance[model_part_instance] = na_part_item
                 win.path_tool_manager.setActivePart(na_part_item)
             else:
-                raise NotImplementedError
+                raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
     def clearSelectionsSlot(self, doc):
@@ -179,10 +181,8 @@ class PathRootItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            part_item (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item (PartItem): Remove the ``PartItem`` from the dicitionary
+            of instances
         """
         for k in self._part_item_for_part_instance.keys():
             if k == part_item:

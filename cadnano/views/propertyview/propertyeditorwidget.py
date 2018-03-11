@@ -163,12 +163,12 @@ class PropertyEditorWidget(QTreeWidget):
             raise NotImplementedError
     # end def
 
-    def partAddedSlot(self, sender, model_part):
+    def partAddedSlot(self, sender, model_part_instance):
         """Summary
 
         Args:
             sender (obj): Model object that emitted the signal.
-            model_part (Part): The model part
+            model_part_instance (ObjectInstance): The model part
 
         Returns:
             TYPE: Description

@@ -134,10 +134,7 @@ class PropertyWrapperObject(QObject):
         return self.animations.get(property_name)
 
     def destroy(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Remove this object and references to it from the view
         """
         self.item = None
         self.animations = None

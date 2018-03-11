@@ -1,7 +1,7 @@
 """Summary
 """
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
 from cadnano.proxies.cnenum import PartType
 from cadnano.controllers.viewrootcontroller import ViewRootController
@@ -29,10 +29,10 @@ class SliceRootItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            rect (TYPE): Description
-            parent (TYPE): Description
-            window (TYPE): Description
-            document (TYPE): Description
+            rect (QRectF): Description
+            parent (QObject): Description
+            window (DocumentWindow): Description
+            document (Document): Description
         """
         super(SliceRootItem, self).__init__(rect, parent)
         self._window = window
@@ -42,6 +42,7 @@ class SliceRootItem(QGraphicsRectItem):
         self.manager = None
         self.select_tool = None
         self.are_signals_on = True
+        self.setFlag(QGraphicsItem.ItemHasNoContents)
     ### SIGNALS ###
 
     ### SLOTS ###
@@ -51,11 +52,11 @@ class SliceRootItem(QGraphicsRectItem):
         Views that subclass AbstractView should override this method.
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            model_part_instance (Part): Description
+            sender (Part): Model object that emitted the signal.
+            model_part_instance (ObjectInstance): Description
 
         Raises:
-            NotImplementedError: partAddedSlot should always be overridden.
+            NotImplementedError: unknown ``part_type``
         """
         if self.are_signals_on:
             part_type = model_part_instance.reference().partType()
@@ -67,7 +68,7 @@ class SliceRootItem(QGraphicsRectItem):
                 self.select_tool.setPartItem(na_part_item)
                 na_part_item.zoomToFit()
             else:
-                raise NotImplementedError
+                raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
     def selectedChangedSlot(self, item_dict):

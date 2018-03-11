@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QDialogButtonBox
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
 
 PREFS_GROUP_NAME = 'Preferences'
-ORTHOVIEWS = ('legacy', 'grid')
+ORTHOVIEW_TYPES = ('legacy', 'grid')
 ORTHOVIEW_KEY = 'EnabledOrthoView'
 ORTHOVIEW_DEFAULT = 0  # legacy idx
 GRIDVIEW_STYLES = ('points', 'points and lines')
@@ -107,19 +107,19 @@ class Preferences(object):
         self.qs.endGroup()
     # end def
 
-    def orthoviewChangedSlot(self, value):
-        """
-        Handles index changes to enabled_orthoview_combo_box.
+    def orthoviewChangedSlot(self, view_idx: int):
+        """Handles index changes to enabled_orthoview_combo_box.
         Saves the setting and notifies the doc controller to toggle
         visibilty of appropriate 2D orthographic view (sliceview or gridview).
         """
-        self.orthoview_idx = value
+        assert isinstance(view_idx, int)
+        self.orthoview_idx = view_idx
         self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.qs.setValue(ORTHOVIEW_KEY, value)
+        self.qs.setValue(ORTHOVIEW_KEY, view_idx)
         self.qs.endGroup()
 
-        value = ORTHOVIEWS[self.orthoview_idx]
-        self.document.controller().setSliceOrGridViewVisible(value)
+        view_type = ORTHOVIEW_TYPES[view_idx]
+        self.document.controller().setSliceOrGridViewVisible(view_type)
 
     def setShowIconLabels(self, value):
         self.show_icon_labels = value

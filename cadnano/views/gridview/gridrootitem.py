@@ -1,6 +1,6 @@
 """Summary
 """
-from PyQt5.QtWidgets import QGraphicsRectItem
+from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 from cadnano.proxies.cnenum import PartType
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import GridNucleicAcidPartItem
@@ -40,6 +40,7 @@ class GridRootItem(QGraphicsRectItem):
         self.manager = None
         self.select_tool = None
         self.are_signals_on = True
+        self.setFlag(QGraphicsItem.ItemHasNoContents)
 
     def __repr__(self):
         _id = str(id(self))[-4:]
@@ -50,16 +51,15 @@ class GridRootItem(QGraphicsRectItem):
 
     ### SLOTS ###
     def partAddedSlot(self, sender, model_part_instance):
-        """
-        Receives notification from the model that a part has been added.
+        """Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
 
         Args:
             sender (obj): Model object that emitted the signal.
-            model_part_instance (Part): Description
+            model_part_instance (ObjectInstance): Description
 
         Raises:
-            NotImplementedError: partAddedSlot should always be overridden.
+            NotImplementedError: unknown ``part_type``
         """
         if self.are_signals_on:
             part_type = model_part_instance.reference().partType()
@@ -71,7 +71,7 @@ class GridRootItem(QGraphicsRectItem):
                 self.select_tool.setPartItem(na_part_item)
                 na_part_item.zoomToFit()
             else:
-                raise NotImplementedError
+                raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
     def selectedChangedSlot(self, item_dict):
