@@ -34,33 +34,37 @@ from numpy.core.umath_tests import inner1d
 DEFAULT_CACHE_SIZE = 20
 
 
-def _defaultProperties(id_num):
-    props = [('name', "vh%d" % (id_num)),
-             ('is_visible', True),
-             ('color', '#00000000'),
-             # ('eulerZ', 17.143*2),    # 0.5*360/10.5
-             ('eulerZ', 0.),
-             ('neighbor_active_angle', 0.0),
-             ('neighbors', '[]'),
-             ('bases_per_repeat', 21),
-             ('turns_per_repeat', 2),
-             ('repeat_hint', 2),  # used in path view for how many repeats to display PXIs
-             ('helical_pitch', 1.),
-             ('minor_groove_angle', 180.),  # 171.),
-             ('length', -1),
-             ('z', 0.0)
-             ]
+def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
+    props_dict = {'name': "vh%d" % (id_num),
+                  'is_visible': True,
+                  'color': '#00000000',
+                  'eulerZ': -20,     # For a Cadnano 2.0 design, the ideal offset angle
+                  'neighbor_active_angle': 0.0,
+                  'neighbors': '[]',
+                  'bases_per_repeat': 21,
+                  'turns_per_repeat': 2,
+                  'repeat_hint': 2,  # used in path view for how many repeats to display PXIs
+                  'helical_pitch': 1.,
+                  'minor_groove_angle': 180.,  # 171.),
+                  'length': -1,
+                  'z': 0.0}
+
+    if grid_type == GridType.SQUARE:
+        props_dict['eulerZ'] = 175 # For a Cadnano 2.0 design, the ideal offset angle
+        props_dict['bases_per_repeat'] = 32
+        props_dict['turns_per_repeat'] = 3
+
+    props = [(k,v) for (k,v) in props_dict.items()]
     return tuple(zip(*props))
-# end def
 
 
 VH_PROPERTY_KEYS = set([x for x in _defaultProperties(0)[0]])
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 
 
-def _defaultDataFrame(size):
+def _defaultDataFrame(size, grid_type=GridType.HONEYCOMB):
     dummy_id_num = 999
-    columns, row = _defaultProperties(dummy_id_num)
+    columns, row = _defaultProperties(dummy_id_num, grid_type)
     df = pd.DataFrame([row for i in range(size)], columns=columns)
     return df
 # end def
@@ -197,7 +201,7 @@ class NucleicAcidPart(Part):
 
         self.reserved_ids = set()
 
-        self.vh_properties = _defaultDataFrame(DEFAULT_SIZE)
+        self.vh_properties = _defaultDataFrame(DEFAULT_SIZE, grid_type)
 
         self.fwd_strandsets = [None] * DEFAULT_SIZE
         self.rev_strandsets = [None] * DEFAULT_SIZE
@@ -312,7 +316,8 @@ class NucleicAcidPart(Part):
         new_vhg.offset_and_size = self._offset_and_size.copy()
         new_vhg.reserved_ids = self.reserved_ids.copy()
 
-        new_vhg.vh_properties = _defaultDataFrame(DEFAULT_SIZE)
+        new_vhg.vh_properties = _defaultDataFrame(DEFAULT_SIZE,
+                                                  self._group_properties['grid_type'])
 
         new_vhg.fwd_strandsets = [x.simpleCopy(new_vhg) for x in self.fwd_strandsets]
         new_vhg.rev_strandsets = [x.simpleCopy(new_vhg) for x in self.rev_strandsets]
@@ -1091,7 +1096,8 @@ class NucleicAcidPart(Part):
             self.directions.resize((total_rows, 3))
             self.directions[len_origin_pts:] = 0  # unnecessary as resize fills with zeros
 
-            self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements),
+            self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements,
+                                                           self._group_properties['grid_type']),
                                                            ignore_index=True)
 
         self._origin_pts[id_num] = origin[:2]
