@@ -38,7 +38,7 @@ def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
     props_dict = {'name': "vh%d" % (id_num),
                   'is_visible': True,
                   'color': '#00000000',
-                  'eulerZ': -20,     # For a Cadnano 2.0 design, the ideal offset angle
+                  'eulerZ': 17,     # For a Cadnano 2.0 design, the ideal offset angle
                   'neighbor_active_angle': 0.0,
                   'neighbors': '[]',
                   'bases_per_repeat': 21,
@@ -50,11 +50,12 @@ def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
                   'z': 0.0}
 
     if grid_type == GridType.SQUARE:
-        props_dict['eulerZ'] = 175 # For a Cadnano 2.0 design, the ideal offset angle
+        props_dict['eulerZ'] = 170 # For a Cadnano 2.0 design, the ideal offset angle
         props_dict['bases_per_repeat'] = 32
         props_dict['turns_per_repeat'] = 3
 
     props = [(k,v) for (k,v) in props_dict.items()]
+
     return tuple(zip(*props))
 
 
