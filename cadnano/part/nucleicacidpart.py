@@ -38,7 +38,7 @@ def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
     props_dict = {'name': "vh%d" % (id_num),
                   'is_visible': True,
                   'color': '#00000000',
-                  'eulerZ': 0,
+                  'eulerZ': -20,     # For a Cadnano 2.0 design, the ideal offset angle
                   'neighbor_active_angle': 0.0,
                   'neighbors': '[]',
                   'bases_per_repeat': 21,
