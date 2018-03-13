@@ -4,6 +4,8 @@
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
+from PyQt5.QtGui import QCursor
+
 from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
@@ -121,6 +123,7 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
+        self.group.resetTransform()
         if part_item is not self.part_item:
             if self.slice_graphics_view is not None:
                 # attempt to enforce good housekeeping, not required
@@ -346,6 +349,11 @@ class SelectGridTool(AbstractGridTool):
             TYPE: Description
         """
         part_instance = self.part_item.partInstance()
+
+        # SAVE the CORNER POINT of the selection box
+
+        self.copy_pt = self.group.scenePos()
+        print("NEW CP", self.copy_pt)
         copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
         self.clip_board = copy_dict
     # end def
@@ -357,10 +365,36 @@ class SelectGridTool(AbstractGridTool):
             TYPE: Description
         """
         doc = self.manager.document
-        part = self.part_item.part()
+        part_item = self.part_item
+        part = part_item.part()
+        sgv = self.slice_graphics_view
+
+        #  1. get mouse point at the paste
+        qc = QCursor()
+        global_pos = qc.pos()
+        view_pt = sgv.mapFromGlobal(global_pos)
+        s_pt = sgv.mapToScene(view_pt)
+        # pt = self.findNearestPoint(part_item, s_pt)
+        # to_pt = part_item.getModelPos(pt)
+
+        to_pt = part_item.getModelPos(s_pt)
+
+        # 2. Get the mouse point of the copy
+        # pt = self.findNearestPoint(part_item, self.copy_pt)
+        # from_pt = part_item.getModelPos(pt)
+        from_pt = part_item.getModelPos(self.copy_pt)
+
+        # 3. Calulate a delta from the CORNER of the selection box
+        distance_offset = to_pt[0] - from_pt[0], to_pt[1] - from_pt[1]
+
+
+        # distance_offset = part_item.getModelPos(s_pt - self.copy_pt)
+
         part_instance = self.part_item.partInstance()
         doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part_instance, self.clip_board)
+        new_vh_set = v3decode.importToPart( part_instance,
+                                            self.clip_board,
+                                            offset=distance_offset)
         doc.undoStack().endMacro()
         self.modelClear()
         doc.addVirtualHelicesToSelection(part, new_vh_set)
@@ -404,23 +438,30 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def getCustomContextMenu(self, point):
-        """point (QPoint)
+        """
 
         Args:
-            point (TYPE): Description
+            point (QPoint): Description
         """
+        sgv = self.slice_graphics_view
+        do_show = False
+        menu = None
         if len(self.selection_set) > 0:
-            sgv = self.slice_graphics_view
             menu = QMenu(sgv)
             copy_act = QAction("copy selection", sgv)
             copy_act.setStatusTip("copy selection")
             copy_act.triggered.connect(self.copySelection)
             menu.addAction(copy_act)
-            if self.clip_board:
-                copy_act = QAction("paste", sgv)
-                copy_act.setStatusTip("paste from clip board")
-                copy_act.triggered.connect(self.pasteClipboard)
-                menu.addAction(copy_act)
+            do_show = True
+        if self.clip_board is not None:
+            if menu is None:
+                menu = QMenu(sgv)
+            copy_act = QAction("paste", sgv)
+            copy_act.setStatusTip("paste from clip board")
+            copy_act.triggered.connect(self.pasteClipboard)
+            menu.addAction(copy_act)
+            do_show = True
+        if do_show:
             menu.exec_(sgv.mapToGlobal(point))
     # end def
 # end class
@@ -516,19 +557,19 @@ class GridSelectionGroup(QGraphicsItemGroup):
             """
             # slice_graphics_view = self.tool.slice_graphics_view
             # print(slice_graphics_view)
-            # self.getCustomContextMenu(event.screenPos())
+            # tool.getCustomContextMenu(event.screenPos())
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
             # print("the right event")
             modifiers = event.modifiers()
             is_shift = modifiers == Qt.ShiftModifier
-            print("Is_shift is %s" % is_shift)
+            # print("Is_shift is %s" % is_shift)
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
                 # print("clicking the box")
                 pos = event.scenePos()
-                for item in tool.sgv.scene().items(pos):
+                for item in tool.slice_graphics_view.scene().items(pos):
                     if isinstance(item, GridVirtualHelixItem):
                         doc = tool.manager.document
                         part = item.part()

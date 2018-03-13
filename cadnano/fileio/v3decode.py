@@ -171,7 +171,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, use_undostack=True):
+def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
     will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
@@ -191,25 +191,45 @@ def importToPart(part_instance, copy_dict, use_undostack=True):
     keys = list(vh_props.keys())
     name_index = keys.index('name')
     new_vh_id_set = set()
+    copied_vh_id_set = set()
+    if offset is None:
+        offx, offy = 0, 0
+    else:
+        offx, offy = offset
+
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
-        z = vh_props['z'][id_num]
+        if offset is not None:
+            x += offx
+            y += offy
+        try:
+            # Don't use id_num since is compacted
+            z = vh_props['z'][i]
+        except:
+            print(vh_props)
+            raise
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
+        # print("creating", new_id_num)
         vals[name_index] += (name_suffix % new_id_num)
-        part.createVirtualHelix(x, y, z, size,
+        did_create = part.createVirtualHelix(x, y, z, size,
                                 id_num=new_id_num,
                                 properties=(keys, vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
-        new_vh_id_set.add(new_id_num)
+        if did_create:
+            copied_vh_id_set.add(i)
+            new_vh_id_set.add(new_id_num)
     # end for
     strands = copy_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']
     for id_num, idx_set in enumerate(strand_index_list):
+        if id_num not in copied_vh_id_set:
+            continue
         if idx_set is not None:
+            # print("getting", new_id_num)
             fwd_strand_set, rev_strand_set = part.getStrandSets(
                 id_num + id_num_offset)
             fwd_idxs, rev_idxs = idx_set

@@ -498,8 +498,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             bottom_right as reconfigured with padding
         """
         rect = self._rect
-        ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
-        ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
+        ptTL = QPointF(*self._padTL(padding, *top_left)) if top_left else rect.topLeft()
+        ptBR = QPointF(*self._padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = QRectF(ptTL, ptBR)
         self.setRect(self._rect)
         self._configureOutline(self.outline)
@@ -507,11 +507,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return self.outline.rect()
     # end def
 
-    def padTL(self, padding, xTL, yTL):
+    def _padTL(self, padding, xTL, yTL):
         return xTL + padding, yTL + padding
     # end def
 
-    def padBR(self, padding, xBR, yBR):
+    def _padBR(self, padding, xBR, yBR):
         return xBR - padding, yBR - padding
     # end def
 

@@ -426,8 +426,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            top_left: Description
-            bottom_right: Description
+            top_left: top left corner point
+            bottom_right: bottom right corner point
             padding: padding of the rectagle in pixels points
 
         Returns:
@@ -435,8 +435,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                 ``bottom_right`` as reconfigured with ``padding``
         """
         rect = self._rect
-        ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
-        ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
+        ptTL = QPointF(*self._padTL(padding, *top_left)) if top_left else rect.topLeft()
+        ptBR = QPointF(*self._padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = new_rect = QRectF(ptTL, ptBR)
         self.setRect(new_rect)
         self._configureOutline(self.outline)
@@ -444,11 +444,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         return (ptTL.x(), ptTL.y()), (ptBR.x(), ptBR.y())
     # end def
 
-    def padTL(self, padding, xTL, yTL):
+    def _padTL(self, padding, xTL, yTL):
         return xTL + padding, yTL + padding
     # end def
 
-    def padBR(self, padding, xBR, yBR):
+    def _padBR(self, padding, xBR, yBR):
         return xBR - padding, yBR - padding
     # end def
 
@@ -468,11 +468,11 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _configureOutline(self, outline):
+    def _configureOutline(self, outline: QGraphicsRectItem):
         """Adjusts `outline` size with default padding.
 
         Args:
-            outline (TYPE): Description
+            outline: Description
 
         Returns:
             o_rect (QRect): `outline` rect adjusted by _BOUNDING_RECT_PADDING
@@ -491,17 +491,17 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelMinBounds(self, handle_type=None):
+    def getModelMinBounds(self, handle_type=None) -> Tuple[float, float, float, float]:
         """Bounds in form of Qt scaled from model
 
-        Args:
-            Tuple (top_left, bottom_right)
+        Returns:
+            top_left + bottom_right tuple concatenated.
         """
         xLL, yLL, xUR, yUR = self.part().boundDimensions(self.scale_factor)
         return xLL, -yUR, xUR, -yLL
     # end def
 
-    def bounds(self):
+    def bounds(self) -> Tuple[float, float, float, float]:
         """x_low, x_high, y_low, y_high
         """
         rect = self._rect
@@ -566,7 +566,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
 
         tool = self._getActiveTool()
@@ -614,22 +614,15 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             tool (TYPE): Description
-            event (TYPE): Description
+            event: Description
             alt_event (None, optional): Description
-
-        Returns:
-            TYPE: Description
         """
         # 1. get point in model coordinates:
         part = self._model_part
         if alt_event is None:
             pt = tool.eventToPosition(self, event)
-            # print("reg_event", pt)
         else:
-            # pt = alt_event.scenePos()
-            # pt = self.mapFromScene(pt)
             pt = alt_event.pos()
-            # print("alt_event", pt)
 
         if pt is None:
             tool.deactivate()

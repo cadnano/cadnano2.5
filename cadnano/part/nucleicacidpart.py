@@ -2566,7 +2566,7 @@ class NucleicAcidPart(Part):
 
     def createVirtualHelix(self, x, y, z=0.0, length=42, id_num=None,
                            properties=None, safe=True, use_undostack=True,
-                           parity=None):
+                           parity=None) -> bool:
         """Create new VirtualHelix by calling CreateVirtualHelixCommand.
 
         Args:
@@ -2581,14 +2581,16 @@ class NucleicAcidPart(Part):
                 neighbors need to be explicitly updated
             use_undostack (bool): Set to False to disable undo stack for bulk
                 operations such as file import.
+        Returns:
+            True if successful, False if not
         """
         valid_pts = np.where(self._origin_pts != np.inf)
         x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
         vps = np.around(self._origin_pts[valid_pts], decimals=9)
         if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
             print("vh already present at coords ({}, {})".format(x9, y9))
-            print(util.trace(5))
-            return
+            # print(util.trace(5))
+            return False
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len
@@ -2598,6 +2600,7 @@ class NucleicAcidPart(Part):
                                       safe=safe,
                                       parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
+        return True
     # end def
 
     def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
