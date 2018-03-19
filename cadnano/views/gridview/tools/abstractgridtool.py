@@ -201,6 +201,7 @@ class AbstractGridTool(AbstractTool):
         Returns:
             TYPE: Description
         """
+        # print("hideLineItem")
         self.vhi_hint_item.hide()
         li = self._line_item
         li.hide()

@@ -67,6 +67,7 @@ class SelectGridTool(AbstractGridTool):
         self.individual_pick = False
         self.snap_origin_item = None
         self.clip_board = None
+        # self.menu_pos = None
     # end def
 
     def __repr__(self):
@@ -348,14 +349,19 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
-        part_instance = self.part_item.partInstance()
+        part_item = self.part_item
+        part_instance = part_item.partInstance()
 
         # SAVE the CORNER POINT of the selection box
+        bri = self.group.bounding_rect_item
+        br = bri.rect()
+        delta = QPointF(br.width() / 2 , br.height()/2)
+        self.copy_pt = bri.pos() + delta
+        # print("NEW Grid copy point", self.copy_pt)
 
-        self.copy_pt = self.group.scenePos()
-        print("NEW CP", self.copy_pt)
         copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
         self.clip_board = copy_dict
+        self.vhi_hint_item.hide()
     # end def
 
     def pasteClipboard(self):
@@ -374,21 +380,18 @@ class SelectGridTool(AbstractGridTool):
         global_pos = qc.pos()
         view_pt = sgv.mapFromGlobal(global_pos)
         s_pt = sgv.mapToScene(view_pt)
-        # pt = self.findNearestPoint(part_item, s_pt)
-        # to_pt = part_item.getModelPos(pt)
 
-        to_pt = part_item.getModelPos(s_pt)
+        to_pt = part_item.mapFromScene(s_pt)
+        # print("To Grid Point", to_pt.x(), to_pt.y())
 
-        # 2. Get the mouse point of the copy
-        # pt = self.findNearestPoint(part_item, self.copy_pt)
-        # from_pt = part_item.getModelPos(pt)
-        from_pt = part_item.getModelPos(self.copy_pt)
+        # self.vhi_hint_item.setParentItem(part_item)
+        # self.setHintPos(to_pt)
+        # self.vhi_hint_item.show()
 
-        # 3. Calulate a delta from the CORNER of the selection box
-        distance_offset = to_pt[0] - from_pt[0], to_pt[1] - from_pt[1]
-
-
-        # distance_offset = part_item.getModelPos(s_pt - self.copy_pt)
+        # 2. Calulate a delta from the CORNER of the selection box
+        sf = part_item.scaleFactor()
+        delta = to_pt - self.copy_pt
+        distance_offset  = delta.x()/sf, -delta.y()/sf
 
         part_instance = self.part_item.partInstance()
         doc.undoStack().beginMacro("Paste VirtualHelices")
@@ -397,7 +400,7 @@ class SelectGridTool(AbstractGridTool):
                                             offset=distance_offset)
         doc.undoStack().endMacro()
         self.modelClear()
-        doc.addVirtualHelicesToSelection(part, new_vh_set)
+        # doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
@@ -462,6 +465,10 @@ class SelectGridTool(AbstractGridTool):
             menu.addAction(copy_act)
             do_show = True
         if do_show:
+            # def menuClickSet(event):
+            #     self.menu_pos = event.globalPos()
+            #     return QMenu.mousePressEvent(menu, event)
+            # menu.mousePressEvent = menuClickSet
             menu.exec_(sgv.mapToGlobal(point))
     # end def
 # end class
@@ -525,7 +532,12 @@ class GridSelectionGroup(QGraphicsItemGroup):
         bri = self.bounding_rect_item
         bri.hide()
         self.removeFromGroup(bri)
+
+        # Need to reparent move back to 0,0
         bri.setParentItem(self.tool)
+        temp_pt = QPointF(0, 0)
+        bri.setPos(temp_pt)
+
         self.setFocus(False)
     # end def
 
