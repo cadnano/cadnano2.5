@@ -6,6 +6,8 @@ from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
 from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
+from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.gui.palette import getPenObj
 
@@ -27,7 +29,7 @@ class AbstractGridTool(AbstractTool):
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
 
-    def __init__(self, manager):
+    def __init__(self, manager: AbstractToolManager):
         """Summary
 
         Args:
@@ -146,11 +148,12 @@ class AbstractGridTool(AbstractTool):
         self.vhi_hint_item.setPos(pos - QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
-    def findNearestPoint(self, part_item, target_scenepos):
+    def findNearestPoint(self,  part_item: QAbstractPartItem,
+                                target_scenepos: QPointF) -> QPointF:
         """
         Args:
-            part_item (TYPE): Description
-            target_scenepos (TYPE): Description
+            part_item: Description
+            target_scenepos: position in the Scene
         """
         li = self._line_item
         pos = li.mapFromScene(target_scenepos)
@@ -180,11 +183,12 @@ class AbstractGridTool(AbstractTool):
             return part_item.mapFromItem(li, pos)
     # end def
 
-    def findNextPoint(self, part_item, target_part_pos):
+    def findNextPoint(self, part_item: QAbstractPartItem,
+                            target_part_pos: QPointF) -> QPointF:
         """
         Args:
-            part_item (TYPE): Description
-            target_part_pos (TYPE): Description
+            part_item: Description
+            target_part_pos: Position in the Part
         """
         li = self._line_item
         pos = li.mapFromItem(part_item, target_part_pos)
@@ -196,10 +200,8 @@ class AbstractGridTool(AbstractTool):
     # end def
 
     def hideLineItem(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """ Hide the ``_line_item`` and the ``vhi_hint_item``
+        set ``is_started`` to :bool:`False`
         """
         # print("hideLineItem")
         self.vhi_hint_item.hide()
@@ -209,7 +211,6 @@ class AbstractGridTool(AbstractTool):
         line = li.line()
         line.setP2(self._CENTER_OF_HELIX)
         li.setLine(line)
-        # li.hide()
         self.is_started = False
     # end def
 

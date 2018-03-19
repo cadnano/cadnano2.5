@@ -196,7 +196,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             if tool.methodPrefix() == "selectTool":
                 if tool.isSelectionActive():
                     # tool.deselectItems()
-                    tool.modelClear()
+                    tool.modelClearSelected()
 
         # 1. move everything that moved
         for id_num in vh_set:
@@ -690,10 +690,10 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                 print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))
             else:
                 # tool.deselectItems()
-                tool.modelClear()
+                tool.modelClearSelected()
         else:
             # tool.deselectItems()
-            tool.modelClear()
+            tool.modelClearSelected()
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 # end class

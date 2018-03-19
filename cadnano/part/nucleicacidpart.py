@@ -5,6 +5,7 @@ from bisect import bisect_left
 from collections import defaultdict, deque
 from heapq import heapify, heappush, nsmallest
 from itertools import count as icount
+from typing import Iterable, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -32,7 +33,8 @@ equivalent to np.sum(a*a, axis=1) but faster
 from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
-
+IntType = Union[np.int64, int]
+IntTuple = (np.int64, int)
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -342,18 +344,21 @@ class NucleicAcidPart(Part):
         return self._TWIST_PER_BASE
     # end def
 
-    def getOffsetAndSize(self, id_num):
+    def getOffsetAndSize(self, id_num: int) -> Tuple[int, int]:
         """Get the index offset of this ID into the point buffers
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: (:obj:`int`, :obj:`int`) of the form::
+            tuple in the form::
 
                 (offset, size)
 
             into the coordinate arrays for a given ID number
+
+        Raises:
+            KeyError for ``id_num`` not being there
         """
         offset_and_size = self._offset_and_size
         if id_num > len(offset_and_size) - 1 or offset_and_size[id_num] is None:
@@ -373,7 +378,7 @@ class NucleicAcidPart(Part):
         return self._virtual_helices_set[id_num]
     # end def
 
-    def _getNewIdNum(self, parity=None):
+    def _getNewIdNum(self, parity: int = None) -> int:
         """
         Return the lowest id_num that is both currently available and that is
         even or odd according to parity (if specified).
@@ -384,12 +389,12 @@ class NucleicAcidPart(Part):
         virtual helices are deleted.
 
         Args:
-            parity (int): 1 or 0 depending on if the parity of the ID should
+            parity: Optional 1 or 0 depending on if the parity of the ID should
             be odd or even.  If this is None, the next available number will
             be used
 
         Returns:
-            int: a valid ID number
+            a valid ID number
         """
         _even = 0
         _odd = 1
@@ -400,77 +405,89 @@ class NucleicAcidPart(Part):
             else:
                 return min(self._highest_odd_id_num_used + 2,
                            self._highest_even_id_num_used + 2)
-        elif parity is _odd:
+        elif parity == _odd:
             if len(self.recycle_bin.get(_odd)):
                 return nsmallest(1, self.recycle_bin.get(_odd))[0]
             else:
                 return self._highest_odd_id_num_used + 2
-        elif parity is _even:
+        elif parity == _even:
             if len(self.recycle_bin.get(_even)):
                 return nsmallest(1, self.recycle_bin.get(_even))[0]
             else:
                 return self._highest_even_id_num_used + 2
         else:
-            raise AttributeError('Invalid parity passed to _getNewIdNum:  %s' % parity)
+            err = 'Invalid parity passed to _getNewIdNum: {}'.format(parity)
+            raise AttributeError(err)
     # end def
 
-    def getMaxIdNum(self, parity=None):
+    def getMaxIdNum(self, parity: int = None) -> int:
         """
         Return the highest ID number used so far.
 
         Returns:
-            int: max virtual helix ID number used
+            max virtual helix ID number used
         """
         if parity is None:
             return max(self._highest_even_id_num_used, self._highest_odd_id_num_used)
-        elif parity is 0:
+        elif parity == 0:
             return self._highest_even_id_num_used
-        elif parity is 1:
+        elif parity == 1:
             return self._highest_odd_id_num_used
         else:
             raise AttributeError('Invalid parity passed to getMaxIdNum:  %s' % parity)
 
-    def _reserveIdNum(self, requested_id_num):
-        """
-        Reserves and returns a unique numerical id_num appropriate for a
+    def _reserveIdNum(self, requested_id_num: IntType):
+        """Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
 
         Args:
-            requested_id_num (int): virtual helix ID number
+            requested_id_num: virtual helix ID number
         """
-        num = requested_id_num
-        parity = requested_id_num % 2
-        assert num >= 0, int(num) == num
+        assert isinstance(requested_id_num, IntTuple)
+        num = int(requested_id_num)
+        assert num >= 0
+        parity = num % 2
+
         # assert not num in self._number_to_virtual_helix
         if num in self.recycle_bin.get(parity):
+            # print("reserved", num)
             self.recycle_bin.get(parity, {}).remove(num)
             # rebuild the heap since we removed a specific item
             heapify(self.recycle_bin.get(parity, {}))
-        if parity is 0 and self._highest_even_id_num_used < num:
+        if parity == 0 and self._highest_even_id_num_used < num:
             self._highest_even_id_num_used = num
-        elif parity is 1 and self._highest_odd_id_num_used < num:
+        elif parity == 1 and self._highest_odd_id_num_used < num:
             self._highest_odd_id_num_used = num
         self.reserved_ids.add(num)
     # end def
 
-    def _recycleIdNum(self, id_num):
-        """
-        The caller's contract is to ensure that id_num is not used in *any*
+    def _recycleIdNum(self, id_num: IntType):
+        """The caller's contract is to ensure that id_num is not used in *any*
         helix at the time of the calling of this function (or afterwards, unless
-        `reserveIdNumForHelix` returns the id_num again).
+        ``reserveIdNumForHelix`` returns the ``id_num`` again).
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
         """
-        parity = id_num % 2
-        if parity is 0:
-            heappush(self.recycle_bin.get(0), id_num)
-            self._highest_even_id_num_used = id_num-2
+        assert isinstance(id_num, IntTuple)
+        store_num: int = int(id_num) # conver to integer
+        parity = store_num % 2
+        self.reserved_ids.remove(store_num)
+        if parity == 0:
+            heappush(self.recycle_bin.get(0), store_num)
+            if store_num == self._highest_even_id_num_used:
+                ids = sorted(list(self.reserved_ids), reverse=True)
+                for i in ids:
+                    if i % 2 == 0:
+                        self._highest_even_id_num_used = i
         else:
-            heappush(self.recycle_bin.get(1), id_num)
-            self._highest_odd_id_num_used = id_num-2
-        self.reserved_ids.remove(id_num)
+            heappush(self.recycle_bin.get(1), store_num)
+            if store_num == self._highest_odd_id_num_used:
+                ids = sorted(list(self.reserved_ids), reverse=True)
+                for i in ids:
+                    if i % 2 == 1:
+                        self._highest_odd_id_num_used = i
     # end def
 
     def _sanity_check_id_numbers(self):
@@ -1507,17 +1524,17 @@ class NucleicAcidPart(Part):
         self.rev_pts[lo:hi] = new_rev_pts
     # end def
 
-    def _removeCoordinates(self, id_num, length, is_right):
+    def _removeCoordinates(self, id_num: int, length: int, is_right: bool) -> bool:
         """Remove coordinates given a length, reindex as necessary
 
         Args:
-            id_num (int): virtual helix ID number
-            length (int): number of coordinates to remove
-            is_right (bool): whether the removal occurs at the right or left
+            id_num: virtual helix ID number
+            length: number of coordinates to remove
+            is_right: whether the removal occurs at the right or left
                 end of a virtual helix since virtual helix arrays are always contiguous
 
         Returns:
-            bool: True if id_num is removed, False otherwise
+            ``True`` if ``id_num`` is removed, ``False`` otherwise
 
         Raises:
             KeyError:
@@ -2689,7 +2706,7 @@ class NucleicAcidPart(Part):
         return id_numbers
     # end def
 
-    def removeVirtualHelix(self, id_num, use_undostack=True):
+    def removeVirtualHelix(self, id_num: int, use_undostack: bool = True):
         """Removes a VirtualHelix from the model. Accepts a reference to the
         VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
         """
@@ -2704,6 +2721,16 @@ class NucleicAcidPart(Part):
             self.undoStack().endMacro()
         else:
             c.redo()
+    # end def
+
+    def removeVirtualHelices(self,  id_numbers: Iterable[int],
+                                    use_undostack: bool = True):
+        if use_undostack:
+            self.undoStack().beginMacro("Delete VirtualHelices")
+        for id_num in id_numbers:
+            self.removeVirtualHelix(id_num)
+        if use_undostack:
+            self.undoStack().endMacro()
     # end def
 
     def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True,

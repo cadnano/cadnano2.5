@@ -96,24 +96,20 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def resetSelections(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Clear all model selections
+        This is redundant with modelClearSelected()
         """
         # print("resetSelections")
         doc = self.manager.document
         doc.clearAllSelected()
 
-    def modelClear(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def modelClearSelected(self):
+        """Clear all model selections
         """
-        # print("modelClear")
+        # print("modelClearSelected")
         doc = self.manager.document
         doc.clearAllSelected()
+    # end def
 
     def setPartItem(self, part_item):
         """Summary
@@ -133,7 +129,7 @@ class SelectGridTool(AbstractGridTool):
                 except TypeError:
                     pass
             if self.part_item is not None:
-                self.modelClear()
+                self.modelClearSelected()
             self.part_item = part_item
 
             # In the event that the old part_item was deleted (and garbage
@@ -288,7 +284,7 @@ class SelectGridTool(AbstractGridTool):
             self.individual_pick = False
         else:  # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
-                self.modelClear()   # deselect if shift isn't held
+                self.modelClearSelected()   # deselect if shift isn't held
 
             if isinstance(target_item, GridVirtualHelixItem):
                 # NOTE: individual_pick seems not needed.
@@ -343,14 +339,21 @@ class SelectGridTool(AbstractGridTool):
         self.hideLineItem()
     # end def
 
-    def copySelection(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def deleteSelection(self):
+        """Delete Selection Group
         """
         part_item = self.part_item
-        part_instance = part_item.partInstance()
+        part = part_item.part()
+        delete_set = self.selection_set.copy()
+        self.modelClearSelected()
+        part.removeVirtualHelices(delete_set)
+    # end def
+
+    def copySelection(self):
+        """Copy Selection Group to a Clip board
+        """
+        part_item = self.part_item
+        part_instance = part_item.part()
 
         # SAVE the CORNER POINT of the selection box
         bri = self.group.bounding_rect_item
@@ -399,7 +402,7 @@ class SelectGridTool(AbstractGridTool):
                                             self.clip_board,
                                             offset=distance_offset)
         doc.undoStack().endMacro()
-        self.modelClear()
+        self.modelClearSelected()
         # doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
@@ -433,7 +436,7 @@ class SelectGridTool(AbstractGridTool):
                 self.slice_graphics_view.rubberBandChanged.disconnect(self.selectRubberband)
             except (AttributeError, TypeError):
                 pass    # required for first call
-        self.modelClear()
+        self.modelClearSelected()
         if self.snap_origin_item is not None:
             self.snap_origin_item.setSnapOrigin(False)
             self.snap_origin_item = None
@@ -455,6 +458,10 @@ class SelectGridTool(AbstractGridTool):
             copy_act.setStatusTip("copy selection")
             copy_act.triggered.connect(self.copySelection)
             menu.addAction(copy_act)
+            delete_act = QAction("delete selection", sgv)
+            delete_act.setStatusTip("delete selection")
+            delete_act.triggered.connect(self.deleteSelection)
+            menu.addAction(delete_act)
             do_show = True
         if self.clip_board is not None:
             if menu is None:
