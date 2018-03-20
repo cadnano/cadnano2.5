@@ -481,6 +481,7 @@ class NucleicAcidPart(Part):
                 for i in ids:
                     if i % 2 == 0:
                         self._highest_even_id_num_used = i
+                        break
         else:
             heappush(self.recycle_bin.get(1), store_num)
             if store_num == self._highest_odd_id_num_used:
@@ -488,6 +489,7 @@ class NucleicAcidPart(Part):
                 for i in ids:
                     if i % 2 == 1:
                         self._highest_odd_id_num_used = i
+                        break
     # end def
 
     def _sanity_check_id_numbers(self):

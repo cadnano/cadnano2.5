@@ -181,6 +181,9 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         copy_dict (dict):
     """
     part = part_instance.reference()
+    if use_undostack:
+        undostack = part.undoStack()
+        undostack.beginMacro("Import to Part")
     id_num_offset = part.getMaxIdNum() + 1
     print("Starting from", id_num_offset)
     vh_id_list = copy_dict['vh_list']
@@ -271,5 +274,7 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     """
     TODO: figure out copy_dict['view_properties'] handling here
     """
+    if use_undostack:
+        undostack.endMacro()
     return new_vh_id_set
 # end def

@@ -353,7 +353,7 @@ class SelectGridTool(AbstractGridTool):
         """Copy Selection Group to a Clip board
         """
         part_item = self.part_item
-        part_instance = part_item.part()
+        part_instance = part_item.partInstance()
 
         # SAVE the CORNER POINT of the selection box
         bri = self.group.bounding_rect_item
