@@ -19,7 +19,7 @@ from cadnano.views.pathview.pathrootitem import PathRootItem
 from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
-
+from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
 
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
@@ -290,6 +290,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.sep.setSeparator(True)
         self.menu_edit.insertAction(self.sep, self.actionRedo)
         self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
+
         # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")
     # end def
@@ -307,4 +308,27 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
         self.action_slice.setChecked(slice_visible)
     # end def
+
+    def getMouseViewTool(self, tool_type_name: str) -> AbstractTool:
+        """Give a tool type, return the tool for the view the mouse is over
+
+        Args:
+            tool_type_name: the tool which is active or None
+
+        Returns:
+            active tool for the view the tool is in
+        """
+        return_tool = None
+        for item in self.views.values():
+            view, scene, root_item = item
+            if view.underMouse():
+                # print("I am under mouse", view)
+                if root_item.manager.isToolActive(tool_type_name):
+                    # print("{} is active".format(tool_type_name))
+                    return_tool = root_item.manager.activeToolGetter()
+                else:
+                    # print("no {} HERE!".format(tool_type_name))
+                    pass
+                break
+        return return_tool
 # end class

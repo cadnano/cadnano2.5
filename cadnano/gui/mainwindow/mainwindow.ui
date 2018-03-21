@@ -651,7 +651,7 @@
   </action>
   <action name="action_copy">
    <property name="text">
-    <string>Copy Part</string>
+    <string>Copy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>

@@ -7,9 +7,10 @@ class AbstractTool(QGraphicsObject):
     """ For use in place of None checks in the code
     reduces boilerplate
     """
-    action_name: str  = 'action_abstract_tool'
 
     def __init__(self, parent: QGraphicsItem):
+        self.type_name: str = 'no tool'
+        self.action_name: str  = 'action_abstract_tool'
         super(AbstractTool, self).__init__(parent)
 
     def methodPrefix(self) -> str:
@@ -32,6 +33,7 @@ class AbstractToolManager(QObject):
     """Manages interactions between the slice widgets/UI and the model."""
 
     def __init__(self,  tool_group_name: str,
+                        view_name: str,
                         window: 'cadnano.views.documentwindow.DocumentWindow',
                         viewroot: QGraphicsItem):
         """
@@ -41,6 +43,7 @@ class AbstractToolManager(QObject):
         super(AbstractToolManager, self).__init__()
         self.window = window
         self.viewroot = viewroot
+        self.view_name = view_name
         self.document = window.document()
         self.tool_group_name = tool_group_name
         self._active_tool = abstract_tool
@@ -74,6 +77,7 @@ class AbstractToolManager(QObject):
             tool_widget = None
         tool = getattr(self, l_tool_name + '_tool')
         tool.action_name = action_name
+        tool.type_name = l_tool_name
 
         set_active_tool_method_name = 'choose%sTool' % (tool_name)
 
@@ -142,6 +146,14 @@ class AbstractToolManager(QObject):
         self._active_tool = new_active_tool
         self._active_tool.setActive(True)
         self.activeToolChangedSignal.emit(self._active_tool.action_name)
+    # end def
+
+    def isToolActive(self, tool_type_name: str) -> bool:
+        if tool_type_name not in self.tool_names:
+            print(self.tool_names)
+            err = "Tool type {} not available in {} view"
+            raise TypeError(err.format(tool_type_name, self.view_name))
+        return self._active_tool.type_name == tool_type_name
     # end def
 
     def getFilterList(self) -> List[str]:

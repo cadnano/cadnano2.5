@@ -23,8 +23,8 @@ class GridToolManager(AbstractToolManager):
             window (TYPE): Description
             viewroot (TYPE): Description
         """
-        super(GridToolManager, self).__init__('vhelix', window, viewroot)
-        self.tool_names = ('Select', 'Create')
+        super(GridToolManager, self).__init__('vhelix', 'grid', window, viewroot)
+        self.tool_names = ('select', 'create')
         self.select_tool = SelectGridTool(self)
         self.create_tool = CreateGridTool(self)
         self.viewroot.setManager(self)

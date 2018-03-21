@@ -37,7 +37,7 @@ class AbstractGridTool(AbstractTool):
         """
         # Setting parent to viewroot to prevent orphan _line_item from occurring
         super(AbstractGridTool, self).__init__(parent=manager.viewroot)
-        self.slice_graphics_view = None
+        self.slice_graphics_view = manager.window.grid_graphics_view
         self.manager = manager
         self._active = False
         self._last_location = None

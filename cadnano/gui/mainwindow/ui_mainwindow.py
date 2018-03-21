@@ -565,7 +565,7 @@ class Ui_MainWindow(object):
         self.action_X3D.setText(_translate("MainWindow", "X3D"))
         self.action_cut.setText(_translate("MainWindow", "Cut"))
         self.action_cut.setShortcut(_translate("MainWindow", "Ctrl+X"))
-        self.action_copy.setText(_translate("MainWindow", "Copy Part"))
+        self.action_copy.setText(_translate("MainWindow", "Copy"))
         self.action_copy.setShortcut(_translate("MainWindow", "Ctrl+C"))
         self.action_paste.setText(_translate("MainWindow", "Paste"))
         self.action_paste.setShortcut(_translate("MainWindow", "Ctrl+V"))

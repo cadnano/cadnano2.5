@@ -165,6 +165,8 @@ class DocumentController(object):
             (win.action_filter_rev.triggered, self.actionFilterRevSlot),
             (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
             (win.action_filter_stap.triggered, self.actionFilterStapSlot),
+            (win.action_copy.triggered, self.actionCopySlot),
+            (win.action_paste.triggered, self.actionPasteSlot),
 
             (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
             (win.action_path.triggered, self.actionTogglePathViewSlot),
@@ -341,6 +343,21 @@ class DocumentController(object):
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_stap.setChecked(True)
         self._strandFilterUpdate()
+    # end def
+
+    def actionCopySlot(self):
+        win = self.win
+        select_tool = win.getMouseViewTool('select')
+        if select_tool is not None and hasattr(select_tool, 'copySelection'):
+            print("select_tool is rolling")
+            select_tool.copySelection()
+    # end def
+
+    def actionPasteSlot(self):
+        win = self.win
+        select_tool = win.getMouseViewTool('select')
+        if select_tool is not None and hasattr(select_tool, 'pasteClipboard'):
+            select_tool.pasteClipboard()
     # end def
 
     def actionFilterFwdSlot(self):
