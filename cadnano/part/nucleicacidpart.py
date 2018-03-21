@@ -38,19 +38,19 @@ def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
     props_dict = {'name': "vh%d" % (id_num),
                   'is_visible': True,
                   'color': '#00000000',
-                  'eulerZ': 40,     #17 .For a Cadnano 2.0 design, the ideal offset angle
+                  'eulerZ': 40,     #17 (2nd set) .For a Cadnano 2.0 design, the ideal offset angle
                   'neighbor_active_angle': 0.0,
                   'neighbors': '[]',
                   'bases_per_repeat': 21,
                   'turns_per_repeat': 2,
                   'repeat_hint': 2,  # used in path view for how many repeats to display PXIs
                   'helical_pitch': 1.,
-                  'minor_groove_angle': 120.,  #180.),
+                  'minor_groove_angle': 120.,  #180 (2nd set),
                   'length': -1,
                   'z': 0.0}
 
     if grid_type == GridType.SQUARE:
-        props_dict['eulerZ'] = 193    #170. For a Cadnano 2.0 design, the ideal offset angle
+        props_dict['eulerZ'] = 193    #170 (2nd set). For a Cadnano 2.0 design, the ideal offset angle
         props_dict['bases_per_repeat'] = 32
         props_dict['turns_per_repeat'] = 3
 
