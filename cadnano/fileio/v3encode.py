@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
+from typing import List
+
 from cadnano.proxies.cnenum import PointType
+from cadnano.objectinstance import ObjectInstance
 
 FORMAT_VERSION = '3.1'
 
@@ -86,17 +89,20 @@ def encodePart(part):
 # end def
 
 
-def encodePartList(part_instance, vh_group_list):
+def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> dict:
     """ Used for copying and pasting
     TODO: unify encodePart and encodePartList
 
     Args:
-        part (Part):
-        vh_group_list (list): of :obj:`int`, virtual_helices IDs to encode to
+        part_instance: The ``Part`` ``ObjectInstance``, to allow for instance
+            specific property copying
+        vh_group_list: List of virtual_helices IDs to encode to
             be used with copy and paste serialization
 
     Returns:
-        dict:
+        Dictionary representing the virtual helices with ordered lists of
+        properties, strands, etc to allow for copy and pasting becoming
+        different ID'd virtual helices
     """
     part = part_instance.reference()
     vh_group_list.sort()

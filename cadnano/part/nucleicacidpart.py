@@ -35,6 +35,8 @@ from numpy.core.umath_tests import inner1d
 DEFAULT_CACHE_SIZE = 20
 IntType = Union[np.int64, int]
 IntTuple = (np.int64, int)
+KeyType = Union[str, Iterable[str]]
+ValueType = Union[object, Iterable[object]]
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -613,12 +615,12 @@ class NucleicAcidPart(Part):
         assert len(limits) is 4
         self.origin_limits = limits[0], limits[1], limits[2], limits[3]
 
-    def getVirtualHelixOriginLimits(self):
-        """Retuns a pair of coordinates bounding the lower-left and upper-right
+    def getVirtualHelixOriginLimits(self) -> Tuple[float, float, float, float]:
+        """Returns a pair of coordinates bounding the lower-left and upper-right
         coordinates of the part.
 
         Returns:
-            tuple: of :obj:`int` of the form::
+            tuple: of the form::
 
                 (xLL, yLL, xUR, yUR)
         """
@@ -1111,7 +1113,8 @@ class NucleicAcidPart(Part):
 
             self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements),
                                                            ignore_index=True)
-
+        # TODO recieved a IndexError: index 256 is out of bounds for axis 0 with size 256
+        # when copy and pasting up to that number for some resason
         self._origin_pts[id_num] = origin[:2]
         new_x, new_y = origin[:2]
         xLL, yLL, xUR, yUR = self.origin_limits
@@ -1327,18 +1330,21 @@ class NucleicAcidPart(Part):
             self._setVirtualHelixProperties(id_num, keys, values, emit_signals=safe)
     # end
 
-    def _setVirtualHelixProperties(self, id_num, keys, values, emit_signals=True):
+    def _setVirtualHelixProperties( self,
+                                    id_num: int,
+                                    keys: KeyType,
+                                    values: ValueType,
+                                    emit_signals: bool = True):
         """Private Version: Keys and values can be :obj:`array-like` of equal
         length or singular values.
 
-        emits `partVirtualHelixPropertyChangedSignal`
+        emits ``partVirtualHelixPropertyChangedSignal``
 
         Args:
-            id_num (int): virtual helix ID number
-            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
-            value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
-                the value or values matching the key order
-            emit_signals (bool): optionally echew signaling
+            id_num: virtual helix ID number
+            keys: the key or ordered keys of the properties
+            value: the value or ordered values of the properties
+            emit_signals: optionally echew signaling
         """
         if emit_signals:
             _, _ = self.getOffsetAndSize(id_num)

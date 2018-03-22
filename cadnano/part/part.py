@@ -250,10 +250,10 @@ class Part(CNObject):
         return self._group_properties['name']
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         """
         Returns:
-            str: The part's color. Defaults to #0066cc.
+            The part's color. Defaults to #0066cc.
         """
         return self._group_properties['color']
     # end def

@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
+from typing import Tuple
+
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 from cadnano.proxies.cnenum import GridType, PointType, OrthoViewType
-
+from cadnano.objectinstance import ObjectInstance
 
 def decode(document, obj, emit_signals=False):
     """ Decode a a deserialized Document dictionary
@@ -171,14 +173,17 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
+def importToPart(   part_instance : ObjectInstance,
+                    copy_dict: dict,
+                    offset: Tuple[float, float] = None,
+                    use_undostack: bool = True):
     """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
     will start numbering `part.getMaxIdNum()` rather than the lowest available
     id_num.  TODO should this numbering change?
 
     Args:
-        part_instance (ObjectInstance):
-        copy_dict (dict):
+        part_instance:
+        copy_dict:
     """
     part = part_instance.reference()
     if use_undostack:
@@ -194,7 +199,7 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     keys = list(vh_props.keys())
     name_index = keys.index('name')
     new_vh_id_set = set()
-    copied_vh_id_set = set()
+    copied_vh_index_set = set()
     if offset is None:
         offx, offy = 0, 0
     else:
@@ -222,21 +227,20 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
         if did_create:
-            copied_vh_id_set.add(i)
+            copied_vh_index_set.add(i)
             new_vh_id_set.add(new_id_num)
     # end for
     strands = copy_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']
-    for id_num, idx_set in enumerate(strand_index_list):
-        if id_num not in copied_vh_id_set:
+    for i, idx_set in enumerate(strand_index_list):
+        if i not in copied_vh_index_set:
             continue
         if idx_set is not None:
             # print("getting", new_id_num)
-            fwd_strand_set, rev_strand_set = part.getStrandSets(
-                id_num + id_num_offset)
+            fwd_strand_set, rev_strand_set = part.getStrandSets(i + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
-            fwd_colors, rev_colors = color_list[id_num]
+            fwd_colors, rev_colors = color_list[i]
             for idxs, color in zip(fwd_idxs, fwd_colors):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
@@ -249,9 +253,9 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
     # end def
 
     xovers = copy_dict['xovers']
-    for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
-        from_strand = part.getStrand(from_is_fwd, from_id + id_num_offset, from_idx)
-        to_strand = part.getStrand(to_is_fwd, to_id + id_num_offset, to_idx)
+    for from_i, from_is_fwd, from_idx, to_i, to_is_fwd, to_idx in xovers:
+        from_strand = part.getStrand(from_is_fwd, from_i + id_num_offset, from_idx)
+        to_strand = part.getStrand(to_is_fwd, to_i + id_num_offset, to_idx)
         part.createXover(from_strand, from_idx,
                          to_strand, to_idx,
                          update_oligo=use_undostack,
@@ -260,16 +264,17 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True):
         RefreshOligosCommand(part).redo()
 
     # INSERTIONS, SKIPS
-    for id_num, idx, length in copy_dict['insertions']:
-        fwd_strand = part.getStrand(True, id_num, idx)
-        rev_strand = part.getStrand(False, id_num, idx)
+    for i, idx, length in copy_dict['insertions']:
+        fwd_strand = part.getStrand(True, i + id_num_offset, idx)
+        rev_strand = part.getStrand(False, i + id_num_offset, idx)
         if fwd_strand:
             fwd_strand.addInsertion(idx, length, use_undostack=use_undostack)
         elif rev_strand:
             rev_strand.addInsertion(idx, length, use_undostack=use_undostack)
         else:
             ins = 'Insertion' if length > 0 else 'Skip'
-            print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
+            err = "Cannot find strand for {} at {}[{}]"
+            print(err.format(ins, i + id_num_offset, idx))
 
     """
     TODO: figure out copy_dict['view_properties'] handling here

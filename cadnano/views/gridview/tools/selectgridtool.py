@@ -109,6 +109,10 @@ class SelectGridTool(AbstractGridTool):
         # print("modelClearSelected")
         doc = self.manager.document
         doc.clearAllSelected()
+        self.deselectSet(self.selection_set)
+        self.is_started = False
+        self._vhi = None
+        self.hideLineItem()
     # end def
 
     def setPartItem(self, part_item):
@@ -347,6 +351,7 @@ class SelectGridTool(AbstractGridTool):
         delete_set = self.selection_set.copy()
         self.modelClearSelected()
         part.removeVirtualHelices(delete_set)
+        self.clip_board = None
     # end def
 
     def copySelection(self):
@@ -373,6 +378,8 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
+        if self.clip_board is None:
+            return
         doc = self.manager.document
         part_item = self.part_item
         part = part_item.part()
@@ -391,17 +398,15 @@ class SelectGridTool(AbstractGridTool):
         # self.setHintPos(to_pt)
         # self.vhi_hint_item.show()
 
-        # 2. Calulate a delta from the CORNER of the selection box
+        # 2. Calculate a delta from the CORNER of the selection box
         sf = part_item.scaleFactor()
         delta = to_pt - self.copy_pt
         distance_offset  = delta.x()/sf, -delta.y()/sf
 
         part_instance = self.part_item.partInstance()
-        doc.undoStack().beginMacro("Paste VirtualHelices")
         new_vh_set = v3decode.importToPart( part_instance,
                                             self.clip_board,
                                             offset=distance_offset)
-        doc.undoStack().endMacro()
         self.modelClearSelected()
         # doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
@@ -570,6 +575,7 @@ class GridSelectionGroup(QGraphicsItemGroup):
         Returns:
             TYPE: Description
         """
+        print("GridSelectionGroup mousePress")
         tool = self.tool
         if event.button() != Qt.LeftButton:
             """ do context menu?
