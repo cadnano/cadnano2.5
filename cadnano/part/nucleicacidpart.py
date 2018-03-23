@@ -5,7 +5,7 @@ from bisect import bisect_left
 from collections import defaultdict, deque
 from heapq import heapify, heappush, nsmallest
 from itertools import count as icount
-from typing import Iterable, Tuple, Union
+from typing import Iterable, Tuple, Union, List
 
 import numpy as np
 import pandas as pd
@@ -37,6 +37,9 @@ IntType = Union[np.int64, int]
 IntTuple = (np.int64, int)
 KeyType = Union[str, Iterable[str]]
 ValueType = Union[object, Iterable[object]]
+Vec3Type = Tuple[float, float, float]
+HitListType = List[Tuple[int, List[int, ...], List[int, ...] ], ...]
+HitDictType = Dict[int, Tuple[HitListType, HitListType]]
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -993,7 +996,7 @@ class NucleicAcidPart(Part):
         return inner1d(v, v)
 
     @staticmethod
-    def cross(self, a, b):
+    def cross(self, a, b) -> List[float]:
         """Compute the cross product of two vectors of length 3
 
         Args:
@@ -1001,7 +1004,7 @@ class NucleicAcidPart(Part):
             b (array-like):  of :obj:`float` of length 3
 
         Returns:
-            list: of :obj:`float` of length 3
+            list of length 3
         """
         ax, ay, az = a
         bx, by, bz = b
@@ -1011,18 +1014,18 @@ class NucleicAcidPart(Part):
         return c
     # end def
 
-    def makeRotation(self, v1, v2):
+    def makeRotation(self, v1: Vec3Type, v2: Vec3Type) -> np.ndarray:
         """Create a rotation matrix for an object pointing in the `v1`
         direction to the `v2` direction.  Uses a class allocated scratch `ndarrays`
 
         see: http://math.stackexchange.com/questions/180418/180436#180436
 
         Args:
-            v1 (array-like):  of :obj:`float` of length 3
-            v2 (array-like):  of :obj:`float` of length 3
+            v1:  pointing direction start
+            v2:  pointing direction end
 
         Returns:
-            ndarray: shape (3, 3) m0
+            ndarray of shape (3, 3)
         """
         if np.all(v1 == v2):
             return self.eye3_scratch.copy()
@@ -1054,16 +1057,19 @@ class NucleicAcidPart(Part):
         return m0
     # end def
 
-    def _createHelix(self, id_num, origin, direction, num_points, color):
+    def _createHelix(self,  id_num: int,
+                            origin: Vec3Type,
+                            direction: Vec3Type,
+                            num_points: int,
+                            color: str):
         """Create a virtual helix in the group that has a Z_ONLY direction
 
         Args:
-            id_num (int): virtual helix ID number
-            origin (array-like):  of :obj:`float` of length 3
-                The origin should be referenced from an index of 0.
-            direction (array-like):  of :obj:`float` of length 3
-            num_points (int): number of bases in Virtual Helix
-            color (str): hexadecimal color code in the form: `#RRGGBB`
+            id_num: virtual helix ID number
+            origin: the origin should be referenced from an index of 0.
+            direction:  direction vector of the virtual helix
+            num_points: number of bases in virtual helix
+            color: hexadecimal color code in the form: ``#RRGGBB``
         """
         num_points = int(num_points)  # re-cast to int to avoid numpy errors
 
@@ -1101,7 +1107,7 @@ class NucleicAcidPart(Part):
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self._origin_pts)
         if id_num >= len_origin_pts:
-            diff = id_num - len_origin_pts + 1 # add 1 to make sure this increase size
+            diff = id_num - len_origin_pts + 1 # add 1 to make sure this increases size
             number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
@@ -1826,16 +1832,16 @@ class NucleicAcidPart(Part):
         return fwd_hit_list, rev_hit_list
     # end def
 
-    def normalizedRange(self, id_num, index):
-        """Given an `index` within the bounds `[0, size]`
-        return an range of length `bases_per_repeat` if pro
+    def normalizedRange(self, id_num: int, index: int) -> Tuple[int, int]:
+        """Given an ``index`` within the bounds ``[0, size]``
+        return an range of length ``bases_per_repeat`` if pro
 
         Args:
-            id_num (int): virtual helix ID number
-            index (int): index
+            id_num: virtual helix ID number
+            index: index
 
         Returns:
-            tuple: of :obj:`int` of form::
+            tuple of form::
 
                 (start index, bases per repeat)
         """
@@ -1849,19 +1855,23 @@ class NucleicAcidPart(Part):
         return start, bpr
     # end def
 
-    def _queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
+    def _queryIdNumRangeNeighbor(self,
+                id_num: IntType,
+                neighbors,
+                alpha: float,
+                index: Tuple[int, int] = None) -> Dict[int, Tuple[HitListType, HitListType]]
         """Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
             neighbors (array-like): neighbors of id_num
-            alpha (float): angle (degrees) commensurate with radius
-            index (tuple): optional, of :obj:`int` (start_index, length) into
-                a virtual helix, default to `(0, size)`
+            alpha: angle (degrees) commensurate with radius
+            index: optional, of form (start_index, length) into a virtual
+                helix, default to ``(0, size)``
 
         Returns:
-            dict: of :obj:`tuple` of form::
+            dict of :obj:`tuple` of form::
 
                 neighbor_id_num: (fwd_hit_list, rev_hit_list)
 
@@ -1943,10 +1953,8 @@ class NucleicAcidPart(Part):
                     v1 = normalize(v1 - dot(v1, direction)*direction)
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
-                    # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
-                    # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
                     # print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
