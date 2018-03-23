@@ -955,7 +955,7 @@ class NucleicAcidPart(Part):
     # end def
 
     def getDirections(self, id_nums):
-        """ Get directions for a :obj:`array-like` of ID numbers
+        """Get directions for a :obj:`array-like` of ID numbers
 
         Args:
             id_nums (array-like): of :obj:`int` array_like list of indices
@@ -968,14 +968,14 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def normalize(self, v):
-        """Normlize a vector
+    def normalize(self, v: Vec3Type) -> np.ndarray:
+        """Normalize a vector
 
         Args:
-            v (array-like): of :obj:`float` of length 3
+            v: of :obj:`float` of length 3
 
         Returns:
-            ndarray: of :obj:`float`, norm of `v`
+            ndarray of :obj:`float`, norm of ``v``
         """
         norm = np.linalg.norm(v)
         if norm == 0:
@@ -984,11 +984,11 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def lengthSq(self, v):
+    def lengthSq(self, v: Vec3Type):
         """Compute the length of a :obj:`array-like`
 
         Args:
-            v (array-like):  of :obj:`float` length 3
+            v:  of :obj:`float` length 3
 
         Returns:
             float
@@ -996,12 +996,12 @@ class NucleicAcidPart(Part):
         return inner1d(v, v)
 
     @staticmethod
-    def cross(self, a, b) -> List[float]:
+    def cross(self, a: Vec3Type, b: Vec3Type) -> List[float]:
         """Compute the cross product of two vectors of length 3
 
         Args:
-            a (array-like):  of :obj:`float` of length 3
-            b (array-like):  of :obj:`float` of length 3
+            a:  of :obj:`float` of length 3
+            b:  of :obj:`float` of length 3
 
         Returns:
             list of length 3
