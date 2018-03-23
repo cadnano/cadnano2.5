@@ -37,7 +37,7 @@ IntType = Union[np.int64, int]
 IntTuple = (np.int64, int)
 KeyType = Union[str, Iterable[str]]
 ValueType = Union[object, Iterable[object]]
-Vec3Type = Tuple[float, float, float]
+Vec3Type = Union[np.ndarray, Tuple[float, float, float]]
 HitListType = List[Tuple[int, List[int, ...], List[int, ...] ], ...]
 HitDictType = Dict[int, Tuple[HitListType, HitListType]]
 
@@ -329,23 +329,23 @@ class NucleicAcidPart(Part):
         return new_vhg
     # end def
 
-    def stepSize(self):
+    def stepSize(self) -> int:
         return self._STEP_SIZE
     # end def
 
-    def baseWidth(self):
+    def baseWidth(self) -> float:
         return self._BASE_WIDTH
     # end def
 
-    def radius(self):
+    def radius(self) -> float:
         return self._radius
     # end def
 
-    def helicalPitch(self):
+    def helicalPitch(self) -> float:
         return self._HELICAL_PITCH
     # end def
 
-    def twistPerBase(self):
+    def twistPerBase(self) -> float:
         return self._TWIST_PER_BASE
     # end def
 
@@ -372,13 +372,14 @@ class NucleicAcidPart(Part):
             return offset_and_size[id_num]
     # end def
 
-    def getVirtualHelix(self, id_num):
+    def getVirtualHelix(self, id_num: int) -> VirtualHelix:
         """Get a VirtualHelix object to allow for convenience manipulation
 
         Args:
-            id_num (int):
+            id_num:
+
         Returns:
-            int: VirtualHelix
+            ``VirtualHelix`` with that ``id_num``
         """
         return self._virtual_helices_set[id_num]
     # end def
@@ -513,14 +514,14 @@ class NucleicAcidPart(Part):
         assert all(x % 2 == 0 for x in self.recycle_bin.get(0))
         assert all(x % 2 == 1 for x in self.recycle_bin.get(1))
 
-    def getCoordinates(self, id_num):
+    def getCoordinates(self, id_num: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Return a view onto the numpy array for a given id_num
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: of :obj:'ndarray' of the form::
+            tuple of :obj:'ndarray' of the form::
 
                 (axis_pts, fwd_pts, rev_pts)
 
@@ -533,15 +534,15 @@ class NucleicAcidPart(Part):
                 self.rev_pts[lo:hi])
     # end def
 
-    def getCoordinate(self, id_num, idx):
+    def getCoordinate(self, id_num: int, idx: int) -> np.ndarray:
         """Given a id_num get the coordinate at a given index
 
         Args:
-            id_num (int): virtual helix ID number
-            idx (int): index
+            id_num: virtual helix ID number
+            idx: index
 
         Returns:
-            ndarray: of :obj:`float` shape (1, 3)
+            ``ndarray`` of :obj:`float` shape (1, 3)
 
         Raises:
             KeyError: id_num not in NucleicAcidPart
@@ -555,50 +556,50 @@ class NucleicAcidPart(Part):
             raise IndexError("idx {} greater than size {}".format(idx, size))
     # end def
 
-    def isAGreaterThanB_Z(self, id_numA, idxA, id_numB, idxB):
+    def isAGreaterThanB_Z(self, id_numA: int, idxA: int, id_numB: int, idxB: int) -> bool:
         """Compare z values at each index of virtual helix A and B
 
         Args:
-            id_numA (int):  ID number of A
-            idxA (int):     index into A
-            id_numB (int):  ID number of B
-            idxB (int):     index into B
+            id_numA:  ID number of A
+            idxA:     index into A
+            id_numB:  ID number of B
+            idxB:     index into B
 
         Returns:
-            bool: True if A > B
+            ``True`` if A > B else ``False``
         """
         a = self.getCoordinate(id_numA, idxA)
         b = self.getCoordinate(id_numB, idxB)
         return a[2] > b[2]
     # end def
 
-    def getVirtualHelixOrigin(self, id_num):
+    def getVirtualHelixOrigin(self, id_num: int) -> np.ndarray:
         """given a id_num get the origin coordinate
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            ndarray: (1, 3) origin of the Virtual Helix (0 index)
+            ``ndarray`` of (1, 3) origin of the Virtual Helix (0 index)
 
         Raises:
-            KeyError: id_num not in NucleicAcidPart
+            KeyError: ``id_num`` not in ``NucleicAcidPart``
         """
         _, _ = self.getOffsetAndSize(id_num)
         return self._origin_pts[id_num]
     # end def
 
-    def getidNums(self):
+    def getidNums(self) -> List[int]:
         """Return a list of used id_nums
 
         Returns:
-            list: of :obj:`int` of virtual helix ID numbers used
+            list of :obj:`int` of virtual helix ID numbers used
         """
         return [i for i, j in filter(lambda x: x[1] is not None, enumerate(self._offset_and_size))]
     # end def
 
     def _setVirtualHelixOriginLimits(self):
-        """Set origin limits by grabbing the max `x` and `y` values of the
+        """Set origin limits by grabbing the max ``x`` and ``y`` values of the
         origins of all virtual helices
         """
         valid_pts = np.where(self._origin_pts != np.inf)
@@ -630,20 +631,20 @@ class NucleicAcidPart(Part):
         return self.origin_limits
     # end def
 
-    def getStrandSets(self, id_num):
+    def getStrandSets(self, id_num: int) -> Tuple[StrandSet, StrandSet]:
         """Given a id_num get the coordinate at a given index
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: (forward :class:`StrandSet`, reverse :class:`StrandSet`)
+            tuple of (forward :class:`StrandSet`, reverse :class:`StrandSet`)
         """
         _, _ = self.getOffsetAndSize(id_num)
         return (self.fwd_strandsets[id_num], self.rev_strandsets[id_num])
     # end def
 
-    def refreshSegments(self, id_num):
+    def refreshSegments(self, id_num: int):
         """Partition strandsets into overlapping segments
 
         Returns:
@@ -729,12 +730,12 @@ class NucleicAcidPart(Part):
         return fwd_segments, rev_segments
     # end def
 
-    def hasStrandAtIdx(self, id_num, idx):
+    def hasStrandAtIdx(self, id_num: int, idx: int) -> Tuple[bool, bool]:
         """Check if `Strand` exists at an index
 
         Args:
-            id_num (int): virtual helix ID number
-            idx (int): index that the strand is at
+            id_num: virtual helix ID number
+            idx: index that the strand is at
 
         Returns:
             tuple[bool, bool]: True if a strand is present at idx,
@@ -744,16 +745,16 @@ class NucleicAcidPart(Part):
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
-    def getStrand(self, is_fwd, id_num, idx):
+    def getStrand(self, is_fwd: bool, id_num: int, idx: int) -> Strand:
         """Get a `Strand` object
 
         Args:
-            is_fwd (bool): is the StrandType Forward
-            id_num (int): virtual helix ID number
-            idx (int): index that the strand is at
+            is_fwd: is the StrandType Forward
+            id_num: virtual helix ID number
+            idx : index that the strand is at
 
         Returns:
-            Strand: if it exists
+            ``Strand`` if it exists
         """
 
         if is_fwd:
@@ -762,14 +763,14 @@ class NucleicAcidPart(Part):
             return self.rev_strandsets[id_num].getStrand(idx)
     # end def
 
-    def indexOfRightmostNonemptyBase(self):
+    def indexOfRightmostNonemptyBase(self) -> int:
         """During reduction of the number of bases in a part, the first click
         removes empty bases from the right hand side of the part (red
         left-facing arrow). This method returns the new numBases that will
         effect that reduction.
 
         Returns:
-            int: index of right most base in all :class:`StrandSets`
+            index of right most base in all :class:`StrandSets`
         """
         ret = self._STEP_SIZE - 1
         fwd_strandsets = self.fwd_strandsets
