@@ -15,6 +15,10 @@ from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartIte
 from cadnano.gui.palette import getPenObj, getNoPen  # , getBrushObj
 from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
 from cadnano.views.grabcorneritem import GrabCornerItem
+from cadnano.cntypes import (
+    RectT,
+    Vec2T
+    )
 
 from .virtualhelixitem import GridVirtualHelixItem
 from .prexovermanager import PreXoverManager
@@ -419,10 +423,10 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         del self._virtual_helix_item_hash[id_num]
     # end def
 
-    def reconfigureRect(self,   top_left: Tuple[float, float],
-                                bottom_right: Tuple[float, float],
+    def reconfigureRect(self,   top_left: Vec2T,
+                                bottom_right: Vec2T,
                                 padding: int = 80
-                                ) -> Tuple[Tuple[float, float],Tuple[float, float]]:
+                                ) -> Tuple[Vec2T, Vec2T]:
         """Summary
 
         Args:
@@ -491,7 +495,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         self._rect = QRectF(QPointF(xTL, yTL), QPointF(xBR, yBR))
     # end def
 
-    def getModelMinBounds(self, handle_type=None) -> Tuple[float, float, float, float]:
+    def getModelMinBounds(self, handle_type=None) -> RectT:
         """Bounds in form of Qt scaled from model
 
         Returns:
@@ -501,7 +505,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         return xLL, -yUR, xUR, -yLL
     # end def
 
-    def bounds(self) -> Tuple[float, float, float, float]:
+    def bounds(self) -> RectT:
         """x_low, x_high, y_low, y_high
         """
         rect = self._rect
@@ -582,7 +586,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         tool = self._getActiveTool()
         tool.hideLineItem()
 
-    def getModelPos(self, pos: QPointF) -> Tuple[float, float]:
+    def getModelPos(self, pos: QPointF) -> Vec2T:
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:

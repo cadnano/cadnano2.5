@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from .abstractproppartitem import AbstractPropertyPartSetItem
 
@@ -31,8 +31,8 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
         """Overrides AbstractPropertyPartItem method for NucleicAcidPartItem.
 
         Returns:
-            ItemType: NUCLEICACID
+            ItemEnum: NUCLEICACID
         """
-        return ItemType.NUCLEICACID
+        return ItemEnum.NUCLEICACID
     # end def
 # end class

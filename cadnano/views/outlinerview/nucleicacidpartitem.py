@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QItemSelectionModel
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.views import styles
 from .cnoutlineritem import CNOutlinerItem, DISABLE_FLAGS, LEAF_FLAGS
 from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
@@ -53,7 +53,7 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def itemType(self):
-        return ItemType.NUCLEICACID
+        return ItemEnum.NUCLEICACID
     # end def
 
     def isModelSelected(self, document):

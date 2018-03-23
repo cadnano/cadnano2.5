@@ -3,7 +3,7 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
-from cadnano.proxies.cnenum import PartType
+from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import SliceNucleicAcidPartItem
 
@@ -60,7 +60,7 @@ class SliceRootItem(QGraphicsRectItem):
         """
         if self.are_signals_on:
             part_type = model_part_instance.reference().partType()
-            if part_type == PartType.NUCLEICACIDPART:
+            if part_type == PartEnum.NUCLEICACIDPART:
                 na_part_item = SliceNucleicAcidPartItem(model_part_instance,
                                                         viewroot=self,
                                                         parent=self)

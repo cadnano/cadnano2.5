@@ -1,7 +1,7 @@
 """Summary
 """
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
-from cadnano.proxies.cnenum import PartType
+from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import GridNucleicAcidPartItem
 
@@ -63,7 +63,7 @@ class GridRootItem(QGraphicsRectItem):
         """
         if self.are_signals_on:
             part_type = model_part_instance.reference().partType()
-            if part_type == PartType.NUCLEICACIDPART:
+            if part_type == PartEnum.NUCLEICACIDPART:
                 na_part_item = GridNucleicAcidPartItem(model_part_instance,
                                                        viewroot=self,
                                                        parent=self)

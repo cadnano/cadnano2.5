@@ -7,19 +7,25 @@ from typing import Iterable
 from typing import Union
 import numpy as np
 
-OligoType = 'cadnano.oligo.Oligo'
-StrandType = 'cadnano.strand.Strand'
-SegmentType = Tuple[int,  int]
+OligoT = 'cadnano.oligo.Oligo'
+StrandT = 'cadnano.strand.Strand'
+SegmentT = Tuple[int,  int]
+WindowT = 'cadnano.views.documentwindow.DocumentWindow'
+DocT = 'cadnano.document.Document'
+DocCtrlT = 'cadnano.controllers.documentcontroller.DocumentController'
 
-RectType = Tuple[float, float, float, float]
-IntType = Union[np.int64, int]
+RectT = Tuple[float, float, float, float]
+IntT = Union[np.int64, int]
 IntTuple = (np.int64, int)
-KeyType = Union[str, Iterable[str]]
-ValueType = Union[object, Iterable[object]]
-Vec3Type = Union[np.ndarray, Tuple[float, float, float]]
-HitListType = List[Tuple[int, List[int], List[int] ]]
-HitDictType = Dict[int, Tuple[HitListType, HitListType]]
-PointsType = Tuple[np.ndarray, np.ndarray, np.ndarray]
+KeyT = Union[str, Iterable[str]]
+ValueT = Union[object, Iterable[object]]
+Vec2T = Tuple[float, float]
+Vec3T = Union[np.ndarray, Tuple[float, float, float]]
+HitListT = List[Tuple[int, List[int], List[int] ]]
+PointsT = Tuple[np.ndarray, np.ndarray, np.ndarray]
+
+
+AbstractToolType = 'cadnano.views.abstractitems.abstracttoolmanager.AbstractTool'
 
 '''
 tuple: of :obj:`list`, fwd_axis_hits, rev_axis_hits
@@ -39,5 +45,5 @@ and the item in second element::
 
                 the index into that neighbor
 '''
-SubQIDType = List[Tuple[int, Tuple[List[int], List[int]]]]
-QueryIDNumType = Tuple[SubQIDType, SubQIDType]
+SubQueryIDNumT = List[Tuple[int, Tuple[List[int], List[int]]]]
+QueryIDNumT = Tuple[SubQueryIDNumT, SubQueryIDNumT]

@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 from cadnano import util
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
-from cadnano.proxies.cnenum import Axis, HandleType, StrandType
+from cadnano.proxies.cnenum import AxisEnum, HandleEnum, StrandEnum
 from cadnano.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 
@@ -451,7 +451,7 @@ class PreXoverItem(QGraphicsRectItem):
             idx = self.idx
             is_fwd = self.is_fwd
             id_num = self._id_num
-            strand_type = StrandType.FWD if is_fwd else StrandType.REV
+            strand_type = StrandEnum.FWD if is_fwd else StrandEnum.REV
 
             # relative position info
             bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
@@ -793,9 +793,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
                                                      self._HANDLE_SIZE,
                                                      styles.BLUE_STROKE,
                                                      True,
-                                                     HandleType.LEFT | HandleType.RIGHT,
+                                                     HandleEnum.LEFT | HandleEnum.RIGHT,
                                                      self,
-                                                     translates_in=Axis.X)
+                                                     translates_in=AxisEnum.X)
 
         # Minimum size hint (darker internal rect, visible during resizing)
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
@@ -804,21 +804,21 @@ class PathWorkplaneItem(QGraphicsRectItem):
         m_b_h.hide()
 
         # Low and high idx labels
-        self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
-        self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+        self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
+        self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
     # end def
 
     def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""
         # TODO: fix bug preventing dragging in imported files
-        if handle_type and handle_type & HandleType.LEFT:
+        if handle_type and handle_type & HandleEnum.LEFT:
             xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
             xBR = self._idx_high*BASE_WIDTH
-        elif handle_type and handle_type & HandleType.RIGHT:
+        elif handle_type and handle_type & HandleEnum.RIGHT:
             xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
             xBR = (self._idx_low)*BASE_WIDTH
-        else:  # default to HandleType.RIGHT behavior for all types
-            print("No HandleType?")
+        else:  # default to HandleEnum.RIGHT behavior for all types
+            print("No HandleEnum?")
             xTL = 0
             xBR = self._high_drag_bound*BASE_WIDTH
         yTL = self._part_item._vh_rect.top()
@@ -860,7 +860,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
             xTL = max(top_left[0], self._low_drag_bound)
             xTL = xTL - (xTL % BASE_WIDTH)  # snap to nearest base
             self._idx_low = int(xTL/BASE_WIDTH)
-            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
+            self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
         else:
             xTL = self._idx_low*BASE_WIDTH
 
@@ -870,7 +870,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
                              (self._high_drag_bound)*BASE_WIDTH)
             xBR = xBR - (xBR % BASE_WIDTH)  # snap to nearest base
             self._idx_high = int(xBR/BASE_WIDTH)
-            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+            self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
         else:
             xBR = self._idx_high*BASE_WIDTH
 
@@ -965,8 +965,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._idx_high = int(self._start_idx_high + delta)
             self._delta = delta
             self.reconfigureRect((), ())
-            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
-            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+            self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
+            self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
         return QGraphicsItem.mouseMoveEvent(self, event)
     # end def
 

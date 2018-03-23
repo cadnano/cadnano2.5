@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.gui.palette import getBrushObj
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from cadnano.views.pathview import pathstyles as styles
@@ -144,7 +144,7 @@ class PropertyEditorWidget(QTreeWidget):
         self._cn_model_list = cn_model_list
 
         # special case for parts since there is currently no part filter
-        if item_type is ItemType.NUCLEICACID:
+        if item_type is ItemEnum.NUCLEICACID:
             pe_item = NucleicAcidPartSetItem(parent=self)
             self.show()
             return
@@ -153,10 +153,10 @@ class PropertyEditorWidget(QTreeWidget):
         if item.FILTER_NAME not in self._document.filter_set:
             print(item.FILTER_NAME, "not in self._document.filter_set")
             return
-        if item_type is ItemType.OLIGO:
+        if item_type is ItemEnum.OLIGO:
             pe_item = OligoSetItem(parent=self)
             self.show()
-        elif item_type is ItemType.VIRTUALHELIX:
+        elif item_type is ItemEnum.VIRTUALHELIX:
             pe_item = VirtualHelixSetItem(parent=self)
             self.show()
         else:

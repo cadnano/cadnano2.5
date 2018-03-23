@@ -3,7 +3,7 @@ from bisect import bisect_left, insort_left
 import cadnano.util as util
 from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnenum import StrandType
+from cadnano.proxies.cnenum import StrandEnum
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .mergecmd import MergeCommand
@@ -43,7 +43,7 @@ class StrandSet(CNObject):
         super(StrandSet, self).__init__(part)
         self._is_fwd = is_fwd
         self._is_scaffold = is_fwd if (id_num % 2 == 0) else not is_fwd
-        self._strand_type = StrandType.FWD if self._is_fwd else StrandType.REV
+        self._strand_type = StrandEnum.FWD if self._is_fwd else StrandEnum.REV
         self._id_num = id_num
         self._part = part
 
@@ -156,7 +156,7 @@ class StrandSet(CNObject):
         """Store the enum of strand type
 
         Returns:
-            int: :class:`StrandType.FWD` if is forward, otherwise :class:`StrandType.REV`
+            int: :class:`StrandEnum.FWD` if is forward, otherwise :class:`StrandEnum.REV`
         """
         return self._strand_type
 

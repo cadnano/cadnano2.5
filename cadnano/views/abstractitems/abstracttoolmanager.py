@@ -3,6 +3,8 @@ from typing import List, Optional, Tuple
 from PyQt5.QtCore import pyqtSignal, QObject
 from PyQt5.QtWidgets import (QGraphicsObject, QGraphicsItem, QAction)
 
+from cadnano.cntypes import ( WindowT )
+
 class AbstractTool(QGraphicsObject):
     """ For use in place of None checks in the code
     reduces boilerplate
@@ -34,7 +36,7 @@ class AbstractToolManager(QObject):
 
     def __init__(self,  tool_group_name: str,
                         view_name: str,
-                        window: 'cadnano.views.documentwindow.DocumentWindow',
+                        window: WindowT,
                         viewroot: QGraphicsItem):
         """
         We store mainWindow because a controller's got to have

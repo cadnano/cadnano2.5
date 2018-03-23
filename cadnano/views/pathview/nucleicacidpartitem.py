@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPointF, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 
 from cadnano import getBatch, util
-from cadnano.proxies.cnenum import HandleType
+from cadnano.proxies.cnenum import HandleEnum
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
@@ -109,8 +109,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         model_color = m_p.getColor()
 
         self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
-                                                     # HandleType.LEFT |
-                                                     HandleType.RIGHT,
+                                                     # HandleEnum.LEFT |
+                                                     HandleEnum.RIGHT,
                                                      self)
 
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
@@ -578,7 +578,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             substep = self._model_part.subStepSize()
             snap_size = new_size - new_size % substep
             snap_offset = -(new_size % substep)*_BASE_WIDTH
-            self.resize_handle_group.updateText(HandleType.RIGHT, snap_size)
+            self.resize_handle_group.updateText(HandleEnum.RIGHT, snap_size)
             if finish:
                 self._model_part.setAllVirtualHelixSizes(snap_size)
                 o_rect = o_rect.adjusted(0, 0, snap_offset, 0)

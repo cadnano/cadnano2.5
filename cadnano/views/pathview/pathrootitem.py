@@ -5,7 +5,7 @@ from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
 from cadnano import util
-from cadnano.proxies.cnenum import PartType
+from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers.viewrootcontroller import ViewRootController
 from .nucleicacidpartitem import PathNucleicAcidPartItem
 
@@ -90,9 +90,9 @@ class PathRootItem(QGraphicsRectItem):
             win = self._window
             part_type = model_part_instance.reference().partType()
 
-            if part_type == PartType.PLASMIDPART:
+            if part_type == PartEnum.PLASMIDPART:
                 pass
-            elif part_type == PartType.NUCLEICACIDPART:
+            elif part_type == PartEnum.NUCLEICACIDPART:
                 na_part_item = PathNucleicAcidPartItem(model_part_instance, viewroot=self, parent=self)
                 self._part_item_for_part_instance[model_part_instance] = na_part_item
                 win.path_tool_manager.setActivePart(na_part_item)

@@ -4,7 +4,7 @@ from typing import Tuple
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano.proxies.cnenum import GridType, PointType, OrthoViewType
+from cadnano.proxies.cnenum import GridEnum, PointEnum, OrthoViewEnum
 from cadnano.objectinstance import ObjectInstance
 
 def decode(document, obj, emit_signals=False):
@@ -21,7 +21,7 @@ def decode(document, obj, emit_signals=False):
     ortho_view_type = meta.get('ortho_view_type')
 
     # This assumes that the lattice without a specified grid type is a honeycomb lattice
-    grid_type = meta.get('grid_type', GridType.HONEYCOMB)
+    grid_type = meta.get('grid_type', GridEnum.HONEYCOMB)
 
     for part_dict in obj['parts']:
         decodePart(document, part_dict, grid_type=grid_type,
@@ -53,14 +53,14 @@ def determineOrthoViewType(document, part_dict, grid_type):
     for vh_id, size in vh_id_list:
         vh_x, vh_y = origins[vh_id]
 
-        if grid_type is GridType.HONEYCOMB:
+        if grid_type is GridEnum.HONEYCOMB:
             distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)
             if distance > THRESHOLD:
-                return OrthoViewType.GRID
-        elif grid_type is GridType.SQUARE:
+                return OrthoViewEnum.GRID
+        elif grid_type is GridEnum.SQUARE:
             if SquareDnaPart.distanceFromClosestLatticeCoord(vh_x, vh_y, DEFAULT_RADIUS)[0] > THRESHOLD:
-                return OrthoViewType.GRID
-    return OrthoViewType.SLICE
+                return OrthoViewEnum.GRID
+    return OrthoViewEnum.SLICE
 # end def
 
 
@@ -79,7 +79,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
-    if part_dict.get('point_type') == PointType.ARBITRARY:
+    if part_dict.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to deserialize parts
         pass
     else:

@@ -5,7 +5,7 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.gui.palette import getNoPen
-from cadnano.proxies.cnenum import StrandType
+from cadnano.proxies.cnenum import StrandEnum
 from .pathextras import PreXoverItem
 
 
@@ -116,9 +116,9 @@ class PreXoverManager(QGraphicsRectItem):
         # active item
         part = self.part_item.part()
         active_id_num, a_is_fwd, a_idx, a_to_id = part.active_base_info
-        a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
+        a_strand_type = StrandEnum.FWD if a_is_fwd else StrandEnum.REV
         neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
-        n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV
+        n_strand_type = StrandEnum.FWD if n_is_fwd else StrandEnum.REV
 
         if not part.hasStrandAtIdx(active_id_num, a_idx)[a_strand_type]:
             print("no active strand", key)

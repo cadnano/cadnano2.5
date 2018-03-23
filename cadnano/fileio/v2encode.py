@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from cadnano.proxies.cnenum import LatticeType
+from cadnano.proxies.cnenum import LatticeEnum
 from cadnano.fileio.lattice import HoneycombDnaPart
 
 FORMAT_VERSION = "2.0"
@@ -7,7 +7,7 @@ ROW_OFFSET = 0
 COL_OFFSET = 0
 # DEFAULT_ROWS = 30
 # DEFAULT_COLS = 32
-lattice_type = LatticeType.HONEYCOMB
+lattice_type = LatticeEnum.HONEYCOMB
 positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoordRound
 
 

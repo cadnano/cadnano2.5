@@ -5,7 +5,7 @@ import traceback
 from cadnano import util
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
-from cadnano.proxies.cnenum import ModType
+from cadnano.proxies.cnenum import ModEnum
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
@@ -301,9 +301,9 @@ class Oligo(CNObject):
         a_seq = ','.join(a_seq)
         a_seq = "(%s)" % (a_seq)
         modseq5p, modseq5p_name = part.getStrandModSequence(strand5p, idx5p,
-                                                            ModType.END_5PRIME)
+                                                            ModEnum.END_5PRIME)
         modseq3p, modseq3p_name = part.getStrandModSequence(strand, idx3p,
-                                                            ModType.END_3PRIME)
+                                                            ModEnum.END_3PRIME)
         seq = ''.join(seq)
         seq = modseq5p + seq + modseq3p
         # output = "%d[%d]\t%d[%d]\t%s\t%s\t%s\t%s\t(%s)\n" % \

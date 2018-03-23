@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QAction, QApplication, QWidget
 
 from cadnano import app
 from cadnano.gui.mainwindow import ui_mainwindow
-from cadnano.proxies.cnenum import OrthoViewType
+from cadnano.proxies.cnenum import OrthoViewEnum
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -20,6 +20,10 @@ from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
+from cadnano.cntypes import (
+                                DocT,
+                                DocCtrlT
+                            )
 
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
@@ -32,10 +36,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     using Qt Creator.
 
     Attributes:
-        controller (DocumentController):
+        controller: DocumentController
     """
 
-    def __init__(self, parent=None, doc_ctrlr=None):
+    def __init__(self, parent=None, doc_ctrlr: DocCtrlT):
         super(DocumentWindow, self).__init__(parent)
 
         self.controller = doc_ctrlr
@@ -67,9 +71,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
         self.setCentralWidget(None)
-        if app().prefs.orthoview_idx == OrthoViewType.SLICE:
+        if app().prefs.orthoview_idx == OrthoViewEnum.SLICE:
             self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
-        elif app().prefs.orthoview_idx == OrthoViewType.GRID:
+        elif app().prefs.orthoview_idx == OrthoViewEnum.GRID:
             self.splitDockWidget(self.grid_dock_widget, self.path_dock_widget, Qt.Horizontal)
         self._restoreGeometryandState()
         self._finishInit()
@@ -171,14 +175,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             raise ValueError("view_name: %s does not exist" % (view_name))
 
 
-    def _initGridview(self, doc) -> CNView:
+    def _initGridview(self, doc: DocT) -> CNView:
         """Initializes Grid View.
 
         Args:
-            doc (cadnano.document.Document): The Document corresponding to
-            the design
+            doc: The ``Document`` corresponding to the design
 
-        Returns: None
+        Returns:
+            ``CNView`` namedtuple
         """
         grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
         grid_root = GridRootItem(   rect=grid_scene.sceneRect(),
@@ -196,15 +200,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         return CNView(ggv, grid_scene, grid_root)
     # end def
 
-    def _initPathview(self, doc) -> CNView:
+    def _initPathview(self, doc: DocT) -> CNView:
         """Initializes Path View.
 
         Args:
-            doc (cadnano.document.Document): The Document corresponding to
-            the design
+            doc: The ``Document`` corresponding to the design
 
         Returns:
-            CNView namedtuple
+            ``CNView`` namedtuple
         """
         path_scene = QGraphicsScene(parent=self.path_graphics_view)
         path_root = PathRootItem(   rect=path_scene.sceneRect(),
@@ -248,15 +251,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setupGL()
     # end def
 
-    def _initSliceview(self, doc) -> CNView:
+    def _initSliceview(self, doc: DocT) -> CNView:
         """Initializes Slice View.
 
         Args:
-            doc (cadnano.document.Document): The Document corresponding to
-            the design
+            doc: The ``Document`` corresponding to the design
 
         Returns:
-            CNView namedtuple
+            ``CNView`` namedtuple
         """
         slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
         slice_root = SliceRootItem( rect=slice_scene.sceneRect(),
@@ -280,16 +282,23 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         Returns: None
         """
-        self.actionUndo = self.controller.undoStack().createUndoAction(self)
-        self.actionRedo = self.controller.undoStack().createRedoAction(self)
-        self.actionUndo.setText(QApplication.translate("MainWindow", "Undo", None))
-        self.actionUndo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Z", None))
-        self.actionRedo.setText(QApplication.translate("MainWindow", "Redo", None))
-        self.actionRedo.setShortcut(QApplication.translate("MainWindow", "Ctrl+Shift+Z", None))
-        self.sep = QAction(self)
-        self.sep.setSeparator(True)
-        self.menu_edit.insertAction(self.sep, self.actionRedo)
-        self.menu_edit.insertAction(self.actionRedo, self.actionUndo)
+        us = self.controller.undoStack()
+        qatrans = QApplication.translate
+
+        action_undo = us.createUndoAction(self)
+        action_undo.setText( qatrans("MainWindow", "Undo", None) )
+        action_undo.setShortcut( qatrans("MainWindow", "Ctrl+Z", None) )
+        self.actionUndo = action_undo
+
+        action_redo = us.createRedoAction(self)
+        action_redo.setText( qatrans("MainWindow", "Redo", None) )
+        action_redo.setShortcut( qatrans("MainWindow", "Ctrl+Shift+Z", None) )
+        self.actionRedo = action_redo
+
+        self.sep = sep = QAction(self)
+        sep.setSeparator(True)
+        self.menu_edit.insertAction(sep, action_redo)
+        self.menu_edit.insertAction(action_redo, action_undo)
 
         # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridType
+from cadnano.proxies.cnenum import GridEnum
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -610,11 +610,11 @@ class DocumentController(object):
 
     def actionCreateNucleicAcidPartHoneycomb(self):
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridType.HONEYCOMB)
+        self.actionCreateNucleicAcidPart(grid_type=GridEnum.HONEYCOMB)
 
     def actionCreateNucleicAcidPartSquare(self):
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridType.SQUARE)
+        self.actionCreateNucleicAcidPart(grid_type=GridEnum.SQUARE)
 
     def actionCreateNucleicAcidPart(self, grid_type):
         # TODO[NF]:  Docstring

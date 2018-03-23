@@ -21,7 +21,7 @@ from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QToolTip
 
-from cadnano.proxies.cnenum import PartType
+from cadnano.proxies.cnenum import PartEnum
 from cadnano.gui.palette import getBrushObj
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.controllers.viewrootcontroller import ViewRootController
@@ -450,7 +450,7 @@ class OutlinerTreeWidget(QTreeWidget):
         if self.are_signals_enabled:
             model_part = model_part_instance.reference()
             part_type = model_part.partType()
-            if part_type == PartType.NUCLEICACIDPART:
+            if part_type == PartEnum.NUCLEICACIDPART:
                 self.is_child_adding += 1
                 na_part_item = OutlineNucleicAcidPartItem(model_part, parent=self)
                 self._instance_items[model_part_instance] = na_part_item

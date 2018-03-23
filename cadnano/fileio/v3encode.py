@@ -2,7 +2,7 @@
 from datetime import datetime
 from typing import List
 
-from cadnano.proxies.cnenum import PointType
+from cadnano.proxies.cnenum import PointEnum
 from cadnano.objectinstance import ObjectInstance
 
 FORMAT_VERSION = '3.1'
@@ -46,7 +46,7 @@ def encodePart(part):
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointType.ARBITRARY:
+    if group_props.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:
@@ -112,7 +112,7 @@ def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> d
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointType.ARBITRARY:
+    if group_props.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:

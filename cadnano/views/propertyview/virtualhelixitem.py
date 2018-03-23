@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
 
@@ -42,9 +42,9 @@ class VirtualHelixSetItem(CNPropertyItem):
         """Overrides AbstractPropertyPartItem.itemType
 
         Returns:
-            ItemType: VIRTUALHELIX
+            ItemEnum: VIRTUALHELIX
         """
-        return ItemType.VIRTUALHELIX
+        return ItemEnum.VIRTUALHELIX
     # end def
 
     # SLOTS

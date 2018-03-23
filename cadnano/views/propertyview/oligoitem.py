@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.controllers.oligoitemcontroller import OligoItemController
 from cadnano.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from .cnpropertyitem import CNPropertyItem
@@ -34,7 +34,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        return ItemType.OLIGO
+        return ItemEnum.OLIGO
     # end def
 
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):

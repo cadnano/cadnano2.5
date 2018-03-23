@@ -49,12 +49,12 @@ class BitEnum(Enum):
             raise
 
 
-class PartType(IntEnum):
+class PartEnum(IntEnum):
     NUCLEICACIDPART = 1
     PLASMIDPART = 2
 
 
-class PointType(IntEnum):
+class PointEnum(IntEnum):
     """For serializing virtual helices as only pointing in the Z direction
     or pointing in arbitrary directions.
     """
@@ -62,16 +62,16 @@ class PointType(IntEnum):
     ARBITRARY = 1
 
 
-ENUM_NAMES['point_type'] = enumNames(PointType)
+ENUM_NAMES['point_type'] = enumNames(PointEnum)
 
 
-class Axis(IntEnum):
+class AxisEnum(IntEnum):
     X = 1
     Y = 2
     Z = 4
 
 
-class ItemType(IntEnum):
+class ItemEnum(IntEnum):
     # DNA = 0
     # PLASMID = 1
     # RNA = 2
@@ -88,37 +88,37 @@ class ItemType(IntEnum):
 #     THREE_PRIME = 1
 
 
-class StrandType(IntEnum):
+class StrandEnum(IntEnum):
     SCAFFOLD = 0
     STAPLE = 1
     FWD = 0
     REV = 1
 
 
-class ModType(IntEnum):
+class ModEnum(IntEnum):
     END_5PRIME = 0
     END_3PRIME = 1
     INTERNAL = 2
 
 
-class LatticeType(IntEnum):
+class LatticeEnum(IntEnum):
     SQUARE = 0
     HONEYCOMB = 1
 
 
-class GridType(IntEnum):
+class GridEnum(IntEnum):
     NONE = 0
     SQUARE = 1
     HONEYCOMB = 2
 
 
-class OrthoViewType(IntEnum):
+class OrthoViewEnum(IntEnum):
     SLICE = 0
     GRID = 1
     BOTH = 2
 
 
-ENUM_NAMES['grid_type'] = enumNames(GridType)
+ENUM_NAMES['grid_type'] = enumNames(GridEnum)
 
 
 class HandleType(IntEnum):

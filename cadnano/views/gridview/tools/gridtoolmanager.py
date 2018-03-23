@@ -4,6 +4,10 @@ from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
 from .selectgridtool import SelectGridTool
 from .creategridtool import CreateGridTool
 
+from cadnano.views.gridview import GridRootItemT
+from cadnano.cntypes import (
+                                WindowT
+                            )
 
 class GridToolManager(AbstractToolManager):
     """Manages interactions between the grid widgets/UI and the model.
@@ -14,14 +18,14 @@ class GridToolManager(AbstractToolManager):
         tool_names (tuple): `str` names of tools
     """
 
-    def __init__(self, window, viewroot):
+    def __init__(self, window: WindowT, viewroot: GridRootItemT):
         """
         We store mainWindow because a controller's got to have
         references to both the layer above (UI) and the layer below (model)
 
         Args:
-            window (TYPE): Description
-            viewroot (TYPE): Description
+            window: Description
+            viewroot: Description
         """
         super(GridToolManager, self).__init__('vhelix', 'grid', window, viewroot)
         self.tool_names = ('select', 'create')

@@ -12,12 +12,12 @@ from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
 from cadnano.views.gridview import gridstyles as styles
-from cadnano.cntypes import RectType
+from cadnano.cntypes import RectT
 
 from .abstractgridtool import AbstractGridTool
 
 
-def normalizeRect(rect: RectType) -> RectType:
+def normalizeRect(rect: RectT) -> RectT:
     """Summary
 
     Args:

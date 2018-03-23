@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt
 
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 
 from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LEAF_FLAGS
 
@@ -32,7 +32,7 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
-        return ItemType.VIRTUALHELIX
+        return ItemEnum.VIRTUALHELIX
     # end def
 
     def updateCNModel(self):

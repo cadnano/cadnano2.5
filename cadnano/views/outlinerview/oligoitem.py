@@ -1,4 +1,4 @@
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from .cnoutlineritem import (CNOutlinerItem, LEAF_FLAGS)
 from cadnano.views.abstractitems.abstractoligoitem import AbstractOligoItem
 from cadnano.controllers.oligoitemcontroller import OligoItemController
@@ -19,7 +19,7 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
-        return ItemType.OLIGO
+        return ItemEnum.OLIGO
     # end def
 
     def isModelSelected(self, document):

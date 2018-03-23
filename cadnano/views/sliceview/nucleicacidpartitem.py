@@ -5,7 +5,7 @@ from PyQt5.QtCore import QPointF, QRectF, Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
 
 from cadnano.part.nucleicacidpart import NucleicAcidPart
-from cadnano.proxies.cnenum import GridType, HandleType
+from cadnano.proxies.cnenum import GridEnum, HandleEnum
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
@@ -95,14 +95,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.model_bounds_hint.setPen(getNoPen())
 
         self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
-                                                     HandleType.TOP |
-                                                     HandleType.BOTTOM |
-                                                     HandleType.LEFT |
-                                                     HandleType.RIGHT |
-                                                     HandleType.TOP_LEFT |
-                                                     HandleType.TOP_RIGHT |
-                                                     HandleType.BOTTOM_LEFT |
-                                                     HandleType.BOTTOM_RIGHT,
+                                                     HandleEnum.TOP |
+                                                     HandleEnum.BOTTOM |
+                                                     HandleEnum.LEFT |
+                                                     HandleEnum.RIGHT |
+                                                     HandleEnum.TOP_LEFT |
+                                                     HandleEnum.TOP_RIGHT |
+                                                     HandleEnum.BOTTOM_LEFT |
+                                                     HandleEnum.BOTTOM_RIGHT,
                                                      self, show_coords=True)
 
         self.griditem = GridItem(self, self._model_props['grid_type'])
@@ -175,7 +175,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 else:
                     self.hide()
             elif property_key == 'grid_type':
-                self.griditem.setGridType(new_value)
+                self.griditem.setGridEnum(new_value)
     # end def
 
     def partRemovedSlot(self, sender):
@@ -780,9 +780,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def _getCoordinateParity(self, row, column):
-        if self.griditem.grid_type is GridType.HONEYCOMB:
+        if self.griditem.grid_type is GridEnum.HONEYCOMB:
             return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-        elif self.griditem.grid_type is GridType.SQUARE:
+        elif self.griditem.grid_type is GridEnum.SQUARE:
             return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:
             return None

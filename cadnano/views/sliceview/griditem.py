@@ -3,7 +3,7 @@ from PyQt5.QtGui import QFont, QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
-from cadnano.proxies.cnenum import GridType
+from cadnano.proxies.cnenum import GridEnum, EnumType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
 from cadnano.views.sliceview import slicestyles as styles
@@ -59,19 +59,19 @@ class GridItem(QGraphicsRectItem):
         self.removePoints()
 
         self.setRect(self.part_item.outline.rect())
-        if self.grid_type == GridType.HONEYCOMB:
+        if self.grid_type == GridEnum.HONEYCOMB:
             self.createHoneycombGrid(part_item, radius, self.bounds)
-        elif self.grid_type == GridType.SQUARE:
+        elif self.grid_type == GridEnum.SQUARE:
             self.createSquareGrid(part_item, radius, self.bounds)
         else:
             self._path.setPath(QPainterPath())
     # end def
 
-    def setGridType(self, grid_type):
+    def setGridType(self, grid_type: EnumType):
         """Sets the grid type. See cadnano.cnenum.GridType.
 
         Args:
-            grid_type (GridType): NONE, HONEYCOMB, or SQUARE
+            grid_type: NONE, HONEYCOMB, or SQUARE
         """
         self.grid_type = grid_type
         self.updateGrid()
@@ -300,14 +300,14 @@ class GridItem(QGraphicsRectItem):
         if point_item is None:
             return
 
-        if show_hint is False:
+        if not show_hint:
             point_item.showCreateHint(show_hint=False)
 
         if point_item:
             row, column = coord
-            if self.grid_type is GridType.HONEYCOMB:
+            if self.grid_type == GridEnum.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-            elif self.grid_type is GridType.SQUARE:
+            elif self.grid_type == GridEnum.SQUARE:
                 parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
             else:
                 return

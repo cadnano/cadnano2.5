@@ -11,7 +11,7 @@ from typing import Optional
 
 from cadnano import app, setBatch, util
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.proxies.cnenum import ModType, GridType, EnumType
+from cadnano.proxies.cnenum import ModEnum, GridEnum, EnumType
 from cadnano.proxies.cnobject import CNObject
 from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnproxy import ProxySignal, UndoStack
@@ -711,7 +711,7 @@ class Document(CNObject):
     # PUBLIC METHODS FOR EDITING THE MODEL #
     def createNucleicAcidPart(  self,
                                 use_undostack: bool = True,
-                                grid_type: EnumType = GridType.HONEYCOMB
+                                grid_type: EnumType = GridEnum.HONEYCOMB
                             ) -> NucleicAcidPart:
         """Create and store a new DnaPart and instance, and return the instance.
 
@@ -954,7 +954,7 @@ class Document(CNObject):
         keylist = key.split(',')
         part_uuid = keylist[0]
         id_num = int(keylist[1])
-        is_fwd = int(keylist[2])    # enumeration of StrandType.FWD or StrandType.REV
+        is_fwd = int(keylist[2])    # enumeration of StrandEnum.FWD or StrandEnum.REV
         idx = int(keylist[3])
         part = self.getPartByUUID(part_uuid)
         strand = part.getStrand(is_fwd, id_num, idx)
@@ -966,7 +966,7 @@ class Document(CNObject):
 
         Args:
             mid (str or None): mod id or None
-            mod_type (int): [ModType.END_5PRIME, ModType.END_3PRIME]
+            mod_type (int): [ModEnum.END_5PRIME, ModEnum.END_3PRIME]
 
         Returns:
             tuple: of :obj:`str` of form::
@@ -975,9 +975,9 @@ class Document(CNObject):
         """
         mod_dict = self._mods.get(mid)
         name = '' if mid is None else mod_dict['name']
-        if mod_type == ModType.END_5PRIME:
+        if mod_type == ModEnum.END_5PRIME:
             seq = '' if mid is None else mod_dict['seq5p']
-        elif mod_type == ModType.END_3PRIME:
+        elif mod_type == ModEnum.END_3PRIME:
             seq = '' if mid is None else mod_dict['seq3p']
         else:
             seq = '' if mid is None else mod_dict['seqInt']
