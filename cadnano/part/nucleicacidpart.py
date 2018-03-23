@@ -3355,7 +3355,7 @@ class NucleicAcidPart(Part):
         emits ``partActiveBaseInfoSignal``
 
         Args:
-            info (Tuple): id_num, is_fwd, idx, to_vh_num
+            info: id_num, is_fwd, idx, to_vh_num
 
         """
         # if info != self.active_base_info:
