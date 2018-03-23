@@ -177,9 +177,9 @@ def importToPart(   part_instance : ObjectInstance,
                     copy_dict: dict,
                     offset: Tuple[float, float] = None,
                     use_undostack: bool = True):
-    """Use this to duplicate virtual_helices within a Part.  duplicate id_nums
-    will start numbering `part.getMaxIdNum()` rather than the lowest available
-    id_num.  TODO should this numbering change?
+    """Use this to duplicate virtual_helices within a ``Part``.  duplicate
+    ``id_num``s will start numbering ``part.getMaxIdNum() + 1`` rather than the
+    lowest available ``id_num``.
 
     Args:
         part_instance:

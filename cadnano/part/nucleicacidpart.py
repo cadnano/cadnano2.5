@@ -1101,7 +1101,7 @@ class NucleicAcidPart(Part):
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self._origin_pts)
         if id_num >= len_origin_pts:
-            diff = id_num - len_origin_pts
+            diff = id_num - len_origin_pts + 1 # add 1 to make sure this increase size
             number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
@@ -1113,8 +1113,7 @@ class NucleicAcidPart(Part):
 
             self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements),
                                                            ignore_index=True)
-        # TODO recieved a IndexError: index 256 is out of bounds for axis 0 with size 256
-        # when copy and pasting up to that number for some resason
+
         self._origin_pts[id_num] = origin[:2]
         new_x, new_y = origin[:2]
         xLL, yLL, xUR, yUR = self.origin_limits
