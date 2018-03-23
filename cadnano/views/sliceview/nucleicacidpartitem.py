@@ -980,7 +980,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         part = self._model_part
         if part.isVirtualHelixNearPoint(part_pt_tuple):
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            if id_num is not None:
+            if id_num >= 0:
                 pass
                 # loc = part.getCoordinate(id_num, 0)
                 # print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """Summary
 """
+from typing import Tuple
+
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
@@ -10,17 +12,21 @@ from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
 from cadnano.views.gridview import gridstyles as styles
+from cadnano.cntypes import RectType
+
 from .abstractgridtool import AbstractGridTool
 
 
-def normalizeRect(rect):
+def normalizeRect(rect: RectType) -> RectType:
     """Summary
 
     Args:
-        rect (TYPE): Description
+        rect: rectangle tuple
 
     Returns:
-        TYPE: Description
+        Tuple of form::
+
+            (x1, y1, x2, y2)
     """
     x1, y1, x2, y2 = rect
     if x1 > x2:
