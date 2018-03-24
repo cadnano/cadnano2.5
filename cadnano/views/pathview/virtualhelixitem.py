@@ -10,9 +10,9 @@ from PyQt5.QtGui import QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers import VirtualHelixItemController
 from cadnano.gui.palette import newPenObj, getColorObj  # getBrushObj, getNoBrush
-from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem

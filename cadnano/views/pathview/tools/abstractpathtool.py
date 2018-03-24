@@ -5,7 +5,7 @@ from typing import Optional, Tuple
 from PyQt5.QtCore import QRectF, QPointF
 
 from cadnano import util
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
+from cadnano.views.abstractitems import AbstractTool
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj, getNoBrush
 

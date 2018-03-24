@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsSimpleTextItem
 
 from cadnano import getBatch
-from cadnano.controllers.stranditemcontroller import StrandItemController
+from cadnano.controllers import StrandItemController
 from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen
 from cadnano.views.pathview import pathstyles as styles
 from .decorators.insertionitem import InsertionItem

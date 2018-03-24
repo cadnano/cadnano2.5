@@ -2,14 +2,19 @@ from ast import literal_eval
 from warnings import warn
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
+from PyQt5.QtWidgets import (
+                            QGraphicsItem,
+                            QGraphicsLineItem,
+                            QGraphicsRectItem,
+                            QGraphicsSceneEvent
+                            )
 
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.proxies.cnenum import GridEnum, HandleEnum
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.resizehandles import ResizeHandleGroup
 from cadnano.views.sliceview.sliceextras import ShortestPathHelper
 from . import slicestyles as styles

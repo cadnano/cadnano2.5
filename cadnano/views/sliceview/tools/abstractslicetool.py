@@ -2,7 +2,7 @@ import math
 
 from PyQt5.QtCore import QLineF, QPointF, QRectF
 
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
+from cadnano.views.abstractitems import AbstractTool
 from cadnano.gui.palette import getPenObj
 from cadnano.views.sliceview import slicestyles as styles
 

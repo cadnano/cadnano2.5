@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from cadnano import getBatch, util
 from cadnano.proxies.cnenum import HandleEnum
 from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
-from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.controllers import NucleicAcidPartItemController
+from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.resizehandles import ResizeHandleGroup
 
 from . import pathstyles as styles

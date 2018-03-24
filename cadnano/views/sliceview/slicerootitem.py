@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
 from cadnano.proxies.cnenum import PartEnum
-from cadnano.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import SliceNucleicAcidPartItem
 
 

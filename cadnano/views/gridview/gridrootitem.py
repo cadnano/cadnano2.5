@@ -1,18 +1,30 @@
+# -*- coding: utf-8 -*-
 """Summary
 """
+from typing import Set
+
+from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
+
 from cadnano.proxies.cnenum import PartEnum
-from cadnano.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import GridNucleicAcidPartItem
 
+from cadnano.views.gridview import GridToolManagerT
+from cadnano.cntypes import (
+                                WindowT,
+                                DocT
+                            )
 
 class GridRootItem(QGraphicsRectItem):
-    """
-    GridRootItem is the root item in the GridView. It gets added directly
-    to the pathscene by DocumentWindow. It receives two signals
-    (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
+    """``GridRootItem`` is the root item in the GridView. It gets added directly
+    to the path ``QGraphicsScene`` by ``DocumentWindow``.
+    It receives two signals::
 
-    GridRootItem must instantiate its own controller to receive signals
+        ``partAddedSignal`` and ``selectedPartChangedSignal``
+    via its ``ViewRootController``.
+
+    ``GridRootItem`` must instantiate its own controller to receive signals
     from the model.
 
     Attributes:
@@ -23,23 +35,26 @@ class GridRootItem(QGraphicsRectItem):
     """
     name = 'grid'
 
-    def __init__(self, rect, parent, window, document):
+    def __init__(self,  rect: QRectF,
+                        parent: QGraphicsItem,
+                        window: WindowT,
+                        document: DocT):
         """Summary
 
         Args:
-            rect (TYPE): Description
-            parent (TYPE): Description
-            window (TYPE): Description
-            document (TYPE): Description
+            rect: Rectangle of this item
+            parent: parent object
+            window: DocumentWindow
+            document: Document
         """
         super(GridRootItem, self).__init__(rect, parent)
-        self._window = window
-        self._document = document
-        self._controller = ViewRootController(self, document)
-        self.instance_items = {}
-        self.manager = None
-        self.select_tool = None
-        self.are_signals_on = True
+        self._window: WindowT = window
+        self._document: DocT = document
+        self._controller: ViewRootController = ViewRootController(self, document)
+        self.instance_items: dict = {}
+        self.manager: GridToolManagerT = None
+        self.select_tool: AbstractGridToolT = None
+        self.are_signals_on: bool = True
         self.setFlag(QGraphicsItem.ItemHasNoContents)
 
     def __repr__(self):
@@ -74,19 +89,19 @@ class GridRootItem(QGraphicsRectItem):
                 raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
-    def selectedChangedSlot(self, item_dict):
+    def selectedChangedSlot(self, item_dict: dict):
         """docstring for selectedChangedSlot
 
         Args:
-            item_dict (TYPE): Description
+            item_dict: Description
         """
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_set):
+    def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
         """Summary
 
         Args:
-            filter_name_set (set): Description
+            filter_name_set: Description
 
         Returns:
             TYPE: Description
@@ -97,45 +112,36 @@ class GridRootItem(QGraphicsRectItem):
         #     nucleicacid_part_item.setSelectionFilter(filter_name_set)
     # end def
 
-    def preXoverFilterChangedSlot(self, filter_name):
+    def preXoverFilterChangedSlot(self, filter_name: str):
         """Summary
 
         Args:
-            filter_name (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            filter_name: Description
         """
     # end def
 
-    def clearSelectionsSlot(self, doc):
+    def clearSelectionsSlot(self, doc: DocT):
         """Summary
 
         Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            doc: Description
         """
         self.select_tool.deselectItems()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
 
-    def resetRootItemSlot(self, doc):
+    def resetRootItemSlot(self, doc: DocT):
         """Summary
 
         Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            doc: Description
         """
         self.select_tool.deselectItems()
         self.scene().views()[0].clearGraphicsView()
     # end def
 
     ### ACCESSORS ###
-    def window(self):
+    def window(self) -> WindowT:
         """Summary
 
         Returns:
@@ -145,11 +151,11 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
-    def removePartItem(self, part_item):
+    def removePartItem(self, part_item: GridNucleicAcidPartItem):
         """Summary
 
         Args:
-            part_item (TYPE): Description
+            part_item: Description
 
         Returns:
             TYPE: Description
@@ -157,11 +163,11 @@ class GridRootItem(QGraphicsRectItem):
         del self.instance_items[part_item]
     # end def
 
-    def resetDocumentAndController(self, document):
+    def resetDocumentAndController(self, document: DocT):
         """docstring for resetDocumentAndController
 
         Args:
-            document (TYPE): Description
+            document: Document
 
         Raises:
             ImportError: Description
@@ -172,24 +178,21 @@ class GridRootItem(QGraphicsRectItem):
             raise ImportError
     # end def
 
-    def setModifyState(self, bool):
+    def setModifyState(self, is_on: bool):
         """docstring for setModifyState
 
         Args:
-            bool (TYPE): Description
+            is_on: Description
         """
         for nucleicacid_part_item in self.instance_items:
-            nucleicacid_part_item.setModifyState(bool)
+            nucleicacid_part_item.setModifyState(is_on)
     # end def
 
-    def setManager(self, manager):
-        """Summary
+    def setManager(self, manager: GridToolManagerT):
+        """Set the ``manager``, and the ``select_tool``
 
         Args:
-            manager (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            manager: the Grid tool manager
         """
         self.manager = manager
         self.select_tool = manager.select_tool

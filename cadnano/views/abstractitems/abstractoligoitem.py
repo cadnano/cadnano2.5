@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class AbstractOligoItem(object):
     """
     AbstractOligoItem is a base class for oligoitems in all views.

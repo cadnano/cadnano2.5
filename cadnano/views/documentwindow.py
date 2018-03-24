@@ -19,7 +19,7 @@ from cadnano.views.pathview.pathrootitem import PathRootItem
 from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
+from cadnano.views.abstractitems import AbstractTool
 from cadnano.cntypes import (
                                 DocT,
                                 DocCtrlT

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 class AbstractStrandItem(object):
     def __init__(self, model_strand=None, virtual_helix_item=None):

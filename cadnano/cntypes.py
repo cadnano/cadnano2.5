@@ -13,7 +13,7 @@ StrandT =   cn('strand.Strand')
 SegmentT =  Tuple[int,  int]
 WindowT =   cn('views.documentwindow.DocumentWindow')
 DocT =      cn('document.Document')
-DocCtrlT =  cn('controllers.documentcontroller.DocumentController')
+DocCtrlT =  cn('controllers.DocumentController')
 NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
 
 RectT = Tuple[float, float, float, float]

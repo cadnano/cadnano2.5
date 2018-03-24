@@ -28,7 +28,7 @@ class AbstractTool(QGraphicsObject):
         pass
 
 
-abstract_tool = AbstractTool(None)
+ABSTRACT_TOOL = AbstractTool(None)
 
 
 class AbstractToolManager(QObject):
@@ -48,7 +48,7 @@ class AbstractToolManager(QObject):
         self.view_name = view_name
         self.document = window.document()
         self.tool_group_name = tool_group_name
-        self._active_tool = abstract_tool
+        self._active_tool = ABSTRACT_TOOL
         self._active_part = None
         self.tool_names = None
     # end def
@@ -112,7 +112,7 @@ class AbstractToolManager(QObject):
             action_name = 'action_%s_%s' % (tgn, l_tool_name)
             tool_widget = getattr(window, action_name)
             tool_widget.setChecked(False)
-        self._active_tool = abstract_tool
+        self._active_tool = ABSTRACT_TOOL
     # end def
 
     def destroy(self):
@@ -128,7 +128,7 @@ class AbstractToolManager(QObject):
             handler = getattr(self, set_active_tool_method_name)
             tool_widget.triggered.disconnect(handler)
             tool_widget.setChecked(False)
-        self._active_tool = abstract_tool
+        self._active_tool = ABSTRACT_TOOL
         self.window = None
     # end def
 
@@ -140,7 +140,7 @@ class AbstractToolManager(QObject):
         if new_active_tool == self._active_tool:
             return
         if new_active_tool is None:
-            new_active_tool = abstract_tool
+            new_active_tool = ABSTRACT_TOOL
 
         if self._active_tool is not None:
             self._active_tool.setActive(False)

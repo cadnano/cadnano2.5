@@ -8,12 +8,15 @@ from ast import literal_eval
 from typing import Tuple
 
 from PyQt5.QtCore import (QPointF, Qt, QRectF)
-from PyQt5.QtWidgets import (QGraphicsItem, QGraphicsRectItem,
-                            QGraphicsSceneMouseEvent)
+from PyQt5.QtWidgets import (
+                            QGraphicsItem,
+                            QGraphicsRectItem,
+                            QGraphicsSceneMouseEvent
+                            )
 
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers import NucleicAcidPartItemController
 from cadnano.gui.palette import getPenObj, getNoPen  # , getBrushObj
-from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.grabcorneritem import GrabCornerItem
 from cadnano.cntypes import (
     RectT,

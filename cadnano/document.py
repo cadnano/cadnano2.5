@@ -27,6 +27,8 @@ from cadnano.oligo import Oligo
 from cadnano.strandset import StrandSet
 from cadnano.strand import Strand
 
+from cadnano.cntypes import DocCtrlT
+
 # Type Aliases
 EndsSelected = Tuple[bool, bool]
 
@@ -761,7 +763,7 @@ class Document(CNObject):
         return self._controller
     # end def
 
-    def setController(self, controller: 'cadnano.controller.DocumentController'):
+    def setController(self, controller: DocCtrlT):
         """Called by ``DocumentController.setDocument`` method."""
         self._controller = controller
     # end def

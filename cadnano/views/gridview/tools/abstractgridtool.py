@@ -5,9 +5,9 @@ from PyQt5.QtCore import QPointF, QLineF, QRectF
 from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
 
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractTool
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
-from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+from cadnano.views.abstractitems import AbstractTool
+from cadnano.views.abstractitems import AbstractToolManager
+from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.gui.palette import getPenObj
 

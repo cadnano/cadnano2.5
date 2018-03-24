@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QStyle, QCommonStyle
 
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.gui.palette import getBrushObj
-from cadnano.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers import ViewRootController
 from cadnano.views.pathview import pathstyles as styles
 
 from .oligoitem import OligoSetItem
