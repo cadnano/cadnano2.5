@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import (
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
 from cadnano.proxies.cnenum import GridEnum, EnumType
-from cadnano.views.gridview import GridNucleicAcidPartItemType
+from cadnano.views.gridview import GridNucleicAcidPartItemT
 from cadnano.views.gridview.tools.abstractgridtool import AbstractGridTool
 
 from cadnano.cntypes import RectT
@@ -36,7 +36,7 @@ class GridItem(QGraphicsPathItem):
         points: Description
     """
 
-    def __init__(self,  part_item: GridNucleicAcidPartItemType,
+    def __init__(self,  part_item: GridNucleicAcidPartItemT,
                         grid_type: EnumType):
         """Summary
 
@@ -92,7 +92,7 @@ class GridItem(QGraphicsPathItem):
         self.draw_lines = draw_lines
         self.updateGrid()
 
-    def doHoneycomb(self,   part_item: GridNucleicAcidPartItemType,
+    def doHoneycomb(self,   part_item: GridNucleicAcidPartItemT,
                             radius: float,
                             bounds: RectT):
         """Summary
@@ -160,7 +160,7 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
     # end def
 
-    def doSquare(self,  part_item: GridNucleicAcidPartItemType,
+    def doSquare(self,  part_item: GridNucleicAcidPartItemT,
                         radius: float,
                         bounds: RectT):
         """Summary
@@ -312,7 +312,7 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def selectToolMousePress(self,  tool: AbstractGridTool,
-                                    part_item: GridNucleicAcidPartItemType,
+                                    part_item: GridNucleicAcidPartItemT,
                                     event: QGraphicsSceneMouseEvent):
         """Summary
 
@@ -330,7 +330,7 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolMousePress(self, tool: AbstractGridTool,
-                                    part_item: GridNucleicAcidPartItemType,
+                                    part_item: GridNucleicAcidPartItemT,
                                     event: QGraphicsSceneMouseEvent):
         """Summary
 

@@ -68,7 +68,7 @@ class GridItem(QGraphicsRectItem):
     # end def
 
     def setGridType(self, grid_type: EnumType):
-        """Sets the grid type. See cadnano.cnenum.GridType.
+        """Sets the grid type. See cadnano.cnenum.GridEnum.
 
         Args:
             grid_type: NONE, HONEYCOMB, or SQUARE

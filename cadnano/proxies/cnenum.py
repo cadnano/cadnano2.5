@@ -121,7 +121,7 @@ class OrthoViewEnum(IntEnum):
 ENUM_NAMES['grid_type'] = enumNames(GridEnum)
 
 
-class HandleType(IntEnum):
+class HandleEnum(IntEnum):
     TOP_LEFT = 1
     TOP = 2
     TOP_RIGHT = 4
@@ -132,22 +132,22 @@ class HandleType(IntEnum):
     LEFT = 128
 
 
-ENUM_NAMES['handle_type'] = enumNames(HandleType)
+ENUM_NAMES['handle_type'] = enumNames(HandleEnum)
 
-# class BreakType(IntEnum):
+# class BreakEnum(IntEnum):
 #     LEFT5PRIME = 0
 #     LEFT3PRIME = 1
 #     RIGHT5PRIME = 2
 #     RIGHT3PRIME = 3
 
 
-# class HandleOrient(IntEnum):
+# class HandleOrientEnum(IntEnum):
 #     LEFT_UP = 0
 #     RIGHT_UP = 1
 #     LEFT_DOWN = 2
 #     RIGHT_DOWN = 3
 
-# class PartEdges(BitEnum):
+# class PartEdgesEnum(BitEnum):
 #     NONE     = 0x0001
 #     TOP      = 0x0002
 #     LEFT     = 0x0004

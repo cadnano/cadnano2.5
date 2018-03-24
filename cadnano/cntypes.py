@@ -7,12 +7,14 @@ from typing import Iterable
 from typing import Union
 import numpy as np
 
-OligoT = 'cadnano.oligo.Oligo'
-StrandT = 'cadnano.strand.Strand'
-SegmentT = Tuple[int,  int]
-WindowT = 'cadnano.views.documentwindow.DocumentWindow'
-DocT = 'cadnano.document.Document'
-DocCtrlT = 'cadnano.controllers.documentcontroller.DocumentController'
+cn = lambda x: 'cadnano.' + x
+OligoT =    cn('oligo.Oligo')
+StrandT =   cn('strand.Strand')
+SegmentT =  Tuple[int,  int]
+WindowT =   cn('views.documentwindow.DocumentWindow')
+DocT =      cn('document.Document')
+DocCtrlT =  cn('controllers.documentcontroller.DocumentController')
+NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
 
 RectT = Tuple[float, float, float, float]
 IntT = Union[np.int64, int]
@@ -23,9 +25,6 @@ Vec2T = Tuple[float, float]
 Vec3T = Union[np.ndarray, Tuple[float, float, float]]
 HitListT = List[Tuple[int, List[int], List[int] ]]
 PointsT = Tuple[np.ndarray, np.ndarray, np.ndarray]
-
-
-AbstractToolType = 'cadnano.views.abstractitems.abstracttoolmanager.AbstractTool'
 
 '''
 tuple: of :obj:`list`, fwd_axis_hits, rev_axis_hits

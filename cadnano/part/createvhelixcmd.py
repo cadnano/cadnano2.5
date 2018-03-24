@@ -2,15 +2,15 @@ from ast import literal_eval
 import bisect
 from typing import Union, List, Tuple
 
-
-
 from cadnano.proxies.cnproxy import UndoCommand
-NAPartType = 'cadnano.part.nucleicacidpart.NucleicAcidPart'
-OriginType = Tuple[float, float, float, float]
+from cadnano.cntypes import (
+                                NucleicAcidPartT,
+                                RectT
+                            )
 
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(self,
-                part: NAPartType,
+                part: NucleicAcidPartT,
                 x: float,
                 y: float,
                 z: float,
@@ -36,7 +36,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                 scaffold based design
         '''
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
-        self.part: NAPartType = part
+        self.part: NucleicAcidPartT = part
         if id_num is None:
             id_num = part._getNewIdNum(parity=parity)
         else:
@@ -59,7 +59,7 @@ class CreateVirtualHelixCommand(UndoCommand):
 
         self.threshold: float = 2.1*part.radius()
         self.safe: bool = safe
-        self.old_limits: OriginType = None
+        self.old_limits: RectT = None
     # end def
 
     def redo(self):

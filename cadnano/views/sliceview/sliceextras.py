@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPa
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
-from cadnano.proxies.cnenum import GridType
+from cadnano.proxies.cnenum import GridEnum
 from . import slicestyles as styles
 
 
@@ -1081,7 +1081,7 @@ class ShortestPathHelper(object):
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
-            if grid_type is GridType.HONEYCOMB:
+            if grid_type is GridEnum.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
                 node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
                                                                      scale_factor=scale_factor)

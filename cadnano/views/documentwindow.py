@@ -39,7 +39,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         controller: DocumentController
     """
 
-    def __init__(self, parent=None, doc_ctrlr: DocCtrlT):
+    def __init__(self, doc_ctrlr: DocCtrlT, parent=None):
         super(DocumentWindow, self).__init__(parent)
 
         self.controller = doc_ctrlr
