@@ -15,6 +15,7 @@ WindowT =   cn('views.documentwindow.DocumentWindow')
 DocT =      cn('document.Document')
 DocCtrlT =  cn('controllers.DocumentController')
 NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
+VirtualHelixT = cn('part.virtualhelix.VirtualHelix')
 
 RectT = Tuple[float, float, float, float]
 IntT = Union[np.int64, int]
@@ -25,6 +26,7 @@ Vec2T = Tuple[float, float]
 Vec3T = Union[np.ndarray, Tuple[float, float, float]]
 HitListT = List[Tuple[int, List[int], List[int] ]]
 PointsT = Tuple[np.ndarray, np.ndarray, np.ndarray]
+ABInfoT = Tuple[int, bool, int, int]
 
 '''
 tuple: of :obj:`list`, fwd_axis_hits, rev_axis_hits

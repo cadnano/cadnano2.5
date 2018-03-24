@@ -39,7 +39,8 @@ from cadnano.cntypes import (
     QueryIDNumT,
     OligoT,
     StrandT,
-    SegmentT
+    SegmentT,
+    ABInfoT
     )
 
 
@@ -162,7 +163,7 @@ class NucleicAcidPart(Part):
         # Runtime state
         self._active_base_index = self._STEP_SIZE
         self._active_id_num = None
-        self.active_base_info = ()
+        self.active_base_info: ABInfoT = ()
         self._selected = False
         self.is_active = False
 
@@ -3351,7 +3352,7 @@ class NucleicAcidPart(Part):
         self.partActiveBaseInfoSignal.emit(self, abi)
     # end def
 
-    def setActiveBaseInfo(self, info: Tuple[int, bool, int, int]):
+    def setActiveBaseInfo(self, info: ABInfoT):
         """ to_vh_num is not use as of now and may change
         emits ``partActiveBaseInfoSignal``
 

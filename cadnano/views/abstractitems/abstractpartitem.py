@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-
+from cadnano.objectinstance import ObjectInstance
+from cadnano.part import Part
 
 class QAbstractPartItem(QGraphicsRectItem):
     """ Use for single inheritance
@@ -13,10 +14,11 @@ class QAbstractPartItem(QGraphicsRectItem):
     all views.
     """
 
-    def __init__(self, model_part_instance, viewroot, parent):
+    def __init__(self, model_part_instance: ObjectInstance, viewroot, parent):
         super(QAbstractPartItem, self).__init__(parent)
-        self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.reference()
+        self._model_instance: ObjectInstance = model_part_instance
+        m_p = model_part_instance.reference()
+        self._model_part: Part = m_p
         self._model_props = m_p.getModelProperties()
         self._viewroot = viewroot
         self._oligo_item_hash = {}
