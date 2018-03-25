@@ -54,19 +54,17 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     _RADIUS = styles.GRID_HELIX_RADIUS
     _BOUNDING_RECT_PADDING = 80
 
-    def __init__(self,  model_part_instance: ObjectInstance,
-                        viewroot: GridRootItemT,
-                        parent: QGraphicsItem = None):
+    def __init__(self,  part_instance: ObjectInstance,
+                        viewroot: GridRootItemT):
         """Summary
 
         Args:
-            model_part_instance: ``ObjectInstance`` of the ``Part``
+            part_instance: ``ObjectInstance`` of the ``Part``
             viewroot: ``GridRootItem``
             parent: Default is ``None``
         """
-        super(GridNucleicAcidPartItem, self).__init__(  model_part_instance,
-                                                        viewroot,
-                                                        parent)
+        super(GridNucleicAcidPartItem, self).__init__(  part_instance,
+                                                        viewroot)
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
@@ -265,9 +263,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                                                     virtual_helix: VirtualHelixT,
                                                     keys: Tuple,
                                                     values: Tuple):
-        """Summary
-
-        Args:
+        """Args:
             sender (Part): Model object that emitted the signal.
             id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             keys: keys that changed
@@ -282,8 +278,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
                                         id_num: int,
                                         virtual_helix: VirtualHelixT,
                                         neighbors: List[int]):
-        """Slot
-
+        """
         Args:
             sender: Model object that emitted the signal.
             id_num: VirtualHelix ID number. See ``NucleicAcidPart`` for

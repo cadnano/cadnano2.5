@@ -6,6 +6,7 @@ from typing import Set
 from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
+from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import GridNucleicAcidPartItem
@@ -13,8 +14,9 @@ from .nucleicacidpartitem import GridNucleicAcidPartItem
 from cadnano.views.gridview import GridToolManagerT
 from cadnano.cntypes import (
                                 WindowT,
-                                DocT
-                            )
+                                DocT,
+                                NucleicAcidPartT
+)
 
 class GridRootItem(QGraphicsRectItem):
     """``GridRootItem`` is the root item in the GridView. It gets added directly
@@ -22,6 +24,7 @@ class GridRootItem(QGraphicsRectItem):
     It receives two signals::
 
         ``partAddedSignal`` and ``selectedPartChangedSignal``
+
     via its ``ViewRootController``.
 
     ``GridRootItem`` must instantiate its own controller to receive signals
@@ -65,23 +68,23 @@ class GridRootItem(QGraphicsRectItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partAddedSlot(self, sender, model_part_instance):
+    def partAddedSlot(self, sender: NucleicAcidPartT,
+                            part_instance: ObjectInstance):
         """Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            model_part_instance (ObjectInstance): Description
+            sender: Model object that emitted the signal.
+            part_instance: Description
 
         Raises:
             NotImplementedError: unknown ``part_type``
         """
         if self.are_signals_on:
-            part_type = model_part_instance.reference().partType()
+            part_type = part_instance.reference().partType()
             if part_type == PartEnum.NUCLEICACIDPART:
-                na_part_item = GridNucleicAcidPartItem(model_part_instance,
-                                                       viewroot=self,
-                                                       parent=self)
+                na_part_item = GridNucleicAcidPartItem(part_instance,
+                                                       viewroot=self)
                 self.instance_items[na_part_item] = na_part_item
                 self.select_tool.setPartItem(na_part_item)
                 na_part_item.zoomToFit()

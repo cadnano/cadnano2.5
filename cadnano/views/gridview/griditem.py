@@ -14,7 +14,9 @@ from cadnano.proxies.cnenum import GridEnum, EnumType
 from cadnano.views.gridview import GridNucleicAcidPartItemT
 from cadnano.views.gridview.tools.abstractgridtool import AbstractGridTool
 
-from cadnano.cntypes import RectT
+from cadnano.cntypes import (
+        RectT
+    )
 
 from . import gridstyles as styles
 _RADIUS = styles.GRID_HELIX_RADIUS

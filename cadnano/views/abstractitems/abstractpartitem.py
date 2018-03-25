@@ -14,8 +14,8 @@ class QAbstractPartItem(QGraphicsRectItem):
     all views.
     """
 
-    def __init__(self, model_part_instance: ObjectInstance, viewroot, parent):
-        super(QAbstractPartItem, self).__init__(parent)
+    def __init__(self, model_part_instance: ObjectInstance, viewroot: QGraphicsItem):
+        super(QAbstractPartItem, self).__init__(parent=viewroot)
         self._model_instance: ObjectInstance = model_part_instance
         m_p = model_part_instance.reference()
         self._model_part: Part = m_p

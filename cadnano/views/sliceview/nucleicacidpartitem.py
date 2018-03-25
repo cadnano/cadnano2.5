@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (
                             QGraphicsSceneEvent
                             )
 
+from cadnano.objectinstance import ObjectInstance
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.proxies.cnenum import GridEnum, HandleEnum
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
@@ -21,6 +22,7 @@ from . import slicestyles as styles
 from .griditem import GridItem
 from .prexovermanager import PreXoverManager
 from .virtualhelixitem import SliceVirtualHelixItem
+from . import SliceRootItemT, AbstractSliceToolT
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
@@ -47,15 +49,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
     _BOUNDING_RECT_PADDING = 80
 
-    def __init__(self, model_part_instance, viewroot, parent=None):
+    def __init__(self,  part_instance: ObjectInstance,
+                        viewroot: SliceRootItemT):
         """Summary
 
         Args:
-            model_part_instance (TYPE): Description
-            viewroot (TYPE): Description
-            parent (None, optional): Description
+            part_instance:  ``ObjectInstance`` of the ``Part``
+            viewroot: ``SliceRootItem`` and parent object
         """
-        super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        super(SliceNucleicAcidPartItem, self).__init__(part_instance, viewroot)
 
         self.shortest_path_start = None
         self.neighbor_map = dict()

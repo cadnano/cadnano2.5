@@ -89,6 +89,9 @@ class CustomQGraphicsView(QGraphicsView):
         self.toolbar = None  # custom hack for the paint tool palette
         self._name = None
 
+        # a ``SelectionItemGroup`` object when not ``None``
+        self._selection_lock = None
+
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
         if GL:
@@ -114,18 +117,18 @@ class CustomQGraphicsView(QGraphicsView):
         objId = self._name if self._name else str(id(self))[-4:]
         return "<%s %s>" % (clsName, objId)
 
-    def setName(self, name):
+    def setName(self, name: str):
         self._name = name
     # end def
 
-    def setViewportUpdateOn(self, is_enabled):
+    def setViewportUpdateOn(self, is_enabled: bool):
         if is_enabled:
             self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
         else:
             self.setViewportUpdateMode(QGraphicsView.NoViewportUpdate)
     # end def
 
-    def activateSelection(self, is_active):
+    def activateSelection(self, is_active: bool):
         if self._selection_lock:
             self._selection_lock.clearSelection(False)
         self.clearSelectionLockAndCallbacks()
@@ -153,7 +156,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._press_list = []  # bookkeeping to handle passing mouseReleaseEvents to QGraphicsItems that don't get them
     # end def
 
-    def _setGLView(self, boolval):
+    def _setGLView(self, boolval: bool):
         # scene = self.scene()
         if boolval and self.is_GL is False:
             self.is_GL = True
@@ -253,7 +256,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._selection_lock = selection_lock
     # end def
 
-    def selectionLock(self):
+    def selectionLock(self):    # returns a ``SelectionItemGroup`` or ``None``
         return self._selection_lock
     # end def
 
@@ -269,14 +272,13 @@ class CustomQGraphicsView(QGraphicsView):
 
     def addToPressList(self, item):
         """docstring for addToPressList"""
-        # self._press_list[self._press_list_idx].append(item)
         self._press_list.append(item)
     # end def
 
     def keyPanDeltaX(self):
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
-        # PyQt isn't aware that QGraphicsObject is a QGraphicsItem and so
+        # PyQt5 isn't aware that QGraphicsObject is a QGraphicsItem and so
         # it returns a separate python object if, say, childItems() returns
         # a QGraphicsObject cast to a QGraphicsItem. If this is the case,
         # we can still find the QGraphicsObject thusly:

@@ -1,20 +1,31 @@
 """Summary
 """
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (
+                        Qt,
+                        QRectF
+)
 from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
 
+from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import SliceNucleicAcidPartItem
 
+from cadnano.cntypes import (
+                                WindowT,
+                                DocT,
+                                NucleicAcidPartT
+)
 
 class SliceRootItem(QGraphicsRectItem):
-    """
-    SliceRootItem is the root item in the SliceView. It gets added directly
-    to the slicescene by DocumentWindow. It receives two signals
-    (partAddedSignal and selectedPartChangedSignal) via its ViewRootController.
+    """SliceRootItem is the root item in the SliceView. It gets added directly
+    to the slicescene by DocumentWindow. It receives two signals::
 
-    SliceRootItem must instantiate its own controller to receive signals
+        partAddedSignal and selectedPartChangedSignal
+
+    via its ``ViewRootController``.
+
+    ``SliceRootItem`` must instantiate its own controller to receive signals
     from the model.
 
     Attributes:
@@ -25,14 +36,17 @@ class SliceRootItem(QGraphicsRectItem):
     """
     name = 'slice'
 
-    def __init__(self, rect, parent, window, document):
+    def __init__(self,  rect: QRectF,
+                        parent: QGraphicsItem,
+                        window: WindowT,
+                        document: DocT):
         """Summary
 
         Args:
-            rect (QRectF): Description
-            parent (QObject): Description
-            window (DocumentWindow): Description
-            document (Document): Description
+            rect: Rectangle of this item
+            parent: parent object
+            window: DocumentWindow
+            document: Document
         """
         super(SliceRootItem, self).__init__(rect, parent)
         self._window = window
@@ -46,24 +60,24 @@ class SliceRootItem(QGraphicsRectItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partAddedSlot(self, sender, model_part_instance):
+    def partAddedSlot(self, sender: NucleicAcidPartT,
+                            part_instance: ObjectInstance):
         """
         Receives notification from the model that a part has been added.
         Views that subclass AbstractView should override this method.
 
         Args:
-            sender (Part): Model object that emitted the signal.
-            model_part_instance (ObjectInstance): Description
+            sender: Model object that emitted the signal.
+            part_instance: Description
 
         Raises:
             NotImplementedError: unknown ``part_type``
         """
         if self.are_signals_on:
-            part_type = model_part_instance.reference().partType()
+            part_type = part_instance.reference().partType()
             if part_type == PartEnum.NUCLEICACIDPART:
-                na_part_item = SliceNucleicAcidPartItem(model_part_instance,
-                                                        viewroot=self,
-                                                        parent=self)
+                na_part_item = SliceNucleicAcidPartItem(part_instance,
+                                                        viewroot=self)
                 self.instance_items[na_part_item] = na_part_item
                 self.select_tool.setPartItem(na_part_item)
                 na_part_item.zoomToFit()
