@@ -247,7 +247,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             vhi: the item associated with id_num
         """
-        neighbors = vhi.cnModel().getProperty('neighbors')
+        neighbors = vhi.getProperties('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
@@ -287,7 +287,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             neighbors: Description
         """
         if self._viewroot.are_signals_on:
-            vhi = GridVirtualHelixItem(virtual_helix, self)
+            vhi = GridVirtualHelixItem(id_num, self)
             self._virtual_helix_item_hash[id_num] = vhi
             self._refreshVirtualHelixItemGizmos(id_num, vhi)
             for neighbor_id in neighbors:

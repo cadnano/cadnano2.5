@@ -403,7 +403,7 @@ class PreXoverItem(QGraphicsRectItem):
         # self.setParentItem(to_vh_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
-        self._model_vh = from_virtual_helix_item.cnModel()
+        self._model_part = from_virtual_helix_item.cnModel()
         self.idx = from_index
         self.is_low = False
         self.is_high = False
@@ -447,7 +447,7 @@ class PreXoverItem(QGraphicsRectItem):
             Args:
                 from_virtual_helix_item (:obj:`VirtualHelixItem`):
             """
-            part = self._model_vh.part()
+            part = self._model_part
             idx = self.idx
             is_fwd = self.is_fwd
             id_num = self._id_num
@@ -562,7 +562,7 @@ class PreXoverItem(QGraphicsRectItem):
             (self.FILTER_NAME not in current_filter_set) ):
             return
 
-        part = self._model_vh.part()
+        part = self._model_part
         is_fwd = self.is_fwd
 
         if self.is3p:

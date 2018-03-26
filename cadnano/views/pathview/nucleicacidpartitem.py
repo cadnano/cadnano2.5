@@ -337,7 +337,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
         if self._viewroot.are_signals_on:
-            vhi = PathVirtualHelixItem(virtual_helix, self)
+            vhi = PathVirtualHelixItem(id_num, self)
             self._virtual_helix_item_hash[id_num] = vhi
             vhi_list = self._virtual_helix_item_list
             vhi_list.append(vhi)
@@ -495,7 +495,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         vhi_h_rect = None
         vhi_h_selection_group = self._viewroot.vhiHandleSelectionGroup()
         for vhi in new_list:
-            _, _, _z = vhi.cnModel().getAxisPoint(0)
+            _, _, _z = vhi.getAxisPoint(0)
             _z *= self._scale_2_Qt
             vhi.setPos(_z, y)
             if vhi_rect is None:

@@ -39,7 +39,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     where x is the cartesian product.
 
     Attributes:
-        active_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
+        active_virtual_helix_item: Description
         resize_handle_group (ResizeHandleGroup): handles for dragging and resizing
         griditem (GridItem): Description
         outline (QGraphicsRectItem): Description
@@ -73,10 +73,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
         self.inverse_scale_factor = m_p.radius() / self._RADIUS
-        self.active_virtual_helix_item = None
+        self.active_virtual_helix_item: SliceVirtualHelixItem = None
         self.prexover_manager = PreXoverManager(self)
         self.hide()  # hide while until after attemptResize() to avoid flicker
-        self._rect = QRectF(0., 0., 1000., 1000.)  # set this to a token value
+        self._rect: QRectF = QRectF(0., 0., 1000., 1000.)  # set this to a token value
         self.boundRectToModel()
         self.setPen(getNoPen())
         self.setRect(self._rect)
@@ -255,7 +255,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             vhi (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): the item associated with id_num
         """
-        neighbors = vhi.cnModel().getProperty('neighbors')
+        neighbors = vhi.getProperties('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
@@ -295,7 +295,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             TYPE: Description
         """
         if self._viewroot.are_signals_on:
-            vhi = SliceVirtualHelixItem(virtual_helix, self)
+            vhi = SliceVirtualHelixItem(id_num, self)
             self._virtual_helix_item_hash[id_num] = vhi
             self._refreshVirtualHelixItemGizmos(id_num, vhi)
             for neighbor_id in neighbors:

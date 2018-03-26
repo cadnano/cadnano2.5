@@ -6,7 +6,6 @@ class AbstractStrandItem(object):
         if self.__class__ == AbstractStrandItem:
             raise NotImplementedError("AbstractStrandItem should be subclassed.")
         self._model_strand = None
-        self._model_vh = None
         self._model_oligo = None
 
     ### SIGNALS ###

@@ -17,6 +17,7 @@ from cadnano.gui.palette import getPenObj, getBrushObj
 
 from . import slicestyles as styles
 from .sliceextras import WedgeGizmo, WEDGE_RECT
+from . import SliceNucleicAcidPartItemT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,13 +51,13 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     FILTER_NAME = 'virtual_helix'
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num: int, part_item: SliceNucleicAcidPartItemT):
         """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: the part item
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._doc_controller = part_item.document().controller()
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
@@ -298,7 +299,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Check item's current visibility, color and active state, and sets
         pen, brush, text according to style defaults.
         """
-        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
+        is_visible, color = self._model_part.getVirtualHelixProperties(self._id_num, ['is_visible', 'color'])
         if is_visible:
             self.show()
         else:
@@ -404,7 +405,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.cnModel().getProperty('name')
+        nvhi_name = nvhi.getProperties('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)

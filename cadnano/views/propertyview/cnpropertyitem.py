@@ -5,7 +5,9 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
                              QLineEdit, QCheckBox, QComboBox)
 from cadnano.proxies.cnenum import ENUM_NAMES
-
+from cadnano.cntypes import (
+                                PropertyEditorWidgetT
+)
 KEY_COL = 0
 VAL_COL = 1
 
@@ -20,12 +22,11 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, parent=None, key=None):
+    def __init__(self, parent: PropertyEditorWidgetT, key=None):
         """Summary
 
         Args:
-            cn_model_list (list): cn_model objects for selected item(s)
-            parent (TYPE): Description
+            parent: Description
             key (None, optional): Description
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)

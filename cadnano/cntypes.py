@@ -14,6 +14,7 @@ SegmentT =  Tuple[int,  int]
 WindowT =   cn('views.documentwindow.DocumentWindow')
 DocT =      cn('document.Document')
 DocCtrlT =  cn('controllers.DocumentController')
+PropertyEditorWidgetT = cn('views.propertyview.PropertyEditorWidget')
 NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
 VirtualHelixT = cn('part.virtualhelix.VirtualHelix')
 

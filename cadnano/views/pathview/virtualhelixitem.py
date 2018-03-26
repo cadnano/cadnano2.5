@@ -17,6 +17,7 @@ from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
+from . import PathNucleicAcidPartItemT
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
@@ -52,15 +53,14 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num: int, part_item: PathNucleicAcidPartItemT):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (TYPE): Description
-            viewroot (TYPE): Description
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: Description
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsPathItem.__init__(self, parent=part_item.proxy())
         self._viewroot = part_item._viewroot
         self._getActiveTool = part_item._getActiveTool
@@ -306,7 +306,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         part = self.part()
         path = QPainterPath()
         sub_step_size = part.subStepSize()
-        canvas_size = self._model_vh.getSize()
+        _, canvas_size = self._model_part.getOffsetAndSize(self._id_num)
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks
@@ -401,7 +401,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
         self.scene().views()[0].addToPressList(self)
         strand_set, idx = self.baseAtPoint(event.pos())
-        self._model_vh.setActive(strand_set.isForward(), idx)
+        self._model_part.setActiveVirtualHelix(self._id_num, strand_set.isForward(), idx)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
 
