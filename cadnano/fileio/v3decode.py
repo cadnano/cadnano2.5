@@ -78,12 +78,12 @@ def determineLatticeType(part_dict):
         hcd, honeycomb_guess_coordinates = HoneycombDnaPart.distanceFromClosestLatticeCoord(DEFAULT_RADIUS, vh_x, vh_y)
         sqd, square_guess_coordinates = SquareDnaPart.distanceFromClosestLatticeCoord(DEFAULT_RADIUS, vh_x, vh_y)
 
-        honeycomb_guess_x, honeycomb_guess_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS,
-                                                                                                 honeycomb_guess_coordinates[0],
-                                                                                                 honeycomb_guess_coordinates[1])
-        square_guess_x, square_guess_y = SquareDnaPart.latticeCoordToPositionXYInverted(DEFAULT_RADIUS,
-                                                                                        square_guess_coordinates[0],
-                                                                                        square_guess_coordinates[1])
+        honeycomb_guess_x, honeycomb_guess_y = HoneycombDnaPart.latticeCoordToQtXY(DEFAULT_RADIUS,
+                                                                                   honeycomb_guess_coordinates[0],
+                                                                                   honeycomb_guess_coordinates[1])
+        square_guess_x, square_guess_y = SquareDnaPart.latticeCoordToQtXY(DEFAULT_RADIUS,
+                                                                          square_guess_coordinates[0],
+                                                                          square_guess_coordinates[1])
 
         honeycomb_delta_x += (vh_x - honeycomb_guess_x)
         honeycomb_delta_y += (vh_y - honeycomb_guess_y)
@@ -206,7 +206,6 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
                 'crossover_span_angle',
                 'max_vhelix_length',
                 'workplane_idxs'):
-                'workplane_idxs']:
         value = part_dict.get(key)
         if value is not None:
             part.setProperty(key, value, use_undostack=False)

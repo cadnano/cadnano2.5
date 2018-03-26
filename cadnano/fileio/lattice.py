@@ -34,16 +34,22 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def isEvenParity(row, column):
+        """Return if the given row and column have even parity."""
         return (row % 2) == (column % 2)
     # end def
 
     @staticmethod
     def isOddParity(row, column):
+        """Return if the given row and column have odd parity."""
         return (row % 2) ^ (column % 2)
     # end def
 
     @staticmethod
     def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
+        """
+        Given a x and y position, determine closest lattice coordinate and the
+        distance to the center of those coordinates.
+        """
         column_guess = x/(radius*root3)
         row_guess = -(y - radius*2)/(radius*3)
 
@@ -55,7 +61,7 @@ class HoneycombDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column, scale_factor)
+                guess_x, guess_y = HoneycombDnaPart.latticeCoordToQtXY(radius, row, column, scale_factor)
                 squared_distance = abs(guess_x-x)**2 + abs(guess_y-y)**2
                 distance = sqrt(squared_distance)
 
@@ -79,7 +85,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+    def latticeCoordToModelXY(radius, row, column, scale_factor=1.0):
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3*scale_factor
         y_offset = radius
@@ -91,12 +97,27 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
-        return HoneycombDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+    def latticeCoordToQtXY(radius, row, column, scale_factor=1.0):
+        """
+        Call HoneyCombDnaPart.latticeCoordToQtXY with the supplied row
+        parameter inverted (i.e. multiplied by -1) to reflect the coordinates
+        used by Qt.
+
+        Args:
+            radius (float): the model radius
+            row (int): the row in question
+            column (int): the column in question
+            scale_factor (float): the scale factor to be used in the calculations
+
+        Returns:
+            The x, y coordinates of the given row and column
+        """
+        return HoneycombDnaPart.latticeCoordToModelXY(radius, -row, column, scale_factor)
     # end def
 
     @staticmethod
-    def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+    def positionModelToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+        """Convert a model position to a lattice coordinate."""
         assert isinstance(radius, float)
         assert isinstance(x, float)
         assert isinstance(y, float)
@@ -116,10 +137,10 @@ class HoneycombDnaPart(object):
         if not strict:
             return row, column
         else:
-            gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius,
-                                                                                                       row,
-                                                                                                       column,
-                                                                                                       scale_factor)
+            gridpoint_center_x, gridpoint_center_y = HoneycombDnaPart.latticeCoordToQtXY(radius,
+                                                                                         row,
+                                                                                         column,
+                                                                                         scale_factor)
 
             if abs(x-gridpoint_center_x)**2 + abs(y+gridpoint_center_y)**2 >= (radius*scale_factor)**2:
                 return None
@@ -128,13 +149,15 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLatticeCoordInverted(radius, x, y, scale_factor=1., strict=False):
-        return HoneycombDnaPart.positionToLatticeCoord(radius, x, -y, scale_factor, strict)
+    def positionQtToLatticeCoord(radius, x, y, scale_factor=1., strict=False):
+        """Convert a Qt position to a lattice coordinate."""
+        return HoneycombDnaPart.positionModelToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod
     def positionToLatticeCoordRound(radius, x, y, round_up_row, round_up_col,
                                     scale_factor=1.0):
+        """Convert a model position to a rounded lattice coordinate."""
         roundRow = ceil if round_up_row else floor
         roundCol = ceil if round_up_col else floor
         column = roundCol(x/(radius*root3*scale_factor))
@@ -149,6 +172,10 @@ class HoneycombDnaPart(object):
 
     @staticmethod
     def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        """
+        Determine if given x-y coordinates are inside a VH at a given
+        row-column coordinate
+        """
         if xy_tuple is None or coordinate_tuple is None:
             return False
 
@@ -161,24 +188,27 @@ class HoneycombDnaPart(object):
         row, column = coordinate_tuple
         x, y = xy_tuple
 
-        row_x, row_y = HoneycombDnaPart.latticeCoordToPositionXYInverted(part_radius,
-                                                                         row,
-                                                                         column,
-                                                                         scale_factor)
+        row_x, row_y = HoneycombDnaPart.latticeCoordToQtXY(part_radius,
+                                                           row,
+                                                           column,
+                                                           scale_factor)
         return abs(row_x - x)**2 + abs(row_y - y)**2 <= item_radius**2
     # end def
 
     @staticmethod
     def sanityCheckCalculations(iterations=100000000):
+        """Ensure that the values returned by latticeCoordToQtXY and
+        positionQtToLatticeCoord return consistent results.
+        """
         for _ in range(iterations):
             radius = 1.125
             scale_factor = 13.333333333333334
             row = random.randint(-1000, 1000)
             col = random.randint(-1000, 1000)
 
-            x_position, y_position = HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, col, scale_factor)
-            output_row, output_column = HoneycombDnaPart.positionToLatticeCoordInverted(radius, x_position, y_position,
-                                                                                 scale_factor)
+            x_position, y_position = HoneycombDnaPart.latticeCoordToQtXY(radius, row, col, scale_factor)
+            output_row, output_column = HoneycombDnaPart.positionQtToLatticeCoord(radius, x_position, y_position,
+                                                                                  scale_factor)
 
             assert row == output_row, '''
                 Rows do not match:  %s != %s.
@@ -221,16 +251,22 @@ class SquareDnaPart(object):
 
     @staticmethod
     def isEvenParity(row, column):
+        """Return if the given row and column have even parity."""
         return (row % 2) == (column % 2)
     # end def
 
     @staticmethod
     def isOddParity(row, column):
+        """Return if the given row and column have odd parity."""
         return (row % 2) ^ (column % 2)
     # end def
 
     @staticmethod
     def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
+        """
+        Given a x and y position, determine closest lattice coordinate and the
+        distance to the center of those coordinates.
+        """
         column_guess = x/(2*radius)
         row_guess = y/(2*radius)
 
@@ -242,7 +278,7 @@ class SquareDnaPart(object):
 
         for row in possible_rows:
             for column in possible_columns:
-                guess_x, guess_y = SquareDnaPart.latticeCoordToPositionXY(radius, -row, column, scale_factor)
+                guess_x, guess_y = SquareDnaPart.latticeCoordToModelXY(radius, -row, column, scale_factor)
                 squared_distance = (guess_x-x)**2 + (-guess_y-y)**2
                 distance = sqrt(squared_distance)
 
@@ -255,31 +291,42 @@ class SquareDnaPart(object):
 
     @staticmethod
     def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
-        """
-        """
+        """Convert legacy row, column coordinates to latticeXY."""
         y = -row*2*radius
         x = column*2*radius
         return scale_factor*x, scale_factor*y
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
-        """
-        """
+    def latticeCoordToModelXY(radius, row, column, scale_factor=1.0):
+        """Convert row, column coordinates to latticeXY."""
         y = row*2*radius
         x = column*2*radius
         return scale_factor*x, scale_factor*y
     # end def
 
     @staticmethod
-    def latticeCoordToPositionXYInverted(radius, row, column, scale_factor=1.0):
+    def latticeCoordToQtXY(radius, row, column, scale_factor=1.0):
         """
+        Call SquareDnaPart.latticeCoordToQtXY with the supplied row
+        parameter inverted (i.e. multiplied by -1) to reflect the coordinates
+        used by Qt.
+
+        Args:
+            radius (float): the model radius
+            row (int): the row in question
+            column (int): the column in question
+            scale_factor (float): the scale factor to be used in the calculations
+
+        Returns:
+            The x, y coordinates of the given row and column
         """
-        return SquareDnaPart.latticeCoordToPositionXY(radius, row, column, scale_factor)
+        return SquareDnaPart.latticeCoordToModelXY(radius, row, column, scale_factor)
     # end def
 
     @staticmethod
-    def positionToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+    def positionModelToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+        """Convert a model position to a lattice coordinate."""
         float_row = y/(2.*radius*scale_factor) + 0.5
         float_column = x/(2.*radius*scale_factor) + 0.5
 
@@ -289,10 +336,10 @@ class SquareDnaPart(object):
         if not strict:
             return row, column
         else:
-            gridpoint_center_x, gridpoint_center_y = SquareDnaPart.latticeCoordToPositionXYInverted(radius,
-                                                                                                    row,
-                                                                                                    column,
-                                                                                                    scale_factor)
+            gridpoint_center_x, gridpoint_center_y = SquareDnaPart.latticeCoordToQtXY(radius,
+                                                                                      row,
+                                                                                      column,
+                                                                                      scale_factor)
 
             if abs(x-gridpoint_center_x)**2 + abs(y-gridpoint_center_y)**2 >= (radius*scale_factor)**2:
                 return None
@@ -301,14 +348,14 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def positionToLatticeCoordInverted(radius, x, y, scale_factor=1., strict=False):
-        return SquareDnaPart.positionToLatticeCoord(radius, x, -y, scale_factor, strict)
+    def positionQtToLatticeCoord(radius, x, y, scale_factor=1., strict=False):
+        """Convert a Qt position to a lattice coordinate."""
+        return SquareDnaPart.positionModelToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod
     def positionToLatticeCoordRound(radius, x, y, scale_factor=1.0):
-        """
-        """
+        """Convert a model position to a rounded lattice coordinate."""
         row = round(y/(2.*radius*scale_factor))
         column = round(x/(2.*radius*scale_factor))
         return row, column
@@ -316,6 +363,10 @@ class SquareDnaPart(object):
 
     @staticmethod
     def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
+        """
+        Determine if given x-y coordinates are inside a VH at a given
+        row-column coordinate
+        """
         if xy_tuple is None or coordinate_tuple is None:
             return False
 
@@ -328,10 +379,10 @@ class SquareDnaPart(object):
         row, column = coordinate_tuple
         x, y = xy_tuple
 
-        row_x, row_y = SquareDnaPart.latticeCoordToPositionXYInverted(part_radius,
-                                                                         row,
-                                                                         column,
-                                                                         scale_factor)
+        row_x, row_y = SquareDnaPart.latticeCoordToQtXY(part_radius,
+                                                        row,
+                                                        column,
+                                                        scale_factor)
         return abs(row_x - x)**2 + abs(row_y  - y)**2 <= item_radius**2
-        # end def
+    # end def
 # end class

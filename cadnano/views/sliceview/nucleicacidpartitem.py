@@ -309,15 +309,15 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                      scale_factor=self.scale_factor)
 
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            coordinates = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                                  position[0],
-                                                                  position[1],
-                                                                  scale_factor=self.scale_factor)
+            coordinates = HoneycombDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                       position[0],
+                                                                       position[1],
+                                                                       scale_factor=self.scale_factor)
         else:
-            coordinates = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                               position[0],
-                                                               position[1],
-                                                               scale_factor=self.scale_factor)
+            coordinates = SquareDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                    position[0],
+                                                                    position[1],
+                                                                    scale_factor=self.scale_factor)
 
         assert id_num not in self.coordinates_to_vhid.values()
         if coordinates in self.coordinates_to_vhid.values():
@@ -825,9 +825,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def _getModelXYforCoord(self, row, column):
         radius = DEFAULT_RADIUS
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            return HoneycombDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
+            return HoneycombDnaPart.latticeCoordToQtXY(radius, row, column)
         elif self.griditem.grid_type is GridType.SQUARE:
-            return SquareDnaPart.latticeCoordToPositionXYInverted(radius, row, column)
+            return SquareDnaPart.latticeCoordToQtXY(radius, row, column)
         else:
             return None
     # end def
@@ -941,17 +941,17 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         mapped_position = self.griditem.mapFromScene(event.scenePos())
         event_xy = (mapped_position.x(), mapped_position.y())
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            event_coord = HoneycombDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                                  event_xy[0],
-                                                                  event_xy[1],
-                                                                  scale_factor=self.scale_factor,
-                                                                  strict=True)
+            event_coord = HoneycombDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                       event_xy[0],
+                                                                       event_xy[1],
+                                                                       scale_factor=self.scale_factor,
+                                                                       strict=True)
         elif self.griditem.grid_type is GridType.SQUARE:
-            event_coord = SquareDnaPart.positionToLatticeCoord(DEFAULT_RADIUS,
-                                                               event_xy[0],
-                                                               event_xy[1],
-                                                               scale_factor=self.scale_factor,
-                                                               strict=True)
+            event_coord = SquareDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                    event_xy[0],
+                                                                    event_xy[1],
+                                                                    scale_factor=self.scale_factor,
+                                                                    strict=True)
         else:
             event_coord = None
 
@@ -1037,8 +1037,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.removeAllCopyPasteHints()
         event_pos = self.griditem.mapFromScene(event.scenePos())
 
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord\
-            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord\
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
         hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
                                                   event_pos.x(),
                                                   event_pos.y(),
@@ -1101,8 +1101,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             else SquareDnaPart.isInLatticeCoord
         event_pos = self.griditem.mapFromScene(event.scenePos())
         event_position_xy = (event_pos.x(), event_pos.y())
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord \
-            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionToLatticeCoord
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord \
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
         hover_coordinates = positionToLatticeCoord(DEFAULT_RADIUS,
                                                    event_position_xy[0],
                                                    event_position_xy[1],

@@ -88,8 +88,8 @@ class GridItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
-        doPosition = HoneycombDnaPart.positionToLatticeCoord
+        doLattice = HoneycombDnaPart.latticeCoordToModelXY
+        doPosition = HoneycombDnaPart.positionModelToLatticeCoord
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
         x_l = x_l + HoneycombDnaPart.PAD_GRID_XL
@@ -175,7 +175,7 @@ class GridItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+        doLattice = SquareDnaPart.latticeCoordToModelXY
         doPosition = SquareDnaPart.positionToLatticeCoordRound
         x_l, x_h, y_l, y_h = bounds
         x_l = x_l + SquareDnaPart.PAD_GRID_XL
@@ -534,14 +534,14 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord if self.grid.grid_type is GridType.HONEYCOMB \
-                else SquareDnaPart.positionToLatticeCoord
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.positionModelToLatticeCoord
         coordinates = positionToLatticeCoord(part_item.part().radius(),
                                              event.scenePos().x(),
                                              event.scenePos().y(),
                                              scale_factor=part_item.scale_factor)
-        latticeCoordToXY = HoneycombDnaPart.latticeCoordToPositionXYInverted if self.grid.grid_type is GridType.HONEYCOMB \
-                else SquareDnaPart.latticeCoordToPositionXYInverted
+        latticeCoordToXY = HoneycombDnaPart.latticeCoordToQtXY if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.latticeCoordToQtXY
         coordinate_string = '(%s, %s)' % coordinates
         coordiate_scaled_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1], part_item.scale_factor)
         coordiate_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1])

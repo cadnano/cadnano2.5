@@ -15,11 +15,11 @@ def encodeDocument(document):
 
     if grid_type is GridType.HONEYCOMB or grid_type is None:
         grid_type = GridType.HONEYCOMB
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoordInverted
+        positionToLatticeCoord = HoneycombDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = HoneycombDnaPart.positionToLatticeCoordRound
     else:
         grid_type = GridType.SQUARE
-        positionToLatticeCoord = SquareDnaPart.positionToLatticeCoordInverted
+        positionToLatticeCoord = SquareDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = SquareDnaPart.positionToLatticeCoordRound
 
     part = next(document.getParts())

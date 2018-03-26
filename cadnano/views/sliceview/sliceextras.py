@@ -939,8 +939,8 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoord if grid_type is GridType.HONEYCOMB else \
-            SquareDnaPart.positionToLatticeCoord
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridType.HONEYCOMB else \
+            SquareDnaPart.positionModelToLatticeCoord
 
         start_coordinates = positionToLatticeCoord(part_radius, start[0], start[1], scale_factor=scale_factor)
         end_coordinates = positionToLatticeCoord(part_radius, end[0], end[1], scale_factor=scale_factor)
@@ -1017,13 +1017,13 @@ class ShortestPathHelper(object):
             column = node[1]
             if grid_type is GridType.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=part_radius,
-                                                                     row=row,
-                                                                     column=column)
-            else:
-                parity = None
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=part_radius,
+                node_pos = HoneycombDnaPart.latticeCoordToModelXY(radius=part_radius,
                                                                   row=row,
                                                                   column=column)
+            else:
+                parity = None
+                node_pos = SquareDnaPart.latticeCoordToModelXY(radius=part_radius,
+                                                               row=row,
+                                                               column=column)
             x_y_path.append((node_pos[0], node_pos[1], parity))
         return x_y_path
