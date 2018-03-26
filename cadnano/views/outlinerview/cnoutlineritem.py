@@ -50,7 +50,7 @@ class CNOutlinerItem(QTreeWidgetItem):
     def _viewroot(self):
         return self.treeWidget()
 
-    def outlineModel(self):
+    def outlineViewObj(self):
         return self
     # end def
 

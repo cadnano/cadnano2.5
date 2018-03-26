@@ -31,7 +31,7 @@ class CNPropertyItem(QTreeWidgetItem):
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        cn_model_list = self.outlineModelList()
+        cn_model_list = self.outlineViewObjList()
         self._controller_list = []
         self.is_enum = False
         if key is None:
@@ -100,26 +100,26 @@ class CNPropertyItem(QTreeWidgetItem):
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def outlineModel(self):
+    def outlineViewObj(self):
         """Summary
 
         Returns:
             TYPE: Description
         """
-        return self.outlineModelList()[0]
+        return self.outlineViewObjList()[0]
     # end def
 
-    def outlineModelList(self):
+    def outlineViewObjList(self):
         """Summary
 
         Returns:
             list: cn_model items
         """
-        return self.treeWidget().outlineModelList()
+        return self.treeWidget().outlineViewObjList()
     # end def
 
-    def outlineModelSet(self):
-        return self.treeWidget().outlineModelSet()
+    def outlineViewObjSet(self):
+        return self.treeWidget().outlineViewObjSet()
 
     def itemType(self):
         """Summary
@@ -155,7 +155,7 @@ class CNPropertyItem(QTreeWidgetItem):
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self.outlineModel()
+        cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
@@ -197,7 +197,7 @@ class CNPropertyItem(QTreeWidgetItem):
         u_s.beginMacro("Multi Property Edit: %s" % key)
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        cn_model_list = self.outlineModelList()
+        cn_model_list = self.outlineViewObjList()
         if isinstance(cn_model_list, list):
             # print("list found")
             for cn_model in cn_model_list:

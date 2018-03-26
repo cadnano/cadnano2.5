@@ -33,7 +33,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         """
         super(VirtualHelixSetItem, self).__init__(**kwargs)
         if self._key == "name":
-            for outline_vh in self.outlineModelList():
+            for outline_vh in self.outlineViewObjList():
                 self._controller_list.append(VirtualHelixItemController(self, outline_vh.part(), True, False))
     # end def
 
@@ -60,7 +60,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        if virtual_helix in self.outlineModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -68,7 +68,7 @@ class VirtualHelixSetItem(CNPropertyItem):
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         # print("resize slot")
-        if virtual_helix in self.outlineModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             val = virtual_helix.getSize()
             self.setValue('length', int(val))
     # end def
@@ -81,7 +81,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if virtual_helix in self.outlineModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             self.disconnectSignals()
             self.parent().removeChild(self)
     # end def
@@ -106,7 +106,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        cn_m = self.outlineModel()
+        cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -145,17 +145,17 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             # print("Property view 'length' updating")
-            for vh in self.outlineModelList():
+            for vh in self.outlineViewObjList():
                 # print("vh", vh.idNum(), value, vh.getSize())
                 if value != vh.getSize():
                     vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
-            for vh in self.outlineModelList():
+            for vh in self.outlineViewObjList():
                 if value != vh.getZ():
                     vh.setZ(value)
         else:
-            for vh in self.outlineModelList():
+            for vh in self.outlineViewObjList():
                 if value != vh.getProperty(key):
                     vh.setProperty(key, value)
         u_s.endMacro()

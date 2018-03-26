@@ -22,7 +22,7 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
         """
         super(NucleicAcidPartSetItem, self).__init__(**kwargs)
         if self._key == "name":
-            for outline_part in self.outlineModelList():
+            for outline_part in self.outlineViewObjList():
                 model_part = outline_part.part()
                 self._controller_list.append(NucleicAcidPartItemController(self, model_part))
 
