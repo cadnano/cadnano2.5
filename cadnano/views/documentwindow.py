@@ -63,9 +63,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.inspector_dock_widget.setTitleBarWidget(QWidget())
 
         self.setCentralWidget(None)
-        if app().prefs.orthoview_idx == OrthoViewType.SLICE:
+        if app().prefs.orthoview_style == OrthoViewType.SLICE:
             self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
-        elif app().prefs.orthoview_idx == OrthoViewType.GRID:
+        elif app().prefs.orthoview_style == OrthoViewType.GRID:
             self.splitDockWidget(self.grid_dock_widget, self.path_dock_widget, Qt.Horizontal)
         self._restoreGeometryandState()
         self._finishInit()

@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridType
+from cadnano.proxies.cnenum import GridType, OrthoViewType
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -662,14 +662,14 @@ class DocumentController(object):
     # end def
 
     def setSliceOrGridViewVisible(self, value):
-        if value == 'legacy':
+        if value == OrthoViewType.SLICE:
             self.toggleSliceView(True)
             self.toggleGridView(False)
-        elif value == 'grid':
+        elif value == OrthoViewType.GRID:
             self.toggleSliceView(False)
             self.toggleGridView(True)
         else:
-            raise ValueError('Invalid slice/grid view value: %s' % value)
+            raise ValueError('Invalid orthoview value: %s' % value)
     # end def
 
     def toggleSliceView(self, show):
