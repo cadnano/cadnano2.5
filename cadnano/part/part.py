@@ -196,11 +196,11 @@ class Part(CNObject):
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         """ Get the dictionary of model properties
 
         Returns:
-            dict: group properties
+            group properties
         """
         return self._group_properties
     # end def

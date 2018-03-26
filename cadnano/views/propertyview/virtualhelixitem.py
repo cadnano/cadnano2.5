@@ -33,8 +33,8 @@ class VirtualHelixSetItem(CNPropertyItem):
         """
         super(VirtualHelixSetItem, self).__init__(**kwargs)
         if self._key == "name":
-            for vh in self.cnModelList():
-                self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))
+            for outline_vh in self.outlineModelList():
+                self._controller_list.append(VirtualHelixItemController(self, outline_vh.part(), True, False))
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -60,8 +60,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        # print("prop slot", self._cn_model_set)
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineModelSet():
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -69,7 +68,7 @@ class VirtualHelixSetItem(CNPropertyItem):
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         # print("resize slot")
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineModelSet():
             val = virtual_helix.getSize()
             self.setValue('length', int(val))
     # end def
@@ -82,7 +81,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineModelSet():
             self.disconnectSignals()
             self.parent().removeChild(self)
     # end def
@@ -107,7 +106,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        cn_m = self.cnModel()
+        cn_m = self.outlineModel()
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -146,17 +145,17 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             # print("Property view 'length' updating")
-            for vh in self.cnModelList():
+            for vh in self.outlineModelList():
                 # print("vh", vh.idNum(), value, vh.getSize())
                 if value != vh.getSize():
                     vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
-            for vh in self.cnModelList():
+            for vh in self.outlineModelList():
                 if value != vh.getZ():
                     vh.setZ(value)
         else:
-            for vh in self.cnModelList():
+            for vh in self.outlineModelList():
                 if value != vh.getProperty(key):
                     vh.setProperty(key, value)
         u_s.endMacro()

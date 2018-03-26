@@ -140,7 +140,7 @@ class Oligo(CNObject):
         return self._props
     # end def
 
-    def setProperty(self, key, value, use_undostack=True):
+    def setProperty(self, key: str, value, use_undostack: bool = True):
         if use_undostack:
             c = SetPropertyCommand([self], key, value)
             self.undoStack().push(c)
@@ -148,22 +148,22 @@ class Oligo(CNObject):
             self._setProperty(key, value)
     # end def
 
-    def _setProperty(self, key, value, emit_signals=False):
+    def _setProperty(self, key: str, value, emit_signals: bool = False):
         self._props[key] = value
         if emit_signals:
             self.oligoPropertyChangedSignal.emit(self, key, value)
     # end def
 
-    def getName(self):
+    def getName(self) -> str:
         return self._props['name']
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         color = self._props['color']
         try:
             if color is None:
                 print(self._props)
-                raise ValueError("Whhat Got None???")
+                raise ValueError("Oligo has no color")
         except Exception:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             traceback.print_tb(exc_traceback, limit=5, file=sys.stdout)
@@ -172,18 +172,18 @@ class Oligo(CNObject):
         return color
     # end def
 
-    def _setColor(self, color):
+    def _setColor(self, color: str):
         """Set this oligo color.
 
         Args:
-            color (str): format '#ffffff'
+            color: format '#ffffff'
         """
         if color is None:
-            raise ValueError("Whhat None???")
+            raise ValueError("Oligo can't be None")
         self._props['color'] = color
     # end def
 
-    def _setLength(self, length, emit_signals):
+    def _setLength(self, length: int, emit_signals: bool):
         before = self.shouldHighlight()
         key = 'length'
         self._props[key] = length
@@ -192,7 +192,7 @@ class Oligo(CNObject):
             self.oligoPropertyChangedSignal.emit(self, key, length)
     # end def
 
-    def locString(self):
+    def locString(self) -> str:
         vh_num = self._strand5p.idNum()
         idx = self._strand5p.idx5Prime()
         return "%d[%d]" % (vh_num, idx)

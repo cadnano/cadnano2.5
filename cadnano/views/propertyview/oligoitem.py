@@ -24,7 +24,8 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
         super(OligoSetItem, self).__init__(**kwargs)
         # print(util.trace(5), "in OligoItem init", cn_model_list)
         if self._key == "name":
-            for model_oligo in self.cnModelList():
+            for outline_oligo in self.outlineModelList():
+                model_oligo = outline_oligo.oligo()
                 self._controller_list.append(OligoItemController(self, model_oligo))
     # end def
 
@@ -48,7 +49,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        if model_oligo in self.cnModelList():
+        if model_oligo in self.outlineModelList():
             # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)
             # self.setValue(key, new_value)
             displayed_val = self.getItemValue(key)

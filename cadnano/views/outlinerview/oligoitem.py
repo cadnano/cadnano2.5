@@ -9,6 +9,7 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
 
     def __init__(self, model_oligo, parent):
         super(OutlineOligoItem, self).__init__(model_oligo, parent)
+        self._model_oligo = model_oligo
         self.setFlags(LEAF_FLAGS)
         self._controller = OligoItemController(self, model_oligo)
     # end def

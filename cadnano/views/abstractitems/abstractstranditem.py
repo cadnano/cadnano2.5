@@ -7,6 +7,19 @@ class AbstractStrandItem(object):
             raise NotImplementedError("AbstractStrandItem should be subclassed.")
         self._model_strand = None
         self._model_oligo = None
+    # end def
+
+    def strand(self):
+        return self._model_strand
+    # end def
+
+    def setProperty(self, key: str, value):
+        self._model_strand.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_strand.getProperty(key)
+    # end def
 
     ### SIGNALS ###
 

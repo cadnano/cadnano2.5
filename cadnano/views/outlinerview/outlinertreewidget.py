@@ -214,7 +214,7 @@ class OutlinerTreeWidget(QTreeWidget):
                             # print("selecting vh", id_num)
                             document.addVirtualHelicesToSelection(part, [id_num])
                 if isinstance(item, OutlineOligoItem):
-                    m_oligo = item.cnModel()
+                    m_oligo = item.oligo()
                     is_selected = document.isOligoSelected(m_oligo)
                     if not is_selected:
                         # print("selecting", m_oligo)
@@ -231,7 +231,7 @@ class OutlinerTreeWidget(QTreeWidget):
                     # print("deselecting vh", id_num)
                     document.removeVirtualHelicesFromSelection(part, [id_num])
             elif isinstance(item, OutlineOligoItem):
-                m_oligo = item.cnModel()
+                m_oligo = item.oligo()
                 is_selected = document.isOligoSelected(m_oligo)
                 if is_selected:
                     # print("deselecting", m_oligo)
@@ -336,13 +336,13 @@ class OutlinerTreeWidget(QTreeWidget):
         do_exec = True
         for item in self.selectedItems():
             if isinstance(item, OutlineOligoItem):
-                model = item.cnModel()
+                model = item.oligo()
                 cmds += model.destroy()
             elif isinstance(item, OutlineVirtualHelixItem):
                 if do_exec:
                     do_exec = False
                     u_s.beginMacro("delete Virtual Helices")
-                part = item.cnModel()
+                part = item.part()
                 part.removeVirtualHelix(item.idNum())
             else:
                 print("item undeletable", item.__class__.__name__)

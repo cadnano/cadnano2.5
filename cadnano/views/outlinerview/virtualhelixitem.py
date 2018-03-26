@@ -12,11 +12,12 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False
 
-    def __init__(self, model_virtual_helix, part_item):
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
-        CNOutlinerItem.__init__(self, model_virtual_helix, parent=part_item)
+    def __init__(self, id_num, part_item):
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
+        part = part_item.part()
+        CNOutlinerItem.__init__(self, part, parent=part_item)
         self.setFlags(LEAF_FLAGS)
-        self._controller = VirtualHelixItemController(self, model_virtual_helix.part(), False, False)
+        self._controller = VirtualHelixItemController(self, part, False, False)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -36,9 +37,8 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     # end def
 
     def updateCNModel(self):
+        """Overloading CNOutlinerItem.updateCNModel
         """
-        """
-        # cn_model = self._model_part
         new_name = self.data(NAME_COL, Qt.DisplayRole)
         new_is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
         new_color = self.data(COLOR_COL, Qt.DisplayRole)

@@ -247,7 +247,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             vhi: the item associated with id_num
         """
-        neighbors = vhi.getProperties('neighbors')
+        neighbors = vhi.getProperty('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:

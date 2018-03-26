@@ -93,7 +93,7 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         if self._viewroot.are_signals_enabled:
             tw = self.treeWidget()
             tw.is_child_adding += 1
-            vh_i = OutlineVirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
+            vh_i = OutlineVirtualHelixItem(id_num, self._root_items['VHelixList'])
             self._virtual_helix_item_hash[id_num] = vh_i
             tw.is_child_adding -= 1
 

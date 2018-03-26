@@ -46,7 +46,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
         Returns:
             TYPE: Description
         """
-        if self.cnModel() == model_part:
+        if self.part() == model_part:
             self.setValue(property_key, new_value)
     # end def
 

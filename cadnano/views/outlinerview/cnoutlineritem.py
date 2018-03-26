@@ -25,8 +25,9 @@ class CNOutlinerItem(QTreeWidgetItem):
     def __init__(self, cn_model, parent):
         super(QTreeWidgetItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self._cn_model = cn_model
-        name = cn_model.getName()
-        color = cn_model.getColor()
+        name = self.getName()
+        color = self.getColor()
+
         self.setData(NAME_COL,      Qt.EditRole, name)
         self.setData(LOCKED_COL,    Qt.EditRole, False)  # is_visible
         self.setData(VISIBLE_COL,   Qt.EditRole, True)  # is_visible
@@ -49,13 +50,20 @@ class CNOutlinerItem(QTreeWidgetItem):
     def _viewroot(self):
         return self.treeWidget()
 
-    def cnModel(self):
-        return self._cn_model
+    def outlineModel(self):
+        return self
     # end def
 
-    def getColor(self):
+    def getName(self) -> str:
+        return self._cn_model.getProperty('name')
+    # end def
+
+    def getColor(self) -> str:
         return self._cn_model.getProperty('color')
     # end def
+
+    def getOutlineProperties(self):
+        return self._cn_model.getOutlineProperties()
 
     def createRootPartItem(self, item_name, parent):
         """ use this for sub-lists for part items
@@ -66,17 +74,16 @@ class CNOutlinerItem(QTreeWidgetItem):
     def updateCNModel(self):
         # this works only for color. uncomment below to generalize to properties
         # print("outliner %s - updateCNModel" % (str(type(self))))
-        cn_model = self._cn_model
         name = self.data(NAME_COL, Qt.DisplayRole)
         color = self.data(COLOR_COL, Qt.DisplayRole)
         is_visible = self.data(VISIBLE_COL, Qt.DisplayRole)
-        mname, mcolor, mvisible = cn_model.getOutlineProperties()
+        mname, mcolor, mvisible = self.getOutlineProperties()
         if name is not None and name != mname:
-            cn_model.setProperty('name', name)
+            self.setProperty('name', name)
         if color is not None and color != mcolor:
-            cn_model.setProperty('color', color)
+            self.setProperty('color', color)
         if is_visible is not None and is_visible != mvisible:
-            cn_model.setProperty('is_visible', is_visible)
+            self.setProperty('is_visible', is_visible)
     # end def
 
     def setValue(self, key, value):
@@ -139,5 +146,5 @@ class RootPartItem(QTreeWidgetItem):
     def part(self):
         return self._cn_model
 
-    def getColor(self):
-        return "#ffffff"
+    # def getOutlineColor(self):
+    #     return "#ffffff"

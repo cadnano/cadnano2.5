@@ -56,8 +56,22 @@ class QAbstractPartItem(QGraphicsRectItem):
     def viewRoot(self):
         return self._viewroot
 
-    def cnModel(self):
-        return self._model_part
+    def setProperty(self, key: str, value):
+        self._model_part.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_part.getProperty(key)
+    # end def
+
+    def getModelProperties(self) -> dict:
+        """ Get the dictionary of model properties
+
+        Returns:
+            group properties
+        """
+        return self._model_part.getModelProperties()
+    # end def
 
     def getFilterSet(self):
         return self._viewroot._document.filter_set
@@ -190,6 +204,23 @@ class AbstractPartItem(object):
 
     def part(self):
         return self._model_part
+    # end def
+
+    def setProperty(self, key: str, value):
+        self._model_part.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_part.getProperty(key)
+    # end def
+
+    def getModelProperties(self) -> dict:
+        """ Get the dictionary of model properties
+
+        Returns:
+            group properties
+        """
+        return self._model_part.getModelProperties()
     # end def
 
     def setMovable(self, is_movable):

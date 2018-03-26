@@ -403,7 +403,7 @@ class PreXoverItem(QGraphicsRectItem):
         # self.setParentItem(to_vh_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
-        self._model_part = from_virtual_helix_item.cnModel()
+        self._model_part = from_virtual_helix_item.part()
         self.idx = from_index
         self.is_low = False
         self.is_high = False
