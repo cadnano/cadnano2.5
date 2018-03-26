@@ -165,9 +165,10 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
                 'crossover_span_angle',
                 'max_vhelix_length',
                 'workplane_idxs']:
-        value = part_dict[key]
-        part.setProperty(key, value, use_undostack=False)
-        part.partPropertyChangedSignal.emit(part, key, value)
+        value = part_dict.get(key)
+        if value is not None:
+            part.setProperty(key, value, use_undostack=False)
+            part.partPropertyChangedSignal.emit(part, key, value)
 # end def
 
 
