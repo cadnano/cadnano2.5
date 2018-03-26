@@ -8,8 +8,6 @@ from typing import Union
 import numpy as np
 
 cn = lambda x: 'cadnano.' + x
-OligoT =    cn('oligo.Oligo')
-StrandT =   cn('strand.Strand')
 SegmentT =  Tuple[int,  int]
 WindowT =   cn('views.documentwindow.DocumentWindow')
 DocT =      cn('document.Document')
@@ -17,10 +15,15 @@ DocCtrlT =  cn('controllers.DocumentController')
 PropertyEditorWidgetT = cn('views.propertyview.PropertyEditorWidget')
 NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
 VirtualHelixT = cn('part.virtualhelix.VirtualHelix')
+OligoT =    cn('oligo.Oligo')
+StrandSetT = cn('strandset.StrandSet')
+StrandT =   cn('strand.Strand')
+
 
 RectT = Tuple[float, float, float, float]
 IntT = Union[np.int64, int]
 IntTuple = (np.int64, int)
+Int2T = Tuple[int, int]
 KeyT = Union[str, Iterable[str]]
 ValueT = Union[object, Iterable[object]]
 Vec2T = Tuple[float, float]

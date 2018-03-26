@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 import sys
 import traceback
+from typing import Tuple, List, Optional
 
 from cadnano import util
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnproxy import ProxySignal
-from cadnano.proxies.cnenum import ModEnum
+from cadnano.proxies.cnproxy import ProxySignal, UndoCommand
+from cadnano.proxies.cnenum import ModEnum, EnumType
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 from cadnano.setpropertycmd import SetPropertyCommand
+
+from cadnano.cntypes import (
+                            NucleicAcidPartT,
+                            OligoT
+)
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18
 OLIGO_LEN_ABOVE_WHICH_HIGHLIGHT = 60
@@ -52,7 +58,7 @@ class Oligo(CNObject):
                        }
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         _name = self.__class__.__name__
         _id = str(id(self))[-4:]
         if self._strand5p is not None:
@@ -71,7 +77,7 @@ class Oligo(CNObject):
         return self.length() < other.length()
     # end def
 
-    def shallowCopy(self):
+    def shallowCopy(self) -> OligoT:
         olg = Oligo(self._part)
         olg._strand5p = self._strand5p
         olg._is_circular = self._is_circular
@@ -81,7 +87,7 @@ class Oligo(CNObject):
         return olg
     # end def
 
-    def dump(self):
+    def dump(self) -> dict:
         """ Return dictionary of this oligo and its properties.
         It's expected that caller will copy the properties
         if mutating
@@ -117,21 +123,23 @@ class Oligo(CNObject):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def getProperty(self, key):
+    def getProperty(self, key: str) -> object:
         return self._props[key]
     # end def
 
-    def getOutlineProperties(self):
+    def getOutlineProperties(self) -> Tuple[str, str, bool]:
         """Convenience method for the outline view
 
         Returns:
-            tuple: (<name>, <color>, <is_visible>)
+            tuple of form::
+
+                (<name>, <color>, <is_visible>)
         """
         props = self._props
         return props['name'], props['color'], props['is_visible']
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         """Return a reference to the property dictionary
 
         Returns:
@@ -198,22 +206,22 @@ class Oligo(CNObject):
         return "%d[%d]" % (vh_num, idx)
     # end def
 
-    def part(self):
+    def part(self) -> NucleicAcidPartT:
         return self._part
     # end def
 
-    def strand5p(self):
+    def strand5p(self) -> Strand:
         """The 5' strand is the first contiguous segment of the oligo,
         representing the region between the 5' base to the first crossover
         or 3' end.
 
         Returns:
-            Strand: the 5'-most strand of the oligo.
+            the 5'-most strand of the oligo.
         """
         return self._strand5p
     # end def
 
-    def strand3p(self):
+    def strand3p(self) -> Strand:
         """The 3' strand. The last strand in the oligo. See strand5p().
 
         Returns:
@@ -227,7 +235,7 @@ class Oligo(CNObject):
         return strand
     # end def
 
-    def setStrand5p(self, strand):
+    def setStrand5p(self, strand: Strand):
         self._strand5p = strand
     # end def
 
@@ -236,28 +244,29 @@ class Oligo(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def isCircular(self):
+    def isCircular(self) -> bool:
         """Used for checking if an oligo is circular, or has a 5' and 3' end.
-        Sequences cannot be exported of oligos for which isCircular returns True.
-        See also: Oligo.sequenceExport().
+        Sequences cannot be exported of oligos for which ``isCircular``
+        returns ``True``.
+        See also: ``Oligo.sequenceExport()``.
 
         Returns:
-            bool: True if the strand3p is connected to strand5p, else False.
+            ``True`` if the strand3p is connected to strand5p, else ``False``.
         """
         return self._is_circular
     # end def
 
-    def length(self):
+    def length(self) -> int:
         """
         The oligo length in bases.
 
         Returns:
-            int: value from the oligo's property dict.
+            value from the oligo's property dict.
         """
         return self._props['length']
     # end def
 
-    def sequence(self):
+    def sequence(self) -> Optional[str]:
         """Get the sequence applied to this `Oligo`
 
         Returns:
@@ -273,15 +282,15 @@ class Oligo(CNObject):
             return None
     # end def
 
-    def sequenceExport(self, output):
-        """ Iterative appending to argument `output` which is a dictionary of
+    def sequenceExport(self, output: dict) -> dict:
+        """ Iterative appending to argument ``output`` which is a dictionary of
         lists
 
         Args:
-            output (dict): dictionary with keys given in `NucleicAcidPart.getSequences`
+            output: dictionary with keys given in `NucleicAcidPart.getSequences`
 
         Returns:
-            dict: output with this oligo's values appended for each key
+            output with this oligo's values appended for each key
         """
         part = self.part()
         vh_num5p = self.strand5p().idNum()
@@ -322,14 +331,14 @@ class Oligo(CNObject):
         return output
     # end def
 
-    def shouldHighlight(self):
+    def shouldHighlight(self) -> bool:
         """
         Checks if oligo's length falls within the range specified by
         OLIGO_LEN_BELOW_WHICH_HIGHLIGHT and OLIGO_LEN_BELOW_WHICH_HIGHLIGHT.
 
         Returns:
-            bool: True if circular or length outside acceptable range,
-            otherwise False.
+            ``True`` if circular or length outside acceptable range,
+            otherwise ``False``.
         """
         if not self._strand5p:
             return True
@@ -343,7 +352,7 @@ class Oligo(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def remove(self, use_undostack=True):
+    def remove(self, use_undostack: bool = True):
         c = RemoveOligoCommand(self)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
@@ -372,33 +381,32 @@ class Oligo(CNObject):
             strand.copyAbstractSequenceToSequence()
     # end def
 
-    def applyColor(self, color, use_undostack=True):
+    def applyColor(self, color: str, use_undostack: bool = True):
         if color == self.getColor():
             return  # oligo already has this color
         c = ApplyColorCommand(self, color)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def applySequence(self, sequence, use_undostack=True):
+    def applySequence(self, sequence: str, use_undostack: bool = True):
         c = ApplySequenceCommand(self, sequence)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def applySequenceCMD(self, sequence):
+    def applySequenceCMD(self, sequence: str) -> ApplySequenceCommand:
         return ApplySequenceCommand(self, sequence)
     # end def
 
-    def _setLoop(self, bool):
-        self._is_circular = bool
+    def _setLoop(self, is_loop: bool):
+        self._is_circular = is_loop
     # end def
 
-    def getStrandLengths(self):
-        """
-        Traverses the oligo and builds up a list of each strand's total length,
+    def getStrandLengths(self) -> List[int]:
+        """Traverses the oligo and builds up a list of each strand's total length,
         which also accounts for any insertions, deletions, or modifications.
 
         Returns:
-            list: lengths of individual strands in the oligo
+            list of lengths of individual strands in the oligo
         """
         strand5p = self.strand5p()
         strand_lengths = []
@@ -406,13 +414,15 @@ class Oligo(CNObject):
             strand_lengths.append(strand.totalLength())
         return strand_lengths
 
-    def getNumberOfBasesToEachXover(self, use_3p_idx=False):
-        """
-        Convenience method to get a list of absolute distances from the 5' end
+    def getNumberOfBasesToEachXover(self, use_3p_idx: bool = False) -> List[int]:
+        """Convenience method to get a list of absolute distances from the 5' end
         of the oligo to each of the xovers in the oligo.
 
         Args:
             use_3p_idx: Adds a 1-base office to return 3' xover idx instead of
+
+        Returns:
+            list of integet differences
         """
         strand5p = self.strand5p()
         num_bases_to_xovers = []
@@ -424,24 +434,32 @@ class Oligo(CNObject):
                 num_bases_to_xovers.append(i+offset)
         return num_bases_to_xovers
 
-    def splitAtAbsoluteLengths(self, len_list):
+    def splitAtAbsoluteLengths(self, len_list: List[int]):
         self._part.splitOligoAtAbsoluteLengths(self, len_list)
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def addToPart(self, part, emit_signals=False):
+    def addToPart(self, part: NucleicAcidPartT, emit_signals: bool = False):
         self._part = part
         self.setParent(part)
         part._addOligoToSet(self, emit_signals)
     # end def
 
-    def getAbsolutePositionAtLength(self, len_for_pos):
-        """
-        Convenience method convert the length in bases from the 5' end of the
-        oligo to the absolute position (vh, strandset, baseidx).
+    def getAbsolutePositionAtLength(self, len_for_pos: int) -> Tuple[int, EnumType, int]:
+        """Convenience method convert the length in bases from the 5' end of the
+        oligo to the absolute position
+
+        ``strandtype is of the form::
+
+            StrandEnum.FWD or StrandEnum.REV
 
         Args:
             len_for_pos: length in bases for position lookup
+
+        Returns:
+            tuple of form::
+
+                (vh, strandtype, baseidx)
         """
         strand5p = self.strand5p()
         temp_len = 0
@@ -461,7 +479,11 @@ class Oligo(CNObject):
         self.setParent(part)
     # end def
 
-    def destroy(self):
+    def destroy(self) -> List[UndoCommand]:
+        '''
+        Returns:
+            list of UndoCommands
+        '''
         # QObject also emits a destroyed() Signal
         # self.setParent(None)
         # self.deleteLater()
@@ -474,15 +496,15 @@ class Oligo(CNObject):
         return cmds
     # end def
 
-    def _decrementLength(self, delta, emit_signals):
+    def _decrementLength(self, delta: int, emit_signals: bool):
         self._setLength(self.length() - delta, emit_signals)
     # end def
 
-    def _incrementLength(self, delta, emit_signals):
+    def _incrementLength(self, delta: int, emit_signals: bool):
         self._setLength(self.length() + delta, emit_signals)
     # end def
 
-    def refreshLength(self, emit_signals=False):
+    def refreshLength(self, emit_signals: bool = False):
         temp = self.strand5p()
         if not temp:
             return
@@ -492,7 +514,7 @@ class Oligo(CNObject):
         self._setLength(length, emit_signals)
     # end def
 
-    def removeFromPart(self, emit_signals=False):
+    def removeFromPart(self, emit_signals: bool = False):
         """This method merely disconnects the object from the model.
         It still lives on in the undoStack until clobbered
 
@@ -503,7 +525,9 @@ class Oligo(CNObject):
         self.setParent(None)
     # end def
 
-    def _strandMergeUpdate(self, old_strand_low, old_strand_high, new_strand):
+    def _strandMergeUpdate(self, old_strand_low: Strand,
+                                old_strand_high: Strand,
+                                new_strand: Strand):
         """This method sets the isCircular status of the oligo and the oligo's
         5' strand.
         """
@@ -529,7 +553,10 @@ class Oligo(CNObject):
         # end if
     # end def
 
-    def _strandSplitUpdate(self, new_strand5p, new_strand3p, oligo3p, old_merged_strand):
+    def _strandSplitUpdate(self, new_strand5p: Strand,
+                                new_strand3p: Strand,
+                                oligo3p: OligoT,
+                                old_merged_strand: Strand):
         """If the oligo is a loop, splitting the strand does nothing. If the
         oligo isn't a loop, a new oligo must be created and assigned to the
         new_strand and everything connected to it downstream.

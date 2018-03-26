@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-from cadnano.extras.wrapapi import copyWrapAPI
+from typing import List, Tuple
+import numpy as np
+
+# from cadnano.extras.wrapapi import copyWrapAPI
 from cadnano.part.virtualhelix import VirtualHelix
 from cadnano.cntypes import (
                             KeyT,
                             ValueT,
-                            NucleicAcidPartT
+                            NucleicAcidPartT,
+                            StrandSetT,
+                            StrandT
 )
 
 class AbstractVirtualHelixItem(object):
@@ -60,7 +65,7 @@ class AbstractVirtualHelixItem(object):
         return self._model_part.getVirtualHelixProperties(self._id_num, keys)
     # end def
 
-    def setProperty(self, keys, values, id_nums=None):
+    def setProperty(self, keys: KeyT, values: ValueT, id_nums=None):
         part = self._model_part
         if id_nums is not None:
             part.setVirtualHelixProperties(id_nums, keys, values)
@@ -68,46 +73,46 @@ class AbstractVirtualHelixItem(object):
             return part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         '''Used in Propert View
         '''
         return self._model_part.getAllVirtualHelixProperties(self._id_num)
     # end def
 
-    def getSize(self):
+    def getSize(self) -> int:
         offset, size = self._model_part.getOffsetAndSize(self._id_num)
         return int(size)
     # end def
 
-    def setSize(self, new_size, id_nums=None):
+    def setSize(self, new_size: int, id_nums: List[int] = None):
         if id_nums:
             for id_num in id_nums:
                 self._model_part.setVirtualHelixSize(id_num, new_size)
         else:
-            return self._model_part.setVirtualHelixSize(self._id_num, new_size)
+            self._model_part.setVirtualHelixSize(self._id_num, new_size)
     # end def
 
-    def getName(self):
+    def getName(self) -> str:
         return self._model_part.getVirtualHelixProperties(self._id_num, 'name')
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         return self._model_part.getVirtualHelixProperties(self._id_num, 'color')
     # end def
 
-    def fwdStrand(self, idx):
+    def fwdStrand(self, idx: int) -> StrandT:
         self._model_part.fwd_strandsets[self._id_num].getStrand(idx)
     # end def
 
-    def revStrand(self, idx):
+    def revStrand(self, idx: int) -> StrandT:
         self._model_part.rev_strandsets[self._id_num].getStrand(idx)
     # end def
 
-    def getAxisPoint(self, idx):
+    def getAxisPoint(self, idx: int) -> np.ndarray:
         return self._model_part.getCoordinate(self._id_num, idx)
     # end def
 
-    def getTwistPerBase(self):
+    def getTwistPerBase(self) -> Tuple[float, float]:
         """
         Returns:
             Tuple: twist per base in degrees, eulerZ
@@ -117,11 +122,13 @@ class AbstractVirtualHelixItem(object):
         return tpr*360./bpr, eulerZ
     # end def
 
-    def getAngularProperties(self):
+    def getAngularProperties(self) -> Tuple[float, float, float, float]:
         """
         Returns:
-            Tuple: 'bases_per_repeat, 'bases_per_turn',
-                    'twist_per_base', 'minor_groove_angle'
+            Tuple of the form::
+
+                ('bases_per_repeat, 'bases_per_turn',
+                    'twist_per_base', 'minor_groove_angle')
         """
         bpr, tpr, mga = self._model_part.getVirtualHelixProperties(self._id_num,
                                                              ['bases_per_repeat', 'turns_per_repeat', 'minor_groove_angle'])
@@ -130,7 +137,7 @@ class AbstractVirtualHelixItem(object):
     # end def
 
 
-    def setZ(self, new_z, id_nums=None):
+    def setZ(self, new_z: float, id_nums: List[int] = None):
         m_p = self._model_part
         if id_nums is None:
             id_nums = [self._id_num]
@@ -142,7 +149,7 @@ class AbstractVirtualHelixItem(object):
                 m_p.translateVirtualHelices([id_num], 0, 0, dz, finalize=False, use_undostack=True)
     # end def
 
-    def getZ(self, id_num=None):
+    def getZ(self, id_num: int = None) -> float:
         """Get the 'z' property of the VirtualHelix described by ID number
         'id_num'.
 
