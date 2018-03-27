@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-
+from cadnano.objectinstance import ObjectInstance
+from cadnano.part import Part
 
 class QAbstractPartItem(QGraphicsRectItem):
     """ Use for single inheritance
@@ -13,17 +14,37 @@ class QAbstractPartItem(QGraphicsRectItem):
     all views.
     """
 
-    def __init__(self, model_part_instance, viewroot, parent):
-        super(QAbstractPartItem, self).__init__(parent)
-        self._model_instance = model_part_instance
-        self._model_part = m_p = model_part_instance.reference()
+    def __init__(self, model_part_instance: ObjectInstance, viewroot: QGraphicsItem):
+        super(QAbstractPartItem, self).__init__(parent=viewroot)
+        self._model_instance: ObjectInstance = model_part_instance
+        m_p = model_part_instance.reference()
+        self._model_part: Part = m_p
         self._model_props = m_p.getModelProperties()
         self._viewroot = viewroot
         self._oligo_item_hash = {}
         self._virtual_helix_item_hash = {}
         self.active_virtual_helix_item = None
         self.is_active = False
+        self._controller = None
         m_p.setInstanceProperty(model_part_instance, '%s:position' % (viewroot.name), (0., 0.))
+    # end def
+
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        if self._controller is not None:
+            self._controller.disconnectSignals()
+            self._controller = None
+        self._model_part = None
+        self._model_instance = None
+        self._model_props = None
+        self._viewroot = None
+        self._oligo_item_hash = None
+        self._virtual_helix_item_hash = None
+        self.active_virtual_helix_item = None
+        self.parentItem().removePartItem(self)
+        scene = self.scene()
+        scene.removeItem(self)
     # end def
 
     def part(self):
@@ -32,8 +53,25 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partInstance(self):
         return self._model_instance
 
-    def cnModel(self):
-        return self._model_part
+    def viewRoot(self):
+        return self._viewroot
+
+    def setProperty(self, key: str, value):
+        self._model_part.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_part.getProperty(key)
+    # end def
+
+    def getModelProperties(self) -> dict:
+        """ Get the dictionary of model properties
+
+        Returns:
+            group properties
+        """
+        return self._model_part.getModelProperties()
+    # end def
 
     def getFilterSet(self):
         return self._viewroot._document.filter_set
@@ -166,6 +204,23 @@ class AbstractPartItem(object):
 
     def part(self):
         return self._model_part
+    # end def
+
+    def setProperty(self, key: str, value):
+        self._model_part.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_part.getProperty(key)
+    # end def
+
+    def getModelProperties(self) -> dict:
+        """ Get the dictionary of model properties
+
+        Returns:
+            group properties
+        """
+        return self._model_part.getModelProperties()
     # end def
 
     def setMovable(self, is_movable):

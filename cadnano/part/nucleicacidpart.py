@@ -5,13 +5,14 @@ from bisect import bisect_left
 from collections import defaultdict, deque
 from heapq import heapify, heappush, nsmallest
 from itertools import count as icount
+from typing import Iterable, Tuple, Union, List, Set, Dict
 
 import numpy as np
 import pandas as pd
 
 from cadnano import util
 from cadnano.oligo import RemoveOligoCommand
-from cadnano.proxies.cnenum import GridType, PartType, PointType
+from cadnano.proxies.cnenum import GridEnum, PartEnum, PointEnum, EnumType
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.part.part import Part
@@ -25,6 +26,24 @@ from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .virtualhelix import VirtualHelix
 from .xovercmds import CreateXoverCommand, RemoveXoverCommand
 
+from cadnano.cntypes import (
+    RectT,
+    IntT,
+    IntTuple,
+    KeyT,
+    ValueT,
+    Vec2T,
+    Vec3T,
+    HitListT,
+    PointsT,
+    QueryIDNumT,
+    OligoT,
+    StrandT,
+    SegmentT,
+    ABInfoT
+    )
+
+
 """
 inner1d(a, a) is equivalent to np.einsum('ik,ij->i', a, a)
 equivalent to np.sum(a*a, axis=1) but faster
@@ -32,7 +51,6 @@ equivalent to np.sum(a*a, axis=1) but faster
 from numpy.core.umath_tests import inner1d
 
 DEFAULT_CACHE_SIZE = 20
-
 
 def _defaultProperties(id_num):
     props = [('name', "vh%d" % (id_num)),
@@ -117,7 +135,7 @@ class NucleicAcidPart(Part):
     def __init__(self, *args, **kwargs):
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
-        grid_type = kwargs.get('grid_type', GridType.HONEYCOMB)
+        grid_type = kwargs.get('grid_type', GridEnum.HONEYCOMB)
         if do_copy:
             return
 
@@ -128,16 +146,16 @@ class NucleicAcidPart(Part):
         self._oligos = set()
 
         # Helix parameters
-        if grid_type == GridType.HONEYCOMB:
+        if grid_type == GridEnum.HONEYCOMB:
             self._STEP_SIZE = 21
             self._SUB_STEP_SIZE = 7
             self._TURNS_PER_STEP = 2
-        elif grid_type == GridType.SQUARE:
+        elif grid_type == GridEnum.SQUARE:
             self._STEP_SIZE = 32
             self._SUB_STEP_SIZE = 8
             self._TURNS_PER_STEP = 3
         else:
-            raise NotImplementedError("Unrecognized GridType")
+            raise NotImplementedError("Unrecognized GridEnum")
         self._HELICAL_PITCH = self._STEP_SIZE / self._TURNS_PER_STEP
         self._TWIST_PER_BASE = 360 / self._HELICAL_PITCH  # degrees
         self._BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
@@ -145,7 +163,7 @@ class NucleicAcidPart(Part):
         # Runtime state
         self._active_base_index = self._STEP_SIZE
         self._active_id_num = None
-        self.active_base_info = ()
+        self.active_base_info: ABInfoT = ()
         self._selected = False
         self.is_active = False
 
@@ -161,8 +179,7 @@ class NucleicAcidPart(Part):
         gps['neighbor_active_angle'] = ''
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
-        gps['point_type'] = kwargs.get('point_type', PointType.Z_ONLY)
-        gps['workplane_idxs'] = (3, 35)
+        gps['point_type'] = kwargs.get('point_type', PointEnum.Z_ONLY)
 
         ############################
         # Begin low level attributes
@@ -323,38 +340,41 @@ class NucleicAcidPart(Part):
         return new_vhg
     # end def
 
-    def stepSize(self):
+    def stepSize(self) -> int:
         return self._STEP_SIZE
     # end def
 
-    def baseWidth(self):
+    def baseWidth(self) -> float:
         return self._BASE_WIDTH
     # end def
 
-    def radius(self):
+    def radius(self) -> float:
         return self._radius
     # end def
 
-    def helicalPitch(self):
+    def helicalPitch(self) -> float:
         return self._HELICAL_PITCH
     # end def
 
-    def twistPerBase(self):
+    def twistPerBase(self) -> float:
         return self._TWIST_PER_BASE
     # end def
 
-    def getOffsetAndSize(self, id_num):
+    def getOffsetAndSize(self, id_num: int) -> Tuple[int, int]:
         """Get the index offset of this ID into the point buffers
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: (:obj:`int`, :obj:`int`) of the form::
+            tuple in the form::
 
                 (offset, size)
 
             into the coordinate arrays for a given ID number
+
+        Raises:
+            KeyError for ``id_num`` not being there
         """
         offset_and_size = self._offset_and_size
         if id_num > len(offset_and_size) - 1 or offset_and_size[id_num] is None:
@@ -363,18 +383,19 @@ class NucleicAcidPart(Part):
             return offset_and_size[id_num]
     # end def
 
-    def getVirtualHelix(self, id_num):
+    def getVirtualHelix(self, id_num: int) -> VirtualHelix:
         """Get a VirtualHelix object to allow for convenience manipulation
 
         Args:
-            id_num (int):
+            id_num:
+
         Returns:
-            int: VirtualHelix
+            ``VirtualHelix`` with that ``id_num``
         """
         return self._virtual_helices_set[id_num]
     # end def
 
-    def _getNewIdNum(self, parity=None):
+    def _getNewIdNum(self, parity: int = None) -> int:
         """
         Return the lowest id_num that is both currently available and that is
         even or odd according to parity (if specified).
@@ -385,12 +406,12 @@ class NucleicAcidPart(Part):
         virtual helices are deleted.
 
         Args:
-            parity (int): 1 or 0 depending on if the parity of the ID should
+            parity: Optional 1 or 0 depending on if the parity of the ID should
             be odd or even.  If this is None, the next available number will
             be used
 
         Returns:
-            int: a valid ID number
+            a valid ID number
         """
         _even = 0
         _odd = 1
@@ -401,77 +422,91 @@ class NucleicAcidPart(Part):
             else:
                 return min(self._highest_odd_id_num_used + 2,
                            self._highest_even_id_num_used + 2)
-        elif parity is _odd:
+        elif parity == _odd:
             if len(self.recycle_bin.get(_odd)):
                 return nsmallest(1, self.recycle_bin.get(_odd))[0]
             else:
                 return self._highest_odd_id_num_used + 2
-        elif parity is _even:
+        elif parity == _even:
             if len(self.recycle_bin.get(_even)):
                 return nsmallest(1, self.recycle_bin.get(_even))[0]
             else:
                 return self._highest_even_id_num_used + 2
         else:
-            raise AttributeError('Invalid parity passed to _getNewIdNum:  %s' % parity)
+            err = 'Invalid parity passed to _getNewIdNum: {}'.format(parity)
+            raise AttributeError(err)
     # end def
 
-    def getMaxIdNum(self, parity=None):
+    def getMaxIdNum(self, parity: int = None) -> int:
         """
         Return the highest ID number used so far.
 
         Returns:
-            int: max virtual helix ID number used
+            max virtual helix ID number used
         """
         if parity is None:
             return max(self._highest_even_id_num_used, self._highest_odd_id_num_used)
-        elif parity is 0:
+        elif parity == 0:
             return self._highest_even_id_num_used
-        elif parity is 1:
+        elif parity == 1:
             return self._highest_odd_id_num_used
         else:
             raise AttributeError('Invalid parity passed to getMaxIdNum:  %s' % parity)
 
-    def _reserveIdNum(self, requested_id_num):
-        """
-        Reserves and returns a unique numerical id_num appropriate for a
+    def _reserveIdNum(self, requested_id_num: IntT):
+        """Reserves and returns a unique numerical id_num appropriate for a
         virtualhelix of a given parity. If a specific index is preferable
         (say, for undo/redo) it can be requested in num.
 
         Args:
-            requested_id_num (int): virtual helix ID number
+            requested_id_num: virtual helix ID number
         """
-        num = requested_id_num
-        parity = requested_id_num % 2
-        assert num >= 0, int(num) == num
+        assert isinstance(requested_id_num, IntTuple)
+        num = int(requested_id_num)
+        assert num >= 0
+        parity = num % 2
+
         # assert not num in self._number_to_virtual_helix
         if num in self.recycle_bin.get(parity):
+            # print("reserved", num)
             self.recycle_bin.get(parity, {}).remove(num)
             # rebuild the heap since we removed a specific item
             heapify(self.recycle_bin.get(parity, {}))
-        if parity is 0 and self._highest_even_id_num_used < num:
+        if parity == 0 and self._highest_even_id_num_used < num:
             self._highest_even_id_num_used = num
-        elif parity is 1 and self._highest_odd_id_num_used < num:
+        elif parity == 1 and self._highest_odd_id_num_used < num:
             self._highest_odd_id_num_used = num
         self.reserved_ids.add(num)
     # end def
 
-    def _recycleIdNum(self, id_num):
-        """
-        The caller's contract is to ensure that id_num is not used in *any*
+    def _recycleIdNum(self, id_num: IntT):
+        """The caller's contract is to ensure that id_num is not used in *any*
         helix at the time of the calling of this function (or afterwards, unless
-        `reserveIdNumForHelix` returns the id_num again).
+        ``reserveIdNumForHelix`` returns the ``id_num`` again).
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
         """
-        parity = id_num % 2
-        if parity is 0:
-            heappush(self.recycle_bin.get(0), id_num)
-            self._highest_even_id_num_used = id_num-2
+        assert isinstance(id_num, IntTuple)
+        store_num: int = int(id_num) # conver to integer
+        parity = store_num % 2
+        self.reserved_ids.remove(store_num)
+        if parity == 0:
+            heappush(self.recycle_bin.get(0), store_num)
+            if store_num == self._highest_even_id_num_used:
+                ids = sorted(list(self.reserved_ids), reverse=True)
+                for i in ids:
+                    if i % 2 == 0:
+                        self._highest_even_id_num_used = i
+                        break
         else:
-            heappush(self.recycle_bin.get(1), id_num)
-            self._highest_odd_id_num_used = id_num-2
-        self.reserved_ids.remove(id_num)
+            heappush(self.recycle_bin.get(1), store_num)
+            if store_num == self._highest_odd_id_num_used:
+                ids = sorted(list(self.reserved_ids), reverse=True)
+                for i in ids:
+                    if i % 2 == 1:
+                        self._highest_odd_id_num_used = i
+                        break
     # end def
 
     def _sanity_check_id_numbers(self):
@@ -490,14 +525,14 @@ class NucleicAcidPart(Part):
         assert all(x % 2 == 0 for x in self.recycle_bin.get(0))
         assert all(x % 2 == 1 for x in self.recycle_bin.get(1))
 
-    def getCoordinates(self, id_num):
+    def getCoordinates(self, id_num: int) -> PointsT:
         """Return a view onto the numpy array for a given id_num
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: of :obj:'ndarray' of the form::
+            tuple of :obj:'ndarray' of the form::
 
                 (axis_pts, fwd_pts, rev_pts)
 
@@ -510,15 +545,15 @@ class NucleicAcidPart(Part):
                 self.rev_pts[lo:hi])
     # end def
 
-    def getCoordinate(self, id_num, idx):
+    def getCoordinate(self, id_num: int, idx: int) -> np.ndarray:
         """Given a id_num get the coordinate at a given index
 
         Args:
-            id_num (int): virtual helix ID number
-            idx (int): index
+            id_num: virtual helix ID number
+            idx: index
 
         Returns:
-            ndarray: of :obj:`float` shape (1, 3)
+            ``ndarray`` of :obj:`float` shape (1, 3)
 
         Raises:
             KeyError: id_num not in NucleicAcidPart
@@ -532,50 +567,50 @@ class NucleicAcidPart(Part):
             raise IndexError("idx {} greater than size {}".format(idx, size))
     # end def
 
-    def isAGreaterThanB_Z(self, id_numA, idxA, id_numB, idxB):
+    def isAGreaterThanB_Z(self, id_numA: int, idxA: int, id_numB: int, idxB: int) -> bool:
         """Compare z values at each index of virtual helix A and B
 
         Args:
-            id_numA (int):  ID number of A
-            idxA (int):     index into A
-            id_numB (int):  ID number of B
-            idxB (int):     index into B
+            id_numA:  ID number of A
+            idxA:     index into A
+            id_numB:  ID number of B
+            idxB:     index into B
 
         Returns:
-            bool: True if A > B
+            ``True`` if A > B else ``False``
         """
         a = self.getCoordinate(id_numA, idxA)
         b = self.getCoordinate(id_numB, idxB)
         return a[2] > b[2]
     # end def
 
-    def getVirtualHelixOrigin(self, id_num):
+    def getVirtualHelixOrigin(self, id_num: int) -> np.ndarray:
         """given a id_num get the origin coordinate
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            ndarray: (1, 3) origin of the Virtual Helix (0 index)
+            ``ndarray`` of (1, 3) origin of the Virtual Helix (0 index)
 
         Raises:
-            KeyError: id_num not in NucleicAcidPart
+            KeyError: ``id_num`` not in ``NucleicAcidPart``
         """
         _, _ = self.getOffsetAndSize(id_num)
         return self._origin_pts[id_num]
     # end def
 
-    def getidNums(self):
+    def getidNums(self) -> List[int]:
         """Return a list of used id_nums
 
         Returns:
-            list: of :obj:`int` of virtual helix ID numbers used
+            list of :obj:`int` of virtual helix ID numbers used
         """
         return [i for i, j in filter(lambda x: x[1] is not None, enumerate(self._offset_and_size))]
     # end def
 
     def _setVirtualHelixOriginLimits(self):
-        """Set origin limits by grabbing the max `x` and `y` values of the
+        """Set origin limits by grabbing the max ``x`` and ``y`` values of the
         origins of all virtual helices
         """
         valid_pts = np.where(self._origin_pts != np.inf)
@@ -595,32 +630,32 @@ class NucleicAcidPart(Part):
         assert len(limits) is 4
         self.origin_limits = limits[0], limits[1], limits[2], limits[3]
 
-    def getVirtualHelixOriginLimits(self):
-        """Retuns a pair of coordinates bounding the lower-left and upper-right
+    def getVirtualHelixOriginLimits(self) -> RectT:
+        """Returns a pair of coordinates bounding the lower-left and upper-right
         coordinates of the part.
 
         Returns:
-            tuple: of :obj:`int` of the form::
+            tuple: of the form::
 
                 (xLL, yLL, xUR, yUR)
         """
         return self.origin_limits
     # end def
 
-    def getStrandSets(self, id_num):
+    def getStrandSets(self, id_num: int) -> Tuple[StrandSet, StrandSet]:
         """Given a id_num get the coordinate at a given index
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Returns:
-            tuple: (forward :class:`StrandSet`, reverse :class:`StrandSet`)
+            tuple of (forward :class:`StrandSet`, reverse :class:`StrandSet`)
         """
         _, _ = self.getOffsetAndSize(id_num)
         return (self.fwd_strandsets[id_num], self.rev_strandsets[id_num])
     # end def
 
-    def refreshSegments(self, id_num):
+    def refreshSegments(self, id_num: int):
         """Partition strandsets into overlapping segments
 
         Returns:
@@ -706,12 +741,12 @@ class NucleicAcidPart(Part):
         return fwd_segments, rev_segments
     # end def
 
-    def hasStrandAtIdx(self, id_num, idx):
+    def hasStrandAtIdx(self, id_num: int, idx: int) -> Tuple[bool, bool]:
         """Check if `Strand` exists at an index
 
         Args:
-            id_num (int): virtual helix ID number
-            idx (int): index that the strand is at
+            id_num: virtual helix ID number
+            idx: index that the strand is at
 
         Returns:
             tuple[bool, bool]: True if a strand is present at idx,
@@ -721,16 +756,16 @@ class NucleicAcidPart(Part):
                 self.rev_strandsets[id_num].hasStrandAt(idx, idx))
     # end def
 
-    def getStrand(self, is_fwd, id_num, idx):
+    def getStrand(self, is_fwd: bool, id_num: int, idx: int) -> StrandT:
         """Get a `Strand` object
 
         Args:
-            is_fwd (bool): is the StrandType Forward
-            id_num (int): virtual helix ID number
-            idx (int): index that the strand is at
+            is_fwd: is the StrandT Forward
+            id_num: virtual helix ID number
+            idx : index that the strand is at
 
         Returns:
-            Strand: if it exists
+            ``Strand`` if it exists
         """
 
         if is_fwd:
@@ -739,14 +774,14 @@ class NucleicAcidPart(Part):
             return self.rev_strandsets[id_num].getStrand(idx)
     # end def
 
-    def indexOfRightmostNonemptyBase(self):
+    def indexOfRightmostNonemptyBase(self) -> int:
         """During reduction of the number of bases in a part, the first click
         removes empty bases from the right hand side of the part (red
         left-facing arrow). This method returns the new numBases that will
         effect that reduction.
 
         Returns:
-            int: index of right most base in all :class:`StrandSets`
+            index of right most base in all :class:`StrandSets`
         """
         ret = self._STEP_SIZE - 1
         fwd_strandsets = self.fwd_strandsets
@@ -825,16 +860,16 @@ class NucleicAcidPart(Part):
                     )
     # end def
 
-    def _getVirtualHelixOriginNeighbors(self, id_num, radius):
-        """ might use radius = 2.1*RADIUS
+    def _getVirtualHelixOriginNeighbors(self, id_num: int, radius: float) -> Set[int]:
+        """might use radius = 2.1*RADIUS
         for now return a set of neighbor id_nums
 
         Args:
-            id_num (int): virtual helix ID number
-            radius (float): radial distance within which a neighbors origin exists
+            id_num: virtual helix ID number
+            radius: radial distance within which a neighbors origin exists
 
         Returns:
-            set: set of neighbor candidate ID numbers
+            set of neighbor candidate ID numbers
         """
         origin = self._origin_pts[id_num]
         neighbors = self.queryVirtualHelixOrigin(radius, tuple(origin))
@@ -843,16 +878,16 @@ class NucleicAcidPart(Part):
         return neighbor_candidates
     # end def
 
-    def _addCoordinates(self, id_num, points, is_right):
+    def _addCoordinates(self, id_num: int, points: PointsT, is_right: bool):
         """Points will only be added on the ends of a virtual helix
         not internally.  NO GAPS!
         handles reindex the points in self.indices
 
         Args:
-            id_num (int): virtual helix ID number
-            points (array-like): n x 3 shaped numpy ndarray of floats or
+            id_num: virtual helix ID number
+            points: n x 3 shaped numpy ndarray of floats or
                 2D Python list. points are stored in order and by index
-            is_right (bool): whether we are extending in the positive index
+            is_right: whether we are extending in the positive index
                 direction or prepending
         """
         offset_and_size_tuple = self.getOffsetAndSize(id_num)
@@ -931,28 +966,28 @@ class NucleicAcidPart(Part):
         self.total_points += num_points
     # end def
 
-    def getDirections(self, id_nums):
-        """ Get directions for a :obj:`array-like` of ID numbers
+    def getDirections(self, id_nums) -> np.ndarray:
+        """Get directions for a :obj:`array-like` of ID numbers
 
         Args:
             id_nums (array-like): of :obj:`int` array_like list of indices
-            or scalar index
+            or scalar index of length ``x``
 
         Returns:
-            ndarray: shape (x, 3) array
+            ``ndarray`` of shape ``(x, 3)`` array
         """
         return np.take(self.directions, id_nums, axis=0)
     # end def
 
     @staticmethod
-    def normalize(self, v):
-        """Normlize a vector
+    def normalize(self, v: Vec3T) -> np.ndarray:
+        """Normalize a vector
 
         Args:
-            v (array-like): of :obj:`float` of length 3
+            v: of :obj:`float` of length 3
 
         Returns:
-            ndarray: of :obj:`float`, norm of `v`
+            ndarray of :obj:`float`, norm of ``v``
         """
         norm = np.linalg.norm(v)
         if norm == 0:
@@ -961,11 +996,11 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def lengthSq(self, v):
+    def lengthSq(self, v: Vec3T):
         """Compute the length of a :obj:`array-like`
 
         Args:
-            v (array-like):  of :obj:`float` length 3
+            v:  of :obj:`float` length 3
 
         Returns:
             float
@@ -973,15 +1008,15 @@ class NucleicAcidPart(Part):
         return inner1d(v, v)
 
     @staticmethod
-    def cross(self, a, b):
+    def cross(self, a: Vec3T, b: Vec3T) -> List[float]:
         """Compute the cross product of two vectors of length 3
 
         Args:
-            a (array-like):  of :obj:`float` of length 3
-            b (array-like):  of :obj:`float` of length 3
+            a:  of :obj:`float` of length 3
+            b:  of :obj:`float` of length 3
 
         Returns:
-            list: of :obj:`float` of length 3
+            list of length 3
         """
         ax, ay, az = a
         bx, by, bz = b
@@ -991,18 +1026,18 @@ class NucleicAcidPart(Part):
         return c
     # end def
 
-    def makeRotation(self, v1, v2):
+    def makeRotation(self, v1: Vec3T, v2: Vec3T) -> np.ndarray:
         """Create a rotation matrix for an object pointing in the `v1`
         direction to the `v2` direction.  Uses a class allocated scratch `ndarrays`
 
         see: http://math.stackexchange.com/questions/180418/180436#180436
 
         Args:
-            v1 (array-like):  of :obj:`float` of length 3
-            v2 (array-like):  of :obj:`float` of length 3
+            v1:  pointing direction start
+            v2:  pointing direction end
 
         Returns:
-            ndarray: shape (3, 3) m0
+            ndarray of shape (3, 3)
         """
         if np.all(v1 == v2):
             return self.eye3_scratch.copy()
@@ -1034,16 +1069,22 @@ class NucleicAcidPart(Part):
         return m0
     # end def
 
-    def _createHelix(self, id_num, origin, direction, num_points, color):
+    def _createHelix(self,  id_num: int,
+                            origin: Vec3T,
+                            direction: Vec3T,
+                            num_points: int,
+                            color: str) -> VirtualHelix:
         """Create a virtual helix in the group that has a Z_ONLY direction
 
         Args:
-            id_num (int): virtual helix ID number
-            origin (array-like):  of :obj:`float` of length 3
-                The origin should be referenced from an index of 0.
-            direction (array-like):  of :obj:`float` of length 3
-            num_points (int): number of bases in Virtual Helix
-            color (str): hexadecimal color code in the form: `#RRGGBB`
+            id_num: virtual helix ID number
+            origin: the origin should be referenced from an index of 0.
+            direction:  direction vector of the virtual helix
+            num_points: number of bases in virtual helix
+            color: hexadecimal color code in the form: ``#RRGGBB``
+
+        Returns:
+            Virtual Helix object
         """
         num_points = int(num_points)  # re-cast to int to avoid numpy errors
 
@@ -1081,7 +1122,7 @@ class NucleicAcidPart(Part):
         # 2. Assign origin on creation, resizing as needed
         len_origin_pts = len(self._origin_pts)
         if id_num >= len_origin_pts:
-            diff = id_num - len_origin_pts
+            diff = id_num - len_origin_pts + 1 # add 1 to make sure this increases size
             number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
@@ -1126,21 +1167,28 @@ class NucleicAcidPart(Part):
         return vh
     # end def
 
-    def _pointsFromDirection(self, id_num, origin, direction, num_points, index):
+    def _pointsFromDirection(self,
+                    id_num: int,
+                    origin: Vec3T,
+                    direction: Vec3T,
+                    num_points: int,
+                    index: int) -> PointsT:
         """Assumes always prepending or appending points.  no insertions.
         changes eulerZ of the id_num vh_properties as required for prepending
         points
 
         Args:
-            id_num (int): virtual helix ID number
-            origin (array-like):  of :obj:`float` of length 3
+            id_num: virtual helix ID number
+            origin:  of :obj:`float` of length 3
                 The origin should be referenced from an index of 0.
-            direction (array-like): of :obj:`float` of length 3
-            index (int): the offset index into a helix to start the helix at.
+            direction: of :obj:`float` of length 3
+            index: the offset index into a helix to start the helix at.
                 Useful for appending points. if index less than zero
 
         Returns:
-            tuple: (coord_pts, fwd_pts, rev_pts)
+            tuple of form::
+
+                (coord_pts, fwd_pts, rev_pts)
         """
         rad = self._radius
         BW = self._BASE_WIDTH
@@ -1199,16 +1247,18 @@ class NucleicAcidPart(Part):
         return (coord_pts, fwd_pts, rev_pts)
     # end def
 
-    def getVirtualHelixProperties(self, id_num, keys, safe=True):
+    def getVirtualHelixProperties(self, id_num: int,
+                                        keys: KeyT,
+                                        safe: bool = True) -> ValueT:
         """Getter of the properties of a virtual helix
 
         Args:
-            id_num (int): virtual helix ID number
-            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`
-            safe (:obj:`bool`): optional, default to True
+            id_num: virtual helix ID number
+            keys: :obj:`str` or :obj:`list`/:obj:`tuple`
+            safe: optional, default to True
 
         Returns:
-            object: object or list depending on type of arg `keys`
+            ``object`` or list depending on type of arg ``keys``
         """
         if safe:
             _, _ = self.getOffsetAndSize(id_num)
@@ -1220,7 +1270,8 @@ class NucleicAcidPart(Part):
             return props.item() if isinstance(props, (np.float64, np.int64, np.bool_)) else props
     # end
 
-    def helixPropertiesAndOrigins(self, id_num_list=None):
+    def helixPropertiesAndOrigins(self,
+                id_num_list: List[int] = None) -> Tuple[dict, np.ndarray]:
         """
         Args:
             id_num_list (list): optional, of :obj:`int` list of virtual
@@ -1252,18 +1303,21 @@ class NucleicAcidPart(Part):
             raise ValueError("id_num_list bad type: {}".format(type(id_num_list)))
     # end def
 
-    def getAllVirtualHelixProperties(self, id_num, inject_extras=True, safe=True):
+    def getAllVirtualHelixProperties(self,
+                                id_num: int,
+                                inject_extras: bool = True,
+                                safe: bool = True) -> dict:
         """NOT to be used for a list of Virtual Helix property keys unless
         `inject_extras` is False
 
         Args:
-            id_num (int): virtual helix ID number
-            inject_extras (bool): optional, adds in 'bases_per_turn' and
-            'twist_per_base'.  default to True
-            safe (bool): check if id_num exists. Default True
+            id_num: virtual helix ID number
+            inject_extras: optional, adds in 'bases_per_turn' and
+                'twist_per_base'.  default to True
+            safe: check if id_num exists. Default True
 
         Returns:
-            dict: properties of a given ids
+            properties of a given ids
 
         Raises:
             IndexError:
@@ -1284,7 +1338,11 @@ class NucleicAcidPart(Part):
         return out
     # end
 
-    def setVirtualHelixProperties(self, id_num, keys, values, safe=True, use_undostack=True):
+    def setVirtualHelixProperties(self, id_num: int,
+                                        keys: KeyT,
+                                        values: ValueT,
+                                        safe: bool = True,
+                                        use_undostack: bool = True):
         """Keys and values can be :obj:`array-like` of equal length or
         singular values. Public handles undostack
 
@@ -1293,11 +1351,12 @@ class NucleicAcidPart(Part):
         emits `partVirtualHelixPropertyChangedSignal`
 
         Args:
-            id_num (int): virtual helix ID number
-            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
-            value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
+            id_num: virtual helix ID number
+            keys: :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
+            value: :obj:`object` or :obj:`list`/:obj:`tuple`,
                 the value or values matching the key order
-            safe (bool): optionally echew signalling
+            safe: optionally echew signalling
+            use_undostack: make this undoable
         """
         if safe:
             _, _ = self.getOffsetAndSize(id_num)
@@ -1309,18 +1368,21 @@ class NucleicAcidPart(Part):
             self._setVirtualHelixProperties(id_num, keys, values, emit_signals=safe)
     # end
 
-    def _setVirtualHelixProperties(self, id_num, keys, values, emit_signals=True):
+    def _setVirtualHelixProperties( self,
+                                    id_num: int,
+                                    keys: KeyT,
+                                    values: ValueT,
+                                    emit_signals: bool = True):
         """Private Version: Keys and values can be :obj:`array-like` of equal
         length or singular values.
 
-        emits `partVirtualHelixPropertyChangedSignal`
+        emits ``partVirtualHelixPropertyChangedSignal``
 
         Args:
-            id_num (int): virtual helix ID number
-            keys (object): :obj:`str` or :obj:`list`/:obj:`tuple`, the key or keys
-            value (object): :obj:`object` or :obj:`list`/:obj:`tuple`,
-                the value or values matching the key order
-            emit_signals (bool): optionally echew signaling
+            id_num: virtual helix ID number
+            keys: the key or ordered keys of the properties
+            value: the value or ordered values of the properties
+            emit_signals: optionally echew signaling
         """
         if emit_signals:
             _, _ = self.getOffsetAndSize(id_num)
@@ -1349,32 +1411,32 @@ class NucleicAcidPart(Part):
                 self, id_num, self.getVirtualHelix(id_num), keys_list, values_list)
     # end def
 
-    def locationQt(self, id_num, scale_factor=1.0):
+    def locationQt(self, id_num: int, scale_factor: float = 1.0) -> Vec2T:
         """ Y-axis is inverted in Qt +y === DOWN
 
         Args:
-            id_num (int):
-            scale_factor (float): optional, default 1.0
+            id_num:
+            scale_factor: optional, default 1.0
 
         Returns:
-            tuple: of :obj:`float`, x, y coordinates
+            tuple of :obj:`float`, x, y coordinates
         """
         x, y = self.getVirtualHelixOrigin(id_num)
         return scale_factor*x, -scale_factor*y
     # end def
 
-    def _resizeHelix(self, id_num, is_right, delta):
+    def _resizeHelix(self, id_num: int, is_right: bool, delta: int) -> int:
         """Resize vritual helix given by ID number
 
         Args:
-            id_num (int): virtual helix ID number
-            is_right (bool): whether this is a left side (False) or
+            id_num: virtual helix ID number
+            is_right: whether this is a left side (False) or
                 right side (True) operation
-            delta (int): number of virtual base pairs to add to (+) or trim (-)
+            delta: number of virtual base pairs to add to (+) or trim (-)
                 from the virtual helix
 
         Returns:
-            int: the ID number of the longest Virtual Helix in the
+            the ID number of the longest Virtual Helix in the
             NucleicAcidPart
 
         Raises:
@@ -1426,7 +1488,7 @@ class NucleicAcidPart(Part):
         return self.zBoundsIds()
     # end def
 
-    def zBoundsIds(self):
+    def zBoundsIds(self) -> Tuple[int, int]:
         """Get the ID numbers of the Z bounds accounting for infinity for
         unitialized virtual helices
 
@@ -1441,11 +1503,11 @@ class NucleicAcidPart(Part):
         return id_z_min, id_z_max
     # end def
 
-    def _removeHelix(self, id_num):
+    def _removeHelix(self, id_num: int):
         """Remove a helix and recycle its `id_num`
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Raises:
             IndexError:
@@ -1461,13 +1523,13 @@ class NucleicAcidPart(Part):
         del self._virtual_helices_set[id_num]
     # end def
 
-    def resetCoordinates(self, id_num):
+    def resetCoordinates(self, id_num: int):
         """Call this after changing helix `vh_properties` to update the points
         controlled by the properties.  Basically clears things back to a simple
         version of a virtual helix
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
 
         Raises:
             KeyError:
@@ -1479,15 +1541,15 @@ class NucleicAcidPart(Part):
         self._setCoordinates(id_num, points)
     # end def
 
-    def _setCoordinates(self, id_num, points, idx_start=0):
+    def _setCoordinates(self, id_num: int, points: PointsT, idx_start: int = 0):
         """Change the stored coordinates.
         Useful when adjusting helix vh_properties.
 
         Args:
-            id_num (int): virtual helix ID number
-            points (tuple): tuple containing :obj:`array-like` of axis, and forward
+            id_num: virtual helix ID number
+            points: tuple containing :obj:`array-like` of axis, and forward
             and reverse phosphates points
-            idx_start (int): optional index offset into the virtual helix to
+            idx_start: optional index offset into the virtual helix to
             assign points to. default to 0
 
         Raises:
@@ -1508,17 +1570,17 @@ class NucleicAcidPart(Part):
         self.rev_pts[lo:hi] = new_rev_pts
     # end def
 
-    def _removeCoordinates(self, id_num, length, is_right):
+    def _removeCoordinates(self, id_num: int, length: int, is_right: bool) -> bool:
         """Remove coordinates given a length, reindex as necessary
 
         Args:
-            id_num (int): virtual helix ID number
-            length (int): number of coordinates to remove
-            is_right (bool): whether the removal occurs at the right or left
+            id_num: virtual helix ID number
+            length: number of coordinates to remove
+            is_right: whether the removal occurs at the right or left
                 end of a virtual helix since virtual helix arrays are always contiguous
 
         Returns:
-            bool: True if id_num is removed, False otherwise
+            ``True`` if ``id_num`` is removed, ``False`` otherwise
 
         Raises:
             KeyError:
@@ -1599,15 +1661,17 @@ class NucleicAcidPart(Part):
         return did_remove
     # end def
 
-    def queryBasePoint(self, radius, point):
+    def queryBasePoint(self,
+                        radius: float,
+                        point: Vec3T) -> Tuple[np.ndarray, np.ndarray]:
         """Cached query
 
         Args:
-            radius (float): distance to consider
-            point (array-like): :obj:`float` of length 3
+            radius: distance to consider
+            point: :obj:`float` of length 3
 
         Returns:
-            tuple: of :obj:`ndarray`
+            tuple of :obj:`ndarray`
         """
         qc = self._point_cache
         query = (radius, point)
@@ -1624,15 +1688,17 @@ class NucleicAcidPart(Part):
             return res
     # end def
 
-    def _queryBasePoint(self, radius, point):
-        """ return the indices of all virtual helices closer than radius
+    def _queryBasePoint(self,
+                        radius: float,
+                        point: Vec3T) -> Tuple[np.ndarray, np.ndarray]:
+        """return the indices of all virtual helices closer than radius
 
         Args:
-            radius (float): distance to consider
-            point (array-like): of :obj:`float` of length 3
+            radius: distance to consider
+            point: of :obj:`float` of length 3
 
         Returns:
-            tuple: of :obj:`ndarray`
+            tuple of :obj:`ndarray`
         """
         difference = self.axis_pts - point
         ldiff = len(difference)
@@ -1649,16 +1715,18 @@ class NucleicAcidPart(Part):
                 np.take(self.indices, close_points))
     # end def
 
-    def queryVirtualHelixOrigin(self, radius, point):
-        """ Hack for now to get 2D behavior
+    def queryVirtualHelixOrigin(self,
+                                radius: float,
+                                point: Vec3T) -> np.ndarray:
+        """Hack for now to get 2D behavior
         point is an array_like of length 2
 
         Args:
-            radius (float): distance to consider
-            point (array-like): of :obj:`float` of length 3
+            radius: distance to consider
+            point: of :obj:`float` of length 3
 
         Returns:
-            ndarray: close origin points to `point`
+            ``ndarray`` close origin points to ``point``
         """
         qc = self._origin_cache
         query = (radius, point)
@@ -1682,16 +1750,18 @@ class NucleicAcidPart(Part):
             return res
     # end def
 
-    def _queryVirtualHelixOrigin(self, radius, point):
+    def _queryVirtualHelixOrigin(self,
+                                radius: float,
+                                point: Vec3T) -> np.ndarray:
         """Return the indices of all id_nums closer
         than radius, sorted by distance
 
         Args:
-            radius (float): distance to consider
-            point (array-like): of :obj:`float` of length 3
+            radius: distance to consider
+            point: of :obj:`float` of length 3
 
         Returns:
-            ndarray: close origin points to `point`
+            ``ndarray`` close origin points to ``point``
         """
         difference = self._origin_pts - point
         ldiff = len(difference)
@@ -1708,13 +1778,13 @@ class NucleicAcidPart(Part):
         return close_points[sorted_idxs]
     # end def
 
-    def _queryVirtualHelixOriginRect(self, rect):
+    def _queryVirtualHelixOriginRect(self, rect: RectT) -> np.ndarray:
         """Query based on a Rectangle
 
         Args:
-            rect (array-like): of :obj:`float` rectangle defined by::
+            rect: of :obj:`float` rectangle defined by::
 
-                    ( x1, y1, x2, y2)
+                    (x1, y1, x2, y2)
 
                 definining the lower left and upper right corner of the
                 rectangle respetively
@@ -1736,7 +1806,10 @@ class NucleicAcidPart(Part):
         return id_nums
     # end def
 
-    def _queryIdNumRange(self, id_num, radius, index_slice=None):
+    def _queryIdNumRange(self,
+                        id_num: int,
+                        radius: float,
+                        index_slice: Tuple[int, int] = None) -> QueryIDNumT:
         """Return the indices of all virtual helices phosphates closer
         than `radius` to `id_num`'s helical axis
 
@@ -1744,13 +1817,13 @@ class NucleicAcidPart(Part):
         ranges
 
         Args:
-            id_num (int): virtual helix ID number
-            radius (float): distance to consider
-            index_slice (Tuple): a tuple of the start index and length into
+            id_num: virtual helix ID number
+            radius: distance to consider
+            index_slice: a tuple of the start index and length into
             a virtual helix
 
         Returns:
-            tuple: of :obj:`list`, fwd_axis_hits, rev_axis_hits
+            :obj:`tuple` of :obj:`list`, fwd_axis_hits, rev_axis_hits
             where each element in the list is::
 
                 :obj:`tuple` of :obj:`int`, :obj:`tuple`
@@ -1803,16 +1876,16 @@ class NucleicAcidPart(Part):
         return fwd_hit_list, rev_hit_list
     # end def
 
-    def normalizedRange(self, id_num, index):
-        """Given an `index` within the bounds `[0, size]`
-        return an range of length `bases_per_repeat` if pro
+    def normalizedRange(self, id_num: int, index: int) -> Tuple[int, int]:
+        """Given an ``index`` within the bounds ``[0, size]``
+        return an range of length ``bases_per_repeat`` if pro
 
         Args:
-            id_num (int): virtual helix ID number
-            index (int): index
+            id_num: virtual helix ID number
+            index: index
 
         Returns:
-            tuple: of :obj:`int` of form::
+            tuple of form::
 
                 (start index, bases per repeat)
         """
@@ -1826,19 +1899,23 @@ class NucleicAcidPart(Part):
         return start, bpr
     # end def
 
-    def _queryIdNumRangeNeighbor(self, id_num, neighbors, alpha, index=None):
+    def _queryIdNumRangeNeighbor(self,
+                id_num: IntT,
+                neighbors: List[int],
+                alpha: float,
+                index: Tuple[int, int] = None) -> Dict[int, Tuple[HitListT, HitListT]]:
         """Get indices of all virtual helices phosphates closer within an
         `alpha` angle's radius to `id_num`'s helical axis
 
         Args:
-            id_num (int): virtual helix ID number
+            id_num: virtual helix ID number
             neighbors (array-like): neighbors of id_num
-            alpha (float): angle (degrees) commensurate with radius
-            index (tuple): optional, of :obj:`int` (start_index, length) into
-                a virtual helix, default to `(0, size)`
+            alpha: angle (degrees) commensurate with radius
+            index: optional, of form (start_index, length) into a virtual
+                helix, default to ``(0, size)``
 
         Returns:
-            dict: of :obj:`tuple` of form::
+            ``dict`` of :obj:`tuple` of form::
 
                 neighbor_id_num: (fwd_hit_list, rev_hit_list)
 
@@ -1920,10 +1997,8 @@ class NucleicAcidPart(Part):
                     v1 = normalize(v1 - dot(v1, direction)*direction)
 
                     v2 = normalize(nfwd_pts[neighbor_min_delta_idx] - neighbor_axis_pt)
-                    # relative_angle = math.acos(np.dot(v1, v2))  # angle
                     # get signed angle between
                     relative_angle = math.atan2(dot(cross(v1, v2), direction), dot(v1, v2))
-                    # relative_angle = math.atan2(dot(cross(v2, v1), direction), dot(v2, v1))
                     # print(id_num, 'f', relative_angle)
                     # b. fwd pt angle relative to first base in virtual helix
                     native_angle = angleNormalize(eulerZ + tpb*neighbor_min_delta_idx - relative_angle)
@@ -1984,18 +2059,20 @@ class NucleicAcidPart(Part):
         return per_neighbor_hits
     # end def
 
-    def queryIdNumNeighbor(self, id_num, neighbors, index=None):
+    def queryIdNumNeighbor(self,
+                id_num: int,
+                neighbors: List[int],
+                index: int = None) -> Dict[int, Tuple[HitListT, HitListT]]:
         """Get indices of all virtual helices phosphates within a bond
         length of each phosphate for the id_num Virtual Helix.
 
         Args:
-            id_num (int): virtual helix ID number
-            neighbors (array-like): neighbors of id_num
-            index_slice (tuple):  optional, of :obj:`int` (start_index, length) into a virtual
-                helix
+            id_num: virtual helix ID number
+            neighbors: neighbors of id_num
+            index:  optional, of :obj:`int` start_index into a virtual helix
 
         Returns:
-            dict: of :obj:`tuple` of form::
+            ``dict`` of :obj:`tuple` of form::
 
                 neighbor_id_num: (fwd_hit_list, rev_hit_list)
 
@@ -2176,31 +2253,33 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def angleNormalize(angle):
+    def angleNormalize(angle: float) -> float:
         """Ensure angle is normalized to [0, 2*PI]
 
         Args:
-            angle (float): radians
+            angle: radians
 
         Returns:
-            float:
+            normalized angle
         """
         TWOPI = 2*3.141592653589793
         return ((angle % TWOPI) + TWOPI) % TWOPI
 
     @staticmethod
-    def angleRangeCheck(angle, target_angle, theta):
-        """See if `angle` falls in range
-        `[target_angle - theta`, target_angle + theta]`
+    def angleRangeCheck(angle: float, target_angle: float, theta: float) -> bool:
+        """See if ``angle`` falls in range::
+
+            [target_angle - theta, target_angle + theta]
+
         Accounting for wrap around
 
         Args:
-            angle (float): radians
-            target_angle (float): radians
-            theta (float): radians
+            angle: radians
+            target_angle: radians
+            theta: radians
 
         Returns:
-            bool: True if in range, False otherwise
+            ``True`` if in range, ``False`` otherwise
         """
         PI = 3.141592653589793
         TWOPI = 2*PI
@@ -2208,7 +2287,10 @@ class NucleicAcidPart(Part):
         return -theta <= diff and diff <= theta
 
     @staticmethod
-    def radiusForAngle(angle, radius_in, bases_per_turn, base_width):
+    def radiusForAngle( angle: float,
+                        radius_in: float,
+                        bases_per_turn: float,
+                        base_width: float) -> Vec2T:
         """Calculate the distance from the center axis of
         a virtual helix with radius_in radius to a bounds of
         an arc on tangent virtual helix with the same radius
@@ -2218,13 +2300,13 @@ class NucleicAcidPart(Part):
         (the BASE_WIDTH)
 
         Args:
-            angle (float):
-            radius_in (float):
-            bases_per_turn (float):
-            base_width (float):
+            angle: degrees
+            radius_in: distance
+            bases_per_turn: bases per turn
+            base_width: width of helix per base
 
         Returns:
-            tuple: of :obj:`float`, angle and radius
+            ``tuple`` of :obj:`float`, angle (radians) and radius
         """
         theta = math.radians(angle) / 2
         R = radius_in*math.sqrt(5 - 4*math.cos(theta))
@@ -2233,27 +2315,27 @@ class NucleicAcidPart(Part):
         return theta, math.sqrt(R*R + x*x)
     # end def
 
-    def _projectionPointOnPlane(self, id_num, point):
+    def _projectionPointOnPlane(self, id_num: int, point: Vec3T) -> Vec3T:
         """VirtualHelices are straight for now so only one direction for the axis
         assume directions are alway normalized, so no need to divide by the
         magnitude of the direction vector squared
 
         Args:
-            id_num (int): virtual helix ID number
-            point (array-like): length 3
+            id_num: virtual helix ID number
+            point: length 3
 
         Returns:
-            array-like: length 3
+            length 3
         """
         direction = self.directions[id_num]
         return point - np.dot(point, direction)*direction
     # end
 
-    def subStepSize(self):
+    def subStepSize(self) -> int:
         """Get the substep size. Used for major grid line spacing.
 
         Returns:
-            int: The substep size.
+            the substep size.
         """
         return self._SUB_STEP_SIZE
     # end def
@@ -2263,26 +2345,26 @@ class NucleicAcidPart(Part):
         """Get this type of Part
 
         Returns:
-            cnenum.PartType.NUCLEICACIDPART
+            cnenum.PartEnum.NUCLEICACIDPART
         """
-        return PartType.NUCLEICACIDPART
+        return PartEnum.NUCLEICACIDPART
     # end def
 
-    def isZEditable(self):
+    def isZEditable(self) -> bool:
         """Return whether we move a Virtual Helix in the Z direction
 
         Returns:
-            bool:
+            ``True`` or ``False``
         """
-        return self._group_properties['point_type'] == PointType.Z_ONLY
+        return self._group_properties['point_type'] == PointEnum.Z_ONLY
     # end def
 
-    def getVirtualHelicesInArea(self, rect):
+    def getVirtualHelicesInArea(self, rect: RectT) -> Set[int]:
         """
         Args:
-            rect (array-like): of :obj:`float` rectangle defined by::
+            rect: of :obj:`float` rectangle defined by::
 
-                    ( x1, y1, x2, y2)
+                    (x1, y1, x2, y2)
 
                 definining the lower left and upper right corner of the
                 rectangle respetively
@@ -2295,24 +2377,28 @@ class NucleicAcidPart(Part):
         return set(res)
     # end def
 
-    def getVirtualHelixAtPoint(self, point, id_num=None):
-        """ Fix this to get the closest result
+    def getVirtualHelixAtPoint(self, point: Vec3T, id_num: int = None) -> int:
+        """Fix this to get the closest result
+
+        Returns:
+            closest ``id_num`` or -1 if nothing is close
         """
         radius = self._radius
         res = self.queryVirtualHelixOrigin(radius, point)
         # res = set(res)
         if len(res) > 0:
             if id_num is None:
+                # return first element of the array
                 return res[0]
             else:
                 for i in range(len(res)):
                     check_id_num = res[i]
                     if check_id_num != id_num:
                         return check_id_num
-        return None
+        return -1
     # end def
 
-    def isVirtualHelixNearPoint(self, point, id_num=None):
+    def isVirtualHelixNearPoint(self, point: Vec3T, id_num: int = None) -> bool:
         """ Is a VirtualHelix near a point
         multiples of radius
         """
@@ -2339,10 +2425,13 @@ class NucleicAcidPart(Part):
         return False
     # end def
 
-    def potentialCrossoverMap(self, id_num, idx=None):
+    def potentialCrossoverMap(self,
+                id_num: int,
+                idx: int = None) -> Dict[int, Tuple[HitListT, HitListT]]:
         """
         Args:
-            id_num (int):
+            id_num: ID Number
+            idx: index
 
         Returns:
             dictionary of tuples:
@@ -2366,7 +2455,7 @@ class NucleicAcidPart(Part):
         return per_neighbor_hits
 
     # end def
-    def boundDimensions(self, scale_factor=1.0):
+    def boundDimensions(self, scale_factor: float = 1.0) -> RectT:
         """Returns a tuple of rectangle defining the XY limits of a part"""
         DMIN = 10  # 30
         xLL, yLL, xUR, yUR = self.getVirtualHelixOriginLimits()
@@ -2381,7 +2470,7 @@ class NucleicAcidPart(Part):
         return xLL * scale_factor, yLL * scale_factor, xUR * scale_factor, yUR * scale_factor
     # end def
 
-    def getSequences(self):
+    def getSequences(self) -> str:
         """getSequences"""
         # s = "Start\tEnd\tColor\tMod5\tSequence\tMod3\tAbstractSequence\n"
         keys = ['Start', 'End', 'Color', 'Mod5',
@@ -2393,12 +2482,12 @@ class NucleicAcidPart(Part):
         s = df.to_csv(index=False)
         return s
 
-    def getIdNums(self):
+    def getIdNums(self) -> Set[int]:
         """return the set of all ids used"""
         return self.reserved_ids
     # end def
 
-    def getCircularOligos(self):
+    def getCircularOligos(self) -> List[OligoT]:
         """
         Returns oligos with no 5'/3' ends. Used by
         actionExportSequencesSlot in documentcontroller to validate before
@@ -2410,7 +2499,7 @@ class NucleicAcidPart(Part):
                 circ_olgs.append(o)
         return circ_olgs
 
-    def maxBaseIdx(self, id_num):
+    def maxBaseIdx(self, id_num: int) -> int:
         try:
             _, size = self.getOffsetAndSize(id_num)
         except KeyError:
@@ -2439,7 +2528,7 @@ class NucleicAcidPart(Part):
         # end for
     # end def
 
-    def remove(self, use_undostack=True):
+    def remove(self, use_undostack: bool = True):
         """This method assumes all strands are and all VirtualHelices are
         going away, so it does not maintain a valid model state while
         the command is being executed.
@@ -2473,7 +2562,7 @@ class NucleicAcidPart(Part):
                 e.redo()
     # end def
 
-    def removeAllOligos(self, use_undostack=True):
+    def removeAllOligos(self, use_undostack: bool = True):
         # clear existing oligos
         cmds = []
         for o in list(self.oligos()):
@@ -2482,25 +2571,24 @@ class NucleicAcidPart(Part):
         util.execCommandList(self, cmds, desc="Clear oligos", use_undostack=use_undostack)
     # end def
 
-    def splitOligoAtAbsoluteLengths(self, oligo, len_list):
-        """
-        Given an oligo and list of split positions, which are lengths in number
-        of bases from the start of the oligo. The method will convert the idxs
-        into absolute (vh,strandset,baseidx) positions and attempt to split the
-        strand or remove any xover at those positions.
+    def splitOligoAtAbsoluteLengths(self, oligo: OligoT, len_list: List[int]) -> int:
+        """Given an oligo and list of split positions, which are lengths in
+        number of bases from the start of the oligo. The method will convert
+        the idxs into absolute (vh,strandset,baseidx) positions and attempt to
+        split the strand or remove any xover at those positions.
 
         Args:
-            oligo (Oligo): to be split
-            len_list (list): lengths from 0 at which to break
+            oligo: to be split
+            len_list: lengths from 0 at which to break
 
         Returns:
-            result: None if succeeded, otherwise the first invalid length.
+            result: -1 if succeeded, otherwise the first invalid length.
         """
         # Quick validation of len_list, need at least 2-base separation
         sorted_lens = [0] + sorted(len_list) + [oligo.length()]
         for i in range(len(sorted_lens)-1):
             j, k = sorted_lens[i], sorted_lens[i+1]
-            if (k-j) < 2:
+            if (k - j) < 2:
                 return k
 
         # Convert lengths to absolute positions
@@ -2517,8 +2605,8 @@ class NucleicAcidPart(Part):
                 # print("Will split strand at len={0}, <VH{1}.{2}>[{3}]".format(olg_len, strand.idNum(), strand.strandType(), idx))
                 pass
             else:
-                print("Couldn't split strand at <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
-                return (id_num, ss_type, idx)
+                err = "Couldn't split strand at <VH{0}.{1}>[{2}]"
+                raise ValueError(err.format(id_num, ss_type, idx))
 
         # Now break for real
         for id_num, ss_type, idx in abs_positions:
@@ -2535,25 +2623,25 @@ class NucleicAcidPart(Part):
             elif ss.strandCanBeSplit(strand, idx):
                 ss.splitStrand(strand, idx)
             else:
-                print("Should never get here: <VH{0}.{1}>[{2}]".format(id_num, ss_type, idx))
-                return (id_num, ss_type, idx)
+                err = "Should never get here: <VH{0}.{1}>[{2}]"
+                return ValueError(err.format(id_num, ss_type, idx))
+        return -1
     # end def
 
-    def _addOligoToSet(self, oligo, emit_signals=False):
+    def _addOligoToSet(self, oligo: OligoT, emit_signals: bool = False):
         """This is an exceptional private method not part of the API as this
         is to be called only by an Oligo.
 
         Args:
-            oligo (Oligo): Oligo to add to the Part
+            oligo: Oligo to add to the Part
         """
         self._oligos.add(oligo)
         if emit_signals:
             self.partOligoAddedSignal.emit(self, oligo)
     # end def
 
-    def _removeOligoFromSet(self, oligo, emit_signals=False):
-        """ Not a designated method
-        (there exist methods that also directly
+    def _removeOligoFromSet(self, oligo: OligoT, emit_signals: bool = False):
+        """Not a designated method (there exist methods that also directly
         remove parts from self._oligos)
         """
         try:
@@ -2563,33 +2651,42 @@ class NucleicAcidPart(Part):
         except KeyError:
             print(util.trace(5))
             print("error removing oligo", oligo)
+            raise
     # end def
 
-    def createVirtualHelix(self, x, y, z=0.0, length=42, id_num=None,
-                           properties=None, safe=True, use_undostack=True,
-                           parity=None):
+    def createVirtualHelix(self,x: float,
+                                y: float,
+                                z: float = 0.0,
+                                length: int = 42,
+                                id_num: int = None,
+                                properties: Tuple = None,
+                                safe: bool = True,
+                                use_undostack: bool = True,
+                                parity: int = None) -> bool:
         """Create new VirtualHelix by calling CreateVirtualHelixCommand.
 
         Args:
-            x (float): x coordinate
-            y (float): y coordinate
-            z (float): z coordinate
-            length (int): Size of VirtualHelix.
-            id_num (int): The id number that this VirtualHelix should correspond to
-            properties (tuple): Tuple of two lists: `keys` and `values`, which
+            x: x coordinate
+            y: y coordinate
+            z: z coordinate
+            length: Size of VirtualHelix.
+            id_num: The id number that this VirtualHelix should correspond to
+            properties: Tuple of two lists: `keys` and `values`, which
                 contain full set of properties for the VirualHelix.
-            safe (bool): Update neighbors otherwise,
+            safe: Update neighbors otherwise,
                 neighbors need to be explicitly updated
-            use_undostack (bool): Set to False to disable undo stack for bulk
+            use_undostack: Set to ``False`` to disable undo stack for bulk
                 operations such as file import.
+        Returns:
+            ``True`` if successful, ``False`` if not
         """
         valid_pts = np.where(self._origin_pts != np.inf)
         x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
         vps = np.around(self._origin_pts[valid_pts], decimals=9)
         if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
             print("vh already present at coords ({}, {})".format(x9, y9))
-            print(util.trace(5))
-            return
+            # print(util.trace(5))
+            return False
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len
@@ -2599,10 +2696,19 @@ class NucleicAcidPart(Part):
                                       safe=safe,
                                       parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
+        return True
     # end def
 
-    def batchCreateVirtualHelices(self, x_list, y_list, z_list=None, length=None, id_num=None, properties=None,
-                                  safe=None, use_undo_stack=True, parity=None):
+    def batchCreateVirtualHelices(self,
+                                    x_list: List[float],
+                                    y_list: List[float],
+                                    z_list: List[float] = None,
+                                    length: List[int] = None,
+                                    id_nums: List[int] = None,
+                                    properties_list: List[Tuple] = None,
+                                    parities: List[int] = None,
+                                    safe_list: List[bool] = None,
+                                    use_undo_stack=True) -> List[int]:
         """Create multiple helices at once.
 
         This method requires that x_list and y_list be specified.  Otherwise,
@@ -2618,24 +2724,24 @@ class NucleicAcidPart(Part):
         batch
 
         Args:
-            x_list (list):  A list of length N corresponding to the x
+            x_list:  A list of length N corresponding to the x
                 coordinates of the N Virtual Helices to be made
-            y_list (list):  A list of length N corresponding to the y
+            y_list:  A list of length N corresponding to the y
                 coordinates of the N Virtual Helices to be made
-            z_list (list):  A list of length N corresponding to the z
+            z_list:  A list of length N corresponding to the z
                 coordinates of the N Virtual Helices to be made
-            length (list):  A list of length N corresponding to the length of
+            length:  A list of length N corresponding to the length of
                 each of the N Virtual Helices to be made
-            id_num (list):  a list of length N corresponding to the id numbers
+            id_nums:  a list of length N corresponding to the id numbers
                 being requested
-            properties (list):  a list of length N tuples; both tuples should be
+            properties_list:  a list of length N tuples; both tuples should be
                 lists corresponding to keys and values
-            safe (list):  a list of length N corresponding to whether or not
+            parities:  a list of length N corresponding to the parity of
+                each Virtual Helix being created
+            safe_list:  a list of length N corresponding to whether or not
                 neighbors should be updated
             use_undo_stack (bool):  whether or not the undo stack should be used
                 for this operation
-            parity (list):  a list of length N corresponding to the parity of
-                each Virtual Helix being created
 
         Returns:
             a list of id_numbers that were created during this batch operation
@@ -2649,13 +2755,13 @@ class NucleicAcidPart(Part):
         assert length is None or len(length) == len(x_list)
         assert id_num is None or isinstance(id_num, (list, tuple))
         assert id_num is None or len(id_num) == len(x_list)
-        assert properties is None or isinstance(properties, (list, tuple))
-        assert properties is None or len(properties) == len(x_list)
-        assert safe is None or isinstance(safe, (list, tuple))
-        assert safe is None or len(safe) == len(x_list)
+        assert properties_list is None or isinstance(properties_list, (list, tuple))
+        assert properties_list is None or len(properties_list) == len(x_list)
+        assert safe_list is None or isinstance(safe_list, (list, tuple))
+        assert safe_list is None or len(safe_list) == len(x_list)
         assert isinstance(use_undo_stack, bool)
-        assert parity is None or isinstance(parity, (list, tuple))
-        assert parity is None or len(parity) == len(x_list)
+        assert parities is None or isinstance(parities, (list, tuple))
+        assert parities is None or len(parities) == len(x_list)
 
         commands = []
         id_numbers = []
@@ -2664,10 +2770,10 @@ class NucleicAcidPart(Part):
             y = y_list[i]
             z = z_list[i] if z_list else 0.0
             _length = length[i] if length else self._STEP_SIZE*2
-            _id_num = id_num[i] if id_num else None
-            _properties = properties[i] if properties else None
-            _safe = safe[i] if safe else True
-            _parity = parity[i] if parity else None
+            _id_num = id_nums[i] if id_nums is not None else None
+            _properties = properties_list[i] if properties_list is not None else None
+            _safe = safe_list[i] if safe_list is not None else True
+            _parity = parities[i] if parities is not None else None
 
             # Reserve the _id_num to prevent id_number collisions between VHs created in this loop
             if _id_num is None:
@@ -2687,7 +2793,7 @@ class NucleicAcidPart(Part):
         return id_numbers
     # end def
 
-    def removeVirtualHelix(self, id_num, use_undostack=True):
+    def removeVirtualHelix(self, id_num: int, use_undostack: bool = True):
         """Removes a VirtualHelix from the model. Accepts a reference to the
         VirtualHelix, or a (row,col) lattice coordinate to perform a lookup.
         """
@@ -2704,16 +2810,32 @@ class NucleicAcidPart(Part):
             c.redo()
     # end def
 
-    def createXover(self, strand5p, idx5p, strand3p, idx3p, update_oligo=True,
-                    allow_reordering=False, use_undostack=True):
+    def removeVirtualHelices(self,  id_numbers: Iterable[int],
+                                    use_undostack: bool = True):
+        if use_undostack:
+            self.undoStack().beginMacro("Delete VirtualHelices")
+        for id_num in id_numbers:
+            self.removeVirtualHelix(id_num)
+        if use_undostack:
+            self.undoStack().endMacro()
+    # end def
+
+    def createXover(self,   strand5p: StrandT, idx5p: int,
+                            strand3p: StrandT, idx3p: int,
+                            update_oligo: bool = True,
+                            allow_reordering: bool = False,
+                            use_undostack: bool = True):
         """Xovers are ALWAYS installed FROM the 3' end of the 5' most
         strand (strand5p) TO the 5' end of the 3' most strand (strand3p)
 
         Args:
-            strand5p (Strand):
-            idx5p (int): index of the 3 prime end of the xover in strand5p
-            strand3p (Strand):
-            idx3p (int): index of the 5 prime end of the xover in strand3p
+            strand5p:
+            idx5p: index of the 3 prime end of the xover in strand5p
+            strand3p:
+            idx3p: index of the 5 prime end of the xover in strand3p
+            update_oligo: Default is ``True``
+            allow_reordering: Default is ``False``
+            use_undostack: Default is ``True``
         """
         # test for reordering malformed input
         if (allow_reordering is True and strand5p.idx5Prime() == idx5p and
@@ -2741,8 +2863,7 @@ class NucleicAcidPart(Part):
             self.undoStack().beginMacro("Create Xover")
 
         if strand5p == strand3p:
-            """
-            This is a complicated case basically we need a truth table.
+            """This is a complicated case basically we need a truth table.
             1 strand becomes 1, 2 or 3 strands depending on where the xover is
             to.  1 and 2 strands happen when the xover is to 1 or more existing
             endpoints.  Since SplitCommand depends on a StrandSet index, we need
@@ -2881,16 +3002,25 @@ class NucleicAcidPart(Part):
             e.redo()
     # end def
 
-    def removeXover(self, strand5p, strand3p, use_undostack=True):
+    def removeXover(self, strand5p: StrandT,
+                        strand3p: StrandT,
+                        use_undostack: bool = True):
         if strand5p.connection3p() == strand3p:
             c = RemoveXoverCommand(self, strand5p, strand3p)
             util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def xoverSnapTo(self, strand, idx, delta):
-        """
-        Returns the nearest xover position to allow snap-to behavior in
+    def xoverSnapTo(self, strand: StrandT, idx: int, delta: int) -> int:
+        """Returns the nearest xover position to allow snap-to behavior in
         resizing strands via dragging selected xovers.
+
+        Args:
+            strand:
+            idx:
+            delta:
+
+        Returns:
+            snap to index
         """
         # strand_type = strand.strandType()
         # if delta > 0:
@@ -2926,11 +3056,13 @@ class NucleicAcidPart(Part):
         return idx + delta
     # end def
 
-    def newPart(self):
+    def newPart(self) -> Part:
         return Part(self._document)
     # end def
 
-    def setAllVirtualHelixSizes(self, new_size, use_undostack=True, zoom_to_fit=False):
+    def setAllVirtualHelixSizes(self, new_size: int,
+                                    use_undostack: bool = True,
+                                    zoom_to_fit: bool = False):
         if use_undostack:
             self.undoStack().beginMacro("Resize all VHs")
         for id_num in self._virtual_helices_set:
@@ -2941,15 +3073,22 @@ class NucleicAcidPart(Part):
             self.undoStack().endMacro()
     # end def
 
-    def setVirtualHelixSize(self, id_num, new_size, use_undostack=True, zoom_to_fit=False):
+    def setVirtualHelixSize(self, id_num: int,
+                                new_size: int,
+                                use_undostack: bool = True,
+                                zoom_to_fit: bool = False):
         old_size = self.vh_properties.loc[id_num, 'length']
         delta = int(new_size - old_size)
         c = ResizeVirtualHelixCommand(self, id_num, True, delta, zoom_to_fit)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def translateVirtualHelices(self, vh_set, dx, dy, dz, finalize,
-                                use_undostack=False):
+    def translateVirtualHelices(self, vh_set: Set[int],
+                                    dx: float,
+                                    dy: float,
+                                    dz: float,
+                                    finalize: bool,
+                                    use_undostack: bool = False):
         if use_undostack:
             c = TranslateVirtualHelicesCommand(self, vh_set, dx, dy, dz)
             if finalize:
@@ -2961,11 +3100,16 @@ class NucleicAcidPart(Part):
             self._translateVirtualHelices(vh_set, dx, dy, dz, False)
     # end def
 
-    def _translateVirtualHelices(self, vh_set, dx, dy, dz, do_deselect):
-        """
-        do_deselect tells a view to clear selections that might have
+    def _translateVirtualHelices(self, vh_set: Set[int],
+                                        dx: float,
+                                        dy: float,
+                                        dz: float,
+                                        do_deselect: bool):
+        """do_deselect tells a view to clear selections that might have
         undesirable Object parenting to make sure the translations are set
         correctly.  set to True when "undo-ing"
+
+        emits ``partVirtualHelicesTranslatedSignal``
         """
         threshold = 2.1*self._radius
         # 1. get old neighbor list
@@ -2980,7 +3124,10 @@ class NucleicAcidPart(Part):
         for id_num in vh_set:
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
+                self.setVirtualHelixProperties( id_num,
+                                                'neighbors',
+                                                str(list(neighbors)),
+                                                use_undostack=False)
             except Exception:
                 print("neighbors", list(neighbors))
                 raise
@@ -2991,7 +3138,10 @@ class NucleicAcidPart(Part):
         for id_num in left_overs:
             neighbors = self._getVirtualHelixOriginNeighbors(id_num, threshold)
             try:
-                self.setVirtualHelixProperties(id_num, 'neighbors', str(list(neighbors)), use_undostack=False)
+                self.setVirtualHelixProperties( id_num,
+                                                'neighbors',
+                                                str(list(neighbors)),
+                                                use_undostack=False)
             except Exception:
                 print("neighbors", list(neighbors))
                 raise
@@ -3005,7 +3155,7 @@ class NucleicAcidPart(Part):
         raise NotImplementedError
     # end def
 
-    def _deepCopy(self):
+    def _deepCopy(self) -> Part:
         """Deep copy is used to create an entirely new copy of a Part in
         memory, rather than an instance pointer to an existing part.
 
@@ -3022,7 +3172,7 @@ class NucleicAcidPart(Part):
         # 2) Copy VirtualHelix Group
         new_part = self.copy(self._document, new_object=new_part)
         # 3) Copy oligos, populating the strandsets
-        for oligo, val in self._oligos:
+        for oligo in self._oligos:
             strandGenerator = oligo.strand5p().generator3pStrand()
             new_oligo = oligo._deepCopy(new_part)
             last_strand = None
@@ -3050,21 +3200,22 @@ class NucleicAcidPart(Part):
         return new_part
     # end def
 
-    def getVirtualHelixOrder(self):
+    def getVirtualHelixOrder(self) -> List[int]:
         """Returns the order of VirtualHelix items in the path view
         each element is the coord of the virtual helix
         """
         return self.getProperty('virtual_helix_order')
     # end def
 
-    def setImportedVHelixOrder(self, ordered_id_list, check_batch=True):
+    def setImportedVHelixOrder(self, ordered_id_list:  List[int],
+                                    check_batch: bool = True):
         """Used on file import to store the order of the virtual helices.
         TODO: do something with check_batch or remove it
         """
         self.setProperty('virtual_helix_order', ordered_id_list)
     # end def
 
-    def oligos(self):
+    def oligos(self) -> Set[OligoT]:
         """
         Returns:
             set: a reference to the part's oligo set.
@@ -3072,14 +3223,14 @@ class NucleicAcidPart(Part):
         return self._oligos
     # end def
 
-    def getOligoAt(self, id_num, strand_set, idx):
+    def getOligoAt(self, id_num: int, is_rev: int, idx: int) -> OligoT:
         """Convenience method. Given a id_num strand_set, idx, return
         the oligo at that location, if it exists. Otherwise return None.
 
         Args:
-            id_num (int): virtual helix ID number
-            strand_set (int): 0 for fwd, or 1 for rev :class:`StrandSet`
-            idx (int): index
+            id_num: virtual helix ID number
+            is_rev: 0 for fwd, or 1 for rev :class:`StrandSet`
+            idx: index
 
         Returns:
             Oligo: reference to oligo at (id_num, strand_set, idx) or None.
@@ -3092,7 +3243,7 @@ class NucleicAcidPart(Part):
             print('VH %d not found' % id_num, err)
             return None
 
-    def getNewAbstractSegmentId(self, segment):
+    def getNewAbstractSegmentId(self, segment: SegmentT) -> Tuple[int, int , int]:
         low_idx, high_idx = segment
         seg_id = next(self._abstract_segment_id)
         offset = self._current_base_count
@@ -3106,7 +3257,7 @@ class NucleicAcidPart(Part):
         self._current_base_count = 0
     # end def
 
-    def setAbstractSequences(self, emit_signals=False):
+    def setAbstractSequences(self, emit_signals: bool = False):
         """Reset, assign, and display abstract sequence numbers."""
         # reset all sequence numbers
         print("setting abstract sequence")
@@ -3126,11 +3277,18 @@ class NucleicAcidPart(Part):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def activeIdNum(self):
+    def activeIdNum(self) -> int:
         return self._active_id_num
     # end def
 
-    def setActive(self, is_active):
+    def setActive(self, is_active: bool):
+        '''Makr this the active ``Part`` in the ``Document``
+
+        emits ``partActiveChangedSignal``
+
+        Args:
+            is_active:
+        '''
         doc = self._document
         current_active_part = doc.activePart()
         if is_active:
@@ -3146,18 +3304,31 @@ class NucleicAcidPart(Part):
         self.partActiveChangedSignal.emit(self, is_active)
     # end def
 
-    def activeBaseIndex(self):
+    def activeBaseIndex(self) -> int:
         return self._active_base_index
     # end def
 
     def clearActiveVirtualHelix(self):
+        '''
+        emits ``partActiveVirtualHelixChangedSignal``
+        emits ``partActiveBaseInfoSignal``
+        '''
         self.active_base_info = active_base_info = ()
         self._active_id_num = id_num = -1
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, active_base_info)
     # end def
 
-    def setActiveVirtualHelix(self, id_num, is_fwd, idx=None):
+    def setActiveVirtualHelix(self, id_num: int, is_fwd: bool, idx: int = None):
+        '''Set the active virtual helix in the ``Part``
+        emits ``partActiveVirtualHelixChangedSignal``
+        emits ``partActiveBaseInfoSignal``
+
+        Args:
+            id_num: ID Number
+            is_fwd: this is relevant for tracking where was clicked in the GUI
+            idx: index
+        '''
         # if id_num != self._active_id_num:
         #     print("AVH change", id_num)
         abi = (id_num, is_fwd, idx, -1)
@@ -3171,16 +3342,22 @@ class NucleicAcidPart(Part):
     # end def
 
     def reemitActiveVirtualHelix(self):
+        '''
+        emits ``partActiveVirtualHelixChangedSignal``
+        emits ``partActiveBaseInfoSignal``
+        '''
         id_num, abi = self._active_id_num, self.active_base_info
         # print("reemit", self._active_id_num, self.active_base_info)
         self.partActiveVirtualHelixChangedSignal.emit(self, id_num)
         self.partActiveBaseInfoSignal.emit(self, abi)
     # end def
 
-    def setActiveBaseInfo(self, info):
+    def setActiveBaseInfo(self, info: ABInfoT):
         """ to_vh_num is not use as of now and may change
+        emits ``partActiveBaseInfoSignal``
+
         Args:
-            info (Tuple): id_num, is_fwd, idx, to_vh_num
+            info: id_num, is_fwd, idx, to_vh_num
 
         """
         # if info != self.active_base_info:
@@ -3192,19 +3369,19 @@ class NucleicAcidPart(Part):
         self.partActiveBaseInfoSignal.emit(self, info)
     # end def
 
-    def isVirtualHelixActive(self, id_num):
+    def isVirtualHelixActive(self, id_num: int) -> bool:
         """Is the argument id_num the active virtual_helix?
 
         Args:
-            id_num (int): ID number
+            id_num: ID number
 
         Returns:
-            bool
+            ``True`` if active
         """
         return id_num == self._active_id_num
     # end def
 
-    def insertions(self):
+    def insertions(self) -> dict:
         """Return dictionary of insertions."""
         return self._insertions
     # end def
@@ -3220,36 +3397,33 @@ class NucleicAcidPart(Part):
                 yield (id_num, idx, insertion.length())
     # end def
 
-    def isSelected(self):
+    def isSelected(self) -> bool:
         """Is this Part selected
-
-        Returns:
-            bool
         """
         return self.is_selected
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def setSelected(self, is_selected):
+    def setSelected(self, is_selected: bool):
         """Set the selectiveness of the Part
 
         Args:
-            is_selected (bool):
+            is_selected: set it
         """
         if is_selected != self._selected:
             self._selected = is_selected
             self.partSelectedChangedSignal.emit(self, is_selected)
     # end def
 
-    def getModID(self, strand, idx):
+    def getModID(self, strand: StrandT, idx: int) -> str:
         """Get the ID of a Mod
 
         Args:
-            strand (Strand):
-            idx (int):
+            strand:
+            idx:
 
         Returns:
-            str: ID of the Mod
+            ID of the Mod
         """
         id_num = strand.idNum()
         strandtype = strand.strandType()
@@ -3259,62 +3433,66 @@ class NucleicAcidPart(Part):
             return mods_strand[key]
     # end def
 
-    def getStrandModSequence(self, strand, idx, mod_type):
-        """Geet sequence of a Mod
+    def getStrandModSequence(self, strand: StrandT, idx: int, mod_type: int) -> str:
+        """Get sequence of a Mod
 
         Args:
-            strand (Strand):
-            idx (int):
-            mod_type (int): 0, 1, or 2
+            strand:
+            idx:
+            mod_type: 0, 1, or 2
 
         Returns:
-            str
+            sequence of the mod
         """
         mid = self.getModID(strand, idx)
         return self._document.getModSequence(mid, mod_type)
 
-    def _getModKeyTokens(self, key):
-        """ Get tokens from key
+    def _getModKeyTokens(self, key: str) -> Tuple[int, bool, int]:
+        """Get tokens from key
         Args:
-            key (str):
+            key:
 
         Returns:
-            tuple: id_num, is_fwd, idx
+            of the form::
+
+                id_num, is_fwd, idx
         """
         keylist = key.split(',')
         id_num = int(keylist[0])
-        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        is_fwd = int(keylist[1])    # enumeration of StrandEnum.FWD or StrandEnum.REV
         idx = int(keylist[2])
         return id_num, is_fwd, idx
     # end def
 
-    def getModStrandIdx(self, key):
-        """ Convert a key of a mod instance relative to a part
+    def getModStrandIdx(self, key: str) -> Tuple[StrandT, int]:
+        """Convert a key of a mod instance relative to a part
         to a strand and an index
 
         Args:
-            key (str):
+            key:
 
         Returns:
-            tuple: Strand, int
+            tuple of ``Strand`` and the index
         """
         keylist = key.split(',')
         id_num = int(keylist[0])
-        is_fwd = int(keylist[1])    # enumeration of StrandType.FWD or StrandType.REV
+        is_fwd = int(keylist[1])    # enumeration of StrandEnum.FWD or StrandEnum.REV
         idx = int(keylist[2])
         strand = self.getStrand(is_fwd, id_num, idx)
         return strand, idx
     # end def
 
-    def addModInstance(self, id_num, idx, is_rev, is_internal, mid):
+    def addModInstance(self, id_num: int, idx: int,
+                            is_rev: bool, is_internal: bool,
+                            mid: str):
         """Add an instance of a Mod given the Mod ID
 
         Args:
-            id_num (int):
-            idx (int):
-            is_rev (bool):
-            is_internal (bool):
-            mid (str): Mod ID
+            id_num:
+            idx:
+            is_rev:
+            is_internal:
+            mid: Mod ID
         """
         key = "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
@@ -3324,20 +3502,25 @@ class NucleicAcidPart(Part):
         self._addModInstanceKey(key, mods_strands, mid)
     # end def
 
-    def _addModInstanceKey(self, key, mods_strands, mid):
+    def _addModInstanceKey(self, key: str, mods_strands: dict, mid: str):
         """
         """
         mods_strands[key] = mid  # add to strand lookup
     # end def
 
-    def addModStrandInstance(self, strand, idx, mid, is_internal=False):
+    def addModStrandInstance(self, strand: StrandT,
+                                idx: int,
+                                mid: str,
+                                is_internal: bool = False):
         id_num = strand.idNum()
         strandtype = strand.strandType()
         if mid is not None:
             self.addModInstance(id_num, idx, strandtype, False, mid)
     # end def
 
-    def removeModInstance(self, id_num, idx, is_rev, is_internal, mid):
+    def removeModInstance(self, id_num: int, idx: int,
+                                is_rev: bool, is_internal: bool,
+                                mid: str):
         key = "{},{},{}".format(id_num, is_rev, idx)
         mods_strands = self._mods['int_instances'] if is_internal else self._mods['ext_instances']
         self._document.removeModInstance(mid, is_internal, self, key)
@@ -3345,13 +3528,16 @@ class NucleicAcidPart(Part):
             del mods_strands[key]
     # end def
 
-    def removeModStrandInstance(self, strand, idx, mid, is_internal=False):
+    def removeModStrandInstance(self, strand: StrandT, idx: int,
+                                    mid: str,
+                                    is_internal: bool = False):
         """
         Args:
-            strand (Strand):
-            idx (int):
-            mid (str): Mod ID
-            is_internal (bool, optional): Default is False
+            strand:
+            idx:
+            mid: Mod ID
+            is_internal: Default is False
+
         """
         id_num = strand.idNum()
         strandtype = strand.strandType()
@@ -3359,11 +3545,11 @@ class NucleicAcidPart(Part):
             self.removeModInstance(id_num, idx, strandtype, is_internal, mid)
     # end def
 
-    def dumpModInstances(self, is_internal):
+    def dumpModInstances(self, is_internal: bool):
         """Serialize a Mod Instance
 
         Args:
-            is_internal (bool):
+            is_internal:
 
         Yields:
             tuple: (id_num, is_fwd, idx, mid)
@@ -3374,29 +3560,29 @@ class NucleicAcidPart(Part):
             yield (id_num, is_fwd, idx, mid)
     # end def
 
-    def getGridType(self):
+    def getGridType(self) -> EnumType:
         # TODO[NF]:  Docstring
         return self._group_properties.get('grid_type')
 
-    def setGridType(self, grid_type):
+    def setGridType(self, grid_type: EnumType):
         # TODO[NF]:  Docstring
-        self._group_properties.setdefault(grid_type, GridType.HONEYCOMB)
+        self._group_properties.setdefault(grid_type, GridEnum.HONEYCOMB)
 # end class
 
 
-def distanceToPoint(origin, direction, point):
+def distanceToPoint(origin: Vec3T, direction: Vec3T, point: Vec3T) -> float:
     """Distance of a line to a point
 
     See:
     http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
 
     Args:
-        origin (array_like): of :obj:`float`, length 3, a starting point for the line
-        direction (array-like): of :obj:`float`, length 3, the direction of the line
-        point (array-like): of :obj:`float`, length 3, the point of interest
+        origin: of :obj:`float`, length 3, a starting point for the line
+        direction: of :obj:`float`, length 3, the direction of the line
+        point: of :obj:`float`, length 3, the point of interest
 
     Returns:
-        float: R squared distance
+        R squared distance
     """
     direction_distance = np.dot(point - origin, direction)
     # point behind the ray
@@ -3410,20 +3596,20 @@ def distanceToPoint(origin, direction, point):
 # end def
 
 
-def remapSlice(start, stop, length):
+def remapSlice(start: int, stop: int, length: int) -> Tuple[int, int]:
     """Remap a slice to positive indices for a given
     length
 
     Args:
-        start (int): index
-        stop (int): index
-        length (int): span
+        start: index
+        stop: index
+        length: span
 
     Returns
-        tuple: of :obj:`int`, positive start and stop index
+        tuple of :obj:`int`, positive start and stop index
 
     Raises:
-        IndexError:
+        IndexError: Stop must be >= to start index
     """
     new_start = length - start if start < 0 else start
     new_stop = length - stop if stop < 0 else stop

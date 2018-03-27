@@ -1,7 +1,7 @@
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from .cnoutlineritem import (CNOutlinerItem, LEAF_FLAGS)
-from cadnano.views.abstractitems.abstractoligoitem import AbstractOligoItem
-from cadnano.controllers.oligoitemcontroller import OligoItemController
+from cadnano.views.abstractitems import AbstractOligoItem
+from cadnano.controllers import OligoItemController
 
 
 class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
@@ -9,6 +9,7 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
 
     def __init__(self, model_oligo, parent):
         super(OutlineOligoItem, self).__init__(model_oligo, parent)
+        self._model_oligo = model_oligo
         self.setFlags(LEAF_FLAGS)
         self._controller = OligoItemController(self, model_oligo)
     # end def
@@ -19,7 +20,7 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def itemType(self):
-        return ItemType.OLIGO
+        return ItemEnum.OLIGO
     # end def
 
     def isModelSelected(self, document):
@@ -36,5 +37,11 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
     def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
         if self._cn_model == model_oligo:
             self.setValue(key, new_value)
+    # end def
+
+    def oligoSelectedChangedSlot(self, model_oligo, new_value):
+        if (self._cn_model == model_oligo and
+            self.isSelected() != new_value):
+            self.setSelected(new_value)
     # end def
 # end class

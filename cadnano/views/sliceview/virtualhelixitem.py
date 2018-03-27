@@ -11,12 +11,13 @@ from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
 from cadnano.views.pathview import pathstyles
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.controllers import VirtualHelixItemController
+from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 
 from . import slicestyles as styles
 from .sliceextras import WedgeGizmo, WEDGE_RECT
+from . import SliceNucleicAcidPartItemT
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,18 +51,19 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     FILTER_NAME = 'virtual_helix'
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num: int, part_item: SliceNucleicAcidPartItemT):
         """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: the part item
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._doc_controller = part_item.document().controller()
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
 
         self.hide()
+        self._viewroot = part_item._viewroot
         model_part = self._model_part
         x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         # set position to offset for radius
@@ -224,24 +226,22 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
 
     def createToolMousePress(self, tool, part_item, event):
         shift = event.modifiers() & Qt.ShiftModifier
-        idx_low, idx_high = self._model_part.getProperty('workplane_idxs')
-        idx_low = int(idx_low)
-        idx_high = int(idx_high-1)
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
+        idx_high = fwd_ss.length() - 1
 
         parity = self._id_num % 2
         c = random.choice(pathstyles.STAP_COLORS) if shift else None
 
         if parity:
             if shift:
-                fwd_ss.createStrand(idx_low, idx_high, color=c)
+                fwd_ss.createStrand(0, idx_high, color=c)
             else:
-                rev_ss.createStrand(idx_low, idx_high, color=c)
+                rev_ss.createStrand(0, idx_high, color=c)
         else:
             if shift:
-                rev_ss.createStrand(idx_low, idx_high, color=c)
+                rev_ss.createStrand(0, idx_high, color=c)
             else:
-                fwd_ss.createStrand(idx_low, idx_high, color=c)
+                fwd_ss.createStrand(0, idx_high, color=c)
 
     def selectToolMousePress(self, tool, part_item, event):
         """The event handler for when the mouse button is pressed inside this
@@ -291,6 +291,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._label = None
         self._part_item = None
         self._model_part = None
+        self._viewroot = None
         self.scene().removeItem(self)
     # end def
 
@@ -298,7 +299,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Check item's current visibility, color and active state, and sets
         pen, brush, text according to style defaults.
         """
-        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
+        is_visible, color = self._model_part.getVirtualHelixProperties(self._id_num, ['is_visible', 'color'])
         if is_visible:
             self.show()
         else:
@@ -403,8 +404,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
-
-        nvhi_name = nvhi.cnModel().getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)
@@ -412,7 +411,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             color = '#5a8bff'
         else:
             color = '#cc0000'
-            nvhi_name = nvhi_name + '*'  # mark as invalid
         line.setLength(_RADIUS)
         if neighbor_virtual_helix in wg_dict:
             wedge_item = wg_dict[neighbor_virtual_helix]

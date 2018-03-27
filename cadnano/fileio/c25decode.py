@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import StrandType, LatticeType
+from cadnano.proxies.cnenum import StrandEnum, LatticeEnum
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import setBatch, getReopen, setReopen
@@ -29,7 +29,7 @@ def decode(document, obj, emit_signals=True):
     """
     num_bases = len(obj['vstrands'][0]['fwd_ss'])
 
-    lattice_type = LatticeType.HONEYCOMB
+    lattice_type = LatticeEnum.HONEYCOMB
 
     part = None
     # DETERMINE MAX ROW,COL
@@ -39,11 +39,11 @@ def decode(document, obj, emit_signals=True):
         max_col_json = max(max_col_json, int(helix['col']) + 1)
 
     # CREATE PART ACCORDING TO LATTICE TYPE
-    if lattice_type == LatticeType.HONEYCOMB:
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
+    if lattice_type == LatticeEnum.HONEYCOMB:
+        doLattice = HoneycombDnaPart.latticeCoordToModelXY
         isEven = HoneycombDnaPart.isEvenParity
-    elif lattice_type == LatticeType.SQUARE:
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+    elif lattice_type == LatticeEnum.SQUARE:
+        doLattice = SquareDnaPart.latticeCoordToModelXY
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")
@@ -153,12 +153,12 @@ def decode(document, obj, emit_signals=True):
 
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i,
+                if isSegmentStartOrEnd(StrandEnum.SCAFFOLD, vh_num, i,
                                        five_vh, five_idx, three_vh, three_idx):
                     fwd_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     fwd_ss_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.SCAFFOLD, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.SCAFFOLD, vh_num, i, three_vh, three_idx):
                     fwd_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
             assert (len(fwd_ss_seg[vh_num]) % 2 == 0)
 
@@ -173,12 +173,12 @@ def decode(document, obj, emit_signals=True):
                 five_vh, five_strand, five_idx, three_vh, three_strand, three_idx = rev_ss[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i,
+                if isSegmentStartOrEnd(StrandEnum.STAPLE, vh_num, i,
                                        five_vh, five_idx, three_vh, three_idx):
                     rev_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     rev_ss_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.STAPLE, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.STAPLE, vh_num, i, three_vh, three_idx):
                     rev_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
             assert (len(rev_ss_seg[vh_num]) % 2 == 0)
 
@@ -310,7 +310,7 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
     Returns:
         bool: True if the base is a breakpoint or crossover.
     """
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1
@@ -348,7 +348,7 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
         return False
     if vh_num != three_vh:
         return True
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1

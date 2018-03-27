@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridType, SliceViewType
+from cadnano.proxies.cnenum import GridEnum, OrthoViewEnum, EnumType
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -58,12 +58,6 @@ class DocumentController(object):
         # call other init methods
         self._initWindow()
         app().document_controllers.add(self)
-
-        self.toggleGridView(show=False)
-
-        self.slice_view_showing = True
-        self.grid_view_showing = False
-        self.exit_when_done = False
 
         self.exit_when_done = False
 
@@ -171,6 +165,8 @@ class DocumentController(object):
             (win.action_filter_rev.triggered, self.actionFilterRevSlot),
             (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
             (win.action_filter_stap.triggered, self.actionFilterStapSlot),
+            (win.action_copy.triggered, self.actionCopySlot),
+            (win.action_paste.triggered, self.actionPasteSlot),
 
             (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
             (win.action_path.triggered, self.actionTogglePathViewSlot),
@@ -192,6 +188,7 @@ class DocumentController(object):
     # end def
 
     def actionCreateForkSlot(self):
+        self._document.clearAllSelected()
         win = self.win
         win.action_vhelix_create.trigger()
         win.action_path_create.trigger()
@@ -346,6 +343,21 @@ class DocumentController(object):
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_stap.setChecked(True)
         self._strandFilterUpdate()
+    # end def
+
+    def actionCopySlot(self):
+        win = self.win
+        select_tool = win.getMouseViewTool('select')
+        if select_tool is not None and hasattr(select_tool, 'copySelection'):
+            print("select_tool is rolling")
+            select_tool.copySelection()
+    # end def
+
+    def actionPasteSlot(self):
+        win = self.win
+        select_tool = win.getMouseViewTool('select')
+        if select_tool is not None and hasattr(select_tool, 'pasteClipboard'):
+            select_tool.pasteClipboard()
     # end def
 
     def actionFilterFwdSlot(self):
@@ -598,11 +610,11 @@ class DocumentController(object):
 
     def actionCreateNucleicAcidPartHoneycomb(self):
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridType.HONEYCOMB)
+        self.actionCreateNucleicAcidPart(grid_type=GridEnum.HONEYCOMB)
 
     def actionCreateNucleicAcidPartSquare(self):
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridType.SQUARE)
+        self.actionCreateNucleicAcidPart(grid_type=GridEnum.SQUARE)
 
     def actionCreateNucleicAcidPart(self, grid_type):
         # TODO[NF]:  Docstring
@@ -623,11 +635,19 @@ class DocumentController(object):
     # end def
 
     def actionToggleSliceViewSlot(self):
-        dock_window = self.win.slice_dock_widget
-        if dock_window.isVisible():
-            dock_window.hide()
+        """Handle the action_slice button being clicked.
+
+        If either the slice or grid view are visible hide them.  Else, revert
+        to showing whichever view(s) are showing.
+        """
+        if self.win.slice_dock_widget.isVisible() or self.win.grid_dock_widget.isVisible():
+            self.win.slice_dock_widget.hide()
+            self.win.grid_dock_widget.hide()
         else:
-            dock_window.show()
+            if self.slice_view_showing:
+                self.win.slice_dock_widget.show()
+            if self.grid_view_showing:
+                self.win.grid_dock_widget.show()
     # end def
 
     def actionTogglePathViewSlot(self):
@@ -646,7 +666,7 @@ class DocumentController(object):
             dock_window.show()
     # end def
 
-    def toggleNewPartButtons(self, is_enabled):
+    def toggleNewPartButtons(self, is_enabled: bool):
         """Toggle the AddPart buttons when the active part changes.
 
         Args:
@@ -658,37 +678,70 @@ class DocumentController(object):
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
-    def toggleSliceView(self, show):
-        """Hide or show the slice view based on the given parameter `show`
+    def setSliceOrGridViewVisible(self, view_type: EnumType):
+        """
+        Args:
+            view_type: type of view enum
+
+        Raises:
+            ValueError for unknown ``view_type``.
+        """
+        if view_type == OrthoViewEnum.SLICE:
+            self.toggleSliceView(True)
+            self.toggleGridView(False)
+        elif view_type == OrthoViewEnum.GRID:
+            self.toggleSliceView(False)
+            self.toggleGridView(True)
+        else:
+            raise ValueError('Invalid orthoview value: %s' % value)
+    # end def
+
+    def toggleSliceView(self, show: bool):
+        """Hide or show the slice view based on the given parameter `show`.
+
+        Since calling this method where show=True will cause the SliceView to
+        show, ensure that the action_slice button is checked if applicable.
 
         Args:
-            show (bool): Whether the slice view should be hidden or shown
+            show: Whether the slice view should be hidden or shown
 
-        Returns: None
         """
-        slice_view = self.win.slice_graphics_view
+        assert isinstance(show, bool)
+
+        slice_view_widget = self.win.slice_dock_widget
+        path_view_widget = self.win.path_dock_widget
         if show:
+            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
+            self.win.action_slice.setChecked(True)
             self.slice_view_showing = True
-            slice_view.show()
+            slice_view_widget.show()
         else:
             self.slice_view_showing = False
-            slice_view.hide()
+            slice_view_widget.hide()
+    # end def
 
-    def toggleGridView(self, show):
+    def toggleGridView(self, show: bool):
         """Hide or show the grid view based on the given parameter `show`
 
-        Args:
-            show (bool): Whether the grid view should be hidden or shown
+        Since calling this method where show=True will cause the SliceView to
+        show, ensure that the action_slice button is checked if applicable.
 
-        Returns: None
+        Args:
+            show: Whether the grid view should be hidden or shown
         """
-        grid_view = self.win.grid_graphics_view
+        assert isinstance(show, bool)
+
+        grid_view_widget = self.win.grid_dock_widget
+        path_view_widget = self.win.path_dock_widget
         if show:
+            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
+            self.win.action_slice.setChecked(True)
             self.grid_view_showing = True
-            grid_view.show()
+            grid_view_widget.show()
         else:
             self.grid_view_showing = False
-            grid_view.hide()
+            grid_view_widget.hide()
+    # end def
 
     ### ACCESSORS ###
     def document(self):
@@ -1011,35 +1064,3 @@ class DocumentController(object):
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
-
-    def getSliceViewType(self):
-        # TODO[NF]:  Make these strings global constants
-        if self.slice_view_showing and self.grid_view_showing:
-            return SliceViewType.BOTH
-        elif self.slice_view_showing and not self.grid_view_showing:
-            return SliceViewType.SLICE
-        elif not self.slice_view_showing and self.grid_view_showing:
-            return SliceViewType.GRID
-        else:
-            raise NotImplementedError
-
-    def setSliceViewType(self, slice_view_type):
-        if slice_view_type not in (SliceViewType.BOTH, SliceViewType.SLICE, SliceViewType.GRID):
-            # logger.error('slice_view_type is invalid:  %s' % slice_view_type)
-            print('slice_view_type is invalid:  %s' % slice_view_type)
-
-        if slice_view_type == SliceViewType.BOTH:
-            self.grid_view_showing = True
-            self.toggleGridView(show=True)
-            self.slice_view_showing = True
-            self.toggleSliceView(show=True)
-        elif slice_view_type == SliceViewType.SLICE:
-            self.grid_view_showing = False
-            self.toggleGridView(show=False)
-            self.slice_view_showing = True
-            self.toggleSliceView(show=True)
-        elif slice_view_type == SliceViewType.GRID:
-            self.grid_view_showing = True
-            self.toggleGridView(show=True)
-            self.slice_view_showing = False
-            self.toggleSliceView(show=False)

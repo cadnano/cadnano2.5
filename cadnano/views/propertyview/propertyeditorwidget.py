@@ -4,6 +4,8 @@ Attributes:
     COLOR_PATTERN (TYPE): Description
 """
 import re
+from typing import List, Set
+
 from PyQt5.QtCore import Qt, QRect
 from PyQt5.QtGui import QFont, QPalette
 from PyQt5.QtWidgets import QTreeWidget, QHeaderView
@@ -11,9 +13,9 @@ from PyQt5.QtWidgets import QStyledItemDelegate
 from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
 from PyQt5.QtWidgets import QStyle, QCommonStyle
 
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.gui.palette import getBrushObj
-from cadnano.controllers.viewrootcontroller import ViewRootController
+from cadnano.controllers import ViewRootController
 from cadnano.views.pathview import pathstyles as styles
 
 from .oligoitem import OligoSetItem
@@ -39,8 +41,9 @@ class PropertyEditorWidget(QTreeWidget):
             parent (None, optional): Description
         """
         super(PropertyEditorWidget, self).__init__(parent)
-        self._cn_model_set = set()
-        self._cn_model_list = []
+        self._outline_view_obj_set = set()
+        self._outline_view_obj_list = []
+        self.are_signals_enabled = True
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
     # end def
 
@@ -117,8 +120,8 @@ class PropertyEditorWidget(QTreeWidget):
         selected_items = o.selectedItems()
 
         self.clear()    # remove pre-existing items
-        self._cn_model_set.clear()
-        self._cn_model_list = []
+        self._outline_view_obj_set.clear()
+        self._outline_view_obj_list = []
         # print("prop multiple selected:", len(selected_items))
         # if len(selected_items):
         #     print(selected_items[0])
@@ -127,22 +130,23 @@ class PropertyEditorWidget(QTreeWidget):
         item_types = set([item.itemType() for item in selected_items])
         num_types = len(item_types)
         if num_types != 1:  # assume no mixed types for now
-            print("outlinerItemSelectionChanged returning1")
+            # print("outlinerItemSelectionChanged returning1")
+            # print(item_types)
             return
         item_type = item_types.pop()
-        cn_model_list = [item.cnModel() for item in selected_items if item.isSelected()]
+        outline_view_obj_list = [item.outlineViewObj() for item in selected_items if item.isSelected()]
 
         '''Workaround as items in QTreeWidget.selectedItems() may be not
         actually selected
         '''
-        if len(cn_model_list) == 0:
-            print("outlinerItemSelectionChanged returning2")
+        if len(outline_view_obj_list) == 0:
+            # print("outlinerItemSelectionChanged returning2")
             return
-        self._cn_model_set = set(cn_model_list)
-        self._cn_model_list = cn_model_list
+        self._outline_view_obj_set = set(outline_view_obj_list)
+        self._outline_view_obj_list = outline_view_obj_list
 
         # special case for parts since there is currently no part filter
-        if item_type is ItemType.NUCLEICACID:
+        if item_type is ItemEnum.NUCLEICACID:
             pe_item = NucleicAcidPartSetItem(parent=self)
             self.show()
             return
@@ -151,22 +155,22 @@ class PropertyEditorWidget(QTreeWidget):
         if item.FILTER_NAME not in self._document.filter_set:
             print(item.FILTER_NAME, "not in self._document.filter_set")
             return
-        if item_type is ItemType.OLIGO:
+        if item_type is ItemEnum.OLIGO:
             pe_item = OligoSetItem(parent=self)
             self.show()
-        elif item_type is ItemType.VIRTUALHELIX:
+        elif item_type is ItemEnum.VIRTUALHELIX:
             pe_item = VirtualHelixSetItem(parent=self)
             self.show()
         else:
             raise NotImplementedError
     # end def
 
-    def partAddedSlot(self, sender, model_part):
+    def partAddedSlot(self, sender, model_part_instance):
         """Summary
 
         Args:
             sender (obj): Model object that emitted the signal.
-            model_part (Part): The model part
+            model_part_instance (ObjectInstance): The model part
 
         Returns:
             TYPE: Description
@@ -212,15 +216,16 @@ class PropertyEditorWidget(QTreeWidget):
         """
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
+    def selectionFilterChangedSlot(self, filter_name_set):
         """Summary
 
         Args:
-            filter_name_list (TYPE): Description
+            filter_name_set (set): Description
 
         Returns:
             TYPE: Description
         """
+        pass
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -232,6 +237,7 @@ class PropertyEditorWidget(QTreeWidget):
         Returns:
             TYPE: Description
         """
+        pass
     # end def
 
     def resetRootItemSlot(self, doc):
@@ -256,12 +262,12 @@ class PropertyEditorWidget(QTreeWidget):
         return self._window
     # end def
 
-    def cnModelSet(self):
-        return self._cn_model_set
+    def outlineViewObjSet(self) -> set:
+        return self._outline_view_obj_set
     # end def
 
-    def cnModelList(self):
-        return self._cn_model_list
+    def outlineViewObjList(self) -> list:
+        return self._outline_view_obj_list
     # end def
 
     ### METHODS ###

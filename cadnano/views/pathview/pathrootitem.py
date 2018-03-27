@@ -1,22 +1,39 @@
-"""Summary
-"""
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsRectItem
+# -*- coding: utf-8 -*-
+from typing import List, Set
 
+from PyQt5.QtCore import (
+                        Qt,
+                        QRectF
+)
+from PyQt5.QtWidgets import (
+                            QGraphicsRectItem,
+                            QGraphicsItem,
+                            QGraphicsSceneMouseEvent
+)
+from PyQt5.QtGui import QKeyEvent
+
+from cadnano.objectinstance import ObjectInstance
 from cadnano import util
-from cadnano.proxies.cnenum import PartType
-from cadnano.controllers.viewrootcontroller import ViewRootController
+from cadnano.proxies.cnenum import PartEnum
+from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import PathNucleicAcidPartItem
-
+from .tools.pathselection import SelectionItemGroup
+from cadnano.views.pathview import PathToolManagerT
+from cadnano.cntypes import (
+                                WindowT,
+                                DocT,
+                                NucleicAcidPartT
+)
 
 class PathRootItem(QGraphicsRectItem):
-    """
-    PathRootItem is the root item in the PathView. It gets added directly
-    to the pathscene by DocumentWindow. It receives two signals
-    (partAddedSignal and documentSelectedPartChangedSignal)
-    via its ViewRootController.
+    """``PathRootItem`` is the root item in the PathView. It gets added directly
+    to the pathscene by ``DocumentWindow``. It receives two signals::
 
-    PathRootItem must instantiate its own controller to receive signals
+        partAddedSignal and documentSelectedPartChangedSignal
+
+    via its ``ViewRootController``.
+
+    ``PathRootItem`` must instantiate its own controller to receive signals
     from the model.
 
     Attributes:
@@ -28,14 +45,17 @@ class PathRootItem(QGraphicsRectItem):
     findChild = util.findChild  # for debug
     name = 'path'
 
-    def __init__(self, rect, parent, window, document):
+    def __init__(self,  rect: QRectF,
+                        parent: QGraphicsItem,
+                        window: WindowT,
+                        document: DocT):
         """Summary
 
         Args:
-            rect (TYPE): Description
-            parent (TYPE): Description
-            window (TYPE): Description
-            document (TYPE): Description
+            rect: Rectangle of this item
+            parent: parent object
+            window: DocumentWindow
+            document: Document
         """
         super(PathRootItem, self).__init__(rect, parent)
         self._window = window
@@ -46,141 +66,120 @@ class PathRootItem(QGraphicsRectItem):
         self._prexover_filter = None
         self.manager = None
         self.select_tool = None
+        self.are_signals_on: bool = True
+        self.setFlag(QGraphicsItem.ItemHasNoContents)
     # end def
 
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partItems(self):
-        """Summary
-
+    def partItems(self) -> List[ObjectInstance]:
+        """
         Returns:
-            iterator: Description
+            iterator: of all ``PathNucleicAcidPartItem``s in the view
         """
         return self._part_item_for_part_instance.values()
 
-    def partItemForPart(self, part):
-        """Summary
-
+    def partItemForPart(self, part: NucleicAcidPartT) -> ObjectInstance:
+        """
         Args:
-            part (TYPE): Description
+            part: The model Part
 
         Returns:
-            TYPE: Description
+            The :obj:`ObjectInstance` of the :obj:`NucleicAcidPart`
         """
         return self._part_item_for_part_instance[part]
 
-    def partAddedSlot(self, sender, model_part_instance):
-        """
-        Receives notification from the model that a part has been added.
+    def partAddedSlot(self, sender: NucleicAcidPartT,
+                            part_instance: ObjectInstance):
+        """Receives notification from the model that a part has been added.
         The Pathview doesn't need to do anything on part addition, since
         the Sliceview handles setting up the appropriate lattice.
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            model_part_instance (TYPE): Description
+            sender: Model object that emitted the signal.
+            part_instance: ``ObjectInstance``
 
         Raises:
-            NotImplementedError: Description
+            NotImplementedError: for unknown ``part_type``
         """
-        win = self._window
-        part_type = model_part_instance.reference().partType()
+        if self.are_signals_on:
+            win = self._window
+            part_type = part_instance.reference().partType()
 
-        if part_type == PartType.PLASMIDPART:
-            pass
-        elif part_type == PartType.NUCLEICACIDPART:
-            na_part_item = PathNucleicAcidPartItem(model_part_instance, viewroot=self, parent=self)
-            self._part_item_for_part_instance[model_part_instance] = na_part_item
-            win.path_tool_manager.setActivePart(na_part_item)
-        else:
-            raise NotImplementedError
+            if part_type == PartEnum.PLASMIDPART:
+                pass
+            elif part_type == PartEnum.NUCLEICACIDPART:
+                na_part_item = PathNucleicAcidPartItem(part_instance, viewroot=self)
+                self._part_item_for_part_instance[part_instance] = na_part_item
+                win.path_tool_manager.setActivePart(na_part_item)
+            else:
+                raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
-    def clearSelectionsSlot(self, doc):
-        """Summary
-
-        Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+    def clearSelectionsSlot(self, doc: DocT):
         """
-        # print("yargh!!!!")
+        Args:
+            doc: ``Document``
+        """
         self.select_tool.resetSelections()
         self.scene().views()[0].clearSelectionLockAndCallbacks()
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_set):
-        """Summary
-
+    def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
+        """
         Args:
-            filter_name_set (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            filter_name_set: the set of all filters enabled
         """
         self.select_tool.clearSelections(False)
     # end def
 
-    def preXoverFilterChangedSlot(self, filter_name):
-        """Summary
-
-        Args:
-            filter_name (TYPE): Description
-
-        Returns:
-            TYPE: Description
+    def preXoverFilterChangedSlot(self, filter_name: str):
         """
-        print("path updating preXovers", filter_name)
+        Args:
+            filter_name: the name of the filter
+        """
+        # print("path updating preXovers", filter_name)
         self._prexover_filter = filter_name
     # end def
 
-    def resetRootItemSlot(self, doc):
-        """Summary
-
+    def resetRootItemSlot(self, doc: DocT):
+        """
         Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            doc: ``Document``
         """
         self.select_tool.resetSelections()
         self.scene().views()[0].clearGraphicsView()
     # end def
 
     ### ACCESSORS ###
-    def window(self):
-        """Summary
-
+    def window(self) -> WindowT:
+        """
         Returns:
-            TYPE: Description
+            The :obj:`DocumentWindow`
         """
         return self._window
     # end def
 
-    def document(self):
-        """Summary
-
+    def document(self) -> DocT:
+        """
         Returns:
-            TYPE: Description
+            The :obj:`Document`
         """
         return self._document
     # end def
 
     ### PUBLIC METHODS ###
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_F:
             self.scene().views()[0].zoomToFit()
     # end def
 
-    def removePartItem(self, part_item):
-        """Summary
-
+    def removePartItem(self, part_item: PathNucleicAcidPartItem):
+        """
         Args:
-            part_item (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item: Remove the ``PartItem`` from the dicitionary
+            of instances
         """
         for k in self._part_item_for_part_instance.keys():
             if k == part_item:
@@ -188,108 +187,87 @@ class PathRootItem(QGraphicsRectItem):
                 return
     # end def
 
-    def resetDocumentAndController(self, document):
-        """docstring for resetDocumentAndController
-
+    def resetDocumentAndController(self, document: DocT):
+        """
         Args:
-            document (TYPE): Description
+            document: Description
         """
         self._document = document
         self._controller = ViewRootController(self, document)
     # end def
 
-    def setModifyState(self, bool):
-        """docstring for setModifyState
-
+    def setModifyState(self, is_on: bool):
+        """
         Args:
-            bool (TYPE): Description
+            is_on: Description
         """
         for part_item in self._part_item_for_part_instance.values():
-            part_item.setModifyState(bool)
+            part_item.setModifyState(is_on)
     # end def
 
-    def selectionFilterSet(self):
-        """Summary
-
+    def selectionFilterSet(self) -> Set[str]:
+        """
         Returns:
-            TYPE: Description
+            ``Document`` filter set
         """
         return self._document.filter_set
     # end def
 
-    def vhiHandleSelectionGroup(self):
-        """Summary
-
+    def vhiHandleSelectionGroup(self) -> SelectionItemGroup:
+        """
         Returns:
-            TYPE: Description
+            the selection group
         """
         return self.select_tool.vhi_h_selection_group
     # end def
 
-    def strandItemSelectionGroup(self):
-        """Summary
-
+    def strandItemSelectionGroup(self) -> SelectionItemGroup:
+        """
         Returns:
-            TYPE: Description
+            the selection group
         """
         return self.select_tool.strand_item_selection_group
     # end def
 
-    def selectionLock(self):
-        """Summary
-
+    def selectionLock(self) -> SelectionItemGroup:
+        """
         Returns:
-            TYPE: Description
+            ``SelectionItemGroup`` or ``None``
         """
         return self.scene().views()[0].selectionLock()
     # end def
 
-    def setSelectionLock(self, locker):
-        """Summary
-
+    def setSelectionLock(self, locker: SelectionItemGroup):
+        """
         Args:
-            locker (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            locker: Description
         """
         self.scene().views()[0].setSelectionLock(locker)
     # end def
 
-    def setManager(self, manager):
-        """Summary
-
+    def setManager(self, manager: PathToolManagerT):
+        """
         Args:
-            manager (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            manager: The tool manager
         """
         self.manager = manager
         self.select_tool = manager.select_tool
     # end def
 
     def clearSelectionsIfActiveTool(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         if self.manager.isSelectToolActive():
             self.select_tool.clearSelections(False)
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
-            coordinates of the the event, and previous event.
-
-        Returns:
-            TYPE: Description
+            event: Contains item, scene, and screen coordinates of the event,
+                and previous event.
         """
-        print("ADSDsadf")
         self.clearSelectionsIfActiveTool()
         return QGraphicsRectItem.mousePressEvent(self, event)
 # end class

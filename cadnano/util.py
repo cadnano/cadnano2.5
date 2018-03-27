@@ -16,6 +16,10 @@ logger = logging.getLogger(__name__)
 
 IS_PY_3 = int(sys.version_info[0] > 2)
 
+relpath = os.path.relpath
+dirname = os.path.dirname
+abspath = os.path.abspath
+CADNANO_PATH = dirname(abspath(__file__))
 
 def clamp(x, min_x, max_x):
     if x < min_x:
@@ -474,3 +478,14 @@ def qtdb_resume():
     from PyQt5.QtCore import pyqtRestoreInputHook
 
     pyqtRestoreInputHook()
+
+
+def to_dot_path(filename):
+    # print(filename)
+    # print(CADNANO_PATH)
+    subpath = relpath(dirname(abspath(filename)), CADNANO_PATH)
+    if sys.platform == 'win32':
+        subpath = subpath.replace('\\', '.')
+    else:
+        subpath = subpath.replace('/', '.')
+    return 'cadnano.' + subpath

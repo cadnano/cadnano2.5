@@ -23,7 +23,7 @@ from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 from cadnano import util
 from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
 from cadnano.gui.palette import getBrushObj, getNoBrush
-from cadnano.proxies.cnenum import Axis, HandleType, StrandType
+from cadnano.proxies.cnenum import AxisEnum, HandleEnum, StrandEnum
 from cadnano.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 
@@ -134,10 +134,7 @@ class PropertyWrapperObject(QObject):
         return self.animations.get(property_name)
 
     def destroy(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Remove this object and references to it from the view
         """
         self.item = None
         self.animations = None
@@ -406,7 +403,7 @@ class PreXoverItem(QGraphicsRectItem):
         # self.setParentItem(to_vh_item)
         self.resetTransform()
         self._id_num = from_virtual_helix_item.idNum()
-        self._model_vh = from_virtual_helix_item.cnModel()
+        self._model_part = from_virtual_helix_item.part()
         self.idx = from_index
         self.is_low = False
         self.is_high = False
@@ -450,11 +447,11 @@ class PreXoverItem(QGraphicsRectItem):
             Args:
                 from_virtual_helix_item (:obj:`VirtualHelixItem`):
             """
-            part = self._model_vh.part()
+            part = self._model_part
             idx = self.idx
             is_fwd = self.is_fwd
             id_num = self._id_num
-            strand_type = StrandType.FWD if is_fwd else StrandType.REV
+            strand_type = StrandEnum.FWD if is_fwd else StrandEnum.REV
 
             # relative position info
             bpr = from_virtual_helix_item.getProperty('bases_per_repeat')
@@ -565,7 +562,7 @@ class PreXoverItem(QGraphicsRectItem):
             (self.FILTER_NAME not in current_filter_set) ):
             return
 
-        part = self._model_vh.part()
+        part = self._model_part
         is_fwd = self.is_fwd
 
         if self.is3p:
@@ -786,7 +783,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
 
         self._model_part = model_part
         self._part_item = part_item
-        self._idx_low, self._idx_high = model_part.getProperty('workplane_idxs')
+
         self._low_drag_bound = 0  # idx, not pos
         self._high_drag_bound = model_part.getProperty('max_vhelix_length')  # idx, not pos
         self._moving_via_handle = False
@@ -796,9 +793,9 @@ class PathWorkplaneItem(QGraphicsRectItem):
                                                      self._HANDLE_SIZE,
                                                      styles.BLUE_STROKE,
                                                      True,
-                                                     HandleType.LEFT | HandleType.RIGHT,
+                                                     HandleEnum.LEFT | HandleEnum.RIGHT,
                                                      self,
-                                                     translates_in=Axis.X)
+                                                     translates_in=AxisEnum.X)
 
         # Minimum size hint (darker internal rect, visible during resizing)
         self.model_bounds_hint = m_b_h = QGraphicsRectItem(self)
@@ -807,21 +804,21 @@ class PathWorkplaneItem(QGraphicsRectItem):
         m_b_h.hide()
 
         # Low and high idx labels
-        self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
-        self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+        self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
+        self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
     # end def
 
     def getModelMinBounds(self, handle_type=None):
         """Resize bounds in form of Qt position, scaled from model."""
         # TODO: fix bug preventing dragging in imported files
-        if handle_type and handle_type & HandleType.LEFT:
+        if handle_type and handle_type & HandleEnum.LEFT:
             xTL = (self._idx_high-self._MIN_WIDTH)*BASE_WIDTH
             xBR = self._idx_high*BASE_WIDTH
-        elif handle_type and handle_type & HandleType.RIGHT:
+        elif handle_type and handle_type & HandleEnum.RIGHT:
             xTL = (self._idx_low+self._MIN_WIDTH)*BASE_WIDTH
             xBR = (self._idx_low)*BASE_WIDTH
-        else:  # default to HandleType.RIGHT behavior for all types
-            print("No HandleType?")
+        else:  # default to HandleEnum.RIGHT behavior for all types
+            print("No HandleEnum?")
             xTL = 0
             xBR = self._high_drag_bound*BASE_WIDTH
         yTL = self._part_item._vh_rect.top()
@@ -863,7 +860,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
             xTL = max(top_left[0], self._low_drag_bound)
             xTL = xTL - (xTL % BASE_WIDTH)  # snap to nearest base
             self._idx_low = int(xTL/BASE_WIDTH)
-            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
+            self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
         else:
             xTL = self._idx_low*BASE_WIDTH
 
@@ -873,7 +870,7 @@ class PathWorkplaneItem(QGraphicsRectItem):
                              (self._high_drag_bound)*BASE_WIDTH)
             xBR = xBR - (xBR % BASE_WIDTH)  # snap to nearest base
             self._idx_high = int(xBR/BASE_WIDTH)
-            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+            self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
         else:
             xBR = self._idx_high*BASE_WIDTH
 
@@ -968,8 +965,8 @@ class PathWorkplaneItem(QGraphicsRectItem):
             self._idx_high = int(self._start_idx_high + delta)
             self._delta = delta
             self.reconfigureRect((), ())
-            self.resize_handle_group.updateText(HandleType.LEFT, self._idx_low)
-            self.resize_handle_group.updateText(HandleType.RIGHT, self._idx_high)
+            self.resize_handle_group.updateText(HandleEnum.LEFT, self._idx_low)
+            self.resize_handle_group.updateText(HandleEnum.RIGHT, self._idx_high)
         return QGraphicsItem.mouseMoveEvent(self, event)
     # end def
 

@@ -42,23 +42,23 @@ class VirtualHelix(CNObject):
             return self._part.setVirtualHelixProperties(self._id_num, keys, values)
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         return self._part.getAllVirtualHelixProperties(self._id_num)
     # end def
 
-    def getAllPropertiesForIdNum(self, id_num):
+    def getAllPropertiesForIdNum(self, id_num: int) -> dict:
         return self._part.getAllVirtualHelixProperties(id_num)
     # end def
 
-    def getName(self):
+    def getName(self) -> str:
         return self._part.getVirtualHelixProperties(self._id_num, 'name')
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         return self._part.getVirtualHelixProperties(self._id_num, 'color')
     # end def
 
-    def getSize(self):
+    def getSize(self) -> int:
         offset, size = self._part.getOffsetAndSize(self._id_num)
         return int(size)
     # end def

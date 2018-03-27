@@ -1,24 +1,32 @@
 # -*- coding: utf-8 -*-
 """Summary
 """
+from typing import Tuple
+
 from PyQt5.QtCore import QPointF, Qt
 from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
                              QGraphicsItem, QMenu, QAction)
+from PyQt5.QtGui import QCursor
+
 from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.fileio import v3encode, v3decode
 from cadnano.views.gridview import gridstyles as styles
+from cadnano.cntypes import RectT
+
 from .abstractgridtool import AbstractGridTool
 
 
-def normalizeRect(rect):
+def normalizeRect(rect: RectT) -> RectT:
     """Summary
 
     Args:
-        rect (TYPE): Description
+        rect: rectangle tuple
 
     Returns:
-        TYPE: Description
+        Tuple of form::
+
+            (x1, y1, x2, y2)
     """
     x1, y1, x2, y2 = rect
     if x1 > x2:
@@ -39,7 +47,7 @@ class SelectGridTool(AbstractGridTool):
     """Handles SelectTool operations in the Grid view
 
     Attributes:
-        clip_board (TYPE): Description
+        clipboard (TYPE): Description
         group (TYPE): Description
         individual_pick (bool): Description
         is_selection_active (bool): Description
@@ -65,6 +73,7 @@ class SelectGridTool(AbstractGridTool):
         self.individual_pick = False
         self.snap_origin_item = None
         self.clip_board = None
+        # self.menu_pos = None
     # end def
 
     def __repr__(self):
@@ -93,24 +102,24 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def resetSelections(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Clear all model selections
+        This is redundant with modelClearSelected()
         """
         # print("resetSelections")
         doc = self.manager.document
         doc.clearAllSelected()
 
-    def modelClear(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def modelClearSelected(self):
+        """Clear all model selections
         """
-        # print("modelClear")
+        # print("modelClearSelected")
         doc = self.manager.document
         doc.clearAllSelected()
+        self.deselectSet(self.selection_set)
+        self.is_started = False
+        self._vhi = None
+        self.hideLineItem()
+    # end def
 
     def setPartItem(self, part_item):
         """Summary
@@ -121,6 +130,7 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
+        self.group.resetTransform()
         if part_item is not self.part_item:
             if self.slice_graphics_view is not None:
                 # attempt to enforce good housekeeping, not required
@@ -129,7 +139,7 @@ class SelectGridTool(AbstractGridTool):
                 except TypeError:
                     pass
             if self.part_item is not None:
-                self.modelClear()
+                self.modelClearSelected()
             self.part_item = part_item
 
             # In the event that the old part_item was deleted (and garbage
@@ -284,7 +294,7 @@ class SelectGridTool(AbstractGridTool):
             self.individual_pick = False
         else:  # just do a selection
             if event.modifiers() != Qt.ShiftModifier:
-                self.modelClear()   # deselect if shift isn't held
+                self.modelClearSelected()   # deselect if shift isn't held
 
             if isinstance(target_item, GridVirtualHelixItem):
                 # NOTE: individual_pick seems not needed.
@@ -339,15 +349,33 @@ class SelectGridTool(AbstractGridTool):
         self.hideLineItem()
     # end def
 
-    def copySelection(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def deleteSelection(self):
+        """Delete Selection Group
         """
-        part_instance = self.part_item.partInstance()
+        part_item = self.part_item
+        part = part_item.part()
+        delete_set = self.selection_set.copy()
+        self.modelClearSelected()
+        part.removeVirtualHelices(delete_set)
+        self.clip_board = None
+    # end def
+
+    def copySelection(self):
+        """Copy Selection Group to a Clip board
+        """
+        part_item = self.part_item
+        part_instance = part_item.partInstance()
+
+        # SAVE the CORNER POINT of the selection box
+        bri = self.group.bounding_rect_item
+        br = bri.rect()
+        delta = QPointF(br.width() / 2 , br.height()/2)
+        self.copy_pt = bri.pos() + delta
+        # print("NEW Grid copy point", self.copy_pt)
+
         copy_dict = v3encode.encodePartList(part_instance, list(self.selection_set))
         self.clip_board = copy_dict
+        self.vhi_hint_item.hide()
     # end def
 
     def pasteClipboard(self):
@@ -356,14 +384,37 @@ class SelectGridTool(AbstractGridTool):
         Returns:
             TYPE: Description
         """
+        if self.clip_board is None:
+            return
         doc = self.manager.document
-        part = self.part_item.part()
+        part_item = self.part_item
+        part = part_item.part()
+        sgv = self.slice_graphics_view
+
+        #  1. get mouse point at the paste
+        qc = QCursor()
+        global_pos = qc.pos()
+        view_pt = sgv.mapFromGlobal(global_pos)
+        s_pt = sgv.mapToScene(view_pt)
+
+        to_pt = part_item.mapFromScene(s_pt)
+        # print("To Grid Point", to_pt.x(), to_pt.y())
+
+        # self.vhi_hint_item.setParentItem(part_item)
+        # self.setHintPos(to_pt)
+        # self.vhi_hint_item.show()
+
+        # 2. Calculate a delta from the CORNER of the selection box
+        sf = part_item.scaleFactor()
+        delta = to_pt - self.copy_pt
+        distance_offset  = delta.x()/sf, -delta.y()/sf
+
         part_instance = self.part_item.partInstance()
-        doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part_instance, self.clip_board)
-        doc.undoStack().endMacro()
-        self.modelClear()
-        doc.addVirtualHelicesToSelection(part, new_vh_set)
+        new_vh_set = v3decode.importToPart( part_instance,
+                                            self.clip_board,
+                                            offset=distance_offset)
+        self.modelClearSelected()
+        # doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
     def moveSelection(self, dx, dy, finalize, use_undostack=True):
@@ -396,7 +447,7 @@ class SelectGridTool(AbstractGridTool):
                 self.slice_graphics_view.rubberBandChanged.disconnect(self.selectRubberband)
             except (AttributeError, TypeError):
                 pass    # required for first call
-        self.modelClear()
+        self.modelClearSelected()
         if self.snap_origin_item is not None:
             self.snap_origin_item.setSnapOrigin(False)
             self.snap_origin_item = None
@@ -404,23 +455,38 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def getCustomContextMenu(self, point):
-        """point (QPoint)
+        """
 
         Args:
-            point (TYPE): Description
+            point (QPoint): Description
         """
+        sgv = self.slice_graphics_view
+        do_show = False
+        menu = None
         if len(self.selection_set) > 0:
-            sgv = self.slice_graphics_view
             menu = QMenu(sgv)
             copy_act = QAction("copy selection", sgv)
             copy_act.setStatusTip("copy selection")
             copy_act.triggered.connect(self.copySelection)
             menu.addAction(copy_act)
-            if self.clip_board:
-                copy_act = QAction("paste", sgv)
-                copy_act.setStatusTip("paste from clip board")
-                copy_act.triggered.connect(self.pasteClipboard)
-                menu.addAction(copy_act)
+            delete_act = QAction("delete selection", sgv)
+            delete_act.setStatusTip("delete selection")
+            delete_act.triggered.connect(self.deleteSelection)
+            menu.addAction(delete_act)
+            do_show = True
+        if self.clip_board is not None:
+            if menu is None:
+                menu = QMenu(sgv)
+            copy_act = QAction("paste", sgv)
+            copy_act.setStatusTip("paste from clip board")
+            copy_act.triggered.connect(self.pasteClipboard)
+            menu.addAction(copy_act)
+            do_show = True
+        if do_show:
+            # def menuClickSet(event):
+            #     self.menu_pos = event.globalPos()
+            #     return QMenu.mousePressEvent(menu, event)
+            # menu.mousePressEvent = menuClickSet
             menu.exec_(sgv.mapToGlobal(point))
     # end def
 # end class
@@ -484,7 +550,12 @@ class GridSelectionGroup(QGraphicsItemGroup):
         bri = self.bounding_rect_item
         bri.hide()
         self.removeFromGroup(bri)
+
+        # Need to reparent move back to 0,0
         bri.setParentItem(self.tool)
+        temp_pt = QPointF(0, 0)
+        bri.setPos(temp_pt)
+
         self.setFocus(False)
     # end def
 
@@ -510,25 +581,26 @@ class GridSelectionGroup(QGraphicsItemGroup):
         Returns:
             TYPE: Description
         """
+        print("GridSelectionGroup mousePress")
         tool = self.tool
         if event.button() != Qt.LeftButton:
             """ do context menu?
             """
             # slice_graphics_view = self.tool.slice_graphics_view
             # print(slice_graphics_view)
-            # self.getCustomContextMenu(event.screenPos())
+            # tool.getCustomContextMenu(event.screenPos())
             tool.individual_pick = False
             return QGraphicsItemGroup.mousePressEvent(self, event)
         else:
             # print("the right event")
             modifiers = event.modifiers()
             is_shift = modifiers == Qt.ShiftModifier
-            print("Is_shift is %s" % is_shift)
+            # print("Is_shift is %s" % is_shift)
             # check to see if we are clicking on a previously selected item
             if tool.is_selection_active:
                 # print("clicking the box")
                 pos = event.scenePos()
-                for item in tool.sgv.scene().items(pos):
+                for item in tool.slice_graphics_view.scene().items(pos):
                     if isinstance(item, GridVirtualHelixItem):
                         doc = tool.manager.document
                         part = item.part()

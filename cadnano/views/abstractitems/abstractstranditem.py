@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 class AbstractStrandItem(object):
     def __init__(self, model_strand=None, virtual_helix_item=None):
@@ -6,8 +6,20 @@ class AbstractStrandItem(object):
         if self.__class__ == AbstractStrandItem:
             raise NotImplementedError("AbstractStrandItem should be subclassed.")
         self._model_strand = None
-        self._model_vh = None
         self._model_oligo = None
+    # end def
+
+    def strand(self):
+        return self._model_strand
+    # end def
+
+    def setProperty(self, key: str, value):
+        self._model_strand.setProperty(key, value)
+    # end def
+
+    def getProperty(self, key: str):
+        self._model_strand.getProperty(key)
+    # end def
 
     ### SIGNALS ###
 
@@ -68,5 +80,9 @@ class AbstractStrandItem(object):
     # end def
 
     def oligoSequenceClearedSlot(self, oligo):
+        pass
+    # end def
+
+    def oligoSelectedChangedSlot(self, oligo, new_value):
         pass
     # end def

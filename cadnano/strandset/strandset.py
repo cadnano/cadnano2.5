@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 from bisect import bisect_left, insort_left
+from typing import Tuple, List
+
 import cadnano.util as util
-from cadnano.proxies.cnproxy import ProxySignal
+from cadnano.proxies.cnproxy import ProxySignal,  UndoCommand
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnenum import StrandType
+from cadnano.proxies.cnenum import StrandEnum, EnumType
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .mergecmd import MergeCommand
 from .splitcmd import SplitCommand
 
+from cadnano.cntypes import (
+                            Int2T,
+                            Vec2T,
+                            StrandT,
+                            StrandSetT
+)
 
 class StrandSet(CNObject):
     """:class:`StrandSet` is a container class for :class:`Strands`, and provides
@@ -43,7 +51,7 @@ class StrandSet(CNObject):
         super(StrandSet, self).__init__(part)
         self._is_fwd = is_fwd
         self._is_scaffold = is_fwd if (id_num % 2 == 0) else not is_fwd
-        self._strand_type = StrandType.FWD if self._is_fwd else StrandType.REV
+        self._strand_type = StrandEnum.FWD if self._is_fwd else StrandEnum.REV
         self._id_num = id_num
         self._part = part
 
@@ -143,75 +151,79 @@ class StrandSet(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def isForward(self):
+    def isForward(self) -> bool:
         """Is the set 5' to 3' (forward) or is it 3' to 5' (reverse)
 
         Returns:
-            bool: True if is forward, False otherwise
+            ``True`` if is forward, ``False`` otherwise
         """
         return self._is_fwd
     # end def
 
-    def strandType(self):
+    def strandType(self) -> EnumType:
         """Store the enum of strand type
 
         Returns:
-            int: :class:`StrandType.FWD` if is forward, otherwise :class:`StrandType.REV`
+            :class:`StrandEnum.FWD` if is forward, otherwise :class:`StrandEnum.REV`
         """
         return self._strand_type
 
-    def isReverse(self):
+    def isReverse(self) -> bool:
         """Is the set 3' to 5' (reverse) or 5' to 3' (forward)?
 
         Returns:
-            bool: True if is reverse, False otherwise
+            ``True`` if is reverse, ``False`` otherwise
         """
         return not self._is_fwd
     # end def
 
-    def isScaffold(self):
+    def isScaffold(self) -> bool:
         """Is the set (5' to 3' and even parity) or (3' to 5' and odd parity)
 
         Returns:
-            bool: True if is scaffold, False otherwise
+            ``True`` if is scaffold, ``False`` otherwise
         """
         return self._is_scaffold
 
-    def isStaple(self):
+    def isStaple(self) -> bool:
         """Is the set (5' to 3' and even parity) or (3' to 5' and odd parity)
 
         Returns:
-            bool: True if is scaffold, False otherwise
+            ``True if is staple, ``False`` otherwise
         """
         return not self._is_scaffold
 
-    def length(self):
-        """ length of the :class:`StrandSet` and therefore also the associated
+    def length(self) -> int:
+        """length of the :class:`StrandSet` and therefore also the associated
         virtual helix in bases
 
         Returns:
-            int: length of the set
+            length of the set
         """
         return len(self.strand_array)
 
-    def idNum(self):
+    def idNum(self) -> int:
         """Get the associated virtual helix ID number
 
         Returns:
-            int: virtual helix ID number
+            virtual helix ID number
         """
         return self._id_num
     # end def
 
-    def getNeighbors(self, strand):
+    def getNeighbors(self, strand: StrandT) -> Tuple[StrandT, StrandT]:
         """Given a :class:`Strand` in this :class:`StrandSet` find its internal
         neighbors
 
         Args:
-            strand (Strand):
+            strand:
 
         Returns:
-            tuple: (low neighbor, high neighbor) of types :class:`Strand` or :obj:`None`
+            of form::
+
+                (low neighbor, high neighbor)
+
+            of types :class:`Strand` or :obj:`None`
         """
         sh = self.strand_heap
         i = bisect_left(sh, strand)
@@ -228,25 +240,25 @@ class StrandSet(CNObject):
         return low_strand, high_strand
     # end def
 
-    def complementStrandSet(self):
+    def complementStrandSet(self) -> StrandSetT:
         """Returns the complementary strandset. Used for insertions and
         sequence application.
 
         Returns:
-            StrandSet: the complementary :class:`StrandSet`
+            the complementary :class:`StrandSet`
         """
         fwd_ss, rev_ss = self._part.getStrandSets(self._id_num)
         return rev_ss if self._is_fwd else fwd_ss
     # end def
 
-    def getBoundsOfEmptyRegionContaining(self, base_idx):
+    def getBoundsOfEmptyRegionContaining(self, base_idx: int) -> Int2T:
         """Return the bounds of the empty region containing base index <base_idx>.
 
         Args:
-            base_idx (int): the index of interest
+            base_idx: the index of interest
 
         Returns:
-            tuple: of :obj:`int` of form::
+            tuple of :obj:`int` of form::
 
                 (low_idx, high_idx)
         """
@@ -279,7 +291,7 @@ class StrandSet(CNObject):
         return (low_idx, high_idx)
     # end def
 
-    def indexOfRightmostNonemptyBase(self):
+    def indexOfRightmostNonemptyBase(self) -> int:
         """Returns the high base_idx of the last strand, or 0."""
         sh = self.strand_heap
         if len(sh) > 0:
@@ -288,28 +300,30 @@ class StrandSet(CNObject):
             return 0
     # end def
 
-    def strandCount(self):
+    def strandCount(self) -> int:
         """Getter for the number of :class:`Strands` in the set
 
         Returns:
-            int: the number of :class:`Strands` in the set
+            the number of :class:`Strands` in the set
         """
         return len(self.strand_heap)
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def createStrand(self, base_idx_low, base_idx_high,
-                     color=None, use_undostack=True):
+    def createStrand(self, base_idx_low: int,
+                        base_idx_high: int,
+                        color: str = None,
+                        use_undostack: bool = True) -> StrandT:
         """Assumes a strand is being created at a valid set of indices.
 
         Args:
-            base_idx_low (int):     low index of strand
-            base_idx_high (int):    high index of strand
-            color (:obj:`str`, optional): default=True
-            use_undostack (:obj:`bool`, optional): default=True
+            base_idx_low:     low index of strand
+            base_idx_high:    high index of strand
+            color (optional): default=True
+            use_undostack (optional): default=True
 
         Returns:
-            object: Strand if successful, None otherwise
+            ``Strand`` if successful, ``None`` otherwise
         """
         part = self._part
 
@@ -331,11 +345,13 @@ class StrandSet(CNObject):
             return None
     # end def
 
-    def createDeserializedStrand(self, base_idx_low, base_idx_high, color, use_undostack=False):
+    def createDeserializedStrand(self,  base_idx_low: int,
+                                        base_idx_high: int,
+                                        color: str,
+                                        use_undostack: bool = False) -> int:
         """Passes a strand to AddStrandCommand that was read in from file input.
         Omits the step of checking _couldStrandInsertAtLastIndex, since
         we assume that deserialized strands will not cause collisions.
-
         """
         c = CreateStrandCommand(self, base_idx_low, base_idx_high,
                                 color,
@@ -346,7 +362,7 @@ class StrandSet(CNObject):
         return 0
     # end def
 
-    def isStrandInSet(self, strand):
+    def isStrandInSet(self, strand: StrandT) -> bool:
         sl = self.strand_array
         if sl[strand.lowIdx()] == strand and sl[strand.highIdx()] == strand:
             return True
@@ -354,15 +370,15 @@ class StrandSet(CNObject):
             return False
     # end def
 
-    def removeStrand(self, strand, use_undostack=True, solo=True):
+    def removeStrand(self, strand: StrandT, use_undostack: bool = True, solo: bool = True):
         """Remove a :class:`Strand` from the set
 
         Args:
-            strand (Strand): the :class:`Strand` to remove
-            use_undostack (:obj:`bool`, optional): default=True
-            solo (:obj:`bool`, optional): solo is an argument to enable
-            limiting signals emiting from the command in the case the command
-            is instantiated part of a larger command, default=True
+            strand: the :class:`Strand` to remove
+            use_undostack (optional): default = ``True``
+            solo ( optional): solo is an argument to enable
+                limiting signals emiting from the command in the case the
+                command is instantiated part of a larger command, default=``True``
         """
         cmds = []
 
@@ -375,14 +391,16 @@ class StrandSet(CNObject):
         util.execCommandList(self, cmds, desc="Remove strand", use_undostack=use_undostack)
     # end def
 
-    def oligoStrandRemover(self, strand, cmds, solo=True):
+    def oligoStrandRemover(self, strand: StrandT,
+                                cmds: List[UndoCommand],
+                                solo: bool = True):
         """Used for removing all :class:`Strand`s from an :class:`Oligo`
 
         Args:
-            strand (Strand): a strand to remove
-            cmds (list): a list of :class:`UndoCommand` objects to append to
-            solo (:obj:`bool`, optional): to pass on to RemoveStrandCommand,
-            default=True
+            strand: a strand to remove
+            cmds: a list of :class:`UndoCommand` objects to append to
+            solo (:optional): to pass on to ``RemoveStrandCommand``,
+            default=``True``
         """
         if not self.isStrandInSet(strand):
             raise IndexError("Strandset.oligoStrandRemover: strand not in set")
@@ -390,28 +408,30 @@ class StrandSet(CNObject):
         cmds.append(RemoveStrandCommand(self, strand, solo=solo))
     # end def
 
-    def removeAllStrands(self, use_undostack=True):
+    def removeAllStrands(self, use_undostack: bool = True):
         """Remove all :class:`Strand` objects in the set
 
         Args:
-         use_undostack (:obj:`bool`, optional): default=True
+         use_undostack (optional): default=``True``
         """
         for strand in list(self.strand_heap):
             self.removeStrand(strand, use_undostack=use_undostack, solo=False)
         # end def
 
-    def mergeStrands(self, priority_strand, other_strand, use_undostack=True):
+    def mergeStrands(self, priority_strand: StrandT,
+                            other_strand: StrandT,
+                            use_undostack: bool = True) -> bool:
         """Merge the priority_strand and other_strand into a single new strand.
         The oligo of priority should be propagated to the other and all of
         its connections.
 
         Args:
-            priority_strand (Strand): priority strand
-            other_strand (Strand): other strand
-            use_undostack (:obj:`bool`, optional): default=True
+            priority_strand: priority strand
+            other_strand: other strand
+            use_undostack (optional): default=``True``
 
         Returns:
-            bool: True if strands were merged, False otherwise
+            ``True`` if strands were merged, ``False`` otherwise
         """
         low_and_high_strands = self.strandsCanBeMerged(priority_strand, other_strand)
         if low_and_high_strands:
@@ -424,17 +444,18 @@ class StrandSet(CNObject):
             return False
     # end def
 
-    def strandsCanBeMerged(self, strandA, strandB):
+    def strandsCanBeMerged(self, strandA, strandB) -> Tuple[StrandT, StrandT]:
         """Only checks that the strands are of the same StrandSet and that the
         end points differ by 1.  DOES NOT check if the Strands overlap, that
         should be handled by addStrand
 
         Returns:
-            tuple: empty :obj:`tuple` if the strands can't be
-            merged if the strands can be merged it returns the strand with the
-            lower index in the form::
+            empty :obj:`tuple` if the strands can't be merged if the strands can
+             be merged it returns the strand with the lower index in the form::
 
                 (strand_low, strand_high)
+
+            otherwise ``None``
         """
         if strandA.strandSet() != strandB.strandSet():
             return ()
@@ -450,18 +471,20 @@ class StrandSet(CNObject):
             return None
     # end def
 
-    def splitStrand(self, strand, base_idx, update_sequence=True, use_undostack=True):
+    def splitStrand(self, strand: StrandT, base_idx: int,
+                        update_sequence: bool = True,
+                        use_undostack: bool = True) -> bool:
         """Break strand into two strands. Reapply sequence by default.
 
         Args:
-            strand (Strand): the :class:`Strand`
-            base_idx (int): the index
-            update_sequence (:obj:`bool`, optional): whether to emit signal, default=True
-            use_undostack (:obj:`bool`, optional): default=True
+            strand: the :class:`Strand`
+            base_idx: the index
+            update_sequence (optional): whether to emit signal, default=``True``
+            use_undostack (optional): default=``True``
 
         Returns:
-            bool: True if successful, False otherwise
-            TODO consider return strands instead
+            ``True`` if successful, ``False`` otherwise
+                TODO consider return strands instead
         """
         if self.strandCanBeSplit(strand, base_idx):
             if self.isStrandInSet(strand):
@@ -474,17 +497,17 @@ class StrandSet(CNObject):
             return False
     # end def
 
-    def strandCanBeSplit(self, strand, base_idx):
+    def strandCanBeSplit(self, strand: StrandT, base_idx: int) -> bool:
         """Make sure the base index is within the strand
         Don't split right next to a 3Prime end
         Don't split on endpoint (AKA a crossover)
 
         Args:
-            strand (Strand): the :class:`Strand`
-            base_idx (int): the index to split at
+            strand: the :class:`Strand`
+            base_idx: the index to split at
 
         Returns:
-            bool: True if can be split, False otherwise
+            ``True`` if can be split, ``False`` otherwise
         """
         # no endpoints
         lo, hi = strand.idxs()
@@ -512,25 +535,25 @@ class StrandSet(CNObject):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def strandFilter(self):
+    def strandFilter(self) -> List[str]:
         """Get the filter type for this set
 
         Returns:
-            str: 'forward' if is_fwd else 'reverse'
+            'forward' if is_fwd else 'reverse' amd 'scaffold' or 'staple'
         """
         return ["forward" if self._is_fwd else "reverse"] + ["scaffold" if self._is_scaffold else "staple"]
     # end def
 
-    def hasStrandAt(self, idx_low, idx_high):
+    def hasStrandAt(self, idx_low: int, idx_high: int) -> bool:
         """Check if set has a strand on the interval given
 
         Args:
-            idx_low (int): low index
-            idx_high (int): high index
+            idx_low: low index
+            idx_high: high index
 
         Returns:
-            bool: True if strandset has a strand in the region between idx_low
-            and idx_high (both included). False otherwise
+            ``True`` if strandset has a strand in the region between ``idx_low``
+            and ``idx_high`` (both included). ``False`` otherwise
         """
         sa = self.strand_array
         sh = self.strand_heap
@@ -560,15 +583,15 @@ class StrandSet(CNObject):
             return True
     # end def
 
-    def getOverlappingStrands(self, idx_low, idx_high):
+    def getOverlappingStrands(self, idx_low, idx_high) -> List[StrandT]:
         """Gets :class:`Strand` list that overlap the given range.
 
         Args:
-            idx_low (int): low index of overlap region
-            idx_high (int): high index of overlap region
+            idx_low: low index of overlap region
+            idx_high: high index of overlap region
 
         Returns:
-            :obj:`list` of :class:`Strand`: all :class:`Strand` objects in range
+            all :class:`Strand` objects in range
         """
         sa = self.strand_array
         sh = self.strand_heap
@@ -639,11 +662,11 @@ class StrandSet(CNObject):
     #         return True
     # # end def
 
-    def getStrand(self, base_idx):
+    def getStrand(self, base_idx: int) -> StrandT:
         """Returns the :class:`Strand` that overlaps with `base_idx`
 
         Args:
-            base_idx (int):
+            base_idx:
 
         Returns:
             Strand: :class:`Strand` at `base_idx` if it exists
@@ -655,17 +678,22 @@ class StrandSet(CNObject):
             raise
     # end def
 
-    def dump(self, xover_list):
+    def dump(self, xover_list: list) -> Tuple[List[Int2T], List[str]]:
         """ Serialize a StrandSet, and append to a xover_list of xovers
         adding a xover if the 3 prime end of it is founds
         TODO update this to support strand properties
 
         Args:
-            xover_list (list): A list to append xovers to
+            xover_list: A list to append xovers to
 
         Returns:
-            :obj:`list` of :obj:`tuple`: indices low and high of each strand in
-            the :class:`StrandSet`
+            tuple of::
+
+                (idxs, colors)
+
+            where idxs is a :obj:`list` of :obj:`tuple`: indices low and high
+            of each strand in the :class:`StrandSet` and colors is a :obj:`list`
+            of color ``str``
         """
         sh = self.strand_heap
         idxs = [strand.idxs() for strand in sh]
@@ -680,12 +708,12 @@ class StrandSet(CNObject):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _addToStrandList(self, strand, update_segments=True):
+    def _addToStrandList(self, strand: StrandT, update_segments: bool = True):
         """Inserts strand into the strand_array at idx
 
         Args:
-            strand (Strand): the strand to add
-            update_segments (:obj:`bool`, optional): whether to signal default=True
+            strand: the strand to add
+            update_segments (optional): whether to signal default=``True``
         """
         idx_low, idx_high = strand.idxs()
         for i in range(idx_low, idx_high+1):
@@ -694,25 +722,25 @@ class StrandSet(CNObject):
         if update_segments:
             self._part.refreshSegments(self._id_num)
 
-    def _updateStrandIdxs(self, strand, old_idxs, new_idxs):
+    def _updateStrandIdxs(self, strand: StrandT, old_idxs: Int2T, new_idxs: Int2T):
         """update indices in the strand array/list of an existing strand
 
         Args:
-            strand (Strand): the strand
-            old_idxs (tuple): range (:obj:`int`) to clear
-            new_idxs (tuple): range (:obj:`int`) to set to `strand`
+            strand: the strand
+            old_idxs: range (:obj:`int`) to clear
+            new_idxs: range (:obj:`int`) to set to `strand`
         """
         for i in range(old_idxs[0], old_idxs[1] + 1):
             self.strand_array[i] = None
         for i in range(new_idxs[0], new_idxs[1] + 1):
             self.strand_array[i] = strand
 
-    def _removeFromStrandList(self, strand, update_segments=True):
+    def _removeFromStrandList(self, strand: StrandT, update_segments: bool = True):
         """Remove strand from strand_array.
 
         Args:
-            strand (Strand): the strand
-            update_segments (:obj:`bool`, optional): whether to signal default=True
+            strand: the strand
+            update_segments (optional): whether to signal default=``True``
         """
         self._document.removeStrandFromSelection(strand)  # make sure the strand is no longer selected
         idx_low, idx_high = strand.idxs()
@@ -723,12 +751,14 @@ class StrandSet(CNObject):
         if update_segments:
             self._part.refreshSegments(self._id_num)
 
-    def getStrandIndex(self, strand):
+    def getStrandIndex(self, strand: StrandT) -> Tuple[bool, int]:
         """Get the 5' end index of strand if it exists for forward strands
         and the 3' end index of the strand for reverse strands
 
         Returns:
-            tuple: (:obj:`bool`, :obj:`int`)
+            tuple of form::
+
+                (is_existing, index)
         """
         try:
             ind = self.strand_array.index(strand)

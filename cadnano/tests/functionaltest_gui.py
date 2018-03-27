@@ -29,7 +29,7 @@ def testCreateVirtualHelixGui(cnapp):
     action_new_honeycomb = toolbar.widgetForAction(cnapp.window.action_new_dnapart_honeycomb)
     QTest.mouseClick(action_new_honeycomb, Qt.LeftButton, delay=DELAY)
 
-    slicerootitem = cnapp.window.slice_root
+    slicerootitem = cnapp.window.views['slice'].root_item
     assert len(slicerootitem.instance_items) == 1
     slice_part_item = list(slicerootitem.instance_items.values())[0]
     QTest.keyClick(cnapp.window, Qt.Key_H, delay=DELAY)
@@ -40,7 +40,7 @@ def testCreateVirtualHelixGui(cnapp):
     for row in range(-2, 2):
         for col in range(-2, 2):
             # print(row, col)
-            x, y = HoneycombDnaPart.latticeCoordToPositionXY(RADIUS, row, col)
+            x, y = HoneycombDnaPart.latticeCoordToModelXY(RADIUS, row, col)
             pt = QPointF(x, y)
             cnapp.graphicsItemClick(slice_part_item, Qt.LeftButton, pos=pt, delay=DELAY)
             cmd_count += 1

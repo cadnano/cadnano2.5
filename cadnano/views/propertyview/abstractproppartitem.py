@@ -1,6 +1,6 @@
 """Summary
 """
-from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
+from cadnano.views.abstractitems import AbstractPartItem
 from .cnpropertyitem import CNPropertyItem
 
 
@@ -16,7 +16,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(AbstractPropertyPartSetItem, self).__init__(**kwargs)
     # end def
 
     # SLOTS
@@ -46,7 +46,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
         Returns:
             TYPE: Description
         """
-        if self.cnModel() == model_part:
+        if self.part() == model_part:
             self.setValue(property_key, new_value)
     # end def
 

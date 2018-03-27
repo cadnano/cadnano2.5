@@ -25,7 +25,7 @@ class Part(CNObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idxs']
+    editable_properties = ['name', 'color', 'is_visible', 'grid_type']
 
     def __init__(self, *args, **kwargs):
         """Sets the parent document, sets bounds for part dimensions, and sets up
@@ -196,11 +196,11 @@ class Part(CNObject):
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         """ Get the dictionary of model properties
 
         Returns:
-            dict: group properties
+            group properties
         """
         return self._group_properties
     # end def
@@ -242,6 +242,7 @@ class Part(CNObject):
 
     def _setProperty(self, key, value, emit_signals=False):
         self._group_properties[key] = value
+
         if emit_signals:
             self.partPropertyChangedSignal.emit(self, key, value)
     # end def
@@ -250,10 +251,10 @@ class Part(CNObject):
         return self._group_properties['name']
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         """
         Returns:
-            str: The part's color. Defaults to #0066cc.
+            The part's color. Defaults to #0066cc.
         """
         return self._group_properties['color']
     # end def

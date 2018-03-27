@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import GridType, LatticeType, StrandType
+from cadnano.proxies.cnenum import GridEnum, LatticeEnum, StrandEnum, OrthoViewEnum
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import setBatch, getReopen, setReopen
@@ -16,11 +16,11 @@ def decode(document, obj, emit_signals=False):
     """
     num_bases = len(obj['vstrands'][0]['scaf'])
     if num_bases % 32 == 0:
-        lattice_type = LatticeType.SQUARE
-        grid_type = GridType.SQUARE
+        lattice_type = LatticeEnum.SQUARE
+        grid_type = GridEnum.SQUARE
     elif num_bases % 21 == 0:
-        lattice_type = LatticeType.HONEYCOMB
-        grid_type = GridType.HONEYCOMB
+        lattice_type = LatticeEnum.HONEYCOMB
+        grid_type = GridEnum.HONEYCOMB
     else:
         raise IOError("error decoding number of bases")
 
@@ -32,10 +32,10 @@ def decode(document, obj, emit_signals=False):
         max_col_json = max(max_col_json, int(helix['col'])+1)
 
     # CREATE PART ACCORDING TO LATTICE TYPE
-    if lattice_type == LatticeType.HONEYCOMB:
+    if lattice_type == LatticeEnum.HONEYCOMB:
         doLattice = HoneycombDnaPart.legacyLatticeCoordToPositionXY
         isEven = HoneycombDnaPart.isEvenParity
-    elif lattice_type == LatticeType.SQUARE:
+    elif lattice_type == LatticeEnum.SQUARE:
         doLattice = SquareDnaPart.legacyLatticeCoordToPositionXY
         isEven = SquareDnaPart.isEvenParity
     else:
@@ -43,6 +43,7 @@ def decode(document, obj, emit_signals=False):
     part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
     part.setActive(True)
     document.setGridType(grid_type)
+    document.setSliceOrGridViewVisible(OrthoViewEnum.SLICE)
     setBatch(True)
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
@@ -65,10 +66,12 @@ def decode(document, obj, emit_signals=False):
     # end for
 
     delta_row = (max_row + min_row) // 2
-    # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
+#    # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
+#    if delta_row & 0:
     if delta_row & 1:
         delta_row += 1
     delta_column = (max_col + min_col) // 2
+#    if delta_column & 0:
     if delta_column & 1:
         delta_column += 1
 
@@ -82,7 +85,10 @@ def decode(document, obj, emit_signals=False):
         col = helix['col']
         scaf = helix['scaf']
         # align row and columns to the center 0, 0
-        coord = (row - delta_row, col - delta_column)
+        if HoneycombDnaPart.isEvenParity(row, col):
+            coord = (row - delta_row, col - delta_column)
+        else:
+            coord = (row - delta_row, col - delta_column)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
     # end for
@@ -92,7 +98,6 @@ def decode(document, obj, emit_signals=False):
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        # print("%d:" % vh_num, x, y)
         part.createVirtualHelix(x, y, 0., num_bases,
                                 id_num=vh_num, use_undostack=False)
     # zoom to fit
@@ -133,12 +138,12 @@ def decode(document, obj, emit_signals=False):
                 five_vh, five_idx, three_vh, three_idx = scaf[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i, five_vh,
+                if isSegmentStartOrEnd(StrandEnum.SCAFFOLD, vh_num, i, five_vh,
                                        five_idx, three_vh, three_idx):
                     scaf_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     scaf_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.SCAFFOLD, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.SCAFFOLD, vh_num, i, three_vh, three_idx):
                     scaf_xo[vh_num].append((i, three_vh, three_idx))
             assert (len(scaf_seg[vh_num]) % 2 == 0)
 
@@ -153,12 +158,12 @@ def decode(document, obj, emit_signals=False):
                 five_vh, five_idx, three_vh, three_idx = stap[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i, five_vh,
+                if isSegmentStartOrEnd(StrandEnum.STAPLE, vh_num, i, five_vh,
                                        five_idx, three_vh, three_idx):
                     stap_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     stap_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.STAPLE, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.STAPLE, vh_num, i, three_vh, three_idx):
                     stap_xo[vh_num].append((i, three_vh, three_idx))
             assert (len(stap_seg[vh_num]) % 2 == 0)
 
@@ -298,7 +303,7 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
     Returns:
         bool: True if the base is a breakpoint or crossover.
     """
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1
@@ -336,7 +341,7 @@ def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
         return False
     if vh_num != three_vh:
         return True
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1

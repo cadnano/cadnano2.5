@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from cadnano.proxies.cnenum import PointType
+from typing import List
+
+from cadnano.proxies.cnenum import PointEnum
+from cadnano.objectinstance import ObjectInstance
 
 FORMAT_VERSION = '3.1'
 
@@ -17,10 +20,6 @@ def encodeDocument(document):
     doc_dict = {'format': FORMAT_VERSION,
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'name': '',
-                'meta': {
-                    # 'slice_view_type': document.getSliceViewType(),
-                    'grid_type': document.getGridType()
-                },
                 'parts': [],
                 'modifications': document.modifications()
                 }
@@ -43,7 +42,7 @@ def encodePart(part):
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointType.ARBITRARY:
+    if group_props.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:
@@ -86,17 +85,20 @@ def encodePart(part):
 # end def
 
 
-def encodePartList(part_instance, vh_group_list):
+def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> dict:
     """ Used for copying and pasting
     TODO: unify encodePart and encodePartList
 
     Args:
-        part (Part):
-        vh_group_list (list): of :obj:`int`, virtual_helices IDs to encode to
+        part_instance: The ``Part`` ``ObjectInstance``, to allow for instance
+            specific property copying
+        vh_group_list: List of virtual_helices IDs to encode to
             be used with copy and paste serialization
 
     Returns:
-        dict:
+        Dictionary representing the virtual helices with ordered lists of
+        properties, strands, etc to allow for copy and pasting becoming
+        different ID'd virtual helices
     """
     part = part_instance.reference()
     vh_group_list.sort()
@@ -106,7 +108,7 @@ def encodePartList(part_instance, vh_group_list):
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointType.ARBITRARY:
+    if group_props.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:
@@ -120,10 +122,12 @@ def encodePartList(part_instance, vh_group_list):
     vh_list = []
     vh_group_set = set(vh_group_list)
 
-    def filter_xovers(x): return (x[0] in vh_group_set and
-                                  x[3] in vh_group_set)
+    def filter_xovers(x):
+        return (x[0] in vh_group_set and x[3] in vh_group_set)
 
-    def filter_vh(x): return x[0] in vh_group_set
+    def filter_vh(x):
+        return x[0] in vh_group_set
+
     for id_num in vh_group_list:
         offset_and_size = part.getOffsetAndSize(id_num)
         if offset_and_size is None:

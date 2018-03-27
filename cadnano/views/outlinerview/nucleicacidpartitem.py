@@ -1,9 +1,9 @@
 from PyQt5.QtCore import QItemSelectionModel
-from cadnano.proxies.cnenum import ItemType
+from cadnano.proxies.cnenum import ItemEnum
 from cadnano.views import styles
-from .cnoutlineritem import CNOutlinerItem
-from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from .cnoutlineritem import CNOutlinerItem, DISABLE_FLAGS, LEAF_FLAGS
+from cadnano.views.abstractitems import AbstractPartItem
+from cadnano.controllers import NucleicAcidPartItemController
 from .oligoitem import OutlineOligoItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 
@@ -28,6 +28,11 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self._root_items = {}
         self._root_items['VHelixList'] = self.createRootPartItem('Virtual Helices', self)
         self._root_items['OligoList'] = self.createRootPartItem('Oligos', self)
+        fs = model_part.document().filter_set
+        if OutlineVirtualHelixItem.FILTER_NAME in fs:
+            self._root_items['OligoList'].setFlags(DISABLE_FLAGS)
+        else:
+            self._root_items['VHelixList'].setFlags(DISABLE_FLAGS)
         # self._root_items['Modifications'] = self._createRootItem('Modifications', self)
         if model_part.is_active:
             print("should be active")
@@ -48,7 +53,7 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def itemType(self):
-        return ItemType.NUCLEICACID
+        return ItemEnum.NUCLEICACID
     # end def
 
     def isModelSelected(self, document):
@@ -69,10 +74,11 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partOligoAddedSlot(self, model_part, model_oligo):
-        m_o = model_oligo
-        m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
-        o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
-        self._oligo_item_hash[m_o] = o_i
+        if self._viewroot.are_signals_enabled:
+            m_o = model_oligo
+            m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
+            o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
+            self._oligo_item_hash[m_o] = o_i
     # end def
 
     def partOligoRemovedSlot(self, model_part, model_oligo):
@@ -84,11 +90,12 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
-        tw = self.treeWidget()
-        tw.is_child_adding += 1
-        vh_i = OutlineVirtualHelixItem(virtual_helix, self._root_items['VHelixList'])
-        self._virtual_helix_item_hash[id_num] = vh_i
-        tw.is_child_adding -= 1
+        if self._viewroot.are_signals_enabled:
+            tw = self.treeWidget()
+            tw.is_child_adding += 1
+            vh_i = OutlineVirtualHelixItem(id_num, self._root_items['VHelixList'])
+            self._virtual_helix_item_hash[id_num] = vh_i
+            tw.is_child_adding -= 1
 
     def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
         vh_i = self._virtual_helix_item_hash.get(id_num)

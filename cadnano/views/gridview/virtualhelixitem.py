@@ -7,11 +7,12 @@ from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
 from PyQt5.QtWidgets import QGraphicsSimpleTextItem
 
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.controllers import VirtualHelixItemController
+from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from cadnano.gui.palette import getPenObj, getBrushObj
 from . import gridstyles as styles
 from .gridextras import WedgeGizmo, WEDGE_RECT
+from . import GridNucleicAcidPartItemT
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.GRID_HELIX_RADIUS
@@ -42,17 +43,18 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     FILTER_NAME = 'virtual_helix'
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num: int, part_item: GridNucleicAcidPartItemT):
         """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: the part item
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         self.hide()
+        self._viewroot = part_item._viewroot
         model_part = self._model_part
         x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         # set position to offset for radius
@@ -269,6 +271,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._label = None
         self._part_item = None
         self._model_part = None
+        self._viewroot = None
         self.scene().removeItem(self)
     # end def
 
@@ -276,7 +279,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Check item's current visibility, color and active state, and sets
         pen, brush, text according to style defaults.
         """
-        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
+        is_visible, color = self._model_part.getVirtualHelixProperties(self._id_num, ['is_visible', 'color'])
         if is_visible:
             self.show()
         else:
@@ -382,7 +385,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.cnModel().getProperty('name')
+        nvhi_name = nvhi.getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)

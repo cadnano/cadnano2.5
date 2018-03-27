@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from array import array
 from operator import attrgetter
+from typing import Tuple, List
+
 from cadnano import util
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
@@ -131,7 +133,7 @@ class Strand(CNObject):
                 break
     # end def
 
-    def strandFilter(self):
+    def strandFilter(self) -> List[str]:
         return self._strandset.strandFilter()
 
     ### SIGNALS ###
@@ -404,7 +406,7 @@ class Strand(CNObject):
         """
         # return self.idx5Prime
 
-    def dump5p(self):
+    def dump5p(self) -> Tuple[int, bool, int]:
         return self._id_num, self._is_forward, self.idx5Prime()
     # def
 

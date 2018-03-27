@@ -2,9 +2,12 @@
 """
 import math
 from PyQt5.QtCore import QPointF, QLineF, QRectF
-from PyQt5.QtWidgets import QGraphicsObject
 from PyQt5.QtWidgets import QGraphicsLineItem
 from PyQt5.QtWidgets import QGraphicsEllipseItem
+
+from cadnano.views.abstractitems import AbstractTool
+from cadnano.views.abstractitems import AbstractToolManager
+from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.gui.palette import getPenObj
 
@@ -19,14 +22,14 @@ DELTA = (HIGHLIGHT_WIDTH - styles.GRID_HELIX_STROKE_WIDTH)/2.
 _INACTIVE_PEN = getPenObj(styles.GRAY_STROKE, HIGHLIGHT_WIDTH)
 
 
-class AbstractGridTool(QGraphicsObject):
+class AbstractGridTool(AbstractTool):
     _RADIUS = styles.GRID_HELIX_RADIUS
     _CENTER_OF_HELIX = QPointF(_RADIUS, _RADIUS)
     FILTER_NAME = 'virtual_helix'
     # _CENTER_OF_HELIX = QPointF(0. 0.)
     """Abstract base class to be subclassed by all other pathview tools."""
 
-    def __init__(self, manager):
+    def __init__(self, manager: AbstractToolManager):
         """Summary
 
         Args:
@@ -34,7 +37,7 @@ class AbstractGridTool(QGraphicsObject):
         """
         # Setting parent to viewroot to prevent orphan _line_item from occurring
         super(AbstractGridTool, self).__init__(parent=manager.viewroot)
-        self.slice_graphics_view = None
+        self.slice_graphics_view = manager.window.grid_graphics_view
         self.manager = manager
         self._active = False
         self._last_location = None
@@ -145,11 +148,12 @@ class AbstractGridTool(QGraphicsObject):
         self.vhi_hint_item.setPos(pos - QPointF(_RADIUS - DELTA, _RADIUS - DELTA))
     # end def
 
-    def findNearestPoint(self, part_item, target_scenepos):
+    def findNearestPoint(self,  part_item: QAbstractPartItem,
+                                target_scenepos: QPointF) -> QPointF:
         """
         Args:
-            part_item (TYPE): Description
-            target_scenepos (TYPE): Description
+            part_item: Description
+            target_scenepos: position in the Scene
         """
         li = self._line_item
         pos = li.mapFromScene(target_scenepos)
@@ -179,11 +183,12 @@ class AbstractGridTool(QGraphicsObject):
             return part_item.mapFromItem(li, pos)
     # end def
 
-    def findNextPoint(self, part_item, target_part_pos):
+    def findNextPoint(self, part_item: QAbstractPartItem,
+                            target_part_pos: QPointF) -> QPointF:
         """
         Args:
-            part_item (TYPE): Description
-            target_part_pos (TYPE): Description
+            part_item: Description
+            target_part_pos: Position in the Part
         """
         li = self._line_item
         pos = li.mapFromItem(part_item, target_part_pos)
@@ -195,11 +200,10 @@ class AbstractGridTool(QGraphicsObject):
     # end def
 
     def hideLineItem(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """ Hide the ``_line_item`` and the ``vhi_hint_item``
+        set ``is_started`` to :bool:`False`
         """
+        # print("hideLineItem")
         self.vhi_hint_item.hide()
         li = self._line_item
         li.hide()
@@ -207,7 +211,6 @@ class AbstractGridTool(QGraphicsObject):
         line = li.line()
         line.setP2(self._CENTER_OF_HELIX)
         li.setLine(line)
-        # li.hide()
         self.is_started = False
     # end def
 
@@ -278,7 +281,7 @@ class AbstractGridTool(QGraphicsObject):
         self._active = False
     # end def
 
-    def isActive(self):
+    def isActive(self) -> bool:
         """Returns isActive
         """
         return self._active

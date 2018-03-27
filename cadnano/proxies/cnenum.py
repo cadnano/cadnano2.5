@@ -1,13 +1,13 @@
-from enum import Enum as _Enum
+from enum import IntEnum, Enum
+from typing import NewType
 
+# Type Alias IntEnum member Alias
+EnumType = int
 
 def enumNames(cls):
-    return [a for a, b in sorted(filter(lambda z: isinstance(z[1], int),
-                                        cls.__dict__.items()), key=lambda x: x[1])]
-
+    return [a for a, b in sorted(cls.__members__.items(), key=lambda x: x[1])]
 
 ENUM_NAMES = {}
-
 
 class EnumMask(object):
     def __init__(self, enum, value):
@@ -30,7 +30,7 @@ class EnumMask(object):
         )
 
 
-class Enum(_Enum):
+class BitEnum(Enum):
     @property
     def bwv(self):  # bitwise value
         cls = self.__class__
@@ -49,12 +49,12 @@ class Enum(_Enum):
             raise
 
 
-class PartType(_Enum):
+class PartEnum(IntEnum):
     NUCLEICACIDPART = 1
     PLASMIDPART = 2
 
 
-class PointType:
+class PointEnum(IntEnum):
     """For serializing virtual helices as only pointing in the Z direction
     or pointing in arbitrary directions.
     """
@@ -62,16 +62,16 @@ class PointType:
     ARBITRARY = 1
 
 
-ENUM_NAMES['point_type'] = enumNames(PointType)
+ENUM_NAMES['point_type'] = enumNames(PointEnum)
 
 
-class Axis:
+class AxisEnum(IntEnum):
     X = 1
     Y = 2
     Z = 4
 
 
-class ItemType(_Enum):
+class ItemEnum(IntEnum):
     # DNA = 0
     # PLASMID = 1
     # RNA = 2
@@ -88,40 +88,40 @@ class ItemType(_Enum):
 #     THREE_PRIME = 1
 
 
-class StrandType:
+class StrandEnum(IntEnum):
     SCAFFOLD = 0
     STAPLE = 1
     FWD = 0
     REV = 1
 
 
-class ModType:
+class ModEnum(IntEnum):
     END_5PRIME = 0
     END_3PRIME = 1
     INTERNAL = 2
 
 
-class LatticeType:
+class LatticeEnum(IntEnum):
     SQUARE = 0
     HONEYCOMB = 1
 
 
-class GridType:
+class GridEnum(IntEnum):
     NONE = 0
     SQUARE = 1
     HONEYCOMB = 2
 
 
-class SliceViewType:
+class OrthoViewEnum(IntEnum):
     SLICE = 0
     GRID = 1
     BOTH = 2
 
 
-ENUM_NAMES['grid_type'] = enumNames(GridType)
+ENUM_NAMES['grid_type'] = enumNames(GridEnum)
 
 
-class HandleType:
+class HandleEnum(IntEnum):
     TOP_LEFT = 1
     TOP = 2
     TOP_RIGHT = 4
@@ -132,22 +132,22 @@ class HandleType:
     LEFT = 128
 
 
-ENUM_NAMES['handle_type'] = enumNames(HandleType)
+ENUM_NAMES['handle_type'] = enumNames(HandleEnum)
 
-# class BreakType:
+# class BreakEnum(IntEnum):
 #     LEFT5PRIME = 0
 #     LEFT3PRIME = 1
 #     RIGHT5PRIME = 2
 #     RIGHT3PRIME = 3
 
 
-# class HandleOrient:
+# class HandleOrientEnum(IntEnum):
 #     LEFT_UP = 0
 #     RIGHT_UP = 1
 #     LEFT_DOWN = 2
 #     RIGHT_DOWN = 3
 
-# class PartEdges(Enum):
+# class PartEdgesEnum(BitEnum):
 #     NONE     = 0x0001
 #     TOP      = 0x0002
 #     LEFT     = 0x0004

@@ -10,13 +10,14 @@ from PyQt5.QtGui import QPainterPath
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
 
 from cadnano import util
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.controllers import VirtualHelixItemController
 from cadnano.gui.palette import newPenObj, getColorObj  # getBrushObj, getNoBrush
-from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
+from . import PathNucleicAcidPartItemT
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
@@ -52,21 +53,20 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
-    def __init__(self, model_virtual_helix, part_item, viewroot):
+    def __init__(self, id_num: int, part_item: PathNucleicAcidPartItemT):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (TYPE): Description
-            viewroot (TYPE): Description
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: Description
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsPathItem.__init__(self, parent=part_item.proxy())
-        self._viewroot = viewroot
+        self._viewroot = part_item._viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
-        self._handle = VirtualHelixHandleItem(self, part_item, viewroot)
+        self._handle = VirtualHelixHandleItem(self, part_item)
         self._last_strand_set = None
         self._last_idx = None
         self.setFlag(QGraphicsItem.ItemUsesExtendedStyleOption)
@@ -124,15 +124,19 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             sender (obj): Model object that emitted the signal.
             strand (TYPE): Description
         """
-        StrandItem(strand, self, self._viewroot)
+        if self._viewroot.are_signals_on:
+            StrandItem(strand, self, self._viewroot)
     # end def
 
     def virtualHelixRemovedSlot(self):
-        """Summary
+        ''' Slot wrapper for ``destroy()``
+        '''
+        return self.destroy()
+    # end def
 
-        Returns:
-            TYPE: Description
-        """
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
         self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
         self._controller.disconnectSignals()
         self._controller = None
@@ -144,6 +148,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._model_part = None
         self._getActiveTool = None
         self._handle = None
+        self._viewroot = None
     # end def
 
     def virtualHelixPropertyChangedSlot(self, keys, values):
@@ -301,7 +306,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         part = self.part()
         path = QPainterPath()
         sub_step_size = part.subStepSize()
-        canvas_size = self._model_vh.getSize()
+        _, canvas_size = self._model_part.getOffsetAndSize(self._id_num)
         # border
         path.addRect(0, 0, bw * canvas_size, 2 * bw)
         # minor tick marks
@@ -396,7 +401,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
         self.scene().views()[0].addToPressList(self)
         strand_set, idx = self.baseAtPoint(event.pos())
-        self._model_vh.setActive(strand_set.isForward(), idx)
+        self._model_part.setActiveVirtualHelix(self._id_num, strand_set.isForward(), idx)
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MousePress"
 

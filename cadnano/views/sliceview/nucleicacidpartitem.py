@@ -1,19 +1,34 @@
 from ast import literal_eval
+from warnings import warn
 
 from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsSceneEvent
 
-from cadnano.proxies.cnenum import GridType, HandleType
+from PyQt5.QtWidgets import (
+                            QGraphicsItem,
+                            QGraphicsLineItem,
+                            QGraphicsRectItem,
+                            QGraphicsSceneEvent
+                            )
+
+from cadnano.objectinstance import ObjectInstance
+from cadnano.part.nucleicacidpart import NucleicAcidPart
+from cadnano.proxies.cnenum import GridEnum, HandleEnum
+
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+from cadnano.controllers import NucleicAcidPartItemController
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-from cadnano.views.abstractitems.abstractpartitem import QAbstractPartItem
+
+from cadnano.views.abstractitems import QAbstractPartItem
+
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
+
 from cadnano.views.resizehandles import ResizeHandleGroup
 from cadnano.views.sliceview.sliceextras import ShortestPathHelper
 from . import slicestyles as styles
 from .griditem import GridItem
 from .prexovermanager import PreXoverManager
 from .virtualhelixitem import SliceVirtualHelixItem
+from . import SliceRootItemT, AbstractSliceToolT
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
@@ -30,7 +45,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     where x is the cartesian product.
 
     Attributes:
-        active_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): Description
+        active_virtual_helix_item: Description
         resize_handle_group (ResizeHandleGroup): handles for dragging and resizing
         griditem (GridItem): Description
         outline (QGraphicsRectItem): Description
@@ -38,36 +53,41 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         scale_factor (float): Description
     """
     _RADIUS = styles.SLICE_HELIX_RADIUS
+    _RADIUS_TUPLE = (DEFAULT_RADIUS, _RADIUS)
     _BOUNDING_RECT_PADDING = 80
 
-    def __init__(self, model_part_instance, viewroot, parent=None):
+    def __init__(self,  part_instance: ObjectInstance,
+                        viewroot: SliceRootItemT):
         """Summary
 
         Args:
-            model_part_instance (TYPE): Description
-            viewroot (TYPE): Description
-            parent (None, optional): Description
+            part_instance:  ``ObjectInstance`` of the ``Part``
+            viewroot: ``SliceRootItem`` and parent object
         """
-        super(SliceNucleicAcidPartItem, self).__init__(model_part_instance, viewroot, parent)
+        super(SliceNucleicAcidPartItem, self).__init__(part_instance, viewroot)
+        self.setFlag(QGraphicsItem.ItemIsFocusable)
 
         self.shortest_path_start = None
-        self.neighbor_map = dict()
         self.coordinates_to_vhid = dict()
-        self.coordinates_to_xy = dict()
+        self._last_hovered_coord = None
         self._last_hovered_item = None
         self._highlighted_path = []
+        self._highlighted_copypaste = []
+        self.lock_hints = False
+        self.copypaste_origin_offset = None
         self.spa_start_vhi = None
         self.last_mouse_position = None
+        self._highlighted_grid_point = None
 
         self._getActiveTool = viewroot.manager.activeToolGetter
         m_p = self._model_part
         self._controller = NucleicAcidPartItemController(self, m_p)
         self.scale_factor = self._RADIUS / m_p.radius()
         self.inverse_scale_factor = m_p.radius() / self._RADIUS
-        self.active_virtual_helix_item = None
+        self.active_virtual_helix_item: SliceVirtualHelixItem = None
         self.prexover_manager = PreXoverManager(self)
         self.hide()  # hide while until after attemptResize() to avoid flicker
-        self._rect = QRectF(0., 0., 1000., 1000.)  # set this to a token value
+        self._rect: QRectF = QRectF(0., 0., 1000., 1000.)  # set this to a token value
         self.boundRectToModel()
         self.setPen(getNoPen())
         self.setRect(self._rect)
@@ -93,14 +113,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.model_bounds_hint.setPen(getNoPen())
 
         self.resize_handle_group = ResizeHandleGroup(o_rect, _HANDLE_SIZE, model_color, True,
-                                                     HandleType.TOP |
-                                                     HandleType.BOTTOM |
-                                                     HandleType.LEFT |
-                                                     HandleType.RIGHT |
-                                                     HandleType.TOP_LEFT |
-                                                     HandleType.TOP_RIGHT |
-                                                     HandleType.BOTTOM_LEFT |
-                                                     HandleType.BOTTOM_RIGHT,
+                                                     HandleEnum.TOP |
+                                                     HandleEnum.BOTTOM |
+                                                     HandleEnum.LEFT |
+                                                     HandleEnum.RIGHT |
+                                                     HandleEnum.TOP_LEFT |
+                                                     HandleEnum.TOP_RIGHT |
+                                                     HandleEnum.BOTTOM_LEFT |
+                                                     HandleEnum.BOTTOM_RIGHT,
                                                      self, show_coords=True)
 
         self.griditem = GridItem(self, self._model_props['grid_type'])
@@ -142,11 +162,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """Summary
 
         Args:
-            part (TYPE): Description
-            info (TYPE): Description
-
-        Args:
-            TYPE: Description
+            part (NucleicAcidPart): Description
+            info (tuple): Description
         """
         pxom = self.prexover_manager
         pxom.deactivateNeighbors()
@@ -156,15 +173,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        """Summary
+        """Slot for property chaing
 
         Args:
-            model_part (Part): The model part
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Args:
-            TYPE: Description
+            model_part (NucleicAcidPart): The model part
+            property_key (str): map key
+            new_value (Any): Description
         """
         if self._model_part == model_part:
             self._model_props[property_key] = new_value
@@ -179,28 +193,30 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                 else:
                     self.hide()
             elif property_key == 'grid_type':
-                self.griditem.setGridType(new_value)
+                self.griditem.setGridEnum(new_value)
     # end def
 
     def partRemovedSlot(self, sender):
-        """docstring for partRemovedSlot
+        """Slot wrapper for ``destroy()``
 
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender (NucleicAcidPart): Model object that emitted the signal.
         """
-        self.parentItem().removePartItem(self)
+        return self.destroy()
+    # end def
 
-        scene = self.scene()
-
-        scene.removeItem(self)
-
-        self._model_part = None
-        self._mod_circ = None
-
-        self._controller.disconnectSignals()
-        self._controller = None
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        super(SliceNucleicAcidPartItem, self).destroy()
+        self.x_axis_line = None
+        self.y_axis_line = None
+        self.model_bounds_hint = None
+        self.outline = None
         self.resize_handle_group.removeHandles()
+        self.resize_handle_group = None
         self.griditem = None
+        self._mod_circ = None
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs, do_deselect):
@@ -250,7 +266,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             vhi (cadnano.views.sliceview.virtualhelixitem.SliceVirtualHelixItem): the item associated with id_num
         """
-        neighbors = vhi.cnModel().getProperty('neighbors')
+        neighbors = vhi.getProperty('neighbors')
         neighbors = literal_eval(neighbors)
         vhi.beginAddWedgeGizmos()
         for nvh in neighbors:
@@ -289,25 +305,38 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             TYPE: Description
         """
-        vhi = SliceVirtualHelixItem(virtual_helix, self)
-        self._virtual_helix_item_hash[id_num] = vhi
-        self._refreshVirtualHelixItemGizmos(id_num, vhi)
-        for neighbor_id in neighbors:
-            nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
-            if nvhi:
-                self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
-        self.enlargeRectToFit()
+        if self._viewroot.are_signals_on:
+            vhi = SliceVirtualHelixItem(id_num, self)
+            self._virtual_helix_item_hash[id_num] = vhi
+            self._refreshVirtualHelixItemGizmos(id_num, vhi)
+            for neighbor_id in neighbors:
+                nvhi = self._virtual_helix_item_hash.get(neighbor_id, False)
+                if nvhi:
+                    self._refreshVirtualHelixItemGizmos(neighbor_id, nvhi)
+            self.enlargeRectToFit()
 
-        position = sender.locationQt(id_num=id_num,
-                                     scale_factor=self.scale_factor)
-        coordinates = ShortestPathHelper.findClosestPoint(position=position, point_map=self.coordinates_to_xy)
+            position = sender.locationQt(id_num=id_num,
+                                         scale_factor=self.scale_factor)
 
-        assert id_num not in self.coordinates_to_vhid.values()
+            if self.griditem.grid_type is GridEnum.HONEYCOMB:
+                coordinates = HoneycombDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                           position[0],
+                                                                           position[1],
+                                                                           scale_factor=self.scale_factor)
+            else:
+                coordinates = SquareDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                        position[0],
+                                                                        position[1],
+                                                                        scale_factor=self.scale_factor)
 
-        self.coordinates_to_vhid[coordinates] = id_num
+            assert id_num not in self.coordinates_to_vhid.values()
+            if coordinates in self.coordinates_to_vhid.values():
+                print('COORDINATES DUPLICATE %s in %s' % (coordinates, self.coordinates_to_vhid.values()))
 
-        assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
-        assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
+                self.coordinates_to_vhid[coordinates] = id_num
+
+                assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
+                assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
@@ -371,29 +400,30 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             select_tool.deselectSet(vh_set)
     # end def
 
-    def partDocumentSettingChangedSlot(self, part, key, value):
-        """Summary
+    def partDocumentSettingChangedSlot(self, part: NucleicAcidPart, key: str, value: str):
+        """Slot for handling changes to Document settings
 
         Args:
-            part (TYPE): Description
-            key (TYPE): Description
-            value (TYPE): Description
-
-        Args:
-            TYPE: Description
+            part: the model :obj:`NucleicAcidPart`
+            key: key to the dictionary, must be `grid`
+            value: value
 
         Raises:
-            ValueError: Description
+            ValueError: Unknown grid styling
         """
+        warn(   "partDocumentSettingChangedSlot is not implemented GridItem.setDrawlines needs to be implemented")
+        return
         if key == 'grid':
             if value == 'lines and points':
                 self.griditem.setDrawlines(True)
             elif value == 'points':
                 self.griditem.setDrawlines(False)
             elif value == 'circles':
-                pass  # self.griditem.setGridAppearance(False)
+                NotImplementedError("not implented circles value")
             else:
-                raise ValueError("unknown grid styling")
+                raise ValueError("unknown grid styling: {}".format(value))
+        else:
+            raise NotImplementedError("unknown key {}".format(key))
 
     ### ACCESSORS ###
     def boundingRect(self):
@@ -498,8 +528,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             bottom_right as reconfigured with padding
         """
         rect = self._rect
-        ptTL = QPointF(*self.padTL(padding, *top_left)) if top_left else rect.topLeft()
-        ptBR = QPointF(*self.padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
+        ptTL = QPointF(*self._padTL(padding, *top_left)) if top_left else rect.topLeft()
+        ptBR = QPointF(*self._padBR(padding, *bottom_right)) if bottom_right else rect.bottomRight()
         self._rect = QRectF(ptTL, ptBR)
         self.setRect(self._rect)
         self._configureOutline(self.outline)
@@ -507,11 +537,11 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return self.outline.rect()
     # end def
 
-    def padTL(self, padding, xTL, yTL):
+    def _padTL(self, padding, xTL, yTL):
         return xTL + padding, yTL + padding
     # end def
 
-    def padBR(self, padding, xBR, yBR):
+    def _padBR(self, padding, xBR, yBR):
         return xBR - padding, yBR - padding
     # end def
 
@@ -621,14 +651,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         else:
             m_b_h.hide()
 
-    def updateStatusBar(self, status_str):
+    def updateStatusBar(self, status_str, timeout=0):
         """Shows status_str in the MainWindow's status bar.
 
         Args:
             status_str (str): Description to display in status bar.
         """
-        pass  # disabled for now.
-        # self.window().statusBar().showMessage(status_str, timeout)
+        self.window().statusBar().showMessage(status_str, timeout)
     # end def
 
     def zoomToFit(self):
@@ -670,7 +699,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def hoverMoveEvent(self, event):
-        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        mapped_position = self.griditem.mapFromScene(event.scenePos())
         self.last_mouse_position = (mapped_position.x(), mapped_position.y())
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "HoverMove"
@@ -710,26 +739,51 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def keyPressEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+            else SquareDnaPart.isInLatticeCoord
+
         if event.key() == Qt.Key_Escape:
+#            print("Esc here")
             self._setShortestPathStart(None)
             self.removeAllCreateHints()
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
+
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates())
-        elif is_alt and self.shortest_path_add_mode is True:
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                x, y = self.coordinates_to_xy.get(self.getLastHoveredCoordinates())
-                self._preview_spa((x, y))
-        elif is_alt:
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
+            tool = self._getActiveTool()
+            if tool.methodPrefix() == 'selectTool':
+                self.removeAllCopyPasteHints()
+                tool.clipboard = None
+        elif is_alt and self.shortest_path_add_mode is True and isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                                                                 xy_tuple=self.last_mouse_position,
+                                                                                 coordinate_tuple=self.getLastHoveredCoordinates(),
+                                                                                 scale_factor=self.scale_factor):
+            self._previewSpa(self.last_mouse_position)
+        elif is_alt and self.getLastHoveredCoordinates() and self.last_mouse_position:
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
+                coord = self.getLastHoveredCoordinates()
+                self.highlightOneGridPoint(coord, styles.SPA_START_HINT_COLOR)
+                self.griditem.highlightGridPoint(coord[0], coord[1], on=True)
     # end def
 
     def keyReleaseEvent(self, event):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
         if not is_alt:
             self.removeAllCreateHints()
-            if self._inPointItem(self.last_mouse_position, self.getLastHoveredCoordinates()):
-                self.highlightOneGridPoint(self.getLastHoveredCoordinates())
+            isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.isInLatticeCoord
+            if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                xy_tuple=self.last_mouse_position,
+                                coordinate_tuple=self.getLastHoveredCoordinates(),
+                                scale_factor=self.scale_factor):
+                coord = self.getLastHoveredCoordinates()
+                self.highlightOneGridPoint(coord)
+                self.griditem.highlightGridPoint(coord[0], coord[1], on=True)
     # end def
 
     def createToolMousePress(self, tool, event, alt_event=None):
@@ -740,7 +794,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             event (TYPE): Description
             alt_event (None, optional): Description
         """
-        mapped_position = self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
+        mapped_position = self.griditem.mapFromScene(event.scenePos())
         position = (mapped_position.x(), mapped_position.y())
 
         # 1. get point in model coordinates:
@@ -779,13 +833,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             self._highlightSpaVH(id_num)
     # end def
 
-    def _getCoordinateParity(self, row, column):
+    def _getModelXYforCoord(self, row, column):
+        radius = DEFAULT_RADIUS
         if self.griditem.grid_type is GridType.HONEYCOMB:
-            return 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
+            return HoneycombDnaPart.latticeCoordToQtXY(radius, row, column)
         elif self.griditem.grid_type is GridType.SQUARE:
+            return SquareDnaPart.latticeCoordToQtXY(radius, row, column)
+        else:
+            return None
+    # end def
+
+    def _getCoordinateParity(self, row, column):
+        if self.griditem.grid_type is GridEnum.HONEYCOMB:
+            return 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
+        elif self.griditem.grid_type is GridEnum.SQUARE:
             return 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
         else:
             return None
+    # end def
 
     def _handleShortestPathMousePress(self, tool, position, is_spa_mode):
         """
@@ -849,13 +914,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             The ID of the last VHI created
         """
-        path = ShortestPathHelper.shortestPathXY(start=start, end=end,
-                                                 neighbor_map=self.neighbor_map,
+        path = ShortestPathHelper.shortestPathXY(start=start,
+                                                 end=end,
                                                  vh_set=self.coordinates_to_vhid.keys(),
-                                                 point_map=self.coordinates_to_xy,
                                                  grid_type=self.griditem.grid_type,
-                                                 scale_factor=self.inverse_scale_factor,
-                                                 radius=self._RADIUS)
+                                                 scale_factor=self.scale_factor,
+                                                 part_radius=DEFAULT_RADIUS)
 
         # Abort and exit SPA if there is no path from start to end
         if path == []:
@@ -884,58 +948,59 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             TYPE: Description
         """
-        mapped_position= self.griditem.mapFromScene(event.scenePos().x(), event.scenePos().y())
-        event_xy = (mapped_position.x(), mapped_position.y())
-        event_coord = ShortestPathHelper.findClosestPoint(event_xy, self.coordinates_to_xy)
         is_alt = True if event.modifiers() & Qt.AltModifier else False
+        mapped_position = self.griditem.mapFromScene(event.scenePos())
+        event_xy = (mapped_position.x(), mapped_position.y())
+        if self.griditem.grid_type is GridType.HONEYCOMB:
+            event_coord = HoneycombDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                       event_xy[0],
+                                                                       event_xy[1],
+                                                                       scale_factor=self.scale_factor,
+                                                                       strict=True)
+        elif self.griditem.grid_type is GridType.SQUARE:
+            event_coord = SquareDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
+                                                                    event_xy[0],
+                                                                    event_xy[1],
+                                                                    scale_factor=self.scale_factor,
+                                                                    strict=True)
+        else:
+            event_coord = None
+
         self.last_mouse_position = event_xy
+
+        if event_coord:
+            try:
+                grid_point = self.griditem.points_dict[(event_coord)]
+                self.setLastHoveredItem(grid_point)
+            except KeyError:
+                pass
 
         # Un-highlight GridItems if necessary by calling createToolHoverLeave
         if len(self._highlighted_path) > 1 or (self._highlighted_path and self._highlighted_path[0] != event_coord):
-            self.createToolHoverLeave(tool=tool, event=event)
+            self.removeAllCreateHints()
+
+        self._highlighted_grid_point = event_coord
+        if event_coord:
+            self.griditem.highlightGridPoint(row=event_coord[0], column=event_coord[1], on=True)
 
         # Highlight GridItems if alt is being held down
-        if is_alt and self.shortest_path_add_mode and self._inPointItem(event_xy, event_coord):
-            self._preview_spa(event_xy)
+        if is_alt and self.shortest_path_add_mode and event_coord is not None:
+            self._previewSpa(event_xy)
         else:
-            point_item = self.coordinates_to_xy.get(event_coord)
-
-            if point_item is not None and self._inPointItem(event_xy, event_coord) and is_alt:
+            if is_alt and event_coord is not None:
                 self.highlightOneGridPoint(self.getLastHoveredCoordinates(), styles.SPA_START_HINT_COLOR)
-            elif point_item is not None and self._inPointItem(event_xy, event_coord) and not is_alt:
+            elif not is_alt and event_coord is not None:
                 part = self._model_part
                 next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
                 self.griditem.showCreateHint(event_coord, next_idnums=next_idnums)
-
                 self._highlighted_path.append(event_coord)
 
         tool.hoverMoveEvent(self, event)
         return QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
-    def _inPointItem(self, event_xy, event_coord):
-        """
-        Determine if x-y coordinates are inside the given GridPoint.
 
-        Args:
-            event_xy (tuple):  the x-y coordinates corresponding to the
-                position of the mouse
-            event_coord (tuple):  the i-j coordinates corresponding to the
-                location of the GridPoint
-
-        Returns:
-            True if the mouse is in the given GridPoint, False otherwise
-        """
-        if event_xy is None or event_coord is None or self.coordinates_to_xy.get(event_coord) is None:
-            return False
-
-        point_x, point_y = self.coordinates_to_xy.get(event_coord)
-        event_x, event_y = event_xy
-
-        return (point_x - event_x)**2 + (point_y - event_y)**2 <= self._RADIUS**2
-    # end def
-
-    def _preview_spa(self, event_xy):
+    def _previewSpa(self, event_xy):
         """
         Highlight and add VH ID numbers to the GridPoints that the SPA would
         use.
@@ -948,16 +1013,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             None
         """
         part = self._model_part
-        start_coord = self.shortest_path_start
-        end_coord = event_xy
-        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_coord,
-                                                                      end=end_coord,
-                                                                      neighbor_map=self.neighbor_map,
+        start_xy = self.shortest_path_start
+        end_xy = event_xy
+        self._highlighted_path = ShortestPathHelper.shortestPathAStar(start=start_xy ,
+                                                                      end=end_xy ,
+                                                                      part_radius=DEFAULT_RADIUS,
                                                                       vh_set=self.coordinates_to_vhid.keys(),
-                                                                      point_map=self.coordinates_to_xy)
+                                                                      grid_type=self.griditem.grid_type,
+                                                                      scale_factor=self.scale_factor)
         even_id = part._getNewIdNum(0)
         odd_id = part._getNewIdNum(1)
         for coord in self._highlighted_path:
+            # This can return True, False or None
             is_odd = self.griditem.showCreateHint(coord, next_idnums=(even_id, odd_id))
             if is_odd is True:
                 odd_id += 2
@@ -967,6 +1034,149 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def createToolHoverLeave(self, tool, event):
         self.removeAllCreateHints()
+        return QGraphicsItem.hoverLeaveEvent(self, event)
+    # end def
+
+    def selectToolHoverEnter(self, tool, event):
+        """
+        Hint vh coords that will be created if clipboard is pasted at hoverEnter
+        position.
+        """
+        if tool.clipboard is None:  # is there anything on the clipboard?
+            return
+
+        self.removeAllCopyPasteHints()
+        event_pos = self.griditem.mapFromScene(event.scenePos())
+
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord\
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
+        hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  event_pos.x(),
+                                                  event_pos.y(),
+                                                  self.scale_factor)
+        self._last_hovered_coord = (hov_row, hov_col)
+        parity = self._getCoordinateParity(hov_row, hov_col)
+
+        part = self._model_part
+        vh_id_list = tool.clipboard['vh_list']
+        try:
+            min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
+        except ValueError:  # no vhs match parity
+            return
+
+        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
+        min_row, min_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  min_pos[0],
+                                                  min_pos[1],
+                                                  self.scale_factor)
+        id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
+
+        # placing clipboard's min_id_same_parity on the hovered_coord,
+        # hint neighboring coords with offsets corresponding to clipboard vhs
+        hinted_coordinates = []
+        for i in range(len(vh_id_list)):
+            vh_id, vh_len = vh_id_list[i]
+            position_xy = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                            position_xy[0],
+                                                            position_xy[1],
+                                                            self.scale_factor)
+            hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
+            hinted_coordinates.append(hint_coord)
+
+        # If any of the highlighted coordinates conflict with any existing VHs, abort
+        if any(coord in self.coordinates_to_vhid.keys() for coord in hinted_coordinates):
+            self.copypaste_origin_offset = None
+            return
+
+        for i, hint_coord in enumerate(hinted_coordinates):
+            self.griditem.showCreateHint(hint_coord, next_idnums=(i+id_offset, i+id_offset))
+            self._highlighted_copypaste.append(hint_coord)
+        # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
+
+        hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
+        min_x, min_y = part.getVirtualHelixOrigin(min_id_same_parity)
+
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+    # end def
+
+    def selectToolHoverMove(self, tool, event):
+        """
+        Hint vh coords that will be created if clipboard is pasted at hoverMove
+        position.
+        """
+        if tool.clipboard is None:  # is there anything on the clipboard?
+            return
+
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+            else SquareDnaPart.isInLatticeCoord
+        event_pos = self.griditem.mapFromScene(event.scenePos())
+        event_position_xy = (event_pos.x(), event_pos.y())
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord \
+            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
+        hover_coordinates = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                   event_position_xy[0],
+                                                   event_position_xy[1],
+                                                   self.scale_factor)
+
+        if self._last_hovered_coord == hover_coordinates or not isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
+                                                                                 xy_tuple=self.last_mouse_position,
+                                                                                 coordinate_tuple=self.getLastHoveredCoordinates(),
+                                                                                 scale_factor=self.scale_factor):
+            return
+        else:
+            self._last_hovered_coord = hover_coordinates
+            self.removeAllCopyPasteHints()
+
+        parity = self._getCoordinateParity(hover_coordinates[0], hover_coordinates[1])
+        vh_id_list = tool.clipboard['vh_list']
+        try:
+            min_id_same_parity = int(min(filter(lambda x: x[0] % 2 == parity, vh_id_list))[0])
+        except ValueError:
+            return
+
+        part = self._model_part
+        min_pos = part.locationQt(min_id_same_parity, self.scaleFactor())
+        min_row, min_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                  min_pos[0],
+                                                  min_pos[1],
+                                                  self.scale_factor)
+
+        id_offset = part.getMaxIdNum() if part.getMaxIdNum() % 2 == 0 else part.getMaxIdNum() + 1
+
+        # placing clipboard's min_id_same_parity on the hovered_coord,
+        # hint neighboring coords with offsets corresponding to clipboard vhs
+        hinted_coordinates = []
+        for i in range(len(vh_id_list)):
+            vh_id, vh_len = vh_id_list[i]
+            position_xy = part.locationQt(vh_id, self.scaleFactor())
+            copied_row, copied_col = positionToLatticeCoord(DEFAULT_RADIUS,
+                                                            position_xy[0],
+                                                            position_xy[1],
+                                                            self.scale_factor)
+            hint_coord = (hover_coordinates[0]+(copied_row-min_row), hover_coordinates[1]+(copied_col-min_col))
+            hinted_coordinates.append(hint_coord)
+
+        # If any of the highlighted coordinates conflict with any existing VHs, abort
+        if any(coord in self.coordinates_to_vhid.keys() for coord in hinted_coordinates):
+            self.copypaste_origin_offset = None
+            return
+
+        for i, hint_coord in enumerate(hinted_coordinates):
+            self.griditem.showCreateHint(hint_coord, next_idnums=(i+id_offset, i+id_offset))
+            self._highlighted_copypaste.append(hint_coord)
+
+        # This is going to give us the difference between hovering and the min parity location.  We want the
+        # difference between the min parity's former and new location
+        hov_x, hov_y = self._getModelXYforCoord(hover_coordinates[0], hover_coordinates[1])
+
+        min_x, min_y, _ = part.getCoordinate(min_id_same_parity, 0)
+        self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
+    # end def
+
+    def selectToolHoverLeave(self, tool, event):
+        self.removeAllCopyPasteHints()
+    # end def
 
     def selectToolMousePress(self, tool, event):
         """
@@ -974,13 +1184,16 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool (TYPE): Description
             event (TYPE): Description
         """
+        if tool.clipboard is not None:
+            self.pasteClipboard(tool, event)
+
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
         part_pt_tuple = self.getModelPos(pt)
         part = self._model_part
         if part.isVirtualHelixNearPoint(part_pt_tuple):
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
-            if id_num is not None:
+            if id_num >= 0:
                 pass
                 # loc = part.getCoordinate(id_num, 0)
                 # print("VirtualHelix #{} at ({:.3f}, {:.3f})".format(id_num, loc[0], loc[1]))
@@ -993,35 +1206,19 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def setNeighborMap(self, neighbor_map):
-        """
-        Update the internal mapping of coordinates to their neighbors.
+    def pasteClipboard(self, tool, event):
+        assert tool.clipboard is not None
+        assert isinstance(event, QGraphicsSceneMouseEvent)
 
-        Args:
-            neighbor_map (dict):  the new mapping of coordinates to their
-                neighbors
+        new_vhs = tool.pasteClipboard()
 
-        Returns:
-            None
-        """
-        assert isinstance(neighbor_map, dict)
-        self.neighbor_map = neighbor_map
-    # end def
-
-    def setPointMap(self, point_map):
-        """
-        Update the internal mapping of coordinates to x-y positions.
-
-        Args:
-            point_map (dict):  the new mapping of coordinates to their x-y
-                position
-
-        Returns:
-            None
-
-        """
-        assert isinstance(point_map, dict)
-        self.coordinates_to_xy = point_map
+    def removeAllCopyPasteHints(self):
+        if self.lock_hints:
+            return
+        for coord in self._highlighted_copypaste:
+            self.griditem.showCreateHint(coord, show_hint=False)
+        self._highlighted_copypaste = []
+        self.copypaste_origin_offset = None
     # end def
 
     def removeAllCreateHints(self):
@@ -1033,8 +1230,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Returns:
             None
         """
+        if self.lock_hints:
+            return
         for coord in self._highlighted_path:
             self.griditem.showCreateHint(coord, show_hint=False)
+            self.griditem.highlightGridPoint(coord[0],
+                                             coord[1],
+                                             on=False)
         self._highlighted_path = []
     # end def
 
@@ -1056,11 +1258,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         assert isinstance(coordinates, tuple) and len(coordinates) is 2
         assert isinstance(coordinates[0], int) and isinstance(coordinates[1], int)
 
-        if self.coordinates_to_xy.get(coordinates) is not None:
-            part = self._model_part
-            next_idnums = (part._getNewIdNum(0), part._getNewIdNum(1))
-            self.griditem.showCreateHint(coordinates, next_idnums=next_idnums, color=color)
-            self._highlighted_path.append(coordinates)
+        next_idnums = (self._model_part._getNewIdNum(0), self._model_part._getNewIdNum(1))
+        self.griditem.showCreateHint(coordinates, next_idnums=next_idnums, color=color)
+        self._highlighted_path.append(coordinates)
     # end def
 
     def getLastHoveredCoordinates(self):

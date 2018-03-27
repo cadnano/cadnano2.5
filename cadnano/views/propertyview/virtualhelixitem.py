@@ -8,8 +8,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
 
-from cadnano.proxies.cnenum import ItemType
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
+from cadnano.proxies.cnenum import ItemEnum
+from cadnano.controllers import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
 
 
@@ -31,10 +31,10 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(VirtualHelixSetItem, self).__init__(**kwargs)
         if self._key == "name":
-            for vh in self.cnModelList():
-                self._controller_list.append(VirtualHelixItemController(self, vh.part(), True, False))
+            for outline_vh in self.outlineViewObjList():
+                self._controller_list.append(VirtualHelixItemController(self, outline_vh.part(), True, False))
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
@@ -42,9 +42,9 @@ class VirtualHelixSetItem(CNPropertyItem):
         """Overrides AbstractPropertyPartItem.itemType
 
         Returns:
-            ItemType: VIRTUALHELIX
+            ItemEnum: VIRTUALHELIX
         """
-        return ItemType.VIRTUALHELIX
+        return ItemEnum.VIRTUALHELIX
     # end def
 
     # SLOTS
@@ -60,8 +60,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        # print("prop slot", self._cn_model_set)
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             for key, val in zip(keys, values):
                 # print("change slot", key, val)
                 self.setValue(key, val)
@@ -69,7 +68,7 @@ class VirtualHelixSetItem(CNPropertyItem):
 
     def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
         # print("resize slot")
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             val = virtual_helix.getSize()
             self.setValue('length', int(val))
     # end def
@@ -82,7 +81,7 @@ class VirtualHelixSetItem(CNPropertyItem):
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             neighbors (list):
         """
-        if virtual_helix in self.cnModelSet():
+        if virtual_helix in self.outlineViewObjSet():
             self.disconnectSignals()
             self.parent().removeChild(self)
     # end def
@@ -107,7 +106,7 @@ class VirtualHelixSetItem(CNPropertyItem):
         Returns:
             TYPE: Description
         """
-        cn_m = self.cnModel()
+        cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'eulerZ':
             editor = QDoubleSpinBox(parent_QWidget)
@@ -146,17 +145,17 @@ class VirtualHelixSetItem(CNPropertyItem):
         u_s.beginMacro("Multi Property VH Edit: %s" % key)
         if key == 'length':
             # print("Property view 'length' updating")
-            for vh in self.cnModelList():
+            for vh in self.outlineViewObjList():
                 # print("vh", vh.idNum(), value, vh.getSize())
                 if value != vh.getSize():
                     vh.setSize(value)
         elif key == 'z':
             # print("Property view 'z' updating", key, value)
-            for vh in self.cnModelList():
+            for vh in self.outlineViewObjList():
                 if value != vh.getZ():
                     vh.setZ(value)
         else:
-            for vh in self.cnModelList():
+            for vh in self.outlineViewObjList():
                 if value != vh.getProperty(key):
                     vh.setProperty(key, value)
         u_s.endMacro()

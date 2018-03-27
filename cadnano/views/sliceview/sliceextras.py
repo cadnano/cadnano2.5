@@ -1,13 +1,16 @@
 from queue import Empty, Queue, PriorityQueue
 
 import numpy as np
-from PyQt5.QtCore import QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt, pyqtProperty
+from PyQt5.QtCore import pyqtProperty, QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt
 from PyQt5.QtGui import QBrush, QColor, QPen, QPainterPath, QPolygonF, QRadialGradient, QTransform
 from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
 
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
-from cadnano.proxies.cnenum import GridType
+
+from cadnano.proxies.cnenum import GridEnum
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
+
 from . import slicestyles as styles
 
 
@@ -487,15 +490,10 @@ class PreXoverItem(QGraphicsRectItem):
         self.bond_3p.setLine(self._default_bond_3p)
     # end def
 
-    def destroy(self, scene):
-        """Summary
-
-        Args:
-            scene (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
+    def destroy(self):
+        '''Remove this object and references to it from the view
+        '''
+        scene = self.scene()
         self.phos_item.adapter.resetAnimations()
         self.phos_item.adapter = None
         scene.removeItem(self.phos_item)
@@ -707,9 +705,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         scene = self.scene()
         for i in range(len(fpxis)):
             x = fpxis.pop(i)
-            x.destroy(scene)
+            x.destroy()
             x = rpxis.pop(i)
-            x.destroy(scene)
+            x.destroy()
         self.virtual_helix_item = None
         self.model_part = None
         scene.removeItem(self.active_wedge_gizmo)
@@ -893,115 +891,33 @@ class WedgeGizmo(QGraphicsPathItem):
 
 class ShortestPathHelper(object):
     @staticmethod
-    def findClosestPoint(position, point_map):
-        """Find the closest point to a given position on the grid
-
-        This method first attempts to do a naive search to determine which
-        point is within _RADIUS of the position in question.
-
-        In the case that no point is within _RADIUS of the position in
-        question (e.g. when the position is just outside the _RADIUS of every
-        point, as is the case when clicking on the outter edge of a
-        GridItem), do a brute force search of the points as a last resort and
-        return a best guess.
-
-        Args:
-            position (tuple):  the X-Y position in question
-            point_map (dict):  a dictionary of coordinates to X-Y positions
-
-        Returns:
-            tuple:  the coordinates of the closest point to position
-        """
-        assert isinstance(position, tuple) and len(position) is 2
-        assert isinstance(point_map, dict) and len(point_map)
-
-        for coordinates, coordiante_position in point_map.items():
-            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-            if distance < _RADIUS**2:
-                # logger.debug('The closest point to %s,%s is %s,%s' % (position, best))
-                return coordinates
-
-        best_coordinates = None
-        best_distance = float('inf')
-        for coordinates, coordiante_position in point_map.items():
-            distance = (coordiante_position[0]-position[0])**2 + (coordiante_position[1]-position[1])**2
-            if distance < best_distance:
-                best_distance = distance
-                best_coordinates = coordinates
-
-        # TODO[NF]:  Remove once we determine why best_coordinates is
-        # sometimes None
-        if best_coordinates is None:
-            print('Could not find coordinates with position %s and coordinates_to_xy %s'
-                  % (position, point_map))
-        return best_coordinates
-
-    @staticmethod
-    def shortestPath(start, end, neighbor_map, vh_set, point_map):
-        """Return a path of coordinates that traverses from start to end.
-
-        Does a breadth-first search.  This could be further improved to do an A*
-        search.
-
-        Args:
-            start (tuple): The i-j coordinates corresponding to the start point
-            end (tuple):  The i-j coordinates corresponding to the end point
-            neighbor_map (dict):  A dictionary mapping i-j coordinates to
-            their neighbors
-            vh_set (set):  A set of points that currently have a VH
-            point_map (dict):  a dictionary of coordinates to X-Y positions
-
-        Returns:
-            A list of coordinates corresponding to a shortest path from start to
-            end.  This list omits the starting point as it's assumed that the
-            start point has already been clicked.
-        """
-        assert isinstance(start, tuple) and len(start) is 2, "start is '%s'" % str(start)
-        assert isinstance(end, tuple) and len(end) is 2, "end is '%s'" % str(end)
-
-        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
-        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
-
-        if start_coordinates is None or end_coordinates is None:
-            # TODO[NF]:  Change to logger
-            print('Could not find path from %s to %s' % (str(start), str(end)))
-            return []
-
-        # TODO[NF]:  Change to logger
-        # print('Finding shortest path from %s to %s...' % (str(start), str(end)))
-
-        if neighbor_map.get(start_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s', start_coordinates)
-        elif neighbor_map.get(end_coordinates) is None:
-            raise LookupError('Could not find a point corresponding to %s', end_coordinates)
-
-        parents = dict()
-        parents[start_coordinates] = None
-        queue = Queue()
-        queue.put(start_coordinates)
-
-        while not queue.empty():
-            try:
-                current_location = queue.get(block=False)
-            except Queue.Empty:
-                return []
-
-            if current_location == end_coordinates:
-                reversed_path = []
-                while current_location is not start_coordinates:
-                    reversed_path.append(current_location)
-                    current_location = parents[current_location]
-                return [node for node in reversed(reversed_path)]
+    def getNeighborsForCoordinate(grid_type, row, column):
+        # TODO[NF]:  Docstring
+        if grid_type is GridType.HONEYCOMB:
+            if not HoneycombDnaPart.isEvenParity(row, column):
+                return (
+                    (row+1, column),
+                    (row, column-1),
+                    (row, column+1)
+                )
             else:
-                neighbors = neighbor_map.get(current_location, [])
-                for neighbor in neighbors:
-                    if neighbor not in parents and neighbor not in vh_set:
-                        parents[neighbor] = current_location
-                        queue.put(neighbor)
-        return []
+                return (
+                    (row-1, column),
+                    (row, column+1),
+                    (row, column-1)
+                )
+        elif grid_type is GridType.SQUARE:
+            return(
+                (row, column+1),
+                (row, column-1),
+                (row-1, column),
+                (row+1, column)
+            )
+        else:
+            return ()
 
     @staticmethod
-    def shortestPathAStar(start, end, neighbor_map, vh_set, point_map):
+    def shortestPathAStar(start, end, vh_set, grid_type, part_radius, scale_factor):
         """Return a path of coordinates that traverses from start to end.
 
         Does an A* search.
@@ -1009,18 +925,22 @@ class ShortestPathHelper(object):
         Args:
             start (tuple): The i-j coordinates corresponding to the start point
             end (tuple):  The i-j coordinates corresponding to the end point
-            neighbor_map (dict):  A dictionary mapping i-j coordinates to
-            their neighbors
             vh_set (set):  A set of points that currently have a VH
-            point_map (dict):  a dictionary of coordinates to X-Y positions
+            grid_type (object):  The current grid type in the design.
+                Either GridType.HONEYCOMB or GridType.SQUARE
+            radius (float):  the radius of the VH
+            scale_factor (float):  the ratio of part to view radius
 
         Returns:
             A list of coordinates corresponding to a shortest path from start to
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        start_coordinates = ShortestPathHelper.findClosestPoint(position=start, point_map=point_map)
-        end_coordinates = ShortestPathHelper.findClosestPoint(position=end, point_map=point_map)
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridType.HONEYCOMB else \
+            SquareDnaPart.positionModelToLatticeCoord
+
+        start_coordinates = positionToLatticeCoord(part_radius, start[0], start[1], scale_factor=scale_factor)
+        end_coordinates = positionToLatticeCoord(part_radius, end[0], end[1], scale_factor=scale_factor)
 
         queue = PriorityQueue()
         queue.put((0, start_coordinates))
@@ -1044,7 +964,9 @@ class ShortestPathHelper(object):
                     current_location = parents[current_location]
                 return [node for node in reversed(reversed_path)]
             else:
-                neighbors = neighbor_map.get(current_location, [])
+                neighbors = ShortestPathHelper.getNeighborsForCoordinate(grid_type,
+                                                                         current_location[0],
+                                                                         current_location[1])
                 for neighbor in neighbors:
                     new_cost = cumulative_cost[current_location] + 1
                     if (neighbor not in parents or new_cost < cumulative_cost[neighbor]) and neighbor not in vh_set:
@@ -1077,23 +999,28 @@ class ShortestPathHelper(object):
         return difference_a*0.01 + difference_b*0.01
 
     @staticmethod
-    def shortestPathXY(start, end, neighbor_map, vh_set, point_map, grid_type,
-                       scale_factor, radius):
+    def shortestPathXY(start, end, vh_set, grid_type, scale_factor, part_radius):
         # TODO[NF]:  Docstring
+        assert part_radius == DEFAULT_RADIUS
         x_y_path = []
-        coordinate_path = ShortestPathHelper.shortestPathAStar(start=start, end=end, neighbor_map=neighbor_map,
-                                                               vh_set=vh_set, point_map=point_map)
+        coordinate_path = ShortestPathHelper.shortestPathAStar(start=start,
+                                                               end=end,
+                                                               vh_set=vh_set,
+                                                               part_radius=part_radius,
+                                                               grid_type=grid_type,
+                                                               scale_factor=scale_factor)
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
-            if grid_type is GridType.HONEYCOMB:
-                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-                node_pos = HoneycombDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
-                                                                     scale_factor=scale_factor)
+            if grid_type is GridEnum.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
+                node_pos = HoneycombDnaPart.latticeCoordToModelXY(radius=part_radius,
+                                                                  row=row,
+                                                                  column=column)
             else:
                 parity = None
-                node_pos = SquareDnaPart.latticeCoordToPositionXY(radius=radius, row=row, column=column,
-                                                                  scale_factor=scale_factor)
+                node_pos = SquareDnaPart.latticeCoordToModelXY(radius=part_radius,
+                                                               row=row,
+                                                               column=column)
             x_y_path.append((node_pos[0], node_pos[1], parity))
-
         return x_y_path

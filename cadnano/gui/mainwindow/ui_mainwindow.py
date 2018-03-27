@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainwindow/mainwindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.10
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -88,23 +88,16 @@ class Ui_MainWindow(object):
         MainWindow.addDockWidget(QtCore.Qt.DockWidgetArea(1), self.slice_dock_widget)
         self.grid_dock_widget = QtWidgets.QDockWidget(MainWindow)
         self.grid_dock_widget.setMinimumSize(QtCore.QSize(400, 200))
-        self.grid_dock_widget.setStyleSheet("background-color: #f6f6f6;")
-        self.grid_dock_widget.setFeatures(QtWidgets.QDockWidget.AllDockWidgetFeatures)
         self.grid_dock_widget.setObjectName("grid_dock_widget")
         self.grid_dock_widget_contents = QtWidgets.QWidget()
         self.grid_dock_widget_contents.setObjectName("grid_dock_widget_contents")
         self.grid_horizontal_layout = QtWidgets.QHBoxLayout(self.grid_dock_widget_contents)
-        self.grid_horizontal_layout.setContentsMargins(0, 0, 0, 0)
+        self.grid_horizontal_layout.setContentsMargins(1, 1, 1, 1)
         self.grid_horizontal_layout.setSpacing(1)
         self.grid_horizontal_layout.setObjectName("grid_horizontal_layout")
         self.grid_graphics_view = CustomQGraphicsView(self.grid_dock_widget_contents)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.grid_graphics_view.sizePolicy().hasHeightForWidth())
-        self.grid_graphics_view.setSizePolicy(sizePolicy)
         self.grid_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
-        self.grid_graphics_view.setBaseSize(QtCore.QSize(480, 0))
+        self.grid_graphics_view.setBaseSize(QtCore.QSize(400, 0))
         self.grid_graphics_view.setMouseTracking(True)
         self.grid_graphics_view.setFocusPolicy(QtCore.Qt.WheelFocus)
         self.grid_graphics_view.setStyleSheet("QGraphicsView { background-color: #f6f6f6; }")
@@ -572,7 +565,7 @@ class Ui_MainWindow(object):
         self.action_X3D.setText(_translate("MainWindow", "X3D"))
         self.action_cut.setText(_translate("MainWindow", "Cut"))
         self.action_cut.setShortcut(_translate("MainWindow", "Ctrl+X"))
-        self.action_copy.setText(_translate("MainWindow", "Copy Part"))
+        self.action_copy.setText(_translate("MainWindow", "Copy"))
         self.action_copy.setShortcut(_translate("MainWindow", "Ctrl+C"))
         self.action_paste.setText(_translate("MainWindow", "Paste"))
         self.action_paste.setShortcut(_translate("MainWindow", "Ctrl+V"))

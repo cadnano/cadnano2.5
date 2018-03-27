@@ -5,7 +5,9 @@ from PyQt5.QtWidgets import QTreeWidgetItem
 from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
                              QLineEdit, QCheckBox, QComboBox)
 from cadnano.proxies.cnenum import ENUM_NAMES
-
+from cadnano.cntypes import (
+                                PropertyEditorWidgetT
+)
 KEY_COL = 0
 VAL_COL = 1
 
@@ -20,17 +22,16 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, parent=None, key=None):
+    def __init__(self, parent: PropertyEditorWidgetT, key=None):
         """Summary
 
         Args:
-            cn_model_list (list): cn_model objects for selected item(s)
-            parent (TYPE): Description
+            parent: Description
             key (None, optional): Description
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        cn_model_list = self.cnModelList()
+        cn_model_list = self.outlineViewObjList()
         self._controller_list = []
         self.is_enum = False
         if key is None:
@@ -86,6 +87,10 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key
     # end def
 
+    @property
+    def _viewroot(self):
+        return self.treeWidget()
+
     def key(self):
         """Summary
 
@@ -95,26 +100,26 @@ class CNPropertyItem(QTreeWidgetItem):
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cnModel(self):
+    def outlineViewObj(self):
         """Summary
 
         Returns:
             TYPE: Description
         """
-        return self.cnModelList()[0]
+        return self.outlineViewObjList()[0]
     # end def
 
-    def cnModelList(self):
+    def outlineViewObjList(self):
         """Summary
 
         Returns:
             list: cn_model items
         """
-        return self.treeWidget().cnModelList()
+        return self.treeWidget().outlineViewObjList()
     # end def
 
-    def cnModelSet(self):
-        return self.treeWidget().cnModelSet()
+    def outlineViewObjSet(self):
+        return self.treeWidget().outlineViewObjSet()
 
     def itemType(self):
         """Summary
@@ -150,7 +155,7 @@ class CNPropertyItem(QTreeWidgetItem):
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self.cnModel()
+        cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'name':
             return QLineEdit(parent_QWidget)
@@ -192,7 +197,7 @@ class CNPropertyItem(QTreeWidgetItem):
         u_s.beginMacro("Multi Property Edit: %s" % key)
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        cn_model_list = self.cnModelList()
+        cn_model_list = self.outlineViewObjList()
         if isinstance(cn_model_list, list):
             # print("list found")
             for cn_model in cn_model_list:

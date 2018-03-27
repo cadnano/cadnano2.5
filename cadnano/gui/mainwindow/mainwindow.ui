@@ -273,12 +273,6 @@
      <height>200</height>
     </size>
    </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: #f6f6f6;</string>
-   </property>
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
    <property name="windowTitle">
     <string>Grid</string>
    </property>
@@ -291,25 +285,19 @@
       <number>1</number>
      </property>
      <property name="leftMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="topMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="rightMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="bottomMargin">
-      <number>0</number>
+      <number>1</number>
      </property>
      <item>
       <widget class="CustomQGraphicsView" name="grid_graphics_view">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -318,7 +306,7 @@
        </property>
        <property name="baseSize">
         <size>
-         <width>480</width>
+         <width>400</width>
          <height>0</height>
         </size>
        </property>
@@ -663,7 +651,7 @@
   </action>
   <action name="action_copy">
    <property name="text">
-    <string>Copy Part</string>
+    <string>Copy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
