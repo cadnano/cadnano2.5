@@ -292,7 +292,6 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         Args:
             event (TYPE): Description
         """
-        print('vhhi mpe')
         selection_group = self.group()
         if selection_group is not None:
             selection_group.mousePressEvent(event)

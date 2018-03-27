@@ -986,29 +986,14 @@ class Document(CNObject):
         return seq, name
     # end def
 
-    def getOrthoViewType(self):
-        """Get the current SliceView type
-        TODO: NC 2018.03.05 THIS IS INCOMPLETE.  Controller.getOrthoViewType missing
-
-        Returns:
-            The current ``SliceView`` type
-        """
-        return
-        if self.controller():
-            return self.controller().getOrthoViewType()
-    # end def
-
-    def setOrthoViewType(self, ortho_view_type):
+    def setSliceOrGridViewVisible(self, view_type: EnumType):
         """Set the current SliceView type
-        TODO: NC 2018.03.05 THIS IS INCOMPLETE.  Controller.setOrthoViewType missing
-
-        Returns:
-            None
+        Args:
+            view_type: enum from the ``OrthoViewEnum``
         """
-        return
         if self.controller():
-            return self.controller().setOrthoViewType(ortho_view_type=ortho_view_type)
-    # end def
+            self.controller().setSliceOrGridViewVisible(view_type)
+#    # end def
 
     def getGridType(self) -> EnumType:
         """Get the current Grid type

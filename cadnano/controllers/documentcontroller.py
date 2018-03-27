@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
                              QStyleOptionGraphicsItem)
 
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridEnum
+from cadnano.proxies.cnenum import GridEnum, OrthoViewEnum, EnumType
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
@@ -678,22 +678,22 @@ class DocumentController(object):
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
-    def setSliceOrGridViewVisible(self, view_type: str):
+    def setSliceOrGridViewVisible(self, view_type: EnumType):
         """
         Args:
-            view_type: type of view, ``grid`` or ``legacy``
+            view_type: type of view enum
 
         Raises:
             ValueError for unknown ``view_type``.
         """
-        if view_type == 'legacy':
+        if view_type == OrthoViewEnum.SLICE:
             self.toggleSliceView(True)
             self.toggleGridView(False)
-        elif view_type == 'grid':
+        elif view_type == OrthoViewEnum.GRID:
             self.toggleSliceView(False)
             self.toggleGridView(True)
         else:
-            raise ValueError('Invalid slice/grid view value: %s' % view_type)
+            raise ValueError('Invalid orthoview value: %s' % value)
     # end def
 
     def toggleSliceView(self, show: bool):

@@ -40,10 +40,10 @@ def decode(document, obj, emit_signals=True):
 
     # CREATE PART ACCORDING TO LATTICE TYPE
     if lattice_type == LatticeEnum.HONEYCOMB:
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
+        doLattice = HoneycombDnaPart.latticeCoordToModelXY
         isEven = HoneycombDnaPart.isEvenParity
     elif lattice_type == LatticeEnum.SQUARE:
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+        doLattice = SquareDnaPart.latticeCoordToModelXY
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")

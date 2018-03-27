@@ -47,7 +47,7 @@ class SelectGridTool(AbstractGridTool):
     """Handles SelectTool operations in the Grid view
 
     Attributes:
-        clip_board (TYPE): Description
+        clipboard (TYPE): Description
         group (TYPE): Description
         individual_pick (bool): Description
         is_selection_active (bool): Description

@@ -163,6 +163,11 @@ class AbstractVirtualHelixItem(object):
                                                     else self._id_num, 'z')
     # end def
 
+    def setActive(self, is_fwd: bool, idx: int):
+        """Makes active the virtual helix associated with this item."""
+        self._model_part.setActiveVirtualHelix(self._id_num, is_fwd, idx)
+    # end def
+
 
 
 # end class

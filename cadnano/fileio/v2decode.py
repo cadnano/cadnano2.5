@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import GridEnum, LatticeEnum, StrandEnum
+from cadnano.proxies.cnenum import GridEnum, LatticeEnum, StrandEnum, OrthoViewEnum
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
 from cadnano import setBatch, getReopen, setReopen
@@ -43,6 +43,7 @@ def decode(document, obj, emit_signals=False):
     part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
     part.setActive(True)
     document.setGridType(grid_type)
+    document.setSliceOrGridViewVisible(OrthoViewEnum.SLICE)
     setBatch(True)
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []
@@ -65,10 +66,12 @@ def decode(document, obj, emit_signals=False):
     # end for
 
     delta_row = (max_row + min_row) // 2
-    # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
+#    # 2 LINES COMMENTED OUT BY NC, doesn't appear to be necessary for honeycomb
+#    if delta_row & 0:
     if delta_row & 1:
         delta_row += 1
     delta_column = (max_col + min_col) // 2
+#    if delta_column & 0:
     if delta_column & 1:
         delta_column += 1
 
@@ -82,7 +85,10 @@ def decode(document, obj, emit_signals=False):
         col = helix['col']
         scaf = helix['scaf']
         # align row and columns to the center 0, 0
-        coord = (row - delta_row, col - delta_column)
+        if HoneycombDnaPart.isEvenParity(row, col):
+            coord = (row - delta_row, col - delta_column)
+        else:
+            coord = (row - delta_row, col - delta_column)
         vh_num_to_coord[vh_num] = coord
         ordered_id_list.append(vh_num)
     # end for
@@ -92,7 +98,6 @@ def decode(document, obj, emit_signals=False):
     for vh_num in sorted(vh_num_to_coord.keys()):
         row, col = vh_num_to_coord[vh_num]
         x, y = doLattice(radius, row, col)
-        # print("%d:" % vh_num, x, y)
         part.createVirtualHelix(x, y, 0., num_bases,
                                 id_num=vh_num, use_undostack=False)
     # zoom to fit

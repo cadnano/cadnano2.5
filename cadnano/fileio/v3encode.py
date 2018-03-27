@@ -20,10 +20,6 @@ def encodeDocument(document):
     doc_dict = {'format': FORMAT_VERSION,
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 'name': '',
-                'meta': {
-                    'ortho_view_type': document.getOrthoViewType(),
-                    'grid_type': document.getGridType()
-                },
                 'parts': [],
                 'modifications': document.modifications()
                 }

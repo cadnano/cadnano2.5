@@ -107,7 +107,7 @@ class GridItem(QGraphicsPathItem):
         Returns:
             TYPE: Description
         """
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
+        doLattice = HoneycombDnaPart.latticeCoordToModelXY
         doPosition = HoneycombDnaPart.positionToLatticeCoordRound
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
@@ -151,7 +151,7 @@ class GridItem(QGraphicsPathItem):
                 # print("newcol")
                 for i in range(row_l, row_h):
                     x, y = doLattice(radius, i, j, scale_factor=sf)
-                    if is_pen_down and isEven(i, j):
+                    if is_pen_down and not isEven(i, j):
                         path.lineTo(x, -y)
                         is_pen_down = False
                     else:
@@ -172,7 +172,7 @@ class GridItem(QGraphicsPathItem):
             radius: Description
             bounds: Description
         """
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+        doLattice = SquareDnaPart.latticeCoordToModelXY
         doPosition = SquareDnaPart.positionToLatticeCoordRound
         x_l, x_h, y_l, y_h = bounds
         dot_size, half_dot_size = self.dots

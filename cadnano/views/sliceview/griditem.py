@@ -1,11 +1,11 @@
 from PyQt5.QtCore import QPointF
 from PyQt5.QtGui import QFont, QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
+from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
 
 from cadnano.proxies.cnenum import GridEnum, EnumType
 from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
+from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.views.sliceview import slicestyles as styles
 
 
@@ -88,8 +88,8 @@ class GridItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        doLattice = HoneycombDnaPart.latticeCoordToPositionXY
-        doPosition = HoneycombDnaPart.positionToLatticeCoordRound
+        doLattice = HoneycombDnaPart.latticeCoordToModelXY
+        doPosition = HoneycombDnaPart.positionModelToLatticeCoord
         isEven = HoneycombDnaPart.isEvenParity
         x_l, x_h, y_l, y_h = bounds
         x_l = x_l + HoneycombDnaPart.PAD_GRID_XL
@@ -99,8 +99,8 @@ class GridItem(QGraphicsRectItem):
         dot_size, half_dot_size = self.dots
         sf = part_item.scale_factor
         points = self.points
-        row_l, col_l = doPosition(radius, x_l, -y_l, False, False, scale_factor=sf)
-        row_h, col_h = doPosition(radius, x_h, -y_h, True, True, scale_factor=sf)
+        row_l, col_l = doPosition(radius, x_l, -y_l, scale_factor=sf)
+        row_h, col_h = doPosition(radius, x_h, -y_h, scale_factor=sf)
 
         redo_neighbors = (row_l, col_l, row_h, col_h) != self.previous_grid_bounds or\
             self.previous_grid_type != self.grid_type
@@ -111,8 +111,6 @@ class GridItem(QGraphicsRectItem):
         draw_lines = self.draw_lines
 
         if redo_neighbors:
-            point_coordinates = dict()
-            neighbor_map = dict()
             self.points_dict = dict()
 
         for row in range(row_l, row_h):
@@ -135,8 +133,8 @@ class GridItem(QGraphicsRectItem):
                                coord=(row, column))
 
                 if self._draw_gridpoint_coordinates:
-                    font = QFont(styles.THE_FONT)
-                    path.addText(x - 10, -y + 5, font, "%s,%s" % (-row, column))
+                    font = QFont(styles.THE_FONT, 6)
+                    path.addText(x - 5, -y + 4, font, "%s,%s" % (-row, column))
 
                 pt.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
 
@@ -147,21 +145,6 @@ class GridItem(QGraphicsRectItem):
                 self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
-                    point_coordinates[(-row, column)] = (x, -y)
-
-                    # This is reversed since the Y is mirrored
-                    if not HoneycombDnaPart.isEvenParity(row, column):
-                        neighbor_map[(-row, column)] = [
-                            (-row-1, column),
-                            (-row, column+1),
-                            (-row, column-1)
-                        ]
-                    else:
-                        neighbor_map[(-row, column)] = [
-                            (-row+1, column),
-                            (-row, column-1),
-                            (-row, column+1)
-                        ]
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False
@@ -179,10 +162,6 @@ class GridItem(QGraphicsRectItem):
                 is_pen_down = False
             # end for j
         self._path.setPath(path)
-
-        if redo_neighbors:
-            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
-            self.part_item.setPointMap(point_map=point_coordinates)
     # end def
 
     def createSquareGrid(self, part_item, radius, bounds):
@@ -196,7 +175,7 @@ class GridItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
-        doLattice = SquareDnaPart.latticeCoordToPositionXY
+        doLattice = SquareDnaPart.latticeCoordToModelXY
         doPosition = SquareDnaPart.positionToLatticeCoordRound
         x_l, x_h, y_l, y_h = bounds
         x_l = x_l + SquareDnaPart.PAD_GRID_XL
@@ -215,7 +194,6 @@ class GridItem(QGraphicsRectItem):
         self.previous_grid_type = self.grid_type
 
         if redo_neighbors:
-            point_map = dict()
             neighbor_map = dict()
 
         path = QPainterPath()
@@ -254,15 +232,6 @@ class GridItem(QGraphicsRectItem):
                 self.points_dict[(-row, column)] = pt
 
                 if redo_neighbors:
-                    point_map[(-row, column)] = (x, -y)
-
-                    neighbor_map[(-row, column)] = [
-                        (-row, column+1),
-                        (-row, column-1),
-                        (-row-1, column),
-                        (-row+1, column)
-                    ]
-
                     self.previous_grid_bounds = (row_l, col_l, row_h, col_h)
 
             is_pen_down = False  # pen up
@@ -279,10 +248,6 @@ class GridItem(QGraphicsRectItem):
                         path.moveTo(x, -y)
                 is_pen_down = False  # pen up
         self._path.setPath(path)
-
-        if redo_neighbors:
-            self.part_item.setNeighborMap(neighbor_map=neighbor_map)
-            self.part_item.setPointMap(point_map=point_map)
     # end def
 
     def removePoints(self):
@@ -296,7 +261,7 @@ class GridItem(QGraphicsRectItem):
     # end def
 
     def showCreateHint(self, coord, next_idnums=(0, 1), show_hint=True, color=None):
-        point_item = self.points_dict.get(coord, None)
+        point_item = self.points_dict.get(coord)
         if point_item is None:
             return
 
@@ -305,9 +270,9 @@ class GridItem(QGraphicsRectItem):
 
         if point_item:
             row, column = coord
-            if self.grid_type == GridEnum.HONEYCOMB:
-                parity = 0 if HoneycombDnaPart.isOddParity(row=row, column=column) else 1
-            elif self.grid_type == GridEnum.SQUARE:
+            if self.grid_type is GridEnum.HONEYCOMB:
+                parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
+            elif self.grid_type is GridEnum.SQUARE:
                 parity = 0 if SquareDnaPart.isEvenParity(row=row, column=column) else 1
             else:
                 return
@@ -324,6 +289,12 @@ class GridItem(QGraphicsRectItem):
     def path(self):
         return self._path
     # end def
+
+    def highlightGridPoint(self, row, column, on=True):
+        grid_point = self.points_dict.get((row, column))
+
+        if grid_point:
+            grid_point.highlightGridPoint(on)
 
 
 class ClickArea(QGraphicsEllipseItem):
@@ -493,7 +464,6 @@ class GridPoint(QGraphicsEllipseItem):
             event (QGraphicsSceneHoverEvent): Description
         """
         # Turn the outline of the GridItem off
-        self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
         self.showCreateHint(show_hint=False)
 
         part_item = self.grid.part_item
@@ -514,21 +484,7 @@ class GridPoint(QGraphicsEllipseItem):
             part_item (TYPE): Description
             event (TYPE): Description
         """
-        # return QGraphicsEllipseItem.mousePressEvent(self, event)
         return self.grid.part_item.mousePressEvent(event)
-        part_item = self.grid.part_item
-        tool = part_item._getActiveTool()
-        controller = part_item.document().controller()
-
-        if tool.FILTER_NAME not in part_item.part().document().filter_set:
-            controller.showFilterHints(True, filter_name='virtual_helix')
-            # return
-        else:  # the filter is correct, tool is wrong
-            controller.showToolHints(True, tool_name='create')
-        part = part_item.part()
-        part.setSelected(True)
-        alt_event = GridEvent(self, self.offset)
-        tool.selectOrSnap(part_item, alt_event, event)
     # end def
 
     def selectToolMouseMove(self, tool, part_item, event):
@@ -562,12 +518,36 @@ class GridPoint(QGraphicsEllipseItem):
         part_item.createToolMousePress(tool, event, alt_event)
     # end def
 
-    def createToolHoverEnterEvent(self, tool, part_item, event):
-        self.setPen(getPenObj(styles.BLUE_STROKE, 2))
-        part_item.setLastHoveredItem(self)
+    def selectToolHoverEnterEvent(self, tool, part_item, event):
+        part_item.selectToolHoverEnter(tool, event)
+    # end def
+
+    def selectToolHoverLeaveEvent(self, tool, part_item, event):
+        part_item.selectToolHoverLeave(tool, event)
+    # end def
+
+    def highlightGridPoint(self, on=True):
+        if on:
+            self.setPen(getPenObj(styles.BLUE_STROKE, 2))
+        else:
+            self.setPen(getPenObj(styles.GRAY_STROKE, styles.EMPTY_HELIX_STROKE_WIDTH))
     # end def
 
     def createToolHoverMoveEvent(self, tool, part_item, event):
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.positionModelToLatticeCoord
+        coordinates = positionToLatticeCoord(part_item.part().radius(),
+                                             event.scenePos().x(),
+                                             event.scenePos().y(),
+                                             scale_factor=part_item.scale_factor)
+        latticeCoordToXY = HoneycombDnaPart.latticeCoordToQtXY if self.grid.grid_type is GridType.HONEYCOMB \
+                else SquareDnaPart.latticeCoordToQtXY
+        coordinate_string = '(%s, %s)' % coordinates
+        coordiate_scaled_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1], part_item.scale_factor)
+        coordiate_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1])
+        position_string = '(%s, %s)' % (event.scenePos().x(), event.scenePos().y())
+
+        part_item.updateStatusBar('%s @ %s (%s) - %s' % (coordinate_string, coordiate_scaled_pos, coordiate_pos, position_string))
         part_item.createToolHoverMove(tool, event)
     # end def
 

@@ -40,7 +40,7 @@ def testCreateVirtualHelixGui(cnapp):
     for row in range(-2, 2):
         for col in range(-2, 2):
             # print(row, col)
-            x, y = HoneycombDnaPart.latticeCoordToPositionXY(RADIUS, row, col)
+            x, y = HoneycombDnaPart.latticeCoordToModelXY(RADIUS, row, col)
             pt = QPointF(x, y)
             cnapp.graphicsItemClick(slice_part_item, Qt.LeftButton, pos=pt, delay=DELAY)
             cmd_count += 1
