@@ -17,7 +17,7 @@ from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
-from . import PathNucleicAcidPartItemT
+from . import (PathNucleicAcidPartItemT, PathRootItemT)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
@@ -62,7 +62,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsPathItem.__init__(self, parent=part_item.proxy())
-        self._viewroot = part_item._viewroot
+        self._viewroot: PathRootItemT = part_item._viewroot
         self._getActiveTool = part_item._getActiveTool
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
@@ -125,7 +125,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             strand (TYPE): Description
         """
         if self._viewroot.are_signals_on:
-            StrandItem(strand, self, self._viewroot)
+            StrandItem(strand, self)
     # end def
 
     def virtualHelixRemovedSlot(self):

@@ -13,7 +13,14 @@ from cadnano.views.pathview import pathstyles as styles
 from .decorators.insertionitem import InsertionItem
 from .endpointitem import EndpointItem
 from .xoveritem import XoverItem
+from cadnano.views.pathview import (
+                                    PathVirtualHelixItemT,
+                                    PathRootItemT
+)
 
+from cadnano.cntypes import (
+                                StrandT
+)
 # import logging
 # logger = logging.getLogger(__name__)
 
@@ -26,24 +33,19 @@ SELECT_COLOR = "#ff3333"
 class StrandItem(QGraphicsLineItem):
     FILTER_NAME = "strand"
 
-    __slots__ = ('_model_strand', '_virtual_helix_item', '_viewroot',
-                 '_getActiveTool', '_controller', 'is_forward',
-                 '_strand_filter', '_insertion_items',
-                 '_low_cap', '_high_cap', '_dual_cap',
-                 '_seq_label', '_click_area', 'xover_3p_end')
-
-    def __init__(self, model_strand, virtual_helix_item, viewroot):
+    def __init__(self,  model_strand: StrandT,
+                        virtual_helix_item: PathVirtualHelixItemT):
         """The parent should be a VirtualHelixItem.
 
         Args:
-            model_strand (:obj:`cadnano.strand.Strand`):
-            virtual_helix_item (:obj:`cadnano.views.pathview.virtualhelixitem.VirtualHelixItem`):
-            viewroot (:obj:`cadnano.views.pathview.pathrootitem.PathRootItem`):
+            model_strand:
+            virtual_helix_item:
+            viewroot:
         """
         super(StrandItem, self).__init__(virtual_helix_item)
         self._model_strand = model_strand
         self._virtual_helix_item = virtual_helix_item
-        self._viewroot = viewroot
+        self._viewroot: PathRootItemT = virtual_helix_item._viewroot
         self._getActiveTool = viewroot.manager.activeToolGetter
 
         self._controller = StrandItemController(model_strand, self)
