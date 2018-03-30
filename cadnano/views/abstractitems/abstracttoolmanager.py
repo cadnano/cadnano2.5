@@ -115,7 +115,7 @@ class AbstractToolManager(QObject):
         self._active_tool = ABSTRACT_TOOL
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         window = self.window
         tgn = self.tool_group_name
         if self._active_tool is not None:

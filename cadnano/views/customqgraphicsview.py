@@ -121,6 +121,12 @@ class CustomQGraphicsView(QGraphicsView):
         self._name = name
     # end def
 
+    def rootItem(self):
+        return self.scene_root_item
+
+    def cnScene(self):
+        return self.scene_root_item.scene()
+
     def setViewportUpdateOn(self, is_enabled: bool):
         if is_enabled:
             self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)

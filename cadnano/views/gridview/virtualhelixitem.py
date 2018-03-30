@@ -256,11 +256,16 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def virtualHelixRemovedSlot(self):
+        self.destroyItem()
+    # end def
+
+    def destroyItem(self):
         """The event handler for when a virtual helix is removed from the model.
 
         Disconnects signals, and sets  internal references to label, part_item,
         and model_part to None, and finally removes the item from the scene.
         """
+        print("removing GridVirtualHelixItem")
         self._controller.disconnectSignals()
         self._controller = None
         part_item = self._part_item

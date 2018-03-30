@@ -313,12 +313,12 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender: NucleicAcidPartT):
-        """Slot wrapper for ``destroy()``
+        """Slot wrapper for ``destroyItem()``
 
         Args:
             sender: Model object that emitted the signal.
         """
-        return self.destroy()
+        return self.destroyItem()
     # end def
 
     def partVirtualHelixAddedSlot(self, sender: NucleicAcidPartT,

@@ -22,13 +22,13 @@ from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.views.abstractitems import AbstractTool
 from cadnano.cntypes import (
                                 DocT,
-                                DocCtrlT
+                                DocCtrlT,
+                                GraphicsViewT
                             )
 
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
 # # for an example of the QOpenGlWidget added in Qt 5.4
-CNView = namedtuple('CNView', ['view', 'scene', 'root_item'])
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     """DocumentWindow subclasses QMainWindow and Ui_MainWindow. It performs
@@ -89,7 +89,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.setValue("state", self.saveState())
         self.settings.endGroup()
         for mgr in self.tool_managers:
-            mgr.destroy()
+            mgr.destroyItem()
         self.controller = None
 
     ### ACCESSORS ###
@@ -166,23 +166,24 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             view_name: the name of the view
 
         Raises:
-            ValueError for ``view_name`` not existing
+            ValueError for :obj:`view_name` not existing
         '''
         cnview = self.views.get(view_name)
         if cnview is not None:
-            cnview.root_item
+            root_item = cnview.rootItem()
+            root_item.destroyViewItems()
         else:
             raise ValueError("view_name: %s does not exist" % (view_name))
 
 
-    def _initGridview(self, doc: DocT) -> CNView:
+    def _initGridview(self, doc: DocT) -> GraphicsViewT:
         """Initializes Grid View.
 
         Args:
             doc: The ``Document`` corresponding to the design
 
         Returns:
-            ``CNView`` namedtuple
+            :class:`CustomQGraphicsView`
         """
         grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
         grid_root = GridRootItem(   rect=grid_scene.sceneRect(),
@@ -197,17 +198,17 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         ggv.scene_root_item = grid_root
         ggv.setName("GridView")
         self.grid_tool_manager = GridToolManager(self, grid_root)
-        return CNView(ggv, grid_scene, grid_root)
+        return ggv
     # end def
 
-    def _initPathview(self, doc: DocT) -> CNView:
+    def _initPathview(self, doc: DocT) -> GraphicsViewT:
         """Initializes Path View.
 
         Args:
             doc: The ``Document`` corresponding to the design
 
         Returns:
-            ``CNView`` namedtuple
+            :class:`CustomQGraphicsView`
         """
         path_scene = QGraphicsScene(parent=self.path_graphics_view)
         path_root = PathRootItem(   rect=path_scene.sceneRect(),
@@ -222,7 +223,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         pgv.scene_root_item = path_root
         pgv.setScaleFitFactor(0.7)
         pgv.setName("PathView")
-        return CNView(pgv, path_scene, path_root)
+        return pgv
     # end def
 
     def _initPathviewToolbar(self):
@@ -232,9 +233,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
-        path_scene = self.views['path'].scene
+        path_scene = self.views['path'].cnScene()
         path_scene.addItem(self.path_color_panel)
-        self.path_tool_manager = PathToolManager(self, self.views['path'].root_item)
+        self.path_tool_manager = PathToolManager(self, self.views['path'].rootItem())
 
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
@@ -251,14 +252,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_graphics_view.setupGL()
     # end def
 
-    def _initSliceview(self, doc: DocT) -> CNView:
+    def _initSliceview(self, doc: DocT) -> GraphicsViewT:
         """Initializes Slice View.
 
         Args:
             doc: The ``Document`` corresponding to the design
 
         Returns:
-            ``CNView`` namedtuple
+            :class:`CustomQGraphicsView`
         """
         slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
         slice_root = SliceRootItem( rect=slice_scene.sceneRect(),
@@ -274,7 +275,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         sgv.setName("SliceView")
         sgv.setScaleFitFactor(0.7)
         self.slice_tool_manager = SliceToolManager(self, slice_root)
-        return CNView(sgv, slice_scene, slice_root)
+        return sgv
     # end def
 
     def _initEditMenu(self):
@@ -328,9 +329,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             active tool for the view the tool is in
         """
         return_tool = None
-        for item in self.views.values():
-            view, scene, root_item = item
+        for view in self.views.values():
             if view.underMouse():
+                root_item = view.rootItem()
                 # print("I am under mouse", view)
                 if root_item.manager.isToolActive(tool_type_name):
                     # print("{} is active".format(tool_type_name))
@@ -340,4 +341,16 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                     pass
                 break
         return return_tool
+    # end def
+
+    def doMouseViewDestroy(self):
+        """Destroy the view the mouse is over
+        """
+        return_tool = None
+        for name, view in self.views.items():
+            if view.underMouse():
+                self.destroyView(name)
+    # end def
+
+
 # end class

@@ -154,6 +154,13 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
+    def destroyViewItems(self):
+        print("destroying grid view")
+        items = list(self.instance_items.values())
+        for item in items:
+            item.destroyItem()
+    # end def
+
     def removePartItem(self, part_item: GridNucleicAcidPartItem):
         """Summary
 
@@ -187,7 +194,7 @@ class GridRootItem(QGraphicsRectItem):
         Args:
             is_on: Description
         """
-        for nucleicacid_part_item in self.instance_items:
+        for nucleicacid_part_item in self.instance_items.values():
             nucleicacid_part_item.setModifyState(is_on)
     # end def
 

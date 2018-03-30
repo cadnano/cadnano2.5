@@ -94,6 +94,16 @@ def nowhite(seqStr):
 
 def nearest(a, l): return min(l, key=lambda x: abs(x - a))
 
+def show_class(msg):
+    def wrapper(func):
+        def f(s, do_alert):
+            if do_alert:
+                print(s.__class__.__name__, msg)
+            return func(s)
+        return f
+    return wrapper
+# end def
+
 
 def isWindows():
     """Returns True if platform is detected as Windows, otherwise False"""

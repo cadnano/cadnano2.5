@@ -157,6 +157,12 @@ class SliceRootItem(QGraphicsRectItem):
     # end def
 
     ### METHODS ###
+    def destroyViewItems(self):
+        print("destroying slice view")
+        for item in self.instance_items.values():
+            item.destroyItem()
+    # end def
+
     def removePartItem(self, part_item):
         """Summary
 
@@ -190,7 +196,7 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             bool (TYPE): Description
         """
-        for nucleicacid_part_item in self.instance_items:
+        for nucleicacid_part_item in self.instance_items.values():
             nucleicacid_part_item.setModifyState(bool)
     # end def
 
@@ -211,11 +217,11 @@ class SliceRootItem(QGraphicsRectItem):
         if event.key() == Qt.Key_F:
             self.scene().views()[0].zoomToFit()
 
-        for na_part_item in self.instance_items:
+        for na_part_item in self.instance_items.values():
             if hasattr(na_part_item, 'keyPressEvent'):
                 getattr(na_part_item, 'keyPressEvent')(event)
 
     def keyReleaseEvent(self, event):
-        for na_part_item in self.instance_items:
+        for na_part_item in self.instance_items.values():
             if hasattr(na_part_item, 'keyReleaseEvent'):
                 getattr(na_part_item, 'keyReleaseEvent')(event)

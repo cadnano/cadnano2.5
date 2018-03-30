@@ -197,18 +197,18 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender):
-        """Slot wrapper for ``destroy()``
+        """Slot wrapper for ``destroyItem()``
 
         Args:
             sender (NucleicAcidPart): Model object that emitted the signal.
         """
-        return self.destroy()
+        return self.destroyItem()
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
-        super(SliceNucleicAcidPartItem, self).destroy()
+        super(SliceNucleicAcidPartItem, self).destroyItem()
         self.x_axis_line = None
         self.y_axis_line = None
         self.model_bounds_hint = None
@@ -216,7 +216,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         self.resize_handle_group.removeHandles()
         self.resize_handle_group = None
         self.griditem = None
-        self._mod_circ = None
+        # self._mod_circ = None
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs, do_deselect):
@@ -631,9 +631,10 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         Args:
             bool_val (boolean): what the modifystate should be set to.
         """
-        self._can_show_mod_circ = bool_val
-        if bool_val is False:
-            self._mod_circ.hide()
+        # self._can_show_mod_circ = bool_val
+        # if bool_val is False:
+        #     self._mod_circ.hide()
+        pass
     # end def
 
     def showModelMinBoundsHint(self, handle_type, show=True):

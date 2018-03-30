@@ -55,6 +55,16 @@ class PreXoverManager(QGraphicsRectItem):
         return self.part_item
     # end def
 
+    def destroyItem(self):
+        print("destroying PreXoverManager")
+        self.deactivateNeighbors()
+        self.clearPreXoverItemGroups()
+        self.neighbor_pairs = None
+        self.part_item = None
+        self.virtual_helix_item = None
+        self.scene().removeItem(self)
+    # end def
+
     def clearPreXoverItemGroups(self):
         """Summary
 

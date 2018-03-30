@@ -60,6 +60,15 @@ class GridItem(QGraphicsPathItem):
         self.setGridType(grid_type)
     # end def
 
+    def destroyItem(self):
+        print("destroying GridItem")
+        scene = self.scene()
+        for point in self.points:
+            point.destroyItem()
+        self.points = None
+        scene.removeItem(self)
+    # end def
+
     def updateGrid(self):
         """Summary
 
@@ -246,6 +255,10 @@ class ClickArea(QGraphicsEllipseItem):
         self.setPen(getNoPen())
     # end def
 
+    def destroyItem(self):
+        self.parent_obj = None
+        self.scene().removeItem(self)
+
     def mousePressEvent(self, event):
         return self.parent_obj.mousePressEvent(event)
 # end class
@@ -269,6 +282,13 @@ class GridPoint(QGraphicsEllipseItem):
 
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
+    # end def
+
+    def destroyItem(self):
+        self.grid = None
+        self.clickarea.destroyItem()
+        self.clickarea = None
+        self.scene().removeItem(self)
     # end def
 
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):

@@ -133,7 +133,7 @@ class PropertyWrapperObject(QObject):
         """
         return self.animations.get(property_name)
 
-    def destroy(self):
+    def destroyItem(self):
         """Remove this object and references to it from the view
         """
         self.item = None
@@ -512,7 +512,7 @@ class PreXoverItem(QGraphicsRectItem):
         """Removes animation adapter, label, bond_item, and this item from scene.
         """
         scene = self.scene()
-        self.adapter.destroy()
+        self.adapter.destroyItem()
         if scene:
             scene.removeItem(self._label)
             self._label = None

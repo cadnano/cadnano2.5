@@ -29,7 +29,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         m_p.setInstanceProperty(model_part_instance, '%s:position' % (viewroot.name), (0., 0.))
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
         if self._controller is not None:

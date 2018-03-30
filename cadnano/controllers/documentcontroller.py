@@ -1,12 +1,29 @@
 # -*- coding: utf-8 -*-
 import os
 
-from PyQt5.QtCore import QDir, QFileInfo, QRect, QSettings, QSize, Qt
+from PyQt5.QtCore import (
+                            QDir,
+                            QFileInfo,
+                            QRect,
+                            QSettings,
+                            QSize,
+                            Qt,
+                            QCoreApplication
+)
+_translate = QCoreApplication.translate
+
 from PyQt5.QtGui import QKeySequence, QPainter
 from PyQt5.QtSvg import QSvgGenerator
-from PyQt5.QtWidgets import (QActionGroup, QApplication, QDialog, QFileDialog,
-                             QGraphicsItem, QMessageBox,
-                             QStyleOptionGraphicsItem)
+from PyQt5.QtWidgets import (
+                            QAction,
+                            QActionGroup,
+                            QApplication,
+                            QDialog,
+                            QFileDialog,
+                            QGraphicsItem,
+                            QMessageBox,
+                            QStyleOptionGraphicsItem
+)
 
 from cadnano import app, setReopen, util
 from cadnano.proxies.cnenum import GridEnum, OrthoViewEnum, EnumType
@@ -14,6 +31,8 @@ from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
 
+
+IS_TESTING = True
 
 DEFAULT_VHELIX_FILTER = True
 ONLY_ONE = True  # bool: Retricts Document to creating only one Part if True.
@@ -93,6 +112,16 @@ class DocumentController(object):
                              'action_path_mods']
         for action_name in action_group_list:
             ag.addAction(getattr(win, action_name))
+
+        if IS_TESTING:
+            # ADDED SPECIAL NC for testing with keyboard shortcut:
+            action_special = QAction(win)
+            action_special.setObjectName("action_special")
+            action_special.setText(_translate("MainWindow", "Special"))
+            action_special.setShortcut(_translate("MainWindow", "Ctrl+J"))
+            win.action_special = action_special
+            win.menu_edit.addAction(action_special)
+            action_special.triggered.connect(self.actionSpecialSlot)
 
         # set up tool & filter hinting
         self._hintable_tools = [win.action_global_create,
@@ -181,6 +210,11 @@ class DocumentController(object):
     # end def
 
     ### SLOTS ###
+    def actionSpecialSlot(self):
+        print("Nachos")
+        self.win.doMouseViewDestroy()
+    # end def
+
     def actionSelectForkSlot(self):
         win = self.win
         win.action_path_select.trigger()

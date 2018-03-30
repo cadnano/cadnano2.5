@@ -32,6 +32,11 @@ class GrabCornerItem(QGraphicsRectItem):
         self.corner_type = TOP_LEFT
     # end def
 
+    def destroyItem(self):
+        print("destroying GrabCornerItem")
+        self.scene().removeItem(self)
+    # end def
+
     def mousePressEvent(self, event):
         if event.button() == Qt.RightButton:
             return

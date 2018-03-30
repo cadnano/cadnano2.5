@@ -179,7 +179,7 @@ class EndpointItem(QGraphicsPathItem):
         self._mod_id = None
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
         scene = self.scene()

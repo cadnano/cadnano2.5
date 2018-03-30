@@ -179,23 +179,38 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partRemovedSlot(self, sender: NucleicAcidPartT):
-        """Slot wrapper for ``destroy()``
+        """Slot wrapper for ``destroyItem()``
 
         Args:
             sender: Model object that emitted the signal.
         """
-        return self.destroy()
+        return self.destroyItem()
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
-        super(GridNucleicAcidPartItem, self).destroy()
+        print("destroying GridNucleicAcidPartItem")
+        for id_num in list(self._virtual_helix_item_hash.keys()):
+            self.removeVirtualHelixItem(id_num)
+        self.prexover_manager.destroyItem()
+        self.prexover_manager = None
+
+        scene = self.scene()
+
+        scene.removeItem(self.outline)
         self.outline = None
+
+        self.grab_cornerTL.destroyItem()
         self.grab_cornerTL = None
+
+        self.grab_cornerBR.destroyItem()
         self.grab_cornerBR = None
+
+        self.griditem.destroyItem()
         self.griditem = None
-        self._mod_circ = None
+
+        super(GridNucleicAcidPartItem, self).destroyItem()
     # end def
 
     def partVirtualHelicesTranslatedSlot(self, sender: NucleicAcidPartT,
@@ -548,9 +563,10 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         Args:
             bool_val (TYPE): what the modifystate should be set to.
         """
-        self._can_show_mod_circ = bool_val
-        if not bool_val:
-            self._mod_circ.hide()
+        # self._can_show_mod_circ = bool_val
+        # if not bool_val:
+        #     self._mod_circ.hide()
+        pass
     # end def
 
     def updateStatusBar(self, status_str: str):

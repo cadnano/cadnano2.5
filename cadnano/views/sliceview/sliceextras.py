@@ -490,7 +490,7 @@ class PreXoverItem(QGraphicsRectItem):
         self.bond_3p.setLine(self._default_bond_3p)
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
         scene = self.scene()
@@ -705,9 +705,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         scene = self.scene()
         for i in range(len(fpxis)):
             x = fpxis.pop(i)
-            x.destroy()
+            x.destroyItem()
             x = rpxis.pop(i)
-            x.destroy()
+            x.destroyItem()
         self.virtual_helix_item = None
         self.model_part = None
         scene.removeItem(self.active_wedge_gizmo)

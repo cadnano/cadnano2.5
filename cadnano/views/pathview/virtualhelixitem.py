@@ -129,12 +129,12 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def virtualHelixRemovedSlot(self):
-        ''' Slot wrapper for ``destroy()``
+        ''' Slot wrapper for ``destroyItem()``
         '''
-        return self.destroy()
+        return self.destroyItem()
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
         self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
