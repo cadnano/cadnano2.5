@@ -2596,7 +2596,6 @@ class NucleicAcidPart(Part):
         if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
             print("vh already present at coords ({}, {})".format(x9, y9))
             print(util.trace(5))
-            return
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len

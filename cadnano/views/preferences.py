@@ -1,11 +1,13 @@
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QWidget, QDialogButtonBox
+
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
+from cadnano.proxies.cnenum import OrthoViewType
+
 
 PREFS_GROUP_NAME = 'Preferences'
-ORTHOVIEWS = ('legacy', 'grid')
 ORTHOVIEW_KEY = 'EnabledOrthoView'
-ORTHOVIEW_DEFAULT = 0  # legacy idx
+ORTHOVIEW_DEFAULT = OrthoViewType.GRID
 GRIDVIEW_STYLES = ('points', 'points and lines')
 GRIDVIEW_STYLE_KEY = 'GridviewStyle'
 GRIDVIEW_STYLE_DEFAULT = 0  # points idx
@@ -47,13 +49,12 @@ class Preferences(object):
         """
         self.qs.beginGroup(PREFS_GROUP_NAME)
         self.gridview_style_idx = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
-        # TODO[NF]:  Investigate QSettings `0` vs `'0'`
-        self.orthoview_idx = int(self.qs.value(ORTHOVIEW_KEY, ORTHOVIEW_DEFAULT))
+        self.orthoview_style = self.qs.value(ORTHOVIEW_KEY, ORTHOVIEW_DEFAULT)
         self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
         self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
         self.qs.endGroup()
         self.ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
-        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_idx)
+        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_style)
         self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
     # end def
@@ -113,13 +114,15 @@ class Preferences(object):
         Saves the setting and notifies the doc controller to toggle
         visibilty of appropriate 2D orthographic view (sliceview or gridview).
         """
-        self.orthoview_idx = value
+        new_orthoview_style = int(value)
+        assert new_orthoview_style in (OrthoViewType.GRID, OrthoViewType.SLICE)
+
+        self.orthoview_style = new_orthoview_style
         self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.qs.setValue(ORTHOVIEW_KEY, value)
+        self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style)
         self.qs.endGroup()
 
-        value = ORTHOVIEWS[self.orthoview_idx]
-        self.document.controller().setSliceOrGridViewVisible(value)
+        self.document.controller().setSliceOrGridViewVisible(self.orthoview_style)
 
     def setShowIconLabels(self, value):
         self.show_icon_labels = value
