@@ -68,6 +68,10 @@ class PathRectItem(QGraphicsRectItem):
         super(PathRectItem, self).__init__(parent)
         self.parent = parent
 
+    def destroyItem(self):
+        self.parent = None
+        self.scene().removeItem(self)
+
     def mousePressEvent(self, event):
         self.parent.unsetActiveVirtualHelixItem()
 
@@ -319,6 +323,30 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             sender: Model object that emitted the signal.
         """
         return self.destroyItem()
+    # end def
+
+    def destroyItem(self):
+        print("destroying PathNucleicAcidPartItem")
+        for item in list(self._virtual_helix_item_hash.values()):
+            item.destroyItem()
+
+        self.prexover_manager.destroyItem()
+        self.prexover_manager = None
+
+        self.resize_handle_group.destroyItem()
+        self.resize_handle_group = None
+
+        self.outline.destroyItem()
+        self.outline = None
+
+        scene = self.scene()
+        scene.removeItem(self.model_bounds_hint)
+        self.model_bounds_hint = None
+
+        scene.removeItem(self._proxy_parent)
+        self._proxy_parent = None
+
+        return super(PathNucleicAcidPartItem, self).destroyItem()
     # end def
 
     def partVirtualHelixAddedSlot(self, sender: NucleicAcidPartT,

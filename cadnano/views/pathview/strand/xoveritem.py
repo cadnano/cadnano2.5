@@ -192,7 +192,7 @@ class XoverNode3(QGraphicsRectItem):
         self._updateLabel(isLeft)
     # end def
 
-    def remove(self):
+    def destroyItem(self):
         """Clean up this joint
         """
         scene = self.scene()
@@ -351,7 +351,7 @@ class XoverItem(QGraphicsPathItem):
         return self._virtual_helix_item.partItem()
     # end def
 
-    def remove(self):
+    def destroyItem(self):
         """Summary
 
         Returns:
@@ -359,8 +359,8 @@ class XoverItem(QGraphicsPathItem):
         """
         scene = self.scene()
         if self._node3:
-            self._node3.remove()
-            self._node5.remove()
+            self._node3.destroyItem()
+            self._node5.destroyItem()
             self._node3 = None
             self._node5 = None
         self._strand5p = None
@@ -377,7 +377,7 @@ class XoverItem(QGraphicsPathItem):
         if self._node3:
             self._node3.hide()
             self._node5.hide()
-            self._node3.remove()
+            self._node3.destroyItem()
             self._node3 = None
     # end def
 
@@ -406,13 +406,13 @@ class XoverItem(QGraphicsPathItem):
                 if node3.virtualHelixItem() is not None:
                     self.update(self._strand5p)
                 else:
-                    node3.remove()
+                    node3.destroyItem()
                     self._node3 = None
             elif node3:
-                node3.remove()
+                node3.destroyItem()
                 self._node3 = None
         elif node3:
-            node3.remove()
+            node3.destroyItem()
             self._node3 = None
     # end def
 
@@ -446,7 +446,7 @@ class XoverItem(QGraphicsPathItem):
             self._updatePath(strand5p)
         else:
             if self._node3:
-                self._node3.remove()
+                self._node3.destroyItem()
                 self._node3 = None
         # end if
     # end def

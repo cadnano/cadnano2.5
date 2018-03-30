@@ -74,9 +74,9 @@ class PreXoverManager(QGraphicsRectItem):
         groups = self.groups
         while groups:
             k, item = groups.popitem()
-            item.remove()
+            item.destroyItem()
         if self.active_group is not None:
-            self.active_group.remove()
+            self.active_group.destroyItem()
             self.active_group = None
         self._active_items = []
         self.prexover_item_map = {}

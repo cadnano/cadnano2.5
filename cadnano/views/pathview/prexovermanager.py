@@ -87,6 +87,16 @@ class PreXoverManager(QGraphicsRectItem):
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
+    def destroyItem(self):
+        scene = self.scene()
+        self.clearPreXoverItems()
+        for x in list(self.pxi_pool):
+            x.destroyItem()
+        self.part_item = None
+        self.virtual_helix_item = None
+        scene.removeItem(self)
+    # end def
+
     def updateBasesPerRepeat(self, step_size):
         """Recreates colors, all vhi
 

@@ -671,7 +671,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
             self.hideItems()
     # end def
 
-    def remove(self):
+    def destroyItem(self):
         """Clean up this joint
         """
         scene = self.scene()
@@ -829,7 +829,7 @@ class ForcedXoverItem(QGraphicsPathItem):
     ### SLOTS ###
 
     ### METHODS ###
-    def remove(self):
+    def destroyItem(self):
         """Summary
 
         Returns:

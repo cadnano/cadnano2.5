@@ -162,9 +162,8 @@ class InsertionItem(QGraphicsPathItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def remove(self):
-        """
-        Called from the following stranditem methods:
+    def destroyItem(self):
+        """Called from the following stranditem methods:
             strandRemovedSlot
             strandInsertionRemovedSlot
             refreshInsertionItems

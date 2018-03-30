@@ -6,10 +6,21 @@ from PyQt5.QtWidgets import QGraphicsTextItem
 from cadnano.gui.palette import getBrushObj, getPenObj
 from cadnano.proxies.cnenum import AxisEnum, HandleEnum
 from . import styles
-
+HANDLE_ITEM_ATTRS = ['_t', '_b', '_l', '_r', '_tl', '_tr', '_bl', '_br']
+HANDLE_ENUMS = [HandleEnum.TOP,
+                HandleEnum.BOTTOM,
+                HandleEnum.LEFT,
+                HandleEnum.RIGHT,
+                HandleEnum.TOP_LEFT,
+                HandleEnum.TOP_RIGHT,
+                HandleEnum.BOTTOM_LEFT,
+                HandleEnum.BOTTOM_RIGHT
+                ]
+HANDLE_ITEM_MAP = {x: y for x, y in zip(HANDLE_ENUMS, HANDLE_ITEM_ATTRS)}
 
 class ResizeHandleGroup(QObject):
     """Provides the ability to move and resize the parent."""
+
     def __init__(self, parent_outline_rect, width, color, is_resizable,
                  handle_types, parent_item, translates_in=None, show_coords=False):
         super(ResizeHandleGroup, self).__init__()
@@ -32,22 +43,16 @@ class ResizeHandleGroup(QObject):
         self.show_coords = show_coords
 
         self.handle_types = handle_types
-        self._t = HandleItem(HandleEnum.TOP, w, color, self, parent_item) \
-            if handle_types & HandleEnum.TOP else None
-        self._b = HandleItem(HandleEnum.BOTTOM, w, color, self, parent_item) \
-            if handle_types & HandleEnum.BOTTOM else None
-        self._l = HandleItem(HandleEnum.LEFT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.LEFT else None
-        self._r = HandleItem(HandleEnum.RIGHT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.RIGHT else None
-        self._tl = HandleItem(HandleEnum.TOP_LEFT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.TOP_LEFT else None
-        self._tr = HandleItem(HandleEnum.TOP_RIGHT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.TOP_RIGHT else None
-        self._bl = HandleItem(HandleEnum.BOTTOM_LEFT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.BOTTOM_LEFT else None
-        self._br = HandleItem(HandleEnum.BOTTOM_RIGHT, w, color, self, parent_item) \
-            if handle_types & HandleEnum.BOTTOM_RIGHT else None
+
+        active_handle_items = []
+        for enum_type, item in zip(HANDLE_ENUMS, HANDLE_ITEM_ATTRS):
+            if handle_types & enum_type:
+                value = HandleItem(enum_type, w, color, self, parent_item)
+                active_handle_items.append(value)
+            else:
+                value = None
+            setattr(self, item, value)
+        self.active_handle_items = active_handle_items
 
         self.alignHandles(parent_outline_rect)
     # end def
@@ -111,99 +116,54 @@ class ResizeHandleGroup(QObject):
             self._r.label.updateText(x_html.format(r_x))
     # end def
 
+    def destroyItem(self):
+        for item in HANDLE_ITEM_ATTRS:
+            handle_item = getattr(self, item)
+            if handle_item is not None:
+                handle_item.destroyItem()
+                setattr(self, item, None)
+        self.active_handle_items = None
+        self.parent_item = None
+
+        # NOTE THIS OBJECT AS A QOBJECT HAS NO SCENE SO COMMENTED OUT
+        # self.scene().removeItem(self)
+    # end def
+
     def removeHandles(self):
-        self._t = None
-        self._b = None
-        self._l = None
-        self._r = None
-        self._tl = None
-        self._tr = None
-        self._bl = None
-        self._br = None
+        for item in HANDLE_ITEM_ATTRS:
+            setattr(self, item, None)
     # end def
 
     def setPens(self, pen):
-        for handle in [self._t, self._b, self._l, self._r,
-                       self._tl, self._tr, self._bl, self._br]:
-            if handle:
-                handle.setPen(pen)
+        for handle in self.active_handle_items:
+            handle.setPen(pen)
     # end def
 
     def setZValue(self, z):
-        if self.handle_types & HandleEnum.TOP:
-            self._t.setZValue(z)
-        if self.handle_types & HandleEnum.BOTTOM:
-            self._b.setZValue(z)
-        if self.handle_types & HandleEnum.LEFT:
-            self._l.setZValue(z)
-        if self.handle_types & HandleEnum.RIGHT:
-            self._r.setZValue(z)
-        if self.handle_types & HandleEnum.TOP_LEFT:
-            self._tl.setZValue(z)
-        if self.handle_types & HandleEnum.TOP_RIGHT:
-            self._tr.setZValue(z)
-        if self.handle_types & HandleEnum.BOTTOM_LEFT:
-            self._bl.setZValue(z)
-        if self.handle_types & HandleEnum.BOTTOM_RIGHT:
-            self._br.setZValue(z)
+        for item in self.active_handle_items:
+            item.setZValue(z)
     # end def
 
     def setParentItemAll(self, new_parent):
-        if self.handle_types & HandleEnum.TOP:
-            self._t.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.BOTTOM:
-            self._b.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.LEFT:
-            self._l.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.RIGHT:
-            self._r.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.TOP_LEFT:
-            self._tl.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.TOP_RIGHT:
-            self._tr.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.BOTTOM_LEFT:
-            self._bl.setParentItem(new_parent)
-        if self.handle_types & HandleEnum.BOTTOM_RIGHT:
-            self._br.setParentItem(new_parent)
+        for item in self.active_handle_items:
+            item.setParentItem(new_parent)
     # end def
 
     def getHandle(self, handle_type):
-        if handle_type == HandleEnum.TOP:
-            return self._t
-        elif handle_type == HandleEnum.BOTTOM:
-            return self._b
-        elif handle_type == HandleEnum.LEFT:
-            return self._l
-        elif handle_type == HandleEnum.RIGHT:
-            return self._r
-        elif handle_type == HandleEnum.TOP_LEFT:
-            return self._tl
-        elif handle_type == HandleEnum.TOP_RIGHT:
-            return self._tr
-        elif handle_type == HandleEnum.BOTTOM_LEFT:
-            return self._bl
-        elif handle_type == HandleEnum.BOTTOM_RIGHT:
-            return self._br
-        else:
+        try:
+            handle_item_attr = HANDLE_ITEM_MAP[handle_type]
+            handle_item = getattr(self, handle_item_attr)
+            return handle_item
+        except:
             raise LookupError("HandleEnum not found", handle_type)
+    # end def
 
     def updateText(self, handle_types, text):
-        if handle_types & HandleEnum.TOP and self._t:
-            self._t.label.updateText(text)
-        if handle_types & HandleEnum.BOTTOM and self._b:
-            self._b.label.updateText(text)
-        if handle_types & HandleEnum.LEFT and self._l:
-            self._l.label.updateText(text)
-        if handle_types & HandleEnum.RIGHT and self._r:
-            self._r.label.updateText(text)
-        if handle_types & HandleEnum.TOP_LEFT and self._tl:
-            self._tl.label.updateText(text)
-        if handle_types & HandleEnum.TOP_RIGHT and self._tr:
-            self._tr.label.updateText(text)
-        if handle_types & HandleEnum.BOTTOM_LEFT and self._bl:
-            self._bl.label.updateText(text)
-        if handle_types & HandleEnum.BOTTOM_RIGHT and self._br:
-            self._br.label.updateText(text)
+        for handle_type in HANDLE_ENUMS:
+            if handle_types & handle_type:
+                handle_item = self.getHandle(getHandle)
+                if handle_item is not None:
+                    handle_item.label.updateText(text)
 # end class
 
 
@@ -241,6 +201,13 @@ class HandleItem(QGraphicsRectItem):
             self._resize_cursor = Qt.SizeBDiagCursor
         else:
             self._resize_cursor = Qt.ClosedHandCursor
+    # end def
+
+    def destroyItem(self):
+        self._group = None
+        self.label.destroyItem()
+        self.label = None
+        self.scene().removeItem(self)
     # end def
 
     def handleGroup(self):
@@ -294,8 +261,9 @@ class HandleItem(QGraphicsRectItem):
 
         if self.model_bounds:
             mTLx, mTLy, mBRx, mBRy = self.model_bounds
-            poTL = parent.outline.rect().topLeft()
-            poBR = parent.outline.rect().bottomRight()
+            po_rect = parent.outline.rect()
+            poTL = po_rect.topLeft()
+            poBR = po_rect.bottomRight()
             poTLx, poTLy = poTL.x(), poTL.y()
             poBRx, poBRy = poBR.x(), poBR.y()
             new_pos = self.item_start + epos - self.event_start_position
@@ -446,6 +414,11 @@ class HandleItemLabel(QGraphicsTextItem):
         self._handle = handle
         self.setFont(self._FONT)
         # self.setBrush(getBrushObj(self._COLOR))
+    # end def
+
+    def destroyItem(self):
+        self._handle = None
+        self.scene().removeItem(self)
     # end def
 
     def updateText(self, text):

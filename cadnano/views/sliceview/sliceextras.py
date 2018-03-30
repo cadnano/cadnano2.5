@@ -697,7 +697,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         line = QLineF(p1, p2)
         self.baseNearLine.setLine(line)
 
-    def remove(self):
+    def destroyItem(self):
         """Summary
         """
         fpxis = self.fwd_prexover_items

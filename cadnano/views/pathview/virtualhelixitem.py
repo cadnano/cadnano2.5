@@ -137,12 +137,16 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
+        print("Destroying PathVirtualHelixItem")
+        strand_item_list = self.getStrandItems()
+        for item in strand_item_list:
+            item.destroyItem()
         self.view().levelOfDetailChangedSignal.disconnect(self.levelOfDetailChangedSlot)
         self._controller.disconnectSignals()
         self._controller = None
 
         scene = self.scene()
-        self._handle.remove()
+        self._handle.destroyItem()
         scene.removeItem(self)
         self._part_item = None
         self._model_part = None
@@ -219,6 +223,14 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         for item in self.childItems():
             if isinstance(item, XoverNode3):
                 item.showXover()
+    # end def
+
+    def getStrandItems(self):
+        strand_item_list: List[StrandItems] = []
+        for item in self.childItems():
+            if isinstance(item, StrandItem):
+                strand_item_list.append(item)
+        return strand_item_list
     # end def
 
     def hideXoverItems(self):

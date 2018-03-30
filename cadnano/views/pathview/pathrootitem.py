@@ -61,7 +61,6 @@ class PathRootItem(QGraphicsRectItem):
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
-        self._model_part = None
         self._part_item_for_part_instance = {}  # Maps Part -> PartItem
         self._prexover_filter = None
         self.manager = None
@@ -170,6 +169,13 @@ class PathRootItem(QGraphicsRectItem):
     # end def
 
     ### PUBLIC METHODS ###
+    def destroyViewItems(self):
+        print("destroying path view")
+        items = list(self._part_item_for_part_instance.values())
+        for item in items:
+            item.destroyItem()
+    # end def
+
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_F:
             self.scene().views()[0].zoomToFit()

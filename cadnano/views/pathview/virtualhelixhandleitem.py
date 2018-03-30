@@ -179,7 +179,7 @@ class VirtualHelixHandleItem(QGraphicsEllipseItem):
         self.update(self.boundingRect())
     # end def
 
-    def remove(self):
+    def destroyItem(self):
         """Summary
 
         Returns:

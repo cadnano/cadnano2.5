@@ -508,7 +508,7 @@ class PreXoverItem(QGraphicsRectItem):
         """
         return (self._id_num, self.is_fwd, self.idx, self.to_vh_id_num)
 
-    def remove(self):
+    def destroyItem(self):
         """Removes animation adapter, label, bond_item, and this item from scene.
         """
         scene = self.scene()

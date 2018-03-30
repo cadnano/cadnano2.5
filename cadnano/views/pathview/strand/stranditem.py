@@ -122,6 +122,11 @@ class StrandItem(QGraphicsLineItem):
         Args:
             strand (:obj:`cadnano.strand.Strand`):
         """
+        self.destroyItem()
+    # end def
+
+    def destroyItem(self):
+        print("Destroying Path StrandItem")
         self._controller.disconnectSignals()
         self._controller = None
         scene = self.scene()
@@ -131,9 +136,9 @@ class StrandItem(QGraphicsLineItem):
         # scene.removeItem(self._high_cap)
         # scene.removeItem(self._low_cap)
         scene.removeItem(self._seq_label)
-        self.xover_3p_end.remove()
+        self.xover_3p_end.destroyItem()
         self.xover_3p_end = None
-        for insertionItem in self._insertion_items.values():
+        for insertionItem in list(self._insertion_items.values()):
             insertionItem.remove()
         self._insertion_items = None
         self._click_area = None
@@ -256,7 +261,7 @@ class StrandItem(QGraphicsLineItem):
             index (int): index of the insertion
         """
         inst_item = self.insertionItems()[index]
-        inst_item.remove()
+        inst_item.destroyItem()
         del self.insertionItems()[index]
     # end def
 
@@ -384,7 +389,7 @@ class StrandItem(QGraphicsLineItem):
         # remove all in items
         not_in_use = was_in_use - in_use
         for index in not_in_use:
-            i_items[index].remove()
+            i_items[index].destroyItem()
             del i_items[index]
         # end for
     # end def
