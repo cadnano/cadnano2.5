@@ -102,6 +102,7 @@ class CadnanoQt(QObject):
 
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
+        self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()
 
         if self.argns.interactive:

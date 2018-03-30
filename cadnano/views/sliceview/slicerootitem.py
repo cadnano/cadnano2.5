@@ -74,20 +74,21 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             item_dict (TYPE): Description
         """
+        pass
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
+    def selectionFilterChangedSlot(self, filter_name_set):
         """Update active tool to respond to active filters.
 
         Args:
-            filter_name_list (list): list of active filters
+            filter_name_set (set): list of active filters
         """
-        # if 'virtual_helix' not in filter_name_list:
+        # if 'virtual_helix' not in filter_name_set:
         #     self.manager.chooseCreateTool()
         tool = self.manager.activeToolGetter()
-        tool.setSelectionFilter(filter_name_list)
+        tool.setSelectionFilter(filter_name_set)
         # for nucleicacid_part_item in self.instance_items:
-        #     nucleicacid_part_item.setSelectionFilter(filter_name_list)
+        #     nucleicacid_part_item.setSelectionFilter(filter_name_set)
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):
@@ -99,6 +100,7 @@ class SliceRootItem(QGraphicsRectItem):
         Returns:
             TYPE: Description
         """
+        pass
     # end def
 
     def clearSelectionsSlot(self, doc):

@@ -39,6 +39,12 @@ class GridRootItem(QGraphicsRectItem):
         self.instance_items = {}
         self.manager = None
         self.select_tool = None
+
+    def __repr__(self):
+        _id = str(id(self))[-4:]
+        _name  = self.__class__.__name__
+        return '%s_%s_%s' % (_name, self._id_num, _id)
+
     ### SIGNALS ###
 
     ### SLOTS ###
@@ -74,19 +80,19 @@ class GridRootItem(QGraphicsRectItem):
         """
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_list):
+    def selectionFilterChangedSlot(self, filter_name_set):
         """Summary
 
         Args:
-            filter_name_list (TYPE): Description
+            filter_name_set (set): Description
 
         Returns:
             TYPE: Description
         """
-        # if 'virtual_helix' not in filter_name_list:
+        # if 'virtual_helix' not in filter_name_set:
         #     self.manager.chooseCreateTool()
         # for nucleicacid_part_item in self.instance_items:
-        #     nucleicacid_part_item.setSelectionFilter(filter_name_list)
+        #     nucleicacid_part_item.setSelectionFilter(filter_name_set)
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name):

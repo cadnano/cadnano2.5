@@ -11,6 +11,7 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
     """Summary
     """
     _GROUPNAME = "oligos"
+    FILTER_NAME = 'oligo'
 
     def __init__(self, **kwargs):
         """Summary

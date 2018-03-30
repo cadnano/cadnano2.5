@@ -75,6 +75,8 @@ class AbstractToolManager(QObject):
                 tool_widget.setChecked(True)
             self.setActiveTool(tool)
             if hasattr(tool, 'widgetClicked'):
+                if l_tool_name != 'select':
+                    self.document.clearAllSelected()
                 tool.widgetClicked()
         # end def
 

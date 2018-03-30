@@ -361,7 +361,10 @@ class Document(CNObject):
             bool: True if `oligo` is selected otherwise False
         """
         strand5p = oligo.strand5p()
-        return self.isModelStrandSelected(strand5p)
+        for strand in strand5p.generator3pStrand():
+            if self.isModelStrandSelected(strand):
+                return True
+        return False
     # end def
 
     def selectOligo(self, oligo):
@@ -631,9 +634,20 @@ class Document(CNObject):
         For now, individual objects need to emit signals
 
         """
+        oligos_selected_set = set()
+        oligos_set = set()
         for obj, value in self._strand_selected_changed_dict.items():
+            oligo = obj.oligo()
+            oligos_set.add(oligo)
+            if True in value:
+                oligos_selected_set.add(oligo)
             obj.strandSelectedChangedSignal.emit(obj, value)
         # end for
+        for oligo in oligos_selected_set:
+            oligo.oligoSelectedChangedSignal.emit(oligo, True)
+        oligos_deselected_set = oligos_set - oligos_selected_set
+        for oligo in oligos_deselected_set:
+            oligo.oligoSelectedChangedSignal.emit(oligo, False)
         self._strand_selected_changed_dict = {}
     # end def
 
@@ -940,26 +954,16 @@ class Document(CNObject):
         return seq, name
     # end def
 
-    def getSliceViewType(self):
-        """
-        Get the current SliceView type
-
-        Returns:
-            The current SliceView type
-        """
-        return self.controller().getSliceViewType()
-    # end def
-
-    def setSliceViewType(self, slice_view_type):
+    def setSliceOrGridViewVisible(self, value):
         """
         Set the current SliceView type
 
         Returns:
             None
         """
-        pass
-        # return self.controller().setSliceViewType(slice_view_type=slice_view_type)
-    # end def
+        if self.controller():
+            return self.controller().setSliceOrGridViewVisible(value)
+#    # end def
 
     def getGridType(self):
         """
@@ -968,7 +972,7 @@ class Document(CNObject):
         Returns:
             The current Grid type
         """
-        if self.activePart() is not None:
+        if self.activePart():
             return self.activePart().getGridType()
     # end def
 
@@ -979,7 +983,7 @@ class Document(CNObject):
         Returns:
             None
         """
-        if self.activePart() is not None:
+        if self.activePart():
             return self.activePart().setGridType(grid_type)
     # end def
 # end class
