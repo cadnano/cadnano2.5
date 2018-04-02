@@ -1,12 +1,45 @@
-from queue import Empty, Queue, PriorityQueue
+from queue import (
+    Empty,
+    Queue,
+    PriorityQueue
+)
 
 import numpy as np
-from PyQt5.QtCore import pyqtProperty, QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt
-from PyQt5.QtGui import QBrush, QColor, QPen, QPainterPath, QPolygonF, QRadialGradient, QTransform
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtCore import (
+    pyqtProperty,
+    QLineF,
+    QObject,
+    QPointF,
+    QPropertyAnimation,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QPen,
+    QPainterPath,
+    QPolygonF,
+    QRadialGradient,
+    QTransform
+)
+from PyQt5.QtWidgets import (
+    QGraphicsEllipseItem,
+    QGraphicsLineItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem
+)
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.gui.palette import (
+    getBrushObj,
+    getColorObj,
+    getNoPen,
+    getPenObj
+)
 
 from cadnano.proxies.cnenum import GridEnum
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS

@@ -1,9 +1,18 @@
 """Summary
 """
-from PyQt5.QtCore import QRectF, Qt
-from PyQt5.QtGui import QBrush, QFont
-from PyQt5.QtWidgets import (QGraphicsItem, QColorDialog,
-                             QGraphicsTextItem)
+from PyQt5.QtCore import (
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QFont
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QColorDialog,
+    QGraphicsTextItem
+)
 
 from cadnano.gui.palette import getColorObj
 from . import pathstyles as styles

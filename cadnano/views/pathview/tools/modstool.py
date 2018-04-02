@@ -1,6 +1,9 @@
-"""Summary
-"""
-from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QPushButton
+# -*- coding: utf-8 -*-
+from PyQt5.QtWidgets import (
+    QDialogButtonBox,
+    QDialog,
+    QPushButton
+)
 
 from cadnano.extras.sequencemods import mods
 from cadnano.gui.dialogs.ui_mods import Ui_ModsDialog

@@ -1,9 +1,14 @@
 from PyQt5.QtCore import QSettings
-from PyQt5.QtWidgets import QWidget, QDialogButtonBox
+from PyQt5.QtWidgets import (
+    QWidget,
+    QDialogButtonBox
+)
 
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
-from cadnano.proxies.cnenum import OrthoViewEnum, EnumType
-
+from cadnano.proxies.cnenum import (
+    OrthoViewEnum,
+    EnumType
+)
 
 PREFS_GROUP_NAME = 'Preferences'
 

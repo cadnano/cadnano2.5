@@ -1,11 +1,18 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 import logging
 from math import floor
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
 from PyQt5.QtGui import QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsItemGroup,
+    QGraphicsPathItem
+)
 
 from cadnano.gui.palette import getPenObj
 from cadnano.views.pathview import pathstyles as styles

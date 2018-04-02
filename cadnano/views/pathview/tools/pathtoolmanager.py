@@ -1,5 +1,4 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 from cadnano.views.abstractitems import AbstractToolManager
 
 from .selecttool import SelectTool

@@ -2,13 +2,13 @@
 from typing import List, Set
 
 from PyQt5.QtCore import (
-                        Qt,
-                        QRectF
+    Qt,
+    QRectF
 )
 from PyQt5.QtWidgets import (
-                            QGraphicsRectItem,
-                            QGraphicsItem,
-                            QGraphicsSceneMouseEvent
+    QGraphicsRectItem,
+    QGraphicsItem,
+    QGraphicsSceneMouseEvent
 )
 from PyQt5.QtGui import QKeyEvent
 
@@ -20,9 +20,9 @@ from .nucleicacidpartitem import PathNucleicAcidPartItem
 from .tools.pathselection import SelectionItemGroup
 from cadnano.views.pathview import PathToolManagerT
 from cadnano.cntypes import (
-                                WindowT,
-                                DocT,
-                                NucleicAcidPartT
+    WindowT,
+    DocT,
+    NucleicAcidPartT
 )
 
 class PathRootItem(QGraphicsRectItem):

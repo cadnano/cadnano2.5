@@ -1,11 +1,16 @@
-"""
-Module for caching `QColor <http://doc.qt.io/qt-5/qcolor.html>`_,
+# -*- coding: utf-8 -*-
+"""Module for caching `QColor <http://doc.qt.io/qt-5/qcolor.html>`_,
 `QPen <http://doc.qt.io/qt-5/qpen.html>`_, and
 `QBrush <http://doc.qt.io/qt-5/qbrush.html>`_ objects.
-Could be extended to cache `QFont <http://doc.qt.io/qt-5/qfont.html>`_ objects as well.
+Could be extended to cache `QFont <http://doc.qt.io/qt-5/qfont.html>`_ objects
+as well.
 """
 
-from PyQt5.QtGui import QColor, QPen, QBrush
+from PyQt5.QtGui import (
+    QColor,
+    QPen,
+    QBrush
+)
 from PyQt5.QtCore import Qt
 
 color_cache = {}
@@ -16,16 +21,18 @@ no_brush = QBrush(Qt.NoBrush)
 solid_brush = QBrush(Qt.SolidPattern)
 
 
-def getColorObj(hex_string, alpha=None, lighter=None):
+def getColorObj(hex_string: str,
+                alpha: int = None,
+                lighter: int = None) -> QColor:
     """Checks internal cache for specified color. If not in the cache, add it.
 
     Args:
-        hex_string (str): hexadecimal color code in the form: #RRGGBB
-        alpha (int): 0–255
-        lighter (int): see `QColor.lighter <http://doc.qt.io/qt-5/qcolor.html#lighter>`_.
+        hex_string: hexadecimal color code in the form: #RRGGBB
+        alpha: 0–255
+        lighter: see `QColor.lighter <http://doc.qt.io/qt-5/qcolor.html#lighter>`_.
 
     Returns:
-        color (QColor)
+        :class:`QColor` object
     """
     global color_cache
     if alpha is not None:
@@ -41,26 +48,27 @@ def getColorObj(hex_string, alpha=None, lighter=None):
 # end def
 
 
-def getPenObj(hex_string, stroke_width,
-              alpha=None,
-              lighter=None,
-              penstyle=None,
-              capstyle=None,
-              joinstyle=None):
-    """If the specified QPen is cached, return it.
-    Otherwise, cache and return a new QPen.
+def getPenObj(hex_string: str,
+            stroke_width: int,
+            alpha: int = None,
+            lighter: int=None,
+            penstyle: Qt.PenStyle = None,
+            capstyle: Qt.PenCapStyle = None,
+            joinstyle: Qt.PenJoinStyle = None) -> QPen:
+    """If the specified :class:`QPen` is cached, return it.
+    Otherwise, cache and return a new :class:`QPen`.
 
     Args:
         hex_string (str): hexadecimal color code in the form: #RRGGBB
         stroke_width (int)
         alpha (int): 0–255
         lighter (int): see `QColor.lighter <http://doc.qt.io/qt-5/qcolor.html#lighter>`_.
-        penstyle (Qt.PenStyle): see `QPen.pen-style <http://doc.qt.io/qt-5/qpen.html#pen-style>`_.
-        capstyle (Qt.CapStyle): see `QPen.cap-style <http://doc.qt.io/qt-5/qpen.html#cap-style>`_.
-        joinstyle (Qt.JoinStyle): see `QPen.join-style <http://doc.qt.io/qt-5/qpen.html#join-style>`_.
+        penstyle: see `QPen.pen-style <http://doc.qt.io/qt-5/qt.html#PenStyle-enum>`_.
+        capstyle: see `QPen.cap-style <http://doc.qt.io/qt-5/qt.html#PenCapStyle-enum>`_.
+        joinstyle: see `QPen.join-style <http://doc.qt.io/qt-5/qt.html#PenJoinStyle-enum>`_.
 
     Returns:
-        pen (QPen)
+        :class:`QPen` object
     """
     global pen_cache
     if alpha is not None:
@@ -82,20 +90,20 @@ def getPenObj(hex_string, stroke_width,
 # end def
 
 
-def newPenObj(hex_string, stroke_width, alpha=None):
-    """Returns a new QPen object. Use this when you need a pen with dynamic
-    properties, or wish to use features that are not supported by the cache,
-    such as  `setCosmetic <http://doc.qt.io/qt-5/qpen.html#setCosmetic>`_.
+def newPenObj(hex_string: str, stroke_width: int, alpha: int = None) -> QPen:
+    """Returns a new :class:`QPen` object. Use this when you need a pen with
+    dynamic properties, or wish to use features that are not supported by the
+    cache, such as  `setCosmetic <http://doc.qt.io/qt-5/qpen.html#setCosmetic>`_.
 
     Does not use the cache.
 
     Args:
-        hex_string (str): hexadecimal color code in the form: #RRGGBB
-        stroke_width (int)
-        alpha (int): 0–255
+        hex_string: hexadecimal color code in the form: #RRGGBB
+        stroke_width
+        alpha: 0–255
 
     Returns:
-        pen (QPen)
+        :class:`QPen` object
     """
     if alpha is not None:
         hex_string = '#%0.2x%s' % (alpha, hex_string[1:])
@@ -104,17 +112,19 @@ def newPenObj(hex_string, stroke_width, alpha=None):
 # end def
 
 
-def getBrushObj(hex_string, alpha=None, lighter=None):
-    """If the specified QBrush is cached, return it.
-    Otherwise, cache and return a new QPen.
+def getBrushObj(hex_string: str,
+                alpha: int = None,
+                lighter: int = None) -> QBrush:
+    """If the specified :class:`QBrush` is cached, return it.
+    Otherwise, cache and return a new :class:`QBrush`
 
     Args:
-        hex_string (str): hexadecimal color code in the form: #RRGGBB
-        alpha (int): 0–255
-        lighter (int): see `QColor.lighter <http://doc.qt.io/qt-5/qcolor.html#lighter>`_.
+        hex_string: hexadecimal color code in the form: #RRGGBB
+        alpha: 0–255
+        lighter: see `QColor.lighter <http://doc.qt.io/qt-5/qcolor.html#lighter>`_.
 
     Returns:
-        brush (QBrush)
+        :class:`QBrush` object
     """
     global brush_cache
     if alpha is not None:
@@ -129,7 +139,7 @@ def getBrushObj(hex_string, alpha=None, lighter=None):
 # end def
 
 
-def newBrushObj(hex_string, alpha=None):
+def newBrushObj(hex_string: str, alpha: int = None) -> QBrush:
     """ Returns a new QPen object. Use this when you need a pen with dynamic
     properties, or wish to use features that are not supported by the cache,
     such as  `setTexture <http://doc.qt.io/qt-5/qbrush.html#setTexture>`_.
@@ -137,11 +147,11 @@ def newBrushObj(hex_string, alpha=None):
     Does not use the cache.
 
     Args:
-        hex_string (str): hexadecimal color code in the form: #RRGGBB
-        alpha (int): 0–255
+        hex_string: hexadecimal color code in the form: ``#RRGGBB``
+        alpha: 0–255
 
     Returns:
-        brush (QBrush)
+        :class:`QBrush` object
     """
     if alpha is not None:
         hex_string = '#%0.2x%s' % (alpha, hex_string[1:])
@@ -150,31 +160,31 @@ def newBrushObj(hex_string, alpha=None):
 # end def
 
 
-def getNoPen():
-    """Global instance of QPen(Qt.NoPen).
+def getNoPen() -> QPen:
+    """Global instance of ``QPen(Qt.NoPen)``.
 
     Returns:
-        QPen(Qt.NoPen)
+        ``QPen(Qt.NoPen)``
     """
     global no_pen
     return no_pen
 
 
-def getNoBrush():
-    """Global instance of QBrush(Qt.NoBrush).
+def getNoBrush() -> QBrush:
+    """Global instance of ``QBrush(Qt.NoBrush)``.
 
     Returns:
-        QBrush(Qt.NoBrush)
+        ``QBrush(Qt.NoBrush)``
     """
     global no_brush
     return no_brush
 
 
-def getSolidBrush():
-    """Global instance of QBrush(Qt.SolidPattern).
+def getSolidBrush() -> QBrush:
+    """Global instance of ``QBrush(Qt.SolidPattern)``.
 
     Returns:
-        QBrush(Qt.SolidPattern)
+        ``QBrush(Qt.SolidPattern)``
     """
     global solid_brush
     return solid_brush

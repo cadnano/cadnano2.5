@@ -2,11 +2,20 @@
 """
 from math import floor
 
-from PyQt5.QtCore import QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
+from PyQt5.QtCore import (
+    QRectF,
+    Qt
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsEllipseItem,
+    QGraphicsSimpleTextItem
+)
 
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj
+)
 from . import pathstyles as styles
 
 _RADIUS = styles.VIRTUALHELIXHANDLEITEM_RADIUS

@@ -1,34 +1,58 @@
 from ast import literal_eval
 from warnings import warn
+from typing import (
+    Tuple,
+    List,
+    Set
+)
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
 
 from PyQt5.QtWidgets import (
-                            QGraphicsItem,
-                            QGraphicsLineItem,
-                            QGraphicsRectItem,
-                            QGraphicsSceneEvent
-                            )
+    QGraphicsItem,
+    QGraphicsLineItem,
+    QGraphicsRectItem,
+    QGraphicsSceneEvent
+)
 
 from cadnano.objectinstance import ObjectInstance
 from cadnano.part.nucleicacidpart import NucleicAcidPart
-from cadnano.proxies.cnenum import GridEnum, HandleEnum
-
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    HandleEnum
+)
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
 from cadnano.controllers import NucleicAcidPartItemController
-from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
-
+from cadnano.gui.palette import (
+    getBrushObj,
+    getNoBrush,
+    getNoPen,
+    getPenObj
+)
 from cadnano.views.abstractitems import QAbstractPartItem
-
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
-
 from cadnano.views.resizehandles import ResizeHandleGroup
 from cadnano.views.sliceview.sliceextras import ShortestPathHelper
 from . import slicestyles as styles
 from .griditem import GridItem
 from .prexovermanager import PreXoverManager
 from .virtualhelixitem import SliceVirtualHelixItem
-from . import SliceRootItemT, AbstractSliceToolT
+
+from . import (
+    SliceRootItemT,
+    AbstractSliceToolT
+)
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+    ABInfoT
+)
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
 _DEFAULT_ALPHA = styles.DEFAULT_ALPHA
@@ -146,24 +170,24 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partActiveVirtualHelixChangedSlot(self, part, id_num):
+    def partActiveVirtualHelixChangedSlot(self, part: NucleicAcidPartT, id_num: int):
         """Summary
 
         Args:
-            part (NucleicAcidPart): Description
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part: Description
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
         vhi = self._virtual_helix_item_hash.get(id_num)
         self.setActiveVirtualHelixItem(vhi)
         self.setPreXoverItemsVisible(vhi)
     # end def
 
-    def partActiveBaseInfoSlot(self, part, info):
+    def partActiveBaseInfoSlot(self, part: NucleicAcidPartT, info: ABInfoT):
         """Summary
 
         Args:
-            part (NucleicAcidPart): Description
-            info (tuple): Description
+            part: Description
+            info: Description
         """
         pxom = self.prexover_manager
         pxom.deactivateNeighbors()
@@ -172,35 +196,35 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             pxom.activateNeighbors(id_num, is_fwd, idx)
     # end def
 
-    def partPropertyChangedSlot(self, model_part, property_key, new_value):
+    def partPropertyChangedSlot(self, part: NucleicAcidPartT, key: str, new_value):
         """Slot for property chaing
 
         Args:
-            model_part (NucleicAcidPart): The model part
-            property_key (str): map key
+            part: The model part
+            key: map key
             new_value (Any): Description
         """
-        if self._model_part == model_part:
-            self._model_props[property_key] = new_value
-            if property_key == 'color':
+        if self._model_part == part:
+            self._model_props[key] = new_value
+            if key == 'color':
                 self.outline.setPen(getPenObj(new_value, _DEFAULT_WIDTH))
                 for vhi in self._virtual_helix_item_hash.values():
                     vhi.updateAppearance()
                 self.resize_handle_group.setPens(getPenObj(new_value, 0))
-            elif property_key == 'is_visible':
+            elif key == 'is_visible':
                 if new_value:
                     self.show()
                 else:
                     self.hide()
-            elif property_key == 'grid_type':
+            elif key == 'grid_type':
                 self.griditem.setGridEnum(new_value)
     # end def
 
-    def partRemovedSlot(self, sender):
+    def partRemovedSlot(self, sender: NucleicAcidPartT):
         """Slot wrapper for ``destroyItem()``
 
         Args:
-            sender (NucleicAcidPart): Model object that emitted the signal.
+            sender: Model object that emitted the signal.
         """
         return self.destroyItem()
     # end def
@@ -208,26 +232,45 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
     def destroyItem(self):
         '''Remove this object and references to it from the view
         '''
-        super(SliceNucleicAcidPartItem, self).destroyItem()
+        print("destroying SliceNucleicAcidPartItem")
+        for id_num in list(self._virtual_helix_item_hash.keys()):
+            self.removeVirtualHelixItem(id_num)
+        self.prexover_manager.destroyItem()
+        self.prexover_manager = None
+
+        scene = self.scene()
+
+        scene.removeItem(self.x_axis_line)
         self.x_axis_line = None
+        scene.removeItem(self.y_axis_line)
         self.y_axis_line = None
-        self.model_bounds_hint = None
+
+        scene.removeItem(self.outline)
         self.outline = None
-        self.resize_handle_group.removeHandles()
+
+        scene.removeItem(self.model_bounds_hint)
+        self.model_bounds_hint = None
+
+        self.resize_handle_group.destroyItem()
         self.resize_handle_group = None
+
+        self.griditem.destroyItem()
         self.griditem = None
-        # self._mod_circ = None
+
+        super(SliceNucleicAcidPartItem, self).destroyItem()
     # end def
 
-    def partVirtualHelicesTranslatedSlot(self, sender, vh_set, left_overs, do_deselect):
-        """
-        left_overs are neighbors that need updating due to changes
+    def partVirtualHelicesTranslatedSlot(self, part: NucleicAcidPartT,
+                                                vh_set: Set[int],
+                                                left_overs:  Set[int],
+                                                do_deselect: bool):
+        """left_overs are neighbors that need updating due to changes
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            vh_set (TYPE): Description
-            left_overs (TYPE): Description
-            do_deselect (TYPE): Description
+            part: Model object that emitted the signal.
+            vh_set: Description
+            left_overs: Description
+            do_deselect: Description
         """
         if do_deselect:
             tool = self._getActiveTool()

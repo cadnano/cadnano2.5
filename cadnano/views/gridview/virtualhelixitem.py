@@ -1,17 +1,30 @@
-"""Summary
-
+# -*- coding: utf-8 -*-
+"""
 Attributes:
     SNAP_WIDTH (int): Description
 """
-from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
-
+from PyQt5.QtCore import (
+    QLineF,
+    QPointF,
+    Qt,
+    QRectF
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsEllipseItem,
+    QGraphicsSimpleTextItem
+)
 from cadnano.controllers import VirtualHelixItemController
 from cadnano.views.abstractitems import AbstractVirtualHelixItem
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj
+)
 from . import gridstyles as styles
-from .gridextras import WedgeGizmo, WEDGE_RECT
+from .gridextras import (
+    WedgeGizmo,
+    WEDGE_RECT
+)
 from . import GridNucleicAcidPartItemT
 
 # set up default, hover, and active drawing styles
@@ -256,13 +269,13 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def virtualHelixRemovedSlot(self):
+        """The event handler for when a virtual helix is removed from the model
+        """
         self.destroyItem()
     # end def
 
     def destroyItem(self):
-        """The event handler for when a virtual helix is removed from the model.
-
-        Disconnects signals, and sets  internal references to label, part_item,
+        """Disconnects signals, and sets  internal references to label, part_item,
         and model_part to None, and finally removes the item from the scene.
         """
         print("removing GridVirtualHelixItem")

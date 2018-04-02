@@ -2,17 +2,26 @@
 from __future__ import division
 from typing import Set, List, Tuple
 
-from PyQt5.QtCore import QPointF, QRectF
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF
+)
 from PyQt5.QtWidgets import (
-                                QGraphicsItem, QGraphicsRectItem,
-                                QGraphicsSceneHoverEvent,
-                                QGraphicsSceneMouseEvent
-                            )
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsSceneHoverEvent,
+    QGraphicsSceneMouseEvent
+)
 
 from cadnano.objectinstance import ObjectInstance
 from cadnano import getBatch, util
 from cadnano.proxies.cnenum import HandleEnum
-from cadnano.gui.palette import getBrushObj, getPenObj, getNoPen  # newPenObj
+from cadnano.gui.palette import (
+    getBrushObj,
+    getPenObj,
+    getNoPen,
+    # newPenObj
+)
 from cadnano.controllers import NucleicAcidPartItemController
 from cadnano.views.abstractitems import QAbstractPartItem
 from cadnano.views.resizehandles import ResizeHandleGroup
@@ -22,7 +31,10 @@ from .pathextras import PathWorkplaneItem
 from .prexovermanager import PreXoverManager
 from .strand.xoveritem import XoverNode3
 from .virtualhelixitem import PathVirtualHelixItem
-from . import PathRootItemT, AbstractPathToolT
+from . import (
+    PathRootItemT,
+    AbstractPathToolT
+)
 
 from cadnano.cntypes import (
     RectT,

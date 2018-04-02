@@ -1,5 +1,4 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 from .abstractpathtool import AbstractPathTool
 
 

@@ -1,5 +1,4 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 from .abstractpathtool import AbstractPathTool
 from .pathselection import EndpointHandleSelectionBox
 from .pathselection import SelectionItemGroup

@@ -1,12 +1,19 @@
 from collections import namedtuple
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtCore import QSettings
-from PyQt5.QtCore import QPoint, QSize
-from PyQt5.QtWidgets import QGraphicsScene
-from PyQt5.QtWidgets import QMainWindow
-from PyQt5.QtWidgets import QGraphicsItem
-from PyQt5.QtWidgets import QAction, QApplication, QWidget
+from PyQt5.QtCore import (
+                            Qt,
+                            QSettings,
+                            QPoint,
+                            QSize
+)
+from PyQt5.QtWidgets import (
+                                QAction,
+                                QApplication,
+                                QWidget,
+                                QGraphicsItem,
+                                QMainWindow,
+                                QGraphicsScene
+)
 
 
 from cadnano import app

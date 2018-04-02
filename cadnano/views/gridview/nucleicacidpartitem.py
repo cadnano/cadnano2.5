@@ -1,14 +1,22 @@
 # -*- coding: utf-8 -*-
 from ast import literal_eval
-from typing import Tuple, List, Set
+from typing import (
+    Tuple,
+    List,
+    Set
+)
 
-from PyQt5.QtCore import (QPointF, Qt, QRectF)
+from PyQt5.QtCore import (
+    QPointF,
+    Qt,
+    QRectF
+)
 from PyQt5.QtWidgets import (
-                            QGraphicsItem,
-                            QGraphicsRectItem,
-                            QGraphicsSceneMouseEvent,
-                            QGraphicsSceneHoverEvent
-                            )
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsSceneMouseEvent,
+    QGraphicsSceneHoverEvent
+)
 
 from cadnano.objectinstance import ObjectInstance
 from cadnano.controllers import NucleicAcidPartItemController
@@ -21,7 +29,7 @@ from cadnano.cntypes import (
     NucleicAcidPartT,
     VirtualHelixT,
     ABInfoT
-    )
+)
 
 from .virtualhelixitem import GridVirtualHelixItem
 from .prexovermanager import PreXoverManager

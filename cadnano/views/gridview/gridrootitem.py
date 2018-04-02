@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
 from typing import Set
 
 from PyQt5.QtCore import QRectF
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsItem
-
+from PyQt5.QtWidgets import (
+    QGraphicsRectItem,
+    QGraphicsItem
+)
 from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnenum import PartEnum
 from cadnano.controllers import ViewRootController
@@ -13,9 +13,9 @@ from .nucleicacidpartitem import GridNucleicAcidPartItem
 
 from cadnano.views.gridview import GridToolManagerT
 from cadnano.cntypes import (
-                                WindowT,
-                                DocT,
-                                NucleicAcidPartT
+    WindowT,
+    DocT,
+    NucleicAcidPartT
 )
 
 class GridRootItem(QGraphicsRectItem):
@@ -42,8 +42,7 @@ class GridRootItem(QGraphicsRectItem):
                         parent: QGraphicsItem,
                         window: WindowT,
                         document: DocT):
-        """Summary
-
+        """
         Args:
             rect: Rectangle of this item
             parent: parent object
@@ -93,16 +92,14 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     def selectedChangedSlot(self, item_dict: dict):
-        """docstring for selectedChangedSlot
-
+        """
         Args:
             item_dict: Description
         """
     # end def
 
     def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
-        """Summary
-
+        """
         Args:
             filter_name_set: Description
 
@@ -116,16 +113,14 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     def preXoverFilterChangedSlot(self, filter_name: str):
-        """Summary
-
+        """
         Args:
             filter_name: Description
         """
     # end def
 
     def clearSelectionsSlot(self, doc: DocT):
-        """Summary
-
+        """
         Args:
             doc: Description
         """
@@ -134,8 +129,7 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     def resetRootItemSlot(self, doc: DocT):
-        """Summary
-
+        """
         Args:
             doc: Description
         """
@@ -145,10 +139,9 @@ class GridRootItem(QGraphicsRectItem):
 
     ### ACCESSORS ###
     def window(self) -> WindowT:
-        """Summary
-
+        """
         Returns:
-            TYPE: Description
+            the :class:`DocumentWindow`
         """
         return self._window
     # end def
@@ -162,20 +155,15 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     def removePartItem(self, part_item: GridNucleicAcidPartItem):
-        """Summary
-
+        """
         Args:
             part_item: Description
-
-        Returns:
-            TYPE: Description
         """
         del self.instance_items[part_item]
     # end def
 
     def resetDocumentAndController(self, document: DocT):
-        """docstring for resetDocumentAndController
-
+        """
         Args:
             document: Document
 
@@ -189,8 +177,7 @@ class GridRootItem(QGraphicsRectItem):
     # end def
 
     def setModifyState(self, is_on: bool):
-        """docstring for setModifyState
-
+        """
         Args:
             is_on: Description
         """

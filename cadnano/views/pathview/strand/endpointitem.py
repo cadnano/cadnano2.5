@@ -331,15 +331,15 @@ class EndpointItem(QGraphicsPathItem):
 
     def addSeqToolMousePress(self, modifiers, event, idx):
         oligo = self._strand_item._model_strand.oligo()
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.applySequence(oligo)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.applySequence(oligo)
     # end def
 
     def addSeqToolHoverMove(self, event, idx):
         # m_strand = self._model_strand
         # vhi = self._strand_item._virtual_helix_item
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.hoverMove(self, event, flag=self._isdrawn5to3)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.hoverMove(self, event, flag=self._isdrawn5to3)
     # end def
 
     def addSeqToolHoverLeave(self, event):

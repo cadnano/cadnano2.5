@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Summary
-
-Attributes:
+"""
     BASE_RECT (TYPE): Description
     BASE_WIDTH (TYPE): Description
     KEYINPUT_ACTIVE_FLAG (TYPE): Description
@@ -12,18 +10,42 @@ Attributes:
 """
 from math import floor
 
-from PyQt5.QtCore import QObject, QPointF, QRectF, Qt
-from PyQt5.QtCore import QPropertyAnimation, pyqtProperty
-from PyQt5.QtGui import QBrush, QColor, QPainterPath
-from PyQt5.QtGui import QPolygonF, QTransform
-from PyQt5.QtGui import QFontMetrics
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
+from PyQt5.QtCore import (
+    QObject,
+    QPointF,
+    QRectF,
+    Qt,
+    QPropertyAnimation,
+    pyqtProperty
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QPainterPath,
+    QPolygonF,
+    QTransform,
+    QFontMetrics
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsSimpleTextItem
+)
 
 from cadnano import util
-from cadnano.gui.palette import getNoPen, getPenObj, newPenObj
-from cadnano.gui.palette import getBrushObj, getNoBrush
-from cadnano.proxies.cnenum import AxisEnum, HandleEnum, StrandEnum
+from cadnano.gui.palette import (
+    getNoPen,
+    getPenObj,
+    newPenObj,
+    getBrushObj,
+    getNoBrush
+)
+from cadnano.proxies.cnenum import (
+    AxisEnum,
+    HandleEnum,
+    StrandEnum
+)
 from cadnano.views.resizehandles import ResizeHandleGroup
 from . import pathstyles as styles
 

@@ -1,32 +1,61 @@
-"""Summary
-
+# -*- coding: utf-8 -*-
+"""
 Attributes:
-    L3_POLY (TYPE): Description
-    POLY_35 (TYPE): Description
-    POLY_53 (TYPE): Description
-    PP35 (TYPE): Description
-    PP53 (TYPE): Description
-    PPL3 (TYPE): Description
-    PPL5 (TYPE): Description
-    PPR3 (TYPE): Description
-    PPR5 (TYPE): Description
-    R3_POLY (TYPE): Description
+    L3_POLY (QPolygonF): Description
+    POLY_35 (QPolygonF): Description
+    POLY_53 (QPolygonF): Description
+    PP35 (QPainterPath): Description
+    PP53 (QPainterPath): Description
+    PPL3 (QPainterPath): Description
+    PPL5 (QPainterPath): Description
+    PPR3 (QPainterPath): Description
+    PPR5 (QPainterPath): Description
+    R3_POLY (QPolygonF): Description
 """
 from math import floor
 
-from PyQt5.QtCore import Qt, QPointF, QRectF
-from PyQt5.QtGui import QPen, QBrush, QColor
-from PyQt5.QtGui import QFontMetrics, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsObject
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsSimpleTextItem
+from PyQt5.QtCore import (
+    Qt,
+    QPointF,
+    QRectF
+)
+from PyQt5.QtGui import (
+    QPen,
+    QBrush,
+    QColor,
+    QFontMetrics,
+    QPainterPath,
+    QPolygonF,
+    QKeyEvent,
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsObject,
+    QGraphicsLineItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsSimpleTextItem,
+)
 
 from cadnano import util
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj
+)
 from cadnano.views.pathview import pathstyles as styles
-
 from .abstractpathtool import AbstractPathTool
-
+from cadnano.views.pathview import (
+    PathVirtualHelixItemT,
+    PathStrandItemT,
+    PathRootItemT,
+    PathToolManagerT
+)
+from cadnano.cntypes import (
+    StrandSetT,
+    StrandT,
+    SegmentT,
+    Vec2T
+)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _PENCIL_COLOR = styles.RED_STROKE
@@ -39,7 +68,7 @@ class CreateTool(AbstractPathTool):
     docstring for CreateTool
     """
 
-    def __init__(self, manager):
+    def __init__(self, manager: PathToolManagerT):
         """Summary
 
         Args:
@@ -53,7 +82,7 @@ class CreateTool(AbstractPathTool):
         self._is_floating_xover_begin = True
         self._is_drawing_strand = False
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Summary
 
         Returns:
@@ -61,7 +90,7 @@ class CreateTool(AbstractPathTool):
         """
         return "create_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
+    def methodPrefix(self) -> str:
         """Summary
 
         Returns:
@@ -69,7 +98,7 @@ class CreateTool(AbstractPathTool):
         """
         return "createTool"  # first letter should be lowercase
 
-    def strandItem(self):
+    def strandItem(self) -> PathStrandItemT:
         """Summary
 
         Returns:
@@ -85,32 +114,34 @@ class CreateTool(AbstractPathTool):
         self._temp_xover.deactivate()
         self.hide()
 
-    def isDrawingStrand(self):
-        """Get _is_drawing_strand
+    def isDrawingStrand(self) -> bool:
+        """Get ``_is_drawing_strand``
 
         Returns:
-            bool: is_drawing_strand
+            is_drawing_strand
         """
         return self._is_drawing_strand
     # end def
 
-    def setIsDrawingStrand(self, boolval):
-        """Set _is_drawing_strand
+    def setIsDrawingStrand(self, boolval: bool):
+        """Set ``_is_drawing_strand``
 
         Args:
-            boolval (bool): True or False.
+            boolval: ``True`` or ``False``.
         """
         self._is_drawing_strand = boolval
         if boolval is False:
             self._temp_strand_item.hideIt()
     # end def
 
-    def initStrandItemFromVHI(self, virtual_helix_item, strand_set, idx):
+    def initStrandItemFromVHI(self, virtual_helix_item: PathVirtualHelixItemT,
+                                    strand_set: StrandSetT,
+                                    idx: int):
         """Called from VHI createToolMousePress. Stores the starting point
         of the strand to be created.
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
+            virtual_helix_item: reference to the VHI
             strand_set (StrandSet): reference to the clicked strand_set
             idx (int): index where clicked
         """
@@ -121,15 +152,17 @@ class CreateTool(AbstractPathTool):
         self._low_drag_bound, self._high_drag_bound = strand_set.getBoundsOfEmptyRegionContaining(idx)
     # end def
 
-    def updateStrandItemFromVHI(self, virtual_helix_item, strand_set, idx):
+    def updateStrandItemFromVHI(self, virtual_helix_item: PathVirtualHelixItemT,
+                                    strand_set: StrandSetT,
+                                    idx: int):
         """A temporary strand item is drawn and refreshed on mousemoves before
         the final mouse release. This method updates its appearance to the
         most recent index.
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): reference to the VHI
-            strand_set (StrandSet): reference to the clicked strand_set
-            idx (int): index of cursor from last mousemove
+            virtual_helix_item: reference to the VHI
+            strand_set: reference to the clicked strand_set
+            idx: index of cursor from last mousemove
         """
         s_i = self._temp_strand_item
         s_idx = self._start_idx
@@ -140,15 +173,15 @@ class CreateTool(AbstractPathTool):
         # end def
     # end def
 
-    def isDragLow(self, idx):
+    def isDragLow(self, idx: int) -> bool:
         """Is the create tool being dragged to a lower idx than the start idx.
         Used to determine how the temp strand should be drawn.
 
         Args:
-            idx (int): the dragged-to base index within the virtual helix
+            idx: the dragged-to base index within the virtual helix
 
         Returns:
-            bool: True if dragging lower (left), False if higher (right).
+            ``True`` if dragging lower (left), ``False`` if higher (right).
         """
         s_idx = self._start_idx
         if s_idx - idx > 0:
@@ -157,27 +190,29 @@ class CreateTool(AbstractPathTool):
             return False
     # end def
 
-    def isWithinBounds(self, idx):
-        """Is the idx with the low and high drag boundaries.
+    def isWithinBounds(self, idx: int) -> bool:
+        """Is the ``idx`` with the low and high drag boundaries.
 
         Args:
-            idx (int): the base index within the virtual helix
+            idx: the base index within the virtual helix
 
         Returns:
-            bool: True if inside the bounds, False otherwise.
+            ``True`` if inside the bounds, ``False`` otherwise.
         """
         return self._low_drag_bound <= idx <= self._high_drag_bound
     # end def
 
-    def attemptToCreateStrand(self, virtual_helix_item, strand_set, idx):
-        """Attempt to create a new strand within the VHI `strand_set` with
-        bounds of the original mouse press index (stored as `self._start_idx`)
-        and the mouse release index `idx`.
+    def attemptToCreateStrand(self, virtual_helix_item: PathVirtualHelixItemT,
+                                    strand_set: StrandSetT,
+                                    idx: int):
+        """Attempt to create a new strand within the VHI ``strand_set`` with
+        bounds of the original mouse press index (stored as ``self._start_idx``)
+        and the mouse release index ``idx``.
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
-            strand_set (StrandSet): Description
-            idx (int): mouse release index
+            virtual_helix_item: from vhi
+            strand_set: Description
+            idx: mouse release index
         """
         self._temp_strand_item.hideIt()
         s_idx = self._start_idx
@@ -187,29 +222,29 @@ class CreateTool(AbstractPathTool):
             self._start_strand_set.createStrand(*idxs)
     # end def
 
-    def floatingXover(self):
+    def floatingXover(self) -> 'ForcedXoverItem':
         """Returns a temporary Xover item used for drawing purposes.
 
         Returns:
-            ForcedXoverItem: Description
+            :class:`ForcedXoverItem`
         """
         return self._temp_xover
     # end def
 
-    def isFloatingXoverBegin(self):
+    def isFloatingXoverBegin(self) -> bool:
         """Returns current status of floating crossover.
 
         Returns:
-            bool: True if begun, False otherwise
+            ``True`` if begun, ``False`` otherwise
         """
         return self._is_floating_xover_begin
     # end def
 
-    def setFloatingXoverBegin(self, boolval):
+    def setFloatingXoverBegin(self, boolval: bool):
         """Sets current status of floating crossover.
 
         Args:
-            boolval (bool): True to begin, False otherwise.
+            boolval: ``True`` to begin, ``False`` otherwise.
 
         """
         self._is_floating_xover_begin = boolval
@@ -219,13 +254,15 @@ class CreateTool(AbstractPathTool):
             self._temp_xover.showIt()
     # end def
 
-    def attemptToCreateXover(self, virtual_helix_item, strand3p, idx):
+    def attemptToCreateXover(self, virtual_helix_item: PathVirtualHelixItemT,
+                                    strand3p: StrandT,
+                                    idx: int):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): the VHI
-            strand3p (Strand): reference to the 3' strand
-            idx (int): the base index within the virtual helix
+            virtual_helix_item: the VHI
+            strand3p: reference to the 3' strand
+            idx: the base index within the virtual helix
 
         """
         xoi = self._temp_xover
@@ -236,12 +273,11 @@ class CreateTool(AbstractPathTool):
         part.createXover(strand5p, idx5, strand3p, idx)
     # end def
 
-    def keyPressEvent(self, event):
-        """
-        Must intercept invalid input events.  Make changes here
+    def keyPressEvent(self, event: QKeyEvent):
+        """Must intercept invalid input events.  Make changes here
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         a = event.key()
         if a in [Qt.Key_Control, Qt.Key_Left, Qt.Key_Right, Qt.Key_Up, Qt.Key_Down]:
@@ -254,24 +290,23 @@ class CreateTool(AbstractPathTool):
 
 
 class ForcedStrandItem(QGraphicsLineItem):
-    """Summary
-
+    """
     Attributes:
         is_forward (bool): True if forward strand, False if reverse.
     """
 
-    def __init__(self, tool, virtual_helix_item):
+    def __init__(self, tool, virtual_helix_item: PathVirtualHelixItemT):
         """The parent should be a VirtualHelixItem.
 
         Args:
             tool (TYPE): Description
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item: Description
         """
         super(ForcedStrandItem, self).__init__(virtual_helix_item)
         self._virtual_helix_item = virtual_helix_item
         self._tool = tool
 
-        is_forward = True
+        is_forward: bool = True
 
         # caps
         self._low_cap = EndpointItem(self, 'low', is_forward)
@@ -301,11 +336,11 @@ class ForcedStrandItem(QGraphicsLineItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def strandResizedSlot(self, idxs):
+    def strandResizedSlot(self, idxs: SegmentT):
         """docstring for strandResizedSlot
 
         Args:
-            idxs (TYPE): Description
+            idxs: Description
         """
         low_moved = self._low_cap.updatePosIfNecessary(idxs[0])
         high_moved = self._high_cap.updatePosIfNecessary(idxs[1])
@@ -366,21 +401,20 @@ class ForcedStrandItem(QGraphicsLineItem):
         self.show()
     # end def
 
-    def resetStrandItem(self, virtualHelixItem, is_forward):
-        """Summary
-
+    def resetStrandItem(self, virtual_helix_item: PathVirtualHelixItemT,
+                            is_forward: bool):
+        """
         Args:
-            virtualHelixItem (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item: Description
             is_forward (bool): Description
         """
-        self.setParentItem(virtualHelixItem)
-        self._virtual_helix_item = virtualHelixItem
+        self.setParentItem(virtual_helix_item)
+        self._virtual_helix_item = virtual_helix_item
         self.resetEndPointItems(is_forward)
     # end def
 
-    def resetEndPointItems(self, is_forward):
-        """Summary
-
+    def resetEndPointItems(self, is_forward: bool):
+        """
         Args:
             is_forward (TYPE): Description
         """
@@ -405,11 +439,11 @@ class ForcedStrandItem(QGraphicsLineItem):
     # end def
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
-    def updateLine(self, moved_cap):
+    def updateLine(self, moved_cap: 'EndpointItem'):
         """Summary
 
         Args:
-            moved_cap (TYPE): Description
+            moved_cap: Description
 
         """
         # setup
@@ -491,19 +525,21 @@ PPR3.addPolygon(R3_POLY)
 
 
 class ForcedXoverNode3(QGraphicsRectItem):
-    """
-    This is a QGraphicsRectItem to allow actions and also a
-    QGraphicsSimpleTextItem to allow a label to be drawn
+    """This is a :class:`QGraphicsRectItem` to allow actions and also a
+    :class:`QGraphicsSimpleTextItem` to allow a label to be drawn
 
     Attributes:
-        is_forward (TYPE): Description
+        is_forward (bool): Description
     """
 
-    def __init__(self, virtual_helix_item, xover_item, strand3p, idx):
+    def __init__(self, virtual_helix_item: PathVirtualHelixItemT,
+                        xover_item: 'ForcedXoverItem',
+                        strand3p: StrandT,
+                        idx: int):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): from vhi
+            virtual_helix_item: from vhi
             xover_item (TYPE): Description
             strand3p (Strand): reference to the 3' strand
             idx (int): the base index within the virtual helix
@@ -531,13 +567,16 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self.setZValue(styles.ZENDPOINTITEM + 1)
     # end def
 
-    def updateForFloatFromVHI(self, virtual_helix_item, is_forward, idx_x, idx_y):
+    def updateForFloatFromVHI(self, virtual_helix_item: PathVirtualHelixItemT,
+                                    is_forward: bool,
+                                    idx_x: int,
+                                    idx_y: int):
         """
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            is_forward (TYPE): Description
-            idx_x (TYPE): Description
-            idx_y (TYPE): Description
+            virtual_helix_item: Description
+            is_forward: Description
+            idx_x: Description
+            idx_y: Description
         """
         self._vhi = virtual_helix_item
         self.setParentItem(virtual_helix_item)
@@ -546,12 +585,14 @@ class ForcedXoverNode3(QGraphicsRectItem):
         self.updatePositionAndAppearance(is_from_strand=False)
     # end def
 
-    def updateForFloatFromStrand(self, virtual_helix_item, strand3p, idx):
+    def updateForFloatFromStrand(self, virtual_helix_item: PathVirtualHelixItemT,
+                                        strand3p: StrandT,
+                                        idx: int):
         """
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            strand3p (Strand): reference to the 3' strand
-            idx (int): the base index within the virtual helix
+            virtual_helix_item: Description
+            strand3p: reference to the 3' strand
+            idx: the base index within the virtual helix
         """
         self._vhi = virtual_helix_item
         self._strand = strand3p
@@ -562,10 +603,7 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def configurePath(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self._path_thing.setBrush(getBrushObj(_PENCIL_COLOR))
         path = PPR3 if self.is_forward else PPL3
@@ -581,80 +619,67 @@ class ForcedXoverNode3(QGraphicsRectItem):
     # end def
 
     def refreshXover(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self._xover_item.refreshXover()
     # end def
 
-    def setPartnerVirtualHelix(self, virtual_helix_item):
-        """Summary
-
+    def setPartnerVirtualHelix(self, virtual_helix_item: PathVirtualHelixItemT):
+        """
         Args:
             virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-
-        Returns:
-            TYPE: Description
         """
         self._partner_virtual_helix = virtual_helix_item
     # end def
 
-    def idx(self):
-        """Summary
-
+    def idx(self) -> int:
+        """
         Returns:
-            TYPE: Description
+            index
         """
         return self._idx
     # end def
 
-    def virtualHelixItem(self):
-        """Summary
-
+    def virtualHelixItem(self) -> PathVirtualHelixItemT:
+        """
         Returns:
-            TYPE: Description
+            :class:`PathVirtualHelixItem`
         """
         return self._vhi
     # end def
 
-    def point(self):
-        """Summary
-
+    def point(self) -> Vec2T:
+        """
         Returns:
-            TYPE: Description
+            tuple point of the base of ``float``s
         """
         return self._vhi.upperLeftCornerOfBaseType(self._idx, self.is_forward)
     # end def
 
-    def floatPoint(self):
-        """Summary
-
+    def floatPoint(self) -> Vec2T:
+        """
         Returns:
-            TYPE: Description
+            tuple point for ``float``s of the floating position of the object
         """
         pt = self.pos()
         return pt.x(), pt.y()
     # end def
 
-    def isForward(self):
-        """Summary
-
+    def isForward(self) -> bool:
+        """
         Returns:
-            TYPE: Description
+            is this forward?
         """
         return self.is_forward
     # end def
 
-    def updatePositionAndAppearance(self, is_from_strand=True):
-        """
-        Sets position by asking the VirtualHelixItem
+    def updatePositionAndAppearance(self, is_from_strand: bool = True):
+        """Sets position by asking the :class:`PathVirtualHelixItem`
         Sets appearance by choosing among pre-defined painterpaths (from
         normalstrandgraphicsitem) depending on drawing direction.
 
         Args:
-            is_from_strand (bool, optional): Description
+            is_from_strand: Description
         """
         self.setPos(*self.point())
         n5 = self._xover_item._node5
@@ -684,12 +709,12 @@ class ForcedXoverNode3(QGraphicsRectItem):
         scene.removeItem(self)
     # end def
 
-    def _updateLabel(self, is_left):
-        """Called by updatePositionAndAppearance during init.
+    def _updateLabel(self, is_left: bool):
+        """Called by ``updatePositionAndAppearance`` during init.
         Updates drawing and position of the label.
 
         Args:
-            is_left (TYPE): Description
+            is_left: Description
         """
         lbl = self._label
         if self._idx is not None:
@@ -740,10 +765,9 @@ class ForcedXoverNode3(QGraphicsRectItem):
 
 
 class ForcedXoverNode5(ForcedXoverNode3):
-    """
-    XoverNode5 is the partner of XoverNode3. It dif
+    """:class:`XoverNode5 is the partner of :class:`XoverNode3`.
 
-    XoverNode3 handles:
+    :class:`XoverNode3` handles:
         1. Drawing of the 5' end of an xover, and its text label. Drawing style
         is determined by the location of the xover with in a vhelix (is it a top
         or bottom vstrand?).
@@ -751,14 +775,17 @@ class ForcedXoverNode5(ForcedXoverNode3):
 
     """
 
-    def __init__(self, virtual_helix_item, xover_item, strand5p, idx):
+    def __init__(self, virtual_helix_item: PathVirtualHelixItemT,
+                        xover_item: 'ForcedXoverItem',
+                        strand5p: StrandT,
+                        idx: int):
         """Summary
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
+            virtual_helix_item: Description
             xover_item (TYPE): Description
-            strand5p (TYPE): Description
-            idx (int): the base index within the virtual helix
+            strand5p: Description
+            idx: the base index within the virtual helix
         """
         super(ForcedXoverNode5, self).__init__(virtual_helix_item, xover_item, strand5p, idx)
     # end def

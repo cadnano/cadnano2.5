@@ -3,21 +3,42 @@
 """
 # encoding: utf-8
 
-from math import floor, atan2, sqrt
+from math import (
+    floor,
+    atan2,
+    sqrt
+)
 
-from PyQt5.QtCore import QRectF, Qt
+from PyQt5.QtCore import (
+    QRectF,
+    Qt
+)
 from PyQt5.QtGui import QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsPathItem
+)
 
 from cadnano import util
 from cadnano.controllers import VirtualHelixItemController
-from cadnano.gui.palette import newPenObj, getColorObj  # getBrushObj, getNoBrush
+from cadnano.gui.palette import (
+    newPenObj,
+    getColorObj,
+    # getBrushObj,
+    # getNoBrush
+)
 from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from .strand.stranditem import StrandItem
 from .strand.xoveritem import XoverNode3
 from .virtualhelixhandleitem import VirtualHelixHandleItem
 from . import pathstyles as styles
-from . import (PathNucleicAcidPartItemT, PathRootItemT)
+from . import (
+    PathNucleicAcidPartItemT,
+    PathRootItemT
+)
+from cadnano.cntypes import (
+    Vec2T
+)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
@@ -292,7 +313,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         return x, y
     # end def
 
-    def upperLeftCornerOfBaseType(self, idx, is_fwd):
+    def upperLeftCornerOfBaseType(self, idx: int, is_fwd: bool) -> Vec2T:
         """Summary
 
         Args:

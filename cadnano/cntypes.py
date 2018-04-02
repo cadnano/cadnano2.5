@@ -19,6 +19,7 @@ VirtualHelixT = cn('part.virtualhelix.VirtualHelix')
 OligoT =    cn('oligo.Oligo')
 StrandSetT = cn('strandset.StrandSet')
 StrandT =   cn('strand.Strand')
+InsertionT = cn('decorators.insertion.Insertion')
 
 
 RectT = Tuple[float, float, float, float]
