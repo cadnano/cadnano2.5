@@ -27,6 +27,7 @@ from PyQt5.QtGui import (
     QPainterPath,
     QPolygonF,
     QKeyEvent,
+    QMouseEvent
 )
 from PyQt5.QtWidgets import (
     QGraphicsItem,
@@ -35,6 +36,8 @@ from PyQt5.QtWidgets import (
     QGraphicsPathItem,
     QGraphicsRectItem,
     QGraphicsSimpleTextItem,
+    QGraphicsSceneMouseEvent,
+    QGraphicsSceneHoverEvent
 )
 
 from cadnano import util
@@ -1278,13 +1281,13 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """
         Parses a mousePressEvent, calling the approproate tool method as
         necessary. Stores _move_idx for future comparison.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         self.scene().views()[0].addToPressList(self)
         self._strand_item.setActiveEndpoint(self.cap_type)
@@ -1297,7 +1300,7 @@ class EndpointItem(QGraphicsPathItem):
             modifiers = event.modifiers()
             getattr(self, tool_method_name)(modifiers)  # call tool method
 
-    def hoverMoveEvent(self, event):
+    def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
         """
         Parses a hoverMoveEvent, calling the approproate tool method as
         necessary. Stores _move_idx for future comparison.
@@ -1309,13 +1312,13 @@ class EndpointItem(QGraphicsPathItem):
         if active_tool_str == 'createTool':
             return self._strand_item.createToolHoverMove(event, self.idx())
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
         """
         Parses a mouseMoveEvent, calling the approproate tool method as
         necessary. Updates _move_idx if it changed.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -1325,13 +1328,12 @@ class EndpointItem(QGraphicsPathItem):
                 self._move_idx = idx
                 getattr(self, tool_method_name)(modifiers, idx)  # call tool method
 
-    def customMouseRelease(self, event):
-        """
-        Parses a mouseReleaseEvent, calling the approproate tool method as
+    def customMouseRelease(self, event: QMouseEvent):
+        """Parses a mouseReleaseEvent, calling the approproate tool method as
         necessary. Deletes _move_idx if necessary.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):  # if the tool method exists

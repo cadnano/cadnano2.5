@@ -1,10 +1,28 @@
-"""Summary
-"""
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QFontMetrics, QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
+# -*- coding: utf-8 -*-
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QFontMetrics,
+    QPainterPath,
+    QMouseEvent
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsSimpleTextItem
+)
 from cadnano.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getColorObj, getPenObj, getNoPen, getNoBrush, getSolidBrush
+from cadnano.gui.palette import (
+    getColorObj,
+    getPenObj,
+    getNoPen,
+    getNoBrush,
+    getSolidBrush
+)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _toHelixNumFont = styles.XOVER_LABEL_FONT
@@ -70,14 +88,10 @@ class XoverNode3(QGraphicsRectItem):
             getattr(xoi, tool_method_name)()
     # end def
 
-    def customMouseRelease(self, event):
-        """Summary
-
+    def customMouseRelease(self, event: QMouseEvent):
+        """
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event: Description
         """
     # end def
 

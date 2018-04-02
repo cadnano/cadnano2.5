@@ -1,16 +1,28 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
+# -*- coding: utf-8 -*-
 from math import floor
 
 # import logging
 # logger = logging.getLogger(__name__)
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QBrush, QPen, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import qApp
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QPen,
+    QPainterPath,
+    QPolygonF,
+    QMouseEvent
+)
+from PyQt5.QtWidgets import (
+    qApp,
+    QGraphicsItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsEllipseItem
+)
 
 from cadnano.gui.palette import getColorObj
 from cadnano.views.pathview import pathstyles as styles
@@ -250,7 +262,7 @@ class EndpointItem(QGraphicsPathItem):
                 self._move_idx = idx
                 getattr(self, tool_method_name)(modifiers, idx)
 
-    def customMouseRelease(self, event):
+    def customMouseRelease(self, event: QMouseEvent):
         """
         Parses a mouseReleaseEvent, calling the approproate tool method as
         necessary. Deletes _move_idx if necessary.

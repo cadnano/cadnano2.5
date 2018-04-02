@@ -1,6 +1,10 @@
-"""Summary"""
+# -*- coding: utf-8 -*-
 from __future__ import division
-from typing import Set, List, Tuple
+from typing import (
+    Set,
+    List,
+    Tuple
+)
 
 from PyQt5.QtCore import (
     QPointF,

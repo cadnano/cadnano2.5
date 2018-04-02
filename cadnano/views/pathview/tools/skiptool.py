@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from .abstractpathtool import AbstractPathTool
+from cadnano.views.pathview import (
+        PathToolManagerT
+)
 
 
 class SkipTool(AbstractPathTool):
     """
-    docstring for SkipTool
     """
 
-    def __init__(self, manager):
+    def __init__(self, manager: PathToolManagerT):
         """Summary
 
         Args:
@@ -15,18 +17,16 @@ class SkipTool(AbstractPathTool):
         """
         super(SkipTool, self).__init__(manager)
 
-    def __repr__(self):
-        """Summary
-
+    def __repr__(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            tool name
         """
         return "skip_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
-        """Summary
-
+    def methodPrefix(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            prefix string
         """
         return "skipTool"  # first letter should be lowercase

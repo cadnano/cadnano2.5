@@ -1,11 +1,12 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
+# -*- coding: utf-8 -*-
 from math import floor
 from PyQt5.QtCore import (
     QRectF,
     QPointF,
     Qt
+)
+from PyQt5.QtGui import (
+    QMouseEvent
 )
 from PyQt5.QtWidgets import (
     QGraphicsItem,
@@ -61,13 +62,12 @@ class StrandItem(QGraphicsLineItem):
         Args:
             model_strand:
             virtual_helix_item:
-            viewroot:
         """
         super(StrandItem, self).__init__(virtual_helix_item)
         self._model_strand = model_strand
         self._virtual_helix_item = virtual_helix_item
         self._viewroot: PathRootItemT = virtual_helix_item._viewroot
-        self._getActiveTool = viewroot.manager.activeToolGetter
+        self._getActiveTool = self._viewroot.manager.activeToolGetter
 
         self._controller = StrandItemController(model_strand, self)
         is_forward = model_strand.strandSet().isForward()
@@ -677,12 +677,12 @@ class StrandItem(QGraphicsLineItem):
             getattr(self, tool_method_name)(event, idx)
     # end def
 
-    def customMouseRelease(self, event):
+    def customMouseRelease(self, event: QMouseEvent):
         """Parses a mouseReleaseEvent to extract strandSet and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
+            event:
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):

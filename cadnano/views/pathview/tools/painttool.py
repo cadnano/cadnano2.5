@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from PyQt5.QtGui import QMouseEvent
 from .abstractpathtool import AbstractPathTool
 
 
@@ -49,23 +50,18 @@ class PaintTool(AbstractPathTool):
         """
         self._window.path_color_panel.nextColor()
 
-    def customMouseRelease(self, event):
-        """Summary
-
+    def customMouseRelease(self, event: QMouseEvent):
+        """
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event: Description
         """
         if self._is_macrod:
             self._is_macrod = False
             self._window.undoStack().endMacro()
     # end def
 
-    def isMacrod(self):
-        """Summary
-
+    def isMacrod(self) -> bool:
+        """
         Returns:
             TYPE: Description
         """
@@ -73,10 +69,7 @@ class PaintTool(AbstractPathTool):
     # end def
 
     def setMacrod(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self._is_macrod = True
         self._window.undoStack().beginMacro("Group Paint")

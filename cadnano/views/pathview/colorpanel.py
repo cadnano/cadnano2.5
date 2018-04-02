@@ -1,5 +1,4 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import (
     QRectF,
     Qt
@@ -22,8 +21,7 @@ _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 
 
 class ColorPanel(QGraphicsItem):
-    """Summary
-
+    """
     Attributes:
         colordialog (TYPE): Description
         rect (TYPE): Description

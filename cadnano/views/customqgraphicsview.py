@@ -18,7 +18,10 @@ from PyQt5.QtCore import (
     pyqtSignal,
     qWarning
  )
-from PyQt5.QtGui import QPaintEngine
+from PyQt5.QtGui import (
+    QPaintEngine,
+    QMouseEvent
+)
 from PyQt5.QtWidgets import (
     QGraphicsView,
     qApp
@@ -426,7 +429,7 @@ class CustomQGraphicsView(QGraphicsView):
             QGraphicsView.mousePressEvent(self, event)
     # end def
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent):
         """If panning, stop. If handles were pressed, release them."""
         if self._transform_enable:
             # QMouseEvent.button() returns the button that triggered the event

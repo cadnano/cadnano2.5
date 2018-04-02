@@ -13,10 +13,14 @@ from PyQt5.QtCore import (
     QRectF,
     Qt
 )
-from PyQt5.QtGui import QPainterPath
+from PyQt5.QtGui import (
+    QPainterPath,
+    QMouseEvent
+)
 from PyQt5.QtWidgets import (
     QGraphicsItem,
-    QGraphicsPathItem
+    QGraphicsPathItem,
+    QGraphicsSceneMouseEvent
 )
 
 from cadnano import util
@@ -414,7 +418,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """
         Parses a mousePressEvent to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
@@ -445,7 +449,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             event.setAccepted(False)
     # end def
 
-    def mouseMoveEvent(self, event):
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
         """
         Parses a mouseMoveEvent to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
@@ -484,7 +488,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             event.setAccepted(False)
     # end def
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
         """Called in the event of doing a Z translation drag
 
         Args:
@@ -502,13 +506,12 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
                                                          use_undostack=True)
     # end def
 
-    def customMouseRelease(self, event):
-        """
-        Parses a mouseReleaseEvent to extract strand_set and base index,
+    def customMouseRelease(self, event: QMouseEvent):
+        """Parses a mouseReleaseEvent to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         tool = self._getActiveTool()
         tool_method_name = tool.methodPrefix() + "MouseRelease"
@@ -520,8 +523,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     ### COORDINATE UTILITIES ###
     def baseAtPoint(self, pos):
-        """
-        Returns the (Strandset, index) under the location x, y or None.
+        """Returns the (Strandset, index) under the location x, y or None.
 
         It shouldn't be possible to click outside a pathhelix and still call
         this function. However, this sometimes happens if you click exactly
