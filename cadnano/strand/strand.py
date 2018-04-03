@@ -199,7 +199,7 @@ class Strand(CNObject):
             return util.markwhite(seq) if for_export else seq
         elif for_export:
             return ''.join(['?' for x in range(self.totalLength())])
-        return ' '*self.totalLength()
+        return ''
     # end def
 
     def abstractSeq(self):
