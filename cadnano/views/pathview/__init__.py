@@ -5,6 +5,7 @@ PathNucleicAcidPartItemT = pp + '.nucleicacidpartitem.PathNucleicAcidPartItem'
 PathVirtualHelixItemT = pp + 'virtualhelixitem.PathVirtualHelixItem'
 PathStrandItemT = pp + 'strand.stranditem.StrandItem'
 PathEndpointItemT = pp + 'strand.endpointitem.EndpointItem'
+PathXoverItemT = pp + 'strand.xoveritem.XoverItem'
 
 PathRootItemT = pp + 'pathrootitem.PathRootItem'
 PathToolManagerT = pp + 'tools.pathtoolmanager.PathToolManager'
