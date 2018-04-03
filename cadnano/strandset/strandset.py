@@ -1,21 +1,33 @@
 # -*- coding: utf-8 -*-
-from bisect import bisect_left, insort_left
-from typing import Tuple, List
+from bisect import (
+    bisect_left,
+    insort_left
+)
+from typing import (
+    Tuple,
+    List
+)
 
 import cadnano.util as util
-from cadnano.proxies.cnproxy import ProxySignal,  UndoCommand
+from cadnano.proxies.cnproxy import (
+    ProxySignal,
+    UndoCommand
+)
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnenum import StrandEnum, EnumType
+from cadnano.proxies.cnenum import (
+    StrandEnum,
+    EnumType
+)
 from .createstrandcmd import CreateStrandCommand
 from .removestrandcmd import RemoveStrandCommand
 from .mergecmd import MergeCommand
 from .splitcmd import SplitCommand
 
 from cadnano.cntypes import (
-                            Int2T,
-                            Vec2T,
-                            StrandT,
-                            StrandSetT
+    Int2T,
+    Vec2T,
+    StrandT,
+    StrandSetT
 )
 
 class StrandSet(CNObject):

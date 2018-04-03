@@ -1,21 +1,30 @@
 # -*- coding: utf-8 -*-
 import sys
 import traceback
-from typing import Tuple, List, Optional
+from typing import (
+    Tuple,
+    List,
+    Optional
+)
 
 from cadnano import util
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnproxy import ProxySignal, UndoCommand
-from cadnano.proxies.cnenum import ModEnum, EnumType
+from cadnano.proxies.cnproxy import (
+    ProxySignal,
+    UndoCommand
+)
+from cadnano.proxies.cnenum import (
+    ModEnum,
+    EnumType
+)
 from cadnano.strand import Strand
 from .applycolorcmd import ApplyColorCommand
 from .applysequencecmd import ApplySequenceCommand
 from .removeoligocmd import RemoveOligoCommand
 from cadnano.setpropertycmd import SetPropertyCommand
-
 from cadnano.cntypes import (
-                            NucleicAcidPartT,
-                            OligoT
+    NucleicAcidPartT,
+    OligoT
 )
 
 OLIGO_LEN_BELOW_WHICH_HIGHLIGHT = 18

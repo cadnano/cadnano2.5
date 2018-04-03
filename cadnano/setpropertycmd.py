@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cadnano.proxies.cnproxy import UndoCommand
 
 

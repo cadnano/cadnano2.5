@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Summary
 """
 from cadnano.proxies.cnenum import ItemEnum

@@ -1,12 +1,22 @@
 # -*- coding: utf-8 -*-
+from typing import (
+    Set
+)
+
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
 from cadnano.objectinstance import ObjectInstance
 from cadnano.part import Part
-
+from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
+from cadnano.cntypes import (
+    ValueT,
+    DocT,
+    OligoT,
+    ABInfoT
+)
 class QAbstractPartItem(QGraphicsRectItem):
-    """ Use for single inheritance
-    QAbstractPartItem is a base class for partitems in all views.
-    It includes slots that get connected in PartItemController which
+    """Use for single inheritance
+    :class:`QAbstractPartItem` is a base class for partitems in all views.
+    It includes slots that get connected in :class:`PartItemController` which
     can be overridden.
 
     If you want to add a new signal to the model, adding the slot here
@@ -14,10 +24,11 @@ class QAbstractPartItem(QGraphicsRectItem):
     all views.
     """
 
-    def __init__(self, model_part_instance: ObjectInstance, viewroot: QGraphicsItem):
+    def __init__(self, part_instance: ObjectInstance,
+                        viewroot: QGraphicsItem):
         super(QAbstractPartItem, self).__init__(parent=viewroot)
-        self._model_instance: ObjectInstance = model_part_instance
-        m_p = model_part_instance.reference()
+        self._model_instance: ObjectInstance = part_instance
+        m_p = part_instance.reference()
         self._model_part: Part = m_p
         self._model_props = m_p.getModelProperties()
         self._viewroot = viewroot
@@ -26,7 +37,7 @@ class QAbstractPartItem(QGraphicsRectItem):
         self.active_virtual_helix_item = None
         self.is_active = False
         self._controller = None
-        m_p.setInstanceProperty(model_part_instance, '%s:position' % (viewroot.name), (0., 0.))
+        m_p.setInstanceProperty(part_instance, '%s:position' % (viewroot.name), (0., 0.))
     # end def
 
     def destroyItem(self):
@@ -47,25 +58,25 @@ class QAbstractPartItem(QGraphicsRectItem):
         scene.removeItem(self)
     # end def
 
-    def part(self):
+    def part(self) -> Part:
         return self._model_part
 
-    def partInstance(self):
+    def partInstance(self) -> ObjectInstance:
         return self._model_instance
 
-    def viewRoot(self):
+    def viewRoot(self) -> QGraphicsItem:
         return self._viewroot
 
-    def setProperty(self, key: str, value):
+    def setProperty(self, key: str, value: ValueT):
         self._model_part.setProperty(key, value)
     # end def
 
-    def getProperty(self, key: str):
+    def getProperty(self, key: str) -> ValueT:
         self._model_part.getProperty(key)
     # end def
 
     def getModelProperties(self) -> dict:
-        """ Get the dictionary of model properties
+        """Get the dictionary of model properties
 
         Returns:
             group properties
@@ -73,21 +84,21 @@ class QAbstractPartItem(QGraphicsRectItem):
         return self._model_part.getModelProperties()
     # end def
 
-    def getFilterSet(self):
+    def getFilterSet(self) -> Set[str]:
         return self._viewroot._document.filter_set
     # end def
 
-    def setMovable(self, is_movable):
+    def setMovable(self, is_movable: bool):
         self._viewroot.manager.select_tool.resetSelections()
         self.setFlag(QGraphicsItem.ItemIsMovable, is_movable)
     # end def
 
-    def isMovable(self):
+    def isMovable(self) -> bool:
         return self.flags() & QGraphicsItem.ItemIsMovable
     # end def
 
     def finishDrag(self):
-        """ set the view position in the model
+        """set the view position in the model
         Does NOT convert to model coordinates, for now
         """
         pos = self.pos()
@@ -97,16 +108,16 @@ class QAbstractPartItem(QGraphicsRectItem):
                                                 view_name, 'position', position)
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         """Return a reference to the model's document object"""
         return self._model_part.document()
     # end def
 
-    def scaleFactor(self):
+    def scaleFactor(self) -> float:
         return self.scale_factor
     # end def
 
-    def idToVirtualHelixItem(self, id_num):
+    def idToVirtualHelixItem(self, id_num: int) -> AbstractVirtualHelixItem:
         return self._virtual_helix_item_hash[id_num]
     # end def
 
@@ -114,78 +125,80 @@ class QAbstractPartItem(QGraphicsRectItem):
         self._model_part.setActive(True)
     # end def
 
-    def partZDimensionsChangedSlot(self, part, min_id_num, max_id_num):
-        """ Accounts for Z translations in parts
+    def partZDimensionsChangedSlot(self, part: Part, min_id_num: int, max_id_num: int):
+        """Accounts for Z translations in parts
         Args:
-            part (Part):
-            min_id_num (int): id number of the least Z Virtual Helix
-            max_id_num (int): id number of most Z Virtual Helix
+            part:
+            min_id_num: id number of the least Z Virtual Helix
+            max_id_num: id number of most Z Virtual Helix
         """
 
-    def partOligoAddedSlot(self, part, oligo):
+    def partOligoAddedSlot(self, part: Part, oligo: OligoT):
         pass
 
-    def partParentChangedSlot(self, sender):
+    def partParentChangedSlot(self, sender: Part):
         pass
 
-    def partPropertyChangedSlot(model_part, property_key, new_value):
+    def partPropertyChangedSlot(part: Part, key: str, new_value: ValueT):
         pass
 
-    def partRemovedSlot(self, sender):
+    def partRemovedSlot(self, sender: Part):
         pass
 
-    def partSelectedChangedSlot(self, model_part, is_selected):
+    def partSelectedChangedSlot(self, part: Part, is_selected: bool):
         pass
 
-    def partWorkplaneChangedSlot(self, start_idx, end_idx):
+    def partActiveVirtualHelixChangedSlot(self, sender: Part, id_num: int):
         pass
 
-    def partActiveVirtualHelixChangedSlot(self, sender, id_num):
+    def partActiveBaseInfoSlot(self, sender: Part, info: ABInfoT):
         pass
 
-    def partActiveBaseInfoSlot(self, sender, info):
+    def partActiveChangedSlot(self, sender: Part, is_active: bool):
         pass
 
-    def partActiveChangedSlot(self, sender, is_active):
-        pass
-
-    def partInstancePropertySlot(self, sender, view_name, key, value):
+    def partInstancePropertySlot(self, sender: Part, view_name: str, key: str, value: ValueT):
         if view_name == self._viewroot.name:
             if key == 'position':
                 self.setPos(*value)
     # end def
 
-    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
+    def partVirtualHelixAddedSlot(self, part: Part, id_num: int, virtual_helix, neighbors):
         pass
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
+    def partVirtualHelixRemovingSlot(self, part: Part, id_num: int, virtual_helix, neighbors):
         pass
 
-    def partVirtualHelixRemovedSlot(self, sender, id_num):
+    def partVirtualHelixRemovedSlot(self, sender: Part, id_num: int):
         pass
 
-    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
+    def partVirtualHelixResizedSlot(self, sender: Part, id_num: int, virtual_helix):
         pass
 
-    def partVirtualHelicesTranslatedSlot(self, sender, vh_set):
+    def partVirtualHelicesTranslatedSlot(self, sender: Part, vh_set: Set[int]):
         pass
 
-    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+    def partVirtualHelicesSelectedSlot(self, sender: Part,
+                                            vh_set: Set[int],
+                                            is_adding: bool):
         """ is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, new_value):
+    def partVirtualHelixPropertyChangedSlot(self, sender: Part,
+                                                    id_num: int,
+                                                    virtual_helix,
+                                                    new_value: ValueT):
         pass
 
-    def partDocumentSettingChangedSlot(self, part, key, value):
+    def partDocumentSettingChangedSlot(self, part: Part, key: str, value: ValueT):
         pass
-    # end defS
+    # end def
 # end class
 
 
 class AbstractPartItem(object):
-    """ Use for multiple inheritance
+    """Use for multiple inheritance
     AbstractPartItem is a base class for partitems in all views.
     It includes slots that get connected in PartItemController which
     can be overridden.

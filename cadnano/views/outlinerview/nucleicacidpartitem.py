@@ -1,7 +1,11 @@
 from PyQt5.QtCore import QItemSelectionModel
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.views import styles
-from .cnoutlineritem import CNOutlinerItem, DISABLE_FLAGS, LEAF_FLAGS
+from .cnoutlineritem import (
+    CNOutlinerItem,
+    DISABLE_FLAGS,
+    LEAF_FLAGS
+)
 from cadnano.views.abstractitems import AbstractPartItem
 from cadnano.controllers import NucleicAcidPartItemController
 from .oligoitem import OutlineOligoItem

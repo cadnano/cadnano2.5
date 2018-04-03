@@ -1,12 +1,18 @@
-"""cnpropertyitem descroption"""
+# -*- coding: utf-8 -*-
+"""cnpropertyitem description"""
 
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
-                             QLineEdit, QCheckBox, QComboBox)
+from PyQt5.QtWidgets import (
+    QTreeWidgetItem,
+    QDoubleSpinBox,
+    QSpinBox,
+    QLineEdit,
+    QCheckBox,
+    QComboBox
+)
 from cadnano.proxies.cnenum import ENUM_NAMES
 from cadnano.cntypes import (
-                                PropertyEditorWidgetT
+    PropertyEditorWidgetT
 )
 KEY_COL = 0
 VAL_COL = 1

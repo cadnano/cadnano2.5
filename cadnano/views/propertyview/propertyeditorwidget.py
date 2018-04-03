@@ -1,17 +1,32 @@
+# -*- coding: utf-8 -*-
 """Summary
 
 Attributes:
     COLOR_PATTERN (TYPE): Description
 """
 import re
-from typing import List, Set
+from typing import (
+    List,
+    Set
+)
 
-from PyQt5.QtCore import Qt, QRect
-from PyQt5.QtGui import QFont, QPalette
-from PyQt5.QtWidgets import QTreeWidget, QHeaderView
-from PyQt5.QtWidgets import QStyledItemDelegate
-from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
-from PyQt5.QtWidgets import QStyle, QCommonStyle
+from PyQt5.QtCore import (
+    Qt,
+    QRect
+)
+from PyQt5.QtGui import (
+    QFont,
+    QPalette
+)
+from PyQt5.QtWidgets import (
+    QTreeWidget,
+    QHeaderView,
+    QStyledItemDelegate,
+    QStyleOptionButton,
+    QStyleOptionViewItem,
+    QStyle,
+    QCommonStyle
+)
 
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.gui.palette import getBrushObj

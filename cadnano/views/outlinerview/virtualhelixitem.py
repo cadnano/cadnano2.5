@@ -2,8 +2,13 @@ from PyQt5.QtCore import Qt
 
 from cadnano.proxies.cnenum import ItemEnum
 
-from .cnoutlineritem import CNOutlinerItem, NAME_COL, VISIBLE_COL, COLOR_COL, LEAF_FLAGS
-
+from .cnoutlineritem import (
+    CNOutlinerItem,
+    NAME_COL,
+    VISIBLE_COL,
+    COLOR_COL,
+    LEAF_FLAGS
+)
 from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from cadnano.controllers import VirtualHelixItemController
 

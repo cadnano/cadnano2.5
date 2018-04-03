@@ -1,22 +1,38 @@
-#!/usr/bin/env python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 from operator import itemgetter
 from uuid import uuid4
-from typing import Set
-from typing import List
-from typing import Tuple
-from typing import Iterable, Iterator
-from typing import Optional
+from typing import (
+    Set,
+    List,
+    Tuple,
+    Iterable,
+    Iterator,
+    Optional
+)
 
-from cadnano import app, setBatch, util
+from cadnano import (
+    app,
+    setBatch,
+    util
+)
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.proxies.cnenum import ModEnum, GridEnum, EnumType
+from cadnano.proxies.cnenum import (
+    ModEnum,
+    GridEnum,
+    EnumType
+)
 from cadnano.proxies.cnobject import CNObject
 from cadnano.objectinstance import ObjectInstance
-from cadnano.proxies.cnproxy import ProxySignal, UndoStack
-from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
-                                RemoveModCommand)
+from cadnano.proxies.cnproxy import (
+    ProxySignal,
+    UndoStack
+)
+from cadnano.docmodscmd import (
+    AddModCommand,
+    ModifyModCommand,
+    RemoveModCommand
+)
 from cadnano.fileio.decode import decodeFile
 from cadnano.fileio.encode import encodeToFile
 
@@ -27,7 +43,10 @@ from cadnano.oligo import Oligo
 from cadnano.strandset import StrandSet
 from cadnano.strand import Strand
 
-from cadnano.cntypes import DocCtrlT
+from cadnano.cntypes import (
+    DocCtrlT,
+    DocT
+)
 
 # Type Aliases
 EndsSelected = Tuple[bool, bool]
@@ -63,7 +82,7 @@ class Document(CNObject):
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}
         self.view_names = []
-        self.filter_set = set()
+        self.filter_set: Set[str] = set()
         self._mods = {}  # modifications keyed by mod id
         this_app = app()
         this_app.documentWasCreatedSignal.emit(self)
@@ -94,7 +113,7 @@ class Document(CNObject):
         """
         return self._undostack
 
-    def children(self) -> Set:
+    def children(self) -> Set[CNObject]:
         """Returns a list of parts associated with the document.
 
         Returns:
@@ -200,7 +219,7 @@ class Document(CNObject):
         encodeToFile(filename, self, legacy)
     # end def
 
-    def readFile(self, filename: str) -> 'cadnano.Document':
+    def readFile(self, filename: str) -> DocT:
         """Convenience wrapper for ``decodeFile`` to always emit_signals and
         set the ``document`` argument to ``self``
 
@@ -575,7 +594,7 @@ class Document(CNObject):
     # end def
 
     def resizeSelection(self, delta: int, use_undostack: bool = True):
-        """ Moves the selected idxs by delta by first iterating over all strands
+        """Moves the selected idxs by delta by first iterating over all strands
         to calculate new idxs (method will return if snap-to behavior would
         create illegal state), then applying a resize command to each strand.
 
@@ -759,7 +778,7 @@ class Document(CNObject):
     # end def
 
     # PUBLIC SUPPORT METHODS #
-    def controller(self):
+    def controller(self) -> DocCtrlT:
         return self._controller
     # end def
 
@@ -777,7 +796,8 @@ class Document(CNObject):
     # end def
 
     def createMod(  self,
-                    params: dict, mid: str = None,
+                    params: dict,
+                    mid: str = None,
                     use_undostack: bool = True) -> Tuple[dict, str]:
         """Create a modification
 
@@ -967,8 +987,8 @@ class Document(CNObject):
         """Getter for the modification sequence give by the arguments
 
         Args:
-            mid (str or None): mod id or None
-            mod_type (int): [ModEnum.END_5PRIME, ModEnum.END_3PRIME]
+            mid: mod id or ``None``
+            mod_type: [ModEnum.END_5PRIME, ModEnum.END_3PRIME]
 
         Returns:
             tuple: of :obj:`str` of form::
@@ -988,6 +1008,7 @@ class Document(CNObject):
 
     def setSliceOrGridViewVisible(self, view_type: EnumType):
         """Set the current SliceView type
+
         Args:
             view_type: enum from the ``OrthoViewEnum``
         """
@@ -1007,11 +1028,8 @@ class Document(CNObject):
 
     def setGridType(self, grid_type: EnumType):
         """Set the current Grid type
-
-        Returns:
-            None
         """
         if self.activePart():
-            return self.activePart().setGridType(grid_type)
+            self.activePart().setGridType(grid_type)
     # end def
 # end class

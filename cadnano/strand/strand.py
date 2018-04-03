@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*-
 from array import array
 from operator import attrgetter
-from typing import Tuple, List
+from typing import (
+    Tuple,
+    List
+)
 
 from cadnano import util
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
-from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
+from .insertioncmd import (
+    AddInsertionCommand,
+    RemoveInsertionCommand
+)
 from .insertioncmd import ChangeInsertionCommand
-from .modscmd import AddModsCommand, RemoveModsCommand
+from .modscmd import (
+    AddModsCommand,
+    RemoveModsCommand
+)
 from .resizecmd import ResizeCommand
 
 

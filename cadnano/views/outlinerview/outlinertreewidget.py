@@ -7,19 +7,38 @@
 # This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
 # WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-from PyQt5.QtCore import QDataStream
-from PyQt5.QtCore import Qt, QRect, QVariant
-from PyQt5.QtCore import QItemSelectionModel, QItemSelection
-from PyQt5.QtCore import QPersistentModelIndex
-from PyQt5.QtGui import QColor, QFont, QPalette, QPixmap
-from PyQt5.QtWidgets import QAbstractItemView, QAction
-from PyQt5.QtWidgets import QColorDialog, QHeaderView
-from PyQt5.QtWidgets import QLineEdit, QMenu
-from PyQt5.QtWidgets import QTreeWidget, QTreeView, QTreeWidgetItemIterator
-from PyQt5.QtWidgets import QStyle, QCommonStyle
-from PyQt5.QtWidgets import QStyledItemDelegate
-from PyQt5.QtWidgets import QStyleOptionButton, QStyleOptionViewItem
-from PyQt5.QtWidgets import QToolTip
+from PyQt5.QtCore import (
+    QDataStream,
+    Qt,
+    QRect,
+    QVariant,
+    QItemSelectionModel,
+    QItemSelection,
+    QPersistentModelIndex
+)
+from PyQt5.QtGui import (
+    QColor,
+    QFont,
+    QPalette,
+    QPixmap
+)
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QAction,
+    QColorDialog,
+    QHeaderView,
+    QLineEdit,
+    QMenu,
+    QTreeWidget,
+    QTreeView,
+    QTreeWidgetItemIterator,
+    QStyle,
+    QCommonStyle,
+    QStyledItemDelegate,
+    QStyleOptionButton,
+    QStyleOptionViewItem,
+    QToolTip
+)
 
 from cadnano.proxies.cnenum import PartEnum
 from cadnano.gui.palette import getBrushObj
@@ -27,8 +46,15 @@ from cadnano.views.pathview import pathstyles as styles
 from cadnano.controllers import ViewRootController
 from cadnano import util
 
-from .cnoutlineritem import NAME_COL, LOCKED_COL, VISIBLE_COL, COLOR_COL
-from .cnoutlineritem import LEAF_FLAGS, DISABLE_FLAGS, ROOT_FLAGS
+from .cnoutlineritem import (
+    NAME_COL,
+    LOCKED_COL,
+    VISIBLE_COL,
+    COLOR_COL,
+    LEAF_FLAGS,
+    DISABLE_FLAGS,
+    ROOT_FLAGS
+)
 from .nucleicacidpartitem import OutlineNucleicAcidPartItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 from .oligoitem import OutlineOligoItem

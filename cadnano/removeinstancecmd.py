@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cadnano.assembly import Assembly
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.part import Part

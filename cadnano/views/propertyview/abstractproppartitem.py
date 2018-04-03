@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Summary
 """
 from cadnano.views.abstractitems import AbstractPartItem

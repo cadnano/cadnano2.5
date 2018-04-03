@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """VirtualHelixItem for the PropertyView.
 
 Attributes:
@@ -5,8 +6,11 @@ Attributes:
     VAL_COL (int): QTreeWidgetItem column that will display property values
 """
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import QDoubleSpinBox, QSpinBox
+from PyQt5.QtWidgets import (
+    QTreeWidgetItem,
+    QDoubleSpinBox,
+    QSpinBox
+)
 
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.controllers import VirtualHelixItemController

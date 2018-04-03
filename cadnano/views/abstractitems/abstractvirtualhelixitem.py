@@ -13,22 +13,20 @@ from cadnano.cntypes import (
 )
 
 class AbstractVirtualHelixItem(object):
-    """
-    AbstractVirtualHelixItem is a base class for virtualhelixitem in all views.
+    """AbstractVirtualHelixItem is a base class for virtualhelixitem in all views.
     It includes slots that get connected in VirtualHelixItemController which
     can be overridden.
 
     Slots that must be overridden should raise an exception.
     """
     def __init__(self, id_num: int, part_item):
-        # super().__init__(**kwargs)
         self._id_num: int = id_num
         self._part_item = part_item
         self._model_part: NucleicAcidPartT = part_item.part() if part_item is not None else None
         self.is_active: bool = False
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         _id = str(id(self))[-4:]
         _name  = self.__class__.__name__
         return '%s_%s_%s' % (_name, self._id_num, _id)

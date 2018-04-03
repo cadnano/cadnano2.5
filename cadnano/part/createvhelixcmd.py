@@ -1,12 +1,16 @@
 from ast import literal_eval
 import bisect
-from typing import Union, List, Tuple
+from typing import (
+    Union,
+    List,
+    Tuple
+)
 
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.cntypes import (
-                                NucleicAcidPartT,
-                                RectT
-                            )
+    NucleicAcidPartT,
+    RectT
+)
 
 class CreateVirtualHelixCommand(UndoCommand):
     def __init__(self,

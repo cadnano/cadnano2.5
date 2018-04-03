@@ -2,17 +2,36 @@
 import math
 from ast import literal_eval
 from bisect import bisect_left
-from collections import defaultdict, deque
-from heapq import heapify, heappush, nsmallest
+from collections import (
+    defaultdict,
+    deque
+)
+from heapq import (
+    heapify,
+    heappush,
+    nsmallest
+)
 from itertools import count as icount
-from typing import Iterable, Tuple, Union, List, Set, Dict
+from typing import (
+    Iterable,
+    Tuple,
+    Union,
+    List,
+    Set,
+    Dict
+)
 
 import numpy as np
 import pandas as pd
 
 from cadnano import util
 from cadnano.oligo import RemoveOligoCommand
-from cadnano.proxies.cnenum import GridEnum, PartEnum, PointEnum, EnumType
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    PartEnum,
+    PointEnum,
+    EnumType
+)
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.part.part import Part
@@ -24,7 +43,10 @@ from .removevhelixcmd import RemoveVirtualHelixCommand
 from .resizevirtualhelixcmd import ResizeVirtualHelixCommand
 from .translatevhelixcmd import TranslateVirtualHelicesCommand
 from .virtualhelix import VirtualHelix
-from .xovercmds import CreateXoverCommand, RemoveXoverCommand
+from .xovercmds import (
+    CreateXoverCommand,
+    RemoveXoverCommand
+)
 
 from cadnano.cntypes import (
     RectT,
@@ -41,7 +63,7 @@ from cadnano.cntypes import (
     StrandT,
     SegmentT,
     ABInfoT
-    )
+)
 
 
 """
