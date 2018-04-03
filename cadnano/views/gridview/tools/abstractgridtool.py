@@ -1,13 +1,22 @@
+# -*- coding: utf-8 -*-
 """Summary
 """
 import math
-from PyQt5.QtCore import QPointF, QLineF, QRectF
-from PyQt5.QtWidgets import QGraphicsLineItem
-from PyQt5.QtWidgets import QGraphicsEllipseItem
+from PyQt5.QtCore import (
+    QPointF,
+    QLineF,
+    QRectF
+)
+from PyQt5.QtWidgets import (
+    QGraphicsLineItem,
+    QGraphicsEllipseItem
+)
 
-from cadnano.views.abstractitems import AbstractTool
-from cadnano.views.abstractitems import AbstractToolManager
-from cadnano.views.abstractitems import QAbstractPartItem
+from cadnano.views.abstractitems import (
+    AbstractTool,
+    AbstractToolManager,
+    QAbstractPartItem
+)
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.gui.palette import getPenObj
 

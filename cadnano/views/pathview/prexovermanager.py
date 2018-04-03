@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collections import deque
 
 from PyQt5.QtCore import Qt

@@ -6,8 +6,8 @@ from .creategridtool import CreateGridTool
 
 from cadnano.views.gridview import GridRootItemT
 from cadnano.cntypes import (
-                                WindowT
-                            )
+    WindowT
+)
 
 class GridToolManager(AbstractToolManager):
     """Manages interactions between the grid widgets/UI and the model.

@@ -1,10 +1,31 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QPointF
-from PyQt5.QtGui import QFont, QPainterPath
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem, QGraphicsSimpleTextItem
+from PyQt5.QtGui import (
+    QFont,
+    QPainterPath
+)
+from PyQt5.QtWidgets import (
+    QGraphicsEllipseItem,
+    QGraphicsItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsSimpleTextItem
+)
 
-from cadnano.proxies.cnenum import GridEnum, EnumType
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getBrushObj, getNoBrush, getNoPen, getPenObj
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    EnumType
+)
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.gui.palette import (
+    getBrushObj,
+    getNoBrush,
+    getNoPen,
+    getPenObj
+)
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.views.sliceview import slicestyles as styles
 

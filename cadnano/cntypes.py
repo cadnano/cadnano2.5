@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-from typing import Tuple
-from typing import List
-from typing import Dict
-from typing import Set
-from typing import Iterable
-from typing import Union
+from typing import (
+    Tuple,
+    List,
+    Dict,
+    Set,
+    Iterable,
+    Union
+)
+
 import numpy as np
 
 cn = lambda x: 'cadnano.' + x

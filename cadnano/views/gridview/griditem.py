@@ -1,24 +1,45 @@
-from typing import List, Tuple
+# -*- coding: utf-8 -*-
+from typing import (
+    List,
+    Tuple
+)
 
-from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtGui import QPainterPath, QColor
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem, QGraphicsItem
+from PyQt5.QtCore import (
+    Qt,
+    QPointF
+)
+from PyQt5.QtGui import (
+    QPainterPath,
+    QColor
+)
 from PyQt5.QtWidgets import (
-                                QGraphicsSceneHoverEvent,
-                                QGraphicsSceneMouseEvent
-                            )
+    QGraphicsPathItem,
+    QGraphicsEllipseItem,
+    QGraphicsItem,
+    QGraphicsSceneHoverEvent,
+    QGraphicsSceneMouseEvent
+)
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
-from cadnano.proxies.cnenum import GridEnum, EnumType
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj,
+    getNoPen
+)
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    EnumType
+)
 from cadnano.views.gridview import GridNucleicAcidPartItemT
 from cadnano.views.gridview.tools.abstractgridtool import AbstractGridTool
-
 from cadnano.cntypes import (
-        RectT
-    )
-
+    RectT
+)
 from . import gridstyles as styles
+
 _RADIUS = styles.GRID_HELIX_RADIUS
 _ZVALUE = styles.ZGRIDHELIX + 1
 HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH

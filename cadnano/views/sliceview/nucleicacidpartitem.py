@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from ast import literal_eval
 from warnings import warn
 from typing import (

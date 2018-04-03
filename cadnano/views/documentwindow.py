@@ -1,18 +1,19 @@
+# -*- coding: utf-8 -*-
 from collections import namedtuple
 
 from PyQt5.QtCore import (
-                            Qt,
-                            QSettings,
-                            QPoint,
-                            QSize
+    Qt,
+    QSettings,
+    QPoint,
+    QSize
 )
 from PyQt5.QtWidgets import (
-                                QAction,
-                                QApplication,
-                                QWidget,
-                                QGraphicsItem,
-                                QMainWindow,
-                                QGraphicsScene
+    QAction,
+    QApplication,
+    QWidget,
+    QGraphicsItem,
+    QMainWindow,
+    QGraphicsScene
 )
 
 
@@ -28,10 +29,10 @@ from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.views.abstractitems import AbstractTool
 from cadnano.cntypes import (
-                                DocT,
-                                DocCtrlT,
-                                GraphicsViewT
-                            )
+    DocT,
+    DocCtrlT,
+    GraphicsViewT
+)
 
 # from PyQt5.QtOpenGL import QGLWidget
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl

@@ -1,7 +1,6 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Summary
 """
-# encoding: utf-8
 
 from math import (
     floor,

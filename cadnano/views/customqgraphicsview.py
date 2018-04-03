@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-"""
-CustomQGraphicsView
+# -*- coding: utf-8 -*-
+"""CustomQGraphicsView
 
 Platform:
     Unix, Windows, Mac OS X

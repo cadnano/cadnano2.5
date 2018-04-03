@@ -3,14 +3,25 @@
 """
 from typing import Tuple
 
-from PyQt5.QtCore import QPointF, Qt
-from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsRectItem,
-                             QGraphicsItem, QMenu, QAction)
+from PyQt5.QtCore import (
+    QPointF,
+    Qt
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItemGroup,
+    QGraphicsRectItem,
+    QGraphicsItem,
+    QMenu,
+    QAction
+)
 from PyQt5.QtGui import QCursor
 
 from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
-from cadnano.fileio import v3encode, v3decode
+from cadnano.fileio import (
+    v3encode,
+    v3decode
+)
 from cadnano.views.gridview import gridstyles as styles
 from cadnano.cntypes import RectT
 

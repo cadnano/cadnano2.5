@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" This allows the model to have a :class:`Color` object class without
+"""This allows the model to have a :class:`Color` object class without
 the need for :class:`PyQt5.QtGui.QColor`
 
 When running the Qt Application, :class:`QColor` will be used, otherwise an

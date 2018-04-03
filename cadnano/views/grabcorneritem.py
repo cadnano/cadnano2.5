@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsRectItem,
+    qApp
+)
+
 from cadnano.gui.palette import getBrushObj, getPenObj
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-from PyQt5.QtWidgets import qApp
 
 TOP_LEFT = 0
 BOTTOM_LEFT = 1

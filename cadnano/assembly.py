@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collections import defaultdict
 # from operator import attrgetter
 from operator import methodcaller

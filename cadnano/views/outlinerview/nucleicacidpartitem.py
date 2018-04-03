@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QItemSelectionModel
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.views import styles

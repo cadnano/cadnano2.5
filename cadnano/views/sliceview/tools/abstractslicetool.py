@@ -1,6 +1,11 @@
+# -*- coding: utf-8 -*-
 import math
 
-from PyQt5.QtCore import QLineF, QPointF, QRectF
+from PyQt5.QtCore import (
+    QLineF,
+    QPointF,
+    QRectF
+)
 
 from cadnano.views.abstractitems import AbstractTool
 from cadnano.gui.palette import getPenObj

@@ -1,5 +1,4 @@
-# types
-
+# -*- coding: utf-8 -*-
 from cadnano.util import to_dot_path
 gp = to_dot_path(__file__)
 GridNucleicAcidPartItemT = gp + '.nucleicacidpartitem.GridNucleicAcidPartItem'

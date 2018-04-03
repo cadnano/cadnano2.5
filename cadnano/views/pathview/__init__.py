@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cadnano.util import to_dot_path
 pp = to_dot_path(__file__)
 PathNucleicAcidPartItemT = pp + '.nucleicacidpartitem.PathNucleicAcidPartItem'
