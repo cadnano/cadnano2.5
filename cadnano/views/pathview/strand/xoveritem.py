@@ -797,16 +797,14 @@ class XoverItem(QGraphicsPathItem):
         document.addStrandToSelection(strand3p, (lowVal3p, highVal3p))
     # end def
 
-    def paint(self, painter: QPainter, option: QStyleOptionGraphicsItem, widget: QWidget):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Description
         """
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
