@@ -17,14 +17,17 @@ from PyQt5.QtGui import (
     QPainterPath,
     QPolygonF,
     QTextCharFormat,
-    QSyntaxHighlighter
+    QSyntaxHighlighter,
+    QPainter
 )
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QDialogButtonBox,
     QDialog,
     QRadioButton,
-    QGraphicsSceneHoverEvent
+    QGraphicsSceneHoverEvent,
+    QStyleOptionGraphicsItem,
+    QWidget
 )
 
 from cadnano.extras.dnasequences import sequences
@@ -162,15 +165,14 @@ class AddSeqTool(AbstractPathTool):
         """
         return "addSeqTool"  # first letter should be lowercase
 
-    def paint(self, painter, option, widget=None):
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
         """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         AbstractPathTool.paint(self, painter, option, widget)
         painter.setPen(getNoPen())

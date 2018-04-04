@@ -5,9 +5,14 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import (
     QPainterPath,
-    QPolygonF
+    QPolygonF,
+    QPainter
 )
-from PyQt5.QtWidgets import QGraphicsSceneHoverEvent
+from PyQt5.QtWidgets import (
+    QGraphicsSceneHoverEvent,
+    QStyleOptionGraphicsItem,
+    QWidget
+)
 
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj
@@ -63,12 +68,14 @@ class BreakTool(AbstractPathTool):
         """
         return "breakTool"  # first letter should be lowercase
 
-    def paint(self, painter, option, widget=None):
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
         """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         AbstractPathTool.paint(self, painter, option, widget)
         painter.setPen(_PEN)

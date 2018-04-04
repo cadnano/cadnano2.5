@@ -15,7 +15,8 @@ from PyQt5.QtGui import (
     QColor,
     QFont,
     QPalette,
-    QPixmap
+    QPixmap,
+    QPainter
 )
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -641,7 +642,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             QStyledItemDelegate.updateEditorGeometry(self, editor, option, model_index)
     # end def
 
-    def paint(self, painter, option, model_index):
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionViewItem,
+                    model_index: QModelIndex):
         column = model_index.column()
         new_rect = QRect(option.rect)
         if column == NAME_COL:  # Part Name

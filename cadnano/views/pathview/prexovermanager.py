@@ -35,10 +35,9 @@ class PreXoverManager(QGraphicsRectItem):
     KEYMAP = {i: getattr(Qt, 'Key_%d' % i) for i in range(10)}
 
     def __init__(self, part_item: PathNucleicAcidPartItemT):
-        """Summary
-
+        """
         Args:
-            part_item (TYPE): Description
+            part_item: Description
         """
         super(QGraphicsRectItem, self).__init__(part_item)
         self.part_item = part_item

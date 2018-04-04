@@ -10,7 +10,12 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import (
     QPen,
-    QBrush
+    QBrush,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    QStyleOptionGraphicsItem,
+    QWidget
 )
 
 from cadnano import util
@@ -49,8 +54,7 @@ class AbstractPathTool(AbstractTool):
     """
 
     def __init__(self, manager: PathToolManagerT):
-        """Summary
-
+        """
         Args:
             manager: Description
         """
@@ -64,26 +68,22 @@ class AbstractPathTool(AbstractTool):
         self.hide()
 
     ######################## Drawing #######################################
-    def paint(self, painter, option, widget=None):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         painter.setPen(self._pen)
         painter.setBrush(_BRUSH)
         painter.drawRect(_TOOL_RECT)
 
-    def boundingRect(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def boundingRect(self) -> QRectF:
+        """Returns:
+            bounding rectangle
         """
         return self._rect
 
