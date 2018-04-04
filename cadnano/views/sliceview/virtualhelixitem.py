@@ -16,7 +16,8 @@ from PyQt5.QtCore import (
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QGraphicsEllipseItem,
-    QGraphicsSimpleTextItem
+    QGraphicsSimpleTextItem,
+    QGraphicsSceneMouseEvent
 )
 
 from cadnano.views.pathview import pathstyles
@@ -32,7 +33,19 @@ from .sliceextras import (
     WedgeGizmo,
     WEDGE_RECT
 )
-from . import SliceNucleicAcidPartItemT
+from cadnano.views.sliceview.tools import (
+    CreateSliceToolT,
+    SelectSliceToolT
+)
+from . import (
+    SliceNucleicAcidPartItemT,
+    SliceVirtualHelixItemT
+)
+from cadnano.cntypes import (
+    KeyT,
+    ValueT
+)
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -106,16 +119,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     ### ACCESSORS ###
-    def part(self):
-        """Reference to the model part associated with the parent part item.
-
-        Returns:
-            NucleicAcidPart: the model part
-        """
-        return self._part_item.part()
-    # end def
-
-    def setSnapOrigin(self, is_snap):
+    def setSnapOrigin(self, is_snap: bool):
         """Used to toggle an item as the snap origin. See `SelectSliceTool`.
 
         Args:
@@ -129,24 +133,6 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         else:
             self.setPen(self.old_pen)
             self.old_pen = None
-
-    def partItem(self):
-        """Reference to the parent part item.
-
-        Returns:
-            NucleicAcidPartItem: the part item
-        """
-        return self._part_item
-    # end def
-
-    def idNum(self):
-        """Virual helix ID number.
-
-        Returns:
-            int: the id_num of the virtual helix object.
-        """
-        return self._id_num
-    # end def
 
     def activate(self):
         """Sets the VirtualHelixItem object as active (i.e. having focus due
@@ -162,13 +148,13 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.is_active = False
         self.updateAppearance()
 
-    def setCenterPos(self, x, y):
+    def setCenterPos(self, x: float, y: float):
         """Moves this item a new position such that its center is located at
         (x,y).
 
         Args:
-            x (float): new x coordinate
-            y (float): new y coordinate
+            x: new x coordinate
+            y: new y coordinate
         """
         # invert the y axis
         part_item = self._part_item
@@ -179,29 +165,20 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.setPos(pos)
     # end def
 
-    def getCenterScenePos(self):
+    def getCenterScenePos(self) -> QPointF:
         """
         Returns:
-            QPointF: the scenePos of the virtualhelixitem center
+            the scenePos of the virtualhelixitem center
         """
         return self.scenePos() + QPointF(_RADIUS, _RADIUS)
     # end def
 
-    def modelColor(self):
-        """The color associated with this item's `Part`.
-
-        Returns:
-            str: hex representation of Color, e.g. `#0066cc`.
-        """
-        return self._model_part.getProperty('color')
-    # end def
-
-    def partCrossoverSpanAngle(self):
+    def partCrossoverSpanAngle(self) -> float:
         """The angle span, centered at each base, within which crossovers
         will be allowed by the interface. The span is drawn by the WedgeGizmo.
 
         Returns:
-            int: The span angle (default is set in NucleicAcidPart init)
+            The span angle (default is set in NucleicAcidPart init)
         """
         return float(self._model_part.getProperty('crossover_span_angle'))
     # end def
@@ -209,7 +186,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Event handler for when the mouse button is pressed inside
         this item. If a tool-specific mouse press method is defined, it will be
         called for the currently active tool. Otherwise, the default
@@ -236,10 +213,12 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
         self._doc_controller.showFilterHints(False)
 
-    def createToolMousePress(self, tool, part_item, event):
+    def createToolMousePress(self,  tool: CreateSliceToolT,
+                                    part_item: SliceNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         shift = event.modifiers() & Qt.ShiftModifier
         fwd_ss, rev_ss = self.part().getStrandSets(self._id_num)
         idx_high = fwd_ss.length() - 1
@@ -258,14 +237,16 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             else:
                 fwd_ss.createStrand(0, idx_high, color=c)
 
-    def selectToolMousePress(self, tool, part_item, event):
+    def selectToolMousePress(self,  tool: SelectSliceToolT,
+                                    part_item: SliceNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         """The event handler for when the mouse button is pressed inside this
-        item with the SelectTool active.
+        item with the :class:`SelectSliceTool` active.
 
         Args:
-            tool (SelectSliceTool): reference to call tool-specific methods
-            part_item (cadnano.views.sliceview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
-            event (QMouseEvent): contains parameters that describe the mouse event
+            tool: reference to call tool-specific methods
+            part_item: reference to the part item
+            event: contains parameters that describe the mouse event
 
         """
         part = self._model_part
@@ -274,15 +255,15 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def virtualHelixPropertyChangedSlot(self, keys, values):
+    def virtualHelixPropertyChangedSlot(self, keys: KeyT, values: ValueT):
         """The event handler for when the a model virtual helix propety has
-        changed. See partVirtualHelixPropertyChangedSignal.
+        changed. See ``partVirtualHelixPropertyChangedSignal``.
 
-        Calls updateAppearance(), which will refresh styles if needed.
+        Calls :meth:`updateAppearance()`, which will refresh styles if needed.
 
         Args:
-            keys (tuple): names of properties that changed
-            values (tuple): new values of properties that change
+            keys: names of properties that changed
+            values: new values of properties that change
 
         """
         # for key, val in zip(keys, values):
@@ -347,7 +328,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Queries the model virtual helix for latest x,y coodinates, and sets
         them in the scene if necessary.
 
-        Note:
+        NOTE:
             coordinates in the model are always in the part
         """
         part_item = self._part_item
@@ -367,12 +348,12 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.setPos(new_pos)
     # end def
 
-    def createLabel(self):
+    def createLabel(self) -> QGraphicsSimpleTextItem:
         """Creates a text label to display the ID number. Font and Z are set
         in slicestyles.
 
         Returns:
-            QGraphicsSimpleTextItem: the label
+            the label
         """
         label = QGraphicsSimpleTextItem("%d" % self.idNum())
         label.setFont(_FONT)
@@ -382,20 +363,21 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def beginAddWedgeGizmos(self):
-        """Resets the list of WedgeGizmos that will be processed by
+        """Resets the list of :class:`WedgeGizmos` that will be processed by
         endAddWedgeGizmos.
 
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos, before
-        setWedgeGizmo and endAddWedgeGizmos.
+        Called by :meth:`SliceNucleicAcidPartItem._refreshVirtualHelixItemGizmos`,
+        before :meth:`setWedgeGizmo` and :meth:`endAddWedgeGizmos`.
         """
         self._added_wedge_gizmos.clear()
     # end def
 
     def endAddWedgeGizmos(self):
-        """Removes beginAddWedgeGizmos that no longer point at a neighbor virtual helix.
+        """Removes :meth:`beginAddWedgeGizmos` that no longer point at a
+        neighbor virtual helix.
 
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos in,
-        after beginAddWedgeGizmos and setWedgeGizmo.
+        Called by :meth:`SliceNucleicAcidPartItem._refreshVirtualHelixItemGizmos`,
+        before :meth:`setWedgeGizmo` and :meth:`endAddWedgeGizmos`.
         """
         remove_list = []
         scene = self.scene()
@@ -410,16 +392,16 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             scene.removeItem(wg)
     # end def
 
-    def setWedgeGizmo(self, neighbor_virtual_helix, neighbor_virtual_helix_item):
-        """Adds a WedgeGizmo to oriented toward the specified neighbor vhi.
+    def setWedgeGizmo(self, neighbor_virtual_helix: int,
+                            neighbor_virtual_helix_item: SliceVirtualHelixItemT):
+        """Adds a :class:`WedgeGizmo` to oriented toward the specified neighbor vhi.
 
-        Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos, in between
-        with beginAddWedgeGizmos and endAddWedgeGizmos.
+        Called by :meth:`SliceNucleicAcidPartItem._refreshVirtualHelixItemGizmos`,
+        before :meth:`setWedgeGizmo` and :meth:`endAddWedgeGizmos`.
 
         Args:
-            neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.views.sliceview.virtualhelixitem.VirtualHelixItem):
-            the neighboring virtual helix item
+            neighbor_virtual_helix: the id_num of neighboring virtual helix
+            neighbor_virtual_helix_item: the neighboring virtual helix item
         """
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
@@ -441,9 +423,9 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def setNumber(self):
-        """Updates the associated QGraphicsSimpleTextItem label text to match
-        the id_num. Adjusts the label position so it is centered regardless
-        of number of digits in the label.
+        """Updates the associated :class:`QGraphicsSimpleTextItem` label text
+        to match the id_num. Adjusts the label position so it is centered
+        regardless of number of digits in the label.
         """
         num = self.idNum()
         label = self._label

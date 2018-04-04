@@ -78,8 +78,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     FILTER_NAME = "virtual_helix"
 
     def __init__(self, id_num: int, part_item: PathNucleicAcidPartItemT):
-        """Summary
-
+        """
         Args:
             id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
             part_item: Description
