@@ -88,8 +88,7 @@ KEYINPUT_ACTIVE_FLAG = QGraphicsItem.ItemIsFocusable
 PROX_ALPHA = 64
 
 class PropertyWrapperObject(QObject):
-    """Summary
-
+    """
     Attributes:
         animations (dict): Description
         brush_alpha (TYPE): Description
@@ -97,77 +96,59 @@ class PropertyWrapperObject(QObject):
         rotation (TYPE): Description
     """
 
-    def __init__(self, item):
-        """Summary
-
+    def __init__(self, item: QGraphicsItem):
+        """
         Args:
-            item (TYPE): Description
+            item: Description
         """
         super(PropertyWrapperObject, self).__init__()
         self.item = item
         self.animations = {}
 
-    def __get_brushAlpha(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def __get_brushAlpha(self) -> int:
+        """
         """
         return self.item.brush().color().alpha()
 
-    def __set_brushAlpha(self, alpha):
-        """Summary
-
+    def __set_brushAlpha(self, alpha: int):
+        """
         Args:
-            alpha (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            alpha: Description
         """
         brush = QBrush(self.item.brush())
         color = QColor(brush.color())
         color.setAlpha(alpha)
         self.item.setBrush(QBrush(color))
 
-    def __get_rotation(self):
-        """Summary
-
+    def __get_rotation(self) -> float:
+        """
         Returns:
-            TYPE: Description
+            rotation angle
         """
         return self.item.rotation()
 
-    def __set_rotation(self, angle):
-        """Summary
-
+    def __set_rotation(self, angle: float):
+        """
         Args:
-            angle (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            angle: Description
         """
         self.item.setRotation(angle)
 
-    def saveRef(self, property_name, animation):
-        """Summary
-
+    def saveRef(self, property_name: str, animation: QPropertyAnimation):
+        """
         Args:
-            property_name (TYPE): Description
-            animation (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            property_name: Description
+            animation: Description
         """
         self.animations[property_name] = animation
 
-    def getRef(self, property_name):
-        """Summary
-
+    def getRef(self, property_name: str) -> QPropertyAnimation:
+        """
         Args:
-            property_name (TYPE): Description
+            property_name: Description
 
         Returns:
-            TYPE: Description
+            :class:`QPropertyAnimation`
         """
         return self.animations.get(property_name)
 
@@ -179,10 +160,7 @@ class PropertyWrapperObject(QObject):
         self.deleteLater()
 
     def resetAnimations(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         for item in self.animations.values():
             item.stop()
@@ -196,18 +174,16 @@ class PropertyWrapperObject(QObject):
 
 
 class Triangle(QGraphicsPathItem):
-    """Summary
-
-    Attributes:
-        adapter (TYPE): Description
+    """Attributes:
+        adapter (PropertyWrapperObject): Description
     """
 
-    def __init__(self, painter_path, parent=None):
+    def __init__(self, painter_path: QPainterPath, parent: QGraphicsItem = None):
         """Summary
 
         Args:
-            painter_path (TYPE): Description
-            parent (None, optional): Description
+            painter_path: Description
+            parent: Default is ``None``
         """
         super(QGraphicsPathItem, self).__init__(painter_path, parent)
         self.adapter = PropertyWrapperObject(self)
@@ -216,16 +192,15 @@ class Triangle(QGraphicsPathItem):
 
 
 class PreXoverLabel(QGraphicsSimpleTextItem):
-    """Summary
-
+    """
     Attributes:
-        is_fwd (TYPE): Description
+        is_fwd (bool): Description
     """
     _XO_FONT = styles.XOVER_LABEL_FONT
     _XO_BOLD = styles.XOVER_LABEL_FONT_BOLD
     _FM = QFontMetrics(_XO_FONT)
 
-    def __init__(self, is_fwd: bool, pre_xover_item):
+    def __init__(self, is_fwd: bool, pre_xover_item: 'PreXoverItem'):
         """
         Args:
             is_fwd: Description
@@ -385,11 +360,12 @@ class PreXoverItem(QGraphicsRectItem):
         """Summary
 
         Args:
-            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            is_fwd (bool): is this a forward strand?
-            from_index (int): index of the Virtual Helix this xover is coming from
-            to_vh_id_num (int): Virtual Helix number this Xover point might connect to
-            prexoveritem_manager (:obj:`PreXoverManager`): Manager of the PreXoverItems
+            from_virtual_helix_item: Description
+            is_fwd: is this a forward strand?
+            from_index: index of the Virtual Helix this xover is coming from
+            nearby_idxs:
+            to_vh_id_num: Virtual Helix number this Xover point might connect to
+            prexoveritem_manager: Manager of the PreXoverItems
         """
         super(QGraphicsRectItem, self).__init__(BASE_RECT, from_virtual_helix_item)
         self.adapter = PropertyWrapperObject(self)
@@ -426,11 +402,12 @@ class PreXoverItem(QGraphicsRectItem):
         Called by PreXoverManager.
 
         Args:
-            from_virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): the associated vh_item
-            is_fwd (bool): True if associated with fwd strand, False if rev strand
-            from_index (int): idx of associated vh
-            to_vh_id_num (int): id_num of the other vh
-            prexoveritem_manager (cadnano.views.pathview.prexoermanager.PreXoverManager): the manager
+            from_virtual_helix_item: the associated vh_item
+            is_fwd: True if associated with fwd strand, False if rev strand
+            from_index: idx of associated vh
+            nearby_idxs:
+            to_vh_id_num: id_num of the other vh
+            prexoveritem_manager: the manager
         """
         # to_vh_item = from_virtual_helix_item.partItem().idToVirtualHelixItem(to_vh_id_num)
         self.setParentItem(from_virtual_helix_item)

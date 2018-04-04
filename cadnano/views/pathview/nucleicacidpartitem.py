@@ -76,7 +76,7 @@ class PathRectItem(QGraphicsRectItem):
     """The rectangle corresponding to the outline of the workable area in the
     Path View.
 
-    This class overrides mousePressEvent so that clicking anywhere in the
+    This class overrides :meth:`mousePressEvent` so that clicking anywhere in the
     rectangle will result in the active VHI being deselected.
     """
 
@@ -88,7 +88,7 @@ class PathRectItem(QGraphicsRectItem):
         self.parent = None
         self.scene().removeItem(self)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         self.parent.unsetActiveVirtualHelixItem()
 
 
@@ -157,10 +157,10 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self.hide()  # show on adding first vh
     # end def
 
-    def proxy(self):
+    def proxy(self) -> ProxyParentItem:
         """
         Returns:
-            TYPE: Description
+            :class:`ProxyParentItem`
         """
         return self._proxy_parent
     # end def
@@ -270,8 +270,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partSelectedChangedSlot(self, part: NucleicAcidPartT, is_selected: bool):
-        """Summary
-
+        """
         Args:
             part: The model part
             is_selected: Descriptions
@@ -398,7 +397,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
 
         Args:
             sender: Model object that emitted the signal.
-            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for
+                description and related methods.
             virtual_helix: The model object
         """
         vhi = self._virtual_helix_item_hash[id_num]
@@ -438,7 +438,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                                                     values: Tuple):
         """Args:
             sender (Part): Model object that emitted the signal.
-            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for
+                description and related methods.
             keys: keys that changed
             values: new values for each key that changed
         """
@@ -531,7 +532,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         position them as well.
 
         Args:
-            new_list: list of ``PathVirtualHelixItem``s
+            new_list: list of :class:`PathVirtualHelixItem`s
             zoom_to_fit: Default is ``True``
         """
         y = 0  # How far down from the top the next PH should be
