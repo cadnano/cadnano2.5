@@ -11,8 +11,6 @@ exposed in the API documentation
 """
 
 try:
-    # from cadnano import app
-    # if not app().is_temp_app:
     from PyQt5.QtGui import QColor as Color
 except Exception:
     class Color(object):
@@ -47,17 +45,17 @@ except Exception:
                 self.setRgb(r, g, b, a)
         # end def
 
-        def __repr__(self):
+        def __repr__(self) -> str:
             return self.hex()
 
-        def setRgb(self, r, g, b, a=255):
+        def setRgb(self, r: int, g: int, b: int, a: int = 255):
             """Set the r, g, b and alpha 8 bit values
 
             Args:
-                r (int): 0 - 255
-                g (int): 0 - 255
-                b (int): 0 - 255
-                a (int): 0 - 255
+                r: 0 - 255
+                g: 0 - 255
+                b: 0 - 255
+                a: 0 - 255
             """
             self.r = r
             self.g = g
@@ -65,7 +63,7 @@ except Exception:
             self.a = a
         # end def
 
-        def setAlpha(self, a):
+        def setAlpha(self, a: int):
             """Set the alpha 8 bit value
 
             Args:
@@ -73,44 +71,44 @@ except Exception:
             """
             self.a = a
 
-        def name(self):
-            """ The hex string name.  For QColor compatibility
+        def name(self) -> str:
+            """The hex string name.  For :class:`QColor` compatibility
 
             Returns:
-                str: QColor compatible hex string in format '#rrggbbaa'
+                :class:`QColor` compatible hex string in format '#rrggbbaa'
             """
             return self.hex()
 
-        def hex(self):
-            """ The hex string name.
+        def hex(self) -> str:
+            """The hex string name.
 
             Returns:
-                str: QColor compatible hex string in format '#rrggbbaa'
+                :class:`QColor` compatible hex string in format '#rrggbbaa'
             """
             return "#{:02X}{:02X}{:02X}{:02X}".format(self.r, self.g, self.b, self.a)
     # end def
 
 
-def _intToColor(color_number):
+def _intToColor(color_number: int) -> Color:
     """ legacy color support for converting integers to color objects based on the
     cadnano 2 file format
 
     Args:
-        color_number (int): integer value of a RGB color
+        color_number: integer value of a RGB color
 
     Returns:
-        Color: the :class:`Color` object
+        the :class:`Color` object
     """
     return Color('#%0.6x' % (color_number))
 
 
-def intToColorHex(color_number):
+def intToColorHex(color_number: int) -> str:
     """Convert an integer to a hexadecimal string compatible with :class:`QColor`
 
     Args:
-        color_number (int): integer value of a RGB color
+        color_number: integer value of a RGB color
 
     Returns:
-        str: QColor compatible hex string in format '#rrggbb'
+        :class:`QColor` compatible hex string in format '#rrggbb'
     """
     return '#%0.6x' % (color_number)
