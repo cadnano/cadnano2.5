@@ -19,10 +19,18 @@ import platform
 import sys
 from code import interact
 
-from PyQt5.QtCore import (QCoreApplication, QEventLoop, QObject, QSize,
-                          pyqtSignal)
+from PyQt5.QtCore import (
+    QCoreApplication,
+    QEventLoop,
+    QObject,
+    QSize,
+    pyqtSignal
+)
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, qApp
+from PyQt5.QtWidgets import (
+    QApplication,
+    qApp
+)
 
 from cadnano import util
 from cadnano.proxies.proxyconfigure import proxyConfigure
