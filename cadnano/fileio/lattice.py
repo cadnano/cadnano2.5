@@ -2,6 +2,13 @@
 """
 from math import ceil, floor, sqrt
 import random
+from typing import (
+    List,
+    Tuple
+)
+from cadnano.cntypes import (
+    Vec2T
+)
 
 root3 = 1.732051
 
@@ -33,22 +40,23 @@ class HoneycombDnaPart(object):
     PAD_GRID_YH = 105
 
     @staticmethod
-    def isEvenParity(row, column):
+    def isEvenParity(row: int, column: int) -> bool:
         """Return if the given row and column have even parity."""
         return (row % 2) == (column % 2)
     # end def
 
     @staticmethod
-    def isOddParity(row, column):
+    def isOddParity(row: int, column: int) -> bool:
         """Return if the given row and column have odd parity."""
         return (row % 2) ^ (column % 2)
     # end def
 
     @staticmethod
-    def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
-        """
-        Given a x and y position, determine closest lattice coordinate and the
-        distance to the center of those coordinates.
+    def distanceFromClosestLatticeCoord(radius: float,
+                                        x: float, y: float,
+                                        scale_factor: float = 1.0) -> Vec2T:
+        """Given a x and y position, determine closest lattice coordinate and
+        the distance to the center of those coordinates.
         """
         column_guess = x/(radius*root3)
         row_guess = -(y - radius*2)/(radius*3)
@@ -72,7 +80,9 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+    def legacyLatticeCoordToPositionXY( radius: float,
+                                        row: int, column: int,
+                                        scale_factor: float = 1.0) -> Vec2T:
         """Convert legacy row,column coordinates to latticeXY."""
         x = column*radius*root3
         y_offset = radius
@@ -85,7 +95,9 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToModelXY(radius, row, column, scale_factor=1.0):
+    def latticeCoordToModelXY(  radius: float,
+                                row: int, column: int,
+                                scale_factor: float = 1.0) -> Vec2T:
         """Convert row, column coordinates to latticeXY."""
         x = column*radius*root3*scale_factor
         y_offset = radius
@@ -97,17 +109,18 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToQtXY(radius, row, column, scale_factor=1.0):
-        """
-        Call HoneyCombDnaPart.latticeCoordToQtXY with the supplied row
+    def latticeCoordToQtXY( radius: float,
+                            row: int, column: int,
+                            scale_factor: float = 1.0) -> Vec2T:
+        """Call :meth:`HoneyCombDnaPart.latticeCoordToQtXY` with the supplied row
         parameter inverted (i.e. multiplied by -1) to reflect the coordinates
         used by Qt.
 
         Args:
-            radius (float): the model radius
-            row (int): the row in question
-            column (int): the column in question
-            scale_factor (float): the scale factor to be used in the calculations
+            radius: the model radius
+            row: the row in question
+            column: the column in question
+            scale_factor: the scale factor to be used in the calculations
 
         Returns:
             The x, y coordinates of the given row and column
@@ -116,7 +129,10 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionModelToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+    def positionModelToLatticeCoord(radius: float,
+                                    x: float, y: float,
+                                    scale_factor: float = 1.0,
+                                    strict: bool = False) -> Tuple[int, int]:
         """Convert a model position to a lattice coordinate."""
         assert isinstance(radius, float)
         assert isinstance(x, float)
@@ -149,14 +165,19 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def positionQtToLatticeCoord(radius, x, y, scale_factor=1., strict=False):
+    def positionQtToLatticeCoord(   radius: float,
+                                    x: float, y: float,
+                                    scale_factor: float = 1.0,
+                                    strict: bool = False) -> Tuple[int, int]:
         """Convert a Qt position to a lattice coordinate."""
         return HoneycombDnaPart.positionModelToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod
-    def positionToLatticeCoordRound(radius, x, y, round_up_row, round_up_col,
-                                    scale_factor=1.0):
+    def positionToLatticeCoordRound(radius: float,
+                                    x: float, y: float,
+                                    round_up_row: bool, round_up_col: bool,
+                                    scale_factor: float = 1.0) -> Vec2T:
         """Convert a model position to a rounded lattice coordinate."""
         roundRow = ceil if round_up_row else floor
         roundCol = ceil if round_up_col else floor
@@ -171,9 +192,11 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
-        """
-        Determine if given x-y coordinates are inside a VH at a given
+    def isInLatticeCoord(   radius_tuple: Tuple[float, float],
+                            xy_tuple: Tuple[float, float],
+                            coordinate_tuple: Tuple[int, int],
+                            scale_factor: float) -> bool:
+        """Determine if given x-y coordinates are inside a VH at a given
         row-column coordinate
         """
         if xy_tuple is None or coordinate_tuple is None:
@@ -196,7 +219,7 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def sanityCheckCalculations(iterations=100000000):
+    def sanityCheckCalculations(iterations: int = 100000000):
         """Ensure that the values returned by latticeCoordToQtXY and
         positionQtToLatticeCoord return consistent results.
         """
@@ -250,19 +273,21 @@ class SquareDnaPart(object):
     PAD_GRID_YH = 80
 
     @staticmethod
-    def isEvenParity(row, column):
+    def isEvenParity(row: int, column: int) -> bool:
         """Return if the given row and column have even parity."""
         return (row % 2) == (column % 2)
     # end def
 
     @staticmethod
-    def isOddParity(row, column):
+    def isOddParity(row: int, column: int) -> bool:
         """Return if the given row and column have odd parity."""
         return (row % 2) ^ (column % 2)
     # end def
 
     @staticmethod
-    def distanceFromClosestLatticeCoord(radius, x, y, scale_factor=1.0):
+    def distanceFromClosestLatticeCoord(radius: float,
+                                        x: float, y: float,
+                                        scale_factor: float = 1.0) -> Vec2T:
         """
         Given a x and y position, determine closest lattice coordinate and the
         distance to the center of those coordinates.
@@ -290,7 +315,9 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def legacyLatticeCoordToPositionXY(radius, row, column, scale_factor=1.0):
+    def legacyLatticeCoordToPositionXY( radius: float,
+                                        row: int, column: int,
+                                        scale_factor: float = 1.0) -> Vec2T:
         """Convert legacy row, column coordinates to latticeXY."""
         y = -row*2*radius
         x = column*2*radius
@@ -298,7 +325,9 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToModelXY(radius, row, column, scale_factor=1.0):
+    def latticeCoordToModelXY(  radius: float,
+                                row: int, column: int,
+                                scale_factor: float = 1.0) -> Vec2T:
         """Convert row, column coordinates to latticeXY."""
         y = row*2*radius
         x = column*2*radius
@@ -306,7 +335,9 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def latticeCoordToQtXY(radius, row, column, scale_factor=1.0):
+    def latticeCoordToQtXY( radius: float,
+                            row: int, column: int,
+                            scale_factor: float = 1.0) -> Vec2T:
         """
         Call SquareDnaPart.latticeCoordToQtXY with the supplied row
         parameter inverted (i.e. multiplied by -1) to reflect the coordinates
@@ -325,7 +356,10 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def positionModelToLatticeCoord(radius, x, y, scale_factor=1.0, strict=False):
+    def positionModelToLatticeCoord(radius: float,
+                                    x: float, y: float,
+                                    scale_factor: float = 1.0,
+                                    strict: bool = False) -> Tuple[int, int]:
         """Convert a model position to a lattice coordinate."""
         float_row = y/(2.*radius*scale_factor) + 0.5
         float_column = x/(2.*radius*scale_factor) + 0.5
@@ -348,13 +382,18 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def positionQtToLatticeCoord(radius, x, y, scale_factor=1., strict=False):
+    def positionQtToLatticeCoord(   radius: float,
+                                    x: float, y: float,
+                                    scale_factor: float = 1.0,
+                                    strict: bool = False) -> Tuple[int, int]:
         """Convert a Qt position to a lattice coordinate."""
         return SquareDnaPart.positionModelToLatticeCoord(radius, x, -y, scale_factor, strict)
     # end def
 
     @staticmethod
-    def positionToLatticeCoordRound(radius, x, y, scale_factor=1.0):
+    def positionToLatticeCoordRound(radius: float,
+                                    x: float, y: float,
+                                    scale_factor: float = 1.0) -> Tuple[int, int]:
         """Convert a model position to a rounded lattice coordinate."""
         row = round(y/(2.*radius*scale_factor))
         column = round(x/(2.*radius*scale_factor))
@@ -362,9 +401,11 @@ class SquareDnaPart(object):
     # end def
 
     @staticmethod
-    def isInLatticeCoord(radius_tuple, xy_tuple, coordinate_tuple, scale_factor):
-        """
-        Determine if given x-y coordinates are inside a VH at a given
+    def isInLatticeCoord(   radius_tuple: Tuple[float, float],
+                            xy_tuple: Tuple[float, float],
+                            coordinate_tuple: Tuple[int, int],
+                            scale_factor: float) -> bool:
+        """Determine if given x-y coordinates are inside a VH at a given
         row-column coordinate
         """
         if xy_tuple is None or coordinate_tuple is None:

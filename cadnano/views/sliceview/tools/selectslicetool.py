@@ -1,21 +1,27 @@
 # -*- coding: utf-8 -*-
 from typing import (
-    Union
+    Union,
+    Set
 )
 
 from PyQt5.QtCore import (
     QPointF,
     QPoint,
+    QRect,
     Qt
 )
-from PyQt5.QtGui import QPainterPath
+from PyQt5.QtGui import (
+    QPainterPath,
+    QKeyEvent
+)
 from PyQt5.QtWidgets import (
     QGraphicsItemGroup,
     QGraphicsPathItem,
     # QGraphicsRectItem,
     QGraphicsItem,
     QMenu,
-    QAction
+    QAction,
+    QGraphicsSceneMouseEvent
 )
 from cadnano.fileio import (
     v3encode,
@@ -25,7 +31,6 @@ from cadnano.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.views.sliceview import slicestyles as styles
 from .abstractslicetool import AbstractSliceTool
-from cadnano.views.sliceview.griditem import GridEvent
 from cadnano.views.sliceview import (
     SliceToolManagerT,
     SliceNucleicAcidPartItemT
@@ -91,7 +96,7 @@ class SelectSliceTool(AbstractSliceTool):
     def __repr__(self) -> str:
         """
         Returns:
-            TYPE: Description
+            tool name string
         """
         return "select_tool"  # first letter should be lowercase
 
@@ -250,7 +255,7 @@ class SelectSliceTool(AbstractSliceTool):
             vh_set: Description
 
         Returns:
-            ``False`` if selection is not active.  TODO: should it return ``True`` also?
+            ``False`` if selection is not active, ``True`` if active
         """
         group = self.group
         if self.snap_origin_item is not None:
@@ -269,19 +274,19 @@ class SelectSliceTool(AbstractSliceTool):
             if len(selection_set) > 0 and len(group.childItems()) > 0:
                 group.setSelectionRect()
                 group.show()
-            return
+            return True
         group.clearSelectionRect()
         return False
     # end def
 
     def selectOrSnap(self,  part_item: SliceNucleicAcidPartItemT,
                             target_item: SliceVirtualHelixItem,
-                            event):
+                            event: QGraphicsSceneMouseEvent):
         """
         Args:
             part_item:
             target_item: Description
-            event (TYPE): Description
+            event: Description
 
         Deleted Parameters:
             snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
@@ -310,11 +315,11 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def doSnap(self, part_item: SliceNucleicAcidPartItemT,
-                    snap_to_item: Union[SliceVirtualHelixItem, GridEvent]):
+                    snap_to_item: SliceVirtualHelixItem):
         """
         Args:
             part_item:
-            snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
+            snap_to_item: Item to snap
                 selection to
         """
         # print("snapping")

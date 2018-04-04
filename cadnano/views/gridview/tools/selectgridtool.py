@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
 """Summary
 """
-from typing import Tuple
+from typing import (
+    Tuple,
+    Union,
+    Set
+)
 
 from PyQt5.QtCore import (
     QPointF,
     QPoint,
+    QRect,
     Qt
 )
 from PyQt5.QtWidgets import (
@@ -13,7 +18,8 @@ from PyQt5.QtWidgets import (
     QGraphicsRectItem,
     QGraphicsItem,
     QMenu,
-    QAction
+    QAction,
+    QGraphicsSceneMouseEvent
 )
 from PyQt5.QtGui import QCursor
 
@@ -24,10 +30,15 @@ from cadnano.fileio import (
     v3decode
 )
 from cadnano.views.gridview import gridstyles as styles
-from cadnano.cntypes import RectT
-
 from .abstractgridtool import AbstractGridTool
-
+from cadnano.views.gridview.griditem import GridEvent
+from cadnano.views.gridview import (
+    GridToolManagerT,
+    GridNucleicAcidPartItemT
+)
+from cadnano.cntypes import (
+    RectT
+)
 
 def normalizeRect(rect: RectT) -> RectT:
     """Summary
@@ -59,21 +70,20 @@ class SelectGridTool(AbstractGridTool):
     """Handles SelectTool operations in the Grid view
 
     Attributes:
-        clipboard (TYPE): Description
-        group (TYPE): Description
+        clip_board (dict): Description
+        group (GridSelectionGroup): Description
         individual_pick (bool): Description
         is_selection_active (bool): Description
         last_rubberband_vals (tuple): Description
-        part_item (TYPE): Description
+        part_item (GridNucleicAcidPartItemT): Description
         selection_set (TYPE): Description
         snap_origin_item (TYPE): Description
     """
 
-    def __init__(self, manager):
-        """Summary
-
+    def __init__(self, manager: GridToolManagerT):
+        """
         Args:
-            manager (TYPE): Description
+            manager: Description
         """
         super(SelectGridTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
@@ -85,30 +95,26 @@ class SelectGridTool(AbstractGridTool):
         self.individual_pick = False
         self.snap_origin_item = None
         self.clip_board = None
-        # self.menu_pos = None
     # end def
 
-    def __repr__(self):
-        """Summary
-
+    def __repr__(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            tool name string
         """
         return "select_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
-        """Summary
-
+    def methodPrefix(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            prefix string
         """
         return "selectTool"  # first letter should be lowercase
 
-    def isSelectionActive(self):
-        """Summary
-
+    def isSelectionActive(self) -> bool:
+        """
         Returns:
-            TYPE: Description
+            is the selection active?
         """
         return self.is_selection_active
     # end def
@@ -133,14 +139,10 @@ class SelectGridTool(AbstractGridTool):
         self.hideLineItem()
     # end def
 
-    def setPartItem(self, part_item):
-        """Summary
-
+    def setPartItem(self, part_item: GridNucleicAcidPartItemT):
+        """
         Args:
-            part_item (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item: Description
         """
         self.group.resetTransform()
         if part_item is not self.part_item:
@@ -169,16 +171,12 @@ class SelectGridTool(AbstractGridTool):
             self.slice_graphics_view.rubberBandChanged.connect(self.selectRubberband)
     # end def
 
-    def selectRubberband(self, rect, from_pt, to_point):
-        """Summary
-
+    def selectRubberband(self, rect: QRect, from_pt: QPointF, to_point: QPointF):
+        """
         Args:
-            rect (TYPE): Description
-            from_pt (TYPE): Description
-            to_point (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            rect: Description
+            from_pt: Description
+            to_point: Description
         """
         fset = self.manager.document.filter_set
         if self.FILTER_NAME not in fset:
@@ -211,10 +209,7 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def getSelectionBoundingRect(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Show the bounding rect
         """
         part_item = self.part_item
         group = self.group
@@ -233,10 +228,9 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def deselectItems(self):
-        """Summary
-
+        """
         Returns:
-            TYPE: Description
+            ``True`` if selection cleared ``False`` if no selection active
         """
         # print("deselecting")
         group = self.group
@@ -258,14 +252,13 @@ class SelectGridTool(AbstractGridTool):
         return False
     # end def
 
-    def deselectSet(self, vh_set):
-        """Summary
-
+    def deselectSet(self, vh_set: Set[int]) -> bool:
+        """
         Args:
-            vh_set (TYPE): Description
+            vh_set: Description
 
         Returns:
-            TYPE: Description
+            ``False`` if selection is not active, ``True`` if active
         """
         group = self.group
         if self.snap_origin_item is not None:
@@ -284,17 +277,19 @@ class SelectGridTool(AbstractGridTool):
             if len(selection_set) > 0 and len(group.childItems()) > 0:
                 group.setSelectionRect()
                 group.show()
-            return
+            return True
         group.clearSelectionRect()
         return False
     # end def
 
-    def selectOrSnap(self, part_item, target_item, event):
+    def selectOrSnap(self,  part_item: GridNucleicAcidPartItemT,
+                            target_item: Union[GridVirtualHelixItem, GridEvent],
+                            event: QGraphicsSceneMouseEvent):
         """
         Args:
-            part_item (PartItem)
-            target_item (TYPE): Description
-            event (TYPE): Description
+            part_item:
+            target_item: Description
+            event: Description
 
         Deleted Parameters:
             snap_to_item (GridVirtualHelixItem or GridEvent): Item to snap

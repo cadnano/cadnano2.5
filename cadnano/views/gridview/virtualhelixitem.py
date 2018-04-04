@@ -12,8 +12,10 @@ from PyQt5.QtCore import (
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QGraphicsEllipseItem,
-    QGraphicsSimpleTextItem
+    QGraphicsSimpleTextItem,
+    QGraphicsSceneMouseEvent
 )
+
 from cadnano.controllers import VirtualHelixItemController
 from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from cadnano.gui.palette import (
@@ -24,6 +26,10 @@ from . import gridstyles as styles
 from .gridextras import (
     WedgeGizmo,
     WEDGE_RECT
+)
+from cadnano.views.gridview.tools import (
+    SelectGridToolT,
+    CreateGridToolT
 )
 from . import GridNucleicAcidPartItemT
 
@@ -105,7 +111,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def setSnapOrigin(self, is_snap):
-        """Used to toggle an item as the snap origin. See `SelectGridTool`.
+        """Used to toggle an item as the snap origin. See :class:`SelectGridTool`.
 
         Args:
             is_snap (bool): True if this should be the snap origin, False otherwise.
@@ -224,12 +230,14 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def selectToolMousePress(self, tool, part_item, event):
+    def selectToolMousePress(self,  tool: SelectGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         """The event handler for when the mouse button is pressed inside this
         item with the SelectTool active.
 
         Args:
-            tool (SelectGridTool): reference to call tool-specific methods
+            tool: reference to call tool-specific methods
             part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
             event (QMouseEvent): contains parameters that describe the mouse event
 
@@ -240,13 +248,15 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def createToolMousePress(self, tool, part_item, event):
+    def createToolMousePress(self,  tool: CreateGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         """Summary
 
         Args:
-            tool (SelectGridTool): reference to call tool-specific methods
-            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
-            event (QMouseEvent): contains parameters that describe the mouse event
+            tool: reference to call tool-specific methods
+            part_item: reference to the part item
+            event: contains parameters that describe the mouse event
         """
         part = self._model_part
         print("createToolMousePress", part)

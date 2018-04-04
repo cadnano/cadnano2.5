@@ -657,7 +657,7 @@ class XoverItem(QGraphicsPathItem):
         Args:
             use_default: Description
         """
-        if value == True:  # noqa
+        if use_default == True:  # noqa
             color = getColorObj(styles.SELECTED_COLOR)
         else:
             oligo = self._strand_item.strand().oligo()
