@@ -5,16 +5,34 @@ Attributes:
     KEY_COL (int): QTreeWidgetItem column that will display property keys
     VAL_COL (int): QTreeWidgetItem column that will display property values
 """
-from PyQt5.QtCore import Qt
+from typing import (
+    List
+)
+
+from PyQt5.QtCore import (
+    Qt,
+    QModelIndex
+)
 from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QDoubleSpinBox,
-    QSpinBox
+    QSpinBox,
+    QWidget,
+    QStyleOptionViewItem
 )
 
-from cadnano.proxies.cnenum import ItemEnum
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
 from cadnano.controllers import VirtualHelixItemController
 from .cnpropertyitem import CNPropertyItem
+from cadnano.cntypes import (
+    VirtualHelixT,
+    NucleicAcidPartT,
+    KeyT,
+    ValueT
+)
 
 
 KEY_COL = 0
@@ -30,10 +48,10 @@ class VirtualHelixSetItem(CNPropertyItem):
         """Summary
 
         Args:
-            model_part (Part): The model part
+            model_part (NucleicAcidPart): The model part
             parent (TYPE): Description
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            key (None, optional): Description
+            key (str, optional): Default is ``None``
         """
         super(VirtualHelixSetItem, self).__init__(**kwargs)
         if self._key == "name":
@@ -42,7 +60,7 @@ class VirtualHelixSetItem(CNPropertyItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def itemType(self):
+    def itemType(self) -> EnumType:
         """Overrides AbstractPropertyPartItem.itemType
 
         Returns:
@@ -52,17 +70,17 @@ class VirtualHelixSetItem(CNPropertyItem):
     # end def
 
     # SLOTS
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
-        """Summary
-
+    def partVirtualHelixPropertyChangedSlot(self, sender: NucleicAcidPartT,
+                                                    id_num: int,
+                                                    virtual_helix: VirtualHelixT,
+                                                    keys: KeyT,
+                                                    values: ValueT):
+        """
         Args:
-            sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            keys (TYPE): Description
-            values (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            sender: Model object that emitted the signal.
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            keys: Description
+            values: Description
         """
         if virtual_helix in self.outlineViewObjSet():
             for key, val in zip(keys, values):
@@ -70,16 +88,20 @@ class VirtualHelixSetItem(CNPropertyItem):
                 self.setValue(key, val)
     # end def
 
-    def partVirtualHelixResizedSlot(self, sender, id_num, virtual_helix):
+    def partVirtualHelixResizedSlot(self, sender: NucleicAcidPartT,
+                                        id_num: int,
+                                        virtual_helix: VirtualHelixT):
         # print("resize slot")
         if virtual_helix in self.outlineViewObjSet():
             val = virtual_helix.getSize()
             self.setValue('length', int(val))
     # end def
 
-    def partVirtualHelixRemovingSlot(self, sender, id_num, virtual_helix, neighbors):
-        """Summary
-
+    def partVirtualHelixRemovingSlot(self, sender: NucleicAcidPartT,
+                                        id_num: int,
+                                        virtual_helix: VirtualHelixT,
+                                        neighbors: List[int]):
+        """
         Args:
             sender (obj): Model object that emitted the signal.
             id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
@@ -90,52 +112,52 @@ class VirtualHelixSetItem(CNPropertyItem):
             self.parent().removeChild(self)
     # end def
 
-    def partVirtualHelixRemovedSlot(self, sender, id_num):
-        """Summary
-
+    def partVirtualHelixRemovedSlot(self, sender: NucleicAcidPartT, id_num: int):
+        """
         Args:
-            sender (obj): Model object that emitted the signal.
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            sender: Model object that emitted the signal.
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
         """
     # end def
 
-    def configureEditor(self, parent_QWidget, option, model_index):
-        """Summary
-
+    def configureEditor(self, parent_qw: QWidget,
+                            option: QStyleOptionViewItem,
+                            model_index: QModelIndex) -> QWidget:
+        """
         Args:
-            parent_QWidget (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
+            parent_qw: Description
+            option: Description
+            model_index: Description
 
         Returns:
-            TYPE: Description
+            the widget used to edit the item specified by index for editing
         """
         cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'eulerZ':
-            editor = QDoubleSpinBox(parent_QWidget)
+            editor = QDoubleSpinBox(parent_qw)
             tpb, _ = cn_m.getTwistPerBase()
             editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
         elif key == 'scamZ':
-            editor = QDoubleSpinBox(parent_QWidget)
+            editor = QDoubleSpinBox(parent_qw)
             tpb, _ = cn_m.getTwistPerBase()
             editor.setSingleStep(tpb)
             editor.setDecimals(1)
             editor.setRange(0, 359)
         elif key == 'length':
-            editor = QSpinBox(parent_QWidget)
+            editor = QSpinBox(parent_qw)
             bpr, length = cn_m.getProperty(['bases_per_repeat', 'length'])
             editor.setRange(length, 4*length)
             editor.setSingleStep(bpr)
         elif key == 'z' and cn_m.part().isZEditable():
-            editor = QDoubleSpinBox(parent_QWidget)
+            editor = QDoubleSpinBox(parent_qw)
             bw = cn_m.part().baseWidth()
             editor.setSingleStep(bw)
             editor.setRange(-bw*21, bw*21)
         else:
-            editor = CNPropertyItem.configureEditor(self, parent_QWidget, option, model_index)
+            editor = CNPropertyItem.configureEditor(self, parent_qw, option, model_index)
         return editor
     # end def
 

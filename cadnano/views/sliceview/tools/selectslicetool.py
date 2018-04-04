@@ -1,25 +1,46 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
-from PyQt5.QtCore import QPointF, Qt
+from typing import (
+    Union
+)
+
+from PyQt5.QtCore import (
+    QPointF,
+    QPoint,
+    Qt
+)
 from PyQt5.QtGui import QPainterPath
-from PyQt5.QtWidgets import (QGraphicsItemGroup, QGraphicsPathItem,  # QGraphicsRectItem,
-                             QGraphicsItem, QMenu, QAction)
-from cadnano.fileio import v3encode, v3decode
+from PyQt5.QtWidgets import (
+    QGraphicsItemGroup,
+    QGraphicsPathItem,
+    # QGraphicsRectItem,
+    QGraphicsItem,
+    QMenu,
+    QAction
+)
+from cadnano.fileio import (
+    v3encode,
+    v3decode
+)
 from cadnano.views.sliceview.virtualhelixitem import SliceVirtualHelixItem
 from cadnano.gui.palette import getPenObj
 from cadnano.views.sliceview import slicestyles as styles
 from .abstractslicetool import AbstractSliceTool
+from cadnano.views.sliceview.griditem import GridEvent
+from cadnano.views.sliceview import (
+    SliceToolManagerT,
+    SliceNucleicAcidPartItemT
+)
+from cadnano.cntypes import (
+    RectT
+)
 
-
-def normalizeRect(rect):
-    """Summary
-
+def normalizeRect(rect: RectT) -> RectT:
+    """
     Args:
-        rect (TYPE): Description
+        rect: Description
 
     Returns:
-        TYPE: Description
+        tuple of a rectangle corners
     """
     x1, y1, x2, y2 = rect
     if x1 > x2:
@@ -50,7 +71,7 @@ class SelectSliceTool(AbstractSliceTool):
         snap_origin_item (TYPE): Description
     """
 
-    def __init__(self, manager):
+    def __init__(self, manager: SliceToolManagerT):
         """Summary
 
         Args:
@@ -67,59 +88,46 @@ class SelectSliceTool(AbstractSliceTool):
         self.clipboard = None
     # end def
 
-    def __repr__(self):
-        """Summary
-
+    def __repr__(self) -> str:
+        """
         Returns:
             TYPE: Description
         """
         return "select_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
-        """Summary
-
+    def methodPrefix(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            prefix string
         """
         return "selectTool"  # first letter should be lowercase
 
-    def isSelectionActive(self):
-        """Summary
-
+    def isSelectionActive(self) -> bool:
+        """
         Returns:
-            TYPE: Description
+            is the selection active?
         """
         return self.is_selection_active
     # end def
 
     def resetSelections(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         # print("resetSelections")
         doc = self.manager.document
         doc.clearAllSelected()
 
     def modelClear(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Clear model selections
         """
         # print("modelClear")
         doc = self.manager.document
         doc.clearAllSelected()
 
-    def setPartItem(self, part_item):
-        """Summary
-
+    def setPartItem(self, part_item: SliceNucleicAcidPartItemT):
+        """
         Args:
-            part_item (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item: Description
         """
         if part_item is not self.part_item:
             if self.sgv is not None:
@@ -155,16 +163,12 @@ class SelectSliceTool(AbstractSliceTool):
                 print("SGV is still none")
     # end def
 
-    def selectRubberband(self, rect, from_pt, to_point):
-        """Summary
-
+    def selectRubberband(self, rect: QRect, from_pt: QPointF, to_point: QPointF):
+        """
         Args:
-            rect (TYPE): Description
-            from_pt (TYPE): Description
-            to_point (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            rect: Description
+            from_pt: Description
+            to_point: Description
         """
         fset = self.manager.document.filter_set
         if self.FILTER_NAME not in fset:
@@ -197,10 +201,7 @@ class SelectSliceTool(AbstractSliceTool):
     # end def
 
     def getSelectionBoundingRect(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Show the bounding rect
         """
         part_item = self.part_item
         group = self.group
@@ -218,11 +219,10 @@ class SelectSliceTool(AbstractSliceTool):
             print("Nothing in selection_set")
     # end def
 
-    def deselectItems(self):
-        """Summary
-
+    def deselectItems(self) -> bool:
+        """
         Returns:
-            TYPE: Description
+            ``True`` if selection cleared ``False`` if no selection active
         """
         # print("deselecting")
         group = self.group
@@ -244,14 +244,13 @@ class SelectSliceTool(AbstractSliceTool):
         return False
     # end def
 
-    def deselectSet(self, vh_set):
-        """Summary
-
+    def deselectSet(self, vh_set: Set[int]) -> bool:
+        """
         Args:
-            vh_set (TYPE): Description
+            vh_set: Description
 
         Returns:
-            TYPE: Description
+            ``False`` if selection is not active.  TODO: should it return ``True`` also?
         """
         group = self.group
         if self.snap_origin_item is not None:
@@ -275,11 +274,13 @@ class SelectSliceTool(AbstractSliceTool):
         return False
     # end def
 
-    def selectOrSnap(self, part_item, target_item, event):
+    def selectOrSnap(self,  part_item: SliceNucleicAcidPartItemT,
+                            target_item: SliceVirtualHelixItem,
+                            event):
         """
         Args:
-            part_item (PartItem)
-            target_item (TYPE): Description
+            part_item:
+            target_item: Description
             event (TYPE): Description
 
         Deleted Parameters:
@@ -308,10 +309,11 @@ class SelectSliceTool(AbstractSliceTool):
                 doc.addVirtualHelicesToSelection(part, [target_item.idNum()])
     # end def
 
-    def doSnap(self, part_item, snap_to_item):
+    def doSnap(self, part_item: SliceNucleicAcidPartItemT,
+                    snap_to_item: Union[SliceVirtualHelixItem, GridEvent]):
         """
         Args:
-            part_item (PartItem)
+            part_item:
             snap_to_item (SliceVirtualHelixItem or GridEvent): Item to snap
                 selection to
         """
@@ -383,13 +385,15 @@ class SelectSliceTool(AbstractSliceTool):
         return new_vh_set
     # end def
 
-    def moveSelection(self, dx, dy, finalize, use_undostack=True):
+    def moveSelection(self, dx: float, dy: float,
+                            finalize: bool,
+                            use_undostack: bool = True):
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:
-            dx (TYPE): Description
-            dy (TYPE): Description
-            finalize (TYPE): Description
+            dx: Description
+            dy: Description
+            finalize: Description
             use_undostack (bool, optional): Description
         """
         # print("moveSelection: {}, {}".format(dx, dy))
@@ -420,11 +424,11 @@ class SelectSliceTool(AbstractSliceTool):
         AbstractSliceTool.deactivate(self)
     # end def
 
-    def getCustomContextMenu(self, point):
-        """point (QPoint)
+    def getCustomContextMenu(self, point: QPoint):
+        """point
 
         Args:
-            point (TYPE): Description
+            point: Description
         """
         if len(self.selection_set) > 0:
             sgv = self.sgv
@@ -456,7 +460,7 @@ class SelectSliceTool(AbstractSliceTool):
 class SliceSelectionBox(QGraphicsPathItem):
     _RADIUS = styles.SLICE_HELIX_RADIUS
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QGraphicsItem = None):
         super(QGraphicsPathItem, self).__init__(parent)
         self._rect = None
     # end def
@@ -496,7 +500,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         tool (TYPE): Description
     """
 
-    def __init__(self, tool, parent=None):
+    def __init__(self, tool, parent: QGraphicsItem = None):
         """Summary
 
         Args:
@@ -550,7 +554,7 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         self.setFocus(False)
     # end def
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         """event.key() seems to be capital only?
 
         Args:
@@ -562,15 +566,12 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         return QGraphicsItem.keyPressEvent(self, event)
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            event: Contains item, scene, and screen
             coordinates of the the event, and previous event.
-
-        Returns:
-            TYPE: Description
         """
         return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def

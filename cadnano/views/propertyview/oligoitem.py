@@ -1,22 +1,28 @@
 # -*- coding: utf-8 -*-
 """Summary
 """
-from cadnano.proxies.cnenum import ItemEnum
+from typing import Any
+
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
 from cadnano.controllers import OligoItemController
 from cadnano.views.abstractitems import AbstractOligoItem
 from .cnpropertyitem import CNPropertyItem
-# from cadnano import util
+from cadnano.cntypes import (
+    OligoT
+)
 
 
 class OligoSetItem(AbstractOligoItem, CNPropertyItem):
-    """Summary
+    """Property View Oligo Set Item
     """
     _GROUPNAME = "oligos"
     FILTER_NAME = 'oligo'
 
     def __init__(self, **kwargs):
-        """Summary
-
+        """
         Args:
             model_oligo (TYPE): Description
             parent (TYPE): Description
@@ -30,25 +36,20 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
                 self._controller_list.append(OligoItemController(self, model_oligo))
     # end def
 
-    def itemType(self):
-        """Summary
-
+    def itemType(self) -> EnumType:
+        """
         Returns:
-            TYPE: Description
+            ItemEnum.OLIGO
         """
         return ItemEnum.OLIGO
     # end def
 
-    def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
-        """Summary
-
+    def oligoPropertyChangedSlot(self, model_oligo: OligoT, key: str, new_value: Any):
+        """
         Args:
-            model_oligo (TYPE): Description
-            key (TYPE): Description
-            new_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            model_oligo: Description
+            key: Description
+            new_value: Description
         """
         if model_oligo in self.outlineViewObjList():
             # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)

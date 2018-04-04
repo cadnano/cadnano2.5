@@ -136,8 +136,7 @@ def methodName():
 
 
 def execCommandList(model_object, commands, desc=None, use_undostack=True):
-    """
-    This is a wrapper for performing QUndoCommands, meant to ensure
+    """This is a wrapper for performing QUndoCommands, meant to ensure
     uniform handling of the undoStack and macro descriptions.
 
     When using the undoStack, commands are pushed onto self.undoStack()
@@ -247,8 +246,7 @@ def loadAllPlugins():
 
 
 def beginSuperMacro(model_object, desc=None):
-    """
-    SuperMacros can be used to nest multiple command lists.
+    """SuperMacros can be used to nest multiple command lists.
 
     Normally execCommandList macros all the commands in a list.
     In some cases, multiple command lists need to be executed separately
@@ -266,7 +264,7 @@ def endSuperMacro(model_object):
 
 
 def findChild(self):
-    """When called when self is a QGraphicsItem, iterates through self's
+    """When called when self is a :class:`QGraphicsItem`, iterates through self's
     childItems(), placing a red rectangle (a sibling of self) around
     each item in sequence (press return to move between items). Since
     the index of each child item is displayed as it is highlighted,
@@ -286,15 +284,15 @@ def findChild(self):
 
     children = self.childItems()
     parent = self.parentItem()
-    childVisibility = [(child, child.isVisible()) for child in children]
+    child_visibility = [(child, child.isVisible()) for child in children]
     for n in range(len(children)):
         child = children[n]
         print("Highlighting %s.childItems()[%i] = %s" % (self, n, child))
         childBR = child.mapToItem(parent, child.boundingRect())
         childBR = childBR.boundingRect()  # xform gives us a QPolygonF
-        debugHighlighter = QGraphicsRectItem(childBR, parent)
-        debugHighlighter.setPen(QPen(Qt.red))
-        debugHighlighter.setZValue(9001)
+        debug_highlighter = QGraphicsRectItem(childBR, parent)
+        debug_highlighter.setPen(QPen(Qt.red))
+        debug_highlighter.setZValue(9001)
         while True:
             # wait for return to be pressed while spinning the event loop.
             # also process single-character commands.
@@ -308,14 +306,14 @@ def findChild(self):
                     c.hide()
                 child.show()
             elif command == 'r':  # Return current child
-                for child, wasVisible in childVisibility:
-                    child.setVisible(wasVisible)
+                for child, was_visible in child_visibility:
+                    child.setVisible(was_visible)
                 return child
             else:
                 break
         debugHighlighter.scene().removeItem(debugHighlighter)
-        for child, wasVisible in childVisibility:
-            child.setVisible(wasVisible)
+        for child, was_visible in child_visibility:
+            child.setVisible(was_visible)
 # end def
 
 

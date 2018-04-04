@@ -29,6 +29,16 @@ from cadnano.gui.palette import (
     getNoPen
 )
 from cadnano.views.pathview import pathstyles as styles
+from cadnano.views.pathview import (
+    PathVirtualHelixItemT,
+    PathXoverItemT,
+    PathStrandItemT,
+    PathNucleicAcidPartItemT
+)
+from cadnano.cntypes import (
+    InsertionT,
+    StrandT
+)
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _HALF_BASE_WIDTH = _HBW = _BASE_WIDTH / 2
@@ -39,7 +49,11 @@ _R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH, capstyle=Qt.RoundCap)
 _NO_PEN = getNoPen()
 
 
-def _insertGen(path, start, c1, p1, c2):
+def _insertGen( path: QPainterPath,
+                start: QPointF,
+                c1: QPointF,
+                p1: QPointF,
+                c2: QPointF):
     path.moveTo(start)
     path.quadTo(c1, p1)
     path.quadTo(c2, start)
@@ -87,11 +101,11 @@ class InsertionPath(object):
         super(InsertionPath, self).__init__()
     # end def
 
-    def getPen(self):
+    def getPen(self) -> QPen:
         return _B_PEN
     # end def
 
-    def getInsert(self, is_top):
+    def getInsert(self, is_top) -> QPainterPath:
         if is_top:
             return _INSERT_PATH_UP
         else:
@@ -100,7 +114,11 @@ class InsertionPath(object):
 # end class
 
 
-def _addLinesToPainterPath(path, p1, p2, p3, p4):
+def _addLinesToPainterPath( path: QPainterPath,
+                            p1: QPointF,
+                            p2: QPointF,
+                            p3: QPointF,
+                            p4: QPointF):
     path.moveTo(p1)
     path.lineTo(p2)
     path.moveTo(p3)
@@ -128,11 +146,11 @@ class SkipPath(object):
         super(SkipPath, self).__init__()
     # end def
 
-    def getPen(self):
+    def getPen(self) -> QPen:
         return _R_PEN
     # end def
 
-    def getSkip(self):
+    def getSkip(self) -> QPainterPath:
         return self._skip_path
     # end def
 # end class
@@ -146,7 +164,9 @@ class InsertionItem(QGraphicsPathItem):
     """This is just the shape of the Insert item
     """
 
-    def __init__(self, virtual_helix_item, strand, insertion):
+    def __init__(self,  virtual_helix_item: PathVirtualHelixItemT,
+                        strand: StrandT,
+                        insertion: InsertionT):
         super(InsertionItem, self).__init__(virtual_helix_item)
         self.hide()
         self._strand = strand

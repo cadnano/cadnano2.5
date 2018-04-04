@@ -12,11 +12,13 @@ from typing import (
 
 from PyQt5.QtCore import (
     Qt,
-    QRect
+    QRect,
+    QModelIndex
 )
 from PyQt5.QtGui import (
     QFont,
-    QPalette
+    QPalette,
+    QPainter
 )
 from PyQt5.QtWidgets import (
     QTreeWidget,
@@ -25,18 +27,26 @@ from PyQt5.QtWidgets import (
     QStyleOptionButton,
     QStyleOptionViewItem,
     QStyle,
-    QCommonStyle
+    QCommonStyle,
+    QWidget
 )
 
+from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnenum import ItemEnum
 from cadnano.gui.palette import getBrushObj
 from cadnano.controllers import ViewRootController
 from cadnano.views.pathview import pathstyles as styles
 
+from cadnano.views.outlinerview.cnoutlineritem import CNOutlinerItem
 from .oligoitem import OligoSetItem
 from .nucleicacidpartitem import NucleicAcidPartSetItem
 from .virtualhelixitem import VirtualHelixSetItem
 from .cnpropertyitem import CNPropertyItem
+from cadnano.cntypes import (
+    PartT,
+    DocT,
+    WindowT
+)
 
 COLOR_PATTERN = re.compile("#[0-9a-f].....")
 _FONT = QFont(styles.THE_FONT, 12)
@@ -49,7 +59,7 @@ class PropertyEditorWidget(QTreeWidget):
     item that is selected in the Outliner.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget = None):
         """Summary
 
         Args:
@@ -119,11 +129,7 @@ class PropertyEditorWidget(QTreeWidget):
 
     ### SLOTS ###
     def outlinerItemSelectionChanged(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
-
+        """
         Raises:
             NotImplementedError: Description
         """
@@ -180,35 +186,27 @@ class PropertyEditorWidget(QTreeWidget):
             raise NotImplementedError
     # end def
 
-    def partAddedSlot(self, sender, model_part_instance):
-        """Summary
-
+    def partAddedSlot(self, sender: PartT, model_part_instance: ObjectInstance):
+        """
         Args:
-            sender (obj): Model object that emitted the signal.
+            sender: Model object that emitted the signal.
             model_part_instance (ObjectInstance): The model part
-
-        Returns:
-            TYPE: Description
         """
     # end def
 
-    def clearSelectionsSlot(self, doc):
-        """Summary
-
+    def clearSelectionsSlot(self, document: DocT):
+        """
         Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            doc: Description
         """
     # end def
 
-    def dataChangedSlot(self, top_left, bot_right):
+    def dataChangedSlot(self, top_left: QModelIndex, bot_right: QModelIndex):
         """docstring for propertyChangedSlot
 
         Args:
-            top_left (TYPE): Description
-            bot_right (TYPE): Description
+            top_left: Description
+            bot_right: Description
         """
         c_i = self.currentItem()
         if c_i is None:
@@ -220,77 +218,59 @@ class PropertyEditorWidget(QTreeWidget):
         self.outlinerItemSelectionChanged()
     # end def
 
-    def selectedChangedSlot(self, item_dict):
-        """Summary
-
+    def selectedChangedSlot(self, item_dict: dict):
+        """
         Args:
             item_dict (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_set):
-        """Summary
-
+    def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
+        """
         Args:
-            filter_name_set (set): Description
-
-        Returns:
-            TYPE: Description
+            filter_name_set: Description
         """
         pass
     # end def
 
-    def preXoverFilterChangedSlot(self, filter_name):
-        """Summary
-
+    def preXoverFilterChangedSlot(self, filter_name: str):
+        """
         Args:
-            filter_name (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            filter_name: Description
         """
         pass
     # end def
 
-    def resetRootItemSlot(self, doc):
-        """Summary
-
+    def resetRootItemSlot(self, document: DocT):
+        """
         Args:
-            doc (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            document: Description
         """
         self.clear()
     # end def
 
     ### ACCESSORS ###
-    def window(self):
-        """Summary
-
+    def window(self) -> WindowT:
+        """
         Returns:
-            TYPE: Description
+            model :class:`DocumentWindow`
         """
         return self._window
     # end def
 
-    def outlineViewObjSet(self) -> set:
+    def outlineViewObjSet(self) -> Set[CNOutlinerItem]:
         return self._outline_view_obj_set
     # end def
 
-    def outlineViewObjList(self) -> list:
+    def outlineViewObjList(self) -> List[CNOutlinerItem]:
         return self._outline_view_obj_list
     # end def
 
     ### METHODS ###
-    def resetDocumentAndController(self, document):
-        """docstring for resetDocumentAndController
-
+    def resetDocumentAndController(self, document: DocT):
+        """
         Args:
-            document (TYPE): Description
+            document: model :class:`Document`
         """
         self._document = document
         self._controller = ViewRootController(self, document)
@@ -303,40 +283,39 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     """Summary
     """
 
-    def createEditor(self, parent_QWidget, option, model_index):
-        """Summary
-
+    def createEditor(self,  parent_qw: QWidget,
+                            option: QStyleOptionViewItem,
+                            model_index: QModelIndex) -> QWidget:
+        """
         Args:
-            parent_QWidget (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
+            parent_qw: Description
+            option: Description
+            model_index: Description
 
         Returns:
-            TYPE: Description
+            the widget used to edit the item specified by index for editing
         """
         column = model_index.column()
         treewidgetitem = self.parent().itemFromIndex(model_index)
         if column == 0:  # Property Name
             return None
         elif column == 1:
-            editor = treewidgetitem.configureEditor(parent_QWidget, option, model_index)
+            editor = treewidgetitem.configureEditor(parent_qw, option, model_index)
             return editor
         else:
             return QStyledItemDelegate.createEditor(self,
-                                                    parent_QWidget,
+                                                    parent_qw,
                                                     option, model_index)
     # end def
 
-    def updateEditorGeometry(self, editor, option, model_index):
-        """Summary
-
+    def updateEditorGeometry(self,  editor: QWidget,
+                                    option: QStyleOptionViewItem,
+                                    model_index: QModelIndex):
+        """
         Args:
-            editor (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            editor: Description
+            option: Description
+            model_index: Description
         """
         column = model_index.column()
         if column == 0:
@@ -355,16 +334,14 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             QStyledItemDelegate.updateEditorGeometry(self, editor, option, model_index)
     # end def
 
-    def paint(self, painter, option, model_index):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionViewItem,
+                    model_index: QModelIndex):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            model_index: Description
         """
         # row = model_index.row()
         column = model_index.column()

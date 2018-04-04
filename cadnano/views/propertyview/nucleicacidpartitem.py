@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
-from cadnano.proxies.cnenum import ItemEnum
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
 from cadnano.controllers import NucleicAcidPartItemController
 from .abstractproppartitem import AbstractPropertyPartSetItem
 
@@ -14,12 +15,11 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
     """
 
     def __init__(self, **kwargs):
-        """Summary
-
+        """
         Args:
-            model_part (Part): The model part
+            model_part (NucleicAcidPart): The model part
             parent (PropertyEditorWidget): The property editor
-            key (None, optional): Description
+            key (str, optional): Default is ``None``
         """
         super(NucleicAcidPartSetItem, self).__init__(**kwargs)
         if self._key == "name":
@@ -29,7 +29,7 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
 
     # end def
 
-    def itemType(self):
+    def itemType(self) -> EnumType:
         """Overrides AbstractPropertyPartItem method for NucleicAcidPartItem.
 
         Returns:

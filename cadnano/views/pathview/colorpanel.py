@@ -5,12 +5,17 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtGui import (
     QBrush,
-    QFont
+    QFont,
+    QColor,
+    QPainter
 )
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QColorDialog,
-    QGraphicsTextItem
+    QGraphicsTextItem,
+    QGraphicsSceneMouseEvent,
+    QWidget,
+    QStyleOptionGraphicsItem
 )
 
 from cadnano.gui.palette import getColorObj
@@ -23,18 +28,17 @@ _FONT = QFont(styles.THE_FONT, 12, QFont.Bold)
 class ColorPanel(QGraphicsItem):
     """
     Attributes:
-        colordialog (TYPE): Description
-        rect (TYPE): Description
+        colordialog (QColorDialog): Description
+        rect (QRectF): Description
     """
     _shift_colors = [getColorObj(x) for x in styles.SCAF_COLORS]
     _colors = [getColorObj(x) for x in styles.STAP_COLORS]
     _PEN = Qt.NoPen
 
-    def __init__(self, parent=None):
-        """Summary
-
+    def __init__(self, parent: QGraphicsItem = None):
+        """
         Args:
-            parent (None, optional): Description
+            parent: Default is ``None``
         """
         super(ColorPanel, self).__init__(parent)
         self.rect = QRectF(0, 0, 30, 30)
@@ -69,16 +73,14 @@ class ColorPanel(QGraphicsItem):
         """
         return self.rect
 
-    def paint(self, painter, option, widget=None):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Description
         """
         painter.setPen(self._PEN)
         painter.setBrush(self._shift_brush)
@@ -87,10 +89,7 @@ class ColorPanel(QGraphicsItem):
         painter.drawRect(0, 15, 30, 15)
 
     def nextColor(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Increment ``self._color_index``
         """
         self._color_index += 1
         if self._color_index == len(self._colors):
@@ -100,45 +99,35 @@ class ColorPanel(QGraphicsItem):
         self.update()
 
     def prevColor(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Decrement ``self._color_index``
         """
         self._color_index -= 1
 
-    def color(self):
-        """Summary
-
+    def color(self) -> QColor:
+        """
         Returns:
-            TYPE: Description
+            :class:`QColor`
         """
         return self._color
 
-    def shiftColorName(self):
-        """Summary
-
+    def shiftColorName(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            string name of the color
         """
         return self._shift_color.name()
 
-    def colorName(self):
-        """Summary
-
+    def colorName(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            string name of the color
         """
         return self._color.name()
 
-    def mousePressEvent(self, event):
-        """Summary
-
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        """
         Args:
-            event (QGraphicsSceneMouseEvent): Description
-
-        Returns:
-            TYPE: Description
+            event: Description
         """
         if event.pos().y() < 10:
             new_color = self.colordialog.getColor(self._shift_color)

@@ -52,7 +52,7 @@ class CadnanoQt(QObject):
     documentWindowWasCreatedSignal = pyqtSignal(object, object)  # doc, window
 
     def __init__(self, argv):
-        """ Create the application object
+        """Create the application object
         """
         self.argns, unused = util.parse_args(argv, gui=True)
         # util.init_logging(self.argns.__dict__)
@@ -135,14 +135,14 @@ class CadnanoQt(QObject):
             def strandsets(id_num):
                 return p().reference().getStrandSets(id_num)
 
-            print("\tvhi(i)\tvirtualHelixItem displaying vh(i)")
+            print("\tvhi(i)\tVirtualHelixItem displaying vh(i)")
 
             def vhi(id_num):
                 partitem = pi()
                 return partitem.vhItemForIdNum(id_num)
 
             print("\tquit()\tquit (for when the menu fails)")
-            print("\tgraphicsItm.findChild()  see help(pi().findChild)")
+            print("\tQGraphicsItem.findChild()  see help(pi().findChild)")
             interact('', local={'a': self, 'd': d, 'w': w,
                                 'p': p, 'pi': pi, 'vhi': vhi,
                                 })
@@ -154,7 +154,7 @@ class CadnanoQt(QObject):
             self.main_event_loop.exec_()
 
     def destroyApp(self):
-        """ Destroy the QApplication.
+        """Destroy the QApplication.
 
         Do not set `self.qApp = None` in this method.
         Do it external to the CadnanoQt class

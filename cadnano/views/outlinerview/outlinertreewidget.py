@@ -7,7 +7,9 @@ from PyQt5.QtCore import (
     QVariant,
     QItemSelectionModel,
     QItemSelection,
-    QPersistentModelIndex
+    # QPersistentModelIndex,
+    QModelIndex,
+    QPoint
 )
 from PyQt5.QtGui import (
     QColor,
@@ -23,6 +25,7 @@ from PyQt5.QtWidgets import (
     QLineEdit,
     QMenu,
     QTreeWidget,
+    QTreeWidgetItem,
     QTreeView,
     QTreeWidgetItemIterator,
     QStyle,
@@ -30,7 +33,8 @@ from PyQt5.QtWidgets import (
     QStyledItemDelegate,
     QStyleOptionButton,
     QStyleOptionViewItem,
-    QToolTip
+    QToolTip,
+    QWidget
 )
 
 from cadnano.proxies.cnenum import PartEnum
@@ -51,6 +55,11 @@ from .cnoutlineritem import (
 from .nucleicacidpartitem import OutlineNucleicAcidPartItem
 from .virtualhelixitem import OutlineVirtualHelixItem
 from .oligoitem import OutlineOligoItem
+from cadnano.cntypes import (
+    PartT,
+    DocT,
+    WindowT
+)
 
 _FONT = QFont(styles.THE_FONT, 12)
 _QCOMMONSTYLE = QCommonStyle()
@@ -64,12 +73,12 @@ class OutlinerTreeWidget(QTreeWidget):
     to row 0, column 0 at the root
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget = None):
         super(OutlinerTreeWidget, self).__init__(parent)
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
         self.to_be_activated = None
 
-    def configure(self, window, document):
+    def configure(self, window: WindowT, document: DocT):
         self._window = window
         self._document = document
         self._controller = ViewRootController(self, document)
@@ -119,17 +128,19 @@ class OutlinerTreeWidget(QTreeWidget):
         '''
         self.selection_filter_disabled = False
 
+        # the :class:`QAbstractItemModel` of this :class:`QTreeWidget`
         self.model().dataChanged.connect(self.dataChangedSlot)
 
         self.itemClicked.connect(self.itemClickedHandler)
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         return self._document
     # end def
 
-    def selectionFilter(self, selected_items, deselected_items):
-        """ Disables selections of items not in the active filter set.
+    def selectionFilter(self,   selected_items: QItemSelection,
+                                deselected_items: QItemSelection):
+        """Disables selections of items not in the active filter set.
         I had issues with segfaults subclassing QItemSelectionModel so
         this is the next best thing I think
         """
@@ -178,7 +189,7 @@ class OutlinerTreeWidget(QTreeWidget):
         self.processSelections(deselect_only=True)
     # end def
 
-    def itemClickedHandler(self, tree_widget_item, column):
+    def itemClickedHandler(self, tree_widget_item: QTreeWidgetItem, column: int):
         # print("I'm click", tree_widget_item.__class__.__name__,
         #       tree_widget_item.isSelected())
         # print("click column", column)
@@ -204,8 +215,8 @@ class OutlinerTreeWidget(QTreeWidget):
         self.processSelections()
     # end def
 
-    def processSelections(self, deselect_only=False):
-        """ Process selections.  We need this because itemClicked doesn't get called
+    def processSelections(self, deselect_only: bool = False):
+        """Process selections.  We need this because itemClicked doesn't get called
         when clicking off of a QTreeWidgetItem in the QTreeWidget and triggers
         a deselection
         we may be able to call this in a mousePressEvent instead of in
@@ -213,7 +224,7 @@ class OutlinerTreeWidget(QTreeWidget):
         order
 
         Args:
-            deselect_only (bool, optional): default is False.  Allows a
+            deselect_only: default is False.  Allows a
                 deselection to occur when clicking off an item in the outlineview
                 since no itemClicked will occur
         """
@@ -260,7 +271,7 @@ class OutlinerTreeWidget(QTreeWidget):
         # self.blockSignals(False)
     # end def
 
-    def dataChangedSlot(self, top_left, bottom_right):
+    def dataChangedSlot(self, top_left: QModelIndex , bottom_right: QModelIndex):
         if self.is_child_adding == 0:
             if top_left == bottom_right:    # single item
                 item = self.itemFromIndex(top_left)
@@ -288,8 +299,8 @@ class OutlinerTreeWidget(QTreeWidget):
         self.to_be_activated = None
     # end def
 
-    def getCustomContextMenu(self, point):
-        """ point (QPoint)
+    def getCustomContextMenu(self, point: QPoint):
+        """ point
         """
         menu = QMenu(self)
 

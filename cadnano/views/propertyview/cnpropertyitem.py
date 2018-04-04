@@ -1,16 +1,30 @@
 # -*- coding: utf-8 -*-
 """cnpropertyitem description"""
+from typing import (
+    List,
+    Set
+)
 
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import (
+    Qt,
+    QModelIndex
+)
 from PyQt5.QtWidgets import (
     QTreeWidgetItem,
     QDoubleSpinBox,
     QSpinBox,
     QLineEdit,
     QCheckBox,
-    QComboBox
+    QComboBox,
+    QWidget,
+    QStyleOptionViewItem
 )
-from cadnano.proxies.cnenum import ENUM_NAMES
+
+from cadnano.views.outlinerview.cnoutlineritem import CNOutlinerItem
+from cadnano.proxies.cnenum import (
+    ENUM_NAMES,
+    EnumType
+)
 from cadnano.cntypes import (
     PropertyEditorWidgetT
 )
@@ -28,12 +42,11 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, parent: PropertyEditorWidgetT, key=None):
-        """Summary
-
+    def __init__(self, parent: PropertyEditorWidgetT, key: str = None):
+        """
         Args:
             parent: Description
-            key (None, optional): Description
+            key: Default is ``None``
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
@@ -97,16 +110,15 @@ class CNPropertyItem(QTreeWidgetItem):
     def _viewroot(self):
         return self.treeWidget()
 
-    def key(self):
-        """Summary
-
+    def key(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            the key string
         """
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def outlineViewObj(self):
+    def outlineViewObj(self) -> CNOutlinerItem:
         """Summary
 
         Returns:
@@ -115,7 +127,7 @@ class CNPropertyItem(QTreeWidgetItem):
         return self.outlineViewObjList()[0]
     # end def
 
-    def outlineViewObjList(self):
+    def outlineViewObjList(self) -> List[CNOutlinerItem]:
         """Summary
 
         Returns:
@@ -124,39 +136,36 @@ class CNPropertyItem(QTreeWidgetItem):
         return self.treeWidget().outlineViewObjList()
     # end def
 
-    def outlineViewObjSet(self):
+    def outlineViewObjSet(self) -> Set[CNOutlinerItem]:
         return self.treeWidget().outlineViewObjSet()
 
-    def itemType(self):
-        """Summary
-
+    def itemType(self) -> EnumType:
+        """
         Returns:
-            TYPE: Description
+            None
         """
         return None
     # end def
 
     def disconnectSignals(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         for controller in self._controller_list:
             controller.disconnectSignals()
         self._controller_list = []
     # end def
 
-    def configureEditor(self, parent_QWidget, option, model_index):
-        """Summary
-
+    def configureEditor(self, parent_qw: QWidget,
+                            option: QStyleOptionViewItem,
+                            model_inde: QModelIndex) -> QWidget:
+        """
         Args:
-            parent_QWidget (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
+            parent_qw: Description
+            option Description
+            model_index: Description
 
         Returns:
-            TYPE: Description
+            the widget used to edit the item specified by index for editing
 
         Raises:
             NotImplementedError: Description
@@ -164,26 +173,26 @@ class CNPropertyItem(QTreeWidgetItem):
         cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'name':
-            return QLineEdit(parent_QWidget)
+            return QLineEdit(parent_qw)
         elif key not in cn_m.editable_properties:
             return None
         if self.is_enum:
-            editor = QComboBox(parent_QWidget)
+            editor = QComboBox(parent_qw)
             for val in ENUM_NAMES[key]:
                 editor.addItem(val)
         else:
             data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
             if data_type is str:
-                editor = QLineEdit(parent_QWidget)
+                editor = QLineEdit(parent_qw)
             elif data_type is int:
-                editor = QSpinBox(parent_QWidget)
+                editor = QSpinBox(parent_qw)
                 editor.setRange(-359, 359)
             elif data_type is float:
-                editor = QDoubleSpinBox(parent_QWidget)
+                editor = QDoubleSpinBox(parent_qw)
                 editor.setDecimals(0)
                 editor.setRange(-359, 359)
             elif data_type is bool:
-                editor = QCheckBox(parent_QWidget)
+                editor = QCheckBox(parent_qw)
             elif isinstance(None, data_type):
                 return None
             else:

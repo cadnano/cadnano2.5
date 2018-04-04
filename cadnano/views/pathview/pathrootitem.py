@@ -26,20 +26,20 @@ from cadnano.cntypes import (
 )
 
 class PathRootItem(QGraphicsRectItem):
-    """``PathRootItem`` is the root item in the PathView. It gets added directly
-    to the pathscene by ``DocumentWindow``. It receives two signals::
+    """:class:`PathRootItem` is the root item in the path view. It gets added directly
+    to the pathscene by :class:`DocumentWindow`. It receives two signals::
 
         partAddedSignal and documentSelectedPartChangedSignal
 
-    via its ``ViewRootController``.
+    via its :class:`ViewRootController`.
 
-    ``PathRootItem`` must instantiate its own controller to receive signals
+    :class:``PathRootItem` must instantiate its own controller to receive signals
     from the model.
 
     Attributes:
         findChild (TYPE): Description
-        manager (TYPE): Description
-        name (str): Description
+        manager (PathToolManagerT): Description
+        name (str): path
         select_tool (TYPE): Description
     """
     findChild = util.findChild  # for debug
@@ -49,8 +49,7 @@ class PathRootItem(QGraphicsRectItem):
                         parent: QGraphicsItem,
                         window: WindowT,
                         document: DocT):
-        """Summary
-
+        """
         Args:
             rect: Rectangle of this item
             parent: parent object

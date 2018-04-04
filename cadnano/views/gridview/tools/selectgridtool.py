@@ -5,6 +5,7 @@ from typing import Tuple
 
 from PyQt5.QtCore import (
     QPointF,
+    QPoint,
     Qt
 )
 from PyQt5.QtWidgets import (
@@ -390,10 +391,7 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def pasteClipboard(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         if self.clip_board is None:
             return
@@ -428,7 +426,9 @@ class SelectGridTool(AbstractGridTool):
         # doc.addVirtualHelicesToSelection(part, new_vh_set)
     # end def
 
-    def moveSelection(self, dx, dy, finalize, use_undostack=True):
+    def moveSelection(self, dx: float, dy: float,
+                        finalize: bool,
+                        use_undostack: bool =True):
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:
@@ -448,10 +448,7 @@ class SelectGridTool(AbstractGridTool):
     # end def
 
     def deactivate(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         if self.slice_graphics_view is not None:
             try:
@@ -465,11 +462,10 @@ class SelectGridTool(AbstractGridTool):
         AbstractGridTool.deactivate(self)
     # end def
 
-    def getCustomContextMenu(self, point):
+    def getCustomContextMenu(self, point: QPoint):
         """
-
         Args:
-            point (QPoint): Description
+            point: Description
         """
         sgv = self.slice_graphics_view
         do_show = False
