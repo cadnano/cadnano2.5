@@ -66,7 +66,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                                            safe=False)
             part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors)
-        print('Done redoing create of %s' % self.id_num)
+        # print('Done redoing create of %s' % self.id_num)
     # end def
 
     def undo(self):

@@ -39,7 +39,7 @@ def encodeDocument(document):
     name = "legacy-export-cn25"
     max_base_idx = max([part.maxBaseIdx(id_num) for id_num in vh_order])
 
-    print("Translating vh:(row,col) to legacy coordinates...")
+    # print("Translating vh:(row,col) to legacy coordinates...")
 
     min_row = float('inf')
     min_col = float('inf')
@@ -95,7 +95,7 @@ def encodeDocument(document):
         new_row = row + row_offset
         new_col = col + col_offset
 
-        print("{0:>2}: ({1:>2},{2:>2}) -> ({3:>2},{4:>2})".format(id_num, row, col, new_row, new_col))
+        # print("{0:>2}: ({1:>2},{2:>2}) -> ({3:>2},{4:>2})".format(id_num, row, col, new_row, new_col))
 
         # Put everything together in a new dict
         vh_dict = {"row": new_row,
