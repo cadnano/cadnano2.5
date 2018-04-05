@@ -62,7 +62,9 @@ from cadnano.cntypes import (
     OligoT,
     StrandT,
     SegmentT,
-    ABInfoT
+    ABInfoT,
+    NucleicAcidPartT,
+    DocT
 )
 
 
@@ -319,7 +321,8 @@ class NucleicAcidPart(Part):
         self._point_cache_keys = deque([None] * DEFAULT_CACHE_SIZE)
     # end def
 
-    def copy(self, document, new_object=None):
+    def copy(self,  document: DocT,
+                    new_object: NucleicAcidPartT = None) -> NucleicAcidPartT:
         """Copy all arrays and counters and create new StrandSets
 
         TODO: consider renaming this method
@@ -589,7 +592,8 @@ class NucleicAcidPart(Part):
             raise IndexError("idx {} greater than size {}".format(idx, size))
     # end def
 
-    def isAGreaterThanB_Z(self, id_numA: int, idxA: int, id_numB: int, idxB: int) -> bool:
+    def isAGreaterThanB_Z(self, id_numA: int, idxA: int,
+                                id_numB: int, idxB: int) -> bool:
         """Compare z values at each index of virtual helix A and B
 
         Args:

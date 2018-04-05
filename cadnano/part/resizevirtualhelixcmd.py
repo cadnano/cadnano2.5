@@ -1,21 +1,27 @@
 from cadnano.proxies.cnproxy import UndoCommand
-
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+)
 
 class ResizeVirtualHelixCommand(UndoCommand):
-    """
-    set the maximum and mininum base index in the helical direction
+    """set the maximum and mininum base index in the helical direction
 
     need to adjust all subelements in the event of a change in the
     minimum index
     """
 
-    def __init__(self, part, id_num, is_right, delta, zoom_to_fit=True):
+    def __init__(self,  part: NucleicAcidPartT,
+                        id_num: int,
+                        is_right: bool,
+                        delta: int,
+                        zoom_to_fit: bool = True):
         """
         Args:
-            part (Part):
-            id_num (int):
-            is_right (bool):
-            delta (int): number of bases to add to the helix
+            part:
+            id_num:
+            is_right:
+            delta: number of bases to add to the helix
+            zoom_to_fit: Default is ``True``
         """
         super(ResizeVirtualHelixCommand, self).__init__("resize virtual helix")
         self._part = part

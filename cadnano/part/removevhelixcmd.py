@@ -2,15 +2,16 @@ from ast import literal_eval
 import bisect
 
 from cadnano.proxies.cnproxy import UndoCommand
-
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+)
 
 class RemoveVirtualHelixCommand(UndoCommand):
-    """
-    RemoveVirtualHelixCommand. redo clears the active vh, removes vh from
+    """RemoveVirtualHelixCommand. redo clears the active vh, removes vh from
     neighbors, emits appropriate signals.
     """
 
-    def __init__(self, part, id_num):
+    def __init__(self, part: NucleicAcidPartT, id_num: int):
         super(RemoveVirtualHelixCommand, self).__init__("remove virtual helix")
         self.part = part
         self.id_num = id_num

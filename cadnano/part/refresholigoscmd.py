@@ -1,10 +1,11 @@
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
-
+from cadnano.cntypes import (
+    NucleicAcidPartT
+)
 
 class RefreshOligosCommand(UndoCommand):
-    """
-    RefreshOligosCommand is a post-processing step for AutoStaple.
+    """RefreshOligosCommand is a post-processing step for AutoStaple.
 
     Normally when an xover is created, all strands in the 3' direction are
     assigned the oligo of the 5' strand. This becomes very expensive
@@ -17,7 +18,7 @@ class RefreshOligosCommand(UndoCommand):
     This command is meant for non-undoable steps, like file-io.
     """
 
-    def __init__(self, part):
+    def __init__(self, part: NucleicAcidPartT):
         super(RefreshOligosCommand, self).__init__("refresh oligos")
         self._part = part
     # end def
