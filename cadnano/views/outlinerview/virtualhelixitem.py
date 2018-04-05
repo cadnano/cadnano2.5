@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import Qt
 
-from cadnano.proxies.cnenum import ItemEnum
-
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
 from .cnoutlineritem import (
     CNOutlinerItem,
+    RootPartItem,
     NAME_COL,
     VISIBLE_COL,
     COLOR_COL,
@@ -12,13 +15,15 @@ from .cnoutlineritem import (
 )
 from cadnano.views.abstractitems import AbstractVirtualHelixItem
 from cadnano.controllers import VirtualHelixItemController
-
+from cadnano.cntypes import (
+    DocT
+)
 
 class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     FILTER_NAME = "virtual_helix"
     CAN_NAME_EDIT = False
 
-    def __init__(self, id_num, part_item):
+    def __init__(self, id_num: int, part_item: RootPartItem):
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         part = part_item.part()
         CNOutlinerItem.__init__(self, part, parent=part_item)
@@ -27,18 +32,18 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def __hash__(self):
+    def __hash__(self) -> int:
         """ necessary as CNOutlinerItem as a base class is unhashable
         but necessary due to __init__ arg differences for whatever reason
         overload
         """
         return hash((self._id_num, self._model_part))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "VHI Outline %d" % self._id_num
 
     ### PUBLIC SUPPORT METHODS ###
-    def itemType(self):
+    def itemType(self) -> EnumType:
         return ItemEnum.VIRTUALHELIX
     # end def
 
@@ -62,7 +67,7 @@ class OutlineVirtualHelixItem(AbstractVirtualHelixItem, CNOutlinerItem):
             part.setVirtualHelixProperties(id_num, ['color'], [new_color])
     # end def
 
-    def isModelSelected(self, document):
+    def isModelSelected(self, document: DocT) -> bool:
         """Make sure the item is selected in the model
 
         Args:

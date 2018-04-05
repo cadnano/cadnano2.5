@@ -56,20 +56,16 @@ class ColorPanel(QGraphicsItem):
         self.hide()
 
     def _initLabel(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self._label = label = QGraphicsTextItem("⇧", parent=self)
         label.setPos(28, -4)
         label.setFont(_FONT)
 
-    def boundingRect(self):
-        """Summary
-
+    def boundingRect(self) -> QRectF:
+        """
         Returns:
-            TYPE: Description
+            :class:`QRectF`
         """
         return self.rect
 

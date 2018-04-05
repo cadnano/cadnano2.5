@@ -11,6 +11,7 @@ from PyQt5.QtCore import (
 )
 from PyQt5.QtWidgets import (
     QTreeWidgetItem,
+    QTreeWidget,
     QDoubleSpinBox,
     QSpinBox,
     QLineEdit,
@@ -107,7 +108,7 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     @property
-    def _viewroot(self):
+    def _viewroot(self) -> QTreeWidget:
         return self.treeWidget()
 
     def key(self) -> str:

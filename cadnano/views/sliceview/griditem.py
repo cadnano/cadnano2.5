@@ -57,8 +57,8 @@ class GridItem(QGraphicsRectItem):
         the grid.
 
         Args:
-            part_item (TYPE): Description
-            grid_type (TYPE): Description
+            part_item: Description
+            grid_type: Description
         """
         super(GridItem, self).__init__(parent=part_item)
         self.setFlag(QGraphicsItem.ItemClipsChildrenToShape)

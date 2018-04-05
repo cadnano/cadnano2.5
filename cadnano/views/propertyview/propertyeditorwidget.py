@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Summary
-
+"""
 Attributes:
-    COLOR_PATTERN (TYPE): Description
+    COLOR_PATTERN (regex): Description
 """
 import re
 from typing import (
@@ -28,7 +27,8 @@ from PyQt5.QtWidgets import (
     QStyleOptionViewItem,
     QStyle,
     QCommonStyle,
-    QWidget
+    QWidget,
+    QUndoStack
 )
 
 from cadnano.objectinstance import ObjectInstance
@@ -72,19 +72,15 @@ class PropertyEditorWidget(QTreeWidget):
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
     # end def
 
-    def undoStack(self):
+    def undoStack(self) -> QUndoStack:
         return self._document.undoStack()
     # end def
 
-    def configure(self, window, document):
-        """Summary
-
+    def configure(self, window: WindowT, document: DocT):
+        """
         Args:
-            window (TYPE): Description
-            document (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            window: Description
+            document: Description
         """
         self._window = window
         self._document = document
@@ -221,7 +217,7 @@ class PropertyEditorWidget(QTreeWidget):
     def selectedChangedSlot(self, item_dict: dict):
         """
         Args:
-            item_dict (TYPE): Description
+            item_dict: Description
         """
     # end def
 

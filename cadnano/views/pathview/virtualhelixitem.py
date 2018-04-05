@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
-
+from typing import (
+    Tuple,
+    List
+)
 from math import (
     floor,
     atan2,
@@ -9,6 +10,7 @@ from math import (
 )
 
 from PyQt5.QtCore import (
+    QPointF,
     QRectF,
     Qt
 )
@@ -19,7 +21,8 @@ from PyQt5.QtGui import (
 from PyQt5.QtWidgets import (
     QGraphicsItem,
     QGraphicsPathItem,
-    QGraphicsSceneMouseEvent
+    QGraphicsSceneMouseEvent,
+    QGraphicsSceneHoverEvent
 )
 
 from cadnano import util
@@ -40,22 +43,27 @@ from . import (
     PathRootItemT
 )
 from cadnano.cntypes import (
-    Vec2T
+    Vec2T,
+    GraphicsViewT,
+    WindowT,
+    StrandT,
+    StrandSetT,
+    KeyT,
+    ValueT
 )
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _VH_XOFFSET = styles.VH_XOFFSET
 
 
-def v2DistanceAndAngle(a, b):
-    """Summary
-
+def v2DistanceAndAngle(a: Vec2T, b: Vec2T) -> Vec2T:
+    """
     Args:
-        a (TYPE): Description
-        b (TYPE): Description
+        a: Description
+        b: Description
 
     Returns:
-        TYPE: Description
+        distance and angle tuple
     """
     dx = b[0] - a[0]
     dy = b[1] - a[1]
@@ -68,10 +76,10 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     """VirtualHelixItem for PathView
 
     Attributes:
-        drag_last_position (TYPE): Description
+        drag_last_position (QPointF): Description
         FILTER_NAME (str): Description
         findChild (TYPE): Description
-        handle_start (TYPE): Description
+        handle_start (QPointF): Description
         is_active (bool): Description
     """
     findChild = util.findChild  # for debug
@@ -80,7 +88,8 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     def __init__(self, id_num: int, part_item: PathNucleicAcidPartItemT):
         """
         Args:
-            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for
+                description and related methods.
             part_item: Description
         """
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
@@ -120,39 +129,39 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     ### SLOTS indirectly called from the part ###
 
-    def levelOfDetailChangedSlot(self, boolval):
+    def levelOfDetailChangedSlot(self, is_cosmetic: bool):
         """Not connected to the model, only the QGraphicsView
 
         Args:
-            boolval (TYPE): Description
+            is_cosmetic: Description
         """
         pen = self.pen()
-        pen.setCosmetic(boolval)
-        # print("levelOfDetailChangedSlot", boolval, pen.width())
-        # if boolval:
+        pen.setCosmetic(is_cosmetic)
+        # print("levelOfDetailChangedSlot", is_cosmetic, pen.width())
+        # if is_cosmetic:
         #     pass
         # else:
         #     pass
         self.setPen(pen)
     # end def
 
-    def strandAddedSlot(self, sender, strand):
-        """
-        Instantiates a StrandItem upon notification that the model has a
-        new Strand.  The StrandItem is responsible for creating its own
-        controller for communication with the model, and for adding itself to
-        its parent (which is *this* VirtualHelixItem, i.e. 'self').
+    def strandAddedSlot(self, strandset: StrandSetT, strand: StrandT):
+        """Instantiates a :class:`StrandItem` upon notification that the model
+        has a new :class:`Strand`.  The :class:`StrandItem` is responsible for
+        creating its own controller for communication with the model, and for
+        adding itself to its parent (which is *this* :class:`VirtualHelixItem`,
+        i.e. 'self').
 
         Args:
-            sender (obj): Model object that emitted the signal.
-            strand (TYPE): Description
+            strandset: Model object that emitted the signal.
+            strand: Description
         """
         if self._viewroot.are_signals_on:
             StrandItem(strand, self)
     # end def
 
     def virtualHelixRemovedSlot(self):
-        ''' Slot wrapper for ``destroyItem()``
+        '''Slot wrapper for ``destroyItem()``
         '''
         return self.destroyItem()
     # end def
@@ -178,15 +187,11 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         self._viewroot = None
     # end def
 
-    def virtualHelixPropertyChangedSlot(self, keys, values):
-        """Summary
-
+    def virtualHelixPropertyChangedSlot(self, keys: KeyT, values: ValueT):
+        """
         Args:
-            keys (TYPE): Description
-            values (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            keys: Description
+            values: Description
         """
         for key, val in zip(keys, values):
             if key == 'is_visible':
@@ -238,17 +243,14 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def showXoverItems(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         for item in self.childItems():
             if isinstance(item, XoverNode3):
                 item.showXover()
     # end def
 
-    def getStrandItems(self):
+    def getStrandItems(self) -> List[StrandItem]:
         strand_item_list: List[StrandItems] = []
         for item in self.childItems():
             if isinstance(item, StrandItem):
@@ -257,10 +259,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def hideXoverItems(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         for item in self.childItems():
             if isinstance(item, XoverNode3):
@@ -268,47 +267,43 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### ACCESSORS ###
-    def viewroot(self):
-        """Summary
-
+    def viewroot(self) -> PathRootItemT:
+        """
         Returns:
-            TYPE: Description
+            :class:`PathRootItem`
         """
         return self._viewroot
     # end def
 
-    def handle(self):
-        """Summary
-
+    def handle(self) -> VirtualHelixHandleItem:
+        """
         Returns:
-            TYPE: Description
+            :class:`VirtualHelixHandleItem`
         """
         return self._handle
     # end def
 
-    def window(self):
-        """Summary
-
+    def window(self) -> WindowT:
+        """
         Returns:
-            TYPE: Description
+            :class:`DocumentWindow`
         """
         return self._part_item.window()
     # end def
 
-    def view(self):
+    def view(self) -> GraphicsViewT:
         return self._viewroot.scene().views()[0]
     # end def
 
     ### DRAWING METHODS ###
-    def upperLeftCornerOfBase(self, idx, strand):
-        """Summary
-
+    def upperLeftCornerOfBase(self, idx: int, strand: StrandT) -> Vec2T:
+        """
         Args:
-            idx (int): the base index within the virtual helix
-            strand (TYPE): Description
+            idx: the base index within the virtual helix
+            strand: Description
 
         Returns:
-            TYPE: Description
+            Tuple of upperLeftCornerOfBase
         """
         x = idx * _BASE_WIDTH
         y = 0 if strand.isForward() else _BASE_WIDTH
@@ -316,14 +311,13 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def upperLeftCornerOfBaseType(self, idx: int, is_fwd: bool) -> Vec2T:
-        """Summary
-
+        """
         Args:
             idx (int): the base index within the virtual helix
-            is_fwd (TYPE): Description
+            is_fwd: Description
 
         Returns:
-            TYPE: Description
+            Tuple of upperLeftCornerOfBase
         """
         x = idx * _BASE_WIDTH
         y = 0 if is_fwd else _BASE_WIDTH
@@ -331,8 +325,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def refreshPath(self):
-        """
-        Returns a QPainterPath object for the minor grid lines.
+        """Returns a :class:`QPainterPath` object for the minor grid lines.
         The path also includes a border outline and a midline for
         dividing scaffold and staple bases.
         """
@@ -392,10 +385,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     ### PUBLIC SUPPORT METHODS ###
     def activate(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         pen = self.pen()
         pen.setColor(getColorObj(styles.MINOR_GRID_STROKE_ACTIVE))
@@ -404,10 +394,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def deactivate(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         pen = self.pen()
         pen.setColor(getColorObj(styles.MINOR_GRID_STROKE))
@@ -417,12 +404,11 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
 
     ### EVENT HANDLERS ###
     def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
-        """
-        Parses a mousePressEvent to extract strand_set and base index,
+        """Parses a :meth:`mousePressEvent` to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         # 1. Check if we are doing a Z translation
         if event.button() == Qt.RightButton:
@@ -448,12 +434,11 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
-        """
-        Parses a mouseMoveEvent to extract strand_set and base index,
+        """Parses a :meth:`mouseMoveEvent` to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         # 1. Check if we are doing a Z translation
         if self._right_mouse_move:
@@ -490,7 +475,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         """Called in the event of doing a Z translation drag
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         if self._right_mouse_move and event.button() == Qt.RightButton:
             MOVE_THRESHOLD = 0.01   # ignore small moves
@@ -505,8 +490,8 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     def customMouseRelease(self, event: QMouseEvent):
-        """Parses a mouseReleaseEvent to extract strand_set and base index,
-        forwarding them to approproate tool method as necessary.
+        """Parses a GraphicsView :meth:`mouseReleaseEvent` to extract strand_set
+         and base index, forwarding them to approproate tool method as necessary.
 
         Args:
             event: Description
@@ -520,7 +505,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### COORDINATE UTILITIES ###
-    def baseAtPoint(self, pos):
+    def baseAtPoint(self, pos: QPointF) -> Tuple[StrandSetT, int]:
         """Returns the (Strandset, index) under the location x, y or None.
 
         It shouldn't be possible to click outside a pathhelix and still call
@@ -528,7 +513,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         on the top or bottom edge, resulting in a negative y value.
 
         Args:
-            pos (TYPE): Description
+            pos: Description
         """
         x, y = pos.x(), pos.y()
         part = self._model_part
@@ -545,7 +530,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         return (strand_set, base_idx)
     # end def
 
-    def keyPanDeltaX(self):
+    def keyPanDeltaX(self) -> float:
         """How far a single press of the left or right arrow key should move
         the scene (in scene space)
         """
@@ -553,25 +538,20 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
         return self.mapToScene(QRectF(0, 0, dx, 1)).boundingRect().width()
     # end def
 
-    def hoverLeaveEvent(self, event):
-        """Summary
-
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent):
+        """
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event: Description
         """
         self._part_item.updateStatusBar("")
     # end def
 
-    def hoverMoveEvent(self, event):
-        """
-        Parses a mouseMoveEvent to extract strand_set and base index,
+    def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
+        """Parses a :meth:`hoverMoveEvent` to extract strand_set and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (TYPE): Description
+            event: Description
         """
         base_idx = int(floor(event.pos().x() / _BASE_WIDTH))
         loc = "%d[%d]" % (self._id_num, base_idx)
@@ -585,12 +565,12 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     # end def
 
     ### TOOL METHODS ###
-    def createToolMousePress(self, strand_set, idx, modifiers):
-        """strand.getDragBounds
+    def createToolMousePress(self, strand_set: StrandSetT, idx: int, modifiers):
+        """:meth:`Strand.getDragBounds`
 
         Args:
-            strand_set (StrandSet): Description
-            idx (int): the base index within the virtual helix
+            strand_set: Description
+            idx: the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         if modifiers & Qt.ShiftModifier:
@@ -604,15 +584,15 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.setIsDrawingStrand(True)
     # end def
 
-    def selectToolMousePress(self, strand_set, idx, modifiers):
+    def selectToolMousePress(self, strand_set: StrandSetT, idx: int, modifiers):
         pass
 
-    def createToolMouseMove(self, strand_set, idx):
-        """strand.getDragBounds
+    def createToolMouseMove(self, strand_set: StrandSetT, idx: int):
+        """:meth:`Strand.getDragBounds`
 
         Args:
-            strand_set (StrandSet): Description
-            idx (int): the base index within the virtual helix
+            strand_set: Description
+            idx: the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
@@ -620,12 +600,12 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.updateStrandItemFromVHI(self, strand_set, idx)
     # end def
 
-    def createToolMouseRelease(self, strand_set, idx):
-        """strand.getDragBounds
+    def createToolMouseRelease(self, strand_set: StrandSetT, idx: int):
+        """:meth:`Strand.getDragBounds`
 
         Args:
-            strand_set (StrandSet): Description
-            idx (int): the base index within the virtual helix
+            strand_set: Description
+            idx: the base index within the virtual helix
         """
         # print("%s: %s[%s]" % (util.methodName(), strand_set, idx))
         active_tool = self._getActiveTool()
@@ -634,13 +614,13 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
             active_tool.attemptToCreateStrand(self, strand_set, idx)
     # end def
 
-    def createToolHoverMove(self, is_fwd, idx_x, idx_y):
+    def createToolHoverMove(self, is_fwd: bool, idx_x: int, idx_y: int):
         """Create the strand is possible.
 
         Args:
-            is_fwd (TYPE): Description
-            idx_x (TYPE): Description
-            idx_y (TYPE): Description
+            is_fwd: Description
+            idx_x: Description
+            idx_y: Description
         """
         active_tool = self._getActiveTool()
         if not active_tool.isFloatingXoverBegin():

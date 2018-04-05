@@ -123,14 +123,11 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         self._initModifierRect()
         self._proxy_parent = ProxyParentItem(self)
         self._proxy_parent.setFlag(QGraphicsItem.ItemHasNoContents)
-        self._scale_2_model = m_p.baseWidth()/_BASE_WIDTH
-        self._scale_2_Qt = _BASE_WIDTH / m_p.baseWidth()
+        self._scale_2_model: float = m_p.baseWidth()/_BASE_WIDTH
+        self._scale_2_Qt: float = _BASE_WIDTH / m_p.baseWidth()
 
-        # self._rect = QRectF()
-        self._vh_rect = QRectF()
-        # self.setPen(getPenObj(styles.ORANGE_STROKE, 0))
+        self._vh_rect: QRectF = QRectF()
         self.setPen(getNoPen())
-        # self.setRect(self._rect)
 
         self.outline: PathRectItem = PathRectItem(self)
         outline = self.outline
@@ -422,7 +419,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     # end def
 
     def partVirtualHelixRemovedSlot(self, sender: NucleicAcidPartT, id_num: int):
-        """ Step 2 of removing a VHI
+        """Step 2 of removing a VHI
         """
         ztf = not getBatch()
         self._setVirtualHelixItemList(self._virtual_helix_item_list, zoom_to_fit=ztf)
@@ -436,7 +433,8 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
                                                     virtual_helix: VirtualHelixT,
                                                     keys: Tuple,
                                                     values: Tuple):
-        """Args:
+        """
+        Args:
             sender (Part): Model object that emitted the signal.
             id_num: VirtualHelix ID number. See `NucleicAcidPart` for
                 description and related methods.

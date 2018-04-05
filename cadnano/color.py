@@ -14,7 +14,7 @@ try:
     from PyQt5.QtGui import QColor as Color
 except Exception:
     class Color(object):
-        """ Overloaded constructor using *args to be compatible with :class:`QColor`
+        """Overloaded constructor using *args to be compatible with :class:`QColor`
 
         usage::
 

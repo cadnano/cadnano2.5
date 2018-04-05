@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from typing import Set
 
 from PyQt5.QtCore import (
     QDataStream,
@@ -9,14 +10,17 @@ from PyQt5.QtCore import (
     QItemSelection,
     # QPersistentModelIndex,
     QModelIndex,
-    QPoint
+    QPoint,
+    QByteArray,
+    QAbstractItemModel
 )
 from PyQt5.QtGui import (
     QColor,
     QFont,
     QPalette,
     QPixmap,
-    QPainter
+    QPainter,
+    QDropEvent
 )
 from PyQt5.QtWidgets import (
     QAbstractItemView,
@@ -38,6 +42,7 @@ from PyQt5.QtWidgets import (
     QWidget
 )
 
+from cadnano.objectinstance import ObjectInstance
 from cadnano.proxies.cnenum import PartEnum
 from cadnano.gui.palette import getBrushObj
 from cadnano.views.pathview import pathstyles as styles
@@ -392,7 +397,7 @@ class OutlinerTreeWidget(QTreeWidget):
         dialog.open()
     # end def
 
-    def colorSelectionSlot(self, color):
+    def colorSelectionSlot(self, color: QColor):
         column = COLOR_COL
         color_name = color.name()
         for item in self.selectedItems():
@@ -403,13 +408,13 @@ class OutlinerTreeWidget(QTreeWidget):
                 print("item uncolorable", item.__class__.__name__)
     # end def
 
-    def dropEvent(self, event):
-        """ custom drop event to prevent reparenting
+    def dropEvent(self, event: QDropEvent):
+        """custom drop event to prevent reparenting
         """
         # data = event.mimeData()
         # if data.hasFormat('application/x-qabstractitemmodeldatalist'):
-        #     bytearray = data.data('application/x-qabstractitemmodeldatalist')
-        #     data_item = self.decodeMimeData(bytearray)
+        #     the_bytearray = data.data('application/x-qabstractitemmodeldatalist')
+        #     data_item = self.decodeMimeData(the_bytearray)
         #     print("got a drop event", data_item)
 
         # item Drop above
@@ -430,20 +435,19 @@ class OutlinerTreeWidget(QTreeWidget):
             part.setImportedVHelixOrder([vhi.idNum() for vhi in vhi_list], check_batch=False)
     # end def
 
-    def decodeMimeData(self, bytearray):
-        """
-        see:
+    def decodeMimeData(self, the_bytearray: QByteArray):
+        """see:
         https://wiki.python.org/moin/PyQt/Handling%20Qt's%20internal%20item%20MIME%20type
         http://doc.qt.io/qt-5.5/datastreamformat.html
         """
         data = {}
-        ds = QDataStream(bytearray)
+        ds = QDataStream(the_bytearray)
         while not ds.atEnd():
             item = []
             row = ds.readInt32()
             column = ds.readInt32()
             number_of_items = ds.readInt32()
-            print("rc:", row, column, number_of_items)
+            # print("rc:", row, column, number_of_items)
             for i in range(number_of_items):
                 key = ds.readInt32()
                 value = QVariant()
@@ -467,31 +471,31 @@ class OutlinerTreeWidget(QTreeWidget):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def partAddedSlot(self, sender, model_part_instance):
+    def partAddedSlot(self, part: PartT, part_instance: ObjectInstance):
         """Receives notification from the model that a part has been added.
         Parts should add themselves to the QTreeWidget by passing parent=self.
 
         Args:
-            sender (Part):
-            model_part_instance (ObjectInstance):
+            part (Part):
+            part_instance (ObjectInstance):
 
         Raises:
             NotImplementedError: for unknown ``part_type``
         """
         if self.are_signals_enabled:
-            model_part = model_part_instance.reference()
+            model_part = part_instance.reference()
             part_type = model_part.partType()
             if part_type == PartEnum.NUCLEICACIDPART:
                 self.is_child_adding += 1
                 na_part_item = OutlineNucleicAcidPartItem(model_part, parent=self)
-                self._instance_items[model_part_instance] = na_part_item
+                self._instance_items[part_instance] = na_part_item
                 self.setCurrentItem(na_part_item)
                 self.is_child_adding -= 1
             else:
                 raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
-    def selectionFilterChangedSlot(self, filter_name_set):
+    def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
         '''Disable or enable items if their features are represented
 
         https://stackoverflow.com/questions/8961449/pyqt-qtreewidget-iterating#8961820
@@ -534,30 +538,30 @@ class OutlinerTreeWidget(QTreeWidget):
                 #     print(root_D.text(0))
     # end def
 
-    def preXoverFilterChangedSlot(self, filter_name):
+    def preXoverFilterChangedSlot(self, filter_name: str):
         pass
     # end def
 
-    def resetRootItemSlot(self, doc):
+    def resetRootItemSlot(self, doc: DocT):
         self.clear()
     # end def
 
-    def clearSelectionsSlot(self, doc):
+    def clearSelectionsSlot(self, doc: DocT):
         self.selectionModel().clearSelection()
     # end def
 
     ### ACCESSORS ###
-    def window(self):
+    def window(self) -> WindowT:
         return self._window
     # end def
 
     ### METHODS ###
-    def removePartItem(self, part_item):
+    def removePartItem(self, part_item: OutlineNucleicAcidPartItem):
         index = self.indexOfTopLevelItem(part_item)
         self.takeTopLevelItem(index)
     # end def
 
-    def resetDocumentAndController(self, document):
+    def resetDocumentAndController(self, document: DocT):
         """docstring for resetDocumentAndController"""
         self._document = document
         self._controller = ViewRootController(self, document)
@@ -565,39 +569,41 @@ class OutlinerTreeWidget(QTreeWidget):
             raise ImportError
     # end def
 
-    def setModifyState(self, bool):
+    def setModifyState(self, is_on):
         """docstring for setModifyState"""
         for part_item in self._instance_items:
-            part_item.setModifyState(bool)
+            part_item.setModifyState(is_on)
     # end def
 # end class OutlinerTreeWidget
 
 
 class CustomStyleItemDelegate(QStyledItemDelegate):
-    def createEditor(self, parent_QWidget, option, model_index):
+    def createEditor(self,  parent_qw: QWidget,
+                            option: QStyleOptionViewItem,
+                            model_index: QModelIndex):
         column = model_index.column()
         if column == NAME_COL:  # Model name
             item = self.parent().itemFromIndex(model_index)
             if item.CAN_NAME_EDIT:
-                editor = QLineEdit(parent_QWidget)
+                editor = QLineEdit(parent_qw)
                 editor.setAlignment(Qt.AlignVCenter)
                 return editor
         elif column == 1:  # Visibility checkbox
-            # editor = QCheckBox(parent_QWidget)
+            # editor = QCheckBox(parent_qw)
             # setAlignment doesn't work https://bugreports.qt-project.org/browse/QTBUG-5368
             # return editor
             return None
         elif column == COLOR_COL:  # Color Picker
-            editor = QColorDialog(parent_QWidget)
+            editor = QColorDialog(parent_qw)
             return editor
         else:
             return QStyledItemDelegate.createEditor(self,
-                                                    parent_QWidget,
+                                                    parent_qw,
                                                     option,
                                                     model_index)
     # end def
 
-    def setEditorData(self, editor, model_index):
+    def setEditorData(self, editor: QWidget, model_index: QModelIndex):
         column = model_index.column()
         if column == NAME_COL:  # Part Name
             text_QString = model_index.model().data(model_index, Qt.EditRole)
@@ -612,7 +618,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             QStyledItemDelegate.setEditorData(self, editor, model_index)
     # end def
 
-    def setModelData(self, editor, model, model_index):
+    def setModelData(self, editor: QWidget,
+                            model: QAbstractItemModel,
+                            model_index: QModelIndex):
         column = model_index.column()
         if column == NAME_COL:  # Part Name
             text_QString = editor.text()
@@ -627,7 +635,9 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
             QStyledItemDelegate.setModelData(self, editor, model, model_index)
     # end def
 
-    def updateEditorGeometry(self, editor, option, model_index):
+    def updateEditorGeometry(self, editor: QWidget,
+                                    option: QStyleOptionViewItem,
+                                    model_index: QModelIndex):
         column = model_index.column()
         if column == NAME_COL:
             editor.setGeometry(option.rect)
@@ -701,6 +711,7 @@ class CustomStyleItemDelegate(QStyledItemDelegate):
     # end def
 
     def itemSelectionChanged(self):
-        print("pppppp", self.selectedItems())
+        pass
+        # print("Outline itemSelectionChanged", self.selectedItems())
     # end def
 # end class CustomStyleItemDelegate

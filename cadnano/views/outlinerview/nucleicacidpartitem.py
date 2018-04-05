@@ -1,9 +1,20 @@
 # -*- coding: utf-8 -*-
+from typing import (
+    Dict,
+    Any,
+    List,
+    Set
+)
+
 from PyQt5.QtCore import QItemSelectionModel
-from cadnano.proxies.cnenum import ItemEnum
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
 from cadnano.views import styles
 from .cnoutlineritem import (
     CNOutlinerItem,
+    RootPartItem,
     DISABLE_FLAGS,
     LEAF_FLAGS
 )
@@ -11,7 +22,14 @@ from cadnano.views.abstractitems import AbstractPartItem
 from cadnano.controllers import NucleicAcidPartItemController
 from .oligoitem import OutlineOligoItem
 from .virtualhelixitem import OutlineVirtualHelixItem
-
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+    DocT,
+    VirtualHelixT,
+    OligoT,
+    KeyT,
+    ValueT
+)
 
 class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     FILTER_NAME = "part"
@@ -49,19 +67,19 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         return "OutlineNucleicAcidPartItem %s" % self._cn_model.getProperty('name')
 
     ### PUBLIC SUPPORT METHODS ###
-    def rootItems(self):
+    def rootItems(self) -> Dict[str, RootPartItem]:
         return self._root_items
     # end def
 
-    def part(self):
+    def part(self) -> NucleicAcidPartT:
         return self._cn_model
     # end def
 
-    def itemType(self):
+    def itemType(self) -> EnumType:
         return ItemEnum.NUCLEICACID
     # end def
 
-    def isModelSelected(self, document):
+    def isModelSelected(self, document: DocT) -> bool:
         """Make sure the item is selected in the model
         TODO implement Part selection
 
@@ -72,29 +90,32 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     # end def
 
     ### SLOTS ###
-    def partRemovedSlot(self, sender):
+    def partRemovedSlot(self, part: NucleicAcidPartT):
         self._controller.disconnectSignals()
         self._cn_model = None
         self._controller = None
     # end def
 
-    def partOligoAddedSlot(self, model_part, model_oligo):
+    def partOligoAddedSlot(self, part: NucleicAcidPartT, oligo: OligoT):
         if self._viewroot.are_signals_enabled:
-            m_o = model_oligo
+            m_o = oligo
             m_o.oligoRemovedSignal.connect(self.partOligoRemovedSlot)
             o_i = OutlineOligoItem(m_o, self._root_items['OligoList'])
             self._oligo_item_hash[m_o] = o_i
     # end def
 
-    def partOligoRemovedSlot(self, model_part, model_oligo):
-        m_o = model_oligo
+    def partOligoRemovedSlot(self, part: NucleicAcidPartT, oligo: OligoT):
+        m_o = oligo
         m_o.oligoRemovedSignal.disconnect(self.partOligoRemovedSlot)
         o_i = self._oligo_item_hash[m_o]
         o_i.parent().removeChild(o_i)
         del self._oligo_item_hash[m_o]
     # end def
 
-    def partVirtualHelixAddedSlot(self, model_part, id_num, virtual_helix, neighbors):
+    def partVirtualHelixAddedSlot(self, part: NucleicAcidPartT,
+                                        id_num: int,
+                                        virtual_helix: VirtualHelixT,
+                                        neighbors: List[int]):
         if self._viewroot.are_signals_enabled:
             tw = self.treeWidget()
             tw.is_child_adding += 1
@@ -102,7 +123,10 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             self._virtual_helix_item_hash[id_num] = vh_i
             tw.is_child_adding -= 1
 
-    def partVirtualHelixRemovingSlot(self, model_part, id_num, virtual_helix, neigbors):
+    def partVirtualHelixRemovingSlot(self, part: NucleicAcidPartT,
+                                            id_num: int,
+                                            virtual_helix: VirtualHelixT,
+                                            neigbors: List[int]):
         vh_i = self._virtual_helix_item_hash.get(id_num)
         # in case a OutlineVirtualHelixItem Object is cleaned up before this happends
         if vh_i is not None:
@@ -110,10 +134,10 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
             vh_i.parent().removeChild(vh_i)
     # end def
 
-    def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        if self._cn_model == model_part:
-            self.setValue(property_key, new_value)
-            if property_key == 'virtual_helix_order':
+    def partPropertyChangedSlot(self, part: NucleicAcidPartT, key: str, new_value: Any):
+        if self._cn_model == part:
+            self.setValue(key, new_value)
+            if key == 'virtual_helix_order':
                 vhi_dict = self._virtual_helix_item_hash
                 self.treeWidget().document()
                 new_list = [vhi_dict[id_num] for id_num in new_value]
@@ -131,12 +155,16 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
                         vhi.setSelected(True)
     # end def
 
-    def partSelectedChangedSlot(self, model_part, is_selected):
+    def partSelectedChangedSlot(self, part: NucleicAcidPartT, is_selected: bool):
         # print("part", is_selected)
         self.setSelected(is_selected)
     # end def
 
-    def partVirtualHelixPropertyChangedSlot(self, sender, id_num, virtual_helix, keys, values):
+    def partVirtualHelixPropertyChangedSlot(self, part: NucleicAcidPartT,
+                                                id_num: int,
+                                                virtual_helix: VirtualHelixT,
+                                                keys: KeyT,
+                                                values: ValueT):
         if self._cn_model == sender:
             vh_i = self._virtual_helix_item_hash[id_num]
             for key, val in zip(keys, values):
@@ -144,7 +172,9 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
                     vh_i.setValue(key, val)
     # end def
 
-    def partVirtualHelicesSelectedSlot(self, sender, vh_set, is_adding):
+    def partVirtualHelicesSelectedSlot(self, part: NucleicAcidPartT,
+                                            vh_set: Set[int],
+                                            is_adding: bool):
         """ is_adding (bool): adding (True) virtual helices to a selection
         or removing (False)
         """
@@ -180,18 +210,18 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         tw.selection_filter_disabled = False
     # end def
 
-    def partActiveVirtualHelixChangedSlot(self, part, id_num):
+    def partActiveVirtualHelixChangedSlot(self, part: NucleicAcidPartT, id_num: int):
         vhi = self._virtual_helix_item_hash.get(id_num, None)
         # if vhi is not None:
         self.setActiveVirtualHelixItem(vhi)
     # end def
 
-    def partActiveChangedSlot(self, part, is_active):
+    def partActiveChangedSlot(self, part: NucleicAcidPartT, is_active: bool):
         if part == self._cn_model:
             self.activate() if is_active else self.deactivate()
     # end def
 
-    def setActiveVirtualHelixItem(self, new_active_vhi):
+    def setActiveVirtualHelixItem(self, new_active_vhi: OutlineVirtualHelixItem):
         current_vhi = self.active_virtual_helix_item
         if new_active_vhi != current_vhi:
             if current_vhi is not None:

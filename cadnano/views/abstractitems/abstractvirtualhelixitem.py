@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-from typing import List, Tuple
+from typing import (
+    List,
+    Tuple,
+    Any,
+    Set
+)
 import numpy as np
 
 # from cadnano.extras.wrapapi import copyWrapAPI
@@ -33,10 +38,11 @@ class AbstractVirtualHelixItem(object):
     # end def
 
     @property
-    def editable_properties(self):
+    def editable_properties(self) -> Set[str]:
         return self._model_part.vh_editable_properties
 
-    def virtualHelixPropertyChangedSlot(self, virtual_helix, transform):
+    def virtualHelixPropertyChangedSlot(self,   keys: KeyT,
+                                                value: ValueT):
         pass
     # end def
 
@@ -44,7 +50,7 @@ class AbstractVirtualHelixItem(object):
         pass
     # end def
 
-    def strandAddedSlot(self, sender, strand):
+    def strandAddedSlot(self, strandset: StrandSetT, strand: StrandT):
         pass
     # end def
 

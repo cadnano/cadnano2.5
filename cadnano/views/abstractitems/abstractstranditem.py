@@ -25,7 +25,7 @@ class AbstractStrandItem(object):
     # end def
 
     def getProperty(self, key: str) -> ValueT:
-        self._model_strand.getProperty(key)
+        return self._model_strand.getProperty(key)
     # end def
 
     ### SIGNALS ###
