@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    DocT
+)
+
 class ViewRootController():
-    def __init__(self, view_root, model_document):
+    def __init__(self, view_root, model_document: DocT):
         self._view_root = view_root
         self._model_document = model_document
         self.connectSignals()

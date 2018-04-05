@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
 from .partitemcontroller import PartItemController
-
+from cadnano.cntypes import (
+    NucleicAcidPartT
+)
 
 class NucleicAcidPartItemController(PartItemController):
-    def __init__(self, nucleicacid_part_item, model_na_part):
-        super(NucleicAcidPartItemController, self).__init__(nucleicacid_part_item, model_na_part)
+    def __init__(self, nucleicacid_part_item, model_part: NucleicAcidPartT):
+        super(NucleicAcidPartItemController, self).__init__(nucleicacid_part_item, model_part)
         self.connectSignals()
     # end def
 

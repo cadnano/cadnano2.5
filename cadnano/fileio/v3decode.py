@@ -1,18 +1,37 @@
 # -*- coding: utf-8 -*-
-from typing import Tuple
+from typing import (
+    Tuple,
+    Set
+)
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano.proxies.cnenum import GridEnum, PointEnum, OrthoViewEnum, EnumType
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    PointEnum,
+    OrthoViewEnum,
+    EnumType
+)
 from cadnano.objectinstance import ObjectInstance
+from cadnano.cntypes import (
+    DocT
+)
 
-def decode(document, obj, emit_signals=False):
-    """ Decode a a deserialized Document dictionary
+def decode(document: DocT, obj: dict, emit_signals: bool = True):
+    """Parses a dictionary (obj) created from reading a json file and uses it
+    to populate the given document with model data.
 
     Args:
-        document (Document):
-        obj (dict): deserialized file object
+        document:
+        obj:
+        emit_signals: whether to signal views
+
+    Raises:
+        AssertionError, TypeError
     """
     obj.get('name')
 
@@ -102,12 +121,17 @@ def determineLatticeType(part_dict: dict) -> EnumType:
         return GridEnum.SQUARE
 # end def
 
-def decodePart(document, part_dict, grid_type, emit_signals=False):
-    """ Decode a a deserialized Part dictionary
+def decodePart( document: DocT,
+                part_dict: dict,
+                grid_type: EnumType,
+                emit_signals: bool = False):
+    """Decode a a deserialized Part dictionary
 
     Args:
-        document (Document):
-        part_dict (dict): deserialized dictionary describing the Part
+        document:
+        part_dict: deserialized dictionary describing the Part
+        grid_type:
+        emit_signals:
     """
     part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
     part.setActive(True)
@@ -217,7 +241,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 def importToPart(   part_instance : ObjectInstance,
                     copy_dict: dict,
                     offset: Tuple[float, float] = None,
-                    use_undostack: bool = True):
+                    use_undostack: bool = True) -> Set[int]:
     """Use this to duplicate virtual_helices within a ``Part``.  duplicate
     ``id_num``s will start numbering ``part.getMaxIdNum() + 1`` rather than the
     lowest available ``id_num``.
@@ -226,6 +250,9 @@ def importToPart(   part_instance : ObjectInstance,
         copy_dict:
         offset:
         use_undostack: default is ``True``
+
+    Returns:
+        set of new virtual helix IDs
     """
     assert isinstance(offset, (tuple, list)) or offset is None
     assert isinstance(use_undostack, bool)

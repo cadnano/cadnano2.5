@@ -1,18 +1,37 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import GridEnum, LatticeEnum, StrandEnum, OrthoViewEnum
-from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import setBatch, getReopen, setReopen
+from cadnano.part.refresholigoscmd import RefreshOligosCommand
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    LatticeEnum,
+    StrandEnum,
+    OrthoViewEnum,
+    EnumType
+)
+from cadnano import (
+    setBatch,
+    getReopen,
+    setReopen
+)
 from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
-
 from .lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.cntypes import (
+    DocT
+)
 
-
-def decode(document, obj, emit_signals=False):
+def decode(document: DocT, obj: dict, emit_signals: bool = True):
     """Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
+
+    Args:
+        document:
+        obj:
+        emit_signals: whether to signal views
+
+    Raises:
+        IOError, AssertionError, TypeError
     """
     num_bases = len(obj['vstrands'][0]['scaf'])
     if num_bases % 32 == 0:
@@ -295,13 +314,12 @@ def decode(document, obj, emit_signals=False):
                 raise
 # end def
 
-
-def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
-                        five_vh, five_idx,
-                        three_vh, three_idx):
+def isSegmentStartOrEnd(strandtype: EnumType, vh_num: int, base_idx: int,
+                        five_vh: int, five_idx: int,
+                        three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True if the base is a breakpoint or crossover.
+        ``True`` if the base is a breakpoint or crossover. otherwise ``False``
     """
     if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
@@ -331,11 +349,13 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
 # end def
 
 
-def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
+def is3primeXover(strandtype: EnumType,
+                    vh_num: int, base_idx: int,
+                    three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True of the three_vh doesn't match vh_num, or three_idx
-                is not a natural neighbor of base_idx.
+        ``True`` of the ``three_vh`` doesn't match`` vh_num``, or ``three_idx``
+            is not a natural neighbor of ``base_idx``.  otherwise ``False``
     """
     if three_vh == -1:
         return False

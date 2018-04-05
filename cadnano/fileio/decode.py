@@ -6,9 +6,13 @@ import os.path
 import cadnano.fileio.v2decode as v2decode
 import cadnano.fileio.c25decode as c25decode
 import cadnano.fileio.v3decode as v3decode
+from cadnano.cntypes import (
+    DocT
+)
 
-
-def decodeFile(filename, document=None, emit_signals=False):
+def decodeFile( filename: str,
+                document: DocT = None,
+                emit_signals: bool = False) -> DocT:
     with io.open(filename, 'r', encoding='utf-8') as fd:
         nno_dict = json.load(fd)
     if document is None:
@@ -25,7 +29,7 @@ def decodeFile(filename, document=None, emit_signals=False):
 # end def
 
 
-def loadtest():
+def loadtest() -> DocT:
     import os
     root_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     test_path = os.path.join(root_path, 'tests', 'super_barcode_hex.json')

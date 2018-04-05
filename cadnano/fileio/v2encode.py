@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
+from typing import List
+
 from cadnano.proxies.cnenum import GridEnum
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.cntypes import (
+    DocT,
+    StrandSetT
+)
 
 FORMAT_VERSION = "2.0"
 ROW_OFFSET = 0
@@ -9,7 +18,7 @@ COL_OFFSET = 0
 # DEFAULT_COLS = 32
 
 
-def encodeDocument(document):
+def encodeDocument(document: DocT) -> dict:
 
     grid_type = document.getGridType()
 
@@ -113,7 +122,7 @@ def encodeDocument(document):
     return obj
 
 
-def getLegacyStrandSetArray(ss, max_base_idx):
+def getLegacyStrandSetArray(ss: StrandSetT, max_base_idx: int) -> List[List[int]]:
     """Given a strandset and max_base_idx, return legacy serialization array format."""
     num = ss.idNum()
     ret = [[-1, -1, -1, -1] for i in range(max_base_idx)]

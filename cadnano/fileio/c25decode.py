@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import StrandEnum, LatticeEnum
-from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import setBatch, getReopen, setReopen
+from cadnano.part.refresholigoscmd import RefreshOligosCommand
+from cadnano.proxies.cnenum import (
+    StrandEnum,
+    LatticeEnum,
+    EnumType
+)
+from cadnano import (
+    setBatch,
+    getReopen,
+    setReopen
+)
 # from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
-
-from .lattice import HoneycombDnaPart, SquareDnaPart
+from .lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.cntypes import (
+    DocT
+)
 
 # hard code these for version changes
 PATH_BASE_WIDTH = 10
@@ -15,17 +28,24 @@ PART_BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
 SCALE_2_MODEL = PART_BASE_WIDTH / PATH_BASE_WIDTH
 
 
-def convertToModelZ(z):
+def convertToModelZ(z: float) -> float:
     """ scale Z-axis coordinate to the model
     """
     return z * SCALE_2_MODEL
 # end def
 
 
-def decode(document, obj, emit_signals=True):
-    """
-    Parses a dictionary (obj) created from reading a json file and uses it
+def decode(document: DocT, obj: dict, emit_signals: bool = True):
+    """Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
+
+    Args:
+        document:
+        obj:
+        emit_signals: whether to signal views
+
+    Raises:
+        AssertionError, TypeError
     """
     num_bases = len(obj['vstrands'][0]['fwd_ss'])
 
@@ -303,12 +323,12 @@ def decode(document, obj, emit_signals=True):
 # end def
 
 
-def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
-                        five_vh, five_idx,
-                        three_vh, three_idx):
+def isSegmentStartOrEnd(strandtype: EnumType, vh_num: int, base_idx: int,
+                        five_vh: int, five_idx: int,
+                        three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True if the base is a breakpoint or crossover.
+        ``True`` if the base is a breakpoint or crossover. otherwise ``False``
     """
     if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
@@ -338,11 +358,13 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
 # end def
 
 
-def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
+def is3primeXover(strandtype: EnumType,
+                    vh_num: int, base_idx: int,
+                    three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True of the three_vh doesn't match vh_num, or three_idx
-                is not a natural neighbor of base_idx.
+        ``True`` of the ``three_vh`` doesn't match`` vh_num``, or ``three_idx``
+            is not a natural neighbor of ``base_idx``.  otherwise ``False``
     """
     if three_vh == -1:
         return False

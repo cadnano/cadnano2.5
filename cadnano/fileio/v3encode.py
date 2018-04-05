@@ -4,18 +4,22 @@ from typing import List
 
 from cadnano.proxies.cnenum import PointEnum
 from cadnano.objectinstance import ObjectInstance
+from cadnano.cntypes import (
+    DocT,
+    PartT
+)
 
 FORMAT_VERSION = '3.1'
 
 
-def encodeDocument(document):
+def encodeDocument(document: DocT) -> dict:
     """ Encode a Document to a dictionary to enable serialization
 
     Args:
         document (Document):
 
     Returns:
-        dict:
+        object dictionary
     """
     doc_dict = {'format': FORMAT_VERSION,
                 'date': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -31,7 +35,7 @@ def encodeDocument(document):
 # end def
 
 
-def encodePart(part):
+def encodePart(part: PartT) -> dict:
     """
     Args:
         part (Part):

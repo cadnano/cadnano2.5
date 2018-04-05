@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    StrandT
+)
+
 class StrandItemController():
-    def __init__(self, model_strand, strand_item):
+    def __init__(self, strand_item, model_strand: StrandT):
         self._model_strand = model_strand
         self._model_oligo = model_strand.oligo()
         self._strand_item = strand_item

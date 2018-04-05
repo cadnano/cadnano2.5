@@ -74,7 +74,7 @@ class StrandItem(QGraphicsLineItem):
         self._viewroot: PathRootItemT = virtual_helix_item._viewroot
         self._getActiveTool = self._viewroot.manager.activeToolGetter
 
-        self._controller = StrandItemController(model_strand, self)
+        self._controller = StrandItemController(self, model_strand)
         is_forward = model_strand.strandSet().isForward()
 
         self._strand_filter = model_strand.strandFilter()
