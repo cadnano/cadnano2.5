@@ -1,11 +1,13 @@
-from cadnano.proxies.cnproxy import UndoCommand
+from typing import Set
 
+from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.cntypes import NucleicAcidPartT
 
 class RefreshSegmentsCommand(UndoCommand):
     """ Add an UndoCommand to the undostack calling Part.refreshSegments
     """
 
-    def __init__(self, part, id_nums):
+    def __init__(self, part: int, id_nums: Set[int]):
         super(RefreshSegmentsCommand, self).__init__("refresh segments")
         self.part = part
         self.id_nums = id_nums
