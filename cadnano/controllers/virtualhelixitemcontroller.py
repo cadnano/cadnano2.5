@@ -3,7 +3,9 @@ class VirtualHelixItemController(object):
     a specialized controller for the property view
     """
 
-    def __init__(self, virtualhelix_item, model_part, do_wire_part, do_wire_strands):
+    def __init__(self,  virtualhelix_item, model_part,
+                        do_wire_part: bool,
+                        do_wire_strands: bool):
         """
         Args:
             virtualhelix_item (AbstractVirtualHelixItem):

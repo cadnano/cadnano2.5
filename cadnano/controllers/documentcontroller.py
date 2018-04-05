@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 import os
+from typing import (
+    Union
+)
 
 from PyQt5.QtCore import (
                             QDir,
@@ -12,7 +15,12 @@ from PyQt5.QtCore import (
 )
 _translate = QCoreApplication.translate
 
-from PyQt5.QtGui import QKeySequence, QPainter
+from PyQt5.QtGui import (
+    QKeySequence,
+    QPainter,
+    QCloseEvent
+)
+
 from PyQt5.QtSvg import QSvgGenerator
 from PyQt5.QtWidgets import (
                             QAction,
@@ -25,12 +33,21 @@ from PyQt5.QtWidgets import (
                             QStyleOptionGraphicsItem
 )
 
+from cadnano.proxies.cnproxy import UndoStack
 from cadnano import app, setReopen, util
-from cadnano.proxies.cnenum import GridEnum, OrthoViewEnum, EnumType
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    OrthoViewEnum,
+    EnumType
+)
 from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.views import styles
 from cadnano.views.documentwindow import DocumentWindow
-
+from cadnano.cntypes import (
+    DocT,
+    WindowT,
+    NucleicAcidPartT
+)
 
 IS_TESTING = True
 
@@ -50,7 +67,7 @@ class DocumentController(object):
 
     ### INIT METHODS ###
 
-    def __init__(self, document):
+    def __init__(self, document: DocT):
         """docstring for __init__"""
         # initialize variables
         self._document = document
@@ -228,7 +245,7 @@ class DocumentController(object):
         win.action_path_create.trigger()
     # end def
 
-    def actionVhelixSnapSlot(self, state):
+    def actionVhelixSnapSlot(self, state: bool):
         for item in self.win.sliceroot.instance_items.values():
             item.griditem.allow_snap = state
     # end def
@@ -251,21 +268,23 @@ class DocumentController(object):
         dialog_about.setupUi(dialog)
         dialog.exec_()
 
-    def showFilterHints(self, show_hints, filter_name=None):
+    def showFilterHints(self, show_hints: bool, filter_name: str = None):
         """Changes the appearance of filter buttons in the toolbar to help user
         realize they may not have the correct filters selected to perform a
-        desired action. Meant to avoid the case where user clicks and nothing happens.
+        desired action. Meant to avoid the case where user clicks and nothing
+        happens.
 
-        Buttons (QActions) can automatically display different icons depending
-        on state. We use "enabled" state, temporarily disabling the QAction to
-        toggle its appearance.
+        Buttons (:class:`QAction`s) can automatically display different icons
+        depending on state. We use "enabled" state, temporarily disabling the
+        :class:`QAction` to toggle its appearance.
 
-        View items should call this method once from a mousePressEvent with
-        show_hints=True, and again on mouseReleaseEvent with show_hints=False.
+        View items should call this method once from a :meth:`mousePressEvent`
+        with ``show_hints=True``, and again on :meth:`mouseReleaseEvent` with
+        ``show_hints=False``.
 
         Args:
-            show_hints (bool): True to show hints, False to hide hints.
-            filter_name (str): What filter to hint from self._hintable_filter_action_map
+            show_hints: ``True to show hints, ``False`` to hide hints.
+            filter_name: What filter to hint from ``self._hintable_filter_action_map``
         """
         if filter_name:
             try:
@@ -281,7 +300,7 @@ class DocumentController(object):
                     f.setEnabled(True)  # enable to hide hint icon
             self._filter_hints_visible = False
 
-    def showToolHints(self, show_hints, tool_name=None):
+    def showToolHints(self, show_hints: bool, tool_name: str = None):
         if tool_name:
             try:
                 for t in self._hintable_tool_action_map[tool_name]:
@@ -314,8 +333,7 @@ class DocumentController(object):
     # end def
 
     def actionFilterEndpointSlot(self):
-        """
-        Disables handle filters when activated.
+        """Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
         fH = self.win.action_filter_helix
@@ -331,8 +349,7 @@ class DocumentController(object):
     # end def
 
     def actionFilterStrandSlot(self):
-        """
-        Disables handle filters when activated.
+        """Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
         fH = self.win.action_filter_helix
@@ -347,8 +364,7 @@ class DocumentController(object):
     # end def
 
     def actionFilterXoverSlot(self):
-        """
-        Disables handle filters when activated.
+        """Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         """
         fH = self.win.action_filter_helix
@@ -530,7 +546,7 @@ class DocumentController(object):
         def paint(self, painter, option, widget=None):
             pass
 
-    def saveSVGDialogCallback(self, selected):
+    def saveSVGDialogCallback(self, selected: Union[str, list, tuple]):
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
         else:
@@ -650,7 +666,7 @@ class DocumentController(object):
         # TODO[NF]:  Docstring
         self.actionCreateNucleicAcidPart(grid_type=GridEnum.SQUARE)
 
-    def actionCreateNucleicAcidPart(self, grid_type):
+    def actionCreateNucleicAcidPart(self, grid_type: EnumType) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
@@ -704,9 +720,7 @@ class DocumentController(object):
         """Toggle the AddPart buttons when the active part changes.
 
         Args:
-            show (bool): Whether the slice view should be hidden or shown
-
-        Returns: None
+            is_enabled: Whether the slice view should be hidden or shown
         """
         self.win.action_new_dnapart_honeycomb.setEnabled(is_enabled)
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
@@ -778,15 +792,15 @@ class DocumentController(object):
     # end def
 
     ### ACCESSORS ###
-    def document(self):
+    def document(self) -> DocT:
         return self._document
     # end def
 
-    def window(self):
+    def window(self) -> WindowT:
         return self.win
     # end def
 
-    def setDocument(self, doc):
+    def setDocument(self, doc: DocT):
         """
         Sets the controller's document, and informs the document that
         this is its controller.
@@ -795,12 +809,12 @@ class DocumentController(object):
         doc.setController(self)
     # end def
 
-    def undoStack(self):
+    def undoStack(self) -> UndoStack:
         return self._document.undoStack()
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def newDocument(self, fname=None):
+    def newDocument(self, fname: str = None):
         """Creates a new Document, reusing the DocumentController.
         Tells all of the views to reset and removes all items from
         them
@@ -864,7 +878,7 @@ class DocumentController(object):
             self.filesavedialog = None
         self.newDocument()
 
-    def exportStaplesCallback(self, selected):
+    def exportStaplesCallback(self, selected: Union[str, list, tuple]):
         """Export all staple sequences to selected CSV file.
 
         Args:
@@ -894,8 +908,7 @@ class DocumentController(object):
     # end def
 
     def newClickedCallback(self):
-        """
-        Gets called on completion of filesavedialog after newClicked's
+        """Gets called on completion of filesavedialog after newClicked's
         promptSaveDialog. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
         """
@@ -906,9 +919,8 @@ class DocumentController(object):
             self.filesavedialog = None
         self.newDocument()
 
-    def openAfterMaybeSaveCallback(self, selected):
-        """
-        Receives file selection info from the dialog created by
+    def openAfterMaybeSaveCallback(self, selected: Union[str, list, tuple]):
+        """Receives file selection info from the dialog created by
         openAfterMaybeSave, following user input.
 
         Extracts the file name and passes it to the decode method, which
@@ -950,7 +962,7 @@ class DocumentController(object):
             self.fileopendialog = None
         self.setFileName(fname)
 
-    def saveFileDialogCallback(self, selected):
+    def saveFileDialogCallback(self, selected: Union[str, list, tuple]):
         """If the user chose to save, write to that file."""
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
@@ -974,7 +986,7 @@ class DocumentController(object):
                 the_app.destroyApp()
 
     ### EVENT HANDLERS ###
-    def windowCloseEventHandler(self, event=None):
+    def windowCloseEventHandler(self, event: QCloseEvent = None):
         """Intercept close events when user attempts to close the window."""
         dialog_result = self.promptSaveDialog(exit_when_done=True)
         if dialog_result is SAVE_DIALOG_OPTIONS['DISCARD']:
@@ -989,16 +1001,16 @@ class DocumentController(object):
     # end def
 
     ### FILE INPUT ##
-    def documentTitle(self):
+    def documentTitle(self) -> str:
         fname = os.path.basename(str(self.fileName()))
         if not self.undoStack().isClean():
             fname += '[*]'
         return fname
 
-    def fileName(self):
+    def fileName(self) -> str:
         return self._document.fileName()
 
-    def setFileName(self, proposed_fname):
+    def setFileName(self, proposed_fname: str) -> bool:
         if self.fileName() == proposed_fname:
             return True
         self._document.setFileName(proposed_fname)
@@ -1033,7 +1045,7 @@ class DocumentController(object):
     # end def
 
     ### FILE OUTPUT ###
-    def promptSaveDialog(self, exit_when_done=False):
+    def promptSaveDialog(self, exit_when_done: bool = False):
         """Save on quit, check if document changes have occurred.
 
         Returns:
@@ -1068,7 +1080,7 @@ class DocumentController(object):
                 return SAVE_DIALOG_OPTIONS['CANCEL']
         return SAVE_DIALOG_OPTIONS['DISCARD']
 
-    def writeDocumentToFile(self, filename=None):
+    def writeDocumentToFile(self, filename: str = None):
         if filename is None or filename == '':
             if self._has_no_associated_file:
                 return False
