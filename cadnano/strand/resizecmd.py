@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 from cadnano.proxies.cnproxy import UndoCommand
-
+from cadnano.cntypes import (
+    StrandT,
+    SegmentT
+)
 
 class ResizeCommand(UndoCommand):
-    def __init__(self, strand, new_idxs, update_segments=True):
+    def __init__(self, strand: StrandT,
+                        new_idxs: SegmentT,
+                        update_segments: bool = True):
         super(ResizeCommand, self).__init__("resize strand")
         self.strand = strand
         self.old_indices = o_i = strand.idxs()

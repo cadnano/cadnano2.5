@@ -18,7 +18,7 @@ class SplitCommand(UndoCommand):
     On undo, the new copies are removed and the original is restored.
     """
 
-    def __init__(self, strand, base_idx, update_sequence=True):
+    def __init__(self, strand: Strand, base_idx: int, update_sequence: bool = True):
         super(SplitCommand, self).__init__("split strand")
         # Store inputs
         self._old_strand = strand

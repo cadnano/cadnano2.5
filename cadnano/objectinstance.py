@@ -5,7 +5,9 @@ from typing import (
 
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
-
+from cadnano.cntypes import (
+    ObjectInstanceT
+)
 
 class ObjectInstance(CNObject):
     def __init__(self, reference_object: CNObject, parent=None):
@@ -49,13 +51,13 @@ class ObjectInstance(CNObject):
         return self._properties[key]
     # end def
 
-    def shallowCopy(self):
+    def shallowCopy(self) -> ObjectInstanceT:
         oi = ObjectInstance(self._ref_object, self._parent)
         oi._properties = oi._properties.copy()
         return oi
     # end def
 
-    def deepCopy(self, reference_object, parent):
+    def deepCopy(self, reference_object: CNObject, parent) -> ObjectInstanceT:
         oi = ObjectInstance(reference_object, parent)
         oi._properties = oi._properties.copy()
         return oi

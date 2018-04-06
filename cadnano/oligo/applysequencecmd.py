@@ -1,9 +1,11 @@
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano import util
-
+from cadnano.cntypes import (
+    OligoT
+)
 
 class ApplySequenceCommand(UndoCommand):
-    def __init__(self, oligo, sequence):
+    def __init__(self, oligo: OligoT, sequence: str):
         super(ApplySequenceCommand, self).__init__("apply sequence")
         self._oligo = oligo
         self._new_sequence = sequence

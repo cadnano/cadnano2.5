@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-util.py
-"""
+from typing import (
+    Union,
+    Tuple,
+    Iterable,
+    List
+)
 import argparse
 import inspect
 import logging
@@ -13,6 +16,11 @@ import sys
 from os import path
 from traceback import extract_stack
 
+from cadnano.cntypes import (
+    CNObjectT,
+    UndoCommandT
+)
+
 logger = logging.getLogger(__name__)
 
 IS_PY_3 = int(sys.version_info[0] > 2)
@@ -21,8 +29,9 @@ relpath = os.path.relpath
 dirname = os.path.dirname
 abspath = os.path.abspath
 CADNANO_PATH = dirname(abspath(__file__))
+NumT = Union[int, float]
 
-def clamp(x, min_x, max_x):
+def clamp(x: NumT, min_x: NumT, max_x: NumT) -> NumT:
     if x < min_x:
         return min_x
     elif x > max_x:
@@ -31,7 +40,7 @@ def clamp(x, min_x, max_x):
         return x
 
 
-def overlap(x, y, a, b):
+def overlap(x: NumT, y: NumT, a: NumT, b: NumT) -> Tuple[NumT, NumT]:
     """Finds the overlap of (x, y) and (a, b).
     Assumes an overlap exists, i.e. y >= a and b >= x.
     """
@@ -68,14 +77,14 @@ else:
     complement = string.maketrans('ACGTacgt', 'TGCATGCA')
 
 
-def rcomp(seqStr):
-    """Returns the reverse complement of the sequence in seqStr."""
-    return seqStr.translate(complement)[::-1]
+def rcomp(seq_str: str) -> str:
+    """Returns the reverse complement of the sequence in seq_str."""
+    return seq_str.translate(complement)[::-1]
 
 
-def comp(seqStr):
-    """Returns the complement of the sequence in seqStr."""
-    return seqStr.translate(complement)
+def comp(seq_str: str) -> str:
+    """Returns the complement of the sequence in seq_str."""
+    return seq_str.translate(complement)
 
 
 if IS_PY_3:
@@ -84,58 +93,47 @@ else:
     whitetoQ = string.maketrans(' |', '??')
 
 
-def markwhite(seqStr):
-    return seqStr.translate(whitetoQ)
+def markwhite(seq_str: str) -> str:
+    return seq_str.translate(whitetoQ)
 
 
-def nowhite(seqStr):
+def nowhite(seq_str: str) -> str:
     """Gets rid of non-letters in a string."""
-    return ''.join([c for c in seqStr if c in string.letters])
+    return ''.join([c for c in seq_str if c in string.letters])
 
 
-def nearest(a, l): return min(l, key=lambda x: abs(x - a))
+def nearest(a: NumT, l: Iterable[NumT]): return min(l, key=lambda x: abs(x - a))
 
-def show_class(msg):
-    def wrapper(func):
-        def f(s, do_alert):
-            if do_alert:
-                print(s.__class__.__name__, msg)
-            return func(s)
-        return f
-    return wrapper
-# end def
-
-
-def isWindows():
+def isWindows() -> bool:
     """Returns True if platform is detected as Windows, otherwise False"""
     if platform.system() == 'Windows':
         return True
     else:
         return False
 
-
-def isMac():
+def isMac() -> bool:
     """Returns True if platform is detected as Darwin, otherwise False"""
     try:
         return platform.system() == 'Darwin'
     except Exception:
         return path.exists('/System/Library/CoreServices/Finder.app')
 
-
-def isLinux():
+def isLinux() -> bool:
     """Returns True if platform is detected as Linux, otherwise False"""
     if platform.system() == 'Linux':
         return True
     else:
         return False
 
-
-def methodName():
+def methodName() -> str:
     """Returns string containing name of the calling method."""
     return inspect.stack()[1][3]
 
 
-def execCommandList(model_object, commands, desc=None, use_undostack=True):
+def execCommandList(model_object: CNObjectT,
+                    commands: List[UndoCommandT],
+                    desc: str = None,
+                    use_undostack: bool = True):
     """This is a wrapper for performing QUndoCommands, meant to ensure
     uniform handling of the undoStack and macro descriptions.
 
@@ -155,7 +153,7 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
 # end def
 
 
-def doCmd(model_object, command, use_undostack):
+def doCmd(model_object: CNObjectT, command: UndoCommandT, use_undostack: bool):
     """Helper for pushing onto the undostack
     """
     if use_undostack:
@@ -165,7 +163,9 @@ def doCmd(model_object, command, use_undostack):
 # end def
 
 
-def finalizeCommands(model_object, commands, desc=None):
+def finalizeCommands(model_object: CNObjectT,
+                    commands: List[UndoCommandT],
+                    desc: str = None):
     """Used to enable interaction with the model but not push
     commands to the undostack.  In practice:
 
@@ -191,7 +191,7 @@ def finalizeCommands(model_object, commands, desc=None):
 # end def
 
 
-def this_path():
+def this_path() -> str:
     return os.path.abspath(os.path.dirname(__file__))
 
 
@@ -237,7 +237,7 @@ def loadPlugin(f):
     # return mod
 
 
-def loadAllPlugins():
+def loadAllPlugins() -> bool:
     loadedAPlugin = False
     for p in unloadedPlugins():
         loadPlugin(p)
@@ -245,7 +245,7 @@ def loadAllPlugins():
     return loadedAPlugin
 
 
-def beginSuperMacro(model_object, desc=None):
+def beginSuperMacro(model_object: CNObjectT, desc: str = None):
     """SuperMacros can be used to nest multiple command lists.
 
     Normally execCommandList macros all the commands in a list.
@@ -257,7 +257,7 @@ def beginSuperMacro(model_object, desc=None):
 # end def
 
 
-def endSuperMacro(model_object):
+def endSuperMacro(model_object: CNObjectT):
     """Ends a SuperMacro. Should be called after beginSuperMacro."""
     model_object.undoStack().endMacro()
 # end def
@@ -489,9 +489,7 @@ def qtdb_resume():
     pyqtRestoreInputHook()
 
 
-def to_dot_path(filename):
-    # print(filename)
-    # print(CADNANO_PATH)
+def to_dot_path(filename: str) -> str:
     subpath = relpath(dirname(abspath(filename)), CADNANO_PATH)
     if sys.platform == 'win32':
         subpath = subpath.replace('\\', '.')

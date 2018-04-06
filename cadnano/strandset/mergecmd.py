@@ -19,9 +19,9 @@ class MergeCommand(UndoCommand):
 
     low_strandset_idx should be known ahead of time as a result of selection
     """
-    # def __init__(self, strand_low, strand_high, low_strandset_idx, priority_strand):
-
-    def __init__(self, strand_low, strand_high, priority_strand):
+    def __init__(self, strand_low: Strand,
+                        strand_high: Strand,
+                        priority_strand: Strand):
         super(MergeCommand, self).__init__("merge strands")
         # Store strands
         self._strand_low = strand_low

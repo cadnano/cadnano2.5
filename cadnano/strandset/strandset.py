@@ -27,7 +27,10 @@ from cadnano.cntypes import (
     Int2T,
     Vec2T,
     StrandT,
-    StrandSetT
+    StrandSetT,
+    NucleicAcidPartT,
+    VirtualHelixT,
+    DocT
 )
 
 class StrandSet(CNObject):
@@ -58,7 +61,10 @@ class StrandSet(CNObject):
         initial_size (int): initial_size to allocate
     """
 
-    def __init__(self, is_fwd, id_num, part, initial_size):
+    def __init__(self,  is_fwd: bool,
+                        id_num: int,
+                        part: NucleicAcidPartT,
+                        initial_size: int):
         self._document = part.document()
         super(StrandSet, self).__init__(part)
         self._is_fwd = is_fwd
@@ -72,7 +78,7 @@ class StrandSet(CNObject):
         self._undo_stack = None
     # end def
 
-    def simpleCopy(self, part):
+    def simpleCopy(self, part: NucleicAcidPartT) -> StrandSetT:
         """Create an empty copy (no strands) of this strandset with the only
         a new virtual_helix_group parent
 
@@ -85,7 +91,7 @@ class StrandSet(CNObject):
                          part, len(self.strand_array))
     # end def
 
-    def __iter__(self):
+    def __iter__(self) -> StrandT:
         """Iterate over each strand in the strands list.
 
         Yields:
@@ -94,7 +100,7 @@ class StrandSet(CNObject):
         return self.strands().__iter__()
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         if self._is_fwd:
             st = 'fwd'
         else:
@@ -110,50 +116,50 @@ class StrandSet(CNObject):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def part(self):
+    def part(self) -> NucleicAcidPartT:
         """Get model :class:`Part`
 
         Returns:
-            Part: the :class:`Part`
+            the :class:`Part`
         """
         return self._part
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         """Get model :class:`Document`
 
         Returns:
-            Document: the :class:`Document`
+            the :class:`Document`
         """
         return self._document
     # end def
 
-    def strands(self):
+    def strands(self) -> List[StrandT]:
         """Get raw reference to the strand_heap of this :class:`StrandSet`
 
         Returns:
-            list: the list of strands
+            the list of strands
         """
         return self.strand_heap
 
-    def _reset(self, initial_size):
+    def _reset(self, initial_size: int):
         """Reset this object clearing out references to all :class:`Strand`
         objects.  Exceptional private method to be only used by Parts
 
         Args:
-            initial_size (int): size to revert to
+            initial_size: size to revert to
         """
         self.strand_array = [None]*(initial_size)
         self.strand_heap = []
     # end def
 
-    def resize(self, delta_low, delta_high):
+    def resize(self, delta_low: int, delta_high: int):
         """Resize this StrandSet.  Pad each end when growing otherwise
         don't do anything
 
         Args:
-            delta_low (int):  amount to resize the low index end
-            delta_high (int):  amount to resize the high index end
+            delta_low:  amount to resize the low index end
+            delta_high:  amount to resize the high index end
         """
         if delta_low < 0:
             self.strand_array = self.strand_array[delta_low:]
@@ -331,11 +337,11 @@ class StrandSet(CNObject):
         Args:
             base_idx_low:     low index of strand
             base_idx_high:    high index of strand
-            color (optional): default=True
-            use_undostack (optional): default=True
+            color (optional): default is ``None``
+            use_undostack (optional): default is ``True``
 
         Returns:
-            ``Strand`` if successful, ``None`` otherwise
+            :class:`Strand` if successful, ``None`` otherwise
         """
         part = self._part
 
@@ -382,7 +388,9 @@ class StrandSet(CNObject):
             return False
     # end def
 
-    def removeStrand(self, strand: StrandT, use_undostack: bool = True, solo: bool = True):
+    def removeStrand(self,  strand: StrandT,
+                            use_undostack: bool = True,
+                            solo: bool = True):
         """Remove a :class:`Strand` from the set
 
         Args:
@@ -595,7 +603,7 @@ class StrandSet(CNObject):
             return True
     # end def
 
-    def getOverlappingStrands(self, idx_low, idx_high) -> List[StrandT]:
+    def getOverlappingStrands(self, idx_low: int, idx_high: int) -> List[StrandT]:
         """Gets :class:`Strand` list that overlap the given range.
 
         Args:
@@ -779,7 +787,7 @@ class StrandSet(CNObject):
             return (False, 0)
     # end def
 
-    def _deepCopy(self, virtual_helix):
+    def _deepCopy(self, virtual_helix: VirtualHelixT):
         """docstring for deepCopy"""
         raise NotImplementedError
     # end def

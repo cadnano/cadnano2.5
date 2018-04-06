@@ -1,10 +1,20 @@
-from cadnano.proxies.cnproxy import UndoCommand
+# -*- coding: utf-8 -*-
+from typing import Any
 
+from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.cntypes import (
+    PartT,
+    ObjectInstanceT
+)
 
 class ChangeInstancePropertyCommand(UndoCommand):
     """ Change ObjectInstance view properties"""
 
-    def __init__(self, part, part_instance, view_name, key, val):
+    def __init__(self, part: PartT,
+                        part_instance: ObjectInstanceT,
+                        view_name: str,
+                        key: str,
+                        val: Any):
         super(ChangeInstancePropertyCommand, self).__init__("change instance property")
         self.part = part
         self.part_instance = part_instance

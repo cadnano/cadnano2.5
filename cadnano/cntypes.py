@@ -24,6 +24,10 @@ OligoT =    cn('oligo.Oligo')
 StrandSetT = cn('strandset.StrandSet')
 StrandT =   cn('strand.Strand')
 InsertionT = cn('decorators.insertion.Insertion')
+CNObjectT = cn('cadnano.proxies.cnobject.CNObject')
+ObjectInstanceT = cn('objectinstance.ObjectiInstance')
+UndoCommandT = cn('cadnano.proxies.cnproxy.UndoCommand')
+
 
 RectT = Tuple[float, float, float, float]
 IntT = Union[np.int64, int]

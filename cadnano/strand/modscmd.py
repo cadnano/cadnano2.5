@@ -1,8 +1,11 @@
 from cadnano.proxies.cnproxy import UndoCommand
-
+from cadnano.cntypes import (
+    DocT,
+    StrandT
+)
 
 class AddModsCommand(UndoCommand):
-    def __init__(self, document, strand, idx, mod_id):
+    def __init__(self, document: DocT, strand: StrandT, idx: int, mod_id: str):
         super(AddModsCommand, self).__init__()
         self._strand = strand
         self._id_num = strand.idNum()

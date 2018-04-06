@@ -3,11 +3,12 @@ from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
 from cadnano.views.pathview import pathstyles
 import random
-
+from cadnano.cntypes import (
+    StrandSetT
+)
 
 class RemoveStrandCommand(UndoCommand):
-    """
-    RemoveStrandCommand deletes a strand. It should only be called on
+    """RemoveStrandCommand deletes a strand. It should only be called on
     strands with no connections to other strands.
 
     Args:
@@ -17,7 +18,7 @@ class RemoveStrandCommand(UndoCommand):
             removed to minimize signaling
     """
 
-    def __init__(self, strandset, strand, solo=True):
+    def __init__(self, strandset: StrandSetT, strand: Strand, solo: bool = True):
         super(RemoveStrandCommand, self).__init__("remove strands")
         self._strandset = strandset
         self._strand = strand
