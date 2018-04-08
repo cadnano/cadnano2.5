@@ -774,7 +774,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def keyPressEvent(self, event: QKeyEvent):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
-        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridEnum.HONEYCOMB \
             else SquareDnaPart.isInLatticeCoord
 
         if event.key() == Qt.Key_Escape:
@@ -810,7 +810,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_alt = bool(event.modifiers() & Qt.AltModifier)
         if not is_alt:
             self.removeAllCreateHints()
-            isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+            isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridEnum.HONEYCOMB \
                 else SquareDnaPart.isInLatticeCoord
             if isInLatticeCoord(radius_tuple=self._RADIUS_TUPLE,
                                 xy_tuple=self.last_mouse_position,
@@ -872,9 +872,9 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
     def _getModelXYforCoord(self, row: int, column: int) -> Vec2T:
         radius = DEFAULT_RADIUS
-        if self.griditem.grid_type is GridType.HONEYCOMB:
+        if self.griditem.grid_type is GridEnum.HONEYCOMB:
             return HoneycombDnaPart.latticeCoordToQtXY(radius, row, column)
-        elif self.griditem.grid_type is GridType.SQUARE:
+        elif self.griditem.grid_type is GridEnum.SQUARE:
             return SquareDnaPart.latticeCoordToQtXY(radius, row, column)
         else:
             return None
@@ -988,13 +988,13 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         is_alt = True if event.modifiers() & Qt.AltModifier else False
         mapped_position = self.griditem.mapFromScene(event.scenePos())
         event_xy = (mapped_position.x(), mapped_position.y())
-        if self.griditem.grid_type is GridType.HONEYCOMB:
+        if self.griditem.grid_type is GridEnum.HONEYCOMB:
             event_coord = HoneycombDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
                                                                        event_xy[0],
                                                                        event_xy[1],
                                                                        scale_factor=self.scale_factor,
                                                                        strict=True)
-        elif self.griditem.grid_type is GridType.SQUARE:
+        elif self.griditem.grid_type is GridEnum.SQUARE:
             event_coord = SquareDnaPart.positionModelToLatticeCoord(DEFAULT_RADIUS,
                                                                     event_xy[0],
                                                                     event_xy[1],
@@ -1086,7 +1086,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         event_pos = self.griditem.mapFromScene(event.scenePos())
 
         positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord\
-            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
+            if self.griditem.grid_type is GridEnum.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
         hov_row, hov_col = positionToLatticeCoord(DEFAULT_RADIUS,
                                                   event_pos.x(),
                                                   event_pos.y(),
@@ -1145,12 +1145,12 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         if tool.clipboard is None:  # is there anything on the clipboard?
             return
 
-        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridType.HONEYCOMB \
+        isInLatticeCoord = HoneycombDnaPart.isInLatticeCoord if self.griditem.grid_type is GridEnum.HONEYCOMB \
             else SquareDnaPart.isInLatticeCoord
         event_pos = self.griditem.mapFromScene(event.scenePos())
         event_position_xy = (event_pos.x(), event_pos.y())
         positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord \
-            if self.griditem.grid_type is GridType.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
+            if self.griditem.grid_type is GridEnum.HONEYCOMB else SquareDnaPart.positionModelToLatticeCoord
         hover_coordinates = positionToLatticeCoord(DEFAULT_RADIUS,
                                                    event_position_xy[0],
                                                    event_position_xy[1],

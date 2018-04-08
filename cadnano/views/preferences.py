@@ -35,6 +35,7 @@ class Preferences(object):
         self.readPreferences()
         self.widget.addAction(self.ui_prefs.actionClose)
         self.connectSignals()
+
         self.document = None
     # end def
 
@@ -66,6 +67,7 @@ class Preferences(object):
         qs.endGroup()
         ui_prefs = self.ui_prefs
         ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
+        # print(self.orthoview_style_idx, ORTHOVIEW_DEFAULT, ORTHOVIEW_DEFAULT)
         ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_style_idx)
         ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
         ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
@@ -135,8 +137,8 @@ class Preferences(object):
         self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style_idx)
         self.qs.endGroup()
 
-        controller = self.document().controller()
-        self.controller.setSliceOrGridViewVisible(self.orthoview_style_idx)
+        controller = self.document.controller()
+        controller.setSliceOrGridViewVisible(self.orthoview_style_idx)
     # end def
 
     def setShowIconLabels(self, value):

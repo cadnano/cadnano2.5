@@ -545,7 +545,7 @@ class GridPoint(QGraphicsEllipseItem):
     def createToolHoverMoveEvent(self,  tool: CreateSliceToolT,
                                         part_item: SliceNucleicAcidPartItemT,
                                         event: QGraphicsSceneHoverEvent):
-        if self.grid.grid_type == GridType.HONEYCOMB:
+        if self.grid.grid_type == GridEnum.HONEYCOMB:
             positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord
         else:
             positionToLatticeCoord = SquareDnaPart.positionModelToLatticeCoord
@@ -553,7 +553,7 @@ class GridPoint(QGraphicsEllipseItem):
                                              event.scenePos().x(),
                                              event.scenePos().y(),
                                              scale_factor=part_item.scale_factor)
-        latticeCoordToXY = HoneycombDnaPart.latticeCoordToQtXY if self.grid.grid_type is GridType.HONEYCOMB \
+        latticeCoordToXY = HoneycombDnaPart.latticeCoordToQtXY if self.grid.grid_type is GridEnum.HONEYCOMB \
                 else SquareDnaPart.latticeCoordToQtXY
         coordinate_string = '(%s, %s)' % coordinates
         coordiate_scaled_pos = '(%s, %s)' % latticeCoordToXY(DEFAULT_RADIUS, coordinates[0], coordinates[1], part_item.scale_factor)

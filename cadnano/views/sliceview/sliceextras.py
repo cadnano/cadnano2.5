@@ -927,7 +927,7 @@ class ShortestPathHelper(object):
     @staticmethod
     def getNeighborsForCoordinate(grid_type, row, column):
         # TODO[NF]:  Docstring
-        if grid_type is GridType.HONEYCOMB:
+        if grid_type is GridEnum.HONEYCOMB:
             if not HoneycombDnaPart.isEvenParity(row, column):
                 return (
                     (row+1, column),
@@ -940,7 +940,7 @@ class ShortestPathHelper(object):
                     (row, column+1),
                     (row, column-1)
                 )
-        elif grid_type is GridType.SQUARE:
+        elif grid_type is GridEnum.SQUARE:
             return(
                 (row, column+1),
                 (row, column-1),
@@ -961,7 +961,7 @@ class ShortestPathHelper(object):
             end (tuple):  The i-j coordinates corresponding to the end point
             vh_set (set):  A set of points that currently have a VH
             grid_type (object):  The current grid type in the design.
-                Either GridType.HONEYCOMB or GridType.SQUARE
+                Either GridEnum.HONEYCOMB or GridEnum.SQUARE
             radius (float):  the radius of the VH
             scale_factor (float):  the ratio of part to view radius
 
@@ -970,7 +970,7 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridType.HONEYCOMB else \
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridEnum.HONEYCOMB else \
             SquareDnaPart.positionModelToLatticeCoord
 
         start_coordinates = positionToLatticeCoord(part_radius, start[0], start[1], scale_factor=scale_factor)

@@ -211,4 +211,6 @@ class CadnanoQt(QObject):
         self.prefs.showDialog()
 
     def wirePrefsSlot(self, document):
+        """MUST CALL THIS TO SET PREFERENCES :class:`Document`
+        """
         self.prefs.document = document

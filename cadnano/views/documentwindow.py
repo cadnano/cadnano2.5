@@ -314,8 +314,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     # end def
 
     def _finishInit(self):
-        """
-        Handle the dockwindow visibility and action checked status.
+        """Handle the dockwindow visibility and action checked status.
         The console visibility is explicitly stored in the settings file,
         since it doesn't seem to work if we treat it like a normal dock widget.
         """
@@ -324,6 +323,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         path_visible = self.path_dock_widget.isVisibleTo(self)
         self.action_path.setChecked(path_visible)
         slice_visible = self.slice_dock_widget.isVisibleTo(self)
+
+        # NOTE THIS IS ALWAYS FALSE FOR  SOME REASON
         self.action_slice.setChecked(slice_visible)
     # end def
 

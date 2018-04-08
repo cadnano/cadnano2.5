@@ -80,6 +80,7 @@ class DocumentController(object):
         self.filesavedialog = None
 
         self.settings = QSettings("cadnano.org", "cadnano2.5")
+        self.settings = QSettings("69bfae41ee5e33c689fded70c89cc64c", "69bfae41ee5e33c689fded70c89cc64c")
         self._readSettings()
 
         self._hintable_tools = []  # filters that display alt icon when disabled
@@ -89,9 +90,12 @@ class DocumentController(object):
         self._tool_hints_visible = False
         self._filter_hints_visible = False
 
+        self.slice_view_showing = False
+
         self.self_signals = []
 
         # call other init methods
+
         self._initWindow()
         app().document_controllers.add(self)
 
@@ -224,11 +228,15 @@ class DocumentController(object):
         ]
         for signal_obj, slot_method in self.self_signals:
             signal_obj.connect(slot_method)
+
+        # NOTE ADDED NC TO GET PROPER SLICE VIEW BEHAVIOR checking of slice view
+        # box not preserved for some reason
+        win.action_slice.setChecked(True)
+        self.actionToggleSliceViewSlot()
     # end def
 
     ### SLOTS ###
     def actionSpecialSlot(self):
-        print("Nachos")
         self.win.doMouseViewDestroy()
     # end def
 
@@ -690,14 +698,22 @@ class DocumentController(object):
         If either the slice or grid view are visible hide them.  Else, revert
         to showing whichever view(s) are showing.
         """
-        if self.win.slice_dock_widget.isVisible() or self.win.grid_dock_widget.isVisible():
-            self.win.slice_dock_widget.hide()
-            self.win.grid_dock_widget.hide()
-        else:
+
+        win = self.win
+        if win.action_slice.isChecked():
+        # if not (win.slice_dock_widget.isVisible() or win.grid_dock_widget.isVisible()):
+            win.action_slice.setChecked(True)
             if self.slice_view_showing:
-                self.win.slice_dock_widget.show()
-            if self.grid_view_showing:
-                self.win.grid_dock_widget.show()
+                self.toggleSliceView(True)
+                self.toggleGridView(False)
+            else:
+                self.toggleGridView(True)
+                self.toggleSliceView(False)
+        else:
+            win.action_slice.setChecked(False)
+            self.toggleSliceView(False)
+            self.toggleGridView(False)
+
     # end def
 
     def actionTogglePathViewSlot(self):
@@ -735,13 +751,12 @@ class DocumentController(object):
             ValueError for unknown ``view_type``.
         """
         if view_type == OrthoViewEnum.SLICE:
-            self.toggleSliceView(True)
-            self.toggleGridView(False)
+            self.slice_view_showing = True
         elif view_type == OrthoViewEnum.GRID:
-            self.toggleSliceView(False)
-            self.toggleGridView(True)
+            self.slice_view_showing = False
         else:
             raise ValueError('Invalid orthoview value: %s' % value)
+        self.actionToggleSliceViewSlot()
     # end def
 
     def toggleSliceView(self, show: bool):
@@ -759,12 +774,10 @@ class DocumentController(object):
         slice_view_widget = self.win.slice_dock_widget
         path_view_widget = self.win.path_dock_widget
         if show:
-            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
-            self.win.action_slice.setChecked(True)
-            self.slice_view_showing = True
+            # self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
+            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
             slice_view_widget.show()
         else:
-            self.slice_view_showing = False
             slice_view_widget.hide()
     # end def
 
@@ -782,12 +795,10 @@ class DocumentController(object):
         grid_view_widget = self.win.grid_dock_widget
         path_view_widget = self.win.path_dock_widget
         if show:
-            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
-            self.win.action_slice.setChecked(True)
-            self.grid_view_showing = True
+            # self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
+            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
             grid_view_widget.show()
         else:
-            self.grid_view_showing = False
             grid_view_widget.hide()
     # end def
 
@@ -989,7 +1000,7 @@ class DocumentController(object):
     def windowCloseEventHandler(self, event: QCloseEvent = None):
         """Intercept close events when user attempts to close the window."""
         dialog_result = self.promptSaveDialog(exit_when_done=True)
-        if dialog_result is SAVE_DIALOG_OPTIONS['DISCARD']:
+        if dialog_result == SAVE_DIALOG_OPTIONS['DISCARD']:
             if event is not None:
                 event.accept()
             the_app = app()
