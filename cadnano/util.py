@@ -344,7 +344,6 @@ def parse_args(argv=None, gui=None):
     parser.add_argument("--testing", "-t", action="store_true", help="Enable testing mode/environment.")
     parser.add_argument("--profile", "-p", action="store_true", help="Profile app execution.")
     parser.add_argument("--print-stats", "-P", action="store_true", help="Print profiling statistics.")
-    parser.add_argument("--interactive", "-i", action="store_true", help="Enable interactive (console) mode.")
     parser.add_argument('--loglevel',
                         help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
     parser.add_argument("--debug-modules", nargs='*', metavar="MODULE-STR",

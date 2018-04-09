@@ -17,7 +17,6 @@
 import os
 import platform
 import sys
-from code import interact
 
 from PyQt5.QtCore import (
     QCoreApplication,
@@ -34,6 +33,9 @@ from PyQt5.QtWidgets import (
 
 from cadnano import util
 from cadnano.proxies.proxyconfigure import proxyConfigure
+from cadnano.cntypes import (
+    DocT
+)
 
 proxyConfigure('PyQt')
 decodeFile = None
@@ -90,7 +92,7 @@ class CadnanoQt(QObject):
         self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         return self._document
     # end def
 
@@ -112,48 +114,6 @@ class CadnanoQt(QObject):
             self.dontAskAndJustDiscardUnsavedChanges = True
         self.dontAskAndJustDiscardUnsavedChanges = True
         util.loadAllPlugins()
-
-        if self.argns.interactive:
-            print("Welcome to cadnano's debug mode!")
-            print("Some handy locals:")
-            print("\ta\tcadnano.app() (the shared cadnano application object)")
-            print("\td()\tthe last created Document")
-
-            def d():
-                return self._document
-
-            print("\tw()\tshortcut for d().controller().window()")
-
-            def w():
-                return self._document.controller().window()
-
-            print("\tp()\tshortcut for d().selectedInstance().reference()")
-
-            def p():
-                return self._document.selectedInstance().reference()
-
-            print("\tpi()\tthe PartItem displaying p()")
-
-            def pi():
-                part_instance = self._document.selectedInstance()
-                return w().pathroot.partItemForPart(part_instance)
-
-            print("\tvh(i)\tshortcut for p().reference().getStrandSets(i)")
-
-            def strandsets(id_num):
-                return p().reference().getStrandSets(id_num)
-
-            print("\tvhi(i)\tVirtualHelixItem displaying vh(i)")
-
-            def vhi(id_num):
-                partitem = pi()
-                return partitem.vhItemForIdNum(id_num)
-
-            print("\tquit()\tquit (for when the menu fails)")
-            print("\tQGraphicsItem.findChild()  see help(pi().findChild)")
-            interact('', local={'a': self, 'd': d, 'w': w,
-                                'p': p, 'pi': pi, 'vhi': vhi,
-                                })
     # end def
 
     def exec_(self):
@@ -183,7 +143,7 @@ class CadnanoQt(QObject):
     def ignoreEnv(self):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)
 
-    def createDocument(self, base_doc=None):
+    def createDocument(self, base_doc: DocT = None):
         global DocumentController
         # print("CadnanoQt createDocument begin")
         default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
@@ -210,7 +170,7 @@ class CadnanoQt(QObject):
     def prefsClicked(self):
         self.prefs.showDialog()
 
-    def wirePrefsSlot(self, document):
+    def wirePrefsSlot(self, document: DocT):
         """MUST CALL THIS TO SET PREFERENCES :class:`Document`
         """
         self.prefs.document = document
