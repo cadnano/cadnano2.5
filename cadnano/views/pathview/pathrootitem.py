@@ -37,12 +37,10 @@ class PathRootItem(QGraphicsRectItem):
     from the model.
 
     Attributes:
-        findChild (TYPE): Description
         manager (PathToolManagerT): Description
         name (str): path
         select_tool (TYPE): Description
     """
-    findChild = util.findChild  # for debug
     name = 'path'
 
     def __init__(self,  rect: QRectF,

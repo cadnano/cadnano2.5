@@ -78,11 +78,9 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     Attributes:
         drag_last_position (QPointF): Description
         FILTER_NAME (str): Description
-        findChild (TYPE): Description
         handle_start (QPointF): Description
         is_active (bool): Description
     """
-    findChild = util.findChild  # for debug
     FILTER_NAME = "virtual_helix"
 
     def __init__(self, id_num: int, part_item: PathNucleicAcidPartItemT):

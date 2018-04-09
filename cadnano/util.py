@@ -262,61 +262,6 @@ def endSuperMacro(model_object: CNObjectT):
     model_object.undoStack().endMacro()
 # end def
 
-
-def findChild(self):
-    """When called when self is a :class:`QGraphicsItem`, iterates through self's
-    childItems(), placing a red rectangle (a sibling of self) around
-    each item in sequence (press return to move between items). Since
-    the index of each child item is displayed as it is highlighted,
-    one can use findChild() to quickly get a reference to one of self's
-    children. At each step, one can type a command letter before
-    hitting return. The command will apply to the current child.
-    Command Letter:     Action:
-    <return>            Advance to next child
-    s<return>           Show current child
-    S<return>           Show current child, hide siblings
-    h<return>           Hide current child
-    r<return>           return current child
-    """
-    from PyQt5.QtWidgets import QGraphicsRectItem
-    from PyQt5.QtGui import QPen
-    from PyQt5.QtCore import Qt
-
-    children = self.childItems()
-    parent = self.parentItem()
-    child_visibility = [(child, child.isVisible()) for child in children]
-    for n in range(len(children)):
-        child = children[n]
-        print("Highlighting %s.childItems()[%i] = %s" % (self, n, child))
-        childBR = child.mapToItem(parent, child.boundingRect())
-        childBR = childBR.boundingRect()  # xform gives us a QPolygonF
-        debug_highlighter = QGraphicsRectItem(childBR, parent)
-        debug_highlighter.setPen(QPen(Qt.red))
-        debug_highlighter.setZValue(9001)
-        while True:
-            # wait for return to be pressed while spinning the event loop.
-            # also process single-character commands.
-            command = raw_input()
-            if command == 's':    # Show current child
-                child.show()
-            elif command == 'h':  # Hde current child
-                child.hide()
-            elif command == 'S':  # Show only current child
-                for c in children:
-                    c.hide()
-                child.show()
-            elif command == 'r':  # Return current child
-                for child, was_visible in child_visibility:
-                    child.setVisible(was_visible)
-                return child
-            else:
-                break
-        debugHighlighter.scene().removeItem(debugHighlighter)
-        for child, was_visible in child_visibility:
-            child.setVisible(was_visible)
-# end def
-
-
 def parse_args(argv=None, gui=None):
     """Uses argparse to process commandline arguments.
 

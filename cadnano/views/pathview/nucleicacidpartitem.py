@@ -65,11 +65,7 @@ _HANDLE_SIZE = 8
 
 class ProxyParentItem(QGraphicsRectItem):
     """an invisible container that allows one to play with Z-ordering
-
-    Attributes:
-        findChild (TYPE): Description
     """
-    findChild = util.findChild  # for debug
 
 
 class PathRectItem(QGraphicsRectItem):
@@ -99,7 +95,6 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
         resize_handle_group: Description
         prexover_manager: Description
     """
-    findChild = util.findChild  # for debug
     _BOUNDING_RECT_PADDING = 20
     _GC_SIZE = 10
 
