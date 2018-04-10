@@ -18,7 +18,7 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
         """
         Args:
             model_part (NucleicAcidPart): The model part
-            parent (PropertyEditorWidget): The property editor
+            parent (:class:`PropertyEditorWidget`): The property editor
             key (str, optional): Default is ``None``
         """
         self.part_set = set()

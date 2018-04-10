@@ -229,7 +229,7 @@ class CNPropertyItem(QTreeWidgetItem):
     def setValue(self, key: str, new_value: Any):
         """
         Args:
-            key: ey: property key string
+            key: property key string
             new_value: new item value
         """
         p_i = self._prop_items[key]

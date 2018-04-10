@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
 from typing import Any
 
 from cadnano.proxies.cnenum import (
@@ -18,15 +16,14 @@ from cadnano.cntypes import (
 class OligoSetItem(AbstractOligoItem, CNPropertyItem):
     """Property View Oligo Set Item
     """
-    _GROUPNAME = "oligos"
+    _GROUPNAME = 'oligos'
     FILTER_NAME = 'oligo'
 
     def __init__(self, **kwargs):
         """
         Args:
-            model_oligo (TYPE): Description
-            parent (TYPE): Description
-            key (None, optional): Description
+            parent (:class:`PropertyEditorWidget`): the :class:`PropertyEditorWidget`
+            key: (str, optional): propert key
         """
         super(OligoSetItem, self).__init__(**kwargs)
         # print(util.trace(5), "in OligoItem init", cn_model_list)
@@ -47,9 +44,9 @@ class OligoSetItem(AbstractOligoItem, CNPropertyItem):
     def oligoPropertyChangedSlot(self, model_oligo: OligoT, key: str, new_value: Any):
         """
         Args:
-            model_oligo: Description
-            key: Description
-            new_value: Description
+            model_oligo: the :class:`Oligo`
+            key: property key string
+            new_value: the property value
         """
         if model_oligo in self.outlineViewObjList():
             # print("prop: oligoPropertyChangedSlot", model_oligo, key, new_value)

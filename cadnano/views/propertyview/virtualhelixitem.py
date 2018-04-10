@@ -2,8 +2,8 @@
 """VirtualHelixItem for the PropertyView.
 
 Attributes:
-    KEY_COL (int): QTreeWidgetItem column that will display property keys
-    VAL_COL (int): QTreeWidgetItem column that will display property values
+    KEY_COL (int): :class:`QTreeWidgetItem` column that will display property keys
+    VAL_COL (int): :class:`QTreeWidgetItem` column that will display property values
 """
 from typing import (
     List
@@ -45,12 +45,12 @@ class VirtualHelixSetItem(CNPropertyItem):
     _GROUPNAME = "helices"
 
     def __init__(self, **kwargs):
-        """Summary
-
+        """
         Args:
             model_part (NucleicAcidPart): The model part
-            parent (TYPE): Description
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            parent (:class:`PropertyEditorWidget`): the :class:`PropertyEditorWidget`
+            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for
+                description and related methods.
             key (str, optional): Default is ``None``
         """
         super(VirtualHelixSetItem, self).__init__(**kwargs)
