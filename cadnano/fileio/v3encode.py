@@ -88,6 +88,67 @@ def encodePart(part: PartT) -> dict:
     return group_props
 # end def
 
+def reEmitPart(part: PartT):
+    """
+    Args:
+        part (Part):
+    """
+    # iterate through virtualhelix list
+    group_props = part.getModelProperties().copy()
+
+    if group_props.get('point_type') == PointEnum.ARBITRARY:
+        # TODO add code to encode Parts with ARBITRARY point configurations
+        pass
+    else:
+        vh_props, origins = part.helixPropertiesAndOrigins()
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
+
+    xover_list = []
+    threshold = 2.1*part.radius()
+    for id_num in part.getidNums():
+        offset_and_size = part.getOffsetAndSize(id_num)
+        if offset_and_size is not None:
+            offset, size = offset_and_size
+            vh = part.getVirtualHelix(id_num)
+            neighbors = part._getVirtualHelixOriginNeighbors(id_num, threshold)
+            part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors)
+
+            fwd_ss, rev_ss = part.getStrandSets(id_num)
+
+            for strand in fwd_ss.strands():
+                fwd_ss.strandsetStrandAddedSignal.emit(fwd_ss, strand)
+            for strand in rev_ss.strands():
+                fwd_ss.strandsetStrandAddedSignal.emit(rev_ss, strand)
+            part.partStrandChangedSignal.emit(part, id_num)
+
+            fwd_idxs, fwd_colors = fwd_ss.dump(xover_list)
+            rev_idxs, rev_colors = rev_ss.dump(xover_list)
+    # end for
+
+    for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xover_list:
+        strand5p = from_strand = part.getStrand(from_is_fwd, from_id, from_idx)
+        strand3p = to_strand = part.getStrand(to_is_fwd, to_id, to_idx)
+        strand5p.strandConnectionChangedSignal.emit(strand5p)
+        strand3p.strandConnectionChangedSignal.emit(strand3p)
+    # end for
+
+    for id_num, id_dict in part.insertions().items():
+        for idx, insertion in id_dict.items():
+            fwd_strand = part.getStrand(True, id_num, idx)
+            rev_strand = part.getStrand(False, id_num, idx)
+            if fwd_strand:
+                fwd_strand.strandInsertionAddedSignal.emit(fwd_strand, insertion)
+            if rev_strand:
+                rev_strand.strandInsertionAddedSignal.emit(rev_strand, insertion)
+    # end for
+
+    # instance_props = list(part.instanceProperties())
+    # emit instance properties
+
+    return group_props
+# end def
+
 
 def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> dict:
     """ Used for copying and pasting

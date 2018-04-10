@@ -102,6 +102,7 @@ class Document(CNObject):
     documentModAddedSignal = ProxySignal(object, object, object, name='documentModAddedSignal')
     documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
     documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
+    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
 
     # SLOTS #
 
@@ -198,6 +199,16 @@ class Document(CNObject):
         self._active_part = None
         if self._controller:
             self._controller.toggleNewPartButtons(True)
+    # end def
+
+    def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
+        '''Turn on and off viwe signaling for enabled slots in views.
+        Signals the root item in each view
+
+        Arg:
+            signal_enum: Default turns on all views signals
+        '''
+        self.documentChangeViewSignalingSignal.emit(signal_enum)
     # end def
 
     def fileName(self) -> str:

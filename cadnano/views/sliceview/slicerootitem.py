@@ -93,6 +93,10 @@ class SliceRootItem(QGraphicsRectItem):
                 raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
+    def documentChangeViewSignalingSlot(self, view_types: int):
+        self.are_signals_on = True if view_types & self.view_type else False
+    # end def
+
     def selectedChangedSlot(self, item_dict: dict):
         """
         Args:

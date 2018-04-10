@@ -23,9 +23,15 @@ from PyQt5.QtWidgets import (
 
 
 from cadnano import app
+from cadnano.fileio.v3encode import reEmitPart
 from cadnano.proxies.cnproxy import UndoStack
 from cadnano.gui.mainwindow import ui_mainwindow
-from cadnano.proxies.cnenum import OrthoViewEnum
+from cadnano.proxies.cnenum import (
+    OrthoViewEnum,
+    ViewReceiveEnum,
+    ViewSendEnum,
+    EnumType
+)
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -72,9 +78,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.tool_managers = None  # initialize
 
         self.views = {}
-        self.views['slice'] = self._initSliceview(doc)
-        self.views['grid']  = self._initGridview(doc)
-        self.views['path']  = self._initPathview(doc)
+        self.views[ViewSendEnum.SLICE] = self._initSliceview(doc)
+        self.views[ViewSendEnum.GRID]  = self._initGridview(doc)
+        self.views[ViewSendEnum.PATH]  = self._initPathview(doc)
 
         self._initPathviewToolbar()
         self._initEditMenu()
@@ -171,21 +177,41 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.endGroup()
     # end def
 
-    def destroyView(self, view_name: str):
+    def destroyView(self, view_type: EnumType):
         '''
         Args:
-            view_name: the name of the view
+            view_type: the name of the view
 
         Raises:
-            ValueError for :obj:`view_name` not existing
+            ValueError for :obj:`view_type` not existing
         '''
-        cnview = self.views.get(view_name)
+        cnview = self.views.get(view_type)
         if cnview is not None:
             root_item = cnview.rootItem()
             root_item.destroyViewItems()
         else:
-            raise ValueError("view_name: %s does not exist" % (view_name))
+            raise ValueError("view_type: %s does not exist" % (view_type))
 
+    def rebuildView(self, view_type: EnumType):
+        doc = self.document()
+
+        # turn OFF all but the views we care about
+        doc.changeViewSignaling(view_type)
+
+        delta = 0
+        if view_type == ViewSendEnum.SLICE:
+            delta = ViewSendEnum.GRID
+            self.destroyView(delta)
+        elif view_type == ViewSendEnum.GRID:
+            delta = ViewSendEnum.GRID
+            self.destroyView(delta)
+
+        for part in doc.getParts():
+            reEmitPart(part)
+
+        # turn ON all but the views we care about
+        doc.changeViewSignaling(ViewSendEnum.ALL - delta)
+    # end def
 
     def _initGridview(self, doc: DocT) -> GraphicsViewT:
         """Initializes Grid View.

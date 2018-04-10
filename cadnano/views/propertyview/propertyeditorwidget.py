@@ -32,7 +32,10 @@ from PyQt5.QtWidgets import (
 )
 
 from cadnano.objectinstance import ObjectInstance
-from cadnano.proxies.cnenum import ItemEnum
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    ViewReceiveEnum
+)
 from cadnano.gui.palette import getBrushObj
 from cadnano.controllers import ViewRootController
 from cadnano.views.pathview import pathstyles as styles
@@ -58,6 +61,7 @@ class PropertyEditorWidget(QTreeWidget):
     PropertyEditorWidget enables direct editing attributes of an
     item that is selected in the Outliner.
     """
+    view_type = ViewReceiveEnum.PROPERTY
 
     def __init__(self, parent: QWidget = None):
         """Summary
@@ -68,7 +72,7 @@ class PropertyEditorWidget(QTreeWidget):
         super(PropertyEditorWidget, self).__init__(parent)
         self._outline_view_obj_set = set()
         self._outline_view_obj_list = []
-        self.are_signals_enabled = True
+        self.are_signals_on = True
         self.setAttribute(Qt.WA_MacShowFocusRect, 0)  # no mac focus halo
     # end def
 
@@ -188,6 +192,11 @@ class PropertyEditorWidget(QTreeWidget):
             sender: Model object that emitted the signal.
             model_part_instance (ObjectInstance): The model part
         """
+    # end def
+
+
+    def documentChangeViewSignalingSlot(self, view_types: int):
+        self.are_signals_on = True if view_types & self.view_type else False
     # end def
 
     def clearSelectionsSlot(self, document: DocT):

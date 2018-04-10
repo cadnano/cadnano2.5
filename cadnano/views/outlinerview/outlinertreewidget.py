@@ -499,6 +499,11 @@ class OutlinerTreeWidget(QTreeWidget):
                 raise NotImplementedError("Unknown part type %s" % part_type)
     # end def
 
+
+    def documentChangeViewSignalingSlot(self, view_types: int):
+        self.are_signals_on = True if view_types & self.view_type else False
+    # end def
+
     def selectionFilterChangedSlot(self, filter_name_set: Set[str]):
         '''Disable or enable items if their features are represented
 
