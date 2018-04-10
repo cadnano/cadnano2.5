@@ -270,9 +270,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
-        path_scene = self.views['path'].cnScene()
+        path_view = self.views[ViewSendEnum.PATH]
+        path_scene = path_view.cnScene()
         path_scene.addItem(self.path_color_panel)
-        self.path_tool_manager = PathToolManager(self, self.views['path'].rootItem())
+        self.path_tool_manager = PathToolManager(self, path_view.rootItem())
 
         self.slice_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.slice_tool_manager = self.slice_tool_manager

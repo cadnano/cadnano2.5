@@ -20,7 +20,8 @@ from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano.proxies.cnenum import (
     ModEnum,
     GridEnum,
-    EnumType
+    EnumType,
+    ViewSendEnum
 )
 from cadnano.proxies.cnobject import CNObject
 from cadnano.objectinstance import ObjectInstance
