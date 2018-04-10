@@ -14,7 +14,10 @@ from PyQt5.QtGui import QKeyEvent
 
 from cadnano.objectinstance import ObjectInstance
 from cadnano import util
-from cadnano.proxies.cnenum import PartEnum
+from cadnano.proxies.cnenum import (
+    PartEnum,
+    ViewReceiveEnum
+)
 from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import PathNucleicAcidPartItem
 from .tools.pathselection import SelectionItemGroup
@@ -42,6 +45,7 @@ class PathRootItem(QGraphicsRectItem):
         select_tool (TYPE): Description
     """
     name = 'path'
+    view_type = ViewReceiveEnum.PATH
 
     def __init__(self,  rect: QRectF,
                         parent: QGraphicsItem,

@@ -12,7 +12,10 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtGui import QKeyEvent
 
 from cadnano.objectinstance import ObjectInstance
-from cadnano.proxies.cnenum import PartEnum
+from cadnano.proxies.cnenum import (
+    PartEnum,
+    ViewReceiveEnum
+)
 from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import SliceNucleicAcidPartItem
 
@@ -41,6 +44,7 @@ class SliceRootItem(QGraphicsRectItem):
         select_tool (TYPE): Description
     """
     name = 'slice'
+    view_type = ViewReceiveEnum.SLICE
 
     def __init__(self,  rect: QRectF,
                         parent: QGraphicsItem,

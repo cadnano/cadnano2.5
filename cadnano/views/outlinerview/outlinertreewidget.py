@@ -43,7 +43,10 @@ from PyQt5.QtWidgets import (
 )
 
 from cadnano.objectinstance import ObjectInstance
-from cadnano.proxies.cnenum import PartEnum
+from cadnano.proxies.cnenum import (
+    PartEnum,
+    ViewReceiveEnum
+)
 from cadnano.gui.palette import getBrushObj
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.controllers import ViewRootController
@@ -78,6 +81,7 @@ class OutlinerTreeWidget(QTreeWidget):
     """ The there needs to always be a currentItem which defaults
     to row 0, column 0 at the root
     """
+    view_type = ViewReceiveEnum.OUTLINER
 
     def __init__(self, parent: QWidget = None):
         super(OutlinerTreeWidget, self).__init__(parent)

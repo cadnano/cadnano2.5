@@ -6,6 +6,9 @@ from typing import (
     Tuple
 )
 
+from cadnano.proxies.cnenum import (
+    ViewSendEnum
+)
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.cntypes import (
     NucleicAcidPartT,
@@ -22,7 +25,8 @@ class CreateVirtualHelixCommand(UndoCommand):
                 id_num: int = None,
                 properties: Union[tuple, dict] = None,
                 safe: bool = True,
-                parity: int = None):
+                parity: int = None,
+                view: int = ViewSendEnum.ALL):
         '''``UndoCommand`` to create a virtual helix in a ``NucleicAcidPart``
 
         Args:
@@ -64,6 +68,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         self.threshold: float = 2.1*part.radius()
         self.safe: bool = safe
         self.old_limits: RectT = None
+        self.view = view
     # end def
 
     def redo(self):
@@ -97,7 +102,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                                            self.keys, self.values,
                                            emit_signals=False)
             part.resetCoordinates(id_num)
-        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors)
+        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors, self.view)
         print('Done redoing create of %s' % self.id_num)
     # end def
 

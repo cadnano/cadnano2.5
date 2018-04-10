@@ -300,7 +300,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     def partVirtualHelixAddedSlot(self, sender: NucleicAcidPartT,
                                         id_num: int,
                                         virtual_helix: VirtualHelixT,
-                                        neighbors: List[int]):
+                                        neighbors: List[int],
+                                        view: int):
         """
         Args:
             sender: Model object that emitted the signal.
@@ -309,7 +310,8 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             virtual_helix:
             neighbors: Description
         """
-        if self._viewroot.are_signals_on:
+        vr = self._viewroot
+        if (view & vr.view_type) and vr.are_signals_on:
             vhi = GridVirtualHelixItem(id_num, self)
             self._virtual_helix_item_hash[id_num] = vhi
             self._refreshVirtualHelixItemGizmos(id_num, vhi)

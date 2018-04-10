@@ -111,6 +111,7 @@ class GridEnum(IntEnum):
     SQUARE = 1
     HONEYCOMB = 2
 
+ENUM_NAMES['grid_type'] = enumNames(GridEnum)
 
 class OrthoViewEnum(IntEnum):
     SLICE = 0
@@ -118,8 +119,23 @@ class OrthoViewEnum(IntEnum):
     BOTH = 2
 
 
-ENUM_NAMES['grid_type'] = enumNames(GridEnum)
+class ViewSendEnum(IntEnum):
+    ALL = 1
+    GRID = 2
+    SLICE = 4
+    PATH = 8
+    OUTLINER = 16
+    PROPERTY = 32
 
+class ViewReceiveEnum(IntEnum):
+    ALL = 1
+    GRID = 3
+    SLICE = 5
+    PATH = 9
+    OUTLINER = 17
+    PROPERTY = 33
+
+ENUM_NAMES['view_type'] = enumNames(ViewSendEnum)
 
 class HandleEnum(IntEnum):
     TOP_LEFT = 1

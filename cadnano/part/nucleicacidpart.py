@@ -276,8 +276,8 @@ class NucleicAcidPart(Part):
     partActiveBaseInfoSignal = ProxySignal(CNObject, object, name='partActiveBaseInfoSignal')
     """self.active_base_info (tuple or None)"""
 
-    partVirtualHelixAddedSignal = ProxySignal(object, int, object, object, name='partVirtualHelixAddedSignal')
-    """self, virtual_helix id_num, virtual_helix, neighbor list"""
+    partVirtualHelixAddedSignal = ProxySignal(object, int, object, object, int, name='partVirtualHelixAddedSignal')
+    """self, virtual_helix id_num, virtual_helix, neighbor list, view"""
 
     partVirtualHelixRemovingSignal = ProxySignal(object, int, object, object, name='partVirtualHelixRemovingSignal')
     """self, virtual_helix id_num, virtual_helix, neighbor list"""

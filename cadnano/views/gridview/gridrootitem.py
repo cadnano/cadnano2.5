@@ -7,7 +7,10 @@ from PyQt5.QtWidgets import (
     QGraphicsItem
 )
 from cadnano.objectinstance import ObjectInstance
-from cadnano.proxies.cnenum import PartEnum
+from cadnano.proxies.cnenum import (
+    PartEnum,
+    ViewReceiveEnum
+)
 from cadnano.controllers import ViewRootController
 from .nucleicacidpartitem import GridNucleicAcidPartItem
 
@@ -37,6 +40,7 @@ class GridRootItem(QGraphicsRectItem):
         select_tool (TYPE): Description
     """
     name = 'grid'
+    view_type = ViewReceiveEnum.GRID
 
     def __init__(self,  rect: QRectF,
                         parent: QGraphicsItem,

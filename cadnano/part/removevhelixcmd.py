@@ -2,6 +2,9 @@ from ast import literal_eval
 import bisect
 
 from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.proxies.cnenum import (
+    ViewSendEnum
+)
 from cadnano.cntypes import (
     NucleicAcidPartT,
 )
@@ -59,7 +62,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         vals = list(self.props.values())
         part.setVirtualHelixProperties(id_num, keys, vals, safe=False)
         part.resetCoordinates(id_num)
-        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, self.neighbors)
+        part.partVirtualHelixAddedSignal.emit(part, id_num, vh, self.neighbors, ViewSendEnum.ALL)
         abi = self.old_active_base_info
         if abi:
             part.setActiveVirtualHelix(*abi[0:3])
