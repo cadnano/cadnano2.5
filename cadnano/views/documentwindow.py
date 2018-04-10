@@ -5,7 +5,12 @@ from PyQt5.QtCore import (
     Qt,
     QSettings,
     QPoint,
-    QSize
+    QSize,
+    QEvent
+)
+from PyQt5.QtGui import (
+    QMoveEvent,
+    QResizeEvent
 )
 from PyQt5.QtWidgets import (
     QAction,
@@ -18,6 +23,7 @@ from PyQt5.QtWidgets import (
 
 
 from cadnano import app
+from cadnano.proxies.cnproxy import UndoStack
 from cadnano.gui.mainwindow import ui_mainwindow
 from cadnano.proxies.cnenum import OrthoViewEnum
 from cadnano.views.gridview.gridrootitem import GridRootItem
@@ -39,9 +45,9 @@ from cadnano.cntypes import (
 # # for an example of the QOpenGlWidget added in Qt 5.4
 
 class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
-    """DocumentWindow subclasses QMainWindow and Ui_MainWindow. It performs
-    some initialization operations that must be done in code rather than
-    using Qt Creator.
+    """:class`DocumentWindow` subclasses :class`QMainWindow` and
+    :class`Ui_MainWindow`. It performs some initialization operations that
+    must be done in code rather than using Qt Creator.
 
     Attributes:
         controller: DocumentController
@@ -89,7 +95,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         doc.setViewNames(['slice', 'path', 'inspector'])
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         return self.controller.document()
 
     def destroyWin(self):
@@ -101,23 +107,20 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.controller = None
 
     ### ACCESSORS ###
-    def undoStack(self):
+    def undoStack(self) -> UndoStack:
         return self.controller.undoStack()
 
-    def selectedInstance(self):
-        return self.controller.document().selectedInstance()
-
-    def activateSelection(self, isActive):
-        self.path_graphics_view.activateSelection(isActive)
-        self.slice_graphics_view.activateSelection(isActive)
-        self.grid_graphics_view.activateSelection(isActive)
+    def activateSelection(self, is_active: bool):
+        self.path_graphics_view.activateSelection(is_active)
+        self.slice_graphics_view.activateSelection(is_active)
+        self.grid_graphics_view.activateSelection(is_active)
 
     ### EVENT HANDLERS ###
     def focusInEvent(self):
         """Handle an OS focus change into cadnano."""
         app().undoGroup.setActiveStack(self.controller.undoStack())
 
-    def moveEvent(self, event):
+    def moveEvent(self, event: QMoveEvent):
         """Handle the moving of the cadnano window itself.
 
         Reimplemented to save state on move.
@@ -127,7 +130,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.setValue("pos", self.pos())
         self.settings.endGroup()
 
-    def resizeEvent(self, event):
+    def resizeEvent(self, event: QResizeEvent):
         """Handle the resizing of the cadnano window itself.
 
         Reimplemented to save state on resize.
@@ -138,7 +141,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.endGroup()
         QWidget.resizeEvent(self, event)
 
-    def changeEvent(self, event):
+    def changeEvent(self, event: QEvent):
         QWidget.changeEvent(self, event)
 
     # end def
