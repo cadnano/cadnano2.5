@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-"""cnpropertyitem description"""
 from typing import (
     List,
-    Set
+    Set,
+    Any
 )
 
 from PyQt5.QtCore import (
@@ -46,7 +46,7 @@ class CNPropertyItem(QTreeWidgetItem):
     def __init__(self, parent: PropertyEditorWidgetT, key: str = None):
         """
         Args:
-            parent: Description
+            parent: the :class:`PropertyEditorWidget`
             key: Default is ``None``
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
@@ -207,10 +207,7 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def updateCNModel(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         value = self.data(VAL_COL, Qt.DisplayRole)
         key = self._key
@@ -229,33 +226,28 @@ class CNPropertyItem(QTreeWidgetItem):
         u_s.endMacro()
     # end def
 
-    def setValue(self, property_key, new_value):
-        """Summary
-
-        Args:
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
+    def setValue(self, key: str, new_value: Any):
         """
-        p_i = self._prop_items[property_key]
+        Args:
+            key: ey: property key string
+            new_value: new item value
+        """
+        p_i = self._prop_items[key]
         if p_i.is_enum:
-            new_value = ENUM_NAMES[property_key][new_value]
+            new_value = ENUM_NAMES[key][new_value]
         current_value = p_i.data(VAL_COL, Qt.DisplayRole)
         if current_value != new_value:
             p_i.setData(VAL_COL, Qt.EditRole, new_value)
     # end def
 
-    def getItemValue(self, property_key):
-        """Summary
-
+    def getItemValue(self, key: str) -> Any:
+        """
         Args:
-            property_key (TYPE): Description
+            key: property key string
 
         Returns:
-            TYPE: Description
+            the item value
         """
-        return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
+        return self._prop_items[key].data(VAL_COL, Qt.DisplayRole)
     # end def
 # end class
