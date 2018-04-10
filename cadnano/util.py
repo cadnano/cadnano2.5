@@ -194,57 +194,6 @@ def finalizeCommands(model_object: CNObjectT,
 def this_path() -> str:
     return os.path.abspath(os.path.dirname(__file__))
 
-
-# maps plugin path (extension stripped) -> plugin module
-loadedPlugins = {}
-
-
-def unloadedPlugins():
-    """Returns a list of plugin paths that have yet to
-    be loaded but are in the top level of one of the
-    search directories specified in pluginDirs"""
-    internalPlugins = os.path.join(this_path(), 'plugins')
-    pluginDirs = [internalPlugins]
-    results = []
-    for pluginDir in pluginDirs:
-        if not os.path.isdir(pluginDir):
-            continue
-        for dirent in os.listdir(pluginDir):
-            f = os.path.join(pluginDir, dirent)
-            isfile = os.path.isfile(f)
-            hasValidSuffix = dirent.endswith(('.py', '.so'))
-            if isfile and hasValidSuffix:
-                results.append(f)
-            if os.path.isdir(f) and\
-               os.path.isfile(os.path.join(f, '__init__.py')):
-                results.append(f)
-    return list(filter(lambda x: x not in loadedPlugins, results))
-
-
-def loadPlugin(f):
-    pass
-    # path, fname = os.path.split(f)
-    # name, ext = os.path.splitext(fname)
-    # pluginKey = os.path.join(path, name)
-    # try:
-    #     mod = loadedPlugins[pluginKey]
-    #     return mod
-    # except KeyError:
-    #     pass
-    # file, filename, data = imp.find_module(name, [path])
-    # mod = imp.load_module(name, file, filename, data)
-    # loadedPlugins[pluginKey] = mod
-    # return mod
-
-
-def loadAllPlugins() -> bool:
-    loadedAPlugin = False
-    for p in unloadedPlugins():
-        loadPlugin(p)
-        loadedAPlugin = True
-    return loadedAPlugin
-
-
 def beginSuperMacro(model_object: CNObjectT, desc: str = None):
     """SuperMacros can be used to nest multiple command lists.
 
@@ -262,28 +211,33 @@ def endSuperMacro(model_object: CNObjectT):
     model_object.undoStack().endMacro()
 # end def
 
-def parse_args(argv=None, gui=None):
+def parse_args(argv=None, use_gui: bool = False):
     """Uses argparse to process commandline arguments.
+    This also presents a nice command line help to the user, exposed with
+    ``--help`` flag::
+
+        python main.py --help
+
+    Args:
+        argv: you can initialize your app via::
+
+                app = QApplication(sys.argv)
+                parse_args(app.arguments())
+
+            :meth:`QApplication.arguments()` returns a list of arguments with all Qt
+            arguments stripped away. Qt command line args include::
+
+                -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
+
+        use_gui: Default is ``False. ``True`` use then the parser will use
+            :func:`parse_known_args`, otherwise :func:`parse_args()`. Unlike
+            :func:`parse_args()`, :func:`parse_known_args()` will not cause
+            abort by show the help message and exit, if it finds any
+            unrecognized command-line arguments.
 
     Returns:
         NameSpace object. This can easily be converted to a regular dict through:
         argns.__dict__
-
-    This also presents a nice command line help to the user, exposed with --help flag:
-        python main.py --help
-
-    If gui is set to "qt", then the parser will use parse_known_args. Unlike
-    parse_args(), parse_known_args() will not cause abort by show the help
-    message and exit, if it finds any unrecognized command-line arguments.
-
-    Alternatively, you can initialize your app via:
-        app = QApplication(sys.argv)
-        parse_args(app.arguments())
-
-    QApplication.arguments() returns a list of arguments with all Qt arguments
-    stripped away. Qt command line args include:
-
-        -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
     """
     parser = argparse.ArgumentParser(description="cadnano 2.5")
     parser.add_argument("--testing", "-t", action="store_true", help="Enable testing mode/environment.")
@@ -296,7 +250,7 @@ def parse_args(argv=None, gui=None):
                              "debug the cadnano file decoder, use --debug-modules cadnano.fileio.decode ."
                              "To debug all gui modules, use --debug-modules cadnano.gui .")
     parser.add_argument("--file", "-f", metavar="designfile.json", help="cadnano design to load upon start up.")
-    if gui and (gui is True or gui.lower() == "qt"):
+    if use_gui:
         # Command line args might include Qt-specific switches and parameters.
         argns, unused = parser.parse_known_args(argv)
     else:
@@ -304,8 +258,9 @@ def parse_args(argv=None, gui=None):
     return argns, unused
 
 
-def init_logging(args=None, logdir=None):
-    """Set up standard logging system based on parameters in args, e.g. loglevel and testing.
+def init_logging(args=None, logdir: str = None):
+    """Set up standard logging system based on parameters in args, e.g. loglevel
+    and testing.
     """
     if args is None:
         args = {}
@@ -369,8 +324,7 @@ def init_logging(args=None, logdir=None):
         # Set filter for debugging:
         if args.get('debug_modules'):
             def module_debug_filter(record):
-                """
-                All Filters attached to a logger or handler are asked.
+                """All Filters attached to a logger or handler are asked.
                 The record is discarted if any of the attached Filters return False.
                 """
                 return any(record.name.startswith(modstr) for modstr in args['debug_modules']) \
@@ -398,17 +352,19 @@ def read_fasta(fp):
 
 
 def qtdb_trace():
-    """Make PDB usable by calling pyqtRemoveInputHook.
+    """Make ``PDB`` usable by calling :func:`pyqtRemoveInputHook`.
 
-    Otherwise, PDB is useless as the message
-    > QCoreApplication::exec: The event loop is already running
+    Otherwise, ``PDB`` is useless as the message::
+
+        > QCoreApplication::exec: The event loop is already running
+
     is spammed to the console.
 
     When done, call qtdb_resume from the PDB prompt to return things back to
     normal.
 
-    Note that PDB will drop you into the current frame (this function) and
-    hitting 'n' is required to return to the frame you wanted PDB originally.
+    Note that ``PDB`` will drop you into the current frame (this function) and
+    hitting 'n' is required to return to the frame you wanted ``PDB`` originally.
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
@@ -424,7 +380,7 @@ def qtdb_trace():
 
 
 def qtdb_resume():
-    """Resume normal PyQt operations after calling qtdb_trace.
+    """Resume normal PyQt operations after calling :fund:`qtdb_trace`.
 
     Note that this function assumes that pyqtRemoveInputHook has been called
     """

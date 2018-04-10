@@ -64,7 +64,7 @@ class CadnanoQt(QObject):
     def __init__(self, argv):
         """Create the application object
         """
-        self.argns, unused = util.parse_args(argv, gui=True)
+        self.argns, unused = util.parse_args(argv, use_gui=True)
         # util.init_logging(self.argns.__dict__)
         # logger.info("CadnanoQt initializing...")
         if argv is None:
@@ -113,7 +113,6 @@ class CadnanoQt(QObject):
         if os.environ.get('CADNANO_DISCARD_UNSAVED', False) and not self.ignoreEnv():
             self.dontAskAndJustDiscardUnsavedChanges = True
         self.dontAskAndJustDiscardUnsavedChanges = True
-        util.loadAllPlugins()
     # end def
 
     def exec_(self):
