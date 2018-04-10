@@ -115,10 +115,8 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
     def partVirtualHelixAddedSlot(self, part: NucleicAcidPartT,
                                         id_num: int,
                                         virtual_helix: VirtualHelixT,
-                                        neighbors: List[int],
-                                        view: int):
-        vr = self._viewroot
-        if (view & vr.view_type) and vr.are_signals_enabled:
+                                        neighbors: List[int]):
+        if self._viewroot.are_signals_enabled:
             tw = self.treeWidget()
             tw.is_child_adding += 1
             vh_i = OutlineVirtualHelixItem(id_num, self._root_items['VHelixList'])

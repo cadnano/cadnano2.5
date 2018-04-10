@@ -359,8 +359,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     def partVirtualHelixAddedSlot(self, sender: NucleicAcidPartT,
                                         id_num: int,
                                         virtual_helix: VirtualHelixT,
-                                        neighbors: List[int],
-                                        view: int):
+                                        neighbors: List[int]):
         """When a virtual helix is added to the model, this slot handles
         the instantiation of a virtualhelix item.
 
@@ -372,8 +371,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
             neighbors: Description
         """
         # print("NucleicAcidPartItem.partVirtualHelixAddedSlot")
-        vr = self._viewroot
-        if (view & vr.view_type) and vr.are_signals_on:
+        if self._viewroot.are_signals_on:
             vhi = PathVirtualHelixItem(id_num, self)
             self._virtual_helix_item_hash[id_num] = vhi
             vhi_list = self._virtual_helix_item_list

@@ -183,8 +183,10 @@ class StrandItem(QGraphicsLineItem):
 
         Args:
             strand:
+            view:
         """
-        self._updateAppearance(strand)
+        if self._viewroot.are_signals_on:
+            self._updateAppearance(strand)
     # end def
 
     def oligoPropertyChangedSlot(self, oligo: OligoT, key: str, new_value: ValueT):
