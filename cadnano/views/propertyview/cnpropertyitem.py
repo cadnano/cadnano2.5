@@ -154,6 +154,11 @@ class CNPropertyItem(QTreeWidgetItem):
         for controller in self._controller_list:
             controller.disconnectSignals()
         self._controller_list = []
+        self.cleanUp()
+    # end def
+
+    def cleanUp(self):
+        pass
     # end def
 
     def configureEditor(self, parent_qw: QWidget,

@@ -40,7 +40,7 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
             key: Description
             new_value: Description
         """
-        if self.part() == part:
+        if part in self.part_set:
             self.setValue(key, new_value)
     # end def
 
