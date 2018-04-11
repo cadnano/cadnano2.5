@@ -60,15 +60,15 @@ SAVE_DIALOG_OPTIONS = {'SAVE': 0,
 
 
 class DocumentController(object):
-    """Connects UI buttons to their corresponding actions in the model."""
+    '''Connects UI buttons to their corresponding actions in the model.'''
 
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
-    """list: String names of enabled filter types."""
+    '''list: String names of enabled filter types.'''
 
     ### INIT METHODS ###
 
     def __init__(self, document: DocT):
-        """docstring for __init__"""
+        ''''''
         # initialize variables
         self._document = document
         self._document.setController(self)
@@ -102,7 +102,7 @@ class DocumentController(object):
         self.exit_when_done = False
 
     def _initWindow(self):
-        """docstring for initWindow"""
+        ''''''
         self.win = win = DocumentWindow(doc_ctrlr=self)
         app().documentWindowWasCreatedSignal.emit(self._document, win)
         self._connectWindowSignalsToSelf()
@@ -168,6 +168,7 @@ class DocumentController(object):
         if self.win is not None:
             self.win.destroyWin()
             self.win = None
+        self.settings = None
     # end def
 
     def disconnectSignalsToSelf(self):
@@ -182,8 +183,8 @@ class DocumentController(object):
     # end def
 
     def _connectWindowSignalsToSelf(self):
-        """This method serves to group all the signal & slot connections
-        made by DocumentController"""
+        '''This method serves to group all the signal & slot connections
+        made by DocumentController'''
         win = self.win
         win.closeEvent = self.windowCloseEventHandler
         self.self_signals = [
@@ -259,16 +260,16 @@ class DocumentController(object):
     # end def
 
     def undoStackCleanChangedSlot(self):
-        """The title changes to include [*] on modification.
+        '''The title changes to include [*] on modification.
         Use this when clearing out undostack to set the modified status of
         the document
-        """
+        '''
         self.win.setWindowModified(not self.undoStack().isClean())
         self.win.setWindowTitle(self.documentTitle())
     # end def
 
     def actionAboutSlot(self):
-        """Displays the about cadnano dialog."""
+        '''Displays the about cadnano dialog.'''
         dialog = QDialog()
         dialog_about = Ui_About()  # reusing this dialog, should rename
         dialog.setStyleSheet(
@@ -277,7 +278,7 @@ class DocumentController(object):
         dialog.exec_()
 
     def showFilterHints(self, show_hints: bool, filter_name: str = None):
-        """Changes the appearance of filter buttons in the toolbar to help user
+        '''Changes the appearance of filter buttons in the toolbar to help user
         realize they may not have the correct filters selected to perform a
         desired action. Meant to avoid the case where user clicks and nothing
         happens.
@@ -293,7 +294,7 @@ class DocumentController(object):
         Args:
             show_hints: ``True to show hints, ``False`` to hide hints.
             filter_name: What filter to hint from ``self._hintable_filter_action_map``
-        """
+        '''
         if filter_name:
             try:
                 for f in self._hintable_filter_action_map[filter_name]:
@@ -322,13 +323,15 @@ class DocumentController(object):
                 if t.isEnabled() is False:
                     t.setEnabled(True)  # enable to hide hint icon
             self._tool_hints_visible = False
+    # end def
 
     def actionFilterVirtualHelixSlot(self):
-        """Disables all other selection filters when active."""
-        fH = self.win.action_filter_helix
-        fE = self.win.action_filter_endpoint
-        fS = self.win.action_filter_strand
-        fX = self.win.action_filter_xover
+        '''Disables all other selection filters when active.'''
+        win = self.win
+        fH = win.action_filter_helix
+        fE = win.action_filter_endpoint
+        fS = win.action_filter_strand
+        fX = win.action_filter_xover
         fH.setChecked(True)
         if fE.isChecked():
             fE.setChecked(False)
@@ -341,13 +344,14 @@ class DocumentController(object):
     # end def
 
     def actionFilterEndpointSlot(self):
-        """Disables handle filters when activated.
+        '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
-        """
-        fH = self.win.action_filter_helix
-        fE = self.win.action_filter_endpoint
-        fS = self.win.action_filter_strand
-        fX = self.win.action_filter_xover
+        '''
+        win = self.win
+        fH = win.action_filter_helix
+        fE = win.action_filter_endpoint
+        fS = win.action_filter_strand
+        fX = win.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fS.isChecked() and not fX.isChecked():
@@ -357,13 +361,14 @@ class DocumentController(object):
     # end def
 
     def actionFilterStrandSlot(self):
-        """Disables handle filters when activated.
+        '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
-        """
-        fH = self.win.action_filter_helix
-        fE = self.win.action_filter_endpoint
-        fS = self.win.action_filter_strand
-        fX = self.win.action_filter_xover
+        '''
+        win = self.win
+        fH = win.action_filter_helix
+        fE = win.action_filter_endpoint
+        fS = win.action_filter_strand
+        fX = win.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fX.isChecked():
@@ -372,13 +377,14 @@ class DocumentController(object):
     # end def
 
     def actionFilterXoverSlot(self):
-        """Disables handle filters when activated.
+        '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
-        """
-        fH = self.win.action_filter_helix
-        fE = self.win.action_filter_endpoint
-        fS = self.win.action_filter_strand
-        fX = self.win.action_filter_xover
+        '''
+        win = self.win
+        fH = win.action_filter_helix
+        fE = win.action_filter_endpoint
+        fS = win.action_filter_strand
+        fX = win.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fS.isChecked():
@@ -387,7 +393,7 @@ class DocumentController(object):
     # end def
 
     def actionFilterScafSlot(self):
-        """Remains checked if no other strand-type filter is active."""
+        '''Remains checked if no other strand-type filter is active.'''
         f_scaf = self.win.action_filter_scaf
         f_stap = self.win.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
@@ -395,7 +401,7 @@ class DocumentController(object):
         self._strandFilterUpdate()
 
     def actionFilterStapSlot(self):
-        """Remains checked if no other strand-type filter is active."""
+        '''Remains checked if no other strand-type filter is active.'''
         f_scaf = self.win.action_filter_scaf
         f_stap = self.win.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
@@ -419,7 +425,7 @@ class DocumentController(object):
     # end def
 
     def actionFilterFwdSlot(self):
-        """Remains checked if no other strand-type filter is active."""
+        '''Remains checked if no other strand-type filter is active.'''
         f_fwd = self.win.action_filter_fwd
         f_rev = self.win.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
@@ -427,7 +433,7 @@ class DocumentController(object):
         self._strandFilterUpdate()
 
     def actionFilterRevSlot(self):
-        """Remains checked if no other strand-type filter is active."""
+        '''Remains checked if no other strand-type filter is active.'''
         f_fwd = self.win.action_filter_fwd
         f_rev = self.win.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
@@ -437,7 +443,6 @@ class DocumentController(object):
 
     def _strandFilterUpdate(self):
         win = self.win
-
         if win.action_filter_helix.isChecked():
             self._document.setFilterSet(["virtual_helix"])
             return
@@ -471,11 +476,10 @@ class DocumentController(object):
     # end def
 
     def actionNewSlot(self):
-        """
-        1. If document is has no parts, do nothing.
+        '''1. If document is has no parts, do nothing.
         2. If document is dirty, call promptSaveDialog and continue if it succeeds.
         3. Create a new document and swap it into the existing ctrlr/window.
-        """
+        '''
         # clear/reset the view!
 
         if len(self._document.children()) == 0:
@@ -489,12 +493,11 @@ class DocumentController(object):
                 self.newClickedCallback()  # finalize new
 
     def actionOpenSlot(self):
-        """
-        1. If document is untouched, proceed to open dialog.
+        '''1. If document is untouched, proceed to open dialog.
         2. If document is dirty, call maybesave and continue if it succeeds.
         3. Downstream, the file is selected in openAfterMaybeSave, and the selected
            file is actually opened in openAfterMaybeSaveCallback.
-        """
+        '''
         if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
             return  # user canceled in maybe save
         else:  # user did not cancel
@@ -507,29 +510,29 @@ class DocumentController(object):
                 self.openAfterMaybeSave()  # finalize new
 
     def actionCloseSlot(self):
-        """Called when DocumentWindow is closed.
+        '''Called when DocumentWindow is closed.
 
         This method does not do anything as its functionality is implemented by
         windowCloseEventHandler.  windowCloseEventHandler captures all close
         events (including quit signals) while this method captures only close
         window events (i.e. a strict subset of the events that the
         windowCloseEventHandler captures.
-        """
+        '''
         pass
 
     def actionSaveSlot(self):
-        """SaveAs if necessary, otherwise overwrite existing file."""
+        '''SaveAs if necessary, otherwise overwrite existing file.'''
         if self._has_no_associated_file:
             self.saveFileDialog()
             return
         self.writeDocumentToFile()
 
     def actionSaveAsSlot(self):
-        """Open a save file dialog so user can choose a name."""
+        '''Open a save file dialog so user can choose a name.'''
         self.saveFileDialog()
 
     def actionSVGSlot(self):
-        """docstring for actionSVGSlot"""
+        ''''''
         fname = os.path.basename(str(self.fileName()))
         if fname is None:
             directory = "."
@@ -594,12 +597,11 @@ class DocumentController(object):
         painter.end()
 
     def actionExportSequencesSlot(self):
-        """
-        Triggered by clicking Export Staples button. Opens a file dialog to
+        '''Triggered by clicking Export Staples button. Opens a file dialog to
         determine where the staples should be saved. The callback is
         exportStaplesCallback which collects the staple sequences and exports
         the file.
-        """
+        '''
         # Validate that no staple oligos are circular.
         part = self._document.activePart()
         if part is None:
@@ -661,10 +663,9 @@ class DocumentController(object):
     # end def
 
     def actionModifySlot(self):
-        """
-        Notifies that part root items that parts should respond to modifier
+        '''Notifies that part root items that parts should respond to modifier
         selection signals.
-        """
+        '''
 
     def actionCreateNucleicAcidPartHoneycomb(self):
         # TODO[NF]:  Docstring
@@ -693,11 +694,11 @@ class DocumentController(object):
     # end def
 
     def actionToggleSliceViewSlot(self):
-        """Handle the action_slice button being clicked.
+        '''Handle the action_slice button being clicked.
 
         If either the slice or grid view are visible hide them.  Else, revert
         to showing whichever view(s) are showing.
-        """
+        '''
 
         win = self.win
         if win.action_slice.isChecked():
@@ -733,23 +734,23 @@ class DocumentController(object):
     # end def
 
     def toggleNewPartButtons(self, is_enabled: bool):
-        """Toggle the AddPart buttons when the active part changes.
+        '''Toggle the AddPart buttons when the active part changes.
 
         Args:
             is_enabled: Whether the slice view should be hidden or shown
-        """
+        '''
         self.win.action_new_dnapart_honeycomb.setEnabled(is_enabled)
         self.win.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
     def setSliceOrGridViewVisible(self, view_type: EnumType):
-        """
+        '''
         Args:
             view_type: type of view enum
 
         Raises:
             ValueError for unknown ``view_type``.
-        """
+        '''
         if view_type == OrthoViewEnum.SLICE:
             self.slice_view_showing = True
         elif view_type == OrthoViewEnum.GRID:
@@ -760,7 +761,7 @@ class DocumentController(object):
     # end def
 
     def toggleSliceView(self, show: bool):
-        """Hide or show the slice view based on the given parameter `show`.
+        '''Hide or show the slice view based on the given parameter `show`.
 
         Since calling this method where show=True will cause the SliceView to
         show, ensure that the action_slice button is checked if applicable.
@@ -768,7 +769,7 @@ class DocumentController(object):
         Args:
             show: Whether the slice view should be hidden or shown
 
-        """
+        '''
         assert isinstance(show, bool)
 
         slice_view_widget = self.win.slice_dock_widget
@@ -782,14 +783,14 @@ class DocumentController(object):
     # end def
 
     def toggleGridView(self, show: bool):
-        """Hide or show the grid view based on the given parameter `show`
+        '''Hide or show the grid view based on the given parameter `show`
 
         Since calling this method where show=True will cause the SliceView to
         show, ensure that the action_slice button is checked if applicable.
 
         Args:
             show: Whether the grid view should be hidden or shown
-        """
+        '''
         assert isinstance(show, bool)
 
         grid_view_widget = self.win.grid_dock_widget
@@ -812,10 +813,9 @@ class DocumentController(object):
     # end def
 
     def setDocument(self, doc: DocT):
-        """
-        Sets the controller's document, and informs the document that
+        '''Sets the controller's document, and informs the document that
         this is its controller.
-        """
+        '''
         self._document = doc
         doc.setController(self)
     # end def
@@ -826,10 +826,10 @@ class DocumentController(object):
 
     ### PRIVATE SUPPORT METHODS ###
     def newDocument(self, fname: str = None):
-        """Creates a new Document, reusing the DocumentController.
+        '''Creates a new Document, reusing the DocumentController.
         Tells all of the views to reset and removes all items from
         them
-        """
+        '''
         if fname is not None and self.fileName() == fname:
             setReopen(True)
         self._document.makeNew()
@@ -870,7 +870,7 @@ class DocumentController(object):
         self.settings.endGroup()
 
     def _writeFileOpenPath(self, path):
-        """docstring for _writePath"""
+        ''''''
         self._file_open_path = path
         self.settings.beginGroup("FileSystem")
         self.settings.setValue("openpath", path)
@@ -878,11 +878,10 @@ class DocumentController(object):
 
     ### SLOT CALLBACKS ###
     def actionNewSlotCallback(self):
-        """
-        Gets called on completion of filesavedialog after newClicked's
+        '''Gets called on completion of filesavedialog after newClicked's
         promptSaveDialog. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
-        """
+        '''
         if self.filesavedialog is not None:
             self.filesavedialog.finished.disconnect(self.actionNewSlotCallback)
             del self.filesavedialog  # prevents hang (?)
@@ -890,12 +889,12 @@ class DocumentController(object):
         self.newDocument()
 
     def exportStaplesCallback(self, selected: Union[str, list, tuple]):
-        """Export all staple sequences to selected CSV file.
+        '''Export all staple sequences to selected CSV file.
 
         Args:
             selected (Tuple, List or str): if a List or Tuple, the filename should
             be the first element
-        """
+        '''
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
         else:
@@ -919,10 +918,10 @@ class DocumentController(object):
     # end def
 
     def newClickedCallback(self):
-        """Gets called on completion of filesavedialog after newClicked's
+        '''Gets called on completion of filesavedialog after newClicked's
         promptSaveDialog. Removes the dialog if necessary, but it was probably
         already removed by saveFileDialogCallback.
-        """
+        '''
 
         if self.filesavedialog is not None:
             self.filesavedialog.finished.disconnect(self.newClickedCallback)
@@ -931,13 +930,13 @@ class DocumentController(object):
         self.newDocument()
 
     def openAfterMaybeSaveCallback(self, selected: Union[str, list, tuple]):
-        """Receives file selection info from the dialog created by
+        '''Receives file selection info from the dialog created by
         openAfterMaybeSave, following user input.
 
         Extracts the file name and passes it to the decode method, which
         returns a new document doc, which is then set as the open document
         by newDocument. Calls finalizeImport and disconnects dialog signaling.
-        """
+        '''
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
         else:
@@ -948,22 +947,23 @@ class DocumentController(object):
             return False
         self._writeFileOpenPath(os.path.dirname(fname))
 
-        self.win.path_graphics_view.setViewportUpdateOn(False)
-        self.win.slice_graphics_view.setViewportUpdateOn(False)
-        self.win.grid_graphics_view.setViewportUpdateOn(False)
+        win = self.win
+        win.path_graphics_view.setViewportUpdateOn(False)
+        win.slice_graphics_view.setViewportUpdateOn(False)
+        win.grid_graphics_view.setViewportUpdateOn(False)
 
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
         self._document.readFile(fname)
 
-        self.win.path_graphics_view.setViewportUpdateOn(True)
-        self.win.slice_graphics_view.setViewportUpdateOn(True)
-        self.win.grid_graphics_view.setViewportUpdateOn(True)
+        win.path_graphics_view.setViewportUpdateOn(True)
+        win.slice_graphics_view.setViewportUpdateOn(True)
+        win.grid_graphics_view.setViewportUpdateOn(True)
 
-        self.win.path_graphics_view.update()
-        self.win.slice_graphics_view.update()
-        self.win.grid_graphics_view.update()
+        win.path_graphics_view.update()
+        win.slice_graphics_view.update()
+        win.grid_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
@@ -974,7 +974,7 @@ class DocumentController(object):
         self.setFileName(fname)
 
     def saveFileDialogCallback(self, selected: Union[str, list, tuple]):
-        """If the user chose to save, write to that file."""
+        '''If the user chose to save, write to that file.'''
         if isinstance(selected, (list, tuple)):
             fname = selected[0]
         else:
@@ -998,7 +998,8 @@ class DocumentController(object):
 
     ### EVENT HANDLERS ###
     def windowCloseEventHandler(self, event: QCloseEvent = None):
-        """Intercept close events when user attempts to close the window."""
+        '''Intercept close events when user attempts to close the window.'''
+        win = self.win
         dialog_result = self.promptSaveDialog(exit_when_done=True)
         if dialog_result == SAVE_DIALOG_OPTIONS['DISCARD']:
             if event is not None:
@@ -1030,11 +1031,10 @@ class DocumentController(object):
         return True
 
     def openAfterMaybeSave(self):
-        """
-        This is the method that initiates file opening. It is called by
+        '''This is the method that initiates file opening. It is called by
         actionOpenSlot to spawn a QFileDialog and connect it to a callback
         method.
-        """
+        '''
         path = self._file_open_path
         if util.isWindows():  # required for native looking file window#"/",
             fname = QFileDialog.getOpenFileName(None,
@@ -1057,13 +1057,13 @@ class DocumentController(object):
 
     ### FILE OUTPUT ###
     def promptSaveDialog(self, exit_when_done: bool = False):
-        """Save on quit, check if document changes have occurred.
+        '''Save on quit, check if document changes have occurred.
 
         Returns:
             SAVE_DIALOG_OPTIONS['CANCEL'] or
             SAVE_DIALOG_OPTIONS['DISCARD'] or
             SAVE_DIALOG_OPTIONS['SAVE']
-        """
+        '''
         if app().dontAskAndJustDiscardUnsavedChanges:
             return SAVE_DIALOG_OPTIONS['DISCARD']
         if not self.undoStack().isClean():    # document dirty?

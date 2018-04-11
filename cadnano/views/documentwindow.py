@@ -105,8 +105,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         return self.controller.document()
 
     def destroyWin(self):
+        '''Save window state and destroy the tool managers.  Also destroy
+        :class`DocumentController` object
+        '''
         self.settings.beginGroup("MainWindow")
-        self.settings.setValue("state", self.saveState())
+        # Saves the current state of this mainwindow's toolbars and dockwidgets
+        self.settings.setValue("windowState", self.saveState())
         self.settings.endGroup()
         for mgr in self.tool_managers:
             mgr.destroyItem()
@@ -156,25 +160,27 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     ### PRIVATE HELPER METHODS ###
     def _restoreGeometryandState(self):
-        self.settings.beginGroup("MainWindow")
-        geometry = self.settings.value("geometry")
-        state = self.settings.value("geometry")
+        settings = self.settings
+        settings.beginGroup("MainWindow")
+        geometry = settings.value("geometry")
         if geometry is not None:
             result = self.restoreGeometry(geometry)
             if result is False:
                 print("MainWindow.restoreGeometry() failed.")
         else:
             print("Setting default MainWindow size: 1100x800")
-            self.resize(self.settings.value("size", QSize(1100, 800)))
-            self.move(self.settings.value("pos", QPoint(200, 200)))
+            self.resize(settings.value("size", QSize(1100, 800)))
+            self.move(settings.value("pos", QPoint(200, 200)))
             self.inspector_dock_widget.close()
             self.action_inspector.setChecked(False)
-        state = self.settings.value("state")
-        if state is not None:
-            result = self.restoreState(state)
+
+        # Restore the current state of this mainwindow's toolbars and dockwidgets
+        window_state = settings.value("windowState")
+        if window_state is not None:
+            result = self.restoreState(window_state)
             if result is False:
                 print("MainWindow.restoreState() failed.")
-        self.settings.endGroup()
+        settings.endGroup()
     # end def
 
     def destroyView(self, view_type: EnumType):
@@ -193,16 +199,22 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             raise ValueError("view_type: %s does not exist" % (view_type))
 
     def rebuildView(self, view_type: EnumType):
+        '''Rebuild views which match view_type ORed argument.
+        Only allows SLICE or GRID view to be active.  Not both at the same time
+
+        Args:
+            view_type: one or more O
+        '''
         doc = self.document()
 
         # turn OFF all but the views we care about
         doc.changeViewSignaling(view_type)
 
         delta = 0
-        if view_type == ViewSendEnum.SLICE:
+        if view_type & ViewSendEnum.SLICE:
             delta = ViewSendEnum.GRID
             self.destroyView(delta)
-        elif view_type == ViewSendEnum.GRID:
+        elif view_type & ViewSendEnum.GRID:
             delta = ViewSendEnum.GRID
             self.destroyView(delta)
 
@@ -217,7 +229,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """Initializes Grid View.
 
         Args:
-            doc: The ``Document`` corresponding to the design
+            doc: The :class:`Document` corresponding to the design
 
         Returns:
             :class:`CustomQGraphicsView`
@@ -242,7 +254,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """Initializes Path View.
 
         Args:
-            doc: The ``Document`` corresponding to the design
+            doc: The :class:`Document` corresponding to the design
 
         Returns:
             :class:`CustomQGraphicsView`
@@ -265,8 +277,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def _initPathviewToolbar(self):
         """Initializes Path View Toolbar.
-
-        Returns: None
         """
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
@@ -294,7 +304,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """Initializes Slice View.
 
         Args:
-            doc: The ``Document`` corresponding to the design
+            doc: The :class:`Document` corresponding to the design
 
         Returns:
             :class:`CustomQGraphicsView`
@@ -318,8 +328,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def _initEditMenu(self):
         """Initializes the Edit menu
-
-        Returns: None
         """
         us = self.controller.undoStack()
         qatrans = QApplication.translate
