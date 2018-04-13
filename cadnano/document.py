@@ -744,7 +744,7 @@ class Document(CNObject):
     # PUBLIC METHODS FOR EDITING THE MODEL #
     def createNucleicAcidPart(  self,
                                 use_undostack: bool = True,
-                                grid_type: EnumType = GridEnum.HONEYCOMB
+                                grid_type: EnumType = GridEnum.NONE
                             ) -> NucleicAcidPart:
         """Create and store a new DnaPart and instance, and return the instance.
 
@@ -795,7 +795,7 @@ class Document(CNObject):
     # end def
 
     def setController(self, controller: DocCtrlT):
-        """Called by ``DocumentController.setDocument`` method."""
+        """Called by :meth:`DocumentController.setDocument` method."""
         self._controller = controller
     # end def
 

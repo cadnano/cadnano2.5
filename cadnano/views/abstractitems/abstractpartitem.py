@@ -244,6 +244,9 @@ class QAbstractPartItem(QGraphicsRectItem):
     def finishDrag(self):
         """set the view position in the model
         Does NOT convert to model coordinates, for now
+
+        Called from :class:`HandleItem` for example to set model positions
+        of instances
         """
         pos = self.pos()
         position = pos.x(), pos.y()
@@ -304,6 +307,8 @@ class QAbstractPartItem(QGraphicsRectItem):
     def partInstancePropertySlot(self, part: PartT, view_name: str, key: str, value: Any):
         if view_name == self._viewroot.name:
             if key == 'position':
+                # TODO translate value position to QPointF space from model space???
+                # Are we going to track instance positions in model space????
                 self.setPos(*value)
     # end def
 

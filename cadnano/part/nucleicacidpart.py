@@ -159,7 +159,7 @@ class NucleicAcidPart(Part):
     def __init__(self, *args, **kwargs):
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy = kwargs.get('do_copy', False)
-        grid_type = kwargs.get('grid_type', GridEnum.HONEYCOMB)
+        grid_type = kwargs.get('grid_type', GridEnum.NONE)
         if do_copy:
             return
 

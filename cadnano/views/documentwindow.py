@@ -344,8 +344,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self.sep = sep = QAction(self)
         sep.setSeparator(True)
+
         self.menu_edit.insertAction(sep, action_redo)
         self.menu_edit.insertAction(action_redo, action_undo)
+        # print([x.text() for x in self.menu_edit.actions()])
 
         # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
         self.statusBar().showMessage("")

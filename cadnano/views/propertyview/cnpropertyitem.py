@@ -221,7 +221,7 @@ class CNPropertyItem(QTreeWidgetItem):
             for cn_model in cn_model_list:
                 cn_model.setProperty(key, value)
         else:  # called from line 65: p_i = constructor(cn_model, root, key=key)
-            # print("single model found")
+            # Single model found
             cn_model_list.setProperty(key, value)
         u_s.endMacro()
     # end def

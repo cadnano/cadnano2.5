@@ -338,13 +338,13 @@ class GridPoint(QGraphicsEllipseItem):
                                     event: QGraphicsSceneMouseEvent):
         """
         Args:
-            tool: Description
-            part_item: Description
-            event: Description
+            tool: :class:`SelectGridTool`
+            part_item: :class:`GridNucleicAcidPartItem`
+            event: the mouse event
         """
         part = part_item.part()
         part.setSelected(True)
-        print("GridPoint MousePress for select")
+        # print("GridPoint MousePress for select")
         alt_event = GridEvent(self, self.offset)
         tool.selectOrSnap(part_item, alt_event, event)
         return QGraphicsEllipseItem.mousePressEvent(self, event)
@@ -355,9 +355,9 @@ class GridPoint(QGraphicsEllipseItem):
                                     event: QGraphicsSceneMouseEvent):
         """
         Args:
-            tool: Description
-            part_item: Description
-            event: Description
+            tool: :class:`CreateGridTool`
+            part_item: :class:`GridNucleicAcidPartItem`
+            event: the mouse event
         """
         part = part_item.part()
         part.setSelected(True)
@@ -392,14 +392,14 @@ class ClickArea(QGraphicsEllipseItem):
 class GridEvent(object):
     """
     Attributes:
-        grid_pt (TYPE): Description
-        offset (QPointF): Description
+        grid_pt (GridPoint): The grid point
+        offset (QPointF): the offset
     """
     def __init__(self, grid_pt: GridPoint, offset: float):
         """
         Args:
-            grid_pt: Description
-            offset: Description
+            grid_pt: The grid point
+            offset: the offset
         """
         self.grid_pt = grid_pt
         self.offset = QPointF(offset, offset)

@@ -171,6 +171,8 @@ class HandleItem(QGraphicsRectItem):
     """Provides the ability to resize the document."""
 
     def __init__(self, handle_type, width, color, handle_group, parent):
+        ''' parent is a :class:`QGraphicsItem` such as a :class:`NucleicAcidPartItem`
+        '''
         super(HandleItem, self).__init__(parent)
         self.setAcceptHoverEvents(True)
         self._handle_type = handle_type
