@@ -22,14 +22,16 @@ def encodeDocument(document: DocT) -> dict:
 
     grid_type = document.getGridType()
 
-    if grid_type == GridEnum.HONEYCOMB or grid_type is None:
+    if grid_type == GridEnum.HONEYCOMB:
         grid_type = GridEnum.HONEYCOMB
         positionToLatticeCoord = HoneycombDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = HoneycombDnaPart.positionToLatticeCoordRound
-    else:
+    elif grid_type == GridEnum.SQUARE:
         grid_type = GridEnum.SQUARE
         positionToLatticeCoord = SquareDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = SquareDnaPart.positionToLatticeCoordRound
+    else:
+        raise ValueError("Unsupported V2 grid type {}".format(grid_type))
 
     part = next(document.getParts())
     radius = part.radius()

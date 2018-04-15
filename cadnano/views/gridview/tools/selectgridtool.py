@@ -69,7 +69,7 @@ _TEST_COLOR = "#00ff00"
 
 
 class SelectGridTool(AbstractGridTool):
-    """Handles SelectTool operations in the Grid view
+    """Handles Select Tool operations in the Grid view
 
     Attributes:
         clip_board (dict): Description
@@ -85,7 +85,7 @@ class SelectGridTool(AbstractGridTool):
     def __init__(self, manager: GridToolManagerT):
         """
         Args:
-            manager: Description
+            manager: the grid view tool manager
         """
         super(SelectGridTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)

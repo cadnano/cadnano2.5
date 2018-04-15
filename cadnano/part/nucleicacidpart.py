@@ -170,7 +170,7 @@ class NucleicAcidPart(Part):
         self._oligos = set()
 
         # Helix parameters
-        if grid_type == GridEnum.HONEYCOMB:
+        if grid_type in (GridEnum.HONEYCOMB, GridEnum.NONE):
             self._STEP_SIZE = 21
             self._SUB_STEP_SIZE = 7
             self._TURNS_PER_STEP = 2
@@ -3592,7 +3592,7 @@ class NucleicAcidPart(Part):
 
     def setGridType(self, grid_type: EnumType):
         # TODO[NF]:  Docstring
-        self._group_properties.setdefault(grid_type, GridEnum.HONEYCOMB)
+        self._group_properties.setdefault(grid_type, GridEnum.NONE)
 # end class
 
 

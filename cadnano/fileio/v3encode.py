@@ -170,8 +170,10 @@ def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> d
     # max_id_number_of_helices = part.getMaxIdNum()
     # vh_insertions = part.insertions()
 
-    # iterate through virtualhelix list
+    '''NOTE This SHOULD INCLUDE 'grid_type' key
+    '''
     group_props = part.getModelProperties().copy()
+    assert('grid_type' in group_props)
 
     if group_props.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to encode Parts with ARBITRARY point configurations

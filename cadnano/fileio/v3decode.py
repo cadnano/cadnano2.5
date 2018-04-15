@@ -70,12 +70,11 @@ def determineOrthoViewType(part_dict: dict, grid_type: EnumType):
         elif grid_type == GridEnum.SQUARE:
             if SquareDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)[0] > THRESHOLD:
                 return OrthoViewEnum.GRID
-    return OrthoViewEnum.SLICE
+    return OrthoViewEnum.GRID
 # end def
 
 def determineLatticeType(part_dict: dict) -> EnumType:
-    """
-    Guess the lattice type based on the sum of the vector distances between
+    """Guess the lattice type based on the sum of the vector distances between
     VHs and the closest lattice position.
 
 
@@ -83,8 +82,12 @@ def determineLatticeType(part_dict: dict) -> EnumType:
         part_dict:  the ``dict`` corresponding to the part to be imported
 
     Returns:
-        ``GridEnum.HONEYCOMB`` or ``GridEnum.SQUARE``
+        ``GridEnum.HONEYCOMB`` or ``GridEnum.SQUARE`` or ``GridEnum.NONE``
     """
+    grid_type = part_dict.get('grid_type')
+    if grid_type is not None:
+        return grid_type
+
     vh_id_list = part_dict.get('vh_list')
     origins = part_dict.get('origins')
 
