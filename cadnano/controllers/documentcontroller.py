@@ -38,6 +38,7 @@ from cadnano import app, setReopen, util
 from cadnano.proxies.cnenum import (
     GridEnum,
     OrthoViewEnum,
+    ViewSendEnum,
     EnumType
 )
 from cadnano.gui.dialogs.ui_about import Ui_About
@@ -774,10 +775,13 @@ class DocumentController(object):
 
         slice_view_widget = self.win.slice_dock_widget
         path_view_widget = self.win.path_dock_widget
+        views = self.win.views
+        sgv = views[ViewSendEnum.SLICE]
         if show:
-            # self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
-            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
+            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
+            # self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
             slice_view_widget.show()
+            sgv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
             slice_view_widget.hide()
     # end def
@@ -792,13 +796,15 @@ class DocumentController(object):
             show: Whether the grid view should be hidden or shown
         '''
         assert isinstance(show, bool)
-
         grid_view_widget = self.win.grid_dock_widget
         path_view_widget = self.win.path_dock_widget
+        views = self.win.views
+        ggv = views[ViewSendEnum.GRID]
         if show:
-            # self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
-            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
+            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
+            # self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
             grid_view_widget.show()
+            ggv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
             grid_view_widget.hide()
     # end def

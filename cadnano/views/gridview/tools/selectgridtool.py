@@ -21,7 +21,10 @@ from PyQt5.QtWidgets import (
     QAction,
     QGraphicsSceneMouseEvent
 )
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import (
+    QCursor,
+    QKeyEvent
+)
 
 from cadnano.views.gridview.virtualhelixitem import GridVirtualHelixItem
 from cadnano.gui.palette import getPenObj
@@ -41,8 +44,7 @@ from cadnano.cntypes import (
 )
 
 def normalizeRect(rect: RectT) -> RectT:
-    """Summary
-
+    """
     Args:
         rect: rectangle tuple
 
@@ -287,13 +289,9 @@ class SelectGridTool(AbstractGridTool):
                             event: QGraphicsSceneMouseEvent):
         """
         Args:
-            part_item:
-            target_item: Description
-            event: Description
-
-        Deleted Parameters:
-            snap_to_item (GridVirtualHelixItem or GridEvent): Item to snap
-                selection to
+            part_item: the part item
+            target_item: Item to snap
+            event: mosue event
         """
         self.setPartItem(part_item)
         if (self.snap_origin_item is not None and event.modifiers() == Qt.AltModifier):
@@ -317,11 +315,12 @@ class SelectGridTool(AbstractGridTool):
                 doc.addVirtualHelicesToSelection(part, [target_item.idNum()])
     # end def
 
-    def doSnap(self, part_item, snap_to_item):
+    def doSnap(self, part_item: GridNucleicAcidPartItemT,
+                    snap_to_item: Union[GridVirtualHelixItem, GridEvent]):
         """
         Args:
-            part_item (PartItem)
-            snap_to_item (GridVirtualHelixItem or GridEvent): Item to snap
+            part_item: the part item
+            snap_to_item: Item to snap
                 selection to
         """
         # print("snapping")
@@ -337,7 +336,7 @@ class SelectGridTool(AbstractGridTool):
             destination = self.findNearestPoint(part_item, origin)
         else:  # GridEvent
             destination = snap_to_item.pos()
-            print("GridEvent", destination)
+            # print("GridEvent", destination)
 
         origin = part_item.mapFromScene(origin)
         if destination is None:
@@ -346,7 +345,8 @@ class SelectGridTool(AbstractGridTool):
             # snap clockwise
             destination = self.findNextPoint(part_item, origin)
         if origin is None or destination is None:
-            print("o", origin, "d", destination)
+            # print("o", origin, "d", destination)
+            pass
         delta = destination - origin
         dx, dy = delta.x(), delta.y()
         group = self.group
@@ -460,7 +460,7 @@ class SelectGridTool(AbstractGridTool):
     def getCustomContextMenu(self, point: QPoint):
         """
         Args:
-            point: Description
+            point: the point to place the context menu
         """
         sgv = self.slice_graphics_view
         do_show = False
@@ -495,21 +495,20 @@ class SelectGridTool(AbstractGridTool):
 
 
 class GridSelectionGroup(QGraphicsItemGroup):
-    """Summary
-
+    """
     Attributes:
-        bounding_rect_item (TYPE): Description
-        drag_last_position (TYPE): Description
-        drag_start_position (TYPE): Description
-        tool (TYPE): Description
+        bounding_rect_item (QGraphicsRectItem):  bounding rectangle
+        drag_last_position (QPointF): last drag position
+        drag_start_position (QPointF): start position of a drag
+        tool (SelectGridTool): the selection tool
     """
 
-    def __init__(self, tool, parent=None):
-        """Summary
-
+    def __init__(self,  tool: SelectGridTool,
+                        parent: GridNucleicAcidPartItemT = None):
+        """
         Args:
-            tool (TYPE): Description
-            parent (None, optional): Description
+            tool: the selection tool
+            parent: default is ``None``. a :class:`GridNucleicAcidPartItem`
         """
         super(GridSelectionGroup, self).__init__(parent)
         self.tool = tool
@@ -528,10 +527,7 @@ class GridSelectionGroup(QGraphicsItemGroup):
     # end def
 
     def setSelectionRect(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """Set the selection rectangle
         """
         bri = self.bounding_rect_item
         rect = self.childrenBoundingRect()
@@ -561,29 +557,26 @@ class GridSelectionGroup(QGraphicsItemGroup):
         self.setFocus(False)
     # end def
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         """event.key() seems to be capital only?
 
         Args:
-            event (TYPE): Description
+            event: the key event
         """
-        print("press", ord('g'))
+        # print("press", ord('g'))
         if event.text() == 'g':
             print("hey het")
         return QGraphicsItem.keyPressEvent(self, event)
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
-            coordinates of the the event, and previous event.
-
-        Returns:
-            TYPE: Description
+            event: Contains item, scene, and screen coordinates of the
+                event, and previous event.
         """
-        print("GridSelectionGroup mousePress")
+        # print("GridSelectionGroup mousePress")
         tool = self.tool
         if event.button() != Qt.LeftButton:
             """ do context menu?
@@ -615,7 +608,7 @@ class GridSelectionGroup(QGraphicsItemGroup):
                             is_alt = modifiers == Qt.AltModifier
                             if (doc.isVirtualHelixSelected(part, origin_id_num) and
                                     not is_alt):
-                                print("origin", origin_id_num)
+                                # print("origin", origin_id_num)
                                 if tool.snap_origin_item is not None:
                                     tool.snap_origin_item.setSnapOrigin(False)
                                 tool.snap_origin_item = item
@@ -629,14 +622,13 @@ class GridSelectionGroup(QGraphicsItemGroup):
             return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 
-    def mouseMoveEvent(self, event):
-        """because GridSelectionGroup has the flag
-        QGraphicsItem.ItemIsMovable
-        we need only get the position of the item to figure
-        out what to submit to the model
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
+        """because :class:`GridSelectionGroup` has the flag
+        ``QGraphicsItem.ItemIsMovable`` we need only get the position of the
+        item to figure out what to submit to the model
 
         Args:
-            event (TYPE): Description
+            event: the mouse evenet
         """
         # 1. call this super class method first to get the item position updated
         res = QGraphicsItemGroup.mouseMoveEvent(self, event)
@@ -651,14 +643,13 @@ class GridSelectionGroup(QGraphicsItemGroup):
         return res
     # end def
 
-    def mouseReleaseEvent(self, event):
-        """because GridSelectionGroup has the flag
-        QGraphicsItem.ItemIsMovable
-        we need only get the position of the item to figure
-        out what to submit to the model
+    def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
+        """because :class:`GridSelectionGroup` has the flag
+        ``QGraphicsItem.ItemIsMovable`` we need only get the position of the
+        item to figure out what to submit to the model
 
         Args:
-            event (TYPE): Description
+            event: the mouse event
         """
         MOVE_THRESHOLD = 0.01   # ignore small moves
         # print("mouse mouseReleaseEvent", self.tool.individual_pick)

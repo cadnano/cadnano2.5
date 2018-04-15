@@ -165,7 +165,7 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
                                                 virtual_helix: VirtualHelixT,
                                                 keys: KeyT,
                                                 values: ValueT):
-        if self._cn_model == sender:
+        if self._cn_model == part:
             vh_i = self._virtual_helix_item_hash[id_num]
             for key, val in zip(keys, values):
                 if key in CNOutlinerItem.PROPERTIES:
