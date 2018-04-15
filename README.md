@@ -24,7 +24,7 @@ When in a python interpreter you can just:
 and script your designs without a GUI. See our [scripting](http://cadnano.readthedocs.io/en/master/scripting.html) docs.
 
 ## License
-
-The code BSD-3.
-The full license can be found in LICENSE
+cadnano model code is BSD-3.
+cadnano GUI code that uses PyQt5 is GPLv3
+The bothh full licenses can be found in the `LICENSE` file
 

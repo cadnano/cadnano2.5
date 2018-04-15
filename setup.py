@@ -157,9 +157,7 @@ setup(
     description='computer-aided design tool for creating DNA nanostructures',
     long_description=LONG_DESCRIPTION,
     classifiers=[
-        'Programming Language :: C',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Development Status :: 4 - Beta',
         'Intended Audience :: Science/Research',
