@@ -12,11 +12,13 @@ pjoin = os.path.join
 
 from pythreejs import (
     CylinderGeometry,
+    CylinderBufferGeometry,
     MeshLambertMaterial,
     Mesh,
     PerspectiveCamera,
     Scene,
     Renderer,
+    WebGLRenderer,
     OrbitControls,
     AmbientLight,
     DirectionalLight,
@@ -39,9 +41,11 @@ TEST_PATH = pjoin(PROJECT_DIR, 'cadnano', 'tests')
 
 import cadnano.fileio.decode as cndecode
 from cadnano.part.nucleicacidpart import NucleicAcidPart
+from cadnano.cntypes import DocT
 
 WIDTH = 600
 HEIGHT = 400
+CAM_Z = 10.
 
 def normalize(v) -> np.ndarray:
     """Normalize a vector
@@ -63,15 +67,18 @@ def vec(x):
 
 def virtualHelixMesh(   pos1,
                         pos2,
-                        radius: float,
+                        radius: float = 1.0,
                         color: str = 'red') -> Mesh:
     pos1 = np.array(pos1, dtype=float)
     pos2 = np.array(pos2, dtype=float)
     delta = pos2 - pos1
     dist = np.linalg.norm(delta)
-    c_geometry = CylinderGeometry(  radiusTop=radius,
-                                    radiusBottom=radius,
-                                    height=dist)
+    c_geometry = CylinderBufferGeometry(  radiusTop=radius,
+                                            radiusBottom=radius,
+                                            height=dist,
+                                            radiusSegments=16
+                                    )
+    # print(c_geometry.height)
     v2 = normalize(delta)
 
     # NOTE default direction in Three.js is the Y direction for geometry
@@ -100,37 +107,56 @@ def virtualHelixMesh(   pos1,
 # end def
 
 def renderScene(items: List[Mesh],
-                width: int = WIDTH, height: int = HEIGHT) -> Renderer:
+                width: int = WIDTH,
+                height: int = HEIGHT,
+                camera_z: float = CAM_Z) -> Renderer:
     c = PerspectiveCamera(fov=90, aspect=width/height, near=1, far=1000,
-                            position=[0, 0, 10], up=[0, 1, 0],
+                            position=[0, 0, camera_z], up=[0, 1, 0],
                           children=[DirectionalLight(color='white',
                                                     position=[3, 5, 1],
                                                     intensity=0.5)])
 
-    scene = Scene(children=items+[c, AmbientLight(color='#777777')])
+    scene = Scene(children=items+[c, AmbientLight(color='#777777')],
+                 background='#000000')
 
     renderer = Renderer(camera=c,
-                        scene=scene,
-                        width=width, height=height,
-                        controls=[OrbitControls(controlling=c)])
+                            scene=scene,
+                            width=width, height=height,
+                            controls=[OrbitControls(controlling=c)])
+
+    # renderer = WebGLRenderer(camera=c,
+    #                         scene=scene,
+    #                         width=width, height=height,
+    #                         controls=[OrbitControls(controlling=c)],
+    #                         alpha=True)
+    # renderer.setClearColor('#000000', 0.5)
     return renderer
 # end def
 
 def displayVHs( part: NucleicAcidPart,
                 id_nums: List[int] = [],
+                radius: float = 1.0,
                 color: str = 'coral',
                 width: int = WIDTH,
-                height: int = HEIGHT):
+                height: int = HEIGHT,
+                camera_z: float = CAM_Z,
+                colors=['coral']):
     if len(id_nums) == 0:
         id_nums = part.getIdNums()
+    len_colors = len(colors)
+
     items = []
+    i = 0
     for id_num in id_nums:
+        color = colors[i]
         vh = part.getVirtualHelix(id_num)
         pos1 = vh.getAxisPoint(0)
         pos2 = vh.getAxisPoint(vh.getSize()-1)
-        vhm = virtualHelixMesh(pos1, pos2, 1.0, color=color)
+        vhm = virtualHelixMesh(pos1, pos2, radius=radius, color=color)
         items.append(vhm)
-    renderer = renderScene(items, width, height)
+        i += 1
+        i %= len_colors
+    renderer = renderScene(items, width, height, camera_z)
     display(renderer)
 # end def
 
@@ -156,7 +182,13 @@ def testDisplay():
                       "data", designname)
     doc = cndecode.decodeFile(inputfile)
     part = doc.activePart()
-    displayVHs(part)
+    displayVHs(part, camera_z = 70)
+
+def loadFile(filename: str) -> DocT:
+    inputfile = pjoin(TEST_PATH,
+                      "data", filename)
+    doc = cndecode.decodeFile(inputfile)
+    return doc
 
 def threeMatrix(m: np.ndarray) -> List[float]:
     '''numpy 3x3 array of shape (3, 3)
@@ -169,7 +201,7 @@ def threeMatrix(m: np.ndarray) -> List[float]:
 
 if __name__ == '__main__':
     mesh = virtualHelixMesh((1,0,0), (2,0,0), 3)
-    testDisplay()
+    # testDisplay()
     '''
     ['_trait_values', '_trait_notifiers', '_trait_validators', '_cross_validation_lock',
        '_model_id', '_geometry_metadata', '_material_metadata']

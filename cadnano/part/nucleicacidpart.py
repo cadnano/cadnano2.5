@@ -1006,7 +1006,7 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def normalize(self, v: Vec3T) -> np.ndarray:
+    def normalize(v: Vec3T) -> np.ndarray:
         """Normalize a vector
 
         Args:
@@ -1022,7 +1022,7 @@ class NucleicAcidPart(Part):
     # end def
 
     @staticmethod
-    def lengthSq(self, v: Vec3T):
+    def lengthSq(v: Vec3T):
         """Compute the length of a :obj:`array-like`
 
         Args:
@@ -1034,7 +1034,7 @@ class NucleicAcidPart(Part):
         return inner1d(v, v)
 
     @staticmethod
-    def cross(self, a: Vec3T, b: Vec3T) -> List[float]:
+    def cross(a: Vec3T, b: Vec3T) -> List[float]:
         """Compute the cross product of two vectors of length 3
 
         Args:
@@ -2684,6 +2684,7 @@ class NucleicAcidPart(Part):
                                 y: float,
                                 z: float = 0.0,
                                 length: int = 42,
+                                direction: Vec3T = (0, 0, 1.),
                                 id_num: int = None,
                                 properties: Tuple = None,
                                 safe: bool = True,
@@ -2696,6 +2697,7 @@ class NucleicAcidPart(Part):
             y: y coordinate
             z: z coordinate
             length: Size of VirtualHelix.
+            direction: the direction of the virtual helix
             id_num: The id number that this VirtualHelix should correspond to
             properties: Tuple of two lists: `keys` and `values`, which
                 contain full set of properties for the VirualHelix.
@@ -2717,6 +2719,7 @@ class NucleicAcidPart(Part):
         if length < max_len:
             length = max_len
         c = CreateVirtualHelixCommand(self, x, y, z, length,
+                                        direction=direction,
                                       id_num=id_num,
                                       properties=properties,
                                       safe=safe,

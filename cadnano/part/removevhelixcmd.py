@@ -18,6 +18,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         _, self.length = part.getOffsetAndSize(id_num)
         x, y = part.getVirtualHelixOrigin(id_num)
         self.origin_pt = (x, y, 0.)
+        self.direction = tuple(part.directions[id_num]) # (0, 0, 1.)
         neighbors = part.getVirtualHelixProperties(id_num, 'neighbors')
         self.neighbors = literal_eval(neighbors)
         self.color = part.getVirtualHelixProperties(id_num, 'color')
@@ -54,7 +55,10 @@ class RemoveVirtualHelixCommand(UndoCommand):
             )
             bisect.insort_left(nneighbors, id_num)
             part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
-        vh = part._createHelix(id_num, self.origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part._createHelix(id_num, self.origin_pt,
+                                        self.direction,
+                                        self.length,
+                                        self.color)
         keys = list(self.props.keys())
         vals = list(self.props.values())
         part.setVirtualHelixProperties(id_num, keys, vals, safe=False)

@@ -9,7 +9,8 @@ from typing import (
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.cntypes import (
     NucleicAcidPartT,
-    RectT
+    RectT,
+    Vec3T
 )
 
 class CreateVirtualHelixCommand(UndoCommand):
@@ -19,6 +20,7 @@ class CreateVirtualHelixCommand(UndoCommand):
                 y: float,
                 z: float,
                 length: int,
+                direction: Vec3T = (0, 0, 1.),
                 id_num: int = None,
                 properties: Union[tuple, dict] = None,
                 safe: bool = True,
@@ -31,6 +33,7 @@ class CreateVirtualHelixCommand(UndoCommand):
             y: ``y`` coordinate of the 0 - index base
             z: ``z`` coordinate of the 0 - index base
             length: Length of the virtual helix in bases
+            direction: the direction of the virtual helix
             id_num: the ID number of the helix in the ``part``
             properties: the initial or inherited properties of the ``part``
             safe: Default is ``True``. safe must be ``True`` to update neighbors.
@@ -46,7 +49,8 @@ class CreateVirtualHelixCommand(UndoCommand):
         else:
             part._reserveIdNum(id_num)
         self.id_num: int = id_num
-        self.origin_pt: Tuple[float, float, float] = (x, y, z)
+        self.origin_pt: Vec3T = (x, y, z)
+        self.direction: Vec3T = direction
         self.length: int = length
         self.color: str = part.getColor()
         self.keys: List[str] = None
@@ -72,7 +76,7 @@ class CreateVirtualHelixCommand(UndoCommand):
         origin_pt = self.origin_pt
         self.old_limits = part.getVirtualHelixOriginLimits()
         # Set direction to (0, 0, 1) for now
-        vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
+        vh = part._createHelix(id_num, origin_pt, self.direction, self.length, self.color)
 
         if self.safe:   # update all neighbors
             if not self.neighbors:
