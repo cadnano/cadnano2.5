@@ -10,6 +10,7 @@ from cadnano.proxies.cnobject import CNObject
 from cadnano.cntypes import (
     NucleicAcidPartT,
     StrandT,
+    StrandSetT,
     KeyT,
     ValueT,
     RectT
@@ -83,6 +84,14 @@ class VirtualHelix(CNObject):
                 self._part.setVirtualHelixSize(id_num, new_size)
         else:
             return self._part.setVirtualHelixSize(self._id_num, new_size)
+    # end def
+
+    def fwdStrandSet(self) -> StrandSetT:
+        return self._part.fwd_strandsets[self._id_num]
+    # end def
+
+    def revStrandSet(self) -> StrandSetT:
+        return self._part.rev_strandsets[self._id_num]
     # end def
 
     def fwdStrand(self, idx: int) -> StrandT:
