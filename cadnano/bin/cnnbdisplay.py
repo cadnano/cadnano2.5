@@ -119,10 +119,13 @@ def renderScene(items: List[Mesh],
     scene = Scene(children=items+[c, AmbientLight(color='#777777')],
                  background='#000000')
 
+
     renderer = Renderer(camera=c,
                             scene=scene,
                             width=width, height=height,
                             controls=[OrbitControls(controlling=c)])
+
+    # scene = Scene(children=items+[c, AmbientLight(color='#777777')])
 
     # renderer = WebGLRenderer(camera=c,
     #                         scene=scene,
@@ -130,7 +133,8 @@ def renderScene(items: List[Mesh],
     #                         controls=[OrbitControls(controlling=c)],
     #                         alpha=True)
     # renderer.setClearColor('#000000', 0.5)
-    return renderer
+    renderer.render( scene, c )
+    return renderer, scene, c
 # end def
 
 def displayVHs( part: NucleicAcidPart,
@@ -156,8 +160,9 @@ def displayVHs( part: NucleicAcidPart,
         items.append(vhm)
         i += 1
         i %= len_colors
-    renderer = renderScene(items, width, height, camera_z)
+    renderer, sc, cam = renderScene(items, width, height, camera_z)
     display(renderer)
+    renderer.render(sc, cam)
 # end def
 
 def rotationMatrix(v2: np.ndarray):
