@@ -260,7 +260,7 @@ def importToPart(   part_instance : ObjectInstance,
     assert isinstance(offset, (tuple, list)) or offset is None
     assert isinstance(use_undostack, bool)
 
-    print('Importing to part where use_undostack is %s' % use_undostack)
+    # print('Importing to part where use_undostack is %s' % use_undostack)
 
     part = part_instance.reference()
     if use_undostack:

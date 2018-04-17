@@ -136,6 +136,7 @@ class NucleicAcidPart(Part):
     """
     __count = 0
     vh_editable_properties = VH_PROPERTY_KEYS.difference(set(['neighbors']))
+    editable_properties = Part.editable_properties + ['crossover_span_angle']
 
     # TODO[NF]:  Change usages of these strings to constants throughout files
     _FLOAT_PROPERTY_KEYS = [

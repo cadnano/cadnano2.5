@@ -163,7 +163,7 @@ class CNPropertyItem(QTreeWidgetItem):
 
     def configureEditor(self, parent_qw: QWidget,
                             option: QStyleOptionViewItem,
-                            model_inde: QModelIndex) -> QWidget:
+                            model_index: QModelIndex) -> QWidget:
         """
         Args:
             parent_qw: Description

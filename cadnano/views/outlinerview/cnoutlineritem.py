@@ -51,6 +51,10 @@ class CNOutlinerItem(QTreeWidgetItem):
     def _viewroot(self):
         return self.treeWidget()
 
+    @property
+    def editable_properties(self):
+        return self._cn_model.editable_properties
+
     def outlineViewObj(self) -> QTreeWidgetItem:
         return self
     # end def
