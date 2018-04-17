@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-"""Summary
-"""
 from typing import (
     Tuple,
     Union,
