@@ -103,22 +103,25 @@ def virtualHelixMesh(   pos1,
     rotm = rotationMatrix(v2)
     mesh.setRotationFromMatrix(threeMatrix(rotm))
     mesh.position = mid_point.tolist()
-    return mesh
+    return mesh, mid_point
 # end def
 
 def renderScene(items: List[Mesh],
                 width: int = WIDTH,
                 height: int = HEIGHT,
-                camera_z: float = CAM_Z) -> Renderer:
+                camera_z: float = CAM_Z,
+                mid_point: List[float] = [0, 0, 0]
+                ) -> Renderer:
     c = PerspectiveCamera(fov=90, aspect=width/height, near=1, far=1000,
                             position=[0, 0, camera_z], up=[0, 1, 0],
                           children=[DirectionalLight(color='white',
                                                     position=[3, 5, 1],
                                                     intensity=0.5)])
+    for x in items:
+        x.position = [x.position[i] - mid_point[i] for i in range(3)]
 
     scene = Scene(children=items+[c, AmbientLight(color='#777777')],
                  background='#000000')
-
 
     renderer = Renderer(camera=c,
                             scene=scene,
@@ -150,17 +153,21 @@ def displayVHs( part: NucleicAcidPart,
     len_colors = len(colors)
 
     items = []
+    mid_point_sum = (0, 0, 0)
     i = 0
     for id_num in id_nums:
         color = colors[i]
         vh = part.getVirtualHelix(id_num)
         pos1 = vh.getAxisPoint(0)
         pos2 = vh.getAxisPoint(vh.getSize()-1)
-        vhm = virtualHelixMesh(pos1, pos2, radius=radius, color=color)
+        vhm, mid_point = virtualHelixMesh(pos1, pos2, radius=radius, color=color)
+
         items.append(vhm)
+        mid_point_sum += mid_point
         i += 1
         i %= len_colors
-    renderer, sc, cam = renderScene(items, width, height, camera_z)
+    mid_point = mid_point_sum / len(id_nums)
+    renderer, sc, cam = renderScene(items, width, height, camera_z, mid_point.tolist())
     display(renderer)
     renderer.render(sc, cam)
 # end def
