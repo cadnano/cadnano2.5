@@ -83,6 +83,15 @@ class GridItem(QGraphicsRectItem):
         self.previous_grid_type = grid_type
     # end def
 
+    def destroyItem(self):
+        print("destroying sliceView GridItem")
+        scene = self.scene()
+        for point in self.points:
+            point.destroyItem()
+        self.points = None
+        scene.removeItem(self)
+    # end def
+
     def updateGrid(self):
         """Recreates the grid according to the latest part_item outline rect.
         """
