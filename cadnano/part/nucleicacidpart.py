@@ -2783,8 +2783,6 @@ class NucleicAcidPart(Part):
         assert z_list is None or len(z_list) == len(x_list)
         assert length is None or isinstance(length, (list, tuple))
         assert length is None or len(length) == len(x_list)
-        assert id_num is None or isinstance(id_num, (list, tuple))
-        assert id_num is None or len(id_num) == len(x_list)
         assert properties_list is None or isinstance(properties_list, (list, tuple))
         assert properties_list is None or len(properties_list) == len(x_list)
         assert safe_list is None or isinstance(safe_list, (list, tuple))

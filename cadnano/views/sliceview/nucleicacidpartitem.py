@@ -396,6 +396,8 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
                 assert len(self.coordinates_to_vhid.keys()) == len(set(self.coordinates_to_vhid.keys()))
                 assert len(self.coordinates_to_vhid.values()) == len(set(self.coordinates_to_vhid.values()))
+            else:
+                self.coordinates_to_vhid[coordinates] = id_num
     # end def
 
     def partVirtualHelixRemovingSlot(self, sender: NucleicAcidPart,
@@ -967,7 +969,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             x_list, y_list, parity_list = zip(*path)
             id_numbers = self._model_part.batchCreateVirtualHelices(x_list=x_list,
                                                                     y_list=y_list,
-                                                                    parity=parity_list)
+                                                                    parities=parity_list)
             for id_number in id_numbers:
                 vhi = self._virtual_helix_item_hash[id_number]
                 tool.setVirtualHelixItem(vhi)
