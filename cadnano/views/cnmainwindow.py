@@ -120,14 +120,12 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._file_open_path: str = None  # will be set in _readSettings
         self._has_no_associated_file: bool = True
 
-        # self.settings = QSettings("cadnano.org", "cadnano2.5")
-        self.settings: QSettings = QSettings(   "69bfae41ee5e33c689fded70c89cc64c",
-                                                "69bfae41ee5e33c689fded70c89cc64c")
+        self.settings: Qsettings = QSettings("cadnano.org", "cadnano2.5")
         self._readSettings()
 
         self._tool_hints_visible:   bool = False
         self._filter_hints_visible: bool = False
-        self.slice_view_showing:    bool = False
+        self.slice_view_showing:    bool = app().prefs.orthoview_style_idx == OrthoViewEnum.SLICE
 
         # Appearance pref
         if not app().prefs.show_icon_labels:
