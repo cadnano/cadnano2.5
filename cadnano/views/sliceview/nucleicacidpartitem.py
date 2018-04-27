@@ -1113,6 +1113,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # placing clipboard's min_id_same_parity on the hovered_coord,
         # hint neighboring coords with offsets corresponding to clipboard vhs
         hinted_coordinates = []
+        copied_coordinates = []
         for i in range(len(vh_id_list)):
             vh_id, vh_len = vh_id_list[i]
             position_xy = part.locationQt(vh_id, self.scaleFactor())
@@ -1122,11 +1123,14 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
                                                             self.scale_factor)
             hint_coord = (hov_row+(copied_row-min_row), hov_col+(copied_col-min_col))
             hinted_coordinates.append(hint_coord)
+            copied_coordinates.append((copied_row, copied_col))
 
         # If any of the highlighted coordinates conflict with any existing VHs, abort
         if any(coord in self.coordinates_to_vhid.keys() for coord in hinted_coordinates):
+            print('Conflict')
             self.copypaste_origin_offset = None
             return
+        print(self.coordinates_to_vhid)
 
         for i, hint_coord in enumerate(hinted_coordinates):
             self.griditem.showCreateHint(hint_coord, next_idnums=(i+id_offset, i+id_offset))
