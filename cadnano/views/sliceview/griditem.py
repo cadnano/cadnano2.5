@@ -83,6 +83,15 @@ class GridItem(QGraphicsRectItem):
         self.previous_grid_type = grid_type
     # end def
 
+    def destroyItem(self):
+        print("destroying sliceView GridItem")
+        scene = self.scene()
+        for point in self.points:
+            point.destroyItem()
+        self.points = None
+        scene.removeItem(self)
+    # end def
+
     def updateGrid(self):
         """Recreates the grid according to the latest part_item outline rect.
         """
@@ -365,6 +374,13 @@ class GridPoint(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
     # end def
 
+    def destroyItem(self):
+        self.grid = None
+        self.click_area.destroyItem()
+        self.click_area = None
+        self.scene().removeItem(self)
+    # end def
+
     def showCreateHint(self, id_num: int = 0,
                             show_hint: bool = True,
                             color: str = None):
@@ -591,6 +607,10 @@ class ClickArea(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
         self.setPen(getNoPen())
     # end def
+
+    def destroyItem(self):
+        self.parent_obj = None
+        self.scene().removeItem(self)
 
     def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
         """Triggered when hovering mouse is moved on the grid."""

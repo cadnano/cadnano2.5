@@ -85,7 +85,7 @@ class GridItem(QGraphicsPathItem):
     # end def
 
     def destroyItem(self):
-        print("destroying GridItem")
+        print("destroying gridView GridItem")
         scene = self.scene()
         for point in self.points:
             point.destroyItem()
