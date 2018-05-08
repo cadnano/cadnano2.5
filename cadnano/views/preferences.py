@@ -32,6 +32,7 @@ class Preferences(object):
 
     def __init__(self):
         self.qs = QSettings("cadnano.org", "cadnano2.5")
+        print('Settings are stored at %s' % self.qs.fileName())
         self.ui_prefs = Ui_Preferences()
         self.widget = QWidget()
         self.ui_prefs.setupUi(self.widget)
@@ -59,14 +60,14 @@ class Preferences(object):
         """
         qs = self.qs
         qs.beginGroup(PREFS_GROUP_NAME)
-        self.gridview_style_idx = qs.value(GRIDVIEW_STYLE_KEY,
-                                            GRIDVIEW_STYLE_DEFAULT)
-        self.orthoview_style_idx = qs.value(ORTHOVIEW_KEY,
-                                            ORTHOVIEW_DEFAULT)
-        self.zoom_speed = qs.value(ZOOM_SPEED_KEY,
-                                    ZOOM_SPEED_DEFAULT)
+        self.gridview_style_idx = int(qs.value(GRIDVIEW_STYLE_KEY,
+                                               GRIDVIEW_STYLE_DEFAULT))
+        self.orthoview_style_idx = int(qs.value(ORTHOVIEW_KEY,
+                                                ORTHOVIEW_DEFAULT))
+        self.zoom_speed = int(qs.value(ZOOM_SPEED_KEY,
+                                       ZOOM_SPEED_DEFAULT))
         self.show_icon_labels = qs.value(SHOW_ICON_LABELS_KEY,
-                                        SHOW_ICON_LABELS_DEFAULT)
+                                         SHOW_ICON_LABELS_DEFAULT)
         qs.endGroup()
         ui_prefs = self.ui_prefs
         ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
