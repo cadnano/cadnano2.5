@@ -1,79 +1,105 @@
-"""Summary
-"""
-from PyQt5.QtCore import QRectF, QPointF
-from PyQt5.QtWidgets import QGraphicsObject
+# -*- coding: utf-8 -*-
+from typing import (
+    Optional,
+    Tuple
+)
+
+from PyQt5.QtCore import (
+    QRectF,
+    QPointF
+)
+from PyQt5.QtGui import (
+    QPen,
+    QBrush,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    QStyleOptionGraphicsItem,
+    QWidget
+)
 
 from cadnano import util
+from cadnano.views.abstractitems import AbstractTool
 from cadnano.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getPenObj, getNoBrush
+from cadnano.gui.palette import (
+    getPenObj,
+    getNoBrush
+)
+from cadnano.views.pathview import (
+        PathToolManagerT,
+        PathVirtualHelixItemT
+)
+from cadnano.cntypes import (
+    DocT,
+    WindowT,
+    Vec2T
+)
 
-_BW = styles.PATH_BASE_WIDTH
-_TOOL_RECT = QRectF(0, 0, _BW, _BW)  # protected not private
-_RECT = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,
+
+_BW: int = styles.PATH_BASE_WIDTH
+_TOOL_RECT: QRectF = QRectF(0, 0, _BW, _BW)  # protected not private
+_RECT: QRectF = QRectF(-styles.PATH_BASE_HL_STROKE_WIDTH,
                -styles.PATH_BASE_HL_STROKE_WIDTH,
                _BW + 2 * styles.PATH_BASE_HL_STROKE_WIDTH,
                _BW + 2 * styles.PATH_BASE_HL_STROKE_WIDTH)
-_PEN = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
-_BRUSH = getNoBrush()
+_PEN: QPen = getPenObj(styles.RED_STROKE, styles.PATH_BASE_HL_STROKE_WIDTH)
+_BRUSH: QBrush = getNoBrush()
 
 
-class AbstractPathTool(QGraphicsObject):
+class AbstractPathTool(AbstractTool):
     """Abstract base class to be subclassed by all other pathview tools.
 
     Attributes:
-        manager (TYPE): Description
+        manager: Description
     """
 
-    def __init__(self, manager):
-        """Summary
-
+    def __init__(self, manager: PathToolManagerT):
+        """
         Args:
-            manager (TYPE): Description
+            manager: Description
         """
         super(AbstractPathTool, self).__init__(None)
-        self.manager = manager
-        self._window = manager.window
-        self._active = False
+        self.manager: PathToolManagerT = manager
+        self._window: DocT = manager.window
+        self._active: bool = False
         self._last_location = None
-        self._rect = _RECT
-        self._pen = _PEN
+        self._rect: QRectF = _RECT
+        self._pen: QPen = _PEN
         self.hide()
 
     ######################## Drawing #######################################
-    def paint(self, painter, option, widget=None):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         painter.setPen(self._pen)
         painter.setBrush(_BRUSH)
         painter.drawRect(_TOOL_RECT)
 
-    def boundingRect(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+    def boundingRect(self) -> QRectF:
+        """Returns:
+            bounding rectangle
         """
         return self._rect
 
     ######################### Positioning and Parenting ####################
-    def updateLocation(self, virtual_helix_item, scene_pos, *args):
+    def updateLocation(self, virtual_helix_item: PathVirtualHelixItemT,
+                            scene_pos: QPointF,
+                            *args):
         """Takes care of caching the location so that a tool switch
         outside the context of an event will know where to
         position the new tool and snaps self's pos to the upper
         left hand corner of the base the user is mousing over.
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            scene_pos (TYPE): Description
-            *args (TYPE): Description
+            virtual_helix_item: PathVirtualHelixItem
+            scene_pos: point in the scene
+            *args: DESCRIPTION
         """
         if virtual_helix_item:
             if self.parentObject() != virtual_helix_item:
@@ -91,16 +117,17 @@ class AbstractPathTool(QGraphicsObject):
                 self.hide()
     # end def
 
-    def lastLocation(self):
-        """A tool's last_location consists of a VirtualHelixItem and a ScenePos
-        (QPoint) representing the last known location of the mouse.
+    def lastLocation(self) -> Optional[Tuple[PathVirtualHelixItemT, QPointF]]:
+        """A tool's last_location consists of a :class`PathVirtualHelixItem` and
+        a scene pos (:class:`QPoint`) representing the last known location of
+        the mouse.
 
         It can be used to provide visual continuity when switching tools.
         When the new tool is selected, this method will be invoked by
         calling `updateLocation(*old_tool.lastLocation())`.
 
         Returns:
-            location (tuple): (virtual_helix_item, QPoint) representing the last
+            location: ``(virtual_helix_item, QPointF)`` representing the last
                 known location of the mouse for purposes of positioning
                 the graphic of a new tool on switching tools (the tool
                 will have called on it)
@@ -108,7 +135,7 @@ class AbstractPathTool(QGraphicsObject):
         """
         return self._last_location
 
-    def setActive(self, will_be_active, old_tool=None):
+    def setActive(self, will_be_active: bool, old_tool=None):
         """
         Called by PathToolManager.setActiveTool when the tool becomes
         active. Used, for example, to show/hide tool-specific ui elements.
@@ -129,7 +156,7 @@ class AbstractPathTool(QGraphicsObject):
         """
         self.hide()
 
-    def isActive(self):
+    def isActive(self) -> bool:
         """Returns isActive
         """
         return self._active
@@ -140,20 +167,21 @@ class AbstractPathTool(QGraphicsObject):
         """
 
     ####################### Coordinate Utilities ###########################
-    def baseAtPoint(self, virtual_helix_item, pt):
-        """Returns the (is_fwd, base_idx, strand_idx) corresponding
+    def baseAtPoint(self, virtual_helix_item: PathVirtualHelixItemT,
+                        pt: QPointF) -> Tuple[bool, int, int]:
+        """Returns the ``(is_fwd, base_idx, strand_idx)`` corresponding
         to pt in virtual_helix_item.
 
         Args:
-            virtual_helix_item (cadnano.views.pathview.virtualhelixitem.VirtualHelixItem): Description
-            pt (TYPE): Description
+            virtual_helix_item: :class:`PathVirtualHelixItem`
+            pt: Point on helix
         """
         x, strand_idx = self.helixIndex(pt)
 
         is_fwd = False if util.clamp(strand_idx, 0, 1) else True
         return (is_fwd, x, strand_idx)
 
-    def helixIndex(self, point):
+    def helixIndex(self, point: QPointF) -> Vec2T:
         """Returns the (row, col) of the base which point lies within.
 
         Returns:

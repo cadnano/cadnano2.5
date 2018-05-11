@@ -1,6 +1,5 @@
-"""Summary
-"""
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
+# -*- coding: utf-8 -*-
+from cadnano.views.abstractitems import AbstractToolManager
 
 from .selecttool import SelectTool
 from .createtool import CreateTool
@@ -35,8 +34,8 @@ class PathToolManager(AbstractToolManager):
             window (TYPE): Description
             viewroot (TYPE): Description
         """
-        super(PathToolManager, self).__init__('path', window, viewroot)
-        self.tool_names = ('Select', 'Create', 'Break', 'Insertion', 'Skip', 'Paint', 'Add_Seq', 'Mods')
+        super(PathToolManager, self).__init__('path', 'path', window, viewroot)
+        self.tool_names = ('select', 'create', 'break', 'insertion', 'skip', 'paint', 'add_seq', 'mods')
         self.select_tool = SelectTool(self, viewroot)
         self.create_tool = CreateTool(self)
         self.break_tool = BreakTool(self)

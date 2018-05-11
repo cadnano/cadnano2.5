@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Summary
 
 Attributes:
@@ -50,11 +51,20 @@ Attributes:
     ZSTRANDITEM (int): Description
     ZXOVERITEM (int): Description
 """
-from PyQt5.QtGui import QFont, QFontMetricsF
-from cadnano.views.styles import THE_FONT, THE_FONT_SIZE
-from cadnano.views.styles import BLUE_FILL, BLUE_STROKE  # noqa
-from cadnano.views.styles import GRAY_FILL, GRAY_STROKE  # noqa
-from cadnano.views.styles import ORANGE_FILL, ORANGE_STROKE  # noqa
+from PyQt5.QtGui import (
+    QFont,
+    QFontMetricsF
+)
+from cadnano.views.styles import (
+    THE_FONT,
+    THE_FONT_SIZE,
+    BLUE_FILL,
+    BLUE_STROKE,  # noqa
+    GRAY_FILL,
+    GRAY_STROKE,  # noqa
+    ORANGE_FILL,
+    ORANGE_STROKE  # noqa
+)
 
 # Path Sizing
 VIRTUALHELIXHANDLEITEM_RADIUS = 15

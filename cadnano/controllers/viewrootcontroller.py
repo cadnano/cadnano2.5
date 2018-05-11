@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    DocT
+)
+
 class ViewRootController():
-    def __init__(self, view_root, model_document):
+    def __init__(self, view_root, model_document: DocT):
         self._view_root = view_root
         self._model_document = model_document
         self.connectSignals()
@@ -13,6 +18,7 @@ class ViewRootController():
         m_d.documentSelectionFilterChangedSignal.connect(v_r.selectionFilterChangedSlot)
         m_d.documentPreXoverFilterChangedSignal.connect(v_r.preXoverFilterChangedSlot)
         m_d.documentViewResetSignal.connect(v_r.resetRootItemSlot)
+        m_d.documentChangeViewSignalingSignal.connect(v_r.documentChangeViewSignalingSlot)
     # end def
 
     def disconnectSignals(self):
@@ -23,4 +29,5 @@ class ViewRootController():
         m_d.documentSelectionFilterChangedSignal.disconnect(v_r.selectionFilterChangedSlot)
         m_d.documentPreXoverFilterChangedSignal.disconnect(v_r.preXoverFilterChangedSlot)
         m_d.documentViewResetSignal.disconnect(v_r.resetRootItemSlot)
+        m_d.documentChangeViewSignalingSignal.disconnect(v_r.documentChangeViewSignalingSlot)
     # end def

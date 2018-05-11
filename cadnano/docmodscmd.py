@@ -1,16 +1,18 @@
+# -*- coding: utf-8 -*-
+"""For adding modifications from a document
+"""
 from cadnano.proxies.cnproxy import UndoCommand
-
-
-"""
-For adding modifications from a document
-"""
+from cadnano.cntypes import (
+    DocT
+)
 
 
 class AddModCommand(UndoCommand):
-    def __init__(self, document, params, mid):
+    def __init__(self, document: DocT, params: dict, mid: str):
         """
-        params: the mods parameters
-        mid: mod id
+        Args:
+            params: the mods parameters
+            mid: mod id
         """
         super(AddModCommand, self).__init__()
         self._document = document

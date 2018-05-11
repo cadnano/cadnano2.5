@@ -1,13 +1,20 @@
+# -*- coding: utf-8 -*-
 from PyQt5.QtCore import QSettings
-from PyQt5.QtWidgets import QWidget, QDialogButtonBox
+from PyQt5.QtWidgets import (
+    QWidget,
+    QDialogButtonBox
+)
 
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
-from cadnano.proxies.cnenum import OrthoViewType
-
+from cadnano.proxies.cnenum import (
+    OrthoViewEnum,
+    EnumType
+)
 
 PREFS_GROUP_NAME = 'Preferences'
+
 ORTHOVIEW_KEY = 'EnabledOrthoView'
-ORTHOVIEW_DEFAULT = OrthoViewType.GRID
+ORTHOVIEW_DEFAULT = OrthoViewEnum.GRID
 GRIDVIEW_STYLES = ('points', 'points and lines')
 GRIDVIEW_STYLE_KEY = 'GridviewStyle'
 GRIDVIEW_STYLE_DEFAULT = 0  # points idx
@@ -28,35 +35,42 @@ class Preferences(object):
         self.readPreferences()
         self.widget.addAction(self.ui_prefs.actionClose)
         self.connectSignals()
+
         self.document = None
     # end def
 
     ### SUPPORT METHODS ###
     def connectSignals(self):
-        self.ui_prefs.actionClose.triggered.connect(self.hideDialog)
-        self.ui_prefs.button_box.clicked.connect(self.handleButtonClick)
-        self.ui_prefs.enabled_orthoview_combo_box.currentIndexChanged.connect(self.orthoviewChangedSlot)
-        self.ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.gridviewStyleChangedSlot)
-        self.ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
-        self.ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
+        ui_prefs = self.ui_prefs
+        ui_prefs.actionClose.triggered.connect(self.hideDialog)
+        ui_prefs.button_box.clicked.connect(self.handleButtonClick)
+        ui_prefs.enabled_orthoview_combo_box.currentIndexChanged.connect(self.orthoviewChangedSlot)
+        ui_prefs.gridview_style_combo_box.currentIndexChanged.connect(self.gridviewStyleChangedSlot)
+        ui_prefs.show_icon_labels.clicked.connect(self.setShowIconLabels)
+        ui_prefs.zoom_speed_slider.valueChanged.connect(self.setZoomSpeed)
     # end def
 
     def readPreferences(self):
         """Read the preferences from self.qs (a QSettings object) and set the
         preferences accordingly in the UI popup.
-
-        Returns: None
         """
-        self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.gridview_style_idx = self.qs.value(GRIDVIEW_STYLE_KEY, GRIDVIEW_STYLE_DEFAULT)
-        self.orthoview_style = self.qs.value(ORTHOVIEW_KEY, ORTHOVIEW_DEFAULT)
-        self.zoom_speed = self.qs.value(ZOOM_SPEED_KEY, ZOOM_SPEED_DEFAULT)
-        self.show_icon_labels = self.qs.value(SHOW_ICON_LABELS_KEY, SHOW_ICON_LABELS_DEFAULT)
-        self.qs.endGroup()
-        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
-        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_style)
-        self.ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
-        self.ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
+        qs = self.qs
+        qs.beginGroup(PREFS_GROUP_NAME)
+        self.gridview_style_idx = qs.value(GRIDVIEW_STYLE_KEY,
+                                            GRIDVIEW_STYLE_DEFAULT)
+        self.orthoview_style_idx = qs.value(ORTHOVIEW_KEY,
+                                            ORTHOVIEW_DEFAULT)
+        self.zoom_speed = qs.value(ZOOM_SPEED_KEY,
+                                    ZOOM_SPEED_DEFAULT)
+        self.show_icon_labels = qs.value(SHOW_ICON_LABELS_KEY,
+                                        SHOW_ICON_LABELS_DEFAULT)
+        qs.endGroup()
+        ui_prefs = self.ui_prefs
+        ui_prefs.gridview_style_combo_box.setCurrentIndex(self.gridview_style_idx)
+        # print(self.orthoview_style_idx, ORTHOVIEW_DEFAULT, ORTHOVIEW_DEFAULT)
+        ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(self.orthoview_style_idx)
+        ui_prefs.show_icon_labels.setChecked(self.show_icon_labels)
+        ui_prefs.zoom_speed_slider.setProperty("value", self.zoom_speed)
     # end def
 
     ### SLOTS ###
@@ -94,10 +108,11 @@ class Preferences(object):
         """Restore the default settings."""
         gridview_style_idx = GRIDVIEW_STYLE_DEFAULT
         orthoview_idx = ORTHOVIEW_DEFAULT
-        self.ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
-        self.ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(orthoview_idx)
-        self.ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
-        self.ui_prefs.show_icon_labels.setChecked(SHOW_ICON_LABELS_DEFAULT)
+        ui_prefs = self.ui_prefs
+        ui_prefs.gridview_style_combo_box.setCurrentIndex(gridview_style_idx)
+        ui_prefs.enabled_orthoview_combo_box.setCurrentIndex(orthoview_idx)
+        ui_prefs.zoom_speed_slider.setProperty("value", ZOOM_SPEED_DEFAULT)
+        ui_prefs.show_icon_labels.setChecked(SHOW_ICON_LABELS_DEFAULT)
     # end def
 
     def setGridviewStyleIdx(self, value):
@@ -108,21 +123,23 @@ class Preferences(object):
         self.qs.endGroup()
     # end def
 
-    def orthoviewChangedSlot(self, value):
-        """
-        Handles index changes to enabled_orthoview_combo_box.
+    def orthoviewChangedSlot(self, view_idx: EnumType):
+        """Handles index changes to enabled_orthoview_combo_box.
         Saves the setting and notifies the doc controller to toggle
         visibilty of appropriate 2D orthographic view (sliceview or gridview).
         """
-        new_orthoview_style = int(value)
-        assert new_orthoview_style in (OrthoViewType.GRID, OrthoViewType.SLICE)
+        assert isinstance(view_idx, EnumType)
+        new_orthoview_style_idx = view_idx
+        assert new_orthoview_style_idx in (OrthoViewEnum.GRID, OrthoViewEnum.SLICE)
 
-        self.orthoview_style = new_orthoview_style
+        self.orthoview_style_idx = new_orthoview_style_idx
         self.qs.beginGroup(PREFS_GROUP_NAME)
-        self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style)
+        self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style_idx)
         self.qs.endGroup()
 
-        self.document.controller().setSliceOrGridViewVisible(self.orthoview_style)
+        controller = self.document.controller()
+        controller.setSliceOrGridViewVisible(self.orthoview_style_idx)
+    # end def
 
     def setShowIconLabels(self, value):
         self.show_icon_labels = value

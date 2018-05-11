@@ -1,19 +1,50 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
+# -*- coding: utf-8 -*-
 from math import floor
+from typing import (
+    Tuple,
+    Any
+)
 
-# import logging
-# logger = logging.getLogger(__name__)
-
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QBrush, QPen, QPainterPath, QPolygonF
-from PyQt5.QtWidgets import qApp
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsPathItem
-from PyQt5.QtWidgets import QGraphicsRectItem, QGraphicsEllipseItem
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QPen,
+    QPainterPath,
+    QPolygonF,
+    QMouseEvent,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    qApp,
+    QGraphicsItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsEllipseItem,
+    QStyleOptionGraphicsItem,
+    QWidget,
+    QGraphicsSceneMouseEvent,
+    QGraphicsSceneHoverEvent
+)
 
 from cadnano.gui.palette import getColorObj
 from cadnano.views.pathview import pathstyles as styles
+from cadnano.views.pathview.tools.pathselection import SelectionItemGroup
+from cadnano.views.pathview import (
+    PathVirtualHelixItemT,
+    PathXoverItemT,
+    PathStrandItemT,
+    PathNucleicAcidPartItemT
+)
+from cadnano.cntypes import (
+    StrandT,
+    DocT,
+    Vec2T,
+    WindowT
+)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
@@ -72,11 +103,10 @@ MOD_RECT = QRectF(.25*_BASE_WIDTH, -.25*_BASE_WIDTH, 0.5*_BASE_WIDTH, 0.5*_BASE_
 class EndpointItem(QGraphicsPathItem):
 
     FILTER_NAME = "endpoint"
-    __slots__ = ('_strand_item', '_getActiveTool', 'cap_type',
-                 '_low_drag_bound', '_high_drag_bound', '_mod_item',
-                 '_click_area')
 
-    def __init__(self, strand_item, cap_type, is_drawn5to3):
+    def __init__(self,  strand_item: PathStrandItemT,
+                        cap_type: str,  # low, high, dual
+                        is_drawn5to3: bool):
         """The parent should be a StrandItem."""
         super(EndpointItem, self).__init__(strand_item.virtualHelixItem())
 
@@ -106,15 +136,16 @@ class EndpointItem(QGraphicsPathItem):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def idx(self):
-        """Look up base_idx, as determined by strandItem idxs and cap type."""
+    def idx(self) ->  int:
+        """Look up ``base_idx``, as determined by :class:`StrandItem `idxs and
+        cap type."""
         if self.cap_type == 'low':
             return self._strand_item.idxs()[0]
         else:  # high or dual, doesn't matter
             return self._strand_item.idxs()[1]
     # end def
 
-    def partItem(self):
+    def partItem(self) -> PathNucleicAcidPartItemT:
         return self._strand_item.partItem()
     # end def
 
@@ -124,12 +155,12 @@ class EndpointItem(QGraphicsPathItem):
         self.mousePressEvent = QGraphicsPathItem.mousePressEvent
     # end def
 
-    def window(self):
+    def window(self) -> WindowT:
         return self._strand_item.window()
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
-    def updatePosIfNecessary(self, idx):
-        """Update position if necessary and return True if updated."""
+    def updatePosIfNecessary(self, idx: int) -> Tuple[bool, SelectionItemGroup]:
+        """Update position if necessary and return ``True`` if updated."""
         group = self.group()
         self.tempReparent()
         x = int(idx * _BASE_WIDTH)
@@ -143,7 +174,7 @@ class EndpointItem(QGraphicsPathItem):
             #     group.addToGroup(self)
             return False, group
 
-    def safeSetPos(self, x, y):
+    def safeSetPos(self, x: float, y: float):
         """
         Required to ensure proper reparenting if selected
         """
@@ -154,21 +185,21 @@ class EndpointItem(QGraphicsPathItem):
             group.addToGroup(self)
     # end def
 
-    def resetEndPoint(self, is_drawn5to3):
+    def resetEndPoint(self, is_drawn5to3: bool):
         self.setParentItem(self._strand_item.virtualHelixItem())
         self._initCapSpecificState(is_drawn5to3)
         upperLeftY = 0 if is_drawn5to3 else _BASE_WIDTH
         self.setY(upperLeftY)
     # end def
 
-    def showMod(self, mod_id, color):
+    def showMod(self, mod_id: str, color: str):
         self._mod_item = QGraphicsEllipseItem(MOD_RECT, self)
         self.changeMod(mod_id, color)
         self._mod_item.show()
         # print("Showing {}".format(mod_id))
     # end def
 
-    def changeMod(self, mod_id, color):
+    def changeMod(self, mod_id: str, color: str):
         self._mod_id = mod_id
         self._mod_item.setBrush(QBrush(getColorObj(color)))
     # end def
@@ -179,7 +210,9 @@ class EndpointItem(QGraphicsPathItem):
         self._mod_id = None
     # end def
 
-    def destroy(self):
+    def destroyItem(self):
+        '''Remove this object and references to it from the view
+        '''
         scene = self.scene()
         if self._mod_item is not None:
             self.destroyMod()
@@ -189,7 +222,7 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _initCapSpecificState(self, is_drawn5to3):
+    def _initCapSpecificState(self, is_drawn5to3: bool):
         c_t = self.cap_type
         if c_t == 'low':
             path = PP_L5 if is_drawn5to3 else PP_L3
@@ -201,10 +234,9 @@ class EndpointItem(QGraphicsPathItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
-        """
-        Parses a mousePressEvent, calling the approproate tool method as
-        necessary. Stores _move_idx for future comparison.
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        """Parses a :meth:`mousePressEvent`, calling the appropriate tool
+        method as necessary. Stores ``_move_idx`` for future comparison.
         """
         self.scene().views()[0].addToPressList(self)
         idx = self._strand_item.setActiveEndpoint(self.cap_type)
@@ -215,14 +247,13 @@ class EndpointItem(QGraphicsPathItem):
             modifiers = event.modifiers()
             getattr(self, tool_method_name)(modifiers, event, self.idx())
 
-    def hoverLeaveEvent(self, event):
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent):
         self._strand_item.hoverLeaveEvent(event)
     # end def
 
-    def hoverMoveEvent(self, event):
-        """
-        Parses a mousePressEvent, calling the approproate tool method as
-        necessary. Stores _move_idx for future comparison.
+    def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
+        """Parses a :meth:`hoverMoveEvent`, calling the approproate tool
+        method as necessary.
         """
         vhi_num = self._strand_item.idNum()
         oligo_length = self._strand_item._model_strand.oligo().length()
@@ -235,10 +266,9 @@ class EndpointItem(QGraphicsPathItem):
         elif active_tool_str == 'addSeqTool':
             return self.addSeqToolHoverMove(event, self.idx())
 
-    def mouseMoveEvent(self, event):
-        """
-        Parses a mouseMoveEvent, calling the approproate tool method as
-        necessary. Updates _move_idx if it changed.
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
+        """Parses a :meth:`mouseMoveEvent`, calling the appropriate tool
+        method as necessary. Updates ``_move_idx`` if it changed.
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -248,10 +278,9 @@ class EndpointItem(QGraphicsPathItem):
                 self._move_idx = idx
                 getattr(self, tool_method_name)(modifiers, idx)
 
-    def customMouseRelease(self, event):
-        """
-        Parses a mouseReleaseEvent, calling the approproate tool method as
-        necessary. Deletes _move_idx if necessary.
+    def customMouseRelease(self, event: QMouseEvent):
+        """Parses a :meth:`mouseReleaseEvent` from view, calling the appropriate
+         tool method as necessary. Deletes ``_move_idx`` if necessary.
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):  # if the tool method exists
@@ -262,34 +291,9 @@ class EndpointItem(QGraphicsPathItem):
             del self._move_idx
 
     ### TOOL METHODS ###
-    # def addSeqToolMousePress(self, modifiers, event, idx):
-    #     """
-    #     Checks that a scaffold was clicked, and then calls apply sequence
-    #     to the clicked strand via its oligo.
-    #     """
-    #     m_strand = self._strand_item._model_strand
-    #     s_i = self._strand_item
-    #     viewroot = s_i.viewroot()
-    #     current_filter_set = viewroot.selectionFilterSet()
-    #     if (all(f in current_filter_set for f in s_i.strandFilter()) and self.FILTER_NAME in current_filter_set):
-    #         olgLen, seqLen = self._getActiveTool().applySequence(m_strand.oligo())
-    #         if olgLen:
-    #             msg = "Populated %d of %d scaffold bases." % (min(seqLen, olgLen), olgLen)
-    #             if olgLen > seqLen:
-    #                 d = olgLen - seqLen
-    #                 msg = msg + " Warning: %d bases have no sequence." % d
-    #             elif olgLen < seqLen:
-    #                 d = seqLen - olgLen
-    #                 msg = msg + " Warning: %d sequence bases unused." % d
-    #             self.partItem().updateStatusBar(msg)
-    #     else:
-    #         pass
-    #         # logger.info("The clicked strand %s does not match current selection filter %s. "\
-    #         #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-    #         #             s_i.strandFilter(), self.FILTER_NAME)
-    # # end def
-
-    def modsToolMousePress(self, modifiers, event, idx):
+    def modsToolMousePress(self,    modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         """
         Checks that a scaffold was clicked, and then calls apply sequence
         to the clicked strand via its oligo.
@@ -298,26 +302,33 @@ class EndpointItem(QGraphicsPathItem):
         self._getActiveTool().applyMod(m_strand, idx)
     # end def
 
-    def breakToolMouseRelease(self, modifiers, x):
+    def breakToolMouseRelease(self, modifiers: Qt.KeyboardModifiers,
+                                    x):
         """Shift-click to merge without switching back to select tool."""
         m_strand = self._strand_item._model_strand
         if modifiers & Qt.ShiftModifier:
             m_strand.merge(self.idx())
     # end def
 
-    def eraseToolMousePress(self, modifiers, event, idx):
+    def eraseToolMousePress(self,   modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         """Erase the strand."""
         m_strand = self._strand_item._model_strand
         m_strand.strandSet().removeStrand(m_strand)
     # end def
 
-    def insertionToolMousePress(self, modifiers, event, idx):
+    def insertionToolMousePress(self,   modifiers: Qt.KeyboardModifiers,
+                                        event: QGraphicsSceneMouseEvent,
+                                        idx: int):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
         m_strand.addInsertion(idx, 1)
     # end def
 
-    def paintToolMousePress(self, modifiers, event, idx):
+    def paintToolMousePress(self,   modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
         if qApp.keyboardModifiers() & Qt.ShiftModifier:
@@ -327,24 +338,27 @@ class EndpointItem(QGraphicsPathItem):
         m_strand.oligo().applyColor(color)
     # end def
 
-    def addSeqToolMousePress(self, modifiers, event, idx):
+    def addSeqToolMousePress(self,  modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         oligo = self._strand_item._model_strand.oligo()
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.applySequence(oligo)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.applySequence(oligo)
     # end def
 
-    def addSeqToolHoverMove(self, event, idx):
+    def addSeqToolHoverMove(self,   event: QGraphicsSceneHoverEvent,
+                                    idx: int):
         # m_strand = self._model_strand
         # vhi = self._strand_item._virtual_helix_item
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.hoverMove(self, event, flag=self._isdrawn5to3)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.hoverMove(self, event, flag=self._isdrawn5to3)
     # end def
 
-    def addSeqToolHoverLeave(self, event):
+    def addSeqToolHoverLeave(self, event: QGraphicsSceneHoverEvent):
         self._getActiveTool().hoverLeaveEvent(event)
     # end def
 
-    def createToolHoverMove(self, idx):
+    def createToolHoverMove(self, idx: int):
         """Create the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
@@ -355,7 +369,9 @@ class EndpointItem(QGraphicsPathItem):
             temp_xover.updateFloatingFromStrandItem(vhi, m_strand, idx)
     # end def
 
-    def createToolMousePress(self, modifiers, event, idx):
+    def createToolMousePress(self,  modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         """Break the strand is possible."""
         m_strand = self._strand_item._model_strand
         vhi = self._strand_item._virtual_helix_item
@@ -374,9 +390,10 @@ class EndpointItem(QGraphicsPathItem):
             active_tool.attemptToCreateXover(vhi, m_strand, idx)
     # end def
 
-    def selectToolMousePress(self, modifiers, event, idx):
-        """
-        Set the allowed drag bounds for use by selectToolMouseMove.
+    def selectToolMousePress(self,  modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
+        """Set the allowed drag bounds for use by selectToolMouseMove.
         """
         # print("%s.%s [%d]" % (self, util.methodName(), self.idx()))
         self._low_drag_bound, self._high_drag_bound = self._strand_item._model_strand.getResizeBounds(self.idx())
@@ -394,7 +411,7 @@ class EndpointItem(QGraphicsPathItem):
             return selection_group.mousePressEvent(event)
     # end def
 
-    def selectToolMouseMove(self, modifiers, idx):
+    def selectToolMouseMove(self, modifiers: Qt.KeyboardModifiers, idx: int):
         """
         Given a new index (pre-validated as different from the prev index),
         calculate the new x coordinate for self, move there, and notify the
@@ -402,7 +419,7 @@ class EndpointItem(QGraphicsPathItem):
         """
     # end def
 
-    def selectToolMouseRelease(self, modifiers, x):
+    def selectToolMouseRelease(self, modifiers: Qt.KeyboardModifiers, x):
         """
         If the positional-calculated idx differs from the model idx, it means
         we have moved and should notify the model to resize.
@@ -419,13 +436,15 @@ class EndpointItem(QGraphicsPathItem):
             m_strand.merge(self.idx())
     # end def
 
-    def skipToolMousePress(self, modifiers, event, idx):
+    def skipToolMousePress(self,    modifiers: Qt.KeyboardModifiers,
+                                    event: QGraphicsSceneMouseEvent,
+                                    idx: int):
         """Add an insert to the strand if possible."""
         m_strand = self._strand_item._model_strand
         m_strand.addInsertion(idx, -1)
     # end def
 
-    def restoreParent(self, pos=None):
+    def restoreParent(self, pos: QPointF = None):
         """
         Required to restore parenting and positioning in the partItem
         """
@@ -435,7 +454,7 @@ class EndpointItem(QGraphicsPathItem):
         self.setSelected(False)
     # end def
 
-    def tempReparent(self, pos=None):
+    def tempReparent(self, pos: QPointF = None):
         vh_item = self._strand_item.virtualHelixItem()
         if pos is None:
             pos = self.scenePos()
@@ -444,8 +463,8 @@ class EndpointItem(QGraphicsPathItem):
         self.setPos(temp_point)
     # end def
 
-    def setSelectedColor(self, value):
-        if value == True:
+    def setSelectedColor(self, use_default: bool):
+        if use_default == True:
             color = getColorObj(styles.SELECTED_COLOR)
         else:
             oligo = self._strand_item.strand().oligo()
@@ -458,12 +477,26 @@ class EndpointItem(QGraphicsPathItem):
         self.setBrush(brush)
     # end def
 
-    def updateHighlight(self, brush):
+    def updateHighlight(self, brush: QBrush):
         if not self.isSelected():
             self.setBrush(brush)
     # end def
 
-    def itemChange(self, change, value):
+    def itemChange(self,    change: QGraphicsItem.GraphicsItemChange,
+                            value: Any) -> bool:
+        """Used for selection of the :class:`EndpointItem`
+
+        Args:
+            change: parameter that is changing
+            value : new value whose type depends on the ``change`` argument
+
+        Returns:
+            If the change is a ``QGraphicsItem.ItemSelectedChange``::
+
+                ``True`` if selected, other ``False``
+
+            Otherwise default to :meth:`QGraphicsPathItem.itemChange()` result
+        """
         # for selection changes test against QGraphicsItem.ItemSelectedChange
         # intercept the change instead of the has changed to enable features.
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
@@ -514,9 +547,9 @@ class EndpointItem(QGraphicsPathItem):
         return QGraphicsPathItem.itemChange(self, change, value)
     # end def
 
-    def modelDeselect(self, document):
-        """ A strand is selected based on whether its low or high endpoints
-        are selected.  this value is a tuple (is_low, is_high) of booleans
+    def modelDeselect(self, document: DocT):
+        """A strand is selected based on whether its low or high endpoints
+        are selected.  this value is a tuple ``(is_low, is_high)`` of booleans
         """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
@@ -532,9 +565,9 @@ class EndpointItem(QGraphicsPathItem):
         self.restoreParent()
     # end def
 
-    def modelSelect(self, document):
-        """ A strand is selected based on whether its low or high endpoints
-        are selected.  this value is a tuple (is_low, is_high) of booleans
+    def modelSelect(self, document: DocT):
+        """A strand is selected based on whether its low or high endpoints
+        are selected.  this value is a tuple ``(is_low, is_high)`` of booleans
         """
         strand = self._strand_item.strand()
         test = document.isModelStrandSelected(strand)
@@ -548,7 +581,9 @@ class EndpointItem(QGraphicsPathItem):
         document.addStrandToSelection(strand, out_value)
     # end def
 
-    def paint(self, painter, option, widget):
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget):
         painter.setPen(self.pen())
         painter.setBrush(self.brush())
         painter.drawPath(self.path())

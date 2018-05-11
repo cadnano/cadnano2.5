@@ -1,9 +1,36 @@
+# -*- coding: utf-8 -*-
 import numpy as np
-from PyQt5.QtCore import QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt, QRectF, pyqtProperty
-from PyQt5.QtGui import QBrush, QColor, QPainterPath, QPen, QPolygonF, QRadialGradient, QTransform
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtCore import (
+    pyqtProperty,
+    QLineF,
+    QObject,
+    QPointF,
+    QPropertyAnimation,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QPen,
+    QPainterPath,
+    QPolygonF,
+    QRadialGradient,
+    QTransform
+)
+from PyQt5.QtWidgets import (
+    QGraphicsEllipseItem,
+    QGraphicsLineItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem
+)
 
-from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
+from cadnano.gui.palette import (
+    getBrushObj,
+    getColorObj,
+    getNoPen,
+    getPenObj
+)
 from . import gridstyles as styles
 
 
@@ -493,15 +520,9 @@ class PreXoverItem(QGraphicsRectItem):
         self.bond_3p.setLine(self._default_bond_3p)
     # end def
 
-    def destroy(self, scene):
-        """Summary
-
-        Args:
-            scene (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
+    def destroyItem(self):
+        '''Remove this object and references to it from the view'''
+        scene = self.scene()
         self.phos_item.adapter.resetAnimations()
         self.phos_item.adapter = None
         scene.removeItem(self.phos_item)
@@ -705,7 +726,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         line = QLineF(p1, p2)
         self.baseNearLine.setLine(line)
 
-    def remove(self):
+    def destroyItem(self):
         """Summary
         """
         fpxis = self.fwd_prexover_items
@@ -713,9 +734,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         scene = self.scene()
         for i in range(len(fpxis)):
             x = fpxis.pop(i)
-            x.destroy(scene)
+            x.destroyItem()
             x = rpxis.pop(i)
-            x.destroy(scene)
+            x.destroyItem()
         self.virtual_helix_item = None
         self.model_part = None
         scene.removeItem(self.active_wedge_gizmo)

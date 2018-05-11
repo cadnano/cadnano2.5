@@ -1,22 +1,44 @@
 # -*- coding: utf-8 -*-
 from array import array
 from operator import attrgetter
+from typing import (
+    Tuple,
+    List,
+    Iterable
+)
+
 from cadnano import util
+from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
-from .insertioncmd import AddInsertionCommand, RemoveInsertionCommand
+from cadnano.proxies.cnenum import EnumType
+from .insertioncmd import (
+    AddInsertionCommand,
+    RemoveInsertionCommand
+)
 from .insertioncmd import ChangeInsertionCommand
-from .modscmd import AddModsCommand, RemoveModsCommand
+from .modscmd import (
+    AddModsCommand,
+    RemoveModsCommand
+)
 from .resizecmd import ResizeCommand
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+    OligoT,
+    StrandSetT,
+    StrandT,
+    DocT,
+    InsertionT,
+    SegmentT
+)
 
-
-def sixb(x): return x.encode('utf-8')
+def sixb(x: str) -> bytes: return x.encode('utf-8')
 
 
 ARRAY_TYPE = 'B'
 
 
-def tostring(x): return x.tobytes().decode('utf-8')
+def tostring(x: array) -> str: return x.tobytes().decode('utf-8')
 
 
 class Strand(CNObject):
@@ -45,7 +67,9 @@ class Strand(CNObject):
 
     """
 
-    def __init__(self, strandset, base_idx_low, base_idx_high, oligo=None):
+    def __init__(self,  strandset: StrandSetT,
+                        base_idx_low: int, base_idx_high: int,
+                        oligo: OligoT = None):
         self._document = strandset.document()
         super(Strand, self).__init__(strandset)
         self._strandset = strandset
@@ -84,7 +108,7 @@ class Strand(CNObject):
         self._is_forward = is_forward
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         s = "%s.<%s(%s, %s)>" % (self._strandset.__repr__(),
                                  self.__class__.__name__,
                                  self._base_idx_low,
@@ -92,10 +116,10 @@ class Strand(CNObject):
         return s
     # end def
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         return self._base_idx_low < other._base_idx_low
 
-    def generator5pStrand(self):
+    def generator5pStrand(self) -> StrandT:
         """Iterate from self to the final _strand5p is None
         3' to 5'
 
@@ -114,7 +138,7 @@ class Strand(CNObject):
 
     # end def
 
-    def generator3pStrand(self):
+    def generator3pStrand(self) -> StrandT:
         """Iterate from self to the final _strand3p is None
         5prime to 3prime
         Includes originalCount to check for circular linked list
@@ -131,7 +155,7 @@ class Strand(CNObject):
                 break
     # end def
 
-    def strandFilter(self):
+    def strandFilter(self) -> List[str]:
         return self._strandset.strandFilter()
 
     ### SIGNALS ###
@@ -145,10 +169,10 @@ class Strand(CNObject):
     """pyqtSignal(QObject, tuple)"""
 
     strandXover5pRemovedSignal = ProxySignal(CNObject, CNObject, name='strandXover5pRemovedSignal')
-    """pyqtSignal(QObject, QObject): (strand3p, strand5p)"""
+    """pyqtSignal(QObject, QObject: (strand3p, strand5p)"""
 
     strandConnectionChangedSignal = ProxySignal(CNObject, name='strandConnectionChangedSignal')
-    """pyqtSignal(QObject): strand"""
+    """pyqtSignal(QObjec): strand"""
 
     strandInsertionAddedSignal = ProxySignal(CNObject, object, name='strandInsertionAddedSignal')
     """pyqtSignal(QObject, object): (strand, insertion object)"""
@@ -173,27 +197,27 @@ class Strand(CNObject):
 
     ### SLOTS ###
     ### ACCESSORS ###
-    def part(self):
+    def part(self) -> NucleicAcidPartT:
         return self._strandset.part()
     # end def
 
-    def idNum(self):
+    def idNum(self) -> int:
         return self._id_num
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         return self._document
     # end def
 
-    def oligo(self):
+    def oligo(self) -> OligoT:
         return self._oligo
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         return self._oligo.getColor()
     # end def
 
-    def sequence(self, for_export=False):
+    def sequence(self, for_export: bool = False) -> str:
         seq = self._sequence
         if seq:
             return util.markwhite(seq) if for_export else seq
@@ -202,41 +226,41 @@ class Strand(CNObject):
         return ''
     # end def
 
-    def abstractSeq(self):
+    def abstractSeq(self) -> str:
         return ','.join([str(i) for i in self.abstract_sequence])
 
-    def strandSet(self):
+    def strandSet(self) -> StrandSetT:
         return self._strandset
     # end def
 
-    def strandType(self):
+    def strandType(self) -> EnumType:
         return self._strandset.strandType()
 
-    def isForward(self):
+    def isForward(self) -> bool:
         return self._strandset.isForward()
 
-    def setSequence(self, sequence_string):
+    def setSequence(self, sequence: str) -> Tuple[str, str]:
         """Applies sequence string from 5' to 3'
-        return the tuple (used, unused) portion of the sequence_string
+        return the tuple (used, unused) portion of the sequence
 
         Args:
-            sequence_string (str):
+            sequence (str):
 
         Returns:
             tuple: of :obj:`str` of form::
 
                 (used, unused)
         """
-        if sequence_string is None:
+        if sequence is None:
             self._sequence = None
             return None, None
         length = self.totalLength()
-        if len(sequence_string) < length:
-            bonus = length - len(sequence_string)
-            sequence_string += ''.join([' ' for x in range(bonus)])
-        temp = sequence_string[0:length]
+        if len(sequence) < length:
+            bonus = length - len(sequence)
+            sequence += ''.join([' ' for x in range(bonus)])
+        temp = sequence[0:length]
         self._sequence = temp
-        return temp, sequence_string[length:]
+        return temp, sequence[length:]
     # end def
 
     def reapplySequence(self):
@@ -258,7 +282,7 @@ class Strand(CNObject):
         # end for
     # end def
 
-    def getComplementStrands(self):
+    def getComplementStrands(self) -> List[StrandT]:
         """Return the list of complement strands that overlap with this strand.
         """
         comp_ss = self.strandSet().complementStrandSet()
@@ -266,7 +290,7 @@ class Strand(CNObject):
                 comp_ss.getOverlappingStrands(self._base_idx_low, self._base_idx_high)]
     # end def
 
-    def setComplementSequence(self, sequence_string, strand):
+    def setComplementSequence(self, sequence: str, strand: StrandT) -> str:
         """This version takes anothers strand and only sets the indices that
         align with the given complimentary strand.
 
@@ -284,11 +308,11 @@ class Strand(CNObject):
         at draw time, or export time
 
         Args:
-            sequence_string (str):
+            sequence (str):
             strand (Strand):
 
         Returns:
-            str: the used portion of the sequence_string
+            str: the used portion of the sequence
         """
         s_low_idx, s_high_idx = self._base_idx_low, self._base_idx_high
         c_low_idx, c_high_idx = strand.idxs()
@@ -303,11 +327,11 @@ class Strand(CNObject):
         total_length = self.totalLength()
 
         # see if we are applying
-        if sequence_string is None:
+        if sequence is None:
             # clear out string for in case of not total overlap
             use_seq = ''.join([' ' for x in range(total_length)])
         else:  # use the string as is
-            use_seq = sequence_string[::-1] if is_forward else sequence_string
+            use_seq = sequence[::-1] if is_forward else sequence
 
         temp = array(ARRAY_TYPE, sixb(use_seq))
         if self_seq is None:
@@ -372,23 +396,23 @@ class Strand(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR QUERYING THE MODEL ###
-    def connection3p(self):
+    def connection3p(self) -> StrandT:
         return self._strand3p
     # end def
 
-    def connection5p(self):
+    def connection5p(self) -> StrandT:
         return self._strand5p
     # end def
 
-    def idxs(self):
+    def idxs(self) -> SegmentT:
         return (self._base_idx_low, self._base_idx_high)
     # end def
 
-    def lowIdx(self):
+    def lowIdx(self) -> int:
         return self._base_idx_low
     # end def
 
-    def highIdx(self):
+    def highIdx(self) -> int:
         return self._base_idx_high
     # end def
 
@@ -404,11 +428,11 @@ class Strand(CNObject):
         """
         # return self.idx5Prime
 
-    def dump5p(self):
+    def dump5p(self) -> Tuple[int, bool, int]:
         return self._id_num, self._is_forward, self.idx5Prime()
     # def
 
-    def getSequenceList(self):
+    def getSequenceList(self) -> List[Tuple[int, Tuple[str, str]]]:
         """return the list of sequences strings comprising the sequence and the
         inserts as a tuple with the index of the insertion
         [(idx, (strandItemString, insertionItemString), ...]
@@ -417,50 +441,57 @@ class Strand(CNObject):
         by keys in order so if keys are indices, the insertions will iterate
         out from low index to high index
         """
-        seqList = []
+        seq_list = []
         is_forward = self._is_forward
         seq = self._sequence if is_forward else self._sequence[::-1]
         # assumes a sequence has been applied correctly and is up to date
         tL = self.totalLength()
 
-        offsetLast = 0
-        lengthSoFar = 0
-        iLength = 0
+        offset_last = 0
+        length_so_far = 0
+        i_length = 0
         lI, hI = self.idxs()
 
         for insertion in self.insertionsOnStrand():
-            iLength = insertion.length()
+            i_length = insertion.length()
             index = insertion.idx()
-            offset = index + 1 - lI + lengthSoFar
-            if iLength < 0:
+            offset = index + 1 - lI + length_so_far
+            if i_length < 0:
                 offset -= 1
             # end if
-            lengthSoFar += iLength
-            seqItem = seq[offsetLast:offset]  # the stranditem seq
+            length_so_far += i_length
+            seq_item = seq[offset_last:offset]  # the stranditem seq
 
             # Because skips literally skip displaying a character at a base
             # position, this needs to be accounted for seperately
-            if iLength < 0:
-                seqItem += ' '
-                offsetLast = offset
+            if i_length < 0:
+                seq_item += ' '
+                offset_last = offset
             else:
-                offsetLast = offset + iLength
-            seqInsertion = seq[offset:offsetLast]  # the insertions sequence
-            seqList.append((index, (seqItem, seqInsertion)))
+                offset_last = offset + i_length
+            seq_insertion = seq[offset:offset_last]  # the insertions sequence
+            seq_list.append((index, (seq_item, seq_insertion)))
         # end for
         # append the last bit of the strand
-        seqList.append((lI + tL, (seq[offsetLast:tL], '')))
+        seq_list.append((lI + tL, (seq[offset_last:tL], '')))
         if not is_forward:
             # reverse it again so all sub sequences are from 5' to 3'
-            for i in range(len(seqList)):
-                index, temp = seqList[i]
-                seqList[i] = (index, (temp[0][::-1], temp[1][::-1]))
-        return seqList
+            for i in range(len(seq_list)):
+                index, temp = seq_list[i]
+                seq_list[i] = (index, (temp[0][::-1], temp[1][::-1]))
+        return seq_list
     # end def
 
-    def canResizeTo(self, new_low, new_high):
+    def canResizeTo(self, new_low: int, new_high: int) -> bool:
         """Checks to see if a resize is allowed. Similar to getResizeBounds
         but works for two bounds at once.
+
+        Args:
+            new_low: index
+            new_high: index
+
+        Returns:
+            ``True`` if can resize, ``False`` otherwise
         """
         part = self.part()
         id_num = self._id_num
@@ -472,7 +503,7 @@ class Strand(CNObject):
             return True
         return False
 
-    def getResizeBounds(self, idx):
+    def getResizeBounds(self, idx: int) -> SegmentT:
         """Determines (inclusive) low and high drag boundaries resizing
         from an endpoint located at idx.
 
@@ -487,6 +518,12 @@ class Strand(CNObject):
             high bound is determined by checking for higher neighbor strands.
 
         When a neighbor is not present, just use the Part boundary.
+
+        Args:
+            idx: index
+
+        Returns:
+            index bounds
         """
         part = self.part()
         neighbors = self._strandset.getNeighbors(self)
@@ -506,7 +543,7 @@ class Strand(CNObject):
             return self._base_idx_low + 1, high
     # end def
 
-    def hasXoverAt(self, idx):
+    def hasXoverAt(self, idx: int) -> bool:
         """An xover is necessarily at an enpoint of a strand
         """
         if idx == self.highIdx():
@@ -517,7 +554,9 @@ class Strand(CNObject):
             return False
     # end def
 
-    def canInstallXoverAt(self, idx, from_strand, from_idx):
+    def canInstallXoverAt(self, idx: int,
+                                from_strand: StrandT,
+                                from_idx: int) -> bool:
         """Assumes idx is:
         self.lowIdx() <= idx <= self.highIdx()
         """
@@ -568,43 +607,58 @@ class Strand(CNObject):
                 return False
     # end def
 
-    def insertionLengthBetweenIdxs(self, idxL, idxH):
+    def insertionLengthBetweenIdxs(self, idx_low: int, idx_high: int) -> int:
         """includes the length of insertions in addition to the bases
+
+        Args:
+            idx_low: low index
+            idx_high: high index
+
+        Returns:
+            total length
         """
         tL = 0
-        insertions = self.insertionsOnStrand(idxL, idxH)
+        insertions = self.insertionsOnStrand(idx_low, idx_high)
         for insertion in insertions:
             tL += insertion.length()
         return tL
     # end def
 
-    def insertionsOnStrand(self, idxL=None, idxH=None):
+    def insertionsOnStrand(self, idx_low: int = None,
+                                idx_high: int = None) -> List[InsertionT]:
         """if passed indices it will use those as a bounds
+
+        Args:
+            idx_low: low index
+            idx_high: high index
+
+        Returns:
+            list of :class:`Insertion`
         """
         insertions = []
         insertionsDict = self.part().insertions()[self._id_num]
         sortedIndices = sorted(insertionsDict.keys())
-        if idxL is None:
-            idxL, idxH = self.idxs()
+        if idx_low is None:
+            idx_low, idx_high = self.idxs()
         for index in sortedIndices:
             insertion = insertionsDict[index]
-            if idxL <= insertion.idx() <= idxH:
+            if idx_low <= insertion.idx() <= idx_high:
                 insertions.append(insertion)
             # end if
         # end for
         return insertions
     # end def
 
-    def modifersOnStrand(self):
+    def modifersOnStrand(self) -> List[dict]:
         """
         """
         mods = []
-        modsDict = self.part().mods()['ext_instances']
+        modsDict = self.part().modifications()['ext_instances']
         id_num = self._id_num
-        isstaple = True  # self.isStaple()
+        is_staple = True  # self.isStaple()
         idxL, idxH = self.idxs()
-        keyL = "{},{},{}".format(id_num, isstaple, idxL)
-        keyH = "{},{},{}".format(id_num, isstaple, idxH)
+        keyL = "{},{},{}".format(id_num, is_staple, idxL)
+        keyH = "{},{},{}".format(id_num, is_staple, idxH)
         if keyL in modsDict:
             mods.append(modsDict[keyL])
         if keyH in modsDict:
@@ -612,11 +666,11 @@ class Strand(CNObject):
         return mods
     # end def
 
-    def length(self):
+    def length(self) -> int:
         return self._base_idx_high - self._base_idx_low + 1
     # end def
 
-    def totalLength(self):
+    def totalLength(self) -> int:
         """includes the length of insertions in addition to the bases
         """
         tL = 0
@@ -628,7 +682,7 @@ class Strand(CNObject):
     # end def
 
     ### PUBLIC METHODS FOR EDITING THE MODEL ###
-    def addMods(self, document, mod_id, idx, use_undostack=True):
+    def addMods(self, document: DocT, mod_id: str, idx: int, use_undostack: bool = True):
         """Used to add mods during a merge operation."""
         cmds = []
         idx_low, idx_high = self.idxs()
@@ -649,7 +703,7 @@ class Strand(CNObject):
         # end if
     # end def
 
-    def removeMods(self, document, mod_id, idx, use_undostack=True):
+    def removeMods(self, document: DocT, mod_id: str, idx: int, use_undostack: bool = True):
         """Used to add mods during a merge operation."""
         idx_low, idx_high = self.idxs()
         print("attempting to remove")
@@ -660,7 +714,7 @@ class Strand(CNObject):
         # end if
     # end def
 
-    def addInsertion(self, idx, length, use_undostack=True):
+    def addInsertion(self, idx: int, length: int, use_undostack: bool = True):
         """Adds an insertion or skip at idx.
         length should be::
 
@@ -690,7 +744,7 @@ class Strand(CNObject):
         # end if
     # end def
 
-    def changeInsertion(self, idx, length, use_undostack=True):
+    def changeInsertion(self, idx: int, length: int, use_undostack: bool = True):
         """
         Args:
             idx (int):
@@ -717,7 +771,7 @@ class Strand(CNObject):
         # end if
     # end def
 
-    def removeInsertion(self, idx, use_undostack=True):
+    def removeInsertion(self, idx: int, use_undostack: bool = True):
         """
         Args:
             idx (int):
@@ -743,7 +797,7 @@ class Strand(CNObject):
         self.deleteLater()  # QObject also emits a destroyed() Signal
     # end def
 
-    def merge(self, idx):
+    def merge(self, idx: int):
         """Check for neighbor, then merge if possible.
 
         Args:
@@ -766,7 +820,9 @@ class Strand(CNObject):
             raise IndexError
     # end def
 
-    def resize(self, new_idxs, use_undostack=True, update_segments=True):
+    def resize(self, new_idxs: SegmentT,
+                    use_undostack: bool = True,
+                    update_segments: bool = True):
         cmds = []
         cmds += self.getRemoveInsertionCommands(new_idxs)
         cmds.append(ResizeCommand(self, new_idxs, update_segments=update_segments))
@@ -774,31 +830,31 @@ class Strand(CNObject):
                              use_undostack=use_undostack)
     # end def
 
-    def setConnection3p(self, strand):
+    def setConnection3p(self, strand: StrandT):
         self._strand3p = strand
     # end def
 
-    def setConnection5p(self, strand):
+    def setConnection5p(self, strand: StrandT):
         self._strand5p = strand
     # end def
 
-    def setIdxs(self, idxs):
+    def setIdxs(self, idxs: SegmentT):
         self._base_idx_low = idxs[0]
         self._base_idx_high = idxs[1]
     # end def
 
-    def setOligo(self, new_oligo, emit_signals=False):
+    def setOligo(self, new_oligo: OligoT, emit_signals: bool = False):
         self._oligo = new_oligo
         if emit_signals:
             self.strandHasNewOligoSignal.emit(self)
     # end def
 
-    def split(self, idx, update_sequence=True):
+    def split(self, idx: int, update_sequence: bool = True):
         """Called by view items to split this strand at idx."""
         self._strandset.splitStrand(self, idx, update_sequence)
 
     ### PUBLIC SUPPORT METHODS ###
-    def getRemoveInsertionCommands(self, new_idxs):
+    def getRemoveInsertionCommands(self, new_idxs: SegmentT):
         """Removes Insertions, Decorators, and Modifiers that have fallen out of
         range of new_idxs.
 
@@ -832,13 +888,14 @@ class Strand(CNObject):
         return self.clearInsertionsCommands(insertions, cIdxL, cIdxH)
     # end def
 
-    def clearInsertionsCommands(self, insertions, idxL, idxH):
+    def clearInsertionsCommands(self, insertions: Iterable[InsertionT],
+                                    idx_low: int, idx_high: int) -> List[UndoCommand]:
         """clear out insertions in this range
         """
         commands = []
         comp_ss = self.strandSet().complementStrandSet()
 
-        overlappingStrandList = comp_ss.getOverlappingStrands(idxL, idxH)
+        overlappingStrandList = comp_ss.getOverlappingStrands(idx_low, idx_high)
         for insertion in insertions:
             idx = insertion.idx()
             removeMe = True
@@ -855,7 +912,7 @@ class Strand(CNObject):
                 # print "keeping %s insertion at %d" % (self, key)
         # end for
 
-        # ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
+        # TODO ADD CODE HERE TO HANDLE DECORATORS AND MODIFIERS
         return commands
     # end def
 
@@ -864,7 +921,7 @@ class Strand(CNObject):
         return self.clearInsertionsCommands(insertions, *self.idxs())
     # end def
 
-    def hasInsertionAt(self, idx):
+    def hasInsertionAt(self, idx: int) -> bool:
         insts = self.part().insertions()[self._id_num]
         return idx in insts
     # end def
@@ -881,7 +938,7 @@ class Strand(CNObject):
         return new_s
     # end def
 
-    def _deepCopy(self, strandset, oligo):
+    def _deepCopy(self, strandset: StrandSetT, oligo: OligoT):
         """
         """
         new_s = Strand(strandset, *self.idxs())

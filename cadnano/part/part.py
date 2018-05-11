@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 from uuid import uuid4
+from typing import (
+    Any,
+    Tuple
+)
 
 from cadnano import util
 from cadnano.proxies.cnproxy import ProxySignal
 from cadnano.proxies.cnobject import CNObject
+from cadnano.objectinstance import ObjectInstance
 from .changeinstancepropertycmd import ChangeInstancePropertyCommand
 from cadnano.setpropertycmd import SetPropertyCommand
 # from cadnano.addinstancecmd import AddInstanceCommand
 # from cadnano.removeinstancecmd import RemoveInstanceCommand
+from cadnano.cntypes import (
+    DocT
+)
 
 
 class Part(CNObject):
@@ -25,7 +33,7 @@ class Part(CNObject):
     Copying a PartInstance only creates a new PartInstance with the same
     Part(), with a mutable parent and position field.
     """
-    editable_properties = ['name', 'color', 'is_visible', 'grid_type', 'workplane_idxs']
+    editable_properties = ['name', 'color', 'is_visible', 'grid_type']
 
     def __init__(self, *args, **kwargs):
         """Sets the parent document, sets bounds for part dimensions, and sets up
@@ -53,7 +61,7 @@ class Part(CNObject):
             raise NotImplementedError(e)
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         cls_name = self.__class__.__name__
         return "<%s %s>" % (cls_name, str(id(self))[-4:])
 
@@ -89,7 +97,7 @@ class Part(CNObject):
     ### SLOTS ###
 
     ### ACCESSORS ###
-    def document(self):
+    def document(self) -> DocT:
         """Get this objects Document
 
         Returns:
@@ -98,7 +106,7 @@ class Part(CNObject):
         return self._document
     # end def
 
-    def setDocument(self, document):
+    def setDocument(self, document: DocT):
         """set this object's Document
 
         Args:
@@ -107,7 +115,7 @@ class Part(CNObject):
         self._document = document
     # end def
 
-    def _canRemove(self):
+    def _canRemove(self) -> bool:
         """If _instance_count == 1 you could remove the part
 
         Returns:
@@ -116,7 +124,7 @@ class Part(CNObject):
         return self._instance_count == 1
     # end def
 
-    def _canReAdd(self):
+    def _canReAdd(self) -> bool:
         """If _instance_count == 0 you could re-add the part
 
         Returns:
@@ -125,12 +133,12 @@ class Part(CNObject):
         return self._instance_count == 0
     # end def
 
-    def _incrementInstance(self, document, obj_instance):
+    def _incrementInstance(self, document: DocT, obj_instance: ObjectInstance):
         """Increment the instances of this reference object
 
         Args:
-            document (Document):
-            obj_instance (ObjectInstance):
+            document:
+            obj_instance:
         """
         self._instance_count += 1
         self._instances.add(obj_instance)
@@ -140,11 +148,11 @@ class Part(CNObject):
             document.addRefObj(self)
     # end def
 
-    def _decrementInstance(self, obj_instance):
+    def _decrementInstance(self, obj_instance: ObjectInstance):
         """Decrement the instances of this reference object
 
         Args:
-            obj_instance (ObjectInstance):
+            obj_instance:
         """
         ic = self._instance_count
         self._instances.remove(obj_instance)
@@ -160,14 +168,14 @@ class Part(CNObject):
         return ic
     # end def
 
-    def instanceProperties(self):
+    def instanceProperties(self) -> dict:
         """ Generator yielding all instance properties
         """
         for instance in self._instances:
             yield instance.properties()
     # end def
 
-    def setInstanceProperty(self, part_instance, key, value):
+    def setInstanceProperty(self, part_instance: ObjectInstance, key: str, value: Any):
         """Set an instance property
 
         Args:
@@ -178,7 +186,7 @@ class Part(CNObject):
         part_instance.setProperty(key, value)
     # end def
 
-    def getInstanceProperty(self, part_instance, key):
+    def getInstanceProperty(self, part_instance: ObjectInstance, key: str) -> Any:
         """Get an instance property
 
         Args:
@@ -186,26 +194,30 @@ class Part(CNObject):
             key (str):
 
         Returns:
-            object:
+            an object
         """
         return part_instance.getProperty(key)
     # end def
 
-    def changeInstanceProperty(self, part_instance, view, key, value, use_undostack=True):
+    def changeInstanceProperty(self, part_instance: ObjectInstance,
+                                    view: str,
+                                    key: str,
+                                    value: Any,
+                                    use_undostack: bool = True):
         c = ChangeInstancePropertyCommand(self, part_instance, view, key, value)
         util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def getModelProperties(self):
+    def getModelProperties(self) -> dict:
         """ Get the dictionary of model properties
 
         Returns:
-            dict: group properties
+            group properties
         """
         return self._group_properties
     # end def
 
-    def getProperty(self, key):
+    def getProperty(self, key: str) -> Any:
         """
         Args:
             key (str):
@@ -213,7 +225,7 @@ class Part(CNObject):
         return self._group_properties[key]
     # end def
 
-    def getOutlineProperties(self):
+    def getOutlineProperties(self) -> Tuple[str, str, bool]:
         """Convenience method for getting the properties used in the outlinerview
 
         Returns:
@@ -223,13 +235,13 @@ class Part(CNObject):
         return props['name'], props['color'], props['is_visible']
     # end def
 
-    def setProperty(self, key, value, use_undostack=True):
+    def setProperty(self, key: str, value: Any, use_undostack: bool = True):
         """ Get the value of the key model properties
 
         Args:
-            key (str):
-            value (object):
-            use_undostack (bool, optional): default True
+            key:
+            value:
+            use_undostack: default is ``True``
         """
         if key == 'is_visible':
             self._document.clearAllSelected()
@@ -240,21 +252,21 @@ class Part(CNObject):
             self._setProperty(key, value)
     # end def
 
-    def _setProperty(self, key, value, emit_signals=False):
+    def _setProperty(self, key: str, value: Any, emit_signals: bool = False):
         self._group_properties[key] = value
 
         if emit_signals:
             self.partPropertyChangedSignal.emit(self, key, value)
     # end def
 
-    def getName(self):
+    def getName(self) -> str:
         return self._group_properties['name']
     # end def
 
-    def getColor(self):
+    def getColor(self) -> str:
         """
         Returns:
-            str: The part's color. Defaults to #0066cc.
+            The part's color. Defaults to #0066cc.
         """
         return self._group_properties['color']
     # end def

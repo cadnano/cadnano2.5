@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
-"""
-CustomQGraphicsView
+# -*- coding: utf-8 -*-
+"""CustomQGraphicsView
 
 Platform:
     Unix, Windows, Mac OS X
@@ -12,11 +9,36 @@ Synopsis:
     panning, and zooming.
 """
 
-from PyQt5.QtCore import Qt, QTimer, pyqtSignal, qWarning
-from PyQt5.QtGui import QPaintEngine
-from PyQt5.QtWidgets import QGraphicsView, qApp
+from PyQt5.QtCore import (
+    Qt,
+    QTimer,
+    pyqtSignal,
+    qWarning,
+    QRectF,
+    QEvent
+ )
+from PyQt5.QtGui import (
+    QPaintEngine,
+    QMouseEvent,
+    QPainter,
+    QFocusEvent,
+    QKeyEvent,
+    QMouseEvent,
+    QWheelEvent,
+    QPaintEvent
+)
+from PyQt5.QtWidgets import (
+    QWidget,
+    QGraphicsItem,
+    QGraphicsScene,
+    QGraphicsView,
+    qApp
+)
 
-from cadnano import app, util
+from cadnano import (
+    app,
+    util
+)
 from cadnano.views.pathview import pathstyles as styles
 
 # for OpenGL mode
@@ -46,13 +68,13 @@ class CustomQGraphicsView(QGraphicsView):
     MouseWheel = Zoom
 
     Args:
-        parent(QWidget): type of QWidget such as QWidget.main_splitter() for the type of
+        parent: type of QWidget such as QWidget.main_splitter() for the type of
                          View its has
 
     For details on these and other miscellaneous methods, see below.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent: QWidget = None):
         """
         On initialization, we need to bind the Ctrl/command key to
         enable manipulation of the view.
@@ -82,12 +104,15 @@ class CustomQGraphicsView(QGraphicsView):
         self._key_pan_delta_y = styles.PATH_HELIX_HEIGHT + styles.PATH_HELIX_PADDING/2
         # Modifier keys and buttons
         self._key_mod = Qt.Key_Control
-        self._button_pan = Qt.LeftButton
-        self._button_pan_alt = Qt.MidButton
-        self._button_zoom = Qt.RightButton
+        self._button_pan: Qt.MouseButtons = Qt.LeftButton
+        self._button_pan_alt: Qt.MouseButtons = Qt.MidButton
+        self._button_zoom: Qt.MouseButtons = Qt.RightButton
 
         self.toolbar = None  # custom hack for the paint tool palette
         self._name = None
+
+        # a ``SelectionItemGroup`` object when not ``None``
+        self._selection_lock = None
 
         self.setContextMenuPolicy(Qt.CustomContextMenu)
 
@@ -109,23 +134,29 @@ class CustomQGraphicsView(QGraphicsView):
 
     levelOfDetailChangedSignal = pyqtSignal(bool)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         clsName = self.__class__.__name__
         objId = self._name if self._name else str(id(self))[-4:]
         return "<%s %s>" % (clsName, objId)
 
-    def setName(self, name):
+    def setName(self, name: str):
         self._name = name
     # end def
 
-    def setViewportUpdateOn(self, is_enabled):
+    def rootItem(self) -> QGraphicsItem:
+        return self.scene_root_item
+
+    def cnScene(self) -> QGraphicsScene:
+        return self.scene_root_item.scene()
+
+    def setViewportUpdateOn(self, is_enabled: bool):
         if is_enabled:
             self.setViewportUpdateMode(QGraphicsView.MinimalViewportUpdate)
         else:
             self.setViewportUpdateMode(QGraphicsView.NoViewportUpdate)
     # end def
 
-    def activateSelection(self, is_active):
+    def activateSelection(self, is_active: bool):
         if self._selection_lock:
             self._selection_lock.clearSelection(False)
         self.clearSelectionLockAndCallbacks()
@@ -153,14 +184,14 @@ class CustomQGraphicsView(QGraphicsView):
         self._press_list = []  # bookkeeping to handle passing mouseReleaseEvents to QGraphicsItems that don't get them
     # end def
 
-    def _setGLView(self, boolval):
+    def _setGLView(self, do_turn_on_GL: bool):
         # scene = self.scene()
-        if boolval and self.is_GL is False:
+        if do_turn_on_GL and self.is_GL is False:
             self.is_GL = True
             # scene.drawBackground = self._drawBackgroundGL
             # self.setViewport(QGLWidget(QGLFormat(QGL.SampleBuffers)))
             # self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
-        elif not boolval and self.is_GL is True:
+        elif not do_turn_on_GL and self.is_GL is True:
             self.is_GL = False
             # scene.drawBackground = self.drawBackgroundNonGL
             # self.setViewport(QWidget())
@@ -213,7 +244,7 @@ class CustomQGraphicsView(QGraphicsView):
             self.qTimer.singleShot(500, self._allowGLSwitch)
     # end def
 
-    def shouldShowDetails(self):
+    def shouldShowDetails(self) -> bool:
         return self._show_details
     # end def
 
@@ -221,14 +252,14 @@ class CustomQGraphicsView(QGraphicsView):
         self.is_GL_switch_allowed = True
     # end def
 
-    def _drawBackgroundGL(self, painter, rect):
+    def _drawBackgroundGL(self, painter: QPainter, rect: QRectF):
+        """This method is for overloading the QGraphicsScene.
         """
-        This method is for overloading the QGraphicsScene.
-        """
-        if painter.paintEngine().type() != QPaintEngine.OpenGL and \
-           painter.paintEngine().type() != QPaintEngine.OpenGL2:
+        if (painter.paintEngine().type() != QPaintEngine.OpenGL and
+           painter.paintEngine().type() != QPaintEngine.OpenGL2):
 
-            qWarning("OpenGLScene: drawBackground needs a QGLWidget to be set as viewport on the graphics view")
+            qWarning("OpenGLScene: drawBackground needs a QGLWidget to be"
+                    "set as viewport on the graphics view")
             return
         # end if
         painter.beginNativePainting()
@@ -239,10 +270,10 @@ class CustomQGraphicsView(QGraphicsView):
         painter.endNativePainting()
     # end def
 
-    def focusInEvent(self, event):
+    def focusInEvent(self, event: QFocusEvent):
         self._has_focus = True
 
-    def focusOutEvent(self, event):
+    def focusOutEvent(self, event: QFocusEvent):
         self._transform_enable = False
         self._dolly_zoom_enable = False
         self._has_focus = False
@@ -250,33 +281,34 @@ class CustomQGraphicsView(QGraphicsView):
     # end def
 
     def setSelectionLock(self, selection_lock):
+        'uses a ``SelectionItemGroup`` or ``None``'
         self._selection_lock = selection_lock
     # end def
 
     def selectionLock(self):
+        'returns a ``SelectionItemGroup`` or ``None``'
         return self._selection_lock
     # end def
 
-    def setScaleFitFactor(self, value):
+    def setScaleFitFactor(self, value: float):
         """docstring for setScaleFitFactor"""
         self._scale_fit_factor = value
     # end def
 
-    def setKeyPan(self, button):
+    def setKeyPan(self, button: Qt.MouseButtons):
         """Set the class pan button remotely"""
         self._button_pan = button
     # end def
 
-    def addToPressList(self, item):
+    def addToPressList(self, item: QGraphicsItem):
         """docstring for addToPressList"""
-        # self._press_list[self._press_list_idx].append(item)
         self._press_list.append(item)
     # end def
 
-    def keyPanDeltaX(self):
+    def keyPanDeltaX(self) -> float:
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
-        # PyQt isn't aware that QGraphicsObject is a QGraphicsItem and so
+        # PyQt5 isn't aware that QGraphicsObject is a QGraphicsItem and so
         # it returns a separate python object if, say, childItems() returns
         # a QGraphicsObject cast to a QGraphicsItem. If this is the case,
         # we can still find the QGraphicsObject thusly:
@@ -290,7 +322,7 @@ class CustomQGraphicsView(QGraphicsView):
                 return keyPanDXMethod()
         return 100
 
-    def keyPanDeltaY(self):
+    def keyPanDeltaY(self) -> float:
         """Returns the distance in scene space to move the scene_root_item when
         panning left or right."""
         candidateDyDeciders = list(self.scene_root_item.childItems())
@@ -303,7 +335,7 @@ class CustomQGraphicsView(QGraphicsView):
                 return keyPanDYMethod()
         return 100
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         """
         Handle key presses for mouse-drag transforms and arrow-key panning.
         """
@@ -339,7 +371,7 @@ class CustomQGraphicsView(QGraphicsView):
                 getattr(self.scene_root_item, KEY_PRESS_EVENT)(event)
     # end def
 
-    def keyReleaseEvent(self, event):
+    def keyReleaseEvent(self, event: QKeyEvent):
         if event.key() == self._key_mod:
             self._transform_enable = False
             self._dolly_zoom_enable = False
@@ -349,19 +381,18 @@ class CustomQGraphicsView(QGraphicsView):
                 getattr(self.scene_root_item, KEY_RELEASE_EVENT)(event)
     # end def
 
-    def enterEvent(self, event):
+    def enterEvent(self, event: QEvent):
         # self.setFocus() # this call robs selection from key focus
         self.setDragMode(self._no_drag)
         QGraphicsView.enterEvent(self, event)
 
-    def leaveEvent(self, event):
+    def leaveEvent(self, event: QEvent):
         self.clearFocus()
         QGraphicsView.leaveEvent(self, event)
 
-    def mouseMoveEvent(self, event):
-        """
-        Must override mouseMoveEvent of QGraphicsView to allow
-        ScrollHandDrag due to the fact that events are intercepted
+    def mouseMoveEvent(self, event: QMouseEvent):
+        """Must override :meth:`mouseMoveEvent` of :class:`QGraphicsView` to allow
+        ``ScrollHandDrag`` due to the fact that events are intercepted
         breaks this feature.
         """
         if self._transform_enable:
@@ -386,7 +417,7 @@ class CustomQGraphicsView(QGraphicsView):
         QGraphicsView.mouseMoveEvent(self, event)
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QMouseEvent):
         """docstring for mousePressEvent"""
         if self._transform_enable and qApp.keyboardModifiers():
             which_buttons = event.buttons()
@@ -407,7 +438,7 @@ class CustomQGraphicsView(QGraphicsView):
             QGraphicsView.mousePressEvent(self, event)
     # end def
 
-    def mouseReleaseEvent(self, event):
+    def mouseReleaseEvent(self, event: QMouseEvent):
         """If panning, stop. If handles were pressed, release them."""
         if self._transform_enable:
             # QMouseEvent.button() returns the button that triggered the event
@@ -447,11 +478,11 @@ class CustomQGraphicsView(QGraphicsView):
     def fname(self):
         """docstring for fname"""
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event: QWheelEvent):
         self.safeScale(event.angleDelta().y())
     # end def
 
-    def safeScale(self, delta):
+    def safeScale(self, delta: float):
         current_scale_level = self.transform().m11()
         scale_factor = 1 + delta * (self._scale_down_rate if delta < 0 else self._scale_up_rate) * \
             (app().prefs.zoom_speed/100.)
@@ -462,19 +493,19 @@ class CustomQGraphicsView(QGraphicsView):
         self._resetLOD()
     # end def
 
-    def zoomIn(self, fraction_of_max=0.5):
+    def zoomIn(self, fraction_of_max: float = 0.5):
         current_scale_level = self.transform().m11()
         scale_change = (fraction_of_max * self._scale_limit_max) / current_scale_level
         self.scale(scale_change, scale_change)
     # end def
 
-    def zoomOut(self, fraction_of_min=1):
+    def zoomOut(self, fraction_of_min: float = 1.0):
         current_scale_level = self.transform().m11()
         scale_change = (fraction_of_min * self._scale_limit_min) / current_scale_level
         self.scale(scale_change, scale_change)
     # end def
 
-    def dollyZoom(self, event):
+    def dollyZoom(self, event: QMouseEvent):
         """docstring for dollyZoom"""
         # QMouseEvent.y() returns the position of the mouse cursor relative
         # to the widget
@@ -533,7 +564,7 @@ class CustomQGraphicsView(QGraphicsView):
         self._resetLOD()
     # end def
 
-    def paintEvent(self, event):
+    def paintEvent(self, event: QPaintEvent):
         if self.toolbar:
             self.toolbar.setPos(self.mapToScene(0, 0))
         QGraphicsView.paintEvent(self, event)

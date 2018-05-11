@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 """Summary
 """
-from cadnano.views.abstractitems.abstracttoolmanager import AbstractToolManager
+from cadnano.views.abstractitems import AbstractToolManager
 from .selectslicetool import SelectSliceTool
 from .createslicetool import CreateSliceTool
 
@@ -23,8 +24,8 @@ class SliceToolManager(AbstractToolManager):
             window (TYPE): Description
             viewroot (TYPE): Description
         """
-        super(SliceToolManager, self).__init__('vhelix', window, viewroot)
-        self.tool_names = ('Select', 'Create')
+        super(SliceToolManager, self).__init__('vhelix', 'slice', window, viewroot)
+        self.tool_names = ('select', 'create')
         self.select_tool = SelectSliceTool(self)
         self.create_tool = CreateSliceTool(self)
         self.viewroot.setManager(self)

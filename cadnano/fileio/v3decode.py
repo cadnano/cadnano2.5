@@ -1,16 +1,37 @@
 # -*- coding: utf-8 -*-
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from typing import (
+    Tuple,
+    Set
+)
+
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
 from cadnano.part.refresholigoscmd import RefreshOligosCommand
-from cadnano.proxies.cnenum import GridType, PointType, OrthoViewType
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    PointEnum,
+    OrthoViewEnum,
+    EnumType
+)
+from cadnano.objectinstance import ObjectInstance
+from cadnano.cntypes import (
+    DocT
+)
 
-
-def decode(document, obj, emit_signals=False):
-    """ Decode a a deserialized Document dictionary
+def decode(document: DocT, obj: dict, emit_signals: bool = True):
+    """Parses a dictionary (obj) created from reading a json file and uses it
+    to populate the given document with model data.
 
     Args:
-        document (Document):
-        obj (dict): deserialized file object
+        document:
+        obj:
+        emit_signals: whether to signal views
+
+    Raises:
+        AssertionError, TypeError
     """
     obj.get('name')
 
@@ -18,7 +39,7 @@ def decode(document, obj, emit_signals=False):
         grid_type = determineLatticeType(part_dict)
 
         ortho_view_type = determineOrthoViewType(part_dict, grid_type)
-        document.setSliceOrGridViewVisible(value=ortho_view_type)
+        document.setSliceOrGridViewVisible(view_type=ortho_view_type)
 
         decodePart(document, part_dict, grid_type=grid_type,
                    emit_signals=emit_signals)
@@ -34,7 +55,7 @@ def decode(document, obj, emit_signals=False):
 # end def
 
 
-def determineOrthoViewType(part_dict, grid_type):
+def determineOrthoViewType(part_dict: dict, grid_type: EnumType):
     THRESHOLD = 0.0005
     vh_id_list = part_dict.get('vh_list')
     origins = part_dict.get('origins')
@@ -42,28 +63,31 @@ def determineOrthoViewType(part_dict, grid_type):
     for vh_id, size in vh_id_list:
         vh_x, vh_y = origins[vh_id]
 
-        if grid_type is GridType.HONEYCOMB:
+        if grid_type == GridEnum.HONEYCOMB:
             distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)
             if distance > THRESHOLD:
-                return OrthoViewType.GRID
-        elif grid_type is GridType.SQUARE:
+                return OrthoViewEnum.GRID
+        elif grid_type == GridEnum.SQUARE:
             if SquareDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)[0] > THRESHOLD:
-                return OrthoViewType.GRID
-    return OrthoViewType.SLICE
+                return OrthoViewEnum.GRID
+    return OrthoViewEnum.GRID
 # end def
 
-def determineLatticeType(part_dict):
-    """
-    Guess the lattice type based on the sum of the vector distances between
+def determineLatticeType(part_dict: dict) -> EnumType:
+    """Guess the lattice type based on the sum of the vector distances between
     VHs and the closest lattice position.
 
 
     Args:
-        part_dict (dict):  the dict corresponding to the part to be imported
+        part_dict:  the ``dict`` corresponding to the part to be imported
 
     Returns:
-        GridType.HONEYCOMB or GridType.SQUARE
+        ``GridEnum.HONEYCOMB`` or ``GridEnum.SQUARE`` or ``GridEnum.NONE``
     """
+    grid_type = part_dict.get('grid_type')
+    if grid_type is not None:
+        return grid_type
+
     vh_id_list = part_dict.get('vh_list')
     origins = part_dict.get('origins')
 
@@ -95,17 +119,22 @@ def determineLatticeType(part_dict):
     sum_square_distance = (square_delta_x**2 + square_delta_y**2)**0.5
 
     if abs(sum_honeycomb_distance) < abs(sum_square_distance):
-        return GridType.HONEYCOMB
+        return GridEnum.HONEYCOMB
     else:
-        return GridType.SQUARE
+        return GridEnum.SQUARE
 # end def
 
-def decodePart(document, part_dict, grid_type, emit_signals=False):
-    """ Decode a a deserialized Part dictionary
+def decodePart( document: DocT,
+                part_dict: dict,
+                grid_type: EnumType,
+                emit_signals: bool = False):
+    """Decode a a deserialized Part dictionary
 
     Args:
-        document (Document):
-        part_dict (dict): deserialized dictionary describing the Part
+        document:
+        part_dict: deserialized dictionary describing the Part
+        grid_type:
+        emit_signals:
     """
     part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
     part.setActive(True)
@@ -115,7 +144,7 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
-    if part_dict.get('point_type') == PointType.ARBITRARY:
+    if part_dict.get('point_type') == PointEnum.ARBITRARY:
         # TODO add code to deserialize parts
         pass
     else:
@@ -204,8 +233,8 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
     for key in ('name',
                 'color',
                 'crossover_span_angle',
-                'max_vhelix_length',
-                'workplane_idxs'):
+                'max_vhelix_length'
+                ):
         value = part_dict.get(key)
         if value is not None:
             part.setProperty(key, value, use_undostack=False)
@@ -213,29 +242,36 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
 # end def
 
 
-def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, ignore_neighbors=False):
-    """
-    Use this to duplicate virtual_helices within a Part. Duplicate id_nums
-    will start numbering `part.getMaxIdNum()` rather than the lowest available
-    id_num.  TODO should this numbering change?
-
+def importToPart(   part_instance : ObjectInstance,
+                    copy_dict: dict,
+                    offset: Tuple[float, float] = None,
+                    use_undostack: bool = True) -> Set[int]:
+    """Use this to duplicate virtual_helices within a ``Part``.  duplicate
+    ``id_num``s will start numbering ``part.getMaxIdNum() + 1`` rather than the
+    lowest available ``id_num``.
     Args:
-        part_instance (ObjectInstance):
-        copy_dict (dict):
+        part_instance:
+        copy_dict:
+        offset:
+        use_undostack: default is ``True``
+
+    Returns:
+        set of new virtual helix IDs
     """
     assert isinstance(offset, (tuple, list)) or offset is None
     assert isinstance(use_undostack, bool)
 
-    print('Importing to part where use_undostack is %s' % use_undostack)
-
     part = part_instance.reference()
+    if use_undostack:
+        undostack = part.undoStack()
+        undostack.beginMacro("Import to Part")
     id_num_offset = part.getMaxIdNum() + 1
     if id_num_offset % 2 == 1:
         id_num_offset += 1
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
     vh_props = copy_dict['virtual_helices']
-    # name_suffix = ".%d"
+    name_suffix = ".%d"
 
     xoffset = offset[0] if offset else 0
     yoffset = offset[1] if offset else 0
@@ -243,37 +279,60 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, igno
     keys = list(vh_props.keys())
     name_index = keys.index('name')
     new_vh_id_set = set()
+    copied_vh_index_set = set()
+    if offset is None:
+        offx, offy = 0, 0
+    else:
+        offx, offy = offset
+
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
         x, y = origins[i]
 
-        z = vh_props['z'][i]
+        if offset is not None:
+            x += offx
+            y += offy
+        try:
+            # Don't use id_num since is compacted
+            z = vh_props['z'][i]
+        except:
+            print(vh_props)
+            raise
         vals = [vh_props[k][i] for k in keys]
         new_id_num = i + id_num_offset
-        vals[name_index] = 'vh%s' % new_id_num
-        if ignore_neighbors:
-            try:
-                ignore_index = keys.index('neighbors')
-                fixed_keys = keys[:ignore_index] + keys[ignore_index + 1:]
-                fixed_vals = vals[:ignore_index] + vals[ignore_index + 1:]
-            except ValueError:
-                fixed_keys = keys
-                fixed_vals = vals
-        part.createVirtualHelix(x+xoffset, y+yoffset, z, size,
+        # print("creating", new_id_num)
+        vals[name_index] += (name_suffix % new_id_num)
+
+        # NOTE GOT RID OF 'if' BY NC SINCE 'neighbors' SHOULD JUST BE
+        # RECALCULATED ON THE FLY? TODO LOOK INTO THIS
+        try:
+            ignore_index = keys.index('neighbors')
+            fixed_keys = keys[:ignore_index] + keys[ignore_index + 1:]
+            fixed_vals = vals[:ignore_index] + vals[ignore_index + 1:]
+        except ValueError:
+            fixed_keys = keys
+            fixed_vals = vals
+        # end if
+
+        did_create = part.createVirtualHelix(x, y, z, size,
                                 id_num=new_id_num,
                                 properties=(fixed_keys, fixed_vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
-        new_vh_id_set.add(new_id_num)
+        if did_create:
+            copied_vh_index_set.add(i)
+            new_vh_id_set.add(new_id_num)
     # end for
     strands = copy_dict['strands']
     strand_index_list = strands['indices']
     color_list = strands['properties']
-    for id_num, idx_set in enumerate(strand_index_list):
+    for i, idx_set in enumerate(strand_index_list):
+        if i not in copied_vh_index_set:
+            continue
         if idx_set is not None:
-            fwd_strand_set, rev_strand_set = part.getStrandSets(id_num + id_num_offset)
+            fwd_strand_set, rev_strand_set = part.getStrandSets(i + id_num_offset)
             fwd_idxs, rev_idxs = idx_set
-            fwd_colors, rev_colors = color_list[id_num]
+            fwd_colors, rev_colors = color_list[i]
             for idxs, color in zip(fwd_idxs, fwd_colors):
                 low_idx, high_idx = idxs
                 fwd_strand_set.createDeserializedStrand(low_idx, high_idx, color,
@@ -286,9 +345,9 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, igno
     # end def
 
     xovers = copy_dict['xovers']
-    for from_id, from_is_fwd, from_idx, to_id, to_is_fwd, to_idx in xovers:
-        from_strand = part.getStrand(from_is_fwd, from_id + id_num_offset, from_idx)
-        to_strand = part.getStrand(to_is_fwd, to_id + id_num_offset, to_idx)
+    for from_i, from_is_fwd, from_idx, to_i, to_is_fwd, to_idx in xovers:
+        from_strand = part.getStrand(from_is_fwd, from_i + id_num_offset, from_idx)
+        to_strand = part.getStrand(to_is_fwd, to_i + id_num_offset, to_idx)
         part.createXover(from_strand, from_idx,
                          to_strand, to_idx,
                          update_oligo=use_undostack,
@@ -297,19 +356,22 @@ def importToPart(part_instance, copy_dict, offset=None, use_undostack=True, igno
         RefreshOligosCommand(part).redo()
 
     # INSERTIONS, SKIPS
-    for id_num, idx, length in copy_dict['insertions']:
-        fwd_strand = part.getStrand(True, id_num + id_num_offset, idx)
-        rev_strand = part.getStrand(False, id_num + id_num_offset, idx)
+    for i, idx, length in copy_dict['insertions']:
+        fwd_strand = part.getStrand(True, i + id_num_offset, idx)
+        rev_strand = part.getStrand(False, i + id_num_offset, idx)
         if fwd_strand:
             fwd_strand.addInsertion(idx, length, use_undostack=use_undostack)
         elif rev_strand:
             rev_strand.addInsertion(idx, length, use_undostack=use_undostack)
         else:
             ins = 'Insertion' if length > 0 else 'Skip'
-            print("Cannot find strand for {} at {}[{}]".format(ins, id_num, idx))
+            err = "Cannot find strand for {} at {}[{}]"
+            print(err.format(ins, i + id_num_offset, idx))
 
     """
     TODO: figure out copy_dict['view_properties'] handling here
     """
+    if use_undostack:
+        undostack.endMacro()
     return new_vh_id_set
 # end def

@@ -1,10 +1,28 @@
-"""Summary
-"""
-from PyQt5.QtCore import QRectF, QPointF
-from PyQt5.QtGui import QPainterPath, QPolygonF
+# -*- coding: utf-8 -*-
+from PyQt5.QtCore import (
+    QRectF,
+    QPointF
+)
+from PyQt5.QtGui import (
+    QPainterPath,
+    QPolygonF,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    QGraphicsSceneHoverEvent,
+    QStyleOptionGraphicsItem,
+    QWidget
+)
+
 from cadnano.views.pathview import pathstyles as styles
 from cadnano.gui.palette import getPenObj
 from .abstractpathtool import AbstractPathTool
+from cadnano.views.pathview import (
+    PathVirtualHelixItemT,
+    PathRootItemT,
+    PathToolManagerT
+)
+
 
 _BW = styles.PATH_BASE_WIDTH
 _PEN = getPenObj(styles.RED_STROKE, 1)
@@ -28,41 +46,36 @@ class BreakTool(AbstractPathTool):
     docstring for BreakTool
     """
 
-    def __init__(self, manager):
-        """Summary
-
+    def __init__(self, manager: PathToolManagerT):
+        """
         Args:
-            manager (TYPE): Description
+            manager: Description
         """
         super(BreakTool, self).__init__(manager)
-        self._is_top_strand = True
+        self._is_top_strand: bool = True
 
-    def __repr__(self):
-        """Summary
-
+    def __repr__(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            string
         """
         return "break_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
-        """Summary
-
+    def methodPrefix(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            prefix string
         """
         return "breakTool"  # first letter should be lowercase
 
-    def paint(self, painter, option, widget=None):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         AbstractPathTool.paint(self, painter, option, widget)
         painter.setPen(_PEN)
@@ -71,19 +84,19 @@ class BreakTool(AbstractPathTool):
         else:
             painter.drawPath(_PATH_ARROW_LEFT)
 
-    def setTopStrand(self, is_top):
-        """
-        Called in hoverMovePathHelix to set whether breaktool is hovering
+    def setTopStrand(self, is_top: bool):
+        """Called in hoverMovePathHelix to set whether breaktool is hovering
         over a top strand (goes 5' to 3' left to right) or bottom strand.
 
         Args:
-            is_top (TYPE): Description
+            is_top: Description
         """
         self._is_top_strand = is_top
 
-    def hoverMove(self, item, event, flag=None):
-        """
-        flag is for the case where an item in the path also needs to
+    def hoverMove(self, item: PathVirtualHelixItemT,
+                        event: QGraphicsSceneHoverEvent,
+                        flag: bool = None):
+        """flag is for the case where an item in the path also needs to
         implement the hover method
 
         Args:

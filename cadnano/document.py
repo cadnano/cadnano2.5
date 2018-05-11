@@ -1,23 +1,56 @@
-#!/usr/bin/env python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 from operator import itemgetter
 from uuid import uuid4
+from typing import (
+    Set,
+    List,
+    Tuple,
+    Iterable,
+    Iterator,
+    Optional
+)
 
-from cadnano import app, setBatch, util
+from cadnano import (
+    app,
+    setBatch,
+    util
+)
 from cadnano.addinstancecmd import AddInstanceCommand
-from cadnano.proxies.cnenum import ModType, GridType
+from cadnano.proxies.cnenum import (
+    ModEnum,
+    GridEnum,
+    EnumType,
+    ViewSendEnum
+)
 from cadnano.proxies.cnobject import CNObject
-from cadnano.proxies.cnproxy import ProxySignal, UndoStack
-from cadnano.docmodscmd import (AddModCommand, ModifyModCommand,
-                                RemoveModCommand)
+from cadnano.objectinstance import ObjectInstance
+from cadnano.proxies.cnproxy import (
+    ProxySignal,
+    UndoStack
+)
+from cadnano.docmodscmd import (
+    AddModCommand,
+    ModifyModCommand,
+    RemoveModCommand
+)
 from cadnano.fileio.decode import decodeFile
 from cadnano.fileio.encode import encodeToFile
+
 from cadnano.part import Part
 from cadnano.part.nucleicacidpart import NucleicAcidPart
 from cadnano.part.refreshsegmentscmd import RefreshSegmentsCommand
+from cadnano.oligo import Oligo
+from cadnano.strandset import StrandSet
 from cadnano.strand import Strand
 
+from cadnano.cntypes import (
+    DocCtrlT,
+    DocT
+)
+
+# Type Aliases
+EndsSelected = Tuple[bool, bool]
 
 class Document(CNObject):
     """
@@ -41,7 +74,6 @@ class Document(CNObject):
         self._children = set()     # for storing a reference to Parts (and Assemblies)
         self._instances = set()    # for storing instances of Parts (and Assemblies)
         self._controller = None
-        self._selected_instance = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
         self._active_part = None
@@ -51,7 +83,7 @@ class Document(CNObject):
         # the added list is what was recently selected or deselected
         self._strand_selected_changed_dict = {}
         self.view_names = []
-        self.filter_set = set()
+        self.filter_set: Set[str] = set()
         self._mods = {}  # modifications keyed by mod id
         this_app = app()
         this_app.documentWasCreatedSignal.emit(self)
@@ -71,18 +103,19 @@ class Document(CNObject):
     documentModAddedSignal = ProxySignal(object, object, object, name='documentModAddedSignal')
     documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
     documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
+    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
 
     # SLOTS #
 
     # ACCESSORS #
-    def undoStack(self):
+    def undoStack(self) -> UndoStack:
         """This is the actual undoStack to use for all commands. Any children
         needing to perform commands should just ask their parent for the
         undoStack, and eventually the request will get here.
         """
         return self._undostack
 
-    def children(self):
+    def children(self) -> Set[CNObject]:
         """Returns a list of parts associated with the document.
 
         Returns:
@@ -90,26 +123,26 @@ class Document(CNObject):
         """
         return self._children
 
-    def addRefObj(self, child):
+    def addRefObj(self, child: CNObject):
         """For adding Part and Assembly object references
         Args:
             child (object):
         """
         self._children.add(child)
 
-    def addInstance(self, instance):
+    def addInstance(self, instance: ObjectInstance):
         """Add an ObjectInstance to the list of instances
 
         Args:
-            instance (ObjectInstance):
+            instance:
         """
         self._instances.add(instance)
 
-    def removeInstance(self, instance):
+    def removeInstance(self, instance: ObjectInstance):
         """ Remove an ObjectInstance from the list of instances
 
         Args:
-            instance (ObjectInstance):
+            instance:
         """
         self._instances.remove(instance)
         self.documentClearSelectionsSignal.emit(self)
@@ -123,13 +156,13 @@ class Document(CNObject):
         self.deactivateActivePart()
     # end def
 
-    def setFilterSet(self, filter_list):
+    def setFilterSet(self, filter_list: List[str]):
         """ Set the Document filter list.
 
         Emits `documentSelectionFilterChangedSignal`
 
         Args:
-            filter_list (list): list of filter key names
+            filter_list: list of filter key names
         """
         assert isinstance(filter_list, list)
 
@@ -144,20 +177,20 @@ class Document(CNObject):
         self.documentSelectionFilterChangedSignal.emit(fs)
     # end def
 
-    def removeRefObj(self, child):
+    def removeRefObj(self, child: CNObject):
         """ Remove child Part or Assembly
 
         Args:
-            child (object):
+            child:
         """
         self._children.remove(child)
     # end def
 
-    def activePart(self):
+    def activePart(self) -> Part:
         return self._active_part
     # end def
 
-    def setActivePart(self, part):
+    def setActivePart(self, part: Part):
         self._active_part = part
         if self._controller:
             self._controller.toggleNewPartButtons(False)
@@ -169,31 +202,44 @@ class Document(CNObject):
             self._controller.toggleNewPartButtons(True)
     # end def
 
-    def fileName(self):
+    def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
+        '''Turn on and off viwe signaling for enabled slots in views.
+        Signals the root item in each view
+
+        Arg:
+            signal_enum: Default turns on all views signals
+        '''
+        self.documentChangeViewSignalingSignal.emit(signal_enum)
+    # end def
+
+    def fileName(self) -> str:
         return self._filename
     # end def
 
-    def setFileName(self, fname):
+    def setFileName(self, fname: str):
         self._filename = fname
     # end def
 
-    def writeToFile(self, filename, legacy=False):
+    def writeToFile(self, filename: str, legacy: bool = False):
         """ Convenience wrapper for `encodeToFile` to set the `document`
         argument to `self`
 
         Args:
-            filename (str): full path file name
-            legacy (bool): attempt to export cadnano2 format
+            filename: full path file name
+            legacy: attempt to export cadnano2 format
         """
         encodeToFile(filename, self, legacy)
     # end def
 
-    def readFile(self, filename):
-        """ Convenience wrapper for `decodeFile` to always emit_signals and
-        set the `document` argument to `self`
+    def readFile(self, filename: str) -> DocT:
+        """Convenience wrapper for ``decodeFile`` to always emit_signals and
+        set the ``document`` argument to ``self``
 
         Args:
-            filename (str): full path file name
+            filename: full path file name
+
+        Returns:
+            self ``Document`` object with data decoded from ``filename``
         """
         print("reading file", filename)
         return decodeFile(filename, document=self, emit_signals=True)
@@ -204,20 +250,16 @@ class Document(CNObject):
     #     return self._assemblies
 
     # PUBLIC METHODS FOR QUERYING THE MODEL #
-    # def selectedInstance(self):
-    #     return self._selected_instance
 
-    def addStrandToSelection(self, strand, value):
+    def addStrandToSelection(self, strand: Strand, value: EndsSelected):
         """ Add `Strand` object to Document selection
 
         Args:
-            strand (Strand):
-            value (tuple): of :obj:`bool` of form::
+            strand:
+            value: of the form::
 
                 (is low index selected, is high index selected)
 
-        Returns:
-            bool: True if successful, False otherwise
         """
         ss = strand.strandSet()
         if ss in self._selection_dict:
@@ -227,14 +269,14 @@ class Document(CNObject):
         self._strand_selected_changed_dict[strand] = value
     # end def
 
-    def removeStrandFromSelection(self, strand):
-        """Remove `Strand` object from Document selection
+    def removeStrandFromSelection(self, strand: Strand) -> bool:
+        """Remove ``Strand`` object from Document selection
 
         Args:
-            strand (Strand):
+            strand:
 
         Returns:
-            bool: True if successful, False otherwise
+            ``True`` if successful, ``False`` otherwise
         """
         ss = strand.strandSet()
         if ss in self._selection_dict:
@@ -251,13 +293,13 @@ class Document(CNObject):
             return False
     # end def
 
-    def addVirtualHelicesToSelection(self, part, id_nums):
-        """If the Part isn't in the _selection_dict its not
+    def addVirtualHelicesToSelection(self, part: Part, id_nums: Iterable[int]):
+        """If the ``Part`` isn't in the ``_selection_dict`` its not
         going to be in the changed_dict either, so go ahead and add
 
         Args:
-            part (Part):
-            id_nums (array-like):
+            part: The Part
+            id_nums: List of virtual helix ID numbers
         """
         selection_dict = self._selection_dict
         if part not in selection_dict:
@@ -273,13 +315,13 @@ class Document(CNObject):
             part.partVirtualHelicesSelectedSignal.emit(part, changed_set, True)
     # end def
 
-    def removeVirtualHelicesFromSelection(self, part, id_nums):
-        """Remove from the `Part` selection the `VirtualHelix` objects specified
-        by id_nums.
+    def removeVirtualHelicesFromSelection(self, part: Part, id_nums: Iterable[int]):
+        """Remove from the ``Part`` selection the ``VirtualHelix`` objects
+        specified by id_nums.
 
         Args:
-            part (Part)
-            id_nums (array-like)
+            part:
+            id_nums:
         """
         # print("remove called", id(part), id_nums,  self._selection_dict.get(part))
         selection_dict = self._selection_dict
@@ -296,12 +338,12 @@ class Document(CNObject):
                 part.partVirtualHelicesSelectedSignal.emit(part, changed_set, False)
     # end def
 
-    def selectedOligos(self):
+    def selectedOligos(self) -> Set[Oligo]:
         """As long as one endpoint of a strand is in the selection, then the
         oligo is considered selected.
 
         Returns:
-            set: or :obj:`None` if nothing is found
+            Set of zero or more selected :obj:`Oligos`
         """
         s_dict = self._selection_dict
         selected_oligos = set()
@@ -310,7 +352,7 @@ class Document(CNObject):
                 selected_oligos.add(strand.oligo())
             # end for
         # end for
-        return selected_oligos if len(selected_oligos) > 0 else None
+        return selected_oligos
     # end def
 
     def clearAllSelected(self):
@@ -324,7 +366,7 @@ class Document(CNObject):
         self.documentClearSelectionsSignal.emit(self)
     # end def
 
-    def isModelStrandSelected(self, strand):
+    def isModelStrandSelected(self, strand: Strand) -> bool:
         ss = strand.strandSet()
         if ss in self._selection_dict:
             if strand in self._selection_dict[ss]:
@@ -335,15 +377,15 @@ class Document(CNObject):
             return False
     # end def
 
-    def isVirtualHelixSelected(self, part, id_num):
-        """For a given part
+    def isVirtualHelixSelected(self, part: Part, id_num: int) -> bool:
+        """For a given ``Part``
 
         Args:
-            part (Part): part in question
-            id_num (int): ID number of a virtual helix
+            part: ``Part`` in question
+            id_num: ID number of a virtual helix
 
         Returns:
-            bool: True if id_num is selected else False
+            ``True`` if ``id_num`` is selected else ``False``
         """
         if part in self._selection_dict:
             return id_num in self._selection_dict[part]
@@ -351,14 +393,14 @@ class Document(CNObject):
             return False
     # end def
 
-    def isOligoSelected(self, oligo):
-        """Determine if given `Oligo` is selected
+    def isOligoSelected(self, oligo: Oligo) -> bool:
+        """Determine if given ``Oligo`` is selected
 
         Args:
-            oligo (Oligo)
+            oligo: ``Oligo`` object
 
         Returns:
-            bool: True if `oligo` is selected otherwise False
+            ``True`` if ``oligo`` is selected otherwise ``False``
         """
         strand5p = oligo.strand5p()
         for strand in strand5p.generator3pStrand():
@@ -367,11 +409,11 @@ class Document(CNObject):
         return False
     # end def
 
-    def selectOligo(self, oligo):
-        """Select given `Oligo`
+    def selectOligo(self, oligo: Oligo):
+        """Select given ``Oligo``
 
         Args:
-            oligo (Oligo):
+            oligo: ``Oligo`` object
         """
         strand5p = oligo.strand5p()
         both_ends = (True, True)
@@ -380,11 +422,11 @@ class Document(CNObject):
         self.updateStrandSelection()
     # end def
 
-    def deselectOligo(self, oligo):
-        """Deselect given `Oligo`
+    def deselectOligo(self, oligo: Oligo):
+        """Deselect given ``Oligo``
 
         Args:
-            oligo (Oligo):
+            oligo: ``Oligo`` object
         """
         strand5p = oligo.strand5p()
         for strand in strand5p.generator3pStrand():
@@ -392,25 +434,28 @@ class Document(CNObject):
         self.updateStrandSelection()
     # end def
 
-    def getSelectedStrandValue(self, strand):
-        """ strand is an objects to look up
-        it is prevetted to be in the dictionary
+    def getSelectedStrandValue(self, strand: Strand) -> EndsSelected:
+        """Strand is an object to look up
+        it is pre-vetted to be in the dictionary
 
         Args:
-            strand (Strand):
+            strand: ``Strand`` object in question
+
+        Returns:
+            Tuple of the end point selection
         """
         return self._selection_dict[strand.strandSet()][strand]
     # end def
 
-    def sortedSelectedStrands(self, strandset):
-        """ Get a list sorted from low to high index of `Strands` in a `StrandSet`
+    def sortedSelectedStrands(self, strandset: StrandSet) -> List[Strand]:
+        """Get a list sorted from low to high index of `Strands` in a `StrandSet`
         that are selected
 
         Args:
-            strandset (StrandSet):
+            strandset: :obj:`StrandSet` to get selected strands from
 
         Returns:
-            list: of :obj: `Strand`
+            List of :obj:`Strand`s
         """
         out_list = [x for x in self._selection_dict[strandset].items()]
 
@@ -419,16 +464,17 @@ class Document(CNObject):
         return out_list
     # end def
 
-    def determineStrandSetBounds(self, selected_strand_list, strandset):
-        """ Determine the bounds of a :class:`StrandSet` `strandset` among a
-        a list of selected strands in that same `strandset`
+    def determineStrandSetBounds(self,  selected_strand_list: List[Tuple[Strand, EndsSelected]],
+                                        strandset: StrandSet) -> Tuple[int, int]:
+        """Determine the bounds of a :class:`StrandSet` ``strandset`` among a
+        a list of selected strands in that same ``strandset``
 
         Args:
-            selected_strand_list (list):
-            strandset (StrandSet):
+            selected_strand_list: list of ``( Strands, (is_low, is_high) )`` items
+            strandset: of interest
 
         Returns:
-            tuple: of :obj:`int`
+            tuple: min low bound and min high bound index
         """
         length = strandset.length()
         min_high_delta = min_low_delta = max_ss_idx = length - 1  # init the return values
@@ -488,8 +534,8 @@ class Document(CNObject):
         return (min_low_delta, min_high_delta)
     # end def
 
-    def getSelectionBounds(self):
-        """ Get the index bounds of a strand selection
+    def getSelectionBounds(self) -> Tuple[int, int]:
+        """Get the index bounds of a strand selection
 
         Returns:
             tuple: of :obj:`int`
@@ -507,9 +553,8 @@ class Document(CNObject):
         return (min_low_delta, min_high_delta)
     # end def
 
-    def deleteStrandSelection(self, use_undostack=True):
-        """
-        Delete selected strands. First iterates through all selected strands
+    def deleteStrandSelection(self, use_undostack: bool = True):
+        """Delete selected strands. First iterates through all selected strands
         and extracts refs to xovers and strands. Next, calls removeXover
         on xoverlist as part of its own macroed command for isoluation
         purposes. Finally, calls removeStrand on all strands that were
@@ -560,14 +605,14 @@ class Document(CNObject):
             self.undoStack().endMacro()
     # end def
 
-    def resizeSelection(self, delta, use_undostack=True):
-        """ Moves the selected idxs by delta by first iterating over all strands
+    def resizeSelection(self, delta: int, use_undostack: bool = True):
+        """Moves the selected idxs by delta by first iterating over all strands
         to calculate new idxs (method will return if snap-to behavior would
         create illegal state), then applying a resize command to each strand.
 
         Args:
-            delta (float):
-            use_undostack (bool): optional, default is True
+            delta:
+            use_undostack: optional, default is ``True``
         """
         resize_list = []
         vh_set = set()
@@ -629,7 +674,7 @@ class Document(CNObject):
     # end def
 
     def updateStrandSelection(self):
-        """ do it this way in the future when we have
+        """Do it this way in the future when we have
         a better signaling architecture between views
         For now, individual objects need to emit signals
 
@@ -652,7 +697,7 @@ class Document(CNObject):
     # end def
 
     def resetViews(self):
-        """ This is a fast way to clear selections and the views.
+        """This is a fast way to clear selections and the views.
         We could manually deselect each item from the Dict, but we'll just
         let them be garbage collect
         the dictionary maintains what is selected
@@ -664,7 +709,12 @@ class Document(CNObject):
         self.documentViewResetSignal.emit(self)
     # end def
 
-    def makeNew(self, fname=None):
+    def makeNew(self, fname: str = "untitled.json"):
+        """For use in creating a new ``Document``
+
+        Args:
+            fname: new filename, default is ``untitled.json``
+        """
         self.clearAllSelected()
         self.resetViews()
         setBatch(True)
@@ -672,17 +722,17 @@ class Document(CNObject):
         setBatch(False)
         self.undoStack().clear()  # reset undostack
         self.deactivateActivePart()
-        self._filename = fname if fname else "untitled.json"
+        self._filename = fname
     # end def
 
-    def setViewNames(self, view_name_list, do_clear=False):
-        """ Tell the model what views the document should support
+    def setViewNames(self, view_name_list: List[str], do_clear: bool = False):
+        """Tell the model what views the document should support
         Allows non-visible views to be used.
         Intended to be called at application launch only at present.
 
         Args:
-            view_name_list (list):
-            do_clear (bool): optional, clear the names or not? defaults to False
+            view_name_list: List of view names like `slice`, `path`, or `inspector`
+            do_clear:: optional, clear the names or not? defaults to ``False``
         """
         view_names = [] if do_clear else self.view_names
         for view_name in view_name_list:
@@ -692,78 +742,89 @@ class Document(CNObject):
     # end def
 
     # PUBLIC METHODS FOR EDITING THE MODEL #
-    def createNucleicAcidPart(self, use_undostack=True, grid_type=GridType.HONEYCOMB):
-        """ Create and store a new DnaPart and instance, and return the instance.
+    def createNucleicAcidPart(  self,
+                                use_undostack: bool = True,
+                                grid_type: EnumType = GridEnum.NONE
+                            ) -> NucleicAcidPart:
+        """Create and store a new DnaPart and instance, and return the instance.
 
         Args:
-            use_undostack (bool): optional, defaults to True
+            use_undostack: optional, defaults to True
+            grid_type: optional default to HoneyComb
+
+        Returns
+            new :obj:`NucleicAcidPart`
         """
         dna_part = NucleicAcidPart(document=self, grid_type=grid_type)
         self._addPart(dna_part, use_undostack=use_undostack)
         return dna_part
     # end def
 
-    def getParts(self):
-        """Get all child `Part` in the document
+    def getParts(self) -> Iterator[Part]:
+        """Get all child :obj:`Part` in the document
 
         Yields:
-            Part: the next Part in the the list of children
+            the next :obj:`Part` in the the Set of children
         """
         for item in self._children:
             if isinstance(item, Part):
                 yield item
     # end def
 
-    def getPartUUID(self, uuid):
-        """ Get the part given the uuid string
+    def getPartByUUID(self, uuid: str) -> Part:
+        """Get the part given the uuid string
 
         Args:
-            uuid (str):
+            uuid: of the part
 
         Returns:
-            Part or None if no matching part is found
+            Part
+
+        Raises:
+            KeyError: no part with that UUID
         """
         for item in self._children:
             if isinstance(item, Part) and item.uuid == uuid:
                 return item
+        raise KeyError("Part with uuid {} not found".format(uuid))
     # end def
 
     # PUBLIC SUPPORT METHODS #
-    def controller(self):
+    def controller(self) -> DocCtrlT:
         return self._controller
     # end def
 
-    def setController(self, controller):
-        """Called by DocumentController setDocument method."""
+    def setController(self, controller: DocCtrlT):
+        """Called by :meth:`DocumentController.setDocument` method."""
         self._controller = controller
     # end def
 
-    def setSelectedInstance(self, new_instance):
-        if self._selected_instance == new_instance:
-            return
-        self._selected_instance = new_instance
-    # end def
-
     # PRIVATE SUPPORT METHODS #
-    def _addPart(self, part, use_undostack=True):
+    def _addPart(self, part: Part, use_undostack: bool = True):
         """Add part to the document via AddInstanceCommand.
         """
         c = AddInstanceCommand(self, part)
         util.doCmd(self, c, use_undostack)
     # end def
 
-    def createMod(self, params, mid=None, use_undostack=True):
-        """ Create a modification
+    def createMod(  self,
+                    params: dict,
+                    mid: str = None,
+                    use_undostack: bool = True) -> Tuple[dict, str]:
+        """Create a modification
 
         Args:
-            params (dict):
-            mid (str): optional, modification ID string
-            use_undostack (bool): optional, default is True
+            params:
+            mid: optional, modification ID string
+            use_undostack: optional, default is ``True``
 
         Returns:
-            tuple: of :obj:`dict`, :obj:`str` of form::
+            tuple of :obj:`dict`, :obj:`str` of form::
 
                 (dictionary of modification paramemters, modification ID string)
+
+        Raises:
+            KeyError: Duplicate mod ID
         """
         if mid is None:
             mid = uuid4().hex
@@ -801,36 +862,36 @@ class Document(CNObject):
         return item, mid
     # end def
 
-    def modifyMod(self, params, mid, use_undostack=True):
+    def modifyMod(self, params: dict, mid: str, use_undostack: bool = True):
         """Modify an existing modification
 
         Args:
-            params (dict):
-            mid (str): optional, modification ID string
-            use_undostack (bool): optional, default is True
+            params:
+            mid: optional, modification ID string
+            use_undostack: optional, default is ``True``
         """
         if mid in self._mods:
             c = ModifyModCommand(self, params, mid)
             util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def destroyMod(self, mid, use_undostack=True):
+    def destroyMod(self, mid: str, use_undostack: bool = True):
         """Destroy an existing modification
 
         Args:
-            mid (str): optional, modification ID string
-            use_undostack (bool): optional, default is True
+            mid: optional, modification ID string
+            use_undostack: optional, default is ``True``
         """
         if mid in self._mods:
             c = RemoveModCommand(self, mid)
             util.doCmd(self, c, use_undostack=use_undostack)
     # end def
 
-    def getMod(self, mid):
+    def getMod(self, mid: str) -> Optional[dict]:
         """Get an existing modification
 
         Args:
-            mid (str): optional, modification ID string
+            mid: modification ID string
 
         Returns:
             dict or None
@@ -838,11 +899,11 @@ class Document(CNObject):
         return self._mods.get(mid)
     # end def
 
-    def getModProperties(self, mid):
+    def getModProperties(self, mid: str) -> Optional[dict]:
         """Get an existing modification properties
 
         Args:
-            mid (str): optional, modification ID string
+            mid: modification ID string
 
         Returns:
             dict or None
@@ -850,16 +911,16 @@ class Document(CNObject):
         return self._mods.get(mid)['props']
     # end def
 
-    def getModLocationsSet(self, mid, is_internal):
-        """Get an existing modifications locations in a Document
-        (Part, Virtual Helix ID, Strand)
+    def getModLocationsSet(self, mid: str, is_internal: bool) -> dict:
+        """Get an existing modifications locations in a ``Document``
+        (``Part``, Virtual Helix ID, ``Strand``)
 
         Args:
-            mid (str): optional, modification ID string
-            is_internal (bool):
+            mid: modification ID string
+            is_internal:
 
         Returns:
-            dict or None
+            dict
         """
         if is_internal:
             return self._mods[mid]['int_locations']
@@ -867,39 +928,39 @@ class Document(CNObject):
             return self._mods[mid]['ext_locations']
     # end def
 
-    def addModInstance(self, mid, is_internal, part, key):
-        """ Add an instance of a modification to the Document
+    def addModInstance(self, mid: str, is_internal: bool, part: Part, key: str):
+        """Add an instance of a modification to the Document
 
         Args:
-            mid (str): modification id string
-            is_internal (bool):
-            part (Part): associated Part
-            key (str): key of the modification at the part level
+            mid: modification id string
+            is_internal:
+            part: associated Part
+            key: key of the modification at the part level
         """
         location_set = self.getModLocationsSet(mid, is_internal)
         doc_key = ''.join((part.uuid, ',', key))
         location_set.add(doc_key)
     # end def
 
-    def removeModInstance(self, mid, is_internal, part, key):
+    def removeModInstance(self, mid: str, is_internal: bool, part: Part, key: str):
         """Remove an instance of a modification from the Document
 
         Args:
-            mid (str): modification id string
-            is_internal (bool):
-            part (Part): associated Part
-            key (str): key of the modification at the part level
+            mid: modification id string
+            is_internal:
+            part: associated Part
+            key: key of the modification at the part level
         """
         location_set = self.getModLocationsSet(mid, is_internal)
         doc_key = ''.join((part.uuid, ',', key))
         location_set.remove(doc_key)
     # end def
 
-    def modifications(self):
-        """ Get a copy of the dictionary of the modifications in this Document
+    def modifications(self) -> dict:
+        """Get a copy of the dictionary of the modifications in this ``Document``
 
         Returns:
-            dict:
+            dictionary of the modifications
         """
         mods = self._mods
         res = {}
@@ -912,31 +973,34 @@ class Document(CNObject):
         return res
     # end def
 
-    def getModStrandIdx(self, key):
-        """ Convert a key of a mod instance relative to a part
+    def getModStrandIdx(self, key: str) -> Tuple[Part, Strand, int]:
+        """Convert a key of a mod instance relative to a part
         to a part, a strand and an index
 
         Args:
-            key (str): Mod key
+            key: Mod key
+
+        Returns:
+            tuple of the form::
+
+                (Part, Strand, and index)
         """
         keylist = key.split(',')
         part_uuid = keylist[0]
         id_num = int(keylist[1])
-        is_fwd = int(keylist[2])    # enumeration of StrandType.FWD or StrandType.REV
+        is_fwd = int(keylist[2])    # enumeration of StrandEnum.FWD or StrandEnum.REV
         idx = int(keylist[3])
-        part = self.getPartUUID(part_uuid)
-        if part is None:
-            raise KeyError("Part with uuid {} not found".format(part_uuid))
+        part = self.getPartByUUID(part_uuid)
         strand = part.getStrand(is_fwd, id_num, idx)
         return part, strand, idx
     # end def
 
-    def getModSequence(self, mid, mod_type):
+    def getModSequence(self, mid: str, mod_type: int) -> Tuple[str, str]:
         """Getter for the modification sequence give by the arguments
 
         Args:
-            mid (str or None): mod id or None
-            mod_type (int): [ModType.END_5PRIME, ModType.END_3PRIME]
+            mid: mod id or ``None``
+            mod_type: [ModEnum.END_5PRIME, ModEnum.END_3PRIME]
 
         Returns:
             tuple: of :obj:`str` of form::
@@ -945,29 +1009,27 @@ class Document(CNObject):
         """
         mod_dict = self._mods.get(mid)
         name = '' if mid is None else mod_dict['name']
-        if mod_type == ModType.END_5PRIME:
+        if mod_type == ModEnum.END_5PRIME:
             seq = '' if mid is None else mod_dict['seq5p']
-        elif mod_type == ModType.END_3PRIME:
+        elif mod_type == ModEnum.END_3PRIME:
             seq = '' if mid is None else mod_dict['seq3p']
         else:
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
     # end def
 
-    def setSliceOrGridViewVisible(self, value):
-        """
-        Set the current SliceView type
+    def setSliceOrGridViewVisible(self, view_type: EnumType):
+        """Set the current SliceView type
 
-        Returns:
-            None
+        Args:
+            view_type: enum from the ``OrthoViewEnum``
         """
         if self.controller():
-            return self.controller().setSliceOrGridViewVisible(value)
+            self.controller().setSliceOrGridViewVisible(view_type)
 #    # end def
 
-    def getGridType(self):
-        """
-        Get the current Grid type
+    def getGridType(self) -> EnumType:
+        """Get the current Grid type
 
         Returns:
             The current Grid type
@@ -976,14 +1038,10 @@ class Document(CNObject):
             return self.activePart().getGridType()
     # end def
 
-    def setGridType(self, grid_type):
-        """
-        Set the current Grid type
-
-        Returns:
-            None
+    def setGridType(self, grid_type: EnumType):
+        """Set the current Grid type
         """
         if self.activePart():
-            return self.activePart().setGridType(grid_type)
+            self.activePart().setGridType(grid_type)
     # end def
 # end class

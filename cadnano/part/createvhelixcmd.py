@@ -1,42 +1,73 @@
 from ast import literal_eval
 import bisect
-from cadnano.proxies.cnproxy import UndoCommand
+from typing import (
+    Union,
+    List,
+    Tuple
+)
 
+from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.cntypes import (
+    NucleicAcidPartT,
+    RectT,
+    Vec3T
+)
 
 class CreateVirtualHelixCommand(UndoCommand):
-    def __init__(self, part, x, y, z, length,
-                 id_num=None, properties=None,
-                 safe=True, parity=None):
-        """
+    def __init__(self,
+                part: NucleicAcidPartT,
+                x: float,
+                y: float,
+                z: float,
+                length: int,
+                direction: Vec3T = (0, 0, 1.),
+                id_num: int = None,
+                properties: Union[tuple, dict] = None,
+                safe: bool = True,
+                parity: int = None):
+        '''``UndoCommand`` to create a virtual helix in a ``NucleicAcidPart``
+
         Args:
-            safe (bool): safe must be True to update neighbors
-            otherwise, neighbors need to be explicitly updated
-        """
+            part: The parent ``NucleicAcidPart``
+            x: ``x`` coordinate of the 0 - index base
+            y: ``y`` coordinate of the 0 - index base
+            z: ``z`` coordinate of the 0 - index base
+            length: Length of the virtual helix in bases
+            direction: the direction of the virtual helix
+            id_num: the ID number of the helix in the ``part``
+            properties: the initial or inherited properties of the ``part``
+            safe: Default is ``True``. safe must be ``True`` to update neighbors.
+                otherwise, neighbors need to be explicitly updated.  Set to
+                ``False`` to speed up creation of many virtual helices
+            parity: even == 0, odd == 1, None == doesn't matter.  Legacy from
+                scaffold based design
+        '''
         super(CreateVirtualHelixCommand, self).__init__("create virtual helix")
-        self.part = part
+        self.part: NucleicAcidPartT = part
         if id_num is None:
-            self.id_num = part._getNewIdNum(parity=parity)
+            id_num = part._getNewIdNum(parity=parity)
         else:
             part._reserveIdNum(id_num)
-            self.id_num = id_num
-        self.origin_pt = (x, y, z)
-        self.length = length
-        self.color = part.getColor()
-        self.keys = None
+        self.id_num: int = id_num
+        self.origin_pt: Vec3T = (x, y, z)
+        self.direction: Vec3T = direction
+        self.length: int = length
+        self.color: str = part.getColor()
+        self.keys: List[str] = None
         if properties is not None:
             if isinstance(properties, tuple):  # usually for unsafe
                 self.keys, self.values = properties
             else:
                 self.keys = list(properties.keys())
                 self.values = list(properties.values())
-        if safe:
-            self.neighbors = []
-        else:
+
+        self.neighbors: List[int] = []
+        if not safe:
             self.neighbors = literal_eval(self.values[self.keys.index('neighbors')])
 
-        self.threshold = 2.1*part.radius()
-        self.safe = safe
-        self.old_limits = None
+        self.threshold: float = 2.1*part.radius()
+        self.safe: bool = safe
+        self.old_limits: RectT = None
     # end def
 
     def redo(self):
@@ -44,11 +75,13 @@ class CreateVirtualHelixCommand(UndoCommand):
         id_num = self.id_num
         origin_pt = self.origin_pt
         self.old_limits = part.getVirtualHelixOriginLimits()
-        vh = part._createHelix(id_num, origin_pt, (0, 0, 1), self.length, self.color)
+        # Set direction to (0, 0, 1) for now
+        vh = part._createHelix(id_num, origin_pt, self.direction, self.length, self.color)
 
         if self.safe:   # update all neighbors
             if not self.neighbors:
-                self.neighbors = part._getVirtualHelixOriginNeighbors(id_num, self.threshold)
+                self.neighbors = list(
+                    part._getVirtualHelixOriginNeighbors(id_num, self.threshold))
 
             neighbors = self.neighbors
             part.vh_properties.loc[id_num, 'neighbors'] = str(list(neighbors))
@@ -61,12 +94,15 @@ class CreateVirtualHelixCommand(UndoCommand):
         else:
             neighbors = self.neighbors
         if self.keys is not None:
-            part.setVirtualHelixProperties(id_num,
+            '''NOTE: DON'T bother UndoCommand-ing this because the helix is
+            deleted on the undo.  Causes a segfault on MacOS if you do
+            '''
+            part._setVirtualHelixProperties(id_num,
                                            self.keys, self.values,
-                                           safe=False)
+                                           emit_signals=False)
             part.resetCoordinates(id_num)
         part.partVirtualHelixAddedSignal.emit(part, id_num, vh, neighbors)
-        print('Done redoing create of %s' % self.id_num)
+        # print('Done redoing create of %s' % self.id_num)
     # end def
 
     def undo(self):
@@ -75,8 +111,12 @@ class CreateVirtualHelixCommand(UndoCommand):
         # since we're hashing on the object in the views do this first
         for neighbor_id in self.neighbors:
             nneighbors = literal_eval(part.getVirtualHelixProperties(neighbor_id, 'neighbors'))
-            nneighbors.remove(id_num)
-            part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
+            try:
+                nneighbors.remove(id_num)
+                part.vh_properties.loc[neighbor_id, 'neighbors'] = str(list(nneighbors))
+            except:
+                print("id_num %d not there in neighbor %d" % (id_num, neighbor_id))
+                pass
 
         # signaling the view is two parts to clean up signals properly
         # and then allow the views to refresh

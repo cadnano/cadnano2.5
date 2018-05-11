@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    OligoT
+)
+
 class OligoItemController():
-    def __init__(self, oligo_item, model_oligo):
+    def __init__(self, oligo_item, model_oligo: OligoT):
         self._oligo_item = oligo_item
         self._model_oligo = model_oligo
         self.connectSignals()

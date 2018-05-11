@@ -1,13 +1,48 @@
+# -*- coding: utf-8 -*-
+from typing import (
+    List,
+    Tuple
+)
 
-from PyQt5.QtCore import Qt, QPointF
-from PyQt5.QtGui import QPainterPath, QColor
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsEllipseItem
+from PyQt5.QtCore import (
+    Qt,
+    QPointF
+)
+from PyQt5.QtGui import (
+    QPainterPath,
+    QColor
+)
+from PyQt5.QtWidgets import (
+    QGraphicsPathItem,
+    QGraphicsEllipseItem,
+    QGraphicsItem,
+    QGraphicsSceneHoverEvent,
+    QGraphicsSceneMouseEvent
+)
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getPenObj, getBrushObj, getNoPen
-from cadnano.proxies.cnenum import GridType
-
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj,
+    getNoPen
+)
+from cadnano.proxies.cnenum import (
+    GridEnum,
+    EnumType
+)
+from cadnano.views.gridview import GridNucleicAcidPartItemT
+from cadnano.views.gridview.tools import (
+    SelectGridToolT,
+    CreateGridToolT
+)
+from cadnano.cntypes import (
+    RectT
+)
 from . import gridstyles as styles
+
 _RADIUS = styles.GRID_HELIX_RADIUS
 _ZVALUE = styles.ZGRIDHELIX + 1
 HIGHLIGHT_WIDTH = styles.GRID_HELIX_MOD_HILIGHT_WIDTH
@@ -18,33 +53,44 @@ class GridItem(QGraphicsPathItem):
     """Summary
 
     Attributes:
-        allow_snap (TYPE): Description
-        bounds (TYPE): Description
-        dots (TYPE): Description
-        draw_lines (bool): Description
-        grid_type (TYPE): Description
-        part_item (TYPE): Description
-        points (list): Description
+        allow_snap: Description
+        bounds: Description
+        dots: Description
+        draw_lines: Description
+        grid_type: Description
+        part_item: Description
+        points: Description
     """
 
-    def __init__(self, part_item, grid_type):
+    def __init__(self,  part_item: GridNucleicAcidPartItemT,
+                        grid_type: EnumType):
         """Summary
 
         Args:
-            part_item (TYPE): Description
-            grid_type (TYPE): Description
+            part_item: Description
+            grid_type: Description
         """
         super(GridItem, self).__init__(parent=part_item)
         self.part_item = part_item
         dot_size = 0.5
-        self.dots = (dot_size, dot_size / 2)
-        self.allow_snap = part_item.window().action_vhelix_snap.isChecked()
-        self.draw_lines = True
-        self.points = []
+        self.dots: Tuple[float, float] = (dot_size, dot_size / 2)
+        self.allow_snap: bool = part_item.window().action_vhelix_snap.isChecked()
+        self.draw_lines: bool = True
+        self.points: List[GridPoint] = []
+
         color = QColor(Qt.blue)
         color.setAlphaF(0.1)
         self.setPen(color)
         self.setGridType(grid_type)
+    # end def
+
+    def destroyItem(self):
+        print("destroying gridView GridItem")
+        scene = self.scene()
+        for point in self.points:
+            point.destroyItem()
+        self.points = None
+        scene.removeItem(self)
     # end def
 
     def updateGrid(self):
@@ -58,22 +104,19 @@ class GridItem(QGraphicsPathItem):
         radius = part.radius()
         self.bounds = bounds = part_item.bounds()
         self.removePoints()
-        if self.grid_type == GridType.HONEYCOMB:
+        if self.grid_type == GridEnum.HONEYCOMB:
             self.doHoneycomb(part_item, radius, bounds)
-        elif self.grid_type == GridType.SQUARE:
+        elif self.grid_type == GridEnum.SQUARE:
             self.doSquare(part_item, radius, bounds)
         else:
             self.setPath(QPainterPath())
     # end def
 
-    def setGridType(self, grid_type):
+    def setGridType(self, grid_type: EnumType):
         """Summary
 
         Args:
-            grid_type (TYPE): Description
-
-        Args:
-            TYPE: Description
+            grid_type: Description
         """
         self.grid_type = grid_type
         self.updateGrid()
@@ -84,16 +127,14 @@ class GridItem(QGraphicsPathItem):
         self.draw_lines = draw_lines
         self.updateGrid()
 
-    def doHoneycomb(self, part_item, radius, bounds):
-        """Summary
-
+    def doHoneycomb(self,   part_item: GridNucleicAcidPartItemT,
+                            radius: float,
+                            bounds: RectT):
+        """
         Args:
-            part_item (TYPE): Description
-            radius (TYPE): Description
-            bounds (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item: Description
+            radius: Description
+            bounds: Description
         """
         doLattice = HoneycombDnaPart.latticeCoordToModelXY
         doPosition = HoneycombDnaPart.positionToLatticeCoordRound
@@ -150,16 +191,14 @@ class GridItem(QGraphicsPathItem):
         self.setPath(path)
     # end def
 
-    def doSquare(self, part_item, radius, bounds):
-        """Summary
-
+    def doSquare(self,  part_item: GridNucleicAcidPartItemT,
+                        radius: float,
+                        bounds: RectT):
+        """
         Args:
-            part_item (TYPE): Description
-            radius (TYPE): Description
-            bounds (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part_item: Description
+            radius: Description
+            bounds: Description
         """
         doLattice = SquareDnaPart.latticeCoordToModelXY
         doPosition = SquareDnaPart.positionToLatticeCoordRound
@@ -184,7 +223,7 @@ class GridItem(QGraphicsPathItem):
                     else:
                         is_pen_down = True
                         path.moveTo(x, -y)
-                """ +x is Left and +y is down
+                """+x is Left and +y is down
                 origin of ellipse is Top Left corner so we subtract half in X
                 and subtract in y
                 """
@@ -210,9 +249,6 @@ class GridItem(QGraphicsPathItem):
 
     def removePoints(self):
         """Summary
-
-        Returns:
-            TYPE: Description
         """
         points = self.points
         scene = self.scene()
@@ -222,60 +258,46 @@ class GridItem(QGraphicsPathItem):
 # end class
 
 
-class ClickArea(QGraphicsEllipseItem):
-    """Summary
-
-    Attributes:
-        parent_obj (TYPE): Description
-    """
-    _RADIUS = styles.GRID_HELIX_RADIUS
-
-    def __init__(self, diameter, parent):
-        nd = 2*self._RADIUS
-        offset = -0.5*nd + diameter/2
-        super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
-        self.parent_obj = parent
-        self.setAcceptHoverEvents(True)
-        self.setPen(getNoPen())
-    # end def
-
-    def mousePressEvent(self, event):
-        return self.parent_obj.mousePressEvent(event)
-# end class
-
-
 class GridPoint(QGraphicsEllipseItem):
-    """Summary
-
-    Attributes:
-        clickarea (TYPE): Description
-        grid (TYPE): Description
-        offset (TYPE): Description
     """
-    __slots__ = 'grid', 'offset'
-
-    def __init__(self, x, y, diameter, parent_grid):
+    Attributes:
+        clickarea (ClickArea): Description
+        grid (GridItem): Description
+        offset (float): Description
+    """
+    def __init__(self,  x: float, y: float, diameter: float,
+                        parent_grid: GridItem):
+        """
+        Args:
+            x:
+            y:
+            diameter:
+            parent_grid:
+        """
         super(GridPoint, self).__init__(0., 0.,
                                         diameter, diameter, parent=parent_grid)
-        self.offset = diameter / 2
-        self.grid = parent_grid
+        self.offset: float = diameter / 2
+        self.grid: GridItem = parent_grid
 
         self.clickarea = ClickArea(diameter, parent=self)
 
         self.setPos(x, y)
         self.setZValue(_ZVALUE)
-        self.setAcceptHoverEvents(True)
     # end def
 
-    def mousePressEvent(self, event):
+    def destroyItem(self):
+        self.grid = None
+        self.clickarea.destroyItem()
+        self.clickarea = None
+        self.scene().removeItem(self)
+    # end def
+
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
-            coordinates of the the event, and previous event.
-
-        Returns:
-            TYPE: Description
+            event: Contains item, scene, and screen coordinates of the the
+                event, and previous event.
         """
         if self.grid.allow_snap:
             part_item = self.grid.part_item
@@ -289,11 +311,11 @@ class GridPoint(QGraphicsEllipseItem):
             QGraphicsEllipseItem.mousePressEvent(self, event)
     # end def
 
-    def hoverEnterEvent(self, event):
+    def hoverEnterEvent(self, event: QGraphicsSceneHoverEvent):
         """Summary
 
         Args:
-            event (QGraphicsSceneHoverEvent): Description
+            event: Description
         """
         self.setBrush(getBrushObj(styles.ACTIVE_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.ACTIVE_GRID_DOT_COLOR, 1.0))
@@ -302,79 +324,99 @@ class GridPoint(QGraphicsEllipseItem):
         # tool.setHintPos(self.scenePos())
     # end def
 
-    def hoverLeaveEvent(self, event):
-        """Summary
-
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent):
+        """
         Args:
-            event (QGraphicsSceneHoverEvent): Description
+            event: Description
         """
         self.setBrush(getBrushObj(styles.DEFAULT_GRID_DOT_COLOR))
         self.setPen(getPenObj(styles.DEFAULT_GRID_DOT_COLOR, 1.0))
     # end def
 
-    def selectToolMousePress(self, tool, part_item, event):
-        """Summary
-
+    def selectToolMousePress(self,  tool: SelectGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
+        """
         Args:
-            tool (TYPE): Description
-            part_item (TYPE): Description
-            event (TYPE): Description
+            tool: :class:`SelectGridTool`
+            part_item: :class:`GridNucleicAcidPartItem`
+            event: the mouse event
         """
         part = part_item.part()
         part.setSelected(True)
-        # print("monkey")
+        # print("GridPoint MousePress for select")
         alt_event = GridEvent(self, self.offset)
         tool.selectOrSnap(part_item, alt_event, event)
         return QGraphicsEllipseItem.mousePressEvent(self, event)
     # end def
 
-    def createToolMousePress(self, tool, part_item, event):
-        """Summary
-
+    def createToolMousePress(self,  tool: CreateGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
+        """
         Args:
-            tool (TYPE): Description
-            part_item (TYPE): Description
-            event (TYPE): Description
+            tool: :class:`CreateGridTool`
+            part_item: :class:`GridNucleicAcidPartItem`
+            event: the mouse event
         """
         part = part_item.part()
         part.setSelected(True)
-        # print("paws")
         alt_event = GridEvent(self, self.offset)
         part_item.createToolMousePress(tool, event, alt_event)
     # end def
+# end class
 
+class ClickArea(QGraphicsEllipseItem):
+    """
+    Attributes:
+        parent_obj: Description
+    """
+    _RADIUS = styles.GRID_HELIX_RADIUS
+
+    def __init__(self, diameter: float, parent: GridPoint):
+        nd = 2*self._RADIUS
+        offset = -0.5*nd + diameter/2
+        super(ClickArea, self).__init__(offset, offset, nd, nd, parent=parent)
+        self.parent_obj = parent
+        self.setPen(getNoPen())
+    # end def
+
+    def destroyItem(self):
+        self.parent_obj = None
+        self.scene().removeItem(self)
+
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        return self.parent_obj.mousePressEvent(event)
+# end class
 
 class GridEvent(object):
-    """Summary
-
-    Attributes:
-        grid_pt (TYPE): Description
-        offset (QPointF): Description
     """
-    __slots__ = 'grid_pt', 'offset'
-
-    def __init__(self, grid_pt, offset):
-        """Summary
-
+    Attributes:
+        grid_pt (GridPoint): The grid point
+        offset (QPointF): the offset
+    """
+    def __init__(self, grid_pt: GridPoint, offset: float):
+        """
         Args:
-            grid_pt (TYPE): Description
-            offset (TYPE): Description
+            grid_pt: The grid point
+            offset: the offset
         """
         self.grid_pt = grid_pt
         self.offset = QPointF(offset, offset)
 
-    def scenePos(self):
+    def scenePos(self) -> QPointF:
         """Scene position, with offset.
 
         Returns:
-            QPointF: Description
+            Scene position, with offset.
         """
         return self.grid_pt.scenePos() + self.offset
 
-    def pos(self):
+    def pos(self) -> QPointF:
         """Local position, with offset.
 
         Returns:
-            QPointF: Description
+            local position with offset
         """
         return self.grid_pt.pos() + self.offset
+# end class

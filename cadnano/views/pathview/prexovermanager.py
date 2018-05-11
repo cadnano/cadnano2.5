@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from collections import deque
 
 from PyQt5.QtCore import Qt
@@ -5,9 +6,16 @@ from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QGraphicsRectItem
 
 from cadnano.gui.palette import getNoPen
-from cadnano.proxies.cnenum import StrandType
+from cadnano.proxies.cnenum import StrandEnum
 from .pathextras import PreXoverItem
-
+from . import (
+    PathNucleicAcidPartItemT,
+    PathVirtualHelixItemT
+)
+from cadnano.cntypes import (
+    WindowT,
+    NucleicAcidPartT
+)
 
 class PreXoverManager(QGraphicsRectItem):
     """Summary
@@ -21,16 +29,15 @@ class PreXoverManager(QGraphicsRectItem):
         part_item (TYPE): Description
         prexover_item_map (dict): Description
         pxi_pool (TYPE): Description
-        virtual_helix_item (VirtualHelixItem): Description
+        virtual_helix_item (PathVirtualHelixItem): Description
     """
     HUE_FACTOR = 1.6
     KEYMAP = {i: getattr(Qt, 'Key_%d' % i) for i in range(10)}
 
-    def __init__(self, part_item):
-        """Summary
-
+    def __init__(self, part_item: PathNucleicAcidPartItemT):
+        """
         Args:
-            part_item (TYPE): Description
+            part_item: Description
         """
         super(QGraphicsRectItem, self).__init__(part_item)
         self.part_item = part_item
@@ -51,47 +58,51 @@ class PreXoverManager(QGraphicsRectItem):
         self.active_pxis = {}
     # end def
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<{}>".format(self.__class__.__name__)
 
     ### ACCESSORS ###
-    def window(self):
-        """Summary
-
+    def window(self) -> WindowT:
+        """
         Returns:
-            TYPE: Description
+            :class:`DocumentWindow`
         """
         return self._parent.window()
 
-    def virtualHelixItem(self):
-        """Summary
-
+    def virtualHelixItem(self) -> PathVirtualHelixItemT:
+        """
         Returns:
-            TYPE: Description
+            :class:`PathVirtualHelixItem`
         """
         return self.virtual_helix_item
     # end def
 
-    def addKeyPress(self, key_int, info):
-        """Summary
-
+    def addKeyPress(self, key_int: int, info: str):
+        """
         Args:
-            key_int (TYPE): Description
-            info (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            key_int: Description
+            info: Description
         """
         qtkey = self.KEYMAP[key_int]
         self._key_press_dict[qtkey] = info
     ### EVENT HANDLERS ###
 
     ### PRIVATE SUPPORT METHODS ###
-    def updateBasesPerRepeat(self, step_size):
+    def destroyItem(self):
+        scene = self.scene()
+        self.clearPreXoverItems()
+        for x in list(self.pxi_pool):
+            x.destroyItem()
+        self.part_item = None
+        self.virtual_helix_item = None
+        scene.removeItem(self)
+    # end def
+
+    def updateBasesPerRepeat(self, step_size: int):
         """Recreates colors, all vhi
 
         Args:
-            step_size (TYPE): Description
+            step_size: Description
         """
         hue_scale = step_size*self.HUE_FACTOR
         self._colors = [QColor.fromHsvF(i / hue_scale, 0.75, 0.8).name()
@@ -100,14 +111,10 @@ class PreXoverManager(QGraphicsRectItem):
         # self.addRepeats()
     # end def
 
-    def handlePreXoverKeyPress(self, key):
-        """Summary
-
+    def handlePreXoverKeyPress(self, key: str):
+        """
         Args:
-            key (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            key: Description
         """
         # print("handling key", key, self.KEYMAP.get(key, None))
         if key not in self._key_press_dict:
@@ -116,9 +123,9 @@ class PreXoverManager(QGraphicsRectItem):
         # active item
         part = self.part_item.part()
         active_id_num, a_is_fwd, a_idx, a_to_id = part.active_base_info
-        a_strand_type = StrandType.FWD if a_is_fwd else StrandType.REV
+        a_strand_type = StrandEnum.FWD if a_is_fwd else StrandEnum.REV
         neighbor_id_num, n_is_fwd, n_idx, n_to_id = self._key_press_dict[key]
-        n_strand_type = StrandType.FWD if n_is_fwd else StrandType.REV
+        n_strand_type = StrandEnum.FWD if n_is_fwd else StrandEnum.REV
 
         if not part.hasStrandAtIdx(active_id_num, a_idx)[a_strand_type]:
             print("no active strand", key)
@@ -163,32 +170,27 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def updateTurnsPerRepeat(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
     # end def
 
-    def part(self):
-        """Summary
-
+    def part(self) -> NucleicAcidPartT:
+        """
         Returns:
-            TYPE: Description
+            model ``Part``
         """
         return self.parentItem().part()
 
     ### PUBLIC SUPPORT METHODS ###
-    def getItem(self, id_num, is_fwd, idx):
-        """Summary
-
+    def getItem(self, id_num: int, is_fwd: bool, idx: int):
+        """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            is_fwd (TYPE): Description
-            idx (int): the base index within the virtual helix
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            is_fwd: Description
+            idx : the base index within the virtual helix
 
         Returns:
-            TYPE: Description
+            :class:`PreXoverItem` with the argument stats
         """
         return self.prexover_item_map[(id_num, is_fwd, idx)]
     # end def
@@ -395,16 +397,12 @@ class PreXoverManager(QGraphicsRectItem):
         # end for per_neighbor_hits
     # end def
 
-    def activateNeighbors(self, id_num, is_fwd, idx):
-        """Summary
-
+    def activateNeighbors(self, id_num: int, is_fwd: bool, idx: int):
+        """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            is_fwd (TYPE): Description
-            idx (int): the base index within the virtual helix
-
-        Returns:
-            TYPE: Description
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            is_fwd: Description
+            idx: the base index within the virtual helix
         """
         # print("ACTIVATING neighbors", id_num, idx)
         item = self.prexover_item_map.get((id_num, is_fwd, idx))
@@ -423,10 +421,7 @@ class PreXoverManager(QGraphicsRectItem):
     # end def
 
     def deactivateNeighbors(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self._key_press_dict = {}
         while self.hovered_items:
@@ -441,14 +436,14 @@ class PreXoverManager(QGraphicsRectItem):
         self.part_item.part().setActiveBaseInfo(pre_xover_info)
     # end def
 
-    def isVirtualHelixActive(self, id_num):
-        """Summary
-
+    def isVirtualHelixActive(self, id_num: int) -> bool:
+        """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            id_num: VirtualHelix ID number. See :class:`NucleicAcidPart` for
+                description and related methods.
 
         Returns:
-            TYPE: Description
+            ``True`` if ``id_num`` is active, ``False`` otherwise
         """
         return self.part_item.part().isVirtualHelixActive(id_num)
     # end def

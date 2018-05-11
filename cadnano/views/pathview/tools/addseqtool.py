@@ -1,23 +1,56 @@
-"""Summary
-
+# -*- coding: utf-8 -*-
+"""
 Attributes:
     RE_DNA_PATTERN (SRE_Pattern): Matches any letters that are not valid DNA.
 """
 import re
-from PyQt5.QtCore import Qt, QSignalMapper
-from PyQt5.QtCore import QRectF, QPointF
-from PyQt5.QtGui import QFont, QTransform
-from PyQt5.QtGui import QPainterPath, QPolygonF
-from PyQt5.QtGui import QTextCharFormat, QSyntaxHighlighter
-from PyQt5.QtWidgets import QDialogButtonBox, QDialog, QRadioButton
+
+from PyQt5.QtCore import (
+    Qt,
+    QSignalMapper,
+    QRectF,
+    QPointF
+)
+from PyQt5.QtGui import (
+    QFont,
+    QTransform,
+    QPainterPath,
+    QPolygonF,
+    QTextCharFormat,
+    QSyntaxHighlighter,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QDialogButtonBox,
+    QDialog,
+    QRadioButton,
+    QGraphicsSceneHoverEvent,
+    QStyleOptionGraphicsItem,
+    QWidget
+)
+
 from cadnano.extras.dnasequences import sequences
 from cadnano.gui.dialogs.ui_addseq import Ui_AddSeqDialog
 from cadnano.views.pathview import pathstyles as styles
-from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
+from cadnano.gui.palette import (
+    getBrushObj,
+    getColorObj,
+    getNoPen,
+    getPenObj
+)
 from .abstractpathtool import AbstractPathTool
+from cadnano.views.pathview import (
+        PathToolManagerT,
+        PathVirtualHelixItemT
+)
+from cadnano.cntypes import (
+    DocT,
+    WindowT,
+    Vec2T
+)
 
 RE_DNA_PATTERN = re.compile("[^ACGTacgt]")
-
 
 class DNAHighlighter(QSyntaxHighlighter):
     """Summary
@@ -88,8 +121,7 @@ _REV_A = T180.map(_REV_A)
 
 
 class AddSeqTool(AbstractPathTool):
-    """Summary
-
+    """
     Attributes:
         apply_button (TYPE): Description
         buttons (list): Description
@@ -102,11 +134,11 @@ class AddSeqTool(AbstractPathTool):
         validated_sequence_to_apply (TYPE): Description
     """
 
-    def __init__(self, manager):
+    def __init__(self, manager: PathToolManagerT):
         """Summary
 
         Args:
-            manager (TYPE): Description
+            manager: Description
         """
         AbstractPathTool.__init__(self, manager)
         self.dialog = QDialog()
@@ -117,7 +149,7 @@ class AddSeqTool(AbstractPathTool):
         self.validated_sequence_to_apply = None
         self.initDialog()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Summary
 
         Returns:
@@ -125,7 +157,7 @@ class AddSeqTool(AbstractPathTool):
         """
         return "add_seq_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
+    def methodPrefix(self) -> str:
         """Summary
 
         Returns:
@@ -133,16 +165,14 @@ class AddSeqTool(AbstractPathTool):
         """
         return "addSeqTool"  # first letter should be lowercase
 
-    def paint(self, painter, option, widget=None):
-        """Summary
-
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget = None):
+        """
         Args:
-            painter (TYPE): Description
-            option (TYPE): Description
-            widget (None, optional): Description
-
-        Returns:
-            TYPE: Description
+            painter: Description
+            option: Description
+            widget: Default is ``None``
         """
         AbstractPathTool.paint(self, painter, option, widget)
         painter.setPen(getNoPen())
@@ -153,25 +183,26 @@ class AddSeqTool(AbstractPathTool):
             painter.drawPath(_REV_A)
     # end def
 
-    def setTopStrand(self, is_top):
+    def setTopStrand(self, is_top: bool):
         """
         Called in hoverMovePathHelix to set whether breaktool is hovering
         over a top strand (goes 5' to 3' left to right) or bottom strand.
 
         Args:
-            is_top (TYPE): Description
+            is_top: Description
         """
         self._is_top_strand = is_top
 
-    def hoverMove(self, item, event, flag=None):
-        """
-        flag is for the case where an item in the path also needs to
+    def hoverMove(self, item: QGraphicsItem,
+                        event: QGraphicsSceneHoverEvent,
+                        flag: bool = None):
+        """flag is for the case where an item in the path also needs to
         implement the hover method
 
         Args:
-            item (TYPE): Description
-            event (TYPE): Description
-            flag (None, optional): Description
+            item: Description
+            event: Description
+            flag: Description
         """
         self.show()
         self.updateLocation(item, item.mapToScene(QPointF(event.pos())))

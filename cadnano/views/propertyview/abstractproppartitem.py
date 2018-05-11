@@ -1,33 +1,31 @@
-"""Summary
-"""
-from cadnano.views.abstractitems.abstractpartitem import AbstractPartItem
-from .cnpropertyitem import CNPropertyItem
+# -*- coding: utf-8 -*-
+from typing import Any
 
+from cadnano.views.abstractitems import AbstractPartItem
+from .cnpropertyitem import CNPropertyItem
+from cadnano.cntypes import (
+    PartT
+)
 
 class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
     """Summary
     """
 
     def __init__(self, **kwargs):
-        """Summary
-
+        """
         Args:
             model_part (Part): The model part
             parent (TYPE): Description
             key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        super(AbstractPropertyPartSetItem, self).__init__(**kwargs)
     # end def
 
     # SLOTS
-    def partRemovedSlot(self, sender):
-        """Summary
-
+    def partRemovedSlot(self, part: PartT):
+        """
         Args:
-            sender (obj): Model object that emitted the signal.
-
-        Returns:
-            TYPE: Description
+            part: Model object that emitted the signal.
         """
         # self.parent.removePartItem(self)
         for controller in self._controller_list:
@@ -35,30 +33,22 @@ class AbstractPropertyPartSetItem(CNPropertyItem, AbstractPartItem):
         self._controller_list = []
     # end def
 
-    def partPropertyChangedSlot(self, model_part, property_key, new_value):
-        """Summary
-
-        Args:
-            model_part (Part): The model part
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
+    def partPropertyChangedSlot(self, part: PartT, key: str, new_value: Any):
         """
-        if self.cnModel() == model_part:
-            self.setValue(property_key, new_value)
+        Args:
+            part: The model part
+            key: Description
+            new_value: Description
+        """
+        if part in self.part_set:
+            self.setValue(key, new_value)
     # end def
 
-    def partSelectedChangedSlot(self, model_part, is_selected):
-        """Summary
-
+    def partSelectedChangedSlot(self, part: PartT, is_selected: bool):
+        """
         Args:
-            model_part (Part): The model part
-            is_selected (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            part: The model part
+            is_selected: Description
         """
         self.setSelected(is_selected)
     # end def

@@ -5,18 +5,22 @@ import random
 from cadnano.views.pathview import pathstyles
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.strand import Strand
-
+from cadnano.cntypes import (
+    NucleicAcidPartT
+)
 
 class CreateXoverCommand(UndoCommand):
-    """
-    Creates a Xover from the 3' end of strand5p to the 5' end of strand3p
+    """Creates a Xover from the 3' end of ``strand5p`` to the 5' end of ``strand3p``
     this needs to
-    1. preserve the old oligo of strand3p
+    1. preserve the old oligo of ``strand3p``
     2. install the crossover
     3. apply the strand5p oligo to the strand3p
     """
 
-    def __init__(self, part, strand5p, strand5p_idx, strand3p, strand3p_idx, update_oligo=True):
+    def __init__(self,  part: NucleicAcidPartT,
+                        strand5p: Strand, strand5p_idx: int,
+                        strand3p: Strand, strand3p_idx: int,
+                        update_oligo: bool = True):
         super(CreateXoverCommand, self).__init__("create xover")
         self._part = part
         self._strand5p = strand5p
@@ -113,8 +117,7 @@ class CreateXoverCommand(UndoCommand):
 
 
 class RemoveXoverCommand(UndoCommand):
-    """
-    Removes a Xover from the 3' end of strand5p to the 5' end of strand3p
+    """Removes a Xover from the 3' end of strand5p to the 5' end of strand3p
     this needs to
     1. preserve the old oligo of strand3p
     2. install the crossover
@@ -122,7 +125,8 @@ class RemoveXoverCommand(UndoCommand):
     4. apply the new strand3p oligo to the strand3p
     """
 
-    def __init__(self, part, strand5p, strand3p):
+    def __init__(self,  part: NucleicAcidPartT,
+                        strand5p: Strand, strand3p: Strand):
         super(RemoveXoverCommand, self).__init__("remove xover")
         self._part = part
         self._strand5p = strand5p

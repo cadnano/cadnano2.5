@@ -1,9 +1,15 @@
+# -*- coding: utf-8 -*-
+from typing import (
+    Iterable,
+    Any
+)
 from cadnano.proxies.cnproxy import UndoCommand
 
 
 class SetPropertyCommand(UndoCommand):
     """Undo ready command for setting an object property
-    Can be used by any objects implementing `getProperty` and `_setProperty`
+    Can be used by any objects implementing :meth:`getProperty` and
+    :meth:`_setProperty`
 
     Args:
         objs (list): iterable of objects
@@ -11,7 +17,7 @@ class SetPropertyCommand(UndoCommand):
         value (any): new value
     """
 
-    def __init__(self, objs, key, value):
+    def __init__(self, objs: Iterable, key: str, value: Any):
         super(SetPropertyCommand, self).__init__("change property")
         self._objs = objs
         self._key = key

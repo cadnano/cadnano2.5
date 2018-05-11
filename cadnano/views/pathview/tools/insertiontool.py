@@ -1,5 +1,4 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 from .abstractpathtool import AbstractPathTool
 
 
@@ -16,18 +15,18 @@ class InsertionTool(AbstractPathTool):
         """
         super(InsertionTool, self).__init__(manager)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Summary
 
         Returns:
-            TYPE: Description
+            lower case name
         """
         return "insertion_tool"  # first letter should be lowercase
 
-    def methodPrefix(self):
+    def methodPrefix(self) -> str:
         """Summary
 
         Returns:
-            TYPE: Description
+            prefix string
         """
         return "insertionTool"  # first letter should be lowercase

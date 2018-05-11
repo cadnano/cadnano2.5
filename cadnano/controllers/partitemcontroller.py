@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    PartT
+)
+
 class PartItemController():
-    def __init__(self, part_item, model_part):
+    def __init__(self, part_item, model_part: PartT):
         self._part_item = part_item
         self._model_part = model_part
     # end def

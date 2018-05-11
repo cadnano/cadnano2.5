@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.decorators.insertion import Insertion
-
+from cadnano.cntypes import (
+    StrandT
+)
 
 class AddInsertionCommand(UndoCommand):
-    def __init__(self, strand, idx, length):
+    def __init__(self, strand: StrandT, idx: int, length: int):
         super(AddInsertionCommand, self).__init__("add insertion")
         self._strand = strand
         id_num = strand.idNum()

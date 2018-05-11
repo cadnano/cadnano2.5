@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
-from cadnano.proxies.cnenum import GridType
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
+from typing import List
+
+from cadnano.proxies.cnenum import GridEnum
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.cntypes import (
+    DocT,
+    StrandSetT
+)
 
 FORMAT_VERSION = "2.0"
 ROW_OFFSET = 0
@@ -9,18 +18,20 @@ COL_OFFSET = 0
 # DEFAULT_COLS = 32
 
 
-def encodeDocument(document):
+def encodeDocument(document: DocT) -> dict:
 
     grid_type = document.getGridType()
 
-    if grid_type is GridType.HONEYCOMB or grid_type is None:
-        grid_type = GridType.HONEYCOMB
+    if grid_type == GridEnum.HONEYCOMB:
+        grid_type = GridEnum.HONEYCOMB
         positionToLatticeCoord = HoneycombDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = HoneycombDnaPart.positionToLatticeCoordRound
-    else:
-        grid_type = GridType.SQUARE
+    elif grid_type == GridEnum.SQUARE:
+        grid_type = GridEnum.SQUARE
         positionToLatticeCoord = SquareDnaPart.positionQtToLatticeCoord
         positionToLatticeCoordRound = SquareDnaPart.positionToLatticeCoordRound
+    else:
+        raise ValueError("Unsupported V2 grid type {}".format(grid_type))
 
     part = next(document.getParts())
     radius = part.radius()
@@ -113,7 +124,7 @@ def encodeDocument(document):
     return obj
 
 
-def getLegacyStrandSetArray(ss, max_base_idx):
+def getLegacyStrandSetArray(ss: StrandSetT, max_base_idx: int) -> List[List[int]]:
     """Given a strandset and max_base_idx, return legacy serialization array format."""
     num = ss.idNum()
     ret = [[-1, -1, -1, -1] for i in range(max_base_idx)]

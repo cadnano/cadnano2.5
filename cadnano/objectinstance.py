@@ -1,9 +1,16 @@
+# -*- coding: utf-8 -*-
+from typing import (
+    Any
+)
+
 from cadnano.proxies.cnobject import CNObject
 from cadnano.proxies.cnproxy import ProxySignal
-
+from cadnano.cntypes import (
+    ObjectInstanceT
+)
 
 class ObjectInstance(CNObject):
-    def __init__(self, reference_object, parent=None):
+    def __init__(self, reference_object: CNObject, parent=None):
         super(ObjectInstance, self).__init__(reference_object)
         self._parent = parent   # parent is either a document or assembly
         self._ref_object = reference_object
@@ -24,7 +31,7 @@ class ObjectInstance(CNObject):
         self.deleteLater()
     # end def
 
-    def reference(self):
+    def reference(self) -> CNObject:
         return self._ref_object
     # end def
 
@@ -32,25 +39,25 @@ class ObjectInstance(CNObject):
         return self._parent
     # end def
 
-    def properties(self):
+    def properties(self) -> dict:
         return self._properties.copy()
     # end def
 
-    def setProperty(self, key, val):
+    def setProperty(self, key: str, val: Any):
         self._properties[key] = val
     # end def
 
-    def getProperty(self, key):
+    def getProperty(self, key: str) -> Any:
         return self._properties[key]
     # end def
 
-    def shallowCopy(self):
+    def shallowCopy(self) -> ObjectInstanceT:
         oi = ObjectInstance(self._ref_object, self._parent)
         oi._properties = oi._properties.copy()
         return oi
     # end def
 
-    def deepCopy(self, reference_object, parent):
+    def deepCopy(self, reference_object: CNObject, parent) -> ObjectInstanceT:
         oi = ObjectInstance(reference_object, parent)
         oi._properties = oi._properties.copy()
         return oi

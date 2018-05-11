@@ -1,18 +1,22 @@
+# -*- coding: utf-8 -*-
 from cadnano.assembly import Assembly
 from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.proxies.cnobject import CNObject
 from cadnano.objectinstance import ObjectInstance
 from cadnano.part import Part
-
+from cadnano.cntypes import (
+    DocT
+)
 
 class AddInstanceCommand(UndoCommand):
     """Undo ready command for adding an instance.
 
     Args:
         document (Document): m
-        obj_instance (ObjectInstance): Object instance to add to Document
+        cnobj (CNObject): Object instance to add to Document
     """
 
-    def __init__(self, document, cnobj):
+    def __init__(self, document: DocT, cnobj: CNObject):
         super(AddInstanceCommand, self).__init__("add instance")
         self._document = document
         self._cnobj = cnobj

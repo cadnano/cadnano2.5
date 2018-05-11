@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.oligo import Oligo
 from cadnano.strand import Strand
-
+from cadnano.cntypes import (
+    StrandSetT
+)
 
 class CreateStrandCommand(UndoCommand):
     """Create a new `Strand` based with bounds (base_idx_low, base_idx_high),
@@ -15,10 +16,10 @@ class CreateStrandCommand(UndoCommand):
     Oligos
     """
 
-    def __init__(self, strandset,
-                 base_idx_low, base_idx_high,
-                 color,
-                 update_segments=True):
+    def __init__(self, strandset: StrandSetT,
+                 base_idx_low: int, base_idx_high: int,
+                 color: str,
+                 update_segments: bool = True):
         """ TODO: Now that parts have a UUID this could be instantiated via
         a document, uuid, id_num, is_fwd, base_idx_low, ... instead of an object
         to be independent of parts keeping strandsets live

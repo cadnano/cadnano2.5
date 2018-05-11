@@ -1,40 +1,61 @@
-"""Summary
-"""
+# -*- coding: utf-8 -*-
 import logging
 from math import floor
 
-from PyQt5.QtCore import QPointF, QRectF, Qt
-from PyQt5.QtGui import QPainterPath
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsItemGroup, QGraphicsPathItem
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QPainterPath,
+    QKeyEvent,
+    QMouseEvent
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsItemGroup,
+    QGraphicsPathItem,
+    QGraphicsSceneMouseEvent,
+)
 
 from cadnano.gui.palette import getPenObj
 from cadnano.views.pathview import pathstyles as styles
+from cadnano.views.pathview import (
+        PathRootItemT,
+)
+from cadnano.cntypes import (
+    Vec2T,
+    DocT
+)
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
 class SelectionItemGroup(QGraphicsItemGroup):
-    """
-    SelectionItemGroup
+    """SelectionItemGroup
 
     Attributes:
         getR (TYPE): Description
-        selectionbox (TYPE): Description
+        selectionbox (TYPE): SelectionBox
         translateR (TYPE): Description
-        viewroot (TYPE): Description
+        viewroot: Description
     """
 
-    def __init__(self, boxtype, constraint='y', parent=None):
-        """Summary
-
-        Args:
-            boxtype (TYPE): Description
-            constraint (str, optional): Description
-            parent (None, optional): Description
+    def __init__(self, boxtype: QGraphicsItem,
+                    constraint: str,
+                    viewroot: PathRootItemT):
         """
-        super(SelectionItemGroup, self).__init__(parent)
-        self.viewroot = parent
+        Args:
+            boxtype: :class:`EndpointHandleSelectionBox` or
+                :class:`VirtualHelixHandleSelectionBox` instance
+            constraint: ``x`` or ``y``. Default to ``y`` (up and down)
+            viewroot: view root item and object parent
+
+        """
+        super(SelectionItemGroup, self).__init__(viewroot)
+        self.viewroot: PathRootItemT = viewroot
         self.setFiltersChildEvents(True)
 
         # LOOK at Qt Source for deprecated code to replace this behavior
@@ -81,20 +102,15 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # # end def
 
     def pendToAdd(self, item):
-        """Summary
-
+        """
         Args:
             item (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         self._pending_to_add_dict[item] = True
     # end def
 
     def isPending(self, item):
-        """Summary
-
+        """
         Args:
             item (TYPE): Description
 
@@ -104,45 +120,35 @@ class SelectionItemGroup(QGraphicsItemGroup):
         return item in self._pending_to_add_dict
     # end def
 
-    def document(self):
-        """Summary
-
+    def document(self) -> DocT:
+        """
         Returns:
-            TYPE: Description
+            :class:`Document`
         """
         return self.viewroot.document()
     # end def
 
     def pendToRemove(self, item):
-        """Summary
-
+        """
         Args:
             item (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         if item in self._pending_to_add_dict:
             del self._pending_to_add_dict[item]
     # end def
 
-    def setNormalSelect(self, bool_val):
-        """Summary
-
+    def setNormalSelect(self, bool_val: bool):
+        """
         Args:
-            bool_val (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            bool_val: Description
         """
         self._normal_select = bool_val
     # end def
 
-    def isNormalSelect(self):
-        """Summary
-
+    def isNormalSelect(self) -> bool:
+        """
         Returns:
-            TYPE: Description
+            is it normal select?
         """
         return self._normal_select
     # end def
@@ -169,8 +175,7 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def selectionLock(self):
-        """Summary
-
+        """
         Returns:
             TYPE: Description
         """
@@ -178,18 +183,14 @@ class SelectionItemGroup(QGraphicsItemGroup):
     # end def
 
     def setSelectionLock(self, selection_group):
-        """Summary
-
+        """
         Args:
             selection_group (TYPE): Description
-
-        Returns:
-            TYPE: Description
         """
         self.viewroot.setSelectionLock(selection_group)
     # end def
 
-    def keyPressEvent(self, event):
+    def keyPressEvent(self, event: QKeyEvent):
         """
         Must intercept invalid input events.  Make changes here
 
@@ -205,15 +206,12 @@ class SelectionItemGroup(QGraphicsItemGroup):
             return QGraphicsItemGroup.keyPressEvent(self, event)
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Handler for user mouse press.
 
         Args:
-            event (QGraphicsSceneMouseEvent): Contains item, scene, and screen
+            event: Contains item, scene, and screen
             coordinates of the the event, and previous event.
-
-        Returns:
-            TYPE: Description
         """
         # self.show()
         if event.button() != Qt.LeftButton:
@@ -242,14 +240,10 @@ class SelectionItemGroup(QGraphicsItemGroup):
             return QGraphicsItemGroup.mousePressEvent(self, event)
     # end def
 
-    def mouseMoveEvent(self, event):
-        """Summary
-
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
+        """
         Args:
-            event (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            event: Description
         """
         if self._drag_enable is True:
 
@@ -273,11 +267,10 @@ class SelectionItemGroup(QGraphicsItemGroup):
         # end else
     # end def
 
-    def customMouseRelease(self, event):
-        """docstring for customMouseRelease
-
+    def customMouseRelease(self, event: QMouseEvent):
+        """
         Args:
-            event (TYPE): Description
+            event: Description
         """
         self.selectionbox.setParentItem(self.viewroot)
         self.selectionbox.hide()
@@ -414,7 +407,7 @@ class VirtualHelixHandleSelectionBox(QGraphicsPathItem):
     _PEN_WIDTH = styles.SELECTIONBOX_PEN_WIDTH
     _BOX_PEN = getPenObj(styles.BLUE_STROKE, _PEN_WIDTH)
 
-    def __init__(self, item_group):
+    def __init__(self, item_group: SelectionItemGroup):
         """
         The item_group.parentItem() is expected to be a partItem
 
@@ -581,12 +574,11 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     _BOX_PEN = getPenObj(styles.SELECTED_COLOR, _PEN_WIDTH)
     _BASE_WIDTH = styles.PATH_BASE_WIDTH
 
-    def __init__(self, item_group):
-        """
-        The item_group.parentItem() is expected to be a partItem
+    def __init__(self, item_group: SelectionItemGroup):
+        """The item_group.parentItem() is expected to be a partItem
 
         Args:
-            item_group (TYPE): Description
+            item_group: Description
         """
         super(EndpointHandleSelectionBox, self).__init__(item_group.parentItem())
         self._item_group = item_group
@@ -598,26 +590,21 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         self._pos0 = QPointF()
     # end def
 
-    def getX(self, pos):
-        """Summary
-
+    def getX(self, pos: QPointF) -> float:
+        """
         Args:
-            pos (TYPE): Description
+            pos: Description
 
         Returns:
-            TYPE: Description
+            ``x`` position
         """
         return pos.x()
     # end def
 
-    def translateX(self, delta):
-        """Summary
-
+    def translateX(self, delta: float):
+        """
         Args:
-            delta (TYPE): Description
-
-        Returns:
-            TYPE: Description
+            delta: Description
         """
         children = self._item_group.childItems()
         if children:
@@ -628,22 +615,18 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
     # end def
 
     def resetPosition(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         self.setPos(self._pos0)
 
-    def delta(self, xf, x0):
-        """Summary
-
+    def delta(self, xf: float, x0: float) -> float:
+        """
         Args:
-            xf (TYPE): Description
-            x0 (TYPE): Description
+            xf: Description
+            x0: Description
 
         Returns:
-            TYPE: Description
+            change distance
         """
         bound_l, bound_h = self._bounds
         delta = int(floor((xf - x0) / self._BASE_WIDTH))
@@ -654,10 +637,7 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         return delta
 
     def refreshPath(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         temp_low, temp_high = self._item_group.viewroot.document().getSelectionBounds()
         self._bounds = (temp_low, temp_high)
@@ -667,11 +647,10 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         self._pos0 = self.pos()
     # end def
 
-    def painterPath(self):
-        """Summary
-
+    def painterPath(self) -> QPainterPath:
+        """
         Returns:
-            TYPE: Description
+            :class:`QPainterPath`
         """
         bw = self._BASE_WIDTH
         i_g = self._item_group
@@ -692,12 +671,11 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         return path
     # end def
 
-    def processSelectedItems(self, r_start, r_end, modifiers):
-        """docstring for processSelectedItems
-
+    def processSelectedItems(self, r_start: float, r_end: float, modifiers):
+        """
         Args:
-            r_start (TYPE): Description
-            r_end (TYPE): Description
+            r_start: Description
+            r_end: Description
             modifiers (TYPE): Description
         """
         delta = self.delta(r_end, r_start)
@@ -719,22 +697,21 @@ class EndpointHandleSelectionBox(QGraphicsPathItem):
         """
         self._item_group.document().deleteStrandSelection()
 
-    def boxParent(self):
-        """Summary
+    def boxParent(self) -> QGraphicsItem:
+        """Get the parent :class:`ProxyParentItem`
 
         Returns:
-            TYPE: Description
+            :class:`ProxyParentItem`
         """
         temp = self._item_group.childItems()[0].partItem().proxy()
         self.setParentItem(temp)
         return temp
     # end def
 
-    def bounds(self):
-        """Summary
-
+    def bounds(self) -> Vec2T:
+        """
         Returns:
-            TYPE: Description
+            the bounds
         """
         return self._bounds
     # end def

@@ -1,17 +1,44 @@
-"""Summary
-
+# -*- coding: utf-8 -*-
+"""
 Attributes:
     SNAP_WIDTH (int): Description
 """
-from PyQt5.QtCore import QLineF, QPointF, Qt, QRectF
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsEllipseItem
-from PyQt5.QtWidgets import QGraphicsSimpleTextItem
+from PyQt5.QtCore import (
+    QLineF,
+    QPointF,
+    Qt,
+    QRectF
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsEllipseItem,
+    QGraphicsSimpleTextItem,
+    QGraphicsSceneMouseEvent
+)
 
-from cadnano.controllers.virtualhelixitemcontroller import VirtualHelixItemController
-from cadnano.views.abstractitems.abstractvirtualhelixitem import AbstractVirtualHelixItem
-from cadnano.gui.palette import getPenObj, getBrushObj
+from cadnano.controllers import VirtualHelixItemController
+from cadnano.views.abstractitems import AbstractVirtualHelixItem
+from cadnano.gui.palette import (
+    getPenObj,
+    getBrushObj
+)
 from . import gridstyles as styles
-from .gridextras import WedgeGizmo, WEDGE_RECT
+from .gridextras import (
+    WedgeGizmo,
+    WEDGE_RECT
+)
+from cadnano.views.gridview.tools import (
+    SelectGridToolT,
+    CreateGridToolT
+)
+from . import (
+    GridNucleicAcidPartItemT,
+    GridVirtualHelixItemT
+)
+from cadnano.cntypes import (
+    KeyT,
+    ValueT
+)
 
 # set up default, hover, and active drawing styles
 _RADIUS = styles.GRID_HELIX_RADIUS
@@ -42,17 +69,18 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     """
     FILTER_NAME = 'virtual_helix'
 
-    def __init__(self, model_virtual_helix, part_item):
+    def __init__(self, id_num: int, part_item: GridNucleicAcidPartItemT):
         """
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): the part item
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            part_item: the part item
         """
-        AbstractVirtualHelixItem.__init__(self, model_virtual_helix, part_item)
+        AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
         self._controller = VirtualHelixItemController(self, self._model_part, False, True)
 
         self.hide()
+        self._viewroot = part_item._viewroot
         model_part = self._model_part
         x, y = model_part.locationQt(self._id_num, part_item.scaleFactor())
         # set position to offset for radius
@@ -80,17 +108,8 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     ### ACCESSORS ###
-    def part(self):
-        """Reference to the model part associated with the parent part item.
-
-        Returns:
-            NucleicAcidPart: the model part
-        """
-        return self._part_item.part()
-    # end def
-
-    def setSnapOrigin(self, is_snap):
-        """Used to toggle an item as the snap origin. See `SelectGridTool`.
+    def setSnapOrigin(self, is_snap: bool):
+        """Used to toggle an item as the snap origin. See :class:`SelectGridTool`.
 
         Args:
             is_snap (bool): True if this should be the snap origin, False otherwise.
@@ -103,24 +122,6 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         else:
             self.setPen(self.old_pen)
             self.old_pen = None
-
-    def partItem(self):
-        """Reference to the parent part item.
-
-        Returns:
-            NucleicAcidPartItem: the part item
-        """
-        return self._part_item
-    # end def
-
-    def idNum(self):
-        """Virual helix ID number.
-
-        Returns:
-            int: the id_num of the virtual helix object.
-        """
-        return self._id_num
-    # end def
 
     def activate(self):
         """Sets the VirtualHelixItem object as active (i.e. having focus due
@@ -136,13 +137,13 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.is_active = False
         self.updateAppearance()
 
-    def setCenterPos(self, x, y):
+    def setCenterPos(self, x: float, y: float):
         """Moves this item a new position such that its center is located at
         (x,y).
 
         Args:
-            x (float): new x coordinate
-            y (float): new y coordinate
+            x: new x coordinate
+            y: new y coordinate
         """
         # invert the y axis
         part_item = self._part_item
@@ -153,21 +154,12 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self.setPos(pos)
     # end def
 
-    def getCenterScenePos(self):
+    def getCenterScenePos(self) -> QPointF:
         """
         Returns:
-            QPointF: the scenePos of the virtualhelixitem center
+            the scenePos of the virtualhelixitem center
         """
         return self.scenePos() + QPointF(_RADIUS, _RADIUS)
-    # end def
-
-    def modelColor(self):
-        """The color associated with this item's `Part`.
-
-        Returns:
-            str: hex representation of Color, e.g. `#0066cc`.
-        """
-        return self._model_part.getProperty('color')
     # end def
 
     def partCrossoverSpanAngle(self):
@@ -183,18 +175,18 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """Event handler for when the mouse button is pressed inside
         this item. If a tool-specific mouse press method is defined, it will be
         called for the currently active tool. Otherwise, the default
-        QGraphicsItem.mousePressEvent will be called.
+        :meth:`QGraphicsItem.mousePressEvent` will be called.
 
         Note:
             Only applies the event if the clicked item is in the part
             item's active filter set.
 
         Args:
-            event (QMouseEvent): contains parameters that describe the mouse event.
+            event: contains parameters that describe the mouse event.
         """
         if self.FILTER_NAME not in self._part_item.getFilterSet():
             return
@@ -209,14 +201,16 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def selectToolMousePress(self, tool, part_item, event):
+    def selectToolMousePress(self,  tool: SelectGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         """The event handler for when the mouse button is pressed inside this
         item with the SelectTool active.
 
         Args:
-            tool (SelectGridTool): reference to call tool-specific methods
-            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
-            event (QMouseEvent): contains parameters that describe the mouse event
+            tool: reference to call tool-specific methods
+            part_item: reference to the part item
+            event: contains parameters that describe the mouse event
 
         """
         part = self._model_part
@@ -225,19 +219,21 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         # return QGraphicsItem.mousePressEvent(self, event)
     # end def
 
-    def createToolMousePress(self, tool, part_item, event):
+    def createToolMousePress(self,  tool: CreateGridToolT,
+                                    part_item: GridNucleicAcidPartItemT,
+                                    event: QGraphicsSceneMouseEvent):
         """Summary
 
         Args:
-            tool (SelectGridTool): reference to call tool-specific methods
-            part_item (cadnano.views.gridview.nucleicacidpartitem.NucleicAcidPartItem): reference to the part item
-            event (QMouseEvent): contains parameters that describe the mouse event
+            tool: reference to call tool-specific methods
+            part_item: reference to the part item
+            event: contains parameters that describe the mouse event
         """
         part = self._model_part
         print("createToolMousePress", part)
         # tool.attemptToCreateStrand
 
-    def virtualHelixPropertyChangedSlot(self, keys, values):
+    def virtualHelixPropertyChangedSlot(self, keys: KeyT, values: ValueT):
         """The event handler for when the a model virtual helix propety has
         changed. See partVirtualHelixPropertyChangedSignal.
 
@@ -254,11 +250,16 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
     # end def
 
     def virtualHelixRemovedSlot(self):
-        """The event handler for when a virtual helix is removed from the model.
+        """The event handler for when a virtual helix is removed from the model
+        """
+        self.destroyItem()
+    # end def
 
-        Disconnects signals, and sets  internal references to label, part_item,
+    def destroyItem(self):
+        """Disconnects signals, and sets  internal references to label, part_item,
         and model_part to None, and finally removes the item from the scene.
         """
+        print("removing GridVirtualHelixItem")
         self._controller.disconnectSignals()
         self._controller = None
         part_item = self._part_item
@@ -269,6 +270,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         self._label = None
         self._part_item = None
         self._model_part = None
+        self._viewroot = None
         self.scene().removeItem(self)
     # end def
 
@@ -276,7 +278,7 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """Check item's current visibility, color and active state, and sets
         pen, brush, text according to style defaults.
         """
-        is_visible, color = self._model_vh.getProperty(['is_visible', 'color'])
+        is_visible, color = self._model_part.getVirtualHelixProperties(self._id_num, ['is_visible', 'color'])
         if is_visible:
             self.show()
         else:
@@ -325,12 +327,12 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             self.setPos(new_pos)
     # end def
 
-    def createLabel(self):
+    def createLabel(self) -> QGraphicsSimpleTextItem:
         """Creates a text label to display the ID number. Font and Z are set
         in gridstyles.
 
         Returns:
-            QGraphicsSimpleTextItem: the label
+            the label
         """
         label = QGraphicsSimpleTextItem("%d" % self.idNum())
         label.setFont(_FONT)
@@ -368,21 +370,22 @@ class GridVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
             scene.removeItem(wg)
     # end def
 
-    def setWedgeGizmo(self, neighbor_virtual_helix, neighbor_virtual_helix_item):
+    def setWedgeGizmo(self, neighbor_virtual_helix: int,
+                            neighbor_virtual_helix_item: GridVirtualHelixItemT):
         """Adds a WedgeGizmo to oriented toward the specified neighbor vhi.
 
         Called by NucleicAcidPartItem _refreshVirtualHelixItemGizmos, in between
         with beginAddWedgeGizmos and endAddWedgeGizmos.
 
         Args:
-            neighbor_virtual_helix (int): the id_num of neighboring virtual helix
-            neighbor_virtual_helix_item (cadnano.views.gridview.virtualhelixitem.VirtualHelixItem):
+            neighbor_virtual_helix: the id_num of neighboring virtual helix
+            neighbor_virtual_helix_item:
             the neighboring virtual helix item
         """
         wg_dict = self.wedge_gizmos
         nvhi = neighbor_virtual_helix_item
 
-        nvhi_name = nvhi.cnModel().getProperty('name')
+        nvhi_name = nvhi.getProperty('name')
         pos = self.scenePos()
         line = QLineF(pos, nvhi.scenePos())
         line.translate(_RADIUS, _RADIUS)

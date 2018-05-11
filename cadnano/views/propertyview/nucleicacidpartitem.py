@@ -1,7 +1,9 @@
-"""Summary
-"""
-from cadnano.proxies.cnenum import ItemType
-from cadnano.controllers.nucleicacidpartitemcontroller import NucleicAcidPartItemController
+# -*- coding: utf-8 -*-
+from cadnano.proxies.cnenum import (
+    ItemEnum,
+    EnumType
+)
+from cadnano.controllers import NucleicAcidPartItemController
 from .abstractproppartitem import AbstractPropertyPartSetItem
 
 KEY_COL = 0
@@ -13,26 +15,31 @@ class NucleicAcidPartSetItem(AbstractPropertyPartSetItem):
     """
 
     def __init__(self, **kwargs):
-        """Summary
-
-        Args:
-            model_part (Part): The model part
-            parent (PropertyEditorWidget): The property editor
-            key (None, optional): Description
         """
-        super().__init__(**kwargs)
+        Args:
+            model_part (NucleicAcidPart): The model part
+            parent (:class:`PropertyEditorWidget`): The property editor
+            key (str, optional): Default is ``None``
+        """
+        self.part_set = set()
+        super(NucleicAcidPartSetItem, self).__init__(**kwargs)
         if self._key == "name":
-            for model_part in self.cnModelList():
+            for outline_part in self.outlineViewObjList():
+                model_part = outline_part.part()
+                self.part_set.add(model_part)
                 self._controller_list.append(NucleicAcidPartItemController(self, model_part))
 
     # end def
 
-    def itemType(self):
+    def cleanUp(self):
+        self.part_set.clear()
+
+    def itemType(self) -> EnumType:
         """Overrides AbstractPropertyPartItem method for NucleicAcidPartItem.
 
         Returns:
-            ItemType: NUCLEICACID
+            ItemEnum: NUCLEICACID
         """
-        return ItemType.NUCLEICACID
+        return ItemEnum.NUCLEICACID
     # end def
 # end class

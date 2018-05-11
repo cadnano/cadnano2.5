@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import QPointF, QRectF, Qt
+from PyQt5.QtCore import (
+    QPointF,
+    QRectF,
+    Qt
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsRectItem,
+    qApp
+)
+
 from cadnano.gui.palette import getBrushObj, getPenObj
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-from PyQt5.QtWidgets import qApp
 
 TOP_LEFT = 0
 BOTTOM_LEFT = 1
@@ -30,6 +38,11 @@ class GrabCornerItem(QGraphicsRectItem):
         self.is_resizable = is_resizable
         self.model_bounds = ()
         self.corner_type = TOP_LEFT
+    # end def
+
+    def destroyItem(self):
+        print("destroying GrabCornerItem")
+        self.scene().removeItem(self)
     # end def
 
     def mousePressEvent(self, event):

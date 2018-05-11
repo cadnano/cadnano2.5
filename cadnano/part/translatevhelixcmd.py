@@ -1,5 +1,9 @@
-from cadnano.proxies.cnproxy import UndoCommand
+from typing import Set
 
+from cadnano.proxies.cnproxy import UndoCommand
+from cadnano.cntypes import (
+    NucleicAcidPartT
+)
 # prevent circular imports
 # from cadnano.part.nucleicacidpart import Z_PROP_INDEX
 Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
@@ -8,7 +12,9 @@ Z_PROP_INDEX = -1  # index for Dataframe.iloc calls
 class TranslateVirtualHelicesCommand(UndoCommand):
     """ Move Virtual Helices around"""
 
-    def __init__(self, part, virtual_helix_set, dx, dy, dz):
+    def __init__(self,  part: NucleicAcidPartT,
+                        virtual_helix_set: Set[int],
+                        dx: float, dy: float, dz: float):
         super(TranslateVirtualHelicesCommand, self).__init__("translate virtual helices")
         self._part = part
         self._vhelix_set = virtual_helix_set.copy()

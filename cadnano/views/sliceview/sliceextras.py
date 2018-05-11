@@ -1,14 +1,50 @@
-from queue import Empty, Queue, PriorityQueue
+# -*- coding: utf-8 -*-
+from queue import (
+    Empty,
+    Queue,
+    PriorityQueue
+)
 
 import numpy as np
-from PyQt5.QtCore import pyqtProperty, QLineF, QObject, QPointF, QPropertyAnimation, QRectF, Qt
-from PyQt5.QtGui import QBrush, QColor, QPen, QPainterPath, QPolygonF, QRadialGradient, QTransform
-from PyQt5.QtWidgets import QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsPathItem, QGraphicsRectItem
+from PyQt5.QtCore import (
+    pyqtProperty,
+    QLineF,
+    QObject,
+    QPointF,
+    QPropertyAnimation,
+    QRectF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QColor,
+    QPen,
+    QPainterPath,
+    QPolygonF,
+    QRadialGradient,
+    QTransform
+)
+from PyQt5.QtWidgets import (
+    QGraphicsEllipseItem,
+    QGraphicsLineItem,
+    QGraphicsPathItem,
+    QGraphicsRectItem
+)
 
-from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
-from cadnano.gui.palette import getBrushObj, getColorObj, getNoPen, getPenObj
+from cadnano.fileio.lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.gui.palette import (
+    getBrushObj,
+    getColorObj,
+    getNoPen,
+    getPenObj
+)
+
+from cadnano.proxies.cnenum import GridEnum
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
-from cadnano.proxies.cnenum import GridType
+
 from . import slicestyles as styles
 
 
@@ -488,15 +524,10 @@ class PreXoverItem(QGraphicsRectItem):
         self.bond_3p.setLine(self._default_bond_3p)
     # end def
 
-    def destroy(self, scene):
-        """Summary
-
-        Args:
-            scene (TYPE): Description
-
-        Returns:
-            TYPE: Description
-        """
+    def destroyItem(self):
+        '''Remove this object and references to it from the view
+        '''
+        scene = self.scene()
         self.phos_item.adapter.resetAnimations()
         self.phos_item.adapter = None
         scene.removeItem(self.phos_item)
@@ -700,7 +731,7 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         line = QLineF(p1, p2)
         self.baseNearLine.setLine(line)
 
-    def remove(self):
+    def destroyItem(self):
         """Summary
         """
         fpxis = self.fwd_prexover_items
@@ -708,9 +739,9 @@ class PreXoverItemGroup(QGraphicsEllipseItem):
         scene = self.scene()
         for i in range(len(fpxis)):
             x = fpxis.pop(i)
-            x.destroy(scene)
+            x.destroyItem()
             x = rpxis.pop(i)
-            x.destroy(scene)
+            x.destroyItem()
         self.virtual_helix_item = None
         self.model_part = None
         scene.removeItem(self.active_wedge_gizmo)
@@ -896,7 +927,7 @@ class ShortestPathHelper(object):
     @staticmethod
     def getNeighborsForCoordinate(grid_type, row, column):
         # TODO[NF]:  Docstring
-        if grid_type is GridType.HONEYCOMB:
+        if grid_type is GridEnum.HONEYCOMB:
             if not HoneycombDnaPart.isEvenParity(row, column):
                 return (
                     (row+1, column),
@@ -909,7 +940,7 @@ class ShortestPathHelper(object):
                     (row, column+1),
                     (row, column-1)
                 )
-        elif grid_type is GridType.SQUARE:
+        elif grid_type is GridEnum.SQUARE:
             return(
                 (row, column+1),
                 (row, column-1),
@@ -930,7 +961,7 @@ class ShortestPathHelper(object):
             end (tuple):  The i-j coordinates corresponding to the end point
             vh_set (set):  A set of points that currently have a VH
             grid_type (object):  The current grid type in the design.
-                Either GridType.HONEYCOMB or GridType.SQUARE
+                Either GridEnum.HONEYCOMB or GridEnum.SQUARE
             radius (float):  the radius of the VH
             scale_factor (float):  the ratio of part to view radius
 
@@ -939,7 +970,7 @@ class ShortestPathHelper(object):
             end.  This list omits the starting point as it's assumed that the
             start point has already been clicked.
         """
-        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridType.HONEYCOMB else \
+        positionToLatticeCoord = HoneycombDnaPart.positionModelToLatticeCoord if grid_type is GridEnum.HONEYCOMB else \
             SquareDnaPart.positionModelToLatticeCoord
 
         start_coordinates = positionToLatticeCoord(part_radius, start[0], start[1], scale_factor=scale_factor)
@@ -1015,7 +1046,7 @@ class ShortestPathHelper(object):
         for node in coordinate_path:
             row = -node[0]
             column = node[1]
-            if grid_type is GridType.HONEYCOMB:
+            if grid_type is GridEnum.HONEYCOMB:
                 parity = 0 if HoneycombDnaPart.isEvenParity(row=row, column=column) else 1
                 node_pos = HoneycombDnaPart.latticeCoordToModelXY(radius=part_radius,
                                                                   row=row,

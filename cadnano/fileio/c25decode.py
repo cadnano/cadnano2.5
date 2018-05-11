@@ -1,13 +1,26 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
-from cadnano.proxies.cnenum import StrandType, LatticeType
-from cadnano.part.refresholigoscmd import RefreshOligosCommand
 
-from cadnano import setBatch, getReopen, setReopen
+from cadnano.part.refresholigoscmd import RefreshOligosCommand
+from cadnano.proxies.cnenum import (
+    StrandEnum,
+    LatticeEnum,
+    EnumType
+)
+from cadnano import (
+    setBatch,
+    getReopen,
+    setReopen
+)
 # from cadnano.color import intToColorHex
 from cadnano.part.nucleicacidpart import DEFAULT_RADIUS
-
-from .lattice import HoneycombDnaPart, SquareDnaPart
+from .lattice import (
+    HoneycombDnaPart,
+    SquareDnaPart
+)
+from cadnano.cntypes import (
+    DocT
+)
 
 # hard code these for version changes
 PATH_BASE_WIDTH = 10
@@ -15,21 +28,28 @@ PART_BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
 SCALE_2_MODEL = PART_BASE_WIDTH / PATH_BASE_WIDTH
 
 
-def convertToModelZ(z):
+def convertToModelZ(z: float) -> float:
     """ scale Z-axis coordinate to the model
     """
     return z * SCALE_2_MODEL
 # end def
 
 
-def decode(document, obj, emit_signals=True):
-    """
-    Parses a dictionary (obj) created from reading a json file and uses it
+def decode(document: DocT, obj: dict, emit_signals: bool = True):
+    """Parses a dictionary (obj) created from reading a json file and uses it
     to populate the given document with model data.
+
+    Args:
+        document:
+        obj:
+        emit_signals: whether to signal views
+
+    Raises:
+        AssertionError, TypeError
     """
     num_bases = len(obj['vstrands'][0]['fwd_ss'])
 
-    lattice_type = LatticeType.HONEYCOMB
+    lattice_type = LatticeEnum.HONEYCOMB
 
     part = None
     # DETERMINE MAX ROW,COL
@@ -39,10 +59,10 @@ def decode(document, obj, emit_signals=True):
         max_col_json = max(max_col_json, int(helix['col']) + 1)
 
     # CREATE PART ACCORDING TO LATTICE TYPE
-    if lattice_type == LatticeType.HONEYCOMB:
+    if lattice_type == LatticeEnum.HONEYCOMB:
         doLattice = HoneycombDnaPart.latticeCoordToModelXY
         isEven = HoneycombDnaPart.isEvenParity
-    elif lattice_type == LatticeType.SQUARE:
+    elif lattice_type == LatticeEnum.SQUARE:
         doLattice = SquareDnaPart.latticeCoordToModelXY
         isEven = SquareDnaPart.isEvenParity
     else:
@@ -153,12 +173,12 @@ def decode(document, obj, emit_signals=True):
 
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.SCAFFOLD, vh_num, i,
+                if isSegmentStartOrEnd(StrandEnum.SCAFFOLD, vh_num, i,
                                        five_vh, five_idx, three_vh, three_idx):
                     fwd_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     fwd_ss_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.SCAFFOLD, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.SCAFFOLD, vh_num, i, three_vh, three_idx):
                     fwd_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
             assert (len(fwd_ss_seg[vh_num]) % 2 == 0)
 
@@ -173,12 +193,12 @@ def decode(document, obj, emit_signals=True):
                 five_vh, five_strand, five_idx, three_vh, three_strand, three_idx = rev_ss[i]
                 if five_vh == -1 and three_vh == -1:
                     continue  # null base
-                if isSegmentStartOrEnd(StrandType.STAPLE, vh_num, i,
+                if isSegmentStartOrEnd(StrandEnum.STAPLE, vh_num, i,
                                        five_vh, five_idx, three_vh, three_idx):
                     rev_ss_seg[vh_num].append(i)
                 if five_vh != vh_num and three_vh != vh_num:  # special case
                     rev_ss_seg[vh_num].append(i)  # end segment on a double crossover
-                if is3primeXover(StrandType.STAPLE, vh_num, i, three_vh, three_idx):
+                if is3primeXover(StrandEnum.STAPLE, vh_num, i, three_vh, three_idx):
                     rev_ss_xo[vh_num].append((i, three_vh, three_strand, three_idx))
             assert (len(rev_ss_seg[vh_num]) % 2 == 0)
 
@@ -303,14 +323,14 @@ def decode(document, obj, emit_signals=True):
 # end def
 
 
-def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
-                        five_vh, five_idx,
-                        three_vh, three_idx):
+def isSegmentStartOrEnd(strandtype: EnumType, vh_num: int, base_idx: int,
+                        five_vh: int, five_idx: int,
+                        three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True if the base is a breakpoint or crossover.
+        ``True`` if the base is a breakpoint or crossover. otherwise ``False``
     """
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1
@@ -338,17 +358,19 @@ def isSegmentStartOrEnd(strandtype, vh_num, base_idx,
 # end def
 
 
-def is3primeXover(strandtype, vh_num, base_idx, three_vh, three_idx):
+def is3primeXover(strandtype: EnumType,
+                    vh_num: int, base_idx: int,
+                    three_vh: int, three_idx: int) -> bool:
     """
     Returns:
-        bool: True of the three_vh doesn't match vh_num, or three_idx
-                is not a natural neighbor of base_idx.
+        ``True`` of the ``three_vh`` doesn't match`` vh_num``, or ``three_idx``
+            is not a natural neighbor of ``base_idx``.  otherwise ``False``
     """
     if three_vh == -1:
         return False
     if vh_num != three_vh:
         return True
-    if strandtype == StrandType.SCAFFOLD:
+    if strandtype == StrandEnum.SCAFFOLD:
         offset = 1
     else:
         offset = -1

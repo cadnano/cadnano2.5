@@ -1,17 +1,17 @@
+# -*- coding: utf-8 -*-
 from collections import defaultdict
-# from operator import attrgetter
 from operator import methodcaller
 
 from cadnano.proxies.cnobject import CNObject
-# from cadnano.part import Part
 from cadnano.proxies.cnproxy import ProxySignal
 
-# from cadnano.proxies.cnproxy import UndoCommand, UndoStack
-
+from cadnano.proxies.cnproxy import UndoCommand, UndoStack
+from cadnano.cntypes import (
+    DocT
+)
 
 class Assembly(CNObject):
-    """
-    An Assembly is a collection of components, comprised recursively of
+    """An Assembly is a collection of components, comprised recursively of
     various levels of individual parts and sub-assembly modules.
 
     The purpose of an Assembly object in radnano is to arrange Parts into
@@ -19,7 +19,7 @@ class Assembly(CNObject):
     to facilitate the modeling of more complex designs than a single part.
     """
 
-    def __init__(self, document):
+    def __init__(self, document: DocT):
         super(Assembly, self).__init__(document)
         self._document = document
         self._obj_instance_list = []   # This is a list of member parts
@@ -38,7 +38,7 @@ class Assembly(CNObject):
     # SLOTS #
 
     # METHODS #
-    def undoStack(self):
+    def undoStack(self) -> UndoStack:
         return self._document.undoStack()
 
     def destroy(self):
@@ -47,7 +47,7 @@ class Assembly(CNObject):
         self.deleteLater()
     # end def
 
-    def document(self):
+    def document(self) -> DocT:
         return self._document
     # end def
 
@@ -62,8 +62,7 @@ class Assembly(CNObject):
     # end def
 
     def deepCopy(self):
-        """
-        Deep copy the assembly by cloning the
+        """Deep copy the assembly by cloning the
 
         This leaves alone assemblyInstances, and only
 

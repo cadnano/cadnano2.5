@@ -1,9 +1,16 @@
+# -*- coding: utf-8 -*-
+from cadnano.cntypes import (
+    NucleicAcidPartT
+)
 class VirtualHelixItemController(object):
-    """ Since there is no model VirtualHelix Object, we need
+    """Since there is no model VirtualHelix Object, we need
     a specialized controller for the property view
     """
 
-    def __init__(self, virtualhelix_item, model_part, do_wire_part, do_wire_strands):
+    def __init__(self,  virtualhelix_item,
+                        model_part: NucleicAcidPartT,
+                        do_wire_part: bool,
+                        do_wire_strands: bool):
         """
         Args:
             virtualhelix_item (AbstractVirtualHelixItem):

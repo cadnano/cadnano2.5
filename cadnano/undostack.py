@@ -5,7 +5,7 @@ from cadnano.undocommand import UndoCommand
 
 
 class UndoStack(object):
-    def __init__(self, limit=10):
+    def __init__(self, limit: int = 10):
         self.undostack = deque()    # not using deque maxlen because pattern is awkward
         self.redostack = []
         self.limit = limit
@@ -16,14 +16,14 @@ class UndoStack(object):
         self.macro_count = 0
     # end def
 
-    def push(self, undocommand):
+    def push(self, undocommand: UndoCommand):
         if self.macro_count > 0:
             self.current_macro.addCommand(undocommand)
         else:
             self.appendUndoStack(undocommand)
     # end def
 
-    def appendUndoStack(self, undocommand):
+    def appendUndoStack(self, undocommand: UndoCommand):
         stack = self.undostack
         stack.append(undocommand)
         undocommand.redo()
@@ -31,7 +31,7 @@ class UndoStack(object):
             stack.popleft()
     # end def
 
-    def beginMacro(self, message):
+    def beginMacro(self, message: str):
         new_macro = UndoCommand(message)
         if self.current_macro is not None:
             self.macro_stack.append(self.current_macro)
@@ -67,14 +67,14 @@ class UndoStack(object):
             self.undostack.append(redo_cmd)
     # end def
 
-    def canUndo(self):
+    def canUndo(self) -> bool:
         return True if len(self.undostack) > 0 else False
     # end def
 
-    def canRedo(self):
+    def canRedo(self) -> bool:
         return True if len(self.redostack) > 0 else False
     # end def
 
-    def setUndoLimit(self, lim):
+    def setUndoLimit(self, lim: int):
         self.limit = lim
     # end def

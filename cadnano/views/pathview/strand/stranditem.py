@@ -1,21 +1,55 @@
-#!/usr/bin/env python
-# encoding: utf-8
-
+# -*- coding: utf-8 -*-
 from math import floor
-from PyQt5.QtCore import QRectF, Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsSimpleTextItem
+from typing import (
+    Any
+)
+
+from PyQt5.QtCore import (
+    QRectF,
+    QPointF,
+    Qt
+)
+from PyQt5.QtGui import (
+    QMouseEvent,
+    QPainter
+)
+from PyQt5.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsLineItem,
+    QGraphicsSimpleTextItem,
+    QGraphicsSceneHoverEvent,
+    QGraphicsSceneMouseEvent,
+    QStyleOptionGraphicsItem,
+    QWidget
+)
 
 from cadnano import getBatch
-from cadnano.controllers.stranditemcontroller import StrandItemController
-from cadnano.gui.palette import getColorObj, getPenObj, getBrushObj, getNoPen
+from cadnano.controllers import StrandItemController
+from cadnano.gui.palette import (
+    getColorObj,
+    getPenObj,
+    getBrushObj,
+    getNoPen
+)
 from cadnano.views.pathview import pathstyles as styles
 from .decorators.insertionitem import InsertionItem
 from .endpointitem import EndpointItem
 from .xoveritem import XoverItem
-
-# import logging
-# logger = logging.getLogger(__name__)
+from cadnano.views.pathview import (
+    PathNucleicAcidPartItemT,
+    PathVirtualHelixItemT,
+    PathRootItemT
+)
+from cadnano.cntypes import (
+    OligoT,
+    StrandT,
+    InsertionT,
+    SegmentT,
+    DocT,
+    WindowT,
+    ValueT
+)
 
 _BASE_WIDTH = styles.PATH_BASE_WIDTH
 _DEFAULT_RECT = QRectF(0, 0, _BASE_WIDTH, _BASE_WIDTH)
@@ -26,27 +60,21 @@ SELECT_COLOR = "#ff3333"
 class StrandItem(QGraphicsLineItem):
     FILTER_NAME = "strand"
 
-    __slots__ = ('_model_strand', '_virtual_helix_item', '_viewroot',
-                 '_getActiveTool', '_controller', 'is_forward',
-                 '_strand_filter', '_insertion_items',
-                 '_low_cap', '_high_cap', '_dual_cap',
-                 '_seq_label', '_click_area', 'xover_3p_end')
-
-    def __init__(self, model_strand, virtual_helix_item, viewroot):
+    def __init__(self,  model_strand: StrandT,
+                        virtual_helix_item: PathVirtualHelixItemT):
         """The parent should be a VirtualHelixItem.
 
         Args:
-            model_strand (:obj:`cadnano.strand.Strand`):
-            virtual_helix_item (:obj:`cadnano.views.pathview.virtualhelixitem.VirtualHelixItem`):
-            viewroot (:obj:`cadnano.views.pathview.pathrootitem.PathRootItem`):
+            model_strand:
+            virtual_helix_item:
         """
         super(StrandItem, self).__init__(virtual_helix_item)
         self._model_strand = model_strand
         self._virtual_helix_item = virtual_helix_item
-        self._viewroot = viewroot
-        self._getActiveTool = viewroot.manager.activeToolGetter
+        self._viewroot: PathRootItemT = virtual_helix_item._viewroot
+        self._getActiveTool = self._viewroot.manager.activeToolGetter
 
-        self._controller = StrandItemController(model_strand, self)
+        self._controller = StrandItemController(self, model_strand)
         is_forward = model_strand.strandSet().isForward()
 
         self._strand_filter = model_strand.strandFilter()
@@ -89,12 +117,12 @@ class StrandItem(QGraphicsLineItem):
     ### SIGNALS ###
 
     ### SLOTS ###
-    def strandResizedSlot(self, strand, indices):
+    def strandResizedSlot(self, strand: StrandT, indices: SegmentT):
         """Slot for handling resizing of this StrandItem
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            indices (tuple): list of indices
+            strand:
+            indices: low and high indices
         """
         low_moved, group_low = self._low_cap.updatePosIfNecessary(self.idxs()[0])
         high_moved, group_high = self._high_cap.updatePosIfNecessary(self.idxs()[1])
@@ -116,24 +144,29 @@ class StrandItem(QGraphicsLineItem):
             group_high.addToGroup(self._high_cap)
     # end def
 
-    def strandRemovedSlot(self, strand):
+    def strandRemovedSlot(self, strand: StrandT):
         """Slot for handling removing of this StrandItem
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
+            strand:
         """
+        self.destroyItem()
+    # end def
+
+    def destroyItem(self):
+        print("Destroying Path StrandItem")
         self._controller.disconnectSignals()
         self._controller = None
         scene = self.scene()
         scene.removeItem(self._click_area)
-        self._high_cap.destroy()
-        self._low_cap.destroy()
+        self._high_cap.destroyItem()
+        self._low_cap.destroyItem()
         # scene.removeItem(self._high_cap)
         # scene.removeItem(self._low_cap)
         scene.removeItem(self._seq_label)
-        self.xover_3p_end.remove()
+        self.xover_3p_end.destroyItem()
         self.xover_3p_end = None
-        for insertionItem in self._insertion_items.values():
+        for insertionItem in list(self._insertion_items.values()):
             insertionItem.remove()
         self._insertion_items = None
         self._click_area = None
@@ -145,21 +178,23 @@ class StrandItem(QGraphicsLineItem):
         scene.removeItem(self)
     # end def
 
-    def strandConnectionChangedSlot(self, strand):
+    def strandConnectionChangedSlot(self, strand: StrandT):
         """Slot for just updating connectivity and color, and endpoint showing
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
+            strand:
+            view:
         """
-        self._updateAppearance(strand)
+        if self._viewroot.are_signals_on:
+            self._updateAppearance(strand)
     # end def
 
-    def oligoPropertyChangedSlot(self, model_oligo, key, new_value):
+    def oligoPropertyChangedSlot(self, oligo: OligoT, key: str, new_value: ValueT):
         """Slot for just updating Oligo properties in the path view
 
         Args:
-            model_oligo (:obj:`cadnano.oligo.Oligo`):
-            key (:obj:`str`): property key
+            oligo:
+            key: property key
             new_value (duck): `str`, `int`, `float`, `list`, or `tuple`
         """
         xover_3p_end = self.xover_3p_end
@@ -182,39 +217,39 @@ class StrandItem(QGraphicsLineItem):
         try:
             self._updateAppearance(strand)
         except Exception:
-            print(model_oligo, key, new_value)
+            print(oligo, key, new_value)
             raise
         for insertion in self.insertionItems().values():
             insertion.updateItem()
     # end def
 
-    def oligoSequenceAddedSlot(self, oligo):
+    def oligoSequenceAddedSlot(self, oligo: OligoT):
         """Slot for updating the oligo sequence
 
         Args:
-            model_oligo (:obj:`cadnano.oligo.Oligo`):
+            oligo:
         """
         self._updateSequenceText()
     # end def
 
-    def oligoSequenceClearedSlot(self, oligo):
+    def oligoSequenceClearedSlot(self, oligo: OligoT):
         """Slot for deleting the oligo sequence
 
         Args:
-            model_oligo (:obj:`cadnano.oligo.Oligo`):
+            oligo:
         """
         self._updateSequenceText()
     # end def
 
-    def oligoSelectedChangedSlot(self, oligo, new_value):
+    def oligoSelectedChangedSlot(self, oligo: OligoT, new_value: ValueT):
         pass
     # end def
 
-    def strandHasNewOligoSlot(self, strand):
+    def strandHasNewOligoSlot(self, strand: StrandT):
         """Slot for changing the `Oligo` of the model `Strand`
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
+            strand:
         """
         strand = self._model_strand
         self._controller.reconnectOligoSignals()
@@ -225,65 +260,73 @@ class StrandItem(QGraphicsLineItem):
             insertion.updateItem()
     # end def
 
-    def strandInsertionAddedSlot(self, strand, insertion):
+    def strandInsertionAddedSlot(self, strand: StrandT, insertion: InsertionT):
         """Slot for adding insertions to a `Strand`
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            insertion (int):
+            strand:
+            insertion:
         """
-        self.insertionItems()[insertion.idx()] = InsertionItem(self._virtual_helix_item,
-                                                               strand,
-                                                               insertion)
+        if self._viewroot.are_signals_on:
+            self.insertionItems()[insertion.idx()] = InsertionItem(self._virtual_helix_item,
+                                                                   strand,
+                                                                   insertion)
     # end def
 
-    def strandInsertionChangedSlot(self, strand, insertion):
+    def strandInsertionChangedSlot(self, strand: StrandT, insertion: InsertionT):
         """Slot for changing an insertion on the Strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            insertion (int):
+            strand:
+            insertion:
         """
         self.insertionItems()[insertion.idx()].updateItem()
     # end def
 
-    def strandInsertionRemovedSlot(self, strand, index):
+    def strandInsertionRemovedSlot(self, strand: StrandT, index: int):
         """Slot for removing an insertion on the Strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            index (int): index of the insertion
+            strand:
+            index: index of the insertion
         """
         inst_item = self.insertionItems()[index]
-        inst_item.remove()
+        inst_item.destroyItem()
         del self.insertionItems()[index]
     # end def
 
-    def strandModsAddedSlot(self, strand, document, mod_id, idx):
+    def strandModsAddedSlot(self, strand: StrandT,
+                                document: DocT,
+                                mod_id: str,
+                                idx: int):
         """Slot for adding a modification on the Strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            document (:obj:`cadnano.document.Document`):
-            mod_id (:obj:`str`):
-            idx (int):
+            strand:
+            document:
+            mod_id:
+            idx:
         """
-        idx_l, idx_h = strand.idxs()
-        color = document.getModProperties(mod_id)['color']
-        if idx == idx_h:
-            self._high_cap.showMod(mod_id, color)
-        else:
-            self._low_cap.showMod(mod_id, color)
+        if self._viewroot.are_signals_on:
+            idx_l, idx_h = strand.idxs()
+            color = document.getModProperties(mod_id)['color']
+            if idx == idx_h:
+                self._high_cap.showMod(mod_id, color)
+            else:
+                self._low_cap.showMod(mod_id, color)
     # end def
 
-    def strandModsChangedSlot(self, strand, document, mod_id, idx):
+    def strandModsChangedSlot(self, strand: StrandT,
+                                document: DocT,
+                                mod_id: str,
+                                idx: int):
         """Slot for changing a modification on the Strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            document (:obj:`cadnano.document.Document`):
-            mod_id (:obj:`str`):
-            idx (int):
+            strand:
+            document:
+            mod_id:
+            idx:
         """
         idx_l, idx_h = strand.idxs()
         color = document.getModProperties(mod_id)['color']
@@ -293,14 +336,17 @@ class StrandItem(QGraphicsLineItem):
             self._low_cap.changeMod(mod_id, color)
     # end def
 
-    def strandModsRemovedSlot(self, strand, document, mod_id, idx):
+    def strandModsRemovedSlot(self, strand: StrandT,
+                                document: DocT,
+                                mod_id: str,
+                                idx: int):
         """Slot for removing a modification on the Strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            document (:obj:`cadnano.document.Document`):
-            mod_id (:obj:`str`):
-            idx (int):
+            strand:
+            document:
+            mod_id:
+            idx:
         """
         idx_l, idx_h = strand.idxs()
         # color = document.getModProperties(mod_id)['color']
@@ -310,34 +356,34 @@ class StrandItem(QGraphicsLineItem):
             self._low_cap.destroyMod()
     # end def
 
-    def strandSelectedChangedSlot(self, strand, indices):
+    def strandSelectedChangedSlot(self, strand: StrandT, indices: SegmentT):
         """Slot for changing the selection on the strand
 
         Args:
-            strand (:obj:`cadnano.strand.Strand`):
-            indices (tuple): low and high indices of the selection
+            strand:
+            indices: low and high indices of the selection
         """
         self.selectIfRequired(self._viewroot.document(), indices)
     # end def
 
     ### ACCESSORS ###
-    def viewroot(self):
+    def viewroot(self) -> PathRootItemT:
         return self._viewroot
     # end def
 
-    def insertionItems(self):
+    def insertionItems(self) -> dict:
         return self._insertion_items
     # end def
 
-    def strand(self):
+    def strand(self) -> StrandT:
         return self._model_strand
     # end def
 
-    def strandFilter(self):
+    def strandFilter(self) -> str:
         return self._strand_filter
     # end def
 
-    def idxs(self):
+    def idxs(self) -> SegmentT:
         """Return the lowest and highest (left most, righ most) in the path view
         from the model
 
@@ -347,22 +393,22 @@ class StrandItem(QGraphicsLineItem):
         return self._model_strand.idxs()
     # end def
 
-    def virtualHelixItem(self):
+    def virtualHelixItem(self) -> PathVirtualHelixItemT:
         return self._virtual_helix_item
     # end def
 
-    def partItem(self):
+    def partItem(self) -> PathNucleicAcidPartItemT:
         return self._virtual_helix_item.partItem()
     # end def
 
     def idNum(self):
         return self._virtual_helix_item.idNum()
 
-    def window(self):
+    def window(self) -> WindowT:
         return self._viewroot.window()
 
     ### PUBLIC METHODS FOR DRAWING / LAYOUT ###
-    def refreshInsertionItems(self, strand):
+    def refreshInsertionItems(self, strand: StrandT):
         i_items = self.insertionItems()
         i_model = strand.insertionsOnStrand()
 
@@ -382,26 +428,27 @@ class StrandItem(QGraphicsLineItem):
         # remove all in items
         not_in_use = was_in_use - in_use
         for index in not_in_use:
-            i_items[index].remove()
+            i_items[index].destroyItem()
             del i_items[index]
         # end for
     # end def
 
-    def resetStrandItem(self, virtual_helix_item, is_forward):
+    def resetStrandItem(self, virtual_helix_item: PathVirtualHelixItemT,
+                            is_forward: bool):
         self.setParentItem(virtual_helix_item)
         self._virtual_helix_item = virtual_helix_item
         self.resetEndPointItems(is_forward)
     # end def
 
-    def resetEndPointItems(self, is_forward):
+    def resetEndPointItems(self, is_forward: bool):
         self.is_forward = is_forward
         self._low_cap.resetEndPoint(is_forward)
         self._high_cap.resetEndPoint(is_forward)
         self._dual_cap.resetEndPoint(is_forward)
     # end def
 
-    def updateLine(self, moved_cap):
-        """ must be called when parented to a VirtualHelixItem
+    def updateLine(self, moved_cap: EndpointItem):
+        """must be called when parented to a :class:`PathVirtualHelixItem`
         """
         # setup
         bw = _BASE_WIDTH
@@ -430,9 +477,10 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
-    def _updateAppearance(self, strand):
-        """
-        Prepare Strand for drawing, positions are relative to the VirtualHelixItem:
+    def _updateAppearance(self, strand: StrandT):
+        """Prepare Strand for drawing, positions are relative to the
+        :class:`PathVirtualHelixItem`:
+
         1. Show or hide caps depending on L and R connectivity.
         2. Determine line coordinates.
         3. Apply paint styles.
@@ -500,7 +548,7 @@ class StrandItem(QGraphicsLineItem):
         self._updateColor(strand)
     # end def
 
-    def _updateColor(self, strand):
+    def _updateColor(self, strand: StrandT):
         oligo = strand.oligo()
         color = SELECT_COLOR if self.isSelected() else oligo.getColor()
         if oligo.shouldHighlight():
@@ -519,7 +567,7 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     def _updateSequenceText(self):
-        """update the sequences text on this StrandItem
+        """update the sequences text on this :class:`StrandItem`
         """
         # print("updating sequence")
         bw = _BASE_WIDTH
@@ -576,12 +624,12 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mousePressEvent(self, event):
-        """Parses a mousePressEvent to extract base index,
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
+        """Parses a :class:`QGraphicsSceneMouseEvent` to extract base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
+            event:
         """
         active_tool_str = self._getActiveTool().methodPrefix()
         self.scene().views()[0].addToPressList(self)
@@ -594,12 +642,12 @@ class StrandItem(QGraphicsLineItem):
             event.setAccepted(False)
     # end def
 
-    def mouseMoveEvent(self, event):
-        """Parses a mouseMoveEvent to extract base index,
+    def mouseMoveEvent(self, event: QGraphicsSceneMouseEvent):
+        """Parses a :class:`QGraphicsSceneMouseEvent` to extract base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
+            event:
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseMove"
         if hasattr(self, tool_method_name):
@@ -607,12 +655,12 @@ class StrandItem(QGraphicsLineItem):
             getattr(self, tool_method_name)(idx)
     # end def
 
-    def hoverLeaveEvent(self, event):
-        """"Parses a QHoverEvent to extract base index,
+    def hoverLeaveEvent(self, event: QGraphicsSceneHoverEvent):
+        """"Parses a :class:`QGraphicsSceneHoverEvent` to extract base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QHoverEvent`):
+            event:
         """
         self.partItem().updateStatusBar("")
         tool_method_name = self._getActiveTool().methodPrefix() + "HoverLeave"
@@ -620,13 +668,13 @@ class StrandItem(QGraphicsLineItem):
             getattr(self, tool_method_name)(event)
     # end def
 
-    def hoverMoveEvent(self, event):
-        """Parses a QHoverEvent to extract a base index,
+    def hoverMoveEvent(self, event: QGraphicsSceneHoverEvent):
+        """Parses a :class:`QGraphicsSceneHoverEvent` to extract a base index,
         forwarding them to approproate tool method as necessary.
         Updates the status bar
 
         Args:
-            event (:obj:`PyQt5.QtGui.QHoverEvent`):
+            event:
         """
         vhi_num = self._virtual_helix_item.idNum()
         idx = int(floor((event.pos().x()) / _BASE_WIDTH))
@@ -637,12 +685,12 @@ class StrandItem(QGraphicsLineItem):
             getattr(self, tool_method_name)(event, idx)
     # end def
 
-    def customMouseRelease(self, event):
-        """Parses a mouseReleaseEvent to extract strandSet and base index,
+    def customMouseRelease(self, event: QMouseEvent):
+        """Parses a :class:`QMouseEvent` to extract strandSet and base index,
         forwarding them to approproate tool method as necessary.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
+            event:
         """
         tool_method_name = self._getActiveTool().methodPrefix() + "MouseRelease"
         if hasattr(self, tool_method_name):
@@ -651,29 +699,29 @@ class StrandItem(QGraphicsLineItem):
     # end def
 
     ### TOOL METHODS ###
-    def addSeqToolMousePress(self, event, idx):
+    def addSeqToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         oligo = self._model_strand.oligo()
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.applySequence(oligo)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.applySequence(oligo)
     # end def
 
-    def addSeqToolHoverMove(self, event, idx):
+    def addSeqToolHoverMove(self, event: QGraphicsSceneHoverEvent, idx: int):
         """
         Args:
             event (:obj:`PyQt5.QtGui.QHoverEvent`):
             idx (int):
         """
         vhi = self._virtual_helix_item
-        addSeq_tool = self._getActiveTool()
-        addSeq_tool.hoverMove(vhi, event, flag=None)
+        add_seq_tool = self._getActiveTool()
+        add_seq_tool.hoverMove(vhi, event, flag=None)
     # end def
 
-    def addSeqToolHoverLeave(self, event):
+    def addSeqToolHoverLeave(self, event: QGraphicsSceneHoverEvent):
         """
         Args:
             event (:obj:`PyQt5.QtGui.QHoverEvent`):
@@ -681,18 +729,18 @@ class StrandItem(QGraphicsLineItem):
         self._getActiveTool().hoverLeaveEvent(event)
     # end def
 
-    def breakToolMousePress(self, event, idx):
+    def breakToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Break the strand if possible.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         m_strand.split(idx)
     # end def
 
-    def breakToolHoverMove(self, event, idx):
+    def breakToolHoverMove(self, event: QGraphicsSceneHoverEvent, idx: int):
         """Hover move over the strand
 
         Args:
@@ -705,7 +753,7 @@ class StrandItem(QGraphicsLineItem):
         # break_tool.updateHoverRect(vhi, m_strand, idx, show=True)
     # end def
 
-    def breakToolHoverLeave(self, event):
+    def breakToolHoverLeave(self, event: QGraphicsSceneHoverEvent):
         """Hover leave the strand
 
         Args:
@@ -714,7 +762,7 @@ class StrandItem(QGraphicsLineItem):
         self._getActiveTool().hoverLeaveEvent(event)
     # end def
 
-    def selectToolMousePress(self, event, idx):
+    def selectToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Mouse press over the strand for select tool
 
         Args:
@@ -723,7 +771,8 @@ class StrandItem(QGraphicsLineItem):
         """
         event.setAccepted(False)
         current_filter_set = self._viewroot.selectionFilterSet()
-        if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
+        if ( all(f in current_filter_set for f in self.strandFilter()) and
+            self.FILTER_NAME in current_filter_set):
             selection_group = self._viewroot.strandItemSelectionGroup()
             mod = Qt.MetaModifier
             if not (event.modifiers() & mod):
@@ -735,34 +784,31 @@ class StrandItem(QGraphicsLineItem):
             selection_group.processPendingToAddList()
             event.setAccepted(True)
             return selection_group.mousePressEvent(event)
-        else:
-            # print("StrandItem.selectToolMousePress: rejection")
-            pass
     # end def
 
-    def eraseToolMousePress(self, event, idx):
+    def eraseToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Mouse press over the strand for erase tool
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         m_strand.strandSet().removeStrand(m_strand)
     # end def
 
-    def insertionToolMousePress(self, event, idx):
+    def insertionToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Add an insert to the strand if possible.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         m_strand.addInsertion(idx, 1)
     # end def
 
-    def paintToolMousePress(self, event, idx):
+    def paintToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Add an insert to the strand if possible.
         Called by XoverItem.paintToolMousePress with event as None
         """
@@ -776,12 +822,12 @@ class StrandItem(QGraphicsLineItem):
         m_strand.oligo().applyColor(color)
     # end def
 
-    def createToolHoverMove(self, event, idx):
+    def createToolHoverMove(self, event: QGraphicsSceneHoverEvent, idx: int):
         """Create the strand if possible.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QHoverEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
@@ -792,12 +838,12 @@ class StrandItem(QGraphicsLineItem):
             temp_xover.updateFloatingFromStrandItem(vhi, m_strand, idx)
     # end def
 
-    def createToolMousePress(self, event, idx):
+    def createToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Break the strand is possible.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         vhi = self._virtual_helix_item
@@ -818,58 +864,34 @@ class StrandItem(QGraphicsLineItem):
             active_tool.attemptToCreateXover(vhi, m_strand, idx)
     # end def
 
-    def skipToolMousePress(self, event, idx):
+    def skipToolMousePress(self, event: QGraphicsSceneMouseEvent, idx: int):
         """Add an insert to the strand if possible.
 
         Args:
-            event (:obj:`PyQt5.QtGui.QMouseEvent`):
-            idx (int):
+            event:
+            idx:
         """
         m_strand = self._model_strand
         m_strand.addInsertion(idx, -1)
     # end def
 
-    # def addSeqToolMousePress(self, event, idx):
-    #     """
-    #     Checks that a scaffold was clicked, and then calls apply sequence
-    #     to the clicked strand via its oligo.
-    #     """
-    #     m_strand = self._model_strand
-    #     current_filter_set = self._viewroot.selectionFilterSet()
-    #     if all(f in current_filter_set for f in self.strandFilter()) and self.FILTER_NAME in current_filter_set:
-    #         olg_len, seq_len = self._getActiveTool().applySequence(m_strand.oligo())
-    #         if olg_len:
-    #             msg = "Populated %d of %d scaffold bases." % (min(seq_len, olg_len), olg_len)
-    #             if olg_len > seq_len:
-    #                 d = olg_len - seq_len
-    #                 msg = msg + " Warning: %d bases have no sequence." % d
-    #             elif olg_len < seq_len:
-    #                 d = seq_len - olg_len
-    #                 msg = msg + " Warning: %d sequence bases unused." % d
-    #             self.partItem().updateStatusBar(msg)
-    #     else:
-    #         pass
-    #         # logger.info("The clicked strand %s does not match current selection filter %s. "\
-    #         #             "strandFilter()=%s, FILTER_NAME=%s", m_strand, current_filter_set,
-    #         #             self.strandFilter(), self.FILTER_NAME)
-    # # end def
-
-    def restoreParent(self, pos=None):
-        """Required to restore parenting and positioning in the partItem
+    def restoreParent(self, pos: QPointF = None):
+        """Required to restore parenting and positioning in the
+        :class:`PathNucleicAcidPartItemT`
 
         Args:
-            pos (tuple, optional): default None, position of part
+            pos: default ``None``, position of part
         """
         self.tempReparent(pos)
         self.setSelectedColor(False)
         self.setSelected(False)
     # end def
 
-    def tempReparent(self, pos=None):
+    def tempReparent(self, pos: QPointF = None):
         """Temporarily reparent to the vh_item to make sure position is correct
 
         Args:
-            pos (tuple, optional): default None, position of part
+            pos: default ``None``, position of part
         """
         vh_item = self.virtualHelixItem()
         if pos is None:
@@ -879,13 +901,12 @@ class StrandItem(QGraphicsLineItem):
         self.setPos(tempP)
     # end def
 
-    def setSelectedColor(self, value):
-        """ Set the selected color
-
-        Args:
-            value (duck):
+    def setSelectedColor(self, use_default: bool):
         """
-        if value == True: # value resolves to int from QVariant, must use ==
+        Args:
+            use_default:
+        """
+        if use_default == True: # use_default resolves to int from QVariant, must use ==
             color = getColorObj(SELECT_COLOR)
         else:
             oligo = self._model_strand.oligo()
@@ -897,7 +918,21 @@ class StrandItem(QGraphicsLineItem):
         self.setPen(pen)
     # end def
 
-    def itemChange(self, change, value):
+    def itemChange(self,    change: QGraphicsItem.GraphicsItemChange,
+                            value: Any) -> bool:
+        """Used for selection of the :class:`StrandItem`
+
+        Args:
+            change: parameter that is changing
+            value : new value whose type depends on the ``change`` argument
+
+        Returns:
+            If the change is a ``QGraphicsItem.ItemSelectedChange``::
+
+                ``True`` if selected, other ``False``
+
+            Otherwise default to :meth:`QGraphicsItem.itemChange()` result
+        """
         # for selection changes test against QGraphicsItem.ItemSelectedChange
         # intercept the change instead of the has changed to enable features.
         if change == QGraphicsItem.ItemSelectedChange and self.scene():
@@ -955,12 +990,12 @@ class StrandItem(QGraphicsLineItem):
         return QGraphicsItem.itemChange(self, change, value)
     # end def
 
-    def selectIfRequired(self, document, indices):
+    def selectIfRequired(self, document: DocT, indices: SegmentT):
         """Select self or xover item as necessary
 
         Args:
-            document (:obj:`cadnano.document.Document`):
-            indices (tuple): low and high index
+            document:
+            indices: low and high index
         """
         strand5p = self._model_strand
         con3p = strand5p.connection3p()
@@ -1025,47 +1060,49 @@ class StrandItem(QGraphicsLineItem):
             self.modelDeselect(document)
     # end def
 
-    def modelDeselect(self, document):
+    def modelDeselect(self, document: DocT):
         """Deselect indices
 
         Args:
-            document (:obj:`cadnano.document.Document`):
+            document:
         """
         self.restoreParent()
         self._low_cap.modelDeselect(document)
         self._high_cap.modelDeselect(document)
     # end def
 
-    def modelSelect(self, document):
+    def modelSelect(self, document: DocT):
         """Select Strand
 
         Args:
-            document (:obj:`cadnano.document.Document`):
+            document:
         """
         self.setSelected(True)
         self.setSelectedColor(True)
     # end def
 
-    def paint(self, painter, option, widget):
+    def paint(self, painter: QPainter,
+                    option: QStyleOptionGraphicsItem,
+                    widget: QWidget):
         """Paint this strand
 
         Args:
-            painter (:obj:`PyQt5.QtGui.QPainter`):
-            option (:obj:`PyQt5.QtWidgets.QStyleOptionGraphicsItem`)
-            widget (:obj:`PyQt5.QtWidgets.QWidget`):
+            painter:
+            option
+            widget:
         """
         painter.setPen(self.pen())
         painter.drawLine(self.line())
     # end def
 
-    def setActiveEndpoint(self, cap_type):
+    def setActiveEndpoint(self, cap_type: str) -> int:
         """Set the active index in the VirtualHelix
 
         Args:
-            cap_type (str): 'low', 'hi'
+            cap_type: 'low', 'hi'
 
         Returns:
-            int: index of cap as a convenience
+            index of cap as a convenience
         """
         idx_l, idx_h = self._model_strand.idxs()
         idx = idx_l if cap_type == 'low' else idx_h

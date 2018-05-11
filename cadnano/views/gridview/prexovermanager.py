@@ -3,6 +3,10 @@
 from PyQt5.QtWidgets import QGraphicsRectItem
 from . import gridstyles as styles
 from .gridextras import PreXoverItemGroup, WEDGE_RECT
+from . import (
+    GridNucleicAcidPartItemT,
+    GridVirtualHelixItemT
+)
 
 _RADIUS = styles.GRID_HELIX_RADIUS
 
@@ -21,7 +25,7 @@ class PreXoverManager(QGraphicsRectItem):
         virtual_helix_item (cadnano.views.gridview.virtualhelixitem.VirtualHelixItem): Description
     """
 
-    def __init__(self, part_item):
+    def __init__(self, part_item: GridNucleicAcidPartItemT):
         """Summary
 
         Args:
@@ -46,13 +50,22 @@ class PreXoverManager(QGraphicsRectItem):
     def __repr__(self):
         return "<{}>".format(self.__class__.__name__)
 
-    def partItem(self):
-        """Summary
-
+    def partItem(self) -> GridNucleicAcidPartItemT:
+        """
         Returns:
-            TYPE: Description
+            The part item
         """
         return self.part_item
+    # end def
+
+    def destroyItem(self):
+        print("destroying Grid PreXoverManager")
+        self.deactivateNeighbors()
+        self.clearPreXoverItemGroups()
+        self.neighbor_pairs = None
+        self.part_item = None
+        self.virtual_helix_item = None
+        self.scene().removeItem(self)
     # end def
 
     def clearPreXoverItemGroups(self):
@@ -64,9 +77,9 @@ class PreXoverManager(QGraphicsRectItem):
         groups = self.groups
         while groups:
             k, item = groups.popitem()
-            item.remove()
+            item.destroyItem()
         if self.active_group is not None:
-            self.active_group.remove()
+            self.active_group.destroyItem()
             self.active_group = None
         self._active_items = []
         self.prexover_item_map = {}
@@ -89,15 +102,18 @@ class PreXoverManager(QGraphicsRectItem):
         self.virtual_helix_item = None
     # end def
 
-    def activateVirtualHelix(self, virtual_helix_item, idx, per_neighbor_hits, pairs):
+    def activateVirtualHelix(self,  virtual_helix_item: GridVirtualHelixItemT,
+                                    idx: int,
+                                    per_neighbor_hits,
+                                    pairs):
         """Create PreXoverItemGroups for the active virtual_helix_item and its
         neighbors and connect the neighboring bases
 
         Args:
-            virtual_helix_item (cadnano.views.gridview.virtualhelixitem.VirtualHelixItem): Description
-            idx (int): the base index within the virtual helix
-            per_neighbor_hits (TYPE): Description
-            pairs (TYPE): Description
+            virtual_helix_item: Description
+            idx: the base index within the virtual helix
+            per_neighbor_hits: Description
+            pairs: Description
         """
         self.clearPreXoverItemGroups()
         pxis = self.prexover_item_map
@@ -167,13 +183,13 @@ class PreXoverManager(QGraphicsRectItem):
         # end for per_neighbor_hits
     # end def
 
-    def activateNeighbors(self, id_num, is_fwd, idx):
+    def activateNeighbors(self, id_num: int, is_fwd: bool, idx: int):
         """Summary
 
         Args:
-            id_num (int): VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
-            is_fwd (TYPE): Description
-            idx (int): the base index within the virtual helix
+            id_num: VirtualHelix ID number. See `NucleicAcidPart` for description and related methods.
+            is_fwd: ``True`` if ``fwd`` (top) strand, ``False`` if ``rev`` (bottom) strand
+            idx: the base index within the virtual helix
 
         Returns:
             TYPE: Description

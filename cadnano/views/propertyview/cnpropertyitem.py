@@ -1,11 +1,34 @@
-"""cnpropertyitem descroption"""
+# -*- coding: utf-8 -*-
+from typing import (
+    List,
+    Set,
+    Any
+)
 
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QTreeWidgetItem
-from PyQt5.QtWidgets import (QDoubleSpinBox, QSpinBox,
-                             QLineEdit, QCheckBox, QComboBox)
-from cadnano.proxies.cnenum import ENUM_NAMES
+from PyQt5.QtCore import (
+    Qt,
+    QModelIndex
+)
+from PyQt5.QtWidgets import (
+    QTreeWidgetItem,
+    QTreeWidget,
+    QDoubleSpinBox,
+    QSpinBox,
+    QLineEdit,
+    QCheckBox,
+    QComboBox,
+    QWidget,
+    QStyleOptionViewItem
+)
 
+from cadnano.views.outlinerview.cnoutlineritem import CNOutlinerItem
+from cadnano.proxies.cnenum import (
+    ENUM_NAMES,
+    EnumType
+)
+from cadnano.cntypes import (
+    PropertyEditorWidgetT
+)
 KEY_COL = 0
 VAL_COL = 1
 
@@ -20,17 +43,15 @@ class CNPropertyItem(QTreeWidgetItem):
     """
     _GROUPNAME = "items"
 
-    def __init__(self, parent=None, key=None):
-        """Summary
-
+    def __init__(self, parent: PropertyEditorWidgetT, key: str = None):
+        """
         Args:
-            cn_model_list (list): cn_model objects for selected item(s)
-            parent (TYPE): Description
-            key (None, optional): Description
+            parent: the :class:`PropertyEditorWidget`
+            key: Default is ``None``
         """
         super(CNPropertyItem, self).__init__(parent, QTreeWidgetItem.UserType)
         self.setFlags(self.flags() | Qt.ItemIsEditable)
-        cn_model_list = self.cnModelList()
+        cn_model_list = self.outlineViewObjList()
         self._controller_list = []
         self.is_enum = False
         if key is None:
@@ -86,93 +107,98 @@ class CNPropertyItem(QTreeWidgetItem):
             self._key = key
     # end def
 
-    def key(self):
-        """Summary
+    @property
+    def _viewroot(self) -> QTreeWidget:
+        return self.treeWidget()
 
+    def key(self) -> str:
+        """
         Returns:
-            TYPE: Description
+            the key string
         """
         return self._key
 
     ### PUBLIC SUPPORT METHODS ###
-    def cnModel(self):
+    def outlineViewObj(self) -> CNOutlinerItem:
         """Summary
 
         Returns:
             TYPE: Description
         """
-        return self.cnModelList()[0]
+        return self.outlineViewObjList()[0]
     # end def
 
-    def cnModelList(self):
+    def outlineViewObjList(self) -> List[CNOutlinerItem]:
         """Summary
 
         Returns:
             list: cn_model items
         """
-        return self.treeWidget().cnModelList()
+        return self.treeWidget().outlineViewObjList()
     # end def
 
-    def cnModelSet(self):
-        return self.treeWidget().cnModelSet()
+    def outlineViewObjSet(self) -> Set[CNOutlinerItem]:
+        return self.treeWidget().outlineViewObjSet()
 
-    def itemType(self):
-        """Summary
-
+    def itemType(self) -> EnumType:
+        """
         Returns:
-            TYPE: Description
+            None
         """
         return None
     # end def
 
     def disconnectSignals(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         for controller in self._controller_list:
             controller.disconnectSignals()
         self._controller_list = []
+        self.cleanUp()
     # end def
 
-    def configureEditor(self, parent_QWidget, option, model_index):
-        """Summary
+    def cleanUp(self):
+        pass
+    # end def
 
+    def configureEditor(self, parent_qw: QWidget,
+                            option: QStyleOptionViewItem,
+                            model_index: QModelIndex) -> QWidget:
+        """
         Args:
-            parent_QWidget (TYPE): Description
-            option (TYPE): Description
-            model_index (TYPE): Description
+            parent_qw: Description
+            option Description
+            model_index: Description
 
         Returns:
-            TYPE: Description
+            the widget used to edit the item specified by index for editing
 
         Raises:
             NotImplementedError: Description
         """
-        cn_m = self.cnModel()
+        cn_m = self.outlineViewObj()
         key = self.key()
         if key == 'name':
-            return QLineEdit(parent_QWidget)
+            return QLineEdit(parent_qw)
         elif key not in cn_m.editable_properties:
             return None
         if self.is_enum:
-            editor = QComboBox(parent_QWidget)
+            editor = QComboBox(parent_qw)
             for val in ENUM_NAMES[key]:
                 editor.addItem(val)
         else:
             data_type = type(model_index.model().data(model_index, Qt.DisplayRole))
             if data_type is str:
-                editor = QLineEdit(parent_QWidget)
+                editor = QLineEdit(parent_qw)
             elif data_type is int:
-                editor = QSpinBox(parent_QWidget)
+                editor = QSpinBox(parent_qw)
                 editor.setRange(-359, 359)
             elif data_type is float:
-                editor = QDoubleSpinBox(parent_QWidget)
+                editor = QDoubleSpinBox(parent_qw)
                 editor.setDecimals(0)
                 editor.setRange(-359, 359)
             elif data_type is bool:
-                editor = QCheckBox(parent_QWidget)
+                editor = QCheckBox(parent_qw)
             elif isinstance(None, data_type):
                 return None
             else:
@@ -181,10 +207,7 @@ class CNPropertyItem(QTreeWidgetItem):
     # end def
 
     def updateCNModel(self):
-        """Summary
-
-        Returns:
-            TYPE: Description
+        """
         """
         value = self.data(VAL_COL, Qt.DisplayRole)
         key = self._key
@@ -192,44 +215,39 @@ class CNPropertyItem(QTreeWidgetItem):
         u_s.beginMacro("Multi Property Edit: %s" % key)
         if self.is_enum:
             value = ENUM_NAMES[key].index(value)
-        cn_model_list = self.cnModelList()
+        cn_model_list = self.outlineViewObjList()
         if isinstance(cn_model_list, list):
             # print("list found")
             for cn_model in cn_model_list:
                 cn_model.setProperty(key, value)
         else:  # called from line 65: p_i = constructor(cn_model, root, key=key)
-            # print("single model found")
+            # Single model found
             cn_model_list.setProperty(key, value)
         u_s.endMacro()
     # end def
 
-    def setValue(self, property_key, new_value):
-        """Summary
-
-        Args:
-            property_key (TYPE): Description
-            new_value (TYPE): Description
-
-        Returns:
-            TYPE: Description
+    def setValue(self, key: str, new_value: Any):
         """
-        p_i = self._prop_items[property_key]
+        Args:
+            key: property key string
+            new_value: new item value
+        """
+        p_i = self._prop_items[key]
         if p_i.is_enum:
-            new_value = ENUM_NAMES[property_key][new_value]
+            new_value = ENUM_NAMES[key][new_value]
         current_value = p_i.data(VAL_COL, Qt.DisplayRole)
         if current_value != new_value:
             p_i.setData(VAL_COL, Qt.EditRole, new_value)
     # end def
 
-    def getItemValue(self, property_key):
-        """Summary
-
+    def getItemValue(self, key: str) -> Any:
+        """
         Args:
-            property_key (TYPE): Description
+            key: property key string
 
         Returns:
-            TYPE: Description
+            the item value
         """
-        return self._prop_items[property_key].data(VAL_COL, Qt.DisplayRole)
+        return self._prop_items[key].data(VAL_COL, Qt.DisplayRole)
     # end def
 # end class

@@ -1,6 +1,10 @@
-"""
-util.py
-"""
+# -*- coding: utf-8 -*-
+from typing import (
+    Union,
+    Tuple,
+    Iterable,
+    List
+)
 import argparse
 import inspect
 import logging
@@ -12,12 +16,22 @@ import sys
 from os import path
 from traceback import extract_stack
 
+from cadnano.cntypes import (
+    CNObjectT,
+    UndoCommandT
+)
+
 logger = logging.getLogger(__name__)
 
 IS_PY_3 = int(sys.version_info[0] > 2)
 
+relpath = os.path.relpath
+dirname = os.path.dirname
+abspath = os.path.abspath
+CADNANO_PATH = dirname(abspath(__file__))
+NumT = Union[int, float]
 
-def clamp(x, min_x, max_x):
+def clamp(x: NumT, min_x: NumT, max_x: NumT) -> NumT:
     if x < min_x:
         return min_x
     elif x > max_x:
@@ -26,7 +40,7 @@ def clamp(x, min_x, max_x):
         return x
 
 
-def overlap(x, y, a, b):
+def overlap(x: NumT, y: NumT, a: NumT, b: NumT) -> Tuple[NumT, NumT]:
     """Finds the overlap of (x, y) and (a, b).
     Assumes an overlap exists, i.e. y >= a and b >= x.
     """
@@ -63,14 +77,14 @@ else:
     complement = string.maketrans('ACGTacgt', 'TGCATGCA')
 
 
-def rcomp(seqStr):
-    """Returns the reverse complement of the sequence in seqStr."""
-    return seqStr.translate(complement)[::-1]
+def rcomp(seq_str: str) -> str:
+    """Returns the reverse complement of the sequence in seq_str."""
+    return seq_str.translate(complement)[::-1]
 
 
-def comp(seqStr):
-    """Returns the complement of the sequence in seqStr."""
-    return seqStr.translate(complement)
+def comp(seq_str: str) -> str:
+    """Returns the complement of the sequence in seq_str."""
+    return seq_str.translate(complement)
 
 
 if IS_PY_3:
@@ -79,50 +93,48 @@ else:
     whitetoQ = string.maketrans(' |', '??')
 
 
-def markwhite(seqStr):
-    return seqStr.translate(whitetoQ)
+def markwhite(seq_str: str) -> str:
+    return seq_str.translate(whitetoQ)
 
 
-def nowhite(seqStr):
+def nowhite(seq_str: str) -> str:
     """Gets rid of non-letters in a string."""
-    return ''.join([c for c in seqStr if c in string.letters])
+    return ''.join([c for c in seq_str if c in string.letters])
 
 
-def nearest(a, l): return min(l, key=lambda x: abs(x - a))
+def nearest(a: NumT, l: Iterable[NumT]): return min(l, key=lambda x: abs(x - a))
 
-
-def isWindows():
+def isWindows() -> bool:
     """Returns True if platform is detected as Windows, otherwise False"""
     if platform.system() == 'Windows':
         return True
     else:
         return False
 
-
-def isMac():
+def isMac() -> bool:
     """Returns True if platform is detected as Darwin, otherwise False"""
     try:
         return platform.system() == 'Darwin'
     except Exception:
         return path.exists('/System/Library/CoreServices/Finder.app')
 
-
-def isLinux():
+def isLinux() -> bool:
     """Returns True if platform is detected as Linux, otherwise False"""
     if platform.system() == 'Linux':
         return True
     else:
         return False
 
-
-def methodName():
+def methodName() -> str:
     """Returns string containing name of the calling method."""
     return inspect.stack()[1][3]
 
 
-def execCommandList(model_object, commands, desc=None, use_undostack=True):
-    """
-    This is a wrapper for performing QUndoCommands, meant to ensure
+def execCommandList(model_object: CNObjectT,
+                    commands: List[UndoCommandT],
+                    desc: str = None,
+                    use_undostack: bool = True):
+    """This is a wrapper for performing QUndoCommands, meant to ensure
     uniform handling of the undoStack and macro descriptions.
 
     When using the undoStack, commands are pushed onto self.undoStack()
@@ -141,7 +153,7 @@ def execCommandList(model_object, commands, desc=None, use_undostack=True):
 # end def
 
 
-def doCmd(model_object, command, use_undostack):
+def doCmd(model_object: CNObjectT, command: UndoCommandT, use_undostack: bool):
     """Helper for pushing onto the undostack
     """
     if use_undostack:
@@ -151,7 +163,9 @@ def doCmd(model_object, command, use_undostack):
 # end def
 
 
-def finalizeCommands(model_object, commands, desc=None):
+def finalizeCommands(model_object: CNObjectT,
+                    commands: List[UndoCommandT],
+                    desc: str = None):
     """Used to enable interaction with the model but not push
     commands to the undostack.  In practice:
 
@@ -177,63 +191,11 @@ def finalizeCommands(model_object, commands, desc=None):
 # end def
 
 
-def this_path():
+def this_path() -> str:
     return os.path.abspath(os.path.dirname(__file__))
 
-
-# maps plugin path (extension stripped) -> plugin module
-loadedPlugins = {}
-
-
-def unloadedPlugins():
-    """Returns a list of plugin paths that have yet to
-    be loaded but are in the top level of one of the
-    search directories specified in pluginDirs"""
-    internalPlugins = os.path.join(this_path(), 'plugins')
-    pluginDirs = [internalPlugins]
-    results = []
-    for pluginDir in pluginDirs:
-        if not os.path.isdir(pluginDir):
-            continue
-        for dirent in os.listdir(pluginDir):
-            f = os.path.join(pluginDir, dirent)
-            isfile = os.path.isfile(f)
-            hasValidSuffix = dirent.endswith(('.py', '.so'))
-            if isfile and hasValidSuffix:
-                results.append(f)
-            if os.path.isdir(f) and\
-               os.path.isfile(os.path.join(f, '__init__.py')):
-                results.append(f)
-    return list(filter(lambda x: x not in loadedPlugins, results))
-
-
-def loadPlugin(f):
-    pass
-    # path, fname = os.path.split(f)
-    # name, ext = os.path.splitext(fname)
-    # pluginKey = os.path.join(path, name)
-    # try:
-    #     mod = loadedPlugins[pluginKey]
-    #     return mod
-    # except KeyError:
-    #     pass
-    # file, filename, data = imp.find_module(name, [path])
-    # mod = imp.load_module(name, file, filename, data)
-    # loadedPlugins[pluginKey] = mod
-    # return mod
-
-
-def loadAllPlugins():
-    loadedAPlugin = False
-    for p in unloadedPlugins():
-        loadPlugin(p)
-        loadedAPlugin = True
-    return loadedAPlugin
-
-
-def beginSuperMacro(model_object, desc=None):
-    """
-    SuperMacros can be used to nest multiple command lists.
+def beginSuperMacro(model_object: CNObjectT, desc: str = None):
+    """SuperMacros can be used to nest multiple command lists.
 
     Normally execCommandList macros all the commands in a list.
     In some cases, multiple command lists need to be executed separately
@@ -244,94 +206,43 @@ def beginSuperMacro(model_object, desc=None):
 # end def
 
 
-def endSuperMacro(model_object):
+def endSuperMacro(model_object: CNObjectT):
     """Ends a SuperMacro. Should be called after beginSuperMacro."""
     model_object.undoStack().endMacro()
 # end def
 
-
-def findChild(self):
-    """When called when self is a QGraphicsItem, iterates through self's
-    childItems(), placing a red rectangle (a sibling of self) around
-    each item in sequence (press return to move between items). Since
-    the index of each child item is displayed as it is highlighted,
-    one can use findChild() to quickly get a reference to one of self's
-    children. At each step, one can type a command letter before
-    hitting return. The command will apply to the current child.
-    Command Letter:     Action:
-    <return>            Advance to next child
-    s<return>           Show current child
-    S<return>           Show current child, hide siblings
-    h<return>           Hide current child
-    r<return>           return current child
-    """
-    from PyQt5.QtWidgets import QGraphicsRectItem
-    from PyQt5.QtGui import QPen
-    from PyQt5.QtCore import Qt
-
-    children = self.childItems()
-    parent = self.parentItem()
-    childVisibility = [(child, child.isVisible()) for child in children]
-    for n in range(len(children)):
-        child = children[n]
-        print("Highlighting %s.childItems()[%i] = %s" % (self, n, child))
-        childBR = child.mapToItem(parent, child.boundingRect())
-        childBR = childBR.boundingRect()  # xform gives us a QPolygonF
-        debugHighlighter = QGraphicsRectItem(childBR, parent)
-        debugHighlighter.setPen(QPen(Qt.red))
-        debugHighlighter.setZValue(9001)
-        while True:
-            # wait for return to be pressed while spinning the event loop.
-            # also process single-character commands.
-            command = raw_input()
-            if command == 's':    # Show current child
-                child.show()
-            elif command == 'h':  # Hde current child
-                child.hide()
-            elif command == 'S':  # Show only current child
-                for c in children:
-                    c.hide()
-                child.show()
-            elif command == 'r':  # Return current child
-                for child, wasVisible in childVisibility:
-                    child.setVisible(wasVisible)
-                return child
-            else:
-                break
-        debugHighlighter.scene().removeItem(debugHighlighter)
-        for child, wasVisible in childVisibility:
-            child.setVisible(wasVisible)
-# end def
-
-
-def parse_args(argv=None, gui=None):
+def parse_args(argv=None, use_gui: bool = False):
     """Uses argparse to process commandline arguments.
+    This also presents a nice command line help to the user, exposed with
+    ``--help`` flag::
+
+        python main.py --help
+
+    Args:
+        argv: you can initialize your app via::
+
+                app = QApplication(sys.argv)
+                parse_args(app.arguments())
+
+            :meth:`QApplication.arguments()` returns a list of arguments with all Qt
+            arguments stripped away. Qt command line args include::
+
+                -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
+
+        use_gui: Default is ``False. ``True`` use then the parser will use
+            :func:`parse_known_args`, otherwise :func:`parse_args()`. Unlike
+            :func:`parse_args()`, :func:`parse_known_args()` will not cause
+            abort by show the help message and exit, if it finds any
+            unrecognized command-line arguments.
 
     Returns:
         NameSpace object. This can easily be converted to a regular dict through:
         argns.__dict__
-
-    This also presents a nice command line help to the user, exposed with --help flag:
-        python main.py --help
-
-    If gui is set to "qt", then the parser will use parse_known_args. Unlike
-    parse_args(), parse_known_args() will not cause abort by show the help
-    message and exit, if it finds any unrecognized command-line arguments.
-
-    Alternatively, you can initialize your app via:
-        app = QApplication(sys.argv)
-        parse_args(app.arguments())
-
-    QApplication.arguments() returns a list of arguments with all Qt arguments
-    stripped away. Qt command line args include:
-
-        -style=<style> -stylesheet=<stylesheet> -widgetcount -reverse -qmljsdebugger -session=<session>
     """
     parser = argparse.ArgumentParser(description="cadnano 2.5")
     parser.add_argument("--testing", "-t", action="store_true", help="Enable testing mode/environment.")
     parser.add_argument("--profile", "-p", action="store_true", help="Profile app execution.")
     parser.add_argument("--print-stats", "-P", action="store_true", help="Print profiling statistics.")
-    parser.add_argument("--interactive", "-i", action="store_true", help="Enable interactive (console) mode.")
     parser.add_argument('--loglevel',
                         help="Specify logging level. Can be either DEBUG, INFO, WARNING, ERROR or any integer.")
     parser.add_argument("--debug-modules", nargs='*', metavar="MODULE-STR",
@@ -339,7 +250,7 @@ def parse_args(argv=None, gui=None):
                              "debug the cadnano file decoder, use --debug-modules cadnano.fileio.decode ."
                              "To debug all gui modules, use --debug-modules cadnano.gui .")
     parser.add_argument("--file", "-f", metavar="designfile.json", help="cadnano design to load upon start up.")
-    if gui and (gui is True or gui.lower() == "qt"):
+    if use_gui:
         # Command line args might include Qt-specific switches and parameters.
         argns, unused = parser.parse_known_args(argv)
     else:
@@ -347,8 +258,9 @@ def parse_args(argv=None, gui=None):
     return argns, unused
 
 
-def init_logging(args=None, logdir=None):
-    """Set up standard logging system based on parameters in args, e.g. loglevel and testing.
+def init_logging(args=None, logdir: str = None):
+    """Set up standard logging system based on parameters in args, e.g. loglevel
+    and testing.
     """
     if args is None:
         args = {}
@@ -412,8 +324,7 @@ def init_logging(args=None, logdir=None):
         # Set filter for debugging:
         if args.get('debug_modules'):
             def module_debug_filter(record):
-                """
-                All Filters attached to a logger or handler are asked.
+                """All Filters attached to a logger or handler are asked.
                 The record is discarted if any of the attached Filters return False.
                 """
                 return any(record.name.startswith(modstr) for modstr in args['debug_modules']) \
@@ -441,17 +352,19 @@ def read_fasta(fp):
 
 
 def qtdb_trace():
-    """Make PDB usable by calling pyqtRemoveInputHook.
+    """Make ``PDB`` usable by calling :func:`pyqtRemoveInputHook`.
 
-    Otherwise, PDB is useless as the message
-    > QCoreApplication::exec: The event loop is already running
+    Otherwise, ``PDB`` is useless as the message::
+
+        > QCoreApplication::exec: The event loop is already running
+
     is spammed to the console.
 
     When done, call qtdb_resume from the PDB prompt to return things back to
     normal.
 
-    Note that PDB will drop you into the current frame (this function) and
-    hitting 'n' is required to return to the frame you wanted PDB originally.
+    Note that ``PDB`` will drop you into the current frame (this function) and
+    hitting 'n' is required to return to the frame you wanted ``PDB`` originally.
     This could probably be optimized at some point to manipulate the frame PDB
     starts in.
     """
@@ -467,10 +380,19 @@ def qtdb_trace():
 
 
 def qtdb_resume():
-    """Resume normal PyQt operations after calling qtdb_trace.
+    """Resume normal PyQt operations after calling :fund:`qtdb_trace`.
 
     Note that this function assumes that pyqtRemoveInputHook has been called
     """
     from PyQt5.QtCore import pyqtRestoreInputHook
 
     pyqtRestoreInputHook()
+
+
+def to_dot_path(filename: str) -> str:
+    subpath = relpath(dirname(abspath(filename)), CADNANO_PATH)
+    if sys.platform == 'win32':
+        subpath = subpath.replace('\\', '.')
+    else:
+        subpath = subpath.replace('/', '.')
+    return 'cadnano.' + subpath

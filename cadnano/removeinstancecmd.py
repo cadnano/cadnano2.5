@@ -1,17 +1,21 @@
+# -*- coding: utf-8 -*-
 from cadnano.assembly import Assembly
 from cadnano.proxies.cnproxy import UndoCommand
 from cadnano.part import Part
-
+from cadnano.objectinstance import ObjectInstance
+from cadnano.proxies.cnobject import CNObject
 
 class RemoveInstanceCommand(UndoCommand):
     """
     Undo ready command for removing an instance.
 
     Args:
-        obj_instance (ObjectInstance): Object instance remove
+        cnobj:
+        obj_instance: Object instance remove
     """
 
-    def __init__(self, cnobj, obj_instance):
+    def __init__(self,  cnobj: CNObject,
+                        obj_instance: ObjectInstance):
         super(RemoveInstanceCommand, self).__init__("remove instance")
         self._items = (cnobj, cnobj.document(), obj_instance)
     # end def

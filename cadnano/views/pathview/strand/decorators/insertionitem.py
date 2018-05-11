@@ -1,13 +1,44 @@
-#!/usr/bin/env python
-# encoding: utf-8
-from PyQt5.QtCore import QRectF, Qt, QPointF, QEvent
-from PyQt5.QtGui import QBrush, QPen, QFont, QColor, QPainterPath
-from PyQt5.QtGui import QTransform, QTextCursor
-from PyQt5.QtWidgets import QGraphicsPathItem, QGraphicsRectItem
-from PyQt5.QtWidgets import QGraphicsTextItem
+# -*- coding: utf-8 -*-
+from PyQt5.QtCore import (
+    QRectF,
+    Qt,
+    QPointF,
+    QEvent
+)
+from PyQt5.QtGui import (
+    QBrush,
+    QPen,
+    QFont,
+    QColor,
+    QPainterPath,
+    QTransform,
+    QTextCursor,
+    QFocusEvent,
+    QInputMethodEvent,
+    QKeyEvent
+)
+from PyQt5.QtWidgets import (
+    QGraphicsPathItem,
+    QGraphicsRectItem,
+    QGraphicsTextItem,
+    QGraphicsSceneMouseEvent
+)
 
-from cadnano.gui.palette import getPenObj, getNoPen
+from cadnano.gui.palette import (
+    getPenObj,
+    getNoPen
+)
 from cadnano.views.pathview import pathstyles as styles
+from cadnano.views.pathview import (
+    PathVirtualHelixItemT,
+    PathXoverItemT,
+    PathStrandItemT,
+    PathNucleicAcidPartItemT
+)
+from cadnano.cntypes import (
+    InsertionT,
+    StrandT
+)
 
 _BASE_WIDTH = _BW = styles.PATH_BASE_WIDTH
 _HALF_BASE_WIDTH = _HBW = _BASE_WIDTH / 2
@@ -18,7 +49,11 @@ _R_PEN = getPenObj(styles.RED_STROKE, styles.SKIPWIDTH, capstyle=Qt.RoundCap)
 _NO_PEN = getNoPen()
 
 
-def _insertGen(path, start, c1, p1, c2):
+def _insertGen( path: QPainterPath,
+                start: QPointF,
+                c1: QPointF,
+                p1: QPointF,
+                c2: QPointF):
     path.moveTo(start)
     path.quadTo(c1, p1)
     path.quadTo(c2, start)
@@ -59,19 +94,18 @@ _FRACTION_INSERT_TO_PAD = .10
 
 
 class InsertionPath(object):
-    """
-    This is just the shape of the Insert item
+    """This is just the shape of the Insert item
     """
 
     def __init__(self):
         super(InsertionPath, self).__init__()
     # end def
 
-    def getPen(self):
+    def getPen(self) -> QPen:
         return _B_PEN
     # end def
 
-    def getInsert(self, is_top):
+    def getInsert(self, is_top) -> QPainterPath:
         if is_top:
             return _INSERT_PATH_UP
         else:
@@ -80,7 +114,11 @@ class InsertionPath(object):
 # end class
 
 
-def _addLinesToPainterPath(path, p1, p2, p3, p4):
+def _addLinesToPainterPath( path: QPainterPath,
+                            p1: QPointF,
+                            p2: QPointF,
+                            p3: QPointF,
+                            p4: QPointF):
     path.moveTo(p1)
     path.lineTo(p2)
     path.moveTo(p3)
@@ -92,8 +130,7 @@ _PATH_START = QPointF(_HBW, _HBW)
 
 
 class SkipPath(object):
-    """
-    This is just the shape of the Insert item
+    """This is just the shape of the Insert item
     """
 
     _skip_path = QPainterPath()
@@ -109,11 +146,11 @@ class SkipPath(object):
         super(SkipPath, self).__init__()
     # end def
 
-    def getPen(self):
+    def getPen(self) -> QPen:
         return _R_PEN
     # end def
 
-    def getSkip(self):
+    def getSkip(self) -> QPainterPath:
         return self._skip_path
     # end def
 # end class
@@ -124,11 +161,12 @@ _skip_path = SkipPath()
 
 
 class InsertionItem(QGraphicsPathItem):
-    """
-    This is just the shape of the Insert item
+    """This is just the shape of the Insert item
     """
 
-    def __init__(self, virtual_helix_item, strand, insertion):
+    def __init__(self,  virtual_helix_item: PathVirtualHelixItemT,
+                        strand: StrandT,
+                        insertion: InsertionT):
         super(InsertionItem, self).__init__(virtual_helix_item)
         self.hide()
         self._strand = strand
@@ -154,7 +192,7 @@ class InsertionItem(QGraphicsPathItem):
     # end def
 
     def _initClickArea(self):
-        """docstring for _initClickArea"""
+        """"""
         self._clickArea = cA = QGraphicsRectItem(_DEFAULT_RECT, self)
         cA.setPen(_NO_PEN)
         cA.mousePressEvent = self.mousePressEvent
@@ -162,9 +200,8 @@ class InsertionItem(QGraphicsPathItem):
     # end def
 
     ### PUBLIC SUPPORT METHODS ###
-    def remove(self):
-        """
-        Called from the following stranditem methods:
+    def destroyItem(self):
+        """Called from the following stranditem methods:
             strandRemovedSlot
             strandInsertionRemovedSlot
             refreshInsertionItems
@@ -207,7 +244,7 @@ class InsertionItem(QGraphicsPathItem):
             self.setPath(_skip_path.getSkip())
     # end def
 
-    def setSequence(self, sequence):
+    def setSequence(self, sequence: str):
         self._seq_text = sequence
         self._updateSequenceText()
         self._seq_item.show()
@@ -272,27 +309,26 @@ class InsertionItem(QGraphicsPathItem):
     # end def
 
     ### EVENT HANDLERS ###
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent):
         """Double clicks remove the insertion/skip."""
         self._strand.changeInsertion(self._insertion.idx(), 0)
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         """This needs to be present for mouseDoubleClickEvent to work."""
 
 # end class
 
 
 class InsertionLabel(QGraphicsTextItem):
-    def __init__(self, parent):
+    def __init__(self, parent: InsertionItem):
         super(QGraphicsTextItem, self).__init__("", parent=parent)
         self.setFont(_FONT)
         self.setTextInteractionFlags(Qt.TextEditorInteraction)
         self.setTextWidth(-1)
     # end def
 
-    def inputMethodEvent(self, event):
-        """
-        This is run on the label being changed
+    def inputMethodEvent(self, event: QInputMethodEvent):
+        """This is run on the label being changed
         or losing focus
         """
         # test = unicode(lbl.toPlainText())
@@ -314,7 +350,7 @@ class InsertionLabel(QGraphicsTextItem):
         self.focusOut()
     # end def
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event: QGraphicsSceneMouseEvent):
         self.setTextInteractionFlags(Qt.TextEditorInteraction)
         cursor = self.textCursor()
         cursor.setPosition(0)
@@ -322,9 +358,8 @@ class InsertionLabel(QGraphicsTextItem):
         self.setTextCursor(cursor)
     # end def
 
-    def keyPressEvent(self, event):
-        """
-        Must intercept invalid input events.  Make changes here
+    def keyPressEvent(self, event: QKeyEvent):
+        """Must intercept invalid input events.  Make changes here
         """
         a = event.key()
         text = event.text()
@@ -343,16 +378,16 @@ class InsertionLabel(QGraphicsTextItem):
             return QGraphicsTextItem.keyPressEvent(self, event)
     # end def
 
-    def mouseDoubleClickEvent(self, event):
+    def mouseDoubleClickEvent(self, event: QGraphicsSceneMouseEvent):
         self.parentItem().mouseDoubleClickEvent(event)
     # end def
 
-    def focusOutEvent(self, event):
+    def focusOutEvent(self, event: QFocusEvent):
         self.inputMethodEvent(event)
         QGraphicsTextItem.focusOutEvent(self, event)
     # end class
 
-    def event(self, event):
+    def event(self, event: QEvent):
         if event.type() == QEvent.KeyPress and event.key() == Qt.Key_Tab:
             # print("tab pressed")
             return True
@@ -367,8 +402,7 @@ class InsertionLabel(QGraphicsTextItem):
     # end def
 
     def resetPosition(self):
-        """
-        Set the label position based on orientation and text alignment.
+        """Set the label position based on orientation and text alignment.
         """
         parent = self.parentItem()
         if parent is None:

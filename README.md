@@ -24,9 +24,7 @@ When in a python interpreter you can just:
 and script your designs without a GUI. See our [scripting](http://cadnano.readthedocs.io/en/master/scripting.html) docs.
 
 ## License
-
-The code is dual licensed as GPLv3 and BSD-3 except the file: `cadnano/gui/views/outlinerview/outlinertreewidget.py`, which is GPL3 only because it fixes a bug in Qt5 using derived code.
-This way, cadnano scripts that don't use the GUI can be released under GPLv3 or BSD-3 license.
-
-The full license can be found in LICENSE
+cadnano model code is BSD-3.
+cadnano GUI code that uses PyQt5 is GPLv3
+The both full licenses can be found in the `LICENSE` file
 
