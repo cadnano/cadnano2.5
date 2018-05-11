@@ -142,7 +142,7 @@ install_requires = ['sip>=4.19.8',
                     'pytz>=2018.3',
                     'python-dateutil>=2.6.1',
                     'termcolor>=1.1.0',
-                    'pythreejs'
+                    'pythreejs>=1.0.0'
                     ]
 
 if sys.platform == 'win32':

@@ -11,3 +11,5 @@ docs/_build/
 misc/scratch/pyqtdeploy/build/
 misc/scratch/pyqtdeploy/winsysroot/
 .cache/
+
+.ipynb_checkpoints/
