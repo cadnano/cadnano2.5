@@ -144,7 +144,7 @@ class HoneycombDnaPart(object):
         column = int(float_column) if float_column >= 0 else int(float_column - 1)
 
         row_temp = y/(radius*scale_factor)
-        if (row_temp % 3) + 0.5 > 1.0: # odd parity
+        if (row_temp % 3) > 1.0: # odd parity
             float_row = (y-radius)/(scale_factor*radius*3) + radius
         else: # even parity
             float_row = y/(scale_factor*radius*3) + radius
