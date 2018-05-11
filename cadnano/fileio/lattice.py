@@ -52,8 +52,8 @@ class HoneycombDnaPart(object):
     # end def
 
     @staticmethod
-    def distanceFromClosestLatticeCoord(radius: float,
-                                        x: float, y: float,
+    def distanceFromClosestLatticeCoord(x: float, y: float,
+                                        radius: float,
                                         scale_factor: float = 1.0) -> Vec2T:
         """Given a x and y position, determine closest lattice coordinate and
         the distance to the center of those coordinates.

@@ -382,7 +382,7 @@ class SelectSliceTool(AbstractSliceTool):
             return
 
         doc.undoStack().beginMacro("Paste VirtualHelices")
-        new_vh_set = v3decode.importToPart(part_instance, self.clipboard, offset, ignore_neighbors=True)
+        new_vh_set = v3decode.importToPart(part_instance, self.clipboard, offset)
         doc.undoStack().endMacro()
         self.modelClear()
         self.clipboard = None
