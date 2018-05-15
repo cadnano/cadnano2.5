@@ -57,6 +57,7 @@
         <file alias="grid-circles">images/grid-circles.png</file>
         <file alias="grid-lines">images/grid-lines.png</file>
         <file alias="grid-points">images/grid-points.png</file>
+        <file alias="freeform">images/slice-freeform.png</file>
     </qresource>
     <qresource prefix="/pathtools">
         <file alias="autobreak">images/path-autobreak.png</file>

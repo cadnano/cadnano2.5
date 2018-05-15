@@ -488,6 +488,12 @@ class Ui_MainWindow(object):
         icon36.addPixmap(QtGui.QPixmap(":/parttools/path"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.action_path.setIcon(icon36)
         self.action_path.setObjectName("action_path")
+        self.action_freeform = QtWidgets.QAction(MainWindow)
+        self.action_freeform.setCheckable(True)
+        icon37 = QtGui.QIcon()
+        icon37.addPixmap(QtGui.QPixmap(":/slicetools/freeform"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.action_freeform.setIcon(icon37)
+        self.action_freeform.setObjectName("action_freeform")
         self.main_toolbar.addAction(self.action_global_select)
         self.main_toolbar.addAction(self.action_global_create)
         self.main_toolbar.addAction(self.action_path_break)
@@ -496,6 +502,7 @@ class Ui_MainWindow(object):
         self.main_toolbar.addAction(self.action_path_skip)
         self.main_toolbar.addAction(self.action_path_add_seq)
         self.main_toolbar.addSeparator()
+        self.main_toolbar.addAction(self.action_freeform)
         self.main_toolbar.addAction(self.action_new_dnapart_honeycomb)
         self.main_toolbar.addAction(self.action_new_dnapart_square)
         self.main_toolbar.addSeparator()
@@ -673,6 +680,9 @@ class Ui_MainWindow(object):
         self.action_slice.setToolTip(_translate("MainWindow", "Toggle Slice"))
         self.action_path.setText(_translate("MainWindow", "Path"))
         self.action_path.setToolTip(_translate("MainWindow", "Toggle Path"))
+        self.action_freeform.setText(_translate("MainWindow", "Freeform"))
+        self.action_freeform.setIconText(_translate("MainWindow", "Freeform"))
+        self.action_freeform.setToolTip(_translate("MainWindow", "Freeform design mode"))
 
 from cadnano.views.cngraphicsview import CNGraphicsView
 from cadnano.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
