@@ -87,6 +87,7 @@
    <addaction name="action_path_skip"/>
    <addaction name="action_path_add_seq"/>
    <addaction name="separator"/>
+   <addaction name="action_freeform"/>
    <addaction name="action_new_dnapart_honeycomb"/>
    <addaction name="action_new_dnapart_square"/>
    <addaction name="separator"/>
@@ -1384,6 +1385,24 @@
    </property>
    <property name="toolTip">
     <string>Toggle Path</string>
+   </property>
+  </action>
+  <action name="action_freeform">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="cadnano.gui.mainwindow.icons.qrc">
+     <normaloff>:/slicetools/freeform</normaloff>:/slicetools/freeform</iconset>
+   </property>
+   <property name="text">
+    <string>Freeform</string>
+   </property>
+   <property name="iconText">
+    <string>Freeform</string>
+   </property>
+   <property name="toolTip">
+    <string>Freeform design mode</string>
    </property>
   </action>
  </widget>
