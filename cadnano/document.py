@@ -18,9 +18,10 @@ from cadnano import (
 )
 from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano.proxies.cnenum import (
-    ModEnum,
-    GridEnum,
     EnumType,
+    GridEnum,
+    ModEnum,
+    PointEnum,
     ViewSendEnum
 )
 from cadnano.proxies.cnobject import CNObject
@@ -747,7 +748,8 @@ class Document(CNObject):
     # PUBLIC METHODS FOR EDITING THE MODEL #
     def createNucleicAcidPart(  self,
                                 use_undostack: bool = True,
-                                grid_type: EnumType = GridEnum.NONE
+                                grid_type: EnumType = GridEnum.NONE,
+                                point_type: EnumType = PointEnum.Z_ONLY
                             ) -> NucleicAcidPart:
         """Create and store a new DnaPart and instance, and return the instance.
 
@@ -758,7 +760,7 @@ class Document(CNObject):
         Returns
             new :obj:`NucleicAcidPart`
         """
-        dna_part = NucleicAcidPart(document=self, grid_type=grid_type)
+        dna_part = NucleicAcidPart(document=self, grid_type=grid_type, point_type=point_type)
         self._addPart(dna_part, use_undostack=use_undostack)
         return dna_part
     # end def
