@@ -46,7 +46,8 @@ from cadnano.strand import Strand
 
 from cadnano.cntypes import (
     DocCtrlT,
-    DocT
+    DocT,
+    WindowT
 )
 
 # Type Aliases
@@ -73,7 +74,7 @@ class Document(CNObject):
         us.setUndoLimit(30)
         self._children = set()     # for storing a reference to Parts (and Assemblies)
         self._instances = set()    # for storing instances of Parts (and Assemblies)
-        self._controller = None
+        self._app_window = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
         self._active_part = None
@@ -194,14 +195,14 @@ class Document(CNObject):
 
     def setActivePart(self, part: Part):
         self._active_part = part
-        if self._controller:
-            self._controller.toggleNewPartButtons(False)
+        if self._app_window:
+            self._app_window.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
         self._active_part = None
-        if self._controller:
-            self._controller.toggleNewPartButtons(True)
+        if self._app_window:
+            self._app_window.toggleNewPartButtons(True)
     # end def
 
     def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
@@ -792,13 +793,13 @@ class Document(CNObject):
     # end def
 
     # PUBLIC SUPPORT METHODS #
-    def controller(self) -> DocCtrlT:
-        return self._controller
+    def appWindow(self) -> WindowT:
+        return self._app_window
     # end def
 
-    def setController(self, controller: DocCtrlT):
-        """Called by :meth:`DocumentController.setDocument` method."""
-        self._controller = controller
+    def setAppWindow(self, app_window: WindowT):
+        """Called by :meth:`DocumentWindow.setDocument` method."""
+        self._app_window = app_window
     # end def
 
     # PRIVATE SUPPORT METHODS #
@@ -1026,8 +1027,8 @@ class Document(CNObject):
         Args:
             view_type: enum from the ``OrthoViewEnum``
         """
-        if self.controller():
-            self.controller().setSliceOrGridViewVisible(view_type)
+        if self.appWindow():
+            self.appWindow().setSliceOrGridViewVisible(view_type)
 #    # end def
 
     def getGridType(self) -> EnumType:

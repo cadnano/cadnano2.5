@@ -434,9 +434,9 @@ class GridPoint(QGraphicsEllipseItem):
     # end def
 
     def mouseReleaseEvent(self, event: QGraphicsSceneMouseEvent):
-        controller = self.grid.part_item.document().controller()
-        controller.showFilterHints(False)
-        controller.showToolHints(False)
+        app_window = self.grid.part_item.document().appWindow()
+        app_window.showFilterHints(False)
+        app_window.showToolHints(False)
 
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
@@ -528,8 +528,8 @@ class GridPoint(QGraphicsEllipseItem):
         part_item = self.grid.part_item
         tool = part_item._getActiveTool()
         if tool.FILTER_NAME not in part_item.part().document().filter_set:
-            controller = part_item.document().controller()
-            controller.showFilterHints(True, filter_name='virtual_helix')
+            app_window = part_item.document().appWindow()
+            app_window.showFilterHints(True, filter_name='virtual_helix')
             return
         part = part_item.part()
         part.setSelected(True)

@@ -6,6 +6,7 @@ from typing import (
     Tuple,
     Union
 )
+from types import MethodType
 
 from PyQt5.QtCore import (
     Qt,
@@ -17,6 +18,7 @@ from PyQt5.QtCore import (
     QRect,
     QSettings,
     QSize,
+    pyqtBoundSignal
 )
 _translate = QCoreApplication.translate
 from PyQt5.QtGui import (
@@ -60,7 +62,6 @@ from cadnano.proxies.cnenum import (
     ViewReceiveEnum,
     ViewSendEnum,
 )
-from cadnano.controllers.documentcontroller import DocumentController
 from cadnano.views.gridview.gridrootitem import GridRootItem
 from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
 from cadnano.views.pathview.colorpanel import ColorPanel
@@ -68,7 +69,11 @@ from cadnano.views.pathview.pathrootitem import PathRootItem
 from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
 from cadnano.views.sliceview.slicerootitem import SliceRootItem
 from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
-from cadnano.views.abstractitems import AbstractTool
+from cadnano.views.abstractitems import (
+    AbstractTool,
+    AbstractToolManager
+)
+
 from cadnano.cntypes import (
     DocT,
     WindowT,
@@ -96,56 +101,53 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     must be done in code rather than using Qt Creator.
 
     Attributes:
-        controller: DocumentController
+        _document
     """
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
 
     def __init__(self, document: DocT, parent=None):
         super(DocumentWindow, self).__init__(parent)
         self._document: DocT = document
-        # self.controller: DocumentController = DocumentController(self, document)
+        document.setAppWindow(self)
         self.setupUi(self)
-        self.docwin_signal_and_slots: List[Tuple] = []
+        self.docwin_signal_and_slots: List[Tuple[pyqtBoundSignal, MethodType]] = []
         self.defineWindowSignals()
         self.connectSelfSignals()
 
-        self.fileopendialog = None
-        self.filesavedialog = None
-        self._file_open_path = None  # will be set in _readSettings
+        self.fileopendialog: QFileDialog = None
+        self.filesavedialog: QFileDialog = None
+        self._file_open_path: str = None  # will be set in _readSettings
         self._has_no_associated_file: bool = True
 
         # self.settings = QSettings("cadnano.org", "cadnano2.5")
-        self.settings = QSettings(  "69bfae41ee5e33c689fded70c89cc64c",
-                                    "69bfae41ee5e33c689fded70c89cc64c")
+        self.settings: QSettings = QSettings(   "69bfae41ee5e33c689fded70c89cc64c",
+                                                "69bfae41ee5e33c689fded70c89cc64c")
         self._readSettings()
 
-        self._hintable_tools: List = []     # filters that display alt icon when disabled
-        self._hintable_filters: List = []   # filters that display alt icon when disabled
-        self._hintable_tool_action_map: dict = {}  # what buttons to hint for each filter
-        self._hintable_filter_action_map: dict = {}  # what buttons to hint for each filter
-        self._tool_hints_visible: bool = False
+        self._tool_hints_visible:   bool = False
         self._filter_hints_visible: bool = False
-
-        self.slice_view_showing: bool = False
+        self.slice_view_showing:    bool = False
 
         # Appearance pref
         if not app().prefs.show_icon_labels:
             self.main_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
         # Outliner & PropertyEditor setup
-        outliner_widget = self.outliner_widget
-        outliner_widget.configure(window=self, document=document)
-        property_widget = self.property_widget
-        property_widget.configure(window=self, document=document)
+        self.outliner_widget.configure(window=self, document=document)
+        self.property_widget.configure(window=self, document=document)
 
         self.property_buttonbox.setVisible(False)
 
-        self.tool_managers = []  # initialize
+        self.tool_managers: List[AbstractToolManager] = []  # initialize
 
-        self.views = {}
+        self.views: Dict[EnumType, GraphicsViewT] = {
+            # ViewSendEnum.SLICE: self._initSliceview(document)
+            # ViewSendEnum.GRID:  self._initGridview(document)
+            # ViewSendEnum.PATH:  self._initPathview(document)
+        }
         self.views[ViewSendEnum.SLICE] = self._initSliceview(document)
-        self.views[ViewSendEnum.GRID]  = self._initGridview(document)
-        self.views[ViewSendEnum.PATH]  = self._initPathview(document)
+        self.views[ViewSendEnum.GRID] = self._initGridview(document)
+        self.views[ViewSendEnum.PATH] =  self._initPathview(document)
 
         self._initToolbar()
         self._initEditMenu()
@@ -165,8 +167,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         document.setViewNames(['slice', 'path', 'inspector'])
 
-        app().documentWindowWasCreatedSignal.emit(document, self)
-
         # Set Default Filter
         if DEFAULT_VHELIX_FILTER:
             self.actionFilterVirtualHelixSlot()
@@ -175,15 +175,18 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.actionFilterXoverSlot()
 
                 # setup tool exclusivity
-        self.actiongroup = ag = QActionGroup(self)
-        action_group_list = ['action_global_select',
-                             'action_global_create',
-                             'action_path_break',
-                             'action_path_paint',
-                             'action_path_insertion',
-                             'action_path_skip',
-                             'action_path_add_seq',
-                             'action_path_mods']
+        self.actiongroup: QActionGroup = QActionGroup(self)
+        ag = self.actiongroup
+        action_group_list: List[str] = [
+            'action_global_select',
+            'action_global_create',
+            'action_path_break',
+            'action_path_paint',
+            'action_path_insertion',
+            'action_path_skip',
+            'action_path_add_seq',
+            'action_path_mods'
+        ]
         for action_name in action_group_list:
             ag.addAction(getattr(self, action_name))
 
@@ -198,27 +201,37 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             action_special.triggered.connect(self.actionSpecialSlot)
 
         # set up tool & filter hinting
-        self._hintable_tools = [self.action_global_create,
-                                self.action_global_select]
-        self._hintable_filters = [self.action_filter_helix,
-                                  self.action_filter_strand,
-                                  self.action_filter_endpoint,
-                                  self.action_filter_xover]
-        self._hintable_tool_action_map = {'create': [self.action_global_create],
-                                          'select': [self.action_global_select]}
+        # filters that display alt icon when disabled
+        self._hintable_tools: List[QAction] = [
+            self.action_global_create,
+            self.action_global_select
+        ]
+        self._hintable_filters: List[QAction] = [
+            self.action_filter_helix,
+            self.action_filter_strand,
+            self.action_filter_endpoint,
+            self.action_filter_xover
+        ]
+        # what buttons to hint for each filter
+        self._hintable_tool_action_map: Dict[str, QAction] = {
+            'create': [self.action_global_create],
+            'select': [self.action_global_select]
+        }
 
-        self._hintable_filter_action_map = {'virtual_helix': [self.action_filter_helix],
-                                            'strand': [self.action_filter_strand],
-                                            'endpoint': [self.action_filter_endpoint],
-                                            'xover': [self.action_filter_xover]}
-
+        self._hintable_filter_action_map: Dict[str, QAction] = {
+            'virtual_helix': [self.action_filter_helix],
+            'strand': [self.action_filter_strand],
+            'endpoint': [self.action_filter_endpoint],
+            'xover': [self.action_filter_xover]
+        }
 
         self.action_global_select.trigger()
         # self.inspector_dock_widget.hide()
 
-        self.exit_when_done = False
-        self.closeEvent = self.windowCloseEventHandler
+        self.exit_when_done: bool = False
+        self.closeEvent: MethodType = self.windowCloseEventHandler
         self.show()
+        app().documentWindowWasCreatedSignal.emit(document, self)
     # end def
 
     def document(self) -> DocT:
@@ -325,12 +338,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         Args:
             view_type: one or more O
         '''
-        doc = self.document()
+        doc: DocT = self.document()
 
         # turn OFF all but the views we care about
         doc.changeViewSignaling(view_type)
 
-        delta = 0
+        delta: EnumType = 0
         if view_type & ViewSendEnum.SLICE:
             delta = ViewSendEnum.GRID
             self.destroyView(delta)
@@ -411,7 +424,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.grid_tool_manager.path_tool_manager = self.path_tool_manager
         self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
 
-        self.tool_managers = (self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager)
+        self.tool_managers = [self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager]
 
         self.insertToolBarBreak(self.main_toolbar)
 
@@ -1087,14 +1100,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         return self._document
     # end def
 
-    def setDocument(self, doc: DocT):
-        '''Sets the controller's document, and informs the document that
-        this is its controller.
-        '''
-        self._document = doc
-        doc.setController(self)
-    # end def
-
     def undoStack(self) -> UndoStack:
         return self._document.undoStack()
     # end def
@@ -1281,7 +1286,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             the_app = app()
             # self.destroyDC()
             self.destroyWin()
-            if the_app.document_windows:
+            if len(the_app.document_windows) > 0:
                 the_app.destroyApp()
         elif event is not None:
             event.ignore()
@@ -1440,7 +1445,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             (self.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
 
             (self.action_vhelix_snap.triggered, self.actionVhelixSnapSlot)
-            ]
+        ]
     # end def
 
     def connectSelfSignals(self):

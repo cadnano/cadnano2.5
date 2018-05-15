@@ -130,7 +130,7 @@ class CadnanoQt(QObject):
         global Document
         global DocumentWindow
         # print("documentWasCreatedSignal", self.documentWasCreatedSignal)
-        if self.document_windows:
+        if len(self.document_windows) > 0:
             self.documentWasCreatedSignal.disconnect(self.wirePrefsSlot)
         decodeFile = None
         Document = None
@@ -150,6 +150,7 @@ class CadnanoQt(QObject):
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
             dw = DocumentWindow(base_doc)
+            self.document_windows.add(dw)
             # logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
             dw.setFileName(default_file)
@@ -160,6 +161,7 @@ class CadnanoQt(QObject):
             if doc_window_count == 0:  # first dw
                 # dw adds itself to app.document_windows
                 dw = DocumentWindow(base_doc)
+                self.document_windows.add(dw)
             elif doc_window_count == 1:  # dw already exists
                 dw = list(self.document_windows)[0]
                 dw.newDocument()  # tell it to make a new doucment

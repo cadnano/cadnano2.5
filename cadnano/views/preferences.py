@@ -137,8 +137,8 @@ class Preferences(object):
         self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style_idx)
         self.qs.endGroup()
 
-        controller = self.document.controller()
-        controller.setSliceOrGridViewVisible(self.orthoview_style_idx)
+        app_window = self.document.appWindow()
+        app_window.setSliceOrGridViewVisible(self.orthoview_style_idx)
     # end def
 
     def setShowIconLabels(self, value):
