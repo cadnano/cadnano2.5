@@ -8,7 +8,7 @@ from cadnano.part.nucleicacidpart import NucleicAcidPart
 
 
 def create3Helix(doc, direction, length):
-    part = doc.createNucleicAcidPart()
+    part = doc.createNucleicAcidPart(is_lattice=True)
     assert len(part.getidNums()) == 0
     radius = part.radius()
     origin_pt00 = (0, 0, 0)

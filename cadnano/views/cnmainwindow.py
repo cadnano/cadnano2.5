@@ -961,20 +961,27 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         # TODO[NF]:  Docstring
         return self.actionCreateNucleicAcidPart(
             grid_type=GridEnum.HONEYCOMB,
-            point_type=PointEnum.Z_ONLY
+            is_lattice=True
         )
 
     def actionCreateNucleicAcidPartSquare(self) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
         return self.actionCreateNucleicAcidPart(
             grid_type=GridEnum.SQUARE,
-            point_type=PointEnum.Z_ONLY
+            is_lattice=True
         )
 
     def actionCreateNucleicAcidPart(self,
             grid_type: EnumType,
-            point_type: EnumType = PointEnum.ARBITRARY) -> NucleicAcidPartT:
-        # TODO[NF]:  Docstring
+            is_lattice: bool = False) -> NucleicAcidPartT:
+        '''
+        Args:
+            grid_type:
+            is_lattice: defaults to False, aka freeform
+
+        Returns:
+            the part created
+        '''
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
@@ -983,7 +990,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         doc = self._document
         part = doc.createNucleicAcidPart(   use_undostack=True,
                                             grid_type=grid_type,
-                                            point_type=point_type)
+                                            is_lattice=is_lattice)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)

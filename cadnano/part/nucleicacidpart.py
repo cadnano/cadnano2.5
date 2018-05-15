@@ -164,12 +164,12 @@ class NucleicAcidPart(Part):
             uuid: str
             do_copy
             grid_type
-            point_type
+            is_lattice
         '''
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
         do_copy: bool = kwargs.get('do_copy', False)
         grid_type: EnumType = kwargs.get('grid_type', GridEnum.NONE)
-        point_type: EnumType = kwargs.get('point_type', PointEnum.Z_ONLY)
+        is_lattice: EnumType = kwargs.get('is_lattice', True)
 
         if do_copy:
             return
@@ -216,7 +216,7 @@ class NucleicAcidPart(Part):
         gps['neighbor_active_angle'] = ''
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
-        gps['point_type'] = point_type
+        gps['is_lattice'] = is_lattice
 
         ############################
         # Begin low level attributes
@@ -2394,7 +2394,7 @@ class NucleicAcidPart(Part):
         Returns:
             ``True`` or ``False``
         """
-        return self._group_properties['point_type'] == PointEnum.Z_ONLY
+        return self._group_properties['is_lattice'] == True
     # end def
 
     def getVirtualHelicesInArea(self, rect: RectT) -> Set[int]:

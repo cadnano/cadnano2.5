@@ -143,7 +143,15 @@ def decodePart( document: DocT,
         grid_type:
         emit_signals:
     """
-    part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
+    if ( part_dict.get('point_type') == PointEnum.ARBITRARY or
+        not part_dict.get('is_lattice', True) ):
+        is_lattice = False
+    else:
+        is_lattice = True
+
+    part = document.createNucleicAcidPart(  use_undostack=False,
+                                            is_lattice=is_lattice,
+                                            grid_type=grid_type)
     part.setActive(True)
 
     vh_id_list = part_dict.get('vh_list')
@@ -151,7 +159,7 @@ def decodePart( document: DocT,
     origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
-    if part_dict.get('point_type') == PointEnum.ARBITRARY:
+    if not is_lattice:
         # TODO add code to deserialize parts
         pass
     else:

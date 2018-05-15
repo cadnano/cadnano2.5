@@ -745,7 +745,7 @@ class Document(CNObject):
     def createNucleicAcidPart(  self,
                                 use_undostack: bool = True,
                                 grid_type: EnumType = GridEnum.NONE,
-                                point_type: EnumType = PointEnum.Z_ONLY
+                                is_lattice: bool = True
                             ) -> NucleicAcidPart:
         """Create and store a new DnaPart and instance, and return the instance.
 
@@ -756,7 +756,7 @@ class Document(CNObject):
         Returns
             new :obj:`NucleicAcidPart`
         """
-        dna_part = NucleicAcidPart(document=self, grid_type=grid_type, point_type=point_type)
+        dna_part = NucleicAcidPart(document=self, grid_type=grid_type, is_lattice=is_lattice)
         self._addPart(dna_part, use_undostack=use_undostack)
         return dna_part
     # end def
