@@ -90,20 +90,22 @@ class Document(CNObject):
     # end def
 
     # SIGNALS #
+    # Signal 1. Connected to the ViewRoots
     documentPartAddedSignal = ProxySignal(object, CNObject, name='documentPartAddedSignal')
     """`Document`, `Part`"""
 
     documentAssemblyAddedSignal = ProxySignal(object, CNObject, name='documentAssemblyAddedSignal')
     """`Document`, `Assembly`"""
-
     documentSelectionFilterChangedSignal = ProxySignal(object, name='documentSelectionFilterChangedSignal')
     documentPreXoverFilterChangedSignal = ProxySignal(str, name='documentPreXoverFilterChangedSignal')
     documentViewResetSignal = ProxySignal(CNObject, name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(CNObject, name='documentClearSelectionsSignal')
+    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
+
+    # Signal 1. Connected to the ModTool
     documentModAddedSignal = ProxySignal(object, object, object, name='documentModAddedSignal')
     documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
     documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
-    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
 
     # SLOTS #
 

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 from collections import namedtuple
+from typing import (
+    List,
+    Tuple,
+    Union
+)
 
 from PyQt5.QtCore import (
     Qt,
@@ -96,8 +101,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         super(DocumentWindow, self).__init__(parent)
         self._document: DocT = document
         self.controller: DocumentController = DocumentController(self, document)
-
         self.setupUi(self)
+        self.docwin_signal_and_slots: List[Tuple] = []
+        self.defineWindowSignals()
+        self.connectSelfSignals()
 
         self.fileopendialog = None
         self.filesavedialog = None
@@ -127,7 +134,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         outliner_widget.configure(window=self, document=doc)
         property_widget = self.property_widget
         property_widget.configure(window=self, document=doc)
-        outliner_widget.itemSelectionChanged.connect(property_widget.outlinerItemSelectionChanged)
 
         self.property_buttonbox.setVisible(False)
 
@@ -202,6 +208,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                                             'strand': [self.action_filter_strand],
                                             'endpoint': [self.action_filter_endpoint],
                                             'xover': [self.action_filter_xover]}
+
 
         self.action_global_select.trigger()
         # self.inspector_dock_widget.hide()
@@ -1272,7 +1279,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         if self.exit_when_done:
             the_app = app()
-            self.destroyDC()
+            # self.destroyDC()
+            self.destroyWin()
             if the_app.document_controllers:
                 the_app.destroyApp()
 
@@ -1285,7 +1293,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             if event is not None:
                 event.accept()
             the_app = app()
-            self.destroyDC()
+            # self.destroyDC()
+            self.destroyWin()
             if the_app.document_controllers:
                 the_app.destroyApp()
         elif event is not None:
@@ -1402,5 +1411,65 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
 
+    def globalCreateSlot(self):
+        self.action_global_create.trigger()
 
+    def defineWindowSignals(self):
+        self.docwin_signal_and_slots = [
+            (self.action_new.triggered, self.actionNewSlot),
+            (self.action_open.triggered, self.actionOpenSlot),
+            (self.action_close.triggered, self.actionCloseSlot),
+            (self.action_save.triggered, self.actionSaveSlot),
+            (self.action_save_as.triggered, self.actionSaveAsSlot),
+            (self.action_SVG.triggered, self.actionSVGSlot),
+            (self.action_export_staples.triggered, self.actionExportSequencesSlot),
+            (self.action_preferences.triggered, self.actionPrefsSlot),
+            (self.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
+            (self.action_new_dnapart_honeycomb.triggered, self.globalCreateSlot),
+            (self.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
+            (self.action_new_dnapart_square.triggered, self.globalCreateSlot),
+            (self.action_about.triggered, self.actionAboutSlot),
+            (self.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
+            (self.action_feedback.triggered, self.actionFeedbackSlot),
+
+            # make it so select tool in slice view activation turns on vh filter
+            (self.action_global_select.triggered, self.actionSelectForkSlot),
+            (self.action_global_create.triggered, self.actionCreateForkSlot),
+
+            (self.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
+            (self.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
+            (self.action_filter_strand.triggered, self.actionFilterStrandSlot),
+            (self.action_filter_xover.triggered, self.actionFilterXoverSlot),
+            (self.action_filter_fwd.triggered, self.actionFilterFwdSlot),
+            (self.action_filter_rev.triggered, self.actionFilterRevSlot),
+            (self.action_filter_scaf.triggered, self.actionFilterScafSlot),
+            (self.action_filter_stap.triggered, self.actionFilterStapSlot),
+            (self.action_copy.triggered, self.actionCopySlot),
+            (self.action_paste.triggered, self.actionPasteSlot),
+
+            (self.action_inspector.triggered, self.actionToggleInspectorViewSlot),
+            (self.action_path.triggered, self.actionTogglePathViewSlot),
+            (self.action_slice.triggered, self.actionToggleSliceViewSlot),
+
+            (self.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
+
+            (self.action_vhelix_snap.triggered, self.actionVhelixSnapSlot)
+            ]
+    # end def
+
+    def connectSelfSignals(self):
+        for signal, slot in self.docwin_signal_and_slots:
+            signal.connect(slot)
+        o = self.outliner_widget
+        p_e = self.property_widget
+        o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
+    # end def
+
+    def disconnectSelfSignals(self):
+        for signal, slot in self.docwin_signal_and_slots:
+            signal.disconnect(slot)
+        o = self.outliner_widget
+        p_e = self.property_widget
+        o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
+    # end def
 # end class
