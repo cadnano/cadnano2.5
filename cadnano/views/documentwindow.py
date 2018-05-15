@@ -147,7 +147,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.views[ViewSendEnum.GRID]  = self._initGridview(document)
         self.views[ViewSendEnum.PATH]  = self._initPathview(document)
 
-        self._initPathviewToolbar()
+        self._initToolbar()
         self._initEditMenu()
 
         self.path_dock_widget.setTitleBarWidget(QWidget())
@@ -395,8 +395,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         return pgv
     # end def
 
-    def _initPathviewToolbar(self):
-        """Initializes Path View Toolbar.
+    def _initToolbar(self):
+        """Initializes the Toolbar and the manager.
         """
         self.path_color_panel = ColorPanel()
         self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
