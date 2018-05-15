@@ -59,6 +59,7 @@ from cadnano.proxies.cnenum import (
     EnumType,
     GridEnum,
     OrthoViewEnum,
+    PointEnum,
     ViewReceiveEnum,
     ViewSendEnum,
 )
@@ -956,15 +957,23 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         selection signals.
         '''
 
-    def actionCreateNucleicAcidPartHoneycomb(self):
+    def actionCreateNucleicAcidPartHoneycomb(self) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridEnum.HONEYCOMB)
+        return self.actionCreateNucleicAcidPart(
+            grid_type=GridEnum.HONEYCOMB,
+            point_type=PointEnum.Z_ONLY
+        )
 
-    def actionCreateNucleicAcidPartSquare(self):
+    def actionCreateNucleicAcidPartSquare(self) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridEnum.SQUARE)
+        return self.actionCreateNucleicAcidPart(
+            grid_type=GridEnum.SQUARE,
+            point_type=PointEnum.Z_ONLY
+        )
 
-    def actionCreateNucleicAcidPart(self, grid_type: EnumType) -> NucleicAcidPartT:
+    def actionCreateNucleicAcidPart(self,
+            grid_type: EnumType,
+            point_type: EnumType = PointEnum.ARBITRARY) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
@@ -972,7 +981,9 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=True, grid_type=grid_type)
+        part = doc.createNucleicAcidPart(   use_undostack=True,
+                                            grid_type=grid_type,
+                                            point_type=point_type)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
@@ -1028,6 +1039,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''
         self.action_new_dnapart_honeycomb.setEnabled(is_enabled)
         self.action_new_dnapart_square.setEnabled(is_enabled)
+        self.action_freeform.setEnabled(is_enabled)
     # end def
 
     def setSliceOrGridViewVisible(self, view_type: EnumType):
@@ -1419,6 +1431,10 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             (self.action_new_dnapart_honeycomb.triggered, self.globalCreateSlot),
             (self.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
             (self.action_new_dnapart_square.triggered, self.globalCreateSlot),
+
+            (self.action_freeform.triggered, self.actionCreateNucleicAcidPart),
+            (self.action_freeform.triggered, self.globalCreateSlot),
+
             (self.action_about.triggered, self.actionAboutSlot),
             (self.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
             (self.action_feedback.triggered, self.actionFeedbackSlot),
