@@ -112,7 +112,7 @@ exclude_patterns = ['_build',
                     # QPixmap: Must construct a QGuiApplication before a QPixmap
                     'api/cadnano.controllers.documentcontroller.rst',
                     'api/cadnano.gui.mainwindow.ui_mainwindow.rst',
-                    'api/cadnano.views.documentwindow.rst',
+                    'api/cadnano.views.cnmainwindow.rst',
                     'api/cadnano.views.outlinerview.outlinertreewidget.rst',
                     'api/cadnano.views.pathview.tools.addseqtool.rst',
                     'api/cadnano.views.pathview.tools.pathtoolmanager.rst'

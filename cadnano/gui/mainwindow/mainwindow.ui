@@ -212,7 +212,7 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="CustomQGraphicsView" name="slice_graphics_view">
+      <widget class="CNGraphicsView" name="slice_graphics_view">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -297,7 +297,7 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="CustomQGraphicsView" name="grid_graphics_view">
+      <widget class="CNGraphicsView" name="grid_graphics_view">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -385,7 +385,7 @@
       <number>1</number>
      </property>
      <item>
-      <widget class="CustomQGraphicsView" name="path_graphics_view">
+      <widget class="CNGraphicsView" name="path_graphics_view">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -1389,9 +1389,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CustomQGraphicsView</class>
+   <class>CNGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>cadnano.views.customqgraphicsview.h</header>
+   <header>cadnano.views.cngraphicsview.h</header>
   </customwidget>
   <customwidget>
    <class>OutlinerTreeWidget</class>

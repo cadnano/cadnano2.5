@@ -95,8 +95,8 @@ SAVE_DIALOG_OPTIONS = {'SAVE': 0,
 # # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
 # # for an example of the QOpenGlWidget added in Qt 5.4
 
-class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
-    """:class`DocumentWindow` subclasses :class`QMainWindow` and
+class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
+    """:class`CNMainWindow` subclasses :class`QMainWindow` and
     :class`Ui_MainWindow`. It performs some initialization operations that
     must be done in code rather than using Qt Creator.
 
@@ -106,7 +106,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
 
     def __init__(self, document: DocT, parent=None):
-        super(DocumentWindow, self).__init__(parent)
+        super(CNMainWindow, self).__init__(parent)
         self._document: DocT = document
         document.setAppWindow(self)
         self.setupUi(self)
@@ -365,7 +365,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             doc: The :class:`Document` corresponding to the design
 
         Returns:
-            :class:`CustomQGraphicsView`
+            :class:`CNGraphicsView`
         """
         grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
         grid_root = GridRootItem(   rect=grid_scene.sceneRect(),
@@ -390,7 +390,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             doc: The :class:`Document` corresponding to the design
 
         Returns:
-            :class:`CustomQGraphicsView`
+            :class:`CNGraphicsView`
         """
         path_scene = QGraphicsScene(parent=self.path_graphics_view)
         path_root = PathRootItem(   rect=path_scene.sceneRect(),
@@ -412,7 +412,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         """Initializes the Toolbar and the manager.
         """
         self.path_color_panel = ColorPanel()
-        self.path_graphics_view.toolbar = self.path_color_panel  # HACK for customqgraphicsview
+        self.path_graphics_view.toolbar = self.path_color_panel  # HACK for cngraphicsview
         path_view = self.views[ViewSendEnum.PATH]
         path_scene = path_view.cnScene()
         path_scene.addItem(self.path_color_panel)
@@ -440,7 +440,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             doc: The :class:`Document` corresponding to the design
 
         Returns:
-            :class:`CustomQGraphicsView`
+            :class:`CNGraphicsView`
         """
         slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
         slice_root = SliceRootItem( rect=slice_scene.sceneRect(),
@@ -799,7 +799,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                 self.openAfterMaybeSave()  # finalize new
 
     def actionCloseSlot(self):
-        '''Called when DocumentWindow is closed.
+        '''Called when CNMainWindow is closed.
 
         This method does not do anything as its functionality is implemented by
         windowCloseEventHandler.  windowCloseEventHandler captures all close
@@ -1273,7 +1273,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             the_app = app()
             # self.destroyDC()
             self.destroyWin()
-            if the_app.document_windows:
+            if the_app.cnmain_windows:
                 the_app.destroyApp()
 
     ### EVENT HANDLERS ###
@@ -1286,7 +1286,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             the_app = app()
             # self.destroyDC()
             self.destroyWin()
-            if len(the_app.document_windows) > 0:
+            if len(the_app.cnmain_windows) > 0:
                 the_app.destroyApp()
         elif event is not None:
             event.ignore()

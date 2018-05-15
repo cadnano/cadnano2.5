@@ -65,7 +65,7 @@ class PreXoverManager(QGraphicsRectItem):
     def window(self) -> WindowT:
         """
         Returns:
-            :class:`DocumentWindow`
+            :class:`CNMainWindow`
         """
         return self._parent.window()
 

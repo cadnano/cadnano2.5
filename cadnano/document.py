@@ -800,7 +800,7 @@ class Document(CNObject):
     # end def
 
     def setAppWindow(self, app_window: WindowT):
-        """Called by :meth:`DocumentWindow.setDocument` method."""
+        """Called by :meth:`CNMainWindow.setDocument` method."""
         self._app_window = app_window
     # end def
 

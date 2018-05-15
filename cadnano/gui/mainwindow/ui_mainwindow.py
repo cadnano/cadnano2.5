@@ -67,7 +67,7 @@ class Ui_MainWindow(object):
         self.slice_horizontal_layout.setContentsMargins(1, 1, 1, 1)
         self.slice_horizontal_layout.setSpacing(1)
         self.slice_horizontal_layout.setObjectName("slice_horizontal_layout")
-        self.slice_graphics_view = CustomQGraphicsView(self.slice_dock_widget_contents)
+        self.slice_graphics_view = CNGraphicsView(self.slice_dock_widget_contents)
         self.slice_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
         self.slice_graphics_view.setBaseSize(QtCore.QSize(400, 0))
         self.slice_graphics_view.setMouseTracking(True)
@@ -95,7 +95,7 @@ class Ui_MainWindow(object):
         self.grid_horizontal_layout.setContentsMargins(1, 1, 1, 1)
         self.grid_horizontal_layout.setSpacing(1)
         self.grid_horizontal_layout.setObjectName("grid_horizontal_layout")
-        self.grid_graphics_view = CustomQGraphicsView(self.grid_dock_widget_contents)
+        self.grid_graphics_view = CNGraphicsView(self.grid_dock_widget_contents)
         self.grid_graphics_view.setMinimumSize(QtCore.QSize(0, 0))
         self.grid_graphics_view.setBaseSize(QtCore.QSize(400, 0))
         self.grid_graphics_view.setMouseTracking(True)
@@ -124,7 +124,7 @@ class Ui_MainWindow(object):
         self.path_horizontal_layout.setContentsMargins(1, 1, 1, 1)
         self.path_horizontal_layout.setSpacing(1)
         self.path_horizontal_layout.setObjectName("path_horizontal_layout")
-        self.path_graphics_view = CustomQGraphicsView(self.path_dock_widget_contents)
+        self.path_graphics_view = CNGraphicsView(self.path_dock_widget_contents)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -674,7 +674,7 @@ class Ui_MainWindow(object):
         self.action_path.setText(_translate("MainWindow", "Path"))
         self.action_path.setToolTip(_translate("MainWindow", "Toggle Path"))
 
-from cadnano.views.customqgraphicsview import CustomQGraphicsView
+from cadnano.views.cngraphicsview import CNGraphicsView
 from cadnano.views.outlinerview.outlinertreewidget import OutlinerTreeWidget
 from cadnano.views.propertyview.propertyeditorwidget import PropertyEditorWidget
 import cadnano.gui.mainwindow.icons_rc

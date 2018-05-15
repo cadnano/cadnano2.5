@@ -489,7 +489,7 @@ class PathNucleicAcidPartItem(QAbstractPartItem):
     def window(self) -> WindowT:
         """
         Returns:
-            :obj:`DocumentWindow`
+            :obj:`CNMainWindow`
         """
         return self.parentItem().window()
     # end def

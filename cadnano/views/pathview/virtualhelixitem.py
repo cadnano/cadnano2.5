@@ -284,7 +284,7 @@ class PathVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsPathItem):
     def window(self) -> WindowT:
         """
         Returns:
-            :class:`DocumentWindow`
+            :class:`CNMainWindow`
         """
         return self._part_item.window()
     # end def

@@ -18,8 +18,8 @@ Submodules
 
 .. toctree::
 
-   cadnano.views.customqgraphicsview
-   cadnano.views.documentwindow
+   cadnano.views.cngraphicsview
+   cadnano.views.cnmainwindow
    cadnano.views.grabcorneritem
    cadnano.views.preferences
    cadnano.views.resizehandles

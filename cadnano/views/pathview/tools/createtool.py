@@ -910,7 +910,7 @@ class ForcedXoverItem(QGraphicsPathItem):
         """
         Must intercept invalid input events.  Make changes here
         Use QWidget.changeEvent Slot for intercepting window changes in order to
-        regain focus if necessary in DocumentWindow or CustomGraphicsView classes
+        regain focus if necessary in CNMainWindow or CustomGraphicsView classes
         looking for event.type() QEvent.ActivationChange and using isActiveWindow()
         or focus to get focus
 
