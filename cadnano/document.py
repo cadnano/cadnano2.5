@@ -196,14 +196,10 @@ class Document(CNObject):
 
     def setActivePart(self, part: Part):
         self._active_part = part
-        # if self._app_window:
-        #     self._app_window.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
         self._active_part = None
-        # if self._app_window:
-        #     self._app_window.toggleNewPartButtons(True)
     # end def
 
     def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
