@@ -1024,7 +1024,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''Toggle the AddPart buttons when the active part changes.
 
         Args:
-            is_enabled: Whether the slice view should be hidden or shown
+            is_enabled:
         '''
         self.action_new_dnapart_honeycomb.setEnabled(is_enabled)
         self.action_new_dnapart_square.setEnabled(is_enabled)

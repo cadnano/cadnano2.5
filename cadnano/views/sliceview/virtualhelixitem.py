@@ -86,7 +86,7 @@ class SliceVirtualHelixItem(AbstractVirtualHelixItem, QGraphicsEllipseItem):
         """
         AbstractVirtualHelixItem.__init__(self, id_num, part_item)
         QGraphicsEllipseItem.__init__(self, parent=part_item)
-        self.app_window = part_item.document().appWindow()
+        self.app_window = part_item.window()
         self._controller = VirtualHelixItemController(self, self._model_part, do_wire_part=False, do_wire_strands=True)
 
         self.hide()

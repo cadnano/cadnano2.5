@@ -13,7 +13,7 @@ class GUITestApp(CNTestApp):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
         self.document = self.app.document()
-        self.app_window = self.document.appWindow()
+        self.app_window = self.app.cnmain_windows[0]
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True

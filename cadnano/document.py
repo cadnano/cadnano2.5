@@ -196,14 +196,14 @@ class Document(CNObject):
 
     def setActivePart(self, part: Part):
         self._active_part = part
-        if self._app_window:
-            self._app_window.toggleNewPartButtons(False)
+        # if self._app_window:
+        #     self._app_window.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
         self._active_part = None
-        if self._app_window:
-            self._app_window.toggleNewPartButtons(True)
+        # if self._app_window:
+        #     self._app_window.toggleNewPartButtons(True)
     # end def
 
     def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
@@ -755,7 +755,7 @@ class Document(CNObject):
 
         Args:
             use_undostack: optional, defaults to True
-            grid_type: optional default to HoneyComb
+            grid_type: optional default to GridEnum.NONE
 
         Returns
             new :obj:`NucleicAcidPart`
@@ -1022,16 +1022,6 @@ class Document(CNObject):
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
     # end def
-
-    def setSliceOrGridViewVisible(self, view_type: EnumType):
-        """Set the current SliceView type
-
-        Args:
-            view_type: enum from the ``OrthoViewEnum``
-        """
-        if self.appWindow():
-            self.appWindow().setSliceOrGridViewVisible(view_type)
-#    # end def
 
     def getGridType(self) -> EnumType:
         """Get the current Grid type

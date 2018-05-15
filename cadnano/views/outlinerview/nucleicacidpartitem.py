@@ -94,6 +94,10 @@ class OutlineNucleicAcidPartItem(CNOutlinerItem, AbstractPartItem):
         self._controller.disconnectSignals()
         self._cn_model = None
         self._controller = None
+
+        # NOTE: This is here to make sure it lives in a view.
+        # only exists in outliner view.
+        self._viewroot.window().toggleNewPartButtons(True)
     # end def
 
     def partOligoAddedSlot(self, part: NucleicAcidPartT, oligo: OligoT):
