@@ -23,7 +23,7 @@ class DocumentController(object):
         self.self_signals = []
 
         # call other init methods
-        app().document_controllers.add(self)
+        # app().document_controllers.add(self)
     # end def
 
     def connectSignals(self):

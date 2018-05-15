@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 from collections import namedtuple
 from typing import (
     List,
@@ -70,8 +71,10 @@ from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
 from cadnano.views.abstractitems import AbstractTool
 from cadnano.cntypes import (
     DocT,
+    WindowT,
     DocCtrlT,
-    GraphicsViewT
+    GraphicsViewT,
+    NucleicAcidPartT
 )
 
 IS_TESTING = True
@@ -100,7 +103,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def __init__(self, document: DocT, parent=None):
         super(DocumentWindow, self).__init__(parent)
         self._document: DocT = document
-        self.controller: DocumentController = DocumentController(self, document)
+        # self.controller: DocumentController = DocumentController(self, document)
         self.setupUi(self)
         self.docwin_signal_and_slots: List[Tuple] = []
         self.defineWindowSignals()
@@ -131,18 +134,18 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         # Outliner & PropertyEditor setup
         outliner_widget = self.outliner_widget
-        outliner_widget.configure(window=self, document=doc)
+        outliner_widget.configure(window=self, document=document)
         property_widget = self.property_widget
-        property_widget.configure(window=self, document=doc)
+        property_widget.configure(window=self, document=document)
 
         self.property_buttonbox.setVisible(False)
 
-        self.tool_managers = None  # initialize
+        self.tool_managers = []  # initialize
 
         self.views = {}
-        self.views[ViewSendEnum.SLICE] = self._initSliceview(doc)
-        self.views[ViewSendEnum.GRID]  = self._initGridview(doc)
-        self.views[ViewSendEnum.PATH]  = self._initPathview(doc)
+        self.views[ViewSendEnum.SLICE] = self._initSliceview(document)
+        self.views[ViewSendEnum.GRID]  = self._initGridview(document)
+        self.views[ViewSendEnum.PATH]  = self._initPathview(document)
 
         self._initPathviewToolbar()
         self._initEditMenu()
@@ -160,9 +163,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self._restoreGeometryandState()
         self._finishInit()
 
-        doc.setViewNames(['slice', 'path', 'inspector'])
+        document.setViewNames(['slice', 'path', 'inspector'])
 
-        app().documentWindowWasCreatedSignal.emit(self._document, self)
+        app().documentWindowWasCreatedSignal.emit(document, self)
 
         # Set Default Filter
         if DEFAULT_VHELIX_FILTER:
@@ -231,11 +234,11 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         self.settings.endGroup()
         for mgr in self.tool_managers:
             mgr.destroyItem()
-        self.controller = None
+        self.tool_managers = []
 
     ### ACCESSORS ###
     def undoStack(self) -> UndoStack:
-        return self.controller.undoStack()
+        return self._document.undoStack()
 
     def activateSelection(self, is_active: bool):
         self.path_graphics_view.activateSelection(is_active)
@@ -245,7 +248,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     ### EVENT HANDLERS ###
     def focusInEvent(self):
         """Handle an OS focus change into cadnano."""
-        app().undoGroup.setActiveStack(self.controller.undoStack())
+        app().undoGroup.setActiveStack(self.undoStack())
 
     def moveEvent(self, event: QMoveEvent):
         """Handle the moving of the cadnano window itself.
@@ -446,7 +449,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def _initEditMenu(self):
         """Initializes the Edit menu
         """
-        us = self.controller.undoStack()
+        us = self.undoStack()
         qatrans = QApplication.translate
 
         action_undo = us.createUndoAction(self)
@@ -520,24 +523,22 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     ##### SLOTS
     def actionSpecialSlot(self):
-        self.win.doMouseViewDestroy()
+        self.doMouseViewDestroy()
     # end def
 
     def actionSelectForkSlot(self):
-        win = self.win
-        win.action_path_select.trigger()
-        win.action_vhelix_select.trigger()
+        self.action_path_select.trigger()
+        self.action_vhelix_select.trigger()
     # end def
 
     def actionCreateForkSlot(self):
         self._document.clearAllSelected()
-        win = self.win
-        win.action_vhelix_create.trigger()
-        win.action_path_create.trigger()
+        self.action_vhelix_create.trigger()
+        self.action_path_create.trigger()
     # end def
 
     def actionVhelixSnapSlot(self, state: bool):
-        for item in self.win.sliceroot.instance_items.values():
+        for item in self.sliceroot.instance_items.values():
             item.griditem.allow_snap = state
     # end def
 
@@ -546,8 +547,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         Use this when clearing out undostack to set the modified status of
         the document
         '''
-        self.win.setWindowModified(not self.undoStack().isClean())
-        self.win.setWindowTitle(self.documentTitle())
+        self.setWindowModified(not self.undoStack().isClean())
+        self.setWindowTitle(self.documentTitle())
     # end def
 
     def actionAboutSlot(self):
@@ -609,11 +610,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def actionFilterVirtualHelixSlot(self):
         '''Disables all other selection filters when active.'''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         fH.setChecked(True)
         if fE.isChecked():
             fE.setChecked(False)
@@ -629,11 +629,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fS.isChecked() and not fX.isChecked():
@@ -646,11 +645,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fX.isChecked():
@@ -662,11 +660,10 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fS.isChecked():
@@ -676,80 +673,77 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
     def actionFilterScafSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_scaf = self.win.action_filter_scaf
-        f_stap = self.win.action_filter_stap
+        f_scaf = self.action_filter_scaf
+        f_stap = self.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_scaf.setChecked(True)
         self._strandFilterUpdate()
 
     def actionFilterStapSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_scaf = self.win.action_filter_scaf
-        f_stap = self.win.action_filter_stap
+        f_scaf = self.action_filter_scaf
+        f_stap = self.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_stap.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
     def actionCopySlot(self):
-        win = self.win
-        select_tool = win.getMouseViewTool('select')
+        select_tool = self.getMouseViewTool('select')
         if select_tool is not None and hasattr(select_tool, 'copySelection'):
             print("select_tool is rolling")
             select_tool.copySelection()
     # end def
 
     def actionPasteSlot(self):
-        win = self.win
-        select_tool = win.getMouseViewTool('select')
+        select_tool = self.getMouseViewTool('select')
         if select_tool is not None and hasattr(select_tool, 'pasteClipboard'):
             select_tool.pasteClipboard()
     # end def
 
     def actionFilterFwdSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_fwd = self.win.action_filter_fwd
-        f_rev = self.win.action_filter_rev
+        f_fwd = self.action_filter_fwd
+        f_rev = self.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
             f_fwd.setChecked(True)
         self._strandFilterUpdate()
 
     def actionFilterRevSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_fwd = self.win.action_filter_fwd
-        f_rev = self.win.action_filter_rev
+        f_fwd = self.action_filter_fwd
+        f_rev = self.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
             f_rev.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
     def _strandFilterUpdate(self):
-        win = self.win
-        if win.action_filter_helix.isChecked():
+        if self.action_filter_helix.isChecked():
             self._document.setFilterSet(["virtual_helix"])
             return
 
         filter_list = []
         add_oligo = False
-        if win.action_filter_endpoint.isChecked():
+        if self.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
             add_oligo = True
-        if win.action_filter_strand.isChecked():
+        if self.action_filter_strand.isChecked():
             filter_list.append("strand")
             add_oligo = True
-        if win.action_filter_xover.isChecked():
+        if self.action_filter_xover.isChecked():
             filter_list.append("xover")
             add_oligo = True
-        if win.action_filter_fwd.isChecked():
+        if self.action_filter_fwd.isChecked():
             filter_list.append("forward")
             add_oligo = True
-        if win.action_filter_rev.isChecked():
+        if self.action_filter_rev.isChecked():
             filter_list.append("reverse")
             add_oligo = True
-        if win.action_filter_scaf.isChecked():
+        if self.action_filter_scaf.isChecked():
             filter_list.append("scaffold")
             add_oligo = True
-        if win.action_filter_stap.isChecked():
+        if self.action_filter_stap.isChecked():
             filter_list.append("staple")
             add_oligo = True
         if add_oligo:
@@ -821,7 +815,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         else:
             directory = QFileInfo(fname).path()
 
-        fdialog = QFileDialog(self.win,
+        fdialog = QFileDialog(self,
                               "%s - Save As" % QApplication.applicationName(),
                               directory,
                               "%s (*.svg)" % QApplication.applicationName())
@@ -861,17 +855,17 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         # Render through scene
         # painter.begin(generator)
-        # self.win.pathscene.render(painter)
+        # self.pathscene.render(painter)
         # painter.end()
 
         # Render item-by-item
         painter = QPainter()
         style_option = QStyleOptionGraphicsItem()
-        q = [self.win.pathroot]
+        q = [self.pathroot]
         painter.begin(generator)
         while q:
             graphics_item = q.pop()
-            transform = graphics_item.itemTransform(self.win.sliceroot)[0]
+            transform = graphics_item.itemTransform(self.sliceroot)[0]
             painter.setTransform(transform)
             if graphics_item.isVisible():
                 graphics_item.paint(painter, style_option, None)
@@ -913,14 +907,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(self.win,
+            fname = QFileDialog.getSaveFileName(self,
                                                 "%s - Export As" % QApplication.applicationName(),
                                                 directory,
                                                 "(*.txt)")
             self.saveStaplesDialog = None
             self.exportStaplesCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "%s - Export As" % QApplication.applicationName(),
                                   directory,
                                   "(*.txt)")
@@ -981,11 +975,9 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         If either the slice or grid view are visible hide them.  Else, revert
         to showing whichever view(s) are showing.
         '''
-
-        win = self.win
-        if win.action_slice.isChecked():
-        # if not (win.slice_dock_widget.isVisible() or win.grid_dock_widget.isVisible()):
-            win.action_slice.setChecked(True)
+        if self.action_slice.isChecked():
+        # if not (self.slice_dock_widget.isVisible() or self.grid_dock_widget.isVisible()):
+            self.action_slice.setChecked(True)
             if self.slice_view_showing:
                 self.toggleSliceView(True)
                 self.toggleGridView(False)
@@ -993,14 +985,14 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                 self.toggleGridView(True)
                 self.toggleSliceView(False)
         else:
-            win.action_slice.setChecked(False)
+            self.action_slice.setChecked(False)
             self.toggleSliceView(False)
             self.toggleGridView(False)
 
     # end def
 
     def actionTogglePathViewSlot(self):
-        dock_window = self.win.path_dock_widget
+        dock_window = self.path_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
         else:
@@ -1008,7 +1000,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     # end def
 
     def actionToggleInspectorViewSlot(self):
-        dock_window = self.win.inspector_dock_widget
+        dock_window = self.inspector_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
         else:
@@ -1021,8 +1013,8 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         Args:
             is_enabled: Whether the slice view should be hidden or shown
         '''
-        self.win.action_new_dnapart_honeycomb.setEnabled(is_enabled)
-        self.win.action_new_dnapart_square.setEnabled(is_enabled)
+        self.action_new_dnapart_honeycomb.setEnabled(is_enabled)
+        self.action_new_dnapart_square.setEnabled(is_enabled)
     # end def
 
     def setSliceOrGridViewVisible(self, view_type: EnumType):
@@ -1054,13 +1046,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         '''
         assert isinstance(show, bool)
 
-        slice_view_widget = self.win.slice_dock_widget
-        path_view_widget = self.win.path_dock_widget
-        views = self.win.views
+        slice_view_widget = self.slice_dock_widget
+        path_view_widget = self.path_dock_widget
+        views = self.views
         sgv = views[ViewSendEnum.SLICE]
         if show:
-            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
-            # self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
+            self.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
+            # self.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
             slice_view_widget.show()
             sgv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
@@ -1077,13 +1069,13 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             show: Whether the grid view should be hidden or shown
         '''
         assert isinstance(show, bool)
-        grid_view_widget = self.win.grid_dock_widget
-        path_view_widget = self.win.path_dock_widget
-        views = self.win.views
+        grid_view_widget = self.grid_dock_widget
+        path_view_widget = self.path_dock_widget
+        views = self.views
         ggv = views[ViewSendEnum.GRID]
         if show:
-            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
-            # self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
+            self.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
+            # self.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
             grid_view_widget.show()
             ggv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
@@ -1093,10 +1085,6 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     ### ACCESSORS ###
     def document(self) -> DocT:
         return self._document
-    # end def
-
-    def window(self) -> WindowT:
-        return self.win
     # end def
 
     def setDocument(self, doc: DocT):
@@ -1121,7 +1109,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             setReopen(True)
         self._document.makeNew()
         self._has_no_associated_file = fname is None
-        self.win.setWindowTitle(self.documentTitle() + '[*]')
+        self.setWindowTitle(self.documentTitle() + '[*]')
     # end def
 
     def saveFileDialog(self):
@@ -1131,7 +1119,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(self.win,
+            fname = QFileDialog.getSaveFileName(self,
                                                 "%s - Save As" % QApplication.applicationName(),
                                                 directory,
                                                 "%s (*.json)" % QApplication.applicationName())
@@ -1139,7 +1127,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                 fname = fname[0]
             self.writeDocumentToFile(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "%s - Save As" % QApplication.applicationName(),
                                   directory,
                                   "%s (*.json)" % QApplication.applicationName())
@@ -1234,23 +1222,22 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             return False
         self._writeFileOpenPath(os.path.dirname(fname))
 
-        win = self.win
-        win.path_graphics_view.setViewportUpdateOn(False)
-        win.slice_graphics_view.setViewportUpdateOn(False)
-        win.grid_graphics_view.setViewportUpdateOn(False)
+        self.path_graphics_view.setViewportUpdateOn(False)
+        self.slice_graphics_view.setViewportUpdateOn(False)
+        self.grid_graphics_view.setViewportUpdateOn(False)
 
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
         self._document.readFile(fname)
 
-        win.path_graphics_view.setViewportUpdateOn(True)
-        win.slice_graphics_view.setViewportUpdateOn(True)
-        win.grid_graphics_view.setViewportUpdateOn(True)
+        self.path_graphics_view.setViewportUpdateOn(True)
+        self.slice_graphics_view.setViewportUpdateOn(True)
+        self.grid_graphics_view.setViewportUpdateOn(True)
 
-        win.path_graphics_view.update()
-        win.slice_graphics_view.update()
-        win.grid_graphics_view.update()
+        self.path_graphics_view.update()
+        self.slice_graphics_view.update()
+        self.grid_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
@@ -1281,13 +1268,12 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             the_app = app()
             # self.destroyDC()
             self.destroyWin()
-            if the_app.document_controllers:
+            if the_app.document_windows:
                 the_app.destroyApp()
 
     ### EVENT HANDLERS ###
     def windowCloseEventHandler(self, event: QCloseEvent = None):
         '''Intercept close events when user attempts to close the window.'''
-        win = self.win
         dialog_result = self.promptSaveDialog(exit_when_done=True)
         if dialog_result == SAVE_DIALOG_OPTIONS['DISCARD']:
             if event is not None:
@@ -1295,7 +1281,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             the_app = app()
             # self.destroyDC()
             self.destroyWin()
-            if the_app.document_controllers:
+            if the_app.document_windows:
                 the_app.destroyApp()
         elif event is not None:
             event.ignore()
@@ -1316,7 +1302,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             return True
         self._document.setFileName(proposed_fname)
         self._has_no_associated_file = False
-        self.win.setWindowTitle(self.documentTitle())
+        self.setWindowTitle(self.documentTitle())
         return True
 
     def openAfterMaybeSave(self):
@@ -1332,7 +1318,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             self.filesavedialog = None
             self.openAfterMaybeSaveCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "Open Document",
                                   path,
                                   "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
@@ -1359,7 +1345,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             savebox = QMessageBox(QMessageBox.Warning, "Application",
                                   "The document has been modified.\nDo you want to save your changes?",
                                   QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                                  self.win,
+                                  self,
                                   Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet)
             savebox.setWindowModality(Qt.WindowModal)
             save = savebox.button(QMessageBox.Save)
@@ -1393,7 +1379,7 @@ class DocumentWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
                                    "cadnano",
                                    "Could not write to '%s'." % filename,
                                    QMessageBox.Ok,
-                                   self.win,
+                                   self,
                                    flags)
             errorbox.setWindowModality(Qt.WindowModal)
             errorbox.open()
