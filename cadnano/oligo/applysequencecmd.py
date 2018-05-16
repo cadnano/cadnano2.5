@@ -14,19 +14,19 @@ class ApplySequenceCommand(UndoCommand):
 
     def redo(self):
         olg = self._oligo
-        n_s = ''.join(self._new_sequence) if self._new_sequence else None
+        n_s = None if self._new_sequence is None else ''.join(self._new_sequence)
         n_s_original = self._new_sequence
         oligo_list = [olg]
         for strand in olg.strand5p().generator3pStrand():
             used_seq, n_s = strand.setSequence(n_s)
             # get the compliment ahead of time
-            used_seq = util.comp(used_seq) if used_seq else None
+            used_seq = None if used_seq is None else util.comp(used_seq)
             for comp_strand in strand.getComplementStrands():
                 comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())
             # end for
             # as long as the new Applied Sequence is not None
-            if n_s is None and n_s_original:
+            if n_s is None and n_s_original is not None:
                 break
         # end for
         for oligo in oligo_list:
@@ -35,7 +35,7 @@ class ApplySequenceCommand(UndoCommand):
 
     def undo(self):
         olg = self._oligo
-        o_s = ''.join(self._old_sequence) if self._old_sequence else None
+        o_s = None if self._old_sequence is None else ''.join(self._old_sequence)
 
         oligo_list = [olg]
 
@@ -43,7 +43,7 @@ class ApplySequenceCommand(UndoCommand):
             used_seq, o_s = strand.setSequence(o_s)
 
             # get the compliment ahead of time
-            used_seq = util.comp(used_seq) if used_seq else None
+            used_seq = None if used_seq is None else util.comp(used_seq)
             for comp_strand in strand.getComplementStrands():
                 comp_strand.setComplementSequence(used_seq, strand)
                 oligo_list.append(comp_strand.oligo())

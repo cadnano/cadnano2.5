@@ -824,7 +824,11 @@ class Strand(CNObject):
                     use_undostack: bool = True,
                     update_segments: bool = True):
         cmds = []
+
+        # Delete sequences and remove inserations upon resize
+        cmds.append(self.oligo().applySequenceCMD(None))
         cmds += self.getRemoveInsertionCommands(new_idxs)
+
         cmds.append(ResizeCommand(self, new_idxs, update_segments=update_segments))
         util.execCommandList(self, cmds, desc="Resize strand",
                              use_undostack=use_undostack)
