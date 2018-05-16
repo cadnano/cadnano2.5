@@ -40,7 +40,7 @@ from cadnano.cntypes import (
 proxyConfigure('PyQt')
 decodeFile = None
 Document = None
-DocumentController = None
+CNMainWindow = None
 
 LOCAL_DIR = os.path.dirname(os.path.realpath(__file__))
 ICON_DIR = os.path.join(LOCAL_DIR, 'gui', 'mainwindow', 'images')
@@ -86,7 +86,7 @@ class CadnanoQt(QObject):
         icon.addFile(ICON_PATH3, QSize(48, 48))
         self.qApp.setWindowIcon(icon)
         self.main_event_loop = None
-        self.document_controllers = set()  # Open documents
+        self.cnmain_windows: set = set()  # Open documents
         self.active_document = None
         self._document = None
         self.documentWasCreatedSignal.connect(self.wirePrefsSlot)
@@ -99,10 +99,10 @@ class CadnanoQt(QObject):
     def finishInit(self):
         global decodeFile
         global Document
-        global DocumentController
+        global CNMainWindow
         from cadnano.document import Document
         from cadnano.fileio.decode import decodeFile
-        from cadnano.controllers.documentcontroller import DocumentController
+        from cadnano.views.cnmainwindow import CNMainWindow
         from cadnano.views.pathview import pathstyles as styles
 
         styles.setFontMetrics()
@@ -128,14 +128,14 @@ class CadnanoQt(QObject):
         """
         global decodeFile
         global Document
-        global DocumentController
+        global CNMainWindow
         # print("documentWasCreatedSignal", self.documentWasCreatedSignal)
-        if self.document_controllers:
+        if len(self.cnmain_windows) > 0:
             self.documentWasCreatedSignal.disconnect(self.wirePrefsSlot)
         decodeFile = None
         Document = None
-        DocumentController = None
-        self.document_controllers.clear()
+        CNMainWindow = None
+        self.cnmain_windows.clear()
         self.qApp.quit()
     # end def
 
@@ -143,28 +143,30 @@ class CadnanoQt(QObject):
         return os.environ.get('CADNANO_IGNORE_ENV_VARS_EXCEPT_FOR_ME', False)
 
     def createDocument(self, base_doc: DocT = None):
-        global DocumentController
+        global CNMainWindow
         # print("CadnanoQt createDocument begin")
         default_file = self.argns.file or os.environ.get('CADNANO_DEFAULT_DOCUMENT', None)
         if default_file is not None and base_doc is not None:
             default_file = os.path.expanduser(default_file)
             default_file = os.path.expandvars(default_file)
-            dc = DocumentController(base_doc)
+            dw = CNMainWindow(base_doc)
+            self.cnmain_windows.add(dw)
             # logger.info("Loading cadnano file %s to base document %s", default_file, base_doc)
             decodeFile(default_file, document=base_doc)
-            dc.setFileName(default_file)
+            dw.setFileName(default_file)
             print("Loaded default document: %s" % (default_file))
         else:
-            doc_ctrlr_count = len(self.document_controllers)
+            doc_window_count = len(self.cnmain_windows)
             # logger.info("Creating new empty document...")
-            if doc_ctrlr_count == 0:  # first dc
-                # dc adds itself to app.document_controllers
-                dc = DocumentController(base_doc)
-            elif doc_ctrlr_count == 1:  # dc already exists
-                dc = list(self.document_controllers)[0]
-                dc.newDocument()  # tell it to make a new doucment
+            if doc_window_count == 0:  # first dw
+                # dw adds itself to app.cnmain_windows
+                dw = CNMainWindow(base_doc)
+                self.cnmain_windows.add(dw)
+            elif doc_window_count == 1:  # dw already exists
+                dw = list(self.cnmain_windows)[0]
+                dw.newDocument()  # tell it to make a new doucment
         # print("CadnanoQt createDocument done")
-        return dc.document()
+        return dw.document()
 
     def prefsClicked(self):
         self.prefs.showDialog()

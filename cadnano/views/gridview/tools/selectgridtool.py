@@ -89,7 +89,7 @@ class SelectGridTool(AbstractGridTool):
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
         self.part_item = None
-        self.group = GridSelectionGroup(self, parent=None)
+        self.group = GridSelectionGroup(self, parent=self)
         self.group.hide()
         self.is_selection_active = False
         self.individual_pick = False
@@ -545,14 +545,15 @@ class GridSelectionGroup(QGraphicsItemGroup):
         """
         bri = self.bounding_rect_item
         bri.hide()
-        self.removeFromGroup(bri)
+        if bri.group() == self:
+            self.removeFromGroup(bri)
 
-        # Need to reparent move back to 0,0
-        bri.setParentItem(self.tool)
-        temp_pt = QPointF(0, 0)
-        bri.setPos(temp_pt)
+            # Need to reparent move back to 0,0
+            bri.setParentItem(self.tool)
+            temp_pt = QPointF(0, 0)
+            bri.setPos(temp_pt)
 
-        self.setFocus(False)
+            self.setFocus(False)
     # end def
 
     def keyPressEvent(self, event: QKeyEvent):

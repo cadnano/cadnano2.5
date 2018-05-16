@@ -256,7 +256,7 @@ class PropertyEditorWidget(QTreeWidget):
     def window(self) -> WindowT:
         """
         Returns:
-            model :class:`DocumentWindow`
+            model :class:`CNMainWindow`
         """
         return self._window
     # end def

@@ -62,12 +62,16 @@ def decode(document: DocT, obj: dict, emit_signals: bool = True):
     if lattice_type == LatticeEnum.HONEYCOMB:
         doLattice = HoneycombDnaPart.latticeCoordToModelXY
         isEven = HoneycombDnaPart.isEvenParity
+        grid_type = GridEnum.HONEYCOMB
     elif lattice_type == LatticeEnum.SQUARE:
         doLattice = SquareDnaPart.latticeCoordToModelXY
         isEven = SquareDnaPart.isEvenParity
+        grid_type = GridEnum.SQUARE
     else:
         raise TypeError("Lattice type not recognized")
-    part = document.createNucleicAcidPart(use_undostack=False)
+    part = document.createNucleicAcidPart(  use_undostack=False,
+                                            is_lattice=True,
+                                            grid_type=grid_type)
     part.setActive(True)
     setBatch(True)
     # POPULATE VIRTUAL HELICES

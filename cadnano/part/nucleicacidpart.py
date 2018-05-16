@@ -158,17 +158,29 @@ class NucleicAcidPart(Part):
         return NucleicAcidPart.__count
 
     def __init__(self, *args, **kwargs):
+        '''
+        Args:
+            document
+            uuid: str
+            do_copy
+            grid_type
+            is_lattice
+        '''
         super(NucleicAcidPart, self).__init__(*args, **kwargs)
-        do_copy = kwargs.get('do_copy', False)
-        grid_type = kwargs.get('grid_type', GridEnum.NONE)
+        do_copy: bool = kwargs.get('do_copy', False)
+        grid_type: EnumType = kwargs.get('grid_type', GridEnum.NONE)
+        is_lattice: EnumType = kwargs.get('is_lattice', True)
+
         if do_copy:
             return
 
         self._radius = DEFAULT_RADIUS     # probably a property???
         self._insertions = defaultdict(dict)  # dict of insertions per virtualhelix
-        self._mods = {'int_instances': {},
-                      'ext_instances': {}}
-        self._oligos = set()
+        self._mods: Dict[str, dict] = {
+            'int_instances': {},
+            'ext_instances': {}
+        }
+        self._oligos: Set[OligoT] = set()
 
         # Helix parameters
         if grid_type in (GridEnum.HONEYCOMB, GridEnum.NONE):
@@ -186,11 +198,11 @@ class NucleicAcidPart(Part):
         self._BASE_WIDTH = 0.34  # nanometers, distance between bases, pith
 
         # Runtime state
-        self._active_base_index = self._STEP_SIZE
-        self._active_id_num = None
+        self._active_base_index: int = self._STEP_SIZE
+        self._active_id_num: int = None
         self.active_base_info: ABInfoT = ()
-        self._selected = False
-        self.is_active = False
+        self._selected: bool = False
+        self.is_active: bool = False
 
         self._abstract_segment_id = None
         self._current_base_count = None
@@ -204,14 +216,14 @@ class NucleicAcidPart(Part):
         gps['neighbor_active_angle'] = ''
         gps['grid_type'] = grid_type
         gps['virtual_helix_order'] = []
-        gps['point_type'] = kwargs.get('point_type', PointEnum.Z_ONLY)
+        gps['is_lattice'] = is_lattice
 
         ############################
         # Begin low level attributes
         ############################
 
         # 1. per virtual base pair allocations
-        self.total_points = 0
+        self.total_points: int = 0
         self.axis_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
         # self.axis_pts[:, 2] = 0.0
         self.fwd_pts = np.full((DEFAULT_FULL_SIZE, 3), np.inf, dtype=float)
@@ -220,24 +232,24 @@ class NucleicAcidPart(Part):
         self.indices = np.zeros((DEFAULT_FULL_SIZE,), dtype=int)
 
         # 2. per virtual helix allocations
-        self.total_id_nums = 0  # should be equal to len(self.reserved_ids)
+        self.total_id_nums: int = 0  # should be equal to len(self.reserved_ids)
 
         self._origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
         """For doing 2D X,Y manipulation for now.  keep track of
         XY position of virtual helices
         """
 
-        self.origin_limits = (0., 0., 0., 0.)
+        self.origin_limits: RectT = (0., 0., 0., 0.)
 
         self.directions = np.zeros((DEFAULT_SIZE, 3), dtype=float)
 
-        self._offset_and_size = [None] * DEFAULT_SIZE
+        self._offset_and_size: List[Union[None, Tuple[int, int]]] = [None] * DEFAULT_SIZE
         """Bookkeeping for fast lookup of indices for insertions and deletions
         and coordinate points. The length of this is the max id_num used.
         """
-        self._virtual_helices_set = {}
+        self._virtual_helices_dict: Dict[int, VirtualHelix] = {}
 
-        self.reserved_ids = set()
+        self.reserved_ids: Set[int] = set()
 
         self.vh_properties = _defaultDataFrame(DEFAULT_SIZE)
 
@@ -262,12 +274,12 @@ class NucleicAcidPart(Part):
         self.delta3D_scratch = np.empty((1,), dtype=float)
 
         # ID assignment
-        self.recycle_bin = {
+        self.recycle_bin: Dict[int, List] = {
             0: [],
             1: []
         }
-        self._highest_even_id_num_used = -2
-        self._highest_odd_id_num_used = -1
+        self._highest_even_id_num_used: int = -2
+        self._highest_odd_id_num_used: int = -1
     # end def
 
     # B. Virtual Helix
@@ -418,12 +430,11 @@ class NucleicAcidPart(Part):
         Returns:
             ``VirtualHelix`` with that ``id_num``
         """
-        return self._virtual_helices_set[id_num]
+        return self._virtual_helices_dict[id_num]
     # end def
 
     def _getNewIdNum(self, parity: int = None) -> int:
-        """
-        Return the lowest id_num that is both currently available and that is
+        """Return the lowest id_num that is both currently available and that is
         even or odd according to parity (if specified).
 
         This method only returns an ID number; it does not take the ID number
@@ -495,9 +506,9 @@ class NucleicAcidPart(Part):
         # assert not num in self._number_to_virtual_helix
         if num in self.recycle_bin.get(parity):
             # print("reserved", num)
-            self.recycle_bin.get(parity, {}).remove(num)
+            self.recycle_bin.get(parity, []).remove(num)
             # rebuild the heap since we removed a specific item
-            heapify(self.recycle_bin.get(parity, {}))
+            heapify(self.recycle_bin.get(parity, []))
         if parity == 0 and self._highest_even_id_num_used < num:
             self._highest_even_id_num_used = num
         elif parity == 1 and self._highest_odd_id_num_used < num:
@@ -1190,7 +1201,7 @@ class NucleicAcidPart(Part):
         points = self._pointsFromDirection(id_num, origin, direction, num_points, 0)
         self._addCoordinates(id_num, points, is_right=False)
         self._group_properties['virtual_helix_order'].append(id_num)
-        self._virtual_helices_set[id_num] = vh = VirtualHelix(id_num, self)
+        self._virtual_helices_dict[id_num] = vh = VirtualHelix(id_num, self)
         return vh
     # end def
 
@@ -1547,7 +1558,7 @@ class NucleicAcidPart(Part):
         # TODO if making 'virtual_helix_order' an instance property,
         # this needs to be changed
         self._group_properties['virtual_helix_order'].remove(id_num)
-        del self._virtual_helices_set[id_num]
+        del self._virtual_helices_dict[id_num]
     # end def
 
     def resetCoordinates(self, id_num: int):
@@ -2383,7 +2394,7 @@ class NucleicAcidPart(Part):
         Returns:
             ``True`` or ``False``
         """
-        return self._group_properties['point_type'] == PointEnum.Z_ONLY
+        return self._group_properties['is_lattice'] == True
     # end def
 
     def getVirtualHelicesInArea(self, rect: RectT) -> Set[int]:
@@ -3095,7 +3106,7 @@ class NucleicAcidPart(Part):
                                     zoom_to_fit: bool = False):
         if use_undostack:
             self.undoStack().beginMacro("Resize all VHs")
-        for id_num in self._virtual_helices_set:
+        for id_num in self._virtual_helices_dict.keys():
             _, size = self.getOffsetAndSize(id_num)
             if size != new_size:
                 self.setVirtualHelixSize(id_num, new_size, use_undostack, zoom_to_fit)

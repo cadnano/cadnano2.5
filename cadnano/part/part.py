@@ -39,6 +39,10 @@ class Part(CNObject):
         """Sets the parent document, sets bounds for part dimensions, and sets up
         bookkeeping for partInstances, Oligos, VirtualHelix's, and helix ID
         number assignment.
+
+        Args:
+            document
+            uuid: str
         """
         self._document = document = kwargs.get('document', None)
         super(Part, self).__init__(document)
@@ -51,7 +55,7 @@ class Part(CNObject):
                                   'is_visible': True
                                   }
 
-        self.uuid = kwargs['uuid'] if 'uuid' in kwargs else uuid4().hex
+        self.uuid: str = kwargs['uuid'] if 'uuid' in kwargs else uuid4().hex
 
         # Selections
         self._selections = {}

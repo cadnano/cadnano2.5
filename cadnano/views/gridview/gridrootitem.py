@@ -23,7 +23,7 @@ from cadnano.cntypes import (
 
 class GridRootItem(QGraphicsRectItem):
     """``GridRootItem`` is the root item in the GridView. It gets added directly
-    to the path ``QGraphicsScene`` by ``DocumentWindow``.
+    to the path ``QGraphicsScene`` by ``CNMainWindow``.
     It receives two signals::
 
         ``partAddedSignal`` and ``selectedPartChangedSignal``
@@ -50,7 +50,7 @@ class GridRootItem(QGraphicsRectItem):
         Args:
             rect: Rectangle of this item
             parent: parent object
-            window: DocumentWindow
+            window: CNMainWindow
             document: Document
         """
         super(GridRootItem, self).__init__(rect, parent)
@@ -149,7 +149,7 @@ class GridRootItem(QGraphicsRectItem):
     def window(self) -> WindowT:
         """
         Returns:
-            the :class:`DocumentWindow`
+            the :class:`CNMainWindow`
         """
         return self._window
     # end def

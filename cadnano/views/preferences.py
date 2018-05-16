@@ -6,6 +6,9 @@ from PyQt5.QtWidgets import (
 )
 
 from cadnano.gui.dialogs.ui_preferences import Ui_Preferences
+from cadnano import (
+    app
+)
 from cadnano.proxies.cnenum import (
     OrthoViewEnum,
     EnumType
@@ -137,8 +140,10 @@ class Preferences(object):
         self.qs.setValue(ORTHOVIEW_KEY, new_orthoview_style_idx)
         self.qs.endGroup()
 
-        controller = self.document.controller()
-        controller.setSliceOrGridViewVisible(self.orthoview_style_idx)
+        the_app = app()
+        if len(the_app.cnmain_windows) > 0:
+            app_window = the_app.cnmain_windows[0]
+            app_window.setSliceOrGridViewVisible(self.orthoview_style_idx)
     # end def
 
     def setShowIconLabels(self, value):

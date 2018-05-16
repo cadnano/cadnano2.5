@@ -1,52 +1,85 @@
 # -*- coding: utf-8 -*-
 import os
+from collections import namedtuple
 from typing import (
+    List,
+    Tuple,
     Union
 )
+from types import MethodType
 
 from PyQt5.QtCore import (
-                            QDir,
-                            QFileInfo,
-                            QRect,
-                            QSettings,
-                            QSize,
-                            Qt,
-                            QCoreApplication
+    Qt,
+    QCoreApplication,
+    QDir,
+    QEvent,
+    QFileInfo,
+    QPoint,
+    QRect,
+    QSettings,
+    QSize,
+    pyqtBoundSignal
 )
 _translate = QCoreApplication.translate
-
+from PyQt5.QtGui import (
+    QMoveEvent,
+    QResizeEvent
+)
+from PyQt5.QtWidgets import (
+    QAction,
+    QActionGroup,
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QGraphicsItem,
+    QGraphicsScene,
+    QMessageBox,
+    QMainWindow,
+    QStyleOptionGraphicsItem,
+    QWidget
+)
 from PyQt5.QtGui import (
     QKeySequence,
     QPainter,
     QCloseEvent
 )
-
 from PyQt5.QtSvg import QSvgGenerator
-from PyQt5.QtWidgets import (
-                            QAction,
-                            QActionGroup,
-                            QApplication,
-                            QDialog,
-                            QFileDialog,
-                            QGraphicsItem,
-                            QMessageBox,
-                            QStyleOptionGraphicsItem
-)
 
+from cadnano import (
+    app,
+    setReopen,
+    util
+)
+from cadnano.views import styles
+from cadnano.fileio.v3encode import reEmitPart
 from cadnano.proxies.cnproxy import UndoStack
-from cadnano import app, setReopen, util
+from cadnano.gui.mainwindow import ui_mainwindow
+from cadnano.gui.dialogs.ui_about import Ui_About
 from cadnano.proxies.cnenum import (
+    EnumType,
     GridEnum,
     OrthoViewEnum,
+    PointEnum,
+    ViewReceiveEnum,
     ViewSendEnum,
-    EnumType
 )
-from cadnano.gui.dialogs.ui_about import Ui_About
-from cadnano.views import styles
-from cadnano.views.documentwindow import DocumentWindow
+from cadnano.views.gridview.gridrootitem import GridRootItem
+from cadnano.views.gridview.tools.gridtoolmanager import GridToolManager
+from cadnano.views.pathview.colorpanel import ColorPanel
+from cadnano.views.pathview.pathrootitem import PathRootItem
+from cadnano.views.pathview.tools.pathtoolmanager import PathToolManager
+from cadnano.views.sliceview.slicerootitem import SliceRootItem
+from cadnano.views.sliceview.tools.slicetoolmanager import SliceToolManager
+from cadnano.views.abstractitems import (
+    AbstractTool,
+    AbstractToolManager
+)
+
 from cadnano.cntypes import (
     DocT,
     WindowT,
+    DocCtrlT,
+    GraphicsViewT,
     NucleicAcidPartT
 )
 
@@ -59,61 +92,81 @@ SAVE_DIALOG_OPTIONS = {'SAVE': 0,
                        'DISCARD': 2
                        }
 
+# from PyQt5.QtOpenGL import QGLWidget
+# # check out https://github.com/baoboa/pyqt5/tree/master/examples/opengl
+# # for an example of the QOpenGlWidget added in Qt 5.4
 
-class DocumentController(object):
-    '''Connects UI buttons to their corresponding actions in the model.'''
+class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
+    """:class`CNMainWindow` subclasses :class`QMainWindow` and
+    :class`Ui_MainWindow`. It performs some initialization operations that
+    must be done in code rather than using Qt Creator.
 
+    Attributes:
+        _document
+    """
     filter_list = ["strand", "endpoint", "xover", "virtual_helix"]
-    '''list: String names of enabled filter types.'''
 
-    ### INIT METHODS ###
+    def __init__(self, document: DocT, parent=None):
+        super(CNMainWindow, self).__init__(parent)
+        self._document: DocT = document
+        document.setAppWindow(self)
+        self.setupUi(self)
+        self.docwin_signal_and_slots: List[Tuple[pyqtBoundSignal, MethodType]] = []
+        self.defineWindowSignals()
+        self.connectSelfSignals()
 
-    def __init__(self, document: DocT):
-        ''''''
-        # initialize variables
-        self._document = document
-        self._document.setController(self)
-        self._file_open_path = None  # will be set in _readSettings
-        self._has_no_associated_file = True
+        self.fileopendialog: QFileDialog = None
+        self.filesavedialog: QFileDialog = None
+        self._file_open_path: str = None  # will be set in _readSettings
+        self._has_no_associated_file: bool = True
 
-        self.win = None
-        self.fileopendialog = None
-        self.filesavedialog = None
-
-        self.settings = QSettings("cadnano.org", "cadnano2.5")
-        self.settings = QSettings("69bfae41ee5e33c689fded70c89cc64c", "69bfae41ee5e33c689fded70c89cc64c")
+        # self.settings = QSettings("cadnano.org", "cadnano2.5")
+        self.settings: QSettings = QSettings(   "69bfae41ee5e33c689fded70c89cc64c",
+                                                "69bfae41ee5e33c689fded70c89cc64c")
         self._readSettings()
 
-        self._hintable_tools = []  # filters that display alt icon when disabled
-        self._hintable_filters = []  # filters that display alt icon when disabled
-        self._hintable_tool_action_map = {}  # what buttons to hint for each filter
-        self._hintable_filter_action_map = {}  # what buttons to hint for each filter
-        self._tool_hints_visible = False
-        self._filter_hints_visible = False
+        self._tool_hints_visible:   bool = False
+        self._filter_hints_visible: bool = False
+        self.slice_view_showing:    bool = False
 
-        self.slice_view_showing = False
+        # Appearance pref
+        if not app().prefs.show_icon_labels:
+            self.main_toolbar.setToolButtonStyle(Qt.ToolButtonIconOnly)
 
-        self.self_signals = []
+        # Outliner & PropertyEditor setup
+        self.outliner_widget.configure(window=self, document=document)
+        self.property_widget.configure(window=self, document=document)
 
-        # call other init methods
+        self.property_buttonbox.setVisible(False)
 
-        self._initWindow()
-        app().document_controllers.add(self)
+        self.tool_managers: List[AbstractToolManager] = []  # initialize
 
-        self.exit_when_done = False
+        self.views: Dict[EnumType, GraphicsViewT] = {
+            # ViewSendEnum.SLICE: self._initSliceview(document)
+            # ViewSendEnum.GRID:  self._initGridview(document)
+            # ViewSendEnum.PATH:  self._initPathview(document)
+        }
+        self.views[ViewSendEnum.SLICE] = self._initSliceview(document)
+        self.views[ViewSendEnum.GRID] = self._initGridview(document)
+        self.views[ViewSendEnum.PATH] =  self._initPathview(document)
 
-    def _initWindow(self):
-        ''''''
-        self.win = win = DocumentWindow(doc_ctrlr=self)
-        app().documentWindowWasCreatedSignal.emit(self._document, win)
-        self._connectWindowSignalsToSelf()
-        win.show()
-        app().active_document = self
+        self._initToolbar()
+        self._initEditMenu()
 
-        # Connect outliner with property editor
-        o = win.outliner_widget
-        p_e = win.property_widget
-        o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
+        self.path_dock_widget.setTitleBarWidget(QWidget())
+        self.grid_dock_widget.setTitleBarWidget(QWidget())
+        self.slice_dock_widget.setTitleBarWidget(QWidget())
+        self.inspector_dock_widget.setTitleBarWidget(QWidget())
+
+        self.setCentralWidget(None)
+        if app().prefs.orthoview_style_idx == OrthoViewEnum.SLICE:
+            self.splitDockWidget(self.slice_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        elif app().prefs.orthoview_style_idx == OrthoViewEnum.GRID:
+            self.splitDockWidget(self.grid_dock_widget, self.path_dock_widget, Qt.Horizontal)
+        self._restoreGeometryandState()
+        self._finishInit()
+
+        document.setViewNames(['slice', 'path', 'inspector'])
 
         # Set Default Filter
         if DEFAULT_VHELIX_FILTER:
@@ -122,141 +175,384 @@ class DocumentController(object):
             self.actionFilterEndpointSlot()
             self.actionFilterXoverSlot()
 
-        # setup tool exclusivity
-        self.actiongroup = ag = QActionGroup(win)
-        action_group_list = ['action_global_select',
-                             'action_global_create',
-                             'action_path_break',
-                             'action_path_paint',
-                             'action_path_insertion',
-                             'action_path_skip',
-                             'action_path_add_seq',
-                             'action_path_mods']
+                # setup tool exclusivity
+        self.actiongroup: QActionGroup = QActionGroup(self)
+        ag = self.actiongroup
+        action_group_list: List[str] = [
+            'action_global_select',
+            'action_global_create',
+            'action_path_break',
+            'action_path_paint',
+            'action_path_insertion',
+            'action_path_skip',
+            'action_path_add_seq',
+            'action_path_mods'
+        ]
         for action_name in action_group_list:
-            ag.addAction(getattr(win, action_name))
+            ag.addAction(getattr(self, action_name))
 
         if IS_TESTING:
             # ADDED SPECIAL NC for testing with keyboard shortcut:
-            action_special = QAction(win)
+            action_special = QAction(self)
             action_special.setObjectName("action_special")
             action_special.setText(_translate("MainWindow", "Special"))
             action_special.setShortcut(_translate("MainWindow", "Ctrl+J"))
-            win.action_special = action_special
-            win.menu_edit.addAction(action_special)
+            self.action_special = action_special
+            self.menu_edit.addAction(action_special)
             action_special.triggered.connect(self.actionSpecialSlot)
 
         # set up tool & filter hinting
-        self._hintable_tools = [win.action_global_create,
-                                win.action_global_select]
-        self._hintable_filters = [win.action_filter_helix,
-                                  win.action_filter_strand,
-                                  win.action_filter_endpoint,
-                                  win.action_filter_xover]
-        self._hintable_tool_action_map = {'create': [win.action_global_create],
-                                          'select': [win.action_global_select]}
-
-        self._hintable_filter_action_map = {'virtual_helix': [win.action_filter_helix],
-                                            'strand': [win.action_filter_strand],
-                                            'endpoint': [win.action_filter_endpoint],
-                                            'xover': [win.action_filter_xover]}
-
-        win.action_global_select.trigger()
-        # self.win.inspector_dock_widget.hide()
-    # end def
-
-    def destroyDC(self):
-        self.disconnectSignalsToSelf()
-        if self.win is not None:
-            self.win.destroyWin()
-            self.win = None
-        self.settings = None
-    # end def
-
-    def disconnectSignalsToSelf(self):
-        win = self.win
-        if win is not None:
-            o = win.outliner_widget
-            p_e = win.property_widget
-            o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
-        for signal_obj, slot_method in self.self_signals:
-            signal_obj.disconnect(slot_method)
-        self.self_signals = []
-    # end def
-
-    def _connectWindowSignalsToSelf(self):
-        '''This method serves to group all the signal & slot connections
-        made by DocumentController'''
-        win = self.win
-        win.closeEvent = self.windowCloseEventHandler
-        self.self_signals = [
-            (win.action_new.triggered, self.actionNewSlot),
-            (win.action_open.triggered, self.actionOpenSlot),
-            (win.action_close.triggered, self.actionCloseSlot),
-            (win.action_save.triggered, self.actionSaveSlot),
-            (win.action_save_as.triggered, self.actionSaveAsSlot),
-            (win.action_SVG.triggered, self.actionSVGSlot),
-            (win.action_export_staples.triggered, self.actionExportSequencesSlot),
-            (win.action_preferences.triggered, self.actionPrefsSlot),
-            (win.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
-            (win.action_new_dnapart_honeycomb.triggered, lambda: win.action_global_create.trigger()),
-            (win.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
-            (win.action_new_dnapart_square.triggered, lambda: win.action_global_create.trigger()),
-            (win.action_about.triggered, self.actionAboutSlot),
-            (win.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
-            (win.action_feedback.triggered, self.actionFeedbackSlot),
-
-            # make it so select tool in slice view activation turns on vh filter
-            (win.action_global_select.triggered, self.actionSelectForkSlot),
-            (win.action_global_create.triggered, self.actionCreateForkSlot),
-
-            (win.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
-            (win.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
-            (win.action_filter_strand.triggered, self.actionFilterStrandSlot),
-            (win.action_filter_xover.triggered, self.actionFilterXoverSlot),
-            (win.action_filter_fwd.triggered, self.actionFilterFwdSlot),
-            (win.action_filter_rev.triggered, self.actionFilterRevSlot),
-            (win.action_filter_scaf.triggered, self.actionFilterScafSlot),
-            (win.action_filter_stap.triggered, self.actionFilterStapSlot),
-            (win.action_copy.triggered, self.actionCopySlot),
-            (win.action_paste.triggered, self.actionPasteSlot),
-
-            (win.action_inspector.triggered, self.actionToggleInspectorViewSlot),
-            (win.action_path.triggered, self.actionTogglePathViewSlot),
-            (win.action_slice.triggered, self.actionToggleSliceViewSlot),
-
-            (win.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
-
-            (win.action_vhelix_snap.triggered, self.actionVhelixSnapSlot)
+        # filters that display alt icon when disabled
+        self._hintable_tools: List[QAction] = [
+            self.action_global_create,
+            self.action_global_select
         ]
-        for signal_obj, slot_method in self.self_signals:
-            signal_obj.connect(slot_method)
+        self._hintable_filters: List[QAction] = [
+            self.action_filter_helix,
+            self.action_filter_strand,
+            self.action_filter_endpoint,
+            self.action_filter_xover
+        ]
+        # what buttons to hint for each filter
+        self._hintable_tool_action_map: Dict[str, QAction] = {
+            'create': [self.action_global_create],
+            'select': [self.action_global_select]
+        }
 
-        # NOTE ADDED NC TO GET PROPER SLICE VIEW BEHAVIOR checking of slice view
-        # box not preserved for some reason
-        win.action_slice.setChecked(True)
-        self.actionToggleSliceViewSlot()
+        self._hintable_filter_action_map: Dict[str, QAction] = {
+            'virtual_helix': [self.action_filter_helix],
+            'strand': [self.action_filter_strand],
+            'endpoint': [self.action_filter_endpoint],
+            'xover': [self.action_filter_xover]
+        }
+
+        self.action_global_select.trigger()
+        # self.inspector_dock_widget.hide()
+
+        self.exit_when_done: bool = False
+        self.closeEvent: MethodType = self.windowCloseEventHandler
+        self.show()
+        app().documentWindowWasCreatedSignal.emit(document, self)
     # end def
 
-    ### SLOTS ###
+    def document(self) -> DocT:
+        return self._document
+
+    def destroyWin(self):
+        '''Save window state and destroy the tool managers.  Also destroy
+        :class`DocumentController` object
+        '''
+        self.settings.beginGroup("MainWindow")
+        # Saves the current state of this mainwindow's toolbars and dockwidgets
+        self.settings.setValue("windowState", self.saveState())
+        self.settings.endGroup()
+        for mgr in self.tool_managers:
+            mgr.destroyItem()
+        self.tool_managers = []
+
+    ### ACCESSORS ###
+    def undoStack(self) -> UndoStack:
+        return self._document.undoStack()
+
+    def activateSelection(self, is_active: bool):
+        self.path_graphics_view.activateSelection(is_active)
+        self.slice_graphics_view.activateSelection(is_active)
+        self.grid_graphics_view.activateSelection(is_active)
+
+    ### EVENT HANDLERS ###
+    def focusInEvent(self):
+        """Handle an OS focus change into cadnano."""
+        app().undoGroup.setActiveStack(self.undoStack())
+
+    def moveEvent(self, event: QMoveEvent):
+        """Handle the moving of the cadnano window itself.
+
+        Reimplemented to save state on move.
+        """
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("pos", self.pos())
+        self.settings.endGroup()
+
+    def resizeEvent(self, event: QResizeEvent):
+        """Handle the resizing of the cadnano window itself.
+
+        Reimplemented to save state on resize.
+        """
+        self.settings.beginGroup("MainWindow")
+        self.settings.setValue("geometry", self.saveGeometry())
+        self.settings.setValue("size", self.size())
+        self.settings.endGroup()
+        QWidget.resizeEvent(self, event)
+
+    def changeEvent(self, event: QEvent):
+        QWidget.changeEvent(self, event)
+
+    # end def
+
+    ### DRAWING RELATED ###
+
+    ### PRIVATE HELPER METHODS ###
+    def _restoreGeometryandState(self):
+        settings = self.settings
+        settings.beginGroup("MainWindow")
+        geometry = settings.value("geometry")
+        if geometry is not None:
+            result = self.restoreGeometry(geometry)
+            if result is False:
+                print("MainWindow.restoreGeometry() failed.")
+        else:
+            print("Setting default MainWindow size: 1100x800")
+            self.resize(settings.value("size", QSize(1100, 800)))
+            self.move(settings.value("pos", QPoint(200, 200)))
+            self.inspector_dock_widget.close()
+            self.action_inspector.setChecked(False)
+
+        # Restore the current state of this mainwindow's toolbars and dockwidgets
+        window_state = settings.value("windowState")
+        if window_state is not None:
+            result = self.restoreState(window_state)
+            if result is False:
+                print("MainWindow.restoreState() failed.")
+        settings.endGroup()
+    # end def
+
+    def destroyView(self, view_type: EnumType):
+        '''
+        Args:
+            view_type: the name of the view
+
+        Raises:
+            ValueError for :obj:`view_type` not existing
+        '''
+        cnview = self.views.get(view_type)
+        if cnview is not None:
+            root_item = cnview.rootItem()
+            root_item.destroyViewItems()
+        else:
+            raise ValueError("view_type: %s does not exist" % (view_type))
+
+    def rebuildView(self, view_type: EnumType):
+        '''Rebuild views which match view_type ORed argument.
+        Only allows SLICE or GRID view to be active.  Not both at the same time
+
+        Args:
+            view_type: one or more O
+        '''
+        doc: DocT = self.document()
+
+        # turn OFF all but the views we care about
+        doc.changeViewSignaling(view_type)
+
+        delta: EnumType = 0
+        if view_type & ViewSendEnum.SLICE:
+            delta = ViewSendEnum.GRID
+            self.destroyView(delta)
+        elif view_type & ViewSendEnum.GRID:
+            delta = ViewSendEnum.GRID
+            self.destroyView(delta)
+
+        for part in doc.getParts():
+            reEmitPart(part)
+
+        # turn ON all but the views we care about
+        doc.changeViewSignaling(ViewSendEnum.ALL - delta)
+    # end def
+
+    def _initGridview(self, doc: DocT) -> GraphicsViewT:
+        """Initializes Grid View.
+
+        Args:
+            doc: The :class:`Document` corresponding to the design
+
+        Returns:
+            :class:`CNGraphicsView`
+        """
+        grid_scene = QGraphicsScene(parent=self.grid_graphics_view)
+        grid_root = GridRootItem(   rect=grid_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        grid_scene.addItem(grid_root)
+        grid_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert grid_root.scene() == grid_scene
+        ggv = self.grid_graphics_view
+        ggv.setScene(grid_scene)
+        ggv.scene_root_item = grid_root
+        ggv.setName("GridView")
+        self.grid_tool_manager = GridToolManager(self, grid_root)
+        return ggv
+    # end def
+
+    def _initPathview(self, doc: DocT) -> GraphicsViewT:
+        """Initializes Path View.
+
+        Args:
+            doc: The :class:`Document` corresponding to the design
+
+        Returns:
+            :class:`CNGraphicsView`
+        """
+        path_scene = QGraphicsScene(parent=self.path_graphics_view)
+        path_root = PathRootItem(   rect=path_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        path_scene.addItem(path_root)
+        path_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert path_root.scene() == path_scene
+        pgv = self.path_graphics_view
+        pgv.setScene(path_scene)
+        pgv.scene_root_item = path_root
+        pgv.setScaleFitFactor(0.7)
+        pgv.setName("PathView")
+        return pgv
+    # end def
+
+    def _initToolbar(self):
+        """Initializes the Toolbar and the manager.
+        """
+        self.path_color_panel = ColorPanel()
+        self.path_graphics_view.toolbar = self.path_color_panel  # HACK for cngraphicsview
+        path_view = self.views[ViewSendEnum.PATH]
+        path_scene = path_view.cnScene()
+        path_scene.addItem(self.path_color_panel)
+        self.path_tool_manager = PathToolManager(self, path_view.rootItem())
+
+        self.slice_tool_manager.path_tool_manager = self.path_tool_manager
+        self.path_tool_manager.slice_tool_manager = self.slice_tool_manager
+
+        self.grid_tool_manager.path_tool_manager = self.path_tool_manager
+        self.path_tool_manager.grid_tool_manager = self.grid_tool_manager
+
+        self.tool_managers = [self.path_tool_manager, self.slice_tool_manager, self.grid_tool_manager]
+
+        self.insertToolBarBreak(self.main_toolbar)
+
+        self.path_graphics_view.setupGL()
+        self.slice_graphics_view.setupGL()
+        self.grid_graphics_view.setupGL()
+    # end def
+
+    def _initSliceview(self, doc: DocT) -> GraphicsViewT:
+        """Initializes Slice View.
+
+        Args:
+            doc: The :class:`Document` corresponding to the design
+
+        Returns:
+            :class:`CNGraphicsView`
+        """
+        slice_scene = QGraphicsScene(parent=self.slice_graphics_view)
+        slice_root = SliceRootItem( rect=slice_scene.sceneRect(),
+                                    parent=None,
+                                    window=self,
+                                    document=doc)
+        slice_scene.addItem(slice_root)
+        slice_scene.setItemIndexMethod(QGraphicsScene.NoIndex)
+        assert slice_root.scene() == slice_scene
+        sgv = self.slice_graphics_view
+        sgv.setScene(slice_scene)
+        sgv.scene_root_item = slice_root
+        sgv.setName("SliceView")
+        sgv.setScaleFitFactor(0.7)
+        self.slice_tool_manager = SliceToolManager(self, slice_root)
+        return sgv
+    # end def
+
+    def _initEditMenu(self):
+        """Initializes the Edit menu
+        """
+        us = self.undoStack()
+        qatrans = QApplication.translate
+
+        action_undo = us.createUndoAction(self)
+        action_undo.setText( qatrans("MainWindow", "Undo", None) )
+        action_undo.setShortcut( qatrans("MainWindow", "Ctrl+Z", None) )
+        self.actionUndo = action_undo
+
+        action_redo = us.createRedoAction(self)
+        action_redo.setText( qatrans("MainWindow", "Redo", None) )
+        action_redo.setShortcut( qatrans("MainWindow", "Ctrl+Shift+Z", None) )
+        self.actionRedo = action_redo
+
+        self.sep = sep = QAction(self)
+        sep.setSeparator(True)
+
+        self.menu_edit.insertAction(sep, action_redo)
+        self.menu_edit.insertAction(action_redo, action_undo)
+        # print([x.text() for x in self.menu_edit.actions()])
+
+        # self.main_splitter.setSizes([400, 400, 180])  # balance main_splitter size
+        self.statusBar().showMessage("")
+    # end def
+
+    def _finishInit(self):
+        """Handle the dockwindow visibility and action checked status.
+        The console visibility is explicitly stored in the settings file,
+        since it doesn't seem to work if we treat it like a normal dock widget.
+        """
+        inspector_visible = self.inspector_dock_widget.isVisibleTo(self)
+        self.action_inspector.setChecked(inspector_visible)
+        path_visible = self.path_dock_widget.isVisibleTo(self)
+        self.action_path.setChecked(path_visible)
+        slice_visible = self.slice_dock_widget.isVisibleTo(self)
+
+        # NOTE THIS IS ALWAYS FALSE FOR  SOME REASON
+        self.action_slice.setChecked(slice_visible)
+    # end def
+
+    def getMouseViewTool(self, tool_type_name: str) -> AbstractTool:
+        """Give a tool type, return the tool for the view the mouse is over
+
+        Args:
+            tool_type_name: the tool which is active or None
+
+        Returns:
+            active tool for the view the tool is in
+        """
+        return_tool = None
+        for view in self.views.values():
+            if view.underMouse():
+                root_item = view.rootItem()
+                # print("I am under mouse", view)
+                if root_item.manager.isToolActive(tool_type_name):
+                    # print("{} is active".format(tool_type_name))
+                    return_tool = root_item.manager.activeToolGetter()
+                else:
+                    # print("no {} HERE!".format(tool_type_name))
+                    pass
+                break
+        return return_tool
+    # end def
+
+    def doMouseViewDestroy(self):
+        """Destroy the view the mouse is over
+        """
+        return_tool = None
+        for name, view in self.views.items():
+            if view.underMouse():
+                self.destroyView(name)
+    # end def
+
+    ##### SLOTS
     def actionSpecialSlot(self):
-        self.win.doMouseViewDestroy()
+        self.doMouseViewDestroy()
     # end def
 
     def actionSelectForkSlot(self):
-        win = self.win
-        win.action_path_select.trigger()
-        win.action_vhelix_select.trigger()
+        self.action_path_select.trigger()
+        self.action_vhelix_select.trigger()
     # end def
 
     def actionCreateForkSlot(self):
         self._document.clearAllSelected()
-        win = self.win
-        win.action_vhelix_create.trigger()
-        win.action_path_create.trigger()
+        self.action_vhelix_create.trigger()
+        self.action_path_create.trigger()
     # end def
 
     def actionVhelixSnapSlot(self, state: bool):
-        for item in self.win.sliceroot.instance_items.values():
+        for item in self.sliceroot.instance_items.values():
             item.griditem.allow_snap = state
     # end def
 
@@ -265,8 +561,8 @@ class DocumentController(object):
         Use this when clearing out undostack to set the modified status of
         the document
         '''
-        self.win.setWindowModified(not self.undoStack().isClean())
-        self.win.setWindowTitle(self.documentTitle())
+        self.setWindowModified(not self.undoStack().isClean())
+        self.setWindowTitle(self.documentTitle())
     # end def
 
     def actionAboutSlot(self):
@@ -328,11 +624,10 @@ class DocumentController(object):
 
     def actionFilterVirtualHelixSlot(self):
         '''Disables all other selection filters when active.'''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         fH.setChecked(True)
         if fE.isChecked():
             fE.setChecked(False)
@@ -348,11 +643,10 @@ class DocumentController(object):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fS.isChecked() and not fX.isChecked():
@@ -365,11 +659,10 @@ class DocumentController(object):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fX.isChecked():
@@ -381,11 +674,10 @@ class DocumentController(object):
         '''Disables handle filters when activated.
         Remains checked if no other item-type filter is active.
         '''
-        win = self.win
-        fH = win.action_filter_helix
-        fE = win.action_filter_endpoint
-        fS = win.action_filter_strand
-        fX = win.action_filter_xover
+        fH = self.action_filter_helix
+        fE = self.action_filter_endpoint
+        fS = self.action_filter_strand
+        fX = self.action_filter_xover
         if fH.isChecked():
             fH.setChecked(False)
         if not fE.isChecked() and not fS.isChecked():
@@ -395,80 +687,77 @@ class DocumentController(object):
 
     def actionFilterScafSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_scaf = self.win.action_filter_scaf
-        f_stap = self.win.action_filter_stap
+        f_scaf = self.action_filter_scaf
+        f_stap = self.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_scaf.setChecked(True)
         self._strandFilterUpdate()
 
     def actionFilterStapSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_scaf = self.win.action_filter_scaf
-        f_stap = self.win.action_filter_stap
+        f_scaf = self.action_filter_scaf
+        f_stap = self.action_filter_stap
         if not f_scaf.isChecked() and not f_stap.isChecked():
             f_stap.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
     def actionCopySlot(self):
-        win = self.win
-        select_tool = win.getMouseViewTool('select')
+        select_tool = self.getMouseViewTool('select')
         if select_tool is not None and hasattr(select_tool, 'copySelection'):
             print("select_tool is rolling")
             select_tool.copySelection()
     # end def
 
     def actionPasteSlot(self):
-        win = self.win
-        select_tool = win.getMouseViewTool('select')
+        select_tool = self.getMouseViewTool('select')
         if select_tool is not None and hasattr(select_tool, 'pasteClipboard'):
             select_tool.pasteClipboard()
     # end def
 
     def actionFilterFwdSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_fwd = self.win.action_filter_fwd
-        f_rev = self.win.action_filter_rev
+        f_fwd = self.action_filter_fwd
+        f_rev = self.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
             f_fwd.setChecked(True)
         self._strandFilterUpdate()
 
     def actionFilterRevSlot(self):
         '''Remains checked if no other strand-type filter is active.'''
-        f_fwd = self.win.action_filter_fwd
-        f_rev = self.win.action_filter_rev
+        f_fwd = self.action_filter_fwd
+        f_rev = self.action_filter_rev
         if not f_fwd.isChecked() and not f_rev.isChecked():
             f_rev.setChecked(True)
         self._strandFilterUpdate()
     # end def
 
     def _strandFilterUpdate(self):
-        win = self.win
-        if win.action_filter_helix.isChecked():
+        if self.action_filter_helix.isChecked():
             self._document.setFilterSet(["virtual_helix"])
             return
 
         filter_list = []
         add_oligo = False
-        if win.action_filter_endpoint.isChecked():
+        if self.action_filter_endpoint.isChecked():
             filter_list.append("endpoint")
             add_oligo = True
-        if win.action_filter_strand.isChecked():
+        if self.action_filter_strand.isChecked():
             filter_list.append("strand")
             add_oligo = True
-        if win.action_filter_xover.isChecked():
+        if self.action_filter_xover.isChecked():
             filter_list.append("xover")
             add_oligo = True
-        if win.action_filter_fwd.isChecked():
+        if self.action_filter_fwd.isChecked():
             filter_list.append("forward")
             add_oligo = True
-        if win.action_filter_rev.isChecked():
+        if self.action_filter_rev.isChecked():
             filter_list.append("reverse")
             add_oligo = True
-        if win.action_filter_scaf.isChecked():
+        if self.action_filter_scaf.isChecked():
             filter_list.append("scaffold")
             add_oligo = True
-        if win.action_filter_stap.isChecked():
+        if self.action_filter_stap.isChecked():
             filter_list.append("staple")
             add_oligo = True
         if add_oligo:
@@ -511,7 +800,7 @@ class DocumentController(object):
                 self.openAfterMaybeSave()  # finalize new
 
     def actionCloseSlot(self):
-        '''Called when DocumentWindow is closed.
+        '''Called when CNMainWindow is closed.
 
         This method does not do anything as its functionality is implemented by
         windowCloseEventHandler.  windowCloseEventHandler captures all close
@@ -540,7 +829,7 @@ class DocumentController(object):
         else:
             directory = QFileInfo(fname).path()
 
-        fdialog = QFileDialog(self.win,
+        fdialog = QFileDialog(self,
                               "%s - Save As" % QApplication.applicationName(),
                               directory,
                               "%s (*.svg)" % QApplication.applicationName())
@@ -580,18 +869,19 @@ class DocumentController(object):
 
         # Render through scene
         # painter.begin(generator)
-        # self.win.pathscene.render(painter)
+        # self.pathscene.render(painter)
         # painter.end()
 
         # Render item-by-item
         painter = QPainter()
         style_option = QStyleOptionGraphicsItem()
-        q = [self.win.pathroot]
+        q = [self.views[ViewSendEnum.PATH].rootItem()]
+        # slice_root = self.views[ViewSendEnum.SLICE].rootItem()
         painter.begin(generator)
         while q:
             graphics_item = q.pop()
-            transform = graphics_item.itemTransform(self.win.sliceroot)[0]
-            painter.setTransform(transform)
+            # transform = graphics_item.itemTransform(slice_root)[0]
+            # painter.setTransform(transform)
             if graphics_item.isVisible():
                 graphics_item.paint(painter, style_option, None)
                 q.extend(graphics_item.childItems())
@@ -632,14 +922,14 @@ class DocumentController(object):
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(self.win,
+            fname = QFileDialog.getSaveFileName(self,
                                                 "%s - Export As" % QApplication.applicationName(),
                                                 directory,
                                                 "(*.txt)")
             self.saveStaplesDialog = None
             self.exportStaplesCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "%s - Export As" % QApplication.applicationName(),
                                   directory,
                                   "(*.txt)")
@@ -668,23 +958,40 @@ class DocumentController(object):
         selection signals.
         '''
 
-    def actionCreateNucleicAcidPartHoneycomb(self):
+    def actionCreateNucleicAcidPartHoneycomb(self) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridEnum.HONEYCOMB)
+        return self.actionCreateNucleicAcidPart(
+            grid_type=GridEnum.HONEYCOMB,
+            is_lattice=True
+        )
 
-    def actionCreateNucleicAcidPartSquare(self):
+    def actionCreateNucleicAcidPartSquare(self) -> NucleicAcidPartT:
         # TODO[NF]:  Docstring
-        self.actionCreateNucleicAcidPart(grid_type=GridEnum.SQUARE)
+        return self.actionCreateNucleicAcidPart(
+            grid_type=GridEnum.SQUARE,
+            is_lattice=True
+        )
 
-    def actionCreateNucleicAcidPart(self, grid_type: EnumType) -> NucleicAcidPartT:
-        # TODO[NF]:  Docstring
+    def actionCreateNucleicAcidPart(self,
+            grid_type: EnumType,
+            is_lattice: bool = False) -> NucleicAcidPartT:
+        '''
+        Args:
+            grid_type:
+            is_lattice: defaults to False, aka freeform
+
+        Returns:
+            the part created
+        '''
         if ONLY_ONE:
             if len(self._document.children()) is not 0:
                 if self.promptSaveDialog() is SAVE_DIALOG_OPTIONS['CANCEL']:
                     return
             self.newDocument()
         doc = self._document
-        part = doc.createNucleicAcidPart(use_undostack=True, grid_type=grid_type)
+        part = doc.createNucleicAcidPart(   use_undostack=True,
+                                            grid_type=grid_type,
+                                            is_lattice=is_lattice)
         active_part = doc.activePart()
         if active_part is not None:
             active_part.setActive(False)
@@ -700,11 +1007,9 @@ class DocumentController(object):
         If either the slice or grid view are visible hide them.  Else, revert
         to showing whichever view(s) are showing.
         '''
-
-        win = self.win
-        if win.action_slice.isChecked():
-        # if not (win.slice_dock_widget.isVisible() or win.grid_dock_widget.isVisible()):
-            win.action_slice.setChecked(True)
+        if self.action_slice.isChecked():
+        # if not (self.slice_dock_widget.isVisible() or self.grid_dock_widget.isVisible()):
+            self.action_slice.setChecked(True)
             if self.slice_view_showing:
                 self.toggleSliceView(True)
                 self.toggleGridView(False)
@@ -712,14 +1017,14 @@ class DocumentController(object):
                 self.toggleGridView(True)
                 self.toggleSliceView(False)
         else:
-            win.action_slice.setChecked(False)
+            self.action_slice.setChecked(False)
             self.toggleSliceView(False)
             self.toggleGridView(False)
 
     # end def
 
     def actionTogglePathViewSlot(self):
-        dock_window = self.win.path_dock_widget
+        dock_window = self.path_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
         else:
@@ -727,7 +1032,7 @@ class DocumentController(object):
     # end def
 
     def actionToggleInspectorViewSlot(self):
-        dock_window = self.win.inspector_dock_widget
+        dock_window = self.inspector_dock_widget
         if dock_window.isVisible():
             dock_window.hide()
         else:
@@ -738,10 +1043,11 @@ class DocumentController(object):
         '''Toggle the AddPart buttons when the active part changes.
 
         Args:
-            is_enabled: Whether the slice view should be hidden or shown
+            is_enabled:
         '''
-        self.win.action_new_dnapart_honeycomb.setEnabled(is_enabled)
-        self.win.action_new_dnapart_square.setEnabled(is_enabled)
+        self.action_new_dnapart_honeycomb.setEnabled(is_enabled)
+        self.action_new_dnapart_square.setEnabled(is_enabled)
+        self.action_freeform.setEnabled(is_enabled)
     # end def
 
     def setSliceOrGridViewVisible(self, view_type: EnumType):
@@ -773,13 +1079,13 @@ class DocumentController(object):
         '''
         assert isinstance(show, bool)
 
-        slice_view_widget = self.win.slice_dock_widget
-        path_view_widget = self.win.path_dock_widget
-        views = self.win.views
+        slice_view_widget = self.slice_dock_widget
+        path_view_widget = self.path_dock_widget
+        views = self.views
         sgv = views[ViewSendEnum.SLICE]
         if show:
-            self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
-            # self.win.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
+            self.splitDockWidget(slice_view_widget, path_view_widget, Qt.Horizontal)
+            # self.splitDockWidget(slice_view_widget, path_view_widget, Qt.Vertical)
             slice_view_widget.show()
             sgv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
@@ -796,13 +1102,13 @@ class DocumentController(object):
             show: Whether the grid view should be hidden or shown
         '''
         assert isinstance(show, bool)
-        grid_view_widget = self.win.grid_dock_widget
-        path_view_widget = self.win.path_dock_widget
-        views = self.win.views
+        grid_view_widget = self.grid_dock_widget
+        path_view_widget = self.path_dock_widget
+        views = self.views
         ggv = views[ViewSendEnum.GRID]
         if show:
-            self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
-            # self.win.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
+            self.splitDockWidget(grid_view_widget, path_view_widget, Qt.Horizontal)
+            # self.splitDockWidget(grid_view_widget, path_view_widget, Qt.Vertical)
             grid_view_widget.show()
             ggv.zoomToFit() # NOTE ZTF for now rather than copying the scale factor
         else:
@@ -812,18 +1118,6 @@ class DocumentController(object):
     ### ACCESSORS ###
     def document(self) -> DocT:
         return self._document
-    # end def
-
-    def window(self) -> WindowT:
-        return self.win
-    # end def
-
-    def setDocument(self, doc: DocT):
-        '''Sets the controller's document, and informs the document that
-        this is its controller.
-        '''
-        self._document = doc
-        doc.setController(self)
     # end def
 
     def undoStack(self) -> UndoStack:
@@ -840,7 +1134,7 @@ class DocumentController(object):
             setReopen(True)
         self._document.makeNew()
         self._has_no_associated_file = fname is None
-        self.win.setWindowTitle(self.documentTitle() + '[*]')
+        self.setWindowTitle(self.documentTitle() + '[*]')
     # end def
 
     def saveFileDialog(self):
@@ -850,7 +1144,7 @@ class DocumentController(object):
         else:
             directory = QFileInfo(fname).path()
         if util.isWindows():  # required for native looking file window
-            fname = QFileDialog.getSaveFileName(self.win,
+            fname = QFileDialog.getSaveFileName(self,
                                                 "%s - Save As" % QApplication.applicationName(),
                                                 directory,
                                                 "%s (*.json)" % QApplication.applicationName())
@@ -858,7 +1152,7 @@ class DocumentController(object):
                 fname = fname[0]
             self.writeDocumentToFile(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "%s - Save As" % QApplication.applicationName(),
                                   directory,
                                   "%s (*.json)" % QApplication.applicationName())
@@ -953,23 +1247,22 @@ class DocumentController(object):
             return False
         self._writeFileOpenPath(os.path.dirname(fname))
 
-        win = self.win
-        win.path_graphics_view.setViewportUpdateOn(False)
-        win.slice_graphics_view.setViewportUpdateOn(False)
-        win.grid_graphics_view.setViewportUpdateOn(False)
+        self.path_graphics_view.setViewportUpdateOn(False)
+        self.slice_graphics_view.setViewportUpdateOn(False)
+        self.grid_graphics_view.setViewportUpdateOn(False)
 
         if ONLY_ONE:
             self.newDocument(fname=fname)
 
         self._document.readFile(fname)
 
-        win.path_graphics_view.setViewportUpdateOn(True)
-        win.slice_graphics_view.setViewportUpdateOn(True)
-        win.grid_graphics_view.setViewportUpdateOn(True)
+        self.path_graphics_view.setViewportUpdateOn(True)
+        self.slice_graphics_view.setViewportUpdateOn(True)
+        self.grid_graphics_view.setViewportUpdateOn(True)
 
-        win.path_graphics_view.update()
-        win.slice_graphics_view.update()
-        win.grid_graphics_view.update()
+        self.path_graphics_view.update()
+        self.slice_graphics_view.update()
+        self.grid_graphics_view.update()
 
         if hasattr(self, "filesavedialog"):  # user did save
             if self.fileopendialog is not None:
@@ -998,21 +1291,22 @@ class DocumentController(object):
 
         if self.exit_when_done:
             the_app = app()
-            self.destroyDC()
-            if the_app.document_controllers:
+            # self.destroyDC()
+            self.destroyWin()
+            if the_app.cnmain_windows:
                 the_app.destroyApp()
 
     ### EVENT HANDLERS ###
     def windowCloseEventHandler(self, event: QCloseEvent = None):
         '''Intercept close events when user attempts to close the window.'''
-        win = self.win
         dialog_result = self.promptSaveDialog(exit_when_done=True)
         if dialog_result == SAVE_DIALOG_OPTIONS['DISCARD']:
             if event is not None:
                 event.accept()
             the_app = app()
-            self.destroyDC()
-            if the_app.document_controllers:
+            # self.destroyDC()
+            self.destroyWin()
+            if len(the_app.cnmain_windows) > 0:
                 the_app.destroyApp()
         elif event is not None:
             event.ignore()
@@ -1033,7 +1327,7 @@ class DocumentController(object):
             return True
         self._document.setFileName(proposed_fname)
         self._has_no_associated_file = False
-        self.win.setWindowTitle(self.documentTitle())
+        self.setWindowTitle(self.documentTitle())
         return True
 
     def openAfterMaybeSave(self):
@@ -1049,7 +1343,7 @@ class DocumentController(object):
             self.filesavedialog = None
             self.openAfterMaybeSaveCallback(fname)
         else:  # access through non-blocking callback
-            fdialog = QFileDialog(self.win,
+            fdialog = QFileDialog(self,
                                   "Open Document",
                                   path,
                                   "cadnano1 / cadnano2 Files (*.nno *.json *.c25)")
@@ -1076,7 +1370,7 @@ class DocumentController(object):
             savebox = QMessageBox(QMessageBox.Warning, "Application",
                                   "The document has been modified.\nDo you want to save your changes?",
                                   QMessageBox.Save | QMessageBox.Discard | QMessageBox.Cancel,
-                                  self.win,
+                                  self,
                                   Qt.Dialog | Qt.MSWindowsFixedSizeDialogHint | Qt.Sheet)
             savebox.setWindowModality(Qt.WindowModal)
             save = savebox.button(QMessageBox.Save)
@@ -1110,7 +1404,7 @@ class DocumentController(object):
                                    "cadnano",
                                    "Could not write to '%s'." % filename,
                                    QMessageBox.Ok,
-                                   self.win,
+                                   self,
                                    flags)
             errorbox.setWindowModality(Qt.WindowModal)
             errorbox.open()
@@ -1127,3 +1421,70 @@ class DocumentController(object):
     def actionFeedbackSlot(self):
         import webbrowser
         webbrowser.open("http://cadnano.org/feedback")
+
+    def globalCreateSlot(self):
+        self.action_global_create.trigger()
+
+    def defineWindowSignals(self):
+        self.docwin_signal_and_slots = [
+            (self.action_new.triggered, self.actionNewSlot),
+            (self.action_open.triggered, self.actionOpenSlot),
+            (self.action_close.triggered, self.actionCloseSlot),
+            (self.action_save.triggered, self.actionSaveSlot),
+            (self.action_save_as.triggered, self.actionSaveAsSlot),
+            (self.action_SVG.triggered, self.actionSVGSlot),
+            (self.action_export_staples.triggered, self.actionExportSequencesSlot),
+            (self.action_preferences.triggered, self.actionPrefsSlot),
+            (self.action_new_dnapart_honeycomb.triggered, self.actionCreateNucleicAcidPartHoneycomb),
+            (self.action_new_dnapart_honeycomb.triggered, self.globalCreateSlot),
+            (self.action_new_dnapart_square.triggered, self.actionCreateNucleicAcidPartSquare),
+            (self.action_new_dnapart_square.triggered, self.globalCreateSlot),
+
+            (self.action_freeform.triggered, self.actionCreateNucleicAcidPart),
+            (self.action_freeform.triggered, self.globalCreateSlot),
+
+            (self.action_about.triggered, self.actionAboutSlot),
+            (self.action_cadnano_website.triggered, self.actionCadnanoWebsiteSlot),
+            (self.action_feedback.triggered, self.actionFeedbackSlot),
+
+            # make it so select tool in slice view activation turns on vh filter
+            (self.action_global_select.triggered, self.actionSelectForkSlot),
+            (self.action_global_create.triggered, self.actionCreateForkSlot),
+
+            (self.action_filter_helix.triggered, self.actionFilterVirtualHelixSlot),
+            (self.action_filter_endpoint.triggered, self.actionFilterEndpointSlot),
+            (self.action_filter_strand.triggered, self.actionFilterStrandSlot),
+            (self.action_filter_xover.triggered, self.actionFilterXoverSlot),
+            (self.action_filter_fwd.triggered, self.actionFilterFwdSlot),
+            (self.action_filter_rev.triggered, self.actionFilterRevSlot),
+            (self.action_filter_scaf.triggered, self.actionFilterScafSlot),
+            (self.action_filter_stap.triggered, self.actionFilterStapSlot),
+            (self.action_copy.triggered, self.actionCopySlot),
+            (self.action_paste.triggered, self.actionPasteSlot),
+
+            (self.action_inspector.triggered, self.actionToggleInspectorViewSlot),
+            (self.action_path.triggered, self.actionTogglePathViewSlot),
+            (self.action_slice.triggered, self.actionToggleSliceViewSlot),
+
+            (self.action_path_add_seq.triggered, self.actionPathAddSeqSlot),
+
+            (self.action_vhelix_snap.triggered, self.actionVhelixSnapSlot)
+        ]
+    # end def
+
+    def connectSelfSignals(self):
+        for signal, slot in self.docwin_signal_and_slots:
+            signal.connect(slot)
+        o = self.outliner_widget
+        p_e = self.property_widget
+        o.itemSelectionChanged.connect(p_e.outlinerItemSelectionChanged)
+    # end def
+
+    def disconnectSelfSignals(self):
+        for signal, slot in self.docwin_signal_and_slots:
+            signal.disconnect(slot)
+        o = self.outliner_widget
+        p_e = self.property_widget
+        o.itemSelectionChanged.disconnect(p_e.outlinerItemSelectionChanged)
+    # end def
+# end class

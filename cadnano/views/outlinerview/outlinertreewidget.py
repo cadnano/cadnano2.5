@@ -486,6 +486,7 @@ class OutlinerTreeWidget(QTreeWidget):
         Raises:
             NotImplementedError: for unknown ``part_type``
         """
+        self._window.toggleNewPartButtons(False)
         if self.are_signals_enabled:
             model_part = part_instance.reference()
             part_type = model_part.partType()

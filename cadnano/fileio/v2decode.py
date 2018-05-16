@@ -59,10 +59,12 @@ def decode(document: DocT, obj: dict, emit_signals: bool = True):
         isEven = SquareDnaPart.isEvenParity
     else:
         raise TypeError("Lattice type not recognized")
-    part = document.createNucleicAcidPart(grid_type=grid_type, use_undostack=False)
+    part = document.createNucleicAcidPart(  grid_type=grid_type,
+                                            is_lattice=True,
+                                            use_undostack=False)
     part.setActive(True)
     document.setGridType(grid_type)
-    document.setSliceOrGridViewVisible(OrthoViewEnum.SLICE)
+    # document.setSliceOrGridViewVisible(OrthoViewEnum.SLICE)
     setBatch(True)
     # POPULATE VIRTUAL HELICES
     ordered_id_list = []

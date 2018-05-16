@@ -12,11 +12,11 @@ import numpy as np
 
 cn = lambda x: 'cadnano.' + x
 SegmentT =  Tuple[int,  int]
-WindowT =   cn('views.documentwindow.DocumentWindow')
+WindowT =   cn('views.cnmainwindow.CNMainWindow')
 DocT =      cn('document.Document')
 DocCtrlT =  cn('controllers.DocumentController')
 PropertyEditorWidgetT = cn('views.propertyview.PropertyEditorWidget')
-GraphicsViewT = cn('views.customqgraphicsview.CustomQGraphicsView')
+GraphicsViewT = cn('views.cngraphicsview.CNGraphicsView')
 PartT = cn('part.part.Part')
 NucleicAcidPartT = cn('part.nucleicacidpart.NucleicAcidPart')
 VirtualHelixT = cn('part.virtualhelix.VirtualHelix')

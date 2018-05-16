@@ -46,7 +46,7 @@ def encodePart(part: PartT) -> dict:
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointEnum.ARBITRARY:
+    if not group_props.get('is_lattice', True):
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:
@@ -96,7 +96,7 @@ def reEmitPart(part: PartT):
     # iterate through virtualhelix list
     group_props = part.getModelProperties().copy()
 
-    if group_props.get('point_type') == PointEnum.ARBITRARY:
+    if not group_props.get('is_lattice', True):
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:
@@ -175,7 +175,7 @@ def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> d
     group_props = part.getModelProperties().copy()
     assert('grid_type' in group_props)
 
-    if group_props.get('point_type') == PointEnum.ARBITRARY:
+    if not group_props.get('is_lattice', True):
         # TODO add code to encode Parts with ARBITRARY point configurations
         pass
     else:

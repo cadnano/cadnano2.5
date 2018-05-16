@@ -28,7 +28,7 @@ from cadnano.cntypes import (
 
 class SliceRootItem(QGraphicsRectItem):
     """SliceRootItem is the root item in the SliceView. It gets added directly
-    to the slicescene by DocumentWindow. It receives two signals::
+    to the slicescene by CNMainWindow. It receives two signals::
 
         partAddedSignal and selectedPartChangedSignal
 
@@ -54,7 +54,7 @@ class SliceRootItem(QGraphicsRectItem):
         Args:
             rect: Rectangle of this item
             parent: parent object
-            window: DocumentWindow
+            window: CNMainWindow
             document: Document
         """
         super(SliceRootItem, self).__init__(rect, parent)
@@ -149,7 +149,7 @@ class SliceRootItem(QGraphicsRectItem):
     def window(self) -> WindowT:
         """
         Returns:
-            the :class:`DocumentWindow`
+            the :class:`CNMainWindow`
         """
         return self._window
     # end def

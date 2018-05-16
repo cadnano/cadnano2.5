@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""CustomQGraphicsView
+"""CNGraphicsView
 
 Platform:
     Unix, Windows, Mac OS X
@@ -55,7 +55,7 @@ KEY_PRESS_EVENT = 'keyPressEvent'
 KEY_RELEASE_EVENT = 'keyReleaseEvent'
 
 
-class CustomQGraphicsView(QGraphicsView):
+class CNGraphicsView(QGraphicsView):
     """
     Base class for QGraphicsViews with Mouse Zoom and Pan support via the
     Control/Command shortcut key.

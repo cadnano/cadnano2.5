@@ -418,7 +418,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
     def window(self):
         """
         Returns:
-            DocumentWindow
+            CNMainWindow
         """
         return self.parentItem().window()
     # end def

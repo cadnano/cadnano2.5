@@ -18,9 +18,10 @@ from cadnano import (
 )
 from cadnano.addinstancecmd import AddInstanceCommand
 from cadnano.proxies.cnenum import (
-    ModEnum,
-    GridEnum,
     EnumType,
+    GridEnum,
+    ModEnum,
+    PointEnum,
     ViewSendEnum
 )
 from cadnano.proxies.cnobject import CNObject
@@ -46,7 +47,8 @@ from cadnano.strand import Strand
 
 from cadnano.cntypes import (
     DocCtrlT,
-    DocT
+    DocT,
+    WindowT
 )
 
 # Type Aliases
@@ -73,7 +75,7 @@ class Document(CNObject):
         us.setUndoLimit(30)
         self._children = set()     # for storing a reference to Parts (and Assemblies)
         self._instances = set()    # for storing instances of Parts (and Assemblies)
-        self._controller = None
+        self._app_window = None
         # the dictionary maintains what is selected
         self._selection_dict = {}
         self._active_part = None
@@ -90,20 +92,22 @@ class Document(CNObject):
     # end def
 
     # SIGNALS #
+    # Signal 1. Connected to the ViewRoots
     documentPartAddedSignal = ProxySignal(object, CNObject, name='documentPartAddedSignal')
     """`Document`, `Part`"""
 
     documentAssemblyAddedSignal = ProxySignal(object, CNObject, name='documentAssemblyAddedSignal')
     """`Document`, `Assembly`"""
-
     documentSelectionFilterChangedSignal = ProxySignal(object, name='documentSelectionFilterChangedSignal')
     documentPreXoverFilterChangedSignal = ProxySignal(str, name='documentPreXoverFilterChangedSignal')
     documentViewResetSignal = ProxySignal(CNObject, name='documentViewResetSignal')
     documentClearSelectionsSignal = ProxySignal(CNObject, name='documentClearSelectionsSignal')
+    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
+
+    # Signal 1. Connected to the ModTool
     documentModAddedSignal = ProxySignal(object, object, object, name='documentModAddedSignal')
     documentModRemovedSignal = ProxySignal(object, object, name='documentModRemovedSignal')
     documentModChangedSignal = ProxySignal(object, object, object, name='documentModChangedSignal')
-    documentChangeViewSignalingSignal = ProxySignal(int, name='documentChangeViewSignalingSignal')
 
     # SLOTS #
 
@@ -192,14 +196,10 @@ class Document(CNObject):
 
     def setActivePart(self, part: Part):
         self._active_part = part
-        if self._controller:
-            self._controller.toggleNewPartButtons(False)
     # end def
 
     def deactivateActivePart(self):
         self._active_part = None
-        if self._controller:
-            self._controller.toggleNewPartButtons(True)
     # end def
 
     def changeViewSignaling(self, signal_enum: int = ViewSendEnum.ALL):
@@ -744,18 +744,19 @@ class Document(CNObject):
     # PUBLIC METHODS FOR EDITING THE MODEL #
     def createNucleicAcidPart(  self,
                                 use_undostack: bool = True,
-                                grid_type: EnumType = GridEnum.NONE
+                                grid_type: EnumType = GridEnum.NONE,
+                                is_lattice: bool = True
                             ) -> NucleicAcidPart:
         """Create and store a new DnaPart and instance, and return the instance.
 
         Args:
             use_undostack: optional, defaults to True
-            grid_type: optional default to HoneyComb
+            grid_type: optional default to GridEnum.NONE
 
         Returns
             new :obj:`NucleicAcidPart`
         """
-        dna_part = NucleicAcidPart(document=self, grid_type=grid_type)
+        dna_part = NucleicAcidPart(document=self, grid_type=grid_type, is_lattice=is_lattice)
         self._addPart(dna_part, use_undostack=use_undostack)
         return dna_part
     # end def
@@ -790,13 +791,13 @@ class Document(CNObject):
     # end def
 
     # PUBLIC SUPPORT METHODS #
-    def controller(self) -> DocCtrlT:
-        return self._controller
+    def appWindow(self) -> WindowT:
+        return self._app_window
     # end def
 
-    def setController(self, controller: DocCtrlT):
-        """Called by :meth:`DocumentController.setDocument` method."""
-        self._controller = controller
+    def setAppWindow(self, app_window: WindowT):
+        """Called by :meth:`CNMainWindow.setDocument` method."""
+        self._app_window = app_window
     # end def
 
     # PRIVATE SUPPORT METHODS #
@@ -1017,16 +1018,6 @@ class Document(CNObject):
             seq = '' if mid is None else mod_dict['seqInt']
         return seq, name
     # end def
-
-    def setSliceOrGridViewVisible(self, view_type: EnumType):
-        """Set the current SliceView type
-
-        Args:
-            view_type: enum from the ``OrthoViewEnum``
-        """
-        if self.controller():
-            self.controller().setSliceOrGridViewVisible(view_type)
-#    # end def
 
     def getGridType(self) -> EnumType:
         """Get the current Grid type

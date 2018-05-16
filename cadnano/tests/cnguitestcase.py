@@ -13,15 +13,15 @@ class GUITestApp(CNTestApp):
         argv = None
         self.app = initAppWithGui(argv, do_exec=False)  # kick off a Gui style app
         self.document = self.app.document()
-        self.window = self.document.controller().win
+        self.app_window = self.app.cnmain_windows[0]
 
         # Include this or the automatic build will hang
         self.app.dontAskAndJustDiscardUnsavedChanges = True
 
-        # By setting the widget to the main window we can traverse and
+        # By setting the widget to the main app_window we can traverse and
         # interact with any part of it. Also, tearDown will close
         # the application so we don't need to worry about that.
-        self.setWidget(self.window, False)
+        self.setWidget(self.app_window, False)
 
     def tearDown(self):
         self._test_widget.close()

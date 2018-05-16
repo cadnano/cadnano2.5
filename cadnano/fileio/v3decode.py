@@ -38,8 +38,11 @@ def decode(document: DocT, obj: dict, emit_signals: bool = True):
     for part_dict in obj['parts']:
         grid_type = determineLatticeType(part_dict)
 
-        ortho_view_type = determineOrthoViewType(part_dict, grid_type)
-        document.setSliceOrGridViewVisible(view_type=ortho_view_type)
+        # NOTE: NC 2018.05.15 THIS is commented out since it violates model view
+        # isolation.  grid or slice view stuff should be in the View only
+        # a signal could be sent to a view with the info to determine this
+        # ortho_view_type = determineOrthoViewType(part_dict, grid_type)
+        # document.setSliceOrGridViewVisible(view_type=ortho_view_type)
 
         decodePart(document, part_dict, grid_type=grid_type,
                    emit_signals=emit_signals)
@@ -54,24 +57,28 @@ def decode(document: DocT, obj: dict, emit_signals: bool = True):
             part.addModStrandInstance(strand, idx, mod_id)
 # end def
 
+# Commented out, see the abve NOTE
+# def determineOrthoViewType(part_dict: dict, grid_type: EnumType):
+#     THRESHOLD = 0.0005
+#     vh_id_list = part_dict.get('vh_list')
+#     origins = part_dict.get('origins')
 
-def determineOrthoViewType(part_dict: dict, grid_type: EnumType):
-    THRESHOLD = 0.0005
-    vh_id_list = part_dict.get('vh_list')
-    origins = part_dict.get('origins')
+#     for vh_id, size in vh_id_list:
+#         vh_x, vh_y = origins[vh_id]
 
-    for vh_id, size in vh_id_list:
-        vh_x, vh_y = origins[vh_id]
-
-        if grid_type == GridEnum.HONEYCOMB:
-            distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)
-            if distance > THRESHOLD:
-                return OrthoViewEnum.GRID
-        elif grid_type == GridEnum.SQUARE:
-            if SquareDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)[0] > THRESHOLD:
-                return OrthoViewEnum.GRID
-    return OrthoViewEnum.GRID
-# end def
+#         if grid_type == GridEnum.HONEYCOMB:
+#             distance, point = HoneycombDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)
+#             if distance > THRESHOLD:
+#                 return OrthoViewEnum.GRID
+#             else:
+#                 return OrthoViewEnum.SLICE
+#         elif grid_type == GridEnum.SQUARE:
+#             if SquareDnaPart.distanceFromClosestLatticeCoord(radius=DEFAULT_RADIUS, x=vh_x, y=vh_y)[0] > THRESHOLD:
+#                 return OrthoViewEnum.GRID
+#             else:
+#                 return OrthoViewEnum.SLICE
+#     return OrthoViewEnum.GRID
+# # end def
 
 def determineLatticeType(part_dict: dict) -> EnumType:
     """Guess the lattice type based on the sum of the vector distances between
@@ -136,7 +143,15 @@ def decodePart( document: DocT,
         grid_type:
         emit_signals:
     """
-    part = document.createNucleicAcidPart(use_undostack=False, grid_type=grid_type)
+    if ( part_dict.get('point_type') == PointEnum.ARBITRARY or
+        not part_dict.get('is_lattice', True) ):
+        is_lattice = False
+    else:
+        is_lattice = True
+
+    part = document.createNucleicAcidPart(  use_undostack=False,
+                                            is_lattice=is_lattice,
+                                            grid_type=grid_type)
     part.setActive(True)
 
     vh_id_list = part_dict.get('vh_list')
@@ -144,7 +159,7 @@ def decodePart( document: DocT,
     origins = part_dict.get('origins')
     keys = list(vh_props.keys())
 
-    if part_dict.get('point_type') == PointEnum.ARBITRARY:
+    if not is_lattice:
         # TODO add code to deserialize parts
         pass
     else:

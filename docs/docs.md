@@ -82,7 +82,7 @@ When building the docs, you may see warnings like:
 ```
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.controllers.documentcontroller'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.gui.mainwindow.ui_mainwindow'
-WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.documentwindow'
+WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.cnmainwindow'
 WARNING: toctree contains reference to nonexisting document 'api/cadnano.views.outlinerview.outlinertreewidget'
 ```
 

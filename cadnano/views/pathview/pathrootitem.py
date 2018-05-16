@@ -30,7 +30,7 @@ from cadnano.cntypes import (
 
 class PathRootItem(QGraphicsRectItem):
     """:class:`PathRootItem` is the root item in the path view. It gets added directly
-    to the pathscene by :class:`DocumentWindow`. It receives two signals::
+    to the pathscene by :class:`CNMainWindow`. It receives two signals::
 
         partAddedSignal and documentSelectedPartChangedSignal
 
@@ -55,7 +55,7 @@ class PathRootItem(QGraphicsRectItem):
         Args:
             rect: Rectangle of this item
             parent: parent object
-            window: DocumentWindow
+            window: CNMainWindow
             document: Document
         """
         super(PathRootItem, self).__init__(rect, parent)
@@ -160,7 +160,7 @@ class PathRootItem(QGraphicsRectItem):
     def window(self) -> WindowT:
         """
         Returns:
-            The :obj:`DocumentWindow`
+            The :obj:`CNMainWindow`
         """
         return self._window
     # end def

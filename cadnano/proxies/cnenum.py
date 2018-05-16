@@ -57,6 +57,9 @@ class PartEnum(IntEnum):
 class PointEnum(IntEnum):
     """For serializing virtual helices as only pointing in the Z direction
     or pointing in arbitrary directions.
+
+    NOTE: This exists for legacy part importing of lattice designs when moving
+    towards the v3 file convention
     """
     Z_ONLY = 0
     ARBITRARY = 1

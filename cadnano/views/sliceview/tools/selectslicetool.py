@@ -85,7 +85,7 @@ class SelectSliceTool(AbstractSliceTool):
         super(SelectSliceTool, self).__init__(manager)
         self.last_rubberband_vals = (None, None, None)
         self.selection_set = set()
-        self.group = SliceSelectionGroup(self)
+        self.group = SliceSelectionGroup(self, parent=self)
         self.group.hide()
         self.is_selection_active = False
         self.individual_pick = False
@@ -245,7 +245,8 @@ class SelectSliceTool(AbstractSliceTool):
             group.hide()
             self.is_selection_active = False
             return True
-        group.clearSelectionRect()
+        if group is not None:
+            group.clearSelectionRect()
         return False
     # end def
 
@@ -553,10 +554,11 @@ class SliceSelectionGroup(QGraphicsItemGroup):
         """reset positions to zero to keep things in check
         """
         bri = self.bounding_rect_item
-        bri.hide()
-        self.removeFromGroup(bri)
-        bri.setParentItem(self.tool)
-        self.setFocus(False)
+        if bri.group() == self:
+            bri.hide()
+            self.removeFromGroup(bri)
+            self.setFocus(False)
+            bri.setParentItem(self.tool)
     # end def
 
     def keyPressEvent(self, event: QKeyEvent):
