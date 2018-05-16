@@ -875,12 +875,13 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         # Render item-by-item
         painter = QPainter()
         style_option = QStyleOptionGraphicsItem()
-        q = [self.pathroot]
+        q = [self.views[ViewSendEnum.PATH].rootItem()]
+        # slice_root = self.views[ViewSendEnum.SLICE].rootItem()
         painter.begin(generator)
         while q:
             graphics_item = q.pop()
-            transform = graphics_item.itemTransform(self.sliceroot)[0]
-            painter.setTransform(transform)
+            # transform = graphics_item.itemTransform(slice_root)[0]
+            # painter.setTransform(transform)
             if graphics_item.isVisible():
                 graphics_item.paint(painter, style_option, None)
                 q.extend(graphics_item.childItems())
