@@ -32,7 +32,7 @@ class Preferences(object):
 
     def __init__(self):
         self.qs = QSettings("cadnano.org", "cadnano2.5")
-        print('Settings are stored at %s' % self.qs.fileName())
+#        print('Settings are stored at %s' % self.qs.fileName())
         self.ui_prefs = Ui_Preferences()
         self.widget = QWidget()
         self.ui_prefs.setupUi(self.widget)
