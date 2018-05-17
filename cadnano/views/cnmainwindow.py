@@ -125,7 +125,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
 
         self._tool_hints_visible:   bool = False
         self._filter_hints_visible: bool = False
-        self.slice_view_showing:    bool = app().prefs.orthoview_style_idx == OrthoViewEnum.SLICE
+        self._slice_view_visible:    bool = app().prefs.orthoview_style_idx == OrthoViewEnum.SLICE
 
         # Appearance pref
         if not app().prefs.show_icon_labels:
@@ -1008,7 +1008,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
         if self.action_slice.isChecked():
         # if not (self.slice_dock_widget.isVisible() or self.grid_dock_widget.isVisible()):
             self.action_slice.setChecked(True)
-            if self.slice_view_showing:
+            if self._slice_view_visible:
                 self.toggleSliceView(True)
                 self.toggleGridView(False)
             else:
@@ -1057,9 +1057,9 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             ValueError for unknown ``view_type``.
         '''
         if view_type == OrthoViewEnum.SLICE:
-            self.slice_view_showing = True
+            self._slice_view_visible = True
         elif view_type == OrthoViewEnum.GRID:
-            self.slice_view_showing = False
+            self._slice_view_visible = False
         else:
             raise ValueError('Invalid orthoview value: %s' % value)
         self.actionToggleSliceViewSlot()
