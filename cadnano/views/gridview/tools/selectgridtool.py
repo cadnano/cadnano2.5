@@ -38,7 +38,8 @@ from cadnano.views.gridview import (
     GridNucleicAcidPartItemT
 )
 from cadnano.cntypes import (
-    RectT
+    RectT,
+    Vec3T
 )
 
 def normalizeRect(rect: RectT) -> RectT:
@@ -192,8 +193,8 @@ class SelectGridTool(AbstractGridTool):
 
             # note QRectF.normalized doesn't seem to actually normalize a
             # rectangle near as I can tell no we have normaliz
-            from_model_point = part_item.getModelPos(from_pt_part_item)
-            to_model_point = part_item.getModelPos(to_pt_part_item)
+            from_model_point: Vec3T = part_item.getModelPos(from_pt_part_item)
+            to_model_point: Vec3T = part_item.getModelPos(to_pt_part_item)
             query_rect = (from_model_point[0], from_model_point[1],
                           to_model_point[0], to_model_point[1])
             query_rect = normalizeRect(query_rect)

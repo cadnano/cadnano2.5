@@ -58,7 +58,7 @@ def encodeDocument(document: DocT) -> dict:
     # Iterate over VHs to determine which one should be at the lattice
     # coordinates (0, 0)
     for id_num in vh_order:
-        vh_x, vh_y = part.getVirtualHelixOrigin(id_num)
+        vh_x, vh_y, _ = part.getVirtualHelixOrigin(id_num)
         row, col = positionToLatticeCoord(radius, vh_x, vh_y)
 
         min_row = min(row, min_row)
@@ -100,7 +100,7 @@ def encodeDocument(document: DocT) -> dict:
                 stap_colors.append([strand.idx5Prime(), int(c, 16)])
 
         # Convert x,y coordinates to new (row, col)
-        vh_x, vh_y = part.getVirtualHelixOrigin(id_num)
+        vh_x, vh_y, _ = part.getVirtualHelixOrigin(id_num)
         row, col = positionToLatticeCoord(radius, vh_x, vh_y)
 
         new_row = row + row_offset

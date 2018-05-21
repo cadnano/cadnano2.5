@@ -16,7 +16,7 @@ class RemoveVirtualHelixCommand(UndoCommand):
         self.part = part
         self.id_num = id_num
         _, self.length = part.getOffsetAndSize(id_num)
-        x, y = part.getVirtualHelixOrigin(id_num)
+        x, y, _ = part.getVirtualHelixOrigin(id_num)
         self.origin_pt = (x, y, 0.)
         self.direction = tuple(part.directions[id_num]) # (0, 0, 1.)
         neighbors = part.getVirtualHelixProperties(id_num, 'neighbors')

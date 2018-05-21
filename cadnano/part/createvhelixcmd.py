@@ -124,7 +124,7 @@ class CreateVirtualHelixCommand(UndoCommand):
             part, id_num, part.getVirtualHelix(id_num), self.neighbors)
         # clear out part references
         part._removeHelix(id_num)
-        part.setVirtualHelixOriginLimits(self.old_limits)
+        part._setVirtualHelixOriginLimits(self.old_limits)
         part.partVirtualHelixRemovedSignal.emit(part, id_num)
     # end def
 # end class

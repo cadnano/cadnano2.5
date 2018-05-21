@@ -68,7 +68,8 @@ from cadnano.cntypes import (
     ValueT,
     WindowT,
     Vec2T,
-    RectT
+    RectT,
+    Vec3T
 )
 
 _DEFAULT_WIDTH = styles.DEFAULT_PEN_WIDTH
@@ -751,7 +752,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             QGraphicsItem.hoverMoveEvent(self, event)
     # end def
 
-    def getModelPos(self, pos: QPointF) -> Vec2T:
+    def getModelPos(self, pos: QPointF) -> Vec3T:
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:
@@ -759,7 +760,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         """
         sf = self.scale_factor
         x, y = pos.x()/sf, -1.0*pos.y()/sf
-        return x, y
+        return x, y, 0.
     # end def
 
     def getVirtualHelixItem(self, id_num: int):
@@ -847,7 +848,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
             tool.deactivate()
             return QGraphicsItem.mousePressEvent(self, event)
 
-        part_pt_tuple = self.getModelPos(pt)
+        part_pt_tuple: Vec3T = self.getModelPos(pt)
         modifiers = event.modifiers()
 
         is_spa_mode = modifiers == Qt.AltModifier
@@ -1138,7 +1139,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
         # print("clipboard contents:", vh_id_list, min_idnum, idnum_offset)
 
         hov_x, hov_y = self._getModelXYforCoord(hov_row, hov_col)
-        min_x, min_y = part.getVirtualHelixOrigin(min_id_same_parity)
+        min_x, min_y, _ = part.getVirtualHelixOrigin(min_id_same_parity)
 
         self.copypaste_origin_offset = (round(hov_x-min_x, 9), round(hov_y-min_y, 9))
     # end def
@@ -1232,7 +1233,7 @@ class SliceNucleicAcidPartItem(QAbstractPartItem):
 
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
-        part_pt_tuple = self.getModelPos(pt)
+        part_pt_tuple: Vec3T = self.getModelPos(pt)
         part = self._model_part
         if part.isVirtualHelixNearPoint(part_pt_tuple):
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)

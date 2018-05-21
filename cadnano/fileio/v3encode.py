@@ -48,7 +48,9 @@ def encodePart(part: PartT) -> dict:
 
     if not group_props.get('is_lattice', True):
         # TODO add code to encode Parts with ARBITRARY point configurations
-        pass
+        vh_props, origins = part.helixPropertiesAndOrigins()
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
     else:
         vh_props, origins = part.helixPropertiesAndOrigins()
         group_props['virtual_helices'] = vh_props

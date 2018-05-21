@@ -104,10 +104,10 @@ class ResizeHandleGroup(QObject):
             # self._tr.label.updateText(xy_html.format(tr_x, tr_y))
             # self._bl.label.updateText(xy_html.format(bl_x, bl_y))
             # self._br.label.updateText(xy_html.format(br_x, br_y))
-            t_x, t_y = self.parent_item.getModelPos(t_pt)
-            b_x, b_y = self.parent_item.getModelPos(b_pt)
-            l_x, l_y = self.parent_item.getModelPos(l_pt)
-            r_x, r_y = self.parent_item.getModelPos(r_pt)
+            t_x, t_y, _ = self.parent_item.getModelPos(t_pt)
+            b_x, b_y, _ = self.parent_item.getModelPos(b_pt)
+            l_x, l_y, _ = self.parent_item.getModelPos(l_pt)
+            r_x, r_y, _ = self.parent_item.getModelPos(r_pt)
             x_html = "<font color='#cc0000'>{:.2f}</font>"
             y_html = "<font color='#007200'>{:.2f}</font>"
             self._t.label.updateText(y_html.format(t_y))

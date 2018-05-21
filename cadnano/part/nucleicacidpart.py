@@ -234,7 +234,7 @@ class NucleicAcidPart(Part):
         # 2. per virtual helix allocations
         self.total_id_nums: int = 0  # should be equal to len(self.reserved_ids)
 
-        self._origin_pts = np.full((DEFAULT_SIZE, 2), np.inf, dtype=float)
+        self._origin_pts = np.full((DEFAULT_SIZE, 3), np.inf, dtype=float)
         """For doing 2D X,Y manipulation for now.  keep track of
         XY position of virtual helices
         """
@@ -647,26 +647,25 @@ class NucleicAcidPart(Part):
         return [i for i, j in filter(lambda x: x[1] is not None, enumerate(self._offset_and_size))]
     # end def
 
-    def _setVirtualHelixOriginLimits(self):
+    def _setVirtualHelixOriginLimits(self, limits: RectT = None):
         """Set origin limits by grabbing the max ``x`` and ``y`` values of the
         origins of all virtual helices
         """
-        valid_pts = np.where(self._origin_pts != np.inf)
-        vps = self._origin_pts[valid_pts]
-        vps = vps.reshape((len(vps) // 2, 2))
-        xs = vps[:, 0]
-        ys = vps[:, 1]
-        xLL = np.amin(xs)
-        xUR = np.amax(xs)
-        yLL = np.amin(ys)
-        yUR = np.amax(ys)
-        self.origin_limits = (xLL, yLL, xUR, yUR)
+        if limits is None:
+            valid_pts = np.where(self._origin_pts != np.inf)
+            vps = self._origin_pts[valid_pts]
+            vps = vps.reshape((len(vps) // 3, 3))
+            xs = vps[:, 0]
+            ys = vps[:, 1]
+            xLL = np.amin(xs)
+            xUR = np.amax(xs)
+            yLL = np.amin(ys)
+            yUR = np.amax(ys)
+            self.origin_limits = (xLL, yLL, xUR, yUR)
+        else:
+            assert len(limits) is 4
+            self.origin_limits = limits[0], limits[1], limits[2], limits[3]
     # end def
-
-    def setVirtualHelixOriginLimits(self, limits):
-        # TODO[NF]:  Docstring
-        assert len(limits) is 4
-        self.origin_limits = limits[0], limits[1], limits[2], limits[3]
 
     def getVirtualHelixOriginLimits(self) -> RectT:
         """Returns a pair of coordinates bounding the lower-left and upper-right
@@ -842,7 +841,7 @@ class NucleicAcidPart(Part):
         self._resetOriginCache()
         self._resetPointCache()
         origin_pts = self._origin_pts
-        delta_origin = delta[:2]  # x, y only
+        delta_origin = delta #delta[:2]  # x, y only
         for id_num in id_nums:
             coord_pts, fwd_pts, rev_pts = self.getCoordinates(id_num)
             coord_pts += delta  # use += to modify the view
@@ -1164,7 +1163,7 @@ class NucleicAcidPart(Part):
             number_of_new_elements = math.ceil(diff / DEFAULT_SIZE)*DEFAULT_SIZE
             total_rows = len_origin_pts + number_of_new_elements
             # resize adding zeros
-            self._origin_pts.resize((total_rows, 2))
+            self._origin_pts.resize((total_rows, 3))
             self._origin_pts[len_origin_pts:] = np.inf
 
             self.directions.resize((total_rows, 3))
@@ -1173,7 +1172,7 @@ class NucleicAcidPart(Part):
             self.vh_properties = self.vh_properties.append(_defaultDataFrame(number_of_new_elements),
                                                            ignore_index=True)
 
-        self._origin_pts[id_num] = origin[:2]
+        self._origin_pts[id_num] = origin #origin[:2]
         new_x, new_y = origin[:2]
         xLL, yLL, xUR, yUR = self.origin_limits
         if new_x < xLL:
@@ -1319,7 +1318,7 @@ class NucleicAcidPart(Part):
         Returns:
             tuple: of (:obj:`dict`, :obj:`ndarray`) (properties dictionary
             where each key has a list of values correspoding to the id_number
-            and, (n, 2) array of origins
+            and, (n, 3) array of origins
 
         Raises:
             ValueError:
@@ -1459,7 +1458,7 @@ class NucleicAcidPart(Part):
         Returns:
             tuple of :obj:`float`, x, y coordinates
         """
-        x, y = self.getVirtualHelixOrigin(id_num)
+        x, y, _ = self.getVirtualHelixOrigin(id_num)
         return scale_factor*x, -scale_factor*y
     # end def
 
@@ -1488,7 +1487,7 @@ class NucleicAcidPart(Part):
 
         # make origin 3D
         origin = self._origin_pts[id_num]
-        origin = (origin[0], origin[1], 0.)
+        # origin = (origin[0], origin[1], 0.)
 
         if delta > 0:   # adding points
             if is_right:
@@ -1681,7 +1680,7 @@ class NucleicAcidPart(Part):
             self.total_id_nums -= 1
             self._resetOriginCache()
             offset_and_size[id_num] = None
-            self._origin_pts[id_num, :] = (np.inf, np.inf)  # set off to infinity
+            self._origin_pts[id_num, :] = (np.inf, np.inf, np.inf)  # set off to infinity
             # trim the unused id_nums at the end
             remove_count = 0
             for i in range(current_offset_and_size_length - 1, id_num - 1, -1):
@@ -2721,21 +2720,23 @@ class NucleicAcidPart(Part):
             ``True`` if successful, ``False`` if not
         """
         valid_pts = np.where(self._origin_pts != np.inf)
-        x9, y9 = np.around([x, y], decimals=9)  # round to match decimals
+        x9, y9, z9 = np.around([x, y, z], decimals=9)  # round to match decimals
         vps = np.around(self._origin_pts[valid_pts], decimals=9)
-        if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
+        if [x9, y9, z9] in vps.reshape((len(vps) // 3, 3)).tolist():
             print("vh already present at coords ({}, {})".format(x9, y9))
             # print(util.trace(5))
             return False
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len
-        c = CreateVirtualHelixCommand(self, x, y, z, length,
+        c = CreateVirtualHelixCommand(self,
+                                        x, y, z,
+                                        length,
                                         direction=direction,
-                                      id_num=id_num,
-                                      properties=properties,
-                                      safe=safe,
-                                      parity=parity)
+                                        id_num=id_num,
+                                        properties=properties,
+                                        safe=safe,
+                                        parity=parity)
         util.doCmd(self, c, use_undostack=use_undostack)
         return True
     # end def

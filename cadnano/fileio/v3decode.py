@@ -156,12 +156,24 @@ def decodePart( document: DocT,
 
     vh_id_list = part_dict.get('vh_list')
     vh_props = part_dict.get('virtual_helices')
-    origins = part_dict.get('origins')
+    origins = part_dict.get('origins', [])
     keys = list(vh_props.keys())
 
-    if not is_lattice:
+    if len(origins) == 0:
+        raise ValueError("no virtual_helices found, origins length zero")
+
+    if not is_lattice or len(origins[0]) == 3:
         # TODO add code to deserialize parts
-        pass
+        for id_num, size in vh_id_list:
+            x, y, z = origins[id_num]
+            # z = vh_props['z'][id_num]
+            vh_props['eulerZ'][id_num] = 0.5*(360./10.5)
+            vals = [vh_props[k][id_num] for k in keys]
+            part.createVirtualHelix(x, y, z, size,
+                                    id_num=id_num,
+                                    properties=(keys, vals),
+                                    safe=False,
+                                    use_undostack=False)
     else:
         for id_num, size in vh_id_list:
             x, y = origins[id_num]
@@ -175,8 +187,8 @@ def decodePart( document: DocT,
                                     use_undostack=False)
         # end for
         # zoom to fit
-        if emit_signals:
-            part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
+    if emit_signals:
+        part.partZDimensionsChangedSignal.emit(part, *part.zBoundsIds(), True)
 
     strands = part_dict['strands']
     strand_index_list = strands['indices']

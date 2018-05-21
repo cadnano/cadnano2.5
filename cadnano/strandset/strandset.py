@@ -355,7 +355,7 @@ class StrandSet(CNObject):
             c = CreateStrandCommand(self, base_idx_low, base_idx_high,
                                     color,
                                     update_segments=use_undostack)
-            x, y = part.getVirtualHelixOrigin(self._id_num)
+            x, y, _ = part.getVirtualHelixOrigin(self._id_num)
             d = "%s:(%0.2f,%0.2f).%d^%d" % (self.part().getName(), x, y, self._is_fwd, base_idx_low)
             util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
             return c.strand()
@@ -374,7 +374,7 @@ class StrandSet(CNObject):
         c = CreateStrandCommand(self, base_idx_low, base_idx_high,
                                 color,
                                 update_segments=use_undostack)
-        x, y = self._part.getVirtualHelixOrigin(self._id_num)
+        x, y, _ = self._part.getVirtualHelixOrigin(self._id_num)
         d = "(%0.2f,%0.2f).%d^%d" % (x, y, self._is_fwd, base_idx_low)
         util.execCommandList(self, [c], desc=d, use_undostack=use_undostack)
         return 0

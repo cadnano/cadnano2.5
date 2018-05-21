@@ -28,7 +28,8 @@ from cadnano.cntypes import (
     Vec2T,
     NucleicAcidPartT,
     VirtualHelixT,
-    ABInfoT
+    ABInfoT,
+    Vec3T
 )
 
 from .virtualhelixitem import GridVirtualHelixItem
@@ -640,7 +641,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         tool = self._getActiveTool()
         tool.hideLineItem()
 
-    def getModelPos(self, pos: QPointF) -> Vec2T:
+    def getModelPos(self, pos: QPointF) -> Vec3T:
         """Y-axis is inverted in Qt +y === DOWN
 
         Args:
@@ -651,7 +652,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """
         sf = self.scale_factor
         x, y = pos.x()/sf, -1.0*pos.y()/sf
-        return x, y
+        return x, y, 0.
     # end def
 
     def getVirtualHelixItem(self, id_num: int) -> GridVirtualHelixItem:
@@ -688,7 +689,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
             tool.deactivate()
             return QGraphicsItem.mousePressEvent(self, event)
 
-        part_pt_tuple = self.getModelPos(pt)
+        part_pt_tuple: Vec3T = self.getModelPos(pt)
 
         mod = Qt.MetaModifier
         if not (event.modifiers() & mod):
@@ -739,7 +740,7 @@ class GridNucleicAcidPartItem(QAbstractPartItem):
         """
         tool.setPartItem(self)
         pt = tool.eventToPosition(self, event)
-        part_pt_tuple = self.getModelPos(pt)
+        part_pt_tuple: Vec3T = self.getModelPos(pt)
         part = self._model_part
         if part.isVirtualHelixNearPoint(part_pt_tuple):
             id_num = part.getVirtualHelixAtPoint(part_pt_tuple)
