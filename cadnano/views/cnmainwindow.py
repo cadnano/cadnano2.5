@@ -704,7 +704,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     def actionCopySlot(self):
         select_tool = self.getMouseViewTool('select')
         if select_tool is not None and hasattr(select_tool, 'copySelection'):
-            print("select_tool is rolling")
+            # print("select_tool is rolling")
             select_tool.copySelection()
     # end def
 

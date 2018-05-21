@@ -47,7 +47,6 @@ def encodePart(part: PartT) -> dict:
     group_props = part.getModelProperties().copy()
 
     if not group_props.get('is_lattice', True):
-        # TODO add code to encode Parts with ARBITRARY point configurations
         vh_props, origins = part.helixPropertiesAndOrigins()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
@@ -99,8 +98,9 @@ def reEmitPart(part: PartT):
     group_props = part.getModelProperties().copy()
 
     if not group_props.get('is_lattice', True):
-        # TODO add code to encode Parts with ARBITRARY point configurations
-        pass
+        vh_props, origins = part.helixPropertiesAndOrigins()
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
     else:
         vh_props, origins = part.helixPropertiesAndOrigins()
         group_props['virtual_helices'] = vh_props
@@ -178,8 +178,9 @@ def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> d
     assert('grid_type' in group_props)
 
     if not group_props.get('is_lattice', True):
-        # TODO add code to encode Parts with ARBITRARY point configurations
-        pass
+        vh_props, origins = part.helixPropertiesAndOrigins()
+        group_props['virtual_helices'] = vh_props
+        group_props['origins'] = origins
     else:
         vh_props, origins = part.helixPropertiesAndOrigins(vh_group_list)
         group_props['virtual_helices'] = vh_props
