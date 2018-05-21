@@ -47,13 +47,20 @@ def encodePart(part: PartT) -> dict:
     group_props = part.getModelProperties().copy()
 
     if not group_props.get('is_lattice', True):
-        vh_props, origins = part.helixPropertiesAndOrigins()
+        vh_props, origins, directions = part.helixProperties()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
     else:
-        vh_props, origins = part.helixPropertiesAndOrigins()
+        vh_props, origins, directions = part.helixProperties()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
+
+    # print("ORIGINS")
+    # print(group_props['origins'])
+    # print("DIRECTIONS")
+    # print(group_props['directions'])
 
     xover_list = []
     strand_list = []
@@ -98,13 +105,15 @@ def reEmitPart(part: PartT):
     group_props = part.getModelProperties().copy()
 
     if not group_props.get('is_lattice', True):
-        vh_props, origins = part.helixPropertiesAndOrigins()
+        vh_props, origins, directions = part.helixProperties()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
     else:
-        vh_props, origins = part.helixPropertiesAndOrigins()
+        vh_props, origins, directions = part.helixProperties()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
 
     xover_list = []
     threshold = 2.1*part.radius()
@@ -152,7 +161,8 @@ def reEmitPart(part: PartT):
 # end def
 
 
-def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> dict:
+def encodePartList( part_instance: ObjectInstance,
+                    vh_group_list: List[int]) -> dict:
     """ Used for copying and pasting
     TODO: unify encodePart and encodePartList
 
@@ -178,13 +188,15 @@ def encodePartList(part_instance: ObjectInstance, vh_group_list: List[int]) -> d
     assert('grid_type' in group_props)
 
     if not group_props.get('is_lattice', True):
-        vh_props, origins = part.helixPropertiesAndOrigins()
+        vh_props, origins, directions = part.helixProperties()
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
     else:
-        vh_props, origins = part.helixPropertiesAndOrigins(vh_group_list)
+        vh_props, origins, directions = part.helixProperties(vh_group_list)
         group_props['virtual_helices'] = vh_props
         group_props['origins'] = origins
+        group_props['directions'] = directions
 
     xover_list = []
     strand_list = []

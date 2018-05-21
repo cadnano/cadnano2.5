@@ -1307,8 +1307,8 @@ class NucleicAcidPart(Part):
             return props.item() if isinstance(props, (np.float64, np.int64, np.bool_)) else props
     # end
 
-    def helixPropertiesAndOrigins(self,
-                id_num_list: List[int] = None) -> Tuple[dict, np.ndarray]:
+    def helixProperties(self,
+                id_num_list: List[int] = None) -> Tuple[dict, np.ndarray, np.ndarray]:
         """
         Args:
             id_num_list (list): optional, of :obj:`int` list of virtual
@@ -1324,18 +1324,20 @@ class NucleicAcidPart(Part):
             ValueError:
         """
         if id_num_list is None:
-            lim = max(self._highest_even_id_num_used + 2,
-                      self._highest_odd_id_num_used + 2)
+            lim = max(self._highest_even_id_num_used + 1,
+                      self._highest_odd_id_num_used + 1)
             props = self.vh_properties.iloc[:lim]
             props = props.to_dict(orient='list')
             origins = self._origin_pts[:lim]
-            return props, origins
+            directions = self.directions[:lim]
+            return props, origins, directions
         elif isinstance(id_num_list, list):
             # select by list of indices
             props = self.vh_properties.iloc[id_num_list].reset_index(drop=True)
             props = props.to_dict(orient='list')
             origins = self._origin_pts[id_num_list]
-            return props, origins
+            directions = self.getDirections(id_num_list)
+            return props, origins, directions
         else:
             raise ValueError("id_num_list bad type: {}".format(type(id_num_list)))
     # end def

@@ -18,7 +18,8 @@ from cadnano.proxies.cnenum import (
 )
 from cadnano.objectinstance import ObjectInstance
 from cadnano.cntypes import (
-    DocT
+    DocT,
+    Vec3T
 )
 
 def decode(document: DocT, obj: dict, emit_signals: bool = True):
@@ -134,6 +135,7 @@ def decodePart( document: DocT,
     vh_id_list = part_dict.get('vh_list')
     vh_props = part_dict.get('virtual_helices')
     origins = part_dict.get('origins', [])
+    directions = part_dict.get('directions', [])
     keys = list(vh_props.keys())
 
     if len(origins) == 0:
@@ -142,10 +144,12 @@ def decodePart( document: DocT,
     if not is_lattice or len(origins[0]) == 3:
         for id_num, size in vh_id_list:
             x, y, z = origins[id_num]
+            direction = directions[id_num]
             vh_props['eulerZ'][id_num] = 0.5*(360./10.5)
             vals = [vh_props[k][id_num] for k in keys]
             part.createVirtualHelix(x, y, z, size,
                                     id_num=id_num,
+                                    direction=direction,
                                     properties=(keys, vals),
                                     safe=False,
                                     use_undostack=False)
@@ -272,6 +276,7 @@ def importToPart(   part_instance : ObjectInstance,
         id_num_offset += 1
     vh_id_list = copy_dict['vh_list']
     origins = copy_dict['origins']
+    directions = copy_dict['directions']
     vh_props = copy_dict['virtual_helices']
     name_suffix = ".%d"
 
@@ -289,7 +294,11 @@ def importToPart(   part_instance : ObjectInstance,
 
     for i, pair in enumerate(vh_id_list):
         id_num, size = pair
+
+        ''' using `i` because we could be using a subset of all virtual
+        helices in a part'''
         x, y, z = origins[i]
+        the_dir: Vec3T = directions[i]
 
         if offset is not None:
             x += offx
@@ -318,6 +327,7 @@ def importToPart(   part_instance : ObjectInstance,
 
         did_create = part.createVirtualHelix(x, y, z, size,
                                 id_num=new_id_num,
+                                direction=the_dir,
                                 properties=(fixed_keys, fixed_vals),
                                 safe=use_undostack,
                                 use_undostack=use_undostack)
