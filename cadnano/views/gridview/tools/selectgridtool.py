@@ -145,7 +145,6 @@ class SelectGridTool(AbstractGridTool):
         Args:
             part_item: Description
         """
-        self.group.resetTransform()
         if part_item is not self.part_item:
             if self.slice_graphics_view is not None:
                 # attempt to enforce good housekeeping, not required
@@ -165,6 +164,8 @@ class SelectGridTool(AbstractGridTool):
                 self.group.setParentItem(part_item)
             except RuntimeError:
                 self.group = GridSelectionGroup(self, parent=part_item)
+
+            self.group.resetTransform()
 
             # required for whatever reason to re-enable QGraphicsView.RubberBandDrag
             self.slice_graphics_view.activateSelection(True)

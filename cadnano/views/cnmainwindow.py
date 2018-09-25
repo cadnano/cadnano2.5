@@ -910,7 +910,7 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
             dialogWarning.title.setText("Staple validation failed")
             dialogWarning.message.setText(msg)
             for o in circ_olgs:
-                o.applyColor(styles.stapColors[0])
+                o.applyColor(styles.CADNANO1_COLORS[0])
             dialog.exec_()
             return
 
@@ -941,11 +941,10 @@ class CNMainWindow(QMainWindow, ui_mainwindow.Ui_MainWindow):
     # end def
 
     def actionPathAddSeqSlot(self):
-        pass
-        # print("triggered seqslot")
-        # ap = self._document.activePart()
-        # if ap is not None:
-        #     self._document.activePart().setAbstractSequences(emit_signals=True)
+        # pass
+        ap = self._document.activePart()
+        if ap is not None:
+            self._document.activePart().setAbstractSequences(emit_signals=True)
     # end def
 
     def actionPrefsSlot(self):
