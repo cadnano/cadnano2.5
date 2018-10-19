@@ -109,7 +109,7 @@ def encodeDocument(document):
                    "stapLoop": [],
                    "stap_colors": stap_colors}
         vh_list.append(vh_dict)
-    obj = {"name": name, "vstrands": vh_list}
+    obj = {"name": name, "sequenceOffset": part.getSequenceOffset(), "vstrands": vh_list}
     return obj
 
 

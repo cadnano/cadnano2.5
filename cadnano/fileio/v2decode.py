@@ -293,6 +293,8 @@ def decode(document, obj, emit_signals=False):
             except Exception:
                 print(strand, idx)
                 raise
+    if "sequenceOffset" in obj:
+        part.setSequenceOffset(obj["sequenceOffset"])
 # end def
 
 
