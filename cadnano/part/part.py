@@ -116,7 +116,7 @@ class Part(CNObject):
         Returns:
             int
         """
-       return  self._sequenceOffset
+        return  self._sequenceOffset
     # end def
 
     def setDocument(self, document):
