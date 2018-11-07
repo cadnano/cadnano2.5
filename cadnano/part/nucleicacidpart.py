@@ -328,25 +328,7 @@ class NucleicAcidPart(Part):
         new_vhg._highest_odd_id_num_used = self._highest_odd_id_num_used
         return new_vhg
     # end def
-
-    def setSequenceOffset(self, offset=0):
-        """Set sequence offset
-
-        Args:
-            offset (int)
-        """
-        self._sequenceOffset = offset
-    # end def
-
-    def getSequenceOffset(self):
-        """Set sequence offset
-
-        Returns:
-            int
-        """
-        return self._sequenceOffset
-    # end def
-
+    
     def stepSize(self):
         return self._STEP_SIZE
     # end def
