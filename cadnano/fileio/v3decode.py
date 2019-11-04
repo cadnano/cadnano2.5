@@ -171,11 +171,14 @@ def decodePart(document, part_dict, grid_type, emit_signals=False):
         is_fwd = oligo['is_5p_fwd']
         color = oligo['color']
         sequence = oligo['sequence']
+        name = oligo['name']
         strand5p = part.getStrand(is_fwd, id_num, idx)
         this_oligo = strand5p.oligo()
         # this_oligo.applyColor(color, use_undostack=False)
         if sequence is not None:
             this_oligo.applySequence(sequence, use_undostack=False)
+        if name is not None:
+            this_oligo.setProperty('name', name)
     # end for
 
     # INSERTIONS, SKIPS
