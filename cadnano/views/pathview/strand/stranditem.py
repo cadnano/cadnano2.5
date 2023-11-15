@@ -206,6 +206,10 @@ class StrandItem(QGraphicsLineItem):
         self._updateSequenceText()
     # end def
 
+    def oligoSelectedChangedSlot(self, oligo, new_value):
+        pass
+    # end def
+
     def strandHasNewOligoSlot(self, strand):
         """Slot for changing the `Oligo` of the model `Strand`
 
@@ -539,7 +543,7 @@ class StrandItem(QGraphicsLineItem):
 
         i_items = self.insertionItems()
         for idx, seq_txt in insert_seq_list:
-            if seq_txt != '':
+            if seq_txt not in ['', ' ']:
                 i_items[idx].setSequence(seq_txt)
 
         if isDrawn3to5:

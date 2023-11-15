@@ -38,23 +38,23 @@ def _defaultProperties(id_num, grid_type=GridType.HONEYCOMB):
     props_dict = {'name': "vh%d" % (id_num),
                   'is_visible': True,
                   'color': '#00000000',
-                  'eulerZ': 17,     # For a Cadnano 2.0 design, the ideal offset angle
+                  'eulerZ': 40,     # 17 (2nd set) .For a Cadnano 2.0 design, the ideal offset angle
                   'neighbor_active_angle': 0.0,
                   'neighbors': '[]',
                   'bases_per_repeat': 21,
                   'turns_per_repeat': 2,
                   'repeat_hint': 2,  # used in path view for how many repeats to display PXIs
                   'helical_pitch': 1.,
-                  'minor_groove_angle': 180.,  # 171.),
+                  'minor_groove_angle': 120.,  # 180 (2nd set),
                   'length': -1,
                   'z': 0.0}
 
     if grid_type == GridType.SQUARE:
-        props_dict['eulerZ'] = 170 # For a Cadnano 2.0 design, the ideal offset angle
+        props_dict['eulerZ'] = 193    # 170 (2nd set). For a Cadnano 2.0 design, the ideal offset angle
         props_dict['bases_per_repeat'] = 32
         props_dict['turns_per_repeat'] = 3
 
-    props = [(k,v) for (k,v) in props_dict.items()]
+    props = [(k, v) for (k, v) in props_dict.items()]
 
     return tuple(zip(*props))
 
@@ -73,7 +73,7 @@ def _defaultDataFrame(size, grid_type=GridType.HONEYCOMB):
 
 DEFAULT_SIZE = 256
 DEFAULT_FULL_SIZE = DEFAULT_SIZE * 48
-DEFAULT_RADIUS = 1.125  # nm
+DEFAULT_RADIUS = 1.0  # nm - It was set to 1.25 before
 HONEYCOMB_SUB_STEP_SIZE = 7
 SQUARE_SUB_STEP_SIZE = 8
 
@@ -328,7 +328,7 @@ class NucleicAcidPart(Part):
         new_vhg._highest_odd_id_num_used = self._highest_odd_id_num_used
         return new_vhg
     # end def
-
+    
     def stepSize(self):
         return self._STEP_SIZE
     # end def
@@ -2596,7 +2596,6 @@ class NucleicAcidPart(Part):
         if [x9, y9] in vps.reshape((len(vps) // 2, 2)).tolist():
             print("vh already present at coords ({}, {})".format(x9, y9))
             print(util.trace(5))
-            return
         max_len = self.getProperty('max_vhelix_length')
         if length < max_len:
             length = max_len

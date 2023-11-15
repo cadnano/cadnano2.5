@@ -112,7 +112,7 @@ class GridType:
     HONEYCOMB = 2
 
 
-class SliceViewType:
+class OrthoViewType:
     SLICE = 0
     GRID = 1
     BOTH = 2

@@ -23,6 +23,7 @@ class StrandItemController():
 
     oligoconnections = [
         ('oligoPropertyChangedSignal', 'oligoPropertyChangedSlot'),
+        ('oligoSelectedChangedSignal', 'oligoSelectedChangedSlot'),
         # ('oligoRemovedSignal', 'oligoRemovedSlot'),
         ('oligoSequenceAddedSignal', 'oligoSequenceAddedSlot'),
         ('oligoSequenceClearedSignal', 'oligoSequenceClearedSlot')

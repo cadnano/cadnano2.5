@@ -37,4 +37,10 @@ class OutlineOligoItem(CNOutlinerItem, AbstractOligoItem):
         if self._cn_model == model_oligo:
             self.setValue(key, new_value)
     # end def
+
+    def oligoSelectedChangedSlot(self, model_oligo, new_value):
+        if (self._cn_model == model_oligo and
+            self.isSelected() != new_value):
+            self.setSelected(new_value)
+    # end def
 # end class

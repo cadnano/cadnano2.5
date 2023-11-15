@@ -70,3 +70,7 @@ class AbstractStrandItem(object):
     def oligoSequenceClearedSlot(self, oligo):
         pass
     # end def
+
+    def oligoSelectedChangedSlot(self, oligo, new_value):
+        pass
+    # end def

@@ -334,6 +334,20 @@ class CustomQGraphicsView(QGraphicsView):
             self.zoomIn(0.03)
         elif event.key() == Qt.Key_Escape:
             QGraphicsView.keyPressEvent(self, event)
+        elif event.key() in [Qt.Key_0,  # Insertions
+                             Qt.Key_1,
+                             Qt.Key_2,
+                             Qt.Key_3,
+                             Qt.Key_4,
+                             Qt.Key_5,
+                             Qt.Key_6,
+                             Qt.Key_7,
+                             Qt.Key_8,
+                             Qt.Key_9,
+                             Qt.Key_Backspace,
+                             Qt.Key_Enter,
+                             Qt.Key_Return]:
+            QGraphicsView.keyPressEvent(self, event)
         else:
             if hasattr(self.scene_root_item, KEY_PRESS_EVENT):
                 getattr(self.scene_root_item, KEY_PRESS_EVENT)(event)

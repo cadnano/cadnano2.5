@@ -1,27 +1,29 @@
 # -*- coding: utf-8 -*-
-from cadnano.proxies.cnenum import LatticeType
-from cadnano.fileio.lattice import HoneycombDnaPart
+from cadnano.proxies.cnenum import GridType
+from cadnano.fileio.lattice import HoneycombDnaPart, SquareDnaPart
 
 FORMAT_VERSION = "2.0"
 ROW_OFFSET = 0
 COL_OFFSET = 0
 # DEFAULT_ROWS = 30
 # DEFAULT_COLS = 32
-lattice_type = LatticeType.HONEYCOMB
-positionToLatticeCoord = HoneycombDnaPart.positionToLatticeCoordRound
 
 
 def encodeDocument(document):
 
+    grid_type = document.getGridType()
+
+    if grid_type is GridType.HONEYCOMB or grid_type is None:
+        grid_type = GridType.HONEYCOMB
+        positionToLatticeCoord = HoneycombDnaPart.positionQtToLatticeCoord
+        positionToLatticeCoordRound = HoneycombDnaPart.positionToLatticeCoordRound
+    else:
+        grid_type = GridType.SQUARE
+        positionToLatticeCoord = SquareDnaPart.positionQtToLatticeCoord
+        positionToLatticeCoordRound = SquareDnaPart.positionToLatticeCoordRound
+
     part = next(document.getParts())
     radius = part.radius()
-
-    # Determine offset to approximately center the shape
-    xLL, yLL, xUR, yUR = part.getVirtualHelixOriginLimits()
-    rowLL, colLL = positionToLatticeCoord(radius, xLL, yLL, False, False)
-    rowUR, colUR = positionToLatticeCoord(radius, xUR, yUR, True, True)
-    row_range = [i for i in range(rowUR+ROW_OFFSET, rowLL-1, -1)]
-    col_range = [i for i in range(colLL-COL_OFFSET, colUR+1)]
 
     # Attempt to shift the design to the center of the lattice
     # height = abs(rowLL-rowUR)
@@ -37,7 +39,27 @@ def encodeDocument(document):
     name = "legacy-export-cn25"
     max_base_idx = max([part.maxBaseIdx(id_num) for id_num in vh_order])
 
-    print("Translating vh:(row,col) to legacy coordinates...")
+    # print("Translating vh:(row,col) to legacy coordinates...")
+
+    min_row = float('inf')
+    min_col = float('inf')
+
+    # Iterate over VHs to determine which one should be at the lattice
+    # coordinates (0, 0)
+    for id_num in vh_order:
+        vh_x, vh_y = part.getVirtualHelixOrigin(id_num)
+        row, col = positionToLatticeCoord(radius, vh_x, vh_y)
+
+        min_row = min(row, min_row)
+        min_col = min(col, min_col)
+
+    row_offset = abs(min_row)
+    col_offset = abs(min_col)
+
+    if row_offset % 2 != 0:
+        row_offset += 1
+    if col_offset % 2 != 0:
+        col_offset += 1
 
     # Iterate through virtualhelix list
     vh_list = []
@@ -68,10 +90,12 @@ def encodeDocument(document):
 
         # Convert x,y coordinates to new (row, col)
         vh_x, vh_y = part.getVirtualHelixOrigin(id_num)
-        row, col = positionToLatticeCoord(radius, vh_x, vh_y, False, False)
-        new_row = row_range.index(row)
-        new_col = col_range.index(col)
-        print("{0:>2}: ({1:>2},{2:>2}) -> ({3:>2},{4:>2})".format(id_num, row, col, new_row, new_col))
+        row, col = positionToLatticeCoord(radius, vh_x, vh_y)
+
+        new_row = row + row_offset
+        new_col = col + col_offset
+
+        # print("{0:>2}: ({1:>2},{2:>2}) -> ({3:>2},{4:>2})".format(id_num, row, col, new_row, new_col))
 
         # Put everything together in a new dict
         vh_dict = {"row": new_row,
@@ -85,7 +109,7 @@ def encodeDocument(document):
                    "stapLoop": [],
                    "stap_colors": stap_colors}
         vh_list.append(vh_dict)
-    obj = {"name": name, "vstrands": vh_list}
+    obj = {"name": name, "sequenceOffset": part.getSequenceOffset(), "vstrands": vh_list}
     return obj
 
 

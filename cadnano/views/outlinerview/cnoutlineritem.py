@@ -9,9 +9,12 @@ VISIBLE_COL = 2
 COLOR_COL = 3
 
 
-LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEnabled |
-              Qt.ItemIsDragEnabled | Qt.ItemIsEditable |
-              Qt.ItemIsUserCheckable)
+LEAF_FLAGS = (Qt.ItemIsSelectable | Qt.ItemIsEditable |
+              Qt.ItemIsDragEnabled |
+              Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)        # 55 + 8 = 63
+DISABLE_FLAGS = Qt.NoItemFlags                                  # 0
+ROOT_FLAGS =  ( Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled |
+                Qt.ItemIsUserCheckable | Qt.ItemIsEnabled )     # 60
 
 
 class CNOutlinerItem(QTreeWidgetItem):
@@ -24,10 +27,10 @@ class CNOutlinerItem(QTreeWidgetItem):
         self._cn_model = cn_model
         name = cn_model.getName()
         color = cn_model.getColor()
-        self.setData(NAME_COL, Qt.EditRole, name)
-        self.setData(LOCKED_COL, Qt.EditRole, False)  # is_visible
-        self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
-        self.setData(COLOR_COL, Qt.EditRole, color)
+        self.setData(NAME_COL,      Qt.EditRole, name)
+        self.setData(LOCKED_COL,    Qt.EditRole, False)  # is_visible
+        self.setData(VISIBLE_COL,   Qt.EditRole, True)  # is_visible
+        self.setData(COLOR_COL,     Qt.EditRole, color)
     # end def
 
     ### PRIVATE SUPPORT METHODS ###
@@ -77,6 +80,7 @@ class CNOutlinerItem(QTreeWidgetItem):
         if key == 'name':
             name = self.data(NAME_COL, Qt.DisplayRole)
             if name != value:
+                # print("setting name", self.isSelected())
                 self.setData(NAME_COL, Qt.EditRole, value)
         elif key == 'color':
             color = self.data(COLOR_COL, Qt.DisplayRole)
@@ -118,7 +122,8 @@ class RootPartItem(QTreeWidgetItem):
         self.setData(LOCKED_COL, Qt.EditRole, False)  # is_locked
         self.setData(VISIBLE_COL, Qt.EditRole, True)  # is_visible
         self.setData(COLOR_COL, Qt.EditRole, "#ffffff")  # color
-        self.setFlags(self.flags() & ~Qt.ItemIsSelectable)
+        # self.setFlags(self.flags() & ~Qt.ItemIsSelectable)
+        self.setFlags(ROOT_FLAGS)
         self.setExpanded(True)
     # end def
 
